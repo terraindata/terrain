@@ -7,7 +7,8 @@ variables:
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
 cache:
   paths:
-  - node_modules/
+  - node_modules
+  - .cache-loader
 
 before_script:
   - yarn
@@ -16,6 +17,8 @@ stages:
   - lint
   - style
   - test
+  - build
+  - deploy
 
 lint:
   script:
@@ -38,16 +41,33 @@ test-backend:
     paths:
       - coverage
 
-test-frontend:
+build-frontend:
   script:
    - yarn run build
-  stage: test
+  stage: build
   when: always
 
-test-frontend-prod:
+build-frontend-prod:
   script:
    - yarn run build-prod
   only:
    - master
-  stage: test
+  stage: build
+
+deploy:
+  script:
+   - MIDWAY_HOST=pa-terraformer01.terrain.int:33000 yarn run build-prod
+   - rsync -a --stats ../Search /opt --exclude '*.db' --exclude '.git'
+   - fuser -k -n tcp 33000 || true
+   - cd /opt/Search && NODE_ENV=production yarn start -- --port 33000 &
+  only:
+   - master
+  stage: deploy
+  tags:
+    - shell
+    - deploy
+  when: manual
+  environment:
+    name: production
+    url: http://pa-terraformer01.terrain.int:3000
 

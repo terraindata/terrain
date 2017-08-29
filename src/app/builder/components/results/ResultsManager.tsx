@@ -57,12 +57,13 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
+import Actions from '../../../fileImport/data/FileImportActions';
+import * as FileImportTypes from '../../../fileImport/FileImportTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-
 import { _Result, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
 
 export interface Props
@@ -165,7 +166,10 @@ export class ResultsManager extends TerrainComponent<Props>
     this.mapQueries(
       (query) =>
       {
-        AjaxM1.killQuery(query.queryId);
+        if (this.props.db.source === 'm1')
+        {
+          AjaxM1.killQuery(query.queryId);
+        }
         query.xhr.abort();
       },
     );
@@ -173,14 +177,16 @@ export class ResultsManager extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (
-      nextProps.query
-      && nextProps.query.tql
-      && (!this.props.query ||
-        (
-          this.props.query.tql !== nextProps.query.tql ||
-          this.props.query.cards !== nextProps.query.cards ||
-          this.props.query.inputs !== nextProps.query.inputs
+    if (this.props.db !== nextProps.db ||
+      (
+        nextProps.query
+        && nextProps.query.tql
+        && (!this.props.query ||
+          (
+            this.props.query.tql !== nextProps.query.tql ||
+            this.props.query.cards !== nextProps.query.cards ||
+            this.props.query.inputs !== nextProps.query.inputs
+          )
         )
       )
     )
@@ -277,13 +283,19 @@ export class ResultsManager extends TerrainComponent<Props>
     // );
   }
 
-  public changeResults(changes: { [key: string]: any })
+  public changeResults(changes: { [key: string]: any }, exportChanges?: { [key: string]: any })
   {
     let { resultsState } = this.props;
     _.map(changes,
       (value: any, key: string) =>
         resultsState = resultsState.set(key, value),
     );
+
+    if (exportChanges)
+    {
+      const { filetype, preview, originalNames } = exportChanges;
+      Actions.chooseFile(filetype, preview, originalNames);
+    }
 
     this.props.onResultsStateChange(resultsState);
   }
@@ -508,7 +520,17 @@ export class ResultsManager extends TerrainComponent<Props>
       changes['count'] = results.size;
     }
 
-    this.changeResults(changes);
+    const filteredFields = List(_.filter(fields.toArray(), (val) => !(val.charAt(0) === '_')));
+    const exportChanges: any = {
+      filetype: 'csv',
+      originalNames: filteredFields,
+      preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
+        filteredFields.map((field, index) =>
+          result.fields.get(String(field)),
+        ),
+      )),
+    };
+    this.changeResults(changes, exportChanges);
   }
 
   private handleM1QueryResponse(response: M1QueryResponse, isAllFields: boolean)

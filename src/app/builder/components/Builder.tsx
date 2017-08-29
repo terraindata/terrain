@@ -59,10 +59,13 @@ import { withRouter } from 'react-router';
 // Data
 import { ItemStatus } from '../../../items/types/Item';
 import Query from '../../../items/types/Query';
+import FileImportStore from '../../fileImport/data/FileImportStore';
+import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import LibraryActions from '../../library/data/LibraryActions';
 import { LibraryStore } from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesStore from '../../roles/data/RolesStore';
+import TerrainStore from '../../store/TerrainStore';
 import UserStore from '../../users/data/UserStore';
 import Util from './../../util/Util';
 import Actions from './../data/BuilderActions';
@@ -70,10 +73,11 @@ import { BuilderState, BuilderStore } from './../data/BuilderStore';
 type Variant = LibraryTypes.Variant;
 
 // Components
-
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { backgroundColor, Colors } from '../../common/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
+import FileImportPreviewColumn from '../../fileImport/components/FileImportPreviewColumn';
 import { notificationManager } from './../../common/components/InAppNotification';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import BuilderColumn from './BuilderColumn';
@@ -99,6 +103,7 @@ export interface Props
 class Builder extends TerrainComponent<Props>
 {
   public state: {
+    exportState: FileImportTypes.FileImportState,
     builderState: BuilderState,
     variants: IMMap<ID, Variant>,
 
@@ -121,6 +126,7 @@ class Builder extends TerrainComponent<Props>
     savingAs?: boolean;
 
   } = {
+    exportState: FileImportStore.getState(),
     builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
 
@@ -170,6 +176,10 @@ class Builder extends TerrainComponent<Props>
     this._subscribe(LibraryStore, {
       stateKey: 'variants',
       storeKeyPath: ['variants'],
+    });
+
+    this._subscribe(FileImportStore, {
+      stateKey: 'exportState',
     });
 
     let colKeys: List<number>;
@@ -542,7 +552,7 @@ class Builder extends TerrainComponent<Props>
     });
 
     // TODO remove if queries/variants model changes
-    LibraryActions.variants.change(variant);
+    TerrainStore.dispatch(LibraryActions.variants.change(variant));
     this.onSaveSuccess(variant);
     Actions.save(); // register that we are saving
 
@@ -625,6 +635,7 @@ class Builder extends TerrainComponent<Props>
       content: query && <BuilderColumn
         query={query}
         resultsState={this.state.builderState.resultsState}
+        exportState={this.state.exportState}
         index={index}
         colKey={key}
         variant={variant}
@@ -765,13 +776,15 @@ class Builder extends TerrainComponent<Props>
           <div className='builder-white-space' />
           {
             this.canEdit() &&
-            <div
-              className='button builder-revert-button'
-              onClick={this.revertVersion}
-              data-tip="Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history."
-            >
-              Revert to this version
-              </div>
+            tooltip(
+              <div
+                className='button builder-revert-button'
+                onClick={this.revertVersion}
+              >
+                Revert to this version
+              </div>,
+              "Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history.",
+            )
           }
         </div>
       );

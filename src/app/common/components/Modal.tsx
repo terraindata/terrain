@@ -79,6 +79,7 @@ export interface Props
   textboxPlaceholderValue?: string;
   onTextboxValueChange?: (newValue: string) => void;
   allowOverflow?: boolean;
+  closeOnConfirm?: boolean;
 }
 
 @Radium
@@ -86,6 +87,11 @@ class Modal extends TerrainComponent<Props>
 {
   public closeModalSuccess()
   {
+    if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
+    {
+      this.props.onConfirm ? this.props.onConfirm() : null;
+      return;
+    }
     this.props.onClose();
     this.props.onConfirm ? this.props.onConfirm() : null;
   }

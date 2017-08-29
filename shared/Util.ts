@@ -50,62 +50,97 @@ const BAD_DELIMITERS =
   [
     '\r',
     '\n',
+    '\r\n',
     '"',
   ];
 
 const VALID_NEWLINE_SEQUENCES =
   [
     '\n',
-    '\r',
+    '\r\n',
   ];
 
 export interface ParseCSVConfig
 {
   /* The delimiting character. Must be string of length 1. */
-  delimiter: string;
+  delimiter?: string;
 
-  /* The newLine sequence. Must be one of \r or \n. */
-  newLine: string;
+  /* The newLine sequence. Must be one of \n or \r\n. */
+  newLine?: string;
 
   /* The character used to quote fields. */
-  quoteChar: string;
+  quoteChar?: string;
 
   /* The character used to escape characters inside quoted fields. */
-  escapeChar: string;
+  escapeChar?: string;
 
   /* The string that indicates a comment (e.g., "#" or "//"). When parser encounters a line starting with this string,
      it will skip the line. */
-  comments: string;
+  comments?: string;
 
   /* If > 0, only that many rows will be parsed. */
-  preview: number;
+  preview?: number;
 
   /* if true, the first row of parsed data will be interpreted as field names. Warning: Duplicate field names will
      overwrite values in previous fields having the same name */
-  hasHeaderRow: boolean;
+  hasHeaderRow?: boolean;
 
   /* callback to execute if parser encounters an error. */
-  error: (err: any) => void;
+  error?: (err: string) => void;
 }
 
 export function parseCSV(file, config: ParseCSVConfig)
 {
-  const delim = config.delimiter;
-  const newLine = config.newLine;
-  const quoteChar = config.quoteChar;
-  const escapeChar = config.escapeChar;
-  const comments = config.comments;
-  const hasHeaderRow = config.hasHeaderRow;
+  const delim = config.delimiter || ',';
+  const quoteChar = config.quoteChar || '\"';
+  const escapeChar = config.escapeChar || '\"';
+  const comments = config.comments || '#';
+  const hasHeaderRow = config.hasHeaderRow === undefined ? true : config.hasHeaderRow;
   let preview = config.preview;
+
+  // autodetect newLine
+  let newLine;
+  const rnIndex = file.indexOf('\r\n');
+  const nIndex = file.indexOf('\n');
+  if (rnIndex === -1 && nIndex === -1)
+  {
+    config.error('Error: no newLine sequence found. Valid newLine sequences are ' + String(VALID_NEWLINE_SEQUENCES));
+    return undefined;
+  }
+  if (rnIndex === -1)
+  {
+    newLine = '\n';
+  }
+  else if (nIndex === -1)
+  {
+    newLine = '\r\n';
+  }
+  else
+  {
+    newLine = rnIndex < nIndex ? '\r\n' : '\n';
+  }
+
+  const newLineLength = newLine.length;
+  const commentsLength = comments.length;
 
   if (BAD_DELIMITERS.indexOf(delim) !== -1)
   {
     config.error('Error: invalid delimiter ' + delim + '. Invalid delimiters are ' + String(BAD_DELIMITERS));
     return undefined;
   }
-  if (VALID_NEWLINE_SEQUENCES.indexOf(newLine) === -1)
+  if (delim.length !== 1)
   {
-    config.error('Error: invalid newLine sequence ' + newLine + '. Valid newLine sequences are ' + String(VALID_NEWLINE_SEQUENCES));
+    config.error('Error: delim character must be length 1');
+    return undefined;
+  }
+  if (quoteChar.length !== 1)
+  {
+    config.error('Error: quoteChar character must be length 1');
+    return undefined;
+  }
+  if (escapeChar.length !== 1)
+  {
+    config.error('Error: escape character must be length 1');
     return undefined;
   }
   if (comments === delim)
@@ -113,7 +148,7 @@ export function parseCSV(file, config: ParseCSVConfig)
     config.error('Error: comment character same as delimiter');
     return undefined;
   }
-  if (file[0] === newLine)
+  if (file.substr(0, newLineLength) === newLine)
   {
     config.error('Error: first line of file cannot be empty');
     return undefined;
@@ -140,7 +175,7 @@ export function parseCSV(file, config: ParseCSVConfig)
     arr[row] = arr[row] || [];             // create a new row if necessary
     arr[row][col] = arr[row][col] || '';   // create a new column (start with empty string) if necessary
 
-    if (rowStart && comments && file.substr(c, comments.length) === comments)
+    if (rowStart && comments && file.substr(c, commentsLength) === comments)
     {
       c = Number(file.indexOf(newLine, c));
       if (c === -1) // EOF
@@ -148,6 +183,7 @@ export function parseCSV(file, config: ParseCSVConfig)
         arr.pop();
         c = file.length;
       }
+      c += newLineLength - 1; // account for loop increment
       continue;
     }
     rowStart = false;
@@ -168,9 +204,9 @@ export function parseCSV(file, config: ParseCSVConfig)
       col++;
       continue;
     }
-    if (curChar === newLine && !insideQuote)
+    if (file.substr(c, newLineLength) === newLine && !insideQuote)
     {
-      if (arr[row].length === newLine.length) // increment preview on blank rows and remove them later
+      if (arr[row].length === newLineLength) // increment preview on blank rows and remove them later
       {
         preview++;
       }
@@ -186,6 +222,7 @@ export function parseCSV(file, config: ParseCSVConfig)
       row++;
       col = 0;
       rowStart = true;
+      c += newLineLength - 1; // account for loop increment
       continue;
     }
     arr[row][col] += curChar;
@@ -201,7 +238,7 @@ export function parseCSV(file, config: ParseCSVConfig)
   }
 
   arr = arr.filter((arrRow) =>
-    arrRow.length > newLine.length,
+    arrRow.length > newLineLength,
   );
 
   if (hasHeaderRow)
@@ -256,4 +293,52 @@ export function parseJSONSubset(file: string, numLines: number): object[]
     }
   }
   return JSON.parse(file.substring(0, c) + ']');
+}
+
+export function parseNewlineJSON(file: string, numLines: number): object[] | string
+{
+  const items: object[] = [];
+  let ind: number = 0;
+  while (ind < file.length)
+  {
+    let rInd: number = file.indexOf('\r', ind);
+    rInd = rInd === -1 ? file.length : rInd;
+    let nInd: number = file.indexOf('\n', ind);
+    nInd = nInd === -1 ? file.length : nInd;
+    const end: number = Math.min(rInd, nInd);
+
+    const line: string = file.substring(ind, end);
+    if (line !== '')
+    {
+      try
+      {
+        items.push(JSON.parse(file.substring(ind, end)));
+        if (items.length === numLines)
+        {
+          return items;
+        }
+      }
+      catch (e)
+      {
+        return 'JSON format incorrect. Could not parse object: ' + line;
+      }
+      ind = end;
+    }
+    else
+    {
+      ind++;
+    }
+  }
+  return items;
+}
+
+// full template name is of the form - 'id: name'
+export function getTemplateName(template: string): string
+{
+  return template.substring(template.indexOf(':') + 2);
+}
+
+export function getTemplateId(template: string): number
+{
+  return Number(template.substring(0, template.indexOf(':')));
 }

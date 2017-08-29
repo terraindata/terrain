@@ -109,7 +109,7 @@ MidwayRouter.get('/assets/bundle.js', async (ctx, next) =>
 {
   if (process.env.NODE_ENV === 'production')
   {
-    await send(ctx, '/src/assets/bundle.js');
+    await send(ctx, '/midway/src/assets/bundle.js');
   }
   else
   {

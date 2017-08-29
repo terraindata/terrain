@@ -84,6 +84,11 @@ export const CleanLibraryActionTypes = // not dirty
   [
     LibraryActionTypes.loadState,
     LibraryActionTypes.setDbs,
+    LibraryActionTypes.variants.fetchVersion,
+    LibraryActionTypes.variants.loadVersion,
+    LibraryActionTypes.variants.select,
+    LibraryActionTypes.variants.unselect,
+    LibraryActionTypes.variants.unselectAll,
   ];
 
 export default LibraryActionTypes;

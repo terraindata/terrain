@@ -53,7 +53,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
-import { altStyle, Colors } from '../../common/Colors';
+import { altStyle, backgroundColor, Colors, fontColor } from '../../common/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Dropdown.less';
@@ -72,6 +72,7 @@ export interface Props
   textColor?: string | ((index: number) => string);
   width?: string;
   directionBias?: number; // bias for determining whether or not dropdown opens up or down
+  unmountOnChange?: boolean;
 }
 
 @Radium
@@ -89,6 +90,11 @@ class Dropdown extends TerrainComponent<Props>
         open: false,
         focusedIndex: -1,
       };
+  }
+
+  public componentWillUnmount()
+  {
+    $('body').unbind('click', this.close);
   }
 
   public clickHandler(index)
@@ -109,6 +115,7 @@ class Dropdown extends TerrainComponent<Props>
           });
         }
       };
+      $('body').click(this.close);
     }
 
     return this._clickHandlers[index];
@@ -129,6 +136,12 @@ class Dropdown extends TerrainComponent<Props>
     }
 
     return undefined;
+  }
+
+  public onMouseDown(event)
+  {
+    event.stopPropagation();
+    $('body').unbind('click', this.close);
   }
 
   public renderOption(option, index)
@@ -173,6 +186,7 @@ class Dropdown extends TerrainComponent<Props>
           'dropdown-option-focused': focused,
         })}
         key={index}
+        onMouseDown={this.onMouseDown}
         onClick={this.clickHandler(index)}
         style={style}
       >
@@ -190,7 +204,7 @@ class Dropdown extends TerrainComponent<Props>
     this.setState({
       open: false,
     });
-    $(document).off('click', this.close);
+    $('body').unbind('click', this.close);
   }
 
   public toggleOpen()
@@ -202,7 +216,7 @@ class Dropdown extends TerrainComponent<Props>
 
     if (!this.state.open)
     {
-      $(document).on('click', this.close);
+      $('body').click(this.close);
     }
 
     const cr = this.refs['value']['getBoundingClientRect']();
@@ -273,6 +287,21 @@ class Dropdown extends TerrainComponent<Props>
     const { selectedIndex, textColor, options } = this.props;
     const customColor = this.colorForOption(selectedIndex);
 
+    const dropdownValueStyle = [
+      this.props.canEdit ?
+        backgroundColor(
+          !this.state.open ? Colors().inputBg : customColor || Colors().active,
+          customColor || Colors().inactiveHover
+        )
+        :
+        backgroundColor(Colors().darkerHighlight)
+      ,
+      fontColor(
+        !this.state.open ? customColor || Colors().text1 : Colors().text1,
+        this.props.canEdit ? Colors().text1 : undefined,
+      )
+    ];
+
     return (
       <div
         onClick={this.toggleOpen}
@@ -294,18 +323,10 @@ class Dropdown extends TerrainComponent<Props>
         <div
           className='dropdown-value'
           ref='value'
-          style={{
-            'width': this.props.width,
-            'backgroundColor': !this.state.open ? Colors().inputBg :
-              customColor || Colors().active,
-            'color': !this.state.open ? customColor || Colors().text1
-              : Colors().text1,
-
-            ':hover': {
-              backgroundColor: customColor || Colors().inactiveHover,
-              color: Colors().text1,
-            },
-          }}
+          style={[
+            { width: this.props.width },
+            ...dropdownValueStyle
+          ]}
           key='dropdown-value'
         >
           {

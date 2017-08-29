@@ -295,12 +295,14 @@
     width: 18px;
     height: 18px;
     border-radius: 18px;
-    background: #fff;
+   // background: #fff;
+    border-width: 1px;
+    border-style: solid;
     margin-top: 3px;
 
     svg {
       width: 12px;
-      fill: #8ac541;
+      //fill: #8ac541;
       .dead-center;
     }
 
@@ -550,7 +552,7 @@
   color: #fff;
   .transition;
 
-  &:hover, &[value=""] {
+  &:hover:not(.ac-input-disabled), &[value=""] {
     background: rgba(0,0,0,0.25) !important;
   }
 

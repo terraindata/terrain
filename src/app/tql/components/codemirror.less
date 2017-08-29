@@ -156,6 +156,37 @@
 .cm-s-default .cm-error::selection {background: #b3b3ff}
 .cm-invalidchar {color: #f00;}
 
+.CodeMirror-lint-tooltip {
+  overflow: hidden;
+  max-height:200pt;
+  background-color: #ffd;
+  border: 1px solid black;
+  border-radius: 4px 4px 4px 4px;
+  color: black;
+  font-family: monospace;
+  font-size: 10pt;
+  padding: 2px 5px;
+  position: fixed;
+  white-space: pre;
+  white-space: pre-wrap;
+  z-index: 999999999;
+  max-width: 100%;
+  opacity: 0;
+  transition: opacity .4s;
+  -moz-transition: opacity .4s;
+  -webkit-transition: opacity .4s;
+  -o-transition: opacity .4s;
+  -ms-transition: opacity .4s;
+}
+
+.CodeMirror-lint-message-error, .CodeMirror-lint-message-warning {
+  overflow: scroll;
+  max-height: 200pt;
+  padding-left: 18px;
+  background-position: top left;
+  background-repeat: no-repeat;
+}
+
 .CodeMirror-composing { border-bottom: 2px solid; }
 
 /* Default styles for common addons */

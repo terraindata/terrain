@@ -104,6 +104,8 @@ export interface Props
   connectDragSource?: (el: El) => El;
 
   display?: Display;
+
+  handleCardDrop?: (type: string) => any;
 }
 
 @Radium
@@ -365,7 +367,7 @@ class _CardComponent extends TerrainComponent<Props>
     };
 
     const card = BlockUtils.recordFromJS(
-      BlockUtils.cardsForServer(removeId(this.props.card)).toJS(),
+      BlockUtils.cardsForServer(removeId(this.props.card)),
       AllBackendsMap[this.props.card.static.language].blocks,
     );
 
@@ -483,6 +485,7 @@ class _CardComponent extends TerrainComponent<Props>
             onClose={this.handleCardToolClose}
             accepts={this.props.display && this.props.display.accepts}
             language={this.props.card.static.language}
+            handleCardDrop={this.props.handleCardDrop}
           />
         </div>
       );
@@ -500,6 +503,7 @@ class _CardComponent extends TerrainComponent<Props>
         color: this.props.card.static.colors[0],
         backgroundColor: this.state.hovering ? Colors().bg1 : undefined,
       }}
+      handleCardDrop={this.props.handleCardDrop}
     />;
 
     const { card } = this.props;
@@ -535,6 +539,7 @@ class _CardComponent extends TerrainComponent<Props>
           wrapType={this.props.card.type}
           singleChild={this.props.singleChild || this.props.singleCard}
           language={card.static.language}
+          handleCardDrop={this.props.handleCardDrop}
         />
         <div
           className={classNames({
@@ -630,6 +635,7 @@ class _CardComponent extends TerrainComponent<Props>
           wrapType={this.props.card.type}
           singleChild={this.props.singleChild || this.props.singleCard}
           language={card.static.language}
+          handleCardDrop={this.props.handleCardDrop}
         />
       </div>
     );

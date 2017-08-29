@@ -84,6 +84,7 @@ export interface Props
   date: string;
   onChange: (newDate: string) => void;
   canEdit: boolean;
+  language: string;
 }
 
 class DatePicker extends TerrainComponent<Props>
@@ -107,7 +108,7 @@ class DatePicker extends TerrainComponent<Props>
     date.setDate(day.getDate());
     date.setMonth(day.getMonth());
     date.setFullYear(day.getFullYear());
-    this.props.onChange(Util.formatInputDate(date));
+    this.props.onChange(Util.formatInputDate(date, this.props.language));
   }
 
   public handleHourChange(hourIndex)
@@ -115,7 +116,7 @@ class DatePicker extends TerrainComponent<Props>
     const date = this.getDate();
     date.setHours(Math.floor(hourIndex / MINUTE_RATIO));
     date.setMinutes((hourIndex % MINUTE_RATIO) * MINUTE_INTERVAL);
-    this.props.onChange(Util.formatInputDate(date));
+    this.props.onChange(Util.formatInputDate(date, this.props.language));
   }
 
   public dateToHourIndex(date)

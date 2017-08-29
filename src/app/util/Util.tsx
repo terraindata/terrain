@@ -270,8 +270,14 @@ const Util = {
   },
 
   // for SQL
-  formatInputDate(date: Date): string
+  formatInputDate(date: Date, language: string = 'elastic'): string
   {
+    if (language === 'elastic')
+    {
+      const day = moment(date).format('YYYY-MM-DD');
+      const time = moment(date).format('HH:mm:ssZ');
+      return day + 'T' + time;
+    }
     return moment(date).format('YYYY-MM-DD HH:mm:ss');
   },
 

@@ -73,6 +73,8 @@ export interface Props
   variant: Variant;
 }
 
+const MAX_RENDERED_VARIANTS = 100;
+
 @Radium
 class VariantVersions extends TerrainComponent<Props>
 {
@@ -214,7 +216,7 @@ class VariantVersions extends TerrainComponent<Props>
             :
             <div className='versions-table'>
               {
-                this.state.versions.map(this.renderVersion)
+                this.state.versions.slice(0, MAX_RENDERED_VARIANTS).map(this.renderVersion)
               }
             </div>
         }

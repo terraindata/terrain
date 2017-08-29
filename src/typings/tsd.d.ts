@@ -123,7 +123,6 @@ declare interface IName
 
 // these are build time substitions done by Webpack
 declare const DEV: boolean;
-declare const OLD_MIDWAY_HOST: string;
 declare const MIDWAY_HOST: string;
 
 declare const escape: (s: string) => string;
