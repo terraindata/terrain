@@ -58,7 +58,7 @@ deploy:
   script:
    - MIDWAY_HOST=pa-terraformer01.terrain.int:3000 yarn run build-prod
    - rsync -a --stats ../Search /opt --exclude '*.db' --exclude '.git' && cd /opt/Search && killall yarn nodemon
-   - NODE_ENV=production yarn start &
+   - NODE_ENV=production yarn start -- --port 33000 &
   only:
    - master
   stage: deploy
