@@ -250,6 +250,15 @@ export const STEP_SUBTEXT =
     TABLE_SUBTEXT: 'Use the field above to either choose an existing table or name a new one that will be created',
   };
 
+export const TRANSFORM_TEXT =
+  {
+    DUPLICATE: 'Duplicate this column and its contents',
+    APPEND: 'Append a string to this column\'s contents',
+    PREPEND: 'Prepend a string to this column\'s contents',
+    SPLIT: 'Split this column into two by a given shared string. If the string is not found, the second column will be empty',
+    MERGE: 'Merge this column\'s contents with that of another with the option of choosing a merge string between them',
+  };
+
 export const enum Steps
 {
   ChooseFile,

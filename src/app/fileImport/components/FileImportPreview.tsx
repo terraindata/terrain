@@ -61,6 +61,7 @@ import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
 import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import { tooltip } from './../../common/components/tooltip/Tooltips';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
@@ -484,6 +485,16 @@ class FileImportPreview extends TerrainComponent<Props>
                 key={pkey}
                 className='flex-shrink flex-container fi-preview-pkeys-wrapper'
               >
+                {
+                  index === 0 &&
+                  <div
+                    style={{
+                      text: Colors().text1,
+                    }}
+                  >
+                    Primary key(s):
+                  </div>
+                }
                 <div
                   className='flex-shrink fi-preview-pkeys-pkey'
                   style={{
@@ -519,13 +530,16 @@ class FileImportPreview extends TerrainComponent<Props>
                           onBlur={this.onDelimChange}
                         />
                         :
-                        <span
-                          className='clickable'
-                        >
-                          {
-                            this.props.primaryKeyDelimiter
-                          }
-                        </span>
+                        tooltip(
+                          <span
+                            className='clickable'
+                          >
+                            {
+                              this.props.primaryKeyDelimiter
+                            }
+                          </span>,
+                          'Click to enter a custom primary key delimiter',
+                        )
                     }
                   </div>
                 }
@@ -538,7 +552,7 @@ class FileImportPreview extends TerrainComponent<Props>
                 text: Colors().text1,
               }}
             >
-              No Primary Keys Selected
+              No primary keys selected
             </div>
         }
       </div>

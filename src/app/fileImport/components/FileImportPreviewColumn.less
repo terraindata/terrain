@@ -8,8 +8,7 @@
   margin-right: 6px;
   margin-left: 6px;
   overflow-y: visible;
-  //border-radius: 3px 3px 0px 0px;
-  //border: solid 1px transparent;
+  border-radius: 3px 3px 0px 0px;
 
   .fi-preview-column-header {
     align-items: center;
@@ -29,15 +28,24 @@
       padding: 6px;
 
       svg {
-        fill: rgba(255, 255, 255, 0.5);
         width: 24px;
         height: 24px;
+        padding: 0px 12px;
       }
+
+      svg path {
+        stroke: rgb(100,105,107) !important; // TODO: call border2?
+      }
+    }
+
+    .fi-preview-column-header-key-selected svg path {
+      stroke: #fff !important; // TODO: call text1?
     }
   }
 
   .fi-preview-column-field {
     padding: 6px;
+    justify-content: center;
 
     .fi-preview-column-field-content {
       flex-grow: 1;

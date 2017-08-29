@@ -1,7 +1,7 @@
 @import "../../common/Common.less";
 
 @padding: 6px;
-@primary-key-padding: 12px 6px;
+@primary-key-padding: 12px 12px;
 
 .fi-preview {
   white-space: nowrap;
@@ -43,14 +43,13 @@
     .fi-preview-pkeys {
       margin-left: 6px;
       margin-bottom: 6px;
-      max-width: 300px;
+      max-width: 600px;
+      min-height: 50px;
       flex-wrap: wrap;
 
       .fi-preview-pkeys-wrapper {
 
         .fi-preview-pkeys-pkey {
-          .big-text;
-          padding: @primary-key-padding;
           margin-bottom: 3px;
           border-radius: 3px;
 
@@ -60,18 +59,21 @@
         }
 
         .fi-preview-pkeys-delim {
-          .big-text;
-          padding: @primary-key-padding;
 
           .autocomplete {
-            max-width: 20px;
+            max-width: 40px;
           }
         }
       }
 
+      .fi-preview-pkeys-wrapper > * {
+        .big-text;
+        padding: @primary-key-padding;
+      }
+
       .fi-preview-pkeys-nokey {
         .big-text;
-        padding: @padding;
+        padding: @primary-key-padding;
         vertical-align: middle;
       }
     }

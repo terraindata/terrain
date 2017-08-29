@@ -447,7 +447,7 @@ class TransformModal extends TerrainComponent<Props>
                 onChange={this._fn(this.handleTransformTypeChange, index)}
               />
               <span
-                className='fi-transform-option-text clickable'
+                className='fi-transform-option-name clickable'
                 onClick={this._fn(this.handleTransformTypeChange, index)}
               >
                 {
@@ -456,6 +456,19 @@ class TransformModal extends TerrainComponent<Props>
               </span>
             </div>,
           )
+        }
+        {
+          this.state.transformTypeIndex !== -1 &&
+          <div
+            className='fi-transform-text'
+            style={{
+              color: Colors().text1,
+            }}
+          >
+            {
+              FileImportTypes.TRANSFORM_TEXT[TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex].toUpperCase()]
+            }
+          </div>
         }
         {this.renderTransform()}
       </div>
