@@ -8,6 +8,33 @@
   margin-right: 6px;
   margin-left: 6px;
   overflow-y: auto;
+  //border-radius: 3px 3px 0px 0px;
+  //border: solid 1px transparent;
+
+  .fi-preview-column-header {
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 3px 3px 0px 0px;
+
+    .fi-preview-column-header-include {
+      vertical-align: middle;
+      padding: 6px;
+
+      .fi-preview-column-header-include-text {
+        .big-text;
+      }
+    }
+
+    .fi-preview-column-header-key {
+      padding: 6px;
+
+      svg {
+        fill: rgba(255, 255, 255, 0.5);
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
 
   .fi-preview-column-field {
     padding: 6px;

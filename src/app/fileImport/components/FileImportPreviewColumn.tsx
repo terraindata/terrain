@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires
+
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Colors } from '../../common/Colors';
@@ -56,6 +58,7 @@ import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreviewColumn.less';
 import TransformBox from './TransformModal';
 
+const KeyIcon = require('./../../../images/icon_key-1.svg');
 type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 export interface Props
@@ -117,6 +120,45 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         localColumnName: nextProps.columnName,
       });
     }
+  }
+
+  public renderHeader()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-column-header'
+        style={{
+          border: this.props.isIncluded ? 'solid 1px ' + Colors().active : 'solid 1px ' + Colors().border3,
+        }}
+      >
+        <div
+          className='fi-preview-column-header-include'
+        >
+          <CheckBox
+            checked={this.props.isIncluded}
+            onChange={this.handleIncludedChange}
+          />
+          <span
+            className='fi-preview-column-header-include-text clickable'
+            onClick={this.handleIncludedChange}
+            style={{
+              color: this.props.isIncluded ? Colors().active : Colors().border3,
+            }}
+          >
+            Include
+          </span>
+        </div>
+        <div
+          className='fi-preview-column-header-key'
+          onClick={this.handlePrimaryKeyChange}
+          style={{
+            background: this.props.isPrimaryKey ? Colors().active : Colors().bg2,
+          }}
+        >
+          <KeyIcon />
+        </div>
+      </div>
+    );
   }
 
   public renderIncluded()
@@ -243,8 +285,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           text: Colors().text1,
         }}
       >
-        {this.renderIncluded()}
-        {this.renderPrimaryKey()}
+        {this.renderHeader()}
         {this.renderName()}
         {this.renderType()}
         {this.renderTransform()}
