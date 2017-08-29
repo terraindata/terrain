@@ -55,7 +55,6 @@ import UserThumbnail from './../../users/components/UserThumbnail';
 import Util from './../../util/Util';
 import * as LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
-import VariantVersions from './VariantVersions';
 
 type Variant = LibraryTypes.Variant;
 
@@ -68,6 +67,7 @@ export interface Props
 }
 
 // TODO MOD centralize
+// TODO Re-add VariantVersions
 const LANGUAGES = Immutable.List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends TerrainComponent<Props>
@@ -126,10 +126,6 @@ class LibraryInfoColumn extends TerrainComponent<Props>
             </div>
           </div>
         </div>
-
-        <VariantVersions
-          variant={this.props.variant}
-        />
       </div>
     );
   }
