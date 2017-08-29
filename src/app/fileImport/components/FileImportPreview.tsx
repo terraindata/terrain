@@ -273,9 +273,12 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleAdvanced()
   {
-    Actions.setExportFiletype(this.state.exportFiletype);
+    if (this.props.exporting)
+    {
+      Actions.setExportFiletype(this.state.exportFiletype);
+      Actions.toggleExportRank(this.state.advancedExportRank);
+    }
     Actions.togglePreviewColumn(this.state.advancedCheck);
-    Actions.toggleExportRank(this.state.advancedExportRank);
   }
 
   public handleUpdateTemplate()
