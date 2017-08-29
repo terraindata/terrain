@@ -65,6 +65,15 @@ const esFilterOperatorsMap = {
   '≈': 'match',
 };
 
+const esFilterOperatorsTooltips = {
+  '>': 'The first value must be greater than the second value',
+  '≥': 'The first value must be greater than or equal to the second value',
+  '<': 'The first value must be less than the second value',
+  '≤': 'The first value must be less than or equal to the second value',
+  '=': 'The two values must match exactly',
+  '≈': 'The two values must approximately match',
+};
+
 export const elasticFilterBlock = _block(
   {
     field: '',
@@ -224,6 +233,7 @@ export const elasticFilter = _card({
                 // can consider using this, but it includes 'boost', and uses raw text values
                 // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
               ),
+              tooltips: List(_.values(esFilterOperatorsTooltips)),
               dropdownUsesRawValues: true,
               centerDropdown: true,
               autoDisabled: true,

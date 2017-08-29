@@ -224,6 +224,7 @@ class BuilderComponent extends TerrainComponent<Props>
               optionsDisplayName={d.optionsDisplayName}
               values={d.dropdownUsesRawValues ? d.options : undefined}
               textColor={this.props.textStyle && this.props.textStyle.color}
+              tooltips={d.tooltips}
             />
             {this.props.helpOn && d.help ?
               <ManualInfo

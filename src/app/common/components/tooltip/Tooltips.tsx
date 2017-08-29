@@ -275,6 +275,7 @@ export interface TooltipProps
   className?: string;
   style?: any;
   [others: string]: any;
+  key?: any;
 }
 
 export const defaultProps: TooltipProps = {

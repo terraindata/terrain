@@ -64,6 +64,7 @@ export interface Props
   columnId: number;
   recursionDepth: number;
   columnType: ColumnTypesTree;
+  tooltips?: List<any>;
 }
 
 @Radium
@@ -89,6 +90,7 @@ class TypeDropdown extends TerrainComponent<Props>
             options={ELASTIC_TYPES}
             onChange={this.handleTypeChange}
             canEdit={true}
+            tooltips={this.props.tooltips}
           />
         </div>
         {
@@ -97,6 +99,7 @@ class TypeDropdown extends TerrainComponent<Props>
             columnId={this.props.columnId}
             recursionDepth={this.props.recursionDepth + 1}
             columnType={this.props.columnType.innerType}
+            tooltips={this.props.tooltips}
           />
         }
       </div>
