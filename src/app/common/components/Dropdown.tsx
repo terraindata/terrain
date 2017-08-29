@@ -92,6 +92,11 @@ class Dropdown extends TerrainComponent<Props>
       };
   }
 
+  public componentWillUnmount()
+  {
+    $('body').unbind('click', this.close);
+  }
+
   public clickHandler(index)
   {
     if (!this._clickHandlers[index])
@@ -110,6 +115,7 @@ class Dropdown extends TerrainComponent<Props>
           });
         }
       };
+      $('body').click(this.close);
     }
 
     return this._clickHandlers[index];
@@ -130,6 +136,12 @@ class Dropdown extends TerrainComponent<Props>
     }
 
     return undefined;
+  }
+
+  public onMouseDown(event)
+  {
+    event.stopPropagation();
+    $('body').unbind('click', this.close);
   }
 
   public renderOption(option, index)
@@ -174,6 +186,7 @@ class Dropdown extends TerrainComponent<Props>
           'dropdown-option-focused': focused,
         })}
         key={index}
+        onMouseDown={this.onMouseDown}
         onClick={this.clickHandler(index)}
         style={style}
       >
@@ -191,7 +204,7 @@ class Dropdown extends TerrainComponent<Props>
     this.setState({
       open: false,
     });
-    $(document).off('click', this.close);
+    $('body').unbind('click', this.close);
   }
 
   public toggleOpen()
@@ -201,9 +214,9 @@ class Dropdown extends TerrainComponent<Props>
       return;
     }
 
-    if (!this.state.open && this.props.unmountOnChange === false)
+    if (!this.state.open)
     {
-      $(document).on('click', this.close);
+      $('body').click(this.close);
     }
 
     const cr = this.refs['value']['getBoundingClientRect']();
