@@ -184,6 +184,25 @@ class CardsColumn extends TerrainComponent<Props>
     }
   }
 
+  public handleCardDrop(type: string)
+  {
+    switch (type)
+    {
+      case 'eqlfrom':
+        return { key: 'from' };
+      case 'eqltype':
+        return { key: 'type' };
+      case 'eqlindex':
+        return { key: 'index' };
+      case 'eqlsize':
+        return { key: 'size' };
+      case 'eqlbody':
+        return { key: 'body' };
+      default:
+        return { key: '' };
+    }
+  }
+
   public render()
   {
     const { props } = this;
@@ -225,6 +244,7 @@ class CardsColumn extends TerrainComponent<Props>
               heightOffset={12}
               accepts={this.getPossibleCards()}
               language={this.props.language}
+              handleCardDrop={this.handleCardDrop}
             />
             <CardsArea
               cards={cards}
@@ -235,6 +255,7 @@ class CardsColumn extends TerrainComponent<Props>
               columnIndex={this.props.columnIndex}
               noCardTool={true}
               accepts={this.getPossibleCards()}
+              handleCardDrop={this.handleCardDrop}
             />
             {
               !cards.size ? /* "Create your first card." */
