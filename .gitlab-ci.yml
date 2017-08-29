@@ -57,7 +57,8 @@ build-frontend-prod:
 deploy:
   script:
    - MIDWAY_HOST=pa-terraformer01.terrain.int:3000 yarn run build-prod
-   - cp -R ../Search /opt/Search/ && cd /opt/Search && killall yarn nodemon && NODE_ENV=production yarn start
+   - cp -R ../Search /opt/Search/ && cd /opt/Search && killall yarn nodemon
+   - NODE_ENV=production yarn start
   only:
    - master
   stage: deploy
