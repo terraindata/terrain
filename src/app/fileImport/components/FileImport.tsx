@@ -562,8 +562,7 @@ class FileImport extends TerrainComponent<any>
           />;
         break;
       case Steps.SelectDb:
-        content = [];
-        content.push(
+        content = [
           <Autocomplete
             value={dbName}
             options={this.state.dbNames}
@@ -586,11 +585,10 @@ class FileImport extends TerrainComponent<any>
               }
             </span>
           </div>,
-        );
+        ];
         break;
       case Steps.SelectTable:
-        content = [];
-        content.push(
+        content = [
           <Autocomplete
             value={tableName}
             options={this.state.tableNames}
@@ -613,7 +611,7 @@ class FileImport extends TerrainComponent<any>
               }
             </span>
           </div>,
-        );
+        ];
         break;
       case Steps.Preview:
         content =

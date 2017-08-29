@@ -49,13 +49,15 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { buttonColors } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
 import Autocomplete from './../../common/components/Autocomplete';
+import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
-import './TransformBox.less';
+import './TransformModal.less';
 const { List } = Immutable;
 
 type Transform = FileImportTypes.Transform;
@@ -64,6 +66,7 @@ const TRANSFORM_TYPES = FileImportTypes.TRANSFORM_TYPES;
 
 export interface Props
 {
+  open: boolean;
   columnId: number;
   columnName: string;
   columnNames: List<string>;
@@ -73,7 +76,7 @@ export interface Props
 }
 
 @Radium
-class TransformBox extends TerrainComponent<Props>
+class TransformModal extends TerrainComponent<Props>
 {
   public state: {
     transformTypeIndex: number;
@@ -271,7 +274,7 @@ class TransformBox extends TerrainComponent<Props>
     return FileImportTypes._Transform(transformConfig);
   }
 
-  public handleTransformClick()
+  public handleTransform()
   {
     const datatypeId: number = ELASTIC_TYPES.indexOf(this.props.datatype);
     const transformName: string = TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex];
@@ -290,101 +293,105 @@ class TransformBox extends TerrainComponent<Props>
 
   public renderText(transformType: string)
   {
+    let components;
     switch (transformType)
     {
       case 'duplicate':
-        return (
-          <div>
-            <Autocomplete
-              value={this.state.duplicateNewName}
-              options={null}
-              onChange={this.handleDuplicateNewNameChange}
-              placeholder={'duplicate column name'}
-              disabled={false}
-            />
-          </div>
-        );
+        components =
+          <Autocomplete
+            value={this.state.duplicateNewName}
+            options={null}
+            onChange={this.handleDuplicateNewNameChange}
+            placeholder={'duplicate column name'}
+            disabled={false}
+          />;
+        break;
       case 'append':
-        return (
-          <div>
-            <Autocomplete
-              value={this.state.transformText}
-              options={null}
-              onChange={this.handleAutocompleteTransformTextChange}
-              placeholder={'text'}
-              disabled={false}
-            />
-          </div>
-        );
+        components =
+          <Autocomplete
+            value={this.state.transformText}
+            options={null}
+            onChange={this.handleAutocompleteTransformTextChange}
+            placeholder={'text'}
+            disabled={false}
+          />;
+        break;
       case 'prepend':
-        return (
-          <div>
-            <Autocomplete
-              value={this.state.transformText}
-              options={null}
-              onChange={this.handleAutocompleteTransformTextChange}
-              placeholder={'text'}
-              disabled={false}
-            />
-          </div>
-        );
+        components =
+          <Autocomplete
+            value={this.state.transformText}
+            options={null}
+            onChange={this.handleAutocompleteTransformTextChange}
+            placeholder={'text'}
+            disabled={false}
+          />;
+        break;
       case 'split':
-        return (
-          <div>
-            <Autocomplete
-              value={this.state.splitNames.get(0)}
-              options={null}
-              onChange={this.handleSplitNameAChange}
-              placeholder={'new column 1'}
-              disabled={false}
-            />
-            <Autocomplete
-              value={this.state.splitNames.get(1)}
-              options={null}
-              onChange={this.handleSplitNameBChange}
-              placeholder={'new column 2'}
-              disabled={false}
-            />
-            <Autocomplete
-              value={this.state.transformText}
-              options={null}
-              onChange={this.handleAutocompleteTransformTextChange}
-              placeholder={'text'}
-              disabled={false}
-            />
-          </div>
-        );
+        components = [
+          <Autocomplete
+            value={this.state.splitNames.get(0)}
+            options={null}
+            onChange={this.handleSplitNameAChange}
+            placeholder={'new column 1'}
+            disabled={false}
+            key={'fi-transform-split-name1'}
+          />,
+          <Autocomplete
+            value={this.state.splitNames.get(1)}
+            options={null}
+            onChange={this.handleSplitNameBChange}
+            placeholder={'new column 2'}
+            disabled={false}
+            key={'fi-transform-split-name2'}
+          />,
+          <Autocomplete
+            value={this.state.transformText}
+            options={null}
+            onChange={this.handleAutocompleteTransformTextChange}
+            placeholder={'text'}
+            disabled={false}
+            key={'fi-transform-split-text'}
+          />,
+        ];
+        break;
       case 'merge':
-        return (
-          <div>
-            {
-              this.state.mergeIndex === -1 &&
-              <p>column to merge</p>
-            }
-            <Dropdown
-              selectedIndex={this.state.mergeIndex}
-              options={this.props.columnNames.delete(this.props.columnId)}
-              onChange={this.handleMergeIndexChange}
-              canEdit={true}
-            />
-            <Autocomplete
-              value={this.state.mergeNewName}
-              options={null}
-              onChange={this.handleMergeNewNameChange}
-              placeholder={'new column name'}
-              disabled={false}
-            />
-            <Autocomplete
-              value={this.state.transformText}
-              options={null}
-              onChange={this.handleAutocompleteTransformTextChange}
-              placeholder={'text'}
-              disabled={false}
-            />
-          </div>
-        );
+        components = [
+          <Dropdown
+            selectedIndex={this.state.mergeIndex}
+            options={this.props.columnNames.delete(this.props.columnId)}
+            onChange={this.handleMergeIndexChange}
+            canEdit={true}
+            key={'fi-transform-merge-index'}
+          />,
+          <Autocomplete
+            value={this.state.mergeNewName}
+            options={null}
+            onChange={this.handleMergeNewNameChange}
+            placeholder={'new column name'}
+            disabled={false}
+            key={'fi-transform-merge-name'}
+          />,
+          <Autocomplete
+            value={this.state.transformText}
+            options={null}
+            onChange={this.handleAutocompleteTransformTextChange}
+            placeholder={'text'}
+            disabled={false}
+            key={'fi-transform-merge-text'}
+          />,
+        ];
+        break;
       default:
     }
+    return (
+      <div
+        className='fi-transform-components'
+      >
+        {
+          components
+        }
+      </div>
+    );
   }
 
   public renderDefault(transformType: string)
@@ -392,7 +399,9 @@ class TransformBox extends TerrainComponent<Props>
     if (transformType === 'duplicate')
     {
       return (
-        <div>
+        <div
+          className='fi-transform-components'
+        >
           <Autocomplete
             value={this.state.duplicateNewName}
             options={null}
@@ -417,33 +426,67 @@ class TransformBox extends TerrainComponent<Props>
     }
   }
 
-  public render()
+  public renderContent()
   {
     const datatypeId: number = ELASTIC_TYPES.indexOf(this.props.datatype);
     return (
       <div
-        className='fi-transform-box'
+        className='fi-transform-content'
       >
-        <Dropdown
-          selectedIndex={this.state.transformTypeIndex}
-          options={List(TRANSFORM_TYPES[datatypeId])}
-          onChange={this.handleTransformTypeChange}
-          canEdit={true}
-        />
-        {this.renderTransform()}
         {
-          this.state.transformTypeIndex !== -1 &&
-          <span
-            className='fi-transform-button clickable button'
-            onClick={this.handleTransformClick}
-            style={buttonColors()}
-          >
-            Apply
-          </span>
+          TRANSFORM_TYPES[datatypeId].map((type, index) =>
+            <div
+              className='fi-transform-option'
+              style={{
+                color: Colors().text1,
+              }}
+              key={index}
+            >
+              <CheckBox
+                checked={this.state.transformTypeIndex === index}
+                onChange={this._fn(this.handleTransformTypeChange, index)}
+              />
+              <span
+                className='fi-transform-option-text clickable'
+                onClick={this._fn(this.handleTransformTypeChange, index)}
+              >
+                {
+                  type
+                }
+              </span>
+            </div>,
+          )
         }
+        {this.renderTransform()}
       </div>
+    );
+  }
+
+  public render()
+  {
+    const { columnName } = this.props;
+    const transformChildren =
+      <div
+        className='flex-container fi-transform'
+        style={backgroundColor(Colors().bg1)}
+      >
+        {this.renderContent()}
+      </div>;
+
+    return (
+      <Modal
+        open={this.props.open}
+        onClose={this.props.onClose}
+        title={'Apply a Transformation to ' + columnName}
+        message={'Choose a transformation that will be applied to every row in' + columnName + ' before data are imported'}
+        children={transformChildren}
+        noFooterPadding={true}
+        confirm={true}
+        confirmButtonText={'Apply Transformation'}
+        onConfirm={this.handleTransform}
+      />
     );
   }
 }
 
-export default TransformBox;
+export default TransformModal;

@@ -50,11 +50,11 @@ import { Colors } from '../../common/Colors';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import TransformBox from './../components/TransformBox';
 import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreviewColumn.less';
+import TransformBox from './TransformModal';
 
 type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
@@ -224,7 +224,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         className='flex-container fi-preview-column-field'
       >
         <div
-          className='fi-preview-column-field-content'
+          className='fi-preview-column-field-content clickable'
           onClick={this._fn(this.props.onTransform, this.props.columnId)}
         >
           Transform
