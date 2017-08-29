@@ -324,8 +324,8 @@ class FileImportPreview extends TerrainComponent<Props>
       Actions.setErrorMsg('Incompatible template. Template does not contain columns: ' + JSON.stringify(missingTableCols));
       return;
     }
-    // only allowed to add additional columns when importing JSON files
-    if (this.props.filetype !== 'json' && unmatchedTemplateCols.size > 0)
+    // only allowed to add additional columns when importing JSON files and no strict checking
+    if ((this.props.filetype !== 'json' || this.props.requireJSONHaveAllFields) && unmatchedTemplateCols.size > 0)
     {
       Actions.setErrorMsg('Incompatible template. Template contains extra columns: ' + JSON.stringify(Array.from(unmatchedTemplateCols)));
       return;
@@ -730,8 +730,6 @@ class FileImportPreview extends TerrainComponent<Props>
         onColumnNameChange={this.onColumnNameChange}
       />,
     ).toArray();
-    console.log(this.props.filetype);
-    console.log(this.props.requireJSONHaveAllFields);
     if (this.props.filetype === 'json' && !this.props.requireJSONHaveAllFields)
     {
       previewColumns.push(

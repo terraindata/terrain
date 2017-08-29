@@ -236,7 +236,7 @@ const EQLSpec: ESClause[] =
         indices_boost: 'index_boost[]',
         min_score: 'min_score',
         inner_hits: 'inner_hits',
-        collapse: 'collapse', //TODO: continue adding from here
+        collapse: 'collapse', // TODO: continue adding from here
         search_after: 'search_after',
         suggest: 'suggest',
         aggregations: 'any[]',
@@ -1810,8 +1810,8 @@ const EQLSpec: ESClause[] =
       }),
     new ESVariantClause('multiple_inner_hits',
       {
-        'object': 'inner_hits',
-        'array': 'inner_hits[]',
+        object: 'inner_hits',
+        array: 'inner_hits[]',
       },
       {
         path: ['join'],
@@ -1879,7 +1879,7 @@ const EQLSpec: ESClause[] =
         path: ['suggest'],
         desc: 'Sets term suggestion settings using a suggestor. The suggestor used is based on which suggestor clause is added: term, phrase, completion, or context.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html',
-        suggestions: ['text', 'field', 'term',],
+        suggestions: ['text', 'field', 'term'],
       }),
     new ESStringClause('suggest_text',
       {

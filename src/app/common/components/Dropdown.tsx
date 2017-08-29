@@ -291,7 +291,7 @@ class Dropdown extends TerrainComponent<Props>
       this.props.canEdit ?
         backgroundColor(
           !this.state.open ? Colors().inputBg : customColor || Colors().active,
-          customColor || Colors().inactiveHover
+          customColor || Colors().inactiveHover,
         )
         :
         backgroundColor(Colors().darkerHighlight)
@@ -299,7 +299,7 @@ class Dropdown extends TerrainComponent<Props>
       fontColor(
         !this.state.open ? customColor || Colors().text1 : Colors().text1,
         this.props.canEdit ? Colors().text1 : undefined,
-      )
+      ),
     ];
 
     return (
@@ -325,7 +325,7 @@ class Dropdown extends TerrainComponent<Props>
           ref='value'
           style={[
             { width: this.props.width },
-            ...dropdownValueStyle
+            ...dropdownValueStyle,
           ]}
           key='dropdown-value'
         >
