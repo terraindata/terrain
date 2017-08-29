@@ -308,7 +308,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         init: (blocksConfig, extraConfig?, skipTemplate?) =>
           ({
             cards: List([
-              BlockUtils.make(blocksConfig, 'eql' + clause.elementID, extraConfig, skipTemplate),
+              // BlockUtils.make(blocksConfig, 'eql' + clause.elementID, extraConfig, skipTemplate),
             ]),
           }),
 

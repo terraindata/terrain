@@ -308,7 +308,6 @@ class CreateCardTool extends TerrainComponent<Props>
     }
 
     const cardTypeList = this.getCardTypeList();
-
     return (
       <div
         className={classes}
@@ -326,7 +325,7 @@ class CreateCardTool extends TerrainComponent<Props>
         <CardDropArea
           index={this.props.index}
           keyPath={this.props.keyPath}
-          accepts={this.props.accepts}
+          accepts={this.getCardTypeList()}
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
           handleCardDrop={this.props.handleCardDrop}

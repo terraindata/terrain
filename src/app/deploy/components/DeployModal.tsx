@@ -47,15 +47,16 @@ THE SOFTWARE.
 // tslint:disable:no-empty-interface strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import './DeployModal.less';
 
+import Modal from 'common/components/Modal';
+import LibraryActions from 'library/data/LibraryActions';
+import LibraryStore from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
+import TerrainStore from 'store/TerrainStore';
 import { ItemStatus } from '../../../items/types/Item';
-import Modal from '../../common/components/Modal';
-import LibraryActions from '../../library/data/LibraryActions';
-import LibraryStore from '../../library/data/LibraryStore';
-import * as LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
 
@@ -111,7 +112,7 @@ class DeployModal extends TerrainComponent<Props>
 
   public handleClose()
   {
-    LibraryActions.variants.status(null, null);
+    TerrainStore.dispatch(LibraryActions.variants.status(null, null));
   }
 
   public handleDeploy()
@@ -143,7 +144,7 @@ class DeployModal extends TerrainComponent<Props>
           template,
         },
       };
-      LibraryActions.variants.deploy(variant, 'putTemplate', body, this.state.changingStatusTo);
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'putTemplate', body, this.state.changingStatusTo));
     }
     else if (this.state.changingStatusTo !== ItemStatus.Live && variant.status === 'LIVE')
     {
@@ -151,7 +152,7 @@ class DeployModal extends TerrainComponent<Props>
       const body: object = {
         id,
       };
-      LibraryActions.variants.deploy(variant, 'deleteTemplate', body, this.state.changingStatusTo);
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'deleteTemplate', body, this.state.changingStatusTo));
     }
   }
 
@@ -161,7 +162,6 @@ class DeployModal extends TerrainComponent<Props>
     const defaultTql =
       (this.state.defaultChecked && defaultVariant) ? defaultVariant.query.tql : null;
     const tql = variant ? variant.query.tql : '';
-
     return (
       <div className='deploy-modal-tql'>
         <div className='deploy-modal-tql-wrapper'>
@@ -170,6 +170,7 @@ class DeployModal extends TerrainComponent<Props>
             tql={tql}
             isDiff={this.state.defaultChecked && defaultTql !== null}
             diffTql={defaultTql}
+            placeholder={'Your algorithm is blank'}
           />
         </div>
       </div>
@@ -242,6 +243,7 @@ class DeployModal extends TerrainComponent<Props>
                 defaultChecked={this.state.defaultChecked}
                 defaultVariant={defaultVariant}
                 onDefaultCheckedChange={this.handleDefaultCheckedChange}
+                onCancelDeploy={this.handleClose}
               />
             </div>
           }

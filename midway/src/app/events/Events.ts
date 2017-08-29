@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import bodybuilder = require('bodybuilder');
+import * as Elastic from 'elasticsearch';
 import * as srs from 'secure-random-string';
 import * as sha1 from 'sha1';
 
@@ -325,6 +327,33 @@ export class Events
         return resolve('');
       }
       resolve(JSON.stringify(encodedEventArr));
+    });
+  }
+
+  public async getEventData(variantId: number, variantInfo: object): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      const client = this.elasticController.getClient();
+
+      let body = bodybuilder();
+      body = body.filter('term', 'variantid', variantId);
+      body = body.filter('term', 'eventid', variantInfo['metric']);
+      body = body.filter('range', '@timestamp', {
+        gte: variantInfo['start'],
+        lte: variantInfo['end'],
+      });
+
+      const response = await new Promise((resolveI, rejectI) =>
+      {
+        const query: Elastic.SearchParams = {
+          index: 'analytics',
+          type: 'events',
+          body: body.build(),
+        };
+        client.search(query, Util.makePromiseCallback(resolveI, rejectI));
+      });
+      resolve(JSON.stringify(response['hits'].hits.map((e) => e['_source'])));
     });
   }
 

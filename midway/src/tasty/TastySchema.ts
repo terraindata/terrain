@@ -116,7 +116,12 @@ export default class TastySchema
 
   public tableNames(database: string): string[]
   {
-    return Object.keys(this.tree[database]);
+    const treeDB: object = this.tree[database];
+    if (treeDB === undefined)
+    {
+      return [];
+    }
+    return Object.keys(treeDB);
   }
 
   public fields(database: string, table: string): object

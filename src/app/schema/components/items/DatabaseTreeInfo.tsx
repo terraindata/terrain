@@ -81,7 +81,7 @@ export class DatabaseTreeInfo extends TerrainComponent<Props>
             style={Styles.infoPieceNumber as any}
           >
             {database.tableIds.size}
-          </span> tables
+          </span> {database.tableIds.size === 1 ? 'type' : 'types'}
         </div>
       </div>
     );
@@ -91,7 +91,7 @@ export class DatabaseTreeInfo extends TerrainComponent<Props>
 export const databaseChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   [
     {
-      label: 'Tables',
+      label: 'Types',
       type: 'table',
     },
   ];

@@ -52,12 +52,9 @@ import thunk from 'redux-thunk';
 
 import BackendInstance from '../../../database/types/BackendInstance';
 import * as LibraryTypes from './../LibraryTypes';
-import { CleanLibraryActionTypes } from './LibraryActionTypes';
 
 import { ItemStatus } from '../../../items/types/Item';
 import Util from './../../util/Util';
-
-import Ajax from './../../util/Ajax';
 
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
@@ -116,47 +113,8 @@ const DefaultState = _LibraryState();
 
 import LibraryReducers from './LibraryReducers';
 
-function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
-{
-  if (current !== previous)
-  {
-    current && previous && current.map((curItem: any, curId: ID) =>
-    {
-      const prevItem = previous.get(curId);
-      if (curItem !== prevItem)
-      {
-        // should save
-        Ajax.saveItem(curItem);
-      }
-    });
-  }
-}
-
-export const LibraryStoreReducerWrapper = (state: LibraryState = DefaultState, action) =>
-{
-  if (LibraryReducers[action.type])
-  {
-    state = LibraryReducers[action.type](state, action);
-  }
-
-  if (CleanLibraryActionTypes.indexOf(action.type) === -1)
-  {
-    // save the new state
-    saveStateOf(state.groups, state.prevGroups);
-    saveStateOf(state.algorithms, state.prevAlgorithms);
-    saveStateOf(state.variants, state.prevVariants);
-  }
-
-  state = state
-    .set('prevGroups', state.groups)
-    .set('prevAlgorithms', state.algorithms)
-    .set('prevVariants', state.variants);
-
-  return state;
-};
-
 export const LibraryStore = Redux.createStore(
-  LibraryStoreReducerWrapper,
+  LibraryReducers,
   DefaultState,
   Redux.applyMiddleware(thunk),
 );

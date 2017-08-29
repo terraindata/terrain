@@ -77,20 +77,6 @@ export const elasticScore = _card(
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
         const factors = block['weights'].map((weightBlock) => tqlTranslationFn(weightBlock, tqlConfig)).toArray();
-
-        // add elastic weight
-        factors.unshift({
-          weight: 0,
-          ranges: [
-            -100.0,
-            100.0,
-          ],
-          outputs: [
-            0.0,
-            1.0,
-          ],
-        });
-
         const _scriptObj = {
           _script:
           {

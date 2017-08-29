@@ -48,10 +48,6 @@ THE SOFTWARE.
 
 import * as CodeMirror from 'codemirror';
 
-import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
-import { toInputMap } from '../../../blocks/types/Input';
-import { BuilderStore } from '../../builder/data/BuilderStore';
-
 CodeMirror.defineMode('elastic', (config, parserConfig) =>
 {
   const indentUnit = config.indentUnit;
@@ -89,30 +85,4 @@ CodeMirror.defineMode('elastic', (config, parserConfig) =>
     indent: (state, textAfter) => state.indent,
     helperType: 'elastic',
   };
-});
-
-CodeMirror.registerHelper('lint', 'elastic', (text) =>
-{
-  const found = [];
-  try
-  {
-    const state = BuilderStore.getState();
-    const inputs = state.query && state.query.inputs;
-    const params: { [name: string]: any; } = toInputMap(inputs);
-    const interpreter = new ESInterpreter(text, params);
-    for (const e of interpreter.parser.getErrors())
-    {
-      const token = e.token;
-      found.push({
-        from: CodeMirror.Pos(token.row, token.col),
-        to: CodeMirror.Pos(token.toRow, token.toCol),
-        message: e.message,
-      });
-    }
-  }
-  catch (e)
-  {
-    throw new Error('Exception when parsing ' + text + ' error: ' + e);
-  }
-  return found;
 });

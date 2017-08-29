@@ -64,9 +64,10 @@ const TRANSFORM_TYPES = FileImportTypes.TRANSFORM_TYPES;
 
 export interface Props
 {
-  datatype: string;
-  colName: string;
+  columnId: number;
+  columnName: string;
   columnNames: List<string>;
+  datatype: string;
   setLocalColumnName(columnName: string);
 }
 
@@ -134,7 +135,7 @@ class TransformBox extends TerrainComponent<Props>
 
   public handleMergeIndexChange(mergeIndex: number)
   {
-    const mergeName = this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName)).get(mergeIndex);
+    const mergeName = this.props.columnNames.delete(this.props.columnId).get(mergeIndex);
     this.setState({
       mergeIndex,
       mergeName,
@@ -154,43 +155,68 @@ class TransformBox extends TerrainComponent<Props>
     {
       return 'Select a transformation';
     }
-    if (transformName === 'duplicate' && !this.state.duplicateNewName)
+
+    switch (transformName)
     {
-      return 'Enter duplicate column name';
-    }
-    if (transformName === 'append' && !this.state.transformText)
-    {
-      return 'Enter text to append';
-    }
-    if (transformName === 'prepend' && !this.state.transformText)
-    {
-      return 'Enter text to prepend';
-    }
-    if (transformName === 'split')
-    {
-      if (!this.state.transformText)
-      {
-        return 'Enter split text';
-      }
-      if (!this.state.splitNames.get(0))
-      {
-        return 'Enter new column 1 name';
-      }
-      if (!this.state.splitNames.get(1))
-      {
-        return 'Enter new column 2 name';
-      }
-    }
-    if (transformName === 'merge')
-    {
-      if (!this.state.mergeName)
-      {
-        return 'Select column to merge';
-      }
-      if (!this.state.mergeNewName)
-      {
-        return 'Enter new column name';
-      }
+      case 'duplicate':
+        if (!this.state.duplicateNewName)
+        {
+          return 'Enter duplicate column name';
+        }
+        if (this.props.columnNames.contains(this.state.duplicateNewName))
+        {
+          return 'Column name: ' + this.state.duplicateNewName + ' already exists, duplicate column names are not allowed';
+        }
+        break;
+
+      case 'append':
+        if (!this.state.transformText)
+        {
+          return 'Enter text to append';
+        }
+        break;
+
+      case 'prepend':
+        if (!this.state.transformText)
+        {
+          return 'Enter text to prepend';
+        }
+        break;
+
+      case 'split':
+        if (!this.state.transformText)
+        {
+          return 'Enter split text';
+        }
+        if (!this.state.splitNames.get(0))
+        {
+          return 'Enter new column 1 name';
+        }
+        if (!this.state.splitNames.get(1))
+        {
+          return 'Enter new column 2 name';
+        }
+        if (this.state.splitNames.get(0) === this.state.splitNames.get(1))
+        {
+          return 'Split names cannot be identical';
+        }
+        if (this.props.columnNames.delete(this.props.columnId).contains(this.state.splitNames.get(0)))
+        {
+          return 'Column name: ' + this.state.splitNames.get(0) + ' already exists, duplicate column names are not allowed';
+        }
+        if (this.props.columnNames.delete(this.props.columnId).contains(this.state.splitNames.get(1)))
+        {
+          return 'Column name: ' + this.state.splitNames.get(1) + ' already exists, duplicate column names are not allowed';
+        }
+        break;
+
+      case 'merge':
+        if (this.props.columnNames.delete(this.props.columnId).delete(this.state.mergeIndex).contains(this.state.mergeNewName))
+        {
+          return 'Column name: ' + this.state.mergeNewName + ' already exists, duplicate column names are not allowed';
+        }
+        break;
+      default:
     }
     return '';
   }
@@ -238,7 +264,7 @@ class TransformBox extends TerrainComponent<Props>
     }
     const transformConfig = {
       name: transformName,
-      colName: this.props.colName,
+      colName: this.props.columnName,
       args: FileImportTypes._TransformArgs(transformArgsConfig),
     };
     return FileImportTypes._Transform(transformConfig);
@@ -251,7 +277,7 @@ class TransformBox extends TerrainComponent<Props>
     const msg: string = this.transformErrorCheck(transformName);
     if (msg)
     {
-      alert(msg);
+      Actions.setErrorMsg(msg);
       return;
     }
 
@@ -345,7 +371,7 @@ class TransformBox extends TerrainComponent<Props>
             }
             <Dropdown
               selectedIndex={this.state.mergeIndex}
-              options={this.props.columnNames.delete(this.props.columnNames.indexOf(this.props.colName))}
+              options={this.props.columnNames.delete(this.props.columnId)}
               onChange={this.handleMergeIndexChange}
               canEdit={true}
             />
@@ -416,7 +442,7 @@ class TransformBox extends TerrainComponent<Props>
         {
           this.state.transformTypeIndex !== -1 &&
           <span
-            className='fi-transform-button clickable'
+            className='fi-transform-button clickable button'
             onClick={this.handleTransformClick}
             style={buttonColors()}
           >

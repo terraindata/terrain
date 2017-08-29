@@ -65,13 +65,14 @@ window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); };
 
 // Components
+import { generateThemeStyles } from 'common/components/tooltip/Tooltips';
 import Login from './auth/components/Login';
 import LayoutManager from './builder/components/layout/LayoutManager';
 import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
-const ReactTooltip = require('./common/components/tooltip/react-tooltip.js');
+
 import { backgroundColor, Colors, fontColor } from './common/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
 import StyleTag from './common/components/StyleTag';
@@ -99,7 +100,7 @@ import UserStore from './users/data/UserStore';
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
-const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
+const BuilderIcon = require('./../images/icon_bldr-3.svg');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
 const SchemaIcon = require('./../images/icon_schema.svg?name=SchemaIcon');
 const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
@@ -138,11 +139,11 @@ const links =
       text: 'Import',
       route: '/import',
     },
-    {
-      icon: <ReportingIcon />,
-      text: 'Analytics',
-      route: '/analytics',
-    },
+    // {
+    //   icon: <ReportingIcon />,
+    //   text: 'Analytics',
+    //   route: '/analytics',
+    // },
     // {
     //   icon: <ManualIcon />,
     //   text: 'Manual',
@@ -377,13 +378,6 @@ class App extends TerrainComponent<Props>
 
         <DeployModal />
 
-        <ReactTooltip
-          place='bottom'
-          effect='solid'
-          class='tooltip'
-          hideOnClick={true}
-        />
-
         <StyleTag
           style={COMMON_THEME_COLOR_STYLE}
         />
@@ -410,6 +404,7 @@ const COMMON_THEME_COLOR_STYLE = {
     background: Colors().inputBg,
     color: Colors().text1,
   },
+  ...generateThemeStyles(),
 };
 
 export default App;

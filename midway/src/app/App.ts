@@ -52,6 +52,7 @@ import cors = require('kcors');
 import session = require('koa-session');
 import serve = require('koa-static-server');
 import srs = require('secure-random-string');
+import v8 = require('v8');
 
 import * as DBUtil from '../database/Util';
 import RouteError from '../error/RouteError';
@@ -60,7 +61,6 @@ import AnalyticsRouter from './AnalyticsRouter';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
-import { imprt } from './import/ImportRouter';
 import './Logging';
 import Middleware from './Middleware';
 import MidwayRouter from './Router';
@@ -69,6 +69,7 @@ import Users from './users/Users';
 
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
+export let HA: number;
 
 class App
 {
@@ -94,6 +95,7 @@ class App
   private DB: Tasty.Tasty;
   private app: Koa;
   private config: Config.Config;
+  private heapAvail: number;
 
   constructor(config: Config.Config = CmdLineArgs)
   {
@@ -122,7 +124,7 @@ class App
     this.app.use(session(undefined, this.app));
 
     this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
-    this.app.use(Middleware.favicon('../../../src/app/favicon.ico'));
+    this.app.use(Middleware.favicon('../../../../midway/src/app/favicon.ico'));
     this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
     this.app.use(Middleware.passport.initialize());
@@ -142,6 +144,9 @@ class App
     await Config.handleConfig(this.config);
     await Users.initializeDefaultUser();
 
+    const heapStats: object = v8.getHeapStatistics();
+    this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));
+    HA = this.heapAvail;
     winston.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
   }

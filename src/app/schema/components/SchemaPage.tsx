@@ -77,6 +77,7 @@ class SchemaPage extends TerrainComponent<Props>
       <SchemaView
         fullPage={true}
         showSearch={true}
+        showResults={true}
       />
     );
   }

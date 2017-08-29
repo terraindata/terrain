@@ -131,8 +131,36 @@ export const ElasticBlockHelpers = {
       }
     }
 
-    return List([]);
+    return List();
   },
 };
+
+// return '' when there is no index card.
+export function getIndex(): string
+{
+  const state = BuilderStore.getState();
+  const cards = state.query.cards;
+  const isIndexCard = (card) => card['type'] === 'eqlindex';
+  const indexCard = cards.find(isIndexCard);
+  if (indexCard === undefined)
+  {
+    return '';
+  }
+  return indexCard['value'];
+}
+
+// return '' when there is no type card.
+export function getType(): string
+{
+  const state = BuilderStore.getState();
+  const cards = state.query.cards;
+  const isTypeCard = (card) => card['type'] === 'eqltype';
+  const typeCard = cards.find(isTypeCard);
+  if (typeCard === undefined)
+  {
+    return '';
+  }
+  return typeCard['value'];
+}
 
 export default ElasticBlockHelpers;

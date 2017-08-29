@@ -52,6 +52,8 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { altStyle, couldHover } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -64,12 +66,16 @@ export interface Props
 
   placeholder?: string;
   help?: string;
+  helpIsError?: boolean;
+
   ref?: string;
   className?: string;
   disabled?: boolean;
 
   onFocus?: (event: React.FocusEvent<any>) => void;
   onBlur?: (event: React.FocusEvent<any>, value: string) => void;
+  onEnter?: (value: string) => void;
+  onSelectOption?: (value: string) => void;
 }
 
 @Radium
@@ -145,6 +151,10 @@ class Autocomplete extends TerrainComponent<Props>
   public handleSelect(value)
   {
     this.props.onChange(value);
+    if (this.props.onSelectOption !== undefined)
+    {
+      this.props.onSelectOption(value);
+    }
     this.setState({
       value,
       open: false,
@@ -211,6 +221,7 @@ class Autocomplete extends TerrainComponent<Props>
         });
         this.blurValue = value;
         this.props.onChange(value);
+        this.props.onEnter && this.props.onEnter(value);
         this.refs['input']['blur']();
         break;
       case 27:
@@ -283,23 +294,37 @@ class Autocomplete extends TerrainComponent<Props>
 
     const open = this.state.open && !!options && options.size > 0;
 
+    const inputElem =
+      <input
+        style={this.props.style}
+        ref='input'
+        type='text'
+        className={inputClassName}
+        value={this.state.value}
+        onChange={this.handleChange}
+        onFocus={this.handleFocus}
+        onBlur={this.handleBlur}
+        onKeyDown={this.handleKeydown}
+        disabled={this.props.disabled}
+        placeholder={this.props.placeholder}
+      />;
+
     return (
       <div className='autocomplete'>
-        <input
-          style={this.props.style}
-          ref='input'
-          type='text'
-          className={inputClassName}
-          value={this.state.value}
-          onChange={this.handleChange}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-          onKeyDown={this.handleKeydown}
-          disabled={this.props.disabled}
-          placeholder={this.props.placeholder}
-          data-tip={this.props.help}
-          data-html={true}
-        />
+        {
+          this.props.help === undefined ?
+            inputElem
+            :
+            tooltip(
+              inputElem,
+              {
+                title: this.props.help,
+                position: 'top-start',
+                key: this.props.helpIsError ? 'error' : 'nonerror',
+                theme: this.props.helpIsError ? 'error' : undefined,
+              },
+            )
+        }
         {!open ? null :
           <div
             className={classNames({

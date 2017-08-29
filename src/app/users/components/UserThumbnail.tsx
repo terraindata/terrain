@@ -49,6 +49,8 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
+
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserStore from './../data/UserStore';
 import * as UserTypes from './../UserTypes';
@@ -119,13 +121,20 @@ class UserThumbnail extends TerrainComponent<Props>
   public render()
   {
     const { user } = this.state;
-    const name: string = user ? user.name : 'Loading...';
+    const name: string = user ? (user.name !== undefined && user.name.length > 0 ? user.name : user.email) : 'Loading...';
     const src: string = UserTypes.profileUrlFor(user);
-    const tip = this.props.showName ? null :
-      '<div class="user-thumbnail-tip-name">' + name + '</div>' +
-      '<div class="user-thumbnail-tip-details">' + this.props.extra + '</div>';
+    const tip = this.props.showName ?
+      null
+      :
+      (
+        <span>
+          <div className='user-thumbnail-tip-name'> {name} </div>
+          <div className='user-thumbnail-tip-details'> {this.props.extra} </div>
+        </span>
+      );
+
     const text: string = this.props.showName ? name : null;
-    const thumbnail = (
+    const thumbnail = tooltip(
       <div
         className={classNames({
           'user-thumbnail': true,
@@ -137,8 +146,6 @@ class UserThumbnail extends TerrainComponent<Props>
           'user-thumbnail-square': this.props.square,
           'user-thumbnail-admin': user && user.isSuperUser && !this.props.hideAdmin,
         })}
-        data-tip={tip}
-        data-html={true}
       >
         <div
           className='user-thumbnail-image'
@@ -154,9 +161,12 @@ class UserThumbnail extends TerrainComponent<Props>
             }
           </div>
         }
-      </div>
+      </div>,
+      {
+        html: tip,
+        position: 'left',
+      },
     );
-
     if (this.props.link && user)
     {
       return (
@@ -165,7 +175,6 @@ class UserThumbnail extends TerrainComponent<Props>
         </Link>
       );
     }
-
     return thumbnail;
   }
 }

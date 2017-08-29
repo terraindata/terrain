@@ -364,7 +364,7 @@ class _CardComponent extends TerrainComponent<Props>
     };
 
     const card = BlockUtils.recordFromJS(
-      BlockUtils.cardsForServer(removeId(this.props.card)).toJS(),
+      BlockUtils.cardsForServer(removeId(this.props.card)),
       AllBackendsMap[this.props.card.static.language].blocks,
     );
 

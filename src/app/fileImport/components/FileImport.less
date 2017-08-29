@@ -3,11 +3,16 @@
 .file-import {
 	height: 100%;
 	position: relative;
+  display: flex; // applies Flexbox to child elements
+  align-items: center; // center horizontally
+  justify-content: center; // center vertically
 
 	.file-import-inner {
-		.dead-center;
     min-width: 300px;
     max-width: 100%;
+
+    max-height: 100%;
+    overflow: hidden;
 
     .fi-step {
       .fi-step-name {
@@ -30,33 +35,62 @@
       max-width: 100%;
       margin: 12px;
 
-      .fi-step-row {
-        align-items: center;
+      .fi-content-csv {
 
-        .fi-input-label {
-          margin-left: 12px;
+        .fi-content-csv-wrapper {
+          text-align: center;
+          margin-bottom: 12px;
+
+          .fi-content-csv-option {
+            margin-left: 12px;
+          }
+        }
+
+        .fi-content-rows-container {
+          overflow: auto;
         }
       }
 
-      .fi-csv {
+      .fi-content-json {
+
+        .fi-content-json-wrapper {
+          text-align: center;
+
+          .fi-content-json-option {
+            margin-left: 12px;
+          }
+        }
+      }
+
+      .fi-content-subtext {
         margin-top: 12px;
-        .fi-csv-option {
-          margin-left: 12px;
+        word-wrap: break-word;
+        max-width: 300px;
+
+        .fi-content-subtext-text {
+          .big-text;
+        }
+      }
+
+      .fi-content-choose {
+        align-items: center;
+        justify-content: center;
+
+        .fi-content-choose-button {
         }
       }
     }
 
     .fi-nav {
-      float: right;
-      margin-top: 12px;
+      margin: 12px;
+      align-items: center;
+      justify-content: space-between;
 
       .fi-back-button {
-        .fi-button;
         display: inline-block;
       }
 
       .fi-next-button {
-        .fi-button;
         display: inline-block;
       }
     }

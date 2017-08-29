@@ -60,14 +60,15 @@ class FileImportStateC extends BaseClass
   public filetype: string = '';
 
   public previewRows: List<List<string>> = List([]);
-  public columnsCount: number = 0;
-  public primaryKey: number = -1;
-  public csvHeaderMissing: boolean = false;
+  public primaryKeys: List<number> = List([]);
+  public primaryKeyDelimiter: string = '-';
+  public hasCsvHeader: boolean = false;
+  public isNewlineSeparatedJSON: boolean = false;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
   public columnsToInclude: List<boolean> = List([]);
-  public columnTypes: List<ColumnTypesTree> = List([]); // TODO: change 'any,' how to specify type of nested IMMap?
+  public columnTypes: List<ColumnTypesTree> = List([]);
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
@@ -75,6 +76,8 @@ class FileImportStateC extends BaseClass
 
   public uploadInProgress: boolean = false;
   public elasticUpdate: boolean = true;
+
+  public errorMsg: string = '';
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -127,8 +130,10 @@ class TemplateC
   public originalNames: List<string> = List([]);
   public columnTypes: List<ColumnTypesTree> = List([]);
   public transformations: List<Transform> = List([]);
-  public csvHeaderMissing = false;
-  public primaryKey = -1;
+  public hasCsvHeader: boolean = true;
+  public primaryKeys: List<number> = List([]);
+  public primaryKeyDelimiter: string = '-';
+  public export = false;
 }
 
 const Template_Record = Immutable.Record(new TemplateC());
@@ -140,8 +145,9 @@ export const _Template =
     originalNames: List<string>;
     columnTypes: Immutable.Map<string, object>;
     transformations: List<object>;
-    csvHeaderMissing: boolean;
-    primaryKey: number;
+    primaryKeys: List<number>;
+    primaryKeyDelimiter: string;
+    export: boolean;
   }) =>
   {
     return new Template_Record(config) as any as Template;
@@ -219,13 +225,37 @@ export const STEP_NAMES =
     'Step 3',
     'Step 4',
     'Step 5',
+    'Step 6',
   ];
 
 export const STEP_TITLES =
   [
     'Select a File',
+    '',
     'Select a Server',
     'Select a Database',
     'Select a Table',
     'Select and Rename Columns you\'d like to Import',
   ];
+
+export const STEP_TWO_TITLES =
+  [
+    'Does your CSV have a header row?',
+    'What format is your JSON file?',
+  ];
+
+export const STEP_SUBTEXT =
+  {
+    DATABASE_SUBTEXT: 'Use the field above to either choose an existing database or name a new one that will be created',
+    TABLE_SUBTEXT: 'Use the field above to either choose an existing table or name a new one that will be created',
+  };
+
+export const enum Steps
+{
+  ChooseFile,
+  CsvJsonOptions,
+  SelectServer,
+  SelectDb,
+  SelectTable,
+  Preview,
+}

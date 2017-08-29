@@ -654,6 +654,18 @@ export function buttonColors()
   return CACHE['buttonColors' + curTheme];
 }
 
+export function disabledButtonColors()
+{
+  if (!CACHE['disabledButtonColors' + curTheme])
+  {
+    CACHE['disabledButtonColors' + curTheme] = extend({},
+      backgroundColor(Colors().altBg2),
+      fontColor(Colors().altText3),
+    );
+  }
+  return CACHE['disabledButtonColors' + curTheme];
+}
+
 export function getStyle(style: string, color: string, hoverColor?: string): object
 {
   if (!dynamicMap[curTheme])
