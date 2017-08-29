@@ -959,7 +959,7 @@ const TransformChart = {
     TransformChart._movePointEditMenu(el);
   },
 
-  _drawPointEditMenu(el, scales, onMove, onRelease, colors)
+  _drawPointEditMenu(el, scales, onMove, onRelease, colors, editPointPosition)
   {
     const point = d3.select(el).select('.point-selected');
     if (!point[0][0] || d3.select(el).selectAll('.point-selected')[0].length > 1)
@@ -1039,12 +1039,12 @@ const TransformChart = {
       .attr('style', 'background-color: ' + Colors().altBg1 + '; color: ' + colors[0])
       .on('change', function()
       {
-        this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
-      })
+        editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
+      }.bind(this))
       .on('input', function()
       {
-        this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
-      })
+        editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
+      }.bind(this))
       .on('keydown', () =>
       {
         const xNode: any = d3.select(el).select('#xVal').node();
@@ -1072,11 +1072,11 @@ const TransformChart = {
       .attr('style', 'background-color: ' + Colors().altBg1 + '; color: ' + colors[0])
       .on('change', (value) =>
       {
-        this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
+        editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
       })
       .on('input', function()
       {
-        this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
+        editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
       })
       .on('keydown', () =>
       {
@@ -1187,11 +1187,11 @@ const TransformChart = {
     return false;
   },
 
-  _mouseClickFactory: (el, scales, onMove, onRelease, colors, drawPointEditMenu) => function(point)
+  _mouseClickFactory: (el, scales, onMove, onRelease, colors, editPointPosition, drawPointEditMenu) => function(point)
   {
     if (!d3.event['shiftKey'] && !d3.event['altKey'])
     {
-      drawPointEditMenu(el, scales, onMove, onRelease, colors);
+      drawPointEditMenu(el, scales, onMove, onRelease, colors, editPointPosition);
     }
     return false;
   }.bind(this),
@@ -1235,7 +1235,7 @@ const TransformChart = {
       point.on('touchstart', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
       point.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
       point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, colors, this._drawMenu));
-      point.on('click', this._mouseClickFactory(el, scales, onMove, onRelease, colors, this._drawPointEditMenu));
+      point.on('click', this._mouseClickFactory(el, scales, onMove, onRelease, colors, this._editPointPosition, this._drawPointEditMenu));
       point.on('mouseout', this._mouseoutFactory(el));
       point.on('dblclick', this._doubleclickFactory(el));
     }

@@ -625,13 +625,13 @@ class FileImport extends TerrainComponent<any>
             columnNames={columnNames}
             columnsToInclude={columnsToInclude}
             columnTypes={columnTypes}
-            filetype={filetype}
-            requireJSONHaveAllFields={requireJSONHaveAllFields}
-            exportRank={exportRank}
             templates={templates}
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
             uploadInProgress={uploadInProgress}
+            filetype={filetype}
+            requireJSONHaveAllFields={requireJSONHaveAllFields}
+            exportRank={exportRank}
             elasticUpdate={elasticUpdate}
             exporting={false}
           />;

@@ -57,7 +57,7 @@ class FileImportStateC extends BaseClass
   public serverName: string = '';
   public dbName: string = '';
   public tableName: string = '';
-  public filetype: string = 'csv';
+  public filetype: string = '';
 
   public previewRows: List<List<string>> = List([]);
   public primaryKeys: List<number> = List([]);
@@ -234,9 +234,9 @@ export const STEP_TITLES =
   [
     'Select a File',
     '',
-    'Select a Server',
-    'Select a Database',
-    'Select a Table',
+    'Select an ElasticSearch Cluster',
+    'Select an ElasticSearch Index',
+    'Select an ElasticSearch Type',
     'Select and Rename Columns you\'d like to Import',
   ];
 

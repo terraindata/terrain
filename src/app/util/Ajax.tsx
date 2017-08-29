@@ -697,7 +697,6 @@ export const Ajax =
       update: boolean,
       hasCsvHeader: boolean,
       isNewlineSeparatedJSON: boolean,
-      requireJSONHaveAllFields: boolean,
       primaryKeyDelimiter: string,
       onLoad: (resp: any) => void,
       onError: (resp: any) => void,
@@ -721,7 +720,6 @@ export const Ajax =
       formData.append('update', String(update));
       formData.append('hasCsvHeader', String(hasCsvHeader));
       formData.append('isNewlineSeparatedJSON', String(isNewlineSeparatedJSON));
-      formData.append('requireJSONHaveAllFields', String(requireJSONHaveAllFields));
       formData.append('primaryKeyDelimiter', primaryKeyDelimiter);
 
       const xhr = new XMLHttpRequest();

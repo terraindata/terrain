@@ -520,7 +520,7 @@ export class ResultsManager extends TerrainComponent<Props>
       changes['count'] = results.size;
     }
 
-    const filteredFields = List(_.difference(fields.toArray(), ['_score', '_index', '_type', '_id']));
+    const filteredFields = List(_.filter(fields.toArray(), (val) => !(val.charAt(0) === '_')));
     const exportChanges: any = {
       filetype: 'csv',
       originalNames: filteredFields,
