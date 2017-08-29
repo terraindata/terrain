@@ -68,7 +68,8 @@ export interface Props
   columnName: string;
   columnNames: List<string>;
   datatype: string;
-  setLocalColumnName(columnName: string);
+  onClose: () => void;
+  // setLocalColumnName(columnName: string);
 }
 
 @Radium
@@ -249,7 +250,7 @@ class TransformBox extends TerrainComponent<Props>
           newName: this.state.splitNames.toArray(),
           text: this.state.transformText,
         };
-        this.props.setLocalColumnName(this.state.splitNames.toArray()[0]);
+        // this.props.setLocalColumnName(this.state.splitNames.toArray()[0]);
         break;
 
       case 'merge':
@@ -258,7 +259,7 @@ class TransformBox extends TerrainComponent<Props>
           newName: this.state.mergeNewName,
           text: this.state.transformText,
         };
-        this.props.setLocalColumnName(this.state.mergeNewName);
+        // this.props.setLocalColumnName(this.state.mergeNewName);
         break;
       default:
     }
@@ -284,16 +285,7 @@ class TransformBox extends TerrainComponent<Props>
     const transform: Transform = this.getTransform(transformName);
     Actions.updatePreviewRows(transform);
     Actions.addTransform(transform);
-
-    this.setState({
-      transformTypeIndex: -1,
-      mergeIndex: -1,
-      transformText: '',
-      splitNames: List(['', '']),
-      mergeName: '',
-      mergeNewName: '',
-      duplicateNewName: '',
-    });
+    this.props.onClose();
   }
 
   public renderText(transformType: string)

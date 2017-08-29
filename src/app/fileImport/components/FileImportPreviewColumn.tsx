@@ -69,6 +69,7 @@ export interface Props
   columnOptions: List<string>;
   exporting: boolean;
   onColumnNameChange(columnId: number, localColumnName: string);
+  onTransform(columnId: number);
 }
 
 @Radium
@@ -224,14 +225,9 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
       >
         <div
           className='fi-preview-column-field-content'
+          onClick={this._fn(this.props.onTransform, this.props.columnId)}
         >
-          <TransformBox
-            datatype={props.columnType.type}
-            columnId={props.columnId}
-            columnName={props.columnName}
-            columnNames={props.columnNames}
-            setLocalColumnName={this.handleLocalColumnNameChange}
-          />
+          Transform
         </div>
       </div>
     );

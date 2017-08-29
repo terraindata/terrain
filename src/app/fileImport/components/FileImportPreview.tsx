@@ -66,6 +66,7 @@ import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
+import TransformBox from './TransformBox';
 const { List } = Immutable;
 
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -108,7 +109,9 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: boolean,
     showingApplyTemplate: boolean,
     showingSaveTemplate: boolean,
+    showingTransformModal: boolean,
     previewErrorMsg: string,
+    columnId: number,
   } = {
     appliedTemplateName: '',
     saveTemplateName: '',
@@ -117,7 +120,9 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: false,
     showingApplyTemplate: false,
     showingSaveTemplate: false,
+    showingTransformModal: false,
     previewErrorMsg: '',
+    columnId: -1,
   };
 
   public componentDidMount()
@@ -170,6 +175,20 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     this.setState({
       showingApplyTemplate: false,
+    });
+  }
+
+  public showTransformModal()
+  {
+    this.setState({
+      showingTransformModal: true,
+    });
+  }
+
+  public hideTransformModal()
+  {
+    this.setState({
+      showingTransformModal: false,
     });
   }
 
@@ -306,6 +325,14 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
+  public onTransform(columnId: number)
+  {
+    this.setState({
+      showingTransformModal: true,
+      columnId,
+    })
+  }
+
   public handleElasticUpdateChange()
   {
     Actions.changeElasticUpdate();
@@ -430,6 +457,55 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderTransformModal()
+  {
+    const columnType = this.props.columnTypes.get(this.state.columnId).type;
+    const columnName = this.props.columnNames.get(this.state.columnId);
+    const transformChildren =
+      <div
+        className='flex-container fi-preview-transform'
+        style={backgroundColor(Colors().altText1)}
+      >
+        <div
+          className='fi-preview-transform-header'
+          style={{
+            color: Colors().text1
+          }}
+        >
+          {
+            columnName
+          }
+        </div>
+        <div
+          className='fi-preview-transform-header'
+          style={{
+            color: Colors().text1
+          }}
+        >
+          {
+            columnType
+          }
+        </div>
+        <TransformBox
+          datatype={columnType}
+          columnId={this.state.columnId}
+          columnName={columnName}
+          columnNames={this.props.columnNames}
+          onClose={this.hideTransformModal}
+        />
+      </div>;
+
+    return (
+      <Modal
+        open={this.state.showingTransformModal}
+        onClose={this.hideTransformModal}
+        title={'Transform'}
+        children={transformChildren}
+        noFooterPadding={true}
+      />
+    );
+  }
+
   public renderPrimaryKeys()
   {
     return (
@@ -526,6 +602,7 @@ class FileImportPreview extends TerrainComponent<Props>
                 columnOptions={this.props.columnOptions}
                 exporting={this.props.exporting}
                 onColumnNameChange={this.onColumnNameChange}
+                onTransform={this.onTransform}
               />,
             ).toArray()
           }
@@ -719,6 +796,7 @@ class FileImportPreview extends TerrainComponent<Props>
               {this.renderApplyTemplate()}
               {this.renderSaveTemplate()}
               {this.renderUpdateTemplate()}
+              {this.renderTransformModal()}
               {this.renderError()}
             </div>
         }
