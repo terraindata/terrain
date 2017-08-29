@@ -177,7 +177,7 @@ class Dropdown extends TerrainComponent<Props>
         tooltipProps = {
           key: index,
           title: this.props.tooltips.get(index),
-          position: 'right',
+          position: 'left',
         };
       }
       else
@@ -186,7 +186,7 @@ class Dropdown extends TerrainComponent<Props>
         tooltipProps.key = index;
         if (tooltipProps.position === undefined)
         {
-          tooltipProps.position = 'right';
+          tooltipProps.position = 'left';
         }
 
       }

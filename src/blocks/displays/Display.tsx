@@ -89,7 +89,7 @@ export interface Display
   centerDropdown?: boolean;
   optionsDisplayName?: Map<any, string>; // maps value to display name
   dropdownUsesRawValues?: boolean; // use the raw values, instead of the indices
-  tooltips?: List<any>;
+  dropdownTooltips?: List<any>;
 
   // for labels
   label?: string;

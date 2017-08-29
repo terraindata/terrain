@@ -233,7 +233,7 @@ export const elasticFilter = _card({
                 // can consider using this, but it includes 'boost', and uses raw text values
                 // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
               ),
-              tooltips: List(_.values(esFilterOperatorsTooltips)),
+              dropdownTooltips: List(_.values(esFilterOperatorsTooltips)),
               dropdownUsesRawValues: true,
               centerDropdown: true,
               autoDisabled: true,
