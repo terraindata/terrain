@@ -300,13 +300,15 @@ function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
 
 const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =>
 {
+  const versioning = action.payload !== undefined ? action.payload.versioning : false;
+
   let nextState = state;
   if (LibraryReducers[action.type])
   {
     nextState = LibraryReducers[action.type](state, action);
   }
 
-  if (CleanLibraryActionTypes.indexOf(action.type) === -1)
+  if (versioning === true && CleanLibraryActionTypes.indexOf(action.type) === -1)
   {
     // save the new state
     saveStateOf(nextState.groups, nextState.prevGroups);

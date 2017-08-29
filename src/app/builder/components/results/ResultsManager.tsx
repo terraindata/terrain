@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands radix prefer-const no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
 import { List, Map } from 'immutable';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
@@ -60,7 +59,6 @@ import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse'
 import Query from '../../../../items/types/Query';
 import Actions from '../../../fileImport/data/FileImportActions';
 import * as FileImportTypes from '../../../fileImport/FileImportTypes';
-import * as SchemaTypes from '../../../schema/SchemaTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
@@ -168,7 +166,10 @@ export class ResultsManager extends TerrainComponent<Props>
     this.mapQueries(
       (query) =>
       {
-        AjaxM1.killQuery(query.queryId);
+        if (this.props.db.source === 'm1')
+        {
+          AjaxM1.killQuery(query.queryId);
+        }
         query.xhr.abort();
       },
     );
@@ -176,14 +177,16 @@ export class ResultsManager extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (
-      nextProps.query
-      && nextProps.query.tql
-      && (!this.props.query ||
-        (
-          this.props.query.tql !== nextProps.query.tql ||
-          this.props.query.cards !== nextProps.query.cards ||
-          this.props.query.inputs !== nextProps.query.inputs
+    if (this.props.db !== nextProps.db ||
+      (
+        nextProps.query
+        && nextProps.query.tql
+        && (!this.props.query ||
+          (
+            this.props.query.tql !== nextProps.query.tql ||
+            this.props.query.cards !== nextProps.query.cards ||
+            this.props.query.inputs !== nextProps.query.inputs
+          )
         )
       )
     )
@@ -517,7 +520,7 @@ export class ResultsManager extends TerrainComponent<Props>
       changes['count'] = results.size;
     }
 
-    const filteredFields = List(_.difference(fields.toArray(), ['_score', '_index', '_type', '_id']));
+    const filteredFields = List(_.filter(fields.toArray(), (val) => !(val.charAt(0) === '_')));
     const exportChanges: any = {
       filetype: 'csv',
       originalNames: filteredFields,

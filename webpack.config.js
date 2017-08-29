@@ -93,7 +93,7 @@ module.exports =
                 test: /\.ts(x?)$/,
                 exclude: [/midway/, /node_modules/],
                 loader:
-                    "babel-loader?presets[]=react&presets[]=es2015&cacheDirectory=true!cache-loader!thread-loader!ts-loader?happyPackMode=true"
+                    "babel-loader?cacheDirectory=true!cache-loader!thread-loader!ts-loader?happyPackMode=true"
                     + JSON.stringify({
                         compilerOptions: {
                         },
@@ -102,7 +102,7 @@ module.exports =
             {
                 test: /\.js(x?)$/,
                 exclude: [/midway/, /node_modules/],
-                loader: "babel-loader?presets[]=react&presets[]=es2015&cacheDirectory=true"
+                loader: "babel-loader?cacheDirectory=true!cache-loader!thread-loader"
             },
             { test: /\.css$/, exclude: /midway/, loader: "style-loader!css-loader" },
             { test: /\.less$/, exclude: /midway/, loader: "style-loader!css-loader!less-loader?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
@@ -125,10 +125,9 @@ module.exports =
     plugins:
     [
         new webpack.DefinePlugin({
-            MIDWAY_HOST: "'http://" + process.env.MIDWAY_HOST + "'",
+            MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || "localhost:3000") + "'",
             DEV: true,
         }),
-        new webpack.optimize.AggressiveMergingPlugin(),
         new ForkTsCheckerWebpackPlugin(),
     ],
 };

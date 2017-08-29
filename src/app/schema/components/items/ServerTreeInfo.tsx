@@ -81,7 +81,7 @@ export class ServerTreeInfo extends TerrainComponent<Props>
             style={Styles.infoPieceNumber as any}
           >
             {server.databaseIds.size}
-          </span> databases
+          </span> {server.databaseIds.size === 1 ? 'index' : 'indices'}
         </div>
       </div>
     );
@@ -91,7 +91,7 @@ export class ServerTreeInfo extends TerrainComponent<Props>
 export const serverChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   [
     {
-      label: 'Databases',
+      label: 'Indices',
       type: 'database',
     },
   ];

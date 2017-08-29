@@ -186,8 +186,8 @@ class FileImport extends TerrainComponent<any>
     const { tables } = this.state;
     const { serverName, dbName } = this.state.fileImportState;
     this.setState({
-      columnOptionNames: tableName && tables.get(tableId(serverName, dbName, tableName)) ?
-        List(tables.get(tableId(serverName, dbName, tableName)).columnIds.map((column) =>
+      columnOptionNames: tableName && tables.get(tableId(serverName + '/' + dbName, tableName)) ?
+        List(tables.get(tableId(serverName + '/' + dbName, tableName)).columnIds.map((column) =>
           column.split('.').pop(),
         ))
         :
