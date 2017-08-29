@@ -142,6 +142,10 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
     if (_scriptValueInfo && _scriptValueInfo.objectChildren.mode)
     {
       sortMode = _scriptValueInfo.objectChildren.mode.propertyValue.value;
+      if (sortMode === undefined)
+      {
+        sortMode = 'auto';
+      }
     }
 
     let sortType;
