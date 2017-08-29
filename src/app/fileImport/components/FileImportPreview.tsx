@@ -730,6 +730,8 @@ class FileImportPreview extends TerrainComponent<Props>
         onColumnNameChange={this.onColumnNameChange}
       />,
     ).toArray();
+    console.log(this.props.filetype);
+    console.log(this.props.requireJSONHaveAllFields);
     if (this.props.filetype === 'json' && !this.props.requireJSONHaveAllFields)
     {
       previewColumns.push(

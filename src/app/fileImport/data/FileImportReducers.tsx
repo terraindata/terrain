@@ -221,6 +221,24 @@ FileImportReducers[ActionTypes.changeElasticUpdate] =
       .set('elasticUpdate', !state.elasticUpdate)
   ;
 
+FileImportReducers[ActionTypes.togglePreviewColumn] =
+  (state, action) =>
+    state
+      .set('requireJSONHaveAllFields', action.payload.requireJSONHaveAllFields)
+  ;
+
+FileImportReducers[ActionTypes.setExportFiletype] =
+  (state, action) =>
+    state
+      .set('filetype', action.payload.exportFiletype)
+  ;
+
+FileImportReducers[ActionTypes.toggleExportRank] =
+  (state, action) =>
+    state
+      .set('exportRank', action.payload.exportRank)
+  ;
+
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
   {
@@ -316,6 +334,7 @@ FileImportReducers[ActionTypes.importFile] =
       state.elasticUpdate,
       state.hasCsvHeader,
       state.isNewlineSeparatedJSON,
+      state.requireJSONHaveAllFields,
       state.primaryKeyDelimiter,
       () =>
       {
