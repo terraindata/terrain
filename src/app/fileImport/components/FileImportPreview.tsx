@@ -553,7 +553,8 @@ class FileImportPreview extends TerrainComponent<Props>
         className='fi-preview-import-button large-button'
         onClick={this.handleUploadFile}
         style={{
-          background: 'green', // TODO: add green to Colors?
+          color: Colors().import,
+          border: 'solid 1px ' + Colors().import,
         }}
       >
         {this.props.exporting ? 'Export' : 'Import'}
@@ -593,40 +594,76 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderUpdate()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-update'
+      >
+        <div
+          className='flex-container fi-preview-update-text'
+        >
+          <span
+            className='fi-preview-update-text-text'
+          >
+            What should the import do when a primary key in a row in this data matches a primary key in a row in the
+            existing data in Terrain?
+            </span>
+        </div>
+
+        <div
+          className='flex-container fi-preview-update-button-row'
+        >
+          <div
+            className='clickable fi-preview-update-button'
+            style={{
+              color: this.props.elasticUpdate ? Colors().active : Colors().border3,
+              border: this.props.elasticUpdate ? 'solid 1px ' + Colors().active : 'solid 1px ' + Colors().border3,
+            }}
+            onClick={this.handleElasticUpdateChange}
+          >
+            <div
+              className='fi-preview-update-button-title'
+            >
+              Join Data
+            </div>
+            <div
+              className='fi-preview-update-button-subtext'
+            >
+              Add new data to existing row
+            </div>
+          </div>
+
+          <div
+            className='clickable fi-preview-update-button'
+            style={{
+              color: !this.props.elasticUpdate ? Colors().active : Colors().border3,
+              border: !this.props.elasticUpdate ? 'solid 1px ' + Colors().active : 'solid 1px ' + Colors().border3,
+            }}
+            onClick={this.handleElasticUpdateChange}
+          >
+            <div
+              className='fi-preview-update-button-title'
+            >
+              Replace Data
+            </div>
+            <div
+              className='fi-preview-update-button-subtext'
+            >
+              Remove the existing row and use the new row instead
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   public renderBottomBar()
   {
     return (
       <div
         className='flex-container fi-import-button-wrapper'
       >
-        {
-          !this.props.exporting &&
-          <div
-            className='flex-container fi-preview-update'
-          >
-            <div
-              className='flex-container fi-preview-update-text'
-            >
-              <span
-                className='fi-preview-update-text-text'
-              >
-                Update: If a document with the specified primary key(s) already exists, update the existing document.
-                </span>
-              <span
-                className='fi-preview-update-text-text'
-              >
-                Replace: If a document with the specified primary key(s) already exists, replace the existing document.
-                </span>
-            </div>
-
-            <Switch
-              first={'update'}
-              second={'replace'}
-              selected={this.props.elasticUpdate ? 1 : 2}
-              onChange={this.handleElasticUpdateChange}
-            />
-          </div>
-        }
+        {this.renderUpdate()}
         {this.renderUpload()}
       </div>
     );

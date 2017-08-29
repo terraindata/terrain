@@ -99,6 +99,8 @@ interface Theme
 
   error: string;
 
+  import: string;
+
   // DO NOT USE these below colors anymore -- these need to be cleaned up
 
   // text
@@ -354,6 +356,8 @@ const DARK: Theme =
     altScrollbarPiece: 'rgba(0, 0, 0, 0.15)',
 
     error: '#d14f42',
+
+    import: '#1efab4',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
