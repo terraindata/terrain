@@ -79,14 +79,14 @@ export interface ParseCSVConfig
   comments?: string;
 
   /* If > 0, only that many rows will be parsed. */
-  preview?: number;
+  preview: number;
 
   /* if true, the first row of parsed data will be interpreted as field names. Warning: Duplicate field names will
      overwrite values in previous fields having the same name */
-  hasHeaderRow?: boolean;
+  hasHeaderRow: boolean;
 
   /* callback to execute if parser encounters an error. */
-  error?: (err: string) => void;
+  error: (err: string) => void;
 }
 
 export function parseCSV(file, config: ParseCSVConfig)
@@ -470,40 +470,6 @@ export class CSVTypeParser
     }
     return Array.isArray(parsedValue);
   }
-  private _getCSVType(value: string): string | string[]
-  {
-    // OoO: null/undefined, boolean, array, int, float, date, text
-    if (this._isNullHelper(value))
-    {
-      return 'null';
-    }
-    if (this._isBooleanHelper(value))
-    {
-      return 'boolean';
-    }
-    if (this._isArrayHelper(value))
-    {
-      const innerValue = JSON.parse(value);
-      if (innerValue.length === 0)
-      {
-        return ['array', 'null'];
-      }
-      return isTypeConsistent(innerValue) ? ['array'].concat(this._getCSVType(JSON.stringify(innerValue[0]))) : ['text'];
-    }
-    if (this._isIntHelper(value))
-    {
-      return 'long';
-    }
-    if (this._isDoubleHelper(value))
-    {
-      return 'double';
-    }
-    if (this._isDateHelper(value))
-    {
-      return 'date';
-    }
-    return 'text';
-  }
   private _getCSVTypeAsArray(value: string): string[]
   {
     if (this._isNullHelper(value))
@@ -516,7 +482,12 @@ export class CSVTypeParser
     }
     if (this._isArrayHelper(value))
     {
-      return [].concat(this._getCSVType(value));
+      const innerValue = JSON.parse(value);
+      if (innerValue.length === 0)
+      {
+        return ['array', 'null'];
+      }
+      return isTypeConsistent(innerValue) ? ['array'].concat(this._getCSVTypeAsArray(JSON.stringify(innerValue[0]))) : ['text'];
     }
     if (this._isIntHelper(value))
     {
