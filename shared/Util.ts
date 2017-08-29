@@ -431,13 +431,13 @@ export class CSVTypeParser
   }
   private _isIntHelper(value: string): boolean
   {
-    const parsedValue: any = parseInt(value, 10);
-    return !isNaN(parsedValue) && parsedValue.toString() === value;
+    const parsedValue: any = Number(value);
+    return !isNaN(parsedValue) && Number.isInteger(parsedValue);
   }
   private _isDoubleHelper(value: string): boolean
   {
-    const parsedValue: any = parseFloat(value);
-    return !isNaN(parsedValue) && parsedValue.toString() === value;
+    const parsedValue: any = Number(value);
+    return !isNaN(parsedValue);
   }
   private _isBooleanHelper(value: string): boolean
   {
