@@ -243,7 +243,7 @@ class Settings extends TerrainComponent<Props>
           <div className='settings-white-space' />
         </div>
         <div className='settings-row settings-bottom-margin'>
-          <CheckBox checked={this.state.showPassword} onChange={this.toggleShowPassword} />
+          <CheckBox checked={this.state.showPassword} onChange={this.toggleShowPassword} className='settings-checkbox' />
           <div className='settings-field-info settings-left-shift' onClick={this.toggleShowPassword}>Show password</div>
         </div>
         <div className='settings-row'>
