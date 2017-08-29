@@ -367,6 +367,7 @@ class TransformCardChart extends TerrainComponent<Props>
     {
       this.setState({
         pointsCache: nextProps.points,
+        pointsBuffer: null,
       });
     }
     else
