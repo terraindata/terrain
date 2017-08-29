@@ -92,6 +92,7 @@ export interface Props
   helpOn?: boolean;
   addColumn?: (number, string?) => void;
   columnIndex?: number;
+  handleCardDrop?: (type: string) => any;
 }
 
 interface IMoveState
@@ -384,6 +385,7 @@ class CardField extends TerrainComponent<Props>
                   renderPreview={true}
                   accepts={(this.props.row.inner as Display).accepts}
                   language={this.props.language}
+                  handleCardDrop={this.props.handleCardDrop}
                 />
               </div>,
               'Add another',
