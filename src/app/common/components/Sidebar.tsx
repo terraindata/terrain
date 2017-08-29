@@ -55,6 +55,7 @@ import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
 import StyleTag from './StyleTag';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less
@@ -113,7 +114,8 @@ export class Sidebar extends TerrainComponent<Props>
                   },
                 }}
               >
-                <div
+                
+                {tooltip( <div
                   className='sidebar-link-inner'
                 >
                   {
@@ -126,7 +128,11 @@ export class Sidebar extends TerrainComponent<Props>
                       link.text
                     }
                   </div>
-                </div>
+                </div>,
+                {
+                  title: link.text,
+                  position: 'right', 
+                })},
               </div>
             </Link>,
           )
