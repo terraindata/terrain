@@ -26,16 +26,6 @@
 
  text-align: left;
 
- // border: 1px solid #fff;
- &:hover:not(.dropdown-disabled),
- &.dropdown-open {
-  // border-color: #aaa;
- }
-
- &.dropdown-disabled {
-  background: #eee;
- }
-
  &.dropdown-wrapper-circle {
   width: @option-height;
  }
@@ -130,10 +120,11 @@
         border-right: 7px solid transparent;
         border-left: 7px solid transparent;
     }
-    
-    &:hover {
-      &:before {
-        opacity: 1;
+    :not(.dropdown-disabled) {
+      &:hover {
+        &:before {
+          opacity: 1;
+        }
       }
     }
   }

@@ -51,6 +51,7 @@ import * as React from 'react';
 import * as ReactDataGrid from 'react-data-grid';
 import { Toolbar } from 'react-data-grid-addons';
 
+import * as _ from 'lodash';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
@@ -195,7 +196,8 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public getRow(i: number): object
   {
-    return this.state.rows.get(i).fields.toJS();
+    const obj = this.state.rows.get(i).fields.toJS();
+    return _.mapValues(obj, (value) => JSON.stringify(value));
   }
 
   public onRowsSelected(rows)
@@ -286,7 +288,8 @@ export default class ResultsTable extends TerrainComponent<Props>
     else
     {
       this.setState({
-        rows: this.props.results.filter((r) => (r.fields.get(filter.column.key).toString().toLowerCase().includes(filter.filterTerm.toLowerCase()))),
+        rows: this.props.results.filter((r) =>
+          (r.fields.get(filter.column.key).toString().toLowerCase().includes(filter.filterTerm.toLowerCase()))),
       });
     }
   }

@@ -67,9 +67,7 @@ export interface Props
   columnType: ColumnTypesTree;
   isPrimaryKey: boolean;
   columnOptions: List<string>;
-  editing: boolean;
   exporting: boolean;
-  handleEditColumnChange(editColumnId: number);
   onColumnNameChange(columnId: number, localColumnName: string);
 }
 
@@ -81,11 +79,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
   } = {
     localColumnName: this.props.columnName,
   };
-
-  public handleEditClick()
-  {
-    this.props.handleEditColumnChange(this.props.columnId);
-  }
 
   public handleIncludedChange()
   {
@@ -104,7 +97,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleBlur()
+  public handleRename()
   {
     const success: boolean = this.props.onColumnNameChange(this.props.columnId, this.state.localColumnName);
     if (!success)
@@ -182,11 +175,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
       <div
         className='flex-container fi-preview-column-field'
       >
-        <span
-          className='fi-preview-column-field-name'
-        >
-          Name
-          </span>
         <div
           className='fi-preview-column-field-content'
         >
@@ -196,7 +184,9 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             onChange={this.handleLocalColumnNameChange}
             placeholder={''}
             disabled={false}
-            onBlur={this.handleBlur}
+            onEnter={this.handleRename}
+            onSelectOption={this.handleRename}
+            onBlur={this.handleRename}
           />
         </div>
       </div>
@@ -211,11 +201,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         <div
           className='flex-container fi-preview-column-field'
         >
-          <span
-            className='fi-preview-column-field-name'
-          >
-            Type
-            </span>
           <div
             className='fi-preview-column-field-content'
           >
@@ -223,7 +208,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
               columnId={this.props.columnId}
               recursionDepth={0}
               columnType={this.props.columnType}
-              editing={this.props.editing}
             />
           </div>
         </div>
@@ -238,11 +222,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
       <div
         className='flex-container fi-preview-column-field'
       >
-        <span
-          className='fi-preview-column-field-name'
-        >
-          Transform
-          </span>
         <div
           className='fi-preview-column-field-content'
         >
@@ -277,40 +256,9 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     );
   }
 
-  public renderColumnTitle()
-  {
-    return (
-      <div
-        className='fi-preview-column-title'
-        style={{
-          background: Colors().bg2,
-          text: Colors().text1,
-        }}
-      >
-        <div className='fi-preview-column-title-name'>
-          {this.props.columnName}
-        </div>
-        {
-          this.props.exporting ?
-            null
-            :
-            <div className='fi-preview-column-title-type'>
-              {this.props.columnType.type}
-            </div>
-        }
-        <div
-          className='fi-preview-column-edit-button'
-          onClick={this.handleEditClick}
-        >
-          Edit
-        </div>
-      </div>
-    );
-  }
-
   public render()
   {
-    return this.props.editing ? this.renderColumn() : this.renderColumnTitle();
+    return this.renderColumn();
   }
 }
 

@@ -49,12 +49,13 @@ THE SOFTWARE.
 import './Autocomplete.less';
 
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { altStyle, couldHover } from '../../common/Colors';
+import { altStyle, backgroundColor, Colors, couldHover } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props
@@ -74,6 +75,8 @@ export interface Props
 
   onFocus?: (event: React.FocusEvent<any>) => void;
   onBlur?: (event: React.FocusEvent<any>, value: string) => void;
+  onEnter?: (value: string) => void;
+  onSelectOption?: (value: string) => void;
 }
 
 @Radium
@@ -149,6 +152,10 @@ class Autocomplete extends TerrainComponent<Props>
   public handleSelect(value)
   {
     this.props.onChange(value);
+    if (this.props.onSelectOption !== undefined)
+    {
+      this.props.onSelectOption(value);
+    }
     this.setState({
       value,
       open: false,
@@ -215,6 +222,7 @@ class Autocomplete extends TerrainComponent<Props>
         });
         this.blurValue = value;
         this.props.onChange(value);
+        this.props.onEnter && this.props.onEnter(value);
         this.refs['input']['blur']();
         break;
       case 27:
@@ -287,12 +295,22 @@ class Autocomplete extends TerrainComponent<Props>
 
     const open = this.state.open && !!options && options.size > 0;
 
+    const inputStyle = this.props.disabled ?
+      _.extend({}, this.props.style ? this.props.style : {},
+        backgroundColor(Colors().darkerHighlight),
+      )
+      :
+      this.props.style;
+
     const inputElem =
       <input
-        style={this.props.style}
+        style={inputStyle}
         ref='input'
         type='text'
-        className={inputClassName}
+        className={classNames({
+          [inputClassName]: true,
+          'ac-input-disabled': this.props.disabled,
+        })}
         value={this.state.value}
         onChange={this.handleChange}
         onFocus={this.handleFocus}

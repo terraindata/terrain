@@ -159,6 +159,12 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
   return state;
 };
 
+FileImportReducers[ActionTypes.setErrorMsg] =
+  (state, action) =>
+    state
+      .set('errorMsg', action.payload.err)
+  ;
+
 FileImportReducers[ActionTypes.changeServer] =
   (state, action) =>
     state
@@ -180,17 +186,16 @@ FileImportReducers[ActionTypes.changeTableName] =
     state
       .set('tableName', action.payload.tableName);
 
-FileImportReducers[ActionTypes.changeServerDbTable] =
-  (state, action) =>
-    state
-      .set('serverId', action.payload.serverId)
-      .set('dbName', action.payload.dbName)
-      .set('tableName', action.payload.tableName);
-
 FileImportReducers[ActionTypes.changeHasCsvHeader] =
   (state, action) =>
     state
       .set('hasCsvHeader', action.payload.hasCsvHeader)
+  ;
+
+FileImportReducers[ActionTypes.changeIsNewlineSeparatedJSON] =
+  (state, action) =>
+    state
+      .set('isNewlineSeparatedJSON', action.payload.isNewlineSeparatedJSON)
   ;
 
 FileImportReducers[ActionTypes.changeUploadInProgress] =
@@ -268,12 +273,17 @@ FileImportReducers[ActionTypes.chooseFile] =
     state
       .set('filetype', action.payload.filetype)
       .set('primaryKeys', List([]))
+      .set('primaryKeyDelimiter', '-')
       .set('previewRows', action.payload.preview)
       .set('originalNames', action.payload.originalNames)
       .set('columnNames', action.payload.originalNames)
       .set('columnsToInclude', List(action.payload.originalNames.map(() => true)))
       .set('columnTypes', List(action.payload.originalNames.map(() => FileImportTypes._ColumnTypesTree())))
       .set('transforms', List([]))
+      .set('serverId', -1)
+      .set('serverName', '')
+      .set('dbName', '')
+      .set('tableName', '')
   ;
 
 FileImportReducers[ActionTypes.importFile] =
@@ -294,6 +304,7 @@ FileImportReducers[ActionTypes.importFile] =
       state.transforms,
       state.elasticUpdate,
       state.hasCsvHeader,
+      state.isNewlineSeparatedJSON,
       state.primaryKeyDelimiter,
       () =>
       {
@@ -303,7 +314,7 @@ FileImportReducers[ActionTypes.importFile] =
       },
       (err: string) =>
       {
-        alert('Error uploading file: ' + JSON.parse(err).errors[0].detail);
+        action.payload.setErrorMsg('Error uploading file: ' + JSON.parse(err).errors[0].detail);
         action.payload.changeUploadInProgress(false);
       },
     );
@@ -315,8 +326,8 @@ FileImportReducers[ActionTypes.exportFile] =
   {
     Ajax.exportFile(
       state.filetype,
-      state.dbName,
-      state.serverId,
+      action.payload.dbName,
+      action.payload.serverId,
       Map<string, object>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&
         [colName, state.columnTypes.get(colId).toJS()],
@@ -365,7 +376,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       },
       (err: string) =>
       {
-        alert('Error saving template: ' + err);
+        action.payload.setErrorMsg('Error saving template: ' + err);
       },
     );
     return state;
@@ -431,7 +442,6 @@ FileImportReducers[ActionTypes.fetchTemplates] =
             originalNames: template['originalNames'],
             columnTypes: template['columnTypes'],
             transformations: template['transformations'],
-            hasCsvHeader: template['csvHeaderMissing'],
             primaryKeys: template['primaryKeys'],
             primaryKeyDelimiter: template['primaryKeyDelimiter'],
             export: template['export'],
@@ -444,10 +454,11 @@ FileImportReducers[ActionTypes.fetchTemplates] =
     return state;
   };
 
-FileImportReducers[ActionTypes.loadTemplate] =
+FileImportReducers[ActionTypes.applyTemplate] =
   (state, action) =>
   {
-    const template: Template = state.templates.get(action.payload.templateId);
+    const index = state.templates.findKey((temp) => temp.templateId === action.payload.templateId);
+    const template: Template = state.templates.get(index);
     template.transformations.map((transform) =>
     {
       state = applyTransform(state, transform);

@@ -50,10 +50,10 @@ const FileImportActionTypes =
     changeServer: '',
     changeDbName: '',
     changeTableName: '',
-    changeServerDbTable: '',
     changeDbText: '',
     changeTableText: '',
     changeHasCsvHeader: '',
+    changeIsNewlineSeparatedJSON: '',
     changePrimaryKey: '',
     changePrimaryKeyDelimiter: '',
     chooseFile: '',
@@ -67,12 +67,13 @@ const FileImportActionTypes =
     saveTemplate: '',
     fetchTemplates: '',
     setTemplates: '',
-    loadTemplate: '',
+    applyTemplate: '',
     deleteTemplate: '',
     updateTemplate: '',
     saveFile: '',
     changeUploadInProgress: '',
     changeElasticUpdate: '',
+    setErrorMsg: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

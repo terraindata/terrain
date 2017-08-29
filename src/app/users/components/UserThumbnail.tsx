@@ -165,7 +165,7 @@ class UserThumbnail extends TerrainComponent<Props>
       {
         html: tip,
         position: 'left',
-      }
+      },
     );
     if (this.props.link && user)
     {

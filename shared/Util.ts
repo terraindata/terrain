@@ -294,3 +294,51 @@ export function parseJSONSubset(file: string, numLines: number): object[]
   }
   return JSON.parse(file.substring(0, c) + ']');
 }
+
+export function parseNewlineJSON(file: string, numLines: number): object[] | string
+{
+  const items: object[] = [];
+  let ind: number = 0;
+  while (ind < file.length)
+  {
+    let rInd: number = file.indexOf('\r', ind);
+    rInd = rInd === -1 ? file.length : rInd;
+    let nInd: number = file.indexOf('\n', ind);
+    nInd = nInd === -1 ? file.length : nInd;
+    const end: number = Math.min(rInd, nInd);
+
+    const line: string = file.substring(ind, end);
+    if (line !== '')
+    {
+      try
+      {
+        items.push(JSON.parse(file.substring(ind, end)));
+        if (items.length === numLines)
+        {
+          return items;
+        }
+      }
+      catch (e)
+      {
+        return 'JSON format incorrect. Could not parse object: ' + line;
+      }
+      ind = end;
+    }
+    else
+    {
+      ind++;
+    }
+  }
+  return items;
+}
+
+// full template name is of the form - 'id: name'
+export function getTemplateName(template: string): string
+{
+  return template.substring(template.indexOf(':') + 2);
+}
+
+export function getTemplateId(template: string): number
+{
+  return Number(template.substring(0, template.indexOf(':')));
+}

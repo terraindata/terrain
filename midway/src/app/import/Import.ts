@@ -194,10 +194,15 @@ export class Import
         return reject(e);
       }
 
+      if (qryObj['index'] === '')
+      {
+        return reject('Must provide an index.');
+      }
       if (qryObj['index'] !== exprt['dbname'])
       {
         return reject('Query index name does not match supplied index name.');
       }
+      const tableName: string = qryObj['type'] !== '' ? qryObj['type'] : undefined;
       let rankCounter: number = 1;
       let writer: any;
       if (exprt.filetype === 'csv')
@@ -235,10 +240,11 @@ export class Import
         }
         let returnDocs: object[] = [];
 
+        const fieldArrayDepths: object = {};
         for (const doc of newDocs)
         {
           // verify schema mapping with documents and fix documents accordingly
-          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname);
+          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname, tableName);
           if (typeof newDoc === 'string')
           {
             writer.end();
@@ -247,12 +253,28 @@ export class Import
           }
           for (const field of Object.keys(newDoc))
           {
+            if (newDoc[field] !== null && newDoc[field] !== undefined)
+            {
+              if (fieldArrayDepths[field] === undefined)
+              {
+                fieldArrayDepths[field] = new Set<number>();
+              }
+              fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
+            }
             if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
             {
               newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
             }
           }
           returnDocs.push(newDoc as object);
+        }
+        for (const field of Object.keys(fieldArrayDepths))
+        {
+          if (fieldArrayDepths[field].size > 1)
+          {
+            errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
+            return reject(errMsg);
+          }
         }
 
         // transform documents with template
@@ -675,7 +697,8 @@ export class Import
     return typeObj['type'];
   }
 
-  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema, database: string): Promise<object | string>
+  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema,
+    database: string, tableName: string): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
@@ -684,7 +707,16 @@ export class Import
       {
         return resolve('Schema not found for database ' + database);
       }
-      for (const table of schema.tableNames(database))
+      let tableNameArr: string[] = [];
+      if (tableName !== undefined)
+      {
+        tableNameArr = [tableName];
+      }
+      else
+      {
+        tableNameArr = schema.tableNames(database);
+      }
+      for (const table of tableNameArr)
       {
         const fields: object = schema.fields(database, table);
         const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(fields), Object.keys(document));
@@ -954,6 +986,16 @@ export class Import
     }
     this.chunkQueue.push({ chunk: contents, isLast });
     return '';
+  }
+
+  /* assumes arrays are of uniform depth */
+  private _getArrayDepth(obj: any): number
+  {
+    if (Array.isArray(obj))
+    {
+      return this._getArrayDepth(obj[0]) + 1;
+    }
+    return 0;
   }
 
   /* return ES type from type specification format of ImportConfig
