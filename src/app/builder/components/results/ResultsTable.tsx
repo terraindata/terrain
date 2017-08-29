@@ -59,6 +59,7 @@ import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import { getResultName } from './Result';
 import { Results } from './ResultTypes';
+import * as _ from 'lodash';
 
 export interface Props
 {
@@ -195,7 +196,8 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public getRow(i: number): object
   {
-    return this.state.rows.get(i).fields.toJS();
+    var obj = this.state.rows.get(i).fields.toJS();
+    return _.mapValues(obj, (value) => JSON.stringify(value));;
   }
 
   public onRowsSelected(rows)
@@ -374,3 +376,5 @@ export default class ResultsTable extends TerrainComponent<Props>
     );
   }
 }
+
+
