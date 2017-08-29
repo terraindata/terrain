@@ -1,5 +1,7 @@
 @import "../../common/Common.less";
 
+@bar-h: 40px;
+
 .fi-preview-column {
   display: inline-block;
   width: 300px;
@@ -8,12 +10,15 @@
   margin-right: 6px;
   margin-left: 6px;
   overflow-y: visible;
-  border-radius: 3px 3px 0px 0px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  position: relative;
 
   .fi-preview-column-header {
     align-items: center;
     justify-content: space-between;
-    border-radius: 3px 3px 0px 0px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
 
     .fi-preview-column-header-include {
       vertical-align: middle;
@@ -50,5 +55,25 @@
     .fi-preview-column-field-content {
       flex-grow: 1;
     }
+  }
+
+  .fi-preview-column-disabled-veil {
+    position: absolute;
+    top: @bar-h;
+    width: 100%;
+    height: calc(~"100% - @{bar-h}");
+    background: rgba(0,0,0,0);
+    opacity: 0;
+    pointer-events: none;
+    .transition(~"all 0.35s");
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+}
+
+.fi-preview-column-disabled {
+  .fi-preview-column-disabled-veil {
+    opacity: 1;
+    pointer-events: all;
   }
 }

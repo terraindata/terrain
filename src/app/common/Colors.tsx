@@ -91,6 +91,8 @@ interface Theme
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
+  notIncludedBg: string; // for denoting not included columns on import/export
+
   inputBg: string;
 
   scrollbarBG: string;
@@ -341,6 +343,8 @@ const DARK: Theme =
     boxShadow: 'rgba(0, 0, 0, 0.39)',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
+
+    notIncludedBg: 'rgba(0, 0, 0, 0.5)', // bg for not included column/row
 
     inputBg: 'rgba(0,0,0,0.25)',
 

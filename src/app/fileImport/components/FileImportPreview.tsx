@@ -594,6 +594,7 @@ class FileImportPreview extends TerrainComponent<Props>
               <FileImportPreviewRow
                 key={key}
                 items={items}
+                columnsToInclude={this.props.columnsToInclude}
               />,
             )
           }
