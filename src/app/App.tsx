@@ -100,7 +100,7 @@ import UserStore from './users/data/UserStore';
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
-const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
+const BuilderIcon = require('./../images/icon_bldr-3.svg');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
 const SchemaIcon = require('./../images/icon_schema.svg?name=SchemaIcon');
 const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
