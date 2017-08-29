@@ -55,7 +55,7 @@ import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
-import { parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
+import { CSVTypeParser, parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -335,12 +335,42 @@ class FileImport extends TerrainComponent<any>
         ),
       );
 
-      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames));
+      const previewColumns = columnNamesToMap.map((name) =>
+        items.map((item) => item[name]));
+      const types = this.detectTypes(filetype, previewColumns);
+      if (types === undefined)
+      {
+        return;
+      }
+
+      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames), List(types));
       this.setState({
         fileSelected: true,
       });
       this.incrementStep();
     };
+  }
+
+  public detectTypes(filetype: string, previewColumns: any[][]): FileImportTypes.ColumnTypesTree[] | undefined
+  {
+    let types: object[];
+    switch (filetype)
+    {
+      case 'csv':
+        const csvParse = new CSVTypeParser();
+        types = previewColumns.map((column) => csvParse.getBestTypeFromArrayAsObject(column));
+        break;
+      case 'json':
+        // TODO
+        break;
+      default:
+    }
+    if (types === undefined)
+    {
+      return undefined;
+    }
+
+    return types.map((typeObj) => FileImportTypes._ColumnTypesTree(typeObj));
   }
 
   public handleSelectFile(file)

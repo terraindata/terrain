@@ -342,3 +342,199 @@ export function getTemplateId(template: string): number
 {
   return Number(template.substring(0, template.indexOf(':')));
 }
+
+export class CSVTypeParser
+{
+  public getBestTypeFromArrayAsObject(values: string[]): object
+  {
+    const arrType: string[] = this.getBestTypeFromArrayAsArray(values);
+    return this._getTypeObjFromArray(arrType);
+  }
+  public getBestTypeFromArrayAsArray(values: string[]): string[]
+  {
+    const stringifiedTypes: Set<string> = new Set();
+    for (const value of values)
+    {
+      stringifiedTypes.add(JSON.stringify(this._getCSVTypeAsArray(value)));
+    }
+    const types: Set<any> = new Set();
+    for (const type of stringifiedTypes)
+    {
+      types.add(JSON.parse(type));
+    }
+    let numberOfArrayTypes: number = 0;
+    let arrType: string[] = [];
+    for (const type of types)
+    {
+      if (type[0] === 'array')
+      {
+        numberOfArrayTypes++;
+        arrType = type;
+      }
+    }
+    if (numberOfArrayTypes > 1 || (numberOfArrayTypes === 1 && (types.size > 2
+      || (types.size === 2 && !stringifiedTypes.has(JSON.stringify(['null']))))))
+    {
+      return ['text']; // special case for when there's multiple array types encountered or array + non-null types
+    }
+    else if (numberOfArrayTypes === 1 || (numberOfArrayTypes === 2 && stringifiedTypes.has(JSON.stringify(['null']))))
+    {
+      return arrType;
+    }
+    if (types.size === 1)
+    {
+      return Array.from(types)[0] as string[];
+    }
+    if (this._matchInSet(types, ['long', 'double']))
+    {
+      return ['double'];
+    }
+    if (this._matchInSet(types, ['long', 'date']))
+    {
+      return ['date'];
+    }
+    if (this._matchInSet(types, ['double', 'date']))
+    {
+      return ['date'];
+    }
+    // TODO: other cases?
+    return ['text'];
+  }
+
+  private _getTypeObjFromArray(typeArr: string[]): object
+  {
+    const typeObj = {};
+    if (typeArr.length === 0)
+    {
+      return typeObj;
+    }
+    typeObj['type'] = typeArr[0];
+    if (typeArr.length > 1)
+    {
+      typeArr.shift();
+      typeObj['innerType'] = this._getTypeObjFromArray(typeArr);
+    }
+    return typeObj;
+  }
+
+  private _isNullHelper(value: string): boolean
+  {
+    return value === null || value === undefined || value === '' || value === 'null';
+  }
+  private _isIntHelper(value: string): boolean
+  {
+    const parsedValue: any = parseInt(value, 10);
+    return !isNaN(parsedValue) && parsedValue.toString() === value;
+  }
+  private _isDoubleHelper(value: string): boolean
+  {
+    const parsedValue: any = parseFloat(value);
+    return !isNaN(parsedValue) && parsedValue.toString() === value;
+  }
+  private _isBooleanHelper(value: string): boolean
+  {
+    let parsedValue: any;
+    try
+    {
+      parsedValue = JSON.parse(value);
+    }
+    catch (e)
+    {
+      return false;
+    }
+    return parsedValue === false || parsedValue === true;
+  }
+  private _isDateHelper(value: string): boolean
+  {
+    const parsedValue: any = Date.parse(value);
+    return !isNaN(parsedValue);
+  }
+  private _isArrayHelper(value: string): boolean
+  {
+    let parsedValue: any;
+    try
+    {
+      parsedValue = JSON.parse(value);
+    }
+    catch (e)
+    {
+      return false;
+    }
+    return Array.isArray(parsedValue);
+  }
+  private _getCSVType(value: string): string | string[]
+  {
+    // OoO: null/undefined, boolean, array, int, float, date, text
+    if (this._isNullHelper(value))
+    {
+      return 'null';
+    }
+    if (this._isBooleanHelper(value))
+    {
+      return 'boolean';
+    }
+    if (this._isArrayHelper(value))
+    {
+      const innerValue = JSON.parse(value);
+      if (innerValue.length === 0)
+      {
+        return ['array', 'null'];
+      }
+      return ['array'].concat(this._getCSVType(innerValue[0]));
+    }
+    if (this._isIntHelper(value))
+    {
+      return 'long';
+    }
+    if (this._isDoubleHelper(value))
+    {
+      return 'double';
+    }
+    if (this._isDateHelper(value))
+    {
+      return 'date';
+    }
+    return 'text';
+  }
+  private _getCSVTypeAsArray(value: string): string[]
+  {
+    if (this._isNullHelper(value))
+    {
+      return ['null'];
+    }
+    if (this._isBooleanHelper(value))
+    {
+      return ['boolean'];
+    }
+    if (this._isArrayHelper(value))
+    {
+      return [].concat(this._getCSVType(value));
+    }
+    if (this._isIntHelper(value))
+    {
+      return ['long'];
+    }
+    if (this._isDoubleHelper(value))
+    {
+      return ['double'];
+    }
+    if (this._isDateHelper(value))
+    {
+      return ['date'];
+    }
+    return ['text'];
+  }
+  private _matchInSet(typeSet: Set<any>, types: string[]): boolean
+  {
+    let counter: number = 0;
+    for (const type of types)
+    {
+      // typeSet.has([type]) ? counter++ : this._noop();
+      if (typeSet.has([type]))
+      {
+        counter++;
+      }
+    }
+    return counter === typeSet.size || (typeSet.has('null') && counter + 1 === typeSet.size);
+  }
+}
