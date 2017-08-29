@@ -8,36 +8,9 @@
    viewBox="-293 385 24 24"
    style="enable-background:new -293 385 24 24;"
    xml:space="preserve"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="icon_bldr-3.svg"><metadata
-     id="metadata4259"><rdf:RDF><cc:Work
-         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
-     id="defs4257" /><sodipodi:namedview
-    
-     id="namedview4255"
-     showgrid="false"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="-58.232891"
-     inkscape:cy="25.35345"
-     inkscape:window-x="408"
-     inkscape:window-y="1462"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="layer1"
-     inkscape:snap-grids="false"
-     inkscape:snap-global="false"
-     inkscape:snap-nodes="true"
-     inkscape:object-nodes="true"
-     inkscape:snap-to-guides="false"
-     inkscape:snap-others="false"
-     showguides="false"><inkscape:grid
-       type="xygrid"
-       id="grid3335"
-       empspacing="30"
-       visible="true" /></sodipodi:namedview><g
-     inkscape:groupmode="layer"
+   
      id="layer1"
-     inkscape:label="Boxes"><rect
+     ><rect
        style="fill:#FFFFFF;fill-opacity:1;stroke:none;stroke-width:4;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4151"
        width="4.5"
@@ -106,4 +79,4 @@
        height="4.6999998"
        x="405.79999"
        y="269.00003"
-       transform="matrix(0,1,-1,0,0,0)" /></g></svg>
+       transform="matrix(0,1,-1,0,0,0)" /></svg>
