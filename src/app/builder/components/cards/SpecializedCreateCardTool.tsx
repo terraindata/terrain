@@ -134,6 +134,9 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
 
   public render()
   {
+    // const accepts = this.props.data.static[] !== undefined ? this.props.data.static.accepts : emptyList;
+    const st = this.props.data.get('static');
+    const accepts = st.accepts !== undefined ? st.accepts : emptyList;
     return (
       <div style={STYLE} >
         <CreateCardTool
@@ -143,7 +146,7 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
           canEdit={this.props.canEdit}
           language={this.props.language}
           className={this.props.className}
-          accepts={emptyList}
+          accepts={accepts}
 
           open={this.state.open}
           onToggle={this._toggle('open')}

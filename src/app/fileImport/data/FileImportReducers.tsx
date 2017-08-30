@@ -270,7 +270,10 @@ FileImportReducers[ActionTypes.updatePreviewRows] =
 
 FileImportReducers[ActionTypes.chooseFile] =
   (state, action) =>
-    state
+  {
+    const columnTypes = action.payload.columnTypes !== undefined ? action.payload.columnTypes :
+      List(action.payload.originalNames.map(() => FileImportTypes._ColumnTypesTree()));
+    return state
       .set('filetype', action.payload.filetype)
       .set('primaryKeys', List([]))
       .set('primaryKeyDelimiter', '-')
@@ -278,13 +281,13 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('originalNames', action.payload.originalNames)
       .set('columnNames', action.payload.originalNames)
       .set('columnsToInclude', List(action.payload.originalNames.map(() => true)))
-      .set('columnTypes', List(action.payload.originalNames.map(() => FileImportTypes._ColumnTypesTree())))
+      .set('columnTypes', columnTypes)
       .set('transforms', List([]))
       .set('serverId', -1)
       .set('serverName', '')
       .set('dbName', '')
-      .set('tableName', '')
-  ;
+      .set('tableName', '');
+  };
 
 FileImportReducers[ActionTypes.importFile] =
   (state, action) =>

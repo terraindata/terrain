@@ -89,6 +89,8 @@ export interface Props
     type: string;
   }>; // can override the options displayed
   overrideClick?: (index: number) => void; // override the click handler
+
+  handleCardDrop?: (tyoe: string) => any;
 }
 
 @Radium
@@ -223,7 +225,7 @@ class CreateCardTool extends TerrainComponent<Props>
 
   public renderPlaceholder()
   {
-    if (this.props.hidePlaceholder || this.props.cannotClose) // || this.props.open)
+    if (this.props.hidePlaceholder || (this.props.cannotClose && this.props.open))
     {
       return null;
     }
@@ -326,6 +328,7 @@ class CreateCardTool extends TerrainComponent<Props>
           accepts={this.getCardTypeList()}
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
+          handleCardDrop={this.props.handleCardDrop}
         />
         <KeyboardFocus
           onFocus={this.handleFocus}
