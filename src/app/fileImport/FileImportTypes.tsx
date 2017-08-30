@@ -57,7 +57,10 @@ class FileImportStateC extends BaseClass
   public serverName: string = '';
   public dbName: string = '';
   public tableName: string = '';
+
+  public file: File = new File([''], '');
   public filetype: string = '';
+  public filesize: number = 0;
 
   public previewRows: List<List<string>> = List([]);
   public primaryKeys: List<number> = List([]);
@@ -74,7 +77,6 @@ class FileImportStateC extends BaseClass
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
-  public file: File = new File([''], '');
 
   public uploadInProgress: boolean = false;
   public elasticUpdate: boolean = true;
@@ -177,6 +179,8 @@ export const NUMBER_PREVIEW_ROWS = 5;
 
 export const PREVIEW_CHUNK_SIZE = 10000000; // (10mb) - amount to read in order to extract preview rows
 
+export const MIN_PROGRESSBAR_FILESIZE = 500000; // (500kb) - threshold to display progressbar (spinning wheel)
+
 export const FILE_TYPES =
   [
     'json',
@@ -250,6 +254,15 @@ export const STEP_SUBTEXT =
   {
     DATABASE_SUBTEXT: 'Use the field above to either choose an existing database or name a new one that will be created',
     TABLE_SUBTEXT: 'Use the field above to either choose an existing table or name a new one that will be created',
+  };
+
+export const TRANSFORM_TEXT =
+  {
+    DUPLICATE: 'Duplicate this column and its contents',
+    APPEND: 'Append a string to this column\'s contents',
+    PREPEND: 'Prepend a string to this column\'s contents',
+    SPLIT: 'Split this column into two by a given shared string. If the string is not found, the second column will be empty',
+    MERGE: 'Merge this column\'s contents with that of another with the option of choosing a merge string between them',
   };
 
 export const enum Steps

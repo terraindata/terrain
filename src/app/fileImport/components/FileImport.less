@@ -34,6 +34,13 @@
   display: flex; // applies Flexbox to child elements
   align-items: center; // center horizontally
   justify-content: center; // center vertically
+  overflow: hidden;
+
+  // TODO: find better way of preventing dropdown option clipping
+  .file-import-inner-server-step {
+    padding-top: 200px;
+    padding-bottom: 200px;
+  }
 
 	.file-import-inner {
     min-width: 300px;
@@ -43,6 +50,8 @@
     overflow: hidden;
 
     .fi-step {
+      margin-top: 12px;
+
       .fi-step-name {
         .title-text;
         text-align: center;

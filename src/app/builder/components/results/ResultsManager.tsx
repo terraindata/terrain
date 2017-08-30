@@ -293,8 +293,8 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (exportChanges)
     {
-      const { filetype, preview, originalNames } = exportChanges;
-      Actions.chooseFile(filetype, preview, originalNames);
+      const { filetype, filesize, preview, originalNames } = exportChanges;
+      Actions.chooseFile(filetype, filesize, preview, originalNames);
     }
 
     this.props.onResultsStateChange(resultsState);

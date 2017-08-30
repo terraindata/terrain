@@ -85,9 +85,10 @@ const FileImportActions =
       $(ActionTypes.changePrimaryKeyDelimiter, { delim }),
 
     chooseFile:
-    (filetype: string, preview: List<List<string>>, originalNames: List<string>, columnTypes?: List<ColumnTypesTree>) =>
+    (filetype: string, filesize: number, preview: List<List<string>>, originalNames: List<string>, columnTypes?: List<ColumnTypesTree>) =>
       $(ActionTypes.chooseFile, {
         filetype,
+        filesize,
         preview,
         originalNames,
         columnTypes,
@@ -183,8 +184,8 @@ const FileImportActions =
       $(ActionTypes.changeUploadInProgress, { uploading }),
 
     changeElasticUpdate:
-    () =>
-      $(ActionTypes.changeElasticUpdate, {}),
+    (elasticUpdate: boolean) =>
+      $(ActionTypes.changeElasticUpdate, { elasticUpdate }),
 
     addPreviewColumn:
     (columnName: string) =>
