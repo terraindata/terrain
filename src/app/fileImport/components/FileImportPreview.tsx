@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-empty strict-boolean-expressions no-console no-var-requires
 
 import * as classNames from 'classnames';
-import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Immutable from 'immutable';
 import * as moment from 'moment';
 import * as Radium from 'radium';
@@ -62,11 +61,13 @@ import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
 import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import { tooltip } from './../../common/components/tooltip/Tooltips';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
+import TransformModal from './TransformModal';
 
 const { List } = Immutable;
 
@@ -100,6 +101,7 @@ export interface Props
   query?: string;
   serverId?: number;
   variantName?: string;
+  filesize?: number;
 }
 
 @Radium
@@ -113,6 +115,8 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: boolean,
     showingApplyTemplate: boolean,
     showingSaveTemplate: boolean,
+    showingTransformModal: boolean,
+    columnId: number,
     showingAdvanced: boolean,
     showingAddColumn: boolean,
     addColumnName: string,
@@ -128,6 +132,8 @@ class FileImportPreview extends TerrainComponent<Props>
     showingUpdateTemplate: false,
     showingApplyTemplate: false,
     showingSaveTemplate: false,
+    showingTransformModal: false,
+    columnId: -1,
     showingAdvanced: false,
     showingAddColumn: false,
     addColumnName: '',
@@ -187,6 +193,20 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     this.setState({
       showingApplyTemplate: false,
+    });
+  }
+
+  public showTransformModal()
+  {
+    this.setState({
+      showingTransformModal: true,
+    });
+  }
+
+  public hideTransformModal()
+  {
+    this.setState({
+      showingTransformModal: false,
     });
   }
 
@@ -366,9 +386,21 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
-  public handleElasticUpdateChange()
+  public onTransform(columnId: number)
   {
-    Actions.changeElasticUpdate();
+    this.setState({
+      showingTransformModal: true,
+      columnId,
+    });
+  }
+
+  public handleElasticUpdateChange(elasticUpdate: boolean)
+  {
+    if (elasticUpdate === this.props.elasticUpdate)
+    {
+      return;
+    }
+    Actions.changeElasticUpdate(elasticUpdate);
   }
 
   public handleRequireJSONHaveAllFieldsChange()
@@ -465,6 +497,7 @@ class FileImportPreview extends TerrainComponent<Props>
           />
         }
         fill={true}
+        noFooterPadding={true}
       />
     );
   }
@@ -653,6 +686,20 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderTransformModal()
+  {
+    return (
+      <TransformModal
+        open={this.state.showingTransformModal}
+        columnId={this.state.columnId}
+        columnName={this.props.columnNames.get(this.state.columnId)}
+        columnNames={this.props.columnNames}
+        datatype={this.props.columnTypes.get(this.state.columnId).type}
+        onClose={this.hideTransformModal}
+      />
+    );
+  }
+
   public renderPrimaryKeys()
   {
     return (
@@ -666,6 +713,16 @@ class FileImportPreview extends TerrainComponent<Props>
                 key={pkey}
                 className='flex-shrink flex-container fi-preview-pkeys-wrapper'
               >
+                {
+                  index === 0 &&
+                  <div
+                    style={{
+                      text: Colors().text1,
+                    }}
+                  >
+                    Primary key(s):
+                  </div>
+                }
                 <div
                   className='flex-shrink fi-preview-pkeys-pkey'
                   style={{
@@ -701,13 +758,16 @@ class FileImportPreview extends TerrainComponent<Props>
                           onBlur={this.onDelimChange}
                         />
                         :
-                        <span
-                          className='clickable'
-                        >
-                          {
-                            this.props.primaryKeyDelimiter
-                          }
-                        </span>
+                        tooltip(
+                          <span
+                            className='clickable'
+                          >
+                            {
+                              this.props.primaryKeyDelimiter
+                            }
+                          </span>,
+                          'Click to edit delimiter',
+                        )
                     }
                   </div>
                 }
@@ -720,7 +780,7 @@ class FileImportPreview extends TerrainComponent<Props>
                 text: Colors().text1,
               }}
             >
-              No Primary Keys Selected
+              No primary keys selected
             </div>
         }
       </div>
@@ -741,6 +801,7 @@ class FileImportPreview extends TerrainComponent<Props>
         columnOptions={this.props.columnOptions}
         exporting={this.props.exporting}
         onColumnNameChange={this.onColumnNameChange}
+        onTransform={this.onTransform}
       />,
     ).toArray();
     if (this.props.filetype === 'json' && !this.props.requireJSONHaveAllFields)
@@ -778,6 +839,7 @@ class FileImportPreview extends TerrainComponent<Props>
               <FileImportPreviewRow
                 key={key}
                 items={items}
+                columnsToInclude={this.props.columnsToInclude}
               />,
             )
           }
@@ -793,7 +855,8 @@ class FileImportPreview extends TerrainComponent<Props>
         className='fi-preview-import-button large-button'
         onClick={this.handleUploadFile}
         style={{
-          background: 'green', // TODO: add green to Colors?
+          color: Colors().import,
+          border: 'solid 1px ' + Colors().import,
         }}
       >
         {this.props.exporting ? 'Export' : 'Import'}
@@ -803,7 +866,7 @@ class FileImportPreview extends TerrainComponent<Props>
       this.props.exporting ?
         upload
         :
-        this.props.uploadInProgress ?
+        this.props.uploadInProgress && this.props.filesize > FileImportTypes.MIN_PROGRESSBAR_FILESIZE ?
           <div className='fi-preview-loading-container'>
             <Loading
               width={100}
@@ -822,7 +885,10 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     return (
       <div
-        className='flex-container fi-preview-topbar'
+        className={classNames({
+          'flex-container fi-preview-topbar': true,
+          'fi-preview-topbar-export': this.props.exporting,
+        })}
       >
         {
           !this.props.exporting &&
@@ -833,6 +899,85 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderUpdate()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-update'
+      >
+        <div
+          className='flex-container fi-preview-update-text'
+        >
+          <span
+            className='fi-preview-update-text-text'
+          >
+            What should the import do when a primary key in a row in this data matches a primary key in a row in the
+            existing data in Terrain?
+            </span>
+        </div>
+
+        <div
+          className='flex-container fi-preview-update-button-row'
+        >
+          <div
+            className='clickable fi-preview-update-button'
+            style={{
+              color: this.props.elasticUpdate ? Colors().active : Colors().border3,
+              border: this.props.elasticUpdate ? 'solid 1px ' + Colors().active : 'solid 1px ' + Colors().border3,
+            }}
+            onClick={this._fn(this.handleElasticUpdateChange, true)}
+          >
+            <div
+              className='flex-container fi-preview-update-button-header'
+            >
+              <CheckBox
+                checked={this.props.elasticUpdate}
+                onChange={this._fn(this.handleElasticUpdateChange, true)}
+              />
+              <div
+                className='fi-preview-update-button-header-title'
+              >
+                Join Data
+              </div>
+            </div>
+            <div
+              className='fi-preview-update-button-subtext'
+            >
+              Add new data to existing row
+            </div>
+          </div>
+
+          <div
+            className='clickable fi-preview-update-button'
+            style={{
+              color: !this.props.elasticUpdate ? Colors().active : Colors().border3,
+              border: !this.props.elasticUpdate ? 'solid 1px ' + Colors().active : 'solid 1px ' + Colors().border3,
+            }}
+            onClick={this._fn(this.handleElasticUpdateChange, false)}
+          >
+            <div
+              className='flex-container fi-preview-update-button-header'
+            >
+              <CheckBox
+                checked={!this.props.elasticUpdate}
+                onChange={this._fn(this.handleElasticUpdateChange, false)}
+              />
+              <div
+                className='fi-preview-update-button-header-title'
+              >
+                Replace Data
+              </div>
+            </div>
+            <div
+              className='fi-preview-update-button-subtext'
+            >
+              Remove the existing row and use the new row instead
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   public renderBottomBar()
   {
     return (
@@ -841,31 +986,7 @@ class FileImportPreview extends TerrainComponent<Props>
       >
         {
           !this.props.exporting &&
-          <div
-            className='flex-container fi-preview-update'
-          >
-            <div
-              className='flex-container fi-preview-update-text'
-            >
-              <span
-                className='fi-preview-update-text-text'
-              >
-                Update: If a document with the specified primary key(s) already exists, update the existing document.
-                </span>
-              <span
-                className='fi-preview-update-text-text'
-              >
-                Replace: If a document with the specified primary key(s) already exists, replace the existing document.
-                </span>
-            </div>
-
-            <Switch
-              first={'update'}
-              second={'replace'}
-              selected={this.props.elasticUpdate ? 1 : 2}
-              onChange={this.handleElasticUpdateChange}
-            />
-          </div>
+          this.renderUpdate()
         }
         {this.renderUpload()}
       </div>
@@ -922,6 +1043,7 @@ class FileImportPreview extends TerrainComponent<Props>
               {this.renderApplyTemplate()}
               {this.renderSaveTemplate()}
               {this.renderUpdateTemplate()}
+              {this.renderTransformModal()}
               {this.renderAdvancedModal()}
               {this.renderAddColumn()}
               {this.renderError()}

@@ -91,6 +91,8 @@ interface Theme
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
+  notIncludedBg: string; // for denoting not included columns on import/export
+
   inputBg: string;
 
   scrollbarBG: string;
@@ -98,6 +100,8 @@ interface Theme
   altScrollbarPiece: string;
 
   error: string;
+
+  import: string;
 
   // DO NOT USE these below colors anymore -- these need to be cleaned up
 
@@ -341,6 +345,8 @@ const DARK: Theme =
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
+    notIncludedBg: 'rgba(0, 0, 0, 0.5)', // bg for not included column/row
+
     inputBg: 'rgba(0,0,0,0.25)',
 
     active: darkActive,
@@ -355,6 +361,8 @@ const DARK: Theme =
     altScrollbarPiece: 'rgba(0, 0, 0, 0.15)',
 
     error: '#d14f42',
+
+    import: '#1efab4',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
