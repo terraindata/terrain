@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
@@ -786,7 +786,7 @@ class FileImport extends TerrainComponent<any>
         <div
           className={classNames({
             'file-import-inner': true,
-            'file-import-inner-server-step': this.state.stepId === Steps.SelectServer
+            'file-import-inner-server-step': this.state.stepId === Steps.SelectServer,
           })}
         >
           {this.renderError()}
