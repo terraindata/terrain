@@ -494,7 +494,7 @@ class FileImportPreview extends TerrainComponent<Props>
                       text: Colors().text1,
                     }}
                   >
-                    Primary key{ primaryKeys.size > 1 ? 's' : ''}:
+                    Primary key{primaryKeys.size > 1 ? 's' : ''}:
                   </div>
                 }
                 <div
