@@ -424,6 +424,11 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public changePrimaryKeyDelimiter(delim: string)
   {
+    if (delim === '')
+    {
+      Actions.setErrorMsg('Primary key delimiter cannot be empty string');
+      return;
+    }
     Actions.changePrimaryKeyDelimiter(delim);
   }
 
@@ -762,6 +767,7 @@ class FileImportPreview extends TerrainComponent<Props>
                         tooltip(
                           <span
                             className='clickable'
+                            onClick={this.showDelimTextBox}
                           >
                             {
                               this.props.primaryKeyDelimiter
