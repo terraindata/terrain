@@ -65,6 +65,9 @@ import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScro
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
+import CardHelpTooltip from './CardHelpTooltip';
+
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
@@ -615,7 +618,21 @@ class _CardComponent extends TerrainComponent<Props>
               this.props.canEdit &&
               !card['cannotBeMoved'] &&
               this.state.hovering &&
-              <HelpIcon className='card-help-icon'/>
+              <div className='card-help-wrapper'>
+                {
+                  tooltip(
+                    <HelpIcon className='card-help-icon'/>,
+                    {
+                      html: <CardHelpTooltip staticInfo={card.static}/>,
+                      trigger: 'click',
+                      position: 'top-end',
+                      interactive: true,
+                      theme: 'faded',
+                      delay: 0,
+                    }
+                  )
+                }
+              </div>
             }
           </div>
           {
