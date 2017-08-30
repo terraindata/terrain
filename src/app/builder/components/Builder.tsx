@@ -868,7 +868,7 @@ class Builder extends TerrainComponent<Props>
         {
           browserHistory.replace(`/builder/${newConfig}`);
         }
-      })
+      }),
     );
   }
 
