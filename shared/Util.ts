@@ -347,23 +347,23 @@ export class CSVTypeParser
 {
   public getDoubleFromString(value: string): number | boolean
   {
-    const parsedValue: number = Number(value);
-    if (!isNaN(parsedValue))
+    const parsedValue: number | boolean = this._getDoubleFromStringHelper(value);
+    if (typeof parsedValue === 'number')
     {
       return parsedValue;
     }
     if (value.charAt(0) === '$')
     {
-      const dollarValue: number = Number(value.substring(1));
-      if (!isNaN(dollarValue))
+      const dollarValue: number | boolean = this._getDoubleFromStringHelper(value.substring(1));
+      if (typeof dollarValue === 'number')
       {
         return dollarValue;
       }
     }
     if (value.charAt(value.length - 1) === '%')
     {
-      const percentValue: number = Number(value.substring(0, value.length - 1));
-      if (!isNaN(percentValue))
+      const percentValue: number | boolean = this._getDoubleFromStringHelper(value.substring(0, value.length - 1));
+      if (typeof percentValue === 'number')
       {
         return percentValue / 100;
       }
@@ -449,6 +449,37 @@ export class CSVTypeParser
       typeObj['innerType'] = this._getTypeObjFromArray(typeArr);
     }
     return typeObj;
+  }
+
+  // accounts for numbers with commas, e.g., "1,105.20"
+  private _getDoubleFromStringHelper(value: string): number | boolean
+  {
+    const parsedValue: number = Number(value);
+    if (!isNaN(parsedValue))
+    {
+      return parsedValue;
+    }
+    let decimalInd: number = value.indexOf('.');
+    decimalInd = decimalInd === -1 ? value.length : decimalInd;
+    let ind = decimalInd - 4;
+    while (ind > 0)
+    {
+      if (value.charAt(ind) === ',')
+      {
+        value = value.substring(0, ind) + value.substring(ind + 1);
+        ind -= 4;
+      }
+      else
+      {
+        return false;
+      }
+    }
+    const noCommaValue: number = Number(value);
+    if (!isNaN(noCommaValue))
+    {
+      return noCommaValue;
+    }
+    return false;
   }
 
   private _isNullHelper(value: string): boolean
