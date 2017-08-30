@@ -97,6 +97,7 @@ export interface Props
   query?: string;
   serverId?: number;
   variantName?: string;
+  filesize?: number;
 }
 
 @Radium
@@ -625,7 +626,7 @@ class FileImportPreview extends TerrainComponent<Props>
       this.props.exporting ?
         upload
         :
-        this.props.uploadInProgress ?
+        this.props.uploadInProgress && this.props.filesize > FileImportTypes.MIN_PROGRESSBAR_FILESIZE ?
           <div className='fi-preview-loading-container'>
             <Loading
               width={100}
@@ -644,7 +645,10 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     return (
       <div
-        className='flex-container fi-preview-topbar'
+        className={classNames({
+          'flex-container fi-preview-topbar': true,
+          'fi-preview-topbar-export': this.props.exporting,
+        })}
       >
         {
           !this.props.exporting &&

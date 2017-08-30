@@ -159,6 +159,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           </span>
         </div>
         {
+          !this.props.exporting &&
           tooltip(
             <div
               className={classNames({

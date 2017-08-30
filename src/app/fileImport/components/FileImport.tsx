@@ -355,7 +355,7 @@ class FileImport extends TerrainComponent<any>
       const types: object[] = previewColumns.map((column) => typeParser.getBestTypeFromArrayAsObject(column));
       const treeTypes: FileImportTypes.ColumnTypesTree[] = types.map((typeObj) => FileImportTypes._ColumnTypesTree(typeObj));
 
-      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames), List(treeTypes));
+      Actions.chooseFile(filetype, file.size, List<List<string>>(previewRows), List<string>(columnNames), List(treeTypes));
       this.setState({
         fileSelected: true,
       });
@@ -559,7 +559,7 @@ class FileImport extends TerrainComponent<any>
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { filetype, serverId, dbName, tableName } = fileImportState;
+    const { filetype, filesize, serverId, dbName, tableName } = fileImportState;
     const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
 
@@ -649,6 +649,7 @@ class FileImport extends TerrainComponent<any>
             uploadInProgress={uploadInProgress}
             elasticUpdate={elasticUpdate}
             exporting={false}
+            filesize={filesize}
           />;
         break;
       default:

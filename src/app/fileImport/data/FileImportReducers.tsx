@@ -275,6 +275,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       List(action.payload.originalNames.map(() => FileImportTypes._ColumnTypesTree()));
     return state
       .set('filetype', action.payload.filetype)
+      .set('filesize', action.payload.filesize)
       .set('primaryKeys', List([]))
       .set('primaryKeyDelimiter', '-')
       .set('previewRows', action.payload.preview)
