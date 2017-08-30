@@ -67,6 +67,7 @@ import { ExportTemplateConfig, ImportTemplateBase, ImportTemplateConfig, ImportT
 const importTemplates = new ImportTemplates();
 
 const TastyItems: Items = new Items();
+const typeParser: SharedUtil.CSVTypeParser = new SharedUtil.CSVTypeParser();
 
 export interface ImportConfig extends ImportTemplateBase
 {
@@ -868,17 +869,18 @@ export class Import
     switch (this.NUMERIC_TYPES.has(typeObj['type']) ? 'number' : typeObj['type'])
     {
       case 'number':
-        const num: number = Number(item[field]);
-        if (!isNaN(num))
-        {
-          item[field] = num;
-        }
-        else if (item[field] === '')
+        if (item[field] === '')
         {
           item[field] = null;
         }
         else
         {
+          const parsedValue: number | boolean = typeParser.getDoubleFromString(String(item[field]));
+          if (typeof parsedValue === 'number')
+          {
+            item[field] = parsedValue;
+            return true;
+          }
           return false;
         }
         break;
