@@ -73,6 +73,7 @@ export interface Props
   width?: string;
   directionBias?: number; // bias for determining whether or not dropdown opens up or down
   unmountOnChange?: boolean;
+  openDown?: boolean;
 }
 
 @Radium
@@ -217,15 +218,28 @@ class Dropdown extends TerrainComponent<Props>
     if (!this.state.open)
     {
       $('body').click(this.close);
+
+      const cr = this.refs['value']['getBoundingClientRect']();
+      const windowBottom = window.innerHeight;
+
+      let up;
+      if (this.props.openDown !== undefined)
+      {
+        up = !this.props.openDown;
+      }
+      else
+      {
+        up = cr.bottom > windowBottom / 2 + (this.props.directionBias || 0);
+      }
+      this.setState({
+        open: true,
+        up,
+      });
     }
-
-    const cr = this.refs['value']['getBoundingClientRect']();
-    const windowBottom = window.innerHeight;
-
-    this.setState({
-      open: !this.state.open,
-      up: cr.bottom > windowBottom / 2 + (this.props.directionBias || 0),
-    });
+    else
+    {
+      this.close();
+    }
   }
 
   public getOptionName(option, index: number): string
@@ -305,6 +319,7 @@ class Dropdown extends TerrainComponent<Props>
     return (
       <div
         onClick={this.toggleOpen}
+        onMouseDown={this.onMouseDown}
         className={classNames({
           'dropdown-wrapper': true,
           'altBg': true,

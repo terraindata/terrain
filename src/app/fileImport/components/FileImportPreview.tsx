@@ -47,11 +47,12 @@ THE SOFTWARE.
 // tslint:disable:no-empty strict-boolean-expressions no-console no-var-requires
 
 import * as classNames from 'classnames';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Immutable from 'immutable';
 import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
@@ -66,6 +67,7 @@ import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
+
 const { List } = Immutable;
 
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -490,44 +492,55 @@ class FileImportPreview extends TerrainComponent<Props>
     const advancedModalContent = this.props.exporting ?
       <div
         className='fi-advanced-fields'
+        style={[
+          fontColor(Colors().altText1),
+          backgroundColor(Colors().altBg1),
+        ]}
       >
-        <CheckBox
-          checked={this.state.advancedExportRank}
-          onChange={this.handleAdvancedRankChange}
-        />
-        <span
-          className='clickable'
-          onClick={this.handleAdvancedRankChange}
-          style={{
-            color: Colors().text1,
-          }}
-        >
-          Rank
-          </span>
+        <div className='fi-advanced-fields-row'>
+          <CheckBox
+            checked={this.state.advancedExportRank}
+            onChange={this.handleAdvancedRankChange}
+            className={'fi-export-advanced-checkbox'}
+          />
+          <label
+            className='clickable'
+            onClick={this.handleAdvancedRankChange}
+          >
+            Include Terrain Rank in export
+          </label>
+        </div>
+        <div className='fi-advanced-fields-dropdown-label'> Select file type for export </div>
         <Dropdown
           selectedIndex={FileImportTypes.FILE_TYPES.indexOf(this.state.exportFiletype)}
           options={List(FileImportTypes.FILE_TYPES)}
           onChange={this.handleExportFiletypeChange}
           canEdit={true}
+          className={'fi-advanced-fields-dropdown'}
+          openDown={true}
         />
       </div>
       :
       <div
         className='fi-advanced-fields'
+        style={[
+          fontColor(Colors().altText1),
+          backgroundColor(Colors().altBg1),
+        ]}
       >
-        <CheckBox
-          checked={this.state.advancedCheck}
-          onChange={this.handleRequireJSONHaveAllFieldsChange}
-        />
-        <span
-          className='clickable'
-          onClick={this.handleRequireJSONHaveAllFieldsChange}
-          style={{
-            color: Colors().text1,
-          }}
-        >
-          Require all JSON fields to exist?
-          </span>
+        <div className='fi-advanced-fields-row'>
+          <CheckBox
+            checked={this.state.advancedCheck}
+            onChange={this.handleRequireJSONHaveAllFieldsChange}
+            className={'fi-export-advanced-checkbox'}
+          />
+          <label
+            className='clickable'
+            onClick={this.handleRequireJSONHaveAllFieldsChange}
+          >
+            Require all JSON fields to exist
+          </label>
+        </div>
       </div>;
 
     const restrictiveMode =
@@ -733,7 +746,7 @@ class FileImportPreview extends TerrainComponent<Props>
     if (this.props.filetype === 'json' && !this.props.requireJSONHaveAllFields)
     {
       previewColumns.push(
-        (<div
+        (tooltip(<div
           key={previewColumns.length}
           className='fi-preview-column fi-preview-add-column-button'
           onClick={this.showAddColumn}
@@ -743,7 +756,7 @@ class FileImportPreview extends TerrainComponent<Props>
             {'+'}
           </div>
 
-        </div>));
+        </div>, 'Add Column')));
     }
 
     return (
