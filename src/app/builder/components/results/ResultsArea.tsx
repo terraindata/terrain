@@ -531,7 +531,7 @@ column if you have customized the results view.');
   public renderExport()
   {
     const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
-      elasticUpdate } = this.props.exportState;
+      filetype, requireJSONHaveAllFields, exportRank, elasticUpdate } = this.props.exportState;
 
     const content =
       <div
@@ -550,6 +550,9 @@ column if you have customized the results view.');
           transforms={transforms}
           columnOptions={List([])}
           uploadInProgress={false}
+          filetype={filetype}
+          requireJSONHaveAllFields={requireJSONHaveAllFields}
+          exportRank={exportRank}
           elasticUpdate={elasticUpdate}
           exporting={true}
           query={this.props.query.tql}
@@ -565,6 +568,7 @@ column if you have customized the results view.');
         title={'Export'}
         children={content}
         fill={true}
+        noFooterPadding={true}
       />
     );
   }

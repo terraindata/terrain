@@ -1,7 +1,7 @@
 @import "../../common/Common.less";
 
 @padding: 6px;
-@primary-key-padding: 12px 6px;
+@primary-key-padding: 12px 12px;
 
 .fi-preview {
   white-space: nowrap;
@@ -43,14 +43,12 @@
     .fi-preview-pkeys {
       margin-left: 6px;
       margin-bottom: 6px;
-      max-width: 300px;
+      min-height: 50px;
       flex-wrap: wrap;
 
       .fi-preview-pkeys-wrapper {
 
         .fi-preview-pkeys-pkey {
-          .big-text;
-          padding: @primary-key-padding;
           margin-bottom: 3px;
           border-radius: 3px;
 
@@ -60,25 +58,37 @@
         }
 
         .fi-preview-pkeys-delim {
-          .big-text;
-          padding: @primary-key-padding;
 
           .autocomplete {
-            max-width: 20px;
+            max-width: 40px;
+          }
+
+          .fi-preview-pkeys-delim-span {
+            padding: 6px 12px;
+            border-radius: 3px;
           }
         }
       }
 
+      .fi-preview-pkeys-wrapper > * {
+        .big-text;
+        padding: @primary-key-padding;
+      }
+
       .fi-preview-pkeys-nokey {
         .big-text;
-        padding: @padding;
+        padding: @primary-key-padding;
         vertical-align: middle;
       }
     }
   }
 
+  .fi-preview-topbar-export {
+    justify-content: flex-end;
+  }
+
   .fi-preview-table-container {
-    overflow-x: auto;
+    overflow: auto;
 
     .fi-preview-columns-container {
     }
@@ -88,31 +98,56 @@
   }
 
   .fi-import-button-wrapper {
-    flex-direction: row;
-    justify-content: flex-end;
+    flex-direction: column;
+    justify-content: center;
     margin-top: 12px;
 
     .fi-preview-update {
-      flex-direction: row;
+      flex-direction: column;
       white-space: normal;
       align-items: center;
-      // max-width: 500px;
 
       .fi-preview-update-text {
-        // word-wrap: break-word;
-        flex-direction: column;
-        margin-right: 12px;
-        align-items: flex-start;
+        word-wrap: break-word;
+        max-width: 500px;
+        margin-bottom: 6px;
 
         .fi-preview-update-text-text {
           .big-text;
           padding: 3px;
         }
       }
-    }
 
-    .fi-preview-import-button {
-      margin-left: 12px;
+      .fi-preview-update-button-row {
+        flex-direction: row;
+        margin-bottom: 6px;
+      }
+
+      .fi-preview-update-button {
+        width: 200px;
+        margin-left: 6px;
+        padding: 4px 18px;
+        border-radius: 3px;
+
+        .fi-preview-update-button-header {
+          justify-content: center;
+          align-items: center;
+
+          .fi-preview-update-button-header-title {
+            .title-text;
+          }
+        }
+
+        .fi-preview-update-button-subtext {
+
+        }
+      }
     }
+  }
+
+  .fi-preview-import-button {
+    margin-left: 12px;
+    align-self: flex-end;
+    height: 30px;
   }
 }

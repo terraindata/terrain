@@ -85,9 +85,10 @@ const FileImportActions =
       $(ActionTypes.changePrimaryKeyDelimiter, { delim }),
 
     chooseFile:
-    (filetype: string, preview: List<List<string>>, originalNames: List<string>, columnTypes?: List<ColumnTypesTree>) =>
+    (filetype: string, filesize: number, preview: List<List<string>>, originalNames: List<string>, columnTypes?: List<ColumnTypesTree>) =>
       $(ActionTypes.chooseFile, {
         filetype,
+        filesize,
         preview,
         originalNames,
         columnTypes,
@@ -160,8 +161,11 @@ const FileImportActions =
       $(ActionTypes.setTemplates, { templates }),
 
     applyTemplate:
-    (templateId: number) =>
-      $(ActionTypes.applyTemplate, { templateId }),
+    (templateId: number, newColumns: List<string>) =>
+      $(ActionTypes.applyTemplate, {
+        templateId,
+        newColumns,
+      }),
 
     deleteTemplate:
     (templateId: number, exporting: boolean) =>
@@ -180,12 +184,28 @@ const FileImportActions =
       $(ActionTypes.changeUploadInProgress, { uploading }),
 
     changeElasticUpdate:
-    () =>
-      $(ActionTypes.changeElasticUpdate, {}),
+    (elasticUpdate: boolean) =>
+      $(ActionTypes.changeElasticUpdate, { elasticUpdate }),
+
+    addPreviewColumn:
+    (columnName: string) =>
+      $(ActionTypes.addPreviewColumn, { columnName }),
+
+    togglePreviewColumn:
+    (requireJSONHaveAllFields: boolean) =>
+      $(ActionTypes.togglePreviewColumn, { requireJSONHaveAllFields }),
 
     setErrorMsg:
     (err: string) =>
       $(ActionTypes.setErrorMsg, { err }),
+
+    setExportFiletype:
+    (exportFiletype: string) =>
+      $(ActionTypes.setExportFiletype, { exportFiletype }),
+
+    toggleExportRank:
+    (exportRank: boolean) =>
+      $(ActionTypes.toggleExportRank, { exportRank }),
   };
 
 export default FileImportActions;

@@ -55,6 +55,8 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import './TemplateList.less';
 
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
+const TrashIcon = require('./../../../images/icon_trash.svg');
+const ArrowIcon = require('./../../../images/icon_carrot.svg');
 
 export interface Props
 {
@@ -133,21 +135,24 @@ class TemplateList extends TerrainComponent<Props>
   public renderApply()
   {
     // TODO: button changes colors on delete
-    return (
-      <div
-        className='list-apply button'
-        onClick={this._fn(this.handleApply)}
-        style={this.state.selectedIndex !== -1 ?
-          buttonColors()
-          :
-          {
-            background: Colors().bg3,
+    if (this.props.items.size > 0)
+    {
+      return (
+        <div
+          className='list-apply button'
+          onClick={this._fn(this.handleApply)}
+          style={this.state.selectedIndex !== -1 ?
+            buttonColors()
+            :
+            {
+              background: Colors().bg3,
+            }
           }
-        }
-      >
-        Apply
-      </div>
-    );
+        >
+          Apply
+        </div>
+      );
+    }
   }
 
   public renderList()
@@ -191,10 +196,9 @@ class TemplateList extends TerrainComponent<Props>
                   {
                     item
                   }
-                  <CloseIcon
+                  <TrashIcon
                     onClick={this._fn(this.handleDelete, index)}
-                    className='close delete-list-item'
-                    data-tip='Delete List Item'
+                    className='delete-list-item'
                   />
                 </div>
               </div>,
