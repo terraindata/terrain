@@ -550,67 +550,74 @@ class _CardComponent extends TerrainComponent<Props>
           )}
           ref='cardInner'
         >
-          <div
-            className={classNames({
-              'card-title': true,
-              'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
-              'card-title-card-hovering': this.state.hovering,
-            })}
-            style={{
-              // shrink the width if the card does not have a title
-              // width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
-              width: NO_TITLE_WIDTH,
-            }}
-            onClick={this.handleTitleClick}
-          >
-            {
-              this.props.canEdit &&
-              !card['cannotBeMoved'] &&
-              connectDragSource(
+          <div className='card-title-row'>
+            <div
+              className={classNames({
+                'card-title': true,
+                'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
+                'card-title-card-hovering': this.state.hovering,
+              })}
+              style={{
+                // shrink the width if the card does not have a title
+                // width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
+                width: NO_TITLE_WIDTH,
+              }}
+              onClick={this.handleTitleClick}
+            >
+              {
+                this.props.canEdit &&
+                !card['cannotBeMoved'] &&
+                connectDragSource(
+                  <div
+                    className='card-handle-icon'
+                  >
+                    <HandleIcon />
+                  </div>,
+                )
+              }
+              {
+                this.state.hovering &&
+                <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
+              }
+              {
+                this.props.canEdit &&
+                !card['cannotBeMoved'] &&
+                <Menu
+                  options={this.state.menuOptions}
+                  openRight={true}
+                />
+              }
+              {
+                !(this.props.card && this.props.card['noTitle']) &&
                 <div
-                  className='card-handle-icon'
+                  className='card-title-inner'
+                  style={{
+                    color: card.static.colors[0],
+                  }}
                 >
-                  <HandleIcon />
-                </div>,
-              )
-            }
-            {
-              this.state.hovering &&
-              <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
-            }
+                  {
+                    title
+                  }
+                </div>
+              }
+
+              {
+                !this.props.card.closed ? null :
+                  <div className={classNames({
+                    'card-preview': true,
+                    'card-preview-hidden': this.state.opening,
+                  })}>
+                    {BlockUtils.getPreview(card)}
+                  </div>
+              }
+            </div>
             {
               this.props.canEdit &&
               !card['cannotBeMoved'] &&
-              <Menu
-                options={this.state.menuOptions}
-                openRight={true}
-              />
-            }
-            {
-              !(this.props.card && this.props.card['noTitle']) &&
-              <div
-                className='card-title-inner'
-                style={{
-                  color: card.static.colors[0],
-                }}
-              >
-                {
-                  title
-                }
-              </div>
-            }
-
-            {
-              !this.props.card.closed ? null :
-                <div className={classNames({
-                  'card-preview': true,
-                  'card-preview-hidden': this.state.opening,
-                })}>
-                  {BlockUtils.getPreview(card)}
-                </div>
+              this.state.hovering &&
+              <HelpIcon className='card-help-icon'/>
             }
           </div>
-
           {
             (!this.props.card.closed || this.state.opening) &&
             <div className='card-body-wrapper' ref='cardBody'>
