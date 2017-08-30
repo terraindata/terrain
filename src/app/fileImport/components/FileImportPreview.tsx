@@ -720,7 +720,10 @@ class FileImportPreview extends TerrainComponent<Props>
       <div
         className='flex-container fi-import-button-wrapper'
       >
-        {this.renderUpdate()}
+        {
+          !this.props.exporting &&
+          this.renderUpdate()
+        }
         {this.renderUpload()}
       </div>
     );
