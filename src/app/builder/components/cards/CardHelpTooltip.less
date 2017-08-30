@@ -5,6 +5,7 @@
   text-align: left;
   padding: @spacing;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
+  
   .card-description {
     display: block;
   }
@@ -15,10 +16,21 @@
     display: inline-block;
     border: 1px solid;
     border-left-width: 3px;
-    margin-bottom: @half-spacing;
+    margin-bottom: @spacing;
   }
   
   .card-help-link {
+    text-align: right;
+    margin-top: @half-spacing;
+
+    a:link {
+      color: #3FF;
+      text-decoration: underline !important;
+    }
+    a:visited {
+      color: #A5D;
+      text-decoration: underline !important;
+    }
 
   }
 }

@@ -70,6 +70,7 @@ export default class CardHelpTooltip extends TerrainComponent<Props>
       getStyle('borderRightColor', Colors().highlight),
       getStyle('borderBottomColor', Colors().highlight),
     );
+
     return (
       <div className='card-help-tooltip'>
         {
@@ -81,9 +82,12 @@ export default class CardHelpTooltip extends TerrainComponent<Props>
         <div className='card-description'>
           {this.props.staticInfo.description}
         </div>
-        <div className='card-help-link'>
-
-        </div>
+        {
+          this.props.staticInfo.url &&
+          <div className='card-help-link'>
+            <a target='_blank' href={this.props.staticInfo.url}> Learn More </a>
+          </div>
+        }
       </div>
     );
   }

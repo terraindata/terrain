@@ -621,9 +621,9 @@ class _CardComponent extends TerrainComponent<Props>
               <div className='card-help-wrapper'>
                 {
                   tooltip(
-                    <HelpIcon className='card-help-icon'/>,
+                    <HelpIcon className='card-help-icon' />,
                     {
-                      html: <CardHelpTooltip staticInfo={card.static}/>,
+                      html: <CardHelpTooltip staticInfo={card.static} />,
                       trigger: 'click',
                       position: 'top-end',
                       interactive: true,
