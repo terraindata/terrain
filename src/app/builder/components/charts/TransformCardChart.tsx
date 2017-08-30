@@ -324,6 +324,14 @@ class TransformCardChart extends TerrainComponent<Props>
       selected: !!this.state.selectedPointIds.get(scorePoint.id),
     }));
 
+    const spotlights = overrideState.spotlights || this.props.spotlights || [];
+    _.map(spotlights, (spotlight) =>
+    {
+      spotlight.id = spotlight.id.replace(/\.|#/g, '-');
+      spotlight.primaryKey = spotlight.primaryKey.replace(/\.|#/g, '-');
+    },
+    );
+
     const chartState = {
       barsData: (overrideState.bars || this.props.bars).toJS(),
       pointsData: points.toJS(),
@@ -335,7 +343,7 @@ class TransformCardChart extends TerrainComponent<Props>
       onRelease: this.onPointRelease,
       onLineClick: this.onLineClick,
       onLineMove: this.onLineMove,
-      spotlights: overrideState.spotlights || this.props.spotlights || [], // TODO toJS()
+      spotlights, // TODO toJS()
       onSelect: this.onSelect,
       onDelete: this.onDelete,
       onCreate: this.onCreate,
