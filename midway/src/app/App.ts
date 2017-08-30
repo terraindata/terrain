@@ -63,8 +63,8 @@ import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import './Logging';
 import Middleware from './Middleware';
-import MidwayRouter from './Router';
 import NotFoundRouter from './NotFoundRouter';
+import MidwayRouter from './Router';
 import * as Schema from './Schema';
 import Users from './users/Users';
 
