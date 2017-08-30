@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { Colors } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../common/Colors';
 import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -88,11 +88,20 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public handleIncludedChange()
   {
+    if (this.props.isIncluded && this.props.isPrimaryKey)
+    {
+      Actions.changePrimaryKey(this.props.columnId);
+    }
     Actions.setColumnToInclude(this.props.columnId);
   }
 
   public handlePrimaryKeyChange()
   {
+    if (!this.props.isIncluded && !this.props.isPrimaryKey)
+    {
+      Actions.setErrorMsg('Cannot set a column not included as a primary key');
+      return;
+    }
     Actions.changePrimaryKey(this.props.columnId);
   }
 
@@ -164,7 +173,10 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             >
               <KeyIcon />
             </div>,
-            this.props.isPrimaryKey ? 'Remove this column as a primary key' : 'Make this column a primary key',
+            !this.props.isIncluded ?
+              'Include this column to set it as a primary key'
+              :
+              this.props.isPrimaryKey ? 'Remove this column as a primary key' : 'Make this column a primary key',
           )
         }
       </div>
@@ -242,7 +254,10 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
   {
     return (
       <div
-        className='fi-preview-column'
+        className={classNames({
+          'fi-preview-column': true,
+          'fi-preview-column-disabled': !this.props.isIncluded,
+        })}
         style={{
           background: Colors().bg2,
           text: Colors().text1,
@@ -263,6 +278,11 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           {
             this.renderTransform()
           }
+        </div>
+        <div
+          className='fi-preview-column-disabled-veil'
+          style={backgroundColor(Colors().notIncludedBg)}
+        >
         </div>
       </div>
     );
