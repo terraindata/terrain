@@ -146,6 +146,11 @@ class FileImport extends TerrainComponent<any>
 
   public decrementStep()
   {
+    const { file, filetype } = this.state.fileImportState;
+    if (filetype === 'csv' && this.state.stepId - 1 === Steps.CsvJsonOptions)
+    {
+      this.parseFile(file, filetype, false, false);
+    }
     this.setState({
       stepId: this.state.stepId - 1,
     });
@@ -360,7 +365,6 @@ class FileImport extends TerrainComponent<any>
       this.setState({
         fileSelected: true,
       });
-      this.incrementStep();
     };
   }
 
@@ -387,10 +391,7 @@ class FileImport extends TerrainComponent<any>
     {
       this.parseFile(file.target.files[0], filetype, false, false);
     }
-    else
-    {
-      this.incrementStep();
-    }
+    this.incrementStep();
   }
 
   public handleSelectFileButtonClick()
@@ -404,6 +405,7 @@ class FileImport extends TerrainComponent<any>
     Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
     this.parseFile(file, filetype, hasCsvHeader, false); // TODO: what happens on error?
+    this.incrementStep();
   }
 
   public handleJSONFormatChoice(isNewlineSeparatedJSON: boolean)
@@ -411,6 +413,7 @@ class FileImport extends TerrainComponent<any>
     Actions.changeIsNewlineSeparatedJSON(isNewlineSeparatedJSON);
     const { file, filetype } = this.state.fileImportState;
     this.parseFile(file, filetype, false, isNewlineSeparatedJSON); // TODO: what happens on error?
+    this.incrementStep();
   }
 
   public handleSelectDb(dbName: string)
