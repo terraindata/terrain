@@ -525,7 +525,7 @@ class Builder extends TerrainComponent<Props>
     const variant = this.getVariant();
     if (variant)
     {
-      if (variant.status === ItemStatus.Live)
+      if (variant.status === ItemStatus.Live || variant.status === ItemStatus.Approve)
       {
         return false;
       }
@@ -545,40 +545,42 @@ class Builder extends TerrainComponent<Props>
   public save()
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
-    variant = variant.set('query', this.getQuery());
-
-    this.setState({
-      saving: true,
-    });
-
-    // TODO remove if queries/variants model changes
-    TerrainStore.dispatch(LibraryActions.variants.change(variant));
-    this.onSaveSuccess(variant);
-    Actions.save(); // register that we are saving
-
-    let configArr = window.location.pathname.split('/')[2].split(',');
-    let currentVariant;
-    configArr = configArr.map((tab) =>
+    if (this.shouldSave())
     {
-      if (tab.substr(0, 1) === '!')
+      variant = variant.set('query', this.getQuery());
+      this.setState({
+        saving: true,
+      });
+
+      // TODO remove if queries/variants model changes
+      TerrainStore.dispatch(LibraryActions.variants.change(variant));
+      this.onSaveSuccess(variant);
+      Actions.save(); // register that we are saving
+
+      let configArr = window.location.pathname.split('/')[2].split(',');
+      let currentVariant;
+      configArr = configArr.map((tab) =>
       {
-        currentVariant = tab.substr(1).split('@')[0];
-        return '!' + currentVariant;
-      }
-      return tab;
-    },
-    );
-    for (let i = 0; i < configArr.length; i++)
-    {
-      if (configArr[i] === currentVariant)
+        if (tab.substr(0, 1) === '!')
+        {
+          currentVariant = tab.substr(1).split('@')[0];
+          return '!' + currentVariant;
+        }
+        return tab;
+      },
+      );
+      for (let i = 0; i < configArr.length; i++)
       {
-        configArr.splice(i, 1);
+        if (configArr[i] === currentVariant)
+        {
+          configArr.splice(i, 1);
+        }
       }
-    }
-    const newConfig = configArr.join(',');
-    if (newConfig !== this.props.params.config)
-    {
-      browserHistory.replace(`/builder/${newConfig}`);
+      const newConfig = configArr.join(',');
+      if (newConfig !== this.props.params.config)
+      {
+        browserHistory.replace(`/builder/${newConfig}`);
+      }
     }
   }
 
@@ -884,7 +886,6 @@ class Builder extends TerrainComponent<Props>
     const config = this.props.params.config;
     const variant = this.getVariant();
     const query = this.getQuery();
-
     return (
       <div
         className={classNames({
