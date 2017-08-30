@@ -15,6 +15,10 @@
       overflow: auto;
       position: relative;
 
+      &::-webkit-scrollbar {
+        height: 5px;
+      }
+
       .fi-preview-row-cell-text {
         padding: 12px;
         float: left;
@@ -34,8 +38,6 @@
     }
 
     .fi-preview-row-cell-disabled {
-      text-align: left;
-
       .fi-preview-row-disabled-veil {
         opacity: 1;
         pointer-events: all;

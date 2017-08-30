@@ -538,7 +538,7 @@ class FileImportPreview extends TerrainComponent<Props>
                               this.props.primaryKeyDelimiter
                             }
                           </span>,
-                          'Click to enter a custom primary key delimiter',
+                          'Click to edit delimiter',
                         )
                     }
                   </div>
