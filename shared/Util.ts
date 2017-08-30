@@ -345,6 +345,32 @@ export function getTemplateId(template: string): number
 
 export class CSVTypeParser
 {
+  public getDoubleFromString(value: string): number | boolean
+  {
+    const parsedValue: number | boolean = this._getDoubleFromStringHelper(value);
+    if (typeof parsedValue === 'number')
+    {
+      return parsedValue;
+    }
+    if (value.charAt(0) === '$')
+    {
+      const dollarValue: number | boolean = this._getDoubleFromStringHelper(value.substring(1));
+      if (typeof dollarValue === 'number')
+      {
+        return dollarValue;
+      }
+    }
+    if (value.charAt(value.length - 1) === '%')
+    {
+      const percentValue: number | boolean = this._getDoubleFromStringHelper(value.substring(0, value.length - 1));
+      if (typeof percentValue === 'number')
+      {
+        return percentValue / 100;
+      }
+    }
+    return false;
+  }
+
   public getBestTypeFromArrayAsObject(values: string[]): object
   {
     const arrType: string[] = this.getBestTypeFromArrayAsArray(values);
@@ -425,19 +451,51 @@ export class CSVTypeParser
     return typeObj;
   }
 
+  // accounts for numbers with commas, e.g., "1,105.20"
+  private _getDoubleFromStringHelper(value: string): number | boolean
+  {
+    const parsedValue: number = Number(value);
+    if (!isNaN(parsedValue))
+    {
+      return parsedValue;
+    }
+    let decimalInd: number = value.indexOf('.');
+    decimalInd = decimalInd === -1 ? value.length : decimalInd;
+    let ind = decimalInd - 4;
+    while (ind > 0)
+    {
+      if (value.charAt(ind) === ',')
+      {
+        value = value.substring(0, ind) + value.substring(ind + 1);
+        ind -= 4;
+      }
+      else
+      {
+        return false;
+      }
+    }
+    const noCommaValue: number = Number(value);
+    if (!isNaN(noCommaValue))
+    {
+      return noCommaValue;
+    }
+    return false;
+  }
+
   private _isNullHelper(value: string): boolean
   {
     return value === null || value === undefined || value === '' || value === 'null' || value === 'undefined';
   }
   private _isIntHelper(value: string): boolean
   {
-    const parsedValue: any = Number(value);
-    return !isNaN(parsedValue) && Number.isInteger(parsedValue);
+    const parsedValue: number | boolean = this.getDoubleFromString(value);
+    // return ((typeof parsedValue) === 'number') && Number.isInteger(parsedValue as number);
+    return ((typeof parsedValue) === 'number') && (value.indexOf('.') === -1);
   }
   private _isDoubleHelper(value: string): boolean
   {
-    const parsedValue: any = Number(value);
-    return !isNaN(parsedValue);
+    const parsedValue: number | boolean = this.getDoubleFromString(value);
+    return (typeof parsedValue) === 'number';
   }
   private _isBooleanHelper(value: string): boolean
   {
