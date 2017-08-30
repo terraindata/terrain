@@ -225,7 +225,7 @@ class CreateCardTool extends TerrainComponent<Props>
 
   public renderPlaceholder()
   {
-    if (this.props.hidePlaceholder || this.props.cannotClose) // || this.props.open)
+    if (this.props.hidePlaceholder || (this.props.cannotClose && this.props.open))
     {
       return null;
     }
