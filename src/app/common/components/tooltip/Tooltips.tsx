@@ -274,7 +274,7 @@ export interface TooltipProps
   theme?: Theme;
   className?: string;
   style?: any;
-  [others: string]: any;
+  key?: any;
 }
 
 export const defaultProps: TooltipProps = {
