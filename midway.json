@@ -2,19 +2,19 @@
     "debug": true,
     "databases": [
         {
-            "name": "My ElasticSearch Instance",
+            "name": "Local ElasticSearch Instance",
             "type": "elastic",
             "dsn": "127.0.0.1:9200",
             "host": "127.0.0.1:9200"
         },
         {
-            "name": "My MySQL Instance",
+            "name": "Local MySQL Instance",
             "type": "mysql",
             "dsn": "t3rr41n-demo:r3curs1v3$@127.0.0.1:3306",
             "host": "127.0.0.1:3306"
         },
         {
-            "name": "Zazzle ES 1",
+            "name": "Terrain ES 1",
             "type": "elastic",
             "dsn": "10.1.0.30:9200",
             "host": "10.1.0.30:9200"

@@ -702,13 +702,15 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderPrimaryKeys()
   {
+    const { primaryKeys } = this.props;
+
     return (
       <div
         className='flex-container fi-preview-pkeys'
       >
         {
-          this.props.primaryKeys.size > 0 ?
-            this.props.primaryKeys.map((pkey, index) =>
+          primaryKeys.size > 0 ?
+            primaryKeys.map((pkey, index) =>
               <div
                 key={pkey}
                 className='flex-shrink flex-container fi-preview-pkeys-wrapper'
@@ -720,7 +722,7 @@ class FileImportPreview extends TerrainComponent<Props>
                       text: Colors().text1,
                     }}
                   >
-                    Primary key(s):
+                    Primary key{primaryKeys.size > 1 ? 's' : ''}:
                   </div>
                 }
                 <div
@@ -743,7 +745,6 @@ class FileImportPreview extends TerrainComponent<Props>
                   index !== this.props.primaryKeys.size - 1 &&
                   <div
                     className='flex-shrink fi-preview-pkeys-delim'
-                    onClick={this.showDelimTextBox}
                   >
                     {
                       this.state.showingDelimTextBox ?
