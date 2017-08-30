@@ -50,6 +50,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
@@ -588,7 +589,7 @@ class FileImport extends TerrainComponent<any>
             value={dbName}
             options={this.state.dbNames}
             onChange={this.handleAutocompleteDbChange}
-            placeholder={'database'}
+            placeholder={'index'}
             disabled={false}
             onEnter={this._fn(this.handleSelectDb)}
             onSelectOption={this._fn(this.handleSelectDb)}
@@ -614,7 +615,7 @@ class FileImport extends TerrainComponent<any>
             value={tableName}
             options={this.state.tableNames}
             onChange={this.handleAutocompleteTableChange}
-            placeholder={'table'}
+            placeholder={'type'}
             disabled={false}
             onEnter={this._fn(this.handleSelectTable)}
             onSelectOption={this._fn(this.handleSelectTable)}
@@ -761,7 +762,10 @@ class FileImport extends TerrainComponent<any>
         className='file-import'
       >
         <div
-          className='file-import-inner'
+          className={classNames({
+            'file-import-inner': true,
+            'file-import-inner-server-step': this.state.stepId === Steps.SelectServer
+          })}
         >
           {this.renderError()}
           {this.renderSteps()}

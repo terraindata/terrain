@@ -772,7 +772,6 @@ export const Ajax =
         rank,
         transformations,
       };
-      console.log('export payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
@@ -818,7 +817,6 @@ export const Ajax =
         export: exporting,
         primaryKeyDelimiter,
       };
-      console.log('save template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
@@ -854,7 +852,6 @@ export const Ajax =
         export: exporting,
         primaryKeyDelimiter,
       };
-      console.log('update template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
@@ -914,7 +911,6 @@ export const Ajax =
       {
         payload['importOnly'] = true;
       }
-      console.log('fetch templates payload: ', payload);
 
       Ajax.req(
         'post',
