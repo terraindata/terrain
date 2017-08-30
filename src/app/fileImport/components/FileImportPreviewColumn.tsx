@@ -281,7 +281,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         </div>
         <div
           className='fi-preview-column-disabled-veil'
-          style={backgroundColor(Colors().notIncludedBg)}
+          style={backgroundColor(Colors().bg3)}
         >
         </div>
       </div>
