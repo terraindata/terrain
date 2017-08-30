@@ -197,8 +197,9 @@ export default class ResultsTable extends TerrainComponent<Props>
   public getRow(i: number): object
   {
     const obj = this.state.rows.get(i).fields.toJS();
-    return _.mapValues(obj, (value) => {
-      if (Array.isArray(value) || typeof(value) === 'boolean')
+    return _.mapValues(obj, (value) =>
+    {
+      if (Array.isArray(value) || typeof (value) === 'boolean')
       {
         return JSON.stringify(value);
       }
