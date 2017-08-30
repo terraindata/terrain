@@ -73,6 +73,10 @@ const FileImportActionTypes =
     saveFile: '',
     changeUploadInProgress: '',
     changeElasticUpdate: '',
+    addPreviewColumn: '',
+    togglePreviewColumn: '',
+    setExportFiletype: '',
+    toggleExportRank: '',
     setErrorMsg: '',
   };
 
