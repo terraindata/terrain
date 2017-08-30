@@ -345,6 +345,32 @@ export function getTemplateId(template: string): number
 
 export class CSVTypeParser
 {
+  public getDoubleFromString(value: string): number | boolean
+  {
+    const parsedValue: number = Number(value);
+    if (!isNaN(parsedValue))
+    {
+      return parsedValue;
+    }
+    if (value.charAt(0) === '$')
+    {
+      const dollarValue: number = Number(value.substring(1));
+      if (!isNaN(dollarValue))
+      {
+        return dollarValue;
+      }
+    }
+    if (value.charAt(value.length - 1) === '%')
+    {
+      const percentValue: number = Number(value.substring(0, value.length - 1));
+      if (!isNaN(percentValue))
+      {
+        return percentValue / 100;
+      }
+    }
+    return false;
+  }
+
   public getBestTypeFromArrayAsObject(values: string[]): object
   {
     const arrType: string[] = this.getBestTypeFromArrayAsArray(values);
@@ -431,13 +457,14 @@ export class CSVTypeParser
   }
   private _isIntHelper(value: string): boolean
   {
-    const parsedValue: any = Number(value);
-    return !isNaN(parsedValue) && Number.isInteger(parsedValue);
+    const parsedValue: number | boolean = this.getDoubleFromString(value);
+    // return ((typeof parsedValue) === 'number') && Number.isInteger(parsedValue as number);
+    return ((typeof parsedValue) === 'number') && (value.indexOf('.') === -1);
   }
   private _isDoubleHelper(value: string): boolean
   {
-    const parsedValue: any = Number(value);
-    return !isNaN(parsedValue);
+    const parsedValue: number | boolean = this.getDoubleFromString(value);
+    return (typeof parsedValue) === 'number';
   }
   private _isBooleanHelper(value: string): boolean
   {
