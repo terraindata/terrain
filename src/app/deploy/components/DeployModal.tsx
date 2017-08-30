@@ -202,7 +202,11 @@ class DeployModal extends TerrainComponent<Props>
     const name = (changingStatusOf && changingStatusOf.name);
 
     let title = 'Deploy "' + name + '" to Live';
-    if (changingStatusTo !== ItemStatus.Live)
+    if (changingStatusTo === ItemStatus.Default)
+    {
+      title = 'Make "' + name + '" Default';
+    }
+    else if (changingStatusTo !== ItemStatus.Live)
     {
       title = 'Remove "' + name + '" from Live';
     }
