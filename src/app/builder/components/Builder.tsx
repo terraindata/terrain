@@ -834,7 +834,7 @@ class Builder extends TerrainComponent<Props>
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
     variant = variant.set('query', this.getQuery());
-    LibraryActions.variants.duplicateAs(variant, variant.get('index'), this.state.saveAsTextboxValue,
+    TerrainStore.dispatch(LibraryActions.variants.duplicateAs(variant, variant.get('index'), this.state.saveAsTextboxValue,
       (response, newVariant) =>
       {
         this.onSaveSuccess(newVariant);
@@ -868,7 +868,8 @@ class Builder extends TerrainComponent<Props>
         {
           browserHistory.replace(`/builder/${newConfig}`);
         }
-      });
+      })
+    );
   }
 
   public handleModalSaveAsCancel()
