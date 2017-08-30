@@ -149,7 +149,7 @@ class FileImport extends TerrainComponent<any>
     const { file, filetype } = this.state.fileImportState;
     if (filetype === 'csv' && this.state.stepId - 1 === Steps.CsvJsonOptions)
     {
-      this.parseFile(file, filetype, false, false);
+      this.parseFile(file, filetype, false, false, false);
     }
     this.setState({
       stepId: this.state.stepId - 1,
@@ -278,7 +278,7 @@ class FileImport extends TerrainComponent<any>
     return parseCSV(file, config);
   }
 
-  public parseFile(file: File, filetype: string, hasCsvHeader: boolean, isNewlineSeparatedJSON: boolean)
+  public parseFile(file: File, filetype: string, hasCsvHeader: boolean, isNewlineSeparatedJSON: boolean, incrementStep?: boolean)
   {
     const fileToRead: Blob = file.slice(0, PREVIEW_CHUNK_SIZE);
     const fr = new FileReader();
@@ -365,6 +365,10 @@ class FileImport extends TerrainComponent<any>
       this.setState({
         fileSelected: true,
       });
+      if (incrementStep !== false)
+      {
+        this.incrementStep();
+      }
     };
   }
 
@@ -403,7 +407,10 @@ class FileImport extends TerrainComponent<any>
     {
       this.parseFile(file.target.files[0], filetype, false, false);
     }
-    this.incrementStep();
+    else
+    {
+      this.incrementStep();
+    }
   }
 
   public handleSelectFileButtonClick()
@@ -417,7 +424,6 @@ class FileImport extends TerrainComponent<any>
     Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
     this.parseFile(file, filetype, hasCsvHeader, false); // TODO: what happens on error?
-    this.incrementStep();
   }
 
   public handleJSONFormatChoice(isNewlineSeparatedJSON: boolean)
@@ -425,7 +431,6 @@ class FileImport extends TerrainComponent<any>
     Actions.changeIsNewlineSeparatedJSON(isNewlineSeparatedJSON);
     const { file, filetype } = this.state.fileImportState;
     this.parseFile(file, filetype, false, isNewlineSeparatedJSON); // TODO: what happens on error?
-    this.incrementStep();
   }
 
   public handleSelectDb(dbName: string)
