@@ -161,8 +161,11 @@ const FileImportActions =
       $(ActionTypes.setTemplates, { templates }),
 
     applyTemplate:
-    (templateId: number) =>
-      $(ActionTypes.applyTemplate, { templateId }),
+    (templateId: number, newColumns: List<string>) =>
+      $(ActionTypes.applyTemplate, {
+        templateId,
+        newColumns,
+      }),
 
     deleteTemplate:
     (templateId: number, exporting: boolean) =>
@@ -184,9 +187,25 @@ const FileImportActions =
     (elasticUpdate: boolean) =>
       $(ActionTypes.changeElasticUpdate, { elasticUpdate }),
 
+    addPreviewColumn:
+    (columnName: string) =>
+      $(ActionTypes.addPreviewColumn, { columnName }),
+
+    togglePreviewColumn:
+    (requireJSONHaveAllFields: boolean) =>
+      $(ActionTypes.togglePreviewColumn, { requireJSONHaveAllFields }),
+
     setErrorMsg:
     (err: string) =>
       $(ActionTypes.setErrorMsg, { err }),
+
+    setExportFiletype:
+    (exportFiletype: string) =>
+      $(ActionTypes.setExportFiletype, { exportFiletype }),
+
+    toggleExportRank:
+    (exportRank: boolean) =>
+      $(ActionTypes.toggleExportRank, { exportRank }),
   };
 
 export default FileImportActions;

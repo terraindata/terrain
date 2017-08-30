@@ -146,6 +146,11 @@ class FileImport extends TerrainComponent<any>
 
   public decrementStep()
   {
+    const { file, filetype } = this.state.fileImportState;
+    if (filetype === 'csv' && this.state.stepId - 1 === Steps.CsvJsonOptions)
+    {
+      this.parseFile(file, filetype, false, false, false);
+    }
     this.setState({
       stepId: this.state.stepId - 1,
     });
@@ -273,7 +278,7 @@ class FileImport extends TerrainComponent<any>
     return parseCSV(file, config);
   }
 
-  public parseFile(file: File, filetype: string, hasCsvHeader: boolean, isNewlineSeparatedJSON: boolean)
+  public parseFile(file: File, filetype: string, hasCsvHeader: boolean, isNewlineSeparatedJSON: boolean, incrementStep?: boolean)
   {
     const fileToRead: Blob = file.slice(0, PREVIEW_CHUNK_SIZE);
     const fr = new FileReader();
@@ -353,15 +358,30 @@ class FileImport extends TerrainComponent<any>
         return;
       }
       const typeParser = new CSVTypeParser();
-      const types: object[] = previewColumns.map((column) => typeParser.getBestTypeFromArrayAsObject(column));
-      const treeTypes: FileImportTypes.ColumnTypesTree[] = types.map((typeObj) => FileImportTypes._ColumnTypesTree(typeObj));
+      const types: string[][] = previewColumns.map((column) => typeParser.getBestTypeFromArrayAsArray(column));
+      const treeTypes: FileImportTypes.ColumnTypesTree[] = types.map(this.buildColumnTypesTreeFromArray);
 
       Actions.chooseFile(filetype, file.size, List<List<string>>(previewRows), List<string>(columnNames), List(treeTypes));
       this.setState({
         fileSelected: true,
       });
-      this.incrementStep();
+      if (incrementStep !== false)
+      {
+        this.incrementStep();
+      }
     };
+  }
+
+  public buildColumnTypesTreeFromArray(typeArr: string[]): FileImportTypes.ColumnTypesTree
+  {
+    const typeObj = {};
+    typeObj['type'] = typeArr[0];
+    if (typeArr.length > 1)
+    {
+      typeArr.shift();
+      typeObj['innerType'] = this.buildColumnTypesTreeFromArray(typeArr);
+    }
+    return FileImportTypes._ColumnTypesTree(typeObj);
   }
 
   public handleSelectFile(file)
@@ -562,7 +582,7 @@ class FileImport extends TerrainComponent<any>
     const { fileImportState } = this.state;
     const { filetype, filesize, serverId, dbName, tableName } = fileImportState;
     const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
-    const { templates, transforms, uploadInProgress, elasticUpdate } = fileImportState;
+    const { templates, transforms, uploadInProgress, elasticUpdate, requireJSONHaveAllFields, exportRank } = fileImportState;
 
     let content;
     switch (this.state.stepId)
@@ -648,6 +668,9 @@ class FileImport extends TerrainComponent<any>
             transforms={transforms}
             columnOptions={this.state.columnOptionNames}
             uploadInProgress={uploadInProgress}
+            filetype={filetype}
+            requireJSONHaveAllFields={requireJSONHaveAllFields}
+            exportRank={exportRank}
             elasticUpdate={elasticUpdate}
             exporting={false}
             filesize={filesize}

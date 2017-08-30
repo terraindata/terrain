@@ -104,7 +104,7 @@ export function parseCSV(file, config: ParseCSVConfig)
   const nIndex = file.indexOf('\n');
   if (rnIndex === -1 && nIndex === -1)
   {
-    config.error('Error: no newLine sequence found. Valid newLine sequences are ' + String(VALID_NEWLINE_SEQUENCES));
+    config.error('Error: no line-breaks found in uploaded CSV file.');
     return undefined;
   }
   if (rnIndex === -1)
@@ -345,11 +345,32 @@ export function getTemplateId(template: string): number
 
 export class CSVTypeParser
 {
-  public getBestTypeFromArrayAsObject(values: string[]): object
+  public getDoubleFromString(value: string): number | boolean
   {
-    const arrType: string[] = this.getBestTypeFromArrayAsArray(values);
-    return this._getTypeObjFromArray(arrType);
+    const parsedValue: number | boolean = this._getDoubleFromStringHelper(value);
+    if (typeof parsedValue === 'number')
+    {
+      return parsedValue;
+    }
+    if (value.charAt(0) === '$')
+    {
+      const dollarValue: number | boolean = this._getDoubleFromStringHelper(value.substring(1));
+      if (typeof dollarValue === 'number')
+      {
+        return dollarValue;
+      }
+    }
+    if (value.charAt(value.length - 1) === '%')
+    {
+      const percentValue: number | boolean = this._getDoubleFromStringHelper(value.substring(0, value.length - 1));
+      if (typeof percentValue === 'number')
+      {
+        return percentValue / 100;
+      }
+    }
+    return false;
   }
+
   public getBestTypeFromArrayAsArray(values: string[]): string[]
   {
     const types: Set<string> = new Set();
@@ -409,20 +430,35 @@ export class CSVTypeParser
     return ['text'];
   }
 
-  private _getTypeObjFromArray(typeArr: string[]): object
+  // accounts for numbers with commas, e.g., "1,105.20"
+  private _getDoubleFromStringHelper(value: string): number | boolean
   {
-    const typeObj = {};
-    if (typeArr.length === 0)
+    const parsedValue: number = Number(value);
+    if (!isNaN(parsedValue))
     {
-      return typeObj;
+      return parsedValue;
     }
-    typeObj['type'] = typeArr[0];
-    if (typeArr.length > 1)
+    let decimalInd: number = value.indexOf('.');
+    decimalInd = decimalInd === -1 ? value.length : decimalInd;
+    let ind = decimalInd - 4;
+    while (ind > 0)
     {
-      typeArr.shift();
-      typeObj['innerType'] = this._getTypeObjFromArray(typeArr);
+      if (value.charAt(ind) === ',')
+      {
+        value = value.substring(0, ind) + value.substring(ind + 1);
+        ind -= 4;
+      }
+      else
+      {
+        return false;
+      }
     }
-    return typeObj;
+    const noCommaValue: number = Number(value);
+    if (!isNaN(noCommaValue))
+    {
+      return noCommaValue;
+    }
+    return false;
   }
 
   private _isNullHelper(value: string): boolean
@@ -431,13 +467,14 @@ export class CSVTypeParser
   }
   private _isIntHelper(value: string): boolean
   {
-    const parsedValue: any = Number(value);
-    return !isNaN(parsedValue) && Number.isInteger(parsedValue);
+    const parsedValue: number | boolean = this.getDoubleFromString(value);
+    // return ((typeof parsedValue) === 'number') && Number.isInteger(parsedValue as number);
+    return ((typeof parsedValue) === 'number') && (value.indexOf('.') === -1);
   }
   private _isDoubleHelper(value: string): boolean
   {
-    const parsedValue: any = Number(value);
-    return !isNaN(parsedValue);
+    const parsedValue: number | boolean = this.getDoubleFromString(value);
+    return (typeof parsedValue) === 'number';
   }
   private _isBooleanHelper(value: string): boolean
   {
