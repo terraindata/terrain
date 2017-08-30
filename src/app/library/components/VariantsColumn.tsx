@@ -50,6 +50,8 @@ import * as React from 'react';
 // import * as moment from 'moment';
 const moment = require('moment');
 
+import * as Immutable from 'immutable';
+
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
