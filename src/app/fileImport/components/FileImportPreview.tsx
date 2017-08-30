@@ -334,9 +334,13 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
-  public handleElasticUpdateChange()
+  public handleElasticUpdateChange(elasticUpdate: boolean)
   {
-    Actions.changeElasticUpdate();
+    if (elasticUpdate === this.props.elasticUpdate)
+    {
+      return;
+    }
+    Actions.changeElasticUpdate(elasticUpdate);
   }
 
   public deletePrimaryKey(columnName: string)
@@ -518,16 +522,30 @@ class FileImportPreview extends TerrainComponent<Props>
                   <div
                     className='flex-shrink fi-preview-pkeys-delim'
                   >
-                    <Autocomplete
-                      value={this.props.primaryKeyDelimiter}
-                      options={null}
-                      onChange={this.changePrimaryKeyDelimiter}
-                      placeholder={'delimiter'}
-                      className={'fi-preview-pkeys-autocomplete'}
-                      disabled={false}
-                      onEnter={this.onDelimChange}
-                      onBlur={this.onDelimChange}
-                    />
+                    {
+                      this.state.showingDelimTextBox ?
+                        <Autocomplete
+                          value={this.props.primaryKeyDelimiter}
+                          options={null}
+                          onChange={this.changePrimaryKeyDelimiter}
+                          placeholder={'delimiter'}
+                          className={'fi-preview-pkeys-autocomplete'}
+                          disabled={false}
+                          onEnter={this.onDelimChange}
+                          onBlur={this.onDelimChange}
+                        />
+                        :
+                        tooltip(
+                          <span
+                            className='clickable'
+                          >
+                            {
+                              this.props.primaryKeyDelimiter
+                            }
+                          </span>,
+                          'Click to edit delimiter',
+                        )
+                    }
                   </div>
                 }
               </div>,
@@ -664,12 +682,20 @@ class FileImportPreview extends TerrainComponent<Props>
               color: this.props.elasticUpdate ? Colors().active : Colors().border3,
               border: this.props.elasticUpdate ? 'solid 1px ' + Colors().active : 'solid 1px ' + Colors().border3,
             }}
-            onClick={this.handleElasticUpdateChange}
+            onClick={this._fn(this.handleElasticUpdateChange, true)}
           >
             <div
-              className='fi-preview-update-button-title'
+              className='flex-container fi-preview-update-button-header'
             >
-              Join Data
+              <CheckBox
+                checked={this.props.elasticUpdate}
+                onChange={this._fn(this.handleElasticUpdateChange, true)}
+              />
+              <div
+                className='fi-preview-update-button-header-title'
+              >
+                Join Data
+              </div>
             </div>
             <div
               className='fi-preview-update-button-subtext'
@@ -684,12 +710,20 @@ class FileImportPreview extends TerrainComponent<Props>
               color: !this.props.elasticUpdate ? Colors().active : Colors().border3,
               border: !this.props.elasticUpdate ? 'solid 1px ' + Colors().active : 'solid 1px ' + Colors().border3,
             }}
-            onClick={this.handleElasticUpdateChange}
+            onClick={this._fn(this.handleElasticUpdateChange, false)}
           >
             <div
-              className='fi-preview-update-button-title'
+              className='flex-container fi-preview-update-button-header'
             >
-              Replace Data
+              <CheckBox
+                checked={!this.props.elasticUpdate}
+                onChange={this._fn(this.handleElasticUpdateChange, false)}
+              />
+              <div
+                className='fi-preview-update-button-header-title'
+              >
+                Replace Data
+              </div>
             </div>
             <div
               className='fi-preview-update-button-subtext'
@@ -707,7 +741,10 @@ class FileImportPreview extends TerrainComponent<Props>
       <div
         className='flex-container fi-import-button-wrapper'
       >
-        {this.renderUpdate()}
+        {
+          !this.props.exporting &&
+          this.renderUpdate()
+        }
         {this.renderUpload()}
       </div>
     );

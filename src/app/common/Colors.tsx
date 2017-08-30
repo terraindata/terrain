@@ -61,9 +61,9 @@ interface Theme
 
   emptyBg: string; // special BG to denote "empty nothingness"
 
-  border1: string; // high contrast border
+  border1: string; // low contrast border
   border2: string; // medium contrast border
-  border3: string; // low contrast border
+  border3: string; // high contrast border
 
   text1: string; // most contrast
   text2: string;
@@ -186,6 +186,7 @@ interface Theme
         compound: string,
         join: string,
         geo: string,
+        suggest: string,
         parameter: string,
       };
 
@@ -449,6 +450,7 @@ const DARK: Theme =
           compound: '#fad14b',
           join: '#fad14b',
           geo: '#0ee06b',
+          suggest: '#bbfa1e',
           parameter: code.inputParameter,
         },
 

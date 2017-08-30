@@ -561,9 +561,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESStructureClause(clause: ESStructureClause): any
   {
     const accepts = this.getCardTypes(_.keys(clause.structure), clause);
-
     // If there's a template, we need to create seed cards
     //  of the template types when this card is initialized.
+    const cardTypesToKeys: { [type: string]: string } = {};
+
     const init = (blocksConfig, extraConfig?, skipTemplate?) =>
     {
       const config = {
@@ -639,6 +640,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               if (card['cards'].find((p) => p.key === key) === undefined)
               {
                 const cardTypes = this.getCardTypes([clauseType]);
+                cardTypes.map((cardType) =>
+                {
+                  cardTypesToKeys[cardType] = key;
+                },
+                );
 
                 cardTypes.map((cardType) =>
                   result.push({
@@ -653,17 +659,22 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
           if (this.customCardTypesMap[clause.type] !== undefined)
           {
+            // TODO consolidate this code with above code block, DRY
             this.customCardTypesMap[clause.type].forEach(
               (cardType) =>
               {
                 const cardConfig = backend.blocks[cardType];
                 const key: string = cardConfig['key'];
+                cardTypesToKeys[cardType] = key;
 
-                result.push({
-                  text: key + ': ' + (cardConfig.static['title'] as string),
-                  key,
-                  type: cardType,
-                });
+                if (card['cards'].find((p) => p.key === key) === undefined)
+                {
+                  result.push({
+                    text: key + ': ' + (cardConfig.static['title'] as string),
+                    key,
+                    type: cardType,
+                  });
+                }
               },
             );
           }
@@ -707,6 +718,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               displayType: DisplayType.CARDS,
               key: 'cards',
               hideCreateCardTool: true,
+              handleCardDrop: (type: string): any =>
+              {
+                return { key: cardTypesToKeys[type] };
+              },
             },
             {
               provideParentData: true, // need this to grey out the type dropdown

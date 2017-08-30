@@ -58,7 +58,6 @@ import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreviewColumn.less';
-import TransformBox from './TransformModal';
 
 const KeyIcon = require('./../../../images/icon_key-1.svg');
 type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
@@ -143,7 +142,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         }}
       >
         <div
-          className='fi-preview-column-header-include clickable'
+          className='flex-container fi-preview-column-header-include clickable'
           onClick={this.handleIncludedChange}
         >
           <CheckBox

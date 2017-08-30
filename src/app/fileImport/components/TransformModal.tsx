@@ -72,7 +72,6 @@ export interface Props
   columnNames: List<string>;
   datatype: string;
   onClose: () => void;
-  // setLocalColumnName(columnName: string);
 }
 
 @Radium
@@ -95,6 +94,20 @@ class TransformModal extends TerrainComponent<Props>
     mergeNewName: '',
     duplicateNewName: '',
   };
+
+  public handleClose()
+  {
+    this.setState({
+      transformTypeIndex: -1,
+      mergeIndex: -1,
+      transformText: '',
+      splitNames: List(['', '']),
+      mergeName: '',
+      mergeNewName: '',
+      duplicateNewName: '',
+    });
+    this.props.onClose();
+  }
 
   public handleDuplicateNewNameChange(duplicateNewName: string)
   {
@@ -436,7 +449,7 @@ class TransformModal extends TerrainComponent<Props>
         {
           TRANSFORM_TYPES[datatypeId].map((type, index) =>
             <div
-              className='fi-transform-option'
+              className='flex-container fi-transform-option'
               style={{
                 color: Colors().text1,
               }}
@@ -483,13 +496,15 @@ class TransformModal extends TerrainComponent<Props>
         className='flex-container fi-transform'
         style={backgroundColor(Colors().bg1)}
       >
-        {this.renderContent()}
+        {
+          this.renderContent()
+        }
       </div>;
 
     return (
       <Modal
         open={this.props.open}
-        onClose={this.props.onClose}
+        onClose={this.handleClose}
         title={'Apply a Transformation to ' + columnName}
         message={'Choose a transformation that will be applied to every row in ' + columnName + ' before data are imported'}
         children={transformChildren}

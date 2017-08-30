@@ -44,51 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+import * as KoaRouter from 'koa-router';
+import * as send from 'koa-send';
 
-import * as classNames from 'classnames';
-import * as _ from 'lodash';
-import * as React from 'react';
-import { borderColor, Colors, getStyle } from '../Colors';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './CheckBox.less';
+const NotFoundRouter = new KoaRouter();
 
-const CheckMark = require('./../../../images/icon_checkMark.svg');
-
-export interface Props
+NotFoundRouter.get('*', async (ctx, next) =>
 {
-  checked: boolean;
-  onChange: () => void;
-  className?: string;
-}
+  await send(ctx, '/src/app/index.html');
+});
 
-class CheckBox extends TerrainComponent<Props>
-{
-  public render()
-  {
-    return (
-      <div
-        className={classNames({
-          'checkbox': true,
-          'checkbox-checked': this.props.checked,
-          [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
-        })}
-        style={this.props.checked ? CHECKED_STYLE : UNCHECKED_STYLE}
-        onClick={this.props.onChange}
-      >
-        {this.props.checked ? <CheckMark className='check-mark-icon' /> : ' '}
-      </div>
-    );
-  }
-}
-
-const CHECKED_STYLE = _.extend({},
-  borderColor(Colors().active),
-  getStyle('fill', Colors().active),
-);
-
-const UNCHECKED_STYLE = _.extend({},
-  borderColor(Colors().border2),
-);
-
-export default CheckBox;
+export default NotFoundRouter;

@@ -50,6 +50,7 @@ import { FileImportStore } from './FileImportStore';
 
 type Transform = FileImportTypes.Transform;
 type Template = FileImportTypes.Template;
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
@@ -84,11 +85,12 @@ const FileImportActions =
       $(ActionTypes.changePrimaryKeyDelimiter, { delim }),
 
     chooseFile:
-    (filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
+    (filetype: string, preview: List<List<string>>, originalNames: List<string>, columnTypes?: List<ColumnTypesTree>) =>
       $(ActionTypes.chooseFile, {
         filetype,
         preview,
         originalNames,
+        columnTypes,
       }),
 
     importFile:
@@ -178,8 +180,8 @@ const FileImportActions =
       $(ActionTypes.changeUploadInProgress, { uploading }),
 
     changeElasticUpdate:
-    () =>
-      $(ActionTypes.changeElasticUpdate, {}),
+    (elasticUpdate: boolean) =>
+      $(ActionTypes.changeElasticUpdate, { elasticUpdate }),
 
     setErrorMsg:
     (err: string) =>
