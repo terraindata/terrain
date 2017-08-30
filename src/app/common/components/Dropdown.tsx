@@ -47,15 +47,17 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions member-access
 
 import * as classNames from 'classnames';
+import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
-import { altStyle, Colors } from '../../common/Colors';
+import { altStyle, backgroundColor, Colors, fontColor } from '../../common/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
+
 import './Dropdown.less';
 
 export interface Props
@@ -73,6 +75,7 @@ export interface Props
   width?: string;
   directionBias?: number; // bias for determining whether or not dropdown opens up or down
   unmountOnChange?: boolean;
+  tooltips?: List<any>;
 }
 
 @Radium
@@ -90,6 +93,11 @@ class Dropdown extends TerrainComponent<Props>
         open: false,
         focusedIndex: -1,
       };
+  }
+
+  public componentWillUnmount()
+  {
+    $('body').unbind('click', this.close);
   }
 
   public clickHandler(index)
@@ -110,6 +118,7 @@ class Dropdown extends TerrainComponent<Props>
           });
         }
       };
+      $('body').click(this.close);
     }
 
     return this._clickHandlers[index];
@@ -130,6 +139,12 @@ class Dropdown extends TerrainComponent<Props>
     }
 
     return undefined;
+  }
+
+  public onMouseDown(event)
+  {
+    event.stopPropagation();
+    $('body').unbind('click', this.close);
   }
 
   public renderOption(option, index)
@@ -166,14 +181,45 @@ class Dropdown extends TerrainComponent<Props>
       });
     }
 
+    let tooltipProps: TooltipProps;
+    if (this.props.tooltips !== undefined && this.props.tooltips.get(index) !== undefined)
+    {
+      if (typeof (this.props.tooltips.get(index)) === 'string')
+      {
+        tooltipProps = {
+          key: index,
+          title: this.props.tooltips.get(index),
+          position: 'left',
+        };
+      }
+      else
+      {
+        tooltipProps = this.props.tooltips.get(index);
+        tooltipProps.key = index;
+        if (tooltipProps.position === undefined)
+        {
+          tooltipProps.position = 'left';
+        }
+
+      }
+    }
+    else
+    {
+      tooltipProps = {
+        key: index,
+        title: '',
+      };
+    }
+
     return (
-      <div
+      tooltip(<div
         className={classNames({
           'dropdown-option': true,
           'dropdown-option-selected': selected,
           'dropdown-option-focused': focused,
         })}
         key={index}
+        onMouseDown={this.onMouseDown}
         onClick={this.clickHandler(index)}
         style={style}
       >
@@ -182,7 +228,9 @@ class Dropdown extends TerrainComponent<Props>
             this.getOptionName(option, index)
           }
         </div>
-      </div>
+      </div>,
+        tooltipProps,
+      )
     );
   }
 
@@ -191,7 +239,7 @@ class Dropdown extends TerrainComponent<Props>
     this.setState({
       open: false,
     });
-    $(document).off('click', this.close);
+    $('body').unbind('click', this.close);
   }
 
   public toggleOpen()
@@ -201,9 +249,9 @@ class Dropdown extends TerrainComponent<Props>
       return;
     }
 
-    if (!this.state.open && this.props.unmountOnChange === false)
+    if (!this.state.open)
     {
-      $(document).on('click', this.close);
+      $('body').click(this.close);
     }
 
     const cr = this.refs['value']['getBoundingClientRect']();
@@ -274,6 +322,21 @@ class Dropdown extends TerrainComponent<Props>
     const { selectedIndex, textColor, options } = this.props;
     const customColor = this.colorForOption(selectedIndex);
 
+    const dropdownValueStyle = [
+      this.props.canEdit ?
+        backgroundColor(
+          !this.state.open ? Colors().inputBg : customColor || Colors().active,
+          customColor || Colors().inactiveHover,
+        )
+        :
+        backgroundColor(Colors().darkerHighlight)
+      ,
+      fontColor(
+        !this.state.open ? customColor || Colors().text1 : Colors().text1,
+        this.props.canEdit ? Colors().text1 : undefined,
+      ),
+    ];
+
     return (
       <div
         onClick={this.toggleOpen}
@@ -295,18 +358,10 @@ class Dropdown extends TerrainComponent<Props>
         <div
           className='dropdown-value'
           ref='value'
-          style={{
-            'width': this.props.width,
-            'backgroundColor': !this.state.open ? Colors().inputBg :
-              customColor || Colors().active,
-            'color': !this.state.open ? customColor || Colors().text1
-              : Colors().text1,
-
-            ':hover': {
-              backgroundColor: customColor || Colors().inactiveHover,
-              color: Colors().text1,
-            },
-          }}
+          style={[
+            { width: this.props.width },
+            ...dropdownValueStyle,
+          ]}
           key='dropdown-value'
         >
           {

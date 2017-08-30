@@ -63,7 +63,7 @@ export const elasticScore = _card(
     key: 'sort',
     sortOrder: 'desc',
     sortType: 'number',
-    sortMode: undefined,
+    sortMode: 'auto',
 
     static: {
       language: 'elastic',
@@ -91,7 +91,7 @@ export const elasticScore = _card(
           },
         };
 
-        if (block['sortMode'] !== undefined)
+        if (block['sortMode'] !== 'auto')
         {
           _scriptObj._script['mode'] = block['sortMode'];
         }
@@ -107,7 +107,7 @@ export const elasticScore = _card(
           ]),
           sortOrder: 'desc',
           sortType: 'number',
-          sortMode: undefined,
+          sortMode: 'auto',
         };
       },
       display:
@@ -151,7 +151,7 @@ export const elasticScore = _card(
             {
               displayType: DisplayType.DROPDOWN,
               key: 'sortMode',
-              options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values']),
+              options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values'].concat(['auto'])),
               dropdownUsesRawValues: true,
               autoDisabled: true,
               centerDropdown: true,

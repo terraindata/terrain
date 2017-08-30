@@ -69,10 +69,10 @@ class FileImportPreviewRow extends TerrainComponent<Props>
         {
           this.props.items.map((value, key) =>
             <div
+              key={key}
               className='fi-preview-row-cell-wrapper'
             >
               <div
-                key={key}
                 className={classNames({
                   'fi-preview-row-cell': true,
                   'fi-preview-row-cell-disabled': columnsToInclude !== undefined && !columnsToInclude.get(key),

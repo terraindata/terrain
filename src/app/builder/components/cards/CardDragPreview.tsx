@@ -75,6 +75,7 @@ interface CDPProps
 
   connectDropTarget?: (el: El) => El;
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
+  handleCardDrop?: (type: string) => any;
 }
 
 class CardDragPreview extends TerrainComponent<CDPProps>
