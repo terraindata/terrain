@@ -80,6 +80,7 @@ export interface Props
   onTextboxValueChange?: (newValue: string) => void;
   allowOverflow?: boolean;
   closeOnConfirm?: boolean;
+  className?: string;
 }
 
 @Radium
@@ -137,6 +138,7 @@ class Modal extends TerrainComponent<Props>
               'modal-content': true,
               'modal-content-fill': this.props.fill,
               'modal-content-allow-overflow': this.props.allowOverflow,
+              [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
             })}
           >
             <div

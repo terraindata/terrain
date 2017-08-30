@@ -225,6 +225,7 @@ class DeployModal extends TerrainComponent<Props>
           title={title}
           confirm={false}
           fill={true}
+          className={'deploy-modal-wrapper'}
         >
           {
             changingStatusOf &&
