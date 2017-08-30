@@ -75,6 +75,7 @@ import CreateCardTool from './CreateCardTool';
 
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('./../../../../images/icon_more_12x3.svg?name=MoreIcon');
+const HelpIcon = require('./../../../../images/icon_help-1.svg?name=HelpIcon');
 
 const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
