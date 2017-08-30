@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Colors, getStyle } from '../Colors';
+import { borderColor, Colors, getStyle } from '../Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './CheckBox.less';
 
@@ -83,12 +83,12 @@ class CheckBox extends TerrainComponent<Props>
 }
 
 const CHECKED_STYLE = _.extend({},
-  getStyle('background', Colors().active),
+  borderColor(Colors().active),
+  getStyle('fill', Colors().active),
 );
 
 const UNCHECKED_STYLE = _.extend({},
-  getStyle('background', Colors().altBg2),
-  getStyle('color', Colors().altBg2),
+  borderColor(Colors().border2),
 );
 
 export default CheckBox;
