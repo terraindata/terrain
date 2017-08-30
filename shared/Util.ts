@@ -371,11 +371,6 @@ export class CSVTypeParser
     return false;
   }
 
-  public getBestTypeFromArrayAsObject(values: string[]): object
-  {
-    const arrType: string[] = this.getBestTypeFromArrayAsArray(values);
-    return this._getTypeObjFromArray(arrType);
-  }
   public getBestTypeFromArrayAsArray(values: string[]): string[]
   {
     const types: Set<string> = new Set();
@@ -433,22 +428,6 @@ export class CSVTypeParser
     }
     // TODO: other cases?
     return ['text'];
-  }
-
-  private _getTypeObjFromArray(typeArr: string[]): object
-  {
-    const typeObj = {};
-    if (typeArr.length === 0)
-    {
-      return typeObj;
-    }
-    typeObj['type'] = typeArr[0];
-    if (typeArr.length > 1)
-    {
-      typeArr.shift();
-      typeObj['innerType'] = this._getTypeObjFromArray(typeArr);
-    }
-    return typeObj;
   }
 
   // accounts for numbers with commas, e.g., "1,105.20"

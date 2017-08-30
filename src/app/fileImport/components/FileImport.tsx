@@ -358,14 +358,26 @@ class FileImport extends TerrainComponent<any>
         return;
       }
       const typeParser = new CSVTypeParser();
-      const types: object[] = previewColumns.map((column) => typeParser.getBestTypeFromArrayAsObject(column));
-      const treeTypes: FileImportTypes.ColumnTypesTree[] = types.map((typeObj) => FileImportTypes._ColumnTypesTree(typeObj));
+      const types: string[][] = previewColumns.map((column) => typeParser.getBestTypeFromArrayAsArray(column));
+      const treeTypes: FileImportTypes.ColumnTypesTree[] = types.map(this.buildColumnTypesTreeFromArray);
 
       Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames), List(treeTypes));
       this.setState({
         fileSelected: true,
       });
     };
+  }
+
+  public buildColumnTypesTreeFromArray(typeArr: string[]): FileImportTypes.ColumnTypesTree
+  {
+    const typeObj = {};
+    typeObj['type'] = typeArr[0];
+    if (typeArr.length > 1)
+    {
+      typeArr.shift();
+      typeObj['innerType'] = this.buildColumnTypesTreeFromArray(typeArr);
+    }
+    return FileImportTypes._ColumnTypesTree(typeObj);
   }
 
   public handleSelectFile(file)
