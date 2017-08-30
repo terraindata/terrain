@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors } from '../../common/Colors';
+import { backgroundColor, Colors, link } from '../../common/Colors';
 import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -239,6 +239,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             <div
               className='fi-preview-column-field-content clickable'
               onClick={this._fn(this.props.onTransform, this.props.columnId)}
+              style={link()}
             >
               Transform
             </div>,
@@ -269,7 +270,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           this.renderName()
         }
         <div
-          className='flex-container'
+          className='flex-container-center'
         >
           {
             this.renderType()
