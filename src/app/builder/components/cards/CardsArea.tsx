@@ -245,7 +245,7 @@ class CardsArea extends TerrainComponent<Props>
               className='nested-create-card-tool-wrapper'
               accepts={this.props.accepts}
               onToggle={this._toggle('cardToolOpen')}
-              hidePlaceholder={this.props.singleChild || cards.size === 0}
+              hidePlaceholder={this.props.singleChild}
               cannotClose={cards.size === 0}
               handleCardDrop={this.props.handleCardDrop}
             />

@@ -55,7 +55,7 @@ import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
-import { parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
+import { CSVTypeParser, parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -146,6 +146,11 @@ class FileImport extends TerrainComponent<any>
 
   public decrementStep()
   {
+    const { file, filetype } = this.state.fileImportState;
+    if (filetype === 'csv' && this.state.stepId - 1 === Steps.CsvJsonOptions)
+    {
+      this.parseFile(file, filetype, false, false);
+    }
     this.setState({
       stepId: this.state.stepId - 1,
     });
@@ -335,12 +340,44 @@ class FileImport extends TerrainComponent<any>
         ),
       );
 
-      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames));
+      let previewColumns;
+      switch (filetype)
+      {
+        case 'csv':
+          previewColumns = columnNamesToMap.map((name) =>
+            items.map((item) => item[name]));
+          break;
+        case 'json':
+          previewColumns = columnNamesToMap.map((name) =>
+            items.map((item) => JSON.stringify(item[name])));
+          break;
+        default:
+      }
+      if (previewColumns === undefined)
+      {
+        return;
+      }
+      const typeParser = new CSVTypeParser();
+      const types: string[][] = previewColumns.map((column) => typeParser.getBestTypeFromArrayAsArray(column));
+      const treeTypes: FileImportTypes.ColumnTypesTree[] = types.map(this.buildColumnTypesTreeFromArray);
+
+      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames), List(treeTypes));
       this.setState({
         fileSelected: true,
       });
-      this.incrementStep();
     };
+  }
+
+  public buildColumnTypesTreeFromArray(typeArr: string[]): FileImportTypes.ColumnTypesTree
+  {
+    const typeObj = {};
+    typeObj['type'] = typeArr[0];
+    if (typeArr.length > 1)
+    {
+      typeArr.shift();
+      typeObj['innerType'] = this.buildColumnTypesTreeFromArray(typeArr);
+    }
+    return FileImportTypes._ColumnTypesTree(typeObj);
   }
 
   public handleSelectFile(file)
@@ -366,10 +403,7 @@ class FileImport extends TerrainComponent<any>
     {
       this.parseFile(file.target.files[0], filetype, false, false);
     }
-    else
-    {
-      this.incrementStep();
-    }
+    this.incrementStep();
   }
 
   public handleSelectFileButtonClick()
@@ -383,6 +417,7 @@ class FileImport extends TerrainComponent<any>
     Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
     this.parseFile(file, filetype, hasCsvHeader, false); // TODO: what happens on error?
+    this.incrementStep();
   }
 
   public handleJSONFormatChoice(isNewlineSeparatedJSON: boolean)
@@ -390,6 +425,7 @@ class FileImport extends TerrainComponent<any>
     Actions.changeIsNewlineSeparatedJSON(isNewlineSeparatedJSON);
     const { file, filetype } = this.state.fileImportState;
     this.parseFile(file, filetype, false, isNewlineSeparatedJSON); // TODO: what happens on error?
+    this.incrementStep();
   }
 
   public handleSelectDb(dbName: string)

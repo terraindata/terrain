@@ -44,67 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
+import * as KoaRouter from 'koa-router';
+import * as send from 'koa-send';
 
-import * as Immutable from 'immutable';
-import * as Radium from 'radium';
-import * as React from 'react';
-import Dropdown from './../../common/components/Dropdown';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import Actions from './../data/FileImportActions';
-import * as FileImportTypes from './../FileImportTypes';
-import './TypeDropdown.less';
-const { List } = Immutable;
+const NotFoundRouter = new KoaRouter();
 
-type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
-const ELASTIC_TYPES = List(FileImportTypes.ELASTIC_TYPES);
-
-export interface Props
+NotFoundRouter.get('*', async (ctx, next) =>
 {
-  columnId: number;
-  recursionDepth: number;
-  columnType: ColumnTypesTree;
-  tooltips?: List<any>;
-}
+  await send(ctx, '/src/app/index.html');
+});
 
-@Radium
-class TypeDropdown extends TerrainComponent<Props>
-{
-  public handleTypeChange(typeIndex: number)
-  {
-    const type = FileImportTypes.ELASTIC_TYPES[typeIndex];
-    Actions.setColumnType(this.props.columnId, this.props.recursionDepth, type);
-  }
-
-  public render()
-  {
-    return (
-      <div
-        className='fi-type-dropdown'
-      >
-        <div
-          className='fi-type-dropdown-dropdown'
-        >
-          <Dropdown
-            selectedIndex={FileImportTypes.ELASTIC_TYPES.indexOf(this.props.columnType.type)}
-            options={ELASTIC_TYPES}
-            onChange={this.handleTypeChange}
-            canEdit={true}
-            tooltips={this.props.tooltips}
-          />
-        </div>
-        {
-          this.props.columnType.type === 'array' &&
-          <TypeDropdown
-            columnId={this.props.columnId}
-            recursionDepth={this.props.recursionDepth + 1}
-            columnType={this.props.columnType.innerType}
-            tooltips={this.props.tooltips}
-          />
-        }
-      </div>
-    );
-  }
-}
-
-export default TypeDropdown;
+export default NotFoundRouter;

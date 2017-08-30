@@ -425,6 +425,7 @@ column if you have customized the results view.');
   {
     this.setState({
       resultFormat: this.state.resultFormat === 'icon' ? 'table' : 'icon',
+      expanded: false,
     });
   }
 
