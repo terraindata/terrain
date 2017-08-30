@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors } from '../../common/Colors';
+import { backgroundColor, Colors, link } from '../../common/Colors';
 import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -142,7 +142,8 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         }}
       >
         <div
-          className='flex-container fi-preview-column-header-include'
+          className='flex-container fi-preview-column-header-include clickable'
+          onClick={this.handleIncludedChange}
         >
           <CheckBox
             checked={this.props.isIncluded}
@@ -150,7 +151,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           />
           <span
             className='fi-preview-column-header-include-text clickable'
-            onClick={this.handleIncludedChange}
             style={{
               color: this.props.isIncluded ? Colors().active : Colors().border3,
             }}
@@ -213,7 +213,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     {
       return (
         <div
-          className='flex-container fi-preview-column-field'
+          className='flex-container fi-preview-column-field flex-grow'
         >
           <div
             className='fi-preview-column-field-content'
@@ -240,6 +240,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             <div
               className='fi-preview-column-field-content clickable'
               onClick={this._fn(this.props.onTransform, this.props.columnId)}
+              style={link()}
             >
               Transform
             </div>,
@@ -269,15 +270,19 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         {
           this.renderName()
         }
-        {
-          this.renderType()
-        }
-        {
-          this.renderTransform()
-        }
+        <div
+          className='flex-container-center'
+        >
+          {
+            this.renderType()
+          }
+          {
+            this.renderTransform()
+          }
+        </div>
         <div
           className='fi-preview-column-disabled-veil'
-          style={backgroundColor(Colors().notIncludedBg)}
+          style={backgroundColor(Colors().bg3)}
         >
         </div>
       </div>

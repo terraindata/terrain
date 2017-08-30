@@ -566,7 +566,6 @@ class FileImport extends TerrainComponent<any>
           }
         </div>
         {
-          this.state.stepId > 0 &&
           <div className='fi-step-title'>
             {
               stepTitle
