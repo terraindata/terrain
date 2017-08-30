@@ -230,7 +230,7 @@ export const STEP_NAMES =
 
 export const STEP_TITLES =
   [
-    'Select a File',
+    'Select a CSV or JSON file to import into Terrain',
     '',
     'Select an ElasticSearch Cluster',
     'Select an ElasticSearch Index',

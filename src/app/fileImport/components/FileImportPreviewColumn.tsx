@@ -134,7 +134,8 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         }}
       >
         <div
-          className='fi-preview-column-header-include'
+          className='fi-preview-column-header-include clickable'
+          onClick={this.handleIncludedChange}
         >
           <CheckBox
             checked={this.props.isIncluded}
@@ -142,7 +143,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           />
           <span
             className='fi-preview-column-header-include-text clickable'
-            onClick={this.handleIncludedChange}
             style={{
               color: this.props.isIncluded ? Colors().active : Colors().border3,
             }}
@@ -201,7 +201,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     {
       return (
         <div
-          className='flex-container fi-preview-column-field'
+          className='flex-container fi-preview-column-field flex-grow'
         >
           <div
             className='fi-preview-column-field-content'
@@ -248,10 +248,22 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           text: Colors().text1,
         }}
       >
-        {this.renderHeader()}
-        {this.renderName()}
-        {this.renderType()}
-        {this.renderTransform()}
+        {
+          this.renderHeader()
+        }
+        {
+          this.renderName()
+        }
+        <div
+          className='flex-container'
+        >
+          {
+            this.renderType()
+          }
+          {
+            this.renderTransform()
+          }
+        </div>
       </div>
     );
   }
