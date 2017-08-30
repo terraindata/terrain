@@ -142,7 +142,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         }}
       >
         <div
-          className='fi-preview-column-header-include'
+          className='flex-container fi-preview-column-header-include'
         >
           <CheckBox
             checked={this.props.isIncluded}
@@ -262,10 +262,18 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           text: Colors().text1,
         }}
       >
-        {this.renderHeader()}
-        {this.renderName()}
-        {this.renderType()}
-        {this.renderTransform()}
+        {
+          this.renderHeader()
+        }
+        {
+          this.renderName()
+        }
+        {
+          this.renderType()
+        }
+        {
+          this.renderTransform()
+        }
         <div
           className='fi-preview-column-disabled-veil'
           style={backgroundColor(Colors().notIncludedBg)}

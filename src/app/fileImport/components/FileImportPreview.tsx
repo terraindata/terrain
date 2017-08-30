@@ -334,9 +334,13 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
-  public handleElasticUpdateChange()
+  public handleElasticUpdateChange(elasticUpdate: boolean)
   {
-    Actions.changeElasticUpdate();
+    if (elasticUpdate === this.props.elasticUpdate)
+    {
+      return;
+    }
+    Actions.changeElasticUpdate(elasticUpdate);
   }
 
   public deletePrimaryKey(columnName: string)
@@ -677,12 +681,20 @@ class FileImportPreview extends TerrainComponent<Props>
               color: this.props.elasticUpdate ? Colors().active : Colors().border3,
               border: this.props.elasticUpdate ? 'solid 1px ' + Colors().active : 'solid 1px ' + Colors().border3,
             }}
-            onClick={this.handleElasticUpdateChange}
+            onClick={this._fn(this.handleElasticUpdateChange, true)}
           >
             <div
-              className='fi-preview-update-button-title'
+              className='flex-container fi-preview-update-button-header'
             >
-              Join Data
+              <CheckBox
+                checked={this.props.elasticUpdate}
+                onChange={this._fn(this.handleElasticUpdateChange, true)}
+              />
+              <div
+                className='fi-preview-update-button-header-title'
+              >
+                Join Data
+              </div>
             </div>
             <div
               className='fi-preview-update-button-subtext'
@@ -697,12 +709,20 @@ class FileImportPreview extends TerrainComponent<Props>
               color: !this.props.elasticUpdate ? Colors().active : Colors().border3,
               border: !this.props.elasticUpdate ? 'solid 1px ' + Colors().active : 'solid 1px ' + Colors().border3,
             }}
-            onClick={this.handleElasticUpdateChange}
+            onClick={this._fn(this.handleElasticUpdateChange, false)}
           >
             <div
-              className='fi-preview-update-button-title'
+              className='flex-container fi-preview-update-button-header'
             >
-              Replace Data
+              <CheckBox
+                checked={!this.props.elasticUpdate}
+                onChange={this._fn(this.handleElasticUpdateChange, false)}
+              />
+              <div
+                className='fi-preview-update-button-header-title'
+              >
+                Replace Data
+              </div>
             </div>
             <div
               className='fi-preview-update-button-subtext'

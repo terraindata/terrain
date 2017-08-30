@@ -207,7 +207,7 @@ FileImportReducers[ActionTypes.changeUploadInProgress] =
 FileImportReducers[ActionTypes.changeElasticUpdate] =
   (state, action) =>
     state
-      .set('elasticUpdate', !state.elasticUpdate)
+      .set('elasticUpdate', action.payload.elasticUpdate)
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =

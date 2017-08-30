@@ -449,7 +449,7 @@ class TransformModal extends TerrainComponent<Props>
         {
           TRANSFORM_TYPES[datatypeId].map((type, index) =>
             <div
-              className='fi-transform-option'
+              className='flex-container fi-transform-option'
               style={{
                 color: Colors().text1,
               }}
@@ -496,7 +496,9 @@ class TransformModal extends TerrainComponent<Props>
         className='flex-container fi-transform'
         style={backgroundColor(Colors().bg1)}
       >
-        {this.renderContent()}
+        {
+          this.renderContent()
+        }
       </div>;
 
     return (

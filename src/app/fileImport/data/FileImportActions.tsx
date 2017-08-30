@@ -180,8 +180,8 @@ const FileImportActions =
       $(ActionTypes.changeUploadInProgress, { uploading }),
 
     changeElasticUpdate:
-    () =>
-      $(ActionTypes.changeElasticUpdate, {}),
+    (elasticUpdate: boolean) =>
+      $(ActionTypes.changeElasticUpdate, { elasticUpdate }),
 
     setErrorMsg:
     (err: string) =>
