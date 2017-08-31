@@ -697,6 +697,7 @@ export const Ajax =
       update: boolean,
       hasCsvHeader: boolean,
       isNewlineSeparatedJSON: boolean,
+      requireJSONHaveAllFields: boolean,
       primaryKeyDelimiter: string,
       onLoad: (resp: any) => void,
       onError: (resp: any) => void,
@@ -720,6 +721,7 @@ export const Ajax =
       formData.append('update', String(update));
       formData.append('hasCsvHeader', String(hasCsvHeader));
       formData.append('isNewlineSeparatedJSON', String(isNewlineSeparatedJSON));
+      formData.append('requireJSONHaveAllFields', String(requireJSONHaveAllFields));
       formData.append('primaryKeyDelimiter', primaryKeyDelimiter);
 
       const xhr = new XMLHttpRequest();
@@ -772,7 +774,6 @@ export const Ajax =
         rank,
         transformations,
       };
-      console.log('export payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
@@ -818,7 +819,6 @@ export const Ajax =
         export: exporting,
         primaryKeyDelimiter,
       };
-      console.log('save template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
@@ -854,7 +854,6 @@ export const Ajax =
         export: exporting,
         primaryKeyDelimiter,
       };
-      console.log('update template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
@@ -914,7 +913,6 @@ export const Ajax =
       {
         payload['importOnly'] = true;
       }
-      console.log('fetch templates payload: ', payload);
 
       Ajax.req(
         'post',

@@ -80,6 +80,8 @@ export interface Props
   onTextboxValueChange?: (newValue: string) => void;
   allowOverflow?: boolean;
   closeOnConfirm?: boolean;
+  className?: string;
+  noFooterPadding?: boolean; // TODO: find better way
 }
 
 @Radium
@@ -137,12 +139,14 @@ class Modal extends TerrainComponent<Props>
               'modal-content': true,
               'modal-content-fill': this.props.fill,
               'modal-content-allow-overflow': this.props.allowOverflow,
+              [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
             })}
           >
             <div
               className={classNames({
                 'modal-dialog': true,
                 'modal-dialog-no-footer': !this.props.confirm,
+                'modal-dialog-no-footer-padding': this.props.noFooterPadding,
               })}
               style={[
                 fontColor(Colors().altText1),

@@ -85,7 +85,10 @@ function recursiveParseFieldProperties(fieldProperty: FieldProperty, fieldProper
       let fieldPropertyChild = SchemaTypes._FieldProperty({
         name: (fieldPropertyChildName as any) as string,
         value: fieldPropertyChildValue,
-        columnId: '',
+        serverId: fieldProperty.serverId,
+        databaseId: fieldProperty.databaseId,
+        tableId: fieldProperty.tableId,
+        columnId: fieldProperty.columnId,
         fieldPropertyParentId: fieldProperty.id,
       });
       const recursiveReturn = recursiveParseFieldProperties(fieldPropertyChild, fieldPropertiesMap);
@@ -376,6 +379,9 @@ export function parseElasticDb(elasticServer: object,
             let fieldProperty = SchemaTypes._FieldProperty({
               name: (fieldPropertyName as any) as string,
               value: fieldPropertyValue,
+              serverId,
+              databaseId,
+              tableId,
               columnId: tableId + '.' + ((fieldName as any) as string),
               fieldPropertyParentId: '',
             });

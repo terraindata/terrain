@@ -43,43 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-const FileImportActionTypes =
-  {
-    changeServer: '',
-    changeDbName: '',
-    changeTableName: '',
-    changeDbText: '',
-    changeTableText: '',
-    changeHasCsvHeader: '',
-    changeIsNewlineSeparatedJSON: '',
-    changePrimaryKey: '',
-    changePrimaryKeyDelimiter: '',
-    chooseFile: '',
-    importFile: '',
-    exportFile: '',
-    addTransform: '',
-    setColumnToInclude: '',
-    setColumnName: '',
-    setColumnType: '',
-    updatePreviewRows: '',
-    saveTemplate: '',
-    fetchTemplates: '',
-    setTemplates: '',
-    applyTemplate: '',
-    deleteTemplate: '',
-    updateTemplate: '',
-    saveFile: '',
-    changeUploadInProgress: '',
-    changeElasticUpdate: '',
-    addPreviewColumn: '',
-    togglePreviewColumn: '',
-    setExportFiletype: '',
-    toggleExportRank: '',
-    setErrorMsg: '',
-  };
+import * as KoaRouter from 'koa-router';
+import * as send from 'koa-send';
 
-Util.setValuesToKeys(FileImportActionTypes, '');
+const NotFoundRouter = new KoaRouter();
 
-export default FileImportActionTypes;
+NotFoundRouter.get('*', async (ctx, next) =>
+{
+  await send(ctx, '/src/app/index.html');
+});
+
+export default NotFoundRouter;

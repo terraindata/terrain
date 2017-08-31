@@ -50,6 +50,8 @@ import * as React from 'react';
 // import * as moment from 'moment';
 const moment = require('moment');
 
+import * as Immutable from 'immutable';
+
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
@@ -171,6 +173,14 @@ class VariantsColumn extends TerrainComponent<Props>
     this.props.variantActions.change(
       this.props.variants.get(id)
         .set('status', ItemStatus.Archive) as Variant,
+    );
+  }
+
+  public handleUnarchive(id: ID)
+  {
+    this.props.variantActions.change(
+      this.props.variants.get(id)
+        .set('status', ItemStatus.Build) as Variant,
     );
   }
 
@@ -349,8 +359,10 @@ class VariantsColumn extends TerrainComponent<Props>
         icon={<VariantIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
-        canArchive={canDrag}
+        onUnarchive={this.handleUnarchive}
+        canArchive={canDrag && variant.status !== ItemStatus.Archive}
         canDuplicate={canEdit}
+        canUnarchive={variant.status === ItemStatus.Archive}
         key={variant.id}
         to={`/${basePath}/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'

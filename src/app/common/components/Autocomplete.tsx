@@ -194,6 +194,19 @@ class Autocomplete extends TerrainComponent<Props>
   {
     if (!this.props.options)
     {
+      // still be able to hit enter when there are no options
+      if (event.keyCode === 13)
+      {
+        const value = event.target.value;
+        this.setState({
+          open: false,
+          value,
+        });
+        this.blurValue = value;
+        this.props.onChange(value);
+        this.props.onEnter && this.props.onEnter(value);
+        this.refs['input']['blur']();
+      }
       return;
     }
     const visibleOptions = this.props.options && this.props.options.filter(this.showOption);

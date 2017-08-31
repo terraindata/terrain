@@ -535,7 +535,9 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
       >
         <div className='results-config-field-body flex-container'>
           <span className='results-config-handle'>
-            <DragHandle key={Math.random().toString()} />
+            <DragHandle
+              key={'handle-for-' + this.props.field + this.props.index}
+            />
           </span>
           <span className='results-config-text flex-grow'>
             {

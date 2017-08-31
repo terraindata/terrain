@@ -79,14 +79,14 @@ export interface ParseCSVConfig
   comments?: string;
 
   /* If > 0, only that many rows will be parsed. */
-  preview?: number;
+  preview: number;
 
   /* if true, the first row of parsed data will be interpreted as field names. Warning: Duplicate field names will
      overwrite values in previous fields having the same name */
-  hasHeaderRow?: boolean;
+  hasHeaderRow: boolean;
 
   /* callback to execute if parser encounters an error. */
-  error?: (err: string) => void;
+  error: (err: string) => void;
 }
 
 export function parseCSV(file, config: ParseCSVConfig)
@@ -104,7 +104,7 @@ export function parseCSV(file, config: ParseCSVConfig)
   const nIndex = file.indexOf('\n');
   if (rnIndex === -1 && nIndex === -1)
   {
-    config.error('Error: no newLine sequence found. Valid newLine sequences are ' + String(VALID_NEWLINE_SEQUENCES));
+    config.error('Error: no line-breaks found in uploaded CSV file.');
     return undefined;
   }
   if (rnIndex === -1)
@@ -341,4 +341,287 @@ export function getTemplateName(template: string): string
 export function getTemplateId(template: string): number
 {
   return Number(template.substring(0, template.indexOf(':')));
+}
+
+export class CSVTypeParser
+{
+  public getDoubleFromString(value: string): number | boolean
+  {
+    const parsedValue: number | boolean = this._getDoubleFromStringHelper(value);
+    if (typeof parsedValue === 'number')
+    {
+      return parsedValue;
+    }
+    if (value.charAt(0) === '$')
+    {
+      const dollarValue: number | boolean = this._getDoubleFromStringHelper(value.substring(1));
+      if (typeof dollarValue === 'number')
+      {
+        return dollarValue;
+      }
+    }
+    if (value.charAt(value.length - 1) === '%')
+    {
+      const percentValue: number | boolean = this._getDoubleFromStringHelper(value.substring(0, value.length - 1));
+      if (typeof percentValue === 'number')
+      {
+        return percentValue / 100;
+      }
+    }
+    return false;
+  }
+
+  public getBestTypeFromArrayAsArray(values: string[]): string[]
+  {
+    const types: Set<string> = new Set();
+    for (const value of values)
+    {
+      types.add(JSON.stringify(this._getCSVTypeAsArray(value)));
+    }
+    const bestType: string[] = this._getBestTypeFromArrayHelper(types);
+    return bestType[0] === 'BAD' ? ['text'] : bestType;
+  }
+  private _getBestTypeFromArrayHelper(types: Set<string>): string[]
+  {
+    types.delete(JSON.stringify(['null']));
+    if (types.size === 0)
+    {
+      return ['text'];    // no data provided, so return the default
+    }
+    let numberOfArrayTypes: number = 0;
+    for (const type of types)
+    {
+      if (JSON.parse(type)[0] === 'array')
+      {
+        numberOfArrayTypes++;
+      }
+    }
+    if (numberOfArrayTypes > 0)
+    {
+      if (numberOfArrayTypes !== types.size)
+      {
+        return ['BAD']; // mix of array and (non-null) non-array types is not allowed
+      }
+      const innerTypes: Set<string> = new Set<string>();
+      for (const type of types)
+      {
+        innerTypes.add(JSON.stringify(JSON.parse(type).slice(1)));
+      }
+      const bestType: string[] = this._getBestTypeFromArrayHelper(innerTypes);
+      return bestType[0] === 'BAD' ? ['text'] : ['array'].concat(bestType);
+    }
+    if (types.size === 1)
+    {
+      return JSON.parse(Array.from(types)[0]) as string[];
+    }
+    if (this._matchInSet(types, ['long', 'double']))
+    {
+      return ['double'];
+    }
+    // if (this._matchInSet(types, ['long', 'date']))
+    // {
+    //   return ['date'];
+    // }
+    // if (this._matchInSet(types, ['double', 'date']))
+    // {
+    //   return ['date'];
+    // }
+    // TODO: other cases?
+    return ['text'];
+  }
+
+  // accounts for numbers with commas, e.g., "1,105.20"
+  private _getDoubleFromStringHelper(value: string): number | boolean
+  {
+    const parsedValue: number = Number(value);
+    if (!isNaN(parsedValue))
+    {
+      return parsedValue;
+    }
+    let decimalInd: number = value.indexOf('.');
+    decimalInd = decimalInd === -1 ? value.length : decimalInd;
+    let ind = decimalInd - 4;
+    while (ind > 0)
+    {
+      if (value.charAt(ind) === ',')
+      {
+        value = value.substring(0, ind) + value.substring(ind + 1);
+        ind -= 4;
+      }
+      else
+      {
+        return false;
+      }
+    }
+    const noCommaValue: number = Number(value);
+    if (!isNaN(noCommaValue))
+    {
+      return noCommaValue;
+    }
+    return false;
+  }
+
+  private _isNullHelper(value: string): boolean
+  {
+    return value === null || value === undefined || value === '' || value === 'null' || value === 'undefined';
+  }
+  private _isIntHelper(value: string): boolean
+  {
+    const parsedValue: number | boolean = this.getDoubleFromString(value);
+    // return ((typeof parsedValue) === 'number') && Number.isInteger(parsedValue as number);
+    return ((typeof parsedValue) === 'number') && (value.indexOf('.') === -1);
+  }
+  private _isDoubleHelper(value: string): boolean
+  {
+    const parsedValue: number | boolean = this.getDoubleFromString(value);
+    return (typeof parsedValue) === 'number';
+  }
+  private _isBooleanHelper(value: string): boolean
+  {
+    let parsedValue: any;
+    try
+    {
+      parsedValue = JSON.parse(value);
+    }
+    catch (e)
+    {
+      return false;
+    }
+    return parsedValue === false || parsedValue === true;
+  }
+  // private _isDateHelper(value: string): boolean
+  // {
+  //   const parsedValue: any = Date.parse(value);
+  //   return !isNaN(parsedValue);
+  // }
+  private _isArrayHelper(value: string): boolean
+  {
+    let parsedValue: any;
+    try
+    {
+      parsedValue = JSON.parse(value);
+    }
+    catch (e)
+    {
+      return false;
+    }
+    return Array.isArray(parsedValue);
+  }
+  private _getCSVTypeAsArray(value: string): string[]
+  {
+    if (this._isNullHelper(value))
+    {
+      return ['null'];
+    }
+    if (this._isBooleanHelper(value))
+    {
+      return ['boolean'];
+    }
+    if (this._isArrayHelper(value))
+    {
+      const innerValue = JSON.parse(value);
+      if (innerValue.length === 0)
+      {
+        return ['array', 'null'];
+      }
+      return isTypeConsistent(innerValue) ? ['array'].concat(this._getCSVTypeAsArray(JSON.stringify(innerValue[0]))) : ['text'];
+    }
+    if (this._isIntHelper(value))
+    {
+      return ['long'];
+    }
+    if (this._isDoubleHelper(value))
+    {
+      return ['double'];
+    }
+    // if (this._isDateHelper(value))
+    // {
+    //   return ['date'];
+    // }
+    return ['text'];
+  }
+  // typeSet should already have JSON.stringify(['null']) removed
+  private _matchInSet(typeSet: Set<string>, types: string[]): boolean
+  {
+    let counter: number = 0;
+    for (const type of types)
+    {
+      if (typeSet.has(JSON.stringify([type])))
+      {
+        counter++;
+      }
+    }
+    return counter === typeSet.size;
+  }
+}
+
+/* checks if all elements in the provided array are of the same type ; handles nested arrays */
+export function isTypeConsistent(arr: object[]): boolean
+{
+  return _isTypeConsistentHelper(arr) !== 'inconsistent';
+}
+
+function _isTypeConsistentHelper(arr: object[]): string
+{
+  if (arr.length === 0)
+  {
+    return 'null';
+  }
+  const types: Set<string> = new Set();
+  arr.forEach((obj) =>
+  {
+    types.add(getType(obj));
+  });
+  if (types.size > 1)
+  {
+    types.delete('null');
+  }
+  if (types.size !== 1)
+  {
+    return 'inconsistent';
+  }
+  const type: string = types.entries().next().value[0];
+  if (type === 'array')
+  {
+    const innerTypes: Set<string> = new Set();
+    arr.forEach((obj) =>
+    {
+      innerTypes.add(_isTypeConsistentHelper(obj as object[]));
+    });
+    if (innerTypes.size > 1)
+    {
+      innerTypes.delete('null');
+    }
+    if (innerTypes.size !== 1)
+    {
+      return 'inconsistent';
+    }
+    return innerTypes.entries().next().value[0];
+  }
+  return type;
+}
+
+export function getType(obj: object): string
+{
+  if (typeof obj === 'object')
+  {
+    if (obj === null)
+    {
+      return 'null';
+    }
+    if (obj instanceof Date)
+    {
+      return 'date';
+    }
+    if (Array.isArray(obj))
+    {
+      return 'array';
+    }
+  }
+  if (typeof obj === 'string')
+  {
+    return 'text';
+  }
+  // handles "number", "boolean", "object", and "undefined" cases
+  return typeof obj;
 }

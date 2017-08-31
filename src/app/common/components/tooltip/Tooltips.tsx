@@ -213,6 +213,7 @@ export interface ThemeInfo
 export interface Themes
 {
   main: ThemeInfo;
+  faded: ThemeInfo;
   alt: ThemeInfo;
   error: ThemeInfo;
 }
@@ -223,6 +224,10 @@ export const TOOLTIP_THEMES: Themes = {
   main: {
     backgroundColor: () => Colors().bg1,
     fontColor: () => Colors().text2,
+  },
+  faded: {
+    backgroundColor: () => 'rgba(0,0,0,.85)',
+    fontColor: () => Colors().text1,
   },
   alt: {
     backgroundColor: () => Colors().altBg1,
@@ -274,7 +279,7 @@ export interface TooltipProps
   theme?: Theme;
   className?: string;
   style?: any;
-  [others: string]: any;
+  key?: any;
 }
 
 export const defaultProps: TooltipProps = {

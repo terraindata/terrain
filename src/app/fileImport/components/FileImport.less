@@ -1,11 +1,46 @@
 @import "../../common/Common.less";
 
+.fi-advanced-fields {
+  .fi-advanced-fields-row {
+    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-left: 32px;
+    display: inline-flex;
+    label {
+      margin-top: -2px;
+    }
+    .fi-export-advanced-checkbox {
+      margin-right: 6px;
+      .check-mark-icon {
+        height: 8px;
+        margin-left: 1px;
+      }
+    }
+  }
+  .fi-advanced-fields-dropdown-label {
+    margin-bottom: 6px;
+    margin-left: 31px;
+  }
+  .fi-advanced-fields-dropdown {
+    margin-bottom: 30px;    
+    width: 75%;
+    margin-left: 31px;
+  }
+}
+
 .file-import {
 	height: 100%;
 	position: relative;
   display: flex; // applies Flexbox to child elements
   align-items: center; // center horizontally
   justify-content: center; // center vertically
+  overflow: hidden;
+
+  // TODO: find better way of preventing dropdown option clipping
+  .file-import-inner-server-step {
+    padding-top: 200px;
+    padding-bottom: 200px;
+  }
 
 	.file-import-inner {
     min-width: 300px;
@@ -15,6 +50,8 @@
     overflow: hidden;
 
     .fi-step {
+      margin-top: 12px;
+
       .fi-step-name {
         .title-text;
         text-align: center;
@@ -48,6 +85,7 @@
 
         .fi-content-rows-container {
           overflow: auto;
+          padding-bottom: 6px;
         }
       }
 

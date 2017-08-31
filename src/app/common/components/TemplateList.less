@@ -28,17 +28,28 @@
 
     .list-items-item {
       .big-text;
-      width: 100%;
+      width: calc(~"100% - 8px");
       text-align: center;
       padding: 12px;
       margin-bottom: 6px;
+      margin-right: 6px;
       border: solid 1px transparent;
 
       .list-items-item-wrapper {
         justify-content: space-between;
 
-        .list-items-delete {
-          font-size: 18px;
+        svg {
+          width: 24px;
+          height: 24px;
+          fill: rgba(255, 255, 255, 1);
+
+          &:hover {
+            fill: rgba(255, 255, 255, 0.1);
+          }
+
+          .st0 {
+            fill: transparent;
+          }
         }
       }
 
