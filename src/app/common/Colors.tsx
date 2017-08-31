@@ -438,8 +438,8 @@ const DARK: Theme =
         categories: {
           primary: '#4fc0ba',
           control: '#fad14b',
-          sort: '#38fa1e', // '#5ed04b',
-          filter: '#54cffc', // '#4f42d1',
+          sort: '#1eb4fa',
+          filter: '#38fa1e',
           match: '#b161bc',
           score: '#1eb4fa',
           script: '#4fc0ba',
