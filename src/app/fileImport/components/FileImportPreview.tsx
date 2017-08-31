@@ -495,7 +495,7 @@ class FileImportPreview extends TerrainComponent<Props>
         children={
           <TemplateList
             items={this.state.templateOptions}
-            title={'Select a Template to Apply'}
+            title={this.state.templateOptions.size > 0 ? 'Select a template to apply' : 'There are no templates to apply'}
             onDelete={this.handleDeleteTemplate}
             onApply={this.handleApplyTemplate}
             confirmDelete={true}
@@ -944,7 +944,7 @@ class FileImportPreview extends TerrainComponent<Props>
               <div
                 className='fi-preview-update-button-header-title'
               >
-                Join Data
+                Merge Data
               </div>
             </div>
             <div

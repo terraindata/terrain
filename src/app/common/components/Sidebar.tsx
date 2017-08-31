@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands interface-name
 
 import * as classNames from 'classnames';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
@@ -113,7 +114,8 @@ export class Sidebar extends TerrainComponent<Props>
                   },
                 }}
               >
-                <div
+
+                {tooltip(<div
                   className='sidebar-link-inner'
                 >
                   {
@@ -126,7 +128,11 @@ export class Sidebar extends TerrainComponent<Props>
                       link.text
                     }
                   </div>
-                </div>
+                </div>,
+                  {
+                    title: link.text,
+                    position: 'right',
+                  })},
               </div>
             </Link>,
           )
