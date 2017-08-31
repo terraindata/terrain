@@ -50,8 +50,16 @@
     opacity: 0;
     .transition;
   }
+
+  .result-expanded-close-button:not(.menu-open) {
+    opacity: 0;
+    .transition;
+  }
   &:hover {
     .menu-wrapper {
+      opacity: 1;
+    }
+    .result-expanded-close-button {
       opacity: 1;
     }
   }
@@ -159,6 +167,7 @@
   
   .result-pin-icon {
     display: none;
+    float: right;
   }
   
   &.result-pinned {
@@ -174,6 +183,11 @@
         fill: #d52c28;
       }
     }
+  }
+
+  .result-expanded-close-button {
+    display: inline-block;
+    float: right;
   }
   
   .result-dragging {

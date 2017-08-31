@@ -43,69 +43,52 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:strict-boolean-expressions
-
-import * as Immutable from 'immutable';
-import * as Radium from 'radium';
+import * as _ from 'lodash';
 import * as React from 'react';
-import Dropdown from './../../common/components/Dropdown';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import Actions from './../data/FileImportActions';
-import * as FileImportTypes from './../FileImportTypes';
-import './TypeDropdown.less';
-const { List } = Immutable;
 
-type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
-const ELASTIC_TYPES = List(FileImportTypes.ELASTIC_TYPES);
+import * as Color from 'color';
+
+import { backgroundColor, Colors, fontColor, getStyle } from 'common/Colors';
+import TerrainComponent from 'common/components/TerrainComponent';
+import './CardHelpTooltip.less';
 
 export interface Props
 {
-  columnId: number;
-  recursionDepth: number;
-  columnType: ColumnTypesTree;
-  tooltips?: List<any>;
+  staticInfo: any;
 }
 
-@Radium
-class TypeDropdown extends TerrainComponent<Props>
+export default class CardHelpTooltip extends TerrainComponent<Props>
 {
-  public handleTypeChange(typeIndex: number)
-  {
-    const type = FileImportTypes.ELASTIC_TYPES[typeIndex];
-    Actions.setColumnType(this.props.columnId, this.props.recursionDepth, type);
-  }
-
   public render()
   {
+    const cardColor = (this.props.staticInfo.colors && this.props.staticInfo.colors[0]) || Colors().altText1;
+    const titleStyle = _.extend({},
+      backgroundColor(Colors().bg3),
+      fontColor(cardColor),
+      getStyle('borderLeftColor', cardColor),
+      getStyle('borderTopColor', Colors().highlight),
+      getStyle('borderRightColor', Colors().highlight),
+      getStyle('borderBottomColor', Colors().highlight),
+    );
+
     return (
-      <div
-        className='fi-type-dropdown'
-      >
-        <div
-          className='fi-type-dropdown-wrapper'
-        >
-          <Dropdown
-            selectedIndex={FileImportTypes.ELASTIC_TYPES.indexOf(this.props.columnType.type)}
-            options={ELASTIC_TYPES}
-            onChange={this.handleTypeChange}
-            canEdit={true}
-            className='fi-type-dropdown-dropdown'
-            tooltips={this.props.tooltips}
-          />
+      <div className='card-help-tooltip'>
+        {
+          this.props.staticInfo.title &&
+          <div className='card-help-title' style={titleStyle}>
+            {this.props.staticInfo.title}
+          </div>
+        }
+        <div className='card-description'>
+          {this.props.staticInfo.description}
         </div>
         {
-          this.props.columnType.type === 'array' &&
-          <TypeDropdown
-            columnId={this.props.columnId}
-            recursionDepth={this.props.recursionDepth + 1}
-            columnType={this.props.columnType.innerType}
-            tooltips={this.props.tooltips}
-          />
+          this.props.staticInfo.url &&
+          <div className='card-help-link'>
+            <a target='_blank' href={this.props.staticInfo.url}> Learn More </a>
+          </div>
         }
       </div>
     );
   }
 }
-
-export default TypeDropdown;

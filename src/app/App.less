@@ -140,8 +140,8 @@ input[type=num], input[type=password]
 .button,
 .large-button {
   display: inline-block;
-  padding: 4px 18px;
-  border-radius: 5px;
+  padding: 6px 12px;
+  border-radius: 3px;
   background: rgba(0,0,0,0.2);
   background-blend-mode: multiply;
   color: #fff;
@@ -150,6 +150,20 @@ input[type=num], input[type=password]
   margin-top: 2px;
   cursor: pointer;
   white-space: nowrap;
+
+  svg {
+    width: 12px;
+    fill: rgba(255, 255, 255, 1);
+
+    &.back {
+      .rotate180;
+      margin-right: 6px;
+    }
+
+    &.next {
+      margin-left: 6px;
+    }
+  }
 
   &:hover {
     background: rgba(0,0,0,0.35); //rgba(255,255,255,0.45);

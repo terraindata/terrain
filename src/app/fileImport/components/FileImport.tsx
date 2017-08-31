@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -73,8 +74,7 @@ import has = Reflect.has;
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
-// const ArrowIcon = require('./../../../images/icon_carrot.svg');
-
+const ArrowIcon = require('./../../../images/icon_carrot.svg');
 const PREVIEW_CHUNK_SIZE = FileImportTypes.PREVIEW_CHUNK_SIZE;
 
 export interface Props
@@ -149,7 +149,7 @@ class FileImport extends TerrainComponent<any>
     const { file, filetype } = this.state.fileImportState;
     if (filetype === 'csv' && this.state.stepId - 1 === Steps.CsvJsonOptions)
     {
-      this.parseFile(file, filetype, false, false);
+      this.parseFile(file, filetype, false, false, false);
     }
     this.setState({
       stepId: this.state.stepId - 1,
@@ -278,7 +278,7 @@ class FileImport extends TerrainComponent<any>
     return parseCSV(file, config);
   }
 
-  public parseFile(file: File, filetype: string, hasCsvHeader: boolean, isNewlineSeparatedJSON: boolean)
+  public parseFile(file: File, filetype: string, hasCsvHeader: boolean, isNewlineSeparatedJSON: boolean, incrementStep?: boolean)
   {
     const fileToRead: Blob = file.slice(0, PREVIEW_CHUNK_SIZE);
     const fr = new FileReader();
@@ -361,10 +361,14 @@ class FileImport extends TerrainComponent<any>
       const types: string[][] = previewColumns.map((column) => typeParser.getBestTypeFromArrayAsArray(column));
       const treeTypes: FileImportTypes.ColumnTypesTree[] = types.map(this.buildColumnTypesTreeFromArray);
 
-      Actions.chooseFile(filetype, List<List<string>>(previewRows), List<string>(columnNames), List(treeTypes));
+      Actions.chooseFile(filetype, file.size, List<List<string>>(previewRows), List<string>(columnNames), List(treeTypes));
       this.setState({
         fileSelected: true,
       });
+      if (incrementStep !== false)
+      {
+        this.incrementStep();
+      }
     };
   }
 
@@ -403,7 +407,10 @@ class FileImport extends TerrainComponent<any>
     {
       this.parseFile(file.target.files[0], filetype, false, false);
     }
-    this.incrementStep();
+    else
+    {
+      this.incrementStep();
+    }
   }
 
   public handleSelectFileButtonClick()
@@ -417,7 +424,6 @@ class FileImport extends TerrainComponent<any>
     Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
     this.parseFile(file, filetype, hasCsvHeader, false); // TODO: what happens on error?
-    this.incrementStep();
   }
 
   public handleJSONFormatChoice(isNewlineSeparatedJSON: boolean)
@@ -425,7 +431,6 @@ class FileImport extends TerrainComponent<any>
     Actions.changeIsNewlineSeparatedJSON(isNewlineSeparatedJSON);
     const { file, filetype } = this.state.fileImportState;
     this.parseFile(file, filetype, false, isNewlineSeparatedJSON); // TODO: what happens on error?
-    this.incrementStep();
   }
 
   public handleSelectDb(dbName: string)
@@ -561,7 +566,6 @@ class FileImport extends TerrainComponent<any>
           }
         </div>
         {
-          this.state.stepId > 0 &&
           <div className='fi-step-title'>
             {
               stepTitle
@@ -575,7 +579,7 @@ class FileImport extends TerrainComponent<any>
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { filetype, serverId, dbName, tableName } = fileImportState;
+    const { filetype, filesize, serverId, dbName, tableName } = fileImportState;
     const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate, requireJSONHaveAllFields, exportRank } = fileImportState;
 
@@ -599,13 +603,12 @@ class FileImport extends TerrainComponent<any>
           />;
         break;
       case Steps.SelectDb:
-        content = [];
-        content.push(
+        content = [
           <Autocomplete
             value={dbName}
             options={this.state.dbNames}
             onChange={this.handleAutocompleteDbChange}
-            placeholder={'database'}
+            placeholder={'index'}
             disabled={false}
             onEnter={this._fn(this.handleSelectDb)}
             onSelectOption={this._fn(this.handleSelectDb)}
@@ -623,16 +626,15 @@ class FileImport extends TerrainComponent<any>
               }
             </span>
           </div>,
-        );
+        ];
         break;
       case Steps.SelectTable:
-        content = [];
-        content.push(
+        content = [
           <Autocomplete
             value={tableName}
             options={this.state.tableNames}
             onChange={this.handleAutocompleteTableChange}
-            placeholder={'table'}
+            placeholder={'type'}
             disabled={false}
             onEnter={this._fn(this.handleSelectTable)}
             onSelectOption={this._fn(this.handleSelectTable)}
@@ -650,7 +652,7 @@ class FileImport extends TerrainComponent<any>
               }
             </span>
           </div>,
-        );
+        ];
         break;
       case Steps.Preview:
         content =
@@ -670,6 +672,7 @@ class FileImport extends TerrainComponent<any>
             exportRank={exportRank}
             elasticUpdate={elasticUpdate}
             exporting={false}
+            filesize={filesize}
           />;
         break;
       default:
@@ -731,6 +734,9 @@ class FileImport extends TerrainComponent<any>
             style={buttonColors()}
             ref='fi-back-button'
           >
+            <ArrowIcon
+              className='back'
+            />
             Back
           </div>
         }
@@ -749,7 +755,10 @@ class FileImport extends TerrainComponent<any>
             ref='fi-next-button'
           >
             Next
-            </div>
+            <ArrowIcon
+              className='next'
+            />
+          </div>
         }
       </div>
     );
@@ -775,7 +784,10 @@ class FileImport extends TerrainComponent<any>
         className='file-import'
       >
         <div
-          className='file-import-inner'
+          className={classNames({
+            'file-import-inner': true,
+            'file-import-inner-server-step': this.state.stepId === Steps.SelectServer,
+          })}
         >
           {this.renderError()}
           {this.renderSteps()}

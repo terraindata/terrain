@@ -69,6 +69,7 @@ import { _Result, MAX_RESULTS, Result, Results, ResultsState } from './ResultTyp
 export interface Props
 {
   query: Query;
+  variantPath?: string;
   resultsState: ResultsState;
   db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
@@ -177,6 +178,7 @@ export class ResultsManager extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    // TODO: the logic here is potentially broken since props appear to be updated at different times and are not consistent with eachother
     if (this.props.db !== nextProps.db ||
       (
         nextProps.query
@@ -192,13 +194,19 @@ export class ResultsManager extends TerrainComponent<Props>
     )
     {
       this.queryResults(nextProps.query, nextProps.db);
-
       if (!this.props.query || nextProps.query.id !== this.props.query.id)
       {
         this.changeResults({
           results: List([]),
         });
       }
+    }
+
+    if (this.props.variantPath !== undefined && (this.props.variantPath !== nextProps.variantPath))
+    {
+      this.changeResults({
+        results: List([]),
+      });
     }
 
     if (nextProps.resultsState.results !== this.props.resultsState.results)
@@ -293,8 +301,8 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (exportChanges)
     {
-      const { filetype, preview, originalNames } = exportChanges;
-      Actions.chooseFile(filetype, preview, originalNames);
+      const { filetype, filesize, preview, originalNames } = exportChanges;
+      Actions.chooseFile(filetype, filesize, preview, originalNames);
     }
 
     this.props.onResultsStateChange(resultsState);
