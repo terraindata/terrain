@@ -68,7 +68,7 @@ class FileImportStateC extends BaseClass
   public hasCsvHeader: boolean = false;
   public isNewlineSeparatedJSON: boolean = false;
   public requireJSONHaveAllFields: boolean = true;
-  public exportRank: boolean = false;
+  public exportRank: boolean = true;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
