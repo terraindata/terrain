@@ -388,7 +388,7 @@ class TransformModal extends TerrainComponent<Props>
             value={this.state.transformText}
             options={null}
             onChange={this.handleAutocompleteTransformTextChange}
-            placeholder={'text'}
+            placeholder={'delimiter'}
             disabled={false}
             key={'fi-transform-merge-text'}
           />,
