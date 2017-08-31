@@ -114,8 +114,6 @@ class FileImport extends TerrainComponent<any>
     fileSelected: false,
   };
 
-  public confirmedLeave: boolean = false;
-
   constructor(props)
   {
     super(props);
@@ -535,27 +533,27 @@ class FileImport extends TerrainComponent<any>
         >
           {
             tooltip(
-             <div
-            className='fi-content-json-option button'
-            onClick={() => this.handleJSONFormatChoice(true)}
-            style={buttonColors()}
-            ref='fi-yes-button'
-          >
-            Newline
-          </div> ,
-          'The rows in your file are separated by new lines')
-        }
+              <div
+                className='fi-content-json-option button'
+                onClick={() => this.handleJSONFormatChoice(true)}
+                style={buttonColors()}
+                ref='fi-yes-button'
+              >
+                Newline
+          </div>,
+              'The rows in your file are separated by new lines')
+          }
           {tooltip(
             <div
-            className='fi-content-json-option button'
-            onClick={() => this.handleJSONFormatChoice(false)}
-            style={buttonColors()}
-            ref='fi-no-button'
-          >
-            Object list
+              className='fi-content-json-option button'
+              onClick={() => this.handleJSONFormatChoice(false)}
+              style={buttonColors()}
+              ref='fi-no-button'
+            >
+              Object list
           </div>
-          , 'The rows in your file are separated by commas (Your file is a syntactically-correct JSON file)')
-        }
+            , 'The rows in your file are separated by commas (Your file is a syntactically-correct JSON file)')
+          }
         </div>
       </div>
     );
