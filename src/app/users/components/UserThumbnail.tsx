@@ -127,10 +127,13 @@ class UserThumbnail extends TerrainComponent<Props>
       null
       :
       (
-        <span>
-          <div className='user-thumbnail-tip-name'> {name} </div>
-          <div className='user-thumbnail-tip-details'> {this.props.extra} </div>
-        </span>
+        typeof this.props.userId === 'string' ?
+          <span> {this.props.userId} </span>
+          :
+          <span>
+            <div className='user-thumbnail-tip-name'> {name} </div>
+            <div className='user-thumbnail-tip-details'> {this.props.extra} </div>
+          </span>
       );
 
     const text: string = this.props.showName ? name : null;
