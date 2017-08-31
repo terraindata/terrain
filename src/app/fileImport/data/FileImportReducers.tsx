@@ -342,7 +342,7 @@ FileImportReducers[ActionTypes.importFile] =
       state.primaryKeyDelimiter,
       () =>
       {
-        alert('success');
+        action.payload.handleFileImportSuccess();
         action.payload.changeUploadInProgress(false);
         action.payload.fetchSchema();
       },
