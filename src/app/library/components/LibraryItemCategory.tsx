@@ -135,7 +135,7 @@ const target =
       {
         props.onDrop(props.status, item.id);
       }
-    }
+    },
   };
 
 const dropCollect = (connect, monitor) =>
