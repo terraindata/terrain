@@ -82,12 +82,21 @@ export default class ESMapClause extends ESClause
     const nameClause: ESClause = interpreter.config.getClause(this.nameType);
     const valueClause: ESClause = interpreter.config.getClause(this.valueType);
 
+    let nrField = 0;
+
     valueInfo.forEachProperty((viTuple: ESPropertyInfo): void =>
     {
       viTuple.propertyName.clause = nameClause;
       if (viTuple.propertyValue !== null)
       {
         viTuple.propertyValue.clause = valueClause;
+      }
+      // multifield checking
+      nrField += 1;
+      if (this.multifield === false && nrField > 1)
+      {
+        interpreter.accumulateError(viTuple.propertyName,
+          'The ' + this.type + ' clause does not support multiple fields.');
       }
     });
   }
