@@ -593,7 +593,7 @@ class FileImport extends TerrainComponent<any>
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { filetype, filesize, serverId, dbName, tableName } = fileImportState;
+    const { filetype, filesize, serverName, serverId, dbName, tableName } = fileImportState;
     const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate, requireJSONHaveAllFields, exportRank } = fileImportState;
 
@@ -702,7 +702,7 @@ class FileImport extends TerrainComponent<any>
               Success!
               </div>
             <div className='fi-import-success-info'>
-              Your data were successfully imported into {serverId}, {dbName}, {tableName}
+              Your data were successfully imported into {serverName}, {dbName}, {tableName}
             </div>
             <div
               className='fi-import-success-button button'
