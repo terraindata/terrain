@@ -82,6 +82,7 @@ class FileImportStateC extends BaseClass
   public elasticUpdate: boolean = true;
 
   public errorMsg: string = '';
+  public isDirty: boolean = false;
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.

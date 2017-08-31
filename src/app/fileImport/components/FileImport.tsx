@@ -688,6 +688,8 @@ class FileImport extends TerrainComponent<any>
             exporting={false}
             filesize={filesize}
             handleFileImportSuccess={this.onFileImportSuccess}
+            router={this.props.router}
+            route={this.props.route}
           />;
         break;
       case Steps.Success:

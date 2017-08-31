@@ -70,6 +70,7 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
   else if (transform.name === 'append' || transform.name === 'prepend')
   {
     return state
+      .set('isDirty', true)
       .set('previewRows', List(state.previewRows.map((row, i) =>
         row.map((col, j) =>
         {
@@ -86,6 +87,7 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
   {
     const primaryKeys = state.primaryKeys.map((pkey) => pkey > transformCol ? pkey + 1 : pkey);
     return state
+      .set('isDirty', true)
       .set('primaryKeys', primaryKeys)
       .set('columnNames', state.columnNames
         .insert(transformCol + 1, transform.args.newName as string))
@@ -101,6 +103,7 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
   {
     const primaryKeys = state.primaryKeys.map((pkey) => pkey > transformCol ? pkey + 1 : pkey);
     return state
+      .set('isDirty', true)
       .set('primaryKeys', primaryKeys)
       .set('columnNames', state.columnNames
         .set(transformCol, transform.args.newName[0])
@@ -141,6 +144,7 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
     });
 
     return state
+      .set('isDirty', true)
       .set('primaryKeys', primaryKeys)
       .set('columnNames', state.columnNames
         .set(transformCol, transform.args.newName as string)
@@ -163,6 +167,7 @@ const addPreviewColumn = (state: FileImportTypes.FileImportState, columnName: st
 {
   const { originalNames, columnNames, columnTypes, columnsToInclude, previewRows } = state;
   return state
+    .set('isDirty', true)
     .set('originalNames', originalNames.push(columnName))
     .set('columnNames', columnNames.push(columnName))
     .set('columnTypes', columnTypes.push(FileImportTypes._ColumnTypesTree()))
@@ -224,6 +229,7 @@ FileImportReducers[ActionTypes.changeElasticUpdate] =
 FileImportReducers[ActionTypes.togglePreviewColumn] =
   (state, action) =>
     state
+      .set('isDirty', true)
       .set('requireJSONHaveAllFields', action.payload.requireJSONHaveAllFields)
   ;
 
@@ -236,6 +242,7 @@ FileImportReducers[ActionTypes.setExportFiletype] =
 FileImportReducers[ActionTypes.toggleExportRank] =
   (state, action) =>
     state
+      .set('isDirty', true)
       .set('exportRank', action.payload.exportRank)
   ;
 
@@ -244,26 +251,33 @@ FileImportReducers[ActionTypes.changePrimaryKey] =
   {
     const index = state.primaryKeys.indexOf(action.payload.columnId);
     return index > -1 ?
-      state.set('primaryKeys', state.primaryKeys.delete(index))
+      state
+        .set('isDirty', true)
+        .set('primaryKeys', state.primaryKeys.delete(index))
       :
-      state.set('primaryKeys', state.primaryKeys.push(action.payload.columnId));
+      state
+        .set('isDirty', true)
+        .set('primaryKeys', state.primaryKeys.push(action.payload.columnId));
   };
 
 FileImportReducers[ActionTypes.changePrimaryKeyDelimiter] =
   (state, action) =>
     state
+      .set('isDirty', true)
       .set('primaryKeyDelimiter', action.payload.delim)
   ;
 
 FileImportReducers[ActionTypes.setColumnToInclude] =
   (state, action) =>
     state
+      .set('isDirty', true)
       .updateIn(['columnsToInclude', action.payload.columnId], (isColIncluded: boolean) => !isColIncluded)
   ;
 
 FileImportReducers[ActionTypes.setColumnName] =
   (state, action) =>
     state
+      .set('isDirty', true)
       .setIn(['columnNames', action.payload.columnId], action.payload.newName)
   ;
 
@@ -281,15 +295,21 @@ FileImportReducers[ActionTypes.setColumnType] =
     {
       const keyPathAdd = keyPath.slice();
       keyPathAdd[keyPathAdd.length - 1] = 'innerType'; // add new 'innerType' at the same level as highest 'type'
-      return state.setIn(keyPath, action.payload.type)
+      return state
+        .set('isDirty', true)
+        .setIn(keyPath, action.payload.type)
         .setIn(keyPathAdd, FileImportTypes._ColumnTypesTree());
     }
-    return state.setIn(keyPath, action.payload.type);
+    return state
+      .set('isDirty', true)
+      .setIn(keyPath, action.payload.type);
   };
 
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
-    state.set('transforms', state.transforms.push(action.payload.transform))
+    state
+      .set('isDirty', true)
+      .set('transforms', state.transforms.push(action.payload.transform))
   ;
 
 FileImportReducers[ActionTypes.updatePreviewRows] =
@@ -413,7 +433,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
         action.payload.setErrorMsg('Error saving template: ' + err);
       },
     );
-    return state;
+    return state.set('isDirty', false);
   };
 
 FileImportReducers[ActionTypes.updateTemplate] =
@@ -439,7 +459,7 @@ FileImportReducers[ActionTypes.updateTemplate] =
         alert('Error updating template: ' + err);
       },
     );
-    return state;
+    return state.set('isDirty', false);
   };
 
 FileImportReducers[ActionTypes.deleteTemplate] =
@@ -517,7 +537,8 @@ FileImportReducers[ActionTypes.applyTemplate] =
       )))
       .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
       .set('previewRows', previewRows)
-      .set('primaryKeyDelimiter', template.primaryKeyDelimiter);
+      .set('primaryKeyDelimiter', template.primaryKeyDelimiter)
+      .set('isDirty', false);
   };
 
 FileImportReducers[ActionTypes.addPreviewColumn] =
@@ -529,6 +550,7 @@ FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
     state.set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
+      .set('isDirty', false);
   ;
 
 export default FileImportReducers;

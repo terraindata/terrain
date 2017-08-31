@@ -51,6 +51,7 @@ import * as Immutable from 'immutable';
 import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
@@ -67,6 +68,7 @@ import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
+import FileImportStore from './../data/FileImportStore';
 import TransformModal from './TransformModal';
 
 const { List } = Immutable;
@@ -104,6 +106,9 @@ export interface Props
   filesize?: number;
 
   handleFileImportSuccess?: () => void;
+
+  router?: any;
+  route?: any;
 }
 
 @Radium
@@ -126,6 +131,8 @@ class FileImportPreview extends TerrainComponent<Props>
     advancedCheck: boolean,
     advancedExportRank: boolean,
     exportFiletype: string,
+    leaving: boolean,
+    nextLocation: boolean,
   } = {
     appliedTemplateName: '',
     saveTemplateName: '',
@@ -143,7 +150,11 @@ class FileImportPreview extends TerrainComponent<Props>
     advancedCheck: this.props.requireJSONHaveAllFields,
     advancedExportRank: this.props.exportRank,
     exportFiletype: 'csv',
+    leaving: false,
+    nextLocation: null,
   };
+
+  public confirmedLeave: boolean = false;
 
   public componentDidMount()
   {
@@ -151,6 +162,8 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
+
+    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -161,6 +174,73 @@ class FileImportPreview extends TerrainComponent<Props>
         templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
       });
     }
+  }
+
+  public handleModalCancel()
+  {
+    this.setState({
+      leaving: false,
+    });
+  }
+
+  public handleModalDontSave()
+  {
+    this.confirmedLeave = true;
+    this.setState({
+      leaving: false,
+    });
+    browserHistory.push(this.state.nextLocation);
+  }
+
+  public handleModalSave()
+  {
+    this.confirmedLeave = true;
+    this.setState({
+      leaving: false,
+      showingSaveTemplate: true,
+    });
+    browserHistory.push(this.state.nextLocation);
+  }
+
+    public routerWillLeave(nextLocation): boolean
+  {
+    if (this.confirmedLeave)
+    {
+      this.confirmedLeave = false;
+      return true;
+    }
+    if (FileImportStore.getState().isDirty)
+    {
+      this.setState({
+        leaving: true,
+        nextLocation,
+      });
+      return false;
+
+    }
+
+    // if (this.shouldSave(BuilderStore.getState()))
+    // {
+    //   // ^ need to pass in the most recent state, because when you've navigated away
+    //   // in a dirty state, saved on the navigation prompt, and then returned,
+    //   // Builder's copy of the state gets out of date at this point
+
+    //   const path = nextLocation.pathname;
+    //   const pieces = path.split('/');
+    //   if (pieces[1] === 'builder' && pieces[2])
+    //   {
+    //     const config = pieces[2].split(',');
+    //     if (config.indexOf('!' + this.getSelectedId()) !== -1)
+    //     {
+    //       // current opened variant is still open, move along.
+    //       // TODO
+    //       return true;
+    //       // note: don't currently return true because that resets unsaved changes in open v
+    //       //  but when we redo how the stores work, then that shouldn't happen.
+    //     }
+    //   }
+    return true;
+      
   }
 
   public setError(msg: string)
@@ -1058,6 +1138,17 @@ class FileImportPreview extends TerrainComponent<Props>
               {this.renderError()}
             </div>
         }
+        <Modal
+          open={this.state.leaving}
+          message={'Save changes before leaving?'}
+          title='Unsaved Changes'
+          confirmButtonText='Save'
+          confirm={true}
+          onClose={this.handleModalCancel}
+          onConfirm={this.handleModalSave}
+          thirdButtonText="Don't Save"
+          onThirdButton={this.handleModalDontSave}
+        />
       </div>
     );
   }
