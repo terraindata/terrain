@@ -91,5 +91,4 @@ export default class CardHelpTooltip extends TerrainComponent<Props>
       </div>
     );
   }
-
 }
