@@ -201,6 +201,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     {
       this.setState({
         boxValue: value,
+        boxValueBuffer: null,
       });
     }
     else
