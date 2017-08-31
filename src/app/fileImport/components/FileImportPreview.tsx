@@ -594,6 +594,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleUploadFile()
   {
+    this.confirmedLeave = true;
     if (this.props.exporting)
     {
       const dbName = JSON.parse(this.props.query)['index'];
