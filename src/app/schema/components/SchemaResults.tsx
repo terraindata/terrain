@@ -106,7 +106,8 @@ class SchemaResults extends TerrainComponent<Props>
           storeState.getIn(['servers', selectedId]) ||
           storeState.getIn(['databases', selectedId]) ||
           storeState.getIn(['tables', selectedId]) ||
-          storeState.getIn(['columns', selectedId]);
+          storeState.getIn(['columns', selectedId]) ||
+          storeState.getIn(['fieldProperties', selectedId]);
 
         if (selectedItem !== this.state.selectedItem)
         {
@@ -137,7 +138,13 @@ class SchemaResults extends TerrainComponent<Props>
                 break;
               case 'column':
                 queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
-                  + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '", "from": 0, "size": 1000 }';
+                  + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '",'
+                  + '"from": 0, "size": 1000 }';
+                break;
+              case 'fieldProperty':
+                queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
+                  + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '",'
+                  + '"from": 0, "size": 1000 }';
                 break;
             }
 

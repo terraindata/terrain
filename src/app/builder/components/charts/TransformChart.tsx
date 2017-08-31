@@ -800,7 +800,7 @@ const TransformChart = {
         d3.select(el).select('.point-edit-menu').remove();
         d3.select('body').on('mousedown', null);
       }
-    }
+    };
 
     const offFn = () =>
     {

@@ -95,21 +95,25 @@ const FileImportActions =
       }),
 
     importFile:
-    () =>
+    (handleFileImportSuccess) =>
       $(ActionTypes.importFile, {
         setErrorMsg: FileImportActions.setErrorMsg,
         changeUploadInProgress: FileImportActions.changeUploadInProgress,
         fetchSchema: SchemaActions.fetch,
+        handleFileImportSuccess,
       }),
 
     exportFile:
-    (query: string, serverId: number, dbName: string, rank: boolean, downloadFilename: string) =>
+    (query: string, serverId: number, dbName: string, rank: boolean, downloadFilename: string,
+      handleFileExportSuccess, handleFileExportError) =>
       $(ActionTypes.exportFile, {
         query,
         serverId,
         dbName,
         rank,
         downloadFilename,
+        handleFileExportSuccess,
+        handleFileExportError,
       }),
 
     addTransform:
@@ -133,20 +137,24 @@ const FileImportActions =
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
-    (templateName: string, exporting: boolean) =>
+    (templateName: string, exporting: boolean, handleTemplateSaveSuccess) =>
       $(ActionTypes.saveTemplate, {
         templateName,
         exporting,
         setErrorMsg: FileImportActions.setErrorMsg,
         fetchTemplates: FileImportActions.fetchTemplates,
+        handleTemplateSaveSuccess,
       }),
 
     updateTemplate:
-    (templateId: number, exporting: boolean) =>
+    (templateId: number, exporting: boolean, handleUpdateTemplateSuccess, handleUpdateTemplateError, templateName: string) =>
       $(ActionTypes.updateTemplate, {
         templateId,
         exporting,
         fetchTemplates: FileImportActions.fetchTemplates,
+        handleUpdateTemplateSuccess,
+        handleUpdateTemplateError,
+        templateName,
       }),
 
     fetchTemplates:
@@ -168,12 +176,17 @@ const FileImportActions =
       }),
 
     deleteTemplate:
-    (templateId: number, exporting: boolean) =>
+    (templateId: number, exporting: boolean, handleDeleteTemplateSuccess, handleDeleteTemplateError, templateName: string) =>
+    {
       $(ActionTypes.deleteTemplate, {
         templateId,
         exporting,
         fetchTemplates: FileImportActions.fetchTemplates,
-      }),
+        handleDeleteTemplateSuccess,
+        handleDeleteTemplateError,
+        templateName,
+      });
+    },
 
     saveFile:
     (file: File, filetype: string) =>

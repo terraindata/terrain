@@ -262,6 +262,9 @@ class FieldPropertyC extends SchemaBaseClass
   public type = 'fieldProperty';
   public name = '';
   public value = '';
+  public serverId: string = '';
+  public databaseId: string = '';
+  public tableId: string = '';
   public columnId: string = '';
   public fieldPropertyParentId: string = ''; // if we have nested field Properties
 
@@ -271,6 +274,9 @@ export type FieldProperty = FieldPropertyC & IRecord<FieldPropertyC>;
 export const _FieldProperty = (config: {
   name: string,
   value: any,
+  serverId: string,
+  databaseId: string,
+  tableId: string,
   columnId: string,
   fieldPropertyParentId: string,
 
