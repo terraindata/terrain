@@ -633,7 +633,7 @@ class _CardComponent extends TerrainComponent<Props>
                       interactive: true,
                       theme: 'faded',
                       delay: 0,
-                    }
+                    },
                   )
                 }
               </div>

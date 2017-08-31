@@ -314,6 +314,7 @@ class TransformModal extends TerrainComponent<Props>
         components = [
           <span
             className='fi-transform-components-label'
+            key='fi-transform-components-duplicate-label'
           >
             Enter the duplicated column name:
           </span>,
@@ -323,13 +324,15 @@ class TransformModal extends TerrainComponent<Props>
             onChange={this.handleDuplicateNewNameChange}
             placeholder={'name'}
             disabled={false}
-          />
+            key='fi-transform-components-duplicate-name'
+          />,
         ];
         break;
       case 'append':
         components = [
           <span
             className='fi-transform-components-label'
+            key='fi-transform-components-append-label'
           >
             Enter the text to append:
           </span>,
@@ -339,13 +342,15 @@ class TransformModal extends TerrainComponent<Props>
             onChange={this.handleAutocompleteTransformTextChange}
             placeholder={'text'}
             disabled={false}
-          />
+            key='fi-transform-components-append-text'
+          />,
         ];
         break;
       case 'prepend':
         components = [
           <span
             className='fi-transform-components-label'
+            key='fi-transform-components-prepend-label'
           >
             Enter the text to prepend:
           </span>,
@@ -355,13 +360,15 @@ class TransformModal extends TerrainComponent<Props>
             onChange={this.handleAutocompleteTransformTextChange}
             placeholder={'text'}
             disabled={false}
-          />
+            key='fi-transform-components-prepend-text'
+          />,
         ];
         break;
       case 'split':
         components = [
           <span
             className='fi-transform-components-label'
+            key='fi-transform-components-split-label1'
           >
             Enter the first split column name:
           </span>,
@@ -375,6 +382,7 @@ class TransformModal extends TerrainComponent<Props>
           />,
           <span
             className='fi-transform-components-label'
+            key='fi-transform-components-split-label2'
           >
             Enter the second split column name:
           </span>,
@@ -388,6 +396,7 @@ class TransformModal extends TerrainComponent<Props>
           />,
           <span
             className='fi-transform-components-label'
+            key='fi-transform-components-split-label3'
           >
             Enter the delimiter to split on:
           </span>,
@@ -405,6 +414,7 @@ class TransformModal extends TerrainComponent<Props>
         components = [
           <span
             className='fi-transform-components-label'
+            key='fi-transform-components-merge-label1'
           >
             Select a column to merge:
           </span>,
@@ -417,6 +427,7 @@ class TransformModal extends TerrainComponent<Props>
           />,
           <span
             className='fi-transform-components-label'
+            key='fi-transform-components-merge-label2'
           >
             Enter the merged column name:
           </span>,
@@ -430,6 +441,7 @@ class TransformModal extends TerrainComponent<Props>
           />,
           <span
             className='fi-transform-components-label'
+            key='fi-transform-components-merge-label3'
           >
             Enter the merge delimiter (optional):
           </span>,
@@ -449,7 +461,7 @@ class TransformModal extends TerrainComponent<Props>
       <div
         className='fi-transform-components'
         style={{
-          color: Colors().text1
+          color: Colors().text1,
         }}
       >
         {
@@ -521,7 +533,7 @@ class TransformModal extends TerrainComponent<Props>
                       type
                     }
                   </span>,
-                  FileImportTypes.TRANSFORM_TEXT[TRANSFORM_TYPES[datatypeId][index].toUpperCase()]
+                  FileImportTypes.TRANSFORM_TEXT[TRANSFORM_TYPES[datatypeId][index].toUpperCase()],
                 )
               }
             </div>,
