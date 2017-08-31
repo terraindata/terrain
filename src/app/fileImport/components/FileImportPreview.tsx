@@ -133,6 +133,7 @@ class FileImportPreview extends TerrainComponent<Props>
     exportFiletype: string,
     leaving: boolean,
     nextLocation: boolean,
+    changeLocationAfterSave: boolean,
   } = {
     appliedTemplateName: '',
     saveTemplateName: '',
@@ -152,6 +153,7 @@ class FileImportPreview extends TerrainComponent<Props>
     exportFiletype: 'csv',
     leaving: false,
     nextLocation: null,
+    changeLocationAfterSave: false,
   };
 
   public confirmedLeave: boolean = false;
@@ -198,8 +200,9 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       leaving: false,
       showingSaveTemplate: true,
+      changeLocationAfterSave: true,
     });
-    browserHistory.push(this.state.nextLocation);
+    //browserHistory.push(this.state.nextLocation);
   }
 
     public routerWillLeave(nextLocation): boolean
@@ -218,29 +221,7 @@ class FileImportPreview extends TerrainComponent<Props>
       return false;
 
     }
-
-    // if (this.shouldSave(BuilderStore.getState()))
-    // {
-    //   // ^ need to pass in the most recent state, because when you've navigated away
-    //   // in a dirty state, saved on the navigation prompt, and then returned,
-    //   // Builder's copy of the state gets out of date at this point
-
-    //   const path = nextLocation.pathname;
-    //   const pieces = path.split('/');
-    //   if (pieces[1] === 'builder' && pieces[2])
-    //   {
-    //     const config = pieces[2].split(',');
-    //     if (config.indexOf('!' + this.getSelectedId()) !== -1)
-    //     {
-    //       // current opened variant is still open, move along.
-    //       // TODO
-    //       return true;
-    //       // note: don't currently return true because that resets unsaved changes in open v
-    //       //  but when we redo how the stores work, then that shouldn't happen.
-    //     }
-    //   }
-    return true;
-      
+    return true;     
   }
 
   public setError(msg: string)
@@ -301,9 +282,18 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public hideSaveTemplate()
   {
-    this.setState({
+    console.log(this.state.changeLocationAfterSave);
+    if (this.state.changeLocationAfterSave)
+    {
+      console.log('leave');
+      browserHistory.push(this.state.nextLocation);
+    }
+    else
+    {
+      this.setState({
       showingSaveTemplate: false,
     });
+    }
   }
 
   public showAdvanced()
