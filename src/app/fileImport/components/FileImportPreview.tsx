@@ -106,7 +106,7 @@ export interface Props
   filesize?: number;
 
   handleFileImportSuccess?: () => void;
-  
+
   router?: any;
   route?: any;
 
