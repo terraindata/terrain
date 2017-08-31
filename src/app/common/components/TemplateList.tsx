@@ -85,7 +85,7 @@ class TemplateList extends TerrainComponent<Props>
   {
     this.setState({
       errorMsg,
-    })
+    });
   }
 
   public hideErrorModal()

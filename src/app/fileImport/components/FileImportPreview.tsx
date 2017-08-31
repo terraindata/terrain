@@ -102,6 +102,8 @@ export interface Props
   serverId?: number;
   variantName?: string;
   filesize?: number;
+
+  handleFileImportSuccess?: () => void;
 }
 
 @Radium
@@ -447,7 +449,7 @@ class FileImportPreview extends TerrainComponent<Props>
     }
     else
     {
-      Actions.importFile();
+      Actions.importFile(this.props.handleFileImportSuccess);
     }
   }
 
