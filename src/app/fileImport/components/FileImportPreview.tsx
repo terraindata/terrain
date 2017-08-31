@@ -64,11 +64,11 @@ import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { tooltip } from './../../common/components/tooltip/Tooltips';
 import Actions from './../data/FileImportActions';
+import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import FileImportPreviewRow from './FileImportPreviewRow';
-import FileImportStore from './../data/FileImportStore';
 import TransformModal from './TransformModal';
 
 const { List } = Immutable;
@@ -132,7 +132,7 @@ class FileImportPreview extends TerrainComponent<Props>
     advancedExportRank: boolean,
     exportFiletype: string,
     leaving: boolean,
-    nextLocation: boolean,
+    nextLocation: any,
     changeLocationAfterSave: boolean,
   } = {
     appliedTemplateName: '',
@@ -202,10 +202,9 @@ class FileImportPreview extends TerrainComponent<Props>
       showingSaveTemplate: true,
       changeLocationAfterSave: true,
     });
-    //browserHistory.push(this.state.nextLocation);
   }
 
-    public routerWillLeave(nextLocation): boolean
+  public routerWillLeave(nextLocation): boolean
   {
     if (this.confirmedLeave)
     {
@@ -221,7 +220,7 @@ class FileImportPreview extends TerrainComponent<Props>
       return false;
 
     }
-    return true;     
+    return true;
   }
 
   public setError(msg: string)
@@ -282,17 +281,15 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public hideSaveTemplate()
   {
-    console.log(this.state.changeLocationAfterSave);
     if (this.state.changeLocationAfterSave)
     {
-      console.log('leave');
       browserHistory.push(this.state.nextLocation);
     }
     else
     {
       this.setState({
-      showingSaveTemplate: false,
-    });
+        showingSaveTemplate: false,
+      });
     }
   }
 
@@ -363,6 +360,11 @@ class FileImportPreview extends TerrainComponent<Props>
       showingSaveTemplate: false,
       appliedTemplateName: saveTemplateName,
     });
+
+    if (this.confirmedLeave)
+    {
+      this.hideSaveTemplate();
+    }
   }
 
   public handleAdvanced()
