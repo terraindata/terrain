@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
 import * as classNames from 'classnames';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -63,6 +64,8 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
 import { databaseId, tableId } from './../../schema/SchemaTypes';
 import * as SchemaTypes from './../../schema/SchemaTypes';
+import has = Reflect.has;
+import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
@@ -70,7 +73,7 @@ import { Steps } from './../FileImportTypes';
 import './FileImport.less';
 import FileImportPreview from './FileImportPreview';
 import FileImportPreviewRow from './FileImportPreviewRow';
-import has = Reflect.has;
+
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
 
@@ -528,22 +531,29 @@ class FileImport extends TerrainComponent<any>
         <div
           className='fi-content-json-wrapper'
         >
-          <div
-            className='fi-content-json-option button'
-            onClick={() => this.handleJSONFormatChoice(true)}
-            style={buttonColors()}
-            ref='fi-yes-button'
-          >
-            Newline
+          {
+            tooltip(
+              <div
+                className='fi-content-json-option button'
+                onClick={() => this.handleJSONFormatChoice(true)}
+                style={buttonColors()}
+                ref='fi-yes-button'
+              >
+                Newline
+          </div>,
+              'The rows in your file are separated by new lines')
+          }
+          {tooltip(
+            <div
+              className='fi-content-json-option button'
+              onClick={() => this.handleJSONFormatChoice(false)}
+              style={buttonColors()}
+              ref='fi-no-button'
+            >
+              Object list
           </div>
-          <div
-            className='fi-content-json-option button'
-            onClick={() => this.handleJSONFormatChoice(false)}
-            style={buttonColors()}
-            ref='fi-no-button'
-          >
-            Object list
-          </div>
+            , 'The rows in your file are separated by commas (Your file is a syntactically-correct JSON file)')
+          }
         </div>
       </div>
     );
@@ -688,6 +698,8 @@ class FileImport extends TerrainComponent<any>
             exporting={false}
             filesize={filesize}
             handleFileImportSuccess={this.onFileImportSuccess}
+            router={this.props.router}
+            route={this.props.route}
             existingIndexAndType={this.state.dbNames.contains(dbName) && this.state.tableNames.contains(tableName)}
           />;
         break;
@@ -703,7 +715,10 @@ class FileImport extends TerrainComponent<any>
               Success!
               </div>
             <div className='fi-import-success-info'>
-              Your data were successfully imported into {serverName}, {dbName}, {tableName}
+              Your data were successfully imported into
+                <div className='fi-import-success-info-row fi-import-success-info-row-top'> <span>Server:</span> {serverName} </div>
+              <div className='fi-import-success-info-row'> <span>Index:</span> {dbName} </div>
+              <div className='fi-import-success-info-row'> <span>Type:</span> {tableName} </div>
             </div>
             <div
               className='fi-import-success-button button'
@@ -831,6 +846,7 @@ class FileImport extends TerrainComponent<any>
           className={classNames({
             'file-import-inner': true,
             'file-import-inner-server-step': this.state.stepId === Steps.SelectServer,
+            'file-import-inner-scroll': this.state.stepId === Steps.Preview,
           })}
         >
           {this.renderError()}

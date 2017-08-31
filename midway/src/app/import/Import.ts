@@ -725,10 +725,11 @@ export class Import
         for (const field of fieldsInMappingNotInDocument)
         {
           newDocument[field] = null;
-          if (fields[field]['type'] === 'text')
-          {
-            newDocument[field] = '';
-          }
+          // TODO: Case 740
+          // if (fields[field]['type'] === 'text')
+          // {
+          //   newDocument[field] = '';
+          // }
         }
         const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(fields));
         for (const field of fieldsInDocumentNotMapping)
