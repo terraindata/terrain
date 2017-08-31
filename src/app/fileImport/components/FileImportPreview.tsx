@@ -54,7 +54,8 @@ import * as React from 'react';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
-import { stringifyWithParameters } from './../../../database/elastic/conversion/ParseElasticQuery';
+import { ESParseTreeToCode } from './../../../database/elastic/conversion/ParseElasticQuery';
+import Query from './../../../items/types/Query';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -99,7 +100,7 @@ export interface Props
   exporting: boolean;
   exportRank: boolean;
 
-  query?: string;
+  query?: Query;
   inputs?: List<any>;
   serverId?: number;
   variantName?: string;
@@ -441,15 +442,16 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      console.log(this.props.inputs);
-      console.log(stringifyWithParameters(this.props.query, this.props.inputs));
-      const dbName = JSON.parse(stringifyWithParameters(this.props.query, this.props.inputs))['index'];
+      const stringQuery: string = ESParseTreeToCode(this.props.query.parseTree.parser, { replaceInputs: true }, this.props.inputs);
+      const parsedQuery = JSON.parse(stringQuery);
+      const dbName = parsedQuery['index'];
+
       if (dbName === undefined || dbName === '')
       {
         this.setError('Index must be selected in order to export results');
         return;
       }
-      Actions.exportFile(this.props.query, this.props.serverId, dbName, this.props.exportRank,
+      Actions.exportFile(stringQuery, this.props.serverId, dbName, this.props.exportRank,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype);
     }
     else

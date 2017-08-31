@@ -555,7 +555,7 @@ column if you have customized the results view.');
           exportRank={exportRank}
           elasticUpdate={elasticUpdate}
           exporting={true}
-          query={this.props.query.tql}
+          query={this.props.query}
           inputs={this.props.query.inputs}
           serverId={Number(this.props.db.id)}
           variantName={this.props.variantName}
