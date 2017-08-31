@@ -696,8 +696,8 @@ class FileImport extends TerrainComponent<any>
             <div
               className='fi-import-success-header'
               style={
-                fontColor(Colors().active,
-                }
+                [fontColor(Colors().active)]
+              }
             >
               Success!
               </div>
@@ -711,7 +711,8 @@ class FileImport extends TerrainComponent<any>
             >
               Import Another File
               </div>
-          </div>
+          </div>;
+        break;
       default:
     }
 
@@ -759,6 +760,7 @@ class FileImport extends TerrainComponent<any>
         break;
       case Steps.Success:
         backEnabled = false;
+        break;
       default:
     }
 
