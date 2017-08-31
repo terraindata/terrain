@@ -359,7 +359,10 @@ export function getResultValue(result: Result, field: string, config: ResultsCon
   if (result)
   {
     value = result.fields.get(field);
-    value = JSON.stringify(value);
+    if (List.isList(value))
+    {
+      value = JSON.stringify(value);
+    }
   }
   return ResultFormatValue(field, value, config, overrideFormat);
 }
