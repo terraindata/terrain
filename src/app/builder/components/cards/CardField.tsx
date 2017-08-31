@@ -330,7 +330,7 @@ class CardField extends TerrainComponent<Props>
     }
 
     const handleToolStyle = _.extend({},
-      this.state.moving ? getStyle('color', Colors().active) : getStyle('color', Colors().text1, Colors().inactiveHover),
+      this.state.moving ? getStyle('color', Colors().active, Colors().active) : getStyle('color', Colors().text1, Colors().inactiveHover),
     );
 
     const { row } = this.props;
@@ -404,8 +404,8 @@ class CardField extends TerrainComponent<Props>
                   style={handleToolStyle}
                   key={'handle-tool'}
                 >
-                  ⋮⋮
-                  </div>
+                  ⋮
+                </div>
                 {
                   this.props.helpOn ?
                     <ManualInfo
