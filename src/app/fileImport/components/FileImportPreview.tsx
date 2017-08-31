@@ -104,6 +104,7 @@ export interface Props
   filesize?: number;
 
   handleFileImportSuccess?: () => void;
+  existingIndexAndType?: boolean;
 }
 
 @Radium
@@ -987,6 +988,7 @@ class FileImportPreview extends TerrainComponent<Props>
       </div>
     );
   }
+
   public renderBottomBar()
   {
     return (
@@ -994,7 +996,7 @@ class FileImportPreview extends TerrainComponent<Props>
         className='flex-container fi-import-button-wrapper'
       >
         {
-          !this.props.exporting &&
+          !this.props.exporting && this.props.existingIndexAndType &&
           this.renderUpdate()
         }
         {this.renderUpload()}

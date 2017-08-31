@@ -688,6 +688,7 @@ class FileImport extends TerrainComponent<any>
             exporting={false}
             filesize={filesize}
             handleFileImportSuccess={this.onFileImportSuccess}
+            existingIndexAndType={this.state.dbNames.contains(dbName) && this.state.tableNames.contains(tableName)}
           />;
         break;
       case Steps.Success:
