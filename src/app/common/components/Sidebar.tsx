@@ -132,7 +132,7 @@ export class Sidebar extends TerrainComponent<Props>
                   {
                     title: link.text,
                     position: 'right',
-                  })},
+                  })}
               </div>
             </Link>,
           )
