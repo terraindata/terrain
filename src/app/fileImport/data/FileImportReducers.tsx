@@ -372,11 +372,11 @@ FileImportReducers[ActionTypes.exportFile] =
       action.payload.downloadFilename,
       (resp: any) =>
       {
-        alert('success');
+        action.payload.handleFileExportSuccess();
       },
       (err: string) =>
       {
-        alert('Error exporting file: ' + err);
+        action.payload.handleFileExportError(err);
       },
     );
     return state;
@@ -431,12 +431,12 @@ FileImportReducers[ActionTypes.updateTemplate] =
       action.payload.templateId,
       () =>
       {
-        alert('successfully updated template');
+        action.payload.handleUpdateTemplateSuccess(action.payload.templateName);
         action.payload.fetchTemplates(action.payload.exporting);
       },
       (err: string) =>
       {
-        alert('Error updating template: ' + err);
+        action.payload.handleUpdateTemplateError(err);
       },
     );
     return state;
@@ -448,12 +448,12 @@ FileImportReducers[ActionTypes.deleteTemplate] =
     Ajax.deleteTemplate(action.payload.templateId,
       () =>
       {
-        alert('successfully deleted template');
+        action.payload.handleDeleteTemplateSuccess(action.payload.templateName);
         action.payload.fetchTemplates(action.payload.exporting);
       },
       (err: string) =>
       {
-        alert('Error deleting template: ' + err);
+        action.payload.handleDeleteTemplateError(err);
       },
     );
     return state;
