@@ -231,13 +231,14 @@ export const elasticFilter = _card({
                 'A result must not pass the equation you specify to be included in the final results.',
                 'A result must pass at least one of the "should" equations you specify to be included in the final results.',
                 'A result must pass the equation you specify to be included in the final results, ' +
-                  "but this equation won't be included in calculating the Elastic _score.",
+                "but this equation won't be included in calculating the Elastic _score.",
               ]),
               dropdownUsesRawValues: true,
               autoDisabled: true,
               centerDropdown: true,
               style: {
-                maxWidth: 75,
+                maxWidth: 125,
+                minWidth: 105,
                 marginRight: 3,
               },
             },

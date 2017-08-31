@@ -63,7 +63,7 @@ import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
-import { borderColor, cardStyle, Colors, getStyle } from '../../common/Colors';
+import { borderColor, cardStyle, Colors, getStyle, getCardColors } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import SchemaStore from '../../schema/data/SchemaStore';
 import Autocomplete from './Autocomplete';
@@ -381,7 +381,7 @@ class BuilderTextbox extends TerrainComponent<Props>
       const textStyle = this.props.textStyle || {};
       if (valueIsInput)
       {
-        textStyle.color = Colors().builder.cards.inputParameter;
+        textStyle.color = getCardColors('parameter', Colors().builder.cards.inputParameter);
       }
 
       let value;
