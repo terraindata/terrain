@@ -63,6 +63,7 @@ import { Result } from './ResultTypes';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
+const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 
 const MAX_DEFAULT_FIELDS = 4;
 
@@ -313,17 +314,25 @@ class ResultComponent extends TerrainComponent<Props> {
               {
                 name
               }
+              {
+                this.props.expanded &&
+                <div
+                  onClick={this.expand}
+                  className='result-expanded-close-button'
+                >
+                  <CloseIcon className='close close-icon' />
+                </div>
+              }
             </div>
           </div>
-
-          {this.props.allowSpotlights &&
+          {
+            this.props.allowSpotlights &&
             <Menu
               options={
                 this.menuOptions[this.state.isSpotlit ? 1 : 0]
               }
             />
           }
-
           {
             scoreArea
           }
