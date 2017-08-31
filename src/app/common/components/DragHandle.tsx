@@ -44,82 +44,76 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ElasticConfig from '../database/elastic/ElasticConfig';
-import ElasticController from '../database/elastic/ElasticController';
+// tslint:disable:no-var-requires
 
-import MySQLConfig from '../database/mysql/MySQLConfig';
-import MySQLController from '../database/mysql/MySQLController';
+import * as classNames from 'classnames';
+import * as Radium from 'radium';
+import * as React from 'react';
+import { Colors, getStyle } from '../../common/Colors';
+import StyleTag from '../../common/components/StyleTag';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import './DragHandleStyle.less';
 
-import SQLiteConfig from '../database/sqlite/SQLiteConfig';
-import SQLiteController from '../database/sqlite/SQLiteController';
+const Handle = require('./../../../images/icon_drag_1.svg');
 
-export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MySQLConfig | ElasticConfig | undefined
+export interface Props
 {
-  if (type === 'sqlite')
-  {
-    return {
-      filename: dsnString,
-    } as SQLiteConfig;
-  }
-  else if (type === 'mysql')
-  {
-    const idx = dsnString.lastIndexOf('@');
-    const h0 = dsnString.substr(0, idx);
-    const h1 = dsnString.substr(idx + 1, dsnString.length - idx);
-    const q1 = h0.split(':');
-    const q2 = h1.split(':');
+  id?: number;
+  hiddenByDefault?: boolean;
+  showWhenHoveringClassName?: string;
+  useAltColor?: boolean;
+  connectDragSource?: (el: El) => El;
+}
 
-    if (q1.length !== 2 || q2.length !== 2)
-    {
-      throw new Error('Error interpreting DSN parameter for MySQL.');
-    }
-
-    const user: string = q1[0];
-    const password: string = q1[1];
-    const host: string = q2[0];
-    const port: number = parseInt(q2[1], 10);
-
-    return {
-      user,
-      password,
-      host,
-      port,
-    } as MySQLConfig;
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
+@Radium
+class DragHandle extends TerrainComponent<Props>
+{
+  public renderHandle(dragHandleStyle)
   {
-    return {
-      hosts: [dsnString],
-      keepAlive: false,
-      requestTimeout: 180000,
-    } as ElasticConfig;
+    return (
+      <div
+        key={this.props.id}
+        style={{
+          'opacity': this.props.hiddenByDefault ? 0 : 0.85,
+          ':hover': {
+            opacity: 0.85,
+          },
+        }}
+      >
+        <Handle className='drag-icon' />
+        <StyleTag style={dragHandleStyle} />
+      </div>
+    );
   }
-  else
+
+  public render()
   {
-    throw new Error('Error parsing database connection parameters.');
+    const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
+
+    // TODO: Find a way to only generate these styles once for the whole app
+    const dragHandleStyle = {
+      '.drag-icon': {
+        fill: this.props.useAltColor ? Colors().altText2 : Colors().text2,
+      },
+      '.drag-icon:hover': {
+        fill: Colors().inactiveHover,
+      },
+      '.drag-icon:active': {
+        fill: Colors().active,
+      },
+      ['.' + hoveringClassName]: {
+        opacity: '0.85 !important' as any,
+      },
+    };
+
+    return (
+      (
+        this.props.connectDragSource !== undefined ?
+          this.props.connectDragSource(this.renderHandle(dragHandleStyle)) :
+          this.renderHandle(dragHandleStyle)
+      )
+    );
   }
 }
 
-export function makeDatabaseController(type: string, dsnString: string): SQLiteController | MySQLController | ElasticController
-{
-  type = type.toLowerCase();
-  if (type === 'sqlite')
-  {
-    const config = DSNToConfig(type, dsnString) as SQLiteConfig;
-    return new SQLiteController(config, 0, 'SQLite');
-  }
-  else if (type === 'mysql')
-  {
-    const config = DSNToConfig(type, dsnString) as MySQLConfig;
-    return new MySQLController(config, 0, 'MySQL');
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    const config = DSNToConfig(type, dsnString) as ElasticConfig;
-    return new ElasticController(config, 0, 'Elastic');
-  }
-  else
-  {
-    throw new Error('Error making new database controller.');
-  }
-}
+export default DragHandle;

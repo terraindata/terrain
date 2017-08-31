@@ -32,7 +32,7 @@
     // border-radius: @card-border-radius;
     box-sizing: border-box;
 
-    min-height: 35px;
+    min-height: 50px;
 
     padding: 3px;
     padding-right: 0px;
@@ -71,7 +71,7 @@
 
   .menu-wrapper {
     top: 5px;
-    left: 34px;
+    left: 56px;
     z-index: 2;
     &.menu-open {
       z-index: 99;
@@ -196,7 +196,7 @@
   text-transform: capitalize;
   position: relative; // for menu component
   text-align: left;
-  top: 3px;
+  top: 6px;
 
   display: flex;
   height: @title-height;
@@ -211,11 +211,17 @@
     border-radius: 6px;
 
     position: absolute;
-    top: 11px;
-    left: 37px;
+    top: 7px;
+    left: 54px;
 
     font-size: @font-size;
     margin-left: 27px;
+  }
+
+  .card-drag-handle {
+    position: absolute;
+    top: 4px;
+    left: 6px;
   }
 
   .card-minimize-icon {
@@ -224,40 +230,13 @@
     width: 10px;
     position: absolute;
     top: 11px;
-    left: 21px;
+    left: 38px;
     .transition;
     opacity: 0;
 
     &:hover {
       fill: #fff;
     }
-  }
-
-  .card-handle-icon {
-    cursor: move;
-
-    .transition;
-    .rotate90;
-    
-    svg {
-      width: 20px;
-      fill: rgba(255,255,255,0.5);
-      
-    }
-    &:hover {
-      svg {
-        fill: rgba(255,255,255,0.75);
-      }
-    }
-    &:active {
-      svg {
-        fill: #fff;
-      }
-    }
-
-    position: absolute;
-    top: 8px;
-    left: 2px;
   }
 
   &.card-title-closed {
@@ -268,7 +247,7 @@
       .rotate(-90deg);
       top: 13px;
       opacity: 1;
-      left: 18px;
+      left: 33px;
     }
   }
 
