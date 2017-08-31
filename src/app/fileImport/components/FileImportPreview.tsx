@@ -51,6 +51,7 @@ import * as Immutable from 'immutable';
 import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
@@ -63,6 +64,7 @@ import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { tooltip } from './../../common/components/tooltip/Tooltips';
 import Actions from './../data/FileImportActions';
+import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
@@ -104,6 +106,10 @@ export interface Props
   filesize?: number;
 
   handleFileImportSuccess?: () => void;
+
+  router?: any;
+  route?: any;
+
   existingIndexAndType?: boolean;
 }
 @Radium
@@ -126,6 +132,9 @@ class FileImportPreview extends TerrainComponent<Props>
     advancedCheck: boolean,
     advancedExportRank: boolean,
     exportFiletype: string,
+    leaving: boolean,
+    nextLocation: any,
+    changeLocationAfterSave: boolean,
     showResponseModal: boolean,
     responseModalContent: string,
     responseModalTitle: string,
@@ -147,11 +156,16 @@ class FileImportPreview extends TerrainComponent<Props>
     advancedCheck: this.props.requireJSONHaveAllFields,
     advancedExportRank: this.props.exportRank,
     exportFiletype: 'csv',
+    leaving: false,
+    nextLocation: null,
+    changeLocationAfterSave: false,
     showResponseModal: false,
     responseModalContent: '',
     responseModalTitle: '',
     responseModalError: false,
   };
+
+  public confirmedLeave: boolean = false;
 
   public componentDidMount()
   {
@@ -159,6 +173,8 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
+
+    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -169,6 +185,51 @@ class FileImportPreview extends TerrainComponent<Props>
         templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
       });
     }
+  }
+
+  public handleModalCancel()
+  {
+    this.setState({
+      leaving: false,
+    });
+  }
+
+  public handleModalDontSave()
+  {
+    this.confirmedLeave = true;
+    this.setState({
+      leaving: false,
+    });
+    browserHistory.push(this.state.nextLocation);
+  }
+
+  public handleModalSave()
+  {
+    this.confirmedLeave = true;
+    this.setState({
+      leaving: false,
+      showingSaveTemplate: true,
+      changeLocationAfterSave: true,
+    });
+  }
+
+  public routerWillLeave(nextLocation): boolean
+  {
+    if (this.confirmedLeave)
+    {
+      this.confirmedLeave = false;
+      return true;
+    }
+    if (FileImportStore.getState().isDirty)
+    {
+      this.setState({
+        leaving: true,
+        nextLocation,
+      });
+      return false;
+
+    }
+    return true;
   }
 
   public setError(msg: string)
@@ -229,9 +290,16 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public hideSaveTemplate()
   {
-    this.setState({
-      showingSaveTemplate: false,
-    });
+    if (this.state.changeLocationAfterSave)
+    {
+      browserHistory.push(this.state.nextLocation);
+    }
+    else
+    {
+      this.setState({
+        showingSaveTemplate: false,
+      });
+    }
   }
 
   public showAdvanced()
@@ -311,6 +379,11 @@ class FileImportPreview extends TerrainComponent<Props>
       showingSaveTemplate: false,
       appliedTemplateName: saveTemplateName,
     });
+
+    if (this.confirmedLeave)
+    {
+      this.hideSaveTemplate();
+    }
   }
 
   public handleAdvanced()
@@ -1171,6 +1244,17 @@ class FileImportPreview extends TerrainComponent<Props>
               {this.renderResponseModal()}
             </div>
         }
+        <Modal
+          open={this.state.leaving}
+          message={'Save changes before leaving?'}
+          title='Unsaved Changes'
+          confirmButtonText='Save'
+          confirm={true}
+          onClose={this.handleModalCancel}
+          onConfirm={this.handleModalSave}
+          thirdButtonText="Don't Save"
+          onThirdButton={this.handleModalDontSave}
+        />
       </div>
     );
   }
