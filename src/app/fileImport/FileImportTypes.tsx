@@ -68,7 +68,7 @@ class FileImportStateC extends BaseClass
   public hasCsvHeader: boolean = false;
   public isNewlineSeparatedJSON: boolean = false;
   public requireJSONHaveAllFields: boolean = true;
-  public exportRank: boolean = false;
+  public exportRank: boolean = true;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
@@ -236,7 +236,7 @@ export const STEP_NAMES =
 
 export const STEP_TITLES =
   [
-    'Select a File',
+    'Select a CSV or JSON file to import into Terrain',
     '',
     'Select an ElasticSearch Cluster',
     'Select an ElasticSearch Index',
@@ -258,11 +258,11 @@ export const STEP_SUBTEXT =
 
 export const TRANSFORM_TEXT =
   {
-    DUPLICATE: 'Duplicate this column and its contents',
-    APPEND: 'Append a string to this column\'s contents',
-    PREPEND: 'Prepend a string to this column\'s contents',
-    SPLIT: 'Split this column into two by a given shared string. If the string is not found, the second column will be empty',
-    MERGE: 'Merge this column\'s contents with that of another with the option of choosing a merge string between them',
+    DUPLICATE: 'Duplicate this column and its rows',
+    APPEND: 'Append text to every row in this column',
+    PREPEND: 'Prepend text to every row in this column',
+    SPLIT: 'Split this column\'s rows by a common delimiter',
+    MERGE: 'Merge this column\'s rows with another column\'s rows',
   };
 
 export const enum Steps
@@ -273,4 +273,5 @@ export const enum Steps
   SelectDb,
   SelectTable,
   Preview,
+  Success,
 }

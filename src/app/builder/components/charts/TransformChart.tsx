@@ -171,15 +171,6 @@ const TransformChart = {
 
     d3.select(el).select('.inner-svg').on('mousedown', () =>
     {
-      if (!d3.event['shiftKey'] &&
-        !d3.event['altKey'] &&
-        d3.event['target'].tagName !== 'LABEL' &&
-        d3.event['target'].tagName !== 'DIV' &&
-        d3.event['target'].tagName !== 'INPUT')
-      {
-        state.onSelect(null);
-        d3.select(el).select('.point-edit-menu').remove();
-      }
       d3.select(el).select('.right-menu').remove();
       d3.select(el).selectAll('.crosshairs').remove();
       d3.select(el).selectAll('.transform-tooltip').remove();
@@ -210,7 +201,7 @@ const TransformChart = {
       {
         if (d3.event['ctrlKey'] || d3.event['shiftKey'])
         {
-          drawCrossHairs(el, d3.mouse(this), scales, d3.mouse(this)[0], state.colors);
+          drawCrossHairs(el, d3.mouse(this), scales, d3.mouse(this)[0], undefined, state.colors);
         }
         return false;
       });
@@ -756,7 +747,6 @@ const TransformChart = {
   // needs to be "function" for d3.mouse(this)
   _mousedownFactory: (el, onMove, onRelease, scales, onSelect, onPointMoveStart, drawCrossHairs, point, colors) => function(d)
   {
-
     if (d3.event['shiftKey'] || d3.event['altKey'])
     {
       onSelect(d.id, d3.event['shiftKey']);
@@ -766,7 +756,7 @@ const TransformChart = {
       onSelect(null);
       onSelect(d.id);
     }
-    d3.event['stopPropagation']();
+    d3.event['pointClicked'] = true;
     const del = d3.select(el);
     const point = d3.select(this);
     const startY = scales.realPointY.invert(parseFloat(point.attr('cy')));
@@ -793,6 +783,25 @@ const TransformChart = {
     del.on('mousemove', move);
     del.on('touchmove', move);
 
+    const deselectPoints = () =>
+    {
+      if (!el.contains(d3.event.target) ||
+        (
+          !d3.event['shiftKey'] &&
+          !d3.event['altKey'] &&
+          d3.event['target'].tagName !== 'LABEL' &&
+          d3.event['target'].tagName !== 'DIV' &&
+          d3.event['target'].tagName !== 'INPUT' &&
+          !d3.event['pointClicked']
+        )
+      )
+      {
+        onSelect(null);
+        d3.select(el).select('.point-edit-menu').remove();
+        d3.select('body').on('mousedown', null);
+      }
+    };
+
     const offFn = () =>
     {
       d3.select(el).selectAll('.crosshairs').remove();
@@ -803,6 +812,7 @@ const TransformChart = {
       del.on('mouseleave', null);
       point.attr('active', '0');
       onRelease && onRelease();
+      d3.select('body').on('mousedown', deselectPoints);
     };
     del.on('mouseup', offFn);
     del.on('touchend', offFn);
@@ -818,7 +828,6 @@ const TransformChart = {
     d3.select(el).selectAll('.crosshairs').remove();
     d3.select(el).select('.transform-tooltip').remove();
     d3.select(el).select('.point-edit-menu').remove();
-
     const y = newY || scales.realPointY.invert(mouse[1]);
     const pos_y = scales.realPointY(y);
     const text_x = 'X:  ' + Util.formatNumber(scales.realX.invert(x));

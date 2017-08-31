@@ -54,7 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
-import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
 import { CSVTypeParser, parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
@@ -576,7 +576,6 @@ class FileImport extends TerrainComponent<any>
           }
         </div>
         {
-          this.state.stepId > 0 &&
           <div className='fi-step-title'>
             {
               stepTitle
@@ -587,10 +586,24 @@ class FileImport extends TerrainComponent<any>
     );
   }
 
+  public onFileImportSuccess()
+  {
+    this.setState({
+      stepId: Steps.Success,
+    });
+  }
+
+  public importAnotherFile()
+  {
+    this.setState({
+      stepId: Steps.ChooseFile,
+    });
+  }
+
   public renderContent()
   {
     const { fileImportState } = this.state;
-    const { filetype, filesize, serverId, dbName, tableName } = fileImportState;
+    const { filetype, filesize, serverName, serverId, dbName, tableName } = fileImportState;
     const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
     const { templates, transforms, uploadInProgress, elasticUpdate, requireJSONHaveAllFields, exportRank } = fileImportState;
 
@@ -684,7 +697,31 @@ class FileImport extends TerrainComponent<any>
             elasticUpdate={elasticUpdate}
             exporting={false}
             filesize={filesize}
+            handleFileImportSuccess={this.onFileImportSuccess}
           />;
+        break;
+      case Steps.Success:
+        content =
+          <div className='fi-import-success-wrapper'>
+            <div
+              className='fi-import-success-header'
+              style={
+                [fontColor(Colors().active)]
+              }
+            >
+              Success!
+              </div>
+            <div className='fi-import-success-info'>
+              Your data were successfully imported into {serverName}, {dbName}, {tableName}
+            </div>
+            <div
+              className='fi-import-success-button button'
+              onClick={this.importAnotherFile}
+              style={buttonColors()}
+            >
+              Import Another File
+              </div>
+          </div>;
         break;
       default:
     }
@@ -706,11 +743,13 @@ class FileImport extends TerrainComponent<any>
     const { stepId, fileSelected } = this.state;
     const { serverName, dbName, tableName } = this.state.fileImportState;
     let nextEnabled: boolean = false;
+    let backEnabled: boolean = true;
     let errorMsg: string = '';
     switch (stepId)
     {
       case Steps.ChooseFile:
         nextEnabled = fileSelected;
+        backEnabled = false;
         break;
       case Steps.CsvJsonOptions:
         nextEnabled = false;
@@ -729,6 +768,9 @@ class FileImport extends TerrainComponent<any>
         break;
       case Steps.Preview:
         break;
+      case Steps.Success:
+        backEnabled = false;
+        break;
       default:
     }
 
@@ -738,7 +780,7 @@ class FileImport extends TerrainComponent<any>
         className='flex-container fi-nav'
       >
         {
-          stepId > Steps.ChooseFile &&
+          backEnabled &&
           <div
             className='fi-back-button button'
             onClick={this.decrementStep}

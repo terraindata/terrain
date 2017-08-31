@@ -43,83 +43,52 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as _ from 'lodash';
+import * as React from 'react';
 
-import ElasticConfig from '../database/elastic/ElasticConfig';
-import ElasticController from '../database/elastic/ElasticController';
+import * as Color from 'color';
 
-import MySQLConfig from '../database/mysql/MySQLConfig';
-import MySQLController from '../database/mysql/MySQLController';
+import { backgroundColor, Colors, fontColor, getStyle } from 'common/Colors';
+import TerrainComponent from 'common/components/TerrainComponent';
+import './CardHelpTooltip.less';
 
-import SQLiteConfig from '../database/sqlite/SQLiteConfig';
-import SQLiteController from '../database/sqlite/SQLiteController';
-
-export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MySQLConfig | ElasticConfig | undefined
+export interface Props
 {
-  if (type === 'sqlite')
-  {
-    return {
-      filename: dsnString,
-    } as SQLiteConfig;
-  }
-  else if (type === 'mysql')
-  {
-    const idx = dsnString.lastIndexOf('@');
-    const h0 = dsnString.substr(0, idx);
-    const h1 = dsnString.substr(idx + 1, dsnString.length - idx);
-    const q1 = h0.split(':');
-    const q2 = h1.split(':');
-
-    if (q1.length !== 2 || q2.length !== 2)
-    {
-      throw new Error('Error interpreting DSN parameter for MySQL.');
-    }
-
-    const user: string = q1[0];
-    const password: string = q1[1];
-    const host: string = q2[0];
-    const port: number = parseInt(q2[1], 10);
-
-    return {
-      user,
-      password,
-      host,
-      port,
-    } as MySQLConfig;
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    return {
-      hosts: [dsnString],
-      keepAlive: false,
-      requestTimeout: 180000,
-    } as ElasticConfig;
-  }
-  else
-  {
-    throw new Error('Error parsing database connection parameters.');
-  }
+  staticInfo: any;
 }
 
-export function makeDatabaseController(type: string, dsnString: string): SQLiteController | MySQLController | ElasticController
+export default class CardHelpTooltip extends TerrainComponent<Props>
 {
-  type = type.toLowerCase();
-  if (type === 'sqlite')
+  public render()
   {
-    const config = DSNToConfig(type, dsnString) as SQLiteConfig;
-    return new SQLiteController(config, 0, 'SQLite');
-  }
-  else if (type === 'mysql')
-  {
-    const config = DSNToConfig(type, dsnString) as MySQLConfig;
-    return new MySQLController(config, 0, 'MySQL');
-  }
-  else if (type === 'elasticsearch' || type === 'elastic')
-  {
-    const config = DSNToConfig(type, dsnString) as ElasticConfig;
-    return new ElasticController(config, 0, 'Elastic');
-  }
-  else
-  {
-    throw new Error('Error making new database controller.');
+    const cardColor = (this.props.staticInfo.colors && this.props.staticInfo.colors[0]) || Colors().altText1;
+    const titleStyle = _.extend({},
+      backgroundColor(Colors().bg3),
+      fontColor(cardColor),
+      getStyle('borderLeftColor', cardColor),
+      getStyle('borderTopColor', Colors().highlight),
+      getStyle('borderRightColor', Colors().highlight),
+      getStyle('borderBottomColor', Colors().highlight),
+    );
+
+    return (
+      <div className='card-help-tooltip'>
+        {
+          this.props.staticInfo.title &&
+          <div className='card-help-title' style={titleStyle}>
+            {this.props.staticInfo.title}
+          </div>
+        }
+        <div className='card-description'>
+          {this.props.staticInfo.description}
+        </div>
+        {
+          this.props.staticInfo.url &&
+          <div className='card-help-link'>
+            <a target='_blank' href={this.props.staticInfo.url}> Learn More </a>
+          </div>
+        }
+      </div>
+    );
   }
 }

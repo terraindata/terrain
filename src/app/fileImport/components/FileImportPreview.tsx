@@ -102,6 +102,8 @@ export interface Props
   serverId?: number;
   variantName?: string;
   filesize?: number;
+
+  handleFileImportSuccess?: () => void;
 }
 
 @Radium
@@ -424,6 +426,11 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public changePrimaryKeyDelimiter(delim: string)
   {
+    if (delim === '')
+    {
+      Actions.setErrorMsg('Primary key delimiter cannot be empty string');
+      return;
+    }
     Actions.changePrimaryKeyDelimiter(delim);
   }
 
@@ -442,7 +449,7 @@ class FileImportPreview extends TerrainComponent<Props>
     }
     else
     {
-      Actions.importFile();
+      Actions.importFile(this.props.handleFileImportSuccess);
     }
   }
 
@@ -490,7 +497,7 @@ class FileImportPreview extends TerrainComponent<Props>
         children={
           <TemplateList
             items={this.state.templateOptions}
-            title={'Select a Template to Apply'}
+            title={this.state.templateOptions.size > 0 ? 'Select a template to apply' : 'There are no templates to apply'}
             onDelete={this.handleDeleteTemplate}
             onApply={this.handleApplyTemplate}
             confirmDelete={true}
@@ -702,13 +709,15 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderPrimaryKeys()
   {
+    const { primaryKeys } = this.props;
+
     return (
       <div
         className='flex-container fi-preview-pkeys'
       >
         {
-          this.props.primaryKeys.size > 0 ?
-            this.props.primaryKeys.map((pkey, index) =>
+          primaryKeys.size > 0 ?
+            primaryKeys.map((pkey, index) =>
               <div
                 key={pkey}
                 className='flex-shrink flex-container fi-preview-pkeys-wrapper'
@@ -720,7 +729,7 @@ class FileImportPreview extends TerrainComponent<Props>
                       text: Colors().text1,
                     }}
                   >
-                    Primary key(s):
+                    Primary key{primaryKeys.size > 1 ? 's' : ''}:
                   </div>
                 }
                 <div
@@ -743,7 +752,6 @@ class FileImportPreview extends TerrainComponent<Props>
                   index !== this.props.primaryKeys.size - 1 &&
                   <div
                     className='flex-shrink fi-preview-pkeys-delim'
-                    onClick={this.showDelimTextBox}
                   >
                     {
                       this.state.showingDelimTextBox ?
@@ -761,6 +769,7 @@ class FileImportPreview extends TerrainComponent<Props>
                         tooltip(
                           <span
                             className='clickable'
+                            onClick={this.showDelimTextBox}
                           >
                             {
                               this.props.primaryKeyDelimiter
@@ -937,7 +946,7 @@ class FileImportPreview extends TerrainComponent<Props>
               <div
                 className='fi-preview-update-button-header-title'
               >
-                Join Data
+                Merge Data
               </div>
             </div>
             <div
