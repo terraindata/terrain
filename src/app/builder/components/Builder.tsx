@@ -884,6 +884,8 @@ class Builder extends TerrainComponent<Props>
     const config = this.props.params.config;
     const variant = this.getVariant();
     const query = this.getQuery();
+    const variantIdentifier = variant === undefined ? '' :
+      `${variant.groupId},${variant.algorithmId},${variant.id}`;
 
     return (
       <div
@@ -943,6 +945,7 @@ class Builder extends TerrainComponent<Props>
         />
         <ResultsManager
           query={query}
+          variantPath={variantIdentifier}
           resultsState={this.state.builderState.resultsState}
           db={this.state.builderState.db}
           onResultsStateChange={Actions.results}

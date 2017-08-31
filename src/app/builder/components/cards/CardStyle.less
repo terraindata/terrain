@@ -8,6 +8,7 @@
 @card-border-radius: 6px;
 @card-padding-horizontal: 15px;
 @card-padding-vertical: 7px;
+@title-help-width: 24px;
 
 .card {
   position: relative;
@@ -156,6 +157,32 @@
       width: 42px;
       fill: #fff;
     }
+  }
+}
+
+.card-help-wrapper {
+  position: absolute;
+  top: 11px;
+  right: 10px;
+}
+
+.card-help-icon {
+  fill: rgba(255,255,255,0.5);
+  width: 20px;
+  height: 20px;
+  position: relative;
+  cursor: pointer;
+  .transition;
+  opacity: 0;
+
+  &:hover {
+    fill: #fff;
+  }
+}
+
+.card-hovering {
+  .card-help-icon {
+    opacity: 1;
   }
 }
 
@@ -471,6 +498,7 @@
 
 .card-flex {
   margin-bottom: 0px !important;
+  margin-right: @title-help-width;
 }
 
 .card-field .card-field-tools-left-inner,
