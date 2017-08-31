@@ -617,7 +617,6 @@ class _CardComponent extends TerrainComponent<Props>
                   </div>
               }
             </div>
->>>>>>> master
             {
               this.props.canEdit &&
               !card['cannotBeMoved'] &&
