@@ -83,13 +83,14 @@ class TypeDropdown extends TerrainComponent<Props>
         className='fi-type-dropdown'
       >
         <div
-          className='fi-type-dropdown-dropdown'
+          className='fi-type-dropdown-wrapper'
         >
           <Dropdown
             selectedIndex={FileImportTypes.ELASTIC_TYPES.indexOf(this.props.columnType.type)}
             options={ELASTIC_TYPES}
             onChange={this.handleTypeChange}
             canEdit={true}
+            className='fi-type-dropdown-dropdown'
             tooltips={this.props.tooltips}
           />
         </div>

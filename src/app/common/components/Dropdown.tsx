@@ -75,6 +75,7 @@ export interface Props
   width?: string;
   directionBias?: number; // bias for determining whether or not dropdown opens up or down
   unmountOnChange?: boolean;
+  openDown?: boolean;
   tooltips?: List<any>;
 }
 
@@ -252,15 +253,28 @@ class Dropdown extends TerrainComponent<Props>
     if (!this.state.open)
     {
       $('body').click(this.close);
+
+      const cr = this.refs['value']['getBoundingClientRect']();
+      const windowBottom = window.innerHeight;
+
+      let up;
+      if (this.props.openDown !== undefined)
+      {
+        up = !this.props.openDown;
+      }
+      else
+      {
+        up = cr.bottom > windowBottom / 2 + (this.props.directionBias || 0);
+      }
+      this.setState({
+        open: true,
+        up,
+      });
     }
-
-    const cr = this.refs['value']['getBoundingClientRect']();
-    const windowBottom = window.innerHeight;
-
-    this.setState({
-      open: !this.state.open,
-      up: cr.bottom > windowBottom / 2 + (this.props.directionBias || 0),
-    });
+    else
+    {
+      this.close();
+    }
   }
 
   public getOptionName(option, index: number): string
@@ -326,7 +340,7 @@ class Dropdown extends TerrainComponent<Props>
       this.props.canEdit ?
         backgroundColor(
           !this.state.open ? Colors().inputBg : customColor || Colors().active,
-          customColor || Colors().inactiveHover
+          customColor || Colors().inactiveHover,
         )
         :
         backgroundColor(Colors().darkerHighlight)
@@ -334,12 +348,13 @@ class Dropdown extends TerrainComponent<Props>
       fontColor(
         !this.state.open ? customColor || Colors().text1 : Colors().text1,
         this.props.canEdit ? Colors().text1 : undefined,
-      )
+      ),
     ];
 
     return (
       <div
         onClick={this.toggleOpen}
+        onMouseDown={this.onMouseDown}
         className={classNames({
           'dropdown-wrapper': true,
           'altBg': true,
@@ -360,7 +375,7 @@ class Dropdown extends TerrainComponent<Props>
           ref='value'
           style={[
             { width: this.props.width },
-            ...dropdownValueStyle
+            ...dropdownValueStyle,
           ]}
           key='dropdown-value'
         >

@@ -150,6 +150,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       colors: getCardColors(clause.path[0], Colors().border2),
       language: 'elastic',
       description: clause.desc,
+      url: clause.url,
     }, obj['static']);
 
     if (true) // switch this on for wrapper card approach

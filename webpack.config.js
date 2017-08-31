@@ -49,7 +49,6 @@ var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports =
 {
-    cache: true,
     entry: "./src/app/Root.tsx",
     devtool: "cheap-module-source-map",
 
@@ -93,7 +92,7 @@ module.exports =
                 test: /\.ts(x?)$/,
                 exclude: [/midway/, /node_modules/],
                 loader:
-                    "babel-loader?cacheDirectory=true!cache-loader!thread-loader!ts-loader?happyPackMode=true"
+                    "babel-loader!thread-loader!ts-loader?happyPackMode=true"
                     + JSON.stringify({
                         compilerOptions: {
                         },
@@ -102,7 +101,7 @@ module.exports =
             {
                 test: /\.js(x?)$/,
                 exclude: [/midway/, /node_modules/],
-                loader: "babel-loader?cacheDirectory=true!cache-loader!thread-loader"
+                loader: "babel-loader!thread-loader"
             },
             { test: /\.css$/, exclude: /midway/, loader: "style-loader!css-loader" },
             { test: /\.less$/, exclude: /midway/, loader: "style-loader!css-loader!less-loader?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */

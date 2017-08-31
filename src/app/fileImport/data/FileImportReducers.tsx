@@ -159,6 +159,17 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
   return state;
 };
 
+const addPreviewColumn = (state: FileImportTypes.FileImportState, columnName: string) =>
+{
+  const { originalNames, columnNames, columnTypes, columnsToInclude, previewRows } = state;
+  return state
+    .set('originalNames', originalNames.push(columnName))
+    .set('columnNames', columnNames.push(columnName))
+    .set('columnTypes', columnTypes.push(FileImportTypes._ColumnTypesTree()))
+    .set('columnsToInclude', columnsToInclude.push(true))
+    .set('previewRows', previewRows.map((row) => row.concat('')));
+};
+
 FileImportReducers[ActionTypes.setErrorMsg] =
   (state, action) =>
     state
@@ -207,7 +218,25 @@ FileImportReducers[ActionTypes.changeUploadInProgress] =
 FileImportReducers[ActionTypes.changeElasticUpdate] =
   (state, action) =>
     state
-      .set('elasticUpdate', !state.elasticUpdate)
+      .set('elasticUpdate', action.payload.elasticUpdate)
+  ;
+
+FileImportReducers[ActionTypes.togglePreviewColumn] =
+  (state, action) =>
+    state
+      .set('requireJSONHaveAllFields', action.payload.requireJSONHaveAllFields)
+  ;
+
+FileImportReducers[ActionTypes.setExportFiletype] =
+  (state, action) =>
+    state
+      .set('filetype', action.payload.exportFiletype)
+  ;
+
+FileImportReducers[ActionTypes.toggleExportRank] =
+  (state, action) =>
+    state
+      .set('exportRank', action.payload.exportRank)
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
@@ -275,6 +304,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       List(action.payload.originalNames.map(() => FileImportTypes._ColumnTypesTree()));
     return state
       .set('filetype', action.payload.filetype)
+      .set('filesize', action.payload.filesize)
       .set('primaryKeys', List([]))
       .set('primaryKeyDelimiter', '-')
       .set('previewRows', action.payload.preview)
@@ -308,6 +338,7 @@ FileImportReducers[ActionTypes.importFile] =
       state.elasticUpdate,
       state.hasCsvHeader,
       state.isNewlineSeparatedJSON,
+      state.requireJSONHaveAllFields,
       state.primaryKeyDelimiter,
       () =>
       {
@@ -442,7 +473,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
           FileImportTypes._Template({
             templateId: template['id'],
             templateName: template['name'],
-            originalNames: template['originalNames'],
+            originalNames: List<string>(template['originalNames']),
             columnTypes: template['columnTypes'],
             transformations: template['transformations'],
             primaryKeys: template['primaryKeys'],
@@ -460,6 +491,10 @@ FileImportReducers[ActionTypes.fetchTemplates] =
 FileImportReducers[ActionTypes.applyTemplate] =
   (state, action) =>
   {
+    action.payload.newColumns.forEach((colName) =>
+    {
+      state = addPreviewColumn(state, colName);
+    });
     const index = state.templates.findKey((temp) => temp.templateId === action.payload.templateId);
     const template: Template = state.templates.get(index);
     template.transformations.map((transform) =>
@@ -484,6 +519,11 @@ FileImportReducers[ActionTypes.applyTemplate] =
       .set('previewRows', previewRows)
       .set('primaryKeyDelimiter', template.primaryKeyDelimiter);
   };
+
+FileImportReducers[ActionTypes.addPreviewColumn] =
+  (state, action) =>
+    addPreviewColumn(state, action.payload.columnName)
+  ;
 
 FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
