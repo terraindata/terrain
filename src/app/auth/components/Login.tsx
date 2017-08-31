@@ -317,7 +317,6 @@ class Login extends TerrainComponent<Props>
                 key={'login-input-password'}
                 id='login-password'
                 type='password'
-                onKeyDown={this.handleKeyDown}
                 onChange={this.handlePasswordChange}
                 className='login-input-field'
                 placeholder=''
