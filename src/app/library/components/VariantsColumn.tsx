@@ -426,7 +426,7 @@ class VariantsColumn extends TerrainComponent<Props>
       this.props.variantActions.change(v.set('status', ItemStatus.Archive) as Variant);
       return;
     }
-    else if (toStatus === ItemStatus.Archive && v.status === ItemStatus.Live)
+    else if (toStatus === ItemStatus.Archive && (v.status === ItemStatus.Live || v.status === ItemStatus.Default))
     {
       this.props.variantActions.status(v, ItemStatus.Archive, false);
       return;
