@@ -147,10 +147,10 @@
 
     .results-config-placeholder,
     .results-config-field {
-      padding: 12px;
-      padding-bottom: 10px;
+      padding: 6px;
       border-radius: 1px;
-      font-size: 12px;
+      font-size: @font-size;
+
       em {
         font-style: normal;
         opacity: 0.5;
@@ -164,18 +164,22 @@
     .results-config-field {
       blend-mode: multiply;
       border: 1px solid;
-      font-weight: 500;
       letter-spacing: 0.5px;
       cursor: pointer;
       position: relative;
-      padding-left: 30px;
+
+      .results-config-field-body {
+        justify-content: center;
+        align-items: center;
+        cursor: move;
+      }
 
       .results-config-text {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: calc(~"100% - 25px");
-        display: inline-block;
+        margin-left: 12px;
+        margin-right: 6px;
       }
 
       .close {
@@ -185,28 +189,13 @@
           fill: #fff;
           opacity: 1;
         }
-        position: absolute;
-        right: 6px;
-        top: 14px;
       }
 
       .results-config-handle {
-        margin-right: 8px;
         .transition;
-        position: absolute;
-        left: 6px;
-        @h: 16px;
-        top: 50%;
-        margin-top: -1 * @h / 2;
-
-        svg {
-          height: @h;
-        }
       }
 
       .results-config-field-gear {
-        float: right;
-        margin-top: 2px;
         opacity: 0.5;
         .transition;
         &:hover {
@@ -214,7 +203,6 @@
         }
         width: 11px;
         fill: rgb(255,255,255);
-        margin-right: 10px;
         cursor: pointer;
       }
 

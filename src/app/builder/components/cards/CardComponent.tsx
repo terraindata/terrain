@@ -82,7 +82,7 @@ const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
 
 // title width when we don't show a title
-const NO_TITLE_WIDTH = 58;
+const NO_TITLE_WIDTH = 74;
 
 export interface Props
 {
@@ -568,8 +568,12 @@ class _CardComponent extends TerrainComponent<Props>
             {
               this.props.canEdit &&
               !card['cannotBeMoved'] &&
-              <div className='drag-handle'>
-                <DragHandle key={Math.random().toString()} hiddenByDefault={!this.state.hovering} connectDragSource={connectDragSource} />
+              <div className='card-drag-handle'>
+                <DragHandle
+                  hiddenByDefault={!this.state.hovering}
+                  connectDragSource={connectDragSource}
+                  key={'handle-' + (this.props.card !== undefined ? this.props.card.id : Math.random())}
+                />
               </div>
             }
             {
