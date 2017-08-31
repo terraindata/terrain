@@ -56,6 +56,7 @@ import
   VictoryChart,
   VictoryGroup,
   VictoryLegend,
+  VictoryPortal,
   VictoryScatter,
   VictoryTheme,
   VictoryTooltip,
@@ -207,7 +208,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               key={key}
               name={`area-${key}`}
               style={{ data: { fill: this.getDatasetColor(key) } }}
-              data={ds.data}
+              data={ds.data.map((d) => ({ ...d, l: true }))}
               interpolation={config.topChart.interpolation}
               x={xDataKey}
               y={yDataKey}
@@ -217,7 +218,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
             <VictoryScatter
               key={key}
               data={ds.data}
-              size={0}
+              size={(datum, active) => active ? 5 : 0}
               x={xDataKey}
               y={yDataKey}
             />,
@@ -229,7 +230,13 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
             <VictoryArea
               name={`area-${key}`}
               key={key}
-              style={{ data: { fill: this.getDatasetColor(key) } }}
+              style={{
+                data: {
+                  fill: this.getDatasetColor(key),
+                  strokeWidth: 3,
+                  fillOpacity: 0.7,
+                },
+              }}
               data={ds.data}
               interpolation={config.topChart.interpolation}
               x={xDataKey}
@@ -368,6 +375,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         eventKey: 'all',
         mutation: () =>
         {
+          this.setState({ highlightDataset: null });
           // Returning null resets all mutations, reverts the component back to
           // its original state.
           return null;
