@@ -46,11 +46,12 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
+import * as classNames from 'classnames';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as classNames from 'classnames';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
@@ -63,16 +64,15 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaStore from './../../schema/data/SchemaStore';
 import { databaseId, tableId } from './../../schema/SchemaTypes';
 import * as SchemaTypes from './../../schema/SchemaTypes';
+import has = Reflect.has;
+import Util from './../../util/Util';
 import Actions from './../data/FileImportActions';
 import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import { Steps } from './../FileImportTypes';
-import { tooltip } from 'common/components/tooltip/Tooltips';
 import './FileImport.less';
 import FileImportPreview from './FileImportPreview';
 import FileImportPreviewRow from './FileImportPreviewRow';
-import has = Reflect.has;
-import Util from './../../util/Util';
 
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
@@ -115,7 +115,6 @@ class FileImport extends TerrainComponent<any>
   };
 
   public confirmedLeave: boolean = false;
-
 
   constructor(props)
   {
@@ -543,7 +542,7 @@ class FileImport extends TerrainComponent<any>
             ref='fi-yes-button'
           >
             Newline
-          </div> , 
+          </div> ,
           'The rows in your file are separated by new lines')
         }
           {tooltip(
@@ -555,7 +554,7 @@ class FileImport extends TerrainComponent<any>
           >
             Object list
           </div>
-          , "The rows in your file are separated by commas (Your file is a syntactically-correct JSON file)")
+          , 'The rows in your file are separated by commas (Your file is a syntactically-correct JSON file)')
         }
         </div>
       </div>
@@ -791,52 +790,6 @@ class FileImport extends TerrainComponent<any>
     );
   }
 
-
-  public handleNavigationException()
-  {
-    this.setState({
-      navigationException: true,
-    });
-  }
-
-  public componentDidMount()
-  {
-    window.onbeforeunload = (e) =>
-    {
-           console.log("meep");
-
-      Util.executeBeforeLeaveHandlers();
-
-        const msg = 'You have unsaved changes to this Variant. If you leave, they will be lost. Are you sure you want to leave?';
-        e && (e.returnValue = msg);
-       return msg;
-     
-    };
-
-    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
-  }
-
-  public componentWillUnmount()
-  {
-    console.log("test");
-    window.onbeforeunload = null;
-  }
-
-  public routerWillLeave(nextLocation): boolean
-  {
-    if (this.confirmedLeave)
-    {
-      this.confirmedLeave = false;
-      return true;
-    }
-
-      // ^ need to pass in the most recent state, because when you've navigated away
-      // in a dirty state, saved on the navigation prompt, and then returned,
-      // Builder's copy of the state gets out of date at this point
-
-     return true;
-  }
-
   public render()
   {
     return (
@@ -847,7 +800,6 @@ class FileImport extends TerrainComponent<any>
           className={classNames({
             'file-import-inner': true,
             'file-import-inner-server-step': this.state.stepId === Steps.SelectServer,
-            'file-import-inner-scroll': this.state.stepId === 5,
           })}
         >
           {this.renderError()}
