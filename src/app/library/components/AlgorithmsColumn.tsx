@@ -201,6 +201,14 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
+  public handleUnarchive(id: ID)
+  {
+    this.props.algorithmActions.change(
+      this.props.algorithms.get(id)
+        .set('status', ItemStatus.Build) as Algorithm,
+    );
+  }
+
   public handleCreate()
   {
     this.props.algorithmActions.create(this.props.groupId);
@@ -381,12 +389,11 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
 
     // scores.splice(0, 1); // remove Archived count
-
     const { me, roles } = this.state;
-    const canArchive = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
-    const canDuplicate = canArchive;
-    const canDrag = canArchive;
-    const canEdit = canDrag; // ||
+    const canArchive = (algorithm.status !== ItemStatus.Archive); // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
+    const canDuplicate = true;
+    const canDrag = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
+    const canEdit = canDrag; // ||me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
     // (me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
@@ -452,6 +459,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         canDuplicate={canDuplicate}
         isSelected={+algorithm.id === +params.algorithmId}
         isFocused={this.props.isFocused}
+        canUnarchive={algorithm.status === ItemStatus.Archive}
+        onUnarchive={this.handleUnarchive}
       >
         <div className='flex-container'>
           <UserThumbnail userId={userId} medium={true} extra={role} />
