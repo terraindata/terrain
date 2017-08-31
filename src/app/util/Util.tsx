@@ -438,6 +438,20 @@ const Util = {
     return ReactDOM.findDOMNode(reactNode).parentNode;
   },
 
+  findParentNode(reactNode, checkParent: (parentNode) => boolean, maxDepth: number = 4): Node | null
+  {
+    while (maxDepth > 0)
+    {
+      if (checkParent(reactNode))
+      {
+        return reactNode;
+      }
+      reactNode = Util.parentNode(reactNode);
+      maxDepth--;
+    }
+    return null;
+  },
+
   siblings(reactNode): NodeList
   {
     return Util.parentNode(reactNode).childNodes;

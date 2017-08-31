@@ -69,6 +69,7 @@ const TEXT =
       main: 'You are deploying the following variant to Live. The variant query will be pushed to the database servers.',
       confirm: 'I approve of deploying this query to Live for this variant.',
       button: 'Deploy to Live',
+      cancelButton: 'Cancel and Do Not Deploy',
     },
 
     default:
@@ -76,6 +77,7 @@ const TEXT =
       main: 'You are deploying the following variant to Live. The variant query will be pushed to the database servers.',
       confirm: 'I approve of deploying this query to Live for this variant, and making it the Default for this algorithm.',
       button: 'Deploy to Live and Make Default',
+      cancelButton: 'Cancel and Do Not Deploy',
     },
 
     notLive:
@@ -83,6 +85,7 @@ const TEXT =
       main: 'You are removing the following variant from Live. The variant query will be removed from the database servers.',
       confirm: 'I approve of removing this query from Live for this variant.',
       button: 'Remove from Live',
+      cancelButton: 'Cancel and Do Not Remove',
     },
   };
 
@@ -335,7 +338,9 @@ class DeployModalColumn extends TerrainComponent<Props>
           style={buttonColors()}
           onClick={this.handleCancelDeploy}
         >
-          Cancel and Do Not Deploy
+          {
+            text.cancelButton
+          }
         </div>
 
       </div>
