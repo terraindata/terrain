@@ -534,8 +534,10 @@ export class ResultsManager extends TerrainComponent<Props>
       originalNames: filteredFields,
       preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
         filteredFields.map((field, index) =>
-          result.fields.get(String(field)),
-        ),
+        {
+          const value = result.fields.get(String(field));
+          return Array.isArray(value) || typeof (value) === 'boolean' ? JSON.stringify(value) : value;
+        }),
       )),
     };
     this.changeResults(changes, exportChanges);

@@ -54,6 +54,7 @@ import * as React from 'react';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
+import { stringifyWithParameters } from './../../../database/elastic/conversion/ParseElasticQuery';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -99,6 +100,7 @@ export interface Props
   exportRank: boolean;
 
   query?: string;
+  inputs?: List<any>;
   serverId?: number;
   variantName?: string;
   filesize?: number;
@@ -439,7 +441,9 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      const dbName = JSON.parse(this.props.query)['index'];
+      console.log(this.props.inputs);
+      console.log(stringifyWithParameters(this.props.query, this.props.inputs));
+      const dbName = JSON.parse(stringifyWithParameters(this.props.query, this.props.inputs))['index'];
       if (dbName === undefined || dbName === '')
       {
         this.setError('Index must be selected in order to export results');
