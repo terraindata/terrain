@@ -273,4 +273,5 @@ export const enum Steps
   SelectDb,
   SelectTable,
   Preview,
+  Success,
 }
