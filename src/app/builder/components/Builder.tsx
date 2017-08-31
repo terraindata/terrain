@@ -151,6 +151,9 @@ class Builder extends TerrainComponent<Props>
 
   public confirmedLeave: boolean = false;
 
+  public unregisterLeaveHook1: any;
+  public unregisterLeaveHook2: any;
+
   constructor(props: Props)
   {
     super(props);
@@ -239,11 +242,13 @@ class Builder extends TerrainComponent<Props>
       }
     };
 
-    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    this.unregisterLeaveHook1 = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 
   public componentWillUnmount()
   {
+    this.unregisterLeaveHook1();
+    this.unregisterLeaveHook2();
     window.onbeforeunload = null;
   }
 
@@ -299,7 +304,7 @@ class Builder extends TerrainComponent<Props>
       this.confirmedLeave = false;
       if (!nextProps.location.query || !nextProps.location.query.o)
       {
-        this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
+        this.unregisterLeaveHook2 = this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
       }
       this.checkConfig(nextProps);
     }

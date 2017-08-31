@@ -690,6 +690,7 @@ class FileImport extends TerrainComponent<any>
             handleFileImportSuccess={this.onFileImportSuccess}
             router={this.props.router}
             route={this.props.route}
+            existingIndexAndType={this.state.dbNames.contains(dbName) && this.state.tableNames.contains(tableName)}
           />;
         break;
       case Steps.Success:

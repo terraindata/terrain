@@ -58,6 +58,7 @@ export interface Props
   status: string;
   type: string;
   onHover: (status: string, id: ID) => void;
+  onDrop?: (status: string, id: ID) => void;
   connectDropTarget?: (c: any) => any;
   titleHidden?: boolean;
   dropDisabled?: boolean;
@@ -126,6 +127,15 @@ const target =
         props.onHover(props.status, item.id);
       }
     },
+
+    drop(props, monitor, component)
+    {
+      const item = monitor.getItem();
+      if (props.onDrop)
+      {
+        props.onDrop(props.status, item.id);
+      }
+    }
   };
 
 const dropCollect = (connect, monitor) =>
