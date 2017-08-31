@@ -176,6 +176,14 @@ class VariantsColumn extends TerrainComponent<Props>
     );
   }
 
+  public handleUnarchive(id: ID)
+  {
+    this.props.variantActions.change(
+      this.props.variants.get(id)
+        .set('status', ItemStatus.Build) as Variant,
+    );
+  }
+
   public handleCreate()
   {
     this.props.variantActions.create(this.props.groupId, this.props.algorithmId);
@@ -351,8 +359,10 @@ class VariantsColumn extends TerrainComponent<Props>
         icon={<VariantIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
-        canArchive={canDrag}
+        onUnarchive={this.handleUnarchive}
+        canArchive={canDrag && variant.status !== ItemStatus.Archive}
         canDuplicate={canEdit}
+        canUnarchive={variant.status === ItemStatus.Archive}
         key={variant.id}
         to={`/${basePath}/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'

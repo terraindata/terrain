@@ -242,7 +242,8 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
     return parseFilterBlock(boolQuery, [filters]);
   }
 
-  const filterBlocks = filters.map((obj: object) =>
+  let filterBlocks = [];
+  filters.forEach((obj: object) =>
   {
     let field;
     let filterOp;
@@ -251,8 +252,14 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
     if (obj['range'] !== undefined)
     {
       field = Object.keys(obj['range'])[0];
-      filterOp = Object.keys(obj['range'][field])[0];
+      const filterOps = Object.keys(obj['range'][field]);
+      filterOp = filterOps[0];
       value = obj['range'][field][filterOp];
+      if (filterOps.length > 1)
+      {
+        delete obj['range'][field][filterOp];
+        filterBlocks = filterBlocks.concat(parseFilterBlock(boolQuery, [obj]));
+      }
       filterOp = esFilterOperatorsMap[filterOp];
     }
     else if (obj['term'] !== undefined)
@@ -268,14 +275,16 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
       value = obj['match'][field];
     }
 
-    return make(Blocks, 'elasticFilterBlock', {
-      field,
-      value,
-      boolQuery,
-      filterOp,
-    }, true);
+    filterBlocks.push(
+      make(Blocks, 'elasticFilterBlock', {
+        field,
+        value,
+        boolQuery,
+        filterOp,
+      }, true)
+    );
   });
-
+  console.log(filterBlocks);
   return filterBlocks;
 }
 

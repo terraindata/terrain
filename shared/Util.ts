@@ -104,7 +104,7 @@ export function parseCSV(file, config: ParseCSVConfig)
   const nIndex = file.indexOf('\n');
   if (rnIndex === -1 && nIndex === -1)
   {
-    config.error('Error: no newLine sequence found. Valid newLine sequences are ' + String(VALID_NEWLINE_SEQUENCES));
+    config.error('Error: no line-breaks found in uploaded CSV file.');
     return undefined;
   }
   if (rnIndex === -1)
@@ -418,14 +418,14 @@ export class CSVTypeParser
     {
       return ['double'];
     }
-    if (this._matchInSet(types, ['long', 'date']))
-    {
-      return ['date'];
-    }
-    if (this._matchInSet(types, ['double', 'date']))
-    {
-      return ['date'];
-    }
+    // if (this._matchInSet(types, ['long', 'date']))
+    // {
+    //   return ['date'];
+    // }
+    // if (this._matchInSet(types, ['double', 'date']))
+    // {
+    //   return ['date'];
+    // }
     // TODO: other cases?
     return ['text'];
   }
@@ -489,11 +489,11 @@ export class CSVTypeParser
     }
     return parsedValue === false || parsedValue === true;
   }
-  private _isDateHelper(value: string): boolean
-  {
-    const parsedValue: any = Date.parse(value);
-    return !isNaN(parsedValue);
-  }
+  // private _isDateHelper(value: string): boolean
+  // {
+  //   const parsedValue: any = Date.parse(value);
+  //   return !isNaN(parsedValue);
+  // }
   private _isArrayHelper(value: string): boolean
   {
     let parsedValue: any;
@@ -534,10 +534,10 @@ export class CSVTypeParser
     {
       return ['double'];
     }
-    if (this._isDateHelper(value))
-    {
-      return ['date'];
-    }
+    // if (this._isDateHelper(value))
+    // {
+    //   return ['date'];
+    // }
     return ['text'];
   }
   // typeSet should already have JSON.stringify(['null']) removed

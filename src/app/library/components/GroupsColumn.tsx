@@ -118,6 +118,12 @@ class GroupsColumn extends TerrainComponent<Props>
       .set('status', ItemStatus.Archive) as Group);
   }
 
+  public handleUnarchive(id: ID)
+  {
+    this.props.groupActions.change(this.props.groups.find((g) => g.id === id)
+      .set('status', ItemStatus.Build) as Group);
+  }
+
   public handleNameChange(id: ID, name: string)
   {
     this.props.groupActions.change(
@@ -186,8 +192,10 @@ class GroupsColumn extends TerrainComponent<Props>
         item={group}
         canEdit={canEdit || canDrag}
         canDrag={canDrag}
-        canArchive={canEdit || canDrag}
+        canArchive={(canEdit || canDrag) && group.status !== ItemStatus.Archive}
         canDuplicate={false}
+        canUnarchive={group.status === ItemStatus.Archive}
+        onUnarchive={this.handleUnarchive}
         canCreate={canCreate}
         isSelected={+group.id === +params.groupId}
         isFocused={this.props.isFocused}
