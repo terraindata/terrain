@@ -702,7 +702,10 @@ class FileImport extends TerrainComponent<any>
               Success!
               </div>
             <div className='fi-import-success-info'>
-              Your data were successfully imported into {serverName}, {dbName}, {tableName}
+              Your data were successfully imported into
+                <div className='fi-import-success-info-row fi-import-success-info-row-top'> <span>Server:</span> {serverName} </div>
+              <div className='fi-import-success-info-row'> <span>Index:</span> {dbName} </div>
+              <div className='fi-import-success-info-row'> <span>Type:</span> {tableName} </div>
             </div>
             <div
               className='fi-import-success-button button'
