@@ -787,6 +787,7 @@ class FileImport extends TerrainComponent<any>
           className={classNames({
             'file-import-inner': true,
             'file-import-inner-server-step': this.state.stepId === Steps.SelectServer,
+            'file-import-inner-scroll': this.state.stepId = Steps.Preview,
           })}
         >
           {this.renderError()}
