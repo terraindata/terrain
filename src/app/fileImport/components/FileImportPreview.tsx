@@ -124,6 +124,7 @@ class FileImportPreview extends TerrainComponent<Props>
     advancedCheck: boolean,
     advancedExportRank: boolean,
     exportFiletype: string,
+    showSaveSuccessModal: boolean,
   } = {
     appliedTemplateName: '',
     saveTemplateName: '',
@@ -141,6 +142,7 @@ class FileImportPreview extends TerrainComponent<Props>
     advancedCheck: this.props.requireJSONHaveAllFields,
     advancedExportRank: this.props.exportRank,
     exportFiletype: 'csv',
+    showSaveSuccessModal: false,
   };
 
   public componentDidMount()
@@ -273,6 +275,13 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public handleTemplateSaveSuccess()
+  {
+    this.setState({
+      showSaveSuccessModal: true,
+    });
+  }
+
   public handleSaveTemplate()
   {
     const { appliedTemplateName, saveTemplateName } = this.state;
@@ -286,7 +295,7 @@ class FileImportPreview extends TerrainComponent<Props>
       this.showUpdateTemplate();
       return;
     }
-    Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting);
+    Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess);
     this.setState({
       showingSaveTemplate: false,
       appliedTemplateName: saveTemplateName,
@@ -1000,6 +1009,25 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public closeSuccessModal()
+  {
+    this.setState({
+      showSaveSuccessModal: false,
+    });
+  }
+
+  public renderSuccessModal()
+  {
+    return (
+      <Modal
+        open={this.state.showSaveSuccessModal}
+        message={'Successfully saved template: "' + this.state.saveTemplateName + '"'}
+        onClose={this.closeSuccessModal}
+        title={'Save Successful'}
+      />
+    );
+  }
+
   public renderError()
   {
     const { previewErrorMsg } = this.state;
@@ -1054,6 +1082,7 @@ class FileImportPreview extends TerrainComponent<Props>
               {this.renderAdvancedModal()}
               {this.renderAddColumn()}
               {this.renderError()}
+              {this.renderSuccessModal()}
             </div>
         }
       </div>

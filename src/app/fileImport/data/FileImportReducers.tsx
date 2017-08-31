@@ -405,7 +405,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       state.primaryKeyDelimiter,
       () =>
       {
-        alert('successfully saved template');
+        action.payload.handleTemplateSaveSuccess();
         action.payload.fetchTemplates(action.payload.exporting);
       },
       (err: string) =>
