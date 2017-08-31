@@ -64,6 +64,7 @@ import Query from '../../../items/types/Query';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import CardsColumn from './cards/CardsColumn';
@@ -335,11 +336,17 @@ const BuilderColumn = createReactClass<any, any>(
                 </div>
               )
             }
+            <div ref='handle' className='builder-title-bar-drag-handle'>
+              <DragHandle
+                key={'builder-column-handle-' + this.props.index}
+                showWhenHoveringClassName='builder-title-bar'
+              />
+            </div>
             <div
               className='builder-title-bar-title'
               style={fontColor(Colors().text2)}
             >
-              <span ref='handle'>
+              <span>
                 {
                   COLUMNS[this.state.column]
                 }

@@ -95,11 +95,12 @@ const FileImportActions =
       }),
 
     importFile:
-    () =>
+    (handleFileImportSuccess) =>
       $(ActionTypes.importFile, {
         setErrorMsg: FileImportActions.setErrorMsg,
         changeUploadInProgress: FileImportActions.changeUploadInProgress,
         fetchSchema: SchemaActions.fetch,
+        handleFileImportSuccess,
       }),
 
     exportFile:

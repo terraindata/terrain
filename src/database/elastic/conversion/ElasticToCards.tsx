@@ -281,7 +281,7 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
         value,
         boolQuery,
         filterOp,
-      }, true)
+      }, true),
     );
   });
   console.log(filterBlocks);

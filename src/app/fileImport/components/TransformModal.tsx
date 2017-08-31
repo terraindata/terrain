@@ -50,6 +50,7 @@ import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
+import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -310,58 +311,100 @@ class TransformModal extends TerrainComponent<Props>
     switch (transformType)
     {
       case 'duplicate':
-        components =
+        components = [
+          <span
+            className='fi-transform-components-label'
+            key='fi-transform-components-duplicate-label'
+          >
+            Enter the duplicated column name:
+          </span>,
           <Autocomplete
             value={this.state.duplicateNewName}
             options={null}
             onChange={this.handleDuplicateNewNameChange}
-            placeholder={'duplicate column name'}
+            placeholder={'name'}
             disabled={false}
-          />;
+            key='fi-transform-components-duplicate-name'
+          />,
+        ];
         break;
       case 'append':
-        components =
+        components = [
+          <span
+            className='fi-transform-components-label'
+            key='fi-transform-components-append-label'
+          >
+            Enter the text to append:
+          </span>,
           <Autocomplete
             value={this.state.transformText}
             options={null}
             onChange={this.handleAutocompleteTransformTextChange}
             placeholder={'text'}
             disabled={false}
-          />;
+            key='fi-transform-components-append-text'
+          />,
+        ];
         break;
       case 'prepend':
-        components =
+        components = [
+          <span
+            className='fi-transform-components-label'
+            key='fi-transform-components-prepend-label'
+          >
+            Enter the text to prepend:
+          </span>,
           <Autocomplete
             value={this.state.transformText}
             options={null}
             onChange={this.handleAutocompleteTransformTextChange}
             placeholder={'text'}
             disabled={false}
-          />;
+            key='fi-transform-components-prepend-text'
+          />,
+        ];
         break;
       case 'split':
         components = [
+          <span
+            className='fi-transform-components-label'
+            key='fi-transform-components-split-label1'
+          >
+            Enter the first split column name:
+          </span>,
           <Autocomplete
             value={this.state.splitNames.get(0)}
             options={null}
             onChange={this.handleSplitNameAChange}
-            placeholder={'new column 1'}
+            placeholder={'name'}
             disabled={false}
             key={'fi-transform-split-name1'}
           />,
+          <span
+            className='fi-transform-components-label'
+            key='fi-transform-components-split-label2'
+          >
+            Enter the second split column name:
+          </span>,
           <Autocomplete
             value={this.state.splitNames.get(1)}
             options={null}
             onChange={this.handleSplitNameBChange}
-            placeholder={'new column 2'}
+            placeholder={'name'}
             disabled={false}
             key={'fi-transform-split-name2'}
           />,
+          <span
+            className='fi-transform-components-label'
+            key='fi-transform-components-split-label3'
+          >
+            Enter the delimiter to split on:
+          </span>,
           <Autocomplete
             value={this.state.transformText}
             options={null}
             onChange={this.handleAutocompleteTransformTextChange}
-            placeholder={'text'}
+            placeholder={'delimiter'}
             disabled={false}
             key={'fi-transform-split-text'}
           />,
@@ -369,6 +412,12 @@ class TransformModal extends TerrainComponent<Props>
         break;
       case 'merge':
         components = [
+          <span
+            className='fi-transform-components-label'
+            key='fi-transform-components-merge-label1'
+          >
+            Select a column to merge:
+          </span>,
           <Dropdown
             selectedIndex={this.state.mergeIndex}
             options={this.props.columnNames.delete(this.props.columnId)}
@@ -376,14 +425,26 @@ class TransformModal extends TerrainComponent<Props>
             canEdit={true}
             key={'fi-transform-merge-index'}
           />,
+          <span
+            className='fi-transform-components-label'
+            key='fi-transform-components-merge-label2'
+          >
+            Enter the merged column name:
+          </span>,
           <Autocomplete
             value={this.state.mergeNewName}
             options={null}
             onChange={this.handleMergeNewNameChange}
-            placeholder={'new column name'}
+            placeholder={'name'}
             disabled={false}
             key={'fi-transform-merge-name'}
           />,
+          <span
+            className='fi-transform-components-label'
+            key='fi-transform-components-merge-label3'
+          >
+            Enter the merge delimiter (optional):
+          </span>,
           <Autocomplete
             value={this.state.transformText}
             options={null}
@@ -399,6 +460,9 @@ class TransformModal extends TerrainComponent<Props>
     return (
       <div
         className='fi-transform-components'
+        style={{
+          color: Colors().text1,
+        }}
       >
         {
           components
@@ -459,29 +523,21 @@ class TransformModal extends TerrainComponent<Props>
                 checked={this.state.transformTypeIndex === index}
                 onChange={this._fn(this.handleTransformTypeChange, index)}
               />
-              <span
-                className='fi-transform-option-name clickable'
-                onClick={this._fn(this.handleTransformTypeChange, index)}
-              >
-                {
-                  type
-                }
-              </span>
+              {
+                tooltip(
+                  <span
+                    className='fi-transform-option-name clickable'
+                    onClick={this._fn(this.handleTransformTypeChange, index)}
+                  >
+                    {
+                      type
+                    }
+                  </span>,
+                  FileImportTypes.TRANSFORM_TEXT[TRANSFORM_TYPES[datatypeId][index].toUpperCase()],
+                )
+              }
             </div>,
           )
-        }
-        {
-          this.state.transformTypeIndex !== -1 &&
-          <div
-            className='fi-transform-text'
-            style={{
-              color: Colors().text1,
-            }}
-          >
-            {
-              FileImportTypes.TRANSFORM_TEXT[TRANSFORM_TYPES[datatypeId][this.state.transformTypeIndex].toUpperCase()]
-            }
-          </div>
         }
         {this.renderTransform()}
       </div>
