@@ -410,10 +410,26 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleItemStatusHover(statusString: string, id: ID)
   {
+    // do nothing
+  }
+
+  public handleItemDrop(toStatus: string, id: ID)
+  {
     const v = this.props.variants.get(id);
-    if (v.status !== statusString)
+    if (v.status === ItemStatus.Archive && toStatus === ItemStatus.Build)
     {
-      this.props.variantActions.change(v.set('status', statusString) as Variant);
+      this.props.variantActions.change(v.set('status', ItemStatus.Build) as Variant);
+      return;
+    }
+    else if (v.status === ItemStatus.Build && toStatus === ItemStatus.Archive)
+    {
+      this.props.variantActions.change(v.set('status', ItemStatus.Archive) as Variant);
+      return;
+    }
+    else if (toStatus === ItemStatus.Archive && v.status === ItemStatus.Live)
+    {
+      this.props.variantActions.status(v, ItemStatus.Archive, false);
+      return;
     }
   }
 
@@ -440,6 +456,7 @@ class VariantsColumn extends TerrainComponent<Props>
         key={archived ? '1' : '0'}
         type='variant'
         onHover={this.handleItemStatusHover}
+        onDrop={this.handleItemDrop}
         titleHidden={!archived}
       >
         {
