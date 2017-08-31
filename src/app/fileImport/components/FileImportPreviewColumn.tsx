@@ -94,6 +94,11 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     Actions.setColumnToInclude(this.props.columnId);
   }
 
+  public handleCheckboxChange()
+  {
+    return;
+  }
+
   public handlePrimaryKeyChange()
   {
     if (!this.props.isIncluded && !this.props.isPrimaryKey)
@@ -147,7 +152,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         >
           <CheckBox
             checked={this.props.isIncluded}
-            onChange={this.handleIncludedChange}
+            onChange={this.handleCheckboxChange}
           />
           <span
             className='fi-preview-column-header-include-text clickable'
