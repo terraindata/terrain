@@ -54,6 +54,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
+import DragHandle from '../../../common/components/DragHandle';
 import ManualInfo from '../../../manual/components/ManualInfo';
 import Util from '../../../util/Util';
 import BuilderComponent from '../BuilderComponent';
@@ -330,7 +331,7 @@ class CardField extends TerrainComponent<Props>
     }
 
     const handleToolStyle = _.extend({},
-      this.state.moving ? getStyle('color', Colors().active) : getStyle('color', Colors().text1, Colors().inactiveHover),
+      this.state.moving ? getStyle('color', Colors().active, Colors().active) : getStyle('color', Colors().text1, Colors().inactiveHover),
     );
 
     const { row } = this.props;
@@ -404,8 +405,8 @@ class CardField extends TerrainComponent<Props>
                   style={handleToolStyle}
                   key={'handle-tool'}
                 >
-                  ⋮⋮
-                  </div>
+                  <DragHandle />
+                </div>
                 {
                   this.props.helpOn ?
                     <ManualInfo

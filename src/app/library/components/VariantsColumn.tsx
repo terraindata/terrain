@@ -176,6 +176,14 @@ class VariantsColumn extends TerrainComponent<Props>
     );
   }
 
+  public handleUnarchive(id: ID)
+  {
+    this.props.variantActions.change(
+      this.props.variants.get(id)
+        .set('status', ItemStatus.Build) as Variant,
+    );
+  }
+
   public handleCreate()
   {
     this.props.variantActions.create(this.props.groupId, this.props.algorithmId);
@@ -351,8 +359,10 @@ class VariantsColumn extends TerrainComponent<Props>
         icon={<VariantIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
-        canArchive={canDrag}
+        onUnarchive={this.handleUnarchive}
+        canArchive={canDrag && variant.status !== ItemStatus.Archive}
         canDuplicate={canEdit}
+        canUnarchive={variant.status === ItemStatus.Archive}
         key={variant.id}
         to={`/${basePath}/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'
@@ -400,10 +410,26 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleItemStatusHover(statusString: string, id: ID)
   {
+    // do nothing
+  }
+
+  public handleItemDrop(toStatus: string, id: ID)
+  {
     const v = this.props.variants.get(id);
-    if (v.status !== statusString)
+    if (v.status === ItemStatus.Archive && toStatus === ItemStatus.Build)
     {
-      this.props.variantActions.change(v.set('status', statusString) as Variant);
+      this.props.variantActions.change(v.set('status', ItemStatus.Build) as Variant);
+      return;
+    }
+    else if (v.status === ItemStatus.Build && toStatus === ItemStatus.Archive)
+    {
+      this.props.variantActions.change(v.set('status', ItemStatus.Archive) as Variant);
+      return;
+    }
+    else if (toStatus === ItemStatus.Archive && (v.status === ItemStatus.Live || v.status === ItemStatus.Default))
+    {
+      this.props.variantActions.status(v, ItemStatus.Archive, false);
+      return;
     }
   }
 
@@ -430,6 +456,7 @@ class VariantsColumn extends TerrainComponent<Props>
         key={archived ? '1' : '0'}
         type='variant'
         onHover={this.handleItemStatusHover}
+        onDrop={this.handleItemDrop}
         titleHidden={!archived}
       >
         {

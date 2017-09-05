@@ -55,6 +55,7 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { _Format, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
+import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 
@@ -532,11 +533,13 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
           'results-config-field-used': selected,
         })}
       >
-        <div className='results-config-field-body'>
+        <div className='results-config-field-body flex-container'>
           <span className='results-config-handle'>
-            <HandleIcon />
+            <DragHandle
+              key={'handle-for-' + this.props.field + this.props.index}
+            />
           </span>
-          <span className='results-config-text'>
+          <span className='results-config-text flex-grow'>
             {
               this.props.field
             }

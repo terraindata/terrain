@@ -43,6 +43,11 @@
   }
 
 	.file-import-inner {
+  
+    &.file-import-inner-scroll {
+      overflow: auto !important;
+    }
+
     min-width: 300px;
     max-width: 100%;
 
@@ -71,6 +76,47 @@
       border-radius: 3px;
       max-width: 100%;
       margin: 12px;
+
+      .fi-import-success-wrapper {
+        width: 550px;
+        height: 245px;
+        padding: 0px;
+        margin: 0px;
+
+        .fi-import-success-header {
+          text-align: center;
+          font-size: @large-font-size;
+          font-weight: @bold-font-weight;
+        }
+        .fi-import-success-button {
+          @button-width: 144px;
+            margin-top: 30px;
+            width: 144px;
+            margin-left: calc(~"50% - @{button-width}/2");
+            text-align: center;
+            cursor: pointer;
+            padding: 10px 6px;
+            font-size: 16px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .fi-import-success-info {
+          margin-top: 30px;
+          text-align: center;
+          font-size: 18px;
+          .fi-import-success-info-row {
+            &.fi-import-success-info-row-top {
+              margin-top: 12px;
+            }
+            margin-top: 6px;
+            font-size: 16px;
+            span {
+              font-weight: bold;
+              font-size: 18px;
+            }
+          }
+        }
+      }
 
       .fi-content-csv {
 

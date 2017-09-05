@@ -51,6 +51,7 @@ import * as Immutable from 'immutable';
 import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { browserHistory } from 'react-router';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
@@ -63,6 +64,7 @@ import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { tooltip } from './../../common/components/tooltip/Tooltips';
 import Actions from './../data/FileImportActions';
+import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
@@ -102,8 +104,14 @@ export interface Props
   serverId?: number;
   variantName?: string;
   filesize?: number;
-}
 
+  handleFileImportSuccess?: () => void;
+
+  router?: any;
+  route?: any;
+
+  existingIndexAndType?: boolean;
+}
 @Radium
 class FileImportPreview extends TerrainComponent<Props>
 {
@@ -124,6 +132,13 @@ class FileImportPreview extends TerrainComponent<Props>
     advancedCheck: boolean,
     advancedExportRank: boolean,
     exportFiletype: string,
+    leaving: boolean,
+    nextLocation: any,
+    changeLocationAfterSave: boolean,
+    showResponseModal: boolean,
+    responseModalContent: string,
+    responseModalTitle: string,
+    responseModalError: boolean,
   } = {
     appliedTemplateName: '',
     saveTemplateName: '',
@@ -141,7 +156,16 @@ class FileImportPreview extends TerrainComponent<Props>
     advancedCheck: this.props.requireJSONHaveAllFields,
     advancedExportRank: this.props.exportRank,
     exportFiletype: 'csv',
+    leaving: false,
+    nextLocation: null,
+    changeLocationAfterSave: false,
+    showResponseModal: false,
+    responseModalContent: '',
+    responseModalTitle: '',
+    responseModalError: false,
   };
+
+  public confirmedLeave: boolean = false;
 
   public componentDidMount()
   {
@@ -149,6 +173,8 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
+
+    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -159,6 +185,51 @@ class FileImportPreview extends TerrainComponent<Props>
         templateOptions: nextProps.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
       });
     }
+  }
+
+  public handleModalCancel()
+  {
+    this.setState({
+      leaving: false,
+    });
+  }
+
+  public handleModalDontSave()
+  {
+    this.confirmedLeave = true;
+    this.setState({
+      leaving: false,
+    });
+    browserHistory.push(this.state.nextLocation);
+  }
+
+  public handleModalSave()
+  {
+    this.confirmedLeave = true;
+    this.setState({
+      leaving: false,
+      showingSaveTemplate: true,
+      changeLocationAfterSave: true,
+    });
+  }
+
+  public routerWillLeave(nextLocation): boolean
+  {
+    if (this.confirmedLeave)
+    {
+      this.confirmedLeave = false;
+      return true;
+    }
+    if (FileImportStore.getState().isDirty)
+    {
+      this.setState({
+        leaving: true,
+        nextLocation,
+      });
+      return false;
+
+    }
+    return true;
   }
 
   public setError(msg: string)
@@ -219,9 +290,16 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public hideSaveTemplate()
   {
-    this.setState({
-      showingSaveTemplate: false,
-    });
+    if (this.state.changeLocationAfterSave)
+    {
+      browserHistory.push(this.state.nextLocation);
+    }
+    else
+    {
+      this.setState({
+        showingSaveTemplate: false,
+      });
+    }
   }
 
   public showAdvanced()
@@ -273,6 +351,16 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
+  public handleTemplateSaveSuccess()
+  {
+    this.setState({
+      showResponseModal: true,
+      responseModalContent: 'Successfully saved template: "' + this.state.saveTemplateName + '"',
+      responseModalTitle: 'Template Saved',
+      responseModalError: false,
+    });
+  }
+
   public handleSaveTemplate()
   {
     const { appliedTemplateName, saveTemplateName } = this.state;
@@ -286,11 +374,16 @@ class FileImportPreview extends TerrainComponent<Props>
       this.showUpdateTemplate();
       return;
     }
-    Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting);
+    Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess);
     this.setState({
       showingSaveTemplate: false,
       appliedTemplateName: saveTemplateName,
     });
+
+    if (this.confirmedLeave)
+    {
+      this.hideSaveTemplate();
+    }
   }
 
   public handleAdvanced()
@@ -303,21 +396,66 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.togglePreviewColumn(this.state.advancedCheck);
   }
 
+  public handleUpdateTemplateSuccess(templateName: string)
+  {
+    this.setState({
+      showResponseModal: true,
+      responseModalContent: 'Successfully updated template: "' + templateName + '"',
+      responseModalTitle: 'Template Updated',
+      responseModalError: false,
+    });
+  }
+
+  public handleUpdateTemplateError(error: string)
+  {
+    this.setState({
+      showResponseModal: true,
+      responseModalContent: 'Error updating template: ' + error,
+      responseModalTitle: 'Could not update template',
+      responseModalError: true,
+    });
+  }
+
   public handleUpdateTemplate()
   {
     const { appliedTemplateName, saveTemplateName } = this.state;
     const id = getTemplateId(this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName));
-    Actions.updateTemplate(id, this.props.exporting);
+    Actions.updateTemplate(id, this.props.exporting, this.handleUpdateTemplateSuccess, this.handleUpdateTemplateError, saveTemplateName);
     this.setState({
       showingSaveTemplate: false,
       appliedTemplateName: saveTemplateName,
     });
   }
 
+  public handleDeleteTemplateError(error: string)
+  {
+    this.setState({
+      showResponseModal: true,
+      responseModalContent: 'Error deleting template: ' + error,
+      responseModalTitle: 'Could not delete template',
+      responseModalError: true,
+    });
+  }
+
+  public handleDeleteTemplateSuccess(templateName: string)
+  {
+    this.setState({
+      showResponseModal: true,
+      responseModalContent: 'Successfully deleted template: "' + templateName + '"',
+      responseModalTitle: 'Template Deleted',
+      responseModalError: false,
+    });
+  }
+
   public handleDeleteTemplate(itemIndex: number)
   {
     const templateName = this.state.templateOptions.get(itemIndex);
-    Actions.deleteTemplate(getTemplateId(templateName), this.props.exporting);
+    Actions.deleteTemplate(
+      getTemplateId(templateName),
+      this.props.exporting,
+      this.handleDeleteTemplateSuccess,
+      this.handleDeleteTemplateError,
+      templateName);
   }
 
   public handleApplyTemplate(itemIndex: number)
@@ -432,8 +570,31 @@ class FileImportPreview extends TerrainComponent<Props>
     Actions.changePrimaryKeyDelimiter(delim);
   }
 
+  public handleFileExportSuccess()
+  {
+    console.log('success');
+    const filename = this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype;
+    this.setState({
+      showResponseModal: true,
+      responseModalContent: 'Successfully exported data to ' + filename,
+      responseModalTitle: 'Data Exported',
+      responseModalError: false,
+    });
+  }
+
+  public handleFileExportError(error: string)
+  {
+    this.setState({
+      showResponseModal: true,
+      responseModalContent: 'Error exporting data: ' + error,
+      responseModalTitle: 'Could not export data',
+      responseModalError: true,
+    });
+  }
+
   public handleUploadFile()
   {
+    this.confirmedLeave = true;
     if (this.props.exporting)
     {
       const dbName = JSON.parse(this.props.query)['index'];
@@ -442,12 +603,18 @@ class FileImportPreview extends TerrainComponent<Props>
         this.setError('Index must be selected in order to export results');
         return;
       }
-      Actions.exportFile(this.props.query, this.props.serverId, dbName, this.props.exportRank,
-        this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype);
+      Actions.exportFile(
+        this.props.query,
+        this.props.serverId,
+        dbName,
+        this.props.exportRank,
+        this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,
+        this.handleFileExportSuccess,
+        this.handleFileExportError);
     }
     else
     {
-      Actions.importFile();
+      Actions.importFile(this.props.handleFileImportSuccess);
     }
   }
 
@@ -495,7 +662,7 @@ class FileImportPreview extends TerrainComponent<Props>
         children={
           <TemplateList
             items={this.state.templateOptions}
-            title={'Select a Template to Apply'}
+            title={this.state.templateOptions.size > 0 ? 'Select a template to apply' : 'There are no templates to apply'}
             onDelete={this.handleDeleteTemplate}
             onApply={this.handleApplyTemplate}
             confirmDelete={true}
@@ -944,7 +1111,7 @@ class FileImportPreview extends TerrainComponent<Props>
               <div
                 className='fi-preview-update-button-header-title'
               >
-                Join Data
+                Merge Data
               </div>
             </div>
             <div
@@ -985,6 +1152,7 @@ class FileImportPreview extends TerrainComponent<Props>
       </div>
     );
   }
+
   public renderBottomBar()
   {
     return (
@@ -992,11 +1160,31 @@ class FileImportPreview extends TerrainComponent<Props>
         className='flex-container fi-import-button-wrapper'
       >
         {
-          !this.props.exporting &&
+          !this.props.exporting && this.props.existingIndexAndType &&
           this.renderUpdate()
         }
         {this.renderUpload()}
       </div>
+    );
+  }
+
+  public closeResponseModal()
+  {
+    this.setState({
+      showResponseModal: false,
+    });
+  }
+
+  public renderResponseModal()
+  {
+    return (
+      <Modal
+        open={this.state.showResponseModal}
+        message={this.state.responseModalContent}
+        onClose={this.closeResponseModal}
+        title={this.state.responseModalTitle}
+        error={this.state.responseModalError}
+      />
     );
   }
 
@@ -1054,8 +1242,20 @@ class FileImportPreview extends TerrainComponent<Props>
               {this.renderAdvancedModal()}
               {this.renderAddColumn()}
               {this.renderError()}
+              {this.renderResponseModal()}
             </div>
         }
+        <Modal
+          open={this.state.leaving}
+          message={'Save changes before leaving?'}
+          title='Unsaved Changes'
+          confirmButtonText='Save'
+          confirm={true}
+          onClose={this.handleModalCancel}
+          onConfirm={this.handleModalSave}
+          thirdButtonText="Don't Save"
+          onThirdButton={this.handleModalDontSave}
+        />
       </div>
     );
   }

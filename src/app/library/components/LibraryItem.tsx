@@ -67,8 +67,10 @@ export interface Props
   name: string;
   onDuplicate: (id: ID) => void;
   onArchive: (id: ID) => void;
+  onUnarchive: (id: ID) => void;
   canArchive: boolean;
   canDuplicate: boolean;
+  canUnarchive: boolean;
   icon: any;
   to?: string;
   type: string;
@@ -146,6 +148,17 @@ class LibraryItem extends TerrainComponent<Props>
         onClick: this.handleArchive,
       },
     ]),
+    unarchive:
+    List([
+      {
+        text: 'Rename',
+        onClick: this.showTextfield,
+      },
+      {
+        text: 'Unarchive',
+        onClick: this.handleUnarchive,
+      },
+    ]),
     duplicateArchive:
     List([
       {
@@ -198,6 +211,11 @@ class LibraryItem extends TerrainComponent<Props>
   public handleArchive()
   {
     this.props.onArchive(this.props.id);
+  }
+
+  public handleUnarchive()
+  {
+    this.props.onUnarchive(this.props.id);
   }
 
   public handleKeyDown(event)
@@ -274,13 +292,16 @@ class LibraryItem extends TerrainComponent<Props>
     const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging, isSelected } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
 
-    const { canArchive, canDuplicate } = this.props;
+    const { canArchive, canDuplicate, canUnarchive } = this.props;
     const menuOptions =
       (canArchive && canDuplicate) ? this.menuOptions.duplicateArchive :
         (
           canArchive ? this.menuOptions.archive :
             (
-              canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
+              canUnarchive ? this.menuOptions.unarchive :
+                (
+                  canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
+                )
             )
         );
 

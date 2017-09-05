@@ -51,6 +51,7 @@ import './CardStyle.less';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { DragSource } from 'react-dnd';
 
@@ -60,6 +61,7 @@ import { Card } from '../../../../blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
+import DragHandle from './../../../common/components/DragHandle';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
@@ -84,7 +86,7 @@ const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
 
 // title width when we don't show a title
-const NO_TITLE_WIDTH = 58;
+const NO_TITLE_WIDTH = 74;
 
 export interface Props
 {
@@ -110,6 +112,7 @@ export interface Props
   handleCardDrop?: (type: string) => any;
 }
 
+@Radium
 class _CardComponent extends TerrainComponent<Props>
 {
   public state: {
@@ -570,13 +573,13 @@ class _CardComponent extends TerrainComponent<Props>
               {
                 this.props.canEdit &&
                 !card['cannotBeMoved'] &&
-                connectDragSource(
-                  <div
-                    className='card-handle-icon'
-                  >
-                    <HandleIcon />
-                  </div>,
-                )
+                <div className='card-drag-handle'>
+                  <DragHandle
+                    hiddenByDefault={!this.state.hovering}
+                    connectDragSource={connectDragSource}
+                    key={'handle-' + (this.props.card !== undefined ? this.props.card.id : Math.random())}
+                  />
+                </div>
               }
               {
                 this.state.hovering &&
@@ -629,7 +632,7 @@ class _CardComponent extends TerrainComponent<Props>
                       interactive: true,
                       theme: 'faded',
                       delay: 0,
-                    }
+                    },
                   )
                 }
               </div>

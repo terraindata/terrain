@@ -54,9 +54,7 @@ import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './TemplateList.less';
 
-const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 const TrashIcon = require('./../../../images/icon_trash.svg');
-const ArrowIcon = require('./../../../images/icon_carrot.svg');
 
 export interface Props
 {
@@ -75,13 +73,29 @@ class TemplateList extends TerrainComponent<Props>
     selectedIndex: number,
     modalOpen: boolean,
     deleteIndex: number,
+    errorMsg: string,
   } = {
     selectedIndex: -1,
     modalOpen: false,
     deleteIndex: -1,
+    errorMsg: '',
   };
 
-  public hideModal()
+  public setErrorMsg(errorMsg: string)
+  {
+    this.setState({
+      errorMsg,
+    });
+  }
+
+  public hideErrorModal()
+  {
+    this.setState({
+      errorMsg: '',
+    });
+  }
+
+  public hideDeleteErrorModal()
   {
     this.setState({
       modalOpen: false,
@@ -140,13 +154,13 @@ class TemplateList extends TerrainComponent<Props>
       return (
         <div
           className='list-apply button'
-          onClick={this._fn(this.handleApply)}
-          style={this.state.selectedIndex !== -1 ?
-            buttonColors()
-            :
+          onClick={this.state.selectedIndex === -1 ? this._fn(this.setErrorMsg, 'Select a template to apply') : this._fn(this.handleApply)}
+          style={this.state.selectedIndex === -1 ?
             {
               background: Colors().bg3,
             }
+            :
+            buttonColors()
           }
         >
           Apply
@@ -157,65 +171,61 @@ class TemplateList extends TerrainComponent<Props>
 
   public renderList()
   {
-    if (this.props.items.size === 0)
-    {
-      return (
-        <div
-          className='list-empty'
-          style={{
-            color: Colors().text1,
-          }}
-        >
-          There are no templates to apply
-        </div>
-      );
-    }
-    else
-    {
-      return (
-        <div
-          className='flex-container list-items'
-        >
-          {
-            this.props.items.map((item, index) =>
+    return (
+      <div
+        className='flex-container list-items'
+      >
+        {
+          this.props.items.map((item, index) =>
+            <div
+              className={classNames({
+                'clickable list-items-item': true,
+                'list-items-item-selected': index === this.state.selectedIndex,
+              })}
+              onClick={this._fn(this.handleSelectOption, index)}
+              style={{
+                background: Colors().bg3,
+                color: Colors().text1,
+              }}
+              key={index}
+            >
               <div
-                className={classNames({
-                  'clickable list-items-item': true,
-                  'list-items-item-selected': index === this.state.selectedIndex,
-                })}
-                onClick={this._fn(this.handleSelectOption, index)}
-                style={{
-                  background: Colors().bg3,
-                  color: Colors().text1,
-                }}
-                key={index}
+                className='flex-container list-items-item-wrapper'
               >
-                <div
-                  className='flex-container list-items-item-wrapper'
-                >
-                  {
-                    item
-                  }
-                  <TrashIcon
-                    onClick={this._fn(this.handleDelete, index)}
-                    className='delete-list-item'
-                  />
-                </div>
-              </div>,
-            )
-          }
-        </div>
-      );
-    }
+                {
+                  item
+                }
+                <TrashIcon
+                  onClick={this._fn(this.handleDelete, index)}
+                  className='delete-list-item'
+                />
+              </div>
+            </div>,
+          )
+        }
+      </div>
+    );
   }
 
   public renderError()
   {
     return (
       <Modal
+        open={this.state.errorMsg !== ''}
+        message={this.state.errorMsg}
+        onClose={this.hideErrorModal}
+        error={true}
+      />
+    );
+  }
+
+  public renderDeleteError()
+  {
+    return (
+      <Modal
         open={this.state.modalOpen}
         message={'Are you sure you want to delete template ' + this.props.items.get(this.state.deleteIndex) + '?'}
-        onClose={this.hideModal}
+        onClose={this.hideDeleteErrorModal}
         confirm={true}
         onConfirm={this._fn(this.props.onDelete, this.state.deleteIndex)}
       />
@@ -233,6 +243,7 @@ class TemplateList extends TerrainComponent<Props>
         {this.renderList()}
         {this.renderApply()}
         {this.renderError()}
+        {this.renderDeleteError()}
       </div>
     );
   }

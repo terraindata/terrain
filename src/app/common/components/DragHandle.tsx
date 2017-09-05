@@ -44,105 +44,76 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
+// tslint:disable:no-var-requires
 
-import './LibraryItemCategory.less';
-
+import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
-import { DropTarget } from 'react-dnd';
-import { ItemStatus } from '../../../items/types/Item';
+import { Colors, getStyle } from '../../common/Colors';
+import StyleTag from '../../common/components/StyleTag';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import './DragHandleStyle.less';
+
+const Handle = require('./../../../images/icon_drag_1.svg');
 
 export interface Props
 {
-  status: string;
-  type: string;
-  onHover: (status: string, id: ID) => void;
-  onDrop?: (status: string, id: ID) => void;
-  connectDropTarget?: (c: any) => any;
-  titleHidden?: boolean;
-  dropDisabled?: boolean;
+  id?: number;
+  hiddenByDefault?: boolean;
+  showWhenHoveringClassName?: string;
+  useAltColor?: boolean;
+  connectDragSource?: (el: El) => El;
 }
 
-class LibraryItemCategory extends TerrainComponent<Props>
+@Radium
+class DragHandle extends TerrainComponent<Props>
 {
-  public state = {
-    open: true,
-  };
-
-  constructor(props: Props)
+  public renderHandle(dragHandleStyle)
   {
-    super(props);
-    this.state.open = props.status !== ItemStatus.Archive;
-  }
-
-  public toggleOpen()
-  {
-    this.setState({
-      open: !this.state.open,
-    });
+    return (
+      <div
+        key={this.props.id}
+        style={{
+          'opacity': this.props.hiddenByDefault ? 0 : 0.85,
+          ':hover': {
+            opacity: 0.85,
+          },
+        }}
+      >
+        <Handle className='drag-icon' />
+        <StyleTag style={dragHandleStyle} />
+      </div>
+    );
   }
 
   public render()
   {
-    return this.props.connectDropTarget(
-      <div className={`library-category library-category-${this.props.status} library-category-${this.state.open ? 'open' : 'closed'}`}>
-        {!this.props.titleHidden &&
-          <div className='library-category-title' onClick={this.toggleOpen}>
-            <div className='library-category-title-symbol' />
-            <div className='library-category-title-text'>
-              {
-                this.props.status
-              }
-            </div>
-          </div>
-        }
-        <div className='library-category-content'>
-          {this.props['children']}
-        </div>
-      </div>,
+    const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
+
+    // TODO: Find a way to only generate these styles once for the whole app
+    const dragHandleStyle = {
+      '.drag-icon': {
+        fill: this.props.useAltColor ? Colors().altText2 : Colors().text2,
+      },
+      '.drag-icon:hover': {
+        fill: Colors().inactiveHover,
+      },
+      '.drag-icon:active': {
+        fill: Colors().active,
+      },
+      ['.' + hoveringClassName]: {
+        opacity: '0.85 !important' as any,
+      },
+    };
+
+    return (
+      (
+        this.props.connectDragSource !== undefined ?
+          this.props.connectDragSource(this.renderHandle(dragHandleStyle)) :
+          this.renderHandle(dragHandleStyle)
+      )
     );
   }
 }
 
-const canDrop = (props, monitor) =>
-{
-  const itemType = monitor.getItem().type;
-  if (itemType !== props.type)
-  {
-    return false;
-  }
-
-  return !props.dropDisabled;
-};
-const target =
-  {
-    canDrop,
-
-    hover(props, monitor, component)
-    {
-      if (canDrop(props, monitor))
-      {
-        const item = monitor.getItem();
-        props.onHover(props.status, item.id);
-      }
-    },
-
-    drop(props, monitor, component)
-    {
-      const item = monitor.getItem();
-      if (props.onDrop)
-      {
-        props.onDrop(props.status, item.id);
-      }
-    },
-  };
-
-const dropCollect = (connect, monitor) =>
-  ({
-    connectDropTarget: connect.dropTarget(),
-  });
-
-const LIC = DropTarget('BROWSER', target, dropCollect)(LibraryItemCategory) as any;
-
-export default LIC;
+export default DragHandle;

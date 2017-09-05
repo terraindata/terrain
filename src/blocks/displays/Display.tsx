@@ -87,7 +87,7 @@ export interface Display
   // for dropdown
   options?: List<(string | El)>;
   centerDropdown?: boolean;
-  optionsDisplayName?: Map<any, string>; // maps value to display name
+  optionsDisplayName?: Immutable.Map<any, string>; // maps value to display name
   dropdownUsesRawValues?: boolean; // use the raw values, instead of the indices
   dropdownTooltips?: List<any>;
 
