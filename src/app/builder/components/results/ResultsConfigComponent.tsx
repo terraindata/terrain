@@ -468,7 +468,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
   {
     const format = this.props.format || _Format({
       type: 'text',
-      template: '',
+      template: '\"[value]\"',
       showRaw: false,
       showField: true,
     });
@@ -609,11 +609,10 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
                 style={borderColor(Colors().border1)}
                 value={format ? format.template : ''}
                 onChange={this.handleTemplateChange}
-                placeholder={'http://web.com/img/[value].png'}
               />
             </div>
             <div>
-              <em>"[value]" inserts the value of {this.props.field}</em>
+              <em>For example: http://example.com/[value].png or "[value]" which inserts the value of {this.props.field}</em>
             </div>
             <div className='results-config-field-value'>
               <input
