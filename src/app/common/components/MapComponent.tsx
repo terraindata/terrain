@@ -47,32 +47,53 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import * as classNames from 'classnames';
-import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './MapComponentStyle.less';
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import GoogleMap from 'google-map-react';
+import { divIcon } from 'leaflet';
+import * as React from 'react';
+import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
+
+import TerrainComponent from './../../common/components/TerrainComponent';
+import CheckBox from './CheckBox';
+import './MapComponentStyle.less';
 
 export interface Props
 {
-  location?: [number, number];
-  address?: string;
+  location: [number, number];
+  address: string;
+  onChange: (value) => void;
 }
+
+const markerIcon = divIcon({
+  html: `<?xml version="1.0" encoding="iso-8859-1"?><!-- Generator: Adobe Illustrator 16.0.0,
+    SVG Export Plug-In . SVG Version: 6.00 Build 0)
+    --><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+    "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class='map-marker-icon' version="1.1" id="Capa_1"
+    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
+    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+    <g><path d="M256,0C167.641,0,96,71.625,96,160c0,24.75,5.625,48.219,15.672,69.125C112.234,230.313,256,512,256,512l142.594-279.375
+    C409.719,210.844,416,186.156,416,160C416,71.625,344.375,0,256,0z M256,256c-53.016,0-96-43-96-96s42.984-96,96-96
+    c53,0,96,43,96,96S309,256,256,256z"/>
+    </g></svg>
+`,
+  iconSize: [40, 40],
+  className: 'map-marker-container',
+});
 
 class MapComponent extends TerrainComponent<Props>
 {
+
   public state: {
     address: string,
-    latitude: number,
-    longitude: number,
+    searchByCoordinate: boolean,
+    error?: any,
   } = {
-     address: '524 Ramona Street',
-     latitude: 0.0,
-     longitude: 0.0,
+    address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
+    searchByCoordinate: false,
+    error: null,
   };
 
-public onAddressChange(address: string)
+  public onAddressChange(address: string)
   {
     this.setState({ address });
   }
@@ -81,34 +102,58 @@ public onAddressChange(address: string)
   {
     geocodeByAddress(this.state.address)
       .then((results) => getLatLng(results[0]))
-      .then((latLng) => this.setState({ latitude: latLng.lat, longitude: latLng.lng }))
-      .catch((error) => console.log('Error', error));
+      .then((latLng) => this.props.onChange({ location: [latLng.lat, latLng.lng], address: this.state.address }))
+      .catch((error) => this.setState({ error }));
+  }
+
+  public changeSearchMode()
+  {
+    this.setState({
+      searchByCoordinate: !this.state.searchByCoordinate,
+    });
   }
 
   public render()
   {
-     const inputProps = {
-        value: this.state.address,
-        onChange: this.onAddressChange,
-      };
-      return (
-        <div>
-          <form onSubmit={this.handleFormSubmit}>
-            <PlacesAutocomplete
-              inputProps={inputProps}
-              onEnterKeyDown={this.handleFormSubmit}
-            />
-          </form>
-          <div className='input-map-wrapper'>
-            <Map center={[this.state.latitude, this.state.longitude]} zoom={18}>
-              <TileLayer
-                url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              />
-            </Map>
-          </div>
+    const inputProps = {
+      value: this.state.address,
+      onChange: this.onAddressChange,
+    };
+    return (
+      <div>
+        <form onSubmit={this.handleFormSubmit}>
+          <PlacesAutocomplete
+            inputProps={inputProps}
+            onEnterKeyDown={this.handleFormSubmit}
+          />
+        </form>
+        <div className='input-map-search-settings-row' >
+          <CheckBox
+            checked={this.state.searchByCoordinate}
+            onChange={this.changeSearchMode}
+          />
+          <label>
+            Search by coordinate
+            </label>
         </div>
-      );
+        <div className='input-map-wrapper'>
+          <Map center={this.props.location} zoom={18}>
+            <Marker
+              position={this.props.location}
+              icon={markerIcon}
+            >
+              <Popup>
+                <span>{this.props.address}</span>
+              </Popup>
+            </Marker>
+            <TileLayer
+              url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            />
+          </Map>
+        </div>
+      </div>
+    );
   }
 }
 

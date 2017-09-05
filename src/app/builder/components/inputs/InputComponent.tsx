@@ -72,7 +72,7 @@ import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-au
 =======
 >>>>>>> in progress
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
-import MapComponent from '../../../common/components/MapComponent.tsx';
+import MapComponent from '../../../common/components/MapComponent';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -235,9 +235,17 @@ class InputComponent extends TerrainComponent<Props>
 
     if (this.props.input.inputType === InputType.LOCATION)
     {
+      let value = this.props.input.value;
+      if (this.props.input.value.toJS !== undefined)
+      {
+        value = this.props.input.value.toJS();
+      }
       return (
-        <MapComponent 
-        />)
+        <MapComponent
+          onChange={this.changeValue}
+          address={value.address}
+          location={value.location}
+        />);
     }
 
     return (
