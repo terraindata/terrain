@@ -136,7 +136,7 @@
     "react-dnd-html5-backend": "^2.1.2",
     "react-dnd-text-dragpreview": "^0.2.3",
     "react-dom": "^15.0.1",
-    "react-leaflet": "^1.6.3",
+    "react-leaflet": "^1.6.5",
     "react-modal": "^1.4.0",
     "react-places-autocomplete": "^5.4.2",
     "react-redux": "^5.0.5",
