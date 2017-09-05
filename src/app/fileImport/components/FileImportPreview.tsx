@@ -230,7 +230,7 @@ class FileImportPreview extends TerrainComponent<Props>
     return true;
   }
 
-  public setError(msg: string)
+  public setPreviewErrorMsg(msg: string)
   {
     this.setState({
       previewErrorMsg: msg,
@@ -364,7 +364,7 @@ class FileImportPreview extends TerrainComponent<Props>
     const { appliedTemplateName, saveTemplateName } = this.state;
     if (!saveTemplateName)
     {
-      Actions.setErrorMsg('Please enter a template name');
+      this.setPreviewErrorMsg('Please enter a template name');
       return;
     }
     if (this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName))
@@ -479,13 +479,14 @@ class FileImportPreview extends TerrainComponent<Props>
     });
     if (!isCompatible)
     {
-      Actions.setErrorMsg('Incompatible template. Template does not contain columns: ' + JSON.stringify(missingTableCols));
+      this.setPreviewErrorMsg('Incompatible template. Template does not contain columns: ' + JSON.stringify(missingTableCols));
       return;
     }
     // only allowed to add additional columns when importing JSON files and no strict checking
     if ((this.props.filetype !== 'json' || this.props.requireJSONHaveAllFields) && unmatchedTemplateCols.size > 0)
     {
-      Actions.setErrorMsg('Incompatible template. Template contains extra columns: ' + JSON.stringify(Array.from(unmatchedTemplateCols)));
+      this.setPreviewErrorMsg('Incompatible template. Template contains extra columns: ' +
+        JSON.stringify(Array.from(unmatchedTemplateCols)));
       return;
     }
 
@@ -503,7 +504,7 @@ class FileImportPreview extends TerrainComponent<Props>
     // otherwise, if the name has actually changed - set the new name and add the rename transform and return true
     if (this.props.columnNames.delete(columnId).contains(localColumnName))
     {
-      Actions.setErrorMsg('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
+      this.setPreviewErrorMsg('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
       return false;
     }
 
@@ -562,7 +563,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (delim === '')
     {
-      Actions.setErrorMsg('Primary key delimiter cannot be empty string');
+      this.setPreviewErrorMsg('Primary key delimiter cannot be empty string');
       return;
     }
     Actions.changePrimaryKeyDelimiter(delim);
@@ -598,7 +599,7 @@ class FileImportPreview extends TerrainComponent<Props>
       const dbName = JSON.parse(this.props.query)['index'];
       if (dbName === undefined || dbName === '')
       {
-        this.setError('Index must be selected in order to export results');
+        this.setPreviewErrorMsg('Index must be selected in order to export results');
         return;
       }
       Actions.exportFile(
@@ -628,12 +629,12 @@ class FileImportPreview extends TerrainComponent<Props>
     const { addColumnName } = this.state;
     if (!addColumnName)
     {
-      Actions.setErrorMsg('Please enter a new column name');
+      this.setPreviewErrorMsg('Please enter a new column name');
       return;
     }
     if (this.props.columnNames.includes(addColumnName))
     {
-      Actions.setErrorMsg('Column name already in use');
+      this.setPreviewErrorMsg('Column name already in use');
       return;
     }
     Actions.addPreviewColumn(addColumnName);
@@ -866,6 +867,7 @@ class FileImportPreview extends TerrainComponent<Props>
         columnNames={this.props.columnNames}
         datatype={this.props.columnTypes.get(this.state.columnId).type}
         onClose={this.hideTransformModal}
+        setErrorMsg={this.setPreviewErrorMsg}
       />
     );
   }
@@ -1013,7 +1015,7 @@ class FileImportPreview extends TerrainComponent<Props>
     const upload =
       <div
         className='fi-preview-import-button large-button'
-        onClick={this.handleUploadFile}
+        onClick={this.props.uploadInProgress ? this._fn(this.setPreviewErrorMsg, 'import in progress') : this.handleUploadFile}
         style={{
           color: Colors().import,
           border: 'solid 1px ' + Colors().import,
@@ -1184,7 +1186,7 @@ class FileImportPreview extends TerrainComponent<Props>
           open={!!previewErrorMsg}
           message={previewErrorMsg}
           error={true}
-          onClose={this._fn(this.setError, '')}
+          onClose={this._fn(this.setPreviewErrorMsg, '')}
         />
       );
     }
