@@ -209,7 +209,7 @@ class InputComponent extends TerrainComponent<Props>
     return (
       <BuilderTextbox
         canEdit={true}
-        value={this.props.input.value}
+        value={typeof this.props.input.value !== 'string' ? this.props.input.value.address : this.props.input.value}
         className='input-text input-text-second'
         keyPath={this.getKeyPath('value')}
         isNumber={this.props.input.inputType === InputType.NUMBER}
