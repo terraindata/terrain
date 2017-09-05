@@ -51,9 +51,10 @@ import GoogleMap from 'google-map-react';
 import { divIcon } from 'leaflet';
 import * as React from 'react';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
+import PlacesAutocomplete, { geocodeByAddress, geocodeByLatLng, getLatLng } from 'react-places-autocomplete';
 
 import TerrainComponent from './../../common/components/TerrainComponent';
+import BuilderTextbox from './BuilderTextbox';
 import CheckBox from './CheckBox';
 import './MapComponentStyle.less';
 
@@ -62,6 +63,7 @@ export interface Props
   location: [number, number];
   address: string;
   onChange: (value) => void;
+  markLocation: boolean;
 }
 
 const markerIcon = divIcon({
@@ -87,11 +89,32 @@ class MapComponent extends TerrainComponent<Props>
     address: string,
     searchByCoordinate: boolean,
     error?: any,
+    latitude: string,
+    longitude: string,
   } = {
     address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
     searchByCoordinate: false,
     error: null,
+    latitude: this.props.location !== undefined ? this.props.location[0].toString() : '',
+    longitude: this.props.location !== undefined ? this.props.location[1].toString() : '',
   };
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (this.props.address !== nextProps.address)
+    {
+      this.setState({
+        address: nextProps.address,
+      });
+    }
+    if (this.props.location !== nextProps.location)
+    {
+      this.setState({
+        latitude: nextProps.location[0].toString(),
+        longitude: nextProps.location[1].toString(),
+      });
+    }
+  }
 
   public onAddressChange(address: string)
   {
@@ -113,20 +136,86 @@ class MapComponent extends TerrainComponent<Props>
     });
   }
 
+  public handleCoordinateFormSubmit(e)
+  {
+    if (e.key === 'Enter')
+    {
+      const lat = parseFloat(this.state.latitude);
+      const lng = parseFloat(this.state.longitude);
+      geocodeByLatLng({ lat, lng })
+        .then((results: any) =>
+        {
+          if (results[0] === undefined)
+          {
+            this.setState({
+              error: 'No results for the coordinates entered',
+            });
+          }
+          else
+          {
+            this.props.onChange({ location: [lat, lng], address: results[0].formatted_address });
+          }
+        })
+        .catch((error) => this.setState({ error }));
+    }
+  }
+
+  // TODO CHECK IF THEY ARE NUMBERS
+  public handleLatitudeChange(e)
+  {
+    this.setState({
+      latitude: e.target.value,
+    });
+  }
+
+  public handleLongitudeChange(e)
+  {
+    this.setState({
+      longitude: e.target.value,
+    });
+  }
+
+  public renderCoordinateInputs()
+  {
+    return (
+      <div>
+        <input
+          type='text'
+          value={this.state.latitude}
+          placeholder={'Latitude'}
+          onChange={this.handleLatitudeChange}
+          onKeyPress={this.handleCoordinateFormSubmit}
+        />
+        <input
+          type='text'
+          value={this.state.longitude}
+          placeholder={'Latitude'}
+          onChange={this.handleLongitudeChange}
+          onKeyPress={this.handleCoordinateFormSubmit}
+        />
+      </div>
+    );
+  }
+
   public render()
   {
     const inputProps = {
       value: this.state.address,
       onChange: this.onAddressChange,
     };
+
     return (
       <div>
-        <form onSubmit={this.handleFormSubmit}>
-          <PlacesAutocomplete
-            inputProps={inputProps}
-            onEnterKeyDown={this.handleFormSubmit}
-          />
-        </form>
+        {this.state.searchByCoordinate ?
+          this.renderCoordinateInputs()
+          :
+          <form onSubmit={this.handleFormSubmit}>
+            <PlacesAutocomplete
+              inputProps={inputProps}
+              onEnterKeyDown={this.handleFormSubmit}
+            />
+          </form>
+        }
         <div className='input-map-search-settings-row' >
           <CheckBox
             checked={this.state.searchByCoordinate}
@@ -138,14 +227,19 @@ class MapComponent extends TerrainComponent<Props>
         </div>
         <div className='input-map-wrapper'>
           <Map center={this.props.location} zoom={18}>
-            <Marker
-              position={this.props.location}
-              icon={markerIcon}
-            >
-              <Popup>
-                <span>{this.props.address}</span>
-              </Popup>
-            </Marker>
+            {
+              this.props.markLocation ?
+                <Marker
+                  position={this.props.location}
+                  icon={markerIcon}
+                >
+                  <Popup>
+                    <span>{this.props.address}</span>
+                  </Popup>
+                </Marker>
+                :
+                null
+            }
             <TileLayer
               url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
