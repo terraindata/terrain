@@ -435,7 +435,11 @@ export function ResultFormatValue(field: string, value: string | number, config:
     switch (format.type)
     {
       case 'image':
-        const url = format.template.replace(/\[value\]/g, value as string);
+        var url = format.template.replace(/\[value\]/g, value as string);
+        if (url === '')
+        {
+          url = value.toString();
+        }
         return (
           <div
             className='result-field-value-image-wrapper'
