@@ -57,7 +57,6 @@ import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
-import './MapComponentStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
 import MapComponent from '../../../common/components/MapComponent';
