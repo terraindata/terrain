@@ -60,7 +60,6 @@ import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
-import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { tooltip } from './../../common/components/tooltip/Tooltips';
 import Actions from './../data/FileImportActions';
@@ -81,36 +80,33 @@ type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 export interface Props
 {
+  exporting: boolean;
+  filetype: string;
   previewRows: List<List<string>>;
-  primaryKeys: List<number>;
-  primaryKeyDelimiter: string;
-
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
   columnTypes: List<ColumnTypesTree>;
-  filetype: string;
-  requireJSONHaveAllFields: boolean;
-
   columnOptions: List<string>;
   templates: List<Template>;
   transforms: List<Transform>;
+  requireJSONHaveAllFields: boolean;
 
-  uploadInProgress: boolean;
-  elasticUpdate: boolean;
-  exporting: boolean;
-  exportRank: boolean;
-
-  query?: string;
-  serverId?: number;
-  variantName?: string;
-  filesize?: number;
-
+  // import only
+  primaryKeys?: List<number>;
+  primaryKeyDelimiter?: string;
+  uploadInProgress?: boolean;
+  elasticUpdate?: boolean;
+  existingIndexAndType?: boolean;
   handleFileImportSuccess?: () => void;
-
+  showProgressBar?: boolean;
   router?: any;
   route?: any;
 
-  existingIndexAndType?: boolean;
+  // export only
+  exportRank?: boolean;
+  query?: string;
+  serverId?: number;
+  variantName?: string;
 }
 @Radium
 class FileImportPreview extends TerrainComponent<Props>
@@ -174,7 +170,10 @@ class FileImportPreview extends TerrainComponent<Props>
       templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
 
-    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    if (!this.props.exporting)
+    {
+      this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -971,7 +970,7 @@ class FileImportPreview extends TerrainComponent<Props>
         columnNames={this.props.columnNames}
         isIncluded={this.props.columnsToInclude.get(key)}
         columnType={this.props.columnTypes.get(key)}
-        isPrimaryKey={this.props.primaryKeys.includes(key)}
+        isPrimaryKey={this.props.exporting ? null : this.props.primaryKeys.includes(key)}
         columnOptions={this.props.columnOptions}
         exporting={this.props.exporting}
         onColumnNameChange={this.onColumnNameChange}
@@ -1040,7 +1039,7 @@ class FileImportPreview extends TerrainComponent<Props>
       this.props.exporting ?
         upload
         :
-        this.props.uploadInProgress && this.props.filesize > FileImportTypes.MIN_PROGRESSBAR_FILESIZE ?
+        this.props.uploadInProgress && this.props.showProgressBar ?
           <div className='fi-preview-loading-container'>
             <Loading
               width={100}

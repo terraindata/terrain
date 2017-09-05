@@ -530,31 +530,27 @@ column if you have customized the results view.');
 
   public renderExport()
   {
-    const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
-      filetype, requireJSONHaveAllFields, exportRank, elasticUpdate } = this.props.exportState;
+    const { previewRows, columnNames, columnsToInclude, columnTypes, templates, transforms,
+      filetype, requireJSONHaveAllFields, exportRank } = this.props.exportState;
 
     const content =
       <div
         style={{
-          background: 'black',  // TODO: black from Colors?
+          background: 'black', // TODO: black from Colors?
         }}
       >
         <FileImportPreview
+          exporting={true}
+          filetype={filetype}
           previewRows={previewRows}
-          primaryKeys={primaryKeys}
-          primaryKeyDelimiter={primaryKeyDelimiter}
           columnNames={columnNames}
           columnsToInclude={columnsToInclude}
           columnTypes={columnTypes}
           templates={templates}
           transforms={transforms}
           columnOptions={List([])}
-          uploadInProgress={false}
-          filetype={filetype}
           requireJSONHaveAllFields={requireJSONHaveAllFields}
           exportRank={exportRank}
-          elasticUpdate={elasticUpdate}
-          exporting={true}
           query={this.props.query.tql}
           serverId={Number(this.props.db.id)}
           variantName={this.props.variantName}

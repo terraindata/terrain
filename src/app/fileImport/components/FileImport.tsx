@@ -57,7 +57,7 @@ import { server } from '../../../../midway/src/Midway';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
-import { CSVTypeParser, parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
+import { CSVTypeParser, parseCSV, ParseCSVConfig, parseObjectListJSONSubset, parseNewlineJSONSubset } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -211,7 +211,7 @@ class FileImport extends TerrainComponent<any>
     let items: object[] = [];
     if (isNewlineSeparatedJSON)
     {
-      const newlineJSON: object[] | string = parseNewlineJSON(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+      const newlineJSON: object[] | string = parseNewlineJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
       if (typeof newlineJSON === 'string')
       {
         Actions.setErrorMsg(newlineJSON);
@@ -223,7 +223,7 @@ class FileImport extends TerrainComponent<any>
     {
       try
       {
-        items = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+        items = parseObjectListJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
       }
       catch (e)
       {
@@ -335,11 +335,11 @@ class FileImport extends TerrainComponent<any>
           _.range(columnNames.length);
 
       previewRows = items.map((item) =>
-        columnNamesToMap.map((value) =>
-          item[value] === undefined ?
+        columnNamesToMap.map((name) =>
+          item[name] === undefined ?
             ''
             :
-            typeof item[value] === 'string' ? item[value] : JSON.stringify(item[value]),
+            typeof item[name] === 'string' ? item[name] : JSON.stringify(item[name]),
         ),
       );
 
@@ -426,14 +426,14 @@ class FileImport extends TerrainComponent<any>
   {
     Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
-    this.parseFile(file, filetype, hasCsvHeader, false); // TODO: what happens on error?
+    this.parseFile(file, filetype, hasCsvHeader, false);
   }
 
   public handleJSONFormatChoice(isNewlineSeparatedJSON: boolean)
   {
     Actions.changeIsNewlineSeparatedJSON(isNewlineSeparatedJSON);
     const { file, filetype } = this.state.fileImportState;
-    this.parseFile(file, filetype, false, isNewlineSeparatedJSON); // TODO: what happens on error?
+    this.parseFile(file, filetype, false, isNewlineSeparatedJSON);
   }
 
   public handleSelectDb(dbName: string)
@@ -681,6 +681,7 @@ class FileImport extends TerrainComponent<any>
       case Steps.Preview:
         content =
           <FileImportPreview
+            exporting={false}
             previewRows={previewRows}
             primaryKeys={primaryKeys}
             primaryKeyDelimiter={primaryKeyDelimiter}
@@ -693,10 +694,8 @@ class FileImport extends TerrainComponent<any>
             uploadInProgress={uploadInProgress}
             filetype={filetype}
             requireJSONHaveAllFields={requireJSONHaveAllFields}
-            exportRank={exportRank}
             elasticUpdate={elasticUpdate}
-            exporting={false}
-            filesize={filesize}
+            showProgressBar={filesize > FileImportTypes.MIN_PROGRESSBAR_FILESIZE}
             handleFileImportSuccess={this.onFileImportSuccess}
             router={this.props.router}
             route={this.props.route}
