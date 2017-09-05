@@ -235,16 +235,22 @@ class InputComponent extends TerrainComponent<Props>
 
     if (this.props.input.inputType === InputType.LOCATION)
     {
-      let value = this.props.input.value;
-      if (this.props.input.value.toJS !== undefined)
+      let value = this.props.input.value.toJS !== undefined ? this.props.input.value.toJS() : this.props.input.value;
+      let markLocation: boolean = false;
+      if (value && value.location && value.address)
       {
-        value = this.props.input.value.toJS();
+        markLocation = true;
+      }
+      else
+      {
+        value = { location: [37.4449002, -122.16174969999997], address: '' };
       }
       return (
         <MapComponent
           onChange={this.changeValue}
           address={value.address}
           location={value.location}
+          markLocation={markLocation}
         />);
     }
 
