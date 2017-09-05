@@ -52,7 +52,7 @@ import { divIcon } from 'leaflet';
 import * as React from 'react';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
 import PlacesAutocomplete, { geocodeByAddress, geocodeByLatLng, getLatLng } from 'react-places-autocomplete';
-
+import { cardStyle, Colors, fontColor, getCardColors } from '../Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import BuilderTextbox from './BuilderTextbox';
 import CheckBox from './CheckBox';
@@ -178,7 +178,7 @@ class MapComponent extends TerrainComponent<Props>
   public renderCoordinateInputs()
   {
     return (
-      <div>
+      <div className='input-map-coordinates'>
         <input
           type='text'
           value={this.state.latitude}
@@ -187,6 +187,7 @@ class MapComponent extends TerrainComponent<Props>
           onKeyPress={this.handleCoordinateFormSubmit}
         />
         <input
+          className='input-map-longitude'
           type='text'
           value={this.state.longitude}
           placeholder={'Latitude'}
@@ -221,7 +222,7 @@ class MapComponent extends TerrainComponent<Props>
             checked={this.state.searchByCoordinate}
             onChange={this.changeSearchMode}
           />
-          <label>
+          <label onClick={this.changeSearchMode}>
             Search by coordinate
             </label>
         </div>
