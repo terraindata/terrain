@@ -151,8 +151,8 @@ class Builder extends TerrainComponent<Props>
 
   public confirmedLeave: boolean = false;
 
-  public unregisterLeaveHook1: any;
-  public unregisterLeaveHook2: any;
+  public unregisterLeaveHook1: any = () => { };
+  public unregisterLeaveHook2: any = () => { };
 
   constructor(props: Props)
   {
