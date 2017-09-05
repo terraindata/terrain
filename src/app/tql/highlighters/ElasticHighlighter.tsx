@@ -109,15 +109,19 @@ class ElasticHighlighter extends SyntaxHighlighter
         { line: token.toRow, ch: token.toCol },
         { className: style },
       );
-    }
-    for (const e of parser.getErrors())
-    {
-      const token = e.token;
-      const errorAnnotation: MarkerAnnotation = { showing: false, msg: e.message };
-      const marker = instance.markText(
-        { line: token.row, ch: token.col },
-        { line: token.toRow, ch: token.toCol },
-        { className: 'CodeMirror-lint-mark-error', __annotation: errorAnnotation });
+      if (token.errors.length > 0)
+      {
+        let message = 'Error:';
+        for (const e of token.errors)
+        {
+          message += '\n' + e.message;
+        }
+        const errorAnnotation: MarkerAnnotation = { showing: false, msg: message };
+        const errMarker = instance.markText(
+          { line: token.row, ch: token.col },
+          { line: token.toRow, ch: token.toCol + 1 },
+          { className: 'CodeMirror-lint-mark-error', __annotation: errorAnnotation });
+      }
     }
   }
 
