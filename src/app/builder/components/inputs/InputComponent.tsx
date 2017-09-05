@@ -57,12 +57,9 @@ import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
-import './MapComponentStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
-import GoogleMap from 'google-map-react';
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
+import MapComponent from '../../../common/components/MapComponent.tsx';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -120,19 +117,6 @@ class InputComponent extends TerrainComponent<Props>
         longitude: 0.0,
         focused: false,
       };
-  }
-
-  public onAddressChange(address: string)
-  {
-    this.setState({ address });
-  }
-
-  public handleFormSubmit()
-  {
-    geocodeByAddress(this.state.address)
-      .then((results) => getLatLng(results[0]))
-      .then((latLng) => this.setState({ latitude: latLng.lat, longitude: latLng.lng }))
-      .catch((error) => console.log('Error', error));
   }
 
   public getKeyPath(type?: string)
@@ -198,28 +182,9 @@ class InputComponent extends TerrainComponent<Props>
 
     if (this.props.input.inputType === InputType.LOCATION)
     {
-      const inputProps = {
-        value: this.state.address,
-        onChange: this.onAddressChange,
-      };
       return (
-        <div>
-          <form onSubmit={this.handleFormSubmit}>
-            <PlacesAutocomplete
-              inputProps={inputProps}
-              onEnterKeyDown={this.handleFormSubmit}
-            />
-          </form>
-          <div className='input-map-wrapper'>
-            <Map center={[this.state.latitude, this.state.longitude]} zoom={18}>
-              <TileLayer
-                url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-              />
-            </Map>
-          </div>
-        </div>
-      );
+        <MapComponent 
+        />)
     }
 
     return (
