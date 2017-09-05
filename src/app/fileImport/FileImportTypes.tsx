@@ -62,7 +62,7 @@ class FileImportStateC extends BaseClass
   public filetype: string = '';
   public filesize: number = 0;
 
-  public previewRows: List<List<string>> = List([]);
+  public previewColumns: List<List<string>> = List([]);
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
   public hasCsvHeader: boolean = false;

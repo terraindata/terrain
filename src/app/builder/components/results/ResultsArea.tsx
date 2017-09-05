@@ -530,7 +530,7 @@ column if you have customized the results view.');
 
   public renderExport()
   {
-    const { previewRows, columnNames, columnsToInclude, columnTypes, templates, transforms,
+    const { previewColumns, columnNames, columnsToInclude, columnTypes, templates, transforms,
       filetype, requireJSONHaveAllFields, exportRank } = this.props.exportState;
 
     const content =
@@ -542,7 +542,7 @@ column if you have customized the results view.');
         <FileImportPreview
           exporting={true}
           filetype={filetype}
-          previewRows={previewRows}
+          previewColumns={previewColumns}
           columnNames={columnNames}
           columnsToInclude={columnsToInclude}
           columnTypes={columnTypes}

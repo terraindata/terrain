@@ -222,9 +222,9 @@ export const elasticFilter = _card({
                 {
                   must: 'Must',
                   must_not: 'Must Not',
-                  'should': 'Should',
-                  filter: "Filter",
-                } as any
+                  should: 'Should',
+                  filter: 'Filter',
+                } as any,
               ),
               dropdownTooltips: List([
                 'A result must pass the equation you specify to be included in the final results.',

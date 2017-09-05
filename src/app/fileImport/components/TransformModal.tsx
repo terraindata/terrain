@@ -300,7 +300,7 @@ class TransformModal extends TerrainComponent<Props>
     }
 
     const transform: Transform = this.getTransform(transformName);
-    Actions.updatePreviewRows(transform);
+    Actions.updatePreviewColumns(transform);
     Actions.addTransform(transform);
     this.props.onClose();
   }

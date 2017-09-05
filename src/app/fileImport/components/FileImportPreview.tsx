@@ -67,7 +67,6 @@ import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
-import FileImportPreviewRow from './FileImportPreviewRow';
 import TransformModal from './TransformModal';
 
 const { List } = Immutable;
@@ -82,7 +81,7 @@ export interface Props
 {
   exporting: boolean;
   filetype: string;
-  previewRows: List<List<string>>;
+  previewColumns: List<List<string>>;
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
   columnTypes: List<ColumnTypesTree>;
@@ -965,6 +964,7 @@ class FileImportPreview extends TerrainComponent<Props>
     const previewColumns = this.props.columnNames.map((value, key) =>
       <FileImportPreviewColumn
         key={key}
+        items={this.props.previewColumns.get(key)}
         columnId={key}
         columnName={this.props.columnNames.get(key)}
         columnNames={this.props.columnNames}
@@ -1002,19 +1002,6 @@ class FileImportPreview extends TerrainComponent<Props>
         >
           {
             previewColumns
-          }
-        </div>
-        <div
-          className='fi-preview-rows-container'
-        >
-          {
-            this.props.previewRows.map((items, key) =>
-              <FileImportPreviewRow
-                key={key}
-                items={items}
-                columnsToInclude={this.props.columnsToInclude}
-              />,
-            )
           }
         </div>
       </div>
