@@ -353,6 +353,7 @@ FileImportReducers[ActionTypes.getStreamingProgress] =
         action.payload.setProgress(progress);
         if (progress !== 1)
         {
+          // TODO: avoid instantiating a new function every time
           setTimeout(() => { action.payload.getStreamingProgress(); }, FileImportTypes.PROGRESS_UPDATE_INTERVAL);
         }
       },

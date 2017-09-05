@@ -181,7 +181,7 @@ export const NUMBER_PREVIEW_ROWS = 5;
 export const PROGRESS_UPDATE_INTERVAL = 10000; // (10s) polling interval for streaming progress
 export const STREAMING_CHUNK_SIZE = 10000000; // (10mb) backend streaming chunk size
 export const PREVIEW_CHUNK_SIZE = 10000000; // (10mb) amount to read in order to extract preview rows
-export const MIN_PROGRESSBAR_FILESIZE = 500000; // (500kb) threshold to display progressbar (spinning wheel)
+export const MIN_PROGRESSBAR_FILESIZE = 500000; // (500kb) threshold to display progressbar
 
 export const FILE_TYPES =
   [

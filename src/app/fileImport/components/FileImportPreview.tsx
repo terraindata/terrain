@@ -598,6 +598,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     Actions.getStreamingProgress();
   }
+
   public manageProgress()
   {
     setTimeout(this._fn(this.getStreamingProgress), FileImportTypes.PROGRESS_UPDATE_INTERVAL);

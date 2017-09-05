@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access
+// tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
@@ -59,7 +59,6 @@ export interface Props
 {
   progress: number; // 0-1
   className?: string;
-  width?: number;
   color?: string;
   textColor?: string;
 }
@@ -81,7 +80,7 @@ class ProgressBar extends TerrainComponent<Props>
         })}
       >
         <div
-          className='progressbar-text'
+          className='flex-container progressbar-text'
         >
           <span
             className='progressbar-text-percentage'
@@ -97,7 +96,6 @@ class ProgressBar extends TerrainComponent<Props>
             'width': String(100 * this.props.progress) + '%',
             'backgroundColor': this.props.color || Colors().active,
             'color': this.props.textColor || Colors().text1,
-
             ':hover': {
               backgroundColor: Colors().inactiveHover,
               color: Colors().text1,

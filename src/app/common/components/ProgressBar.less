@@ -1,20 +1,17 @@
 @import "../../common/Common.less";
 
 @progressbar-height: 30px;
-@border-radius: 3px;
 
 .progressbar-wrapper {
   display: flex;
   cursor: pointer;
   text-align: center;
-  margin: 0px (@standard-margin / 2);
-  font-size: @font-size;
   flex-direction: column;
 
   .progressbar-text {
     height: @progressbar-height;
-    margin-bottom: 6px;
-    margin-top: 6px;
+    align-items: center;
+    justify-content: center;
   }
 
   .progressbar-progress {
