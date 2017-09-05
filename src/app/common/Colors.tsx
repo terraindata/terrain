@@ -61,9 +61,9 @@ interface Theme
 
   emptyBg: string; // special BG to denote "empty nothingness"
 
-  border1: string; // high contrast border
+  border1: string; // low contrast border
   border2: string; // medium contrast border
-  border3: string; // low contrast border
+  border3: string; // high contrast border
 
   text1: string; // most contrast
   text2: string;
@@ -98,6 +98,8 @@ interface Theme
   altScrollbarPiece: string;
 
   error: string;
+
+  import: string;
 
   // DO NOT USE these below colors anymore -- these need to be cleaned up
 
@@ -182,6 +184,7 @@ interface Theme
         compound: string,
         join: string,
         geo: string,
+        suggest: string,
         parameter: string,
       };
 
@@ -355,6 +358,8 @@ const DARK: Theme =
 
     error: '#d14f42',
 
+    import: '#1efab4',
+
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
     // text
@@ -433,14 +438,15 @@ const DARK: Theme =
         categories: {
           primary: '#4fc0ba',
           control: '#fad14b',
-          sort: '#5ed04b',
-          filter: '#d14f42',
+          sort: '#1eb4fa',
+          filter: '#38fa1e',
           match: '#b161bc',
           score: '#1eb4fa',
           script: '#4fc0ba',
           compound: '#fad14b',
           join: '#fad14b',
           geo: '#0ee06b',
+          suggest: '#bbfa1e',
           parameter: code.inputParameter,
         },
 
@@ -652,6 +658,18 @@ export function buttonColors()
   }
 
   return CACHE['buttonColors' + curTheme];
+}
+
+export function disabledButtonColors()
+{
+  if (!CACHE['disabledButtonColors' + curTheme])
+  {
+    CACHE['disabledButtonColors' + curTheme] = extend({},
+      backgroundColor(Colors().altBg2),
+      fontColor(Colors().altText3),
+    );
+  }
+  return CACHE['disabledButtonColors' + curTheme];
 }
 
 export function getStyle(style: string, color: string, hoverColor?: string): object

@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands radix prefer-const no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
 import { List, Map } from 'immutable';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
@@ -55,13 +54,11 @@ import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
 import Actions from '../../../fileImport/data/FileImportActions';
 import * as FileImportTypes from '../../../fileImport/FileImportTypes';
-import * as SchemaTypes from '../../../schema/SchemaTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
@@ -72,6 +69,7 @@ import { _Result, MAX_RESULTS, Result, Results, ResultsState } from './ResultTyp
 export interface Props
 {
   query: Query;
+  variantPath?: string;
   resultsState: ResultsState;
   db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
@@ -169,7 +167,10 @@ export class ResultsManager extends TerrainComponent<Props>
     this.mapQueries(
       (query) =>
       {
-        AjaxM1.killQuery(query.queryId);
+        if (this.props.db.source === 'm1')
+        {
+          AjaxM1.killQuery(query.queryId);
+        }
         query.xhr.abort();
       },
     );
@@ -177,26 +178,35 @@ export class ResultsManager extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (
-      nextProps.query
-      && nextProps.query.tql
-      && (!this.props.query ||
-        (
-          this.props.query.tql !== nextProps.query.tql ||
-          this.props.query.cards !== nextProps.query.cards ||
-          this.props.query.inputs !== nextProps.query.inputs
+    // TODO: the logic here is potentially broken since props appear to be updated at different times and are not consistent with eachother
+    if (this.props.db !== nextProps.db ||
+      (
+        nextProps.query
+        && nextProps.query.tql
+        && (!this.props.query ||
+          (
+            this.props.query.tql !== nextProps.query.tql ||
+            this.props.query.cards !== nextProps.query.cards ||
+            this.props.query.inputs !== nextProps.query.inputs
+          )
         )
       )
     )
     {
       this.queryResults(nextProps.query, nextProps.db);
-
       if (!this.props.query || nextProps.query.id !== this.props.query.id)
       {
         this.changeResults({
           results: List([]),
         });
       }
+    }
+
+    if (this.props.variantPath !== undefined && (this.props.variantPath !== nextProps.variantPath))
+    {
+      this.changeResults({
+        results: List([]),
+      });
     }
 
     if (nextProps.resultsState.results !== this.props.resultsState.results)
@@ -291,8 +301,8 @@ export class ResultsManager extends TerrainComponent<Props>
 
     if (exportChanges)
     {
-      const { filetype, preview, originalNames } = exportChanges;
-      Actions.chooseFile(filetype, preview, originalNames);
+      const { filetype, filesize, preview, originalNames } = exportChanges;
+      Actions.chooseFile(filetype, filesize, preview, originalNames);
     }
 
     this.props.onResultsStateChange(resultsState);
@@ -518,17 +528,16 @@ export class ResultsManager extends TerrainComponent<Props>
       changes['count'] = results.size;
     }
 
+    const filteredFields = List(_.filter(fields.toArray(), (val) => !(val.charAt(0) === '_')));
     const exportChanges: any = {
       filetype: 'csv',
-      originalNames: fields,
-      preview: Immutable.List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
-        Immutable.List(result.fields.valueSeq().toList().map((field) =>
-          field,
-        )),
+      originalNames: filteredFields,
+      preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
+        filteredFields.map((field, index) =>
+          result.fields.get(String(field)),
+        ),
       )),
     };
-    Actions.changeServerDbTable(Number(this.props.db.id), getIndex(), getType());
-
     this.changeResults(changes, exportChanges);
   }
 

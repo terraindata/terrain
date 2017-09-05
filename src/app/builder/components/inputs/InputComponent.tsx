@@ -73,6 +73,7 @@ interface Props
   index: number;
   canEdit: boolean;
   onCreateInput: (index: number) => void;
+  language: string;
 }
 
 const TYPE_OPTIONS =
@@ -121,7 +122,7 @@ class InputComponent extends TerrainComponent<Props>
       {
         date = new Date();
       }
-      const value = Util.formatInputDate(date);
+      const value = Util.formatInputDate(date, this.props.language);
       Actions.change(this.getKeyPath('value'), value);
     }
   }
@@ -155,6 +156,7 @@ class InputComponent extends TerrainComponent<Props>
             date={this.props.input.value}
             onChange={this.changeValue}
             canEdit={true}
+            language={this.props.language}
           />
         </div>
       );

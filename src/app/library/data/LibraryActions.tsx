@@ -64,9 +64,10 @@ import Ajax from './../../util/Ajax';
 
 const $ = (type: string, payload: any) =>
 {
-  // jmansor: Dispatch to the old LibraryStore too, store unification is finished.
+  // jmansor: Dispatch to the old LibraryStore too, until store unification is finished.
   Store.dispatch({ type, payload });
-  return { type, payload };
+  // jmansor: to prevent versioning duplication, only do it during global store dispatch.
+  return { type, payload: Object.assign({}, payload, { versioning: true }) };
 };
 
 const Actions =

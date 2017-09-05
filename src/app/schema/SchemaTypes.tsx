@@ -61,11 +61,12 @@ export class SchemaBaseClass extends BaseClass
 
 class SchemaStateC
 {
-  public servers: ServerMap = Map<string, Server>({});
-  public databases: DatabaseMap = Map<string, Database>({});
-  public tables: TableMap = Map<string, Table>({});
-  public columns: ColumnMap = Map<string, Column>({});
-  public indexes: IndexMap = Map<string, Index>({});
+  public servers: ServerMap = Map<string, Server>();
+  public databases: DatabaseMap = Map<string, Database>();
+  public tables: TableMap = Map<string, Table>();
+  public columns: ColumnMap = Map<string, Column>();
+  public indexes: IndexMap = Map<string, Index>();
+  public fieldProperties: FieldPropertyMap = Map<string, FieldProperty>();
 
   public serverCount: number = -1;
   public loading: boolean = false;
@@ -78,9 +79,9 @@ class SchemaStateC
   public highlightedInSearchResults: boolean = false;
 
   // for the builder, a list of names for each db
-  public dbNamesByServer: TableNamesByDb = Map<string, List<string>>({});
-  public tableNamesByDb: TableNamesByDb = Map<string, List<string>>({});
-  public columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>({});
+  public dbNamesByServer: TableNamesByDb = Map<string, List<string>>();
+  public tableNamesByDb: TableNamesByDb = Map<string, List<string>>();
+  public columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>();
 }
 export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
 export const _SchemaState = (config?: { [key: string]: any }) =>
@@ -97,7 +98,7 @@ class ServerC extends SchemaBaseClass
   public name = '';
   public connectionId: number = -1;
 
-  public databaseIds: List<string> = List([]);
+  public databaseIds: List<string> = List();
 }
 export type Server = ServerC & IRecord<ServerC>;
 export const _Server =
@@ -126,7 +127,7 @@ class DatabaseC extends SchemaBaseClass
   public databaseType = 'mysql';
   public serverId: string = '';
 
-  public tableIds: List<string> = List([]);
+  public tableIds: List<string> = List();
 }
 export type Database = DatabaseC & IRecord<DatabaseC>;
 export const _Database =
@@ -143,9 +144,9 @@ export const _Database =
   };
 export type DatabaseMap = IMMap<string, Database>;
 
-export function tableId(serverName: string, databaseName: string, tableName: string): string
+export function tableId(databaseId: string, tableName: string): string
 {
-  return serverName + '/' + databaseName + '.' + tableName;
+  return databaseId + '.' + tableName;
 }
 
 class TableC extends SchemaBaseClass
@@ -155,8 +156,8 @@ class TableC extends SchemaBaseClass
   public serverId: string = '';
   public databaseId: string = '';
 
-  public columnIds: List<string> = List([]);
-  public indexIds: List<string> = List([]);
+  public columnIds: List<string> = List();
+  public indexIds: List<string> = List();
 }
 export type Table = TableC & IRecord<TableC>;
 export const _Table = (config: {
@@ -166,7 +167,7 @@ export const _Table = (config: {
   id?: string,
 }) =>
 {
-  config.id = tableId(config.serverId, config.databaseId, config.name);
+  config.id = tableId(config.databaseId, config.name);
   return New<Table>(new TableC(config), config, 'string');
 };
 export type TableMap = IMMap<string, Table>;
@@ -184,7 +185,8 @@ class ColumnC extends SchemaBaseClass
   public databaseId: string = '';
   public tableId: string = '';
 
-  public indexIds: List<string> = List([]);
+  public fieldPropertyIds: List<string> = List();
+  public indexIds: List<string> = List();
   public datatype = '';
   public defaultValue = '';
   public isNullable = false;
@@ -201,6 +203,7 @@ export const _Column = (config: {
   datatype: string,
   isNullable?: boolean,
   isPrimaryKey?: boolean,
+  // fieldProperties?: any,
 
   id?: string,
 }) =>
@@ -224,7 +227,7 @@ class IndexC extends SchemaBaseClass
   public tableId: string = '';
 
   public indexType = '';
-  public columnIds: List<string> = List([]);
+  public columnIds: List<string> = List();
 }
 export type Index = IndexC & IRecord<IndexC>;
 export const _Index = (config: {
@@ -242,6 +245,49 @@ export const _Index = (config: {
 };
 export type IndexMap = IMMap<string, Index>;
 
+export function fieldPropertyId(columnId: string, fieldPropertyParentId: string, fieldPropertyName: string)
+{
+  if (fieldPropertyParentId)
+  {
+    return fieldPropertyParentId + '.' + fieldPropertyName;
+  }
+  else
+  {
+    return columnId + '.' + fieldPropertyName;
+  }
+}
+
+class FieldPropertyC extends SchemaBaseClass
+{
+  public type = 'fieldProperty';
+  public name = '';
+  public value = '';
+  public serverId: string = '';
+  public databaseId: string = '';
+  public tableId: string = '';
+  public columnId: string = '';
+  public fieldPropertyParentId: string = ''; // if we have nested field Properties
+
+  public fieldPropertyIds: List<string> = List(); // If we have nested field Properties
+}
+export type FieldProperty = FieldPropertyC & IRecord<FieldPropertyC>;
+export const _FieldProperty = (config: {
+  name: string,
+  value: any,
+  serverId: string,
+  databaseId: string,
+  tableId: string,
+  columnId: string,
+  fieldPropertyParentId: string,
+
+  id?: string,
+}) =>
+{
+  config.id = fieldPropertyId(config.columnId, config.fieldPropertyParentId, config.name);
+  return New<FieldProperty>(new FieldPropertyC(config), config, 'string');
+};
+export type FieldPropertyMap = IMMap<string, FieldProperty>;
+
 export const typeToStoreKey =
   {
     server: 'servers',
@@ -249,6 +295,7 @@ export const typeToStoreKey =
     table: 'tables',
     column: 'columns',
     index: 'indexes',
+    fieldProperty: 'fieldProperties',
   };
 
 export function searchIncludes(item: SchemaBaseClass, search: string): boolean
@@ -279,6 +326,7 @@ export interface SetServerActionPayload
   tables: IMMap<string, Table>;
   columns: IMMap<string, Column>;
   indexes: IMMap<string, Index>;
+  fieldProperties: IMMap<string, FieldProperty>;
   columnNames: IMMap<string, List<string>>;
   tableNames: List<string>;
 }
@@ -289,6 +337,7 @@ export interface AddDbToServerActionPayload
   tables: IMMap<string, Table>;
   columns: IMMap<string, Column>;
   indexes: IMMap<string, Index>;
+  fieldProperties: IMMap<string, FieldProperty>;
   columnNames: IMMap<string, List<string>>;
   tableNames: List<string>;
 }

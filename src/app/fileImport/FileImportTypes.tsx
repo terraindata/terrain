@@ -57,12 +57,18 @@ class FileImportStateC extends BaseClass
   public serverName: string = '';
   public dbName: string = '';
   public tableName: string = '';
+
+  public file: File = new File([''], '');
   public filetype: string = '';
+  public filesize: number = 0;
 
   public previewRows: List<List<string>> = List([]);
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
   public hasCsvHeader: boolean = false;
+  public isNewlineSeparatedJSON: boolean = false;
+  public requireJSONHaveAllFields: boolean = true;
+  public exportRank: boolean = true;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
@@ -71,10 +77,13 @@ class FileImportStateC extends BaseClass
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
-  public file: File = new File([''], '');
 
   public uploadInProgress: boolean = false;
   public elasticUpdate: boolean = true;
+
+  public errorMsg: string = '';
+  public isDirty: boolean = false;
+  public progress: number = 0;
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -142,7 +151,6 @@ export const _Template =
     originalNames: List<string>;
     columnTypes: Immutable.Map<string, object>;
     transformations: List<object>;
-    hasCsvHeader: boolean;
     primaryKeys: List<number>;
     primaryKeyDelimiter: string;
     export: boolean;
@@ -170,8 +178,10 @@ export const _ColumnTypesTree = (config?: any) =>
 };
 
 export const NUMBER_PREVIEW_ROWS = 5;
-
-export const PREVIEW_CHUNK_SIZE = 10000000; // (10mb) - amount to read in order to extract preview rows
+export const PROGRESS_UPDATE_INTERVAL = 10000; // (10s) polling interval for streaming progress
+export const STREAMING_CHUNK_SIZE = 10000000; // (10mb) backend streaming chunk size
+export const PREVIEW_CHUNK_SIZE = 10000000; // (10mb) amount to read in order to extract preview rows
+export const MIN_PROGRESSBAR_FILESIZE = 500000; // (500kb) threshold to display progressbar (spinning wheel)
 
 export const FILE_TYPES =
   [
@@ -223,13 +233,47 @@ export const STEP_NAMES =
     'Step 3',
     'Step 4',
     'Step 5',
+    'Step 6',
   ];
 
 export const STEP_TITLES =
   [
-    'Select a File',
-    'Select a Server',
-    'Select a Database',
-    'Select a Table',
+    'Select a CSV or JSON file to import into Terrain',
+    '',
+    'Select an ElasticSearch Cluster',
+    'Select an ElasticSearch Index',
+    'Select an ElasticSearch Type',
     'Select and Rename Columns you\'d like to Import',
   ];
+
+export const STEP_TWO_TITLES =
+  [
+    'Does your CSV have a header row?',
+    'What format is your JSON file?',
+  ];
+
+export const STEP_SUBTEXT =
+  {
+    DATABASE_SUBTEXT: 'Use the field above to either choose an existing database or name a new one that will be created',
+    TABLE_SUBTEXT: 'Use the field above to either choose an existing table or name a new one that will be created',
+  };
+
+export const TRANSFORM_TEXT =
+  {
+    DUPLICATE: 'Duplicate this column and its rows',
+    APPEND: 'Append text to every row in this column',
+    PREPEND: 'Prepend text to every row in this column',
+    SPLIT: 'Split this column\'s rows by a common delimiter',
+    MERGE: 'Merge this column\'s rows with another column\'s rows',
+  };
+
+export const enum Steps
+{
+  ChooseFile,
+  CsvJsonOptions,
+  SelectServer,
+  SelectDb,
+  SelectTable,
+  Preview,
+  Success,
+}

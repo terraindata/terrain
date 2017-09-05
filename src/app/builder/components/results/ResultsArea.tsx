@@ -54,11 +54,13 @@ import * as _ from 'lodash';
 import * as React from 'react';
 // import * as moment from 'moment';
 const moment = require('moment');
+const ReactModal = require('react-modal');
 
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
+import Modal from '../../../common/components/Modal';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
@@ -69,7 +71,7 @@ import ResultsTable from '../results/ResultsTable';
 
 import Radium = require('radium');
 
-import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -85,7 +87,9 @@ export interface Props
   query: Query;
   canEdit: boolean;
   variantName: string;
-
+  showExport: boolean;
+  showCustomizeView: boolean;
+  allowSpotlights: boolean;
   onNavigationException: () => void;
 }
 
@@ -175,6 +179,7 @@ class ResultsArea extends TerrainComponent<Props>
           resultsConfig={resultsConfig}
           onExpand={this.handleCollapse}
           expanded={true}
+          allowSpotlights={this.props.allowSpotlights}
           index={-1}
           primaryKey={result.primaryKey}
         />
@@ -297,6 +302,7 @@ class ResultsArea extends TerrainComponent<Props>
             resultsConfig={resultsConfig}
             onExpand={this.handleExpand}
             resultsLoading={resultsState.loading}
+            allowSpotlights={this.props.allowSpotlights}
           />
         </div>
       );
@@ -327,6 +333,7 @@ class ResultsArea extends TerrainComponent<Props>
                   index={index}
                   key={index}
                   primaryKey={result.primaryKey}
+                  allowSpotlights={this.props.allowSpotlights}
                 />
               );
             })
@@ -418,6 +425,7 @@ column if you have customized the results view.');
   {
     this.setState({
       resultFormat: this.state.resultFormat === 'icon' ? 'table' : 'icon',
+      expanded: false,
     });
   }
 
@@ -459,23 +467,27 @@ column if you have customized the results view.');
           }
         </div>
 
-        <div
-          className='results-top-config'
-          onClick={this.showExport}
-          key='results-area-export'
-          style={link()}
-        >
-          Export
-        </div>
+        {this.props.showExport &&
+          <div
+            className='results-top-config'
+            onClick={this.showExport}
+            key='results-area-export'
+            style={link()}
+          >
+            Export
+          </div>
+        }
 
-        <div
-          className='results-top-config'
-          onClick={this.showConfig}
-          key='results-area-customize'
-          style={link()}
-        >
-          Customize view
+        {this.props.showCustomizeView &&
+          <div
+            className='results-top-config'
+            onClick={this.showConfig}
+            key='results-area-customize'
+            style={link()}
+          >
+            Customize view
         </div>
+        }
 
         <Switch
           first='Icons'
@@ -518,60 +530,47 @@ column if you have customized the results view.');
 
   public renderExport()
   {
-    if (this.state.showingExport)
-    {
-      const mainBg = backgroundColor(Colors().bg1);
-      const mainFontColor = fontColor(Colors().text2);
-      const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
-        elasticUpdate } = this.props.exportState;
-      // TODO: re-style, current styling taken from ResultsConfigComponent
-      return (
-        <div className='results-config-wrapper'>
-          <div
-            className={classNames({
-              'results-config': true,
-              'results-config-disabled': false,
-            })}
-            style={[mainBg, borderColor(Colors().border2)]}
-          >
-            <div className='results-config-bar' style={[mainBg, borderColor(Colors().border1)]}>
-              <div className='results-config-title' style={mainFontColor}>
-                Export Results
-              </div>
-              <div key={'results-config-button'}
-                className='results-config-button'
-                style={[
-                  fontColor(Colors().text1),
-                  borderColor(Colors().border1, Colors().border3),
-                  backgroundColor(Colors().bg3),
-                ]}
-                onClick={this.hideExport}
-              >
-                Done
-              </div>
-            </div>
+    const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
+      filetype, requireJSONHaveAllFields, exportRank, elasticUpdate } = this.props.exportState;
 
-            <FileImportPreview
-              previewRows={previewRows}
-              primaryKeys={primaryKeys}
-              primaryKeyDelimiter={primaryKeyDelimiter}
-              columnNames={columnNames}
-              columnsToInclude={columnsToInclude}
-              columnTypes={columnTypes}
-              templates={templates}
-              transforms={transforms}
-              columnOptions={List([])}
-              uploadInProgress={false}
-              elasticUpdate={elasticUpdate}
-              exporting={true}
-              query={this.props.query.tql}
-              variantName={this.props.variantName}
-            />
+    const content =
+      <div
+        style={{
+          background: 'black',  // TODO: black from Colors?
+        }}
+      >
+        <FileImportPreview
+          previewRows={previewRows}
+          primaryKeys={primaryKeys}
+          primaryKeyDelimiter={primaryKeyDelimiter}
+          columnNames={columnNames}
+          columnsToInclude={columnsToInclude}
+          columnTypes={columnTypes}
+          templates={templates}
+          transforms={transforms}
+          columnOptions={List([])}
+          uploadInProgress={false}
+          filetype={filetype}
+          requireJSONHaveAllFields={requireJSONHaveAllFields}
+          exportRank={exportRank}
+          elasticUpdate={elasticUpdate}
+          exporting={true}
+          query={this.props.query.tql}
+          serverId={Number(this.props.db.id)}
+          variantName={this.props.variantName}
+        />
+      </div>;
 
-          </div>
-        </div>
-      );
-    }
+    return (
+      <Modal
+        open={this.state.showingExport}
+        onClose={this.hideExport}
+        title={'Export'}
+        children={content}
+        fill={true}
+        noFooterPadding={true}
+      />
+    );
   }
 
   public renderConfig()
@@ -599,13 +598,14 @@ column if you have customized the results view.');
         className={classNames({
           'results-area': true,
           'results-area-config-open': this.state.showingConfig,
-          'results-area-table': this.state.resultFormat === 'table',
+          'results-area-table altBg': this.state.resultFormat === 'table',
         })}
       >
         {this.renderTopbar()}
         {this.renderResults()}
-        {this.renderConfig()}
-        {this.renderExport()}
+        {this.renderExpandedResult()}
+        {this.props.showCustomizeView && this.renderConfig()}
+        {this.props.showExport && this.renderExport()}
       </div>
     );
   }

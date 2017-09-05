@@ -63,7 +63,7 @@ export const elasticScore = _card(
     key: 'sort',
     sortOrder: 'desc',
     sortType: 'number',
-    sortMode: undefined,
+    sortMode: 'auto',
 
     static: {
       language: 'elastic',
@@ -77,20 +77,6 @@ export const elasticScore = _card(
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
         const factors = block['weights'].map((weightBlock) => tqlTranslationFn(weightBlock, tqlConfig)).toArray();
-
-        // add elastic weight
-        factors.unshift({
-          weight: 0,
-          ranges: [
-            -100.0,
-            100.0,
-          ],
-          outputs: [
-            0.0,
-            1.0,
-          ],
-        });
-
         const _scriptObj = {
           _script:
           {
@@ -105,7 +91,7 @@ export const elasticScore = _card(
           },
         };
 
-        if (block['sortMode'] !== undefined)
+        if (block['sortMode'] !== 'auto')
         {
           _scriptObj._script['mode'] = block['sortMode'];
         }
@@ -121,7 +107,7 @@ export const elasticScore = _card(
           ]),
           sortOrder: 'desc',
           sortType: 'number',
-          sortMode: undefined,
+          sortMode: 'auto',
         };
       },
       display:
@@ -165,7 +151,7 @@ export const elasticScore = _card(
             {
               displayType: DisplayType.DROPDOWN,
               key: 'sortMode',
-              options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values']),
+              options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values'].concat(['auto'])),
               dropdownUsesRawValues: true,
               autoDisabled: true,
               centerDropdown: true,

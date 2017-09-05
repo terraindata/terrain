@@ -45,13 +45,18 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
+
+import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
-import { LibraryStoreReducerWrapper } from '../library/data/LibraryStore';
+import RolesReducer from 'roles/data/RolesReducers';
+import UserReducer from 'users/data/UserReducers';
 
 const reducers = {
-  library: LibraryStoreReducerWrapper,
+  library: LibraryReducer,
+  roles: RolesReducer,
+  users: UserReducer,
 };
 
 const rootReducer = combineReducers(reducers);

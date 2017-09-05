@@ -155,6 +155,7 @@ export const Ajax =
         const form = document.createElement('form');
         form.setAttribute('action', fullUrl);
         form.setAttribute('method', 'post');
+        form.setAttribute('target', '_blank');
 
         // TODO move
         const accessToken = AuthStore.getState().accessToken;
@@ -715,6 +716,8 @@ export const Ajax =
       transformations: Immutable.List<object>,
       update: boolean,
       hasCsvHeader: boolean,
+      isNewlineSeparatedJSON: boolean,
+      requireJSONHaveAllFields: boolean,
       primaryKeyDelimiter: string,
       onLoad: (resp: any) => void,
       onError: (resp: any) => void,
@@ -737,6 +740,8 @@ export const Ajax =
       formData.append('transformations', JSON.stringify(transformations));
       formData.append('update', String(update));
       formData.append('hasCsvHeader', String(hasCsvHeader));
+      formData.append('isNewlineSeparatedJSON', String(isNewlineSeparatedJSON));
+      formData.append('requireJSONHaveAllFields', String(requireJSONHaveAllFields));
       formData.append('primaryKeyDelimiter', primaryKeyDelimiter);
 
       const xhr = new XMLHttpRequest();
@@ -789,26 +794,21 @@ export const Ajax =
         rank,
         transformations,
       };
-      console.log('export payload: ', payload);
-      // const onLoadHandler = (resp) =>
-      // {
-      //   const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
-      //   onLoad(queryResult);
-      // };
+      const onLoadHandler = (resp) =>
+      {
+        const queryResult: MidwayQueryResponse = MidwayQueryResponse.fromParsedJsonObject(resp);
+        onLoad(queryResult);
+      };
       Ajax.req(
         'post',
         'import/export/',
         payload,
-        onLoad,
-        // onLoadHandler,
+        onLoadHandler,
         {
           onError,
           download: true,
           downloadFilename,
         },
-        // {
-        //   onError,
-        // },
       );
       return;
     },
@@ -839,7 +839,6 @@ export const Ajax =
         export: exporting,
         primaryKeyDelimiter,
       };
-      console.log('save template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
@@ -875,8 +874,6 @@ export const Ajax =
         export: exporting,
         primaryKeyDelimiter,
       };
-      console.log('updating template: ', templateId);
-      console.log('update template payload: ', payload);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
@@ -898,7 +895,6 @@ export const Ajax =
       onError?: (ev: string) => void,
     )
     {
-      console.log('deleting template: ', templateId);
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
@@ -937,7 +933,6 @@ export const Ajax =
       {
         payload['importOnly'] = true;
       }
-      console.log('fetch templates payload: ', payload);
 
       Ajax.req(
         'post',
@@ -969,47 +964,21 @@ export const Ajax =
 
     getDbs(onLoad: (dbs: BackendInstance[], loadFinished: boolean) => void, onError?: (ev: Event) => void)
     {
-      let m1Dbs: BackendInstance[] = null;
       let m2Dbs: BackendInstance[] = null;
       const checkForLoaded = () =>
       {
-        if (!m1Dbs || !m2Dbs)
+        if (!m2Dbs)
         {
           return;
         }
 
         let dbs: BackendInstance[] = [];
-        if (m1Dbs)
-        {
-          dbs = m1Dbs;
-        }
         if (m2Dbs)
         {
           dbs = dbs.concat(m2Dbs);
         }
-        onLoad(dbs, !!(m1Dbs && m2Dbs));
+        onLoad(dbs, !!(m2Dbs));
       };
-
-      AjaxM1.getDbs_m1(
-        (dbNames: string[]) =>
-        {
-          m1Dbs = dbNames.map(
-            (dbName: string) =>
-              ({
-                id: dbName,
-                name: dbName,
-                type: 'mysql',
-                source: 'm1' as ('m1' | 'm2'),
-              }),
-          );
-          checkForLoaded();
-        },
-        () =>
-        {
-          m1Dbs = [];
-          checkForLoaded();
-        },
-      );
 
       Ajax.req(
         'get',

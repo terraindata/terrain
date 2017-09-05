@@ -61,6 +61,7 @@ import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
 const GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
 type Group = LibraryTypes.Group;
@@ -115,6 +116,12 @@ class GroupsColumn extends TerrainComponent<Props>
   {
     this.props.groupActions.change(this.props.groups.find((g) => g.id === id)
       .set('status', ItemStatus.Archive) as Group);
+  }
+
+  public handleUnarchive(id: ID)
+  {
+    this.props.groupActions.change(this.props.groups.find((g) => g.id === id)
+      .set('status', ItemStatus.Build) as Group);
   }
 
   public handleNameChange(id: ID, name: string)
@@ -185,8 +192,10 @@ class GroupsColumn extends TerrainComponent<Props>
         item={group}
         canEdit={canEdit || canDrag}
         canDrag={canDrag}
-        canArchive={canEdit || canDrag}
+        canArchive={(canEdit || canDrag) && group.status !== ItemStatus.Archive}
         canDuplicate={false}
+        canUnarchive={group.status === ItemStatus.Archive}
+        onUnarchive={this.handleUnarchive}
         canCreate={canCreate}
         isSelected={+group.id === +params.groupId}
         isFocused={this.props.isFocused}
@@ -256,10 +265,13 @@ class GroupsColumn extends TerrainComponent<Props>
         }
         {
           status === ItemStatus.Build && !!canCreate &&
-          <CreateLine
-            onClick={this.handleCreate}
-            open={false}
-          />
+          tooltip(
+            <CreateLine onClick={this.handleCreate} open={false} />,
+            {
+              title: 'Create a New Group',
+              position: 'top',
+            },
+          )
         }
       </LibraryItemCategory>
     );

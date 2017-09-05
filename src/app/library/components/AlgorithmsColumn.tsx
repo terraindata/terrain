@@ -72,6 +72,8 @@ import LibraryItemCategory from './LibraryItemCategory';
 
 import './AlgorithmsColumn.less';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
+
 const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
 type Group = LibraryTypes.Group;
@@ -196,6 +198,14 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     this.props.algorithmActions.change(
       this.props.algorithms.get(id)
         .set('status', ItemStatus.Archive) as Algorithm,
+    );
+  }
+
+  public handleUnarchive(id: ID)
+  {
+    this.props.algorithmActions.change(
+      this.props.algorithms.get(id)
+        .set('status', ItemStatus.Build) as Algorithm,
     );
   }
 
@@ -379,12 +389,11 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
 
     // scores.splice(0, 1); // remove Archived count
-
     const { me, roles } = this.state;
-    const canArchive = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
-    const canDuplicate = canArchive;
-    const canDrag = canArchive;
-    const canEdit = canDrag; // ||
+    const canArchive = (algorithm.status !== ItemStatus.Archive); // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
+    const canDuplicate = true;
+    const canDrag = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
+    const canEdit = canDrag; // ||me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
     // (me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
@@ -450,6 +459,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         canDuplicate={canDuplicate}
         isSelected={+algorithm.id === +params.algorithmId}
         isFocused={this.props.isFocused}
+        canUnarchive={algorithm.status === ItemStatus.Archive}
+        onUnarchive={this.handleUnarchive}
       >
         <div className='flex-container'>
           <UserThumbnail userId={userId} medium={true} extra={role} />
@@ -506,10 +517,13 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         }
         {
           status === ItemStatus.Build && canCreate &&
-          <CreateLine
-            onClick={this.handleNewAlgorithmModalOpen}
-            open={false}
-          />
+          tooltip(
+            <CreateLine onClick={this.handleNewAlgorithmModalOpen} open={false} />,
+            {
+              title: 'Create a New Algorithm',
+              position: 'top',
+            },
+          )
         }
       </LibraryItemCategory>
     );
@@ -518,7 +532,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public renderDatabaseDropdown()
   {
     const dbs = this.getSortedDatabases(this.props.dbs);
-    const options = dbs ? dbs.map((db) => db.name + ` (${db.type})`).toList() : [];
+    const options = dbs ? dbs.filter((db) => db.type === 'elastic').map((db) => db.name + ` (${db.type})`).toList() : [];
 
     return (
       <div className='new-algorithm-modal-child'>

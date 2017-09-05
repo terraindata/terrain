@@ -61,6 +61,7 @@ const UserActionTypes =
     completeTutorial: '',
   };
 
-Util.setValuesToKeys(UserActionTypes, '');
+// jmansor: Because we'll have a global store, action types need to be unique.
+Util.setValuesToKeys(UserActionTypes, 'users');
 
 export default UserActionTypes;

@@ -57,7 +57,7 @@ import './ProgressBar.less';
 
 export interface Props
 {
-  progress: number;
+  progress: number; // 0-1
   className?: string;
   width?: number;
   color?: string;

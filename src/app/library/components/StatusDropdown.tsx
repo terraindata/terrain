@@ -66,6 +66,7 @@ export interface Props
   variant: LibraryTypes.Variant;
   noBorder?: boolean;
   variantActions: any;
+  tooltips?: List<any>;
 }
 
 class StatusDropdown extends TerrainComponent<Props>
@@ -179,6 +180,7 @@ class StatusDropdown extends TerrainComponent<Props>
         selectedIndex={this.getSelectedIndex()}
         onChange={this.handleChange}
         canEdit={this.canEdit()}
+        tooltips={this.props.tooltips}
       />
     );
     // <div className='status-dropdown-wrapper'>
@@ -188,8 +190,6 @@ class StatusDropdown extends TerrainComponent<Props>
     //       'status-dropdown-no-border': this.props.noBorder,
     //       'status-dropdown-can-edit': this.canEdit(),
     //     })}
-    //     data-tip={tooltip}
-    //     data-html={true}
     //   >
     //   </div>
     // </div>

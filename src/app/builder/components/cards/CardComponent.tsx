@@ -51,6 +51,7 @@ import './CardStyle.less';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import { DragSource } from 'react-dnd';
 
@@ -60,10 +61,14 @@ import { Card } from '../../../../blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
+import DragHandle from './../../../common/components/DragHandle';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
+
+import { tooltip } from 'common/components/tooltip/Tooltips';
+import CardHelpTooltip from './CardHelpTooltip';
 
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
@@ -75,12 +80,13 @@ import CreateCardTool from './CreateCardTool';
 
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('./../../../../images/icon_more_12x3.svg?name=MoreIcon');
+const HelpIcon = require('./../../../../images/icon_help-1.svg?name=HelpIcon');
 
 const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
 
 // title width when we don't show a title
-const NO_TITLE_WIDTH = 58;
+const NO_TITLE_WIDTH = 74;
 
 export interface Props
 {
@@ -102,8 +108,11 @@ export interface Props
   connectDragSource?: (el: El) => El;
 
   display?: Display;
+
+  handleCardDrop?: (type: string) => any;
 }
 
+@Radium
 class _CardComponent extends TerrainComponent<Props>
 {
   public state: {
@@ -362,7 +371,7 @@ class _CardComponent extends TerrainComponent<Props>
     };
 
     const card = BlockUtils.recordFromJS(
-      BlockUtils.cardsForServer(removeId(this.props.card)).toJS(),
+      BlockUtils.cardsForServer(removeId(this.props.card)),
       AllBackendsMap[this.props.card.static.language].blocks,
     );
 
@@ -480,6 +489,7 @@ class _CardComponent extends TerrainComponent<Props>
             onClose={this.handleCardToolClose}
             accepts={this.props.display && this.props.display.accepts}
             language={this.props.card.static.language}
+            handleCardDrop={this.props.handleCardDrop}
           />
         </div>
       );
@@ -497,6 +507,7 @@ class _CardComponent extends TerrainComponent<Props>
         color: this.props.card.static.colors[0],
         backgroundColor: this.state.hovering ? Colors().bg1 : undefined,
       }}
+      handleCardDrop={this.props.handleCardDrop}
     />;
 
     const { card } = this.props;
@@ -532,6 +543,7 @@ class _CardComponent extends TerrainComponent<Props>
           wrapType={this.props.card.type}
           singleChild={this.props.singleChild || this.props.singleCard}
           language={card.static.language}
+          handleCardDrop={this.props.handleCardDrop}
         />
         <div
           className={classNames({
@@ -544,67 +556,88 @@ class _CardComponent extends TerrainComponent<Props>
           )}
           ref='cardInner'
         >
-          <div
-            className={classNames({
-              'card-title': true,
-              'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
-              'card-title-card-hovering': this.state.hovering,
-            })}
-            style={{
-              // shrink the width if the card does not have a title
-              // width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
-              width: NO_TITLE_WIDTH,
-            }}
-            onClick={this.handleTitleClick}
-          >
-            {
-              this.props.canEdit &&
-              !card['cannotBeMoved'] &&
-              connectDragSource(
+          <div className='card-title-row'>
+            <div
+              className={classNames({
+                'card-title': true,
+                'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
+                'card-title-card-hovering': this.state.hovering,
+              })}
+              style={{
+                // shrink the width if the card does not have a title
+                // width: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
+                width: NO_TITLE_WIDTH,
+              }}
+              onClick={this.handleTitleClick}
+            >
+              {
+                this.props.canEdit &&
+                !card['cannotBeMoved'] &&
+                <div className='card-drag-handle'>
+                  <DragHandle
+                    hiddenByDefault={!this.state.hovering}
+                    connectDragSource={connectDragSource}
+                    key={'handle-' + (this.props.card !== undefined ? this.props.card.id : Math.random())}
+                  />
+                </div>
+              }
+              {
+                this.state.hovering &&
+                <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
+              }
+              {
+                this.props.canEdit &&
+                !card['cannotBeMoved'] &&
+                <Menu
+                  options={this.state.menuOptions}
+                  openRight={true}
+                />
+              }
+              {
+                !(this.props.card && this.props.card['noTitle']) &&
                 <div
-                  className='card-handle-icon'
+                  className='card-title-inner'
+                  style={{
+                    color: card.static.colors[0],
+                  }}
                 >
-                  <HandleIcon />
-                </div>,
-              )
-            }
-            {
-              this.state.hovering &&
-              <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
-            }
+                  {
+                    title
+                  }
+                </div>
+              }
+
+              {
+                !this.props.card.closed ? null :
+                  <div className={classNames({
+                    'card-preview': true,
+                    'card-preview-hidden': this.state.opening,
+                  })}>
+                    {BlockUtils.getPreview(card)}
+                  </div>
+              }
+            </div>
             {
               this.props.canEdit &&
               !card['cannotBeMoved'] &&
-              <Menu
-                options={this.state.menuOptions}
-                openRight={true}
-              />
-            }
-            {
-              !(this.props.card && this.props.card['noTitle']) &&
-              <div
-                className='card-title-inner'
-                style={{
-                  color: card.static.colors[0],
-                }}
-              >
+              this.state.hovering &&
+              <div className='card-help-wrapper'>
                 {
-                  title
+                  tooltip(
+                    <HelpIcon className='card-help-icon' />,
+                    {
+                      html: <CardHelpTooltip staticInfo={card.static} />,
+                      trigger: 'click',
+                      position: 'top-end',
+                      interactive: true,
+                      theme: 'faded',
+                      delay: 0,
+                    },
+                  )
                 }
               </div>
             }
-
-            {
-              !this.props.card.closed ? null :
-                <div className={classNames({
-                  'card-preview': true,
-                  'card-preview-hidden': this.state.opening,
-                })}>
-                  {BlockUtils.getPreview(card)}
-                </div>
-            }
           </div>
-
           {
             (!this.props.card.closed || this.state.opening) &&
             <div className='card-body-wrapper' ref='cardBody'>
@@ -631,6 +664,7 @@ class _CardComponent extends TerrainComponent<Props>
           wrapType={this.props.card.type}
           singleChild={this.props.singleChild || this.props.singleCard}
           language={card.static.language}
+          handleCardDrop={this.props.handleCardDrop}
         />
       </div>
     );

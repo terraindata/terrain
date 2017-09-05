@@ -292,7 +292,7 @@ class Team extends TerrainComponent<Props>
       {
         return (
           <div className='create-user'>
-            <div className='create-user-cancel' onClick={this.toggleAddingUser} data-tip='Cancel'>
+            <div className='create-user-cancel' onClick={this.toggleAddingUser}>
               x
             </div>
             <h3>Create a new user</h3>

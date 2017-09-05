@@ -63,6 +63,7 @@ import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import './Logging';
 import Middleware from './Middleware';
+import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
 import * as Schema from './Schema';
 import Users from './users/Users';
@@ -124,7 +125,7 @@ class App
     this.app.use(session(undefined, this.app));
 
     this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
-    this.app.use(Middleware.favicon('../../../src/app/favicon.ico'));
+    this.app.use(Middleware.favicon('../../../../midway/src/app/favicon.ico'));
     this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
     this.app.use(Middleware.passport.initialize());
@@ -135,6 +136,7 @@ class App
     this.app.use(MidwayRouter.routes());
     this.app.use(AnalyticsRouter.routes());
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/midway/v1/assets' }));
+    this.app.use(NotFoundRouter.routes());
   }
 
   public async start(): Promise<http.Server>

@@ -54,6 +54,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display } from '../../../blocks/displays/Display';
 import { Card, CardString } from '../../../blocks/types/Card';
 import { isInput } from '../../../blocks/types/Input';
@@ -62,7 +63,7 @@ import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
-import { borderColor, cardStyle, Colors, getStyle } from '../../common/Colors';
+import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import SchemaStore from '../../schema/data/SchemaStore';
 import Autocomplete from './Autocomplete';
@@ -173,7 +174,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     // If you want two-way backups, use this line
     // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
     if (
-      (this.props.value && this.props.value['type'] === this.getCreatingType() && value === '')
+      (this.props.value !== undefined && this.props.value['type'] === this.getCreatingType() && value === '')
     )
     {
       if (this.state.backupString)
@@ -200,6 +201,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     {
       this.setState({
         boxValue: value,
+        boxValueBuffer: null,
       });
     }
     else
@@ -312,18 +314,20 @@ class BuilderTextbox extends TerrainComponent<Props>
     }
 
     return (
-      <a
-        className={classNames({
-          'builder-tb-switch': this.isText(),
-          'close-icon-builder-textbox': !this.isText(),
-        })}
-        onClick={this.handleSwitch}
-        data-tip={this.isText() ? 'Convert to cards' : ''}
-      >
-        {
-          this.isText() ? <AddCardIcon /> : <CloseIcon />
-        }
-      </a>
+      tooltip(
+        <a
+          className={classNames({
+            'builder-tb-switch': this.isText(),
+            'close-icon-builder-textbox': !this.isText(),
+          })}
+          onClick={this.handleSwitch}
+        >
+          {
+            this.isText() ? <AddCardIcon /> : <CloseIcon />
+          }
+        </a>,
+        this.isText() ? 'Convert to cards' : '',
+      )
     );
   }
 
@@ -377,8 +381,19 @@ class BuilderTextbox extends TerrainComponent<Props>
       const textStyle = this.props.textStyle || {};
       if (valueIsInput)
       {
-        textStyle.color = Colors().builder.cards.inputParameter;
+        textStyle.color = getCardColors('parameter', Colors().builder.cards.inputParameter);
       }
+
+      let value;
+      if (typeof (this.state.boxValue) === 'number')
+      {
+        value = this.state.boxValue.toString();
+      }
+      else
+      {
+        value = this.state.boxValue as string;
+      }
+
       return (
         <div
           className={classNames({
@@ -394,7 +409,7 @@ class BuilderTextbox extends TerrainComponent<Props>
               <textarea
                 ref='input'
                 disabled={!this.props.canEdit}
-                defaultValue={this.state.boxValue as string || ''}
+                defaultValue={value || ''}
                 onChange={this.handleTextareaChange}
                 className={this.props.className}
                 placeholder={placeholder}
@@ -403,11 +418,12 @@ class BuilderTextbox extends TerrainComponent<Props>
               <Autocomplete
                 ref='input'
                 disabled={!this.props.canEdit}
-                value={this.state.boxValue as string || ''}
+                value={value || ''}
                 options={options}
                 onChange={this.handleAutocompleteChange}
                 placeholder={placeholder}
                 help={valueIsWrongType ? this.props.typeErrorMessage : this.props.help}
+                helpIsError={valueIsWrongType}
                 className={valueIsWrongType ? 'ac-wrong-type' : null}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}

@@ -54,22 +54,27 @@ import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { json } from 'd3-request';
-import * as SharedUtil from '../../../../shared/database/elastic/ElasticUtil';
+import * as SharedElasticUtil from '../../../../shared/database/elastic/ElasticUtil';
+import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import { ItemConfig, Items } from '../items/Items';
+import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
 import { ExportTemplateConfig, ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 const importTemplates = new ImportTemplates();
 
 const TastyItems: Items = new Items();
+const typeParser: SharedUtil.CSVTypeParser = new SharedUtil.CSVTypeParser();
 
 export interface ImportConfig extends ImportTemplateBase
 {
   file: stream.Readable;
   filetype: string;     // either 'json' or 'csv'
+  isNewlineSeparatedJSON?: boolean;      // defaults to false
+  requireJSONHaveAllFields?: boolean;    // defaults to true
   update: boolean;      // false means replace (instead of update) ; default should be true
 }
 
@@ -111,14 +116,16 @@ export class Import
   private nextChunk: string;
   private progress: number;
 
-  public async getProgress(): Promise<number | string>
+  public async getProgress(): Promise<number>
   {
     return new Promise<number>(async (resolve, reject) =>
     {
-      if (this.progress < 0)
-      {
-        return reject('negative progress');
-      }
+      // if (this.progress < 0)
+      // {
+      //   return reject('negative progress');
+      // }
+      // console.log('--------------------FSDHJFKSDFFFFFFJSDFFHJKSDFHJKSDFSDFSDF---------------------');
+      // console.log(this.chunkCount);
       resolve(this.chunkCount);
     });
   }
@@ -140,13 +147,17 @@ export class Import
 
       const dbSchema: Tasty.Schema = await database.getTasty().schema();
 
+      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json')
+      {
+        return reject('Filetype must be either CSV or JSON.');
+      }
       if (headless)
       {
         // get a template given the template ID
-        const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateID);
+        const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateId);
         if (templates.length === 0)
         {
-          return reject('Template not found.');
+          return reject('Template not found. Did you supply an export template ID?');
         }
         const template = templates[0] as object;
         if (exprt.dbid !== template['dbid'])
@@ -156,10 +167,6 @@ export class Import
         for (const templateKey of Object.keys(template))
         {
           exprt[templateKey] = template[templateKey];
-        }
-        if (exprt['export'] === undefined || exprt['export'] === false || Number(exprt['export']) === 0)
-        {
-          return reject('Cannot use an import template for export.');
         }
       }
 
@@ -193,21 +200,47 @@ export class Import
       {
         return reject('Empty query provided.');
       }
-      const qryObj: object = JSON.parse(qry);
+
+      let qryObj: object;
+      try
+      {
+        qryObj = JSON.parse(qry);
+      }
+      catch (e)
+      {
+        return reject(e);
+      }
+
+      if (qryObj['index'] === '')
+      {
+        return reject('Must provide an index.');
+      }
       if (qryObj['index'] !== exprt['dbname'])
       {
         return reject('Query index name does not match supplied index name.');
       }
+      const tableName: string = qryObj['type'] !== '' ? qryObj['type'] : undefined;
       let rankCounter: number = 1;
-      const writer = csvWriter();
+      let writer: any;
+      if (exprt.filetype === 'csv')
+      {
+        writer = csvWriter();
+      }
+      else if (exprt.filetype === 'json')
+      {
+        writer = new stream.PassThrough();
+      }
       const pass = new stream.PassThrough();
       writer.pipe(pass);
-      if (qryObj.hasOwnProperty('terrainRank') && exprt.rank === true)
+
+      if (exprt.filetype === 'json')
       {
-        return reject('Conflicting field: terrainRank.');
+        writer.write('[');
       }
+
       qryObj['scroll'] = this.SCROLL_TIMEOUT;
       let errMsg: string = '';
+      let isFirstJSONObj: boolean = true;
       elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
       {
         if (resp.hits === undefined || resp.hits.total === 0)
@@ -223,32 +256,61 @@ export class Import
           return resolve(pass);
         }
         let returnDocs: object[] = [];
+
+        const fieldArrayDepths: object = {};
         for (const doc of newDocs)
         {
           // verify schema mapping with documents and fix documents accordingly
-          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname);
+          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname, tableName);
           if (typeof newDoc === 'string')
           {
             writer.end();
             errMsg = newDoc;
             return reject(errMsg);
           }
-          newDoc['terrainRank'] = rankCounter;
           for (const field of Object.keys(newDoc))
           {
-            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]))
+            if (newDoc[field] !== null && newDoc[field] !== undefined)
+            {
+              if (fieldArrayDepths[field] === undefined)
+              {
+                fieldArrayDepths[field] = new Set<number>();
+              }
+              fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
+            }
+            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
             {
               newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
             }
           }
           returnDocs.push(newDoc as object);
-          rankCounter++;
+        }
+        for (const field of Object.keys(fieldArrayDepths))
+        {
+          if (fieldArrayDepths[field].size > 1)
+          {
+            errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
+            return reject(errMsg);
+          }
         }
 
         // transform documents with template
         try
         {
-          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true, exprt.rank));
+          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true));
+          for (const doc of returnDocs)
+          {
+            if (exprt.rank === true)
+            {
+              if (doc['terrainRank'] !== undefined)
+              {
+                errMsg = 'Conflicting field: terrainRank.';
+                return reject(errMsg);
+              }
+              doc['terrainRank'] = rankCounter;
+            }
+            rankCounter++;
+          }
         } catch (e)
         {
           writer.end();
@@ -259,7 +321,15 @@ export class Import
         // export to csv
         for (const returnDoc of returnDocs)
         {
-          writer.write(returnDoc);
+          if (exprt.filetype === 'csv')
+          {
+            writer.write(returnDoc);
+          }
+          else if (exprt.filetype === 'json')
+          {
+            isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+            writer.write(JSON.stringify(returnDoc));
+          }
         }
         if (Math.min(resp.hits.total, qryObj['size']) > rankCounter - 1)
         {
@@ -270,6 +340,10 @@ export class Import
         }
         else
         {
+          if (exprt.filetype === 'json')
+          {
+            writer.write(']');
+          }
           writer.end();
           resolve(pass);
         }
@@ -282,10 +356,22 @@ export class Import
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
-      const update: boolean | string = this._parseBooleanField(fields, 'update', false);
+      const update: boolean | string = this._parseBooleanField(fields, 'update', true);
       if (typeof update === 'string')
       {
         return reject(update);
+      }
+
+      const isNewlineSeparatedJSON: boolean | string = this._parseBooleanField(fields, 'isNewlineSeparatedJSON', false);
+      if (typeof isNewlineSeparatedJSON === 'string')
+      {
+        return reject(isNewlineSeparatedJSON);
+      }
+
+      const requireJSONHaveAllFields: boolean | string = this._parseBooleanField(fields, 'requireJSONHaveAllFields', true);
+      if (typeof requireJSONHaveAllFields === 'string')
+      {
+        return reject(requireJSONHaveAllFields);
       }
 
       let file: stream.Readable | null = null;
@@ -307,15 +393,15 @@ export class Import
         return reject(hasCsvHeader);
       }
       let csvHeaderRemoved: boolean = (fields['filetype'] !== 'csv') || !hasCsvHeader;
-      let jsonBracketRemoved: boolean = fields['filetype'] !== 'json';
+      let jsonBracketRemoved: boolean = !(fields['filetype'] === 'json' && !isNewlineSeparatedJSON);
 
       let imprtConf: ImportConfig;
       if (headless)
       {
-        const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateID']));
+        const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateId']));
         if (templates.length === 0)
         {
-          return reject('Invalid template ID provided: ' + String(fields['templateID']));
+          return reject('Invalid template ID provided: ' + String(fields['templateId']));
         }
         const template: ImportTemplateConfig = templates[0];
 
@@ -325,9 +411,11 @@ export class Import
           dbname: template['dbname'],
           file,
           filetype: fields['filetype'],
+          isNewlineSeparatedJSON,
           originalNames: template['originalNames'],
           primaryKeyDelimiter: template['primaryKeyDelimiter'],
           primaryKeys: template['primaryKeys'],
+          requireJSONHaveAllFields,
           tablename: template['tablename'],
           transformations: template['transformations'],
           update,
@@ -348,9 +436,11 @@ export class Import
             dbname: fields['dbname'],
             file,
             filetype: fields['filetype'],
+            isNewlineSeparatedJSON,
             originalNames,
             primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
             primaryKeys,
+            requireJSONHaveAllFields,
             tablename: fields['tablename'],
             transformations,
             update,
@@ -625,7 +715,8 @@ export class Import
     return typeObj['type'];
   }
 
-  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema, database: string): Promise<object | string>
+  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema,
+    database: string, tableName: string): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
@@ -634,17 +725,27 @@ export class Import
       {
         return resolve('Schema not found for database ' + database);
       }
-      for (const table of schema.tableNames(database))
+      let tableNameArr: string[] = [];
+      if (tableName !== undefined)
+      {
+        tableNameArr = [tableName];
+      }
+      else
+      {
+        tableNameArr = schema.tableNames(database);
+      }
+      for (const table of tableNameArr)
       {
         const fields: object = schema.fields(database, table);
         const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(fields), Object.keys(document));
         for (const field of fieldsInMappingNotInDocument)
         {
           newDocument[field] = null;
-          if (fields[field]['type'] === 'text')
-          {
-            newDocument[field] = '';
-          }
+          // TODO: Case 740
+          // if (fields[field]['type'] === 'text')
+          // {
+          //   newDocument[field] = '';
+          // }
         }
         const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(fields));
         for (const field of fieldsInDocumentNotMapping)
@@ -725,7 +826,7 @@ export class Import
         }
         for (const key of Object.keys(obj))
         {
-          if (obj.hasOwnProperty(key) && obj[key] !== null)
+          if (obj.hasOwnProperty(key))
           {
             if (!this._jsonCheckTypesHelper(obj[key], imprt.columnTypes[key]))
             {
@@ -756,7 +857,7 @@ export class Import
     {
       if (imprt.columnTypes[field]['type'] === 'array')
       {
-        if (obj[field] !== null && !this._isTypeConsistent(obj[field]))
+        if (obj[field] !== null && !SharedUtil.isTypeConsistent(obj[field]))
         {
           return 'Array in field "' + field + '" of the following object contains inconsistent types: ' + JSON.stringify(obj);
         }
@@ -785,17 +886,18 @@ export class Import
     switch (this.NUMERIC_TYPES.has(typeObj['type']) ? 'number' : typeObj['type'])
     {
       case 'number':
-        const num: number = Number(item[field]);
-        if (!isNaN(num))
-        {
-          item[field] = num;
-        }
-        else if (item[field] === '')
+        if (item[field] === '')
         {
           item[field] = null;
         }
         else
         {
+          const parsedValue: number | boolean = typeParser.getDoubleFromString(String(item[field]));
+          if (typeof parsedValue === 'number')
+          {
+            item[field] = parsedValue;
+            return true;
+          }
           return false;
         }
         break;
@@ -906,6 +1008,16 @@ export class Import
     return '';
   }
 
+  /* assumes arrays are of uniform depth */
+  private _getArrayDepth(obj: any): number
+  {
+    if (Array.isArray(obj))
+    {
+      return this._getArrayDepth(obj[0]) + 1;
+    }
+    return 0;
+  }
+
   /* return ES type from type specification format of ImportConfig
    * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
   private _getESType(typeObject: object, withinArray: boolean = false): string
@@ -1000,7 +1112,7 @@ export class Import
 
   private _getObjectStructureStr(payload: object): string
   {
-    let structStr: string = this._getType(payload);
+    let structStr: string = SharedUtil.getType(payload);
     if (structStr === 'object')
     {
       structStr = Object.keys(payload).sort().reduce((res, item) =>
@@ -1024,31 +1136,6 @@ export class Import
     return structStr;
   }
 
-  private _getType(obj: object): string
-  {
-    if (typeof obj === 'object')
-    {
-      if (obj === null)
-      {
-        return 'null';
-      }
-      if (obj instanceof Date)
-      {
-        return 'date';
-      }
-      if (Array.isArray(obj))
-      {
-        return 'array';
-      }
-    }
-    if (typeof obj === 'string')
-    {
-      return 'text';
-    }
-    // handles "number", "boolean", "object", and "undefined" cases
-    return typeof obj;
-  }
-
   /* returns a hash based on the object's field names and data types
    * handles object fields recursively ; only checks the type of the first element of arrays */
   private _hashObjectStructure(payload: object): string
@@ -1064,44 +1151,14 @@ export class Import
     return this.COMPATIBLE_TYPES[proposedType] !== undefined && this.COMPATIBLE_TYPES[proposedType].has(existing['type']);
   }
 
-  /* checks if all elements in the provided array are of the same type ; handles nested arrays */
-  private _isTypeConsistent(arr: object[]): boolean
-  {
-    return this._isTypeConsistentHelper(arr) !== 'inconsistent';
-  }
-
-  private _isTypeConsistentHelper(arr: object[]): string
-  {
-    const types: Set<string> = new Set();
-    arr.forEach((obj) =>
-    {
-      types.add(this._getType(obj));
-    });
-    if (types.size !== 1)
-    {
-      return 'inconsistent';
-    }
-    const type: string = types.entries().next().value[0];
-    if (type === 'array')
-    {
-      const innerTypes: Set<string> = new Set();
-      arr.forEach((obj) =>
-      {
-        innerTypes.add(this._isTypeConsistentHelper(obj as object[]));
-      });
-      if (innerTypes.size !== 1)
-      {
-        return 'inconsistent';
-      }
-      return innerTypes.entries().next().value[0];
-    }
-    return type;
-  }
-
   /* manually checks types (rather than checking hashes) ; handles arrays recursively */
   private _jsonCheckTypesHelper(item: object, typeObj: object): boolean
   {
-    const thisType: string = this._getType(item);
+    const thisType: string = SharedUtil.getType(item);
+    if (thisType === 'null')
+    {
+      return true;
+    }
     if (thisType === 'number' && this.NUMERIC_TYPES.has(typeObj['type']))
     {
       return true;
@@ -1112,6 +1169,10 @@ export class Import
     }
     if (thisType === 'array')
     {
+      if (item[0] === undefined)
+      {
+        return true;
+      }
       return this._jsonCheckTypesHelper(item[0], typeObj['innerType']);
     }
     return true;
@@ -1126,7 +1187,11 @@ export class Import
     {
       parsed = false;
     }
-    else if (obj[field] !== undefined && obj[field] !== 'true')
+    else if (obj[field] === 'true')
+    {
+      parsed = true;
+    }
+    else if (obj[field] !== undefined)
     {
       return 'Invalid value for parameter "' + field + '": ' + String(obj[field]);
     }
@@ -1139,14 +1204,44 @@ export class Import
     {
       if (imprt.filetype === 'json')
       {
-        try
+        let items: object[];
+        if (imprt.isNewlineSeparatedJSON === true)
         {
-          const items: object[] = JSON.parse(contents);
-          if (!Array.isArray(items))
+          const stringItems: string[] = contents.split(/\r|\n/);
+          items = [];
+          for (const str of stringItems)
           {
-            return reject('Input JSON file must parse to an array of objects.');
+            try
+            {
+              if (str !== '')
+              {
+                items.push(JSON.parse(str));
+              }
+            }
+            catch (e)
+            {
+              return reject('JSON format incorrect: Could not parse object: ' + str);
+            }
           }
+        }
+        else
+        {
+          try
+          {
+            items = JSON.parse(contents);
+            if (!Array.isArray(items))
+            {
+              return reject('Input JSON file must parse to an array of objects.');
+            }
+          }
+          catch (e)
+          {
+            return reject('JSON format incorrect: ' + String(e));
+          }
+        }
 
+        if (imprt.requireJSONHaveAllFields !== false)
+        {
           const expectedCols: string = JSON.stringify(imprt.originalNames.sort());
           for (const obj of items)
           {
@@ -1156,11 +1251,29 @@ export class Import
                 JSON.stringify(Object.keys(obj).sort()) + '\nExpected: ' + expectedCols);
             }
           }
-          resolve(items);
-        } catch (e)
-        {
-          return reject('JSON format incorrect: ' + String(e));
         }
+        else
+        {
+          for (const obj of items)
+          {
+            const fieldsInDocumentNotExpected = _.difference(Object.keys(obj), imprt.originalNames);
+            for (const field of fieldsInDocumentNotExpected)
+            {
+              if (obj.hasOwnProperty(field))
+              {
+                return reject('JSON file contains an object with an unexpected field ("' + String(field) + '"): ' +
+                  JSON.stringify(obj));
+              }
+              delete obj[field];
+            }
+            const expectedFieldsNotInDocument = _.difference(imprt.originalNames, Object.keys(obj));
+            for (const field of expectedFieldsNotInDocument)
+            {
+              obj[field] = null;
+            }
+          }
+        }
+        resolve(items);
       } else if (imprt.filetype === 'csv')
       {
         const items: object[] = [];
@@ -1281,7 +1394,7 @@ export class Import
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
   private async _transformAndCheck(allItems: object[], imprt: ImportConfig | ExportConfig,
-    dontCheck?: boolean, rank?: boolean): Promise<object[][]>
+    dontCheck?: boolean): Promise<object[][]>
   {
     const promises: Array<Promise<object[]>> = [];
     let items: object[];
@@ -1307,7 +1420,14 @@ export class Import
             {
               if (imprt.columnTypes.hasOwnProperty(name))
               {
-                trimmedItem[name] = item[name];
+                if (typeof item[name] === 'string')
+                {
+                  trimmedItem[name] = item[name].replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+                }
+                else
+                {
+                  trimmedItem[name] = item[name];
+                }
               }
             }
             if (dontCheck !== true)
@@ -1317,10 +1437,6 @@ export class Import
               {
                 return thisReject(typeError);
               }
-            }
-            if (rank === true)
-            {
-              trimmedItem['terrainRank'] = item['terrainRank'];
             }
             transformedItems.push(trimmedItem);
           }
@@ -1333,12 +1449,12 @@ export class Import
   /* returns an error message if there are any; else returns empty string */
   private _verifyConfig(imprt: ImportConfig): string
   {
-    const indexError: string = SharedUtil.isValidIndexName(imprt.dbname);
+    const indexError: string = SharedElasticUtil.isValidIndexName(imprt.dbname);
     if (indexError !== '')
     {
       return indexError;
     }
-    const typeError: string = SharedUtil.isValidTypeName(imprt.tablename);
+    const typeError: string = SharedElasticUtil.isValidTypeName(imprt.tablename);
     if (typeError !== '')
     {
       return typeError;
@@ -1369,7 +1485,7 @@ export class Import
     let fieldError: string;
     for (const colName of columnList)
     {
-      fieldError = SharedUtil.isValidFieldName(colName);
+      fieldError = SharedElasticUtil.isValidFieldName(colName);
       if (fieldError !== '')
       {
         return fieldError;
@@ -1406,13 +1522,13 @@ export class Import
     {
       // get valid piece of data
       let thisChunk: string = '';
-      if (imprt.filetype === 'csv')
+      if (imprt.filetype === 'csv' || (imprt.filetype === 'json' && imprt.isNewlineSeparatedJSON === true))
       {
         const end: number = isLast ? chunk.length : chunk.lastIndexOf('\n');
         thisChunk = this.nextChunk + String(chunk.substring(0, end));
         this.nextChunk = chunk.substring(end + 1, chunk.length);
       }
-      else if (imprt.filetype === 'json')
+      else
       {
         // open square-bracket has already been removed by frontend/headless preprocessing
         if (isLast)

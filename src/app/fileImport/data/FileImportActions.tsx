@@ -43,12 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { SchemaActions } from '../../schema/data/SchemaStore';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
 
 type Transform = FileImportTypes.Transform;
 type Template = FileImportTypes.Template;
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
@@ -66,13 +68,13 @@ const FileImportActions =
     (tableName: string) =>
       $(ActionTypes.changeTableName, { tableName }),
 
-    changeServerDbTable:
-    (serverId: number, dbName: string, tableName: string) =>
-      $(ActionTypes.changeServerDbTable, { serverId, dbName, tableName }),
-
     changeHasCsvHeader:
     (hasCsvHeader: boolean) =>
       $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),
+
+    changeIsNewlineSeparatedJSON:
+    (isNewlineSeparatedJSON: boolean) =>
+      $(ActionTypes.changeIsNewlineSeparatedJSON, { isNewlineSeparatedJSON }),
 
     changePrimaryKey:
     (columnId: number) =>
@@ -83,16 +85,36 @@ const FileImportActions =
       $(ActionTypes.changePrimaryKeyDelimiter, { delim }),
 
     chooseFile:
-    (filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
-      $(ActionTypes.chooseFile, { filetype, preview, originalNames }),
+    (filetype: string, filesize: number, preview: List<List<string>>, originalNames: List<string>, columnTypes?: List<ColumnTypesTree>) =>
+      $(ActionTypes.chooseFile, {
+        filetype,
+        filesize,
+        preview,
+        originalNames,
+        columnTypes,
+      }),
 
     importFile:
-    () =>
-      $(ActionTypes.importFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
+    (handleFileImportSuccess) =>
+      $(ActionTypes.importFile, {
+        setErrorMsg: FileImportActions.setErrorMsg,
+        changeUploadInProgress: FileImportActions.changeUploadInProgress,
+        fetchSchema: SchemaActions.fetch,
+        handleFileImportSuccess,
+      }),
 
     exportFile:
-    (query: string, rank: boolean, downloadFilename: string) =>
-      $(ActionTypes.exportFile, { query, rank, downloadFilename }),
+    (query: string, serverId: number, dbName: string, rank: boolean, downloadFilename: string,
+      handleFileExportSuccess, handleFileExportError) =>
+      $(ActionTypes.exportFile, {
+        query,
+        serverId,
+        dbName,
+        rank,
+        downloadFilename,
+        handleFileExportSuccess,
+        handleFileExportError,
+      }),
 
     addTransform:
     (transform: Transform) =>
@@ -115,28 +137,56 @@ const FileImportActions =
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
-    (templateName: string, exporting: boolean) =>
-      $(ActionTypes.saveTemplate, { templateName, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
+    (templateName: string, exporting: boolean, handleTemplateSaveSuccess) =>
+      $(ActionTypes.saveTemplate, {
+        templateName,
+        exporting,
+        setErrorMsg: FileImportActions.setErrorMsg,
+        fetchTemplates: FileImportActions.fetchTemplates,
+        handleTemplateSaveSuccess,
+      }),
 
     updateTemplate:
-    (templateId: number, exporting: boolean) =>
-      $(ActionTypes.updateTemplate, { templateId, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
+    (templateId: number, exporting: boolean, handleUpdateTemplateSuccess, handleUpdateTemplateError, templateName: string) =>
+      $(ActionTypes.updateTemplate, {
+        templateId,
+        exporting,
+        fetchTemplates: FileImportActions.fetchTemplates,
+        handleUpdateTemplateSuccess,
+        handleUpdateTemplateError,
+        templateName,
+      }),
 
     fetchTemplates:
     (exporting: boolean) =>
-      $(ActionTypes.fetchTemplates, { exporting, setTemplates: FileImportActions.setTemplates }),
+      $(ActionTypes.fetchTemplates, {
+        exporting,
+        setTemplates: FileImportActions.setTemplates,
+      }),
 
     setTemplates:
     (templates: List<Template>) =>
       $(ActionTypes.setTemplates, { templates }),
 
-    loadTemplate:
-    (templateId: number) =>
-      $(ActionTypes.loadTemplate, { templateId }),
+    applyTemplate:
+    (templateId: number, newColumns: List<string>) =>
+      $(ActionTypes.applyTemplate, {
+        templateId,
+        newColumns,
+      }),
 
     deleteTemplate:
-    (templateId: number, exporting: boolean) =>
-      $(ActionTypes.deleteTemplate, { templateId, exporting, fetchTemplates: FileImportActions.fetchTemplates }),
+    (templateId: number, exporting: boolean, handleDeleteTemplateSuccess, handleDeleteTemplateError, templateName: string) =>
+    {
+      $(ActionTypes.deleteTemplate, {
+        templateId,
+        exporting,
+        fetchTemplates: FileImportActions.fetchTemplates,
+        handleDeleteTemplateSuccess,
+        handleDeleteTemplateError,
+        templateName,
+      });
+    },
 
     saveFile:
     (file: File, filetype: string) =>
@@ -147,12 +197,39 @@ const FileImportActions =
       $(ActionTypes.changeUploadInProgress, { uploading }),
 
     changeElasticUpdate:
-    () =>
-      $(ActionTypes.changeElasticUpdate, {}),
+    (elasticUpdate: boolean) =>
+      $(ActionTypes.changeElasticUpdate, { elasticUpdate }),
+
+    addPreviewColumn:
+    (columnName: string) =>
+      $(ActionTypes.addPreviewColumn, { columnName }),
+
+    togglePreviewColumn:
+    (requireJSONHaveAllFields: boolean) =>
+      $(ActionTypes.togglePreviewColumn, { requireJSONHaveAllFields }),
+
+    setErrorMsg:
+    (err: string) =>
+      $(ActionTypes.setErrorMsg, { err }),
+
+    setExportFiletype:
+    (exportFiletype: string) =>
+      $(ActionTypes.setExportFiletype, { exportFiletype }),
+
+    toggleExportRank:
+    (exportRank: boolean) =>
+      $(ActionTypes.toggleExportRank, { exportRank }),
 
     getStreamingProgress:
     () =>
-      $(ActionTypes.getStreamingProgress, {}),
+      $(ActionTypes.getStreamingProgress, {
+        getStreamingProgress: FileImportActions.getStreamingProgress,
+        setProgress: FileImportActions.setProgress,
+      }),
+
+    setProgress:
+    (progress: number) =>
+      $(ActionTypes.setProgress, { progress }),
   };
 
 export default FileImportActions;

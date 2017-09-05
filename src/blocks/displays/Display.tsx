@@ -87,8 +87,9 @@ export interface Display
   // for dropdown
   options?: List<(string | El)>;
   centerDropdown?: boolean;
-  optionsDisplayName?: Map<any, string>; // maps value to display name
+  optionsDisplayName?: Immutable.Map<any, string>; // maps value to display name
   dropdownUsesRawValues?: boolean; // use the raw values, instead of the indices
+  dropdownTooltips?: List<any>;
 
   // for labels
   label?: string;
@@ -134,6 +135,8 @@ export interface Display
   //  let's change that in the future by having the histogram bars be
   //  computed at a higher level
   requiresBuilderState?: boolean;
+
+  handleCardDrop?: (type: string) => any;
 }
 
 // Section: Re-useable displays

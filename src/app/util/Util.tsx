@@ -270,8 +270,14 @@ const Util = {
   },
 
   // for SQL
-  formatInputDate(date: Date): string
+  formatInputDate(date: Date, language: string = 'elastic'): string
   {
+    if (language === 'elastic')
+    {
+      const day = moment(date).format('YYYY-MM-DD');
+      const time = moment(date).format('HH:mm:ssZ');
+      return day + 'T' + time;
+    }
     return moment(date).format('YYYY-MM-DD HH:mm:ss');
   },
 
@@ -430,6 +436,20 @@ const Util = {
   parentNode(reactNode): Node
   {
     return ReactDOM.findDOMNode(reactNode).parentNode;
+  },
+
+  findParentNode(reactNode, checkParent: (parentNode) => boolean, maxDepth: number = 4): Node | null
+  {
+    while (maxDepth > 0)
+    {
+      if (checkParent(reactNode))
+      {
+        return reactNode;
+      }
+      reactNode = Util.parentNode(reactNode);
+      maxDepth--;
+    }
+    return null;
   },
 
   siblings(reactNode): NodeList

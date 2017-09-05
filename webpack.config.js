@@ -43,10 +43,9 @@ THE SOFTWARE.
 */
 
 
-let CircularDependencyPlugin = require('circular-dependency-plugin');
-
 var webpack = require("webpack");
 var path = require("path");
+var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports =
 {
@@ -90,19 +89,23 @@ module.exports =
             // note: this first loader string gets updated in webpack.config.prod.js
             //  keep it first in this list
             {
-                test: /\.(ts|tsx)$/,
+                test: /\.ts(x?)$/,
                 exclude: [/midway/, /node_modules/],
                 loader:
-                    "babel-loader?presets[]=react&presets[]=latest!ts-loader?"
+                    "babel-loader!thread-loader!ts-loader?happyPackMode=true"
                     + JSON.stringify({
                         compilerOptions: {
                         },
                     }),
             },
+            {
+                test: /\.js(x?)$/,
+                exclude: [/midway/, /node_modules/],
+                loader: "babel-loader!thread-loader"
+            },
             { test: /\.css$/, exclude: /midway/, loader: "style-loader!css-loader" },
             { test: /\.less$/, exclude: /midway/, loader: "style-loader!css-loader!less-loader?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.jsx?$/, exclude: /node_modules/, loader: "babel-loader?presets[]=react&presets[]=latest" },
-            { test: /\.woff(2)?$/,   loader: "url-loader?limit=10000&mimetype=application/font-woff" },
+            { test: /\.woff(2?)$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
             { test: /\.ttf$/, loader: "file-loader" },
             { test: /\.eot$/, loader: "file-loader" },
             { test: /\.jpg$/, loader: "file-loader" },
@@ -110,10 +113,10 @@ module.exports =
             { test: /\.png$/, loader: "url-loader?limit=4000000" },
             { test: require.resolve("jquery"), use: [{ loader: "expose-loader", options: "$" }]},
             {
-		      test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: "babel-loader?presets[]=react&presets[]=latest!svg-react-loader" +
-		              // removes data-name attributes
-		              "!string-replace-loader?search=%20data-name%3D%22%5B%5Cw%5Cs_-%5D*%22&replace=&flags=ig",
-	        },
+                test: /\.svg(\?name=[a-zA-Z]*)*$/,
+                exclude: [/midway/, /node_modules/],
+                loader: "svg-react-loader",
+            },
             { test: /\.txt$/, exclude: /midway/, loader: "raw-loader" },
         ],
     },
@@ -121,19 +124,9 @@ module.exports =
     plugins:
     [
         new webpack.DefinePlugin({
-            OLD_MIDWAY_HOST: "'//" + process.env.OLD_MIDWAY_HOST + ":40080'",
-            TDB_HOST: "'//" + process.env.TDB_HOST + ":7344'",
-            MIDWAY_HOST: "'http://" + process.env.MIDWAY_HOST + "'",
+            MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || "localhost:3000") + "'",
             DEV: true,
         }),
-        new webpack.optimize.AggressiveMergingPlugin(),
-
-	// You can enable this plugin to detect for circular dependencies
-	// new CircularDependencyPlugin({
-	//	// exclude detection of files based on a RegExp
-	//	exclude: /a\.js|node_modules/,
-	//	// add errors to webpack instead of warnings
-	//	failOnError: false
-	//    })
+        new ForkTsCheckerWebpackPlugin(),
     ],
 };

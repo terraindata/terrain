@@ -1,54 +1,91 @@
 @import "../../common/Common.less";
 
+@bar-h: 40px;
+
 .fi-preview-column {
   display: inline-block;
-  height: 248px;
   width: 300px;
   color: rgba(255, 255, 255, 1);
   vertical-align: middle;
   margin-right: 6px;
   margin-left: 6px;
-  overflow-y: auto;
+  overflow-y: visible;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  position: relative;
+
+  &.fi-preview-add-column-button {
+    cursor: pointer;
+    height: 80px;
+    border-radius: 6px;
+    position: relative;
+    top: -40px;
+    font-size: 65px;
+  }
+
+  .fi-preview-column-header {
+    align-items: center;
+    justify-content: space-between;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+
+    .fi-preview-column-header-include {
+      align-items: center;
+      padding: 6px;
+      padding-left: 12px;
+      width: 100%;
+      text-align: left;
+
+      .fi-preview-column-header-include-text {
+        .big-text;
+      }
+    }
+
+    .fi-preview-column-header-key {
+      padding: 6px;
+
+      svg {
+        width: 24px;
+        height: 24px;
+        padding: 0px 12px;
+      }
+
+      svg path {
+        stroke: rgb(100,105,107) !important; // TODO: call border2?
+      }
+    }
+
+    .fi-preview-column-header-key-selected svg path {
+      stroke: #fff !important; // TODO: call text1?
+    }
+  }
 
   .fi-preview-column-field {
     padding: 6px;
-    align-items: center;
-
-    .fi-preview-column-field-name {
-      display: inline-block;
-      flex-basis: 30%;
-    }
+    justify-content: center;
 
     .fi-preview-column-field-content {
-      display: inline-block;
       flex-grow: 1;
     }
   }
-}
 
-.fi-preview-column-title {
-  display: inline-block;
-  height: 200px;
-  width: 300px;
-  color: rgba(255, 255, 255, 1);
-  text-align: center;
-  vertical-align: middle;
-  margin-right: 6px;
-  margin-left: 6px;
-  padding-top: 24px;
-  padding-bottom: 24px;
-
-  .fi-preview-column-title-name {
-    .title-text;
-  }
-
-  .fi-preview-column-title-type {
-    .big-text;
-  }
-
-  .fi-preview-column-edit-button {
-    .big-text;
-    cursor: pointer;
+  .fi-preview-column-disabled-veil {
+    position: absolute;
+    top: @bar-h;
+    width: 100%;
+    height: calc(~"100% - @{bar-h}");
+    background: rgba(0,0,0,0);
+    opacity: 0;
+    pointer-events: none;
+    .transition(~"all 0.35s");
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
   }
 }
 
+.fi-preview-column-disabled {
+  .fi-preview-column-disabled-veil {
+    opacity: 0.5;
+    pointer-events: all;
+  }
+}
