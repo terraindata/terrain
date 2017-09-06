@@ -73,6 +73,7 @@ export interface Props
   columnNames: List<string>;
   datatype: string;
   onClose: () => void;
+  setErrorMsg: (errMsg: string) => void;
 }
 
 @Radium
@@ -295,14 +296,12 @@ class TransformModal extends TerrainComponent<Props>
     const msg: string = this.transformErrorCheck(transformName);
     if (msg)
     {
-      Actions.setErrorMsg(msg);
+      this.props.setErrorMsg(msg);
       return;
     }
-
     const transform: Transform = this.getTransform(transformName);
-    Actions.updatePreviewRows(transform);
+    Actions.updatePreviewColumns(transform);
     Actions.addTransform(transform);
-    this.props.onClose();
   }
 
   public renderText(transformType: string)
@@ -568,6 +567,7 @@ class TransformModal extends TerrainComponent<Props>
         confirm={true}
         confirmButtonText={'Apply Transformation'}
         onConfirm={this.handleTransform}
+        closeOnConfirm={false}
       />
     );
   }

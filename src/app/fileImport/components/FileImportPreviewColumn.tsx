@@ -64,6 +64,7 @@ type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 export interface Props
 {
+  items: List<string>;
   columnId: number;
   columnName: string;
   columnNames: List<string>; // TODO: move to parent component while preserving split/merge functionality
@@ -262,34 +263,56 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
       <div
         className={classNames({
           'fi-preview-column': true,
-          'fi-preview-column-disabled': !this.props.isIncluded,
+          'fi-preview-column-excluded': !this.props.isIncluded,
         })}
         style={{
-          background: Colors().bg2,
           text: Colors().text1,
         }}
       >
-        {
-          this.renderHeader()
-        }
-        {
-          this.renderName()
-        }
         <div
-          className='flex-container-center'
+          style={{
+            background: Colors().bg2,
+          }}
         >
           {
-            this.renderType()
+            this.renderHeader()
           }
           {
-            this.renderTransform()
+            this.renderName()
           }
+          <div
+            className='flex-container-center'
+          >
+            {
+              this.renderType()
+            }
+            {
+              this.renderTransform()
+            }
+          </div>
         </div>
-        <div
-          className='fi-preview-column-disabled-veil'
-          style={backgroundColor(Colors().bg3)}
-        >
-        </div>
+        {
+          this.props.items.map((item, key) =>
+            <div
+              key={key}
+              className={classNames({
+                'fi-preview-column-cell': true,
+              })}
+              style={{
+                background: Colors().bg2,
+                color: Colors().text1,
+              }}
+            >
+              <div
+                className='fi-preview-column-cell-text'
+              >
+                {
+                  item
+                }
+              </div>
+            </div>,
+          )
+        }
       </div>
     );
   }

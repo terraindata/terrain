@@ -61,7 +61,6 @@ import Dropdown from './../../common/components/Dropdown';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
 import ProgressBar from './../../common/components/ProgressBar';
-import Switch from './../../common/components/Switch';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { tooltip } from './../../common/components/tooltip/Tooltips';
 import Actions from './../data/FileImportActions';
@@ -69,7 +68,6 @@ import FileImportStore from './../data/FileImportStore';
 import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
-import FileImportPreviewRow from './FileImportPreviewRow';
 import TransformModal from './TransformModal';
 
 const { List } = Immutable;
@@ -82,37 +80,34 @@ type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 export interface Props
 {
-  previewRows: List<List<string>>;
-  primaryKeys: List<number>;
-  primaryKeyDelimiter: string;
-
+  exporting: boolean;
+  filetype: string;
+  previewColumns: List<List<string>>;
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
   columnTypes: List<ColumnTypesTree>;
-  filetype: string;
-  requireJSONHaveAllFields: boolean;
-
   columnOptions: List<string>;
   templates: List<Template>;
   transforms: List<Transform>;
+  requireJSONHaveAllFields: boolean;
 
-  uploadInProgress: boolean;
-  elasticUpdate: boolean;
-  exporting: boolean;
-  exportRank: boolean;
-
-  query?: string;
-  serverId?: number;
-  variantName?: string;
-  filesize?: number;
-
+  // import only
+  primaryKeys?: List<number>;
+  primaryKeyDelimiter?: string;
+  uploadInProgress?: boolean;
+  elasticUpdate?: boolean;
+  existingIndexAndType?: boolean;
   handleFileImportSuccess?: () => void;
-
+  progress?: number;
+  showProgressBar?: boolean;
   router?: any;
   route?: any;
 
-  existingIndexAndType?: boolean;
-  progress?: number;
+  // export only
+  exportRank?: boolean;
+  query?: string;
+  serverId?: number;
+  variantName?: string;
 }
 @Radium
 class FileImportPreview extends TerrainComponent<Props>
@@ -176,7 +171,10 @@ class FileImportPreview extends TerrainComponent<Props>
       templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
 
-    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    if (!this.props.exporting)
+    {
+      this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -234,7 +232,7 @@ class FileImportPreview extends TerrainComponent<Props>
     return true;
   }
 
-  public setError(msg: string)
+  public setPreviewErrorMsg(msg: string)
   {
     this.setState({
       previewErrorMsg: msg,
@@ -368,7 +366,7 @@ class FileImportPreview extends TerrainComponent<Props>
     const { appliedTemplateName, saveTemplateName } = this.state;
     if (!saveTemplateName)
     {
-      Actions.setErrorMsg('Please enter a template name');
+      this.setPreviewErrorMsg('Please enter a template name');
       return;
     }
     if (this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName))
@@ -483,13 +481,14 @@ class FileImportPreview extends TerrainComponent<Props>
     });
     if (!isCompatible)
     {
-      Actions.setErrorMsg('Incompatible template. Template does not contain columns: ' + JSON.stringify(missingTableCols));
+      this.setPreviewErrorMsg('Incompatible template. Template does not contain columns: ' + JSON.stringify(missingTableCols));
       return;
     }
     // only allowed to add additional columns when importing JSON files and no strict checking
     if ((this.props.filetype !== 'json' || this.props.requireJSONHaveAllFields) && unmatchedTemplateCols.size > 0)
     {
-      Actions.setErrorMsg('Incompatible template. Template contains extra columns: ' + JSON.stringify(Array.from(unmatchedTemplateCols)));
+      this.setPreviewErrorMsg('Incompatible template. Template contains extra columns: ' +
+        JSON.stringify(Array.from(unmatchedTemplateCols)));
       return;
     }
 
@@ -507,7 +506,7 @@ class FileImportPreview extends TerrainComponent<Props>
     // otherwise, if the name has actually changed - set the new name and add the rename transform and return true
     if (this.props.columnNames.delete(columnId).contains(localColumnName))
     {
-      Actions.setErrorMsg('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
+      this.setPreviewErrorMsg('column name: ' + localColumnName + ' already exists, duplicate column names are not allowed');
       return false;
     }
 
@@ -566,7 +565,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (delim === '')
     {
-      Actions.setErrorMsg('Primary key delimiter cannot be empty string');
+      this.setPreviewErrorMsg('Primary key delimiter cannot be empty string');
       return;
     }
     Actions.changePrimaryKeyDelimiter(delim);
@@ -613,7 +612,7 @@ class FileImportPreview extends TerrainComponent<Props>
       const dbName = JSON.parse(this.props.query)['index'];
       if (dbName === undefined || dbName === '')
       {
-        this.setError('Index must be selected in order to export results');
+        this.setPreviewErrorMsg('Index must be selected in order to export results');
         return;
       }
       Actions.exportFile(
@@ -644,12 +643,12 @@ class FileImportPreview extends TerrainComponent<Props>
     const { addColumnName } = this.state;
     if (!addColumnName)
     {
-      Actions.setErrorMsg('Please enter a new column name');
+      this.setPreviewErrorMsg('Please enter a new column name');
       return;
     }
     if (this.props.columnNames.includes(addColumnName))
     {
-      Actions.setErrorMsg('Column name already in use');
+      this.setPreviewErrorMsg('Column name already in use');
       return;
     }
     Actions.addPreviewColumn(addColumnName);
@@ -882,6 +881,7 @@ class FileImportPreview extends TerrainComponent<Props>
         columnNames={this.props.columnNames}
         datatype={this.props.columnTypes.get(this.state.columnId).type}
         onClose={this.hideTransformModal}
+        setErrorMsg={this.setPreviewErrorMsg}
       />
     );
   }
@@ -980,12 +980,13 @@ class FileImportPreview extends TerrainComponent<Props>
     const previewColumns = this.props.columnNames.map((value, key) =>
       <FileImportPreviewColumn
         key={key}
+        items={this.props.previewColumns.get(key)}
         columnId={key}
         columnName={this.props.columnNames.get(key)}
         columnNames={this.props.columnNames}
         isIncluded={this.props.columnsToInclude.get(key)}
         columnType={this.props.columnTypes.get(key)}
-        isPrimaryKey={this.props.primaryKeys.includes(key)}
+        isPrimaryKey={this.props.exporting ? null : this.props.primaryKeys.includes(key)}
         columnOptions={this.props.columnOptions}
         exporting={this.props.exporting}
         onColumnNameChange={this.onColumnNameChange}
@@ -1019,19 +1020,6 @@ class FileImportPreview extends TerrainComponent<Props>
             previewColumns
           }
         </div>
-        <div
-          className='fi-preview-rows-container'
-        >
-          {
-            this.props.previewRows.map((items, key) =>
-              <FileImportPreviewRow
-                key={key}
-                items={items}
-                columnsToInclude={this.props.columnsToInclude}
-              />,
-            )
-          }
-        </div>
       </div>
     );
   }
@@ -1041,7 +1029,7 @@ class FileImportPreview extends TerrainComponent<Props>
     const upload =
       <div
         className='fi-preview-import-button large-button'
-        onClick={this.handleUploadFile}
+        onClick={this.props.uploadInProgress ? this._fn(this.setPreviewErrorMsg, 'import in progress') : this.handleUploadFile}
         style={{
           color: Colors().import,
           border: 'solid 1px ' + Colors().import,
@@ -1054,7 +1042,7 @@ class FileImportPreview extends TerrainComponent<Props>
       this.props.exporting ?
         upload
         :
-        this.props.uploadInProgress && this.props.filesize > FileImportTypes.MIN_PROGRESSBAR_FILESIZE ?
+        this.props.uploadInProgress && this.props.showProgressBar ?
           <div className='fi-preview-loading-container'>
             <ProgressBar
               progress={this.props.progress}
@@ -1209,7 +1197,7 @@ class FileImportPreview extends TerrainComponent<Props>
           open={!!previewErrorMsg}
           message={previewErrorMsg}
           error={true}
-          onClose={this._fn(this.setError, '')}
+          onClose={this._fn(this.setPreviewErrorMsg, '')}
         />
       );
     }

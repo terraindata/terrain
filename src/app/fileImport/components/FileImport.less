@@ -22,7 +22,7 @@
     margin-left: 31px;
   }
   .fi-advanced-fields-dropdown {
-    margin-bottom: 30px;    
+    margin-bottom: 30px;
     width: 75%;
     margin-left: 31px;
   }
@@ -43,7 +43,7 @@
   }
 
 	.file-import-inner {
-  
+
     &.file-import-inner-scroll {
       overflow: auto !important;
     }
@@ -129,9 +129,34 @@
           }
         }
 
-        .fi-content-rows-container {
+        .fi-content-preview-columns-wrapper {
           overflow: auto;
-          padding-bottom: 6px;
+
+          .fi-content-preview-columns {
+            flex-direction: row;
+
+            .fi-content-preview-columns-column {
+              flex-direction: column;
+              margin-right: 6px;
+
+              .fi-content-preview-column-columns-column-cell {
+                width: 300px;
+                height: 40px;
+                margin-top: 3px;
+                overflow: auto;
+                overflow-y: hidden;
+                white-space: nowrap;
+
+                &::-webkit-scrollbar {
+                  height: 5px;
+                }
+
+                .fi-content-preview-column-columns-column-cell-text {
+                  padding: 12px;
+                }
+              }
+            }
+          }
         }
       }
 
