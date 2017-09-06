@@ -501,7 +501,6 @@ FileImportReducers[ActionTypes.fetchTemplates] =
             export: template['export'],
           }),
         ));
-        console.log('fetched templates: ', templates);
         action.payload.setTemplates(templates);
       },
     );
