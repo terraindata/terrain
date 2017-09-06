@@ -270,6 +270,7 @@ class Library extends TerrainComponent<any>
               basePath,
               router,
               variantActions: this.props.libraryVariantActions,
+              analyticsActions: this.props.analyticsActions,
             }}
           />
           {!variantsMultiselect ?

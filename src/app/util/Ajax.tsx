@@ -1062,6 +1062,30 @@ export const Ajax =
         onError,
       );
     },
+
+    getAnalytics(variantId: ID, start: Date, end: Date, metricId: number)
+    {
+      // jmansor: will need to change Ajax.req to allow calls without prepending
+      // /midway/v1/ to the URL.
+      const headers = new Headers({
+        'Content-Type': 'application/json'
+      });
+      const init: RequestInit = {
+        method: 'POST',
+        headers: headers,
+        cache: 'default',
+      };
+      const request = new Request(
+        `http://localhost:3000/events/variants/${variantId}?id=1&accessToken=-ZSif-p5YY7G9WUyUq7fE1y3SYPvAHEq9jntn6ezU9RY63fQDAQ73AUd316ej1bgOuJSxs0YodW4OKejZhw0watpuD0nbNoL4hJMHRd8xAk8jxFIjc6k4qtTQNtGj68k0daz9CgqEcWLN5sHEJgsSJ3DQ15BP9M_O9958MeQgoISMPEUQO0aGCxxjpjan5rEZ7BMXhI-0lA_UvqJGPw1G77zd5Ete746UYDuB_A6nRiwugiXb980LjcmqPVqWxO9&start=${start.toISOString()}&end=${end.toISOString()}&metric=${metricId.toString()}`,
+        init
+      );
+
+      return fetch(request)
+        .then((response) =>
+        {
+          return response.json();
+        })
+    }
   };
 
 export default Ajax;

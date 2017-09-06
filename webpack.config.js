@@ -65,6 +65,7 @@ module.exports =
         extensions: [ ".js", ".tsx", ".jsx", ".ts", ".css", ".less", ".json", ".svg" ],
         alias: {
             auth: path.resolve(__dirname, 'src/app/auth'),
+            analytics: path.resolve(__dirname, 'src/app/analytics'),
             builder: path.resolve(__dirname, 'src/app/builder'),
             charts: path.resolve(__dirname, 'src/app/charts'),
             common: path.resolve(__dirname, 'src/app/common'),

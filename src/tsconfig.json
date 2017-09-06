@@ -15,6 +15,7 @@
         "paths": {
             "library*": ["app/library/*"],
             "auth*": ["app/auth/*"],
+            "analytics*": ["app/analytics/*"],
             "builder*": ["app/builder/*"],
             "charts*": ["app/charts/*"],
             "common*": ["app/common/*"],

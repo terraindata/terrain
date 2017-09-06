@@ -86,6 +86,7 @@ export interface Props
   multiselect?: boolean;
   params?: any;
   variantActions?: any;
+  analyticsActions?: any;
 }
 
 class VariantsColumn extends TerrainComponent<Props>
@@ -296,6 +297,7 @@ class VariantsColumn extends TerrainComponent<Props>
       } else
       {
         this.props.variantActions.select(id.toString());
+        this.props.analyticsActions.fetch(id);
       }
     } else
     {
