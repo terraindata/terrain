@@ -51,9 +51,11 @@ import GoogleMap from 'google-map-react';
 import { List } from 'immutable';
 import { divIcon } from 'leaflet';
 import * as React from 'react';
-import { Circle, Map, Marker, Polyline, Popup, TileLayer } from 'react-leaflet';
-import PlacesAutocomplete, { geocodeByAddress, geocodeByLatLng, getLatLng } from 'react-places-autocomplete';
+import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 'react-leaflet';
+import PlacesAutocomplete from 'react-places-autocomplete';
 
+import Routing from './RoutingMachine';
+import { geocodeByAddress, geocodeByLatLng, getLatLng } from '../../util/MapUtil';
 import { cardStyle, Colors, fontColor, getCardColors } from '../Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import BuilderTextbox from './BuilderTextbox';
@@ -68,6 +70,7 @@ export interface Props
   onChange: (value) => void;
   markLocation: boolean;
   showDistanceTools?: boolean;
+  secondLocation?: [number, number];
 }
 
 enum UNITS
@@ -105,6 +108,9 @@ class MapComponent extends TerrainComponent<Props>
     longitude: string,
     distance?: number,
     selectedUnit: number,
+    errorLatitude: boolean,
+    errorLongitude: boolean,
+    errorDistnace: boolean,
   } = {
     address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
     searchByCoordinate: false,
@@ -113,6 +119,9 @@ class MapComponent extends TerrainComponent<Props>
     longitude: this.props.location !== undefined ? this.props.location[1].toString() : '',
     distance: 0.0,
     selectedUnit: 0,
+    errorLatitude: false,
+    errorLongitude: false,
+    errorDistance: false,
   };
 
   public componentWillReceiveProps(nextProps)
@@ -156,6 +165,10 @@ class MapComponent extends TerrainComponent<Props>
   {
     if (e.key === 'Enter')
     {
+      if (isNaN(this.state.latitude) || isNaN(this.state.longitude) || this.state.latitude === '' || this.state.longitude === '')
+      {
+        return;
+      }
       const lat = parseFloat(this.state.latitude);
       const lng = parseFloat(this.state.longitude);
       geocodeByLatLng({ lat, lng })
@@ -179,15 +192,27 @@ class MapComponent extends TerrainComponent<Props>
   // TODO CHECK IF THEY ARE NUMBERS
   public handleLatitudeChange(e)
   {
+    let error = false;
+    if (isNaN(e.target.value))
+    {
+      error = true;
+    }
     this.setState({
       latitude: e.target.value,
+      errorLatitude: error,
     });
   }
 
   public handleLongitudeChange(e)
   {
+    let error = false;
+    if (isNaN(e.target.value))
+    {
+      error = true;
+    }
     this.setState({
       longitude: e.target.value,
+      errorLongitude: error,
     });
   }
 
@@ -201,14 +226,20 @@ class MapComponent extends TerrainComponent<Props>
           placeholder={'Latitude'}
           onChange={this.handleLatitudeChange}
           onKeyPress={this.handleCoordinateFormSubmit}
+          className={classNames({
+            'input-map-input-error': this.state.errorLatitude,
+          })}
         />
         <input
-          className='input-map-longitude'
           type='text'
           value={this.state.longitude}
           placeholder={'Latitude'}
           onChange={this.handleLongitudeChange}
           onKeyPress={this.handleCoordinateFormSubmit}
+          className={classNames({
+            'input-map-longitude': true,
+            'input-map-input-error': this.state.errorLongitude,
+          })}
         />
       </div>
     );
@@ -216,66 +247,131 @@ class MapComponent extends TerrainComponent<Props>
 
   public convertDistanceToMeters()
   {
+    if (isNaN(this.state.distance) || this.state.distance === '')
+    {
+      return 0;
+    }
+    const distance = parseFloat(this.state.distance);
     switch (this.state.selectedUnit)
     {
       case UNITS.Meters:
-        return this.state.distance;
+        return distance;
       case UNITS.Kilometers:
-        return 1000 * this.state.distance;
+        return 1000 * distance;
       case UNITS.Miles:
-        return 1609.34 * this.state.distance;
+        return 1609.34 * distance;
       case UNITS.Feet:
-        return 0.3048 * this.state.distance;
+        return 0.3048 * distance;
       default:
         return this.state.distance;
     }
   }
 
+  public radians(degrees)
+  {
+    return degrees * Math.PI / 180;
+  }
+
+  // returns linnear distance between two coordinate points in METERS
+  public directDistance(firstLocation, secondLocation)
+  {
+    const R = 6371e3; // meters
+    const phi1 = this.radians(firstLocation[0]);
+    const phi2 = this.radians(secondLocation[0]);
+    const deltaPhi = this.radians(secondLocation[0] - firstLocation[0]);
+    const deltaLambda = this.radians(secondLocation[1] - firstLocation[1]);
+
+    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+            Math.cos(phi1) * Math.cos(phi2) *
+            Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  }
+
   public renderMap()
   {
+    const {location, secondLocation} = this.props;
     return (
-      <div className='input-map-wrapper'>
-        <Map center={this.props.location} zoom={18}>
-          {
-            this.props.markLocation ?
-              <Marker
-                position={this.props.location}
-                icon={markerIcon}
-              >
-                <Popup>
-                  <span>{this.props.address}</span>
-                </Popup>
-              </Marker>
-              :
-              null
-          }
-          {
-            this.props.showDistanceTools ?
-              <Circle
-                center={this.props.location}
-                radius={this.convertDistanceToMeters()}
-              />
-              :
-              null
-          }
-          <Polyline
-            positions={[this.props.location, [37.77, -122.43]]}
-          />
-          <TileLayer
-            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      <div className="map">
+        <Map
+          key={`routing-${location[0]}-${location[1]}-${secondLocation[0]}-${secondLocation[1]}`}
+          scrollWheelZoom={false}
+          zoomControl={false}
+        >
+          <ZoomControl position="bottomright" />
+          <Routing
+            to={location}
+            from={secondLocation}
           />
         </Map>
       </div>
-    );
   }
+
+
+  // public renderMap()
+  // {
+  //   const directDistance = this.directDistance(this.props.location, this.props.secondLocation);
+  //   return (
+  //     <div className='input-map-wrapper'>
+  //       <Map 
+  //         center={this.props.location} 
+  //         zoom={18}
+  //         key='map'
+  //        >
+  //         {
+  //           this.props.markLocation ?
+  //             <Marker
+  //               position={this.props.location}
+  //               icon={markerIcon}
+  //             >
+  //               <Popup>
+  //                 <span>{this.props.address}</span>
+  //               </Popup>
+  //             </Marker>
+  //             :
+  //             null
+  //         }
+  //         {
+  //           this.props.showDistanceTools ?
+  //             <Circle
+  //               center={this.props.location}
+  //               radius={this.convertDistanceToMeters()}
+  //             />
+  //             :
+  //             null
+  //         }
+  //         {
+  //           this.props.secondLocation !== undefined ?
+  //           <Polyline
+  //             positions={[this.props.location, this.props.secondLocation]}
+  //           />
+  //           :
+  //           null
+  //         }
+  //         <Routing
+  //           from={[57.74, 11.94]}
+  //           to={[57.6792, 11.949]}
+  //         />
+  //         <TileLayer
+  //           url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+  //           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+  //         />
+  //       </Map>
+  //     </div>
+  //   );
+  // }
 
   public handleDistanceChange(e)
   {
-    // TODO Restrict to being a number
-    const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+    let error = false;
+    if (isNaN(e.target.value))
+    {
+      error = true;
+    }
     this.setState({
-      distance: value,
+      distance: e.target.value,
+      errorDistance: error,
     });
   }
 
@@ -286,15 +382,40 @@ class MapComponent extends TerrainComponent<Props>
     });
   }
 
+  public handleDistanceKeyDown(e)
+  {
+    if (isNaN(this.state.distance))
+    {
+      return;
+    }
+    const dist = parseFloat(this.state.distance);
+    if (e.key === 'ArrowUp')
+    {
+      this.setState({
+        distance: (dist + 1).toString(),
+      });
+    }
+    if (e.key === 'ArrowDown' && dist >= 1)
+    {
+      this.setState({
+        distance: (dist - 1).toString(),
+      })
+    }
+  }
+
   public renderDistanceTools()
   {
     return (
       <div className='input-map-distance-tools'>
         <input
           type='text'
-          value={this.state.distance.toString()}
+          value={this.state.distance}
           onChange={this.handleDistanceChange}
-          className='input-map-distance-tools-input'
+          onKeyDown={this.handleDistanceKeyDown}
+          className={classNames({
+            'input-map-distance-tools-input': true,
+            'input-map-input-error': this.state.errorDistance
+          })}
         />
         <Dropdown
           options={List(['m', 'km', 'mi', 'ft'])}
