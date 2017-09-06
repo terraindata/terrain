@@ -219,17 +219,6 @@ const FileImportActions =
     toggleExportRank:
     (exportRank: boolean) =>
       $(ActionTypes.toggleExportRank, { exportRank }),
-
-    getStreamingProgress:
-    () =>
-      $(ActionTypes.getStreamingProgress, {
-        getStreamingProgress: FileImportActions.getStreamingProgress,
-        setProgress: FileImportActions.setProgress,
-      }),
-
-    setProgress:
-    (progress: number) =>
-      $(ActionTypes.setProgress, { progress }),
   };
 
 export default FileImportActions;

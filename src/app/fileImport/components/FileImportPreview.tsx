@@ -60,7 +60,6 @@ import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
-import ProgressBar from './../../common/components/ProgressBar';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { tooltip } from './../../common/components/tooltip/Tooltips';
 import Actions from './../data/FileImportActions';
@@ -98,7 +97,6 @@ export interface Props
   elasticUpdate?: boolean;
   existingIndexAndType?: boolean;
   handleFileImportSuccess?: () => void;
-  progress?: number;
   showProgressBar?: boolean;
   router?: any;
   route?: any;
@@ -598,17 +596,6 @@ class FileImportPreview extends TerrainComponent<Props>
     });
   }
 
-  public getStreamingProgress()
-  {
-    Actions.getStreamingProgress();
-  }
-
-  public manageProgress()
-  {
-    // must guarantee first poll does not fail, otherwise entire process stops
-    setTimeout(this._fn(this.getStreamingProgress), FileImportTypes.PROGRESS_UPDATE_INTERVAL);
-  }
-
   public handleUploadFile()
   {
     this.confirmedLeave = true;
@@ -632,7 +619,6 @@ class FileImportPreview extends TerrainComponent<Props>
     else
     {
       Actions.importFile(this.props.handleFileImportSuccess);
-      this.manageProgress();
     }
   }
 
@@ -1039,10 +1025,17 @@ class FileImportPreview extends TerrainComponent<Props>
         upload
         :
         this.props.uploadInProgress && this.props.showProgressBar ?
-          <ProgressBar
-            progress={this.props.progress}
-            text={this.props.progress < 0.5 ? 'transforming and type-checking data' : 'inserting data into elastic'}
-          />
+          <div
+            className='fi-preview-loading'
+          >
+            <Loading
+              width={100}
+              height={100}
+              loading={this.props.uploadInProgress}
+              loaded={false}
+              onLoadedEnd={null}
+            />
+          </div>
           :
           upload
     );

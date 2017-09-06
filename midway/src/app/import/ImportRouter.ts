@@ -68,7 +68,7 @@ Router.post('/', async (ctx, next) =>
     ctx.status = 400;
     return;
   }
-  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'filesize', 'tablename']);
+  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
   Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
   // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
 
@@ -119,13 +119,6 @@ Router.post('/headless', async (ctx, next) =>
   await perm.ImportPermissions.verifyHeadlessRoute(authStream['user'] as UserConfig, authStream['fields']);
 
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
-});
-
-Router.post('/progress', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  // TODO: add permissions
-  const progress: number | string = await imprt.getProgress();
-  ctx.body = progress;
 });
 
 export default Router;

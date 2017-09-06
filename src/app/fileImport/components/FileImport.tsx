@@ -619,8 +619,7 @@ class FileImport extends TerrainComponent<any>
     const { fileImportState } = this.state;
     const { filetype, filesize, serverName, serverId, dbName, tableName } = fileImportState;
     const { previewColumns, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
-    const { templates, transforms, uploadInProgress, elasticUpdate, requireJSONHaveAllFields, exportRank } = fileImportState;
-    const { progress } = fileImportState;
+    const { templates, transforms, uploadInProgress, elasticUpdate, requireJSONHaveAllFields } = fileImportState;
 
     let content;
     switch (this.state.stepId)
@@ -715,7 +714,6 @@ class FileImport extends TerrainComponent<any>
             router={this.props.router}
             route={this.props.route}
             existingIndexAndType={this.state.dbNames.contains(dbName) && this.state.tableNames.contains(tableName)}
-            progress={progress}
           />;
         break;
       case Steps.Success:

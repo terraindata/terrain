@@ -316,34 +316,6 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('tableName', '');
   };
 
-FileImportReducers[ActionTypes.getStreamingProgress] =
-  (state, action) =>
-  {
-    Ajax.getStreamingProgress(
-      (resp: any) =>
-      {
-        console.log(resp);
-        action.payload.setProgress(resp);
-        if (resp !== 1)
-        {
-          // TODO: avoid instantiating a new function every time
-          setTimeout(() => { action.payload.getStreamingProgress(); }, FileImportTypes.PROGRESS_UPDATE_INTERVAL);
-        }
-      },
-      (err: string) =>
-      {
-        console.log('Error getting streaming progress: ' + err);
-      },
-    );
-    return state;
-  };
-
-FileImportReducers[ActionTypes.setProgress] =
-  (state, action) =>
-    state
-      .set('progress', action.payload.progress)
-  ;
-
 FileImportReducers[ActionTypes.importFile] =
   (state, action) =>
   {

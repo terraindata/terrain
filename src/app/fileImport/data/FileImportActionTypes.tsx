@@ -73,8 +73,6 @@ const FileImportActionTypes =
     saveFile: '',
     changeUploadInProgress: '',
     changeElasticUpdate: '',
-    getStreamingProgress: '',
-    setProgress: '',
     addPreviewColumn: '',
     togglePreviewColumn: '',
     setExportFiletype: '',

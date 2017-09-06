@@ -731,7 +731,6 @@ export const Ajax =
       formData.append('id', String(authState.id));
       formData.append('accessToken', authState.accessToken);
       formData.append('filetype', filetype);
-      formData.append('filesize', String(file.size));
       formData.append('dbname', dbname);
       formData.append('tablename', tablename);
       formData.append('dbid', String(connectionId));
