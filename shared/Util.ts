@@ -206,7 +206,7 @@ export function parseCSV(file, config: ParseCSVConfig)
     }
     if (file.substr(c, newLineLength) === newLine && !insideQuote)
     {
-      if (arr[row].length === 1 && arr[row][0] === newLineLength) // increment preview on blank rows and remove them later
+      if (arr[row].length === 1 && arr[row][0].length === newLineLength) // increment preview on blank rows and remove them later
       {
         preview++;
       }
