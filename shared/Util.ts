@@ -206,7 +206,7 @@ export function parseCSV(file, config: ParseCSVConfig)
     }
     if (file.substr(c, newLineLength) === newLine && !insideQuote)
     {
-      if (arr[row].length === newLineLength) // increment preview on blank rows and remove them later
+      if (arr[row].length === 1 && arr[row][0] === newLineLength) // increment preview on blank rows and remove them later
       {
         preview++;
       }
@@ -237,8 +237,9 @@ export function parseCSV(file, config: ParseCSVConfig)
     arr[row][col] = '';
   }
 
+  // remove blank lines
   arr = arr.filter((arrRow) =>
-    arrRow.length > newLineLength,
+    arrRow.length > 1 || arrRow[0].length > newLineLength,
   );
 
   if (hasHeaderRow)

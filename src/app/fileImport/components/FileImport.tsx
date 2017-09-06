@@ -447,6 +447,20 @@ class FileImport extends TerrainComponent<any>
     this.incrementStep();
   }
 
+  public onFileImportSuccess()
+  {
+    this.setState({
+      stepId: Steps.Success,
+    });
+  }
+
+  public importAnotherFile()
+  {
+    this.setState({
+      stepId: Steps.ChooseFile,
+    });
+  }
+
   public renderSelect()
   {
     return (
@@ -600,20 +614,6 @@ class FileImport extends TerrainComponent<any>
         }
       </div>
     );
-  }
-
-  public onFileImportSuccess()
-  {
-    this.setState({
-      stepId: Steps.Success,
-    });
-  }
-
-  public importAnotherFile()
-  {
-    this.setState({
-      stepId: Steps.ChooseFile,
-    });
   }
 
   public renderContent()
