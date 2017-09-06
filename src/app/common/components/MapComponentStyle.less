@@ -62,10 +62,12 @@
 .input-map-search-settings-row {
 	margin-bottom: 18px;
     margin-top: -12px;
-    .checkbox {
+    display: inline-flex;
+    .input-map-checkbox {
     	margin-right: 6px !important;
-	    position: relative !important;
-	    bottom: 2px !important;
+    }
+    .input-map-checkbox-label {
+    	cursor: pointer;
     }
 }
 
@@ -76,7 +78,17 @@
 	}
 }
 
->>>>>>> started styling
+.input-map-distance-tools {
+	.input-map-distance-tools-dropdown {
+		max-width: 10%;
+		position: relative;
+		top: -30px;
+		left: 25%;
+	}
+	.input-map-distance-tools-input {
+		max-width: 25%;
+	}
+}
 
 /* required styles */
 .map-marker-container{
