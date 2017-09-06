@@ -119,7 +119,7 @@ class ElasticHighlighter extends SyntaxHighlighter
         const errorAnnotation: MarkerAnnotation = { showing: false, msg: message };
         const errMarker = instance.markText(
           { line: token.row, ch: token.col },
-          { line: token.toRow, ch: token.toCol},
+          { line: token.toRow, ch: token.toCol },
           { className: 'CodeMirror-lint-mark-error', __annotation: errorAnnotation });
       }
     }
