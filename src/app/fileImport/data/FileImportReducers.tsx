@@ -345,11 +345,6 @@ FileImportReducers[ActionTypes.getStreamingProgress] =
     Ajax.getStreamingProgress(
       (resp: any) =>
       {
-        // console.log('response: ', resp);
-        // const progress = resp / Math.ceil(state.filesize / FileImportTypes.STREAMING_CHUNK_SIZE);
-        // console.log('filesize: ' + state.filesize);
-        // console.log(' filesize in chunks: ' + Math.ceil(state.filesize / FileImportTypes.STREAMING_CHUNK_SIZE));
-        // console.log('progress: ', progress);
         console.log(resp);
         action.payload.setProgress(resp);
         if (resp !== 1)
@@ -360,7 +355,6 @@ FileImportReducers[ActionTypes.getStreamingProgress] =
       },
       (err: string) =>
       {
-        // TODO: if first poll fails entire process stops
         console.log('Error getting streaming progress: ' + err);
       },
     );

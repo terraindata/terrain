@@ -601,6 +601,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public manageProgress()
   {
+    // must guarantee first poll does not fail, otherwise entire process stops
     setTimeout(this._fn(this.getStreamingProgress), FileImportTypes.PROGRESS_UPDATE_INTERVAL);
   }
 
