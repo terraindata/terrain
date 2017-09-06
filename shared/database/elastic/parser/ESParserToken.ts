@@ -79,7 +79,7 @@ export default class ESParserToken
     this.row = row;
     this.col = col;
     this.toRow = row;
-    this.toCol = col;
+    this.toCol = col + length;
     this.length = length;
     this.substring = substring;
     this._errors = [];
