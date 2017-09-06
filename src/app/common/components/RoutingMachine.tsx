@@ -46,32 +46,50 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import {PropTypes} from 'react';
-import {MapLayer, Map, MapComponent} from 'react-leaflet';
+import { PropTypes } from 'react';
+import { MapLayer } from 'react-leaflet';
 import 'leaflet-routing-machine';
-import {isEqual} from 'lodash';
+import { isEqual } from 'lodash';
+import L from 'leaflet';
 
-class RoutingMachine extends MapLayer {
-  componentWillMount() {
+class RoutingMachine extends MapLayer
+{
+
+  public componentWillMount()
+  {
     super.componentWillMount();
-    const { map, from, to } = this.props;
-    this.leafletElement =
-      L.Routing.control({
+  }
+
+  public updateLeafletElement(fromProps, toProps)
+  {
+    if (fromProps.to !== toProps.to || fromProps.from !== toProps.from)
+    {
+      return L.Routing.control({
+        position: 'topleft',
+        waypoints: [
+          L.latLng(fromProps.from[0], fromProps.from[1]),
+          L.latLng(fromProps.to[0], fromProps.to[1]),
+        ],
+        router: L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
+      });
+    }
+  }
+
+  public createLeafletElement(props)
+  {
+    const { to, from } = props;
+    return L.Routing.control({
       position: 'topleft',
-      router: L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
       waypoints: [
         L.latLng(from[0], from[1]),
         L.latLng(to[0], to[1]),
       ],
-    }).addTo(map);
+      router: L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
+    });
   }
 
-  createLeafletElement() 
+  public render()
   {
-    console.log('bitch');
-  }
-
-  render() {
     return null;
   }
 }
