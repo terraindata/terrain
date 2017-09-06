@@ -66,7 +66,8 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|svg\\?.*|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/mocks/fileMock.ts"
     },
     "globals": {
-      "DEV": true
+      "DEV": true,
+      "MIDWAY_HOST": "http://localhost"
     },
     "setupFiles": [
       "<rootDir>/src/test/mocks/browserMock.ts"
@@ -113,6 +114,7 @@
     "memoize-one": "^3.0.1",
     "moment": "^2.13.0",
     "mysql": "^2.13.0",
+    "nock": "^9.0.14",
     "node-libs-browser": "0.6.0",
     "node-schedule": "^1.2.3",
     "object-assign": "^4.1.1",

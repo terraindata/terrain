@@ -723,6 +723,10 @@ assert@~1.3.0:
   dependencies:
     util "0.10.3"
 
+assertion-error@^1.0.1:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/assertion-error/-/assertion-error-1.0.2.tgz#13ca515d86206da0bac66e834dd397d87581094c"
+
 async-busboy@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/async-busboy/-/async-busboy-0.6.1.tgz#d33a53f3650f4a9ec53ee0aa147ab29d5d6ba9d5"
@@ -1877,6 +1881,14 @@ center-align@^0.1.1:
     align-text "^0.1.3"
     lazy-cache "^1.0.3"
 
+"chai@>=1.9.2 <4.0.0":
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/chai/-/chai-3.5.0.tgz#4d02637b067fe958bdbfdd3a40ec56fef7373247"
+  dependencies:
+    assertion-error "^1.0.1"
+    deep-eql "^0.1.3"
+    type-detect "^1.0.0"
+
 chain-function@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/chain-function/-/chain-function-1.0.0.tgz#0d4ab37e7e18ead0bdc47b920764118ce58733dc"
@@ -2634,7 +2646,6 @@ debug@2.6.7:
   dependencies:
     ms "2.0.0"
 
-
 debug@2.6.8, debug@^2.2.0, debug@^2.6.3, debug@^2.6.6, debug@^2.6.8:
   version "2.6.8"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.8.tgz#e731531ca2ede27d188222427da17821d68ff4fc"
@@ -2653,7 +2664,13 @@ declare.js@~0.0.4:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/declare.js/-/declare.js-0.0.8.tgz#0478adff9564c004f51df73d8bc134019d28dcde"
 
-deep-equal@^1.0.1, deep-equal@~1.0.1:
+deep-eql@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/deep-eql/-/deep-eql-0.1.3.tgz#ef558acab8de25206cd713906d74e56930eb69f2"
+  dependencies:
+    type-detect "0.1.1"
+
+deep-equal@^1.0.0, deep-equal@^1.0.1, deep-equal@~1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-1.0.1.tgz#f5d260292b660e084eff4cdbc9f08ad3247448b5"
 
@@ -5522,7 +5539,7 @@ lodash@^3.10.1, lodash@^3.8.0:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.14.0, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.5.0:
+lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.14.0, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.5.0, lodash@~4.17.2:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
@@ -5854,6 +5871,20 @@ nested-error-stacks@^1.0.0:
   resolved "https://registry.yarnpkg.com/nested-error-stacks/-/nested-error-stacks-1.0.2.tgz#19f619591519f096769a5ba9a86e6eeec823c3cf"
   dependencies:
     inherits "~2.0.1"
+
+nock@^9.0.14:
+  version "9.0.14"
+  resolved "https://registry.yarnpkg.com/nock/-/nock-9.0.14.tgz#2211550253173ce298bcd89fca825e83813ca72b"
+  dependencies:
+    chai ">=1.9.2 <4.0.0"
+    debug "^2.2.0"
+    deep-equal "^1.0.0"
+    json-stringify-safe "^5.0.1"
+    lodash "~4.17.2"
+    mkdirp "^0.5.0"
+    propagate "0.4.0"
+    qs "^6.0.2"
+    semver "^5.3.0"
 
 node-fetch@^1.0.1:
   version "1.7.2"
@@ -6862,6 +6893,10 @@ prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.7,
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
 
+propagate@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/propagate/-/propagate-0.4.0.tgz#f3fcca0a6fe06736a7ba572966069617c130b481"
+
 protocols@^1.1.0, protocols@^1.4.0:
   version "1.4.5"
   resolved "https://registry.yarnpkg.com/protocols/-/protocols-1.4.5.tgz#21de1f441c4ef7094408ed9f1c94f7a114b87557"
@@ -6917,7 +6952,7 @@ qs@6.4.0, qs@^6.1.0, qs@^6.4.0, qs@~6.4.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.4.0.tgz#13e26d28ad6b0ffaa91312cd3bf708ed351e7233"
 
-qs@6.5.0:
+qs@6.5.0, qs@^6.0.2:
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.0.tgz#8d04954d364def3efc55b5a0793e1e2c8b1e6e49"
 
@@ -8527,6 +8562,14 @@ type-check@~0.3.2:
   resolved "https://registry.yarnpkg.com/type-check/-/type-check-0.3.2.tgz#5884cab512cf1d355e3fb784f30804b2b520db72"
   dependencies:
     prelude-ls "~1.1.2"
+
+type-detect@0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-0.1.1.tgz#0ba5ec2a885640e470ea4e8505971900dac58822"
+
+type-detect@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-1.0.0.tgz#762217cc06db258ec48908a1298e8b95121e8ea2"
 
 type-is@^1.5.5, type-is@^1.6.14, type-is@~1.6.15:
   version "1.6.15"
