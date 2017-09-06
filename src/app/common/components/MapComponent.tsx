@@ -48,14 +48,17 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import GoogleMap from 'google-map-react';
+import { List } from 'immutable';
 import { divIcon } from 'leaflet';
 import * as React from 'react';
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
+import { Circle, Map, Marker, Polyline, Popup, TileLayer } from 'react-leaflet';
 import PlacesAutocomplete, { geocodeByAddress, geocodeByLatLng, getLatLng } from 'react-places-autocomplete';
+
 import { cardStyle, Colors, fontColor, getCardColors } from '../Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import BuilderTextbox from './BuilderTextbox';
 import CheckBox from './CheckBox';
+import Dropdown from './Dropdown';
 import './MapComponentStyle.less';
 
 export interface Props
@@ -64,6 +67,15 @@ export interface Props
   address: string;
   onChange: (value) => void;
   markLocation: boolean;
+  showDistanceTools?: boolean;
+}
+
+enum UNITS
+{
+  Meters,
+  Kilometers,
+  Miles,
+  Feet,
 }
 
 const markerIcon = divIcon({
@@ -91,12 +103,16 @@ class MapComponent extends TerrainComponent<Props>
     error?: any,
     latitude: string,
     longitude: string,
+    distance?: number,
+    selectedUnit: number,
   } = {
     address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
     searchByCoordinate: false,
     error: null,
     latitude: this.props.location !== undefined ? this.props.location[0].toString() : '',
     longitude: this.props.location !== undefined ? this.props.location[1].toString() : '',
+    distance: 0.0,
+    selectedUnit: 0,
   };
 
   public componentWillReceiveProps(nextProps)
@@ -198,6 +214,99 @@ class MapComponent extends TerrainComponent<Props>
     );
   }
 
+  public convertDistanceToMeters()
+  {
+    switch (this.state.selectedUnit)
+    {
+      case UNITS.Meters:
+        return this.state.distance;
+      case UNITS.Kilometers:
+        return 1000 * this.state.distance;
+      case UNITS.Miles:
+        return 1609.34 * this.state.distance;
+      case UNITS.Feet:
+        return 0.3048 * this.state.distance;
+      default:
+        return this.state.distance;
+    }
+  }
+
+  public renderMap()
+  {
+    return (
+      <div className='input-map-wrapper'>
+        <Map center={this.props.location} zoom={18}>
+          {
+            this.props.markLocation ?
+              <Marker
+                position={this.props.location}
+                icon={markerIcon}
+              >
+                <Popup>
+                  <span>{this.props.address}</span>
+                </Popup>
+              </Marker>
+              :
+              null
+          }
+          {
+            this.props.showDistanceTools ?
+              <Circle
+                center={this.props.location}
+                radius={this.convertDistanceToMeters()}
+              />
+              :
+              null
+          }
+          <Polyline
+            positions={[this.props.location, [37.77, -122.43]]}
+          />
+          <TileLayer
+            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
+        </Map>
+      </div>
+    );
+  }
+
+  public handleDistanceChange(e)
+  {
+    // TODO Restrict to being a number
+    const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+    this.setState({
+      distance: value,
+    });
+  }
+
+  public handleUnitChange(index)
+  {
+    this.setState({
+      selectedUnit: index,
+    });
+  }
+
+  public renderDistanceTools()
+  {
+    return (
+      <div className='input-map-distance-tools'>
+        <input
+          type='text'
+          value={this.state.distance.toString()}
+          onChange={this.handleDistanceChange}
+          className='input-map-distance-tools-input'
+        />
+        <Dropdown
+          options={List(['m', 'km', 'mi', 'ft'])}
+          selectedIndex={this.state.selectedUnit}
+          className='input-map-distance-tools-dropdown'
+          canEdit={true}
+          onChange={this.handleUnitChange}
+        />
+      </div>
+    );
+  }
+
   public render()
   {
     const inputProps = {
@@ -221,32 +330,22 @@ class MapComponent extends TerrainComponent<Props>
           <CheckBox
             checked={this.state.searchByCoordinate}
             onChange={this.changeSearchMode}
+            className='input-map-checkbox'
           />
-          <label onClick={this.changeSearchMode}>
+          <label
+            onClick={this.changeSearchMode}
+            className='input-map-checkbox-label'
+          >
             Search by coordinate
             </label>
         </div>
-        <div className='input-map-wrapper'>
-          <Map center={this.props.location} zoom={18}>
-            {
-              this.props.markLocation ?
-                <Marker
-                  position={this.props.location}
-                  icon={markerIcon}
-                >
-                  <Popup>
-                    <span>{this.props.address}</span>
-                  </Popup>
-                </Marker>
-                :
-                null
-            }
-            <TileLayer
-              url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            />
-          </Map>
-        </div>
+        {
+          this.props.showDistanceTools ?
+            this.renderDistanceTools()
+            :
+            null
+        }
+        {this.renderMap()}
       </div>
     );
   }

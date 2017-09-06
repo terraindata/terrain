@@ -251,6 +251,7 @@ class InputComponent extends TerrainComponent<Props>
           address={value.address}
           location={value.location}
           markLocation={markLocation}
+          showDistanceTools={true}
         />);
     }
 
