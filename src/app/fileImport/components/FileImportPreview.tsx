@@ -113,22 +113,24 @@ export interface Props
 class FileImportPreview extends TerrainComponent<Props>
 {
   public state: {
+    templateOptions: List<string>,
     appliedTemplateName: string,
     saveTemplateName: string,
-    templateOptions: List<string>,
     showingDelimTextBox: boolean,
     showingUpdateTemplate: boolean,
     showingApplyTemplate: boolean,
     showingSaveTemplate: boolean,
+
     showingTransformModal: boolean,
-    columnId: number,
+    transformColumnId: number,
+
     showingAdvanced: boolean,
     showingAddColumn: boolean,
     addColumnName: string,
-    previewErrorMsg: string,
     advancedCheck: boolean,
     advancedExportRank: boolean,
     exportFiletype: string,
+
     leaving: boolean,
     nextLocation: any,
     changeLocationAfterSave: boolean,
@@ -136,23 +138,26 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalContent: string,
     responseModalTitle: string,
     responseModalError: boolean,
+    previewErrorMsg: string,
   } = {
+    templateOptions: List([]),
     appliedTemplateName: '',
     saveTemplateName: '',
-    templateOptions: List([]),
     showingDelimTextBox: false,
     showingUpdateTemplate: false,
     showingApplyTemplate: false,
     showingSaveTemplate: false,
+
     showingTransformModal: false,
-    columnId: -1,
+    transformColumnId: -1,
+
     showingAdvanced: false,
     showingAddColumn: false,
     addColumnName: '',
-    previewErrorMsg: '',
     advancedCheck: this.props.requireJSONHaveAllFields,
     advancedExportRank: this.props.exportRank,
     exportFiletype: 'csv',
+
     leaving: false,
     nextLocation: null,
     changeLocationAfterSave: false,
@@ -160,6 +165,7 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalContent: '',
     responseModalTitle: '',
     responseModalError: false,
+    previewErrorMsg: '',
   };
 
   public confirmedLeave: boolean = false;
@@ -363,7 +369,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleSaveTemplate()
   {
-    const { appliedTemplateName, saveTemplateName } = this.state;
+    const { saveTemplateName } = this.state;
     if (!saveTemplateName)
     {
       this.setPreviewErrorMsg('Please enter a template name');
@@ -418,7 +424,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleUpdateTemplate()
   {
-    const { appliedTemplateName, saveTemplateName } = this.state;
+    const { saveTemplateName } = this.state;
     const id = getTemplateId(this.state.templateOptions.find((option) => getTemplateName(option) === saveTemplateName));
     Actions.updateTemplate(id, this.props.exporting, this.handleUpdateTemplateSuccess, this.handleUpdateTemplateError, saveTemplateName);
     this.setState({
@@ -527,8 +533,8 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public onTransform(columnId: number)
   {
+    this.showTransformModal();
     this.setState({
-      showingTransformModal: true,
       columnId,
     });
   }
@@ -876,10 +882,10 @@ class FileImportPreview extends TerrainComponent<Props>
     return (
       <TransformModal
         open={this.state.showingTransformModal}
-        columnId={this.state.columnId}
-        columnName={this.props.columnNames.get(this.state.columnId)}
+        columnId={this.state.transformColumnId}
+        columnName={this.props.columnNames.get(this.state.transformColumnId)}
         columnNames={this.props.columnNames}
-        datatype={this.props.columnTypes.get(this.state.columnId).type}
+        datatype={this.props.columnTypes.get(this.state.transformColumnId).type}
         onClose={this.hideTransformModal}
         setErrorMsg={this.setPreviewErrorMsg}
       />
@@ -1190,17 +1196,14 @@ class FileImportPreview extends TerrainComponent<Props>
   public renderError()
   {
     const { previewErrorMsg } = this.state;
-    if (this.props.exporting)
-    {
-      return (
-        <Modal
-          open={!!previewErrorMsg}
-          message={previewErrorMsg}
-          error={true}
-          onClose={this._fn(this.setPreviewErrorMsg, '')}
-        />
-      );
-    }
+    return (
+      <Modal
+        open={!!previewErrorMsg}
+        message={previewErrorMsg}
+        error={true}
+        onClose={this._fn(this.setPreviewErrorMsg, '')}
+      />
+    );
   }
 
   public renderEmptyExport()
