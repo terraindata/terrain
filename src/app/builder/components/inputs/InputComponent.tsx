@@ -203,6 +203,7 @@ class InputComponent extends TerrainComponent<Props>
           location={value.location}
           markLocation={markLocation}
           showDistanceTools={true}
+          secondLocation={[40, -120]}
         />);
     }
 
