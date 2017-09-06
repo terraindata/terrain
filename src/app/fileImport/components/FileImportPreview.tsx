@@ -531,11 +531,11 @@ class FileImportPreview extends TerrainComponent<Props>
     }
   }
 
-  public onTransform(columnId: number)
+  public onTransform(transformColumnId: number)
   {
     this.showTransformModal();
     this.setState({
-      columnId,
+      transformColumnId,
     });
   }
 
@@ -579,7 +579,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleFileExportSuccess()
   {
-    console.log('success');
     const filename = this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype;
     this.setState({
       showResponseModal: true,

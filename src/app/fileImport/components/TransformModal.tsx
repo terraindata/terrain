@@ -503,6 +503,7 @@ class TransformModal extends TerrainComponent<Props>
   public renderContent()
   {
     const datatypeId: number = ELASTIC_TYPES.indexOf(this.props.datatype);
+    console.log(datatypeId);
     return (
       <div
         className='fi-transform-content'
