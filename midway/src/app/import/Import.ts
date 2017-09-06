@@ -122,15 +122,18 @@ export class Import
   {
     return new Promise<number>(async (resolve, reject) =>
     {
-      if (this.chunkCount < 0)
+      if (this.totalChunks < 0)
       {
-        return reject('negative progress');
+        return reject('Negative file size in chunks');
       }
-      // console.log(this.chunkCount, this.totalChunks);
+      if (this.chunkCount < 0 || this.upsertCount < 0)
+      {
+        return reject('Negative streaming/upsert progress');
+      }
       const streamingProgress: number = this.chunkCount / this.totalChunks;
-      const upsertProgress: number = this.upsertCount / this.totalChunks;
-
-      resolve((streamingProgress < 1 ? streamingProgress : streamingProgress + upsertProgress) / 2);
+      const upsertProgress: number = ((this.upsertCount || 0) + 2) / this.totalChunks; // give boost to show 100% on UI
+      const totalProgress: number = (streamingProgress < 1 ? streamingProgress : 1 + upsertProgress) / 2;
+      resolve(totalProgress > 1 ? 1 : totalProgress);
     });
   }
 

@@ -1065,24 +1065,6 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
-  public renderTopBar()
-  {
-    return (
-      <div
-        className={classNames({
-          'flex-container fi-preview-topbar': true,
-          'fi-preview-topbar-export': this.props.exporting,
-        })}
-      >
-        {
-          !this.props.exporting &&
-          this.renderPrimaryKeys()
-        }
-        {this.renderTemplate()}
-      </div>
-    );
-  }
-
   public renderUpdate()
   {
     return (
@@ -1163,6 +1145,24 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderTopBar()
+  {
+    return (
+      <div
+        className={classNames({
+          'flex-container fi-preview-topbar': true,
+          'fi-preview-topbar-export': this.props.exporting,
+        })}
+      >
+        {
+          !this.props.exporting &&
+          this.renderPrimaryKeys()
+        }
+        {this.renderTemplate()}
+      </div>
+    );
+  }
+
   public renderBottomBar()
   {
     return (
@@ -1170,7 +1170,7 @@ class FileImportPreview extends TerrainComponent<Props>
         className='flex-container fi-import-button-wrapper'
       >
         {
-          !this.props.exporting && this.props.existingIndexAndType &&
+          !this.props.exporting && this.props.existingIndexAndType && !this.props.uploadInProgress &&
           this.renderUpdate()
         }
         {this.renderUpload()}
