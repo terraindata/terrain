@@ -79,11 +79,11 @@ class FileImportStateC extends BaseClass
   public templates: List<Template> = List([]);
 
   public uploadInProgress: boolean = false;
+  public progress: number = 0;
   public elasticUpdate: boolean = true;
 
   public errorMsg: string = '';
   public isDirty: boolean = false;
-  public progress: number = 0;
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.
@@ -131,21 +131,21 @@ export const _Transform =
 
 class TemplateC
 {
+  public export = false;
   public templateId = -1;
   public templateName = '';
   public originalNames: List<string> = List([]);
   public columnTypes: List<ColumnTypesTree> = List([]);
   public transformations: List<Transform> = List([]);
-  public hasCsvHeader: boolean = true;
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
-  public export = false;
 }
 
 const Template_Record = Immutable.Record(new TemplateC());
 export interface Template extends TemplateC, IRecord<Template> { }
 export const _Template =
   (config: {
+    export: boolean;
     templateId: number;
     templateName: string;
     originalNames: List<string>;
@@ -153,7 +153,6 @@ export const _Template =
     transformations: List<object>;
     primaryKeys: List<number>;
     primaryKeyDelimiter: string;
-    export: boolean;
   }) =>
   {
     return new Template_Record(config) as any as Template;
@@ -179,7 +178,6 @@ export const _ColumnTypesTree = (config?: any) =>
 
 export const NUMBER_PREVIEW_ROWS = 5;
 export const PROGRESS_UPDATE_INTERVAL = 10000; // (10s) polling interval for streaming progress
-export const STREAMING_CHUNK_SIZE = 10000000; // (10mb) backend streaming chunk size
 export const PREVIEW_CHUNK_SIZE = 10000000; // (10mb) amount to read in order to extract preview rows
 export const MIN_PROGRESSBAR_FILESIZE = 500000; // (500kb) threshold to display progressbar
 

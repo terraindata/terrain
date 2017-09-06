@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, link } from '../../common/Colors';
+import { backgroundColor, Colors, fontColor, link } from '../../common/Colors';
 import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -157,9 +157,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           />
           <span
             className='fi-preview-column-header-include-text clickable'
-            style={{
-              color: this.props.isIncluded ? Colors().active : Colors().border3,
-            }}
+            style={fontColor(this.props.isIncluded ? Colors().active : Colors().border3)}
           >
             Include
           </span>
@@ -173,9 +171,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
                 'fi-preview-column-header-key-selected': this.props.isPrimaryKey,
               })}
               onClick={this.handlePrimaryKeyChange}
-              style={{
-                background: this.props.isPrimaryKey ? Colors().active : Colors().bg2,
-              }}
+              style={backgroundColor(this.props.isPrimaryKey ? Colors().active : Colors().bg2)}
             >
               <KeyIcon />
             </div>,
@@ -257,7 +253,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     );
   }
 
-  public renderColumn()
+  public render()
   {
     return (
       <div
@@ -265,14 +261,10 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           'fi-preview-column': true,
           'fi-preview-column-excluded': !this.props.isIncluded,
         })}
-        style={{
-          text: Colors().text1,
-        }}
+        style={fontColor(Colors().text1)}
       >
         <div
-          style={{
-            background: Colors().bg2,
-          }}
+          style={backgroundColor(Colors().bg2)}
         >
           {
             this.renderHeader()
@@ -298,10 +290,10 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
               className={classNames({
                 'fi-preview-column-cell': true,
               })}
-              style={{
-                background: Colors().bg2,
-                color: Colors().text1,
-              }}
+              style={[
+                fontColor(Colors().text1),
+                backgroundColor(Colors().bg2),
+              ]}
             >
               <div
                 className='fi-preview-column-cell-text'
@@ -315,11 +307,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
         }
       </div>
     );
-  }
-
-  public render()
-  {
-    return this.renderColumn();
   }
 }
 

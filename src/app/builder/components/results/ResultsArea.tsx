@@ -535,9 +535,7 @@ column if you have customized the results view.');
 
     const content =
       <div
-        style={{
-          background: 'black', // TODO: black from Colors?
-        }}
+        style={backgroundColor(Colors().bg1)}
       >
         <FileImportPreview
           exporting={true}

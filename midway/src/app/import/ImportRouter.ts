@@ -123,6 +123,7 @@ Router.post('/headless', async (ctx, next) =>
 
 Router.post('/progress', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  // TODO: add permissions
   const progress: number | string = await imprt.getProgress();
   ctx.body = progress;
 });

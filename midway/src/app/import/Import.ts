@@ -131,7 +131,8 @@ export class Import
         return reject('Negative streaming/upsert progress');
       }
       const streamingProgress: number = this.chunkCount / this.totalChunks;
-      const upsertProgress: number = ((this.upsertCount || 0) + 2) / this.totalChunks; // give boost to show 100% on UI
+      // arbitrary boost of 2 in order to show 100% on UI
+      const upsertProgress: number = ((this.upsertCount === undefined ? 0 : this.upsertCount) + 2) / this.totalChunks;
       const totalProgress: number = (streamingProgress < 1 ? streamingProgress : 1 + upsertProgress) / 2;
       resolve(totalProgress > 1 ? 1 : totalProgress);
     });

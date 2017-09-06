@@ -711,6 +711,22 @@ class FileImportPreview extends TerrainComponent<Props>
     );
   }
 
+  public renderUpdateTemplate()
+  {
+    const overwriteName: string = this.state.templateOptions.find((option) => getTemplateName(option) === this.state.saveTemplateName);
+    return (
+      <Modal
+        open={this.state.showingUpdateTemplate}
+        message={'By saving this, you are overwriting template ' + overwriteName + ', Continue?'}
+        onClose={this.hideUpdateTemplate}
+        title={'Overwriting Template'}
+        confirm={true}
+        confirmButtonText={'Yes'}
+        onConfirm={this.handleUpdateTemplate}
+      />
+    );
+  }
+
   public renderAdvancedModal()
   {
     const advancedModalContent = this.props.exporting ?
@@ -770,9 +786,7 @@ class FileImportPreview extends TerrainComponent<Props>
     const restrictiveMode =
       <div
         className='fi-advanced'
-        style={{
-          background: Colors().bg1,
-        }}
+        style={backgroundColor(Colors().bg1)}
       >
         {advancedModalContent}
       </div>;
@@ -787,22 +801,6 @@ class FileImportPreview extends TerrainComponent<Props>
         confirmButtonText={'Save'}
         onConfirm={this.handleAdvanced}
         closeOnConfirm={true}
-      />
-    );
-  }
-
-  public renderUpdateTemplate()
-  {
-    const overwriteName: string = this.state.templateOptions.find((option) => getTemplateName(option) === this.state.saveTemplateName);
-    return (
-      <Modal
-        open={this.state.showingUpdateTemplate}
-        message={'By saving this, you are overwriting template ' + overwriteName + ', Continue?'}
-        onClose={this.hideUpdateTemplate}
-        title={'Overwriting Template'}
-        confirm={true}
-        confirmButtonText={'Yes'}
-        onConfirm={this.handleUpdateTemplate}
       />
     );
   }
@@ -827,29 +825,12 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderTemplate()
   {
-    const renderAdvancedButton =
-      (this.props.filetype === 'json' || this.props.exporting) &&
-      (
-        <div
-          className='flex-container fi-preview-template-wrapper'
-        >
-          <div
-            className='flex-grow fi-preview-template-button button'
-            onClick={this.showAdvanced}
-            style={buttonColors()}
-            ref='fi-preview-template-button-advanced'
-          >
-            Advanced...
-          </div>
-        </div>
-      );
-
     return (
       <div
-        className='flex-container fi-preview-template'
+        className='flex-container fi-preview-template-wrapper'
       >
         <div
-          className='flex-container fi-preview-template-wrapper'
+          className='flex-container fi-preview-template'
         >
           <div
             className='flex-grow fi-preview-template-button button'
@@ -861,7 +842,7 @@ class FileImportPreview extends TerrainComponent<Props>
           </div>
         </div>
         <div
-          className='flex-container fi-preview-template-wrapper'
+          className='flex-container fi-preview-template'
         >
           <div
             className='flex-grow fi-preview-template-button button'
@@ -872,7 +853,21 @@ class FileImportPreview extends TerrainComponent<Props>
             Save As Template
           </div>
         </div>
-        {renderAdvancedButton}
+        {
+          this.props.filetype === 'json' || this.props.exporting &&
+          <div
+            className='flex-container fi-preview-template'
+          >
+            <div
+              className='flex-grow fi-preview-template-button button'
+              onClick={this.showAdvanced}
+              style={buttonColors()}
+              ref='fi-preview-template-button-advanced'
+            >
+              Advanced...
+            </div>
+          </div>
+        }
       </div>
     );
   }
@@ -898,38 +893,36 @@ class FileImportPreview extends TerrainComponent<Props>
 
     return (
       <div
-        className='flex-container fi-preview-pkeys'
+        className='flex-container fi-preview-pkeys-wrapper'
       >
         {
           primaryKeys.size > 0 ?
             primaryKeys.map((pkey, index) =>
               <div
                 key={pkey}
-                className='flex-shrink flex-container fi-preview-pkeys-wrapper'
+                className='flex-shrink flex-container fi-preview-pkeys'
               >
                 {
                   index === 0 &&
                   <div
-                    style={{
-                      text: Colors().text1,
-                    }}
+                    style={fontColor(Colors().text1)}
                   >
                     Primary key{primaryKeys.size > 1 ? 's' : ''}:
                   </div>
                 }
                 <div
                   className='flex-shrink fi-preview-pkeys-pkey'
-                  style={{
-                    background: Colors().bg1,
-                    text: Colors().text1,
-                  }}
+                  style={[
+                    fontColor(Colors().text1),
+                    backgroundColor(Colors().bg1),
+                  ]}
                 >
                   {
                     this.props.columnNames.get(pkey)
                   }
                   <CloseIcon
                     onClick={this._fn(this.deletePrimaryKey, this.props.columnNames.get(pkey))}
-                    className='close delete-primary-key'
+                    className='close delete-pkey'
                     data-tip='Delete Primary Key'
                   />
                 </div>
@@ -970,9 +963,7 @@ class FileImportPreview extends TerrainComponent<Props>
             :
             <div
               className='flex-shrink fi-preview-pkeys-nokey'
-              style={{
-                text: Colors().text1,
-              }}
+              style={fontColor(Colors().text1)}
             >
               No primary keys selected
             </div>
@@ -1034,7 +1025,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     const upload =
       <div
-        className='fi-preview-import-button large-button'
+        className='fi-preview-import large-button'
         onClick={this.props.uploadInProgress ? this._fn(this.setPreviewErrorMsg, 'import in progress') : this.handleUploadFile}
         style={{
           color: Colors().import,
@@ -1049,12 +1040,10 @@ class FileImportPreview extends TerrainComponent<Props>
         upload
         :
         this.props.uploadInProgress && this.props.showProgressBar ?
-          <div className='fi-preview-loading-container'>
-            <ProgressBar
-              progress={this.props.progress}
-              text={this.props.progress < 0.5 ? 'transforming and type-checking data' : 'inserting data into elastic'}
-            />
-          </div>
+          <ProgressBar
+            progress={this.props.progress}
+            text={this.props.progress < 0.5 ? 'transforming and type-checking data' : 'inserting data into elastic'}
+          />
           :
           upload
     );
@@ -1162,7 +1151,7 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     return (
       <div
-        className='flex-container fi-import-button-wrapper'
+        className='flex-container fi-preview-bottombar'
       >
         {
           !this.props.exporting && this.props.existingIndexAndType && !this.props.uploadInProgress &&
@@ -1211,9 +1200,7 @@ class FileImportPreview extends TerrainComponent<Props>
     return (
       <div
         className='fi-preview-empty-export'
-        style={{
-          color: Colors().text1,
-        }}
+        style={fontColor(Colors().text1)}
       >
         You must create a query in order to export
       </div>

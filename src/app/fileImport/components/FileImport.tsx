@@ -54,7 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
-import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors, disabledButtonColors, fontColor } from '../../common/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
 import { CSVTypeParser, parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from './../../../../shared/Util';
@@ -487,10 +487,10 @@ class FileImport extends TerrainComponent<any>
     const { previewColumns } = this.state.fileImportState;
     return (
       <div
-        className='fi-content-csv'
+        className='fi-content-csv-wrapper'
       >
         <div
-          className='fi-content-csv-wrapper'
+          className='fi-content-csv'
         >
           <div
             className='fi-content-csv-option button'
@@ -515,37 +515,35 @@ class FileImport extends TerrainComponent<any>
           <div
             className='flex-container fi-content-preview-columns'
           >
-          {
-            previewColumns.map((column, columnKey) =>
-              <div
-                key={columnKey}
-                className='flex-container fi-content-preview-columns-column'
-              >
-                {
-                  column.map((item, itemKey) =>
-                    <div
-                      key={columnKey + itemKey}
-                      className={classNames({
-                        'fi-content-preview-column-columns-column-cell': true,
-                      })}
-                      style={{
-                        background: Colors().bg2,
-                        color: Colors().text1,
-                      }}
-                    >
+            {
+              previewColumns.map((column, columnKey) =>
+                <div
+                  key={columnKey}
+                  className='flex-container fi-content-preview-columns-column'
+                >
+                  {
+                    column.map((item, itemKey) =>
                       <div
-                        className='fi-content-preview-column-columns-column-cell-text'
+                        key={columnKey + itemKey}
+                        className='fi-content-preview-columns-column-cell'
+                        style={[
+                          fontColor(Colors().text1),
+                          backgroundColor(Colors().bg2),
+                        ]}
                       >
-                        {
-                          item
-                        }
-                      </div>
-                    </div>,
-                  )
-                }
-              </div>,
+                        <div
+                          className='fi-content-preview-columns-column-cell-text'
+                        >
+                          {
+                            item
+                          }
+                        </div>
+                      </div>,
+                    )
+                  }
+                </div>,
               )
-          }
+            }
           </div>
         </div>
       </div>
@@ -556,10 +554,10 @@ class FileImport extends TerrainComponent<any>
   {
     return (
       <div
-        className='fi-content-json'
+        className='fi-content-json-wrapper'
       >
         <div
-          className='fi-content-json-wrapper'
+          className='fi-content-json'
         >
           {
             tooltip(
@@ -752,7 +750,7 @@ class FileImport extends TerrainComponent<any>
     return (
       <div
         className='fi-content'
-        style={this.state.stepId === Steps.ChooseFile ? backgroundColor(Colors().bg1) : backgroundColor(Colors().bg3)}
+        style={backgroundColor(this.state.stepId === Steps.ChooseFile ? Colors().bg1 : Colors().bg3)}
       >
         {
           content
@@ -820,13 +818,7 @@ class FileImport extends TerrainComponent<any>
           <div
             className='fi-next-button button'
             onClick={nextEnabled ? this.incrementStep : this._fn(this.setError, errorMsg)}
-            style={nextEnabled ?
-              buttonColors()
-              :
-              {
-                background: Colors().bg3,
-              }
-            }
+            style={nextEnabled ? buttonColors() : disabledButtonColors()}
             ref='fi-next-button'
           >
             Next

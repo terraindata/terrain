@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -459,9 +459,7 @@ class TransformModal extends TerrainComponent<Props>
     return (
       <div
         className='fi-transform-components'
-        style={{
-          color: Colors().text1,
-        }}
+        style={fontColor(Colors().text1)}
       >
         {
           components
@@ -513,9 +511,7 @@ class TransformModal extends TerrainComponent<Props>
           TRANSFORM_TYPES[datatypeId].map((type, index) =>
             <div
               className='flex-container fi-transform-option'
-              style={{
-                color: Colors().text1,
-              }}
+              style={fontColor(Colors().text1)}
               key={index}
             >
               <CheckBox

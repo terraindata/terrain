@@ -104,7 +104,7 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
         .set(transformCol, List(state.previewColumns.get(transformCol).map((item) =>
           item.substring(0, item.indexOf(transform.args.text)),
         ))),
-      );
+    );
   }
   else if (transform.name === 'merge')
   {
@@ -135,7 +135,7 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
           item + transform.args.text + state.previewColumns.get(mergeCol).get(index),
         )))
         .delete(mergeCol),
-      );
+    );
   }
   return state;
 };
@@ -496,6 +496,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
           FileImportTypes._Template({
+            export: template['export'],
             templateId: template['id'],
             templateName: template['name'],
             originalNames: List<string>(template['originalNames']),
@@ -503,7 +504,6 @@ FileImportReducers[ActionTypes.fetchTemplates] =
             transformations: template['transformations'],
             primaryKeys: template['primaryKeys'],
             primaryKeyDelimiter: template['primaryKeyDelimiter'],
-            export: template['export'],
           }),
         ));
         action.payload.setTemplates(templates);
@@ -529,9 +529,7 @@ FileImportReducers[ActionTypes.applyTemplate] =
     return state
       .set('originalNames', List(template.originalNames))
       .set('primaryKeys', List(template.primaryKeys.map((pkey) => columnNames.indexOf(pkey))))
-      .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('columnNames', columnNames)
-      .set('originalNames', List(template.originalNames))
       .set('transforms', List<Transform>(template.transformations))
       .set('columnTypes', List(columnNames.map((colName) =>
         template.columnTypes[colName] ?
@@ -554,6 +552,7 @@ FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
     state.set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
-      .set('isDirty', false);
+      .set('isDirty', false)
+  ;
 
 export default FileImportReducers;
