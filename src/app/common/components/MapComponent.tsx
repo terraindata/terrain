@@ -54,9 +54,9 @@ import * as React from 'react';
 import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 'react-leaflet';
 import PlacesAutocomplete from 'react-places-autocomplete';
 
-import Routing from './RoutingMachine';
+import RoutingMachine from './RoutingMachine';
 import { geocodeByAddress, geocodeByLatLng, getLatLng } from '../../util/MapUtil';
-import { cardStyle, Colors, fontColor, getCardColors } from '../Colors';
+import { cardStyle, Colors, fontColor, getCardColors z} from '../Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import BuilderTextbox from './BuilderTextbox';
 import CheckBox from './CheckBox';
@@ -106,18 +106,18 @@ class MapComponent extends TerrainComponent<Props>
     error?: any,
     latitude: string,
     longitude: string,
-    distance?: number,
+    distance?: string,
     selectedUnit: number,
     errorLatitude: boolean,
     errorLongitude: boolean,
-    errorDistnace: boolean,
+    errorDistance: boolean,
   } = {
     address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
     searchByCoordinate: false,
     error: null,
     latitude: this.props.location !== undefined ? this.props.location[0].toString() : '',
     longitude: this.props.location !== undefined ? this.props.location[1].toString() : '',
-    distance: 0.0,
+    distance: '0.0',
     selectedUnit: 0,
     errorLatitude: false,
     errorLongitude: false,
@@ -165,7 +165,7 @@ class MapComponent extends TerrainComponent<Props>
   {
     if (e.key === 'Enter')
     {
-      if (isNaN(this.state.latitude) || isNaN(this.state.longitude) || this.state.latitude === '' || this.state.longitude === '')
+      if (isNaN(parseFloat(this.state.latitude)) || isNaN(parseFloat(this.state.longitude)) || this.state.latitude === '' || this.state.longitude === '')
       {
         return;
       }
@@ -247,7 +247,7 @@ class MapComponent extends TerrainComponent<Props>
 
   public convertDistanceToMeters()
   {
-    if (isNaN(this.state.distance) || this.state.distance === '')
+    if (isNaN(parseFloat(this.state.distance)) || this.state.distance === '')
     {
       return 0;
     }
@@ -282,8 +282,8 @@ class MapComponent extends TerrainComponent<Props>
     const deltaLambda = this.radians(secondLocation[1] - firstLocation[1]);
 
     const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-            Math.cos(phi1) * Math.cos(phi2) *
-            Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+      Math.cos(phi1) * Math.cos(phi2) *
+      Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c;
@@ -291,81 +291,61 @@ class MapComponent extends TerrainComponent<Props>
 
   public renderMap()
   {
-    const {location, secondLocation} = this.props;
+    const directDistance = this.directDistance(this.props.location, this.props.secondLocation);
     return (
-      <div className="map">
+      <div className='input-map-wrapper'>
         <Map
-          key={`routing-${location[0]}-${location[1]}-${secondLocation[0]}-${secondLocation[1]}`}
-          scrollWheelZoom={false}
-          zoomControl={false}
+          center={this.props.location}
+          zoom={18}
+          key='map'
         >
-          <ZoomControl position="bottomright" />
-          <Routing
-            to={location}
-            from={secondLocation}
+          {
+            this.props.markLocation ?
+              <Marker
+                position={this.props.location}
+                icon={markerIcon}
+              >
+                <Popup>
+                  <span>{this.props.address}</span>
+                </Popup>
+              </Marker>
+              :
+              null
+          }
+          {
+            this.props.showDistanceTools ?
+              <Circle
+                center={this.props.location}
+                radius={this.convertDistanceToMeters()}
+              />
+              :
+              null
+          }
+          {
+            this.props.secondLocation !== undefined ?
+              <Polyline
+                positions={[this.props.location, this.props.secondLocation]}
+              />
+              :
+              null
+          }
+          <RoutingMachine
+            from={[57.74, 11.94]}
+            to={[57.6792, 11.949]}
+          />
+          <TileLayer
+            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           />
         </Map>
       </div>
+    );
   }
-
-
-  // public renderMap()
-  // {
-  //   const directDistance = this.directDistance(this.props.location, this.props.secondLocation);
-  //   return (
-  //     <div className='input-map-wrapper'>
-  //       <Map 
-  //         center={this.props.location} 
-  //         zoom={18}
-  //         key='map'
-  //        >
-  //         {
-  //           this.props.markLocation ?
-  //             <Marker
-  //               position={this.props.location}
-  //               icon={markerIcon}
-  //             >
-  //               <Popup>
-  //                 <span>{this.props.address}</span>
-  //               </Popup>
-  //             </Marker>
-  //             :
-  //             null
-  //         }
-  //         {
-  //           this.props.showDistanceTools ?
-  //             <Circle
-  //               center={this.props.location}
-  //               radius={this.convertDistanceToMeters()}
-  //             />
-  //             :
-  //             null
-  //         }
-  //         {
-  //           this.props.secondLocation !== undefined ?
-  //           <Polyline
-  //             positions={[this.props.location, this.props.secondLocation]}
-  //           />
-  //           :
-  //           null
-  //         }
-  //         <Routing
-  //           from={[57.74, 11.94]}
-  //           to={[57.6792, 11.949]}
-  //         />
-  //         <TileLayer
-  //           url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-  //           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-  //         />
-  //       </Map>
-  //     </div>
-  //   );
-  // }
 
   public handleDistanceChange(e)
   {
     let error = false;
-    if (isNaN(e.target.value))
+    if (isNaN(parseFloat(e.target.value)))
     {
       error = true;
     }
@@ -384,7 +364,7 @@ class MapComponent extends TerrainComponent<Props>
 
   public handleDistanceKeyDown(e)
   {
-    if (isNaN(this.state.distance))
+    if (isNaN(parseFloat(this.state.distance)))
     {
       return;
     }
