@@ -795,7 +795,6 @@ class FileImport extends TerrainComponent<any>
       default:
     }
 
-    // TODO: add carrot icon arrows
     return (
       <div
         className='flex-container fi-nav'
