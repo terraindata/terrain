@@ -61,15 +61,12 @@ export interface Props
   className?: string;
   color?: string;
   textColor?: string;
+  text?: string;
 }
 
 @Radium
 class ProgressBar extends TerrainComponent<Props>
 {
-  public state: {
-  } = {
-  };
-
   public render()
   {
     return (
@@ -86,7 +83,7 @@ class ProgressBar extends TerrainComponent<Props>
             className='progressbar-text-percentage'
           >
             {
-              String(Math.round(100 * Number(this.props.progress))) + '%'
+              this.props.text + ' ' + String(Math.round(100 * Number(this.props.progress))) + '%'
             }
           </span>
         </div>

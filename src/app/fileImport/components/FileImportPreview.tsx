@@ -1057,6 +1057,7 @@ class FileImportPreview extends TerrainComponent<Props>
           <div className='fi-preview-loading-container'>
             <ProgressBar
               progress={this.props.progress}
+              text={this.props.progress < 0.5 ? 'transforming and type-checking data' : 'inserting data into elastic'}
             />
           </div>
           :

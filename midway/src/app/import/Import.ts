@@ -72,6 +72,7 @@ const typeParser: SharedUtil.CSVTypeParser = new SharedUtil.CSVTypeParser();
 export interface ImportConfig extends ImportTemplateBase
 {
   file: stream.Readable;
+  filesize: number;
   filetype: string;     // either 'json' or 'csv'
   isNewlineSeparatedJSON?: boolean;      // defaults to false
   requireJSONHaveAllFields?: boolean;    // defaults to true
@@ -114,19 +115,22 @@ export class Import
   private chunkCount: number;
   private chunkQueue: object[];
   private nextChunk: string;
-  private progress: number;
+  private totalChunks: number;
+  private upsertCount: number;
 
-  public async getProgress(): Promise<number>
+  public async getProgress(): Promise<number | string>
   {
     return new Promise<number>(async (resolve, reject) =>
     {
-      // if (this.progress < 0)
-      // {
-      //   return reject('negative progress');
-      // }
-      // console.log('--------------------FSDHJFKSDFFFFFFJSDFFHJKSDFHJKSDFSDFSDF---------------------');
-      // console.log(this.chunkCount);
-      resolve(this.chunkCount);
+      if (this.chunkCount < 0)
+      {
+        return reject('negative progress');
+      }
+      // console.log(this.chunkCount, this.totalChunks);
+      const streamingProgress: number = this.chunkCount / this.totalChunks;
+      const upsertProgress: number = this.upsertCount / this.totalChunks;
+
+      resolve((streamingProgress < 1 ? streamingProgress : streamingProgress + upsertProgress) / 2);
     });
   }
 
@@ -411,6 +415,7 @@ export class Import
           dbname: template['dbname'],
           file,
           filetype: fields['filetype'],
+          filesize: fields['filesize'],
           isNewlineSeparatedJSON,
           originalNames: template['originalNames'],
           primaryKeyDelimiter: template['primaryKeyDelimiter'],
@@ -436,6 +441,7 @@ export class Import
             dbname: fields['dbname'],
             file,
             filetype: fields['filetype'],
+            filesize: fields['filesize'],
             isNewlineSeparatedJSON,
             originalNames,
             primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
@@ -451,6 +457,7 @@ export class Import
           return reject('Error parsing originalNames, columnTypes, and/or transformations of import request: ' + String(e));
         }
       }
+      this.totalChunks = Math.ceil(imprtConf.filesize / this.CHUNK_SIZE);
 
       const database: DatabaseController | undefined = DatabaseRegistry.get(imprtConf.dbid);
       if (database === undefined)
@@ -494,7 +501,6 @@ export class Import
       this.chunkQueue = [];
       this.nextChunk = '';
       this.chunkCount = 0;
-      this.progress = 0;
       let contents: string = '';
       file.on('data', async (chunk) =>
       {
@@ -1373,6 +1379,7 @@ export class Import
 
       const queue = new promiseQueue(this.MAX_ACTIVE_READS, this.chunkCount);
       let counter: number = 0;
+      this.upsertCount = 0;
       for (let num = 0; num < this.chunkCount; num++)
       {
         queue.add(() =>
@@ -1380,6 +1387,7 @@ export class Import
           {
             await this._readFileAndUpsert(imprt, database, insertTable, num);
             counter++;
+            this.upsertCount++;
             if (counter === this.chunkCount)
             {
               await this._deleteStreamingTempFolder();

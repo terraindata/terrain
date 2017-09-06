@@ -68,7 +68,7 @@ Router.post('/', async (ctx, next) =>
     ctx.status = 400;
     return;
   }
-  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
+  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'filesize', 'tablename']);
   Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
   // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
 
@@ -123,7 +123,7 @@ Router.post('/headless', async (ctx, next) =>
 
 Router.post('/progress', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const progress: number = await imprt.getProgress();
+  const progress: number | string = await imprt.getProgress();
   ctx.body = progress;
 });
 
