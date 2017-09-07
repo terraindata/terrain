@@ -111,6 +111,7 @@
     "koa-session": "^5.3.0",
     "koa-static-server": "^1.2.1",
     "leaflet": "^1.2.0",
+    "leaflet-routing-machine": "^3.2.5",
     "lodash": "^4.17.4",
     "memoize-one": "^3.0.1",
     "moment": "^2.13.0",

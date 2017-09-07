@@ -73,6 +73,7 @@ export interface Props
   showDistanceTools?: boolean;
   secondLocation?: [number, number];
   routing?: boolean;
+  showDirectDistance?: boolean;
 }
 
 enum UNITS
@@ -113,6 +114,8 @@ class MapComponent extends TerrainComponent<Props>
     errorLatitude: boolean,
     errorLongitude: boolean,
     errorDistance: boolean,
+    trafficDistance: number,
+    trafficTime: number,
   } = {
     address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
     searchByCoordinate: false,
@@ -124,6 +127,8 @@ class MapComponent extends TerrainComponent<Props>
     errorLatitude: false,
     errorLongitude: false,
     errorDistance: false,
+    trafficDistance: 0.0,
+    trafficTime: 0.0,
   };
 
   public componentWillReceiveProps(nextProps)
@@ -195,7 +200,6 @@ class MapComponent extends TerrainComponent<Props>
     }
   }
 
-  // TODO CHECK IF THEY ARE NUMBERS
   public handleLatitudeChange(e)
   {
     let error = false;
@@ -303,44 +307,27 @@ class MapComponent extends TerrainComponent<Props>
 
   public renderMap()
   {
-    return this.props.routing ? this.renderMapWithRoute() : this.renderMapNoRoute();
-  }
-
-  public renderMapWithRoute()
-  {
     return (
       <div className='input-map-wrapper'>
         <Map
           center={this.props.location}
-          zoom={18}
-          ref='map'
-        >
-          <RoutingMachine
-            to={[37.4449002, -122.16174969999997]}
-            from={[37.54554419999999, -122.29136640000002]}
-            getMapRef={this.getMapRef}
-          />
-          <TileLayer
-            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          />
-        </Map>
-      </div>
-    );
-  }
-
-  public renderMapNoRoute()
-  {
-    const directDistance = this.directDistance(this.props.location, this.props.secondLocation);
-    return (
-      <div className='input-map-wrapper'>
-        <Map
-          center={this.props.location}
-          zoom={18}
+          zoom={10}
           ref='map'
         >
           {
-            this.props.markLocation ?
+            this.props.routing ?
+              <RoutingMachine
+                to={this.props.location}
+                from={this.props.secondLocation}
+                getMapRef={this.getMapRef}
+                markerIcon={markerIcon}
+                setTrafficData={this.setTrafficData}
+              />
+              :
+              null
+          }
+          {
+            this.props.markLocation && !this.props.routing ?
               <Marker
                 position={this.props.location}
                 icon={markerIcon}
@@ -362,14 +349,13 @@ class MapComponent extends TerrainComponent<Props>
               null
           }
           {
-            this.props.secondLocation !== undefined ?
+            this.props.secondLocation !== undefined && this.props.showDirectDistance ?
               <Polyline
                 positions={[this.props.location, this.props.secondLocation]}
               />
               :
               null
           }
-
           <TileLayer
             url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -377,13 +363,16 @@ class MapComponent extends TerrainComponent<Props>
         </Map>
       </div>
     );
+
   }
 
-  //   <RoutingMachine
-  //   to={[37.4449002, -122.16174969999997]}
-  //   from={[37.54554419999999, -122.29136640000002]}
-  //   getMapRef={this.getMapRef}
-  // />
+  public setTrafficData(distance: number, time: number)
+  {
+    this.setState({
+      trafficDistance: distance,
+      trafficTime: time,
+    });
+  }
 
   public handleDistanceChange(e)
   {
@@ -451,8 +440,17 @@ class MapComponent extends TerrainComponent<Props>
     );
   }
 
+  public formatTime(seconds)
+  {
+    const hours = (seconds / 3600);
+    const minutes = (hours % 1) * 60;
+    return Math.floor(hours).toString() + ' hours ' + Math.round(minutes).toString() + ' minutes';
+  }
+
   public render()
   {
+    const dist = this.directDistance(this.props.location, this.props.secondLocation);
+    const { trafficDistance, trafficTime } = this.state;
     const inputProps = {
       value: this.state.address,
       onChange: this.onAddressChange,
@@ -488,6 +486,11 @@ class MapComponent extends TerrainComponent<Props>
             :
             null
         }
+        <div>
+          <div>Direct distance: {(dist / 1609.34).toFixed(1)} miles </div>
+          <div>Traffic distance: {(trafficDistance / 1609.34).toFixed(1)} miles </div>
+          <div>Traffic time: {this.formatTime(trafficTime)}</div>
+        </div>
         {this.renderMap()}
       </div>
     );
