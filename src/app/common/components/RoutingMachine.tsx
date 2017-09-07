@@ -46,52 +46,47 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import { PropTypes } from 'react';
-import { MapLayer } from 'react-leaflet';
+import {PropTypes} from 'react';
+import {MapComponent, MapLayer} from 'react-leaflet';
 import 'leaflet-routing-machine';
-import { isEqual } from 'lodash';
-import L from 'leaflet';
+import {isEqual} from 'lodash';
 
-class RoutingMachine extends MapLayer
-{
-
-  public componentWillMount()
-  {
+export default class RoutingMachine extends MapComponent {
+  public componentWillMount() {
     super.componentWillMount();
+    const {to, from, getMapRef} = this.props;
+    const map = getMapRef();
+    setTimeout(this.addRouteToMap(to, from, map), 5000);
+
   }
 
-  public updateLeafletElement(fromProps, toProps)
-  {
-    if (fromProps.to !== toProps.to || fromProps.from !== toProps.from)
-    {
-      return L.Routing.control({
-        position: 'topleft',
-        waypoints: [
-          L.latLng(fromProps.from[0], fromProps.from[1]),
-          L.latLng(fromProps.to[0], fromProps.to[1]),
-        ],
-        router: L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
-      });
-    }
-  }
+  public addRouteToMap(to, from, map) {
 
-  public createLeafletElement(props)
-  {
-    const { to, from } = props;
-    return L.Routing.control({
+    this.leafletElement = L.Routing.control({
       position: 'topleft',
+      router: L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
       waypoints: [
         L.latLng(from[0], from[1]),
         L.latLng(to[0], to[1]),
       ],
-      router: L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
-    });
+      collapsible: false,
+      show: false,
+    }).addTo(map);
   }
 
-  public render()
-  {
+  public createLeafletElement(props) {}
+
+  public componentWillReceiveProps(newProps) {
+    const {coords} = newProps;
+    if (!isEqual(coords, this.props.coords)) {
+      this.leafletElement.getPlan().setWaypoints([
+        L.latLng(coords.fromLat, coords.fromLon),
+        L.latLng(coords.toLat, coords.toLon),
+      ]);
+    }
+  }
+
+  public render() {
     return null;
   }
 }
-
-export default RoutingMachine;
