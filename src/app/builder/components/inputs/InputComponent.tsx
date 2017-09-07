@@ -203,6 +203,9 @@ class InputComponent extends TerrainComponent<Props>
           showSearchBar={true}
           zoomControl={true}
           geocoder='google'
+          showDistanceTools={true}
+          secondLocation={[40, -120]}
+          showDirectDistance={true}
         />);
     }
 
