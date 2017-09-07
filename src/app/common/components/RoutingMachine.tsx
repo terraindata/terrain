@@ -44,49 +44,65 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+// tslint:disable
 
-import {PropTypes} from 'react';
-import {MapComponent, MapLayer} from 'react-leaflet';
+import { PropTypes } from 'react';
+import { MapComponent, MapLayer } from 'react-leaflet';
 import 'leaflet-routing-machine';
-import {isEqual} from 'lodash';
+import { isEqual } from 'lodash';
+import TerrainComponent from './TerrainComponent';
 
-export default class RoutingMachine extends MapComponent {
-  public componentWillMount() {
+export interface Props
+{
+  to: [number, number];
+  from: [number, number];
+  getMapRef: () => any;
+}
+
+export default class RoutingMachine extends MapComponent
+{
+  // The linter fails without these properties...
+  public props: Props;
+  public setState;
+  public forceUpdate;
+  public state = {};
+  public context;
+  public refs;
+
+  public componentWillMount()
+  {
     super.componentWillMount();
-    const {to, from, getMapRef} = this.props;
+    const { to, from, getMapRef } = (this as any).props;
     const map = getMapRef();
-    setTimeout(this.addRouteToMap(to, from, map), 5000);
-
-  }
-
-  public addRouteToMap(to, from, map) {
-
-    this.leafletElement = L.Routing.control({
+    (this as any).leafletElement = (window as any).L.Routing.control({
       position: 'topleft',
-      router: L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
+      router: (window as any).L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
       waypoints: [
-        L.latLng(from[0], from[1]),
-        L.latLng(to[0], to[1]),
+        (window as any).L.latLng(from[0], from[1]),
+        (window as any).L.latLng(to[0], to[1]),
       ],
       collapsible: false,
       show: false,
     }).addTo(map);
+
   }
 
-  public createLeafletElement(props) {}
+  public createLeafletElement(props) { }
 
-  public componentWillReceiveProps(newProps) {
-    const {coords} = newProps;
-    if (!isEqual(coords, this.props.coords)) {
-      this.leafletElement.getPlan().setWaypoints([
-        L.latLng(coords.fromLat, coords.fromLon),
-        L.latLng(coords.toLat, coords.toLon),
+  public componentWillReceiveProps(newProps)
+  {
+    const { to, from } = newProps;
+    if (!isEqual(from, (this as any).props.from) || !isEqual(to, (this as any).props.to))
+    {
+      (this as any).leafletElement.getPlan().setWaypoints([
+        (window as any).L.latLng(from[0], from[1]),
+        (window as any).L.latLng(to[0], to[1]),
       ]);
     }
   }
 
-  public render() {
+  public render()
+  {
     return null;
   }
 }

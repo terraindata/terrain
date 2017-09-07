@@ -55,13 +55,14 @@ import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 're
 import PlacesAutocomplete from 'react-places-autocomplete';
 
 import RoutingMachine from './RoutingMachine';
-import { geocodeByAddress, geocodeByLatLng, getLatLng } from '../../util/MapUtil';
-import { cardStyle, Colors, fontColor, getCardColors z} from '../Colors';
-import TerrainComponent from './../../common/components/TerrainComponent';
+const { geocodeByAddress, geocodeByLatLng, getLatLng } = require('../../util/MapUtil.js');
+// import { geocodeByAddress, geocodeByLatLng, getLatLng } from '../../util/MapUtil.js';
+import { cardStyle, Colors, fontColor, getCardColors } from '../Colors';
 import BuilderTextbox from './BuilderTextbox';
 import CheckBox from './CheckBox';
 import Dropdown from './Dropdown';
 import './MapComponentStyle.less';
+import TerrainComponent from './TerrainComponent';
 
 export interface Props
 {
@@ -166,7 +167,11 @@ class MapComponent extends TerrainComponent<Props>
   {
     if (e.key === 'Enter')
     {
-      if (isNaN(parseFloat(this.state.latitude)) || isNaN(parseFloat(this.state.longitude)) || this.state.latitude === '' || this.state.longitude === '')
+      if (isNaN(parseFloat(this.state.latitude)) ||
+        isNaN(parseFloat(this.state.longitude)) ||
+        this.state.latitude === '' ||
+        this.state.longitude === ''
+      )
       {
         return;
       }
@@ -292,7 +297,8 @@ class MapComponent extends TerrainComponent<Props>
 
   public getMapRef()
   {
-    return this.refs.map.leafletElement;
+    const reactMap: any = this.refs.map;
+    return reactMap.leafletElement;
   }
 
   public renderMap()
@@ -309,7 +315,7 @@ class MapComponent extends TerrainComponent<Props>
           zoom={18}
           ref='map'
         >
-         <RoutingMachine
+          <RoutingMachine
             to={[37.4449002, -122.16174969999997]}
             from={[37.54554419999999, -122.29136640000002]}
             getMapRef={this.getMapRef}
@@ -322,8 +328,6 @@ class MapComponent extends TerrainComponent<Props>
       </div>
     );
   }
-
-
 
   public renderMapNoRoute()
   {
@@ -375,11 +379,11 @@ class MapComponent extends TerrainComponent<Props>
     );
   }
 
-          //   <RoutingMachine
-          //   to={[37.4449002, -122.16174969999997]}
-          //   from={[37.54554419999999, -122.29136640000002]}
-          //   getMapRef={this.getMapRef}
-          // />
+  //   <RoutingMachine
+  //   to={[37.4449002, -122.16174969999997]}
+  //   from={[37.54554419999999, -122.29136640000002]}
+  //   getMapRef={this.getMapRef}
+  // />
 
   public handleDistanceChange(e)
   {
@@ -418,7 +422,7 @@ class MapComponent extends TerrainComponent<Props>
     {
       this.setState({
         distance: (dist - 1).toString(),
-      })
+      });
     }
   }
 
@@ -433,7 +437,7 @@ class MapComponent extends TerrainComponent<Props>
           onKeyDown={this.handleDistanceKeyDown}
           className={classNames({
             'input-map-distance-tools-input': true,
-            'input-map-input-error': this.state.errorDistance
+            'input-map-input-error': this.state.errorDistance,
           })}
         />
         <Dropdown
