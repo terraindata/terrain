@@ -308,6 +308,36 @@ class TransformCardChart extends TerrainComponent<Props>
     );
   }
 
+  public onZoomIn(el, mouse)
+  {
+
+  }
+
+  public onZoomOut(el, mouse)
+  {
+
+  }
+
+  public onZoomToFit(el, mouse)
+  {
+    
+  }
+
+  public onClearAll(el, mouse)
+  {
+    this.updatePoints(List<ScorePoint>(), true);
+  }
+
+  public getContextOptions()
+  {
+    return {
+      'Zoom in': this.onZoomIn,
+      'Zoom out': this.onZoomOut,
+      'Zoom to fit': this.onZoomToFit,
+      'Clear all points': this.onClearAll,
+    }
+  }
+
   public componentDidUpdate()
   {
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState());
@@ -353,6 +383,7 @@ class TransformCardChart extends TerrainComponent<Props>
       canEdit: this.props.canEdit,
       inputKey: overrideState.inputKey || this.props.inputKey,
       colors: this.props.colors,
+      contextOptions: this.getContextOptions(),
     };
 
     return chartState;

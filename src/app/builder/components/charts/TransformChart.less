@@ -1,11 +1,6 @@
 @import "../../../common/Common.less";
 
-@line: #005d69;
-@bar: #0acee9;
-@lineFill: #01a8bf;
-@axis: #b1e0e6;
-@bg: #dbf7fb;
-@text: fade(@trans-black, 50%);
+@hover-overlay: rgba(255,255,255,0.25);
 
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
@@ -34,6 +29,24 @@ input[type=number]::-webkit-outer-spin-button {
       font-size: 14px;
       margin-right: 1px;
     }
+  }
+
+  .context-menu {
+    position: absolute;
+    max-width: 140px;
+    border-radius: 3px;
+    overflow: hidden;
+
+    .chart-context-menu-item {
+      font-size: 14px;
+      padding: 3px 12px 3px 12px;
+      text-align: left;
+      cursor: pointer;
+      &:hover {
+        background: @hover-overlay;
+      }
+    }
+
   }
 }
 
@@ -106,11 +119,18 @@ input[type=number]::-webkit-outer-spin-button {
   }
   
   .right-menu {
-
+    cursor: pointer;
     
     text {
       font-size: 12px;
       letter-spacing: 0.3px;
+    }
+
+    .menu-hover-rect {
+      background: none;
+      &:hover {
+        fill: @hover-overlay;
+      }
     }
   }
 
