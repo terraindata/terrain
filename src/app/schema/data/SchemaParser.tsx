@@ -319,6 +319,7 @@ export function parseElasticDb(elasticServer: object,
   schemaData: object,
   setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void)
 {
+  debugger;
   let server = SchemaTypes._Server({
     name: elasticServer['name'],
     connectionId: elasticServer['id'],
@@ -326,6 +327,8 @@ export function parseElasticDb(elasticServer: object,
   const serverId = server.id;
 
   let databases: IMMap<string, Database> = Map<string, Database>();
+
+  let didSetServer = false;
 
   _.each((schemaData as any), (databaseValue, databaseKey, databaseList) =>
   {
@@ -439,5 +442,22 @@ export function parseElasticDb(elasticServer: object,
       columnNames: columnNamesByTable,
     });
 
+    didSetServer = true;
   });
+
+  if (!didSetServer)
+  {
+    // empty server, no dbs/indexes, need to set it manually
+    // TODO change this terrible code flow
+    setServerAction({
+      server,
+      databases,
+      tables: Map<string, Table>(),
+      columns: Map<string, Column>(),
+      indexes: Map<string, Index>(),
+      fieldProperties: Map<string, FieldProperty>(),
+      tableNames: List<string>(),
+      columnNames: Map<string, List<string>>(),
+    });
+  }
 }
