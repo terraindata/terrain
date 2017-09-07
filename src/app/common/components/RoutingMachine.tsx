@@ -57,6 +57,8 @@ export interface Props
   to: [number, number];
   from: [number, number];
   getMapRef: () => any;
+  markerIcon: any;
+  setTrafficData: (distance: number, time: number) => void;
 }
 
 export default class RoutingMachine extends MapComponent
@@ -72,19 +74,37 @@ export default class RoutingMachine extends MapComponent
   public componentWillMount()
   {
     super.componentWillMount();
-    const { to, from, getMapRef } = (this as any).props;
+    const { to, from, getMapRef, markerIcon, setTrafficData } = (this as any).props;
     const map = getMapRef();
+    const waypoints = [
+      (window as any).L.latLng(from[0], from[1]),
+      (window as any).L.latLng(to[0], to[1]),
+    ];
+
     (this as any).leafletElement = (window as any).L.Routing.control({
-      position: 'topleft',
+      plan: (window as any).L.Routing.plan(waypoints, {
+        createMarker: function(i, wp)
+        {
+          return (window as any).L.marker(wp.latLng, {
+            draggable: false,
+            icon: markerIcon,
+            addWaypoints: false,
+          });
+        },
+      }),
       router: (window as any).L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
-      waypoints: [
-        (window as any).L.latLng(from[0], from[1]),
-        (window as any).L.latLng(to[0], to[1]),
-      ],
-      collapsible: false,
       show: false,
+      collapsible: false,
+      lineOptions: {
+        styles: [{ color: 'blue', opacity: 1, weight: 5, }]
+      },
     }).addTo(map);
 
+    (this as any).leafletElement.on('routesfound', function(e)
+    {
+      var routes = e.routes;
+      setTrafficData(routes[0].summary.totalDistance, routes[0].summary.totalTime);
+    });
   }
 
   public createLeafletElement(props) { }

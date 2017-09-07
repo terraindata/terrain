@@ -254,6 +254,7 @@ class InputComponent extends TerrainComponent<Props>
           showDistanceTools={true}
           secondLocation={[40, -120]}
           routing={true}
+          showDirectDistance={true}
         />);
     }
 
