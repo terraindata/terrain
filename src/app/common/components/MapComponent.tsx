@@ -71,6 +71,7 @@ export interface Props
   markLocation: boolean;
   showDistanceTools?: boolean;
   secondLocation?: [number, number];
+  routing?: boolean;
 }
 
 enum UNITS
@@ -289,7 +290,42 @@ class MapComponent extends TerrainComponent<Props>
     return R * c;
   }
 
+  public getMapRef()
+  {
+    return this.refs.map.leafletElement;
+  }
+
   public renderMap()
+  {
+    return this.props.routing ? this.renderMapWithRoute() : this.renderMapNoRoute();
+  }
+
+  public renderMapWithRoute()
+  {
+    return (
+      <div className='input-map-wrapper'>
+        <Map
+          center={this.props.location}
+          zoom={18}
+          ref='map'
+        >
+         <RoutingMachine
+            to={[37.4449002, -122.16174969999997]}
+            from={[37.54554419999999, -122.29136640000002]}
+            getMapRef={this.getMapRef}
+          />
+          <TileLayer
+            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
+        </Map>
+      </div>
+    );
+  }
+
+
+
+  public renderMapNoRoute()
   {
     const directDistance = this.directDistance(this.props.location, this.props.secondLocation);
     return (
@@ -297,7 +333,7 @@ class MapComponent extends TerrainComponent<Props>
         <Map
           center={this.props.location}
           zoom={18}
-          key='map'
+          ref='map'
         >
           {
             this.props.markLocation ?
@@ -329,10 +365,7 @@ class MapComponent extends TerrainComponent<Props>
               :
               null
           }
-          <RoutingMachine
-            from={[57.74, 11.94]}
-            to={[57.6792, 11.949]}
-          />
+
           <TileLayer
             url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -341,6 +374,12 @@ class MapComponent extends TerrainComponent<Props>
       </div>
     );
   }
+
+          //   <RoutingMachine
+          //   to={[37.4449002, -122.16174969999997]}
+          //   from={[37.54554419999999, -122.29136640000002]}
+          //   getMapRef={this.getMapRef}
+          // />
 
   public handleDistanceChange(e)
   {
@@ -414,7 +453,6 @@ class MapComponent extends TerrainComponent<Props>
       value: this.state.address,
       onChange: this.onAddressChange,
     };
-
     return (
       <div>
         {this.state.searchByCoordinate ?
