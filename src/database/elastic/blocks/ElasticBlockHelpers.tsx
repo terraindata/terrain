@@ -65,7 +65,6 @@ export const ElasticBlockHelpers = {
     const state = BuilderStore.getState();
     const cards = state.query.cards;
     const index = getIndex();
-    console.log("AutoComple : " + index);
     const server = BuilderStore.getState().db.name;
 
     if (matchType === AutocompleteMatchType.Index)
