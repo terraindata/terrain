@@ -58,6 +58,7 @@ import { backgroundColor, borderColor, Colors, fontColor } from '../../../common
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction } from '../../data/SpotlightStore';
+import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { Result } from './ResultTypes';
 
@@ -359,10 +360,6 @@ export function getResultValue(result: Result, field: string, config: ResultsCon
   if (result)
   {
     value = result.fields.get(field);
-    if (List.isList(value))
-    {
-      value = JSON.stringify(value);
-    }
   }
   return ResultFormatValue(field, value, config, overrideFormat);
 }
@@ -404,7 +401,7 @@ export function getResultName(result: Result, config: ResultsConfig)
   return getResultValue(result, nameField, config);
 }
 
-export function ResultFormatValue(field: string, value: string | number, config: ResultsConfig, overrideFormat?: any): any
+export function ResultFormatValue(field: string, value: any, config: ResultsConfig, overrideFormat?: any): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const { showRaw } = overrideFormat || format || { showRaw: false };
@@ -428,6 +425,13 @@ export function ResultFormatValue(field: string, value: string | number, config:
   {
     value = 'null';
     italics = true;
+  }
+  if (format && format.type !== 'map')
+  {
+    if (List.isList(value))
+    {
+      value = JSON.stringify(value);
+    }
   }
 
   if (format)
@@ -455,6 +459,22 @@ export function ResultFormatValue(field: string, value: string | number, config:
                 showRaw ? value : null
               }
             </div>
+          </div>
+        );
+
+      case 'map':
+        return (
+          <div className='result-field-value-map-wrapper'>
+            <MapComponent
+              address={'524 Ramona Street'}
+              location={[37.4449002, -122.16174969999997]}
+              markLocation={false}
+              showDistanceTools={false}
+              secondLocation={value.toJS()}
+              routing={false}
+              showDirectDistance={true}
+              showSearchBar={false}
+            />
           </div>
         );
 
