@@ -50,7 +50,6 @@ import * as _ from 'lodash';
 
 import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
-import { Card } from '../../../blocks/types/Card';
 import Query from '../../../items/types/Query';
 import Options from '../../types/CardsToCodeOptions';
 
@@ -61,25 +60,15 @@ class CardsToElastic
 {
   public static toElastic(query: Query, options: Options = {}): string
   {
-    const elasticObj: ESQueryObject = {};
-    query.cards.map(
-      (card: Card) =>
-      {
-        const val = CardsToElastic.blockToElastic(card, options);
-        const key = card['key'];
-
-        if (key)
-        {
-          elasticObj[key] = val;
-        }
-        else if (typeof val === 'object' && !Array.isArray(val))
-        {
-          _.extend(elasticObj, val);
-        }
-      },
-    );
-
-    return ESQueryToCode(elasticObj, options, query.inputs);
+    const rootCard = query.cards.get(0);
+    if (!rootCard)
+    {
+      const emptyCardEQL = ESQueryToCode({}, options, query.inputs);
+      return emptyCardEQL;
+    }
+    const rootCardValue = CardsToElastic.blockToElastic(rootCard, options);
+    const eql = ESQueryToCode(rootCardValue as ESQueryObject, options, query.inputs);
+    return eql;
   }
 
   public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
