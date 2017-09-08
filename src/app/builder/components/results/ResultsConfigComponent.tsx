@@ -449,6 +449,11 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     this.changeFormat('type', 'image');
   }
 
+  public changeToMap()
+  {
+    this.changeFormat('type', 'map');
+  }
+
   public toggleRaw(event)
   {
     this.changeFormat('showRaw', event.target.checked);
@@ -496,6 +501,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
   {
     const { format } = this.props;
     const image = format && format.type === 'image';
+    const map = format && format.type === 'map';
 
     const selected: boolean = this.props.is !== null && this.props.isAvailableField;
     const mainStyle = [
@@ -586,7 +592,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             <div className='results-config-text-btn'
               key={'text-btn-' + this.props.field}
               onClick={this.changeToText}
-              style={image ? inactiveBtnStyle : activeBtnStyle}
+              style={(image || map) ? inactiveBtnStyle : activeBtnStyle}
             >
               <TextIcon /> Text
             </div>
@@ -597,6 +603,14 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             >
               <ImageIcon /> Image
             </div>
+            <div className='results-config-image-btn'
+              key={'map-btn-' + this.props.field}
+              onClick={this.changeToMap}
+              style={map ? activeBtnStyle : inactiveBtnStyle}
+            >
+              Map
+            </div>
+
           </div>
 
           <div className='results-config-image'>

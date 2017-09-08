@@ -255,6 +255,7 @@ class InputComponent extends TerrainComponent<Props>
           secondLocation={[40, -120]}
           routing={true}
           showDirectDistance={true}
+          showSearchBar={true}
         />);
     }
 
