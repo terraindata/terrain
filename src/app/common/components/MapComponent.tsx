@@ -68,12 +68,13 @@ export interface Props
 {
   location: [number, number];
   address: string;
-  onChange: (value) => void;
+  onChange?: (value) => void;
   markLocation: boolean;
   showDistanceTools?: boolean;
   secondLocation?: [number, number];
   routing?: boolean;
   showDirectDistance?: boolean;
+  showSearchBar: boolean;
 }
 
 enum UNITS
@@ -440,32 +441,24 @@ class MapComponent extends TerrainComponent<Props>
     );
   }
 
-  public formatTime(seconds)
+  public renderSearchBar()
   {
-    const hours = (seconds / 3600);
-    const minutes = (hours % 1) * 60;
-    return Math.floor(hours).toString() + ' hours ' + Math.round(minutes).toString() + ' minutes';
-  }
-
-  public render()
-  {
-    const dist = this.directDistance(this.props.location, this.props.secondLocation);
-    const { trafficDistance, trafficTime } = this.state;
-    const inputProps = {
+        const inputProps = {
       value: this.state.address,
       onChange: this.onAddressChange,
     };
     return (
       <div>
-        {this.state.searchByCoordinate ?
-          this.renderCoordinateInputs()
-          :
-          <form onSubmit={this.handleFormSubmit}>
-            <PlacesAutocomplete
-              inputProps={inputProps}
-              onEnterKeyDown={this.handleFormSubmit}
-            />
-          </form>
+        {
+          this.state.searchByCoordinate ?
+            this.renderCoordinateInputs()
+            :
+            <form onSubmit={this.handleFormSubmit}>
+              <PlacesAutocomplete
+                inputProps={inputProps}
+                onEnterKeyDown={this.handleFormSubmit}
+              />
+            </form>
         }
         <div className='input-map-search-settings-row' >
           <CheckBox
@@ -480,21 +473,47 @@ class MapComponent extends TerrainComponent<Props>
             Search by coordinate
             </label>
         </div>
+      </div>
+    );
+  }
+
+  public formatTime(seconds)
+  {
+    const hours = (seconds / 3600);
+    const minutes = (hours % 1) * 60;
+    return Math.floor(hours).toString() + ' hours ' + Math.round(minutes).toString() + ' minutes';
+  }
+
+  public render()
+  {
+    const dist = this.directDistance(this.props.location, this.props.secondLocation);
+    const { trafficDistance, trafficTime } = this.state;
+
+    return (
+      <div>
+        {
+          this.props.showSearchBar ?
+            this.renderSearchBar()
+            :
+            null
+        }
         {
           this.props.showDistanceTools ?
             this.renderDistanceTools()
             :
             null
         }
-        <div>
-          <div>Direct distance: {(dist / 1609.34).toFixed(1)} miles </div>
-          <div>Traffic distance: {(trafficDistance / 1609.34).toFixed(1)} miles </div>
-          <div>Traffic time: {this.formatTime(trafficTime)}</div>
-        </div>
         {this.renderMap()}
       </div>
     );
   }
 }
+
+// Getting the distance values
+// <div>
+//     <div>Direct distance: {(dist / 1609.34).toFixed(1)} miles </div>
+//     <div>Traffic distance: {(trafficDistance / 1609.34).toFixed(1)} miles </div>
+//     <div>Traffic time: {this.formatTime(trafficTime)}</div>
+//   </div>
 
 export default MapComponent;
