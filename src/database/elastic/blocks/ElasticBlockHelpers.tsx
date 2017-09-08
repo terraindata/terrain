@@ -48,6 +48,8 @@ import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
+import { Block } from '../../../blocks/types/Block';
+
 export const enum AutocompleteMatchType
 {
   Index = 1,
@@ -62,9 +64,9 @@ export const ElasticBlockHelpers = {
 
     const state = BuilderStore.getState();
     const cards = state.query.cards;
-    const isIndexCard = (card) => card['type'] === 'eqlindex';
+    const index = getIndex();
+    console.log("AutoComple : " + index);
     const server = BuilderStore.getState().db.name;
-
 
     if (matchType === AutocompleteMatchType.Index)
     {
@@ -75,19 +77,8 @@ export const ElasticBlockHelpers = {
       ).toList();
     }
 
-    let indexCard = cards.find(isIndexCard);
-    if (indexCard === undefined)
+    if (index !== '')
     {
-      indexCard = cards.get(0);
-      if (indexCard !== undefined)
-      {
-        indexCard = indexCard['cards'].find(isIndexCard);
-      }
-    }
-
-    if (indexCard !== undefined)
-    {
-      const index = indexCard['value'];
       const indexId = state.db.name + '/' + String(index);
 
       if (matchType === AutocompleteMatchType.Type)
@@ -103,21 +94,9 @@ export const ElasticBlockHelpers = {
 
       // 2. Need to get current type
 
-      const isTypeCard = (card) => card['type'] === 'eqltype';
-
-      let typeCard = cards.find(isTypeCard);
-      if (typeCard === undefined)
+      const type = getType();
+      if (type !== '')
       {
-        typeCard = cards.get(1);
-        if (typeCard !== undefined)
-        {
-          typeCard = typeCard['cards'].find(isTypeCard);
-        }
-      }
-
-      if (typeCard !== undefined)
-      {
-        const type = typeCard['value'];
         const typeId = state.db.name + '/' + String(index) + '.' + String(type);
 
         // 3. Return columns matching this (server+)index+type
@@ -136,32 +115,42 @@ export const ElasticBlockHelpers = {
   },
 };
 
+export function searchFromRootCard(name: string): Block
+{
+  const state = BuilderStore.getState();
+  const rootCard = state.query.cards.get(0);
+  if (!rootCard)
+  {
+    return undefined;
+  }
+  const isTheCard = (card) => card['type'] === name;
+  return rootCard['cards'].find(isTheCard);
+}
+
 // return '' when there is no index card.
 export function getIndex(): string
 {
-  const state = BuilderStore.getState();
-  const cards = state.query.cards;
-  const isIndexCard = (card) => card['type'] === 'eqlindex';
-  const indexCard = cards.find(isIndexCard);
-  if (indexCard === undefined)
+  const c = searchFromRootCard('eqlindex');
+  if (c === undefined)
   {
     return '';
+  } else
+  {
+    return c['value'];
   }
-  return indexCard['value'];
 }
 
 // return '' when there is no type card.
 export function getType(): string
 {
-  const state = BuilderStore.getState();
-  const cards = state.query.cards;
-  const isTypeCard = (card) => card['type'] === 'eqltype';
-  const typeCard = cards.find(isTypeCard);
-  if (typeCard === undefined)
+  const c = searchFromRootCard('eqltype');
+  if (c === undefined)
   {
     return '';
+  } else
+  {
+    return c['value'];
   }
-  return typeCard['value'];
 }
 
 export default ElasticBlockHelpers;
