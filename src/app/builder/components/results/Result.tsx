@@ -464,6 +464,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
         );
 
       case 'map':
+<<<<<<< HEAD
         let location = [0, 0];
         let address = '';
         if (format.separateCoordinates)
