@@ -460,7 +460,6 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     this.changeFormat('type', 'map');
   }
 
-<<<<<<< HEAD
   public changeLatitude(value: string)
   {
     this.changeFormat('latitude', value);
@@ -635,7 +634,6 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             >
               Map
             </div>
-<<<<<<< HEAD
           </div>
 
           <div className='results-config-map'>
@@ -667,7 +665,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
                 </div>
                 :
                 null
-            }            
+            }
           </div>
 
           <div className='results-config-image'>

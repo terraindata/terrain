@@ -198,15 +198,16 @@ class InputComponent extends TerrainComponent<Props>
           address={value.address}
           location={value.location}
           markLocation={markLocation}
-          routing={false}
           showDirectDistance={false}
           showSearchBar={true}
           zoomControl={true}
           geocoder='google'
           showDistanceTools={true}
           secondLocation={[40, -120]}
+          routing={false}
           showDirectDistance={true}
           showSearchBar={true}
+          zoomControl={true}
         />);
     }
 

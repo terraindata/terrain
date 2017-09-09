@@ -464,7 +464,6 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
         );
 
       case 'map':
-<<<<<<< HEAD
         let location = [0, 0];
         let address = '';
         if (format.separateCoordinates)
@@ -496,6 +495,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
               address={''} // This will be what the search geopoint was
               location={secondLocation} // this will be what the search geopoint was
               markLocation={true}
+              showDistanceTools={false}
               secondLocation={location}
               routing={false}
               showDirectDistance={true}
