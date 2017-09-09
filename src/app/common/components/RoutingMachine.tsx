@@ -54,8 +54,8 @@ import TerrainComponent from './TerrainComponent';
 
 export interface Props
 {
-  to: [number, number];
-  from: [number, number];
+  to: [number, number] | number[];
+  from: [number, number] | number[];
   getMapRef: () => any;
   markerIcon: any;
   setTrafficData: (distance: number, time: number) => void;

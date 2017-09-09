@@ -55,6 +55,7 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { _Format, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
+import Autocomplete from './../../../common/components/Autocomplete';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -298,6 +299,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onFormatChange={this.handleFormatChange}
                       primaryKeys={config.primaryKeys}
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                      allFields={this.props.fields}
                     />
                     :
                     <div className='results-config-placeholder' style={placeholderStyle}>
@@ -323,6 +325,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onFormatChange={this.handleFormatChange}
                       primaryKeys={config.primaryKeys}
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                      allFields={this.props.fields}
                     />
                     :
                     <div className='results-config-placeholder' style={placeholderStyle}>
@@ -352,6 +355,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                         onFormatChange={this.handleFormatChange}
                         primaryKeys={config.primaryKeys}
                         onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                        allFields={this.props.fields}
                       />
                     </div>,
                   )
@@ -379,6 +383,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                   onFormatChange={this.handleFormatChange}
                   primaryKeys={config.primaryKeys}
                   onPrimaryKeysChange={this.handlePrimaryKeysChange}
+                  allFields={this.props.fields}
                 />,
               )
             }
@@ -402,6 +407,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
 
 interface ResultsConfigResultProps
 {
+  allFields: List<string>;
   field: string;
   is?: string; // 'title', 'score', 'field', or null
   onHover?: (index: number, field: string) => void;
@@ -454,6 +460,16 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     this.changeFormat('type', 'map');
   }
 
+  public changeLatitude(value: string)
+  {
+    this.changeFormat('latitude', value);
+  }
+
+  public changeLongitude(value: string)
+  {
+    this.changeFormat('longitude', value);
+  }
+
   public toggleRaw(event)
   {
     this.changeFormat('showRaw', event.target.checked);
@@ -467,6 +483,11 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
   public handleTemplateChange(event)
   {
     this.changeFormat('template', event.target.value);
+  }
+
+  public changeMapFormat()
+  {
+    this.changeFormat('separateCoordinates', !this.props.format.separateCoordinates);
   }
 
   public changeFormat(key: string, val: any)
@@ -502,6 +523,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const { format } = this.props;
     const image = format && format.type === 'image';
     const map = format && format.type === 'map';
+    const separateCoordinates = format && format.separateCoordinates;
 
     const selected: boolean = this.props.is !== null && this.props.isAvailableField;
     const mainStyle = [
@@ -542,7 +564,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
         <div className='results-config-field-body flex-container'>
           <span className='results-config-handle'>
             <DragHandle
-              key={'handle-for-' + this.props.field + this.props.index}
+              key={'handle-for-' + this.props.field + this.props.index.toString()}
             />
           </span>
           <span className='results-config-text flex-grow'>
@@ -567,8 +589,9 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
         <div className={classNames({
           'results-config-field-format': true,
           'results-config-field-format-showing': this.state.showFormat,
-          'results-config-field-format-text': !image,
+          'results-config-field-format-text': !(image || map),
           'results-config-field-format-image': image,
+          'results-config-field-format-map': map,
         })}>
           <div className='results-config-format-header'>
             <input
@@ -610,7 +633,38 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             >
               Map
             </div>
+          </div>
 
+          <div className='results-config-map'>
+            <input
+              type='checkbox'
+              checked={separateCoordinates}
+              onChange={this.changeMapFormat}
+            />
+            <label>Latitude and longitude are separate fields</label>
+            {
+              separateCoordinates ?
+                <div>
+                  <div>
+                    Latitude
+              </div>
+                  <Autocomplete
+                    value={format.latitude}
+                    onChange={this.changeLatitude}
+                    options={this.props.allFields}
+                  />
+                  <div>
+                    Longitude
+              </div>
+                  <Autocomplete
+                    value={format.longitude}
+                    onChange={this.changeLongitude}
+                    options={this.props.allFields}
+                  />
+                </div>
+                :
+                null
+            }
           </div>
 
           <div className='results-config-image'>
