@@ -56,7 +56,6 @@ import PlacesAutocomplete from 'react-places-autocomplete';
 
 import RoutingMachine from './RoutingMachine';
 const { geocodeByAddress, geocodeByLatLng, getLatLng } = require('../../util/MapUtil.js');
-// import { geocodeByAddress, geocodeByLatLng, getLatLng } from '../../util/MapUtil.js';
 import { cardStyle, Colors, fontColor, getCardColors } from '../Colors';
 import BuilderTextbox from './BuilderTextbox';
 import CheckBox from './CheckBox';
@@ -71,10 +70,12 @@ export interface Props
   onChange?: (value) => void;
   markLocation: boolean;
   showDistanceTools?: boolean;
-  secondLocation?: [number, number];
+  secondLocation?: [number, number] | number[];
   routing?: boolean;
   showDirectDistance?: boolean;
   showSearchBar: boolean;
+  secondAddress?: string;
+  zoomControl?: boolean;
 }
 
 enum UNITS
@@ -306,13 +307,44 @@ class MapComponent extends TerrainComponent<Props>
     return reactMap.leafletElement;
   }
 
+  public renderMarker(address, location)
+  {
+    return (
+      <Marker
+        position={location}
+        icon={markerIcon}
+      >
+        {
+          address !== '' && address !== undefined ?
+            <Popup>
+              <span>{address}</span>
+            </Popup>
+            :
+            null
+        }
+      </Marker>
+    );
+  }
+
   public renderMap()
   {
+    let center;
+    let bounds;
+    if (this.props.secondLocation !== undefined)
+    {
+      bounds = [this.props.location, this.props.secondLocation];
+    }
+    else
+    {
+      center = this.props.location;
+    }
+    const mapProps = bounds !== undefined ? { bounds } : { center };
     return (
       <div className='input-map-wrapper'>
         <Map
-          center={this.props.location}
-          zoom={10}
+          {...mapProps}
+          zoom={15}
+          zoomControl={this.props.zoomControl}
           ref='map'
         >
           {
@@ -329,14 +361,13 @@ class MapComponent extends TerrainComponent<Props>
           }
           {
             this.props.markLocation && !this.props.routing ?
-              <Marker
-                position={this.props.location}
-                icon={markerIcon}
-              >
-                <Popup>
-                  <span>{this.props.address}</span>
-                </Popup>
-              </Marker>
+              this.renderMarker(this.props.address, this.props.location)
+              :
+              null
+          }
+          {
+            this.props.secondLocation !== undefined && this.props.showDirectDistance ?
+              this.renderMarker(this.props.secondAddress, this.props.secondLocation)
               :
               null
           }
@@ -443,7 +474,7 @@ class MapComponent extends TerrainComponent<Props>
 
   public renderSearchBar()
   {
-        const inputProps = {
+    const inputProps = {
       value: this.state.address,
       onChange: this.onAddressChange,
     };
@@ -486,9 +517,11 @@ class MapComponent extends TerrainComponent<Props>
 
   public render()
   {
-    const dist = this.directDistance(this.props.location, this.props.secondLocation);
-    const { trafficDistance, trafficTime } = this.state;
-
+    if (this.props.secondLocation !== undefined)
+    {
+      const dist = this.directDistance(this.props.location, this.props.secondLocation);
+      const { trafficDistance, trafficTime } = this.state;
+    }
     return (
       <div>
         {
