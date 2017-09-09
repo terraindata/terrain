@@ -263,6 +263,10 @@
 
         }
 
+        .results-config-map {
+          display: none;
+        }
+
         .results-config-image {
           display: none;
         }
@@ -270,6 +274,13 @@
         &.results-config-field-format-text {
           .results-config-text-btn {
             .rc-selected;
+          }
+        }
+
+        &.results-config-field-format-map {
+          .results-config-map {
+            display: block;
+            marg: 6px;
           }
         }
 

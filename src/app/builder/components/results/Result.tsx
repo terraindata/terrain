@@ -61,6 +61,7 @@ import { spotlightAction } from '../../data/SpotlightStore';
 import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { Result } from './ResultTypes';
+const { geocodeByAddress, geocodeByLatLng, getLatLng } = require('../../../util/MapUtil.js');
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -361,7 +362,7 @@ export function getResultValue(result: Result, field: string, config: ResultsCon
   {
     value = result.fields.get(field);
   }
-  return ResultFormatValue(field, value, config, overrideFormat);
+  return ResultFormatValue(field, value, config, overrideFormat, result);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -401,7 +402,7 @@ export function getResultName(result: Result, config: ResultsConfig)
   return getResultValue(result, nameField, config);
 }
 
-export function ResultFormatValue(field: string, value: any, config: ResultsConfig, overrideFormat?: any): any
+export function ResultFormatValue(field: string, value: any, config: ResultsConfig, overrideFormat?: any, result?: Result): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const { showRaw } = overrideFormat || format || { showRaw: false };
@@ -463,17 +464,43 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
         );
 
       case 'map':
+        let location = [0, 0];
+        let address = '';
+        if (format.separateCoordinates)
+        {
+          const lat = getResultValue(result, format.latitude, config, overrideFormat);
+          const lng = getResultValue(result, format.longitude, config, overrideFormat);
+          if (isNaN(parseFloat(lat)) || isNaN(parseFloat(lng)))
+          {
+            return <div>Error: Fields for latitude and longitude must contain numbers </div>;
+          }
+          location = [parseFloat(lat), parseFloat(lng)];
+        }
+        else if (typeof value === 'string')
+        {
+          address = value;
+          geocodeByAddress(value)
+            .then((results) => getLatLng(results[0]))
+            .then((latLng) => location = [latLng.lat, latLng.lng]);
+        }
+        else
+        {
+          location = value.toJS();
+        }
+        const secondLocation: [number, number] = [37.4449002, -122.16174969999997];
         return (
           <div className='result-field-value-map-wrapper'>
             <MapComponent
-              address={'524 Ramona Street'}
-              location={[37.4449002, -122.16174969999997]}
-              markLocation={false}
+              secondAddress={address}
+              address={''} // This will be what the search geopoint was
+              location={secondLocation} // this will be what the search geopoint was
+              markLocation={true}
               showDistanceTools={false}
-              secondLocation={value.toJS()}
+              secondLocation={location}
               routing={false}
               showDirectDistance={true}
               showSearchBar={false}
+              zoomControl={false}
             />
           </div>
         );
