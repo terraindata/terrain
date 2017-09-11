@@ -220,8 +220,8 @@ const TransformChart = {
           el,
           state.contextOptions,
           scales,
-          state.colors
-        )
+          state.colors,
+        ),
       );
 
       // Delete selected points on del/backspace key press
@@ -1227,7 +1227,7 @@ const TransformChart = {
       .attr('width', 0)
       .attr('height', 0)
       .attr('class', 'right-menu context-menu')
-      .attr('style', 'background: ' + colors[0])
+      .attr('style', 'background: ' + colors[0]);
 
     const bounds = d3.select(el)[0][0]['getBoundingClientRect']();
     const containerWidth = parseFloat(d3.select(el).select('.inner-svg').attr('width'));
@@ -1240,26 +1240,26 @@ const TransformChart = {
 
     if (mouse[0] + clipAllowanceWidth < containerWidth)
     {
-      menu.style('left', `${mouse[0] + dx + 2}px`)
+      menu.style('left', `${mouse[0] + dx + 2}px`);
     }
     else
     {
-      menu.style('right', `${(containerWidth - mouse[0]) + dx}px`)
+      menu.style('right', `${(containerWidth - mouse[0]) + dx}px`);
     }
 
     if (mouse[1] + clipAllowanceHeight < containerHeight)
     {
-      menu.style('top', `${mouse[1] + dy - 2}px`)
+      menu.style('top', `${mouse[1] + dy - 2}px`);
     }
     else
     {
-      menu.style('bottom', `${(containerHeight - mouse[1]) + dy + 2}px`)
+      menu.style('bottom', `${(containerHeight - mouse[1]) + dy + 2}px`);
     }
 
     menu.on('mousedown', () =>
-      {
-        d3.select('.right-menu').remove();
-      });
+    {
+      d3.select('.right-menu').remove();
+    });
 
     for (const menuText of Object.keys(menuOptions))
     {
@@ -1267,7 +1267,7 @@ const TransformChart = {
       item.attr('style', `display: block; color: ${Colors().altBg1}`)
         .attr('class', 'chart-context-menu-item')
         .text(menuText);
-      item.on('mousedown', () => { menuOptions[menuText](d3.select(el), d3.mouse(this)) });
+      item.on('mousedown', () => { menuOptions[menuText](d3.select(el), d3.mouse(this)); });
     }
   },
 
