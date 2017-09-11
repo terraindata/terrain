@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as React from 'react';
 
 // import * as SchemaTypes from '../schema/SchemaTypes';
@@ -61,6 +60,7 @@ export enum DisplayType
   FLEX, // a single row, doesn't require a key
   COMPONENT,
   LABEL, // strict text to paste in to HTML
+  MAP,
 }
 
 export interface RowDisplay
