@@ -370,6 +370,33 @@ class BuilderComponent extends TerrainComponent<Props>
           </div>
         );
         break;
+      case DisplayType.MAP:
+        const MapComp = d.component as any;
+        content = (
+          <div
+            key={key}
+            className={'builder-component-wrapper builder-component-wrapper-wide'}
+          >
+            {
+              React.cloneElement(
+                <MapComp />,
+                {
+                  keyPath,
+                  location: [37.4449002, -122.16174969999997],
+                  address: '',
+                  markLocation: true,
+                  showDistanceCircle: true,
+                  routing: false,
+                  showSearchBar: true,
+                  zoomControl: true,
+                  distance: 2000,
+                  distanceUnits: 'meters',
+                },
+              )
+            }
+          </div>
+        );
+        break;
       case DisplayType.COMPONENT:
         const Comp = d.component as any;
         content = (

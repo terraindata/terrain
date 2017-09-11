@@ -65,17 +65,20 @@ import TerrainComponent from './TerrainComponent';
 
 export interface Props
 {
-  location: [number, number];
-  address: string;
+  location?: [number, number];
+  address?: string;
   onChange?: (value) => void;
-  markLocation: boolean;
+  markLocation?: boolean;
   showDistanceTools?: boolean;
   secondLocation?: [number, number] | number[];
   routing?: boolean;
   showDirectDistance?: boolean;
-  showSearchBar: boolean;
+  showSearchBar?: boolean;
   secondAddress?: string;
   zoomControl?: boolean;
+  distance?: number;
+  distanceUnits?: string;
+  showDistanceCircle?: boolean;
 }
 
 enum UNITS
@@ -259,11 +262,19 @@ class MapComponent extends TerrainComponent<Props>
 
   public convertDistanceToMeters()
   {
-    if (isNaN(parseFloat(this.state.distance)) || this.state.distance === '')
+    let distance: number;
+    if (this.props.distance !== undefined)
     {
-      return 0;
+      distance = this.props.distance;
     }
-    const distance = parseFloat(this.state.distance);
+    else
+    {
+      if (isNaN(parseFloat(this.state.distance)) || this.state.distance === '')
+      {
+        return 0;
+      }
+      distance = parseFloat(this.state.distance);
+    }
     switch (this.state.selectedUnit)
     {
       case UNITS.Meters:
@@ -275,7 +286,7 @@ class MapComponent extends TerrainComponent<Props>
       case UNITS.Feet:
         return 0.3048 * distance;
       default:
-        return this.state.distance;
+        return distance;
     }
   }
 
@@ -372,7 +383,7 @@ class MapComponent extends TerrainComponent<Props>
               null
           }
           {
-            this.props.showDistanceTools ?
+            this.props.showDistanceCircle ?
               <Circle
                 center={this.props.location}
                 radius={this.convertDistanceToMeters()}

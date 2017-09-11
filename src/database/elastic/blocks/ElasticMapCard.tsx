@@ -1,0 +1,172 @@
+/*
+University of Illinois/NCSA Open Source License 
+
+Copyright (c) 2018 Terrain Data, Inc. and the authors. All rights reserved.
+
+Developed by: Terrain Data, Inc. and
+              the individuals who committed the code in this file.
+              https://github.com/terraindata/terrain
+                  
+Permission is hereby granted, free of charge, to any person 
+obtaining a copy of this software and associated documentation files 
+(the "Software"), to deal with the Software without restriction, 
+including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, 
+and to permit persons to whom the Software is furnished to do so, 
+subject to the following conditions:
+
+* Redistributions of source code must retain the above copyright notice, 
+  this list of conditions and the following disclaimers.
+
+* Redistributions in binary form must reproduce the above copyright 
+  notice, this list of conditions and the following disclaimers in the 
+  documentation and/or other materials provided with the distribution.
+
+* Neither the names of Terrain Data, Inc., Terrain, nor the names of its 
+  contributors may be used to endorse or promote products derived from
+  this Software without specific prior written permission.
+
+This license supersedes any copyright notice, license, or related statement
+following this comment block.  All files in this repository are provided
+under the same license, regardless of whether a corresponding comment block
+appears in them.  This license also applies retroactively to any previous
+state of the repository, including different branches and commits, which
+were made public on or after December 8th, 2018.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
+THE SOFTWARE.
+*/
+
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:restrict-plus-operands
+
+import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
+import * as _ from 'lodash';
+
+import { Colors, getCardColors } from '../../../app/common/Colors';
+import MapComponent from '../../../app/common/components/MapComponent';
+import * as BlockUtils from '../../../blocks/BlockUtils';
+import { DisplayType } from '../../../blocks/displays/Display';
+import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
+import { _card } from '../../../blocks/types/Card';
+import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
+
+const esMapDistanceUnits = {
+  mi: 'miles',
+  yd: 'yards',
+  ft: 'feet',
+  in: 'inches',
+  km: 'kilometers',
+  m: 'meters',
+  cm: 'centimeters',
+  mm: 'millimeters',
+  nmi: 'nautical miles',
+};
+
+const esMapDistanceTypes = [
+  'arc',
+  'plane',
+];
+
+export const elasticMap = _card({
+
+  distance: 0,
+  key: 'geo_distance',
+  field: '',
+  distanceUnit: 'mi',
+  distanceType: 'arc',
+
+  static: {
+    language: 'elastic',
+    title: 'Geo Distance',
+    description: 'Terrain\'s custom card for filtering results by distance to a geo_point.',
+    colors: getCardColors('filter', Colors().builder.cards.structureClause),
+    preview: 'Geo Distance',
+
+    tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+    {
+      // TODO EDIT THIS
+      return {
+        geo_distance: {
+          distance: '10m',
+          location: '1,2',
+        },
+      };
+    },
+
+    display:
+    [
+      {
+        displayType: DisplayType.FLEX,
+        key: 'distance_flex',
+        flex:
+        [
+          {
+            displayType: DisplayType.LABEL,
+            key: 'distance_label',
+            label: 'Distance:',
+          },
+          {
+            displayType: DisplayType.NUM,
+            key: 'distance',
+            placeholder: 'distance',
+          },
+          {
+            displayType: DisplayType.DROPDOWN,
+            key: 'distanceUnit',
+            options: List(_.keys(esMapDistanceUnits)),
+            optionsDisplayName: Immutable.Map<any, string>(esMapDistanceUnits) as any,
+            dropdownUsesRawValues: true,
+            autoDisabled: true,
+            centerDropdown: true,
+            style: {
+              maxWidth: 125,
+              minWidth: 105,
+              marginRight: 3,
+            },
+          },
+        ],
+      },
+      {
+        displayType: DisplayType.FLEX,
+        key: 'distance_type_flex',
+        flex:
+        [
+          {
+            displayType: DisplayType.LABEL,
+            key: 'distance_type_label',
+            label: 'Distance Type:',
+          },
+          {
+            displayType: DisplayType.DROPDOWN,
+            key: 'distanceType',
+            options: List(esMapDistanceTypes),
+            dropdownUsesRawValues: true,
+            autoDisabled: true,
+            centerDropdown: true,
+            style: {
+              maxWidth: 125,
+              minWidth: 105,
+              marginRight: 3,
+            },
+          },
+        ],
+      },
+      {
+        // Will likely have to add in functions to handle and save map info ? here or in builder component ?
+        displayType: DisplayType.MAP,
+        key: null,
+        component: MapComponent,
+      },
+    ],
+  },
+});
+
+export default elasticMap;
