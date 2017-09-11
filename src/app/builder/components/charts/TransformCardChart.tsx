@@ -66,7 +66,8 @@ interface ScorePoint
 }
 type ScorePoints = List<ScorePoint>;
 
-const zoomFactor = 2.0;
+const ZOOM_FACTOR = 2.0;
+const ROUND_PRECISION = 3;
 
 import TransformChart from './TransformChart';
 
@@ -313,11 +314,22 @@ class TransformCardChart extends TerrainComponent<Props>
     );
   }
 
-  public changeDomain(domain)
+  public changeDomain(domain, round = true)
   {
-    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 0), domain.get(0));
-    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 1), domain.get(1));
-    this.props.onDomainChange(domain);
+    if (Number.isNaN(domain.get(0)) || Number.isNaN(domain.get(1)))
+    {
+      return;
+    }
+
+    let newDomain = domain;
+    if (round)
+    {
+      newDomain = List([domain.get(0).toPrecision(ROUND_PRECISION), domain.get(1).toPrecision(ROUND_PRECISION)]);
+    }
+
+    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 0), newDomain.get(0));
+    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 1), newDomain.get(1));
+    this.props.onDomainChange(newDomain);
   }
 
   public onZoomIn(el, mouse)
@@ -327,7 +339,7 @@ class TransformCardChart extends TerrainComponent<Props>
     const currentMin = this.props.domain.get(0);
     const currentMax = this.props.domain.get(1);
     const domainWidth = currentMax - currentMin;
-    const spreadDistance = domainWidth / zoomFactor * 0.5;
+    const spreadDistance = domainWidth / ZOOM_FACTOR * 0.5;
     const mouseDomainPosition = currentMin + mousePositionRatio * domainWidth;
     const newDomain = List([mouseDomainPosition - spreadDistance, mouseDomainPosition + spreadDistance]);
 
@@ -341,7 +353,7 @@ class TransformCardChart extends TerrainComponent<Props>
     const currentMin = this.props.domain.get(0);
     const currentMax = this.props.domain.get(1);
     const domainWidth = currentMax - currentMin;
-    const spreadDistance = domainWidth * zoomFactor * 0.5;
+    const spreadDistance = domainWidth * ZOOM_FACTOR * 0.5;
     const mouseDomainPosition = currentMin + mousePositionRatio * domainWidth;
     const newDomain = List([mouseDomainPosition - spreadDistance, mouseDomainPosition + spreadDistance]);
 
