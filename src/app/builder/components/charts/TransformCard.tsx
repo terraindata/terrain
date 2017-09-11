@@ -99,7 +99,7 @@ export type Bars = List<Bar>;
 class TransformCard extends TerrainComponent<Props>
 {
   public state: {
-    // the domain of the chart and the periscope, updated by the periscope domain change.
+    // the domain of the chart and the periscope, updated by the periscope domain change and zoom in/out from the chart
     chartDomain: List<number>;
     // the maximum domain, updated by the two input fields.
     maxDomain: List<number>;
@@ -190,6 +190,15 @@ class TransformCard extends TerrainComponent<Props>
     });
   }
 
+  public handleZoomDomainChange(newDomain: List<number>)
+  {
+    const domain = this.trimDomain(this.state.chartDomain, newDomain);
+    this.setState({
+      chartDomain: domain,
+      maxDomain: domain,
+    });
+  }
+
   public handleUpdatePoints(points, isConcrete?: boolean)
   {
     this.props.onChange(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
@@ -209,11 +218,13 @@ class TransformCard extends TerrainComponent<Props>
         className='transform-card-inner'
       >
         <TransformCardChart
+          onDomainChange={this.handleZoomDomainChange}
           canEdit={this.props.canEdit}
           points={data.scorePoints}
           bars={this.state.bars}
           domain={this.state.chartDomain}
           range={this.state.range}
+          keyPath={this.props.keyPath}
           spotlights={spotlights && spotlights.toList().toJS()}
           inputKey={BlockUtils.transformAlias(this.props.data)}
           updatePoints={this.handleUpdatePoints}

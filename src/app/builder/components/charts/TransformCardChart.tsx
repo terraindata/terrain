@@ -55,6 +55,7 @@ import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
 
 interface ScorePoint
 {
@@ -73,9 +74,11 @@ export interface Props
   bars: any;
   domain: List<number>;
   range: List<number>;
+  keyPath: KeyPath;
   canEdit: boolean;
   inputKey: string;
   updatePoints: (points: ScorePoints, released?: boolean) => void;
+  onDomainChange: (domain: List<number>) => void;
   width: number;
   language: string;
   colors: [string, string];
@@ -308,19 +311,38 @@ class TransformCardChart extends TerrainComponent<Props>
     );
   }
 
+  public changeDomain(domain)
+  {
+    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 0), domain.get(0));
+    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 1), domain.get(1));
+    this.props.onDomainChange(domain);
+  }
+
   public onZoomIn(el, mouse)
   {
-
+    const domain = this.props.domain.map(
+      (value) => value * 0.5
+    ).toList();
+    this.changeDomain(domain);
   }
 
   public onZoomOut(el, mouse)
   {
-
+    const domain = this.props.domain.map(
+      (value) => value * 2.0
+    ).toList();
+    this.changeDomain(domain);
   }
 
-  public onZoomToFit(el, mouse)
+  public onZoomToFit(el, mouse) // zoom to fit all bars data or all points
   {
-    
+    if (this.state.pointsCache && this.state.pointsCache.size > 0)
+    {
+      const max = this.state.pointsCache.max((a, b) => a.value - b.value).value;
+      const min = this.state.pointsCache.min((a, b) => a.value - b.value).value;
+      const tailWidth = (max - min) * 0.05;
+      this.changeDomain(List([min - tailWidth, max + tailWidth]));
+    }
   }
 
   public onClearAll(el, mouse)
