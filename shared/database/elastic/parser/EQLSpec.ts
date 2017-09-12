@@ -63,7 +63,7 @@ import ESStringClause from './clauses/ESStringClause';
 import ESStructureClause from './clauses/ESStructureClause';
 import ESTypeClause from './clauses/ESTypeClause';
 import ESVariantClause from './clauses/ESVariantClause';
-
+import ESWildcardStructureClause from './clauses/ESWildcardStructureClause';
 /* tslint:disable:max-line-length */
 
 const EQLSpec: ESClause[] =
@@ -766,6 +766,7 @@ const EQLSpec: ESClause[] =
       }),
     new ESStructureClause('query',
       {
+        geo_distance: 'geo_distance',
         bool: 'bool_query',
         term: 'term_query',
         terms: 'terms_query',
@@ -836,6 +837,26 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
         // template: { must: null, must_not: null, should: null, minimum_should_match: null },
         suggestions: ['must', 'must_not', 'filter', 'should', 'minimum_should_match'],
+      }),
+    new ESWildcardStructureClause('geo_distance',
+      {
+        distance: 'distance',
+        distance_type: 'distance_type',
+      },
+      'field',
+      'geo_point',
+      {
+        path: ['geo_distance'],
+        name: 'geo_distance',
+        desc: 'Filters in and out documents that meet given distance requirements',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.4/query-dsl-geo-distance-query.html',
+        required: ['distance'],
+      }),
+    new ESStringClause('distance',
+      {
+        name: 'distance',
+        path: ['geo_distance'],
+        desc: 'The distance, in various units, from a specified location',
       }),
     new ESVariantClause('must',
       {
