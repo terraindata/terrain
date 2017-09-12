@@ -69,6 +69,8 @@ export default function ElasticToCards(
 {
   if (query.parseTree === null || query.parseTree.hasError())
   {
+    console.log('ERROR');
+    console.log(query);
     // TODO: we may want to show some error messages on the cards.
     return query
       .set('cardsAndCodeInSync', false);
@@ -159,6 +161,34 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         sortType,
       }, true);
   }
+  else if (isMapCard(valueInfo))
+  {
+    const distanceAndUnit = valueInfo.objectChildren.distance.propertyValue.value;
+    const match = /[a-zA-Z]/.exec(distanceAndUnit);
+    const distance = distanceAndUnit.substring(0, match.index).replace(/ /g, '');
+    const distanceUnit = distanceAndUnit.substring(match.index);
+    const distanceType = valueInfo.objectChildren.distance_type.propertyValue.value;
+
+    // Get variable-name for field
+    let field: string;
+    _.keys(valueInfo.objectChildren).forEach((key) =>
+    {
+      if (key !== 'distance' && key !== 'distance_type')
+      {
+        field = key;
+      }
+    });
+    // Get value of field (lat lon value)
+    return make(
+      Blocks, 'elasticMap',
+      {
+        distance,
+        distanceType,
+        distanceUnit,
+        field,
+      },
+      true);
+  }
 
   const clauseCardType = 'eql' + valueInfo.clause.type;
   if (typeof valueInfo.value !== 'object')
@@ -190,6 +220,14 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
 
   return make(Blocks, clauseCardType, valueMap, true);
 };
+
+// TODO CHECK THAT THIS IS A VALID MAP CARD!!!
+function isMapCard(valueInfo: ESValueInfo): boolean
+{
+  const isBool = (valueInfo.clause.clauseType === ESClauseType.ESWildcardStructureClause) &&
+    (valueInfo.clause.name === 'geo_distance');
+  return isBool;
+}
 
 function isFilterCard(valueInfo: ESValueInfo): boolean
 {
