@@ -52,12 +52,15 @@ const { Map, List } = Immutable;
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import BuilderTextbox from '../../../common/components/BuilderTextbox';
+
+import Autocomplete from 'common/components/Autocomplete';
+// import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import Periscope from './Periscope';
 import { Bar, Bars } from './TransformCard';
+
 
 export interface Props
 {
@@ -74,6 +77,7 @@ export interface Props
 }
 
 const MAX_BARS = 100;
+const EMPTY_OPTIONS = List([]);
 
 class TransformCardPeriscope extends TerrainComponent<Props>
 {
@@ -84,6 +88,8 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     bars: Bars,
     maxDomainLow: number,
     maxDomainHigh: number,
+    maxDomainLowErrorText: string,
+    maxDomainHighErrorText: string,
   } = {
     chartState: null,
     initialDomain: null,
@@ -91,6 +97,8 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     bars: null,
     maxDomainLow: this.props.maxDomain.get(0),
     maxDomainHigh: this.props.maxDomain.get(1),
+    maxDomainLowErrorText: '',
+    maxDomainHighErrorText: '',
   };
 
   public refs: {
@@ -217,6 +225,57 @@ class TransformCardPeriscope extends TerrainComponent<Props>
       maxDomainHigh: value
     });
     Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 1), value);
+    this.handleDomainTextChange();
+  }
+
+  public validateDomainLowValue(value)
+  {
+    if (isNaN(value))
+    {
+     this.setState({
+       maxDomainLowErrorText: 'Must be a number',
+     });
+     return false;
+    }
+    else if (value >= this.props.maxDomain.get(1))
+    {
+      this.setState({
+        maxDomainLowErrorText: 'Must be less than the maximum view range',
+      });
+      return false;
+    }
+    else
+    {
+      this.setState({
+        maxDomainLowErrorText: '',
+      });
+      return true;
+    }
+  }
+
+  public validateDomainHighValue(value)
+  {
+    if (isNaN(value))
+    {
+     this.setState({
+       maxDomainHighErrorText: 'Must be a number',
+     });
+     return false;
+    }
+    else if (value <= this.props.maxDomain.get(0))
+    {
+      this.setState({
+        maxDomainHighErrorText: 'Must be greater than the minimum view range',
+      });
+      return false;
+    }
+    else
+    {
+      this.setState({
+        maxDomainHighErrorText: '',
+      });
+      return true;
+    }
   }
 
   public getChartState(overrideState = {}): IMMap<string, any>
@@ -251,26 +310,29 @@ class TransformCardPeriscope extends TerrainComponent<Props>
         <div ref='chart' />
 
         <div className='tp-text-wrapper'>
-          <BuilderTextbox
-            value={this.props.maxDomain.get(0)}
-            keyPath={this._ikeyPath(this.props.keyPath, 'domain', 0)}
-            isNumber={true}
-            className='tp-tb-left'
-            canEdit={this.props.canEdit}
-            onChange={this.handleDomainTextChange}
-            autoDisabled={true}
-            language={this.props.language}
-          />
-          <BuilderTextbox
-            value={this.props.maxDomain.get(1)}
-            keyPath={this._ikeyPath(this.props.keyPath, 'domain', 1)}
-            isNumber={true}
-            className='tp-tb-right'
-            canEdit={this.props.canEdit}
-            onChange={this.handleDomainTextChange}
-            autoDisabled={true}
-            language={this.props.language}
-          />
+          <div className= 'tp-tb-left'>
+            <Autocomplete
+              // value={this.props.maxDomain.get(0)}
+              value={this.state.maxDomainLow.toString()}
+              options={EMPTY_OPTIONS}
+              // validateValue={this.validateDomainLowValue}
+              // typeErrorMessage={this.state.maxDomainLowErrorText}
+              // help={'Edit the chart view range'}
+              disabled={!this.props.canEdit}
+              onChange={this.handleDomainLowChange}
+            />
+          </div>
+          <div className='tp-tb-right'>
+            <Autocomplete
+              // value={this.props.maxDomain.get(1)}
+              value={this.state.maxDomainHigh.toString()}
+              options={EMPTY_OPTIONS}
+              // validateValue={this.validateDomainHighValue}
+              // typeErrorMessage={this.state.maxDomainHighErrorText}
+              disabled={!this.props.canEdit}
+              onChange={this.handleDomainHighChange}
+            />
+          </div>
         </div>
 
       </div>

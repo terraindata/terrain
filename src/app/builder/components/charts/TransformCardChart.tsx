@@ -317,7 +317,7 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public changeDomain(domain, round = true)
   {
-    if (Number.isNaN(domain.get(0)) || Number.isNaN(domain.get(1)))
+    if (isNaN(domain.get(0)) || isNaN(domain.get(1)))
     {
       return;
     }
