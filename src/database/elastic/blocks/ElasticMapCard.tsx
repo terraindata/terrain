@@ -79,9 +79,11 @@ export const elasticMap = _card({
 
   distance: 0,
   key: 'geo_distance',
-  field: '',
+  field: 'location',
   distanceUnit: 'mi',
   distanceType: 'arc',
+  geopoint_lat: 35,
+  geopoint_lon: -120,
 
   static: {
     language: 'elastic',
@@ -92,17 +94,36 @@ export const elasticMap = _card({
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      // TODO EDIT THIS
+      // TODO Geo point needs to coordinate with what is in map ...
       return {
-        geo_distance: {
-          distance: '10m',
-          location: '1,2',
+        distance: (block['distance']).toString() + block['distanceUnit'],
+        distance_type: block['distanceType'],
+        [block['field']]: {
+          lat: block['geopoint_lat'],
+          lon: block['geopoint_lon'],
         },
       };
     },
 
     display:
     [
+      {
+        displayType: DisplayType.FLEX,
+        key: 'distance_field_flex',
+        flex:
+        [
+          {
+            displayType: DisplayType.LABEL,
+            key: 'distance_field_label',
+            label: 'Field:',
+          },
+          {
+            displayType: DisplayType.TEXT,
+            placeholder: 'Key',
+            key: 'field',
+          },
+        ],
+      },
       {
         displayType: DisplayType.FLEX,
         key: 'distance_flex',
