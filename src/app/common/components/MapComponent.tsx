@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires restrict-plus-operands
 
 import * as classNames from 'classnames';
 import GoogleMap from 'google-map-react';
@@ -79,6 +79,7 @@ export interface Props
   distance?: number;
   distanceUnits?: string;
   showDistanceCircle?: boolean;
+  geocoder?: string;
 }
 
 enum UNITS
@@ -136,6 +137,9 @@ class MapComponent extends TerrainComponent<Props>
     trafficTime: 0.0,
   };
 
+  public geoCache = {};
+  public reverseGeoCache = {};
+
   public componentWillReceiveProps(nextProps)
   {
     if (this.props.address !== nextProps.address)
@@ -158,12 +162,37 @@ class MapComponent extends TerrainComponent<Props>
     this.setState({ address });
   }
 
+  public onPhotonChange(result)
+  {
+    const location = result.features[0].geometry.coordinates;
+    this.props.onChange({ location: [location[1], location[0]], address: this.state.address });
+    this.geoCache[this.state.address] = result;
+    this.reverseGeoCache[result.toString()] = this.state.address;
+  }
+
   public handleFormSubmit()
   {
-    geocodeByAddress(this.state.address)
-      .then((results) => getLatLng(results[0]))
-      .then((latLng) => this.props.onChange({ location: [latLng.lat, latLng.lng], address: this.state.address }))
-      .catch((error) => this.setState({ error }));
+    if (this.geoCache[this.state.address] !== undefined)
+    {
+      this.props.onChange({ location: this.geoCache[this.state.address], address: this.state.address });
+      return;
+    }
+    if (this.props.geocoder === 'photon')
+    {
+      geocodeByAddress('photon', this.state.address, this.onPhotonChange);
+    }
+    else
+    {
+      geocodeByAddress('google', this.state.address)
+        .then((results) => getLatLng(results[0]))
+        .then((latLng) =>
+        {
+          this.props.onChange({ location: [latLng.lat, latLng.lng], address: this.state.address });
+          this.geoCache[this.state.address] = [latLng.lat, latLng.lng];
+          this.reverseGeoCache[[latLng.lat, latLng.lng].toString()] = this.state.address;
+        })
+        .catch((error) => this.setState({ error }));
+    }
   }
 
   public changeSearchMode()
@@ -171,6 +200,16 @@ class MapComponent extends TerrainComponent<Props>
     this.setState({
       searchByCoordinate: !this.state.searchByCoordinate,
     });
+  }
+
+  public onPhotonReverseChange(result)
+  {
+    const { housenumber, street, city, state, country } = result.features[0].properties;
+    const { lat, lon } = result.features[0].geometry.coordinates;
+    const address = housenumber + ' ' + street + ', ' + city + ', ' + state + ', ' + country;
+    this.props.onChange({ location: [lat, lon], address });
+    this.geoCache[address] = [lat, lon];
+    this.reverseGeoCache[[lat, lon].toString()] = address;
   }
 
   public handleCoordinateFormSubmit(e)
@@ -187,21 +226,37 @@ class MapComponent extends TerrainComponent<Props>
       }
       const lat = parseFloat(this.state.latitude);
       const lng = parseFloat(this.state.longitude);
-      geocodeByLatLng({ lat, lng })
-        .then((results: any) =>
-        {
-          if (results[0] === undefined)
+
+      if (this.reverseGeoCache[[lat, lng].toString()] !== undefined)
+      {
+        this.props.onChange({ location: [lat, lng], address: this.reverseGeoCache[[lat, lng].toString()] });
+        return;
+      }
+
+      if (this.props.geocoder === 'photon')
+      {
+        geocodeByLatLng('photon', { lat, lng }, this.onPhotonReverseChange);
+      }
+      else
+      {
+        geocodeByLatLng('google', { lat, lng })
+          .then((results: any) =>
           {
-            this.setState({
-              error: 'No results for the coordinates entered',
-            });
-          }
-          else
-          {
-            this.props.onChange({ location: [lat, lng], address: results[0].formatted_address });
-          }
-        })
-        .catch((error) => this.setState({ error }));
+            if (results[0] === undefined)
+            {
+              this.setState({
+                error: 'No results for the coordinates entered',
+              });
+            }
+            else
+            {
+              this.props.onChange({ location: [lat, lng], address: results[0].formatted_address });
+              this.geoCache[results[0].formatted_address] = [lat, lng];
+              this.reverseGeoCache[[lat, lng].toString()] = results[0].formatted_address;
+            }
+          })
+          .catch((error) => this.setState({ error }));
+      }
     }
   }
 

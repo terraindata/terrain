@@ -58,19 +58,6 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
-<<<<<<< HEAD
-<<<<<<< HEAD
-import GoogleMap from 'google-map-react';
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
-import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
-=======
->>>>>>> working on search bar
-import GoogleMap from 'google-map-react';
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
-=======
->>>>>>> in progress
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
 import MapComponent from '../../../common/components/MapComponent';
 
@@ -251,12 +238,12 @@ class InputComponent extends TerrainComponent<Props>
           address={value.address}
           location={value.location}
           markLocation={markLocation}
-          showDistanceTools={true}
-          secondLocation={[40, -120]}
+          showDistanceTools={false}
           routing={false}
-          showDirectDistance={true}
+          showDirectDistance={false}
           showSearchBar={true}
           zoomControl={true}
+          geocoder='photon'
         />);
     }
 
