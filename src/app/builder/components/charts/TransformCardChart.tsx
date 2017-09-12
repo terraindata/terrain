@@ -82,6 +82,7 @@ export interface Props
   inputKey: string;
   updatePoints: (points: ScorePoints, released?: boolean) => void;
   onDomainChange: (domain: List<number>) => void;
+  onRequestZoomToData: () => void;
   width: number;
   language: string;
   colors: [string, string];
@@ -371,6 +372,11 @@ class TransformCardChart extends TerrainComponent<Props>
     }
   }
 
+  public onZoomToData(el, mouse)
+  {
+    this.props.onRequestZoomToData();
+  }
+
   public onClearAll(el, mouse)
   {
     this.updatePoints(List<ScorePoint>(), true);
@@ -381,7 +387,8 @@ class TransformCardChart extends TerrainComponent<Props>
     return {
       'Zoom in': this.onZoomIn,
       'Zoom out': this.onZoomOut,
-      'Zoom to fit': this.onZoomToFit,
+      'Auto-center on curve': this.onZoomToFit,
+      'Auto-center on data': this.onZoomToData,
       'Clear all points': this.onClearAll,
     };
   }

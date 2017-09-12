@@ -1235,8 +1235,8 @@ const TransformChart = {
     const dx = (bounds.width - containerWidth) / 2;
     const dy = (bounds.height - containerHeight) / 2;
 
-    const clipAllowanceWidth = 120 - dx;
-    const clipAllowanceHeight = 22 * Object.keys(menuOptions).length - dy;
+    const clipAllowanceWidth = 140 - dx; // should approximately match context-menu max-width
+    const clipAllowanceHeight = 20 * Object.keys(menuOptions).length - dy; // should approximately match context-menu-item height
 
     if (mouse[0] + clipAllowanceWidth < containerWidth)
     {
