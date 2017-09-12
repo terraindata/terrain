@@ -82,11 +82,15 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     chartState: IMMap<string, any>,
     initialVal: number,
     bars: Bars,
+    maxDomainLow: number,
+    maxDomainHigh: number,
   } = {
     chartState: null,
     initialDomain: null,
     initialVal: 0,
     bars: null,
+    maxDomainLow: this.props.maxDomain.get(0),
+    maxDomainHigh: this.props.maxDomain.get(1),
   };
 
   public refs: {
@@ -196,6 +200,23 @@ class TransformCardPeriscope extends TerrainComponent<Props>
   public handleDomainTextChange()
   {
     Actions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
+  }
+
+  public handleDomainLowChange(value)
+  {
+    this.setState({
+      maxDomainLow: value,
+    });
+    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 0), value);
+    this.handleDomainTextChange();
+  }
+
+  public handleDomainHighChange(value)
+  {
+    this.setState({
+      maxDomainHigh: value
+    });
+    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 1), value);
   }
 
   public getChartState(overrideState = {}): IMMap<string, any>

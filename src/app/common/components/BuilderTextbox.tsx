@@ -144,8 +144,8 @@ class BuilderTextbox extends TerrainComponent<Props>
     this.state = {
       // store these in state to avoid unnecessary calls to Store.getState()
       //  might be unnecessary with container components and connect/provide
-      valueIsInput: this.valueIsInput(props),
-      valueIsWrongType: this.valueIsWrongType(props),
+      valueIsInput: this.valueIsInput(props, props.value),
+      valueIsWrongType: this.valueIsWrongType(props, props.value),
 
       isSwitching: false,
       backupString: props.value,
@@ -268,7 +268,6 @@ class BuilderTextbox extends TerrainComponent<Props>
       backupString: typeof this.props.value === 'string' ? this.props.value : null,
     });
     this.executeChange(value);
-
   }
 
   public handleFocus(event: React.FocusEvent<any>)
@@ -365,8 +364,8 @@ class BuilderTextbox extends TerrainComponent<Props>
   public componentWillUpdate(nextProps: Props, nextState)
   {
     this.setState({
-      valueIsInput: this.valueIsInput(nextProps),
-      valueIsWrongType: this.valueIsWrongType(nextProps),
+      valueIsInput: this.valueIsInput(nextProps, nextState.boxValue),
+      valueIsWrongType: this.valueIsWrongType(nextProps, nextState.boxValue),
     });
   }
 
@@ -510,10 +509,10 @@ class BuilderTextbox extends TerrainComponent<Props>
     );
   }
 
-  private valueIsInput(props: Props): boolean
+  private valueIsInput(props: Props, value): boolean
   {
-    if (typeof this.props.value === 'string' &&
-      isInput(this.props.value as string, BuilderStore.getState().query.inputs))
+    if (typeof value === 'string' &&
+      isInput(value as string, BuilderStore.getState().query.inputs))
     {
       return true;
     }
@@ -521,11 +520,11 @@ class BuilderTextbox extends TerrainComponent<Props>
     return false;
   }
 
-  private valueIsWrongType(props: Props): boolean
+  private valueIsWrongType(props: Props, value): boolean
   {
-    const { isNumber, value } = props;
+    const { isNumber } = props;
 
-    if (!isNumber || this.valueIsInput(props))
+    if (!isNumber || this.valueIsInput(props, value))
     {
       return false;
     }
