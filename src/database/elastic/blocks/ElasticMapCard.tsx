@@ -82,8 +82,7 @@ export const elasticMap = _card({
   field: 'location',
   distanceUnit: 'mi',
   distanceType: 'arc',
-  geopoint_lat: 35,
-  geopoint_lon: -120,
+  geopoint: [-35, 120],
 
   static: {
     language: 'elastic',
@@ -99,8 +98,8 @@ export const elasticMap = _card({
         distance: (block['distance']).toString() + block['distanceUnit'],
         distance_type: block['distanceType'],
         [block['field']]: {
-          lat: block['geopoint_lat'],
-          lon: block['geopoint_lon'],
+          lat: block['geopoint'][0],
+          lon: block['geopoint'][1],
         },
       };
     },
@@ -183,7 +182,7 @@ export const elasticMap = _card({
       {
         // Will likely have to add in functions to handle and save map info ? here or in builder component ?
         displayType: DisplayType.MAP,
-        key: null,
+        key: 'geopoint',
         component: MapComponent,
         style: {
           height: 200,
