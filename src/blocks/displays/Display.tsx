@@ -119,7 +119,7 @@ export interface Display
 
   style?: React.CSSProperties;
 
-  // for components
+  // for components and map
   component?: any; // TerrainComponent?
 
   // for cards areas
