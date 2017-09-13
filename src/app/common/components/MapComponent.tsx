@@ -53,7 +53,7 @@ import { divIcon } from 'leaflet';
 import * as React from 'react';
 import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 'react-leaflet';
 import PlacesAutocomplete from 'react-places-autocomplete';
-
+import Actions from '../../builder/data/BuilderActions';
 import RoutingMachine from './RoutingMachine';
 const { geocodeByAddress, geocodeByLatLng, getLatLng } = require('../../util/MapUtil.js');
 import { cardStyle, Colors, fontColor, getCardColors } from '../Colors';
@@ -79,6 +79,7 @@ export interface Props
   distanceUnit?: string;
   showDistanceCircle?: boolean;
   geocoder?: string;
+  keyPath?: KeyPath;
 }
 
 const UNIT_CONVERSIONS =
@@ -173,16 +174,28 @@ class MapComponent extends TerrainComponent<Props>
   public onPhotonChange(result)
   {
     const location = result.features[0].geometry.coordinates;
-    this.props.onChange({ location: [location[1], location[0]], address: this.state.address });
-    this.geoCache[this.state.address] = result;
-    this.reverseGeoCache[result.toString()] = this.state.address;
+    this.handleLocationChange([location[1], location[0]], this.state.address);
+  }
+
+  public handleLocationChange(location, address)
+  {
+    this.geoCache[address] = location;
+    this.reverseGeoCache[location.toString()] = address;
+    if (this.props.onChange !== undefined)
+    {
+      this.props.onChange({ location, address });
+    }
+    if (this.props.keyPath !== undefined)
+    {
+      Actions.change(this.props.keyPath, location);
+    }
   }
 
   public handleFormSubmit()
   {
     if (this.geoCache[this.state.address] !== undefined)
     {
-      this.props.onChange({ location: this.geoCache[this.state.address], address: this.state.address });
+      this.handleLocationChange(this.geoCache[this.state.address], this.state.address);
       return;
     }
     if (this.props.geocoder === 'photon')
@@ -193,12 +206,7 @@ class MapComponent extends TerrainComponent<Props>
     {
       geocodeByAddress('google', this.state.address)
         .then((results) => getLatLng(results[0]))
-        .then((latLng) =>
-        {
-          this.props.onChange({ location: [latLng.lat, latLng.lng], address: this.state.address });
-          this.geoCache[this.state.address] = [latLng.lat, latLng.lng];
-          this.reverseGeoCache[[latLng.lat, latLng.lng].toString()] = this.state.address;
-        })
+        .then((latLng) => this.handleLocationChange([latLng.lat, latLng.lng], this.state.address))
         .catch((error) => this.setState({ error }));
     }
   }
@@ -215,9 +223,7 @@ class MapComponent extends TerrainComponent<Props>
     const { housenumber, street, city, state, country } = result.features[0].properties;
     const { lat, lon } = result.features[0].geometry.coordinates;
     const address = housenumber + ' ' + street + ', ' + city + ', ' + state + ', ' + country;
-    this.props.onChange({ location: [lat, lon], address });
-    this.geoCache[address] = [lat, lon];
-    this.reverseGeoCache[[lat, lon].toString()] = address;
+    this.handleLocationChange([lat, lon], address);
   }
 
   public handleCoordinateFormSubmit(e)
@@ -237,7 +243,7 @@ class MapComponent extends TerrainComponent<Props>
 
       if (this.reverseGeoCache[[lat, lng].toString()] !== undefined)
       {
-        this.props.onChange({ location: [lat, lng], address: this.reverseGeoCache[[lat, lng].toString()] });
+        this.handleLocationChange([lat, lng], this.reverseGeoCache[[lat, lng].toString()]);
         return;
       }
 
@@ -258,9 +264,7 @@ class MapComponent extends TerrainComponent<Props>
             }
             else
             {
-              this.props.onChange({ location: [lat, lng], address: results[0].formatted_address });
-              this.geoCache[results[0].formatted_address] = [lat, lng];
-              this.reverseGeoCache[[lat, lng].toString()] = results[0].formatted_address;
+              this.handleLocationChange([lat, lng], results[0].formatted_address);
             }
           })
           .catch((error) => this.setState({ error }));
