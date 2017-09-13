@@ -174,7 +174,9 @@ class BuilderTextbox extends TerrainComponent<Props>
     // If you want two-way backups, use this line
     // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
     if (
-      (this.props.value !== undefined && this.props.value['type'] === this.getCreatingType() && value === '')
+      this.props.value !== undefined
+      && this.props.value['type'] !== undefined && this.props.value['type'] === this.getCreatingType()
+      && value === ''
     )
     {
       if (this.state.backupString)
