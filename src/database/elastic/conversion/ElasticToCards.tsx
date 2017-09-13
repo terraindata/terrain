@@ -92,8 +92,6 @@ export default function ElasticToCards(
 {
   if (query.parseTree === null || query.parseTree.hasError())
   {
-    console.log('ERROR');
-    console.log(query);
     // TODO: we may want to show some error messages on the cards.
     return query
       .set('cardsAndCodeInSync', false);

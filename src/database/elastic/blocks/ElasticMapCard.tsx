@@ -185,6 +185,10 @@ export const elasticMap = _card({
         displayType: DisplayType.MAP,
         key: null,
         component: MapComponent,
+        style: {
+          height: 200,
+          width: 200,
+        },
       },
     ],
   },
