@@ -154,6 +154,16 @@ class TransformCardPeriscope extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    const maxDomainLow = nextProps.maxDomain.get(0);
+    const maxDomainHigh = nextProps.maxDomain.get(1);
+    if (this.props.maxDomain.get(0) !== maxDomainLow || this.props.maxDomain.get(1) !== maxDomainHigh)
+    {
+      this.setState({
+        maxDomainLow,
+        maxDomainHigh,
+      });
+    }
+
     if (this.shouldComponentUpdate(nextProps, this.state))
     {
       let bars = this.state.bars;
@@ -215,8 +225,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     this.setState({
       maxDomainLow: value,
     });
-    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 0), value);
-    this.handleDomainTextChange();
+    this.verifyAndSetDomainValues(value, this.state.maxDomainHigh);
   }
 
   public handleDomainHighChange(value)
@@ -224,57 +233,16 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     this.setState({
       maxDomainHigh: value
     });
-    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 1), value);
-    this.handleDomainTextChange();
+    this.verifyAndSetDomainValues(this.state.maxDomainLow, value);
   }
 
-  public validateDomainLowValue(value)
+  public verifyAndSetDomainValues(maxDomainLow, maxDomainHigh)
   {
-    if (isNaN(value))
+    if (!isNaN(maxDomainLow) && !isNaN(maxDomainHigh) && maxDomainLow < maxDomainHigh)
     {
-     this.setState({
-       maxDomainLowErrorText: 'Must be a number',
-     });
-     return false;
-    }
-    else if (value >= this.props.maxDomain.get(1))
-    {
-      this.setState({
-        maxDomainLowErrorText: 'Must be less than the maximum view range',
-      });
-      return false;
-    }
-    else
-    {
-      this.setState({
-        maxDomainLowErrorText: '',
-      });
-      return true;
-    }
-  }
-
-  public validateDomainHighValue(value)
-  {
-    if (isNaN(value))
-    {
-     this.setState({
-       maxDomainHighErrorText: 'Must be a number',
-     });
-     return false;
-    }
-    else if (value <= this.props.maxDomain.get(0))
-    {
-      this.setState({
-        maxDomainHighErrorText: 'Must be greater than the minimum view range',
-      });
-      return false;
-    }
-    else
-    {
-      this.setState({
-        maxDomainHighErrorText: '',
-      });
-      return true;
+      Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 0), maxDomainLow);
+      Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 1), maxDomainHigh);
+      this.handleDomainTextChange();
     }
   }
 
@@ -310,7 +278,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
         <div ref='chart' />
 
         <div className='tp-text-wrapper'>
-          <div className= 'tp-tb-left'>
+          <div className='tp-tb-left'>
             <Autocomplete
               // value={this.props.maxDomain.get(0)}
               value={this.state.maxDomainLow.toString()}
