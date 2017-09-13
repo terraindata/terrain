@@ -62,6 +62,29 @@ import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo'
 
 const { make } = BlockUtils;
 
+const UNIT_MAPPINGS = {
+  'mi': 'mi',
+  'yd': 'yd',
+  'ft': 'ft',
+  'in': 'in',
+  'km': 'km',
+  'm': 'm',
+  'cm': 'cm',
+  'mm': 'mm',
+  'nmi': 'nmi',
+  'miles': 'mi',
+  'meters': 'm',
+  'yards': 'yd',
+  'feet': 'ft',
+  'inch': 'in',
+  'inches': 'in',
+  'kilometers': 'km',
+  'centimeters': 'cm',
+  'millimeters': 'mm',
+  'NM': 'nmi',
+  'nautical miles': 'nmi',
+};
+
 export default function ElasticToCards(
   query: Query,
   queryReady: (query: Query) => void,
@@ -69,8 +92,6 @@ export default function ElasticToCards(
 {
   if (query.parseTree === null || query.parseTree.hasError())
   {
-    console.log('ERROR');
-    console.log(query);
     // TODO: we may want to show some error messages on the cards.
     return query
       .set('cardsAndCodeInSync', false);
@@ -166,7 +187,11 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
     const distanceAndUnit = valueInfo.objectChildren.distance.propertyValue.value;
     const match = /[a-zA-Z]/.exec(distanceAndUnit);
     const distance = distanceAndUnit.substring(0, match.index).replace(/ /g, '');
-    const distanceUnit = distanceAndUnit.substring(match.index);
+    let distanceUnit = UNIT_MAPPINGS[distanceAndUnit.substring(match.index)];
+    if (distanceUnit === undefined)
+    {
+      distanceUnit = 'm';
+    }
     const distanceType = valueInfo.objectChildren.distance_type.propertyValue.value;
 
     // Get variable-name for field
