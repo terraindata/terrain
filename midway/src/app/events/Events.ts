@@ -338,7 +338,7 @@ export class Events
 
       let body = bodybuilder();
       body = body.filter('term', 'variantid', variantId);
-      body = body.filter('term', 'eventid', variantInfo['metric']);
+      body = body.filter('term', 'eventid', variantInfo['eventid']);
       body = body.filter('range', '@timestamp', {
         gte: variantInfo['start'],
         lte: variantInfo['end'],

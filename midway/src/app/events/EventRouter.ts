@@ -110,7 +110,7 @@ Router.post('/update/', async (ctx, next) =>
 Router.post('/variants/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const requestObj = JSON.parse(JSON.stringify(ctx.request.query));
-  Util.verifyParameters(requestObj, ['start', 'end', 'metric']);
+  Util.verifyParameters(requestObj, ['start', 'end', 'eventid']);
   if (!ctx.params.id)
   {
     throw new Error('missing variant ID');
