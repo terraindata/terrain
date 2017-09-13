@@ -21,7 +21,6 @@
             "common*": ["../src/app/common/*"],
             "deploy*": ["../src/app/deploy/*"],
             "fileimport*": ["../src/app/fileimport/*"],
-            "library*": ["../src/app/library/*"],
             "manual*": ["../src/app/manual/*"],
             "roles*": ["../src/app/roles/*"],
             "schema*": ["../src/app/schema/*"],
