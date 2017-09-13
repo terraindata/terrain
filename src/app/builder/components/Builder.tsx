@@ -151,9 +151,6 @@ class Builder extends TerrainComponent<Props>
 
   public confirmedLeave: boolean = false;
 
-  public unregisterLeaveHook1: any = () => { };
-  public unregisterLeaveHook2: any = () => { };
-
   constructor(props: Props)
   {
     super(props);
@@ -214,6 +211,9 @@ class Builder extends TerrainComponent<Props>
     }
     this.initialColSizes = colSizes;
   }
+
+  public unregisterLeaveHook1: any = () => undefined;
+  public unregisterLeaveHook2: any = () => undefined;
 
   public componentWillMount()
   {

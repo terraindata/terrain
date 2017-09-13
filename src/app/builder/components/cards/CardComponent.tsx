@@ -577,7 +577,7 @@ class _CardComponent extends TerrainComponent<Props>
                   <DragHandle
                     hiddenByDefault={!this.state.hovering}
                     connectDragSource={connectDragSource}
-                    key={'handle-' + (this.props.card !== undefined ? this.props.card.id : Math.random())}
+                    key={'handle-' + (this.props.card !== undefined ? this.props.card.id : Math.random().toString())}
                   />
                 </div>
               }

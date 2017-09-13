@@ -65,7 +65,6 @@ export const ElasticBlockHelpers = {
     const isIndexCard = (card) => card['type'] === 'eqlindex';
     const server = BuilderStore.getState().db.name;
 
-
     if (matchType === AutocompleteMatchType.Index)
     {
       return schemaState.databases.toList().filter(
