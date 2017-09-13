@@ -78,6 +78,15 @@ class ElasticClient
   }
 
   /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-ping
+   */
+  public ping(params: Elastic.PingParams, callback: (error: any, response: any) => void): void
+  {
+    // this.log('ping', params);
+    this.delegate.ping(params, callback);
+  }
+
+  /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-bulk
    */
   public bulk(params: Elastic.BulkIndexDocumentsParams, callback: (error: any, response: any) => void): void
