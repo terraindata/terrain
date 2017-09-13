@@ -328,6 +328,7 @@ class BuilderComponent extends TerrainComponent<Props>
         break;
       case DisplayType.MAP:
         const MapComp = d.component as any;
+        const { distance, distanceUnit, geopoint_lat, geopoint_lon } = this.props.data;
         content = (
           <div
             key={key}
@@ -338,15 +339,15 @@ class BuilderComponent extends TerrainComponent<Props>
                 <MapComp />,
                 {
                   keyPath,
-                  location: [37.4449002, -122.16174969999997],
+                  location: [geopoint_lat, geopoint_lon],
                   address: '',
                   markLocation: true,
                   showDistanceCircle: true,
                   routing: false,
                   showSearchBar: true,
                   zoomControl: true,
-                  distance: 2000,
-                  distanceUnits: 'meters',
+                  distance: parseFloat(distance),
+                  distanceUnit,
                 },
               )
             }

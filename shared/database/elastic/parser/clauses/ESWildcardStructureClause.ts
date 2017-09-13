@@ -95,7 +95,6 @@ export default class ESWildcardStructureClause extends ESStructureClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-
     this.typeCheck(interpreter, valueInfo, ESJSONType.object);
 
     const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;

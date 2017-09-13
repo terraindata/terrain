@@ -69,7 +69,6 @@ export interface Props
   address?: string;
   onChange?: (value) => void;
   markLocation?: boolean;
-  showDistanceTools?: boolean;
   secondLocation?: [number, number] | number[];
   routing?: boolean;
   showDirectDistance?: boolean;
@@ -77,18 +76,33 @@ export interface Props
   secondAddress?: string;
   zoomControl?: boolean;
   distance?: number;
-  distanceUnits?: string;
+  distanceUnit?: string;
   showDistanceCircle?: boolean;
   geocoder?: string;
 }
 
-enum UNITS
-{
-  Meters,
-  Kilometers,
-  Miles,
-  Feet,
-}
+const UNIT_CONVERSIONS =
+  {
+    mi: 1609.34,
+    yd: 0.9144,
+    ft: 0.3048,
+    in: 0.0254,
+    km: 1000,
+    m: 1,
+    cm: .01,
+    mm: .001,
+    nmi: 1852,
+    miles: 1609.34,
+    yards: 0.9144,
+    feet: 0.3048,
+    inch: 0.0254,
+    kilometers: 1000,
+    meters: 1,
+    centimeters: .01,
+    millimeters: .001,
+    nauticalmiles: 1852,
+    NM: 1852,
+  };
 
 const markerIcon = divIcon({
   html: `<?xml version="1.0" encoding="iso-8859-1"?><!-- Generator: Adobe Illustrator 16.0.0,
@@ -115,11 +129,8 @@ class MapComponent extends TerrainComponent<Props>
     error?: any,
     latitude: string,
     longitude: string,
-    distance?: string,
-    selectedUnit: number,
     errorLatitude: boolean,
     errorLongitude: boolean,
-    errorDistance: boolean,
     trafficDistance: number,
     trafficTime: number,
   } = {
@@ -128,11 +139,8 @@ class MapComponent extends TerrainComponent<Props>
     error: null,
     latitude: this.props.location !== undefined ? this.props.location[0].toString() : '',
     longitude: this.props.location !== undefined ? this.props.location[1].toString() : '',
-    distance: '0.0',
-    selectedUnit: 0,
     errorLatitude: false,
     errorLongitude: false,
-    errorDistance: false,
     trafficDistance: 0.0,
     trafficTime: 0.0,
   };
@@ -317,32 +325,12 @@ class MapComponent extends TerrainComponent<Props>
 
   public convertDistanceToMeters()
   {
-    let distance: number;
-    if (this.props.distance !== undefined)
+    if (this.props.distance !== undefined && this.props.distanceUnit !== undefined
+      && UNIT_CONVERSIONS[this.props.distanceUnit] !== undefined)
     {
-      distance = this.props.distance;
+      return this.props.distance * UNIT_CONVERSIONS[this.props.distanceUnit];
     }
-    else
-    {
-      if (isNaN(parseFloat(this.state.distance)) || this.state.distance === '')
-      {
-        return 0;
-      }
-      distance = parseFloat(this.state.distance);
-    }
-    switch (this.state.selectedUnit)
-    {
-      case UNITS.Meters:
-        return distance;
-      case UNITS.Kilometers:
-        return 1000 * distance;
-      case UNITS.Miles:
-        return 1609.34 * distance;
-      case UNITS.Feet:
-        return 0.3048 * distance;
-      default:
-        return distance;
-    }
+    return 0;
   }
 
   public radians(degrees)
@@ -492,52 +480,6 @@ class MapComponent extends TerrainComponent<Props>
     });
   }
 
-  public handleDistanceKeyDown(e)
-  {
-    if (isNaN(parseFloat(this.state.distance)))
-    {
-      return;
-    }
-    const dist = parseFloat(this.state.distance);
-    if (e.key === 'ArrowUp')
-    {
-      this.setState({
-        distance: (dist + 1).toString(),
-      });
-    }
-    if (e.key === 'ArrowDown' && dist >= 1)
-    {
-      this.setState({
-        distance: (dist - 1).toString(),
-      });
-    }
-  }
-
-  public renderDistanceTools()
-  {
-    return (
-      <div className='input-map-distance-tools'>
-        <input
-          type='text'
-          value={this.state.distance}
-          onChange={this.handleDistanceChange}
-          onKeyDown={this.handleDistanceKeyDown}
-          className={classNames({
-            'input-map-distance-tools-input': true,
-            'input-map-input-error': this.state.errorDistance,
-          })}
-        />
-        <Dropdown
-          options={List(['m', 'km', 'mi', 'ft'])}
-          selectedIndex={this.state.selectedUnit}
-          className='input-map-distance-tools-dropdown'
-          canEdit={true}
-          onChange={this.handleUnitChange}
-        />
-      </div>
-    );
-  }
-
   public renderSearchBar()
   {
     const inputProps = {
@@ -593,12 +535,6 @@ class MapComponent extends TerrainComponent<Props>
         {
           this.props.showSearchBar ?
             this.renderSearchBar()
-            :
-            null
-        }
-        {
-          this.props.showDistanceTools ?
-            this.renderDistanceTools()
             :
             null
         }
