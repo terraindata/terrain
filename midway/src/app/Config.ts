@@ -125,11 +125,6 @@ export async function handleConfig(config: Config): Promise<void>
         const insertedDB = await databases.select([], { name: db.name });
         db.id = insertedDB[0].id;
       }
-
-      if (db.id !== undefined)
-      {
-        await databases.connect({} as UserConfig, db.id);
-      }
     }
   }
 }

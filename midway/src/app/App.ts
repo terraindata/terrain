@@ -61,6 +61,7 @@ import AnalyticsRouter from './AnalyticsRouter';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
+import { databases } from './database/DatabaseRouter';
 import './Logging';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
@@ -145,6 +146,14 @@ class App
     await Schema.createAppSchema(this.config.db as string, this.DB);
     await Config.handleConfig(this.config);
     await Users.initializeDefaultUser();
+    const dbs = await databases.select([], {});
+    for (const db of dbs)
+    {
+      if (db.id !== undefined)
+      {
+        await databases.connect({} as any, db.id);
+      }
+    }
 
     const heapStats: object = v8.getHeapStatistics();
     this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));
