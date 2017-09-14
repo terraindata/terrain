@@ -55,19 +55,6 @@ export const events: Events = new Events();
 
 const Router = new KoaRouter();
 
-// Get HTML IDs for event tracking
-Router.get('/ids', async (ctx, next) =>
-{
-  try
-  {
-    ctx.body = JSON.stringify(await events.getHTMLIDs());
-  }
-  catch (e)
-  {
-    ctx.body = '';
-  }
-});
-
 // Get an event tracker.
 Router.post('/', async (ctx, next) =>
 {
