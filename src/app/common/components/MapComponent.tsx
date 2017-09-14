@@ -143,6 +143,7 @@ class MapComponent extends TerrainComponent<Props>
     inputName: string,
     usingInput: boolean,
     zoom: number,
+    focused: boolean,
   } = {
     address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
     searchByCoordinate: false,
@@ -153,9 +154,10 @@ class MapComponent extends TerrainComponent<Props>
     errorLongitude: false,
     trafficDistance: 0.0,
     trafficTime: 0.0,
-    inputName: '@',
+    inputName: '@', // don't auto set this to @, check if the props starts with @ and then set it to that, otherwise set it to @
     usingInput: false,
     zoom: 15,
+    focused: false,
   };
 
   public geoCache = {};
@@ -177,7 +179,7 @@ class MapComponent extends TerrainComponent<Props>
           value = value.toJS !== undefined ? value.toJS() : value;
           if (value !== undefined && value.location !== undefined && value.address !== undefined)
           {
-            this.handleLocationChange(value.location, value.address);
+            this.handleLocationChange(value.location, value.address, inputName);
           }
         }
       }
@@ -236,7 +238,7 @@ class MapComponent extends TerrainComponent<Props>
     this.handleLocationChange([location[1], location[0]], this.state.address);
   }
 
-  public handleLocationChange(location, address)
+  public handleLocationChange(location, address, inputName?)
   {
     this.geoCache[address] = location;
     this.reverseGeoCache[location.toString()] = address;
@@ -247,7 +249,8 @@ class MapComponent extends TerrainComponent<Props>
     if (this.props.keyPath !== undefined)
     {
       Actions.change(this.props.keyPath, location);
-      Actions.change(this.props.textKeyPath, address);
+      const addr = inputName ? inputName : address;
+      Actions.change(this.props.textKeyPath, addr);
     }
   }
 
@@ -572,7 +575,7 @@ class MapComponent extends TerrainComponent<Props>
         value = value.toJS !== undefined ? value.toJS() : value;
         if (value !== undefined && value.location !== undefined && value.address !== undefined)
         {
-          this.handleLocationChange(value.location, value.address);
+          this.handleLocationChange(value.location, value.address, inputName);
         }
       }
     }
@@ -583,6 +586,22 @@ class MapComponent extends TerrainComponent<Props>
         usingInput: false,
       });
     }
+  }
+
+  public onFocus()
+  {
+    console.log('focus');
+    this.setState({
+      focused: true,
+    });
+  }
+
+  public setBlur()
+  {
+    console.log('blur');
+    this.setState({
+      focused: false,
+    });
   }
 
   public renderSearchBar()
@@ -604,6 +623,8 @@ class MapComponent extends TerrainComponent<Props>
           value={this.state.inputName} // consider adding new state variable to be the input name
           options={List(_.keys(inputs))}
           onChange={this.changeLocationInput}
+          onFocus={this.setFocus}
+          onBlur={this.setBlur}
         />
       );
     }
@@ -621,6 +642,8 @@ class MapComponent extends TerrainComponent<Props>
               <PlacesAutocomplete
                 inputProps={inputProps}
                 onEnterKeyDown={this.handleFormSubmit}
+                onFocus={this.setFocus}
+                onBlur={this.setBlur}
               />
             </form>
         }
