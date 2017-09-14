@@ -103,15 +103,12 @@ export default class ESWildcardStructureClause extends ESStructureClause
     const nameClause: ESClause = interpreter.config.getClause(this.nameType);
     const valueClause: ESClause = interpreter.config.getClause(this.valueType);
     let wildcardMarked = false;
+
     // check required members
-    this.required.forEach((name: string): void =>
-    {
-      if (children[name] === undefined)
-      {
-        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
-      }
-    });
+    this.validateRequiredMembers(interpreter, children, valueInfo);
+
     let markerPropertyName = null; // Keeps track of last line, use to mark if there is a missing wildcard field
+
     // mark properties
     valueInfo.forEachProperty(
       (viTuple: ESPropertyInfo): void =>

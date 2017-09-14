@@ -90,14 +90,7 @@ export default class ESStructureClause extends ESClause
     const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
     const propertyClause: ESClause = interpreter.config.getClause('property');
 
-    // check required members
-    this.required.forEach((name: string): void =>
-    {
-      if (children[name] === undefined)
-      {
-        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
-      }
-    });
+    this.validateRequiredMembers(interpreter, children, valueInfo);
 
     // mark properties
     valueInfo.forEachProperty(
@@ -131,6 +124,18 @@ export default class ESStructureClause extends ESClause
           viTuple.propertyValue.clause = valueClause;
         }
       });
+  }
+
+  protected validateRequiredMembers(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, valueInfo: ESValueInfo)
+  {
+    // check required members
+    this.required.forEach((name: string): void =>
+    {
+      if (children[name] === undefined)
+      {
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
   }
 
   protected checkValidAndUniqueProperties(names: string[], listName: string): void
