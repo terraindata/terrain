@@ -203,14 +203,19 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         field = key;
       }
     });
+    const fieldValue = valueInfo.value[field];
+    // TODO: handle all acceptable elastic forms of the value
+    const lat = fieldValue.lat;
+    const lon = fieldValue.lon;
     // Get value of field (lat lon value)
     return make(
-      Blocks, 'elasticMap',
+      Blocks, 'elasticDistance',
       {
         distance,
         distanceType,
         distanceUnit,
         field,
+        geopoint: [lat, lon],
       },
       true);
   }

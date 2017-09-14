@@ -75,7 +75,7 @@ const esMapDistanceTypes = [
   'plane',
 ];
 
-export const elasticMap = _card({
+export const elasticDistance = _card({
 
   distance: 0,
   key: 'geo_distance',
@@ -108,23 +108,6 @@ export const elasticMap = _card({
     [
       {
         displayType: DisplayType.FLEX,
-        key: 'distance_field_flex',
-        flex:
-        [
-          {
-            displayType: DisplayType.LABEL,
-            key: 'distance_field_label',
-            label: 'Field:',
-          },
-          {
-            displayType: DisplayType.TEXT,
-            placeholder: 'Key',
-            key: 'field',
-          },
-        ],
-      },
-      {
-        displayType: DisplayType.FLEX,
         key: 'distance_flex',
         flex:
         [
@@ -137,6 +120,12 @@ export const elasticMap = _card({
             displayType: DisplayType.NUM,
             key: 'distance',
             placeholder: 'distance',
+            style: {
+              maxWidth: 110,
+              minWidth: 75,
+              marginLeft: 6,
+              marginBottom: 6,
+            },
           },
           {
             displayType: DisplayType.DROPDOWN,
@@ -148,21 +137,18 @@ export const elasticMap = _card({
             centerDropdown: true,
             style: {
               maxWidth: 125,
-              minWidth: 105,
-              marginRight: 3,
+              minWidth: 95,
+              marginLeft: 6,
+              marginRight: 6,
             },
           },
-        ],
-      },
-      {
-        displayType: DisplayType.FLEX,
-        key: 'distance_type_flex',
-        flex:
-        [
           {
             displayType: DisplayType.LABEL,
             key: 'distance_type_label',
             label: 'Distance Type:',
+            style: {
+              minWidth: 97,
+            },
           },
           {
             displayType: DisplayType.DROPDOWN,
@@ -172,25 +158,30 @@ export const elasticMap = _card({
             autoDisabled: true,
             centerDropdown: true,
             style: {
-              maxWidth: 125,
-              minWidth: 105,
-              marginRight: 3,
+              maxWidth: 95,
+              minWidth: 75,
+              marginLeft: 6,
             },
           },
         ],
       },
       {
-        // Will likely have to add in functions to handle and save map info ? here or in builder component ?
+        displayType: DisplayType.TEXT,
+        key: 'field',
+        placeholder: 'Field',
+        className: 'builder-comp-list-item-margin-bottom',
+        getAutoTerms: (schemaState): List<string> =>
+        {
+          return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+        },
+      },
+      {
         displayType: DisplayType.MAP,
         key: 'geopoint',
         component: MapComponent,
-        style: {
-          height: 200,
-          width: 200,
-        },
       },
     ],
   },
 });
 
-export default elasticMap;
+export default elasticDistance;

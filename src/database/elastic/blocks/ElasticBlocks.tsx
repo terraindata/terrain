@@ -52,9 +52,9 @@ import { _block } from '../../../blocks/types/Block';
 import { _card } from '../../../blocks/types/Card';
 import { InputType } from '../../../blocks/types/Input';
 
+import { elasticDistance } from './ElasticDistanceCard';
 import { ElasticElasticCards } from './ElasticElasticCards';
 import { elasticFilter, elasticFilterBlock } from './ElasticFilterCard';
-import { elasticMap } from './ElasticMapCard';
 import { elasticScore, elasticWeight } from './ElasticScoreCard';
 import { elasticTransform, scorePoint } from './ElasticTransformCard';
 
@@ -70,7 +70,7 @@ export const ElasticBlocks = _.extend(
     elasticWeight,
 
     // Geo distance Card
-    elasticMap,
+    elasticDistance,
 
     // Filter Card
     elasticFilterBlock,
