@@ -44,16 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands
+// tslint:disable:no-var-requires restrict-plus-operands prefer-const
 
 import * as classNames from 'classnames';
 import GoogleMap from 'google-map-react';
 import { List } from 'immutable';
 import { divIcon } from 'leaflet';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 'react-leaflet';
 import PlacesAutocomplete from 'react-places-autocomplete';
+
 import Actions from '../../builder/data/BuilderActions';
+import Autocomplete from './Autocomplete';
 import RoutingMachine from './RoutingMachine';
 const { geocodeByAddress, geocodeByLatLng, getLatLng } = require('../../util/MapUtil.js');
 import { cardStyle, Colors, fontColor, getCardColors } from '../Colors';
@@ -80,6 +83,8 @@ export interface Props
   showDistanceCircle?: boolean;
   geocoder?: string;
   keyPath?: KeyPath;
+  hideSearchSettings?: boolean;
+  inputs?: any;
 }
 
 const UNIT_CONVERSIONS =
@@ -134,16 +139,22 @@ class MapComponent extends TerrainComponent<Props>
     errorLongitude: boolean,
     trafficDistance: number,
     trafficTime: number,
+    inputName: string,
+    usingInput: boolean,
+    zoom: number,
   } = {
     address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
     searchByCoordinate: false,
     error: null,
-    latitude: this.props.location !== undefined ? this.props.location[0].toString() : '',
-    longitude: this.props.location !== undefined ? this.props.location[1].toString() : '',
+    latitude: this.props.location !== undefined && this.props.location[0] !== undefined ? this.props.location[0].toString() : '',
+    longitude: this.props.location !== undefined && this.props.location[1] !== undefined ? this.props.location[1].toString() : '',
     errorLatitude: false,
     errorLongitude: false,
     trafficDistance: 0.0,
     trafficTime: 0.0,
+    inputName: '@',
+    usingInput: false,
+    zoom: 15,
   };
 
   public geoCache = {};
@@ -151,6 +162,26 @@ class MapComponent extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
+    if (this.state.usingInput)
+    {
+      const currentInputs = this.props.inputs && this.props.inputs.toJS ? this.props.inputs.toJS() : this.props.inputs;
+      const nextInputs = nextProps.inputs && nextProps.inputs.toJS ? nextProps.inputs.toJS() : nextProps.inputs;
+
+      if (!_.isEqual(currentInputs, nextInputs))
+      {
+        const inputs = this.parseInputs(nextInputs);
+        if (inputs[this.state.inputName] !== undefined)
+        {
+          let value = inputs[this.state.inputName];
+          value = value.toJS !== undefined ? value.toJS() : value;
+          if (value !== undefined && value.location !== undefined && value.address !== undefined)
+          {
+            this.handleLocationChange(value.location, value.address);
+          }
+        }
+      }
+    }
+
     if (this.props.address !== nextProps.address)
     {
       this.setState({
@@ -163,7 +194,34 @@ class MapComponent extends TerrainComponent<Props>
         latitude: nextProps.location[0].toString(),
         longitude: nextProps.location[1].toString(),
       });
+      // If the location changes with no address (i.e. in cards) fill in the address via reverse-geo
+      if ((nextProps.address === undefined || nextProps.address === '') && !this.state.usingInput)
+      {
+        // TODO Make this use the correct geo coder
+        geocodeByLatLng('google', { lat: nextProps.location[0], lng: nextProps.location[1] })
+          .then((results: any) =>
+          {
+            if (results[0] !== undefined)
+            {
+              this.setState({
+                address: results[0].formatted_address,
+              });
+            }
+          })
+          .catch((error) => this.setState({ error }));
+      }
     }
+  }
+
+  public parseInputs(inputsToParse?)
+  {
+    let inputs = {};
+    const toParse = inputsToParse !== undefined ? inputsToParse : this.props.inputs;
+    toParse.forEach((input) =>
+    {
+      inputs['@' + input.key] = input.value;
+    });
+    return inputs;
   }
 
   public onAddressChange(address: string)
@@ -384,6 +442,16 @@ class MapComponent extends TerrainComponent<Props>
     );
   }
 
+  public setZoomLevel(viewport?: { center: [number, number], zoom: number })
+  {
+    if (viewport !== undefined && viewport.zoom !== undefined)
+    {
+      this.setState({
+        zoom: viewport.zoom,
+      });
+    }
+  }
+
   public renderMap()
   {
     let center;
@@ -401,9 +469,10 @@ class MapComponent extends TerrainComponent<Props>
       <div className='input-map-wrapper'>
         <Map
           {...mapProps}
-          zoom={15}
           zoomControl={this.props.zoomControl}
+          zoom={this.state.zoom}
           ref='map'
+          onViewportChanged={this.setZoomLevel}
         >
           {
             this.props.routing ?
@@ -484,38 +553,93 @@ class MapComponent extends TerrainComponent<Props>
     });
   }
 
+  public changeLocationInput(inputName)
+  {
+    // TODO move this code somewhere else
+    if (this.state.inputName !== undefined && this.state.inputName !== ''
+      && this.state.inputName[0] === '@')
+    {
+      this.setState({
+        inputName,
+        usingInput: true,
+      });
+      const inputs = this.parseInputs();
+      if (inputs[inputName] !== undefined)
+      {
+        let value = inputs[inputName];
+        value = value.toJS !== undefined ? value.toJS() : value;
+        if (value !== undefined && value.location !== undefined && value.address !== undefined)
+        {
+          this.handleLocationChange(value.location, value.address);
+        }
+      }
+    }
+    else
+    {
+      this.setState({
+        address: inputName,
+        usingInput: false,
+      });
+    }
+  }
+
   public renderSearchBar()
   {
     const inputProps = {
       value: this.state.address,
       onChange: this.onAddressChange,
     };
+    const style = this.props.hideSearchSettings ? { marginBottom: '0px' } : {};
+    // if there are inputs and the first key typed in is @, render an autocomplete that has the inputs as choices
+    // when an input is selected, set the value of the map to be that value
+    // make sure to not change input address (@location) to the actual address
+    if (this.props.inputs !== undefined && this.state.address !== undefined &&
+      this.state.address !== '' && this.state.address[0] === '@')
+    {
+      const inputs = this.parseInputs();
+      return (
+        <Autocomplete
+          value={this.state.inputName} // consider adding new state variable to be the input name
+          options={List(_.keys(inputs))}
+          onChange={this.changeLocationInput}
+        />
+      );
+    }
+
     return (
       <div>
         {
           this.state.searchByCoordinate ?
             this.renderCoordinateInputs()
             :
-            <form onSubmit={this.handleFormSubmit}>
+            <form
+              onSubmit={this.handleFormSubmit}
+              style={style}
+            >
               <PlacesAutocomplete
                 inputProps={inputProps}
                 onEnterKeyDown={this.handleFormSubmit}
               />
             </form>
         }
-        <div className='input-map-search-settings-row' >
-          <CheckBox
-            checked={this.state.searchByCoordinate}
-            onChange={this.changeSearchMode}
-            className='input-map-checkbox'
-          />
-          <label
-            onClick={this.changeSearchMode}
-            className='input-map-checkbox-label'
-          >
-            Search by coordinate
+        {
+          this.props.hideSearchSettings ?
+            null
+            :
+            <div className='input-map-search-settings-row' >
+              <CheckBox
+                checked={this.state.searchByCoordinate}
+                onChange={this.changeSearchMode}
+                className='input-map-checkbox'
+              />
+              <label
+                onClick={this.changeSearchMode}
+                className='input-map-checkbox-label'
+              >
+                Search by coordinate
             </label>
-        </div>
+            </div>
+        }
       </div>
     );
   }
