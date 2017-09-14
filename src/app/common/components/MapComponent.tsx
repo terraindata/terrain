@@ -394,8 +394,11 @@ class MapComponent extends TerrainComponent<Props>
 
   public convertDistanceToMeters()
   {
-    if (this.props.distance !== undefined && this.props.distanceUnit !== undefined
-      && UNIT_CONVERSIONS[this.props.distanceUnit] !== undefined)
+    if ( this.props.distance !== undefined &&
+         this.props.distanceUnit !== undefined &&
+         UNIT_CONVERSIONS[this.props.distanceUnit] !== undefined &&
+         !isNaN(this.props.distance)
+      )
     {
       return this.props.distance * UNIT_CONVERSIONS[this.props.distanceUnit];
     }
