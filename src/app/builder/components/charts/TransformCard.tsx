@@ -190,6 +190,7 @@ class TransformCard extends TerrainComponent<Props>
     });
   }
 
+  // called by TransformCardChart to zoom on a specific part of the domain
   public handleZoomDomainChange(newDomain: List<number>)
   {
     const domain = this.trimDomain(this.state.chartDomain, newDomain);
@@ -199,6 +200,7 @@ class TransformCard extends TerrainComponent<Props>
     });
   }
 
+  // called by TransformCardChart to request that the view be zoomed to fit the data
   public handleZoomToData()
   {
     this.computeBars(this.props.data.input, this.state.maxDomain, true);
