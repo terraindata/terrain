@@ -319,7 +319,8 @@ export function tooltip(innerComponent: any, options: TooltipProps | string)
     props.title = options;
     return <Tooltip children={innerComponent} {...props} />;
   }
-  else if ((options.title === '' || options.title === undefined) && (options.html === null || options.html === undefined))
+  else if ((options.title === '' || options.title === undefined || options.title === null)
+    && (options.html === null || options.html === undefined))
   {
     return innerComponent;
   }

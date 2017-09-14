@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression no-var-requires
 
 import './Autocomplete.less';
 
@@ -57,6 +57,8 @@ import * as ReactDOM from 'react-dom';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { altStyle, backgroundColor, Colors, couldHover } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+
+const InfoIcon = require('./../../../images/icon_info.svg');
 
 export interface Props
 {
@@ -333,22 +335,21 @@ class Autocomplete extends TerrainComponent<Props>
         placeholder={this.props.placeholder}
       />;
 
+            // :
+            // tooltip(
+            //   inputElem,
+            //   {
+            //     title: this.props.help,
+            //     position: 'top-start',
+            //     key: this.props.helpIsError ? 'error' : 'nonerror',
+            //     theme: this.props.helpIsError ? 'error' : undefined,
+            //   },
+            // )
+
     return (
       <div className='autocomplete'>
-        {
-          this.props.help === undefined ?
-            inputElem
-            :
-            tooltip(
-              inputElem,
-              {
-                title: this.props.help,
-                position: 'top-start',
-                key: this.props.helpIsError ? 'error' : 'nonerror',
-                theme: this.props.helpIsError ? 'error' : undefined,
-              },
-            )
-        }
+        { inputElem }
+        {this.props.helpIsError && <InfoIcon height='16px' width='16px' className='tooltip-icon'/>}
         {!open ? null :
           <div
             className={classNames({
