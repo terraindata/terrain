@@ -325,7 +325,9 @@ class TransformCardChart extends TerrainComponent<Props>
     let newDomain = domain;
     if (round)
     {
-      newDomain = List([domain.get(0).toPrecision(ROUND_PRECISION), domain.get(1).toPrecision(ROUND_PRECISION)]);
+      const low = Number(domain.get(0).toPrecision(ROUND_PRECISION));
+      const high = Number(domain.get(1).toPrecision(ROUND_PRECISION));
+      newDomain = List([low, high]);
     }
 
     Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 0), newDomain.get(0));
@@ -343,7 +345,6 @@ class TransformCardChart extends TerrainComponent<Props>
     const spreadDistance = domainWidth / ZOOM_FACTOR * 0.5;
     const mouseDomainPosition = currentMin + mousePositionRatio * domainWidth;
     const newDomain = List([mouseDomainPosition - spreadDistance, mouseDomainPosition + spreadDistance]);
-
     this.changeDomain(newDomain);
   }
 
@@ -357,7 +358,6 @@ class TransformCardChart extends TerrainComponent<Props>
     const spreadDistance = domainWidth * ZOOM_FACTOR * 0.5;
     const mouseDomainPosition = currentMin + mousePositionRatio * domainWidth;
     const newDomain = List([mouseDomainPosition - spreadDistance, mouseDomainPosition + spreadDistance]);
-
     this.changeDomain(newDomain);
   }
 
