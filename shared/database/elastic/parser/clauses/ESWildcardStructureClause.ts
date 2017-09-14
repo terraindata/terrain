@@ -111,12 +111,13 @@ export default class ESWildcardStructureClause extends ESStructureClause
         interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
       }
     });
+    let markerPropertyName = null; // Keeps track of last line, use to mark if there is a missing wildcard field
     // mark properties
     valueInfo.forEachProperty(
       (viTuple: ESPropertyInfo): void =>
       {
         viTuple.propertyName.clause = propertyClause;
-
+        markerPropertyName = viTuple.propertyName;
         if (!this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string))
         {
           return;
@@ -160,8 +161,8 @@ export default class ESWildcardStructureClause extends ESStructureClause
     // If no wildcard property was marked, accumulate and error (because this is required)
     if (!wildcardMarked)
     {
-      interpreter.accumulateError(null,
-        'Error: missing required field of type ' + nameClause.name + ' with value type of ' + valueClause.name);
+      interpreter.accumulateError(markerPropertyName,
+        'Error: missing required wildcard field with value type of ' + valueClause.name);
     }
   }
 }
