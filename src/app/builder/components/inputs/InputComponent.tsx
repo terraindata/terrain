@@ -119,46 +119,6 @@ class InputComponent extends TerrainComponent<Props>
       };
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  public onAddressChange(address: string)
-  {
-    this.setState({ address });
-  }
-
-  public handleFormSubmit()
-  {
-    geocodeByAddress(this.state.address)
-      .then((results) => getLatLng(results[0]))
-      .then((latLng) => this.setState({ latitude: latLng.lat, longitude: latLng.lng }))
-      .catch((error) => console.log('Error', error));
-=======
-  public onAddressChange(address: string) {
-=======
-  public onAddressChange(address: string)
-  {
->>>>>>> experimenting with leaflet maps
-    this.setState({ address });
-  }
-
-  public handleFormSubmit()
-  {
-    geocodeByAddress(this.state.address)
-<<<<<<< HEAD
-      .then(results => getLatLng(results[0]))
-      .then(latLng => this.setState({latitude: latLng.lat, longitude: latLng.lon}))
-      .catch(error => console.log('Error', error));
->>>>>>> working on search bar
-=======
-      .then((results) => getLatLng(results[0]))
-      .then((latLng) => this.setState({ latitude: latLng.lat, longitude: latLng.lng }))
-      .catch((error) => console.log('Error', error));
->>>>>>> experimenting with leaflet maps
-  }
-
-=======
->>>>>>> in progress
   public getKeyPath(type?: string)
   {
     const keyPath = List(['query', 'inputs']);
