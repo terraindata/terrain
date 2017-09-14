@@ -595,12 +595,13 @@ export function altStyle()
   return CACHE['altStyle' + curTheme];
 }
 
-export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean)
+export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean, hovered?: boolean)
 {
-  const key = 'card-' + strongColor + bgColor + hoverBg + small;
+  const key = 'card-' + strongColor + bgColor + hoverBg + small + hovered;
 
   if (!CACHE[key])
   {
+    const borderHover = Color(strongColor).alpha(0.5);
     CACHE[key] = {
       background: bgColor,
       color: strongColor,
@@ -612,9 +613,9 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
       borderLeftWidth: '3px',
       borderLeftColor: strongColor,
 
-      borderTopColor: Colors().highlight,
-      borderRightColor: Colors().darkerHighlight,
-      borderBottomColor: Colors().darkerHighlight,
+      borderTopColor: hovered ? borderHover : Colors().highlight,
+      borderRightColor: hovered ? borderHover : Colors().darkerHighlight,
+      borderBottomColor: hovered ? borderHover : Colors().darkerHighlight,
 
       [hoverBg && ':hover']: {
         background: hoverBg,

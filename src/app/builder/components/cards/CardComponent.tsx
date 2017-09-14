@@ -552,7 +552,7 @@ class _CardComponent extends TerrainComponent<Props>
             'single-card-inner': this.props.singleCard,
           })}
           style={cardStyle(
-            card.static.colors[0], this.state.hovering ? this.props.card.static.colors[1] : Colors().bg3,
+            card.static.colors[0], Colors().bg3, undefined, undefined, this.state.hovering
           )}
           ref='cardInner'
         >
