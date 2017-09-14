@@ -361,7 +361,7 @@ class TransformCard extends TerrainComponent<Props>
     }
   }
 
-  private computeElasticBars(input: CardString, maxDomain: List<number>, recomputeDomain)
+  private computeElasticBars(input: CardString, maxDomain: List<number>, recomputeDomain: boolean)
   {
     const { builderState } = this.props;
     const { db } = builderState;
