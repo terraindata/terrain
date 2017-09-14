@@ -84,6 +84,7 @@ export interface Props
 
 class BuilderComponent extends TerrainComponent<Props>
 {
+
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {
     BuilderActions.create(keyPath, index + 1, display.factoryType);
@@ -339,7 +340,7 @@ class BuilderComponent extends TerrainComponent<Props>
                 <MapComp />,
                 {
                   keyPath,
-                  location: geopoint,
+                  location: geopoint.toJS !== undefined ? geopoint.toJS() : geopoint,
                   address: '',
                   markLocation: true,
                   showDistanceCircle: true,
@@ -349,6 +350,8 @@ class BuilderComponent extends TerrainComponent<Props>
                   distance: parseFloat(distance),
                   distanceUnit,
                   geocoder: 'google',
+                  hideSearchSettings: true,
+                  inputs: BuilderStore.getState().query.inputs,
                 },
               )
             }
