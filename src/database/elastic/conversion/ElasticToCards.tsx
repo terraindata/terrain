@@ -182,7 +182,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         sortType,
       }, true);
   }
-  else if (isMapCard(valueInfo))
+  else if (isDistanceCard(valueInfo))
   {
     const distanceAndUnit = valueInfo.objectChildren.distance.propertyValue.value;
     const match = /[a-zA-Z]/.exec(distanceAndUnit);
@@ -252,7 +252,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
 };
 
 // TODO CHECK THAT THIS IS A VALID MAP CARD!!!
-function isMapCard(valueInfo: ESValueInfo): boolean
+function isDistanceCard(valueInfo: ESValueInfo): boolean
 {
   const isBool = (valueInfo.clause.clauseType === ESClauseType.ESWildcardStructureClause) &&
     (valueInfo.clause.name === 'geo_distance');
