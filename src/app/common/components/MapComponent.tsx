@@ -85,6 +85,7 @@ export interface Props
   keyPath?: KeyPath;
   hideSearchSettings?: boolean;
   inputs?: any;
+  textKeyPath?: KeyPath;
 }
 
 const UNIT_CONVERSIONS =
@@ -195,21 +196,21 @@ class MapComponent extends TerrainComponent<Props>
         longitude: nextProps.location[1].toString(),
       });
       // If the location changes with no address (i.e. in cards) fill in the address via reverse-geo
-      if ((nextProps.address === undefined || nextProps.address === '') && !this.state.usingInput)
-      {
-        // TODO Make this use the correct geo coder
-        geocodeByLatLng('google', { lat: nextProps.location[0], lng: nextProps.location[1] })
-          .then((results: any) =>
-          {
-            if (results[0] !== undefined)
-            {
-              this.setState({
-                address: results[0].formatted_address,
-              });
-            }
-          })
-          .catch((error) => this.setState({ error }));
-      }
+      // if ((nextProps.address === undefined || nextProps.address === '') && !this.state.usingInput)
+      // {
+      //   // TODO Make this use the correct geo coder
+      //   geocodeByLatLng('google', { lat: nextProps.location[0], lng: nextProps.location[1] })
+      //     .then((results: any) =>
+      //     {
+      //       if (results[0] !== undefined)
+      //       {
+      //         this.setState({
+      //           address: results[0].formatted_address,
+      //         });
+      //       }
+      //     })
+      //     .catch((error) => this.setState({ error }));
+      // }
     }
   }
 
@@ -246,6 +247,7 @@ class MapComponent extends TerrainComponent<Props>
     if (this.props.keyPath !== undefined)
     {
       Actions.change(this.props.keyPath, location);
+      Actions.change(this.props.textKeyPath, address);
     }
   }
 
