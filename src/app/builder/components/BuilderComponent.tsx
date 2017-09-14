@@ -87,12 +87,15 @@ export interface Props
 
 class BuilderComponent extends TerrainComponent<Props>
 {
+<<<<<<< HEAD
   public state:
   {
     showExpanded: boolean,
   } = {
     showExpanded: false,
   };
+=======
+>>>>>>> Renamed elasticMap, small styling changes, starting to integrate the distance card and distance input -- incomplete / buggy
 
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {

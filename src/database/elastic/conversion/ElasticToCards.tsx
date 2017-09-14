@@ -209,7 +209,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
     const lon = fieldValue.lon;
     // Get value of field (lat lon value)
     return make(
-      Blocks, 'elasticMap',
+      Blocks, 'elasticDistance',
       {
         distance,
         distanceType,

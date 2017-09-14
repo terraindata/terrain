@@ -83,7 +83,6 @@ export const elasticDistance = _card({
   distanceUnit: 'mi',
   distanceType: 'arc',
   geopoint: [-35, 120],
-  map_text: '',
 
   static: {
     language: 'elastic',
