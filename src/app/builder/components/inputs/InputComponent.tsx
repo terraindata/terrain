@@ -205,7 +205,7 @@ class InputComponent extends TerrainComponent<Props>
           geocoder='google'
         />);
     }
-  
+
     return (
       <BuilderTextbox
         canEdit={true}
