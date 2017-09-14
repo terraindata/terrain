@@ -56,7 +56,7 @@ import Dropdown from '../../common/components/Dropdown';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderActions from '../data/BuilderActions';
-import BuilderStore from '../data/BuilderStore';
+import { BuilderState, BuilderStore } from '../data/BuilderStore';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 
@@ -84,6 +84,29 @@ export interface Props
 
 class BuilderComponent extends TerrainComponent<Props>
 {
+
+  public state: {
+    inputs: any,
+  } = {
+    inputs: null,
+  };
+
+  public constructor(props: Props)
+  {
+    super(props);
+    this._subscribe(BuilderStore, {
+      stateKey: 'builderState',
+      updater: (builderState: BuilderState) =>
+      {
+        if (builderState.query.inputs !== this.state.inputs)
+        {
+          this.setState({
+            inputs: builderState.query.inputs,
+          });
+        }
+      },
+    });
+  }
 
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {
@@ -351,7 +374,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   distanceUnit,
                   geocoder: 'google',
                   hideSearchSettings: true,
-                  inputs: BuilderStore.getState().query.inputs,
+                  inputs: this.state.inputs,
                   textKeyPath: this._ikeyPath(parentKeyPath, 'map_text'),
                 },
               )
