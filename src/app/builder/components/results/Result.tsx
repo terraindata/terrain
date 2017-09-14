@@ -156,7 +156,7 @@ class ResultComponent extends TerrainComponent<Props> {
       <div
         className='result-field'
         key={field}
-        style={borderColor(Colors().builder.results.lines)}
+        style={borderColor(Colors().resultLine)}
       >
         {
           showField &&
@@ -296,8 +296,8 @@ class ResultComponent extends TerrainComponent<Props> {
         <div
           className='result-inner'
           style={[
-            borderColor(Colors().builder.results.lines),
-            backgroundColor(Colors().builder.results.background),
+            borderColor(Colors().resultLine),
+            backgroundColor(Colors().emptyBg),
           ]}
         >
           <div className='result-name'>
