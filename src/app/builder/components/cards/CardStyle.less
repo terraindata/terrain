@@ -180,7 +180,24 @@
   }
 }
 
+@keyframes fadeMe {
+  from {
+    background: rgb(60, 63, 65)
+  }
+  to {
+    // transform: rotate(360deg);
+    background: rgb(56, 81, 93)
+  }
+}
+
 .card-hovering {
+
+  .card-inner-hovering {
+    animation-duration: 0.75s;
+    animation-name: fadeMe;
+
+  }
+
   .card-help-icon {
     opacity: 1;
   }

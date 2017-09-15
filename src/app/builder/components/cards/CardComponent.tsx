@@ -67,13 +67,14 @@ import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScro
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 
+import StyleTag from 'common/components/StyleTag';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import CardHelpTooltip from './CardHelpTooltip';
 
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { cardStyle, Colors } from '../../../common/Colors';
+import { cardAnimationCSS, cardStyle, Colors } from '../../../common/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
@@ -513,7 +514,10 @@ class _CardComponent extends TerrainComponent<Props>
     const { card } = this.props;
     const { title } = card.static;
     const { isDragging, connectDragSource } = this.props;
-
+    if(this.state.hovering){
+      console.log(card.static.colors)
+      console.log(cardAnimationCSS(card.static.colors[0], card.static.colors[1]));
+    }
     return (
       <div
         className={classNames({
@@ -531,9 +535,6 @@ class _CardComponent extends TerrainComponent<Props>
         ref='card'
         id={id}
         onMouseMove={this.handleMouseMove}
-        style={{
-          // backgroundColor(Colors().builder.cards.cardBase)
-        }}
       >
         <CDA
           half={true}
@@ -548,6 +549,7 @@ class _CardComponent extends TerrainComponent<Props>
         <div
           className={classNames({
             'card-inner': true,
+            'card-inner-hovering': this.state.hovering,
             'card-inner-with-title': !card['noTitle'],
             'single-card-inner': this.props.singleCard,
           })}
