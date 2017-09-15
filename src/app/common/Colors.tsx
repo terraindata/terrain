@@ -602,8 +602,10 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
   if (!CACHE[key])
   {
     const borderHover = Color(strongColor).alpha(0.5);
+    const backgroundHover = Color(bgColor).mix(Color(strongColor), Colors().builder.cards.cardBgOpacity);
+
     CACHE[key] = {
-      background: bgColor,
+      background: hovered ? backgroundHover : bgColor,
       color: strongColor,
 
       boxShadow: small ? 'rgba(0, 0, 0, 0.39) 2px 2px 4px 1px' :
@@ -718,7 +720,7 @@ export function getCardColors(category: string | undefined, typeColor: string): 
     }
   }
 
-  return [color, Color(color).alpha(colors.builder.cards.cardBgOpacity).string()];
+  return [color, colors.bg3];
 }
 
 export default Colors;
