@@ -60,7 +60,10 @@ export enum DisplayType
   FLEX, // a single row, doesn't require a key
   COMPONENT,
   LABEL, // strict text to paste in to HTML
+<<<<<<< HEAD
   EXPANDABLE,
+=======
+>>>>>>> 2d8bcc7c8becc7f87aa2742f85419bc8d603688c
   MAP,
 }
 

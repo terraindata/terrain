@@ -57,7 +57,7 @@ import Dropdown from '../../common/components/Dropdown';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderActions from '../data/BuilderActions';
-import BuilderStore from '../data/BuilderStore';
+import { BuilderState, BuilderStore } from '../data/BuilderStore';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 
@@ -87,15 +87,32 @@ export interface Props
 
 class BuilderComponent extends TerrainComponent<Props>
 {
-<<<<<<< HEAD
   public state:
   {
     showExpanded: boolean,
+    inputs: any,
   } = {
     showExpanded: false,
+    inputs: null,
   };
-=======
->>>>>>> Renamed elasticMap, small styling changes, starting to integrate the distance card and distance input -- incomplete / buggy
+
+  public constructor(props: Props)
+  {
+    super(props);
+    this._subscribe(BuilderStore, {
+      stateKey: 'builderState',
+      updater: (builderState: BuilderState) =>
+      {
+        if (builderState.query.inputs !== this.state.inputs)
+        {
+          this.setState({
+            inputs: builderState.query.inputs,
+          });
+        }
+      },
+    });
+  }
+>>>>>>> 2d8bcc7c8becc7f87aa2742f85419bc8d603688c
 
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {
@@ -397,7 +414,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   distanceUnit,
                   geocoder: 'google',
                   hideSearchSettings: true,
-                  inputs: BuilderStore.getState().query.inputs,
+                  inputs: this.state.inputs,
                   textKeyPath: this._ikeyPath(parentKeyPath, 'map_text'),
                 },
               )
