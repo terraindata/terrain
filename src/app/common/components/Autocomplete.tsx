@@ -335,32 +335,30 @@ class Autocomplete extends TerrainComponent<Props>
         placeholder={this.props.placeholder}
       />;
 
-            // :
-            // tooltip(
-            //   inputElem,
-            //   {
-            //     title: this.props.help,
-            //     position: 'top-start',
-            //     key: this.props.helpIsError ? 'error' : 'nonerror',
-            //     theme: this.props.helpIsError ? 'error' : undefined,
-            //   },
-            // )
-
     return (
       <div className='autocomplete'>
-        { inputElem }
+        {inputElem}
         {
-          this.props.helpIsError &&
-          tooltip(
-            <InfoIcon className='tooltip-icon'/>,
+          this.props.help &&
+          <div className='tooltip-icon-positioning'>
             {
-              title: this.props.help,
-              className: 'tooltip-positioning',
-              position: 'top-end',
-              theme: 'error',
+              tooltip(
+                <InfoIcon
+                  className={classNames({
+                    'tooltip-icon': true,
+                    'tooltip-is-error': this.props.helpIsError,
+                  })}
+                />,
+                {
+                  title: this.props.help,
+                  position: 'top-end',
+                  theme: this.props.helpIsError ? 'error' : undefined,
+                }
+              )
             }
-          )
+          </div>
         }
+
         {!open ? null :
           <div
             className={classNames({
