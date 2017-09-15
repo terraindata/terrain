@@ -74,7 +74,7 @@ import CardHelpTooltip from './CardHelpTooltip';
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { cardAnimationCSS, cardStyle, Colors } from '../../../common/Colors';
+import { cardStyle, Colors } from '../../../common/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
@@ -514,10 +514,7 @@ class _CardComponent extends TerrainComponent<Props>
     const { card } = this.props;
     const { title } = card.static;
     const { isDragging, connectDragSource } = this.props;
-    if(this.state.hovering){
-      console.log(card.static.colors)
-      console.log(cardAnimationCSS(card.static.colors[0], card.static.colors[1]));
-    }
+
     return (
       <div
         className={classNames({

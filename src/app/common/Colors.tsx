@@ -595,37 +595,6 @@ export function altStyle()
   return CACHE['altStyle' + curTheme];
 }
 
-export function cardAnimationCSS(strongColor, bgColor)
-{
-  const key = 'animation-' + strongColor + bgColor;
-
-  if (!CACHE[key])
-  {
-    const borderHover = Color(strongColor).alpha(0.5).toString();
-    const backgroundHover = Color(bgColor).mix(Color(strongColor), Colors().builder.cards.cardBgOpacity).toString();
-
-    CACHE[key] = {
-      '@keyframes cardhoveranimation': {
-        from: {
-          borderTopColor: Colors().highlight,
-          borderRightColor: Colors().darkerHighlight,
-          borderBottomColor: Colors().darkerHighlight,
-          background: bgColor,
-          opacity: 0,
-        },
-        to: {
-          borderTopColor: borderHover,
-          borderRightColor: borderHover,
-          borderBottomColor: borderHover,
-          background: backgroundHover,
-          opacity: 1,
-        }
-      }
-    }
-  }
-  return CACHE[key];
-}
-
 export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean, hovered?: boolean)
 {
   const key = 'card-' + strongColor + bgColor + hoverBg + small + hovered;
@@ -649,7 +618,7 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
       borderTopColor: hovered ? borderHover : Colors().highlight,
       borderRightColor: hovered ? borderHover : Colors().darkerHighlight,
       borderBottomColor: hovered ? borderHover : Colors().darkerHighlight,
-
+      transition: 'background 0.25s',
       [hoverBg && ':hover']: {
         background: hoverBg,
       },
