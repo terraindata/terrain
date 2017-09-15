@@ -428,7 +428,7 @@ const DARK: Theme =
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
 
-        cardBgOpacity: 0.45,
+        cardBgOpacity: 0.15,
 
         cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
 
