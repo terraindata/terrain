@@ -636,38 +636,6 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             </div>
           </div>
 
-          <div className='results-config-map'>
-            <input
-              type='checkbox'
-              checked={separateCoordinates}
-              onChange={this.changeMapFormat}
-            />
-            <label>Latitude and longitude are separate fields</label>
-            {
-              separateCoordinates ?
-                <div>
-                  <div>
-                    Latitude
-              </div>
-                  <Autocomplete
-                    value={format.latitude}
-                    onChange={this.changeLatitude}
-                    options={this.props.allFields}
-                  />
-                  <div>
-                    Longitude
-              </div>
-                  <Autocomplete
-                    value={format.longitude}
-                    onChange={this.changeLongitude}
-                    options={this.props.allFields}
-                  />
-                </div>
-                :
-                null
-            }
-          </div>
-
           <div className='results-config-image'>
             <div>
               <b>Image URL Template</b>

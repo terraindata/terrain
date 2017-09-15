@@ -61,7 +61,7 @@ import { spotlightAction } from '../../data/SpotlightStore';
 import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { Result } from './ResultTypes';
-const { geocodeByAddress, geocodeByLatLng, getLatLng } = require('../../../util/MapUtil.js');
+const { decodeGeohash } = require('../../../util/MapUtil.js');
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -464,38 +464,49 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
         );
 
       case 'map':
-        let location = [0, 0];
-        let address = '';
-        if (format.separateCoordinates)
+        let lat: number;
+        let lon: number;
+        // string = geohash or 0,0 format
+        if (typeof value === 'string')
         {
-          const lat = getResultValue(result, format.latitude, config, overrideFormat);
-          const lng = getResultValue(result, format.longitude, config, overrideFormat);
-          if (isNaN(parseFloat(lat)) || isNaN(parseFloat(lng)))
+          if (value.split(',').length > 1)
           {
-            return <div>Error: Fields for latitude and longitude must contain numbers </div>;
+            const coords = value.split(',');
+            // have some sort of check to make sure this is ok ?
+            lat = parseFloat(coords[0].replace(/ /g, ''));
+            lon = parseFloat(coords[1].replace(/ /g, ''));
           }
-          location = [parseFloat(lat), parseFloat(lng)];
+          else
+          {
+            const coords = decodeGeohash(value);
+            if (coords !== null)
+            {
+              lat = coords.lat;
+              lon = coords.lon;
+            }
+          }
         }
-        else if (typeof value === 'string')
+        // object type for geopoint
+        else if (value.lat !== undefined && value.lon !== undefined)
         {
-          address = value;
-          geocodeByAddress(value)
-            .then((results) => getLatLng(results[0]))
-            .then((latLng) => location = [latLng.lat, latLng.lng]);
+          lat = value.lat;
+          lon = value.lon;
         }
-        else
+        // array type for geopoint
+        else if (value[0] !== undefined && value[1] !== undefined)
         {
-          location = value.toJS();
+          lat = value[0];
+          lon = value[1];
         }
+
+        // Get location info from query ( what are we querying against ? )
         const secondLocation: [number, number] = [37.4449002, -122.16174969999997];
         return (
           <div className='result-field-value-map-wrapper'>
             <MapComponent
-              secondAddress={address}
-              address={''} // This will be what the search geopoint was
-              location={secondLocation} // this will be what the search geopoint was
+              address={''}
+              location={[lat, lon]}
               markLocation={true}
-              secondLocation={location}
               routing={false}
               showDirectDistance={true}
               showSearchBar={false}
