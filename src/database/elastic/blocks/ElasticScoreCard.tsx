@@ -113,74 +113,6 @@ export const elasticScore = _card(
       display:
       [
         {
-          displayType: DisplayType.FLEX,
-          key: null,
-          style: {
-            paddingBottom: 20,
-          },
-
-          flex:
-          [
-            {
-              displayType: DisplayType.LABEL,
-              key: null,
-              label: 'Order',
-              style: {
-                paddingLeft: 20,
-              },
-            },
-            {
-              displayType: DisplayType.DROPDOWN,
-              key: 'sortOrder',
-              options: List(ESInterpreterDefaultConfig.getClause('sort_order')['values']),
-              autoDisabled: true,
-              dropdownUsesRawValues: true,
-              centerDropdown: true,
-              style: {
-                maxWidth: 80,
-              },
-            },
-            {
-              displayType: DisplayType.LABEL,
-              key: null,
-              label: 'Mode',
-              style: {
-                paddingLeft: 20,
-              },
-            },
-            {
-              displayType: DisplayType.DROPDOWN,
-              key: 'sortMode',
-              options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values'].concat(['auto'])),
-              dropdownUsesRawValues: true,
-              autoDisabled: true,
-              centerDropdown: true,
-              style: {
-                maxWidth: 80,
-              },
-            },
-            {
-              displayType: DisplayType.LABEL,
-              key: null,
-              label: 'Type',
-              style: {
-                paddingLeft: 20,
-              },
-            },
-            {
-              displayType: DisplayType.DROPDOWN,
-              key: 'sortType',
-              options: List(ESInterpreterDefaultConfig.getClause('field_type')['values']),
-              dropdownUsesRawValues: true,
-              autoDisabled: true,
-              centerDropdown: true,
-              style: {
-                maxWidth: 120,
-              },
-            },
-          ],
-        },
-        {
           displayType: DisplayType.ROWS,
           key: 'weights',
           english: 'weight',
@@ -224,6 +156,93 @@ export const elasticScore = _card(
               key: 'key',
             },
           },
+        },
+        // Advanced controls
+        {
+          displayType: DisplayType.EXPANDABLE,
+          key: null,
+          expandToggle: {
+            displayType: DisplayType.LABEL,
+            label: 'Advanced',
+            key: null,
+            style: {
+              display: 'inline',
+              marginLeft: 6,
+              fontSize: 16,
+            },
+          },
+          expandContent:
+          [
+            {
+              displayType: DisplayType.FLEX,
+              key: null,
+              style: {
+                paddingBottom: 20,
+                marginTop: 18,
+              },
+
+              flex:
+              [
+                {
+                  displayType: DisplayType.LABEL,
+                  key: null,
+                  label: 'Order',
+                  style: {
+                    paddingLeft: 20,
+                  },
+                },
+                {
+                  displayType: DisplayType.DROPDOWN,
+                  key: 'sortOrder',
+                  options: List(ESInterpreterDefaultConfig.getClause('sort_order')['values']),
+                  autoDisabled: true,
+                  dropdownUsesRawValues: true,
+                  centerDropdown: true,
+                  style: {
+                    maxWidth: 80,
+                  },
+                },
+                {
+                  displayType: DisplayType.LABEL,
+                  key: null,
+                  label: 'Mode',
+                  style: {
+                    paddingLeft: 20,
+                  },
+                },
+                {
+                  displayType: DisplayType.DROPDOWN,
+                  key: 'sortMode',
+                  options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values'].concat(['auto'])),
+                  dropdownUsesRawValues: true,
+                  autoDisabled: true,
+                  centerDropdown: true,
+                  style: {
+                    maxWidth: 80,
+                  },
+                },
+                {
+                  displayType: DisplayType.LABEL,
+                  key: null,
+                  label: 'Type',
+                  style: {
+                    paddingLeft: 20,
+                  },
+                },
+                {
+                  displayType: DisplayType.DROPDOWN,
+                  key: 'sortType',
+                  options: List(ESInterpreterDefaultConfig.getClause('field_type')['values']),
+                  dropdownUsesRawValues: true,
+                  autoDisabled: true,
+                  centerDropdown: true,
+                  style: {
+                    maxWidth: 120,
+                  },
+                },
+              ],
+            },
+          ],
         },
       ],
     },

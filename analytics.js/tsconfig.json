@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "newLine": "LF",
+        "module": "commonjs",
+        "sourceMap": false,
+        "inlineSources": true,
+        "inlineSourceMap": true,
+        "strictNullChecks": true,
+        "target": "es6",
+        "typeRoots": [
+            "./node_modules/@types"
+        ],
+        "baseUrl": ".",
+        "experimentalDecorators": true,
+        "declaration": false,
+        "outDir": "./build/"
+    },
+    "exclude": [
+        "node_modules",
+        "build",
+        "coverage"
+    ]
+}

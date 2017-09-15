@@ -176,8 +176,10 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
-
-    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    if (this.props.router !== undefined)
+    {
+      this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props)
