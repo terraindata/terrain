@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import './BuilderComponent.less';
 
+import FadeInOut from 'common/components/FadeInOut';
 import * as React from 'react';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import BuilderTextbox from '../../common/components/BuilderTextbox';
@@ -273,20 +274,19 @@ class BuilderComponent extends TerrainComponent<Props>
                 textStyle={this.props.textStyle}
               />
             </div>
-            {
-              this.state.showExpanded ?
-                <BuilderComponent
-                  display={d.expandContent}
-                  keyPath={this.props.keyPath}
-                  data={data}
-                  canEdit={this.props.canEdit}
-                  parentData={this.props.parentData}
-                  language={this.props.language}
-                  textStyle={this.props.textStyle}
-                />
-                :
-                null
-            }
+            <FadeInOut
+              open={this.state.showExpanded}
+            >
+              <BuilderComponent
+                display={d.expandContent}
+                keyPath={this.props.keyPath}
+                data={data}
+                canEdit={this.props.canEdit}
+                parentData={this.props.parentData}
+                language={this.props.language}
+                textStyle={this.props.textStyle}
+              />
+            </FadeInOut>
           </div>
         );
         break;
