@@ -23,7 +23,7 @@
   }
 }
 
-.bc-expandable-expanded {
+.bc-expandable-expanded, .bc-expandable-collapsed {
   cursor: pointer;
   .bc-minimize-icon {
     display: inline-block;
@@ -39,19 +39,10 @@
 }
 
 .bc-expandable-collapsed {
-  cursor: pointer;
   .bc-minimize-icon {
-    display: inline-block;
-    fill: rgba(255, 255, 255, 0.5);
-    width: 10px;
     position: relative;
     top: 2px;
     .rotate(-90deg);
-  }
-  &:hover {
-    .bc-minimize-icon {
-      fill: #fff;
-    }
   }
 }
 

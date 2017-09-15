@@ -109,13 +109,6 @@ class BuilderComponent extends TerrainComponent<Props>
     BuilderActions.move(keyPath, index, newIndex);
   }
 
-  public toggleExpanded()
-  {
-    this.setState({
-      showExpanded: !this.state.showExpanded,
-    });
-  }
-
   public renderDisplay(displayArg: Display | Display[],
     parentKeyPath: KeyPath,
     data: IMMap<any, any>,
@@ -261,7 +254,7 @@ class BuilderComponent extends TerrainComponent<Props>
           <div key={key}>
             <div
               className={this.state.showExpanded ? 'bc-expandable-expanded' : 'bc-expandable-collapsed'}
-              onClick={this.toggleExpanded}
+              onClick={this._toggle('showExpanded')}
             >
               <ArrowIcon className='bc-minimize-icon' />
               <BuilderComponent
