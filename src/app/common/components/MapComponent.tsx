@@ -68,7 +68,7 @@ import TerrainComponent from './TerrainComponent';
 
 export interface Props
 {
-  location?: [number, number];
+  location?: [number, number] | number[];
   address?: string;
   onChange?: (value) => void;
   markLocation?: boolean;
@@ -614,6 +614,7 @@ class MapComponent extends TerrainComponent<Props>
       onChange: this.onAddressChange,
       onFocus: this.handleFocus,
       onBlur: this.handleBlur,
+      autoFocus: this.state.focused,
     };
     const style = this.props.hideSearchSettings ? { marginBottom: '0px' } : {};
     // if there are inputs and the first key typed in is @, render an autocomplete that has the inputs as choices
@@ -631,6 +632,8 @@ class MapComponent extends TerrainComponent<Props>
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
           className='map-input-autocomplete'
+          autoFocus={this.state.focused}
+          moveCursorToEnd={true}
         />
       );
     }
