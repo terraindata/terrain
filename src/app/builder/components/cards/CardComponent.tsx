@@ -553,7 +553,7 @@ class _CardComponent extends TerrainComponent<Props>
           })}
           style={cardStyle(
             card.static.colors[0],
-            this.state.hovering ? card.static.colors[1] : Colors().bg3,
+            card.static.colors[1],
             undefined,
             undefined,
             this.state.hovering
