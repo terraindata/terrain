@@ -1,0 +1,12 @@
+.directory
+*DS_Store
+*~
+.cache-loader
+coverage/
+node_modules
+build/
+.idea
+.vscode
+midway.db
+*.swp
+yarn-error.log

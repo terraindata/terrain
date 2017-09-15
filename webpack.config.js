@@ -90,7 +90,7 @@ module.exports =
             //  keep it first in this list
             {
                 test: /\.ts(x?)$/,
-                exclude: [/midway/, /node_modules/],
+                exclude: [/midway/, /analytics.js/, /node_modules/],
                 loader:
                     "babel-loader!thread-loader!ts-loader?happyPackMode=true"
                     + JSON.stringify({
@@ -100,7 +100,7 @@ module.exports =
             },
             {
                 test: /\.js(x?)$/,
-                exclude: [/midway/, /node_modules/],
+                exclude: [/midway/, /analytics.js/, /node_modules/],
                 loader: "babel-loader!thread-loader"
             },
             { test: /\.css$/, exclude: /midway/, loader: "style-loader!css-loader" },

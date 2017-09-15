@@ -48,6 +48,7 @@ import bodybuilder = require('bodybuilder');
 import * as Elastic from 'elasticsearch';
 import * as srs from 'secure-random-string';
 import * as sha1 from 'sha1';
+import * as winston from 'winston';
 
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
@@ -95,9 +96,9 @@ export class Events
   constructor()
   {
     const elasticConfig: ElasticConfig = DBUtil.DSNToConfig('elastic', 'http://127.0.0.1:9200') as ElasticConfig;
-    this.elasticController = new ElasticController(elasticConfig, 0, 'Events');
+    this.elasticController = new ElasticController(elasticConfig, 0, 'Analytics');
     this.eventTable = new Tasty.Table(
-      'data',
+      'events',
       ['id'],
       [
         'date',
@@ -105,17 +106,17 @@ export class Events
         'payload',
         'type',
       ],
-      'events',
+      'terrain-analytics',
     );
 
     this.payloadTable = new Tasty.Table(
-      'data',
+      'payload',
       ['id'],
       [
         'meta',
         'payload',
       ],
-      'payload',
+      'terrain-analytics',
     );
   }
 
@@ -171,86 +172,6 @@ export class Events
     let currSeconds: any = new Date();
     currSeconds = Math.floor(currSeconds / 1000);
     return currSeconds - (currSeconds % (timeInterval * 60));
-  }
-
-  /*
-  * Return a list of HTML IDs and relevant info for event tracking purposes
-  *
-  */
-  public async getHTMLIDs(): Promise<object[]>
-  {
-    return new Promise<object[]>(async (resolve, reject) =>
-    {
-      const itemLst = await items.get();
-      const payloadLst: object[] = [];
-      const returnLst: object[] = [];
-      itemLst.forEach((item) =>
-      {
-        if (item.status !== 'ARCHIVE' && item.meta !== undefined)
-        {
-          const meta = JSON.parse(item.meta);
-          let itemParent: any;
-          let itemId: any;
-          if (item.parent !== undefined)
-          {
-            itemParent = item.parent.toString();
-          }
-          if (item.id !== undefined)
-          {
-            itemId = item.id.toString();
-          }
-          const otherFields: object =
-            {
-              eventType: 'group',
-              ip: '',
-              language: 'elastic',
-              name: '',
-              type: 'click',
-              url: '',
-              variantId: '',
-            };
-
-          const payloadEvent: object =
-            {
-              id: 'item' + (itemId as string),
-              meta: otherFields,
-              payload:
-              {
-                date: '',
-                dependencies: item.parent === 0 ? [] : ['item' + (itemParent as string)],
-                numClicks: 0,
-                loadTime: 0,
-              },
-            };
-          const returnEvent: object =
-            {
-              id: 'item' + (itemId as string),
-            };
-
-          // for now, only use items that are ES
-          if (meta.algorithmsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
-          {
-            returnEvent['eventType'] = 'group';
-            payloadLst.push(payloadEvent);
-            returnLst.push(returnEvent);
-          }
-          if (meta.variantsOrder !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
-          {
-            returnEvent['eventType'] = 'algorithm';
-            payloadLst.push(payloadEvent);
-            returnLst.push(returnEvent);
-          }
-          if (meta.query !== undefined && (meta['defaultLanguage'] === 'elastic' || meta['language'] === 'elastic'))
-          {
-            returnEvent['eventType'] = 'variant';
-            payloadLst.push(payloadEvent);
-            returnLst.push(returnEvent);
-          }
-        }
-      });
-      await this.elasticController.getTasty().upsert(this.payloadTable, payloadLst);
-      resolve(returnLst);
-    });
   }
 
   /*
@@ -330,7 +251,7 @@ export class Events
     });
   }
 
-  public async getEventData(variantId: number, variantInfo: object): Promise<string>
+  public async getEventData(variantId: number, request: object): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
@@ -338,22 +259,70 @@ export class Events
 
       let body = bodybuilder();
       body = body.filter('term', 'variantid', variantId);
-      body = body.filter('term', 'eventid', variantInfo['metric']);
+      body = body.filter('term', 'eventid', request['eventid']);
       body = body.filter('range', '@timestamp', {
-        gte: variantInfo['start'],
-        lte: variantInfo['end'],
+        gte: request['start'],
+        lte: request['end'],
       });
 
-      const response = await new Promise((resolveI, rejectI) =>
+      if (request['agg'] === 'none' || request['agg'] === undefined)
       {
-        const query: Elastic.SearchParams = {
-          index: 'analytics',
-          type: 'events',
-          body: body.build(),
-        };
-        client.search(query, Util.makePromiseCallback(resolveI, rejectI));
-      });
-      resolve(JSON.stringify(response['hits'].hits.map((e) => e['_source'])));
+        if (request['field'] !== undefined)
+        {
+          try
+          {
+            const fields = request['field'].split(',');
+            body = body.rawOption('_source', request['field']);
+          }
+          catch (e)
+          {
+            winston.info('Ignoring malformed field value');
+          }
+        }
+
+        const response = await new Promise((resolveI, rejectI) =>
+        {
+          const query: Elastic.SearchParams = {
+            index: 'terrain-analytics',
+            type: 'events',
+            body: body.build(),
+          };
+          client.search(query, Util.makePromiseCallback(resolveI, rejectI));
+        });
+        return resolve(JSON.stringify(response['hits'].hits.map((e) => e['_source'])));
+      }
+      else
+      {
+        if (request['interval'] === undefined)
+        {
+          reject('Required parameter \"interval\" is missing');
+        }
+
+        if (request['field'] === undefined)
+        {
+          reject('Required parameter \"field\" is missing');
+        }
+
+        body = body.aggregation(
+          request['agg'],
+          request['field'],
+          request['agg'],
+          {
+            interval: request['interval'],
+          },
+        );
+
+        const response = await new Promise((resolveI, rejectI) =>
+        {
+          const query: Elastic.SearchParams = {
+            index: 'terrain-analytics',
+            type: 'events',
+            body: body.build(),
+          };
+          client.search(query, Util.makePromiseCallback(resolveI, rejectI));
+        });
+        return resolve(JSON.stringify(response['aggregations'][request['agg']].buckets));
+      }
     });
   }
 
