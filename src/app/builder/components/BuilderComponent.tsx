@@ -112,7 +112,6 @@ class BuilderComponent extends TerrainComponent<Props>
       },
     });
   }
->>>>>>> 2d8bcc7c8becc7f87aa2742f85419bc8d603688c
 
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {
