@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands prefer-const
 
 import * as classNames from 'classnames';
-import GoogleMap from 'google-map-react';
 import { List } from 'immutable';
 import { divIcon } from 'leaflet';
 import * as _ from 'lodash';
