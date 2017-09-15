@@ -310,7 +310,7 @@ class Autocomplete extends TerrainComponent<Props>
 
     const inputStyle = this.props.disabled ?
       _.extend({}, this.props.style ? this.props.style : {},
-        backgroundColor(Colors().darkerHighlight),
+        backgroundColor(Colors().darkerHighlight, Colors().highlight),
       )
       :
       this.props.style;

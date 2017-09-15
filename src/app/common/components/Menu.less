@@ -3,7 +3,6 @@
 @card-menu-bg: rgba(0,0,0,0.2);
 @card-menu-hover-bg: rgba(0,0,0,0.7);
 
-@menu-color: #fff;
 @menu-collapsed-size: 24px;
 @menu-collapsed-small-size: 18px;
 @menu-icon-width: 14px;
@@ -13,6 +12,7 @@
 @option-height: 30px;
 
 .menu-wrapper {
+
   // float: right;
   background: @card-menu-bg;
   border-radius: @menu-collapsed-size;
@@ -48,7 +48,6 @@
   }
 
   .menu-icon {
-    fill: @menu-color;
     width: @menu-icon-width;
     height: @menu-icon-height;
     position: absolute;
@@ -57,6 +56,7 @@
     opacity: 1;
     
     .transition;
+
   }
   
   &.menu-vertical {

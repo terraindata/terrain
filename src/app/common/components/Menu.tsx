@@ -53,6 +53,8 @@ import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Menu.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
+import { Colors } from '../../common/Colors';
+import StyleTag from './StyleTag';
 
 const optionHeight = 30; // coordinate with Menu.less
 
@@ -206,8 +208,20 @@ export class Menu extends TerrainComponent<Props>
             }
           </div>
         }
+         <StyleTag
+            style={SVG_STYLE}
+          />
       </div>
     );
   }
 }
+
+    
+const SVG_STYLE = {
+  '.menu-wrapper .menu-icon .st0': {
+    fill: Colors().altBg1;
+  }
+  
+};
+
 export default Menu;

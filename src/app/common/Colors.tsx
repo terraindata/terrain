@@ -551,11 +551,11 @@ const LIGHT: Theme =
     border2: 'rgb(100,105,107)',
     border3: 'rgb(125,130,139)',
 
-    text1: 'rgb(30, 180, 250)',
+    text1: '#161616',
     text2: '#242424',
     text3: '#424242',
 
-    altBg1: 'rgba(0,0,0,0.15)', //'rgb(39, 39, 39)',
+    altBg1: 'rgba(0,0,0,0.40)', //'rgb(39, 39, 39)',
     altBg2: 'rgb(47, 47, 47)',
 
     altText1: '#fff',
@@ -588,7 +588,7 @@ const LIGHT: Theme =
 
     import: '#1efab4',
 
-    resultLine: 'rgba(255,255,255,0.25)',
+    resultLine: 'rgba(0,0,0,0.25)',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 

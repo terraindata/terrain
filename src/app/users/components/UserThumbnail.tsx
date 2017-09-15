@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
-
+import { fontColor, Colors } from '../../common/Colors';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserStore from './../data/UserStore';
@@ -158,7 +158,10 @@ class UserThumbnail extends TerrainComponent<Props>
         />
         {
           text &&
-          <div className='user-thumbnail-text'>
+          <div 
+            className='user-thumbnail-text'
+            style={fontColor(Colors().text1)}
+          >
             {
               text
             }

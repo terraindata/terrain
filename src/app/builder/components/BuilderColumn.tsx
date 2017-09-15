@@ -62,6 +62,7 @@ import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
 
+import StyleTag from 'common/components/StyleTag';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import DragHandle from '../../common/components/DragHandle';
@@ -296,7 +297,7 @@ const BuilderColumn = createReactClass<any, any>(
         onClick: this.switchView,
         disabled: index === this.state.column,
         icon: menuIcons[index].icon,
-        iconColor: menuIcons[index].color,
+        iconColor: Colors().altBg1,
       })));
 
       return options;
@@ -396,10 +397,22 @@ const BuilderColumn = createReactClass<any, any>(
               this.renderContent(canEdit)
             }
           </div>
+          <StyleTag
+            style={SVG_STYLE}
+          />
         </div>
       ));
     },
   },
 );
+
+const SVG_STYLE = {
+  '.builder-column .builder-title-bar-options .bc-options-svg .cls-1 ': {
+    fill: Colors().altBg1;
+  }
+  '.builder-column .builder-title-bar-options .menu-wrapper':{
+    'border-color': Colors().altBg1;
+  }
+};
 
 export default BuilderColumn;

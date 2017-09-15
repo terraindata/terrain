@@ -174,6 +174,9 @@ const SVG_STYLE = {
   '.sidebar-expand:hover .sidebar-expand-icon': {
     fill: Colors().text1,
   },
+  '.sidebar-link svg': {
+    fill: Colors().altBg1;
+  }
 };
 
 export default Sidebar;
