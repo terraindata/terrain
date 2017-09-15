@@ -239,6 +239,7 @@ export const TOOLTIP_THEMES: Themes = {
   },
 };
 
+// see https://github.com/tvkhoa/react-tippy
 export interface TooltipProps
 {
   title?: string;
@@ -260,7 +261,7 @@ export interface TooltipProps
   duration?: number;
   hideDuration?: number;
   distance?: number;
-  offset?: number;
+  offset?: number; // appears to be inconsistent when over inline lements
   hideOnClick?: boolean | 'persistent';
   multiple?: boolean;
   followCursor?: boolean;
@@ -272,10 +273,6 @@ export interface TooltipProps
   size?: 'small' | 'regular' | 'big';
   sticky?: boolean;
   stickyDuration?: number;
-  beforeShown?: () => void;
-  shown?: () => void;
-  beforeHidden?: () => void;
-  hidden?: () => void;
   theme?: Theme;
   className?: string;
   style?: any;

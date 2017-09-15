@@ -50,9 +50,38 @@
   background: fade(#e27d7d, 50%) !important;
 }
 
-.tooltip-icon {
+.tooltip-icon-wrapper {
+  // display: inline-block;
+  // position: absolute;
+  // right: 6px;
+  // top: 50%;
+  // bottom: 50%;
+  // position: asbolute;
+  // right: 6px;
+  // top: 6px;
+  // top: 50%;
+  // transform:translate(-50%, -50%);
+  // fill: #FFF;
+  // width: 16px;
+  // height: 16px;
+}
+.tooltip-positioning {
   position: absolute;
-  right: 4px;
-  top: 8px;
-  fill: #FFF
+  right: 6px;
+  top: 50%;
+  transform: translate(0%, -50%);
+  // bottom: 50%;
+  // transform: translate(0%, -50%);
+  // height: 16px;
+  // width: 16px;
+}
+
+.tooltip-icon {
+  // position: absolute;
+  // top: 50%;
+  // bottom: 50%;
+  // transform:translate(0%, -50%);
+  height: 16px;
+  width: 16px;
+  fill: #FFF;
 }
