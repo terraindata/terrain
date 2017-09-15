@@ -1,3 +1,5 @@
+@import "../../common/Common.less";
+
 .builder-component-wrapper {
   position: relative;
   &.builder-component-wrapper-wide {
@@ -18,6 +20,38 @@
   .builder-component-help-transform-bottom {
     left: 0%;
     top: 90%;
+  }
+}
+
+.bc-expandable-expanded {
+  cursor: pointer;
+  .bc-minimize-icon {
+    display: inline-block;
+    fill: rgba(255, 255, 255, 0.5);
+    width: 10px;
+
+  }
+  &:hover {
+    .bc-minimize-icon {
+      fill: #fff;
+    }
+  }
+}
+
+.bc-expandable-collapsed {
+  cursor: pointer;
+  .bc-minimize-icon {
+    display: inline-block;
+    fill: rgba(255, 255, 255, 0.5);
+    width: 10px;
+    position: relative;
+    top: 2px;
+    .rotate(-90deg);
+  }
+  &:hover {
+    .bc-minimize-icon {
+      fill: #fff;
+    }
   }
 }
 

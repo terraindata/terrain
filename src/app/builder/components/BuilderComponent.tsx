@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const
+// tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-var-requires
 
 import './BuilderComponent.less';
 
@@ -59,6 +59,8 @@ import BuilderActions from '../data/BuilderActions';
 import BuilderStore from '../data/BuilderStore';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
+
+const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 export interface Props
 {
@@ -84,6 +86,13 @@ export interface Props
 
 class BuilderComponent extends TerrainComponent<Props>
 {
+  public state:
+  {
+    showExpanded: boolean,
+  } = {
+    showExpanded: false,
+  };
+
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {
     BuilderActions.create(keyPath, index + 1, display.factoryType);
@@ -97,6 +106,13 @@ class BuilderComponent extends TerrainComponent<Props>
   public moveRow(keyPath: KeyPath, index: number, newIndex: number)
   {
     BuilderActions.move(keyPath, index, newIndex);
+  }
+
+  public toggleExpanded()
+  {
+    this.setState({
+      showExpanded: !this.state.showExpanded,
+    });
   }
 
   public renderDisplay(displayArg: Display | Display[],
@@ -235,6 +251,41 @@ class BuilderComponent extends TerrainComponent<Props>
                 className='builder-component-help-right'
               />
               : null
+            }
+          </div>
+        );
+        break;
+      case DisplayType.EXPANDABLE:
+        content = (
+          <div key={key}>
+            <div
+              className={this.state.showExpanded ? 'bc-expandable-expanded' : 'bc-expandable-collapsed'}
+              onClick={this.toggleExpanded}
+            >
+              <ArrowIcon className='bc-minimize-icon' />
+              <BuilderComponent
+                display={d.expandToggle}
+                keyPath={this.props.keyPath}
+                data={data}
+                canEdit={this.props.canEdit}
+                parentData={this.props.parentData}
+                language={this.props.language}
+                textStyle={this.props.textStyle}
+              />
+            </div>
+            {
+              this.state.showExpanded ?
+                <BuilderComponent
+                  display={d.expandContent}
+                  keyPath={this.props.keyPath}
+                  data={data}
+                  canEdit={this.props.canEdit}
+                  parentData={this.props.parentData}
+                  language={this.props.language}
+                  textStyle={this.props.textStyle}
+                />
+                :
+                null
             }
           </div>
         );
