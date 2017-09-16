@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions prefer-const
 
 import * as Immutable from 'immutable';
 import './ResultsArea.less';
@@ -309,6 +309,23 @@ class ResultsArea extends TerrainComponent<Props>
     }
     else
     {
+      // Extract the geo_distance fields and values from the query
+      // Maybe only do this is there is a map field in the config ?
+      const geoDistances = this.props.query.tql.match(/"geo_distance": \{[^\}]*\}/g);
+      let locations = {};
+      geoDistances.forEach((geoDist) =>
+      {
+        geoDist = '{' + geoDist + '}}';
+        const obj = JSON.parse(geoDist);
+        // find field that isn't distance or distance_type
+        _.keys(obj.geo_distance).forEach((key) =>
+        {
+          if (key !== 'distance' && key !== 'distance_type')
+          {
+            locations[key] = obj.geo_distance[key];
+          }
+        });
+      });
       resultsContent = (
         <InfiniteScroll
           className={classNames({
@@ -334,6 +351,7 @@ class ResultsArea extends TerrainComponent<Props>
                   key={index}
                   primaryKey={result.primaryKey}
                   allowSpotlights={this.props.allowSpotlights}
+                  locations={locations}
                 />
               );
             })

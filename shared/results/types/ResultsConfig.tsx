@@ -57,7 +57,6 @@ export class Format
   showField: boolean = false;
   latitude: string = ' ';
   longitude: string = ' ';
-  separateCoordinates: boolean = false;
 
   set: (f: string, v: any) => Format;
   setIn: (f: string[], v: any) => Format;

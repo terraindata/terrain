@@ -460,16 +460,6 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     this.changeFormat('type', 'map');
   }
 
-  public changeLatitude(value: string)
-  {
-    this.changeFormat('latitude', value);
-  }
-
-  public changeLongitude(value: string)
-  {
-    this.changeFormat('longitude', value);
-  }
-
   public toggleRaw(event)
   {
     this.changeFormat('showRaw', event.target.checked);
@@ -483,11 +473,6 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
   public handleTemplateChange(event)
   {
     this.changeFormat('template', event.target.value);
-  }
-
-  public changeMapFormat()
-  {
-    this.changeFormat('separateCoordinates', !this.props.format.separateCoordinates);
   }
 
   public changeFormat(key: string, val: any)
@@ -523,7 +508,6 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     const { format } = this.props;
     const image = format && format.type === 'image';
     const map = format && format.type === 'map';
-    const separateCoordinates = format && format.separateCoordinates;
 
     const selected: boolean = this.props.is !== null && this.props.isAvailableField;
     const mainStyle = [

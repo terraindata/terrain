@@ -60,6 +60,7 @@ import ColorManager from '../../../util/ColorManager';
 import { spotlightAction } from '../../data/SpotlightStore';
 import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
+
 import { Result } from './ResultTypes';
 const { decodeGeohash } = require('../../../util/MapUtil.js');
 
@@ -85,6 +86,8 @@ export interface Props
   connectDragSource?: (a: any) => any;
   connectDropTarget?: (a: any) => any;
   connectDragPreview?: (a: any) => void;
+
+  locations?: { [field: string]: any };
 }
 
 @Radium
@@ -151,7 +154,7 @@ class ResultComponent extends TerrainComponent<Props> {
       return null;
     }
 
-    const value = getResultValue(this.props.result, field, this.props.resultsConfig, overrideFormat);
+    const value = getResultValue(this.props.result, field, this.props.resultsConfig, overrideFormat, this.props.locations);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
@@ -196,7 +199,7 @@ class ResultComponent extends TerrainComponent<Props> {
     }, function()
       {
         const spotlightData = this.props.result.toJS();
-        spotlightData['name'] = getResultName(this.props.result, this.props.resultsConfig);
+        spotlightData['name'] = getResultName(this.props.result, this.props.resultsConfig, this.props.locations);
         spotlightData['color'] = spotlightColor;
         spotlightData['id'] = id;
         spotlightAction(id, spotlightData);
@@ -257,7 +260,7 @@ class ResultComponent extends TerrainComponent<Props> {
       );
     }
 
-    const name = getResultName(result, resultsConfig);
+    const name = getResultName(result, resultsConfig, this.props.locations);
     const fields = getResultFields(result, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
 
@@ -355,14 +358,15 @@ class ResultComponent extends TerrainComponent<Props> {
     ));
   }
 }
-export function getResultValue(result: Result, field: string, config: ResultsConfig, overrideFormat?: any): string
+export function getResultValue(result: Result, field: string, config: ResultsConfig,
+  overrideFormat?: any, locations?: { [field: string]: any }): string
 {
   let value: any;
   if (result)
   {
     value = result.fields.get(field);
   }
-  return ResultFormatValue(field, value, config, overrideFormat, result);
+  return ResultFormatValue(field, value, config, overrideFormat, locations);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -386,7 +390,7 @@ export function getResultFields(result: Result, config: ResultsConfig): string[]
   return fields;
 }
 
-export function getResultName(result: Result, config: ResultsConfig)
+export function getResultName(result: Result, config: ResultsConfig, locations?: { [field: string]: any })
 {
   let nameField: string;
 
@@ -399,10 +403,50 @@ export function getResultName(result: Result, config: ResultsConfig)
     nameField = _.first(getResultFields(result, config));
   }
 
-  return getResultValue(result, nameField, config);
+  return getResultValue(result, nameField, config, locations);
 }
 
-export function ResultFormatValue(field: string, value: any, config: ResultsConfig, overrideFormat?: any, result?: Result): any
+function getLatLon(value: any)
+{
+  let lat: number;
+  let lon: number;
+  // string = geohash or 0,0 format
+  if (typeof value === 'string')
+  {
+    if (value.split(',').length > 1)
+    {
+      const coords = value.split(',');
+      // have some sort of check to make sure this is ok ?
+      lat = parseFloat(coords[0].replace(/ /g, ''));
+      lon = parseFloat(coords[1].replace(/ /g, ''));
+    }
+    else
+    {
+      const coords = decodeGeohash(value);
+      if (coords !== null)
+      {
+        lat = coords.lat;
+        lon = coords.lon;
+      }
+    }
+  }
+  // object type for geopoint
+  else if (value.lat !== undefined && value.lon !== undefined)
+  {
+    lat = value.lat;
+    lon = value.lon;
+  }
+  // array type for geopoint
+  else if (value[0] !== undefined && value[1] !== undefined)
+  {
+    lat = value[0];
+    lon = value[1];
+  }
+  return [lat, lon];
+}
+
+export function ResultFormatValue(field: string, value: any, config: ResultsConfig,
+  overrideFormat?: any, locations?: { [field: string]: any }): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const { showRaw } = overrideFormat || format || { showRaw: false };
@@ -464,53 +508,23 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
         );
 
       case 'map':
-        let lat: number;
-        let lon: number;
-        // string = geohash or 0,0 format
-        if (typeof value === 'string')
+        const location = getLatLon(value);
+        let secondLocation: [number, number];
+        if (locations !== undefined && locations[field] !== undefined)
         {
-          if (value.split(',').length > 1)
-          {
-            const coords = value.split(',');
-            // have some sort of check to make sure this is ok ?
-            lat = parseFloat(coords[0].replace(/ /g, ''));
-            lon = parseFloat(coords[1].replace(/ /g, ''));
-          }
-          else
-          {
-            const coords = decodeGeohash(value);
-            if (coords !== null)
-            {
-              lat = coords.lat;
-              lon = coords.lon;
-            }
-          }
+          secondLocation = getLatLon(locations[field]) as [number, number];
         }
-        // object type for geopoint
-        else if (value.lat !== undefined && value.lon !== undefined)
-        {
-          lat = value.lat;
-          lon = value.lon;
-        }
-        // array type for geopoint
-        else if (value[0] !== undefined && value[1] !== undefined)
-        {
-          lat = value[0];
-          lon = value[1];
-        }
-
-        // Get location info from query ( what are we querying against ? )
-        const secondLocation: [number, number] = [37.4449002, -122.16174969999997];
         return (
           <div className='result-field-value-map-wrapper'>
             <MapComponent
               address={''}
-              location={[lat, lon]}
+              location={location}
               markLocation={true}
               routing={false}
-              showDirectDistance={true}
+              showDirectDistance={secondLocation !== undefined}
               showSearchBar={false}
               zoomControl={false}
+              secondLocation={secondLocation}
             />
           </div>
         );
