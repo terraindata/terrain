@@ -618,7 +618,7 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
       borderTopColor: hovered ? borderHover : Colors().highlight,
       borderRightColor: hovered ? borderHover : Colors().darkerHighlight,
       borderBottomColor: hovered ? borderHover : Colors().darkerHighlight,
-      transition: 'background 0.25s',
+      transition: 'background 0.15s',
       [hoverBg && ':hover']: {
         background: hoverBg,
       },
