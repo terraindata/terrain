@@ -55,19 +55,6 @@ export const events: Events = new Events();
 
 const Router = new KoaRouter();
 
-// Get HTML IDs for event tracking
-Router.get('/ids', async (ctx, next) =>
-{
-  try
-  {
-    ctx.body = JSON.stringify(await events.getHTMLIDs());
-  }
-  catch (e)
-  {
-    ctx.body = '';
-  }
-});
-
 // Get an event tracker.
 Router.post('/', async (ctx, next) =>
 {
@@ -107,10 +94,10 @@ Router.post('/update/', async (ctx, next) =>
 
 });
 
-Router.post('/variants/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/variants/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const requestObj = JSON.parse(JSON.stringify(ctx.request.query));
-  Util.verifyParameters(requestObj, ['start', 'end', 'metric']);
+  Util.verifyParameters(requestObj, ['start', 'end', 'eventid']);
   if (!ctx.params.id)
   {
     throw new Error('missing variant ID');

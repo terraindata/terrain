@@ -44,54 +44,49 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
+var webpack = require("webpack");
+var path = require("path");
 
-import * as _ from 'lodash';
-import * as React from 'react';
-
-import * as Color from 'color';
-
-import { backgroundColor, Colors, fontColor, getStyle } from 'common/Colors';
-import TerrainComponent from 'common/components/TerrainComponent';
-import './CardHelpTooltip.less';
-
-export interface Props
+module.exports =
 {
-  staticInfo: any;
-}
+    entry: "./lib/analytics.ts",
+    devtool: "cheap-module-source-map",
 
-export default class CardHelpTooltip extends TerrainComponent<Props>
-{
-  public render()
-  {
-    const cardColor = (this.props.staticInfo.colors && this.props.staticInfo.colors[0]) || Colors().altText1;
-    const titleStyle = _.extend({},
-      backgroundColor(Colors().bg3),
-      fontColor(cardColor),
-      getStyle('borderLeftColor', cardColor),
-      getStyle('borderTopColor', Colors().highlight),
-      getStyle('borderRightColor', Colors().highlight),
-      getStyle('borderBottomColor', Colors().highlight),
-    );
+    output:
+    {
+        path: __dirname,
+        publicPath: "/build/",
+        filename: "bundle.js",
+    },
 
-    return (
-      <div className='card-help-tooltip'>
-        {
-          this.props.staticInfo.title &&
-          <div className='card-help-title' style={titleStyle}>
-            {this.props.staticInfo.title}
-          </div>
-        }
-        <div className='card-description'>
-          {this.props.staticInfo.description}
-        </div>
-        {
-          this.props.staticInfo.url &&
-          <div className='card-help-link'>
-            <a target='_blank' href={this.props.staticInfo.url}> Learn More </a>
-          </div>
-        }
-      </div>
-    );
-  }
-}
+    resolve:
+    {
+        extensions: [ ".js", ".ts", ".json" ],
+    },
+
+    module:
+    {
+        rules:
+        [
+            {
+                test: /\.ts(x?)$/,
+                exclude: [/node_modules/],
+                loader:
+                    "ts-loader?happyPackMode=true"
+                    + JSON.stringify({
+                        compilerOptions: {
+                        },
+                    }),
+            },
+            {
+                test: /\.js(x?)$/,
+                exclude: [/node_modules/],
+                loader: ""
+            },
+        ],
+    },
+
+    plugins:
+    [
+    ],
+};

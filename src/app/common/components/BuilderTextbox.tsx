@@ -63,7 +63,7 @@ import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
-import { borderColor, cardStyle, Colors, getStyle, getCardColors } from '../../common/Colors';
+import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import SchemaStore from '../../schema/data/SchemaStore';
 import Autocomplete from './Autocomplete';
@@ -174,7 +174,9 @@ class BuilderTextbox extends TerrainComponent<Props>
     // If you want two-way backups, use this line
     // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
     if (
-      (this.props.value !== undefined && this.props.value['type'] === this.getCreatingType() && value === '')
+      this.props.value !== undefined
+      && this.props.value['type'] !== undefined && this.props.value['type'] === this.getCreatingType()
+      && value === ''
     )
     {
       if (this.state.backupString)

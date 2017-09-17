@@ -1,0 +1,49 @@
+{
+  "name": "terrain-analytics.js",
+  "version": "1.0.0",
+  "description": "Analytics library for Terrain.",
+  "main": "lib/analytics.ts",
+  "private": true,
+  "scripts": {
+    "build": "webpack --config webpack.config.js --output-filename ./build/bundle.js",
+    "lint": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
+    "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
+    "fix": "yarn run style && yarn run lint;"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://git.terrain.int/terrain/Search"
+  },
+  "authors": [
+    "Han Solo"
+  ],
+  "pre-commit": [
+    "lint",
+    "style"
+  ],
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "/test/.+Tests\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json"
+    ],
+    "mapCoverage": true,
+    "globals": {
+      "DEV": true
+    },
+    "testURL": "http://localhost"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "ts-loader": "^2.3.7",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2",
+    "typescript-formatter": "^6.0.0",
+    "webpack": "^3.5.6"
+  }
+}
