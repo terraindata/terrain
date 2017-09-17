@@ -96,7 +96,7 @@ export default class ESMapClause extends ESClause
       if (this.multifield === false && nrField > 1)
       {
         interpreter.accumulateError(viTuple.propertyName,
-          'The ' + this.type + ' clause does not support multiple fields.');
+          'The ' + this.name + ' does not support multiple fields.');
       }
     });
   }

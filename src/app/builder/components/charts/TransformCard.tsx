@@ -328,8 +328,8 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
 
-    const index: string = getIndex();
-    const type: string = getType();
+    const index: string = getIndex('');
+    const type: string = getType('');
     const min = maxDomain.get(0);
     const max = maxDomain.get(1);
     const interval = (max - min) / NUM_BARS;

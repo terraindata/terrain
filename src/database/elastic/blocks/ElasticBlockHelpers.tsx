@@ -76,7 +76,7 @@ export const ElasticBlockHelpers = {
       ).toList();
     }
 
-    if (index !== '')
+    if (index !== null)
     {
       const indexId = state.db.name + '/' + String(index);
 
@@ -94,7 +94,7 @@ export const ElasticBlockHelpers = {
       // 2. Need to get current type
 
       const type = getType();
-      if (type !== '')
+      if (type !== null)
       {
         const typeId = state.db.name + '/' + String(index) + '.' + String(type);
 
@@ -114,38 +114,41 @@ export const ElasticBlockHelpers = {
   },
 };
 
-export function searchFromRootCard(name: string): Block
+export function searchFromRootCard(name: string): Block | null
 {
   const state = BuilderStore.getState();
   const rootCard = state.query.cards.get(0);
   if (!rootCard)
   {
-    return undefined;
+    return null;
   }
   const isTheCard = (card) => card['type'] === name;
-  return rootCard['cards'].find(isTheCard);
+  const theCard = rootCard['cards'].find(isTheCard);
+  if (!theCard)
+  {
+    return null;
+  }
+  return theCard;
 }
 
-// return '' when there is no index card.
-export function getIndex(): string
+export function getIndex(notSetIndex: string = null): string | null
 {
   const c = searchFromRootCard('eqlindex');
-  if (c === undefined)
+  if (c === null)
   {
-    return '';
+    return notSetIndex;
   } else
   {
     return c['value'];
   }
 }
 
-// return '' when there is no type card.
-export function getType(): string
+export function getType(notSetType: string = null): string | null
 {
   const c = searchFromRootCard('eqltype');
-  if (c === undefined)
+  if (c === null)
   {
-    return '';
+    return notSetType;
   } else
   {
     return c['value'];
