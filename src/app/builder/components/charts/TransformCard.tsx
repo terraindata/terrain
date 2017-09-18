@@ -191,13 +191,27 @@ class TransformCard extends TerrainComponent<Props>
   }
 
   // called by TransformCardChart to zoom on a specific part of the domain
-  public handleZoomDomainChange(newDomain: List<number>)
+  public handleRequestDomainChange(domain: List<number>, overrideMaxDomain = false)
   {
-    const domain = this.trimDomain(this.state.chartDomain, newDomain);
-    this.setState({
-      chartDomain: domain,
-      maxDomain: domain,
-    });
+    const trimmedDomain = this.trimDomain(this.state.chartDomain, domain);
+
+    let low = trimmedDomain.get(0);
+    let high = trimmedDomain.get(1);
+
+    if (!overrideMaxDomain)
+    {
+      low = Math.max(low, this.state.maxDomain.get(0));
+      high = Math.min(high, this.state.maxDomain.get(1));
+    }
+
+    if (low !== this.state.chartDomain.get(0) || high !== this.state.chartDomain.get(1))
+    {
+      const newDomain = List([low, high]);
+      this.setState({
+        chartDomain: newDomain,
+        ...overrideMaxDomain ? { maxDomain: newDomain } : {},
+      });
+    }
   }
 
   // called by TransformCardChart to request that the view be zoomed to fit the data
@@ -225,7 +239,7 @@ class TransformCard extends TerrainComponent<Props>
         className='transform-card-inner'
       >
         <TransformCardChart
-          onDomainChange={this.handleZoomDomainChange}
+          onRequestDomainChange={this.handleRequestDomainChange}
           onRequestZoomToData={this.handleZoomToData}
           canEdit={this.props.canEdit}
           points={data.scorePoints}

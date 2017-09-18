@@ -67,7 +67,6 @@ interface ScorePoint
 type ScorePoints = List<ScorePoint>;
 
 const ZOOM_FACTOR = 2.0;
-const ROUND_PRECISION = 3;
 
 import TransformChart from './TransformChart';
 
@@ -81,7 +80,7 @@ export interface Props
   canEdit: boolean;
   inputKey: string;
   updatePoints: (points: ScorePoints, released?: boolean) => void;
-  onDomainChange: (domain: List<number>) => void;
+  onRequestDomainChange: (domain: List<number>, overrideMaxDomain: boolean) => void;
   onRequestZoomToData: () => void;
   width: number;
   language: string;
@@ -315,50 +314,36 @@ class TransformCardChart extends TerrainComponent<Props>
     );
   }
 
-  public changeDomain(domain, round = true)
+  public changeDomain(domain, override = false)
   {
-    if (isNaN(domain.get(0)) || isNaN(domain.get(1)))
+    if (isNaN(domain.get(0)) || isNaN(domain.get(1)) || domain.get(0) >= domain.get(1))
     {
       return;
     }
+    this.props.onRequestDomainChange(domain, override);
+  }
 
-    let newDomain = domain;
-    if (round)
-    {
-      const low = Number(domain.get(0).toPrecision(ROUND_PRECISION));
-      const high = Number(domain.get(1).toPrecision(ROUND_PRECISION));
-      newDomain = List([low, high]);
-    }
-
-    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 0), newDomain.get(0));
-    Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 1), newDomain.get(1));
-    this.props.onDomainChange(newDomain);
+  public onZoom(el, mouse, zoomFactor)
+  {
+    const canvasWidth = el.select('.inner-svg').attr('width');
+    const mousePositionRatio = canvasWidth < 1 ? 0 : mouse[0] / canvasWidth;
+    const currentMin = this.props.domain.get(0);
+    const currentMax = this.props.domain.get(1);
+    const domainWidth = currentMax - currentMin;
+    const spreadDistance = domainWidth / zoomFactor * 0.5;
+    const mouseDomainPosition = currentMin + mousePositionRatio * domainWidth;
+    const newDomain = List([mouseDomainPosition - spreadDistance, mouseDomainPosition + spreadDistance]);
+    this.changeDomain(newDomain);
   }
 
   public onZoomIn(el, mouse)
   {
-    const canvasWidth = el.select('.inner-svg').attr('width');
-    const mousePositionRatio = canvasWidth < 1 ? 0 : mouse[0] / canvasWidth;
-    const currentMin = this.props.domain.get(0);
-    const currentMax = this.props.domain.get(1);
-    const domainWidth = currentMax - currentMin;
-    const spreadDistance = domainWidth / ZOOM_FACTOR * 0.5;
-    const mouseDomainPosition = currentMin + mousePositionRatio * domainWidth;
-    const newDomain = List([mouseDomainPosition - spreadDistance, mouseDomainPosition + spreadDistance]);
-    this.changeDomain(newDomain);
+    this.onZoom(el, mouse, ZOOM_FACTOR);
   }
 
   public onZoomOut(el, mouse)
   {
-    const canvasWidth = el.select('.inner-svg').attr('width');
-    const mousePositionRatio = canvasWidth < 1 ? 0 : mouse[0] / canvasWidth;
-    const currentMin = this.props.domain.get(0);
-    const currentMax = this.props.domain.get(1);
-    const domainWidth = currentMax - currentMin;
-    const spreadDistance = domainWidth * ZOOM_FACTOR * 0.5;
-    const mouseDomainPosition = currentMin + mousePositionRatio * domainWidth;
-    const newDomain = List([mouseDomainPosition - spreadDistance, mouseDomainPosition + spreadDistance]);
-    this.changeDomain(newDomain);
+    this.onZoom(el, mouse, 1.0 / ZOOM_FACTOR);
   }
 
   public onZoomToFit(el, mouse) // zoom to fit all bars data or all points
@@ -368,7 +353,7 @@ class TransformCardChart extends TerrainComponent<Props>
       const max = this.state.pointsCache.max((a, b) => a.value - b.value).value;
       const min = this.state.pointsCache.min((a, b) => a.value - b.value).value;
       const tailWidth = this.state.pointsCache.size === 1 ? 1 : (max - min) * 0.05;
-      this.changeDomain(List([min - tailWidth, max + tailWidth]));
+      this.changeDomain(List([min - tailWidth, max + tailWidth]), true);
     }
   }
 

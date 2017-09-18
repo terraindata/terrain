@@ -240,8 +240,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
   {
     if (!isNaN(maxDomainLow) && !isNaN(maxDomainHigh) && maxDomainLow < maxDomainHigh)
     {
-      Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 0), maxDomainLow);
-      Actions.change(this._ikeyPath(this.props.keyPath, 'domain', 1), maxDomainHigh);
+      Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), List([maxDomainLow, maxDomainHigh]));
       this.handleDomainTextChange();
     }
   }
@@ -280,23 +279,16 @@ class TransformCardPeriscope extends TerrainComponent<Props>
         <div className='tp-text-wrapper'>
           <div className='tp-tb-left'>
             <Autocomplete
-              // value={this.props.maxDomain.get(0)}
               value={this.state.maxDomainLow.toString()}
               options={EMPTY_OPTIONS}
-              // validateValue={this.validateDomainLowValue}
-              // typeErrorMessage={this.state.maxDomainLowErrorText}
-              // help={'Edit the chart view range'}
               disabled={!this.props.canEdit}
               onChange={this.handleDomainLowChange}
             />
           </div>
           <div className='tp-tb-right'>
             <Autocomplete
-              // value={this.props.maxDomain.get(1)}
               value={this.state.maxDomainHigh.toString()}
               options={EMPTY_OPTIONS}
-              // validateValue={this.validateDomainHighValue}
-              // typeErrorMessage={this.state.maxDomainHighErrorText}
               disabled={!this.props.canEdit}
               onChange={this.handleDomainHighChange}
             />
