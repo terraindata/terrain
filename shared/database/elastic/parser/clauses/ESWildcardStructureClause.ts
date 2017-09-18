@@ -96,6 +96,8 @@ export default class ESWildcardStructureClause extends ESStructureClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
+    // for marking missing wildcard field errors
+    const marker = valueInfo.objectChildren[_.keys(valueInfo.objectChildren)[0]];
     const valueClause: ESClause = interpreter.config.getClause(this.valueType);
 
     const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
@@ -107,7 +109,7 @@ export default class ESWildcardStructureClause extends ESStructureClause
     // If no wildcard property was marked, accumulate and error (because this is required)
     if (!this.wildcardMarked)
     {
-      interpreter.accumulateError(null,
+      interpreter.accumulateError(marker !== undefined ? marker.propertyName : null,
         'Error: missing required wildcard field with value type of ' + valueClause.name);
     }
   }
