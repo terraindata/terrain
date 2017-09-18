@@ -109,7 +109,7 @@ const TransformChart = {
     innerSvg.append('g')
       .append('path')
       .attr('class', 'lines-bg')
-      .attr('fill', state.colors[1]);
+      .attr('fill', state.colors[0]);
 
     innerSvg.append('g')
       .append('path')
