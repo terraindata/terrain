@@ -69,6 +69,8 @@ import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
+import { Colors, fontColor } from '../../common/Colors';
+
 
 import './AlgorithmsColumn.less';
 
@@ -473,6 +475,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
             </div>
             <div
               className='library-item-line'
+              style={fontColor(Colors().text1)}
             >
               {
                 date === undefined ? 'There are no variants' :

@@ -59,8 +59,10 @@ import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryStore } from './../../../library/data/LibraryStore';
+import StyleTag from 'common/components/StyleTag';
 
-import { backgroundColor, Colors } from '../../../common/Colors';
+
+import { fontColor, backgroundColor, Colors } from '../../../common/Colors';
 
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -283,7 +285,10 @@ export class Tabs extends TerrainComponent<TabsProps> {
                   }
                 </div>
               }
-              <div className='tabs-action-piece'>
+              <div 
+                className='tabs-action-piece'
+                style={fontColor(Colors().text1)}
+              >
                 {
                   action.text
                 }
@@ -384,8 +389,20 @@ export class Tabs extends TerrainComponent<TabsProps> {
             <div className='tabs-shadow'></div>
           </div>
         </div>
+        <StyleTag
+            style={SVG_STYLE}
+          />
       </div>
     );
   }
 }
+
+const SVG_STYLE = {
+  '.tabs-container .tabs-actions .tabs-action svg': {
+     fill: Colors().altBg1;
+  }
+  '.tabs-container .tabs-actions .tabs-action': {
+     'border-color': Colors().altBg1;
+  }
+};
 export default Tabs;

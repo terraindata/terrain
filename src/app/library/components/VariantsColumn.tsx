@@ -70,6 +70,8 @@ import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 import StatusDropdown from './StatusDropdown';
+import { Colors, fontColor } from '../../common/Colors';
+
 
 const VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
@@ -397,6 +399,7 @@ class VariantsColumn extends TerrainComponent<Props>
             />
             <div
               className='library-item-line'
+              style={fontColor(Colors().text1)}
             >
               {
                 'Changed ' + Util.formatDate(variant.lastEdited)

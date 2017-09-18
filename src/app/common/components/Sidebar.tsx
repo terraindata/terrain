@@ -51,7 +51,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
-import { backgroundColor, Colors } from '../../common/Colors';
+import { backgroundColor, fontColor, Colors } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
@@ -123,6 +123,7 @@ export class Sidebar extends TerrainComponent<Props>
                   }
                   <div
                     className='sidebar-link-text'
+                    style={fontColor(Colors().text1)}
                   >
                     {
                       link.text

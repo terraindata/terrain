@@ -82,7 +82,7 @@ const TransformChart = {
 
     svg.append('rect')
       .attr('class', 'bg')
-      .attr('fill', Colors().altBg1);
+      .attr('fill', '#fff');
 
     svg.append('g')
       .attr('class', 'yLeftAxis');
@@ -301,7 +301,7 @@ const TransformChart = {
       .attr('x', scaleMin(scales.x))
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
-      .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY));
+      .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
   },
 
   _drawAxes(el, scales, width, height)
@@ -314,7 +314,7 @@ const TransformChart = {
       .orient('left');
     d3.select(el).select('.yLeftAxis')
       .attr('transform', 'translate(' + xMargin + ',0)')
-      .style('color', '#fff')
+      .style('color', '#000000')
       .call(yLeftAxis);
 
     const yRightAxis = d3.svg.axis()
@@ -854,14 +854,14 @@ const TransformChart = {
       .attr('x', menuX + 6)
       .attr('y', menuY + 14)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .text(text_x);
 
     crosshairs.append('text')
       .attr('x', menuX + 6)
       .attr('y', menuY + 14 * 2)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .text(text_y);
 
     const crosshairLines = d3.select(el).select('.inner-svg').insert('g', '.points').attr('class', 'crosshairs');
@@ -924,14 +924,14 @@ const TransformChart = {
       .attr('x', x + 6)
       .attr('y', y + 14)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .text(text_x);
 
     tooltip.append('text')
       .attr('x', x + 6)
       .attr('y', y + 14 * 2)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .text(text_y);
 
   },
@@ -1035,7 +1035,7 @@ const TransformChart = {
 
     div1.append('label')
       .text('X: ')
-      .attr('style', 'color: ' + Colors().altBg1);
+      .attr('style', 'color: ' + '#fff');
 
     div1.append('input')
       .attr('type', 'number')
@@ -1045,7 +1045,7 @@ const TransformChart = {
       .attr('value', f(value))
       .attr('raw_value', value)
       .attr('id', 'xVal')
-      .attr('style', 'background-color: ' + Colors().altBg1 + '; color: ' + colors[0])
+      .attr('style', 'background-color: ' + '#fff' + '; color: ' + colors[0])
       .on('change', function()
       {
         editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
@@ -1068,7 +1068,7 @@ const TransformChart = {
 
     div2.append('label')
       .text('Y: ')
-      .attr('style', 'color: ' + Colors().altBg1);
+      .attr('style', 'color: ' + '#fff');
 
     div2.append('input')
       .attr('type', 'number')
@@ -1078,7 +1078,7 @@ const TransformChart = {
       .attr('value', f(score))
       .attr('raw_value', score)
       .attr('id', 'yVal')
-      .attr('style', 'background-color: ' + Colors().altBg1 + '; color: ' + colors[0])
+      .attr('style', 'background-color: ' + '#fff' + '; color: ' + colors[0])
       .on('change', (value) =>
       {
         editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
@@ -1160,7 +1160,7 @@ const TransformChart = {
       .delay(100)
       .duration(50)
       .attr('opacity', 1)
-      .attr('fill', Colors().altBg1);
+      .attr('fill', '#fff');
 
     menu.append('circle')
       .attr('cx', mouse[0])
@@ -1228,7 +1228,7 @@ const TransformChart = {
     point
       .attr('cx', (d) => scales.realX(d['x']))
       .attr('cy', (d) => scales.realPointY(d['y']))
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('style', (d) => 'stroke: ' + (d['selected'] ? Colors().error : colors[0]))
       .attr('class', (d) =>
         'point' + (d['selected'] ? ' point-selected' : '')

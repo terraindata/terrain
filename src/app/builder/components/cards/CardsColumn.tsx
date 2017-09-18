@@ -62,6 +62,7 @@ import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { altStyle, Colors, fontColor } from '../../../common/Colors';
+import StyleTag from './../../../common/components/StyleTag';
 
 import { Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;
@@ -295,6 +296,9 @@ class CardsColumn extends TerrainComponent<Props>
             'There is a parsing error with your code.' || 'All good!'
           }
         </div>
+        <StyleTag
+          style={SVG_STYLE}
+        />
       </div>
     );
   }
@@ -310,6 +314,17 @@ class CardsColumn extends TerrainComponent<Props>
   }
 
 }
+
+const SVG_STYLE = {
+  '.cards-deck-knob .cards-deck-knob-icon': {
+    fill: Colors().altBg1;
+  }
+
+   '.cards-deck-knob .cards-deck-knob-icon &:hover': {
+    fill: Colors().bg3;
+    background: Colors().altBg1;
+  }
+};
 
 // <CardDropArea
 //   half={true}
@@ -357,6 +372,8 @@ class CardsColumn extends TerrainComponent<Props>
 //     );
 //   }
 // }
+
+
 
 // const CardsColumnInner = Dimensions()(_CardsColumnInner);
 

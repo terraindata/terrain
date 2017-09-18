@@ -137,7 +137,7 @@ const Periscope = {
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
-      .attr('fill', Colors().altBg1);
+      .attr('fill', '#fff');
   },
 
   _drawAxes(el, scales)
@@ -150,7 +150,7 @@ const Periscope = {
       .orient('bottom');
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
-      .attr('style', 'stroke: ' + Colors().altHighlight)
+      .attr('style', 'stroke: ' + '#fff')
       .call(bottomAxis);
   },
 
@@ -243,12 +243,12 @@ const Periscope = {
       .append('circle')
       .attr('class', 'handle')
       .attr('style', 'stroke: ' + Colors().altHighlight)
-      .attr('fill', Colors().altBg1);
+      .attr('fill', '#fff');
 
     handle
       .attr('cx', (d) => scales.x(d))
       .attr('cy', scaleMin(scales.barY))
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('style', 'stroke: ' + Colors().altHighlight)
       .attr('stroke-width', '3px')
       .attr('r', 10);
