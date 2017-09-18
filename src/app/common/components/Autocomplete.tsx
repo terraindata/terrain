@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression no-var-requires
 
 import './Autocomplete.less';
 
@@ -57,6 +57,8 @@ import * as ReactDOM from 'react-dom';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { altStyle, backgroundColor, Colors, couldHover } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+
+const InfoIcon = require('./../../../images/icon_info.svg');
 
 export interface Props
 {
@@ -323,6 +325,7 @@ class Autocomplete extends TerrainComponent<Props>
         className={classNames({
           [inputClassName]: true,
           'ac-input-disabled': this.props.disabled,
+          'ac-input-has-tooltip': this.props.help !== undefined,
         })}
         value={this.state.value}
         onChange={this.handleChange}
@@ -335,20 +338,28 @@ class Autocomplete extends TerrainComponent<Props>
 
     return (
       <div className='autocomplete'>
+        {inputElem}
         {
-          this.props.help === undefined ?
-            inputElem
-            :
-            tooltip(
-              inputElem,
-              {
-                title: this.props.help,
-                position: 'top-start',
-                key: this.props.helpIsError ? 'error' : 'nonerror',
-                theme: this.props.helpIsError ? 'error' : undefined,
-              },
-            )
+          this.props.help &&
+          <div className='tooltip-icon-positioning'>
+            {
+              tooltip(
+                <InfoIcon
+                  className={classNames({
+                    'tooltip-icon': true,
+                    'tooltip-is-error': this.props.helpIsError,
+                  })}
+                />,
+                {
+                  title: this.props.help,
+                  position: 'top-end',
+                  theme: this.props.helpIsError ? 'error' : undefined,
+                }
+              )
+            }
+          </div>
         }
+
         {!open ? null :
           <div
             className={classNames({
