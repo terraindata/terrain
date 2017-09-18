@@ -55,9 +55,6 @@ export class Format
   template: string = '';
   showRaw: boolean = false;
   showField: boolean = false;
-  latitude: string = ' ';
-  longitude: string = ' ';
-
   set: (f: string, v: any) => Format;
   setIn: (f: string[], v: any) => Format;
 }

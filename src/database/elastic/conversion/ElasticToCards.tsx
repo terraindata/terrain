@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions no-console no-var-requires
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-console
 
 import { List } from 'immutable';
 import * as _ from 'lodash';

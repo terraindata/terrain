@@ -55,7 +55,6 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { _Format, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
-import Autocomplete from './../../../common/components/Autocomplete';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -299,7 +298,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onFormatChange={this.handleFormatChange}
                       primaryKeys={config.primaryKeys}
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
-                      allFields={this.props.fields}
                     />
                     :
                     <div className='results-config-placeholder' style={placeholderStyle}>
@@ -325,7 +323,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                       onFormatChange={this.handleFormatChange}
                       primaryKeys={config.primaryKeys}
                       onPrimaryKeysChange={this.handlePrimaryKeysChange}
-                      allFields={this.props.fields}
                     />
                     :
                     <div className='results-config-placeholder' style={placeholderStyle}>
@@ -355,7 +352,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                         onFormatChange={this.handleFormatChange}
                         primaryKeys={config.primaryKeys}
                         onPrimaryKeysChange={this.handlePrimaryKeysChange}
-                        allFields={this.props.fields}
                       />
                     </div>,
                   )
@@ -383,7 +379,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
                   onFormatChange={this.handleFormatChange}
                   primaryKeys={config.primaryKeys}
                   onPrimaryKeysChange={this.handlePrimaryKeysChange}
-                  allFields={this.props.fields}
                 />,
               )
             }
@@ -407,7 +402,6 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
 
 interface ResultsConfigResultProps
 {
-  allFields: List<string>;
   field: string;
   is?: string; // 'title', 'score', 'field', or null
   onHover?: (index: number, field: string) => void;

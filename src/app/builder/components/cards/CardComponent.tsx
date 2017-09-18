@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires class-name no-empty max-line-length no-unused-expression
+// tslint:disable:strict-boolean-expressions no-var-requires class-name no-empty max-line-length no-unused-expression
 
 import './CardStyle.less';
 
