@@ -215,11 +215,14 @@ const TransformChart = {
         }
       });
 
-      // Stop normal right click functioning from happening
-      d3.select(el).select('.inner-svg').on('contextmenu', () =>
-      {
-        d3.event['preventDefault']();
-      });
+      d3.select(el).select('.inner-svg').on('contextmenu',
+        this._rightClickChartFactory(
+          el,
+          state.contextOptions,
+          scales,
+          state.colors,
+        ),
+      );
 
       // Delete selected points on del/backspace key press
       const deletePoints = this._deletePoints;
@@ -1170,6 +1173,20 @@ const TransformChart = {
       .transition()
       .duration(50);
 
+    menu.append('rect')
+      .attr('x', x)
+      .attr('y', mouse[1] - 10)
+      .attr('rx', 5)
+      .attr('ry', 5)
+      .attr('width', 0)
+      .attr('height', 0)
+      .transition()
+      .duration(50)
+      .attr('width', w)
+      .attr('height', h)
+      .attr('fill', 'rgba(0,0,0,0)')
+      .attr('class', 'menu-hover-rect');
+
     const isvg = d3.select(el).select('.inner-svg');
     menu.on('mousedown', () =>
     {
@@ -1188,6 +1205,70 @@ const TransformChart = {
   {
     drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales, colors);
     return false;
+  },
+
+  // menuOptions maps menu text to click handlers
+  _rightClickChartFactory: (el, menuOptions, scales, colors) => function(chart)
+  {
+    // Stop normal right click functioning from happening
+    d3.event['preventDefault']();
+    if (d3.event.target.classList.contains('point'))
+    {
+      return;
+    }
+
+    const mouse = d3.mouse(this);
+    d3.select(el).select('.right-menu').remove();
+    d3.select(el).selectAll('.transform-tooltip').remove();
+    d3.select(el).select('.point-edit-menu').remove();
+
+    const menu = d3.select(el)
+      .append('div')
+      .attr('width', 0)
+      .attr('height', 0)
+      .attr('class', 'right-menu context-menu')
+      .attr('style', 'background: ' + colors[0]);
+
+    const bounds = d3.select(el)[0][0]['getBoundingClientRect']();
+    const containerWidth = parseFloat(d3.select(el).select('.inner-svg').attr('width'));
+    const containerHeight = parseFloat(d3.select(el).select('.inner-svg').attr('height'));
+    const dx = (bounds.width - containerWidth) / 2;
+    const dy = (bounds.height - containerHeight) / 2;
+
+    const clipAllowanceWidth = 140 - dx; // should approximately match context-menu max-width
+    const clipAllowanceHeight = 20 * Object.keys(menuOptions).length - dy; // should approximately match context-menu-item height
+
+    if (mouse[0] + clipAllowanceWidth < containerWidth)
+    {
+      menu.style('left', `${mouse[0] + dx + 2}px`);
+    }
+    else
+    {
+      menu.style('right', `${(containerWidth - mouse[0]) + dx}px`);
+    }
+
+    if (mouse[1] + clipAllowanceHeight < containerHeight)
+    {
+      menu.style('top', `${mouse[1] + dy - 2}px`);
+    }
+    else
+    {
+      menu.style('bottom', `${(containerHeight - mouse[1]) + dy + 2}px`);
+    }
+
+    menu.on('mousedown', () =>
+    {
+      d3.select('.right-menu').remove();
+    });
+
+    for (const menuText of Object.keys(menuOptions))
+    {
+      const item = menu.append('div');
+      item.attr('style', `display: block; color: ${Colors().altBg1}`)
+        .attr('class', 'chart-context-menu-item')
+        .text(menuText);
+      item.on('mousedown', () => { menuOptions[menuText](d3.select(el), d3.mouse(this)); });
+    }
   },
 
   _mouseoverFactory: (el, scales, colors, drawToolTip) => function(point)
