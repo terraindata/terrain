@@ -76,7 +76,6 @@ const esMapDistanceTypes = [
 ];
 
 export const elasticDistance = _card({
-
   distance: 0,
   key: 'geo_distance',
   field: 'location',
@@ -94,13 +93,13 @@ export const elasticDistance = _card({
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      // TODO Geo point needs to coordinate with what is in map ...
+      const point = block['geopoint'].toJS !== undefined ? block['geopoint'].toJS() : block['geopoint'];
       return {
         distance: (block['distance']).toString() + block['distanceUnit'],
         distance_type: block['distanceType'],
         [block['field']]: {
-          lat: block['geopoint'][0],
-          lon: block['geopoint'][1],
+          lat: point[0],
+          lon: point[1],
         },
       };
     },
@@ -131,7 +130,7 @@ export const elasticDistance = _card({
           {
             displayType: DisplayType.DROPDOWN,
             key: 'distanceUnit',
-            options: List(_.keys(esMapDistanceUnits)),
+            options: List(_.keys(esMapDistanceUnits) as string[]),
             optionsDisplayName: Immutable.Map<any, string>(esMapDistanceUnits) as any,
             dropdownUsesRawValues: true,
             autoDisabled: true,

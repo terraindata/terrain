@@ -435,13 +435,35 @@ class MapComponent extends TerrainComponent<Props>
     return reactMap.leafletElement;
   }
 
-  public renderMarker(address, location, key?)
+  public markerIconWithStyle(style)
   {
+    const styledIcon = divIcon({
+      html: `<?xml version="1.0" encoding="iso-8859-1"?><!-- Generator: Adobe Illustrator 16.0.0,
+        SVG Export Plug-In . SVG Version: 6.00 Build 0)
+        --><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+        "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class='map-marker-icon' version="1.1" id="Capa_1"
+        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
+        viewBox="0 0 512 512" style="enable-background:new 0 0 512 512; ${style}" xml:space="preserve">
+        <g><path d="M256,0C167.641,0,96,71.625,96,160c0,24.75,5.625,48.219,15.672,69.125C112.234,230.313,256,512,256,512l142.594-279.375
+        C409.719,210.844,416,186.156,416,160C416,71.625,344.375,0,256,0z M256,256c-53.016,0-96-43-96-96s42.984-96,96-96
+        c53,0,96,43,96,96S309,256,256,256z"/>
+        </g></svg>
+    `,
+      iconSize: [40, 40],
+      className: 'map-marker-container',
+    });
+    return styledIcon;
+  }
+
+  public renderMarker(address, location, color?, key?)
+  {
+    const style = 'fill: ' + String(color) + ' !important;';
     return (
       <Marker
         position={location}
-        icon={markerIcon}
+        icon={color !== undefined ? this.markerIconWithStyle(style) : markerIcon}
         key={key}
+        title={address}
       >
         {
           address !== '' && address !== undefined ?
@@ -462,7 +484,7 @@ class MapComponent extends TerrainComponent<Props>
     {
       const location = MapUtil.getCoordinatesFromGeopoint(spotlight.fields[this.props.field]);
       const address = spotlight.fields['_id'];
-      return this.renderMarker(address, location, address + '_' + String(index));
+      return this.renderMarker(address, location, spotlight.color, address + '_' + String(index));
     }
     return null;
   }
