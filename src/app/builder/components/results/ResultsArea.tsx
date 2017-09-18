@@ -313,19 +313,22 @@ class ResultsArea extends TerrainComponent<Props>
       // Maybe only do this is there is a map field in the config ?
       const geoDistances = this.props.query.tql.match(/"geo_distance": \{[^\}]*\}/g);
       let locations = {};
-      geoDistances.forEach((geoDist) =>
+      if (geoDistances !== undefined && geoDistances !== null)
       {
-        geoDist = '{' + geoDist + '}}';
-        const obj = JSON.parse(geoDist);
-        // find field that isn't distance or distance_type
-        _.keys(obj.geo_distance).forEach((key) =>
+        geoDistances.forEach((geoDist) =>
         {
-          if (key !== 'distance' && key !== 'distance_type')
+          geoDist = '{' + geoDist + '}}';
+          const obj = JSON.parse(geoDist);
+          // find field that isn't distance or distance_type
+          _.keys(obj.geo_distance).forEach((key) =>
           {
-            locations[key] = obj.geo_distance[key];
-          }
+            if (key !== 'distance' && key !== 'distance_type')
+            {
+              locations[key] = obj.geo_distance[key];
+            }
+          });
         });
-      });
+      }
       resultsContent = (
         <InfiniteScroll
           className={classNames({

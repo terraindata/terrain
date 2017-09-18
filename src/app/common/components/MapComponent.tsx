@@ -56,14 +56,14 @@ import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 're
 import PlacesAutocomplete from 'react-places-autocomplete';
 
 import Actions from '../../builder/data/BuilderActions';
-import Autocomplete from './Autocomplete';
-import RoutingMachine from './RoutingMachine';
-const { geocodeByAddress, geocodeByLatLng, getLatLng } = require('../../util/MapUtil.js');
+import MapUtil from '../../util/MapUtil';
 import { cardStyle, Colors, fontColor, getCardColors } from '../Colors';
+import Autocomplete from './Autocomplete';
 import BuilderTextbox from './BuilderTextbox';
 import CheckBox from './CheckBox';
 import Dropdown from './Dropdown';
 import './MapComponentStyle.less';
+import RoutingMachine from './RoutingMachine';
 import TerrainComponent from './TerrainComponent';
 
 export interface Props
@@ -86,6 +86,8 @@ export interface Props
   hideSearchSettings?: boolean;
   inputs?: any;
   textKeyPath?: KeyPath;
+  spotlights?: any;
+  field?: string;
 }
 
 const UNIT_CONVERSIONS =
@@ -199,7 +201,7 @@ class MapComponent extends TerrainComponent<Props>
       if ((nextProps.address === undefined || nextProps.address === '') && !this.state.usingInput)
       {
         // TODO Make this use the correct geo coder
-        geocodeByLatLng('google', { lat: nextProps.location[0], lng: nextProps.location[1] })
+        MapUtil.geocodeByLatLng('google', { lat: nextProps.location[0], lng: nextProps.location[1] })
           .then((results: any) =>
           {
             if (results[0] !== undefined)
@@ -265,13 +267,13 @@ class MapComponent extends TerrainComponent<Props>
     }
     if (this.props.geocoder === 'photon')
     {
-      geocodeByAddress('photon', this.state.address, this.onPhotonChange);
+      MapUtil.geocodeByAddress('photon', this.state.address, this.onPhotonChange);
     }
     else
     {
-      geocodeByAddress('google', this.state.address)
-        .then((results) => getLatLng(results[0]))
-        .then((latLng) => this.handleLocationChange([latLng.lat, latLng.lng], this.state.address))
+      MapUtil.geocodeByAddress('google', this.state.address)
+        .then((results) => MapUtil.getLatLng(results[0]))
+        .then((latLng: any) => this.handleLocationChange([latLng.lat, latLng.lng], this.state.address))
         .catch((error) => this.setState({ error }));
     }
   }
@@ -314,11 +316,11 @@ class MapComponent extends TerrainComponent<Props>
 
       if (this.props.geocoder === 'photon')
       {
-        geocodeByLatLng('photon', { lat, lng }, this.onPhotonReverseChange);
+        MapUtil.geocodeByLatLng('photon', { lat, lng }, this.onPhotonReverseChange);
       }
       else
       {
-        geocodeByLatLng('google', { lat, lng })
+        MapUtil.geocodeByLatLng('google', { lat, lng })
           .then((results: any) =>
           {
             if (results[0] === undefined)
@@ -433,12 +435,13 @@ class MapComponent extends TerrainComponent<Props>
     return reactMap.leafletElement;
   }
 
-  public renderMarker(address, location)
+  public renderMarker(address, location, key?)
   {
     return (
       <Marker
         position={location}
         icon={markerIcon}
+        key={key}
       >
         {
           address !== '' && address !== undefined ?
@@ -450,6 +453,18 @@ class MapComponent extends TerrainComponent<Props>
         }
       </Marker>
     );
+  }
+
+  // TODO Add checks and colors
+  public renderSpotlightMarkers(spotlight, index)
+  {
+    if (spotlight !== undefined && typeof spotlight === 'object')
+    {
+      const location = MapUtil.getCoordinatesFromGeopoint(spotlight.fields[this.props.field]);
+      const address = spotlight.fields['_id'];
+      return this.renderMarker(address, location, address + '_' + String(index));
+    }
+    return null;
   }
 
   public setZoomLevel(viewport?: { center: [number, number], zoom: number })
@@ -505,6 +520,12 @@ class MapComponent extends TerrainComponent<Props>
           {
             this.props.secondLocation !== undefined && this.props.showDirectDistance ?
               this.renderMarker(this.props.secondAddress, this.props.secondLocation)
+              :
+              null
+          }
+          {
+            this.props.spotlights !== undefined && this.props.spotlights !== null && this.props.spotlights.size > 0 ?
+              _.map(this.props.spotlights.toJS(), this.renderSpotlightMarkers)
               :
               null
           }

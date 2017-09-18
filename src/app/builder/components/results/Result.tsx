@@ -61,8 +61,8 @@ import { spotlightAction } from '../../data/SpotlightStore';
 import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 
+import MapUtil from '../../../util/MapUtil';
 import { Result } from './ResultTypes';
-const { decodeGeohash } = require('../../../util/MapUtil.js');
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -406,45 +406,6 @@ export function getResultName(result: Result, config: ResultsConfig, locations?:
   return getResultValue(result, nameField, config, locations);
 }
 
-function getLatLon(value: any)
-{
-  let lat: number;
-  let lon: number;
-  // string = geohash or 0,0 format
-  if (typeof value === 'string')
-  {
-    if (value.split(',').length > 1)
-    {
-      const coords = value.split(',');
-      // have some sort of check to make sure this is ok ?
-      lat = parseFloat(coords[0].replace(/ /g, ''));
-      lon = parseFloat(coords[1].replace(/ /g, ''));
-    }
-    else
-    {
-      const coords = decodeGeohash(value);
-      if (coords !== null)
-      {
-        lat = coords.lat;
-        lon = coords.lon;
-      }
-    }
-  }
-  // object type for geopoint
-  else if (value.lat !== undefined && value.lon !== undefined)
-  {
-    lat = value.lat;
-    lon = value.lon;
-  }
-  // array type for geopoint
-  else if (value[0] !== undefined && value[1] !== undefined)
-  {
-    lat = value[0];
-    lon = value[1];
-  }
-  return [lat, lon];
-}
-
 export function ResultFormatValue(field: string, value: any, config: ResultsConfig,
   overrideFormat?: any, locations?: { [field: string]: any }): any
 {
@@ -508,11 +469,11 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
         );
 
       case 'map':
-        const location = getLatLon(value);
+        const location = MapUtil.getCoordinatesFromGeopoint(value);
         let secondLocation: [number, number];
         if (locations !== undefined && locations[field] !== undefined)
         {
-          secondLocation = getLatLon(locations[field]) as [number, number];
+          secondLocation = MapUtil.getCoordinatesFromGeopoint(locations[field]) as [number, number];
         }
         return (
           <div className='result-field-value-map-wrapper'>

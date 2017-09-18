@@ -52,12 +52,11 @@ import * as _ from 'lodash';
 // TODO change / remove
 import Query from '../../../items/types/Query';
 
+import MapUtil from '../../../../src/app/util/MapUtil';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
-
-const { decodeGeohash } = require('../../../../src/app/util/MapUtil.js');
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
@@ -206,40 +205,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       }
     });
     const fieldValue = valueInfo.value[field];
-    let lat;
-    let lon;
-    // string = geohash or 0,0 format
-    if (typeof fieldValue === 'string')
-    {
-      if (fieldValue.split(',').length > 1)
-      {
-        const coords = fieldValue.split(',');
-        // have some sort of check to make sure this is ok ?
-        lat = parseFloat(coords[0].replace(/ /g, ''));
-        lon = parseFloat(coords[1].replace(/ /g, ''));
-      }
-      else
-      {
-        const coords = decodeGeohash(fieldValue);
-        if (coords !== null)
-        {
-          lat = coords.lat;
-          lon = coords.lon;
-        }
-      }
-    }
-    // object type for geopoint
-    else if (fieldValue.lat !== undefined && fieldValue.lon !== undefined)
-    {
-      lat = fieldValue.lat;
-      lon = fieldValue.lon;
-    }
-    // array type for geopoint
-    else if (fieldValue[0] !== undefined && fieldValue[1] !== undefined)
-    {
-      lat = fieldValue[0];
-      lon = fieldValue[1];
-    }
+    const coords = MapUtil.getCoordinatesFromGeopoint(fieldValue);
     return make(
       Blocks, 'elasticDistance',
       {
@@ -247,7 +213,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         distanceType,
         distanceUnit,
         field,
-        geopoint: [lat, lon],
+        geopoint: coords,
       },
       true);
   }

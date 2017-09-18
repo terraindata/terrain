@@ -58,6 +58,7 @@ import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderActions from '../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../data/BuilderStore';
+import SpotlightStore from '../data/SpotlightStore';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 
@@ -91,14 +92,21 @@ class BuilderComponent extends TerrainComponent<Props>
   {
     showExpanded: boolean,
     inputs: any,
+    spotlights: any,
   } = {
     showExpanded: false,
     inputs: null,
+    spotlights: null,
   };
 
   public constructor(props: Props)
   {
     super(props);
+    this._subscribe(SpotlightStore, {
+      isMounted: false,
+      storeKeyPath: ['spotlights'],
+      stateKey: 'spotlights',
+    });
     this._subscribe(BuilderStore, {
       stateKey: 'builderState',
       updater: (builderState: BuilderState) =>
@@ -391,7 +399,7 @@ class BuilderComponent extends TerrainComponent<Props>
         break;
       case DisplayType.MAP:
         const MapComp = d.component as any;
-        const { distance, distanceUnit, geopoint, map_text } = this.props.data;
+        const { distance, distanceUnit, geopoint, map_text, field } = this.props.data;
         content = (
           <div
             key={key}
@@ -415,6 +423,8 @@ class BuilderComponent extends TerrainComponent<Props>
                   hideSearchSettings: true,
                   inputs: this.state.inputs,
                   textKeyPath: this._ikeyPath(parentKeyPath, 'map_text'),
+                  spotlights: this.state.spotlights,
+                  field,
                 },
               )
             }
