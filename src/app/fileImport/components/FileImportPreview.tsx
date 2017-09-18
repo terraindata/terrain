@@ -55,6 +55,8 @@ import { browserHistory } from 'react-router';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
+import { ESParseTreeToCode } from './../../../database/elastic/conversion/ParseElasticQuery';
+import Query from './../../../items/types/Query';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -100,7 +102,8 @@ export interface Props
   exporting: boolean;
   exportRank: boolean;
 
-  query?: string;
+  query?: Query;
+  inputs?: List<any>;
   serverId?: number;
   variantName?: string;
   filesize?: number;
@@ -173,8 +176,10 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
-
-    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    if (this.props.router !== undefined)
+    {
+      this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -597,20 +602,24 @@ class FileImportPreview extends TerrainComponent<Props>
     this.confirmedLeave = true;
     if (this.props.exporting)
     {
-      const dbName = JSON.parse(this.props.query)['index'];
+      const stringQuery: string = ESParseTreeToCode(this.props.query.parseTree.parser, { replaceInputs: true }, this.props.inputs);
+      const parsedQuery = JSON.parse(stringQuery);
+      const dbName = parsedQuery['index'];
+
       if (dbName === undefined || dbName === '')
       {
         this.setError('Index must be selected in order to export results');
         return;
       }
       Actions.exportFile(
-        this.props.query,
+        stringQuery,
         this.props.serverId,
         dbName,
         this.props.exportRank,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,
         this.handleFileExportSuccess,
-        this.handleFileExportError);
+        this.handleFileExportError,
+      );
     }
     else
     {

@@ -61,6 +61,7 @@ export enum DisplayType
   FLEX, // a single row, doesn't require a key
   COMPONENT,
   LABEL, // strict text to paste in to HTML
+  EXPANDABLE,
 }
 
 export interface RowDisplay
@@ -137,6 +138,12 @@ export interface Display
   requiresBuilderState?: boolean;
 
   handleCardDrop?: (type: string) => any;
+
+  // for expandable sections of display
+  // section that toggles whether or not expanded section is visible
+  expandToggle?: Display | Display[];
+  // section shown or hidden by the toggle
+  expandContent?: Display | Display[];
 }
 
 // Section: Re-useable displays

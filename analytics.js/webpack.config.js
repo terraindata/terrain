@@ -44,66 +44,49 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+var webpack = require("webpack");
+var path = require("path");
 
-import * as Util from '../Util';
-import { EventConfig, Events } from './Events';
-
-export const events: Events = new Events();
-
-const Router = new KoaRouter();
-
-// Get an event tracker.
-Router.post('/', async (ctx, next) =>
+module.exports =
 {
-  ctx.body = await events.JSONHandler(ctx.request.ip, ctx.request.body.body);
-});
+    entry: "./lib/analytics.ts",
+    devtool: "cheap-module-source-map",
 
-// Handle client response for event tracker
-Router.post('/update/', async (ctx, next) =>
-{
-  try
-  {
-    const event: EventConfig =
-      {
-        id: ctx.request.body['id'],
-        ip: ctx.request.ip,
-        message: ctx.request.body['message'],
-        payload: ctx.request.body['payload'],
-        type: ctx.request.body['type'],
-        url: ctx.request.body['url'],
-      };
-    // TODO in production, use this instead
-    // await events.decodeMessage(event);
-    // ctx.body = '';
-    if (await events.decodeMessage(event))
+    output:
     {
-      ctx.body = 'Success'; // for dev/testing purposes only
-    }
-    else
+        path: __dirname,
+        publicPath: "/build/",
+        filename: "bundle.js",
+    },
+
+    resolve:
     {
-      ctx.body = '';
-    }
-  }
-  catch (e)
-  {
-    ctx.body = '';
-  }
+        extensions: [ ".js", ".ts", ".json" ],
+    },
 
-});
+    module:
+    {
+        rules:
+        [
+            {
+                test: /\.ts(x?)$/,
+                exclude: [/node_modules/],
+                loader:
+                    "ts-loader?happyPackMode=true"
+                    + JSON.stringify({
+                        compilerOptions: {
+                        },
+                    }),
+            },
+            {
+                test: /\.js(x?)$/,
+                exclude: [/node_modules/],
+                loader: ""
+            },
+        ],
+    },
 
-Router.get('/variants/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const requestObj = JSON.parse(JSON.stringify(ctx.request.query));
-  Util.verifyParameters(requestObj, ['start', 'end', 'eventid']);
-  if (!ctx.params.id)
-  {
-    throw new Error('missing variant ID');
-  }
-  winston.info('getting events for variant ID ' + String(ctx.params.id));
-  ctx.body = await events.getEventData(Number(ctx.params.id), ctx.request.query);
-});
-
-export default Router;
+    plugins:
+    [
+    ],
+};
