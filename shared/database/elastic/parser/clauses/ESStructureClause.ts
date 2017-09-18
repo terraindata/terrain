@@ -107,12 +107,11 @@ export default class ESStructureClause extends ESClause
 
         if (!this.structure.hasOwnProperty(name))
         {
-          interpreter.accumulateError(viTuple.propertyName,
-            'Unknown property \"' + name +
-            '\". Expected one of these properties: ' +
-            JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
-            true);
-          return;
+          const shouldReturn = this.unknownPropertyName(interpreter, children, viTuple);
+          if (shouldReturn)
+          {
+            return;
+          }
         }
         else if (viTuple.propertyValue === null)
         {
@@ -124,6 +123,16 @@ export default class ESStructureClause extends ESClause
           viTuple.propertyValue.clause = valueClause;
         }
       });
+  }
+
+  protected unknownPropertyName(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, viTuple: ESPropertyInfo)
+  {
+    interpreter.accumulateError(viTuple.propertyName,
+      'Unknown property \"' + String(name) +
+      '\". Expected one of these properties: ' +
+      JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
+      true);
+    return true;
   }
 
   protected validateRequiredMembers(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, valueInfo: ESValueInfo)
