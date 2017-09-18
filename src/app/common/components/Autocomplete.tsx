@@ -325,6 +325,7 @@ class Autocomplete extends TerrainComponent<Props>
         className={classNames({
           [inputClassName]: true,
           'ac-input-disabled': this.props.disabled,
+          'ac-input-has-tooltip': this.props.help !== undefined,
         })}
         value={this.state.value}
         onChange={this.handleChange}
