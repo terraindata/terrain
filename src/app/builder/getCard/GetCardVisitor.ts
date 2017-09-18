@@ -82,6 +82,7 @@ import ESStringClause from '../../../../shared/database/elastic/parser/clauses/E
 import ESStructureClause from '../../../../shared/database/elastic/parser/clauses/ESStructureClause';
 import ESTypeClause from '../../../../shared/database/elastic/parser/clauses/ESTypeClause';
 import ESVariantClause from '../../../../shared/database/elastic/parser/clauses/ESVariantClause';
+import ESWildcardStructureClause from '../../../../shared/database/elastic/parser/clauses/ESWildcardStructureClause';
 import EQLConfig from '../../../../shared/database/elastic/parser/EQLConfig';
 import ESClauseVisitor from '../../../../shared/database/elastic/parser/ESClauseVisitor';
 
@@ -559,6 +560,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     });
   }
 
+  public visitESWildcardStructureClause(clause: ESWildcardStructureClause): any
+  {
+    return this.visitESStructureClause(clause);
+  }
+
   public visitESStructureClause(clause: ESStructureClause): any
   {
     const accepts = this.getCardTypes(_.keys(clause.structure), clause);
@@ -620,7 +626,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
       return config;
     };
-
     return GetCardVisitor.seedCard(clause,
       {
         cards: List([]),
@@ -646,7 +651,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
                   cardTypesToKeys[cardType] = key;
                 },
                 );
-
                 cardTypes.map((cardType) =>
                   result.push({
                     text: key + ': ' + (backend.blocks[cardType].static['title'] as string),

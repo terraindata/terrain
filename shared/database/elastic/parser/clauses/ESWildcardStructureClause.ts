@@ -54,19 +54,27 @@ import ESJSONType from '../ESJSONType';
 import ESPropertyInfo from '../ESPropertyInfo';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
+import ESStructureClause from './ESStructureClause';
 
 /**
- * A clause with a well-defined structure.
+ * A clause that extends ESStructureClause by allowing for a wildcard value.
  */
-export default class ESStructureClause extends ESClause
+export default class ESWildcardStructureClause extends ESStructureClause
 {
   public structure: { [name: string]: string };
 
-  public constructor(type: string, structure: { [name: string]: string }, settings?: ESClauseSettings,
-    clauseType: ESClauseType = ESClauseType.ESStructureClause)
+  public nameType: string;
+  public valueType: string;
+  public wildcardMarked: boolean = false;
+
+  public constructor(type: string, structure: { [name: string]: string }, nameType: string, valueType: string, settings?: ESClauseSettings,
+    clauseType: ESClauseType = ESClauseType.ESWildcardStructureClause)
   {
-    super(type, clauseType, settings);
+    super(type, structure, settings, clauseType);
+    // super(type, clauseType, settings);
     this.structure = structure;
+    this.nameType = nameType;
+    this.valueType = valueType;
     this.setDefaultProperty('template', () => ({}));
   }
 
@@ -81,94 +89,51 @@ export default class ESStructureClause extends ESClause
     this.checkValidAndUniqueProperties(this.required, 'required');
     this.checkValidAndUniqueProperties(this.suggestions, 'suggestions');
     this.checkValidAndUniqueProperties(Object.keys(this.template), 'template');
+
+    config.declareType(this.nameType);
+    config.declareType(this.valueType);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
+    // for marking missing wildcard field errors
+    const marker = valueInfo.objectChildren[_.keys(valueInfo.objectChildren)[0]];
+    const valueClause: ESClause = interpreter.config.getClause(this.valueType);
+    this.wildcardMarked = false;
 
-    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
-    const propertyClause: ESClause = interpreter.config.getClause('property');
+    super.mark(interpreter, valueInfo);
 
-    this.validateRequiredMembers(interpreter, children, valueInfo);
-
-    // mark properties
-    valueInfo.forEachProperty(
-      (viTuple: ESPropertyInfo): void =>
-      {
-        viTuple.propertyName.clause = propertyClause;
-
-        if (!this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string))
-        {
-          return;
-        }
-
-        const name: string = viTuple.propertyName.value as string;
-
-        if (!this.structure.hasOwnProperty(name))
-        {
-          const shouldReturn = this.unknownPropertyName(interpreter, children, viTuple);
-          if (shouldReturn)
-          {
-            return;
-          }
-        }
-        else if (viTuple.propertyValue === null)
-        {
-          interpreter.accumulateError(viTuple.propertyName, 'Property without valid value.');
-        }
-        else
-        {
-          const valueClause: ESClause = interpreter.config.getClause(this.structure[name]);
-          viTuple.propertyValue.clause = valueClause;
-        }
-      });
+    // If no wildcard property was marked, accumulate and error (because this is required)
+    if (!this.wildcardMarked)
+    {
+      interpreter.accumulateError(marker !== undefined ? marker.propertyName : null,
+        'Error: missing required wildcard field with value type of ' + valueClause.name);
+    }
   }
 
   protected unknownPropertyName(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, viTuple: ESPropertyInfo)
   {
-    interpreter.accumulateError(viTuple.propertyName,
-      'Unknown property \"' + String(name) +
-      '\". Expected one of these properties: ' +
-      JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
-      true);
-    return true;
-  }
-
-  protected validateRequiredMembers(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, valueInfo: ESValueInfo)
-  {
-    // check required members
-    this.required.forEach((name: string): void =>
+    const nameClause: ESClause = interpreter.config.getClause(this.nameType);
+    const valueClause: ESClause = interpreter.config.getClause(this.valueType);
+    // check if this is the wild card field
+    if (!this.wildcardMarked)
     {
-      if (children[name] === undefined)
+      viTuple.propertyName.clause = nameClause;
+      if (viTuple.propertyValue !== null)
       {
-        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+        viTuple.propertyValue.clause = valueClause;
       }
-    });
-  }
-
-  protected checkValidAndUniqueProperties(names: string[], listName: string): void
-  {
-    const seen = new Set();
-    names.forEach((name) =>
+      this.wildcardMarked = true;
+      return false;
+    }
+    else
     {
-      if (!this.structure.hasOwnProperty(name))
-      {
-        throw new Error('Unknown property "' +
-          name + '" found in ' + listName + ' list for clause "' +
-          this.name +
-          '".');
-      }
-
-      if (seen.has(name))
-      {
-        throw new Error('Duplicate property "' +
-          name + '" found in ' + listName + ' list for clause "' +
-          this.name +
-          '".');
-      }
-
-      seen.add(name);
-    });
+      interpreter.accumulateError(viTuple.propertyName,
+        'Unknown property \"' + String(name) +
+        '\". Expected one of these properties: ' +
+        JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
+        true);
+      return true;
+    }
   }
 }
