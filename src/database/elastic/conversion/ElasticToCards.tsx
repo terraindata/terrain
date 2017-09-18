@@ -193,7 +193,11 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
     {
       distanceUnit = 'm';
     }
-    const distanceType = valueInfo.objectChildren.distance_type.propertyValue.value;
+    let distanceType = 'arc';
+    if (valueInfo.objectChildren.distance_type !== undefined)
+    {
+      distanceType = valueInfo.objectChildren.distance_type.propertyValue.value;
+    }
 
     // Get variable name for field
     let field: string;

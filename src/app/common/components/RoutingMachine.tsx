@@ -56,7 +56,7 @@ export interface Props
 {
   to: [number, number] | number[];
   from: [number, number] | number[];
-  getMapRef: () => any;
+  getMapRef: () => any; // returns a reference to a leaflet map component
   markerIcon: any;
   setTrafficData: (distance: number, time: number) => void;
 }

@@ -87,11 +87,11 @@ const MapUtil = {
     }
     else
     {
-      MapUtil.ajax(callback, { q: address }, 'http://localhost:2322/api?');
+      MapUtil.ajax(callback, { q: address }, 'http://localhost:2322/api?', false);
     }
   },
 
-  ajax(callback, params, url: string)
+  ajax(callback, params, url: string, reverse: boolean)
   {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url + MapUtil.buildQueryString(params), true);
@@ -104,7 +104,20 @@ const MapUtil = {
         {
           let raw = xhr.response;
           raw = JSON.parse(raw);
-          callback.call(xhr, raw);
+          let value;
+          if (reverse)
+          {
+            const { housenumber, street, city, state, country } = raw.features[0].properties;
+            const { lat, lon } = raw.features[0].geometry.coordinates;
+            const address = String(housenumber) + ' ' + String(street) + ', ' +
+              String(city) + ', ' + String(state) + ', ' + String(country);
+            value = { address, location: [lat, lon] };
+          }
+          else
+          {
+            value = raw.features[0].geometry.coordinates;
+          }
+          callback.call(xhr, value);
         }
       }
     };
@@ -180,7 +193,7 @@ const MapUtil = {
     }
     else
     {
-      MapUtil.ajax(callback, { lat: location.lat, lon: location.lng }, 'http://localhost:2322/reverse?');
+      MapUtil.ajax(callback, { lat: location.lat, lon: location.lng }, 'http://localhost:2322/reverse?', true);
     }
   },
 

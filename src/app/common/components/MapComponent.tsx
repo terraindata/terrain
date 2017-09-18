@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands prefer-const
 
 import * as classNames from 'classnames';
-import GoogleMap from 'google-map-react';
 import { List } from 'immutable';
 import { divIcon, point } from 'leaflet';
 import * as _ from 'lodash';
@@ -57,39 +56,45 @@ import PlacesAutocomplete from 'react-places-autocomplete';
 
 import Actions from '../../builder/data/BuilderActions';
 import MapUtil from '../../util/MapUtil';
-import { cardStyle, Colors, fontColor, getCardColors } from '../Colors';
 import Autocomplete from './Autocomplete';
-import BuilderTextbox from './BuilderTextbox';
 import CheckBox from './CheckBox';
-import Dropdown from './Dropdown';
 import './MapComponentStyle.less';
-import RoutingMachine from './RoutingMachine';
 import TerrainComponent from './TerrainComponent';
 
 export interface Props
 {
+  // location and address for two points
   location?: [number, number] | number[];
   address?: string;
-  onChange?: (value) => void;
-  markLocation?: boolean;
   secondLocation?: [number, number] | number[];
-  routing?: boolean;
+  secondAddress?: string;
+
+  onChange?: (value) => void;
+  geocoder?: string;
+
+  // control what features are visible on map
+  markLocation?: boolean;
   showDirectDistance?: boolean;
   showSearchBar?: boolean;
-  secondAddress?: string;
+  showDistanceCircle?: boolean;
+  hideSearchSettings?: boolean;
   zoomControl?: boolean;
+
   distance?: number;
   distanceUnit?: string;
-  showDistanceCircle?: boolean;
-  geocoder?: string;
-  keyPath?: KeyPath;
-  hideSearchSettings?: boolean;
-  inputs?: any;
+
+  // For card, keeps map in sync with card / builder
   textKeyPath?: KeyPath;
+  keyPath?: KeyPath;
+
+  // builder information
   spotlights?: any;
-  field?: string;
+  inputs?: any;
+  field?: any;
+
 }
 
+// for map markers, distances must be converted to meters
 const UNIT_CONVERSIONS =
   {
     mi: 1609.34,
@@ -114,10 +119,7 @@ const UNIT_CONVERSIONS =
   };
 
 const markerIcon = divIcon({
-  html: `<?xml version="1.0" encoding="iso-8859-1"?><!-- Generator: Adobe Illustrator 16.0.0,
-    SVG Export Plug-In . SVG Version: 6.00 Build 0)
-    --><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
-    "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class='map-marker-icon' version="1.1" id="Capa_1"
+  html: `<svg class='map-marker-icon' version="1.1" id="Capa_1"
     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
     viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
     <g><path d="M256,0C167.641,0,96,71.625,96,160c0,24.75,5.625,48.219,15.672,69.125C112.234,230.313,256,512,256,512l142.594-279.375
@@ -140,8 +142,6 @@ class MapComponent extends TerrainComponent<Props>
     longitude: string,
     errorLatitude: boolean,
     errorLongitude: boolean,
-    trafficDistance: number,
-    trafficTime: number,
     inputName: string,
     usingInput: boolean,
     zoom: number,
@@ -154,8 +154,6 @@ class MapComponent extends TerrainComponent<Props>
     longitude: this.props.location !== undefined && this.props.location[1] !== undefined ? this.props.location[1].toString() : '',
     errorLatitude: false,
     errorLongitude: false,
-    trafficDistance: 0.0,
-    trafficTime: 0.0,
     inputName: this.props.address !== undefined && this.props.address !== '' && this.props.address[0] === '@' ? this.props.address : '@',
     usingInput: (this.props.address !== undefined && this.props.address !== ''
       && this.props.address[0] === '@' && this.props.address !== '@'),
@@ -168,6 +166,7 @@ class MapComponent extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
+    // If the map is using an input for it's location and address values, and the input changes, update address and location
     if (this.state.usingInput)
     {
       const currentInputs = this.props.inputs && this.props.inputs.toJS ? this.props.inputs.toJS() : this.props.inputs;
@@ -184,7 +183,7 @@ class MapComponent extends TerrainComponent<Props>
         }
       }
     }
-
+    // Keep state copies of address / coordinates in sync with props
     if (this.props.address !== nextProps.address)
     {
       this.setState({
@@ -231,17 +230,6 @@ class MapComponent extends TerrainComponent<Props>
     return inputs;
   }
 
-  public onAddressChange(address: string)
-  {
-    this.setState({ address });
-  }
-
-  public onPhotonChange(result)
-  {
-    const location = result.features[0].geometry.coordinates;
-    this.handleLocationChange([location[1], location[0]], this.state.address);
-  }
-
   public handleLocationChange(location, address, inputName?)
   {
     this.geoCache[address] = location;
@@ -258,7 +246,20 @@ class MapComponent extends TerrainComponent<Props>
     }
   }
 
-  public handleFormSubmit()
+  public convertDistanceToMeters()
+  {
+    if (this.props.distance !== undefined &&
+      this.props.distanceUnit !== undefined &&
+      UNIT_CONVERSIONS[this.props.distanceUnit] !== undefined &&
+      !isNaN(this.props.distance)
+    )
+    {
+      return this.props.distance * UNIT_CONVERSIONS[this.props.distanceUnit];
+    }
+    return 0;
+  }
+
+  public geocode()
   {
     if (this.geoCache[this.state.address] !== undefined)
     {
@@ -267,7 +268,10 @@ class MapComponent extends TerrainComponent<Props>
     }
     if (this.props.geocoder === 'photon')
     {
-      MapUtil.geocodeByAddress('photon', this.state.address, this.onPhotonChange);
+      MapUtil.geocodeByAddress('photon', this.state.address, (result) =>
+      {
+        this.handleLocationChange([result[1], result[0]], this.state.address);
+      });
     }
     else
     {
@@ -278,22 +282,45 @@ class MapComponent extends TerrainComponent<Props>
     }
   }
 
-  public changeSearchMode()
+  public reverseGeocode()
   {
-    this.setState({
-      searchByCoordinate: !this.state.searchByCoordinate,
-    });
+    const lat = parseFloat(this.state.latitude);
+    const lng = parseFloat(this.state.longitude);
+
+    if (this.reverseGeoCache[[lat, lng].toString()] !== undefined)
+    {
+      this.handleLocationChange([lat, lng], this.reverseGeoCache[[lat, lng].toString()]);
+      return;
+    }
+
+    if (this.props.geocoder === 'photon')
+    {
+      MapUtil.geocodeByLatLng('photon', { lat, lng }, (result) =>
+      {
+        this.handleLocationChange(result.location, result.address);
+      });
+    }
+    else
+    {
+      MapUtil.geocodeByLatLng('google', { lat, lng })
+        .then((results: any) =>
+        {
+          if (results[0] === undefined)
+          {
+            this.setState({
+              error: 'No results for the coordinates entered',
+            });
+          }
+          else
+          {
+            this.handleLocationChange([lat, lng], results[0].formatted_address);
+          }
+        })
+        .catch((error) => this.setState({ error }));
+    }
   }
 
-  public onPhotonReverseChange(result)
-  {
-    const { housenumber, street, city, state, country } = result.features[0].properties;
-    const { lat, lon } = result.features[0].geometry.coordinates;
-    const address = housenumber + ' ' + street + ', ' + city + ', ' + state + ', ' + country;
-    this.handleLocationChange([lat, lon], address);
-  }
-
-  public handleCoordinateFormSubmit(e)
+  public handleKeyPress(e)
   {
     if (e.key === 'Enter')
     {
@@ -305,38 +332,16 @@ class MapComponent extends TerrainComponent<Props>
       {
         return;
       }
-      const lat = parseFloat(this.state.latitude);
-      const lng = parseFloat(this.state.longitude);
-
-      if (this.reverseGeoCache[[lat, lng].toString()] !== undefined)
-      {
-        this.handleLocationChange([lat, lng], this.reverseGeoCache[[lat, lng].toString()]);
-        return;
-      }
-
-      if (this.props.geocoder === 'photon')
-      {
-        MapUtil.geocodeByLatLng('photon', { lat, lng }, this.onPhotonReverseChange);
-      }
       else
       {
-        MapUtil.geocodeByLatLng('google', { lat, lng })
-          .then((results: any) =>
-          {
-            if (results[0] === undefined)
-            {
-              this.setState({
-                error: 'No results for the coordinates entered',
-              });
-            }
-            else
-            {
-              this.handleLocationChange([lat, lng], results[0].formatted_address);
-            }
-          })
-          .catch((error) => this.setState({ error }));
+        this.reverseGeocode();
       }
     }
+  }
+
+  public handleAddressChange(address: string)
+  {
+    this.setState({ address });
   }
 
   public handleLatitudeChange(e)
@@ -365,48 +370,6 @@ class MapComponent extends TerrainComponent<Props>
     });
   }
 
-  public renderCoordinateInputs()
-  {
-    return (
-      <div className='input-map-coordinates'>
-        <input
-          type='text'
-          value={this.state.latitude}
-          placeholder={'Latitude'}
-          onChange={this.handleLatitudeChange}
-          onKeyPress={this.handleCoordinateFormSubmit}
-          className={classNames({
-            'input-map-input-error': this.state.errorLatitude,
-          })}
-        />
-        <input
-          type='text'
-          value={this.state.longitude}
-          placeholder={'Latitude'}
-          onChange={this.handleLongitudeChange}
-          onKeyPress={this.handleCoordinateFormSubmit}
-          className={classNames({
-            'input-map-longitude': true,
-            'input-map-input-error': this.state.errorLongitude,
-          })}
-        />
-      </div>
-    );
-  }
-
-  public convertDistanceToMeters()
-  {
-    if (this.props.distance !== undefined &&
-      this.props.distanceUnit !== undefined &&
-      UNIT_CONVERSIONS[this.props.distanceUnit] !== undefined &&
-      !isNaN(this.props.distance)
-    )
-    {
-      return this.props.distance * UNIT_CONVERSIONS[this.props.distanceUnit];
-    }
-    return 0;
-  }
-
   public radians(degrees)
   {
     return degrees * Math.PI / 180;
@@ -429,12 +392,6 @@ class MapComponent extends TerrainComponent<Props>
     return R * c;
   }
 
-  public getMapRef()
-  {
-    const reactMap: any = this.refs.map;
-    return reactMap.leafletElement;
-  }
-
   public markerIconWithStyle(style)
   {
     const styledIcon = divIcon({
@@ -453,6 +410,59 @@ class MapComponent extends TerrainComponent<Props>
       className: 'map-marker-container',
     });
     return styledIcon;
+  }
+
+  public setZoomLevel(viewport?: { center: [number, number], zoom: number })
+  {
+    if (viewport !== undefined && viewport.zoom !== undefined)
+    {
+      this.setState({
+        zoom: viewport.zoom,
+      });
+    }
+  }
+
+  public changeLocationInput(inputName)
+  {
+    if (inputName !== undefined && inputName !== '' && inputName[0] === '@')
+    {
+      this.setState({
+        inputName,
+        usingInput: true,
+      });
+      const inputs = this.parseInputs();
+      if (inputs[inputName] !== undefined)
+      {
+        let value = inputs[inputName];
+        value = value.toJS !== undefined ? value.toJS() : value;
+        if (value !== undefined && value.location !== undefined && value.address !== undefined)
+        {
+          this.handleLocationChange(value.location, value.address, inputName);
+        }
+      }
+    }
+    else
+    {
+      this.setState({
+        address: inputName,
+        usingInput: false,
+        inputName: '@',
+      });
+    }
+  }
+
+  public handleFocus()
+  {
+    this.setState({
+      focused: true,
+    });
+  }
+
+  public handleBlur()
+  {
+    this.setState({
+      focused: false,
+    });
   }
 
   public renderMarker(address, location, color?, key?)
@@ -493,16 +503,6 @@ class MapComponent extends TerrainComponent<Props>
     return null;
   }
 
-  public setZoomLevel(viewport?: { center: [number, number], zoom: number })
-  {
-    if (viewport !== undefined && viewport.zoom !== undefined)
-    {
-      this.setState({
-        zoom: viewport.zoom,
-      });
-    }
-  }
-
   public renderMap()
   {
     let center;
@@ -526,19 +526,7 @@ class MapComponent extends TerrainComponent<Props>
           onViewportChanged={this.setZoomLevel}
         >
           {
-            this.props.routing ?
-              <RoutingMachine
-                to={this.props.location}
-                from={this.props.secondLocation}
-                getMapRef={this.getMapRef}
-                markerIcon={markerIcon}
-                setTrafficData={this.setTrafficData}
-              />
-              :
-              null
-          }
-          {
-            this.props.markLocation && !this.props.routing ?
+            this.props.markLocation ?
               this.renderMarker(this.props.address, this.props.location)
               :
               null
@@ -582,83 +570,40 @@ class MapComponent extends TerrainComponent<Props>
 
   }
 
-  public setTrafficData(distance: number, time: number)
+  public renderCoordinateInputs()
   {
-    this.setState({
-      trafficDistance: distance,
-      trafficTime: time,
-    });
-  }
-
-  public handleDistanceChange(e)
-  {
-    let error = false;
-    if (isNaN(parseFloat(e.target.value)))
-    {
-      error = true;
-    }
-    this.setState({
-      distance: e.target.value,
-      errorDistance: error,
-    });
-  }
-
-  public handleUnitChange(index)
-  {
-    this.setState({
-      selectedUnit: index,
-    });
-  }
-
-  public changeLocationInput(inputName)
-  {
-    // TODO move this code somewhere else
-    if (inputName !== undefined && inputName !== '' && inputName[0] === '@')
-    {
-      this.setState({
-        inputName,
-        usingInput: true,
-      });
-      const inputs = this.parseInputs();
-      if (inputs[inputName] !== undefined)
-      {
-        let value = inputs[inputName];
-        value = value.toJS !== undefined ? value.toJS() : value;
-        if (value !== undefined && value.location !== undefined && value.address !== undefined)
-        {
-          this.handleLocationChange(value.location, value.address, inputName);
-        }
-      }
-    }
-    else
-    {
-      this.setState({
-        address: inputName,
-        usingInput: false,
-        inputName: '@',
-      });
-    }
-  }
-
-  public handleFocus()
-  {
-    this.setState({
-      focused: true,
-    });
-  }
-
-  public handleBlur()
-  {
-    this.setState({
-      focused: false,
-    });
+    return (
+      <div className='input-map-coordinates'>
+        <input
+          type='text'
+          value={this.state.latitude}
+          placeholder={'Latitude'}
+          onChange={this.handleLatitudeChange}
+          onKeyPress={this.handleKeyPress}
+          className={classNames({
+            'input-map-input-error': this.state.errorLatitude,
+          })}
+        />
+        <input
+          type='text'
+          value={this.state.longitude}
+          placeholder={'Latitude'}
+          onChange={this.handleLongitudeChange}
+          onKeyPress={this.reverseGeocode}
+          className={classNames({
+            'input-map-longitude': true,
+            'input-map-input-error': this.state.errorLongitude,
+          })}
+        />
+      </div>
+    );
   }
 
   public renderSearchBar()
   {
     const inputProps = {
       value: this.state.address,
-      onChange: this.onAddressChange,
+      onChange: this.handleAddressChange,
       onFocus: this.handleFocus,
       onBlur: this.handleBlur,
       autoFocus: this.state.focused,
@@ -674,7 +619,7 @@ class MapComponent extends TerrainComponent<Props>
       return (
         <Autocomplete
           value={this.state.inputName} // consider adding new state variable to be the input name
-          options={List(_.keys(inputs))}
+          options={List(_.keys(inputs) as string[])}
           onChange={this.changeLocationInput}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
@@ -692,12 +637,12 @@ class MapComponent extends TerrainComponent<Props>
             this.renderCoordinateInputs()
             :
             <form
-              onSubmit={this.handleFormSubmit}
+              onSubmit={this.geocode}
               style={style}
             >
               <PlacesAutocomplete
                 inputProps={inputProps}
-                onEnterKeyDown={this.handleFormSubmit}
+                onEnterKeyDown={this.geocode}
               />
             </form>
         }
@@ -708,11 +653,11 @@ class MapComponent extends TerrainComponent<Props>
             <div className='input-map-search-settings-row' >
               <CheckBox
                 checked={this.state.searchByCoordinate}
-                onChange={this.changeSearchMode}
+                onChange={this._toggle('searchByCoordinate')}
                 className='input-map-checkbox'
               />
               <label
-                onClick={this.changeSearchMode}
+                onClick={this._toggle('searchByCoordinate')}
                 className='input-map-checkbox-label'
               >
                 Search by coordinate
@@ -723,19 +668,11 @@ class MapComponent extends TerrainComponent<Props>
     );
   }
 
-  public formatTime(seconds)
-  {
-    const hours = (seconds / 3600);
-    const minutes = (hours % 1) * 60;
-    return Math.floor(hours).toString() + ' hours ' + Math.round(minutes).toString() + ' minutes';
-  }
-
   public render()
   {
     if (this.props.secondLocation !== undefined)
     {
       const dist = this.directDistance(this.props.location, this.props.secondLocation);
-      const { trafficDistance, trafficTime } = this.state;
     }
     return (
       <div>
@@ -750,12 +687,5 @@ class MapComponent extends TerrainComponent<Props>
     );
   }
 }
-
-// Getting the distance values
-// <div>
-//     <div>Direct distance: {(dist / 1609.34).toFixed(1)} miles </div>
-//     <div>Traffic distance: {(trafficDistance / 1609.34).toFixed(1)} miles </div>
-//     <div>Traffic time: {this.formatTime(trafficTime)}</div>
-//   </div>
 
 export default MapComponent;

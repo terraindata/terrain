@@ -481,7 +481,6 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
               address={''}
               location={location}
               markLocation={true}
-              routing={false}
               showDirectDistance={secondLocation !== undefined}
               showSearchBar={false}
               zoomControl={false}
