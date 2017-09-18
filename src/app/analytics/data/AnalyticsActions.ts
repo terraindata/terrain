@@ -48,10 +48,10 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 
+import ActionTypes from 'analytics/data/AnalyticsActionTypes';
+import Util from 'util/Util';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
-import Util from 'util/Util';
-import ActionTypes from 'analytics/data/AnalyticsActionTypes';
 
 import Ajax from './../../util/Ajax';
 
@@ -62,14 +62,15 @@ const Actions =
       const start = new Date(2015, 5, 2);
       const end = new Date(2015, 5, 4);
       Ajax.getAnalytics(1, start, end, 2)
-        .then((variantAnalytics) => {
+        .then((variantAnalytics) =>
+        {
           return dispatch({
             type: ActionTypes.fetch,
-            payload: { variantId: 1, analytics: variantAnalytics }
+            payload: { variantId: 1, analytics: variantAnalytics },
           });
         })
-        .catch(() => { console.log('error') });
-    }
+        .catch((error) => null);
+    },
   };
 
 export default Actions;

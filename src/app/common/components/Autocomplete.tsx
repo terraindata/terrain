@@ -354,7 +354,7 @@ class Autocomplete extends TerrainComponent<Props>
                   title: this.props.help,
                   position: 'top-end',
                   theme: this.props.helpIsError ? 'error' : undefined,
-                }
+                },
               )
             }
           </div>

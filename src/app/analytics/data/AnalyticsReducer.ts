@@ -49,18 +49,16 @@ import Ajax from 'util/Ajax';
 import ActionTypes from './AnalyticsActionTypes';
 
 const AnalyticsReducer = {};
-const a = 1;
 
 AnalyticsReducer[ActionTypes.fetch] =
-  (state, action: Action<{variantId: ID, analytics: any}>) =>
+  (state, action: Action<{ variantId: ID, analytics: any }>) =>
   {
     const { variantId, analytics } = action.payload;
     return state.set(variantId, analytics);
-  }
+  };
 
 const AnalyticsReducerWrapper = (state: any = Immutable.Map({}), action) =>
 {
-  console.log('reducer', state, action)
   let nextState = state;
   if (AnalyticsReducer[action.type])
   {

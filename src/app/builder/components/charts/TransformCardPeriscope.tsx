@@ -61,7 +61,6 @@ import Actions from '../../data/BuilderActions';
 import Periscope from './Periscope';
 import { Bar, Bars } from './TransformCard';
 
-
 export interface Props
 {
   barsData: Bars;
@@ -231,7 +230,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
   public handleDomainHighChange(value)
   {
     this.setState({
-      maxDomainHigh: value
+      maxDomainHigh: value,
     });
     this.verifyAndSetDomainValues(this.state.maxDomainLow, value);
   }

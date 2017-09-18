@@ -114,13 +114,24 @@ class Library extends TerrainComponent<any>
     this.props.userActions.fetch();
   }
 
-  public getData()
+  public getData(variantId: ID)
   {
-    return [...Array(20).keys()].map((i) =>
+    const { analytics } = this.props;
+
+    let data = [];
+
+    if (analytics.get(1) !== undefined)
     {
-      const time = new Date(2017, 8, i, 0, 0, 0);
-      return { time, value: _.random(1, 100) };
-    });
+      data = analytics.get(1);
+    }
+
+    // return [...Array(20).keys()].map((i) =>
+    // {
+    //  const time = new Date(2017, 8, i, 0, 0, 0);
+    //  return { time, value: _.random(1, 100) };
+    // });
+    // TODO: Replace by variantId when analytics mock data have correct variant ids.
+    return data;
   }
 
   public getDatasets()
@@ -135,7 +146,7 @@ class Library extends TerrainComponent<any>
       })
       .map((variant) =>
       {
-        return { id: variant.id, label: variant.name, data: this.getData() };
+        return { id: variant.id, label: variant.name, data: this.getData(variant.id) };
       });
 
     return datasets.toMap();
@@ -292,8 +303,8 @@ class Library extends TerrainComponent<any>
           <div className='library-bottom'>
             <MultipleAreaChart
               datasets={datasets}
-              xDataKey={'time'}
-              yDataKey={'value'}
+              xDataKey={'key'}
+              yDataKey={'doc_count'}
             />
           </div> : null
         }
