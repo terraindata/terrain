@@ -65,6 +65,7 @@ export default class ESWildcardStructureClause extends ESStructureClause
 
   public nameType: string;
   public valueType: string;
+  public wildcardMarked: boolean = false;
 
   public constructor(type: string, structure: { [name: string]: string }, nameType: string, valueType: string, settings?: ESClauseSettings,
     clauseType: ESClauseType = ESClauseType.ESWildcardStructureClause)
@@ -95,74 +96,47 @@ export default class ESWildcardStructureClause extends ESStructureClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
+    // for marking missing wildcard field errors
+    const marker = valueInfo.objectChildren[_.keys(valueInfo.objectChildren)[0]];
+    const valueClause: ESClause = interpreter.config.getClause(this.valueType);
 
     const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
     const propertyClause: ESClause = interpreter.config.getClause('property');
+    this.wildcardMarked = false;
 
-    const nameClause: ESClause = interpreter.config.getClause(this.nameType);
-    const valueClause: ESClause = interpreter.config.getClause(this.valueType);
-    let wildcardMarked = false;
-    // check required members
-    this.required.forEach((name: string): void =>
-    {
-      if (children[name] === undefined)
-      {
-        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
-      }
-    });
-    let markerPropertyName = null; // Keeps track of last line, use to mark if there is a missing wildcard field
-    // mark properties
-    valueInfo.forEachProperty(
-      (viTuple: ESPropertyInfo): void =>
-      {
-        viTuple.propertyName.clause = propertyClause;
-        markerPropertyName = viTuple.propertyName;
-        if (!this.typeCheck(interpreter, viTuple.propertyName, ESJSONType.string))
-        {
-          return;
-        }
-
-        const name: string = viTuple.propertyName.value as string;
-
-        if (!this.structure.hasOwnProperty(name))
-        {
-          // check if this is the wild card field
-          if (!wildcardMarked)
-          {
-            viTuple.propertyName.clause = nameClause;
-            if (viTuple.propertyValue !== null)
-            {
-              viTuple.propertyValue.clause = valueClause;
-            }
-            wildcardMarked = true;
-          }
-          else
-          {
-            interpreter.accumulateError(viTuple.propertyName,
-              'Unknown property \"' + name +
-              '\". Expected one of these properties: ' +
-              JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
-              true);
-            return;
-          }
-        }
-        else if (viTuple.propertyValue === null)
-        {
-          interpreter.accumulateError(viTuple.propertyName, 'Property without valid value.');
-        }
-        else
-        {
-          const vClause: ESClause = interpreter.config.getClause(this.structure[name]);
-          viTuple.propertyValue.clause = vClause;
-        }
-      });
+    super.mark(interpreter, valueInfo);
 
     // If no wildcard property was marked, accumulate and error (because this is required)
-    if (!wildcardMarked)
+    if (!this.wildcardMarked)
     {
-      interpreter.accumulateError(markerPropertyName,
+      interpreter.accumulateError(marker !== undefined ? marker.propertyName : null,
         'Error: missing required wildcard field with value type of ' + valueClause.name);
+    }
+  }
+
+  protected unknownPropertyName(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, viTuple: ESPropertyInfo)
+  {
+    const nameClause: ESClause = interpreter.config.getClause(this.nameType);
+    const valueClause: ESClause = interpreter.config.getClause(this.valueType);
+    // check if this is the wild card field
+    if (!this.wildcardMarked)
+    {
+      viTuple.propertyName.clause = nameClause;
+      if (viTuple.propertyValue !== null)
+      {
+        viTuple.propertyValue.clause = valueClause;
+      }
+      this.wildcardMarked = true;
+      return false;
+    }
+    else
+    {
+      interpreter.accumulateError(viTuple.propertyName,
+        'Unknown property \"' + String(name) +
+        '\". Expected one of these properties: ' +
+        JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
+        true);
+      return true;
     }
   }
 }
