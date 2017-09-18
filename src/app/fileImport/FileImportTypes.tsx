@@ -201,6 +201,7 @@ export const ELASTIC_TYPES =
     'integer',
     'half_float',
     'float',
+    'geo_point',
   ];
 
 // contains set of transforms applicable to each elastic type

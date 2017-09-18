@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import GoogleMap from 'google-map-react';
 import { List } from 'immutable';
-import { divIcon } from 'leaflet';
+import { divIcon, point } from 'leaflet';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 'react-leaflet';
@@ -467,7 +467,12 @@ class MapComponent extends TerrainComponent<Props>
       >
         {
           address !== '' && address !== undefined ?
-            <Popup>
+            <Popup
+              className='map-component-popup'
+              closeButton={false}
+              offset={point(0, -33)}
+              autoPan={false}
+            >
               <span>{address}</span>
             </Popup>
             :
@@ -477,7 +482,6 @@ class MapComponent extends TerrainComponent<Props>
     );
   }
 
-  // TODO Add checks and colors
   public renderSpotlightMarkers(spotlight, index)
   {
     if (spotlight !== undefined && typeof spotlight === 'object')

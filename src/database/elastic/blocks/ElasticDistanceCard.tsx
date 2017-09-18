@@ -78,10 +78,10 @@ const esMapDistanceTypes = [
 export const elasticDistance = _card({
   distance: 0,
   key: 'geo_distance',
-  field: 'location',
+  field: '',
   distanceUnit: 'mi',
   distanceType: 'arc',
-  geopoint: [-35, 120],
+  geopoint: [0, 0],
   map_text: '',
 
   static: {

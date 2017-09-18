@@ -100,6 +100,7 @@ export class Import
     double: new Set(['text', 'double']),
     boolean: new Set(['text', 'boolean']),
     date: new Set(['text', 'date']),
+    geo_point: new Set(['text', 'geo_point']),
     // object: new Set(['object', 'nested']),
     // nested: new Set(['nested']),
   };
