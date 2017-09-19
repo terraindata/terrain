@@ -64,6 +64,7 @@ enum ESClauseType
   ESStructureClause,
   ESTypeClause,
   ESVariantClause,
+  ESWildcardStructureClause,
 }
 
 export default ESClauseType;

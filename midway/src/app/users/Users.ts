@@ -75,8 +75,8 @@ export class Users
   {
     // tslint:disable-next-line
     (new Users()).create({
-      accessToken: 'ImALuser',
-      email: 'luser@terraindata.com',
+      accessToken: 'ImAnAdmin',
+      email: 'admin@terraindata.com',
       isSuperUser: 1,
       name: 'Terrain Admin',
       password: 'secret',
@@ -85,7 +85,7 @@ export class Users
     })
       .catch((error: string) =>
       {
-        if (error !== 'User with email luser@terraindata.com already exists.')
+        if (error !== 'User with email admin@terraindata.com already exists.')
         {
           throw new Error('Problem creating default user: ' + error);
         }
