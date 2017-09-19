@@ -51,7 +51,6 @@ import * as _ from 'lodash';
 import * as Redux from 'redux';
 import * as ReduxActions from 'redux-actions';
 import thunk from 'redux-thunk';
-import * as ColorsTypes from '../ColorsTypes';
 import Util from './../../util/Util';
 import ColorsReducers from './ColorsReducers';
 
