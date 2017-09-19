@@ -341,6 +341,7 @@ class MapComponent extends TerrainComponent<Props>
 
   public handleAddressChange(address: string)
   {
+    console.log('handle address change');
     this.setState({ address });
   }
 
@@ -426,6 +427,7 @@ class MapComponent extends TerrainComponent<Props>
   {
     if (inputName !== undefined && inputName !== '' && inputName[0] === '@')
     {
+      console.log('change state input');
       this.setState({
         inputName,
         usingInput: true,
@@ -443,6 +445,7 @@ class MapComponent extends TerrainComponent<Props>
     }
     else
     {
+      console.log('change input state: no input');
       this.setState({
         address: inputName,
         usingInput: false,
@@ -453,16 +456,18 @@ class MapComponent extends TerrainComponent<Props>
 
   public handleFocus()
   {
-    this.setState({
-      focused: true,
-    });
+    console.log('handle focus');
+    // this.setState({
+    //   focused: true,
+    // });
   }
 
   public handleBlur()
   {
-    this.setState({
-      focused: false,
-    });
+    console.log('handle blur');
+    // this.setState({
+    //   focused: false,
+    // });
   }
 
   public renderMarker(address, location, color?, key?)
