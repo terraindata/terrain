@@ -555,7 +555,7 @@ class _CardComponent extends TerrainComponent<Props>
             card.static.colors[1],
             undefined,
             undefined,
-            this.state.hovering
+            this.state.hovering,
           )}
           ref='cardInner'
         >

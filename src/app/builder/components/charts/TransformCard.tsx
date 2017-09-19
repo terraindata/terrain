@@ -398,17 +398,17 @@ class TransformCard extends TerrainComponent<Props>
           aggs: {
             maximum: {
               max: {
-                field: input
-              }
+                field: input,
+              },
             },
             minimum: {
               min: {
-                field: input
-              }
-            }
-          }
-        }
-      }
+                field: input,
+              },
+            },
+          },
+        },
+      };
 
       domainQuery['index'] = index;
       domainQuery['type'] = type;
@@ -423,7 +423,7 @@ class TransformCard extends TerrainComponent<Props>
         (err) =>
         {
           this.handleElasticAggregationError(err);
-        }
+        },
       );
     }
     else
