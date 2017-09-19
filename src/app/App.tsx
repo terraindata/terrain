@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires no-reference strict-boolean-expressions max-line-length no-console::@
+// tslint:disable:no-var-requires no-reference strict-boolean-expressions max-line-length no-console
 
 /// <reference path="../typings/tsd.d.ts" />
 
@@ -183,17 +183,16 @@ class App extends TerrainComponent<Props>
     noLocalStorage: false,
 
     stylesTag: Immutable.Map(),
-    colors: null,
   };
 
   constructor(props: Props)
   {
     super(props);
 
-    // Ajax.midwayStatus(
-    //   () => console.log('Midway is running'),
-    //   () => console.log('Midway 2 is not running.'),
-    // );
+    Ajax.midwayStatus(
+      () => console.log('Midway is running'),
+      () => console.log('Midway 2 is not running.'),
+    );
 
     try
     {
@@ -272,7 +271,6 @@ class App extends TerrainComponent<Props>
     ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
 
     const tooltipStyles = generateThemeStyles();
-
     Object.keys(tooltipStyles).forEach((key) =>
     {
       ColorsActions.setStyle(key, tooltipStyles[key]);
