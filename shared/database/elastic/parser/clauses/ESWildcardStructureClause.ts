@@ -99,9 +99,6 @@ export default class ESWildcardStructureClause extends ESStructureClause
     // for marking missing wildcard field errors
     const marker = valueInfo.objectChildren[_.keys(valueInfo.objectChildren)[0]];
     const valueClause: ESClause = interpreter.config.getClause(this.valueType);
-
-    const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
-    const propertyClause: ESClause = interpreter.config.getClause('property');
     this.wildcardMarked = false;
 
     super.mark(interpreter, valueInfo);
