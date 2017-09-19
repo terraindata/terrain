@@ -44,29 +44,50 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires
+
+import * as _ from 'lodash';
 import * as Immutable from 'immutable';
-
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
+import * as Redux from 'redux';
 import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import ColorsReducer from '../colors/data/ColorsReducers';
-import UserReducer from 'users/data/UserReducers';
+//const Redux = require('redux');
+import * as ReduxActions from 'redux-actions';
+import * as ColorsTypes from '../ColorsTypes';
+import ColorsReducers from './ColorsReducers';
+import Util from './../../util/Util';
 
-const reducers = {
-  library: LibraryReducer,
-  roles: RolesReducer,
-  users: UserReducer,
-  colors: ColorsReducer,
+
+class ColorsStateC
+{
+  public styles : Map<string, React.CSSProperties> = new Map<string, React.CSSProperties>;
+}
+
+const ColorsState_Record = Immutable.Record(new ColorsStateC());
+export interface ColorsState extends ColorsStateC, IRecord<ColorsState> { }
+export const _ColorsState = (config?: any) =>
+{
+  return new ColorsState_Record(Util.extendId(config || {})) as any as ColorsState;
 };
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+const DefaultState = _ColorsState();
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
+export const ColorsStore = Redux.createStore(
+  ColorsReducers,
+  DefaultState,
+  Redux.applyMiddleware(thunk),
+);
 
-export default terrainStore;
+export default ColorsStore;
+
+// import * as _ from 'lodash';
+// const Redux = require('redux');
+// import * as ReduxActions from 'redux-actions';
+// import * as ColorsTypes from '../ColorsTypes';
+
+// import ColorsReducers from './ColorsReducers';
+
+// const ColorsStore: IStore<ColorsTypes.ColorsState> = Redux.createStore(ReduxActions.handleActions(_.extend({},
+//   ColorsReducers,
+//   {}), ColorsTypes._ColorsState()), ColorsTypes._ColorsState());
+
+// export default ColorsStore;

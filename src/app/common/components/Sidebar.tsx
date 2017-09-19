@@ -56,6 +56,8 @@ import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
 import StyleTag from './StyleTag';
+import ColorsActions from '../../colors/data/ColorsActions';
+
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less
@@ -76,9 +78,15 @@ export interface Props
   onExpand?: () => void;
 }
 
+
 @Radium
 export class Sidebar extends TerrainComponent<Props>
 {
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.sidebar-container .sidebar-link .sidebar-link-text', {color: 'red'});
+  }
+
   public render()
   {
     return (
@@ -154,9 +162,6 @@ export class Sidebar extends TerrainComponent<Props>
                       },
                     }}
                   />
-                  <StyleTag
-                    style={SVG_STYLE}
-                  />
                 </div>
               </div>
             )
@@ -168,6 +173,9 @@ export class Sidebar extends TerrainComponent<Props>
 }
 
 const SVG_STYLE = {
+  '.sidebar-container .sidebar-link .sidebar-link-text': {
+    color: 'red';
+  },
   '.sidebar-expand-icon': {
     fill: Colors().text2,
   },

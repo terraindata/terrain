@@ -95,6 +95,8 @@ import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
+import ColorsActions from './colors/data/ColorsActions';
+import ColorsStore from './colors/data/ColorsStore';
 
 // Icons
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
@@ -178,6 +180,9 @@ class App extends TerrainComponent<Props>
     usersLoaded: false,
 
     noLocalStorage: false,
+
+    stylesTag: null,
+    colors: null,
   };
 
   constructor(props: Props)
@@ -244,6 +249,11 @@ class App extends TerrainComponent<Props>
       storeKeyPath: ['loaded'],
     });
 
+    this._subscribe(ColorsStore, {
+      stateKey: 'stylesTag',
+      storeKeyPath: ['styles'],
+    });
+
     // Retrieve logged-in state from persistent storage.
     const accessToken = localStorage['accessToken'];
     const id = localStorage['id'];
@@ -251,6 +261,11 @@ class App extends TerrainComponent<Props>
     {
       AuthActions.login(accessToken, id);
     }
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.input', { background: Colors().inputBg });
   }
 
   public fetchData()
@@ -337,6 +352,22 @@ class App extends TerrainComponent<Props>
     BuilderActions.hoverCard(null);
   }
 
+  public test()
+  {
+    if (this.state.stylesTag !== null)
+    {
+      console.log(this.state.stylesTag);
+      console.log(this.state.stylesTag.toJSON().toString());
+      console.log(this.state.stylesTag._c);
+      // console.log(meep.toJS());
+    }
+    return (
+        <StyleTag
+          style= {this.state.stylesTag ? this.state.stylesTag.toJSON() : ''}
+        /> 
+    );
+  }
+
   public render()
   {
     if (this.state.noLocalStorage)
@@ -377,13 +408,12 @@ class App extends TerrainComponent<Props>
         </div>
 
         <DeployModal />
-
-        <StyleTag
-          style={COMMON_THEME_COLOR_STYLE}
-        />
-
+        <div>
+          {this.test()}
+        </div>
+     
         <InAppNotification />
-
+    
         <EasterEggs />
       </div>
     );

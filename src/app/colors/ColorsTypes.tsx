@@ -43,30 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+import { BaseClass, New } from '../Classes';
 
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import ColorsReducer from '../colors/data/ColorsReducers';
-import UserReducer from 'users/data/UserReducers';
-
-const reducers = {
-  library: LibraryReducer,
-  roles: RolesReducer,
-  users: UserReducer,
-  colors: ColorsReducer,
-};
-
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
-
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+// This module will contain all of the different 'types' (i.e. models) relevant to auth
+// This type represents the state of the AuthStore
+class ColorsStateC extends BaseClass
+{
+	public styles : Map<string, React.CSSProperties> = new Map<string, React.CSSProperties>;
+}
+// These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
+//  This first line exports a type that you will actually use in other files.
+//  It combines the class we defined above with the Immutable methods specified in IRecord (e.g. set, setIn, getIn)
+export type ColorsState = ColorsStateC & IRecord<ColorsStateC>;
+//  This second line exports a function to create a new instance of the AuthState Immutable backed class
+//  It's a replacement for a constructor.
+//  This is necessary because simply doing `new AuthStateC` will not create an Immutable version
+//   and you can't use `new` simply with Immutable Records.
+export const _ColorsState = (config?: { [key: string]: any }) =>
+  New<ColorsState>(new ColorsStateC(config), config);
