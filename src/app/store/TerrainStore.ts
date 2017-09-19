@@ -51,8 +51,8 @@ import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
 import RolesReducer from 'roles/data/RolesReducers';
-import ColorsReducer from '../colors/data/ColorsReducers';
 import UserReducer from 'users/data/UserReducers';
+import ColorsReducer from '../colors/data/ColorsReducers';
 
 const reducers = {
   library: LibraryReducer,

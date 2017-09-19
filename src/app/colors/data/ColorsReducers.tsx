@@ -49,22 +49,13 @@ import * as ColorsTypes from '../ColorsTypes';
 import ActionTypes from './ColorsActionTypes';
 import { _ColorsState, ColorsState } from './ColorsStore';
 
-
 const ColorsReducer = {};
-
 
 ColorsReducer[ActionTypes.setStyle] =
   (state, action) =>
   {
     const { selector, style } = action.payload;
-    if (state.styles === null)
-    {
-    	//var styles = new Map<string, React.CSSProperties>;
-    	styles = state.styles.set(selector, style);
-    	return state.set('styles',styles);
-    }
-    var styles = state.styles.set(selector, style);
-    return state.set('styles', styles);
+    return state.set('styles', state.styles.set(selector, style));
   };
 
 const ColorsReducerWrapper = (state: ColorsState = _ColorsState(), action) =>
@@ -78,4 +69,3 @@ const ColorsReducerWrapper = (state: ColorsState = _ColorsState(), action) =>
 };
 
 export default ColorsReducerWrapper;
-

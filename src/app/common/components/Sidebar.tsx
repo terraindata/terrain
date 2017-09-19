@@ -51,13 +51,11 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
+import ColorsActions from '../../colors/data/ColorsActions';
 import { backgroundColor, Colors } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
-import StyleTag from './StyleTag';
-import ColorsActions from '../../colors/data/ColorsActions';
-
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less
@@ -78,13 +76,13 @@ export interface Props
   onExpand?: () => void;
 }
 
-
 @Radium
 export class Sidebar extends TerrainComponent<Props>
 {
   public componentWillMount()
   {
-    ColorsActions.setStyle('.sidebar-container .sidebar-link .sidebar-link-text', {color: 'red'});
+    ColorsActions.setStyle('.sidebar-expand-icon', { fill: Colors().text2 });
+    ColorsActions.setStyle('.sidebar-expand:hover .sidebar-expand-icon', { fill: Colors().text1 });
   }
 
   public render()
@@ -171,17 +169,5 @@ export class Sidebar extends TerrainComponent<Props>
     );
   }
 }
-
-const SVG_STYLE = {
-  '.sidebar-container .sidebar-link .sidebar-link-text': {
-    color: 'red';
-  },
-  '.sidebar-expand-icon': {
-    fill: Colors().text2,
-  },
-  '.sidebar-expand:hover .sidebar-expand-icon': {
-    fill: Colors().text1,
-  },
-};
 
 export default Sidebar;

@@ -51,7 +51,7 @@ import { BaseClass, New } from '../Classes';
 // This type represents the state of the AuthStore
 class ColorsStateC extends BaseClass
 {
-	public styles : Map<string, React.CSSProperties> = new Map<string, React.CSSProperties>;
+  public styles: IMMap<string, React.CSSProperties> = null;
 }
 // These two lines are boilerplate that you can copy and paste and adapt for other Immutable-backed classes
 //  This first line exports a type that you will actually use in other files.

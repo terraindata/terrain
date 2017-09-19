@@ -48,10 +48,10 @@ import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import AppRouter from './AppRouter';
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
+import ColorsStore from './colors/data/ColorsStore';
 import LibraryStore from './library/data/LibraryStore';
 import TerrainStore from './store/TerrainStore';
 import UserStore from './users/data/UserStore';
-import ColorsStore from './colors/data/ColorsStore';
 
 if (!DEV)
 {
@@ -98,4 +98,5 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('app'), () =>
   {
+    // tests can go here
   });

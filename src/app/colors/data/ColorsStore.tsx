@@ -44,22 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 
-import * as _ from 'lodash';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Redux from 'redux';
-import thunk from 'redux-thunk';
-//const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
+import thunk from 'redux-thunk';
 import * as ColorsTypes from '../ColorsTypes';
-import ColorsReducers from './ColorsReducers';
 import Util from './../../util/Util';
-
+import ColorsReducers from './ColorsReducers';
 
 class ColorsStateC
 {
-  public styles : Map<string, React.CSSProperties> = new Map<string, React.CSSProperties>;
+  public styles: IMMap<string, React.CSSProperties> = Immutable.Map();
 }
 
 const ColorsState_Record = Immutable.Record(new ColorsStateC());
@@ -78,16 +76,3 @@ export const ColorsStore = Redux.createStore(
 );
 
 export default ColorsStore;
-
-// import * as _ from 'lodash';
-// const Redux = require('redux');
-// import * as ReduxActions from 'redux-actions';
-// import * as ColorsTypes from '../ColorsTypes';
-
-// import ColorsReducers from './ColorsReducers';
-
-// const ColorsStore: IStore<ColorsTypes.ColorsState> = Redux.createStore(ReduxActions.handleActions(_.extend({},
-//   ColorsReducers,
-//   {}), ColorsTypes._ColorsState()), ColorsTypes._ColorsState());
-
-// export default ColorsStore;

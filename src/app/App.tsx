@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires no-reference strict-boolean-expressions max-line-length no-console
+// tslint:disable:no-var-requires no-reference strict-boolean-expressions max-line-length no-console::@
 
 /// <reference path="../typings/tsd.d.ts" />
 
@@ -54,6 +54,7 @@ require('babel-polyfill');
 import './App.less';
 
 // Libraries
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
@@ -87,6 +88,8 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // data that needs to be loaded
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
+import ColorsActions from './colors/data/ColorsActions';
+import ColorsStore from './colors/data/ColorsStore';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
@@ -95,8 +98,6 @@ import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
-import ColorsActions from './colors/data/ColorsActions';
-import ColorsStore from './colors/data/ColorsStore';
 
 // Icons
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
@@ -181,7 +182,7 @@ class App extends TerrainComponent<Props>
 
     noLocalStorage: false,
 
-    stylesTag: null,
+    stylesTag: Immutable.Map(),
     colors: null,
   };
 
@@ -189,10 +190,10 @@ class App extends TerrainComponent<Props>
   {
     super(props);
 
-    Ajax.midwayStatus(
-      () => console.log('Midway is running'),
-      () => console.log('Midway 2 is not running.'),
-    );
+    // Ajax.midwayStatus(
+    //   () => console.log('Midway is running'),
+    //   () => console.log('Midway 2 is not running.'),
+    // );
 
     try
     {
@@ -265,7 +266,17 @@ class App extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.input', { background: Colors().inputBg });
+    ColorsActions.setStyle('.input', { background: Colors().inputBg, color: Colors().text1 });
+    ColorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
+    ColorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
+    ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
+
+    const tooltipStyles = generateThemeStyles();
+
+    Object.keys(tooltipStyles).forEach((key) =>
+    {
+      ColorsActions.setStyle(key, tooltipStyles[key]);
+    });
   }
 
   public fetchData()
@@ -352,22 +363,6 @@ class App extends TerrainComponent<Props>
     BuilderActions.hoverCard(null);
   }
 
-  public test()
-  {
-    if (this.state.stylesTag !== null)
-    {
-      console.log(this.state.stylesTag);
-      console.log(this.state.stylesTag.toJSON().toString());
-      console.log(this.state.stylesTag._c);
-      // console.log(meep.toJS());
-    }
-    return (
-        <StyleTag
-          style= {this.state.stylesTag ? this.state.stylesTag.toJSON() : ''}
-        /> 
-    );
-  }
-
   public render()
   {
     if (this.state.noLocalStorage)
@@ -408,33 +403,16 @@ class App extends TerrainComponent<Props>
         </div>
 
         <DeployModal />
-        <div>
-          {this.test()}
-        </div>
-     
+        <StyleTag
+          style={this.state.stylesTag.toJS()}
+        />
+
         <InAppNotification />
-    
+
         <EasterEggs />
       </div>
     );
   }
 }
-
-const COMMON_THEME_COLOR_STYLE = {
-  '::-webkit-scrollbar-track': {
-    background: Colors().scrollbarBG,
-  },
-  '::-webkit-scrollbar-thumb': {
-    background: Colors().scrollbarPiece,
-  },
-  '.altBg ::-webkit-scrollbar-thumb': {
-    background: Colors().altScrollbarPiece,
-  },
-  'input': {
-    background: Colors().inputBg,
-    color: Colors().text1,
-  },
-  ...generateThemeStyles(),
-};
 
 export default App;

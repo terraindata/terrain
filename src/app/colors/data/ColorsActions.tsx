@@ -52,7 +52,7 @@ const ColorsActions =
   {
     setStyle:
     (selector: string, style: React.CSSProperties) =>
-      $(ActionTypes.setStyle, { selector, style}),
+      $(ActionTypes.setStyle, { selector, style }),
   };
 
 export default ColorsActions;
