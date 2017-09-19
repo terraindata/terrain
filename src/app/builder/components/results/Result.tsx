@@ -485,6 +485,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
               showSearchBar={false}
               zoomControl={false}
               secondLocation={secondLocation}
+              keepAddressInSync={false}
             />
           </div>
         );

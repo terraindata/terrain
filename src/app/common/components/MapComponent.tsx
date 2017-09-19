@@ -56,6 +56,7 @@ import PlacesAutocomplete from 'react-places-autocomplete';
 
 import Actions from '../../builder/data/BuilderActions';
 import MapUtil from '../../util/MapUtil';
+import { backgroundColor, Colors } from '../Colors';
 import Autocomplete from './Autocomplete';
 import CheckBox from './CheckBox';
 import './MapComponentStyle.less';
@@ -79,6 +80,8 @@ export interface Props
   showDistanceCircle?: boolean;
   hideSearchSettings?: boolean;
   zoomControl?: boolean;
+  keepAddressInSync?: boolean;
+  canEdit?: boolean;
 
   distance?: number;
   distanceUnit?: string;
@@ -128,6 +131,19 @@ const markerIcon = divIcon({
     </g></svg>
 `,
   iconSize: [40, 40],
+  className: 'map-marker-container',
+});
+
+const markerIconSmall = divIcon({
+  html: `<svg class='map-marker-icon-small' version="1.1" id="Capa_1"
+    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
+    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+    <g><path d="M256,0C167.641,0,96,71.625,96,160c0,24.75,5.625,48.219,15.672,69.125C112.234,230.313,256,512,256,512l142.594-279.375
+    C409.719,210.844,416,186.156,416,160C416,71.625,344.375,0,256,0z M256,256c-53.016,0-96-43-96-96s42.984-96,96-96
+    c53,0,96,43,96,96S309,256,256,256z"/>
+    </g></svg>
+`,
+  iconSize: [20, 20],
   className: 'map-marker-container',
 });
 
@@ -197,7 +213,7 @@ class MapComponent extends TerrainComponent<Props>
         longitude: nextProps.location[1].toString(),
       });
       // If the location changes with no address (i.e. in cards) fill in the address via reverse-geo
-      if ((nextProps.address === undefined || nextProps.address === '') && !this.state.usingInput)
+      if (nextProps.keepAddressInSync && (nextProps.address === undefined || nextProps.address === '') && !this.state.usingInput)
       {
         // TODO Make this use the correct geo coder
         MapUtil.geocodeByLatLng('google', { lat: nextProps.location[0], lng: nextProps.location[1] })
@@ -341,7 +357,6 @@ class MapComponent extends TerrainComponent<Props>
 
   public handleAddressChange(address: string)
   {
-    console.log('handle address change');
     this.setState({ address });
   }
 
@@ -427,7 +442,6 @@ class MapComponent extends TerrainComponent<Props>
   {
     if (inputName !== undefined && inputName !== '' && inputName[0] === '@')
     {
-      console.log('change state input');
       this.setState({
         inputName,
         usingInput: true,
@@ -445,7 +459,6 @@ class MapComponent extends TerrainComponent<Props>
     }
     else
     {
-      console.log('change input state: no input');
       this.setState({
         address: inputName,
         usingInput: false,
@@ -456,27 +469,27 @@ class MapComponent extends TerrainComponent<Props>
 
   public handleFocus()
   {
-    console.log('handle focus');
-    // this.setState({
-    //   focused: true,
-    // });
+    this.setState({
+      focused: true,
+    });
   }
 
   public handleBlur()
   {
-    console.log('handle blur');
-    // this.setState({
-    //   focused: false,
-    // });
+    this.setState({
+      focused: false,
+    });
   }
 
-  public renderMarker(address, location, color?, key?)
+  public renderMarker(address, location, small?, color?, key?)
   {
     const style = 'fill: ' + String(color) + ' !important;';
+    const icon = color !== undefined ? this.markerIconWithStyle(style) : small ? markerIconSmall : markerIcon;
+
     return (
       <Marker
         position={location}
-        icon={color !== undefined ? this.markerIconWithStyle(style) : markerIcon}
+        icon={icon}
         key={key}
         title={address}
       >
@@ -503,7 +516,7 @@ class MapComponent extends TerrainComponent<Props>
     {
       const location = MapUtil.getCoordinatesFromGeopoint(spotlight.fields[this.props.field]);
       const address = spotlight.fields['_id'];
-      return this.renderMarker(address, location, spotlight.color, address + '_' + String(index));
+      return this.renderMarker(address, location, false, spotlight.color, address + '_' + String(index));
     }
     return null;
   }
@@ -514,12 +527,22 @@ class MapComponent extends TerrainComponent<Props>
     let bounds;
     if (this.props.secondLocation !== undefined)
     {
-      bounds = [this.props.location, this.props.secondLocation];
+      if (this.props.location[0] > this.props.secondLocation[0])
+      {
+        bounds = [[this.props.location[0] + 0.05, this.props.location[1]],
+        [this.props.secondLocation[0] - 0.05, this.props.secondLocation[1]]];
+      }
+      else
+      {
+        bounds = [[this.props.location[0] - 0.05, this.props.location[1]],
+        [this.props.secondLocation[0] + 0.05, this.props.secondLocation[1]]];
+      }
     }
     else
     {
       center = this.props.location;
     }
+    const address = this.props.address !== undefined && this.props.address !== '' ? this.props.address : this.state.address;
     const mapProps = bounds !== undefined ? { bounds } : { center };
     return (
       <div className='input-map-wrapper'>
@@ -532,13 +555,13 @@ class MapComponent extends TerrainComponent<Props>
         >
           {
             this.props.markLocation ?
-              this.renderMarker(this.props.address, this.props.location)
+              this.renderMarker(address, this.props.location, this.props.secondLocation !== undefined)
               :
               null
           }
           {
             this.props.secondLocation !== undefined && this.props.showDirectDistance ?
-              this.renderMarker(this.props.secondAddress, this.props.secondLocation)
+              this.renderMarker(this.props.secondAddress, this.props.secondLocation, this.props.secondLocation !== undefined)
               :
               null
           }
@@ -567,7 +590,7 @@ class MapComponent extends TerrainComponent<Props>
           }
           <TileLayer
             url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
           />
         </Map>
       </div>
@@ -606,14 +629,6 @@ class MapComponent extends TerrainComponent<Props>
 
   public renderSearchBar()
   {
-    const inputProps = {
-      value: this.state.address,
-      onChange: this.handleAddressChange,
-      onFocus: this.handleFocus,
-      onBlur: this.handleBlur,
-      autoFocus: this.state.focused,
-    };
-    const style = this.props.hideSearchSettings ? { marginBottom: '0px' } : {};
     // if there are inputs and the first key typed in is @, render an autocomplete that has the inputs as choices
     // when an input is selected, set the value of the map to be that value
     // make sure to not change input address (@location) to the actual address
@@ -631,9 +646,22 @@ class MapComponent extends TerrainComponent<Props>
           className='map-input-autocomplete'
           autoFocus={this.state.focused}
           moveCursorToEnd={true}
+          disabled={this.props.canEdit === false}
         />
       );
     }
+
+    const inputStyle = this.props.canEdit === false ? _.extend({}, backgroundColor(Colors().darkerHighlight)) : {};
+    const style = this.props.hideSearchSettings ? { marginBottom: '0px' } : {};
+
+    const inputProps = {
+      value: this.state.address,
+      onChange: this.handleAddressChange,
+      onFocus: this.handleFocus,
+      onBlur: this.handleBlur,
+      autoFocus: this.state.focused,
+      disabled: this.props.canEdit === false,
+    };
 
     return (
       <div>
@@ -648,6 +676,7 @@ class MapComponent extends TerrainComponent<Props>
               <PlacesAutocomplete
                 inputProps={inputProps}
                 onEnterKeyDown={this.geocode}
+                styles={{ input: inputStyle }}
               />
             </form>
         }

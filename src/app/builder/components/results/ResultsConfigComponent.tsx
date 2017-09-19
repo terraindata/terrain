@@ -66,6 +66,7 @@ const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
 const TextIcon = require('./../../../../images/icon_text_12x18.svg?name=TextIcon');
 const ImageIcon = require('./../../../../images/icon_profile_16x16.svg?name=ImageIcon');
 const HandleIcon = require('./../../../../images/icon_handle.svg?name=HandleIcon');
+const MarkerIcon = require('./../../../../images/icon_marker.svg?name=MarkerIcon');
 
 export interface Props
 {
@@ -604,12 +605,12 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             >
               <ImageIcon /> Image
             </div>
-            <div className='results-config-image-btn'
+            <div className='results-config-map-btn'
               key={'map-btn-' + this.props.field}
               onClick={this.changeToMap}
               style={map ? activeBtnStyle : inactiveBtnStyle}
             >
-              Map
+              <MarkerIcon /> Map
             </div>
           </div>
 

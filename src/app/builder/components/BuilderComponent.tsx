@@ -425,6 +425,8 @@ class BuilderComponent extends TerrainComponent<Props>
                   textKeyPath: this._ikeyPath(parentKeyPath, 'map_text'),
                   spotlights: this.state.spotlights,
                   field,
+                  keepAddressInSync: true,
+                  canEdit: this.props.canEdit,
                 },
               )
             }
