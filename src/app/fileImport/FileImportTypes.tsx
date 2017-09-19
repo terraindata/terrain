@@ -224,6 +224,7 @@ export const TRANSFORM_TYPES =
     ['duplicate'],    // integer
     ['duplicate'],    // half_float
     ['duplicate'],    // float
+    ['duplicate'],    // geopoint
   ];
 
 export const STEP_NAMES =

@@ -44,15 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands prefer-const
-
 import * as classNames from 'classnames';
 import { List } from 'immutable';
 import { divIcon, point } from 'leaflet';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 'react-leaflet';
-import PlacesAutocomplete from 'react-places-autocomplete';
 
 import Actions from '../../builder/data/BuilderActions';
 import MapUtil from '../../util/MapUtil';
@@ -60,6 +57,7 @@ import { backgroundColor, Colors } from '../Colors';
 import Autocomplete from './Autocomplete';
 import CheckBox from './CheckBox';
 import './MapComponentStyle.less';
+import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';
 
 export interface Props
@@ -233,7 +231,7 @@ class MapComponent extends TerrainComponent<Props>
 
   public parseInputs(inputsToParse?)
   {
-    let inputs = {};
+    const inputs = {};
     const toParse = inputsToParse !== undefined ? inputsToParse : this.props.inputs;
     if (toParse === undefined || toParse === null)
     {
@@ -241,7 +239,7 @@ class MapComponent extends TerrainComponent<Props>
     }
     toParse.forEach((input) =>
     {
-      inputs['@' + input.key] = input.value;
+      inputs['@' + String(input.key)] = input.value;
     });
     return inputs;
   }
@@ -392,8 +390,14 @@ class MapComponent extends TerrainComponent<Props>
   }
 
   // returns linnear distance between two coordinate points in METERS
-  public directDistance(firstLocation, secondLocation)
+  public directDistance()
   {
+    const firstLocation = this.props.location;
+    const secondLocation = this.props.secondLocation;
+    if (firstLocation === undefined || this.props.secondLocation === undefined)
+    {
+      return null;
+    }
     const R = 6371e3; // meters
     const phi1 = this.radians(firstLocation[0]);
     const phi2 = this.radians(secondLocation[0]);
@@ -515,8 +519,8 @@ class MapComponent extends TerrainComponent<Props>
     if (spotlight !== undefined && typeof spotlight === 'object')
     {
       const location = MapUtil.getCoordinatesFromGeopoint(spotlight.fields[this.props.field]);
-      const address = spotlight.fields['_id'];
-      return this.renderMarker(address, location, false, spotlight.color, address + '_' + String(index));
+      const address = spotlight.name;
+      return this.renderMarker(address, location, false, spotlight.color, String(address) + '_' + String(index));
     }
     return null;
   }
@@ -677,6 +681,7 @@ class MapComponent extends TerrainComponent<Props>
                 inputProps={inputProps}
                 onEnterKeyDown={this.geocode}
                 styles={{ input: inputStyle }}
+                geocoder='google'
               />
             </form>
         }
@@ -704,10 +709,6 @@ class MapComponent extends TerrainComponent<Props>
 
   public render()
   {
-    if (this.props.secondLocation !== undefined)
-    {
-      const dist = this.directDistance(this.props.location, this.props.secondLocation);
-    }
     return (
       <div>
         {
