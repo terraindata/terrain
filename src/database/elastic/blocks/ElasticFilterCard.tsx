@@ -152,6 +152,7 @@ export const elasticFilter = _card({
     description: 'Terrain\'s custom card for filtering results in a human-readable way.',
     colors: getCardColors('filter', Colors().builder.cards.structureClause),
     preview: '[filters.length] Filters',
+    // tunable: true,
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
@@ -246,7 +247,7 @@ export const elasticFilter = _card({
               displayType: DisplayType.DROPDOWN,
               key: 'filterOp',
               options: List(
-                _.keys(esFilterOperatorsMap),
+                _.keys(esFilterOperatorsMap) as string[],
                 // can consider using this, but it includes 'boost', and uses raw text values
                 // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
               ),

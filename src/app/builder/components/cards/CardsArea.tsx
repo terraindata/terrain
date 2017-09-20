@@ -259,6 +259,7 @@ class CardsArea extends TerrainComponent<Props>
 
           {
             !this.props.hideCreateCardTool &&
+            !this.props.tuningMode &&
             renderCardTool &&
             <CreateCardTool
               language={this.props.language}

@@ -596,6 +596,7 @@ class _CardComponent extends TerrainComponent<Props>
             >
               {
                 this.props.canEdit &&
+                !this.props.tuningMode &&
                 !card['cannotBeMoved'] &&
                 <div className='card-drag-handle'>
                   <DragHandle
@@ -607,10 +608,12 @@ class _CardComponent extends TerrainComponent<Props>
               }
               {
                 this.state.hovering &&
+                !this.props.tuningMode &&
                 <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
               }
               {
                 this.props.canEdit &&
+                !this.props.tuningMode &&
                 !card['cannotBeMoved'] &&
                 <Menu
                   options={this.state.menuOptions}

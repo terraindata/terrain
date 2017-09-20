@@ -61,7 +61,7 @@ import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, Colors, fontColor } from '../../../common/Colors';
+import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
 
 import { Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;
@@ -133,7 +133,10 @@ class CardsColumn extends TerrainComponent<Props>
   public renderTopbar()
   {
     return (
-      <div className='cards-area-top-bar'>
+      <div
+        className='cards-area-top-bar'
+        style={backgroundColor(Colors().bg2)}
+      >
         <div className='cards-area-white-space' />
         <Switch
           first='Standard'
@@ -225,7 +228,11 @@ class CardsColumn extends TerrainComponent<Props>
           onScroll={this.handleScroll}
           id='cards-column'
         >
-          {this.renderTopbar()}
+          {cards.size ?
+            this.renderTopbar()
+            :
+            null
+          }
           <div
             id='cards-column-inner'
           >
