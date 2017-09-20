@@ -114,7 +114,7 @@ export const ElasticBlockHelpers = {
   },
 };
 
-export function searchFromRootCard(name: string): Block | null
+export function findCardTypeInRoot(name: string): Block | null
 {
   const state = BuilderStore.getState();
   const rootCard = state.query.cards.get(0);
@@ -133,7 +133,7 @@ export function searchFromRootCard(name: string): Block | null
 
 export function getIndex(notSetIndex: string = null): string | null
 {
-  const c = searchFromRootCard('eqlindex');
+  const c = findCardTypeInRoot('eqlindex');
   if (c === null)
   {
     return notSetIndex;
@@ -145,7 +145,7 @@ export function getIndex(notSetIndex: string = null): string | null
 
 export function getType(notSetType: string = null): string | null
 {
-  const c = searchFromRootCard('eqltype');
+  const c = findCardTypeInRoot('eqltype');
   if (c === null)
   {
     return notSetType;
