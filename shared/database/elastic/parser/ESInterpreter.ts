@@ -47,6 +47,7 @@ THE SOFTWARE.
 import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
+import ESParserError from './ESParserError';
 import ESValueInfo from './ESValueInfo';
 
 export const ESInterpreterDefaultConfig = new EQLConfig();
@@ -60,6 +61,8 @@ export default class ESInterpreter
   public config: EQLConfig; // query language description
   public params: { [name: string]: null | ESClause }; // input parameter clause types
   public parser: ESJSONParser; // source parser
+  public rootValueInfo: ESValueInfo;
+  public errors: ESParserError[];
 
   /**
    * Runs the interpreter on the given query string. Read needed data by calling the
@@ -73,62 +76,95 @@ export default class ESInterpreter
    * @param config the spec config to use
    * @param params parameter map to use
    */
-  public constructor(query: string | ESJSONParser,
+  public constructor(query: string | ESJSONParser | ESValueInfo,
     params: { [name: string]: any } = {},
     config: EQLConfig = ESInterpreterDefaultConfig)
   {
     this.config = config;
     this.params = params;
+    this.errors = [];
 
     if (typeof query === 'string')
     {
       this.parser = new ESJSONParser(query);
-    } else
+      if (this.parser.hasError())
+      {
+        this.accumulateError(null, 'Failed to parse the query ' + query);
+        return;
+      }
+      this.rootValueInfo = this.parser.getValueInfo();
+    } else if (query instanceof ESValueInfo)
+    {
+      this.rootValueInfo = query;
+      this.parser = null;
+    } else if (query instanceof ESJSONParser)
     {
       this.parser = query;
+      this.rootValueInfo = this.parser.getValueInfo();
+    } else
+    {
+      this.accumulateError(null, 'The input must be a query, an ESJSONParser object, or an ESValueInfo');
+      return;
     }
 
-    if (this.parser.getValue() !== null && this.parser.hasError() === false)
+    try
     {
-      try
-      {
-        const root: ESValueInfo = this.parser.getValueInfo();
-        root.clause = this.config.getClause('root');
-        root.recursivelyVisit(
-          (info: ESValueInfo): boolean =>
+      const root: ESValueInfo = this.rootValueInfo;
+      root.clause = this.config.getClause('root');
+      root.recursivelyVisit(
+        (info: ESValueInfo): boolean =>
+        {
+          if (info.parameter !== undefined)
           {
-            if (info.parameter !== undefined)
+            const value: null | any = this.params[info.parameter];
+            if (value === undefined)
             {
-              const value: null | any = this.params[info.parameter];
-              if (value === undefined)
-              {
-                this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
-              }
-
-              return false; // don't validate parameters
+              this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
             }
 
-            if (info.clause !== undefined)
-            {
-              info.clause.mark(this, info);
-            }
+            return false; // don't validate parameters
+          }
 
-            return true;
-          });
-      } catch (e)
-      {
-        this.accumulateError(this.parser.getValueInfo(), 'Failed to mark the json object ' + String(e.message));
-      }
+          if (info.clause !== undefined)
+          {
+            info.clause.mark(this, info);
+          }
+
+          return true;
+        });
+    } catch (e)
+    {
+      this.accumulateError(this.rootValueInfo, 'Failed to mark the json object ' + String(e.message));
     }
   }
 
   public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
   {
-    this.parser.accumulateErrorOnValueInfo(info, message, isWarning);
+    let token = null;
+    if (info !== null)
+    {
+      token = info.tokens[0];
+    }
+    const e = new ESParserError(token, info, message, isWarning);
+    this.errors.push(e);
+    if (this.parser !== null)
+    {
+      this.parser.accumulateError(e);
+    }
+  }
+
+  public hasInterpretingError()
+  {
+    return this.errors.length > 0;
+  }
+
+  public hasJSONParsingError()
+  {
+    return this.parser === null || this.parser.hasError();
   }
 
   public hasError()
   {
-    return this.parser === null || this.parser.hasError();
+    return this.hasInterpretingError() || this.hasJSONParsingError();
   }
 }
