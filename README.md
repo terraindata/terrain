@@ -92,7 +92,7 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * `yarn run start-front` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the
                         dev front-end server on start (and kill it on end)
 * When you want to stop the local elastic instance: `yarn test-back-teardown`
-* Default user login: `luser@terraindata.com` / `secret`
+* Default user login: `admin@terraindata.com` / `secret`
 * Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because
   your browser won't have to fetch Open Sans on each load
 
