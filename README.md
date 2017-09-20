@@ -85,11 +85,13 @@ General coding standards for Javascript are located in the TechDocs repo, not in
     * https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 * Add these keys to your gitlab key set: https://git.terrain.int/profile/keys
 * Checkout our repo somewhere that makes sense, like `~/terrain/` by using git: `git clone git@git.terrain.int:terrain/Search.git`
-* `yarn`
+* `yarn` installs and updates dependencies
 * `yarn global add webpack-dev-server`
+* `yarn test-back-setup` - starts a local elastic instance
 * `yarn start` - starts the Midway server, now running at localhost:3000
 * `yarn run start-front` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the
                         dev front-end server on start (and kill it on end)
+* When you want to stop the local elastic instance: `yarn test-back-teardown`
 * Default user login: `luser@terraindata.com` / `secret`
 * Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because
   your browser won't have to fetch Open Sans on each load
