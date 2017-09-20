@@ -81,6 +81,7 @@ General coding standards for Javascript are located in the TechDocs repo, not in
   * Update package lists again: `sudo apt-get update`
   * Install nodejs: `sudo apt-get install -y nodejs`
   * Install yarn: `sudo npm -g install yarn`
+* Checkout our repo somewhere that makes sense, like `~/terrain/` by using git: `git clone git@git.terrain.int:terrain/Search.git`
 * `yarn`
 * `yarn global add webpack-dev-server`
 * `yarn start` - starts the Midway server, now running at localhost:3000
