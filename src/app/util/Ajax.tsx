@@ -1070,6 +1070,40 @@ export const Ajax =
         },
       );
     },
+
+    getAnalytics(variantId: ID, start: Date, end: Date, metricId: number)
+    {
+      const authState = AuthStore.getState();
+      // jmansor: will need to change Ajax.req to allow calls without prepending
+      // /midway/v1/ to the URL.
+      const headers = new Headers({
+        'Content-Type': 'application/json',
+      });
+      const init: RequestInit = {
+        method: 'GET',
+        headers,
+        cache: 'default',
+      };
+      const request = new Request(
+        `http://localhost:3000/events/variants/${variantId}?
+id=1&
+accessToken=${authState.accessToken}&
+start=${start.toISOString()}&
+end=${end.toISOString()}&
+metric=${metricId.toString()}&
+interval=day&
+eventid=1&
+agg=date_histogram&
+field=@timestamp`,
+        init,
+      );
+
+      return fetch(request)
+        .then((response) =>
+        {
+          return response.json();
+        });
+    },
   };
 
 export default Ajax;
