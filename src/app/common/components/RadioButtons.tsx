@@ -53,26 +53,40 @@ export interface Props
   selected?: string;
   options: Array<{
     value: string;
-    onClick: () => void
+    label?: string;
+    onClick: (optionValue?: any) => void
   }>;
+  optionShadow?: boolean;
 }
 
 class RadioButtons extends TerrainComponent<Props>
 {
+  public static defaultProps = { optionShadow: false };
 
   public renderOption(option)
   {
+    const { optionShadow } = this.props;
+    const style: any = {};
+
+    if (optionShadow)
+    {
+      style.boxShadow = '2px 2px 2px #222';
+      style.backgroundColor = '#666';
+      style.margin = '10px';
+      style.padding = '5px';
+    }
+
     return (
-      <div key={option.value} className='radio-button-option'>
+      <div key={option.value} style={style} className='radio-button-option'>
         <div
-          onClick={option.onClick}
+          onClick={() => option.onClick(option.value)}
           className={classNames({
             'radio-button': true,
             'radio-button-selected': option.value === this.props.selected,
           })}
         >
         </div>
-        {option.value}
+        {option.label !== undefined ? option.label : option.value}
         <br />
       </div>
     );

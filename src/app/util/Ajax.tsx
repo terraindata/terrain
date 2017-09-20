@@ -1092,7 +1092,7 @@ start=${start.toISOString()}&
 end=${end.toISOString()}&
 metric=${metricId.toString()}&
 interval=day&
-eventid=1&
+eventid=${metricId.toString()}&
 agg=date_histogram&
 field=@timestamp`,
         init,

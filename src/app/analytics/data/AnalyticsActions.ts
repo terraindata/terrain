@@ -57,11 +57,11 @@ import Ajax from './../../util/Ajax';
 
 const Actions =
   {
-    fetch: () => (dispatch) =>
+    fetch: (metricId) => (dispatch) =>
     {
       const start = new Date(2015, 5, 2);
       const end = new Date(2015, 5, 4);
-      Ajax.getAnalytics(1, start, end, 2)
+      Ajax.getAnalytics(1, start, end, metricId)
         .then((variantAnalytics) =>
         {
           return dispatch({

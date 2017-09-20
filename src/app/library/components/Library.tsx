@@ -57,6 +57,7 @@ import GroupsColumn from './GroupsColumn';
 import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
+import RadioButtons from 'common/components/RadioButtons';
 
 export interface Props
 {
@@ -73,6 +74,7 @@ export interface State
   libraryState: LibraryState;
   selectedDomain: any;
   zoomDomain: any;
+  selectedMetric: string;
 }
 
 class Library extends TerrainComponent<any>
@@ -91,6 +93,7 @@ class Library extends TerrainComponent<any>
     libraryState: null,
     selectedDomain: {},
     zoomDomain: {},
+    selectedMetric: '',
   };
 
   public componentWillMount()
@@ -169,6 +172,13 @@ class Library extends TerrainComponent<any>
     localStorage.setItem(lastPath, location.pathname);
   }
 
+  handleRadioButtonClick(optionValue)
+  {
+    this.props.analyticsActions.fetch(optionValue);
+    this.setState({ selectedMetric: optionValue });
+  }
+
+
   public render()
   {
     const { library: libraryState } = this.props;
@@ -181,6 +191,8 @@ class Library extends TerrainComponent<any>
       selectedVariants,
       groupsOrder,
     } = libraryState;
+
+    const { selectedMetric } = this.state;
 
     const { router, basePath, variantsMultiselect } = this.props;
     const { params } = router;
@@ -301,11 +313,23 @@ class Library extends TerrainComponent<any>
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
-            <MultipleAreaChart
-              datasets={datasets}
-              xDataKey={'key'}
-              yDataKey={'doc_count'}
-            />
+            <div style={{ width: '80%', height: '100%' }}>
+              <MultipleAreaChart
+                datasets={datasets}
+                xDataKey={'key'}
+                yDataKey={'doc_count'}
+              />
+            </div>
+            <div style={{ width: '20%', height: '100%' }}>
+              <RadioButtons
+                optionShadow={true}
+                selected={selectedMetric}
+                options={[
+                  { value: '1', label: 'CTR', onClick: this.handleRadioButtonClick },
+                  { value: '2', label: 'Conversions', onClick: this.handleRadioButtonClick }
+                ]}
+              />
+            </div>
           </div> : null
         }
       </div>
