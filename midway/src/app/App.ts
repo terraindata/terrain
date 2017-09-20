@@ -143,9 +143,17 @@ class App
   public async start(): Promise<http.Server>
   {
     // tslint:disable-next-line:no-floating-promises
+
+    // create application schema
     await Schema.createAppSchema(this.config.db as string, this.DB);
+
+    // process configuration options
     await Config.handleConfig(this.config);
+
+    // create a default seed user
     await Users.initializeDefaultUser();
+
+    // connect to configured databases
     const dbs = await databases.select([], {});
     for (const db of dbs)
     {
@@ -158,6 +166,7 @@ class App
     const heapStats: object = v8.getHeapStatistics();
     this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));
     HA = this.heapAvail;
+
     winston.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
   }
