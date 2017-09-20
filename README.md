@@ -81,6 +81,9 @@ General coding standards for Javascript are located in the TechDocs repo, not in
   * Update package lists again: `sudo apt-get update`
   * Install nodejs: `sudo apt-get install -y nodejs`
   * Install yarn: `sudo npm -g install yarn`
+* Generate ssh keys for your computer (if you don't already have them)
+    * https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
+* Add these keys to your gitlab key set: https://git.terrain.int/profile/keys
 * Checkout our repo somewhere that makes sense, like `~/terrain/` by using git: `git clone git@git.terrain.int:terrain/Search.git`
 * `yarn`
 * `yarn global add webpack-dev-server`
