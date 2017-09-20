@@ -108,7 +108,7 @@ export async function handleConfig(config: Config): Promise<void>
 
   if (config.databases !== undefined)
   {
-    const results = await databases.select([], {});
+    const results = await databases.select(['id'], {});
     if (results.length === 0)
     {
       for (const database of config.databases)
