@@ -114,6 +114,7 @@ export async function handleConfig(config: Config): Promise<void>
       for (const database of config.databases)
       {
         const db = database as DatabaseConfig;
+        db.status = 'DISCONNECTED';
         winston.info('Registering new database item: ', db);
         await databases.upsert({} as UserConfig, db);
       }

@@ -154,7 +154,7 @@ class App
     await Users.initializeDefaultUser();
 
     // connect to configured databases
-    const dbs = await databases.select([], {});
+    const dbs = await databases.select([ 'id' ], {});
     for (const db of dbs)
     {
       if (db.id !== undefined)
