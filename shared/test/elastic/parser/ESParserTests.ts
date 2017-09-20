@@ -81,8 +81,8 @@ function testParse(testString: string,
   const errors = parser.getErrors();
 
   winston.info(util.inspect(parser.getValueInfo()));
-  // winston.info(util.inspect(parser.getValueInfos()));
-  // winston.info(util.inspect(parser.getTokens()));
+  winston.info(util.inspect(parser.getTokens()));
+  winston.info(util.inspect(parser.getValueInfos()));
 
   winston.info(util.inspect(errors));
 
