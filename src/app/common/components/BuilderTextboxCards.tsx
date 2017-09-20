@@ -65,6 +65,7 @@ export interface Props
   columnIndex: number;
   display: Display;
   language: string;
+  tuningMode?: boolean;
 }
 
 class BuilderTextboxCards extends React.Component<Props, any>
@@ -104,6 +105,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
           card={this.props.value as Card}
           index={null}
           display={this.props.display}
+          tuningMode={this.props.tuningMode}
         />
       </div>
     );

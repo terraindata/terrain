@@ -68,7 +68,7 @@ export interface Card extends IRecord<Card>
     colors: string[];
     title: string;
     display: Display | Display[];
-
+    tunable?: boolean;
     isAggregate: boolean;
 
     // the format string used for generating tql
@@ -138,6 +138,7 @@ export interface CardConfig
     description?: string;
 
     metaFields?: string[];
+    tunable?: boolean;
 
     init?: InitFn;
   };

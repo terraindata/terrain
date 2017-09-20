@@ -81,6 +81,8 @@ export let BuilderActionTypes =
     changeResultsConfig: '',
     results: '',
 
+    updateKeyPath: '',
+
     save: '', // just tells the store that something was saved
 
     undo: '',

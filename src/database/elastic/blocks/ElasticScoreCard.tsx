@@ -67,6 +67,7 @@ export const elasticScore = _card(
 
     static: {
       language: 'elastic',
+      tunable: true,
       title: 'Terrain Score Sort',
       description: 'Sort results using Terrain\'s proprietary scoring method: Transform \
         individual field values using a simple graphing tool, and combine the transformed \
@@ -194,7 +195,7 @@ export const elasticScore = _card(
                 {
                   displayType: DisplayType.DROPDOWN,
                   key: 'sortOrder',
-                  options: List(ESInterpreterDefaultConfig.getClause('sort_order')['values']),
+                  options: List(ESInterpreterDefaultConfig.getClause('sort_order')['values'] as string[]),
                   autoDisabled: true,
                   dropdownUsesRawValues: true,
                   centerDropdown: true,
@@ -213,7 +214,7 @@ export const elasticScore = _card(
                 {
                   displayType: DisplayType.DROPDOWN,
                   key: 'sortMode',
-                  options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values'].concat(['auto'])),
+                  options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values'].concat(['auto']) as string[]),
                   dropdownUsesRawValues: true,
                   autoDisabled: true,
                   centerDropdown: true,
@@ -232,7 +233,7 @@ export const elasticScore = _card(
                 {
                   displayType: DisplayType.DROPDOWN,
                   key: 'sortType',
-                  options: List(ESInterpreterDefaultConfig.getClause('field_type')['values']),
+                  options: List(ESInterpreterDefaultConfig.getClause('field_type')['values'] as string[]),
                   dropdownUsesRawValues: true,
                   autoDisabled: true,
                   centerDropdown: true,

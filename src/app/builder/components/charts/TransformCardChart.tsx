@@ -114,6 +114,8 @@ class TransformCardChart extends TerrainComponent<Props>
     dragging: false,
   };
 
+  public _isMounted = false;
+
   constructor(props: Props)
   {
     super(props);
@@ -124,48 +126,52 @@ class TransformCardChart extends TerrainComponent<Props>
   {
     const el = ReactDOM.findDOMNode(this);
     TransformChart.create(el, this.getChartState());
+    this._isMounted = true;
   }
 
   public onSelect(pointId: string, selectRange: boolean): void
   {
-    const { points } = this.props;
-    let { selectedPointIds } = this.state;
-
-    if (pointId)
+    if (this._isMounted)
     {
-      if (selectRange)
+      const { points } = this.props;
+      let { selectedPointIds } = this.state;
+
+      if (pointId)
       {
-        selectedPointIds = selectedPointIds.set(pointId, true);
-        const firstIndex = points.findIndex((point) => point.id === pointId);
-        const secondIndex = points.findIndex((point) => point.id === this.state.lastSelectedPointId);
-        if (firstIndex !== -1 && secondIndex !== -1)
+        if (selectRange)
         {
-          _.range(
-            Math.min(firstIndex, secondIndex),
-            Math.max(secondIndex, firstIndex),
-          ).map((index) =>
-            selectedPointIds = selectedPointIds.set(points.get(index).id, true),
-          );
+          selectedPointIds = selectedPointIds.set(pointId, true);
+          const firstIndex = points.findIndex((point) => point.id === pointId);
+          const secondIndex = points.findIndex((point) => point.id === this.state.lastSelectedPointId);
+          if (firstIndex !== -1 && secondIndex !== -1)
+          {
+            _.range(
+              Math.min(firstIndex, secondIndex),
+              Math.max(secondIndex, firstIndex),
+            ).map((index) =>
+              selectedPointIds = selectedPointIds.set(points.get(index).id, true),
+            );
+          }
+        }
+        else
+        {
+          // clicking on a single point with shift or ctrl
+          selectedPointIds = selectedPointIds.set(pointId, !selectedPointIds.get(pointId));
         }
       }
       else
       {
-        // clicking on a single point with shift or ctrl
-        selectedPointIds = selectedPointIds.set(pointId, !selectedPointIds.get(pointId));
+        selectedPointIds = Map<string, boolean>();
       }
-    }
-    else
-    {
-      selectedPointIds = Map<string, boolean>();
-    }
-    // else, a click to unselect things
+      // else, a click to unselect things
 
-    this.setState({
-      selectedPointIds,
-      lastSelectedPointId: pointId,
-    });
+      this.setState({
+        selectedPointIds,
+        lastSelectedPointId: pointId,
+      });
 
-    TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState(selectedPointIds));
+      TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState(selectedPointIds));
+    }
   }
 
   // gets turned into debounced function/object
@@ -434,6 +440,7 @@ class TransformCardChart extends TerrainComponent<Props>
     this.setState({
       dragging: false,
     });
+    this._isMounted = false;
     this.debouncedUpdatePoints.flush();
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);

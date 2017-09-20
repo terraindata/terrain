@@ -78,6 +78,7 @@ export interface Props
   singleChild?: boolean;
   hideCreateCardTool?: boolean;
   handleCardDrop?: (type: string) => any;
+  tuningMode?: boolean;
 }
 
 interface KeyState
@@ -87,7 +88,7 @@ interface KeyState
 
 interface State extends KeyState
 {
-  learningMode: boolean;
+  tuningMode: boolean;
   cardToolOpen: boolean;
   isDraggingCardOver: boolean;
   draggingOverIndex: number;
@@ -99,12 +100,14 @@ class CardsArea extends TerrainComponent<Props>
 {
   public state: State = {
     keyPath: null,
-    learningMode: this.props.helpOn,
+    tuningMode: this.props.tuningMode,
     cardToolOpen: true,
     isDraggingCardOver: false,
     draggingOverIndex: -1,
     draggingCardItem: null,
   };
+
+  public tunableCards = [];
 
   constructor(props: Props)
   {
@@ -151,18 +154,27 @@ class CardsArea extends TerrainComponent<Props>
     Actions.create(this.props.keyPath, 0, 'sfw');
   }
 
-  public toggleView()
-  {
-    this.setState({
-      learningMode: !this.state.learningMode,
-    });
-  }
-
   public toggleCardTool()
   {
     this.setState({
       cardToolOpen: !this.state.cardToolOpen,
     });
+  }
+
+  public getTunableCards(cards)
+  {
+    cards.forEach((card) =>
+    {
+      if (card.static.tunable)
+      {
+        this.tunableCards.push(card);
+      }
+      if (card.cards !== undefined && card.cards.size > 0)
+      {
+        this.getTunableCards(card.cards);
+      }
+    });
+
   }
 
   public render()
@@ -173,6 +185,13 @@ class CardsArea extends TerrainComponent<Props>
 
     const { isDraggingCardOver, draggingCardItem, draggingOverIndex } = this.state;
     const { keyPath } = this.props;
+    if (this.props.tuningMode)
+    {
+      this.tunableCards = [];
+      this.getTunableCards(cards);
+    }
+
+    const cardsToShow = this.props.tuningMode ? List(this.tunableCards) : cards;
 
     return (
       <div>
@@ -184,38 +203,43 @@ class CardsArea extends TerrainComponent<Props>
 
         >
           {
-            cards.map((card: Card, index: number) =>
-              <div
-                key={card.id}
-              >
-                <CardDragPreview
-                  cardItem={draggingCardItem}
-                  isInList={true}
-                  visible={isDraggingCardOver && draggingOverIndex === index}
-                  index={index}
-                  keyPath={keyPath}
-                  accepts={this.props.accepts}
-                  singleChild={this.props.singleChild}
-                  wrapType={card.type}
-                  language={this.props.language}
-                  handleCardDrop={this.props.handleCardDrop}
-                />
-                <CardComponent
-                  card={card}
-                  language={this.props.language}
-                  index={index}
-                  singleCard={false}
-                  canEdit={this.props.canEdit}
-                  keyPath={this.props.keyPath}
-                  accepts={this.props.accepts}
-                  singleChild={this.props.singleChild}
+            cardsToShow.map((card: Card, index: number) =>
+            {
+              return (
+                <div
+                  key={card.id}
+                >
+                  <CardDragPreview
+                    cardItem={draggingCardItem}
+                    isInList={true}
+                    visible={isDraggingCardOver && draggingOverIndex === index}
+                    index={index}
+                    keyPath={keyPath}
+                    accepts={this.props.accepts}
+                    singleChild={this.props.singleChild}
+                    wrapType={card.type}
+                    language={this.props.language}
+                    handleCardDrop={this.props.handleCardDrop}
+                  />
+                  <CardComponent
+                    card={card}
+                    language={this.props.language}
+                    index={index}
+                    singleCard={false}
+                    canEdit={this.props.canEdit}
+                    keyPath={this.props.keyPath}
+                    accepts={this.props.accepts}
+                    singleChild={this.props.singleChild}
 
-                  addColumn={this.props.addColumn}
-                  columnIndex={this.props.columnIndex}
-                  helpOn={this.state.learningMode || this.props.helpOn}
-                  handleCardDrop={this.props.handleCardDrop}
-                />
-              </div>,
+                    addColumn={this.props.addColumn}
+                    columnIndex={this.props.columnIndex}
+                    helpOn={this.props.helpOn}
+                    handleCardDrop={this.props.handleCardDrop}
+                    tuningMode={this.props.tuningMode}
+                  />
+                </div>
+              );
+            },
             )
           }
 

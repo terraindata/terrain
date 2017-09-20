@@ -80,6 +80,7 @@ interface IWrapperCardConfig
   language: string;
   init?: () => any;
   className?: string;
+  tunable?: boolean;
 }
 
 export const _wrapperCard = (config: IWrapperCardConfig) =>
@@ -102,6 +103,7 @@ export const _wrapperCard = (config: IWrapperCardConfig) =>
       colors: config.colors,
       accepts: config.accepts,
       language: config.language,
+      tunable: config.tunable,
 
       // manualEntry: config.manualEntry,
 
@@ -135,6 +137,7 @@ export const _aggregateCard = (config: {
   tql: TQLFn;
   defaultValue?: string;
   language: string;
+  tunable?: boolean;
 }) => _card({
   value: '',
 
@@ -142,6 +145,7 @@ export const _aggregateCard = (config: {
     language: config.language,
     title: config.title,
     colors: config.colors,
+    tunable: config.tunable,
     // manualEntry: config.manualEntry,
     preview: '[value]',
     tql: config.tql,
@@ -168,6 +172,7 @@ export const _aggregateNestedCard = (config: {
   accepts: List<string>,
   init?: () => any,
   language: string,
+  tunable?: boolean,
 }) => _card({
   value: '',
 
@@ -175,6 +180,7 @@ export const _aggregateNestedCard = (config: {
     language: config.language,
     title: config.title,
     colors: config.colors,
+    tunable: config.tunable,
     // manualEntry: config.manualEntry,
     preview: '[value]',
     tql: config.tql,
@@ -195,6 +201,7 @@ export const _valueCard = (config: {
   defaultValue: number | string,
   language: string,
   string?: boolean,
+  tunable?: boolean,
 }) => (
     _card({
       value: config.defaultValue,
@@ -207,6 +214,7 @@ export const _valueCard = (config: {
         display: config.string ? stringValueDisplay : valueDisplay,
         // manualEntry: config.manualEntry,
         tql: config.tql,
+        tunable: config.tunable,
       },
     })
   );

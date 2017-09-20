@@ -139,6 +139,13 @@ const BuilderActions =
         resultsConfig,
       }),
 
+    updateKeyPath:
+    (id, keyPath) =>
+      $(ActionTypes.updateKeyPath, {
+        id,
+        keyPath,
+      }),
+
     results:
     (resultsState) =>
       $(ActionTypes.results, {

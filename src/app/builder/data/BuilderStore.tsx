@@ -94,6 +94,9 @@ export class BuilderStateClass
 
   public resultsState: ResultsState = _ResultsState();
   public exportState: FileImportState = _FileImportState();
+
+  // For tuning mode: keep track of keypaths of cards
+  public cardKeyPaths = Map<ID, KeyPath>({});
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
 const BuilderState_Record = Immutable.Record(new BuilderStateClass());

@@ -94,6 +94,7 @@ export interface Props
   addColumn?: (number, string?) => void;
   columnIndex?: number;
   handleCardDrop?: (type: string) => any;
+  tuningMode?: boolean;
 }
 
 interface IMoveState
@@ -359,6 +360,7 @@ class CardField extends TerrainComponent<Props>
             addColumn={this.props.addColumn}
             columnIndex={this.props.columnIndex}
             language={this.props.language}
+            tuningMode={this.props.tuningMode}
           />
         }
         <div
@@ -430,6 +432,7 @@ class CardField extends TerrainComponent<Props>
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
               language={this.props.language}
+              tuningMode={this.props.tuningMode}
             />
           </div>
           {
@@ -496,6 +499,7 @@ class CardField extends TerrainComponent<Props>
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
               language={this.props.language}
+              tuningMode={this.props.tuningMode}
             />
           </div>
         }

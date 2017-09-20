@@ -111,6 +111,7 @@ export interface Props
   display?: Display;
 
   handleCardDrop?: (type: string) => any;
+  tuningMode?: boolean;
 }
 
 @Radium
@@ -124,6 +125,7 @@ class _CardComponent extends TerrainComponent<Props>
     menuOptions: List<MenuOption>;
 
     scrollState: BuilderScrollState;
+    keyPath: KeyPath;
   };
 
   public refs: {
@@ -164,8 +166,8 @@ class _CardComponent extends TerrainComponent<Props>
       ]),
 
       scrollState: BuilderScrollStore.getState(),
+      keyPath: props.keyPath,
     };
-
   }
 
   public componentWillMount()
@@ -198,6 +200,9 @@ class _CardComponent extends TerrainComponent<Props>
     this._subscribe(BuilderScrollStore, {
       stateKey: 'scrollState',
       isMounted: true,
+    });
+    this.setState({
+      keyPath: this.getKeyPath(),
     });
   }
 
@@ -391,9 +396,14 @@ class _CardComponent extends TerrainComponent<Props>
 
   public getKeyPath()
   {
-    return this.props.singleCard
+    const newKeyPath = this.props.singleCard
       ? this.props.keyPath
       : this._ikeyPath(this.props.keyPath, this.props.index);
+    if (!this.props.tuningMode)
+    {
+      Actions.updateKeyPath(this.props.card.id, newKeyPath);
+    }
+    return newKeyPath;
   }
 
   public handleCardToolClose()
@@ -496,19 +506,30 @@ class _CardComponent extends TerrainComponent<Props>
       );
     }
 
+    let keyPath = this.state.keyPath;
+    if (this.props.tuningMode)
+    {
+      const keyPaths = Store.getState().cardKeyPaths;
+      if (keyPaths.get(this.props.card.id) !== undefined)
+      {
+        keyPath = keyPaths.get(this.props.card.id);
+      }
+    }
+
     const content = <BuilderComponent
       canEdit={this.props.canEdit}
       data={this.props.card}
       helpOn={this.props.helpOn}
       addColumn={this.props.addColumn}
       columnIndex={this.props.columnIndex}
-      keyPath={this.getKeyPath()}
+      keyPath={keyPath}
       language={this.props.card.static.language}
       textStyle={{
         color: this.props.card.static.colors[0],
         backgroundColor: this.state.hovering ? Colors().bg1 : undefined,
       }}
       handleCardDrop={this.props.handleCardDrop}
+      tuningMode={this.props.tuningMode}
     />;
 
     const { card } = this.props;

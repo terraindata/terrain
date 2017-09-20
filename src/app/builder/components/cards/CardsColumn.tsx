@@ -86,10 +86,10 @@ class CardsColumn extends TerrainComponent<Props>
 {
   public state: {
     keyPath: KeyPath;
-    learningMode: boolean;
+    tuningMode: boolean;
   } = {
     keyPath: this.computeKeyPath(this.props),
-    learningMode: false,
+    tuningMode: false,
   };
 
   public innerHeight: number = -1;
@@ -130,13 +130,6 @@ class CardsColumn extends TerrainComponent<Props>
     //   });
   }
 
-  public toggleLearningMode()
-  {
-    this.setState({
-      learningMode: !this.state.learningMode,
-    });
-  }
-
   public renderTopbar()
   {
     return (
@@ -144,9 +137,9 @@ class CardsColumn extends TerrainComponent<Props>
         <div className='cards-area-white-space' />
         <Switch
           first='Standard'
-          second='Learning'
-          onChange={this.toggleLearningMode}
-          selected={this.state.learningMode ? 2 : 1}
+          second='Tuning'
+          onChange={this._toggle('tuningMode')}
+          selected={this.state.tuningMode ? 2 : 1}
           small={true}
         />
       </div>
@@ -209,7 +202,6 @@ class CardsColumn extends TerrainComponent<Props>
     const { cards, canEdit } = props;
     const { keyPath } = this.state;
     const canHaveDeck = canEdit;
-
     return (
       <div
         className={classNames({
@@ -233,6 +225,7 @@ class CardsColumn extends TerrainComponent<Props>
           onScroll={this.handleScroll}
           id='cards-column'
         >
+          {this.renderTopbar()}
           <div
             id='cards-column-inner'
           >
@@ -256,6 +249,7 @@ class CardsColumn extends TerrainComponent<Props>
               noCardTool={true}
               accepts={this.getPossibleCards()}
               handleCardDrop={this.handleCardDrop}
+              tuningMode={this.state.tuningMode}
             />
             {
               !cards.size ? /* "Create your first card." */

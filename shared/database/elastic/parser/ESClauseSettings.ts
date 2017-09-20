@@ -58,6 +58,7 @@ interface ESClauseSettings
   template?: any;
   required?: string[];
   suggestions?: any[];
+  tunable?: boolean;
 }
 
 export default ESClauseSettings;
