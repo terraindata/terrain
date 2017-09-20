@@ -63,7 +63,7 @@ import ESStringClause from './clauses/ESStringClause';
 import ESStructureClause from './clauses/ESStructureClause';
 import ESTypeClause from './clauses/ESTypeClause';
 import ESVariantClause from './clauses/ESVariantClause';
-
+import ESWildcardStructureClause from './clauses/ESWildcardStructureClause';
 /* tslint:disable:max-line-length */
 
 const EQLSpec: ESClause[] =

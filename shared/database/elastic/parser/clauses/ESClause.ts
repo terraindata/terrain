@@ -72,7 +72,7 @@ import ESStringClause from './ESStringClause';
 import ESStructureClause from './ESStructureClause';
 import ESTypeClause from './ESTypeClause';
 import ESVariantClause from './ESVariantClause';
-
+import ESWildcardStructureClause from './ESWildcardStructureClause';
 /**
  * Represents an Elastic Search query clause
  */
@@ -167,6 +167,8 @@ abstract class ESClause
         return visitor.visitESVariantClause(this as any as ESVariantClause);
       case ESClauseType.ESScriptClause:
         return visitor.visitESScriptClause(this as any as ESScriptClause);
+      case ESClauseType.ESWildcardStructureClause:
+        return visitor.visitESWildcardStructureClause(this as any as ESWildcardStructureClause);
       default:
         return visitor.visitESClause(this);
     }
