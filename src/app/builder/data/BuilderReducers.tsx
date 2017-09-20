@@ -132,7 +132,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       }
 
       let correctCard = true;
-      if (query.language === 'elastic' && query.cards)
+      if (query.language === 'elastic' && query.cards && query.cards.size > 0)
       {
         // Elastic cards must start from the root card
         if (query.cards.get(0)['key'] !== 'root')
