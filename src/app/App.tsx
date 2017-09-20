@@ -275,11 +275,6 @@ class App extends TerrainComponent<Props>
     {
       ColorsActions.setStyle(key, value);
     });
-
-    // Object.keys(tooltipStyles).forEach((key) =>
-    // {
-    //   ColorsActions.setStyle(key, tooltipStyles[key]);
-    // });
   }
 
   public fetchData()
