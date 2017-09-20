@@ -61,7 +61,7 @@ import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, Colors, fontColor } from '../../../common/Colors';
+import { altStyle, Colors, fontColor, backgroundColor, borderColor} from '../../../common/Colors';
 import StyleTag from './../../../common/components/StyleTag';
 
 import { Cards } from '../../../../blocks/types/Card';
@@ -278,6 +278,7 @@ class CardsColumn extends TerrainComponent<Props>
           >
             <ExpandIcon
               className='cards-deck-knob-icon'
+              style={borderColor(Colors().border1)} 
             />
             <div
               className='cards-deck-knob-text'
@@ -285,6 +286,7 @@ class CardsColumn extends TerrainComponent<Props>
             >
               Card Deck
             </div>
+
           </div>
         }
 
@@ -318,11 +320,12 @@ class CardsColumn extends TerrainComponent<Props>
 const SVG_STYLE = {
   '.cards-deck-knob .cards-deck-knob-icon': {
     fill: Colors().altBg1;
+    background: Colors().bg3;
   }
 
-   '.cards-deck-knob .cards-deck-knob-icon &:hover': {
+  '.cards-deck-knob .cards-deck-knob-icon &:hover': {
     fill: Colors().bg3;
-    background: Colors().altBg1;
+    'background-color': Colors().altBg1;
   }
 };
 

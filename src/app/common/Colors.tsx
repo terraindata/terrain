@@ -547,7 +547,7 @@ const LIGHT: Theme =
 
     emptyBg: '#fff',
 
-    border1: 'rgb(72,72,72)',
+    border1: 'rgb(200, 202, 206)',
     border2: 'rgb(100,105,107)',
     border3: 'rgb(125,130,139)',
 
