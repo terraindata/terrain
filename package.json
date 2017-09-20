@@ -60,6 +60,7 @@
       "^roles(.*)$": "<rootDir>/src/app/roles$1",
       "^schema(.*)$": "<rootDir>/src/app/schema$1",
       "^shared(.*)$": "<rootDir>/shared/$1",
+      "^src(.*)$": "<rootDir>/src/$1",
       "^store(.*)$": "<rootDir>/src/app/store$1",
       "^tql(.*)$": "<rootDir>/src/app/tql$1",
       "^users(.*)$": "<rootDir>/src/app/users$1",

@@ -51,16 +51,14 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { CardConfig } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { backgroundColor, Colors } from '../../../common/Colors';
 import CreateLine from '../../../common/components/CreateLine';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import CardDropArea from './CardDropArea';
-import CreateCardOption from './CreateCardOption';
+import CardSelector from './CardSelector';
 import './CreateCardTool.less';
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
@@ -137,26 +135,6 @@ class CreateCardTool extends TerrainComponent<Props>
     this.props.onToggle && this.props.onToggle();
   }
 
-  public renderCardOption(type: string, index: number)
-  {
-    const { overrideText } = this.props;
-
-    return (
-      <CreateCardOption
-        card={AllBackendsMap[this.props.language].blocks[type] as CardConfig}
-        index={index}
-        onClick={this.handleCardClick}
-        overrideTitle={
-          overrideText &&
-          overrideText.get(index) &&
-          overrideText.get(index).text
-        }
-        isFocused={this.state.focusedIndex === index}
-        key={'' + index}
-      />
-    );
-  }
-
   public getCardTypeList(): List<string>
   {
     if (this.props.overrideText)
@@ -169,46 +147,15 @@ class CreateCardTool extends TerrainComponent<Props>
 
   public renderCardSelector()
   {
-    const cardTypeList = this.getCardTypeList();
-    const isEmpty = cardTypeList.size === 0;
-
     return (
-      <div
-        className={classNames({
-          'create-card-selector': true,
-          'create-card-selector-open': this.props.open,
-          'create-card-selector-focused': this.state.focusedIndex !== -1,
-        })}
-        ref='selector'
-        style={
-          backgroundColor(Colors().bg2)
-        }
-      >
-        <div className='create-card-selector-inner'>
-          {
-            isEmpty &&
-            <div className='create-card-empty'>
-              There are no remaining cards that can be created here.
-                </div>
-          }
-          {
-            cardTypeList.map(this.renderCardOption)
-          }
-          {
-            _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
-          }
-        </div>
-      </div>
+      <CardSelector
+        cardTypeList={this.getCardTypeList()}
+        open={this.props.open}
+        language={this.props.language}
+        handleCardClick={this.handleCardClick}
+        overrideText={this.props.overrideText}
+      />
     );
-    // {
-    //   !this.props.cannotClose &&
-    //   <div
-    //     className='close create-card-close'
-    //     onClick={this.handleCloseClick}
-    //   >
-    //     <CloseIcon />
-    //   </div>
-    // }
   }
 
   public handleCloseClick()
@@ -255,32 +202,32 @@ class CreateCardTool extends TerrainComponent<Props>
     // );
   }
 
-  handleFocus()
-  {
-    this.setState({
-      focusedIndex: 0,
-    });
-  }
+  // handleFocus()
+  // {
+  //   this.setState({
+  //     focusedIndex: 0,
+  //   });
+  // }
 
-  handleFocusLost()
-  {
-    this.setState({
-      focusedIndex: -1,
-    });
-  }
+  // handleFocusLost()
+  // {
+  //   this.setState({
+  //     focusedIndex: -1,
+  //   });
+  // }
 
-  handleFocusedIndexChange(focusedIndex: number)
-  {
-    this.setState({
-      focusedIndex,
-    });
-  }
+  // handleFocusedIndexChange(focusedIndex: number)
+  // {
+  //   this.setState({
+  //     focusedIndex,
+  //   });
+  // }
 
-  handleKeyboardSelect(index: number)
-  {
-    const type = this.getCardTypeList().get(index);
-    this.createCard(type);
-  }
+  // handleKeyboardSelect(index: number)
+  // {
+  //   const type = this.getCardTypeList().get(index);
+  //   this.createCard(type);
+  // }
 
   public render()
   {
@@ -308,6 +255,7 @@ class CreateCardTool extends TerrainComponent<Props>
     }
 
     const cardTypeList = this.getCardTypeList();
+
     return (
       <div
         className={classes}
@@ -319,25 +267,31 @@ class CreateCardTool extends TerrainComponent<Props>
         {
           this.renderPlaceholder()
         }
-        {
-          this.renderCardSelector()
-        }
+        <CardSelector
+          cardTypeList={this.getCardTypeList()}
+          open={this.props.open}
+          language={this.props.language}
+          handleCardClick={this.handleCardClick}
+          overrideText={this.props.overrideText}
+        />
         <CardDropArea
           index={this.props.index}
           keyPath={this.props.keyPath}
-          accepts={this.getCardTypeList()}
+          accepts={cardTypeList}
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
           handleCardDrop={this.props.handleCardDrop}
         />
-        <KeyboardFocus
-          onFocus={this.handleFocus}
-          onFocusLost={this.handleFocusLost}
-          index={this.state.focusedIndex}
-          onIndexChange={this.handleFocusedIndexChange}
-          length={cardTypeList.size}
-          onSelect={this.handleKeyboardSelect}
-        />
+        {
+          // <KeyboardFocus
+          //   onFocus={this.handleFocus}
+          //   onFocusLost={this.handleFocusLost}
+          //   index={this.state.focusedIndex}
+          //   onIndexChange={this.handleFocusedIndexChange}
+          //   length={cardTypeList.size}
+          //   onSelect={this.handleKeyboardSelect}
+          // />
+        }
       </div>
     );
   }
