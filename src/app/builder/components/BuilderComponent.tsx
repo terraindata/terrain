@@ -419,7 +419,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   zoomControl: true,
                   distance: parseFloat(distance),
                   distanceUnit,
-                  geocoder: 'google',
+                  geocoder: 'photon',
                   hideSearchSettings: true,
                   inputs: this.state.inputs,
                   textKeyPath: this._ikeyPath(parentKeyPath, 'map_text'),

@@ -85,7 +85,7 @@ const MapUtil = {
     }
     else
     {
-      MapUtil.ajax(callback, { q: address }, 'http://localhost:2322/api?', false);
+      MapUtil.ajax(callback, { q: address }, 'https://photon.komoot.de/api/?', false);
     }
   },
 
@@ -188,7 +188,7 @@ const MapUtil = {
     }
     else
     {
-      MapUtil.ajax(callback, { lat: location.lat, lon: location.lng }, 'http://localhost:2322/reverse?', true);
+      MapUtil.ajax(callback, { lat: location.lat, lon: location.lng }, 'https://photon.komoot.de/reverse?', true);
     }
   },
 
