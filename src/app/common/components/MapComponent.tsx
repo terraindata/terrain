@@ -213,18 +213,37 @@ class MapComponent extends TerrainComponent<Props>
       // If the location changes with no address (i.e. in cards) fill in the address via reverse-geo
       if (nextProps.keepAddressInSync && (nextProps.address === undefined || nextProps.address === '') && !this.state.usingInput)
       {
-        // TODO Make this use the correct geo coder
-        MapUtil.geocodeByLatLng('google', { lat: nextProps.location[0], lng: nextProps.location[1] })
-          .then((results: any) =>
+        const lat = nextProps.location[0];
+        const lng = nextProps.location[1];
+        if (this.reverseGeoCache[[lat, lng].toString()] !== undefined)
+        {
+          this.setState({
+            address: this.reverseGeoCache[[lat, lng].toString()],
+          });
+        }
+        else if (this.props.geocoder === 'photon')
+        {
+          MapUtil.geocodeByLatLng('photon', { lat, lng }, (result) =>
           {
-            if (results[0] !== undefined)
+            this.setState({
+              address: result.address,
+            });
+          });
+        }
+        else
+        {
+          MapUtil.geocodeByLatLng('google', { lat, lng })
+            .then((results: any) =>
             {
-              this.setState({
-                address: results[0].formatted_address,
-              });
-            }
-          })
-          .catch((error) => this.setState({ error }));
+              if (results[0] !== undefined)
+              {
+                this.setState({
+                  address: results[0].formatted_address,
+                });
+              }
+            })
+            .catch((error) => this.setState({ error }));
+        }
       }
     }
   }
@@ -681,7 +700,7 @@ class MapComponent extends TerrainComponent<Props>
                 inputProps={inputProps}
                 onEnterKeyDown={this.geocode}
                 styles={{ input: inputStyle }}
-                geocoder='google'
+                geocoder={this.props.geocoder}
               />
             </form>
         }

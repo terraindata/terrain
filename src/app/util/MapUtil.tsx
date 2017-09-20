@@ -63,7 +63,6 @@ const MapUtil = {
         {
           if (status !== OK)
           {
-            // TODO: Remove callback support in the next major version.
             if (callback)
             {
               callback({ status }, null, results);
@@ -72,7 +71,6 @@ const MapUtil = {
             reject(status);
           }
 
-          // TODO: Remove callback support in the next major version.
           if (callback)
           {
             const latLng = {
@@ -169,8 +167,6 @@ const MapUtil = {
         {
           if (status !== OK)
           {
-
-            // TODO: Remove callback support in the next major version.
             if (callback)
             {
               callback({ status }, null, results);
@@ -180,7 +176,6 @@ const MapUtil = {
             reject(status);
           }
 
-          // TODO: Remove callback support in the next major version.
           if (callback)
           {
             const address = results[0].formatted_address;

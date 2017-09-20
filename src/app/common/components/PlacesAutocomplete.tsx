@@ -113,7 +113,7 @@ class PlacesAutocomplete extends TerrainComponent<Props>
   public constructor(props: Props)
   {
     super(props);
-    this.fetchPredictions = _.debounce(this.fetchPredictions, 1);
+    this.fetchPredictions = _.debounce(this.fetchPredictions, 5);
   }
 
   public componentDidMount()
@@ -139,6 +139,45 @@ class PlacesAutocomplete extends TerrainComponent<Props>
 
   }
 
+  public photonAutocompleteCallback(predictions)
+  {
+    this.setState({
+      autocompleteItems: predictions.features.map((p, idx) =>
+      {
+        const { housenumber, street, city, state, country, osm_id } = p.properties;
+        let address: string = '';
+        if (housenumber !== undefined)
+        {
+          address += String(housenumber) + ' ';
+        }
+        if (street !== undefined)
+        {
+          address += String(street) + ', ';
+        }
+        if (city !== undefined)
+        {
+          address += String(city) + ', ';
+        }
+        if (state !== undefined)
+        {
+          address += String(state) + ', ';
+        }
+        if (country !== undefined)
+        {
+          address += String(country);
+        }
+        return {
+          suggestion: address,
+          placeId: String(osm_id) + '_' + String(idx),
+          active: this.props.highlightFirstSuggestion && idx === 0 ? true : false,
+          formattedSuggestion: address,
+          index: idx,
+          coordinates: p.geometry.coordinates,
+        };
+      }),
+    });
+  }
+
   public autocompleteCallback(predictions, status)
   {
     if (status !== this.autocompleteOK)
@@ -160,7 +199,7 @@ class PlacesAutocomplete extends TerrainComponent<Props>
         return {
           suggestion: p.description,
           placeId: p.place_id,
-          active: highlightFirstSuggestion && idx === 0 ? true : false,
+          active: this.props.highlightFirstSuggestion && idx === 0 ? true : false,
           index: idx,
           formattedSuggestion: this.formattedSuggestion(p.structured_formatting),
         };
@@ -181,10 +220,44 @@ class PlacesAutocomplete extends TerrainComponent<Props>
     const value = this.props.inputProps.value;
     if (value.length > 0)
     {
-      this.autocompleteService.getPlacePredictions(_.extend({}, this.props.options, {
-        input: value,
-      }), this.autocompleteCallback);
+      if (this.props.geocoder === 'google')
+      {
+        this.autocompleteService.getPlacePredictions(_.extend({}, this.props.options, {
+          input: value,
+        }), this.autocompleteCallback);
+      }
+      else if (this.props.geocoder === 'photon')
+      {
+        // handle photon get predictions
+        this.ajax(this.photonAutocompleteCallback, 'https://photon.komoot.de/api/?',
+          { q: value, limit: 5, lat: 37.4449002, lon: -122.16174969999997 });
+      }
     }
+  }
+
+  public ajax(callback, url: string, params)
+  {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url + MapUtil.buildQueryString(params), true);
+
+    xhr.onload = (e) =>
+    {
+      if (xhr.status === 200)
+      {
+        if (callback)
+        {
+          callback(JSON.parse(xhr.response));
+        }
+      }
+      else
+      {
+        if (this.props.onError !== undefined)
+        {
+          this.props.onError(xhr.status);
+        }
+      }
+    };
+    xhr.send();
   }
 
   public clearAutocomplete()
