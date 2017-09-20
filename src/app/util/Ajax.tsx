@@ -357,7 +357,9 @@ export const Ajax =
           password,
         },
         onSave,
-        onError,
+        {
+          onError,
+        },
       );
     },
 
@@ -999,7 +1001,9 @@ export const Ajax =
           type,
         },
         onSave,
-        onError,
+        {
+          onError,
+        },
       );
     },
 
@@ -1012,7 +1016,9 @@ export const Ajax =
         `database/` + id + `/delete`,
         {},
         onSave,
-        onError,
+        {
+          onError,
+        },
       );
     },
 
@@ -1059,7 +1065,9 @@ export const Ajax =
             onError();
           }
         },
-        onError,
+        {
+          onError,
+        },
       );
     },
   };
