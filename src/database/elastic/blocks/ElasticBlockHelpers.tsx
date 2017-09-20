@@ -118,13 +118,13 @@ export function searchFromRootCard(name: string): Block | null
 {
   const state = BuilderStore.getState();
   const rootCard = state.query.cards.get(0);
-  if (!rootCard)
+  if (rootCard === undefined)
   {
     return null;
   }
   const isTheCard = (card) => card['type'] === name;
   const theCard = rootCard['cards'].find(isTheCard);
-  if (!theCard)
+  if (theCard === undefined)
   {
     return null;
   }
