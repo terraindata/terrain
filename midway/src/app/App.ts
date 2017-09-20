@@ -67,6 +67,7 @@ import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
 import * as Schema from './Schema';
+import { users } from './users/UserRouter';
 import Users from './users/Users';
 
 export let CFG: Config.Config;
@@ -151,7 +152,7 @@ class App
     await Config.handleConfig(this.config);
 
     // create a default seed user
-    await Users.initializeDefaultUser();
+    await users.initializeDefaultUser();
 
     // connect to configured databases
     const dbs = await databases.select(['id'], {});

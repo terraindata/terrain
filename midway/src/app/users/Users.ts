@@ -71,27 +71,6 @@ export interface UserConfig
 
 export class Users
 {
-  public static initializeDefaultUser()
-  {
-    // tslint:disable-next-line
-    (new Users()).create({
-      accessToken: 'ImAnAdmin',
-      email: 'admin@terraindata.com',
-      isSuperUser: 1,
-      name: 'Terrain Admin',
-      password: 'secret',
-      isDisabled: 0,
-      timezone: '',
-    })
-      .catch((error: string) =>
-      {
-        if (error !== 'User with email admin@terraindata.com already exists.')
-        {
-          throw new Error('Problem creating default user: ' + error);
-        }
-      });
-  }
-
   private readonly saltRounds = 10;
   private userTable: Tasty.Table;
 
@@ -114,6 +93,29 @@ export class Users
     );
   }
 
+  public async initializeDefaultUser()
+  {
+    try
+    {
+      this.create({
+        accessToken: 'ImAnAdmin',
+        email: 'admin@terraindata.com',
+        isSuperUser: 1,
+        name: 'Terrain Admin',
+        password: 'secret',
+        isDisabled: 0,
+        timezone: '',
+      });
+    }
+    catch (error)
+    {
+      if (error !== 'User with email admin@terraindata.com already exists.')
+      {
+        throw new Error('Problem creating default user: ' + error);
+      }
+    }
+  }
+
   public async create(user: UserConfig): Promise<UserConfig>
   {
     return new Promise<UserConfig>(async (resolve, reject) =>
@@ -131,7 +133,7 @@ export class Users
 
       const newUser: UserConfig =
         {
-          accessToken: '',
+          accessToken: user.accessToken === undefined ? '' : user.accessToken,
           email: user.email,
           isDisabled: user.isDisabled === undefined ? 0 : user.isDisabled,
           isSuperUser: user.isSuperUser === undefined ? 0 : user.isSuperUser,
