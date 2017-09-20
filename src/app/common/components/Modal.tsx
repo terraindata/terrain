@@ -112,12 +112,15 @@ class Modal extends TerrainComponent<Props>
 
     const msgTag = this.props.pre ? <pre /> : <div />;
 
-    const messageStyle = fontColor(Colors().altText2);
-    const buttonTextColor = Color(Colors().altText2);
+    const messageStyle = [
+      fontColor('#242424'),
+      backgroundColor('#fff'),
+    ];
+    const buttonTextColor = Color('#242424');
     const buttonStyle = [
-      fontColor(Colors().altText3, buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
-      backgroundColor(Colors().altBg1),
-      borderColor(Colors().altBg2),
+      fontColor('#424242', buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
+      backgroundColor('#fff'),
+      borderColor('#EDEFF3'),
     ];
 
     return (

@@ -230,7 +230,7 @@ export const TOOLTIP_THEMES: Themes = {
     fontColor: () => Colors().text1,
   },
   alt: {
-    backgroundColor: () => Colors().altBg1,
+    backgroundColor: () => Colors().tooltipBg,
     fontColor: () => Colors().altText2,
   },
   error: {

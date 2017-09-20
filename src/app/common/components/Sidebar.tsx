@@ -94,6 +94,7 @@ export class Sidebar extends TerrainComponent<Props>
           style={{
             top: (this.props.selectedIndex * linkHeight) + 'px',
             backgroundColor: Colors().active,
+            'svg fill': '#fff !important',
           }}
         />
         {
@@ -105,7 +106,7 @@ export class Sidebar extends TerrainComponent<Props>
               <div
                 className={Util.objToClassname({
                   'sidebar-link': true,
-                  'sidebar-link-selected': index === this.props.selectedIndex,
+                  'xr': index === this.props.selectedIndex,
                 })}
                 key={'sidebar-link-' + index}
                 style={{

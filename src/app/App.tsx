@@ -404,6 +404,9 @@ const COMMON_THEME_COLOR_STYLE = {
     background: Colors().inputBg,
     color: Colors().text1,
   },
+  '.close': {
+    fill: Colors().altBg1;
+  }
   ...generateThemeStyles(),
 };
 

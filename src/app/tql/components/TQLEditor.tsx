@@ -141,6 +141,7 @@ class TQLEditor extends TerrainComponent<Props>
 
   public render()
   {
+    console.log(this.props.theme);
     const options =
       {
         readOnly: !this.props.canEdit,
@@ -153,7 +154,7 @@ class TQLEditor extends TerrainComponent<Props>
           'Ctrl-Enter': this.issueQuery,
         },
         lineWrapping: true,
-        theme: this.props.theme || localStorage.getItem('theme') || 'default',
+        theme: Colors().tqlEditor,
         matchBrackets: true,
         autoCloseBrackets: true,
         foldGutter: true,

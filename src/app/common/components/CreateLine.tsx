@@ -50,6 +50,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { borderColor, Colors } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
+import StyleTag from './StyleTag';
 import './CreateLine.less';
 
 const AddIcon = require('./../../../images/icon_add_7x7.svg?name=AddIcon');
@@ -99,8 +100,17 @@ class CreateLine extends TerrainComponent<Props>
             this.props.open ? <CloseIcon /> : <AddIcon />
           }
         </div>
+        <StyleTag
+          style={SVG_STYLE}
+        />
       </div>
     );
   }
 }
+
+const SVG_STYLE = {
+  '.create-line-plus .st0': {
+    fill: Colors().text1,
+  },
+};
 export default CreateLine;

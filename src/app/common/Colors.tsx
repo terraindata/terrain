@@ -359,6 +359,10 @@ const DARK: Theme =
 
     resultLine: 'rgba(255,255,255,0.25)',
 
+    tooltipBg: '#fff',
+
+    tqlEditor: 'monokai',
+
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
     // text
@@ -556,10 +560,10 @@ const LIGHT: Theme =
     text3: '#424242',
 
     altBg1: 'rgba(0,0,0,0.40)', //'rgb(39, 39, 39)',
-    altBg2: 'rgb(47, 47, 47)',
+    altBg2: '#EDEFF3',
 
     altText1: '#fff',
-    altText2: 'rgba(255,255,255,0.85)',
+    altText2: '#fff',
     altText3: 'rgba(255,255,255,0.5)',
 
     altHighlight: 'rgba(255,255,255,0.15)',
@@ -589,6 +593,10 @@ const LIGHT: Theme =
     import: '#1efab4',
 
     resultLine: 'rgba(0,0,0,0.25)',
+
+    tooltipBg: 'rgba(0,0,0,0.60)',
+
+    tqlEditor: 'default',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 

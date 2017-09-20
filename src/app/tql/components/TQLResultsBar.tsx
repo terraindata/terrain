@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { ResultsState } from '../../builder/components/results/ResultTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import { backgroundColor, Colors } from '../../common/Colors';
 import './TQLResultsBar.less';
 export interface Props
 {
@@ -146,6 +147,7 @@ class TQLResultsBar extends TerrainComponent<Props>
           'tql-results-bar': true,
           'tql-results-bar-open': this.props.open,
         })}
+        style={backgroundColor(Colors().bg1)}
         onClick={this.props.onToggle}
       >
         <div className='tql-results-bar-inner'>
