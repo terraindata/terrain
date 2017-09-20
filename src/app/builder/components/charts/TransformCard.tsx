@@ -385,8 +385,8 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
 
-    const index: string = getIndex();
-    const type: string = getType();
+    const index: string = getIndex('');
+    const type: string = getType('');
 
     if (recomputeDomain)
     {
@@ -425,8 +425,7 @@ class TransformCard extends TerrainComponent<Props>
           this.handleElasticAggregationError(err);
         },
       );
-    }
-    else
+    } else
     {
       const min = maxDomain.get(0);
       const max = maxDomain.get(1);

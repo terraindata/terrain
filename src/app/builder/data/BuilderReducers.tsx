@@ -131,7 +131,17 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         query = query.set('parseTree', null);
       }
 
-      if (!action.payload.query.cardsAndCodeInSync)
+      let correctCard = true;
+      if (query.language === 'elastic' && query.cards)
+      {
+        // Elastic cards must start from the root card
+        if (query.cards.get(0)['key'] !== 'root')
+        {
+          correctCard = false;
+        }
+      }
+
+      if (!(action.payload.query.cardsAndCodeInSync && correctCard))
       {
         if (action.payload.query.tql)
         {

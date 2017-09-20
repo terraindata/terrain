@@ -90,12 +90,9 @@ class ElasticBackend implements Backend
 
   getRootCards = () =>
   {
+    // The Elastic cards always start from the root card.
     return List([
-      make(ElasticBlocks, 'eqlindex', { key: 'index' }),
-      make(ElasticBlocks, 'eqltype', { key: 'type' }),
-      make(ElasticBlocks, 'eqlfrom', { key: 'from' }),
-      make(ElasticBlocks, 'eqlsize', { key: 'size' }),
-      make(ElasticBlocks, 'eqlbody', { key: 'body' }),
+      make(ElasticBlocks, 'eqlroot', { key: 'root' }),
     ]);
   }
 
