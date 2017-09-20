@@ -71,6 +71,7 @@ module.exports =
             common: path.resolve(__dirname, 'src/app/common'),
             deploy: path.resolve(__dirname, 'src/app/deploy'),
             fileimport: path.resolve(__dirname, 'src/app/fileimport'),
+            images: path.resolve(__dirname, 'src/images'),
             library: path.resolve(__dirname, 'src/app/library'),
             manual: path.resolve(__dirname, 'src/app/manual'),
             roles: path.resolve(__dirname, 'src/app/roles'),
