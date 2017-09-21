@@ -291,7 +291,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESArrayClause(clause: ESArrayClause): any
   {
-    const accepts = List(this.getCardTypes([clause.elementID], clause));
+    const accepts = this.getCardTypes([clause.elementID], clause);
     return GetCardVisitor.seedCard(clause, {
       cards: List([]),
 
@@ -421,7 +421,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESMapClause(clause: ESMapClause): any
   {
-    const accepts = List(['eql' + clause.valueType]);
+    const accepts = this.getCardTypes([clause.valueType], clause);
 
     return GetCardVisitor.seedCard(clause, {
       cards: List([]),
@@ -567,7 +567,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESStructureClause(clause: ESStructureClause): any
   {
-    const accepts = this.getCardTypes(_.keys(clause.structure), clause);
+    const accepts = this.getCardTypes(_.values(clause.structure), clause);
     // If there's a template, we need to create seed cards
     //  of the template types when this card is initialized.
     const cardTypesToKeys: { [type: string]: string } = {};
