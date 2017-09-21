@@ -51,8 +51,8 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
-import { backgroundColor, fontColor, Colors } from '../../common/Colors';
 import ColorsActions from '../../colors/data/ColorsActions';
+import { backgroundColor, Colors, fontColor } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
@@ -84,6 +84,7 @@ export class Sidebar extends TerrainComponent<Props>
     ColorsActions.setStyle('.sidebar-expand-icon', { fill: Colors().text2 });
     ColorsActions.setStyle('.sidebar-expand:hover .sidebar-expand-icon', { fill: Colors().text1 });
     ColorsActions.setStyle('.sidebar-link svg', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.sidebar-link-inner-selected svg', { fill: '#fff !important' });
   }
 
   public render()
@@ -99,9 +100,8 @@ export class Sidebar extends TerrainComponent<Props>
         <div
           className='sidebar-selected-square'
           style={{
-            top: (this.props.selectedIndex * linkHeight) + 'px',
-            backgroundColor: Colors().active,
-            'svg fill': '#fff !important',
+            'top': (this.props.selectedIndex * linkHeight) + 'px',
+            'backgroundColor': Colors().active,
           }}
         />
         {
@@ -124,7 +124,11 @@ export class Sidebar extends TerrainComponent<Props>
               >
 
                 {tooltip(<div
-                  className='sidebar-link-inner'
+                  className={classNames({
+                    'sidebar-link-inner': true,
+                    'sidebar-link-inner-selected': index === this.props.selectedIndex,
+                  })}  
+
                 >
                   {
                     link.icon

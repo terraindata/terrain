@@ -67,6 +67,8 @@ import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../c
 import TerrainComponent from '../../common/components/TerrainComponent';
 import SchemaStore from '../../schema/data/SchemaStore';
 import Autocomplete from './Autocomplete';
+import ColorsActions from '../../colors/data/ColorsActions';
+
 
 const shallowCompare = require('react-addons-shallow-compare');
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
@@ -155,6 +157,11 @@ class BuilderTextbox extends TerrainComponent<Props>
       boxValue: props.value,
       boxValueBuffer: null,
     };
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.builder-tb input &::placeholder ', { color: Colors().text3 + '!important'});
   }
 
   public getCreatingType(): string

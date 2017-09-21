@@ -272,7 +272,7 @@ class App extends TerrainComponent<Props>
     ColorsActions.setStyle('.close', { fill: Colors().altBg1 });
 
     const tooltipStyles = generateThemeStyles();
-    _.map(tooltipStyles, (value, key) => 
+    _.map(tooltipStyles, (value, key) =>
     {
       ColorsActions.setStyle(key, value);
     });

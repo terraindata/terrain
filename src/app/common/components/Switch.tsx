@@ -120,7 +120,7 @@ const SWITCH_STYLE = {
 };
 
 const ACTIVE_SECTION_STYLE = {
-  color: '#fff'//Colors().text1
+  color: '#fff',
 };
 
 export default Switch;

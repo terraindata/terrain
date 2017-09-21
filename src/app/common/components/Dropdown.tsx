@@ -389,6 +389,7 @@ class Dropdown extends TerrainComponent<Props>
                   'dropdown-option-inner': true,
                   'dropdown-option-value-selected': index === selectedIndex,
                 })}
+                style={fontColor(Colors().text1)}
               >
                 {
                   this.getOptionName(option, index)

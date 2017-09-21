@@ -55,9 +55,9 @@ import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import ColorsActions from './../../colors/data/ColorsActions';
 import Menu from './../../common/components/Menu';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import StyleTag from 'common/components/StyleTag';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -177,6 +177,11 @@ class LibraryItem extends TerrainComponent<Props>
       },
     ]),
   };
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.library-item .library-item-title-bar .library-item-icon svg, .cls-1 ', { fill: Colors().altBg1 });
+  }
 
   public componentDidMount()
   {
@@ -359,7 +364,7 @@ class LibraryItem extends TerrainComponent<Props>
                 className={'library-item ' + this.props.className}
                 style={
                   isSelected ? backgroundColor(Colors().active) :
-                    backgroundColor(Colors().bg3, Colors().inactiveHover) 
+                    backgroundColor(Colors().bg3, Colors().inactiveHover)
                 }
               >
                 <div
@@ -413,9 +418,6 @@ class LibraryItem extends TerrainComponent<Props>
             )}
           </div>
         </Link>
-        <StyleTag
-            style={SVG_STYLE}
-          />
       </div>
     ));
   }
@@ -511,11 +513,5 @@ const dropCollect = (connect, monitor) =>
   });
 
 const LI = DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(LibraryItem)) as any;
-
-const SVG_STYLE = {
-  '.library-item .library-item-title-bar .library-item-icon svg, .cls-1': {
-    fill: Colors().altBg1;
-  }
-};
 
 export default LI;

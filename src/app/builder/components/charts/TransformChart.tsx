@@ -304,7 +304,7 @@ const TransformChart = {
       .attr('x', scaleMin(scales.x))
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
-      .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
+      .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY));
   },
 
   _drawAxes(el, scales, width, height)

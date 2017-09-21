@@ -544,7 +544,6 @@ const DARK: Theme =
     },
   };
 
-
 const LIGHT: Theme =
   {
     // Use these colors
@@ -587,8 +586,8 @@ const LIGHT: Theme =
     inactiveHoverText: '#fff',
     activeHover: Color(darkActive).fade(0.75).string(),
 
-    scrollbarBG: 'rgba(255,255,255,0.15)',
-    scrollbarPiece: 'rgba(255,255,255,0.15)',
+    scrollbarBG: '#fff',
+    scrollbarPiece: 'rgb(180, 182, 186)',
 
     altScrollbarPiece: 'rgba(0, 0, 0, 0.25)',
 
@@ -664,7 +663,7 @@ const LIGHT: Theme =
 
       // deck
       deck: {
-        background: 'rgb(256, 256, 260)', 
+        background: 'rgb(256, 256, 260)',
       },
 
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
@@ -781,7 +780,7 @@ const LIGHT: Theme =
 
 const Themes: { [name: string]: Theme } =
   {
-    DARK, LIGHT
+    DARK, LIGHT,
   };
 
 const curTheme = 'LIGHT';

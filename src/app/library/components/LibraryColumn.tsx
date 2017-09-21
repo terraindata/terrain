@@ -51,7 +51,7 @@ import './LibraryColumn.less';
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { backgroundColor, borderColor, fontColor, Colors } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props

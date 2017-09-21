@@ -61,7 +61,7 @@ import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, Colors, fontColor, backgroundColor, borderColor} from '../../../common/Colors';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 import ColorsActions from './../../../colors/data/ColorsActions';
 
 import { Cards } from '../../../../blocks/types/Card';
@@ -102,9 +102,11 @@ class CardsColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon ', {  fill: Colors().altBg1, background: Colors().bg3 });
-    ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon &:hover ', {  fill: Colors().bg3, 'background-color': Colors().altBg1 });
-  },
+    ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon ',
+      { fill: Colors().altBg1, background: Colors().bg3 });
+    ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon &:hover ',
+      { 'fill': Colors().bg3, 'background-color': Colors().altBg1 });
+  }
 
   public computeKeyPath(props: Props): KeyPath
   {
@@ -284,7 +286,7 @@ class CardsColumn extends TerrainComponent<Props>
           >
             <ExpandIcon
               className='cards-deck-knob-icon'
-              style={borderColor(Colors().border1)} 
+              style={borderColor(Colors().border1)}
             />
             <div
               className='cards-deck-knob-text'
@@ -319,18 +321,6 @@ class CardsColumn extends TerrainComponent<Props>
   }
 
 }
-
-const SVG_STYLE = {
-  '.cards-deck-knob .cards-deck-knob-icon': {
-    fill: Colors().altBg1;
-    background: Colors().bg3;
-  }
-
-  '.cards-deck-knob .cards-deck-knob-icon &:hover': {
-    fill: Colors().bg3;
-    'background-color': Colors().altBg1;
-  }
-};
 
 // <CardDropArea
 //   half={true}
@@ -378,8 +368,6 @@ const SVG_STYLE = {
 //     );
 //   }
 // }
-
-
 
 // const CardsColumnInner = Dimensions()(_CardsColumnInner);
 

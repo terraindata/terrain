@@ -57,11 +57,11 @@ import { browserHistory } from 'react-router';
 import LibraryActions from '../../../library/data/LibraryActions';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
+import ColorsActions from './../../../colors/data/ColorsActions';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryStore } from './../../../library/data/LibraryStore';
-import ColorsActions from './../../../colors/data/ColorsActions';
 
-import { fontColor, backgroundColor, Colors } from '../../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
 
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -290,7 +290,7 @@ export class Tabs extends TerrainComponent<TabsProps> {
                   }
                 </div>
               }
-              <div 
+              <div
                 className='tabs-action-piece'
                 style={fontColor(Colors().text1)}
               >
