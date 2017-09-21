@@ -426,15 +426,18 @@ class _CardComponent extends TerrainComponent<Props>
 
   public toggleTuning()
   {
-    if (!this.props.card.tuning)
+    if (this.props.tuningMode)
     {
-      Actions.addTuningCard(this.props.card);
+      const keyPaths = Store.getState().cardKeyPaths;
+      if (keyPaths.get(this.props.card.id) !== undefined)
+      {
+        Actions.change(keyPaths.get(this.props.card.id).push('tuning'), false);
+      }
     }
     else
     {
-      Actions.removeTuningCard(this.props.card);
+      Actions.change(this.getKeyPath().push('tuning'), !this.props.card.tuning);
     }
-    Actions.change(this.props.keyPath.push('tuning'), !this.props.card.tuning);
   }
 
   public render()
@@ -464,7 +467,7 @@ class _CardComponent extends TerrainComponent<Props>
 
         CARD_HEIGHT_MAP[id] = cardHeight;
 
-        if (cardEnd < visibleStart || cardStart > visibleEnd)
+        if ((cardEnd < visibleStart || cardStart > visibleEnd) && !this.props.tuningMode)
         {
           // TODO fix bug here where you have the CreateCardTool open
           //  and scroll to the bottom of the column and it expands
@@ -481,7 +484,7 @@ class _CardComponent extends TerrainComponent<Props>
         }
       }
     }
-    else
+    else if (!this.props.tuningMode)
     {
       this.renderTimeout = setTimeout(() =>
       {
@@ -659,16 +662,19 @@ class _CardComponent extends TerrainComponent<Props>
               }
             </div>
             {
-              !this.props.tuningMode &&
               <div
                 className='card-tuning-wrapper'
                 onClick={this.toggleTuning}
-                style={card.tuning ? { fill: 'red' } : {}}
               >
                 {
                   tooltip(
-                    <TuningIcon className='card-tuning-icon' />,
-                    card.tuning ? 'Remove this card from the tuning column'
+                    <TuningIcon
+                      className={classNames({
+                        'card-tuning-icon': true,
+                        'card-tuning-icon-on': card.tuning || this.props.tuningMode,
+                      })}
+                    />,
+                    card.tuning || this.props.tuningMode ? 'Remove this card from the tuning column'
                       : 'Add this card to the tuning column',
                   )
                 }

@@ -146,18 +146,6 @@ const BuilderActions =
         keyPath,
       }),
 
-    addTuningCard:
-    (card) =>
-      $(ActionTypes.addTuningCard, {
-        card,
-      }),
-
-    removeTuningCard:
-    (card) =>
-      $(ActionTypes.removeTuningCard, {
-        card,
-      }),
-
     results:
     (resultsState) =>
       $(ActionTypes.results, {

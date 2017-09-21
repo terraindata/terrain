@@ -82,8 +82,6 @@ export let BuilderActionTypes =
     results: '',
 
     updateKeyPath: '',
-    addTuningCard: '',
-    removeTuningCard: '',
 
     save: '', // just tells the store that something was saved
 

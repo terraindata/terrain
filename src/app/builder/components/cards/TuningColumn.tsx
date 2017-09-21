@@ -86,11 +86,13 @@ class TuningColumn extends TerrainComponent<Props>
 {
   public state: {
     keyPath: KeyPath;
-    tuningCards: Cards
+    allCards: Cards,
   } = {
     keyPath: this.computeKeyPath(this.props),
-    tuningCards: List([]),
+    allCards: List([]),
   };
+
+  public tuningCards: Cards = List([]);
 
   public innerHeight: number = -1;
 
@@ -100,19 +102,35 @@ class TuningColumn extends TerrainComponent<Props>
     this._subscribe(BuilderStore, {
       updater: (state: BuilderState) =>
       {
-        if (!_.isEqual(this.state.tuningCards, state.tuningCards))
+        if (!_.isEqual(this.state.allCards, state.query.cards))
         {
+          this.tuningCards = List([]);
+          this.updateTuningCards(state.query.cards);
           this.setState({
-            tuningCards: state.tuningCards,
+            allCards: state.query.cards,
           });
         }
       },
     });
   }
 
-  public componentDidMount()
+  public updateTuningCards(cards)
   {
-    this.handleScroll();
+    cards.forEach((card) =>
+    {
+      if (card.tuning)
+      {
+        this.tuningCards = this.tuningCards.push(card);
+      }
+      if (card.cards !== undefined && card.cards.size > 0)
+      {
+        this.updateTuningCards(card.cards);
+      }
+      if (card.weights !== undefined && card.weights.size > 0)
+      {
+        this.updateTuningCards(card.weights);
+      }
+    });
   }
 
   public computeKeyPath(props: Props): KeyPath
@@ -128,60 +146,12 @@ class TuningColumn extends TerrainComponent<Props>
         keyPath: this.computeKeyPath(nextProps),
       });
     }
-
-    if (nextProps.containerHeight !== this.props.containerHeight
-      || nextProps.containerWidth !== this.props.containerWidth)
-    {
-      this.handleScroll();
-    }
   }
-
-  public handleScroll()
-  {
-    // TODO improve make faster
-    const el = $('#cards-column');
-    const start = el.offset().top;
-    const totalHeight = document.getElementById('cards-column-inner').clientHeight;
-    scrollAction(start, el.height(), el.scrollTop(), totalHeight);
-  }
-
-  public componentWillUpdate()
-  {
-    const inner = document.getElementById('cards-column-inner');
-    if (inner)
-    {
-      const height = inner.clientHeight;
-      if (height !== this.innerHeight)
-      {
-        if (this.innerHeight !== -1)
-        {
-          this.handleScroll();
-        }
-        this.innerHeight = height;
-      }
-    }
-  }
-
-  // public getTuningCards(cards)
-  // {
-  //   cards.forEach((card) =>
-  //   {
-  //     if (card.tuning)
-  //     {
-  //       this.tuningCards.push(card);
-  //     }
-  //     if (card.cards !== undefined && card.cards.size > 0)
-  //     {
-  //       this.getTuningCards(card.cards);
-  //     }
-  //   });
-
-  // }
 
   public render()
   {
-    const { canEdit } = this.props;
-    const { keyPath, tuningCards } = this.state;
+    const { canEdit, language, addColumn, columnIndex } = this.props;
+    const { keyPath } = this.state;
     return (
       <div
         className='cards-column'
@@ -189,19 +159,18 @@ class TuningColumn extends TerrainComponent<Props>
         <div
           className='cards-column-cards-area'
 
-          onScroll={this.handleScroll}
           id='cards-column'
         >
           <div
             id='cards-column-inner'
           >
             <CardsArea
-              cards={tuningCards}
-              language={this.props.language}
+              cards={this.tuningCards}
+              language={language}
               keyPath={keyPath}
               canEdit={canEdit}
-              addColumn={this.props.addColumn}
-              columnIndex={this.props.columnIndex}
+              addColumn={addColumn}
+              columnIndex={columnIndex}
               noCardTool={true}
               accepts={this.getPossibleCards()}
               tuningMode={true}

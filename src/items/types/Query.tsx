@@ -92,6 +92,7 @@ class QueryC
   excludeFields = ['dbFields', 'excludeFields'];
 
   modelVersion = 2; // 2 is for the first version of Node midway
+
 }
 const Query_Record = Record(new QueryC());
 export interface Query extends QueryC, IRecord<Query> { }
@@ -104,7 +105,6 @@ export const _Query = (config?: object) =>
   config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
   config['meta'] = Map<string, any>(config['meta']);
-
   const query = new Query_Record(config) as any as Query;
 
   return query;

@@ -448,16 +448,6 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       keyPath: KeyPath,
     }>) =>
       state.setIn(['cardKeyPaths', action.payload.id], action.payload.keyPath),
-
-    [ActionTypes.addTuningCard]: (state: BuilderState, action: Action<{
-      card: any,
-    }>) =>
-      state.set('tuningCards', state.get('tuningCards').push(action.payload.card)),
-
-    [ActionTypes.removeTuningCard]: (state: BuilderState, action: Action<{
-      card: any,
-    }>) =>
-      state.set('tuningCards', state.get('tuningCards').remove(state.get('tuningCards').indexOf(action.payload.card))),
   };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
