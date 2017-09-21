@@ -51,7 +51,6 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
-import InfoArea from '../../../common/components/InfoArea';
 import Actions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
 import Switch from './../../../common/components/Switch';
@@ -67,7 +66,6 @@ import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 
 import { Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;
-const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
 export interface Props
 {
@@ -87,9 +85,11 @@ class TuningColumn extends TerrainComponent<Props>
   public state: {
     keyPath: KeyPath;
     allCards: Cards,
+    shouldUpdate: boolean,
   } = {
     keyPath: this.computeKeyPath(this.props),
     allCards: List([]),
+    shouldUpdate: true,
   };
 
   public tuningCards: Cards = List([]);
@@ -102,10 +102,11 @@ class TuningColumn extends TerrainComponent<Props>
     this._subscribe(BuilderStore, {
       updater: (state: BuilderState) =>
       {
-        if (!_.isEqual(this.state.allCards, state.query.cards))
+        if (!_.isEqual(this.state.allCards, state.query.cards) && this.state.shouldUpdate)
         {
           this.tuningCards = List([]);
           this.updateTuningCards(state.query.cards);
+          this.orderCards();
           this.setState({
             allCards: state.query.cards,
           });
@@ -113,6 +114,54 @@ class TuningColumn extends TerrainComponent<Props>
       },
     });
   }
+
+  public orderCards()
+  {
+    let lastPos = this.tuningCards.size - 1;
+    this.tuningCards = List(this.tuningCards.sortBy((card) => {
+      if (card.tuningIndex === undefined)
+      {
+        lastPos += 1;
+        return lastPos - 1;
+      }
+      return card.tuningIndex;
+    })) as Cards;
+    console.log(this.tuningCards);
+    this.setState({
+      shouldUpdate: false,
+    });
+    let index = 0;
+    const keyPaths = BuilderStore.getState().cardKeyPaths;
+    this.tuningCards.forEach((card) => {
+      if (keyPaths.get(card.id) !== undefined)
+      {
+        Actions.change(keyPaths.get(card.id).push('tuningIndex'), index);
+        index += 1;
+      }
+    });
+    this.setState({
+      shouldUpdate: true,
+    });
+  }
+
+  /*
+
+          const keyPaths = BuilderStore.getState().cardKeyPaths;
+        if (keyPaths.get(card.id) !== undefined)
+        {
+          console.log('time to update the index...'); // if it was undefined before (maybe don't do this here .....)
+          // Actions.change(keyPaths.get(card.id).push('tuningIndex'), this.tuningCards.size - 1);
+        }
+        */
+
+        /*
+           before the render (or after tuning cards is updated), go through each of the cards in the list
+           if the tuningIndex is defined leave it
+           if the tuningIndex is undefined set that card to be at the end of the list
+           adjust the list so the indexes are in order (if you removed the first card or something, have to shift down)
+           set all new indexes with Actions
+           render in that order
+        */
 
   public updateTuningCards(cards)
   {
@@ -152,6 +201,7 @@ class TuningColumn extends TerrainComponent<Props>
   {
     const { canEdit, language, addColumn, columnIndex } = this.props;
     const { keyPath } = this.state;
+    console.log(this.tuningCards);
     return (
       <div
         className='cards-column'

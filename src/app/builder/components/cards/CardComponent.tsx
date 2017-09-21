@@ -432,11 +432,13 @@ class _CardComponent extends TerrainComponent<Props>
       if (keyPaths.get(this.props.card.id) !== undefined)
       {
         Actions.change(keyPaths.get(this.props.card.id).push('tuning'), false);
+        Actions.change(keyPaths.get(this.props.card.id).push('tuningIndex'), undefined);
       }
     }
     else
     {
       Actions.change(this.getKeyPath().push('tuning'), !this.props.card.tuning);
+      Actions.change(this.getKeyPath().push('tuningIndex'), undefined);
     }
   }
 

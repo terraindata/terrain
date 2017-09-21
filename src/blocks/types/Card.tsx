@@ -62,7 +62,7 @@ export interface Card extends IRecord<Card>
   _isBlock: boolean;
   closed: boolean;
   tuning?: boolean; // whether the card is in the tuning section
-
+  tuningIndex?: number; // what position the card has in the tuning section
   // the following fields are excluded from the server save
   static: {
     language: string;
@@ -156,6 +156,7 @@ export const _card = (config: CardConfig) =>
     _isBlock: true,
     closed: false,
     tuning: false,
+    tuningIndex: undefined,
   });
 
   if (config.static.metaFields)
