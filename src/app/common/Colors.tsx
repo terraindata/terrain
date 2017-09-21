@@ -574,7 +574,7 @@ const LIGHT: Theme =
     highlight: 'rgba(210,215,219,0.75)', // for slight emphasis
     darkerHighlight: 'rgba(0,0,0,0.15)', // to make a depth effect with highlight
 
-    boxShadow: 'rgba(0, 0, 0, 0.39)',
+    boxShadow: 'rgba(0, 0, 0, 0.15)',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
@@ -843,8 +843,8 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
       background: hovered ? backgroundHover : bgColor,
       color: strongColor,
 
-      boxShadow: small ? 'rgba(0, 0, 0, 0.39) 2px 2px 4px 1px' :
-        '3px 3px 5px 2px rgba(0,0,0,.39)',
+      boxShadow: small ? Colors().boxShadow + ' 2px 2px 4px 1px' :
+        '3px 3px 5px 2px ' + Colors().boxShadow,
       borderWidth: 1,
       borderStyle: 'solid',
       borderLeftWidth: '3px',
