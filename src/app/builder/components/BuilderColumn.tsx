@@ -297,7 +297,7 @@ const BuilderColumn = createReactClass<any, any>(
         onClick: this.switchView,
         disabled: index === this.state.column,
         icon: menuIcons[index].icon,
-        iconColor: Colors().altBg1,
+        iconColor: menuIcons[index].color,
       })));
 
       return options;

@@ -141,7 +141,6 @@ class TQLEditor extends TerrainComponent<Props>
 
   public render()
   {
-    console.log(this.props.theme);
     const options =
       {
         readOnly: !this.props.canEdit,
