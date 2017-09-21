@@ -44,48 +44,33 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import AnalyticsActions from 'analytics/data/AnalyticsActions';
-import Library from 'library/components/Library';
-import LibraryActions from 'library/data/LibraryActions';
-import { LibraryState } from 'library/data/LibraryStore';
-import * as _ from 'lodash';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import RolesActions from 'roles/data/RolesActions';
-import UserActions from 'users/data/UserActions';
+// tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
 
-const mapStateToProps = (state) =>
-{
-  return {
-    analytics: state.get('analytics'),
-    library: state.get('library'),
-    roles: state.get('roles'),
-    users: state.get('users'),
+import * as Immutable from 'immutable';
+
+import ActionTypes from 'analytics/data/AnalyticsActionTypes';
+import Util from 'util/Util';
+import BackendInstance from '../../../database/types/BackendInstance';
+import { ItemStatus } from '../../../items/types/Item';
+
+import Ajax from './../../util/Ajax';
+
+const Actions =
+  {
+    fetch: () => (dispatch) =>
+    {
+      const start = new Date(2015, 5, 2);
+      const end = new Date(2015, 5, 4);
+      Ajax.getAnalytics(1, start, end, 2)
+        .then((variantAnalytics) =>
+        {
+          return dispatch({
+            type: ActionTypes.fetch,
+            payload: { variantId: 1, analytics: variantAnalytics },
+          });
+        })
+        .catch((error) => null);
+    },
   };
-};
 
-function mapDispatchToProps(dispatch)
-{
-  return {
-    analyticsActions: bindActionCreators(AnalyticsActions, dispatch),
-    libraryGroupActions: bindActionCreators(LibraryActions.groups, dispatch),
-    libraryAlgorithmActions: bindActionCreators(LibraryActions.algorithms, dispatch),
-    libraryVariantActions: bindActionCreators(LibraryActions.variants, dispatch),
-    libraryActions: bindActionCreators(
-      _.pick(
-        LibraryActions,
-        ['loadState', 'setDbs', 'fetch'],
-      ),
-      dispatch,
-    ),
-    roleActions: bindActionCreators(RolesActions, dispatch),
-    userActions: bindActionCreators(UserActions, dispatch),
-  };
-}
-
-const LibraryContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Library);
-
-export default LibraryContainer;
+export default Actions;

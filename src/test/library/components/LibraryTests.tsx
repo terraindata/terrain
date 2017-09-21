@@ -76,8 +76,6 @@ describe('Library', () =>
     name: 'Variant 1',
   })));
 
-  const mockStore = configureStore();
-  const store = null;
   let libraryComponent = null;
 
   beforeEach(() =>
@@ -90,11 +88,52 @@ describe('Library', () =>
     );
   });
 
-  it('should have 3 columns', () =>
+  describe('when props.variantsMultiselect is true', () =>
   {
-    // Render a checkbox with label in the document
-    expect(libraryComponent.find('GroupsColumn').length).toEqual(1);
-    expect(libraryComponent.find('AlgorithmsColumn').length).toEqual(1);
-    expect(libraryComponent.find('VariantsColumn').length).toEqual(1);
+    beforeEach(() =>
+    {
+      libraryComponent.setProps({ variantsMultiselect: true });
+    });
+
+    describe('and props.selectedVariants is empty', () =>
+    {
+      it('should have 3 columns', () =>
+      {
+        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
+        expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(0);
+      });
+    });
+
+    describe('and props.selectedVariants is NOT empty', () =>
+    {
+      it('should have 3 columns and display the analytics chart', () =>
+      {
+        const selectedVariants = library.get('selectedVariants');
+        const nextLibrary = library.set('selectedVariants', selectedVariants.push(1));
+        libraryComponent.setProps({
+          library: nextLibrary,
+        });
+
+        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
+        expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
+      });
+    });
+  });
+
+  describe('when variantsMultiselect prop is false', () =>
+  {
+    it('should have 4 columns', () =>
+    {
+      expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
+      expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+      expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
+      expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(1);
+    });
   });
 });

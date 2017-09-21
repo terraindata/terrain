@@ -37,6 +37,7 @@
     "no-invalid-template-strings" : true,
     "no-invalid-this" : true,
     "no-misused-new" : true,
+    "no-unused-variable" : true,
     "no-switch-case-fall-through" : false,
     "switch-default" : false,
     "restrict-plus-operands" : false,
@@ -48,7 +49,7 @@
       true,
       "never-prefix"
     ],
-    
+
     "trailing-comma": false,
     "new-parens" : false,
     "semicolon" : [false, "always"]

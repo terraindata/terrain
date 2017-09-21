@@ -199,7 +199,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
     datasets.forEach((ds, key) =>
     {
-      if (visibleDatasets.includes(key))
+      if (visibleDatasets.includes(key) && ds.data.length > 0)
       {
         if (key !== highlightDataset || highlightDataset === null)
         {
@@ -402,6 +402,12 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     }
   }
 
+  public formatDate(timestamp)
+  {
+    const date = new Date(timestamp);
+    return date.toISOString();
+  }
+
   public render()
   {
     const { datasets, xDataKey, yDataKey } = this.props;
@@ -424,7 +430,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                   dimension='x'
                   zoomDomain={this.state.zoomDomain}
                   onDomainChange={this.handleZoom}
-                  labels={(d) => d.l ? `${d.x} => ${d.y}` : null}
+                  labels={(d) => d.l ? `${this.formatDate(d.x)} => ${d.y}` : null}
                   labelComponent={
                     <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
                   }

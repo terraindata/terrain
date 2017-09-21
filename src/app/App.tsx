@@ -54,6 +54,7 @@ require('babel-polyfill');
 import './App.less';
 
 // Libraries
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
@@ -87,6 +88,8 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // data that needs to be loaded
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
+import ColorsActions from './colors/data/ColorsActions';
+import ColorsStore from './colors/data/ColorsStore';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
@@ -178,6 +181,8 @@ class App extends TerrainComponent<Props>
     usersLoaded: false,
 
     noLocalStorage: false,
+
+    stylesTag: Immutable.Map(),
   };
 
   constructor(props: Props)
@@ -244,6 +249,11 @@ class App extends TerrainComponent<Props>
       storeKeyPath: ['loaded'],
     });
 
+    this._subscribe(ColorsStore, {
+      stateKey: 'stylesTag',
+      storeKeyPath: ['styles'],
+    });
+
     // Retrieve logged-in state from persistent storage.
     const accessToken = localStorage['accessToken'];
     const id = localStorage['id'];
@@ -251,6 +261,20 @@ class App extends TerrainComponent<Props>
     {
       AuthActions.login(accessToken, id);
     }
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('input', { background: Colors().inputBg, color: Colors().text1 });
+    ColorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
+    ColorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
+    ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
+
+    const tooltipStyles = generateThemeStyles();
+    _.map(tooltipStyles, (key, value) => 
+    {
+      ColorsActions.setStyle(key, value);
+    });
   }
 
   public fetchData()
@@ -377,9 +401,8 @@ class App extends TerrainComponent<Props>
         </div>
 
         <DeployModal />
-
         <StyleTag
-          style={COMMON_THEME_COLOR_STYLE}
+          style={this.state.stylesTag.toJS()}
         />
 
         <InAppNotification />
@@ -389,22 +412,5 @@ class App extends TerrainComponent<Props>
     );
   }
 }
-
-const COMMON_THEME_COLOR_STYLE = {
-  '::-webkit-scrollbar-track': {
-    background: Colors().scrollbarBG,
-  },
-  '::-webkit-scrollbar-thumb': {
-    background: Colors().scrollbarPiece,
-  },
-  '.altBg ::-webkit-scrollbar-thumb': {
-    background: Colors().altScrollbarPiece,
-  },
-  'input': {
-    background: Colors().inputBg,
-    color: Colors().text1,
-  },
-  ...generateThemeStyles(),
-};
 
 export default App;

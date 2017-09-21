@@ -209,8 +209,14 @@ class TransformCard extends TerrainComponent<Props>
       const newDomain = List([low, high]);
       this.setState({
         chartDomain: newDomain,
-        ...overrideMaxDomain ? { maxDomain: newDomain } : {},
       });
+      if (overrideMaxDomain)
+      {
+        this.setState({
+          maxDomain: newDomain,
+        });
+        this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), newDomain, true);
+      }
     }
   }
 
