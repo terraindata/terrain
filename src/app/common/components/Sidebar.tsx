@@ -83,6 +83,7 @@ export class Sidebar extends TerrainComponent<Props>
   {
     ColorsActions.setStyle('.sidebar-expand-icon', { fill: Colors().text2 });
     ColorsActions.setStyle('.sidebar-expand:hover .sidebar-expand-icon', { fill: Colors().text1 });
+    ColorsActions.setStyle('.sidebar-link svg', { fill: Colors().altBg1 });
   }
 
   public render()
@@ -171,17 +172,5 @@ export class Sidebar extends TerrainComponent<Props>
     );
   }
 }
-
-const SVG_STYLE = {
-  '.sidebar-expand-icon': {
-    fill: Colors().text2,
-  },
-  '.sidebar-expand:hover .sidebar-expand-icon': {
-    fill: Colors().text1,
-  },
-  '.sidebar-link svg': {
-    fill: Colors().altBg1;
-  }
-};
 
 export default Sidebar;

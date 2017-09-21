@@ -59,8 +59,7 @@ import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryStore } from './../../../library/data/LibraryStore';
-import StyleTag from 'common/components/StyleTag';
-
+import ColorsActions from './../../../colors/data/ColorsActions';
 
 import { fontColor, backgroundColor, Colors } from '../../../common/Colors';
 
@@ -199,6 +198,12 @@ export class Tabs extends TerrainComponent<TabsProps> {
       isMounted: true,
     });
     this.computeTabs(this.props.config);
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action svg', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action', { 'border-color': Colors().altBg1 });
   }
 
   public componentWillUnmount()
@@ -389,20 +394,9 @@ export class Tabs extends TerrainComponent<TabsProps> {
             <div className='tabs-shadow'></div>
           </div>
         </div>
-        <StyleTag
-            style={SVG_STYLE}
-          />
       </div>
     );
   }
 }
 
-const SVG_STYLE = {
-  '.tabs-container .tabs-actions .tabs-action svg': {
-     fill: Colors().altBg1;
-  }
-  '.tabs-container .tabs-actions .tabs-action': {
-     'border-color': Colors().altBg1;
-  }
-};
 export default Tabs;

@@ -105,6 +105,8 @@ interface Theme
 
   tooltipBg: string;
 
+  tqlEditor: string;
+
   // DO NOT USE these below colors anymore -- these need to be cleaned up
 
   // text

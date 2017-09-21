@@ -67,7 +67,6 @@ import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScro
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 
-import StyleTag from 'common/components/StyleTag';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import CardHelpTooltip from './CardHelpTooltip';
 
@@ -199,6 +198,7 @@ class _CardComponent extends TerrainComponent<Props>
       stateKey: 'scrollState',
       isMounted: true,
     });
+
   }
 
   public getCardTerms(card: Card): List<string>
