@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { CardConfig } from '../../../../blocks/types/Card';
-import { borderColor, cardStyle, Colors } from '../../../common/Colors';
+import { backgroundColor, borderColor, cardStyle, Colors, getStyle } from '../../../common/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CreateCardOption.less';
 
@@ -91,9 +91,11 @@ class CreateCardOption extends TerrainComponent<Props>
           'create-card-option-focused': this.props.isFocused,
         })}
         onClick={this.handleClick}
-        style={
-          borderColor(Colors().bg3, Colors().inactiveHover)
-        }
+        style={[
+          borderColor(Colors().highlight, Colors().inactiveHover),
+          backgroundColor(Colors().darkerHighlight),
+          getStyle('boxShadow', '1px 2px 14px ' + Colors().boxShadow),
+        ]}
         key='create-option'
       >
         <div

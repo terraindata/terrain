@@ -49,12 +49,11 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import { backgroundColor, Colors } from 'common/Colors';
+import { backgroundColor, borderColor, Colors, getStyle } from 'common/Colors';
 import TerrainComponent from 'common/components/TerrainComponent';
-
 import { CardConfig } from 'src/blocks/types/Card';
-
 import { AllBackendsMap } from 'src/database/AllBackends';
+
 import CreateCardOption from './CreateCardOption';
 import './CreateCardTool.less';
 
@@ -63,9 +62,7 @@ export interface Props
   cardTypeList: List<string>;
   open: boolean;
   language: string;
-
   handleCardClick: (block, index) => void;
-
   overrideText?: List<{
     text: string;
     type: string;
@@ -77,10 +74,24 @@ export interface Props
 class CardSelector extends TerrainComponent<Props>
 {
   public state: {
+    searchValue: string;
     focusedIndex: number;
   } = {
+    searchValue: '',
     focusedIndex: -1,
   };
+
+  private handleSearchTextboxChange(ev: any)
+  {
+    this.setState({
+      searchValue: ev.target.value;
+    });
+  }
+
+  private renderCategoryOptions()
+  {
+    return <div/>; // TODO
+  }
 
   public renderCardOption(type: string, index: number)
   {
@@ -114,23 +125,41 @@ class CardSelector extends TerrainComponent<Props>
           'create-card-selector-focused': this.state.focusedIndex !== -1,
         })}
         ref='selector'
-        style={
-          backgroundColor(Colors().bg2)
-        }
+        style={backgroundColor(Colors().bg2)}
       >
-        <div className='create-card-selector-inner'>
-          {
-            isEmpty &&
-            <div className='create-card-empty'>
-              There are no remaining cards that can be created here.
-                </div>
-          }
-          {
-            this.props.cardTypeList.map(this.renderCardOption)
-          }
-          {
-            _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
-          }
+        <div className='inset-shadow-veil' style={getStyle('boxShadow', 'inset 2px 2px 6px rgba(0,0,0,0.25)')}/>
+        <div className='card-search-line' style={borderColor(Colors().border1)}>
+          <input
+            className='card-search-input'
+            placeholder='search for an available card'
+            value={this.state.searchValue}
+            onChange={this.handleSearchTextboxChange}
+            style={backgroundColor(Colors().highlight)}
+          />
+        </div>
+        <div className='selectors-row'>
+          <div className='card-category-selector' style={borderColor(Colors().border1)}>
+            {
+              this.renderCategoryOptions()
+            }
+          </div>
+          <div
+            className='create-card-selector-inner'
+            style={backgroundColor(Colors().bg1)}
+          >
+            {
+              isEmpty &&
+              <div className='create-card-empty'>
+                There are no remaining cards that can be created here.
+                  </div>
+            }
+            {
+              this.props.cardTypeList.map(this.renderCardOption)
+            }
+            {
+              _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
+            }
+          </div>
         </div>
       </div>
     );

@@ -50,20 +50,22 @@ import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../database/AllBackends';
-import CreateLine from '../../../common/components/CreateLine';
-import KeyboardFocus from '../../../common/components/KeyboardFocus';
-import TerrainComponent from '../../../common/components/TerrainComponent';
-import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
+
+import Actions from 'builder/data/BuilderActions';
+import CreateLine from 'common/components/CreateLine';
+import KeyboardFocus from 'common/components/KeyboardFocus';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as BlockUtils from 'src/blocks/BlockUtils';
+import { AllBackendsMap } from 'src/database/AllBackends';
+import Util from 'util/Util';
+
 import CardDropArea from './CardDropArea';
 import CardSelector from './CardSelector';
 import './CreateCardTool.less';
 
-const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
-const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
-const AddCardIcon = require('./../../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
+const AddIcon = require('images/icon_add_7x7.svg?name=AddIcon');
+const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
+const AddCardIcon = require('images/icon_addCard_22x17.svg?name=AddCardIcon');
 
 export interface Props
 {

@@ -5,7 +5,7 @@
 .create-card-wrapper {
   
   position: relative;
-  @create-card-border-radius: 5px;
+  @create-card-border-radius: 3px;
   padding-right: 0px;
   
   &.create-card-closed {
@@ -26,13 +26,22 @@
     height: 0px;
   }
   
+
+
+  .inset-shadow-veil {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
   .create-card-selector {
+    position:relative;
     overflow: auto;
     max-height: 0px;
     &.create-card-selector-open {
-      max-height: 250px;
+      max-height: 450px;
     }
-    
     
     border-radius: @create-card-border-radius;
     box-sizing: border-box;
@@ -42,9 +51,34 @@
     &.create-card-selector-focused {
       border-color: @focus-color;
     }
-    
+
+    .selectors-row
+    {
+      display: flex;
+
+    }
+
     .create-card-selector-inner {
-      padding: @standard-margin;
+      flex: 1;
+      max-height: 250px;
+      overflow: auto;
+      padding: @half-spacing;
+    }
+
+    .card-category-selector {
+      width: 240px;
+      border-right: 1px solid;
+    }
+
+    .card-search-line {
+      padding: @spacing @spacing @half-spacing @spacing;
+      height: 30px;
+      border-bottom: 1px solid;
+      // background-color: blue;
+      .card-search-input {
+        border-radius: 3px;
+        // background-color: rgba(125,125,125,0.5);
+      }
     }
   }
   
