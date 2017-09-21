@@ -67,7 +67,6 @@ export const elasticScore = _card(
 
     static: {
       language: 'elastic',
-      tunable: true,
       title: 'Terrain Score Sort',
       description: 'Sort results using Terrain\'s proprietary scoring method: Transform \
         individual field values using a simple graphing tool, and combine the transformed \

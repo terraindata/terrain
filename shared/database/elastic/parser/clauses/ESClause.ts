@@ -100,7 +100,6 @@ abstract class ESClause
   public required: string[]; // required members (used for object types)
   public suggestions: any[]; // suggested autocomplete values or keys
   public multifield: boolean;
-  public tunable: boolean; // whether this clause will be included in the tuning view
 
   /**
    * @param type the name to refer to this clause (type)
@@ -121,7 +120,6 @@ abstract class ESClause
     this.setDefaultProperty('required', () => []);
     this.setDefaultProperty('suggestions', () => []);
     this.setDefaultProperty('multifield', () => true);
-    this.setDefaultProperty('tunable', () => false);
   }
 
   public init(config: EQLConfig): void

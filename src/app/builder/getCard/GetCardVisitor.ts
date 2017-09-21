@@ -119,7 +119,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   protected static seedCard(clause: ESClause,
     obj: {
       [field: string]: any;
-
       static: {
         colors?: string[]; // optional, filled below
         title?: string; // optional, filled below
@@ -134,7 +133,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         getParentTerms?: (card: Card, schemaState) => List<string>;
 
         metaFields?: string[];
-        tunable?: boolean;
         init?: InitFn;
       };
     }): any
@@ -152,7 +150,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       language: 'elastic',
       description: clause.desc,
       url: clause.url,
-      tunable: false,
     }, obj['static']);
 
     if (true) // switch this on for wrapper card approach
@@ -286,7 +283,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           singleChild: true,
         },
         preview: '',
-        tunable: clause.tunable,
       },
     });
   }
@@ -302,7 +298,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         colors: getCardColors(clause.path[0], Colors().builder.cards.arrayClause),
         preview: '[cards.size] ' + clause.type + '(s)',
         accepts,
-        tunable: clause.tunable,
         display:
         {
           displayType: DisplayType.CARDS,
@@ -333,7 +328,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.baseClause),
         preview: '[value]',
-        tunable: clause.tunable,
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -351,7 +345,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.booleanClause),
         preview: '[value]',
-        tunable: clause.tunable,
         display: {
           displayType: DisplayType.DROPDOWN,
           key: 'value',
@@ -373,7 +366,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.enumClause),
         preview: '[value]',
-        tunable: clause.tunable,
         display: {
           displayType: DisplayType.DROPDOWN,
           key: 'value',
@@ -392,7 +384,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.fieldClause),
         preview: '[value]',
-        tunable: clause.tunable,
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -413,7 +404,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.indexClause),
         preview: '[value]',
-        tunable: clause.tunable,
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -441,7 +431,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: getCardColors(clause.path[0], Colors().builder.cards.mapClause),
         preview: '[cards.size] properties',
-        tunable: clause.tunable,
         display:
         {
           displayType: DisplayType.CARDS,
@@ -474,7 +463,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         preview: '',
         display: [],
         tql: () => null,
-        tunable: clause.tunable,
       },
     });
   }
@@ -486,7 +474,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         ? 0 : clause.template,
       static: {
         preview: '[value]',
-        tunable: clause.tunable,
         colors: getCardColors(clause.path[0], Colors().builder.cards.numberClause),
         display: {
           displayType: DisplayType.NUM,
@@ -508,7 +495,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: getCardColors(clause.path[0], Colors().builder.cards.objectClause),
         preview: '[cards.size] properties',
-        tunable: clause.tunable,
         display:
         {
           displayType: DisplayType.CARDS,
@@ -559,7 +545,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.stringClause),
         preview: '[value]',
-        tunable: clause.tunable,
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -721,7 +706,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             );
             return json;
           },
-          tunable: clause.tunable,
           colors: getCardColors(clause.path[0], Colors().builder.cards.structureClause),
           preview: '[cards.size] Properties',
 
@@ -758,7 +742,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.typeClause),
         preview: '[value]',
-        tunable: clause.tunable,
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -807,7 +790,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static:
       {
         title: clause.type + ' (Variant)',
-        tunable: clause.tunable,
         tql: (block, tqlFn, tqlConfig) =>
         {
           return ''; // tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through

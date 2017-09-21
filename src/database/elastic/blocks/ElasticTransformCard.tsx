@@ -88,7 +88,6 @@ export const elasticTransform = _card(
       // manualEntry: ManualConfig.cards['transform'],
       colors: getCardColors('score', Colors().builder.cards.inputParameter),
       title: 'Transform',
-      tunable: true,
       preview: (card: any) =>
       {
         let preview = '';

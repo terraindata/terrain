@@ -152,7 +152,6 @@ export const elasticFilter = _card({
     description: 'Terrain\'s custom card for filtering results in a human-readable way.',
     colors: getCardColors('filter', Colors().builder.cards.structureClause),
     preview: '[filters.length] Filters',
-    // tunable: true,
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {

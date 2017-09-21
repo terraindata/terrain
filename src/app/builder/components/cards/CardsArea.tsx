@@ -88,7 +88,6 @@ interface KeyState
 
 interface State extends KeyState
 {
-  tuningMode: boolean;
   cardToolOpen: boolean;
   isDraggingCardOver: boolean;
   draggingOverIndex: number;
@@ -100,14 +99,11 @@ class CardsArea extends TerrainComponent<Props>
 {
   public state: State = {
     keyPath: null,
-    tuningMode: this.props.tuningMode,
     cardToolOpen: true,
     isDraggingCardOver: false,
     draggingOverIndex: -1,
     draggingCardItem: null,
   };
-
-  public tunableCards = [];
 
   constructor(props: Props)
   {
@@ -161,22 +157,6 @@ class CardsArea extends TerrainComponent<Props>
     });
   }
 
-  public getTunableCards(cards)
-  {
-    cards.forEach((card) =>
-    {
-      if (card.static.tunable)
-      {
-        this.tunableCards.push(card);
-      }
-      if (card.cards !== undefined && card.cards.size > 0)
-      {
-        this.getTunableCards(card.cards);
-      }
-    });
-
-  }
-
   public render()
   {
     const { props } = this;
@@ -185,13 +165,6 @@ class CardsArea extends TerrainComponent<Props>
 
     const { isDraggingCardOver, draggingCardItem, draggingOverIndex } = this.state;
     const { keyPath } = this.props;
-    if (this.props.tuningMode)
-    {
-      this.tunableCards = [];
-      this.getTunableCards(cards);
-    }
-
-    const cardsToShow = this.props.tuningMode ? List(this.tunableCards) : cards;
 
     return (
       <div>
@@ -203,7 +176,7 @@ class CardsArea extends TerrainComponent<Props>
 
         >
           {
-            cardsToShow.map((card: Card, index: number) =>
+            cards.map((card: Card, index: number) =>
             {
               return (
                 <div

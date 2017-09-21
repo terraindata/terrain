@@ -180,8 +180,32 @@
   }
 }
 
+.card-tuning-wrapper {
+  position: absolute;
+  top: 11px;
+  right: 30px;
+}
+
+.card-tuning-icon {
+  fill: rgba(255, 255, 255, 0.5);
+  width: 20px;
+  height: 20px;
+  position: relative;
+  cursor: pointer;
+  .transition;
+  opacity: 0;
+  &:hover {
+    fill: #fff;
+  }
+}
+
+.card-tuning-icon-set {
+  fill: red !important;
+  opacity: 1;
+}
+
 .card-hovering {
-  .card-help-icon {
+  .card-help-icon, .card-tuning-icon {
     opacity: 1;
   }
 }

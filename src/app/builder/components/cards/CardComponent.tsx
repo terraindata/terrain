@@ -82,6 +82,7 @@ import CreateCardTool from './CreateCardTool';
 const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('./../../../../images/icon_more_12x3.svg?name=MoreIcon');
 const HelpIcon = require('./../../../../images/icon_help-1.svg?name=HelpIcon');
+const TuningIcon = require('./../../../../images/icon_tuning.svg?name=TuningIcon');
 
 const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
@@ -423,6 +424,19 @@ class _CardComponent extends TerrainComponent<Props>
     this.renderTimeout && clearTimeout(this.renderTimeout);
   }
 
+  public toggleTuning()
+  {
+    if (!this.props.card.tuning)
+    {
+      Actions.addTuningCard(this.props.card);
+    }
+    else
+    {
+      Actions.removeTuningCard(this.props.card);
+    }
+    Actions.change(this.props.keyPath.push('tuning'), !this.props.card.tuning);
+  }
+
   public render()
   {
     const { id } = this.props.card;
@@ -644,6 +658,23 @@ class _CardComponent extends TerrainComponent<Props>
                   </div>
               }
             </div>
+            {
+              !this.props.tuningMode &&
+              <div
+                className='card-tuning-wrapper'
+                onClick={this.toggleTuning}
+                style={card.tuning ? { fill: 'red' } : {}}
+              >
+                {
+                  tooltip(
+                    <TuningIcon className='card-tuning-icon' />,
+                    card.tuning ? 'Remove this card from the tuning column'
+                      : 'Add this card to the tuning column',
+                  )
+                }
+              </div>
+            }
+
             {
               this.props.canEdit &&
               !card['cannotBeMoved'] &&

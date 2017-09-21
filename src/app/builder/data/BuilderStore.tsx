@@ -97,6 +97,7 @@ export class BuilderStateClass
 
   // For tuning mode: keep track of keypaths of cards
   public cardKeyPaths = Map<ID, KeyPath>({});
+  public tuningCards: Cards = List([]);
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
 const BuilderState_Record = Immutable.Record(new BuilderStateClass());

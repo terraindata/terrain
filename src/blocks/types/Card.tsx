@@ -61,6 +61,7 @@ export interface Card extends IRecord<Card>
   _isCard: boolean;
   _isBlock: boolean;
   closed: boolean;
+  tuning?: boolean; // whether the card is in the tuning section
 
   // the following fields are excluded from the server save
   static: {
@@ -68,7 +69,6 @@ export interface Card extends IRecord<Card>
     colors: string[];
     title: string;
     display: Display | Display[];
-    tunable?: boolean;
     isAggregate: boolean;
 
     // the format string used for generating tql
@@ -138,7 +138,6 @@ export interface CardConfig
     description?: string;
 
     metaFields?: string[];
-    tunable?: boolean;
 
     init?: InitFn;
   };
@@ -156,6 +155,7 @@ export const _card = (config: CardConfig) =>
     _isCard: true,
     _isBlock: true,
     closed: false,
+    tuning: false,
   });
 
   if (config.static.metaFields)

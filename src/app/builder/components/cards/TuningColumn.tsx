@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
 import InfoArea from '../../../common/components/InfoArea';
 import Actions from '../../data/BuilderActions';
@@ -62,6 +63,7 @@ import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 
 import { Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;
@@ -69,29 +71,44 @@ const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=Expa
 
 export interface Props
 {
-  cards: Cards;
   language: string;
-  deckOpen: boolean;
   queryId: ID;
   canEdit: boolean;
   addColumn: (number, string?) => void;
   columnIndex: number;
-  cardsAndCodeInSync: boolean;
 
   containerWidth?: number;
   containerHeight?: number;
-
+  tuning?: boolean;
 }
 
-class CardsColumn extends TerrainComponent<Props>
+class TuningColumn extends TerrainComponent<Props>
 {
   public state: {
     keyPath: KeyPath;
+    tuningCards: Cards
   } = {
     keyPath: this.computeKeyPath(this.props),
+    tuningCards: List([]),
   };
 
   public innerHeight: number = -1;
+
+  public constructor(props: Props)
+  {
+    super(props);
+    this._subscribe(BuilderStore, {
+      updater: (state: BuilderState) =>
+      {
+        if (!_.isEqual(this.state.tuningCards, state.tuningCards))
+        {
+          this.setState({
+            tuningCards: state.tuningCards,
+          });
+        }
+      },
+    });
+  }
 
   public componentDidMount()
   {
@@ -117,39 +134,6 @@ class CardsColumn extends TerrainComponent<Props>
     {
       this.handleScroll();
     }
-  }
-
-  public createCards()
-  {
-    Actions.change(this.state.keyPath, this.getFirstCards());
-    // _.map(this.getFirstCards(),
-    //   (blockConfig: object, index: number) =>
-    //   {
-    //     Actions.create(this.state.keyPath, index, blockConfig['type']);
-    //   });
-  }
-
-  // public renderTopbar()
-  // {
-  //   return (
-  //     <div
-  //       className='cards-area-top-bar'
-  //       style={backgroundColor(Colors().bg2)}
-  //     >
-  //       <div className='cards-area-white-space' />
-  //       <Switch
-  //         first='Standard'
-  //         second='Tuning'
-  //         onChange={this._toggle('tuningMode')}
-  //         small={true}
-  //       />
-  //     </div>
-  //   );
-  // }
-
-  public toggleDeck()
-  {
-    Actions.toggleDeck(!this.props.deckOpen);
   }
 
   public handleScroll()
@@ -178,69 +162,41 @@ class CardsColumn extends TerrainComponent<Props>
     }
   }
 
-  public handleCardDrop(type: string)
-  {
-    switch (type)
-    {
-      case 'eqlfrom':
-        return { key: 'from' };
-      case 'eqltype':
-        return { key: 'type' };
-      case 'eqlindex':
-        return { key: 'index' };
-      case 'eqlsize':
-        return { key: 'size' };
-      case 'eqlbody':
-        return { key: 'body' };
-      default:
-        return { key: '' };
-    }
-  }
+  // public getTuningCards(cards)
+  // {
+  //   cards.forEach((card) =>
+  //   {
+  //     if (card.tuning)
+  //     {
+  //       this.tuningCards.push(card);
+  //     }
+  //     if (card.cards !== undefined && card.cards.size > 0)
+  //     {
+  //       this.getTuningCards(card.cards);
+  //     }
+  //   });
+
+  // }
 
   public render()
   {
-    const { props } = this;
-    const { cards, canEdit } = props;
-    const { keyPath } = this.state;
-    const canHaveDeck = canEdit;
+    const { canEdit } = this.props;
+    const { keyPath, tuningCards } = this.state;
     return (
       <div
-        className={classNames({
-          'cards-column': true,
-          'cards-column-deck-open': canHaveDeck && this.props.deckOpen,
-          'cards-column-has-tql-parse-error': !this.props.cardsAndCodeInSync,
-        })}
+        className='cards-column'
       >
-        {
-          canHaveDeck &&
-          <CardsDeck
-            open={this.props.deckOpen}
-            language={this.props.language}
-          />
-        }
         <div
-          className={classNames({
-            'cards-column-cards-area': true,
-            'cards-column-cards-area-faded': !this.props.cardsAndCodeInSync,
-          })}
+          className='cards-column-cards-area'
+
           onScroll={this.handleScroll}
           id='cards-column'
         >
           <div
             id='cards-column-inner'
           >
-            <CardDropArea
-              half={true}
-              lower={true}
-              index={cards.size}
-              keyPath={keyPath}
-              heightOffset={12}
-              accepts={this.getPossibleCards()}
-              language={this.props.language}
-              handleCardDrop={this.handleCardDrop}
-            />
             <CardsArea
-              cards={cards}
+              cards={tuningCards}
               language={this.props.language}
               keyPath={keyPath}
               canEdit={canEdit}
@@ -248,45 +204,9 @@ class CardsColumn extends TerrainComponent<Props>
               columnIndex={this.props.columnIndex}
               noCardTool={true}
               accepts={this.getPossibleCards()}
-              handleCardDrop={this.handleCardDrop}
+              tuningMode={true}
             />
-            {
-              !cards.size ? /* "Create your first card." */
-                <InfoArea
-                  large={"There aren't any cards in this query."}
-                  button={canEdit && 'Create a starter set of cards'}
-                  onClick={this.createCards}
-                  inline={false}
-                />
-                : null
-            }
           </div>
-        </div>
-        {
-          canHaveDeck &&
-          <div
-            className='cards-deck-knob'
-            onClick={this.toggleDeck}
-          >
-            <ExpandIcon
-              className='cards-deck-knob-icon'
-            />
-            <div
-              className='cards-deck-knob-text'
-              style={fontColor(Colors().text3)}
-            >
-              Card Deck
-            </div>
-          </div>
-        }
-
-        <div
-          className='cards-column-tql-parse-error'
-          style={altStyle()}
-        >
-          {
-            'There is a parsing error with your code.' || 'All good!'
-          }
         </div>
       </div>
     );
@@ -296,61 +216,6 @@ class CardsColumn extends TerrainComponent<Props>
   {
     return AllBackendsMap[this.props.language].topLevelCards;
   }
-
-  private getFirstCards(): Cards
-  {
-    return AllBackendsMap[this.props.language].getRootCards();
-  }
-
 }
 
-// <CardDropArea
-//   half={true}
-//   index={0}
-//   keyPath={keyPath}
-//   height={12}
-//   accepts={this.getPossibleCards()}
-// />
-
-// wasn't able to get this to work but will leave it around in case some
-//  bright eyed dev comes along and find the solution
-
-// interface InnerProps
-// {
-//   onChange: () => void;
-
-//   children?: any;
-//   containerWidth?: number;
-//   containerHeight?: number;
-// }
-// class _CardsColumnInner extends TerrainComponent<InnerProps>
-// {
-//   componentWillReceiveProps(nextProps:InnerProps)
-//   {
-//     if(nextProps.containerHeight !== this.props.containerHeight)
-//     {
-//       console.log('asdf');
-//       // size of the content changed
-//       this.props.onChange();
-//     }
-//     console.log('gpp', nextProps.containerHeight);
-//   }
-
-//   render()
-//   {
-//     console.log('mdc', this.props.containerHeight);
-//     return (
-//       <div
-//         id='cards-column-inner'
-//       >
-//         {
-//           this.props.children
-//         }
-//       </div>
-//     );
-//   }
-// }
-
-// const CardsColumnInner = Dimensions()(_CardsColumnInner);
-
-export default Dimensions()(CardsColumn);
+export default Dimensions()(TuningColumn);
