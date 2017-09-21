@@ -21,7 +21,8 @@
     "lint-back": "tslint -c tslint.json --fix --type-check --project midway/tsconfig.json",
     "lint-front": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
     "style": "find midway src shared -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1",
-    "fix": "yarn run style && yarn run lint-parallel;"
+    "fix": "yarn run style && yarn run lint-parallel;",
+    "diff-style": "git ls-files -m  \\*.ts\\* | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1"
   },
   "repository": {
     "type": "git",
@@ -48,15 +49,18 @@
     "mapCoverage": true,
     "moduleNameMapper": {
       "^auth(.*)$": "<rootDir>/src/app/auth$1",
+      "^analytics(.*)$": "<rootDir>/src/app/analytics$1",
       "^builder(.*)$": "<rootDir>/src/app/builder$1",
       "^charts(.*)$": "<rootDir>/src/app/charts$1",
       "^common(.*)$": "<rootDir>/src/app/common$1",
       "^deploy(.*)$": "<rootDir>/src/app/deploy$1",
       "^fileimport(.*)$": "<rootDir>/src/app/fileimport$1",
+      "^images(.*)$": "<rootDir>/src/images/$1",
       "^library(.*)$": "<rootDir>/src/app/library$1",
       "^manual(.*)$": "<rootDir>/src/app/manual$1",
       "^roles(.*)$": "<rootDir>/src/app/roles$1",
       "^schema(.*)$": "<rootDir>/src/app/schema$1",
+      "^shared(.*)$": "<rootDir>/shared/$1",
       "^store(.*)$": "<rootDir>/src/app/store$1",
       "^tql(.*)$": "<rootDir>/src/app/tql$1",
       "^users(.*)$": "<rootDir>/src/app/users$1",
@@ -66,7 +70,8 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|svg\\?.*|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/mocks/fileMock.ts"
     },
     "globals": {
-      "DEV": true
+      "DEV": true,
+      "MIDWAY_HOST": "http://localhost"
     },
     "setupFiles": [
       "<rootDir>/src/test/mocks/browserMock.ts"
@@ -113,6 +118,7 @@
     "memoize-one": "^3.0.1",
     "moment": "^2.13.0",
     "mysql": "^2.13.0",
+    "nock": "^9.0.14",
     "node-libs-browser": "0.6.0",
     "node-schedule": "^1.2.3",
     "object-assign": "^4.1.1",

@@ -15,6 +15,7 @@
         "paths": {
             "library*": ["app/library/*"],
             "auth*": ["app/auth/*"],
+            "analytics*": ["app/analytics/*"],
             "builder*": ["app/builder/*"],
             "charts*": ["app/charts/*"],
             "common*": ["app/common/*"],
@@ -27,7 +28,8 @@
             "tql*": ["app/tql/*"],
             "users*": ["app/users/*"],
             "util*": ["app/util/*"],
-            "x*": ["app/x/*"]
+            "x*": ["app/x/*"],
+            "colors*": ["app/colors*"]
         },
         "experimentalDecorators": true,
         "allowJs": true,

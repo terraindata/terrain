@@ -79,10 +79,16 @@ import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
 
-const ArrowIcon = require('./../../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
-const HandleIcon = require('./../../../../images/icon_more_12x3.svg?name=MoreIcon');
-const HelpIcon = require('./../../../../images/icon_help-1.svg?name=HelpIcon');
-const TuningIcon = require('./../../../../images/icon_tuning.svg?name=TuningIcon');
+<<<<<<< src/app/builder/components/cards/CardComponent.tsx
+const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
+const HandleIcon = require('images/icon_more_12x3.svg?name=MoreIcon');
+const HelpIcon = require('images/icon_help-1.svg?name=HelpIcon');
+const TuningIcon = require('images/icon_tuning.svg?name=TuningIcon');
+=======
+const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
+const HandleIcon = require('images/icon_more_12x3.svg?name=MoreIcon');
+const HelpIcon = require('images/icon_help-1.svg?name=HelpIcon');
+>>>>>>> src/app/builder/components/cards/CardComponent.tsx
 
 const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
