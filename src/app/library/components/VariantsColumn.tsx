@@ -88,6 +88,7 @@ export interface Props
   multiselect?: boolean;
   params?: any;
   variantActions?: any;
+  analyticsActions?: any;
 }
 
 class VariantsColumn extends TerrainComponent<Props>
@@ -115,7 +116,11 @@ class VariantsColumn extends TerrainComponent<Props>
     if (multiselect && params && params.variantId)
     {
       const variantIds = params.variantId.split(',');
-      variantIds.forEach((id) => this.props.variantActions.select(id));
+      variantIds.forEach((id) =>
+      {
+        this.props.variantActions.select(id);
+        this.props.analyticsActions.fetch(id);
+      });
     }
 
     this._subscribe(UserStore, {
@@ -298,6 +303,7 @@ class VariantsColumn extends TerrainComponent<Props>
       } else
       {
         this.props.variantActions.select(id.toString());
+        this.props.analyticsActions.fetch(id);
       }
     } else
     {

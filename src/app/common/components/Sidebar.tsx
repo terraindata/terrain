@@ -52,10 +52,10 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
 import { backgroundColor, fontColor, Colors } from '../../common/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
-import StyleTag from './StyleTag';
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less
@@ -79,6 +79,12 @@ export interface Props
 @Radium
 export class Sidebar extends TerrainComponent<Props>
 {
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.sidebar-expand-icon', { fill: Colors().text2 });
+    ColorsActions.setStyle('.sidebar-expand:hover .sidebar-expand-icon', { fill: Colors().text1 });
+  }
+
   public render()
   {
     return (
@@ -155,9 +161,6 @@ export class Sidebar extends TerrainComponent<Props>
                         fill: Colors().text1,
                       },
                     }}
-                  />
-                  <StyleTag
-                    style={SVG_STYLE}
                   />
                 </div>
               </div>

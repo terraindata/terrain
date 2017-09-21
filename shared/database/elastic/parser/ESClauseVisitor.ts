@@ -63,7 +63,7 @@ import ESStringClause from './clauses/ESStringClause';
 import ESStructureClause from './clauses/ESStructureClause';
 import ESTypeClause from './clauses/ESTypeClause';
 import ESVariantClause from './clauses/ESVariantClause';
-
+import ESWildcardStructureClause from './clauses/ESWildcardStructureClause';
 /**
  * A visitor for visiting ESClause objects
  */
@@ -107,6 +107,7 @@ abstract class ESClauseVisitor<ReturnType>
 
   public visitESVariantClause(clause: ESVariantClause): ReturnType { return this.visitESClause(clause); }
 
+  public visitESWildcardStructureClause(clause: ESWildcardStructureClause): ReturnType { return this.visitESClause(clause); }
 }
 
 export default ESClauseVisitor;

@@ -75,8 +75,8 @@ export class Users
   {
     // tslint:disable-next-line
     (new Users()).create({
-      accessToken: 'ImALuser',
-      email: 'luser@terraindata.com',
+      accessToken: 'ImAnAdmin',
+      email: 'admin@terraindata.com',
       isSuperUser: 1,
       name: 'Terrain Admin',
       password: 'secret',
@@ -85,7 +85,7 @@ export class Users
     })
       .catch((error: string) =>
       {
-        if (error !== 'User with email luser@terraindata.com already exists.')
+        if (error !== 'User with email admin@terraindata.com already exists.')
         {
           throw new Error('Problem creating default user: ' + error);
         }
@@ -164,19 +164,15 @@ export class Users
           return reject('Must provide password if updating email or password');
         }
 
+        const unhashedPassword: string = user.oldPassword === undefined ? user.password : user.oldPassword;
         user.password = await this.hashPassword(user.password);
-        let hashedPassword: string;
+
         if (user.oldPassword !== undefined)
         {
           user.oldPassword = await this.hashPassword(user.oldPassword);
-          hashedPassword = user.oldPassword;
-        }
-        else
-        {
-          hashedPassword = user.password;
         }
 
-        const passwordsMatch: boolean = await this.comparePassword(hashedPassword, oldUser.password);
+        const passwordsMatch: boolean = await this.comparePassword(unhashedPassword, oldUser.password);
         if (!passwordsMatch)
         {
           return reject('Password does not match');

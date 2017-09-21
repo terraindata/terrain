@@ -46,17 +46,21 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 
+import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
 import RolesReducer from 'roles/data/RolesReducers';
 import UserReducer from 'users/data/UserReducers';
+import ColorsReducer from '../colors/data/ColorsReducers';
 
 const reducers = {
+  analytics: AnalyticsReducer,
   library: LibraryReducer,
   roles: RolesReducer,
   users: UserReducer,
+  colors: ColorsReducer,
 };
 
 const rootReducer = combineReducers(reducers);
