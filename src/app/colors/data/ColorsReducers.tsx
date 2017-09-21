@@ -43,32 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as Immutable from 'immutable';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import UserReducer from 'users/data/UserReducers';
-import ColorsReducer from '../colors/data/ColorsReducers';
+import ActionTypes from './ColorsActionTypes';
+import { _ColorsState, ColorsState } from './ColorsStore';
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  users: UserReducer,
-  colors: ColorsReducer,
+const ColorsReducer = {};
+
+ColorsReducer[ActionTypes.setStyle] =
+  (state, action) =>
+  {
+    const { selector, style } = action.payload;
+    return state.set('styles', state.styles.set(selector, style));
+  };
+
+const ColorsReducerWrapper = (state: ColorsState = _ColorsState(), action) =>
+{
+  let nextState = state;
+  if (ColorsReducer[action.type])
+  {
+    nextState = ColorsReducer[action.type](state, action);
+  }
+  return nextState;
 };
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
-
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+export default ColorsReducerWrapper;

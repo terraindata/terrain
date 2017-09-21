@@ -43,32 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import ActionTypes from './ColorsActionTypes';
+import Store from './ColorsStore';
 
-import * as Immutable from 'immutable';
+const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import UserReducer from 'users/data/UserReducers';
-import ColorsReducer from '../colors/data/ColorsReducers';
+const ColorsActions =
+  {
+    setStyle:
+    (selector: string, style: React.CSSProperties) =>
+      $(ActionTypes.setStyle, { selector, style }),
+  };
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  users: UserReducer,
-  colors: ColorsReducer,
-};
-
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
-
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+export default ColorsActions;
