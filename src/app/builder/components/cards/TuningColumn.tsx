@@ -106,7 +106,6 @@ class TuningColumn extends TerrainComponent<Props>
         {
           this.tuningCards = List([]);
           this.updateTuningCards(state.query.cards);
-          this.orderCards();
           this.setState({
             allCards: state.query.cards,
           });
@@ -115,34 +114,34 @@ class TuningColumn extends TerrainComponent<Props>
     });
   }
 
-  public orderCards()
-  {
-    let lastPos = this.tuningCards.size - 1;
-    this.tuningCards = List(this.tuningCards.sortBy((card) => {
-      if (card.tuningIndex === undefined)
-      {
-        lastPos += 1;
-        return lastPos - 1;
-      }
-      return card.tuningIndex;
-    })) as Cards;
-    console.log(this.tuningCards);
-    this.setState({
-      shouldUpdate: false,
-    });
-    let index = 0;
-    const keyPaths = BuilderStore.getState().cardKeyPaths;
-    this.tuningCards.forEach((card) => {
-      if (keyPaths.get(card.id) !== undefined)
-      {
-        Actions.change(keyPaths.get(card.id).push('tuningIndex'), index);
-        index += 1;
-      }
-    });
-    this.setState({
-      shouldUpdate: true,
-    });
-  }
+  // public orderCards()
+  // {
+  //   let lastPos = this.tuningCards.size - 1;
+  //   this.tuningCards = List(this.tuningCards.sortBy((card) => {
+  //     if (card.tuningIndex === undefined)
+  //     {
+  //       lastPos += 1;
+  //       return lastPos - 1;
+  //     }
+  //     return card.tuningIndex;
+  //   })) as Cards;
+  //   console.log(this.tuningCards);
+  //   this.setState({
+  //     shouldUpdate: false,
+  //   });
+  //   let index = 0;
+  //   const keyPaths = BuilderStore.getState().cardKeyPaths;
+  //   this.tuningCards.forEach((card) => {
+  //     if (keyPaths.get(card.id) !== undefined)
+  //     {
+  //       Actions.change(keyPaths.get(card.id).push('tuningIndex'), index);
+  //       index += 1;
+  //     }
+  //   });
+  //   this.setState({
+  //     shouldUpdate: true,
+  //   });
+  // }
 
   /*
 
@@ -154,14 +153,14 @@ class TuningColumn extends TerrainComponent<Props>
         }
         */
 
-        /*
-           before the render (or after tuning cards is updated), go through each of the cards in the list
-           if the tuningIndex is defined leave it
-           if the tuningIndex is undefined set that card to be at the end of the list
-           adjust the list so the indexes are in order (if you removed the first card or something, have to shift down)
-           set all new indexes with Actions
-           render in that order
-        */
+  /*
+     before the render (or after tuning cards is updated), go through each of the cards in the list
+     if the tuningIndex is defined leave it
+     if the tuningIndex is undefined set that card to be at the end of the list
+     adjust the list so the indexes are in order (if you removed the first card or something, have to shift down)
+     set all new indexes with Actions
+     render in that order
+  */
 
   public updateTuningCards(cards)
   {
@@ -197,11 +196,15 @@ class TuningColumn extends TerrainComponent<Props>
     }
   }
 
+  public afterDrop(item, targetProps)
+  {
+    // console.log('card drop boooom');
+  }
+
   public render()
   {
     const { canEdit, language, addColumn, columnIndex } = this.props;
     const { keyPath } = this.state;
-    console.log(this.tuningCards);
     return (
       <div
         className='cards-column'
@@ -225,6 +228,16 @@ class TuningColumn extends TerrainComponent<Props>
               accepts={this.getPossibleCards()}
               tuningMode={true}
             />
+            <CardDropArea
+              half={true}
+              lower={true}
+              index={this.tuningCards.size}
+              keyPath={keyPath}
+              heightOffset={0}
+              accepts={this.getPossibleCards()}
+              language={this.props.language}
+              afterDrop={this.afterDrop}
+            />
           </div>
         </div>
       </div>
@@ -233,7 +246,7 @@ class TuningColumn extends TerrainComponent<Props>
 
   private getPossibleCards()
   {
-    return AllBackendsMap[this.props.language].topLevelCards;
+    return AllBackendsMap[this.props.language].cardsList;
   }
 }
 
