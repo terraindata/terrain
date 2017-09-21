@@ -45,11 +45,12 @@
   }
 
   &.card-hovering {
-    .menu-wrapper, .manual-popup-wrapper {
+    .menu-wrapper, .manual-popup-wrapper, .card-tuning-icon:not(.card-tuning-icon-off) {
       opacity: 1;
     }
     .card {
-      .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open) {
+      .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open), 
+      .card-tuning-icon:not(.card-tuning-icon-on) {
         opacity: 0;
       }
     }
@@ -200,12 +201,15 @@
 }
 
 .card-tuning-icon-on {
-  fill: red !important;
   opacity: 1;
 }
 
+.card-tuning-icon-off {
+  opacity: 0;
+}
+
 .card-hovering {
-  .card-help-icon, .card-tuning-icon {
+  .card-help-icon {
     opacity: 1;
   }
 }

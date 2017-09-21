@@ -74,7 +74,7 @@ import CardHelpTooltip from './CardHelpTooltip';
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { cardStyle, Colors } from '../../../common/Colors';
+import { cardStyle, Colors, getStyle } from '../../../common/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
@@ -672,8 +672,10 @@ class _CardComponent extends TerrainComponent<Props>
                     <TuningIcon
                       className={classNames({
                         'card-tuning-icon': true,
-                        'card-tuning-icon-on': card.tuning || this.props.tuningMode,
+                        'card-tuning-icon-on': card.tuning,
+                        'card-tuning-icon-off': this.props.tuningMode && !card.tuning,
                       })}
+                      style={card.tuning ? getStyle('fill', Colors().active) : {}}
                     />,
                     card.tuning || this.props.tuningMode ? 'Remove this card from the tuning column'
                       : 'Add this card to the tuning column',

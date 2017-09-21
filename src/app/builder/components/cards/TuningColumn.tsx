@@ -170,6 +170,10 @@ class TuningColumn extends TerrainComponent<Props>
       {
         this.tuningCards = this.tuningCards.push(card);
       }
+      if (card.key.tuning) // for transform cards
+      {
+        this.tuningCards = this.tuningCards.push(card.key);
+      }
       if (card.cards !== undefined && card.cards.size > 0)
       {
         this.updateTuningCards(card.cards);
