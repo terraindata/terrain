@@ -43,32 +43,51 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as Immutable from 'immutable';
+import ActionTypes from 'library/data/LibraryActionTypes';
+import reducer from 'library/data/LibraryReducers';
+import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import UserReducer from 'users/data/UserReducers';
-import ColorsReducer from '../colors/data/ColorsReducers';
+describe('LibraryReducers', () =>
+{
+  let library: LibraryState = _LibraryState({});
+  let group = LibraryTypes._Group();
+  const groupId = 1;
+  const groupName = 'Test Group';
+  group = group
+    .set('id', groupId)
+    .set('name', groupName);
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  users: UserReducer,
-  colors: ColorsReducer,
-};
+  beforeEach(() =>
+  {
+    library = _LibraryState({});
+  });
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+  it('should return the inital state', () =>
+  {
+    expect(reducer(undefined, {})).toEqual(library);
+  });
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
+  describe('#groups.create', () =>
+  {
+    it('should handle groups.create', () =>
+    {
+      library = library.set(
+        'groups',
+        Immutable.Map<number, LibraryTypes.Group>({}),
+      );
 
-export default terrainStore;
+      const nextState = reducer(library, {
+        type: ActionTypes.groups.create,
+        payload: { group },
+      });
+
+      expect(
+        nextState.groups,
+      ).toEqual(
+        library.groups.set(groupId, group),
+      );
+    });
+  });
+});

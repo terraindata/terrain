@@ -44,31 +44,34 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+
 import * as Immutable from 'immutable';
-
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
+import * as _ from 'lodash';
+import * as Redux from 'redux';
+import * as ReduxActions from 'redux-actions';
 import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import UserReducer from 'users/data/UserReducers';
-import ColorsReducer from '../colors/data/ColorsReducers';
+import Util from './../../util/Util';
+import ColorsReducers from './ColorsReducers';
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  users: UserReducer,
-  colors: ColorsReducer,
+class ColorsStateC
+{
+  public styles: IMMap<string, React.CSSProperties> = Immutable.Map();
+}
+
+const ColorsState_Record = Immutable.Record(new ColorsStateC());
+export interface ColorsState extends ColorsStateC, IRecord<ColorsState> { }
+export const _ColorsState = (config?: any) =>
+{
+  return new ColorsState_Record(Util.extendId(config || {})) as any as ColorsState;
 };
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+const DefaultState = _ColorsState();
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
+export const ColorsStore = Redux.createStore(
+  ColorsReducers,
+  DefaultState,
+  Redux.applyMiddleware(thunk),
+);
 
-export default terrainStore;
+export default ColorsStore;

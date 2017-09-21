@@ -43,32 +43,68 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as Immutable from 'immutable';
-
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
+import Actions from 'library/data/LibraryActions';
+import ActionTypes from 'library/data/LibraryActionTypes';
+import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
+import * as nock from 'nock';
+import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import UserReducer from 'users/data/UserReducers';
-import ColorsReducer from '../colors/data/ColorsReducers';
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  users: UserReducer,
-  colors: ColorsReducer,
-};
+const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+const middlewares = [thunk];
+const mockStore = configureMockStore(middlewares);
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
+describe('LibraryActions', () =>
+{
+  describe('#groups.create', () =>
+  {
+    const library: LibraryState = _LibraryState({
+      groups: Immutable.Map<number, LibraryTypes.Group>({}),
+      variants: Immutable.Map<number, LibraryTypes.Variant>({}),
+    });
 
-export default terrainStore;
+    const group = LibraryTypes._Group();
+    const groupId = 1;
+    const groupName = 'Test Group';
+    group.set('name', groupName);
+
+    afterEach(() =>
+    {
+      nock.cleanAll();
+    });
+
+    it('should create a groups.create action after the new group has been created', () =>
+    {
+      nock(MIDWAY_BASE_URL)
+        .post(`/items/${groupId}`)
+        .reply(200, [
+          {
+            id: groupId,
+            meta: `{"db":{},"modelVersion":2,"lastEdited":"","lastUserId":"",
+"userIds":[],"algorithmsOrder":[],"defaultLanguage":"elastic"}`,
+            name: groupName,
+            parent: 0,
+            status: 'BUILD',
+            type: 'GROUP',
+          },
+        ]);
+
+      const expectedActions = [
+        {
+          type: ActionTypes.groups.create,
+          payload: { group: group.set('id', groupId) },
+        },
+      ];
+
+      const store = mockStore({ library });
+
+      return store.dispatch(Actions.groups.create(group, (id) =>
+      {
+        expect(store.getActions()).toEqual(expectedActions);
+      }));
+    });
+  });
+});

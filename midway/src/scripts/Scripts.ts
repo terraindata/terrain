@@ -92,6 +92,20 @@ export async function provisionScripts(controller: DatabaseController)
     {
       try
       {
+        const alive: boolean = await new Promise<boolean>(
+          (resolve, reject) =>
+          {
+            client.ping({
+              requestTimeout: 100,
+            }, (error) => resolve(!error));
+          });
+
+        if (alive === false)
+        {
+          winston.info('Skipped provisioning script ' + script.id + ' for offline database ' + controller.getName());
+          continue;
+        }
+
         await new Promise(
           (resolve, reject) =>
           {
