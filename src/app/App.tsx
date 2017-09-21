@@ -269,6 +269,7 @@ class App extends TerrainComponent<Props>
     ColorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
     ColorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
     ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
+    ColorsActions.setStyle('.close', { fill: Colors().altBg1 });
 
     const tooltipStyles = generateThemeStyles();
     _.map(tooltipStyles, (key, value) => 
@@ -412,26 +413,5 @@ class App extends TerrainComponent<Props>
     );
   }
 }
-
-
-const COMMON_THEME_COLOR_STYLE = {
-  '::-webkit-scrollbar-track': {
-    background: Colors().scrollbarBG,
-  },
-  '::-webkit-scrollbar-thumb': {
-    background: Colors().scrollbarPiece,
-  },
-  '.altBg ::-webkit-scrollbar-thumb': {
-    background: Colors().altScrollbarPiece,
-  },
-  'input': {
-    background: Colors().inputBg,
-    color: Colors().text1,
-  },
-  '.close': {
-    fill: Colors().altBg1;
-  }
-  ...generateThemeStyles(),
-};
 
 export default App;

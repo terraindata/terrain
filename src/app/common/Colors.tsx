@@ -103,6 +103,8 @@ interface Theme
 
   resultLine: string;
 
+  tooltipBg: string;
+
   // DO NOT USE these below colors anymore -- these need to be cleaned up
 
   // text
