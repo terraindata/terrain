@@ -72,7 +72,7 @@ import ESStringClause from './ESStringClause';
 import ESStructureClause from './ESStructureClause';
 import ESTypeClause from './ESTypeClause';
 import ESVariantClause from './ESVariantClause';
-
+import ESWildcardStructureClause from './ESWildcardStructureClause';
 /**
  * Represents an Elastic Search query clause
  */
@@ -99,6 +99,7 @@ abstract class ESClause
   public template: any; // template for this clause type
   public required: string[]; // required members (used for object types)
   public suggestions: any[]; // suggested autocomplete values or keys
+  public multifield: boolean;
 
   /**
    * @param type the name to refer to this clause (type)
@@ -118,6 +119,7 @@ abstract class ESClause
     this.setDefaultProperty('template', () => undefined);
     this.setDefaultProperty('required', () => []);
     this.setDefaultProperty('suggestions', () => []);
+    this.setDefaultProperty('multifield', () => true);
   }
 
   public init(config: EQLConfig): void
@@ -165,6 +167,8 @@ abstract class ESClause
         return visitor.visitESVariantClause(this as any as ESVariantClause);
       case ESClauseType.ESScriptClause:
         return visitor.visitESScriptClause(this as any as ESScriptClause);
+      case ESClauseType.ESWildcardStructureClause:
+        return visitor.visitESWildcardStructureClause(this as any as ESWildcardStructureClause);
       default:
         return visitor.visitESClause(this);
     }

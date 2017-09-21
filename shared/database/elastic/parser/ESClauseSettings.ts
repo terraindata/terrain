@@ -54,6 +54,7 @@ interface ESClauseSettings
   path?: string[];
   desc?: string;
   url?: string;
+  multifield?: boolean;
   template?: any;
   required?: string[];
   suggestions?: any[];

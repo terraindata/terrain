@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as React from 'react';
+import { MidwayError } from 'shared/error/MidwayError';
 import * as UserTypes from '../UserTypes';
 import AuthStore from './../../auth/data/AuthStore';
 import CheckBox from './../../common/components/CheckBox';
@@ -190,7 +191,7 @@ class Settings extends TerrainComponent<Props>
     }, (error) =>
       {
         this.setState({
-          modalMessage: 'Error changing your password: ' + JSON.stringify(error.error),
+          modalMessage: 'Error changing your password: ' + MidwayError.fromJSON(error).getDetail(),
           errorModal: true,
         });
         this.toggleModal();

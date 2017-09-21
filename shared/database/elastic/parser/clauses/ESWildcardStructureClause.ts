@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
+
 import EQLConfig from '../EQLConfig';
 import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
@@ -52,52 +54,86 @@ import ESJSONType from '../ESJSONType';
 import ESPropertyInfo from '../ESPropertyInfo';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
+import ESStructureClause from './ESStructureClause';
 
 /**
- * A clause that corresponds to an object of uniform type values.
+ * A clause that extends ESStructureClause by allowing for a wildcard value.
  */
-export default class ESMapClause extends ESClause
+export default class ESWildcardStructureClause extends ESStructureClause
 {
+  public structure: { [name: string]: string };
+
   public nameType: string;
   public valueType: string;
+  public wildcardMarked: boolean = false;
 
-  public constructor(type: string, nameType: string, valueType: string, settings?: ESClauseSettings)
+  public constructor(type: string, structure: { [name: string]: string }, nameType: string, valueType: string, settings?: ESClauseSettings,
+    clauseType: ESClauseType = ESClauseType.ESWildcardStructureClause)
   {
-    super(type, ESClauseType.ESMapClause, settings);
+    super(type, structure, settings, clauseType);
+    // super(type, clauseType, settings);
+    this.structure = structure;
     this.nameType = nameType;
     this.valueType = valueType;
+    this.setDefaultProperty('template', () => ({}));
   }
 
   public init(config: EQLConfig): void
   {
+    Object.keys(this.structure).forEach(
+      (key: string): void =>
+      {
+        config.declareType(this.structure[key]);
+      });
+
+    this.checkValidAndUniqueProperties(this.required, 'required');
+    this.checkValidAndUniqueProperties(this.suggestions, 'suggestions');
+    this.checkValidAndUniqueProperties(Object.keys(this.template), 'template');
+
     config.declareType(this.nameType);
     config.declareType(this.valueType);
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    this.typeCheck(interpreter, valueInfo, ESJSONType.object);
+    // for marking missing wildcard field errors
+    const marker = valueInfo.objectChildren[_.keys(valueInfo.objectChildren)[0]];
+    const valueClause: ESClause = interpreter.config.getClause(this.valueType);
+    this.wildcardMarked = false;
 
-    // mark properties
+    super.mark(interpreter, valueInfo);
+
+    // If no wildcard property was marked, accumulate and error (because this is required)
+    if (!this.wildcardMarked)
+    {
+      interpreter.accumulateError(marker !== undefined ? marker.propertyName : null,
+        'Error: missing required wildcard field with value type of ' + valueClause.name);
+    }
+  }
+
+  protected unknownPropertyName(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, viTuple: ESPropertyInfo)
+  {
     const nameClause: ESClause = interpreter.config.getClause(this.nameType);
     const valueClause: ESClause = interpreter.config.getClause(this.valueType);
-
-    let nrField = 0;
-
-    valueInfo.forEachProperty((viTuple: ESPropertyInfo): void =>
+    // check if this is the wild card field
+    if (!this.wildcardMarked)
     {
       viTuple.propertyName.clause = nameClause;
       if (viTuple.propertyValue !== null)
       {
         viTuple.propertyValue.clause = valueClause;
       }
-      // multifield checking
-      nrField += 1;
-      if (this.multifield === false && nrField > 1)
-      {
-        interpreter.accumulateError(viTuple.propertyName,
-          'The ' + this.name + ' does not support multiple fields.');
-      }
-    });
+      this.wildcardMarked = true;
+      return false;
+    }
+    else
+    {
+      interpreter.accumulateError(viTuple.propertyName,
+        'Unknown property \"' + String(name) +
+        '\". Expected one of these properties: ' +
+        JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
+        true);
+      return true;
+    }
   }
 }

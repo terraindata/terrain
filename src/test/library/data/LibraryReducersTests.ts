@@ -43,49 +43,51 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import ActionTypes from 'library/data/LibraryActionTypes';
+import reducer from 'library/data/LibraryReducers';
+import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
 
-import AnalyticsActions from 'analytics/data/AnalyticsActions';
-import Library from 'library/components/Library';
-import LibraryActions from 'library/data/LibraryActions';
-import { LibraryState } from 'library/data/LibraryStore';
-import * as _ from 'lodash';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import RolesActions from 'roles/data/RolesActions';
-import UserActions from 'users/data/UserActions';
-
-const mapStateToProps = (state) =>
+describe('LibraryReducers', () =>
 {
-  return {
-    analytics: state.get('analytics'),
-    library: state.get('library'),
-    roles: state.get('roles'),
-    users: state.get('users'),
-  };
-};
+  let library: LibraryState = _LibraryState({});
+  let group = LibraryTypes._Group();
+  const groupId = 1;
+  const groupName = 'Test Group';
+  group = group
+    .set('id', groupId)
+    .set('name', groupName);
 
-function mapDispatchToProps(dispatch)
-{
-  return {
-    analyticsActions: bindActionCreators(AnalyticsActions, dispatch),
-    libraryGroupActions: bindActionCreators(LibraryActions.groups, dispatch),
-    libraryAlgorithmActions: bindActionCreators(LibraryActions.algorithms, dispatch),
-    libraryVariantActions: bindActionCreators(LibraryActions.variants, dispatch),
-    libraryActions: bindActionCreators(
-      _.pick(
-        LibraryActions,
-        ['loadState', 'setDbs', 'fetch'],
-      ),
-      dispatch,
-    ),
-    roleActions: bindActionCreators(RolesActions, dispatch),
-    userActions: bindActionCreators(UserActions, dispatch),
-  };
-}
+  beforeEach(() =>
+  {
+    library = _LibraryState({});
+  });
 
-const LibraryContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Library);
+  it('should return the inital state', () =>
+  {
+    expect(reducer(undefined, {})).toEqual(library);
+  });
 
-export default LibraryContainer;
+  describe('#groups.create', () =>
+  {
+    it('should handle groups.create', () =>
+    {
+      library = library.set(
+        'groups',
+        Immutable.Map<number, LibraryTypes.Group>({}),
+      );
+
+      const nextState = reducer(library, {
+        type: ActionTypes.groups.create,
+        payload: { group },
+      });
+
+      expect(
+        nextState.groups,
+      ).toEqual(
+        library.groups.set(groupId, group),
+      );
+    });
+  });
+});

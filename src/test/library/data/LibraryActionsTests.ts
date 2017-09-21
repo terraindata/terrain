@@ -43,49 +43,68 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import Actions from 'library/data/LibraryActions';
+import ActionTypes from 'library/data/LibraryActionTypes';
+import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
+import * as nock from 'nock';
+import configureMockStore from 'redux-mock-store';
+import thunk from 'redux-thunk';
 
-import AnalyticsActions from 'analytics/data/AnalyticsActions';
-import Library from 'library/components/Library';
-import LibraryActions from 'library/data/LibraryActions';
-import { LibraryState } from 'library/data/LibraryStore';
-import * as _ from 'lodash';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import RolesActions from 'roles/data/RolesActions';
-import UserActions from 'users/data/UserActions';
+const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
-const mapStateToProps = (state) =>
+const middlewares = [thunk];
+const mockStore = configureMockStore(middlewares);
+
+describe('LibraryActions', () =>
 {
-  return {
-    analytics: state.get('analytics'),
-    library: state.get('library'),
-    roles: state.get('roles'),
-    users: state.get('users'),
-  };
-};
+  describe('#groups.create', () =>
+  {
+    const library: LibraryState = _LibraryState({
+      groups: Immutable.Map<number, LibraryTypes.Group>({}),
+      variants: Immutable.Map<number, LibraryTypes.Variant>({}),
+    });
 
-function mapDispatchToProps(dispatch)
-{
-  return {
-    analyticsActions: bindActionCreators(AnalyticsActions, dispatch),
-    libraryGroupActions: bindActionCreators(LibraryActions.groups, dispatch),
-    libraryAlgorithmActions: bindActionCreators(LibraryActions.algorithms, dispatch),
-    libraryVariantActions: bindActionCreators(LibraryActions.variants, dispatch),
-    libraryActions: bindActionCreators(
-      _.pick(
-        LibraryActions,
-        ['loadState', 'setDbs', 'fetch'],
-      ),
-      dispatch,
-    ),
-    roleActions: bindActionCreators(RolesActions, dispatch),
-    userActions: bindActionCreators(UserActions, dispatch),
-  };
-}
+    const group = LibraryTypes._Group();
+    const groupId = 1;
+    const groupName = 'Test Group';
+    group.set('name', groupName);
 
-const LibraryContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(Library);
+    afterEach(() =>
+    {
+      nock.cleanAll();
+    });
 
-export default LibraryContainer;
+    it('should create a groups.create action after the new group has been created', () =>
+    {
+      nock(MIDWAY_BASE_URL)
+        .post(`/items/${groupId}`)
+        .reply(200, [
+          {
+            id: groupId,
+            meta: `{"db":{},"modelVersion":2,"lastEdited":"","lastUserId":"",
+"userIds":[],"algorithmsOrder":[],"defaultLanguage":"elastic"}`,
+            name: groupName,
+            parent: 0,
+            status: 'BUILD',
+            type: 'GROUP',
+          },
+        ]);
+
+      const expectedActions = [
+        {
+          type: ActionTypes.groups.create,
+          payload: { group: group.set('id', groupId) },
+        },
+      ];
+
+      const store = mockStore({ library });
+
+      return store.dispatch(Actions.groups.create(group, (id) =>
+      {
+        expect(store.getActions()).toEqual(expectedActions);
+      }));
+    });
+  });
+});
