@@ -49,7 +49,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors, getStyle } from 'common/Colors';
+import { backgroundColor, borderColor, cardHoverBackground, cardStyle, Colors, fontColor, getStyle } from 'common/Colors';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { CardConfig } from 'src/blocks/types/Card';
 import { AllBackendsMap } from 'src/database/AllBackends';
@@ -67,8 +67,9 @@ export interface Props
     text: string;
     type: string;
   }>; // can override the options displayed
-
 }
+
+const cardCategoryColors = Colors().builder.cards.categories;
 
 @Radium
 class CardSelector extends TerrainComponent<Props>
@@ -81,16 +82,11 @@ class CardSelector extends TerrainComponent<Props>
     focusedIndex: -1,
   };
 
-  private handleSearchTextboxChange(ev: any)
+  public handleSearchTextboxChange(ev: any)
   {
     this.setState({
       searchValue: ev.target.value;
     });
-  }
-
-  private renderCategoryOptions()
-  {
-    return <div/>; // TODO
   }
 
   public renderCardOption(type: string, index: number)
@@ -113,6 +109,44 @@ class CardSelector extends TerrainComponent<Props>
     );
   }
 
+  public renderCategory(color: string, key: string)
+  {
+    if (key === 'parameter' || key === 'compound' || key === 'suggest')
+    {
+      return undefined;
+    }
+    // return (
+    //   <div
+    //     className='card-category-list-item'
+    //     style={[fontColor(color), backgroundColor(Colors().bg2)]}
+    //     key={key}
+    //   >
+    //     {key}
+    //   </div>
+    // );
+    return (
+      <div
+        className='card-category-list-item'
+        style={[
+          cardStyle(color, Colors().bg3, cardHoverBackground(color, Colors().bg3), true),
+          getStyle('boxShadow', '1px 2px 14px ' + Colors().boxShadow),
+        ]}
+        key={key}
+      >
+        {key}
+      </div>
+    );
+  }
+
+  public renderCategoryOptions()
+  {
+    return (
+      <div className='card-category-list'>
+        {_.map(cardCategoryColors, this.renderCategory)}
+      </div>
+    );
+  }
+
   public render()
   {
     const isEmpty = this.props.cardTypeList.size === 0;
@@ -127,11 +161,11 @@ class CardSelector extends TerrainComponent<Props>
         ref='selector'
         style={backgroundColor(Colors().bg2)}
       >
-        <div className='inset-shadow-veil' style={getStyle('boxShadow', 'inset 2px 2px 6px rgba(0,0,0,0.25)')}/>
+        <div className='inset-shadow-veil' style={getStyle('boxShadow', 'inset 2px 2px 6px rgba(0,0,0,0.25)')} />
         <div className='card-search-line' style={borderColor(Colors().border1)}>
           <input
             className='card-search-input'
-            placeholder='search for an available card'
+            placeholder='Search for a card'
             value={this.state.searchValue}
             onChange={this.handleSearchTextboxChange}
             style={backgroundColor(Colors().highlight)}
@@ -139,6 +173,9 @@ class CardSelector extends TerrainComponent<Props>
         </div>
         <div className='selectors-row'>
           <div className='card-category-selector' style={borderColor(Colors().border1)}>
+            <div className='card-category-title' style={fontColor(Colors().text1)}>
+              Categories
+            </div>
             {
               this.renderCategoryOptions()
             }
@@ -164,5 +201,6 @@ class CardSelector extends TerrainComponent<Props>
       </div>
     );
   }
+
 }
 export default CardSelector;
