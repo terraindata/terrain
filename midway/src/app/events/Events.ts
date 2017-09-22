@@ -251,14 +251,14 @@ export class Events
     });
   }
 
-  public async getEventData(variantId: number, request: object): Promise<string>
+  public async getVariantEvents(variantid: number, request: object): Promise<object>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<object>(async (resolve, reject) =>
     {
       const client = this.elasticController.getClient();
 
       let body = bodybuilder();
-      body = body.filter('term', 'variantid', variantId);
+      body = body.filter('term', 'variantid', variantid);
       body = body.filter('term', 'eventid', request['eventid']);
       body = body.filter('range', '@timestamp', {
         gte: request['start'],
@@ -289,7 +289,11 @@ export class Events
           };
           client.search(query, Util.makePromiseCallback(resolveI, rejectI));
         });
-        return resolve(JSON.stringify(response['hits'].hits.map((e) => e['_source'])));
+
+        return resolve({
+          variantid,
+          data: response['hits'].hits.map((e) => e['_source']),
+        });
       }
       else
       {
@@ -321,9 +325,28 @@ export class Events
           };
           client.search(query, Util.makePromiseCallback(resolveI, rejectI));
         });
-        return resolve(JSON.stringify(response['aggregations'][request['agg']].buckets));
+        return resolve({
+          variantid,
+          data: response['aggregations'][request['agg']].buckets,
+        });
       }
     });
+  }
+
+  public async getEventData(request: object): Promise<object>
+  {
+    if (request['variantid'] === undefined)
+    {
+      throw new Error('Required parameter \"variantid\" is missing');
+    }
+
+    const variantids = request['variantid'].split(',');
+    const promises: Array<Promise<any>> = [];
+    for (const variantid of variantids)
+    {
+      promises.push(this.getVariantEvents(variantid, request));
+    }
+    return Promise.all(promises);
   }
 
   /*
