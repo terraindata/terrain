@@ -92,9 +92,10 @@ class CreateCardOption extends TerrainComponent<Props>
         })}
         onClick={this.handleClick}
         style={[
-          borderColor(Colors().highlight, Colors().inactiveHover),
-          backgroundColor(Colors().darkerHighlight),
-          getStyle('boxShadow', '1px 2px 14px ' + Colors().boxShadow),
+          borderColor(Colors().highlight),
+          backgroundColor('rgba(0,0,0,0)', Colors().darkerHighlight),
+          // backgroundColor(Colors().darkerHighlight),
+          // getStyle('boxShadow', '1px 2px 14px ' + Colors().boxShadow),
         ]}
         key='create-option'
       >

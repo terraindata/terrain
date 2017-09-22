@@ -2,15 +2,15 @@
 
 .create-card-option {
   .transition;
-  
+
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  border: 1px solid;
-  
+  // border: 1px solid;
+  // border-top: 1px solid;
   padding: 6px;
   // border-bottom: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 6px;
+  // margin-bottom: 6px;
   border-radius: 1px;
   width: 100%;
   
@@ -30,4 +30,7 @@
     padding-left: 12px;
   }
 }
-   
+
+.create-card-option:not(:first-child) {
+  border-top: 1px solid;
+}

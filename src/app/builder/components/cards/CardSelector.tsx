@@ -162,27 +162,19 @@ class CardSelector extends TerrainComponent<Props>
         style={backgroundColor(Colors().bg2)}
       >
         <div className='inset-shadow-veil' style={getStyle('boxShadow', 'inset 2px 2px 6px rgba(0,0,0,0.25)')} />
-        <div className='card-search-line' style={borderColor(Colors().border1)}>
-          <input
-            className='card-search-input'
-            placeholder='Search for a card'
-            value={this.state.searchValue}
-            onChange={this.handleSearchTextboxChange}
-            style={backgroundColor(Colors().highlight)}
-          />
-        </div>
         <div className='selectors-row'>
-          <div className='card-category-selector' style={borderColor(Colors().border1)}>
-            <div className='card-category-title' style={fontColor(Colors().text1)}>
-              Categories
-            </div>
-            {
-              this.renderCategoryOptions()
-            }
-          </div>
+          { // TODO once card categories are ready to go
+            // <div className='card-category-selector' style={borderColor(Colors().border1)}>
+            //   <div className='card-category-title' style={fontColor(Colors().text1)}>
+            //     Categories
+            //   </div>
+            //   {
+            //     this.renderCategoryOptions()
+            //   }
+            // </div>
+          }
           <div
             className='create-card-selector-inner'
-            style={backgroundColor(Colors().bg1)}
           >
             {
               isEmpty &&
@@ -197,6 +189,15 @@ class CardSelector extends TerrainComponent<Props>
               _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
             }
           </div>
+        </div>
+        <div className='card-search-line' style={borderColor(Colors().border1)}>
+          <input
+            className='card-search-input'
+            placeholder='Search for a card'
+            value={this.state.searchValue}
+            onChange={this.handleSearchTextboxChange}
+            style={backgroundColor(Colors().highlight)}
+          />
         </div>
       </div>
     );

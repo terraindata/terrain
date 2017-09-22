@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 import * as _ from 'lodash';
-import { ESClause } from 'shared/database/elastic/parser/clauses/ESClause';
 import { Display } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
 
@@ -65,10 +64,8 @@ export interface Card extends IRecord<Card>
 
   // the following fields are excluded from the server save
   static: {
-    clause: ESClause;
     language: string;
     colors: string[];
-    category: string;
     title: string;
     display: Display | Display[];
 
@@ -109,7 +106,6 @@ export interface Card extends IRecord<Card>
     // TODO bring back manualEntry
     // manualEntry: IManualEntry;
     description?: string;
-    url?: string;
 
     // a list of which fields on this card are just metadata, e.g. 'closed'
     metaFields: string[];
@@ -122,10 +118,8 @@ export interface CardConfig
   [field: string]: any;
 
   static: {
-    clause: ESClause;
     language: string;
     colors: string[];
-    category: string;
     title: string;
     preview: string | ((c: Card) => string);
     display: Display | Display[];
@@ -142,7 +136,6 @@ export interface CardConfig
     getParentTerms?: (card: Card, schemaState) => List<string>;
 
     description?: string;
-    url?: string;
 
     metaFields?: string[];
 
