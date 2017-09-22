@@ -188,15 +188,16 @@
 }
 
 .card-tuning-icon {
-  fill: rgba(255, 255, 255, 0.5);
+  stroke: rgba(255, 255, 255, 0.5);
   width: 20px;
   height: 20px;
   position: relative;
   cursor: pointer;
+  z-index: 99999;
   .transition;
   opacity: 0;
   &:hover {
-    fill: #fff;
+    stroke: #fff;
   }
 }
 
