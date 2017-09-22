@@ -4,7 +4,5 @@ INSERT INTO "versions" VALUES(1,'items',2,'{"id":2,"meta":"#realmusician","name"
 INSERT INTO "items" VALUES(1,'I won a Nobel prize! But Im more proud of my music','Al Gore',0,'Still Alive','ALGORITHM');
 INSERT INTO "items" VALUES(2,'#realmusician','Updated Item',0,'LIVE','GROUP');
 INSERT INTO "items" VALUES(3,'Are we an item?','Justin Bieber',0,'Baby','VARIANT');
-INSERT INTO "users" VALUES(1,'AccessToken','barry.allen@speedforce.net',0,1,'Barry Allen','','$2a$10$yT0EuOUNSkIE6Mu04DcqAeM0Yhgz9YzZTncIGMGi7dLzEUTJtmOv6','EST','');
-INSERT INTO "users" VALUES(2,'','luser@terraindata.com',0,1,'Terrain Admin',NULL,'$2a$10$S6xM2V1JAzjzeL85PJFnEOpF9K0jfLaBcrfuyDNIg9B/mGJPfroW.','','{}');
-INSERT INTO "users" VALUES(3,'','test@terraindata.com',0,0,'Test Person',NULL,'$2a$10$Bov3ZgCLKd2l/4bu0cXP2OEofcknNO1mhW9Tt.MjFzQdqRUK//NXe','UTC','{}');
+INSERT INTO "users" VALUES(2,'','test@terraindata.com',0,0,'Test Person',NULL,'$2a$10$Bov3ZgCLKd2l/4bu0cXP2OEofcknNO1mhW9Tt.MjFzQdqRUK//NXe','UTC','{}');
 COMMIT;

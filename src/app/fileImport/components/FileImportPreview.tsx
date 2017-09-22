@@ -55,6 +55,8 @@ import { browserHistory } from 'react-router';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
+import { ESParseTreeToCode } from './../../../database/elastic/conversion/ParseElasticQuery';
+import Query from './../../../items/types/Query';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
@@ -90,12 +92,17 @@ export interface Props
   transforms: List<Transform>;
   requireJSONHaveAllFields: boolean;
 
-  // import only
-  primaryKeys?: List<number>;
+  // import only primaryKeys?: List<number>;
   primaryKeyDelimiter?: string;
   uploadInProgress?: boolean;
-  elasticUpdate?: boolean;
   existingIndexAndType?: boolean;
+  uploadInProgress: boolean;
+  elasticUpdate: boolean;
+  exportRank: boolean;
+  query?: Query;
+  inputs?: List<any>;
+  serverId?: number;
+  filesize?: number;
   handleFileImportSuccess?: () => void;
   showProgressBar?: boolean;
   router?: any;
@@ -103,8 +110,6 @@ export interface Props
 
   // export only
   exportRank?: boolean;
-  query?: string;
-  serverId?: number;
   variantName?: string;
 }
 @Radium
@@ -174,8 +179,8 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       templateOptions: this.props.templates.map((template, i) => template.templateName),
     });
-
-    if (!this.props.exporting)
+    
+    if (!this.props.exporting && this.props.router !== undefined)
     {
       this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
     }
@@ -601,20 +606,24 @@ class FileImportPreview extends TerrainComponent<Props>
     this.confirmedLeave = true;
     if (this.props.exporting)
     {
-      const dbName = JSON.parse(this.props.query)['index'];
+      const stringQuery: string = ESParseTreeToCode(this.props.query.parseTree.parser, { replaceInputs: true }, this.props.inputs);
+      const parsedQuery = JSON.parse(stringQuery);
+      const dbName = parsedQuery['index'];
+
       if (dbName === undefined || dbName === '')
       {
         this.setPreviewErrorMsg('Index must be selected in order to export results');
         return;
       }
       Actions.exportFile(
-        this.props.query,
+        stringQuery,
         this.props.serverId,
         dbName,
         this.props.exportRank,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,
         this.handleFileExportSuccess,
-        this.handleFileExportError);
+        this.handleFileExportError,
+      );
     }
     else
     {

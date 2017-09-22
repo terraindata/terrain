@@ -428,7 +428,7 @@ const DARK: Theme =
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
 
-        cardBgOpacity: 0.45,
+        cardBgOpacity: 0.15,
 
         cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
 
@@ -595,14 +595,17 @@ export function altStyle()
   return CACHE['altStyle' + curTheme];
 }
 
-export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean)
+export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean, hovered?: boolean)
 {
-  const key = 'card-' + strongColor + bgColor + hoverBg + small;
+  const key = 'card-' + strongColor + bgColor + hoverBg + small + hovered;
 
   if (!CACHE[key])
   {
+    const borderHover = Color(strongColor).alpha(0.5);
+    const backgroundHover = Color(bgColor).mix(Color(strongColor), Colors().builder.cards.cardBgOpacity);
+
     CACHE[key] = {
-      background: bgColor,
+      background: hovered ? backgroundHover : bgColor,
       color: strongColor,
 
       boxShadow: small ? 'rgba(0, 0, 0, 0.39) 2px 2px 4px 1px' :
@@ -612,10 +615,10 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
       borderLeftWidth: '3px',
       borderLeftColor: strongColor,
 
-      borderTopColor: Colors().highlight,
-      borderRightColor: Colors().darkerHighlight,
-      borderBottomColor: Colors().darkerHighlight,
-
+      borderTopColor: hovered ? borderHover : Colors().highlight,
+      borderRightColor: hovered ? borderHover : Colors().darkerHighlight,
+      borderBottomColor: hovered ? borderHover : Colors().darkerHighlight,
+      transition: 'background 0.15s',
       [hoverBg && ':hover']: {
         background: hoverBg,
       },
@@ -717,7 +720,7 @@ export function getCardColors(category: string | undefined, typeColor: string): 
     }
   }
 
-  return [color, Color(color).alpha(colors.builder.cards.cardBgOpacity).string()];
+  return [color, colors.bg3];
 }
 
 export default Colors;

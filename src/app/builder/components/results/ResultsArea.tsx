@@ -549,7 +549,10 @@ column if you have customized the results view.');
           columnOptions={List([])}
           requireJSONHaveAllFields={requireJSONHaveAllFields}
           exportRank={exportRank}
+          elasticUpdate={elasticUpdate}
+          exporting={true}
           query={this.props.query.tql}
+          inputs={this.props.query.inputs}
           serverId={Number(this.props.db.id)}
           variantName={this.props.variantName}
         />

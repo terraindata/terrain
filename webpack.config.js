@@ -65,15 +65,18 @@ module.exports =
         extensions: [ ".js", ".tsx", ".jsx", ".ts", ".css", ".less", ".json", ".svg" ],
         alias: {
             auth: path.resolve(__dirname, 'src/app/auth'),
+            analytics: path.resolve(__dirname, 'src/app/analytics'),
             builder: path.resolve(__dirname, 'src/app/builder'),
             charts: path.resolve(__dirname, 'src/app/charts'),
             common: path.resolve(__dirname, 'src/app/common'),
             deploy: path.resolve(__dirname, 'src/app/deploy'),
             fileimport: path.resolve(__dirname, 'src/app/fileimport'),
+            images: path.resolve(__dirname, 'src/images'),
             library: path.resolve(__dirname, 'src/app/library'),
             manual: path.resolve(__dirname, 'src/app/manual'),
             roles: path.resolve(__dirname, 'src/app/roles'),
             schema: path.resolve(__dirname, 'src/app/schema'),
+            shared: path.resolve(__dirname, 'shared'),
             store: path.resolve(__dirname, 'src/app/store'),
             tql: path.resolve(__dirname, 'src/app/tql'),
             users: path.resolve(__dirname, 'src/app/users'),
@@ -90,7 +93,7 @@ module.exports =
             //  keep it first in this list
             {
                 test: /\.ts(x?)$/,
-                exclude: [/midway/, /node_modules/],
+                exclude: [/midway/, /analytics.js/, /node_modules/],
                 loader:
                     "babel-loader!thread-loader!ts-loader?happyPackMode=true"
                     + JSON.stringify({
@@ -100,7 +103,7 @@ module.exports =
             },
             {
                 test: /\.js(x?)$/,
-                exclude: [/midway/, /node_modules/],
+                exclude: [/midway/, /analytics.js/, /node_modules/],
                 loader: "babel-loader!thread-loader"
             },
             { test: /\.css$/, exclude: /midway/, loader: "style-loader!css-loader" },

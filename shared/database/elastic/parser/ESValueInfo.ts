@@ -100,12 +100,13 @@ export default class ESValueInfo
    * If errors were detected associated with this value, they will be in this list
    * in the order in which they were detected, undefined otherwise.
    */
-  private _errors: undefined | ESParserError[];
+  private _errors: ESParserError[];
 
   public constructor()
   {
     this.jsonType = ESJSONType.unknown;
     this.tokens = [];
+    this._errors = [];
   }
 
   /**
@@ -142,12 +143,11 @@ export default class ESValueInfo
    */
   public get errors(): ESParserError[]
   {
-    return (this._errors === undefined) ? [] : this._errors;
+    return this._errors;
   }
 
   public attachError(error: ESParserError): void
   {
-    this._errors = this.errors;
     this._errors.push(error);
   }
 

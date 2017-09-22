@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import AnalyticsActions from 'analytics/data/AnalyticsActions';
 import Library from 'library/components/Library';
 import LibraryActions from 'library/data/LibraryActions';
 import { LibraryState } from 'library/data/LibraryStore';
@@ -56,6 +57,7 @@ import UserActions from 'users/data/UserActions';
 const mapStateToProps = (state) =>
 {
   return {
+    analytics: state.get('analytics'),
     library: state.get('library'),
     roles: state.get('roles'),
     users: state.get('users'),
@@ -65,6 +67,7 @@ const mapStateToProps = (state) =>
 function mapDispatchToProps(dispatch)
 {
   return {
+    analyticsActions: bindActionCreators(AnalyticsActions, dispatch),
     libraryGroupActions: bindActionCreators(LibraryActions.groups, dispatch),
     libraryAlgorithmActions: bindActionCreators(LibraryActions.algorithms, dispatch),
     libraryVariantActions: bindActionCreators(LibraryActions.variants, dispatch),

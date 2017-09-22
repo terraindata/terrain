@@ -56,6 +56,7 @@ import
   VictoryChart,
   VictoryGroup,
   VictoryLegend,
+  VictoryPortal,
   VictoryScatter,
   VictoryTheme,
   VictoryTooltip,
@@ -198,7 +199,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
     datasets.forEach((ds, key) =>
     {
-      if (visibleDatasets.includes(key))
+      if (visibleDatasets.includes(key) && ds.data.length > 0)
       {
         if (key !== highlightDataset || highlightDataset === null)
         {
@@ -207,7 +208,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               key={key}
               name={`area-${key}`}
               style={{ data: { fill: this.getDatasetColor(key) } }}
-              data={ds.data}
+              data={ds.data.map((d) => ({ ...d, l: true }))}
               interpolation={config.topChart.interpolation}
               x={xDataKey}
               y={yDataKey}
@@ -217,7 +218,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
             <VictoryScatter
               key={key}
               data={ds.data}
-              size={0}
+              size={(datum, active) => active ? 5 : 0}
               x={xDataKey}
               y={yDataKey}
             />,
@@ -229,7 +230,13 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
             <VictoryArea
               name={`area-${key}`}
               key={key}
-              style={{ data: { fill: this.getDatasetColor(key) } }}
+              style={{
+                data: {
+                  fill: this.getDatasetColor(key),
+                  strokeWidth: 3,
+                  fillOpacity: 0.7,
+                },
+              }}
               data={ds.data}
               interpolation={config.topChart.interpolation}
               x={xDataKey}
@@ -368,6 +375,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         eventKey: 'all',
         mutation: () =>
         {
+          this.setState({ highlightDataset: null });
           // Returning null resets all mutations, reverts the component back to
           // its original state.
           return null;
@@ -394,6 +402,12 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     }
   }
 
+  public formatDate(timestamp)
+  {
+    const date = new Date(timestamp);
+    return date.toISOString();
+  }
+
   public render()
   {
     const { datasets, xDataKey, yDataKey } = this.props;
@@ -416,7 +430,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                   dimension='x'
                   zoomDomain={this.state.zoomDomain}
                   onDomainChange={this.handleZoom}
-                  labels={(d) => d.l ? `${d.x} => ${d.y}` : null}
+                  labels={(d) => d.l ? `${this.formatDate(d.x)} => ${d.y}` : null}
                   labelComponent={
                     <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
                   }

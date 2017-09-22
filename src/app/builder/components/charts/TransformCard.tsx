@@ -99,7 +99,7 @@ export type Bars = List<Bar>;
 class TransformCard extends TerrainComponent<Props>
 {
   public state: {
-    // the domain of the chart and the periscope, updated by the periscope domain change.
+    // the domain of the chart and the periscope, updated by the periscope domain change and zoom in/out from the chart
     chartDomain: List<number>;
     // the maximum domain, updated by the two input fields.
     maxDomain: List<number>;
@@ -126,7 +126,7 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    this.computeBars(this.props.data.input, this.state.maxDomain);
+    this.computeBars(this.props.data.input, this.state.maxDomain, !this.props.data.hasCustomDomain);
     this._subscribe(SpotlightStore, {
       isMounted: true,
       storeKeyPath: ['spotlights'],
@@ -154,7 +154,7 @@ class TransformCard extends TerrainComponent<Props>
 
     if (nextProps.data.input !== this.props.data.input)
     {
-      this.computeBars(nextProps.data.input, this.state.maxDomain);
+      this.computeBars(nextProps.data.input, this.state.maxDomain, true);
     }
   }
 
@@ -190,6 +190,42 @@ class TransformCard extends TerrainComponent<Props>
     });
   }
 
+  // called by TransformCardChart to zoom on a specific part of the domain
+  public handleRequestDomainChange(domain: List<number>, overrideMaxDomain = false)
+  {
+    const trimmedDomain = this.trimDomain(this.state.chartDomain, domain);
+
+    let low = trimmedDomain.get(0);
+    let high = trimmedDomain.get(1);
+
+    if (!overrideMaxDomain)
+    {
+      low = Math.max(low, this.state.maxDomain.get(0));
+      high = Math.min(high, this.state.maxDomain.get(1));
+    }
+
+    if (low !== this.state.chartDomain.get(0) || high !== this.state.chartDomain.get(1))
+    {
+      const newDomain = List([low, high]);
+      this.setState({
+        chartDomain: newDomain,
+      });
+      if (overrideMaxDomain)
+      {
+        this.setState({
+          maxDomain: newDomain,
+        });
+        this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), newDomain, true);
+      }
+    }
+  }
+
+  // called by TransformCardChart to request that the view be zoomed to fit the data
+  public handleZoomToData()
+  {
+    this.computeBars(this.props.data.input, this.state.maxDomain, true);
+  }
+
   public handleUpdatePoints(points, isConcrete?: boolean)
   {
     this.props.onChange(this._ikeyPath(this.props.keyPath, 'scorePoints'), points, !isConcrete);
@@ -209,11 +245,14 @@ class TransformCard extends TerrainComponent<Props>
         className='transform-card-inner'
       >
         <TransformCardChart
+          onRequestDomainChange={this.handleRequestDomainChange}
+          onRequestZoomToData={this.handleZoomToData}
           canEdit={this.props.canEdit}
           points={data.scorePoints}
           bars={this.state.bars}
           domain={this.state.chartDomain}
           range={this.state.range}
+          keyPath={this.props.keyPath}
           spotlights={spotlights && spotlights.toList().toJS()}
           inputKey={BlockUtils.transformAlias(this.props.data)}
           updatePoints={this.handleUpdatePoints}
@@ -302,8 +341,32 @@ class TransformCard extends TerrainComponent<Props>
     });
   }
 
+  private handleElasticDomainAggregationResponse(resp: MidwayQueryResponse)
+  {
+    this.setState({
+      queryXhr: null,
+      queryId: null,
+    });
+
+    const agg = (resp.result as ElasticQueryResult).aggregations;
+    if (agg === undefined || agg['minimum'] === undefined || agg['maximum'] === undefined)
+    {
+      return;
+    }
+
+    const newDomain = this.trimDomain(this.state.maxDomain, List([agg['minimum'].value, agg['maximum'].value]));
+
+    this.setState({
+      chartDomain: newDomain,
+      maxDomain: newDomain,
+    });
+    this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), newDomain, true);
+
+    this.computeBars(this.props.data.input, this.state.maxDomain);
+  }
+
   // TODO move the bars computation to a higher level
-  private computeBars(input: CardString, maxDomain: List<number>)
+  private computeBars(input: CardString, maxDomain: List<number>, recomputeDomain = false)
   {
     switch (this.props.language)
     {
@@ -311,14 +374,14 @@ class TransformCard extends TerrainComponent<Props>
         this.computeTQLBars(input);
         break;
       case 'elastic':
-        this.computeElasticBars(input, maxDomain);
+        this.computeElasticBars(input, maxDomain, recomputeDomain);
         break;
       default:
         break;
     }
   }
 
-  private computeElasticBars(input: CardString, maxDomain: List<number>)
+  private computeElasticBars(input: CardString, maxDomain: List<number>, recomputeDomain: boolean)
   {
     const { builderState } = this.props;
     const { db } = builderState;
@@ -328,53 +391,94 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
 
-    const index: string = getIndex();
-    const type: string = getType();
-    const min = maxDomain.get(0);
-    const max = maxDomain.get(1);
-    const interval = (max - min) / NUM_BARS;
+    const index: string = getIndex('');
+    const type: string = getType('');
 
-    const aggQuery = {
-      body: {
-        size: 0,
-        query: {
-          bool: {
-            must: {
-              range: {
-                [input as string]: { gte: min, lt: max },
+    if (recomputeDomain)
+    {
+      const domainQuery = {
+        body: {
+          size: 0,
+          query: {
+          },
+          aggs: {
+            maximum: {
+              max: {
+                field: input,
+              },
+            },
+            minimum: {
+              min: {
+                field: input,
               },
             },
           },
         },
-        aggs: {
-          transformCard: {
-            histogram: {
-              field: input,
-              interval,
-              extended_bounds: {
-                min, max, // force the ES server to return NUM_BARS + 1 bins.
-              },
-            },
-          },
-        },
-      },
-    };
-    aggQuery['index'] = index;
-    aggQuery['type'] = type;
+      };
 
-    this.setState(
+      domainQuery['index'] = index;
+      domainQuery['type'] = type;
+
       Ajax.query(
-        JSON.stringify(aggQuery),
+        JSON.stringify(domainQuery),
         db,
         (resp) =>
         {
-          this.handleElasticAggregationResponse(resp);
+          this.handleElasticDomainAggregationResponse(resp);
         },
         (err) =>
         {
           this.handleElasticAggregationError(err);
-        }),
-    );
+        },
+      );
+    } else
+    {
+      const min = maxDomain.get(0);
+      const max = maxDomain.get(1);
+      const interval = (max - min) / NUM_BARS;
+
+      const aggQuery = {
+        body: {
+          size: 0,
+          query: {
+            bool: {
+              must: {
+                range: {
+                  [input as string]: { gte: min, lt: max },
+                },
+              },
+            },
+          },
+          aggs: {
+            transformCard: {
+              histogram: {
+                field: input,
+                interval,
+                extended_bounds: {
+                  min, max, // force the ES server to return NUM_BARS + 1 bins.
+                },
+              },
+            },
+          },
+        },
+      };
+      aggQuery['index'] = index;
+      aggQuery['type'] = type;
+
+      this.setState(
+        Ajax.query(
+          JSON.stringify(aggQuery),
+          db,
+          (resp) =>
+          {
+            this.handleElasticAggregationResponse(resp);
+          },
+          (err) =>
+          {
+            this.handleElasticAggregationError(err);
+          }),
+      );
+    }
   }
 
   private handleM1TQLQueryResponse(response: M1QueryResponse)
