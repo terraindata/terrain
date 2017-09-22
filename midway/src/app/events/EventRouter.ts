@@ -113,7 +113,18 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
     ['start', 'end', 'eventid', 'variantid'],
   );
   winston.info('getting events for variant');
-  ctx.body = await events.getEventData(ctx.request.query);
+  const response: object[] = await events.getEventData(ctx.request.query);
+  ctx.body = response.reduce((acc, x) =>
+  {
+    for (const key in x)
+    {
+      if (x.hasOwnProperty(key) !== undefined)
+      {
+        acc[key] = x[key];
+        return acc;
+      }
+    }
+  }, {});
 });
 
 export default Router;

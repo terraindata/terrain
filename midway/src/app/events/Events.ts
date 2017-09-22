@@ -291,8 +291,7 @@ export class Events
         });
 
         return resolve({
-          variantid,
-          data: response['hits'].hits.map((e) => e['_source']),
+          [variantid]: response['hits'].hits.map((e) => e['_source']),
         });
       }
       else
@@ -326,14 +325,13 @@ export class Events
           client.search(query, Util.makePromiseCallback(resolveI, rejectI));
         });
         return resolve({
-          variantid,
-          data: response['aggregations'][request['agg']].buckets,
+          [variantid]: response['aggregations'][request['agg']].buckets,
         });
       }
     });
   }
 
-  public async getEventData(request: object): Promise<object>
+  public async getEventData(request: object): Promise<object[]>
   {
     if (request['variantid'] === undefined)
     {
