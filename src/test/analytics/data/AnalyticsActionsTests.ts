@@ -125,11 +125,12 @@ field=@timestamp`)
 
       const store = mockStore({ analytics });
 
-      return store.dispatch(Actions.fetch(variantId, metricId))
-        .then((variantAnalytics) =>
+      store.dispatch(
+        Actions.fetch(variantId, metricId, (variantIdParam, analyticsResponseParam) =>
         {
           expect(store.getActions()).toEqual(expectedActions);
-        });
+        }),
+      );
     });
   });
 
@@ -147,7 +148,7 @@ field=@timestamp`)
       const store = mockStore({ analytics });
 
       store.dispatch(Actions.selectMetric(metricId));
-      return expect(store.getActions()).toEqual(expectedActions);
+      expect(store.getActions()).toEqual(expectedActions);
     });
   });
 });
