@@ -531,7 +531,7 @@ column if you have customized the results view.');
   public renderExport()
   {
     const { previewColumns, columnNames, columnsToInclude, columnTypes, templates, transforms,
-      filetype, requireJSONHaveAllFields, exportRank } = this.props.exportState;
+      filetype, requireJSONHaveAllFields, exportRank, elasticUpdate } = this.props.exportState;
 
     const content =
       <div
@@ -547,11 +547,11 @@ column if you have customized the results view.');
           templates={templates}
           transforms={transforms}
           columnOptions={List([])}
+          uploadInProgress={false}
           requireJSONHaveAllFields={requireJSONHaveAllFields}
           exportRank={exportRank}
           elasticUpdate={elasticUpdate}
-          exporting={true}
-          query={this.props.query.tql}
+          query={this.props.query}
           inputs={this.props.query.inputs}
           serverId={Number(this.props.db.id)}
           variantName={this.props.variantName}

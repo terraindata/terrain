@@ -92,13 +92,13 @@ export interface Props
   transforms: List<Transform>;
   requireJSONHaveAllFields: boolean;
 
-  // import only primaryKeys?: List<number>;
+  // import only 
+  primaryKeys?: List<number>;
   primaryKeyDelimiter?: string;
-  uploadInProgress?: boolean;
   existingIndexAndType?: boolean;
   uploadInProgress: boolean;
   elasticUpdate: boolean;
-  exportRank: boolean;
+  exportRank?: boolean;
   query?: Query;
   inputs?: List<any>;
   serverId?: number;
@@ -109,7 +109,6 @@ export interface Props
   route?: any;
 
   // export only
-  exportRank?: boolean;
   variantName?: string;
 }
 @Radium
