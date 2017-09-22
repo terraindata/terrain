@@ -57,7 +57,6 @@ import v8 = require('v8');
 import * as DBUtil from '../database/Util';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
-import AnalyticsRouter from './AnalyticsRouter';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
@@ -136,7 +135,6 @@ class App
     // make sure we insert the RouteErrorHandler first
     this.app.use(RouteError.RouteErrorHandler);
     this.app.use(MidwayRouter.routes());
-    this.app.use(AnalyticsRouter.routes());
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/midway/v1/assets' }));
     this.app.use(NotFoundRouter.routes());
   }

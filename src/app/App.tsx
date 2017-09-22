@@ -271,7 +271,7 @@ class App extends TerrainComponent<Props>
     ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
 
     const tooltipStyles = generateThemeStyles();
-    _.map(tooltipStyles, (value, key) => 
+    _.map(tooltipStyles, (value, key) =>
     {
       ColorsActions.setStyle(key, value);
     });
