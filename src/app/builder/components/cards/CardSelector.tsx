@@ -49,6 +49,9 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+
 import { backgroundColor, borderColor, cardHoverBackground, cardStyle, Colors, fontColor, getStyle } from 'common/Colors';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { CardConfig } from 'src/blocks/types/Card';
@@ -71,21 +74,59 @@ export interface Props
 
 const cardCategoryColors = Colors().builder.cards.categories;
 
+interface FilteredListItem
+{
+  originalIndex: number;
+
+}
+
 @Radium
 class CardSelector extends TerrainComponent<Props>
 {
   public state: {
     searchValue: string;
     focusedIndex: number;
+    inputElement: any;
+    cardSelectorElement: any;
+    filteredList: List<number>; // list of indices of cardTypeList to show
+    computedHeight: number;
   } = {
     searchValue: '',
     focusedIndex: -1,
+    inputElement: undefined,
+    cardSelectorElement: undefined,
+    filteredList: List([]),
+    computedHeight: -1,
   };
 
   public handleSearchTextboxChange(ev: any)
   {
+    if (this.state.cardSelectorElement !== undefined && this.state.cardSelectorElement !== null)
+    {
+      this.setState({
+        computedHeight: Math.max(this.state.cardSelectorElement.clientHeight, this.state.computedHeight),
+      });
+    }
     this.setState({
-      searchValue: ev.target.value;
+      searchValue: ev.target.value,
+    });
+  }
+
+  public registerInputElement(inputElement)
+  {
+    this.setState({
+      inputElement,
+    });
+    if (this.props.open && inputElement !== null && inputElement !== undefined)
+    {
+      inputElement.focus();
+    }
+  }
+
+  public registerCardSelector(cardSelectorElement)
+  {
+    this.setState({
+      cardSelectorElement,
     });
   }
 
@@ -97,6 +138,7 @@ class CardSelector extends TerrainComponent<Props>
       <CreateCardOption
         card={AllBackendsMap[this.props.language].blocks[type] as CardConfig}
         index={index}
+        searchText={this.state.searchValue}
         onClick={this.props.handleCardClick}
         overrideTitle={
           overrideText &&
@@ -109,21 +151,14 @@ class CardSelector extends TerrainComponent<Props>
     );
   }
 
+  // TODO: put this back in once categories are ready to go
   public renderCategory(color: string, key: string)
   {
     if (key === 'parameter' || key === 'compound' || key === 'suggest')
     {
       return undefined;
     }
-    // return (
-    //   <div
-    //     className='card-category-list-item'
-    //     style={[fontColor(color), backgroundColor(Colors().bg2)]}
-    //     key={key}
-    //   >
-    //     {key}
-    //   </div>
-    // );
+
     return (
       <div
         className='card-category-list-item'
@@ -147,6 +182,22 @@ class CardSelector extends TerrainComponent<Props>
     );
   }
 
+  public componentWillReceiveProps(nextProps)
+  {
+    if (this.props.cardTypeList !== nextProps.cardTypeList || !nextProps.open)
+    {
+      this.setState({
+        computedHeight: -1,
+        searchValue: '',
+      });
+    }
+    if (!this.props.open && nextProps.open &&
+      this.state.inputElement !== null && this.state.inputElement !== undefined)
+    {
+      this.state.inputElement.focus();
+    }
+  }
+
   public render()
   {
     const isEmpty = this.props.cardTypeList.size === 0;
@@ -159,9 +210,9 @@ class CardSelector extends TerrainComponent<Props>
           'create-card-selector-focused': this.state.focusedIndex !== -1,
         })}
         ref='selector'
-        style={backgroundColor(Colors().bg2)}
+        style={backgroundColor(Colors().bg1)}
       >
-        <div className='inset-shadow-veil' style={getStyle('boxShadow', 'inset 2px 2px 6px rgba(0,0,0,0.25)')} />
+        <div className='inset-shadow-veil' style={getStyle('boxShadow', 'inset 1px 2px 14px rgba(0,0,0,0.25)')} />
         <div className='selectors-row'>
           { // TODO once card categories are ready to go
             // <div className='card-category-selector' style={borderColor(Colors().border1)}>
@@ -175,6 +226,12 @@ class CardSelector extends TerrainComponent<Props>
           }
           <div
             className='create-card-selector-inner'
+            ref={this.registerCardSelector}
+            style={this.state.computedHeight === -1 ?
+              {} :
+              {
+                height: this.state.computedHeight
+              }}
           >
             {
               isEmpty &&
@@ -195,6 +252,7 @@ class CardSelector extends TerrainComponent<Props>
             className='card-search-input'
             placeholder='Search for a card'
             value={this.state.searchValue}
+            ref={this.registerInputElement}
             onChange={this.handleSearchTextboxChange}
             style={backgroundColor(Colors().highlight)}
           />

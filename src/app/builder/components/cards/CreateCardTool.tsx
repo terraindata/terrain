@@ -147,19 +147,6 @@ class CreateCardTool extends TerrainComponent<Props>
     return this.props.accepts || AllBackendsMap[this.props.language].cardsList;
   }
 
-  public renderCardSelector()
-  {
-    return (
-      <CardSelector
-        cardTypeList={this.getCardTypeList()}
-        open={this.props.open}
-        language={this.props.language}
-        handleCardClick={this.handleCardClick}
-        overrideText={this.props.overrideText}
-      />
-    );
-  }
-
   public handleCloseClick()
   {
     if (this.props.onClose)

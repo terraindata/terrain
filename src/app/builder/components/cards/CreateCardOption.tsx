@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { CardConfig } from '../../../../blocks/types/Card';
-import { backgroundColor, borderColor, cardStyle, Colors, getStyle } from '../../../common/Colors';
+import { backgroundColor, borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../common/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CreateCardOption.less';
 
@@ -59,6 +59,7 @@ export interface Props
   index: number;
   card: CardConfig;
   onClick: (card: CardConfig, index: number) => void;
+  searchText: string;
   overrideTitle?: string;
   isFocused?: boolean;
 }
@@ -71,20 +72,34 @@ class CreateCardOption extends TerrainComponent<Props>
     this.props.onClick(this.props.card, this.props.index);
   }
 
+  public passesSearch(title: string, description: string, searchText: string)
+  {
+    const searchValueLowerCase = searchText.toLowerCase();
+    if (searchText === '')
+    {
+      return true;
+    }
+    else
+    {
+      return title.toLowerCase().indexOf(searchValueLowerCase) !== -1 || description.toLowerCase().indexOf(searchValueLowerCase) !== -1;
+    }
+  }
+
   public render()
   {
     const { card } = this.props;
 
     if (!card)
     {
-      console.log('Missing card type: ', card);
+      console.warn('Missing card type: ', card);
       // TODO throw error instead
       return null;
     }
 
     const text = this.props.overrideTitle || card.static.title;
-
+    const description = card.static.description || 'Create a ' + card.static.title + ' card.';
     return (
+      !this.passesSearch(text, description, this.props.searchText) ? null :
       <div
         className={classNames({
           'create-card-option': true,
@@ -94,8 +109,7 @@ class CreateCardOption extends TerrainComponent<Props>
         style={[
           borderColor(Colors().highlight),
           backgroundColor('rgba(0,0,0,0)', Colors().darkerHighlight),
-          // backgroundColor(Colors().darkerHighlight),
-          // getStyle('boxShadow', '1px 2px 14px ' + Colors().boxShadow),
+          fontColor(Colors().text2, Colors().text1),
         ]}
         key='create-option'
       >
@@ -112,7 +126,7 @@ class CreateCardOption extends TerrainComponent<Props>
           className='create-card-option-description'
         >
           {
-            card.static.description || 'Create a ' + card.static.title + ' card.'
+            description
           }
         </div>
       </div>
