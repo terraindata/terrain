@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import RadioButtons from 'common/components/RadioButtons';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
@@ -57,7 +58,6 @@ import GroupsColumn from './GroupsColumn';
 import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
-import RadioButtons from 'common/components/RadioButtons';
 
 export interface Props
 {
@@ -74,7 +74,6 @@ export interface State
   libraryState: LibraryState;
   selectedDomain: any;
   zoomDomain: any;
-  selectedMetric: string;
 }
 
 class Library extends TerrainComponent<any>
@@ -93,7 +92,6 @@ class Library extends TerrainComponent<any>
     libraryState: null,
     selectedDomain: {},
     zoomDomain: {},
-    selectedMetric: '',
   };
 
   public componentWillMount()
@@ -121,11 +119,13 @@ class Library extends TerrainComponent<any>
   {
     const { analytics } = this.props;
 
+    // Remove when analytics mock up have valid variant ids.
     let data = [];
 
-    if (analytics.get(1) !== undefined)
+    const analyticsData = analytics.data.get(variantId);
+    if (analyticsData !== undefined)
     {
-      data = analytics.get(1);
+      data = analyticsData;
     }
 
     // return [...Array(20).keys()].map((i) =>
@@ -172,16 +172,22 @@ class Library extends TerrainComponent<any>
     localStorage.setItem(lastPath, location.pathname);
   }
 
-  handleRadioButtonClick(optionValue)
+  public handleRadioButtonClick(optionValue)
   {
-    this.props.analyticsActions.fetch(optionValue);
-    this.setState({ selectedMetric: optionValue });
+    const { selectedVariants } = this.props.library;
+    selectedVariants
+      .forEach((variantId) =>
+      {
+        const numericVariantId = parseInt(variantId, 10);
+        const numericOptionValue = parseInt(optionValue, 10);
+        this.props.analyticsActions.fetch(numericVariantId, numericOptionValue);
+        this.props.analyticsActions.selectMetric(optionValue);
+      });
   }
-
 
   public render()
   {
-    const { library: libraryState } = this.props;
+    const { library: libraryState, analytics } = this.props;
 
     const {
       dbs,
@@ -192,7 +198,7 @@ class Library extends TerrainComponent<any>
       groupsOrder,
     } = libraryState;
 
-    const { selectedMetric } = this.state;
+    const { selectedMetric } = analytics;
 
     const { router, basePath, variantsMultiselect } = this.props;
     const { params } = router;
@@ -293,6 +299,7 @@ class Library extends TerrainComponent<any>
               basePath,
               router,
               variantActions: this.props.libraryVariantActions,
+              analytics,
               analyticsActions: this.props.analyticsActions,
             }}
           />
@@ -320,13 +327,18 @@ class Library extends TerrainComponent<any>
                 yDataKey={'doc_count'}
               />
             </div>
-            <div style={{ width: '20%', height: '100%' }}>
+            <div style={{
+              width: '20%',
+              height: '100%',
+              backgroundColor: '#333',
+              marginLeft: '10px',
+            }}>
               <RadioButtons
                 optionShadow={true}
-                selected={selectedMetric}
+                selected={selectedMetric.toString()}
                 options={[
                   { value: '1', label: 'CTR', onClick: this.handleRadioButtonClick },
-                  { value: '2', label: 'Conversions', onClick: this.handleRadioButtonClick }
+                  { value: '2', label: 'Conversions', onClick: this.handleRadioButtonClick },
                 ]}
               />
             </div>

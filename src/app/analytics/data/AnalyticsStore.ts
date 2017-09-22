@@ -43,15 +43,20 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+import * as Immutable from 'immutable';
 import Util from 'util/Util';
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 
-export const AnalyticsActionTypes =
-  {
-    fetch: '',
-    selectMetric: '',
-  };
+class AnalyticsStateC
+{
+  public loaded = false;
+  public data: IMMap<ID, any> = Immutable.Map({});
+  public selectedMetric: ID = 1;
+}
 
-Util.setValuesToKeys(AnalyticsActionTypes, 'analytics');
-
-export default AnalyticsActionTypes;
+const AnalyticsState_Record = Immutable.Record(new AnalyticsStateC());
+export interface AnalyticsState extends AnalyticsStateC, IRecord<AnalyticsState> { }
+export const _AnalyticsState = (config?: any) =>
+{
+  return new AnalyticsState_Record(Util.extendId(config || {})) as any as AnalyticsState;
+};
