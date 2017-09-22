@@ -113,6 +113,7 @@ export interface Props
 
   handleCardDrop?: (type: string) => any;
   tuningMode?: boolean;
+  handleCardReorder?: (card, siblings) => void;
 }
 
 @Radium
@@ -395,6 +396,34 @@ class _CardComponent extends TerrainComponent<Props>
     }
   }
 
+  public handleMouseDown(event)
+  {
+    if (!this.props.tuningMode)
+    {
+      return;
+    }
+    // for tuning mode, dragging and dropping cards will just reorder them (in tuner)
+    // but have no effect on the actual layout of cards in builder
+    $('body').on('mouseup', this.handleMouseUp);
+    $('body').on('mouseleave', this.handleMouseUp);
+  }
+
+  public handleMouseUp(event)
+  {
+    if (!this.props.tuningMode)
+    {
+      return;
+    }
+    $('body').off('mouseup', this.handleMouseUp);
+    $('body').off('mouseleave', this.handleMouseUp);
+    const sibs = Util.siblings(this.refs['card']);
+    if (this.props.handleCardReorder)
+    {
+      this.props.handleCardReorder(this.props.card, sibs);
+    }
+    // somehow get the index of the cards - maybe just call a parent function ?
+  }
+
   public getKeyPath()
   {
     const newKeyPath = this.props.singleCard
@@ -432,13 +461,11 @@ class _CardComponent extends TerrainComponent<Props>
       if (keyPaths.get(this.props.card.id) !== undefined)
       {
         Actions.change(keyPaths.get(this.props.card.id).push('tuning'), false);
-        Actions.change(keyPaths.get(this.props.card.id).push('tuningIndex'), undefined);
       }
     }
     else
     {
       Actions.change(this.getKeyPath().push('tuning'), !this.props.card.tuning);
-      Actions.change(this.getKeyPath().push('tuningIndex'), undefined);
     }
   }
 
@@ -573,16 +600,18 @@ class _CardComponent extends TerrainComponent<Props>
         id={id}
         onMouseMove={this.handleMouseMove}
       >
-        <CDA
-          half={true}
-          keyPath={this.props.keyPath}
-          index={this.props.index}
-          accepts={this.props.accepts}
-          wrapType={this.props.card.type}
-          singleChild={this.props.singleChild || this.props.singleCard}
-          language={card.static.language}
-          handleCardDrop={this.props.handleCardDrop}
-        />
+        {!this.props.tuningMode &&
+          <CDA
+            half={true}
+            keyPath={this.props.keyPath}
+            index={this.props.index}
+            accepts={this.props.accepts}
+            wrapType={this.props.card.type}
+            singleChild={this.props.singleChild || this.props.singleCard}
+            language={card.static.language}
+            handleCardDrop={this.props.handleCardDrop}
+          />
+        }
         <div
           className={classNames({
             'card-inner': true,
@@ -616,7 +645,10 @@ class _CardComponent extends TerrainComponent<Props>
               {
                 this.props.canEdit &&
                 !card['cannotBeMoved'] &&
-                <div className='card-drag-handle'>
+                <div
+                  className='card-drag-handle'
+                  onMouseDown={this.handleMouseDown}
+                >
                   <DragHandle
                     hiddenByDefault={!this.state.hovering}
                     connectDragSource={connectDragSource}
@@ -722,17 +754,19 @@ class _CardComponent extends TerrainComponent<Props>
             </div>
           }
         </div>
-        <CDA
-          half={true}
-          lower={true}
-          keyPath={this.props.keyPath}
-          index={this.props.index}
-          accepts={this.props.accepts}
-          wrapType={this.props.card.type}
-          singleChild={this.props.singleChild || this.props.singleCard}
-          language={card.static.language}
-          handleCardDrop={this.props.handleCardDrop}
-        />
+        {!this.props.tuningMode &&
+          <CDA
+            half={true}
+            lower={true}
+            keyPath={this.props.keyPath}
+            index={this.props.index}
+            accepts={this.props.accepts}
+            wrapType={this.props.card.type}
+            singleChild={this.props.singleChild || this.props.singleCard}
+            language={card.static.language}
+            handleCardDrop={this.props.handleCardDrop}
+          />
+        }
       </div>
     );
   }

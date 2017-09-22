@@ -93,6 +93,9 @@ class QueryC
 
   modelVersion = 2; // 2 is for the first version of Node midway
 
+  //what order the cards are in the tuning column
+  tuningOrder: List<string> = List([]);
+
 }
 const Query_Record = Record(new QueryC());
 export interface Query extends QueryC, IRecord<Query> { }

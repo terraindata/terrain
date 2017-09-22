@@ -62,6 +62,7 @@ import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import Util from '../../../util/Util';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 
 import { Cards } from '../../../../blocks/types/Card';
@@ -85,14 +86,15 @@ class TuningColumn extends TerrainComponent<Props>
   public state: {
     keyPath: KeyPath;
     allCards: Cards,
-    shouldUpdate: boolean,
+    tuningOrder: List<string>,
   } = {
     keyPath: this.computeKeyPath(this.props),
     allCards: List([]),
-    shouldUpdate: true,
+    tuningOrder: List([]),
   };
 
   public tuningCards: Cards = List([]);
+  public prevTuningCards: Cards = List([]);
 
   public innerHeight: number = -1;
 
@@ -102,10 +104,12 @@ class TuningColumn extends TerrainComponent<Props>
     this._subscribe(BuilderStore, {
       updater: (state: BuilderState) =>
       {
-        if (!_.isEqual(this.state.allCards, state.query.cards) && this.state.shouldUpdate)
+        if (!_.isEqual(this.state.allCards, state.query.cards))
         {
+          this.prevTuningCards = this.tuningCards;
           this.tuningCards = List([]);
           this.updateTuningCards(state.query.cards);
+          this.checkForRemovedCards();
           this.setState({
             allCards: state.query.cards,
           });
@@ -114,53 +118,52 @@ class TuningColumn extends TerrainComponent<Props>
     });
   }
 
-  // public orderCards()
-  // {
-  //   let lastPos = this.tuningCards.size - 1;
-  //   this.tuningCards = List(this.tuningCards.sortBy((card) => {
-  //     if (card.tuningIndex === undefined)
-  //     {
-  //       lastPos += 1;
-  //       return lastPos - 1;
-  //     }
-  //     return card.tuningIndex;
-  //   })) as Cards;
-  //   console.log(this.tuningCards);
-  //   this.setState({
-  //     shouldUpdate: false,
-  //   });
-  //   let index = 0;
-  //   const keyPaths = BuilderStore.getState().cardKeyPaths;
-  //   this.tuningCards.forEach((card) => {
-  //     if (keyPaths.get(card.id) !== undefined)
-  //     {
-  //       Actions.change(keyPaths.get(card.id).push('tuningIndex'), index);
-  //       index += 1;
-  //     }
-  //   });
-  //   this.setState({
-  //     shouldUpdate: true,
-  //   });
-  // }
+  public componentWillMount()
+  {
+    const order = BuilderStore.getState().query.tuningOrder;
+    this.setState({
+      tuningOrder: order !== undefined ? List(order) : List([]),
+    });
+  }
 
-  /*
+  public componentWillUnmount()
+  {
+    Actions.change(List(this._keyPath('query', 'tuningOrder')), this.state.tuningOrder);
+  }
 
-          const keyPaths = BuilderStore.getState().cardKeyPaths;
-        if (keyPaths.get(card.id) !== undefined)
-        {
-          console.log('time to update the index...'); // if it was undefined before (maybe don't do this here .....)
-          // Actions.change(keyPaths.get(card.id).push('tuningIndex'), this.tuningCards.size - 1);
-        }
-        */
+  public sortTuningCards()
+  {
+    this.tuningCards = this.tuningCards.sortBy((card) =>
+      this.state.tuningOrder.indexOf(card.id),
+    ) as any;
+  }
 
-  /*
-     before the render (or after tuning cards is updated), go through each of the cards in the list
-     if the tuningIndex is defined leave it
-     if the tuningIndex is undefined set that card to be at the end of the list
-     adjust the list so the indexes are in order (if you removed the first card or something, have to shift down)
-     set all new indexes with Actions
-     render in that order
-  */
+  public handleCardAdded(card)
+  {
+    const x = this.state.tuningOrder.push(card.id);
+    this.setState({
+      tuningOrder: this.state.tuningOrder.push(card.id),
+    });
+  }
+
+  public handleCardRemove(card)
+  {
+    const index = this.state.tuningOrder.indexOf(card.id);
+    this.setState({
+      tuningOrder: this.state.tuningOrder.remove(index),
+    });
+  }
+
+  public checkForRemovedCards()
+  {
+    this.prevTuningCards.forEach((card) =>
+    {
+      if (this.tuningCards.indexOf(card) === -1)
+      {
+        this.handleCardRemove(card);
+      }
+    });
+  }
 
   public updateTuningCards(cards)
   {
@@ -169,10 +172,20 @@ class TuningColumn extends TerrainComponent<Props>
       if (card.tuning)
       {
         this.tuningCards = this.tuningCards.push(card);
+        if (this.prevTuningCards.indexOf(card) === -1)
+        {
+          // new card added
+          this.handleCardAdded(card);
+        }
       }
       if (card.key.tuning) // for transform cards
       {
         this.tuningCards = this.tuningCards.push(card.key);
+        if (this.prevTuningCards.indexOf(card.key) === -1)
+        {
+          // new card added
+          this.handleCardAdded(card.key);
+        }
       }
       if (card.cards !== undefined && card.cards.size > 0)
       {
@@ -205,10 +218,25 @@ class TuningColumn extends TerrainComponent<Props>
     // console.log('card drop boooom');
   }
 
+  public handleCardReorder(card, siblings)
+  {
+    const cardsArea = Util.children(this.refs['cardsArea'])[0];
+    const children = cardsArea.childNodes;
+    let cards = List([]);
+    for (let i = 0; i < children.length; ++i)
+    {
+      if (children[i].childNodes.length > 1)
+      {
+        cards = cards.push((children[i].childNodes[1] as any).id);
+      }
+    }
+  }
+
   public render()
   {
     const { canEdit, language, addColumn, columnIndex } = this.props;
     const { keyPath } = this.state;
+    this.sortTuningCards();
     return (
       <div
         className='cards-column'
@@ -231,16 +259,8 @@ class TuningColumn extends TerrainComponent<Props>
               noCardTool={true}
               accepts={this.getPossibleCards()}
               tuningMode={true}
-            />
-            <CardDropArea
-              half={true}
-              lower={true}
-              index={this.tuningCards.size}
-              keyPath={keyPath}
-              heightOffset={0}
-              accepts={this.getPossibleCards()}
-              language={this.props.language}
-              afterDrop={this.afterDrop}
+              handleCardReorder={this.handleCardReorder}
+              ref='cardsArea'
             />
           </div>
         </div>

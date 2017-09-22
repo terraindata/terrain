@@ -374,7 +374,7 @@ class CardField extends TerrainComponent<Props>
           ref='cardField'
         >
           {
-            !renderTools && this.props.canEdit && this.props.isFirstRow &&
+            !renderTools && this.props.canEdit && this.props.isFirstRow && !this.props.tuningMode &&
             tooltip(
               <div
                 className='card-field-top-add card-field-add'
