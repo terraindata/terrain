@@ -106,16 +106,28 @@ class TuningColumn extends TerrainComponent<Props>
       {
         if (!_.isEqual(this.state.allCards, state.query.cards))
         {
-          this.prevTuningCards = this.tuningCards;
-          this.tuningCards = List([]);
-          this.updateTuningCards(state.query.cards);
-          this.checkForRemovedCards();
-          this.setState({
-            allCards: state.query.cards,
-          });
+          this.setTuningCards(state.query.cards);
         }
       },
     });
+  }
+
+  public setTuningCards(newCards)
+  {
+    if (this.tuningCards.size === 0)
+    {
+      this.setState({
+        tuningOrder: List([]),
+      });
+    }
+    this.prevTuningCards = this.tuningCards;
+    this.tuningCards = List([]);
+    this.updateTuningCards(newCards);
+    this.checkForRemovedCards();
+    this.setState({
+      allCards: newCards,
+    });
+    setTimeout(this.updateTuningOrder, 250);
   }
 
   public componentWillMount()
@@ -126,9 +138,18 @@ class TuningColumn extends TerrainComponent<Props>
     });
   }
 
+  public updateTuningOrder()
+  {
+    if (!_.isEqual(this.state.tuningOrder, BuilderStore.getState().query.tuningOrder))
+    {
+      Actions.change(List(this._keyPath('query', 'tuningOrder')),
+        this.state.tuningOrder);
+    }
+  }
+
   public componentWillUnmount()
   {
-    Actions.change(List(this._keyPath('query', 'tuningOrder')), this.state.tuningOrder);
+    this.updateTuningOrder();
   }
 
   public sortTuningCards()
@@ -140,7 +161,6 @@ class TuningColumn extends TerrainComponent<Props>
 
   public handleCardAdded(card)
   {
-    const x = this.state.tuningOrder.push(card.id);
     this.setState({
       tuningOrder: this.state.tuningOrder.push(card.id),
     });
@@ -213,22 +233,20 @@ class TuningColumn extends TerrainComponent<Props>
     }
   }
 
-  public afterDrop(item, targetProps)
+  public handleCardReorder(card, index)
   {
-    // console.log('card drop boooom');
-  }
-
-  public handleCardReorder(card, siblings)
-  {
-    const cardsArea = Util.children(this.refs['cardsArea'])[0];
-    const children = cardsArea.childNodes;
-    let cards = List([]);
-    for (let i = 0; i < children.length; ++i)
+    const oldIndex = this.state.tuningOrder.indexOf(card.id);
+    if (index < oldIndex)
     {
-      if (children[i].childNodes.length > 1)
-      {
-        cards = cards.push((children[i].childNodes[1] as any).id);
-      }
+      this.setState({
+        tuningOrder: this.state.tuningOrder.insert(index, card.id).remove(oldIndex + 1),
+      });
+    }
+    else
+    {
+      this.setState({
+        tuningOrder: this.state.tuningOrder.remove(oldIndex).insert(index, card.id),
+      });
     }
   }
 

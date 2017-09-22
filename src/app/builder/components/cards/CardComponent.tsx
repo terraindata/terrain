@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions no-var-requires class-name no-empty max-line-length no-unused-expression
+// tslint:disable:strict-boolean-expressions no-var-requires class-name no-empty max-line-length no-unused-expression prefer-const
 
 import './CardStyle.less';
 
@@ -113,7 +113,7 @@ export interface Props
 
   handleCardDrop?: (type: string) => any;
   tuningMode?: boolean;
-  handleCardReorder?: (card, siblings) => void;
+  handleCardReorder?: (card, index) => void;
 }
 
 @Radium
@@ -128,6 +128,12 @@ class _CardComponent extends TerrainComponent<Props>
 
     scrollState: BuilderScrollState;
     keyPath: KeyPath;
+
+    // for tuning DnD
+    originalMouseY: number
+    midpoints: number[];
+    originalElTop: number;
+    originalElBottom: number;
   };
 
   public refs: {
@@ -151,6 +157,10 @@ class _CardComponent extends TerrainComponent<Props>
       hovering: false,
       closing: false,
       opening: false,
+      originalMouseY: 0,
+      originalElTop: 0,
+      originalElBottom: 0,
+      midpoints: [],
       menuOptions:
       Immutable.List([
         // {
@@ -406,6 +416,30 @@ class _CardComponent extends TerrainComponent<Props>
     // but have no effect on the actual layout of cards in builder
     $('body').on('mouseup', this.handleMouseUp);
     $('body').on('mouseleave', this.handleMouseUp);
+    const el = Util.parentNode(this.refs['card']);
+    const cr = el['getBoundingClientRect']();
+
+    const children = Util.siblings(Util.parentNode(this.refs['card']));
+    let cards = [];
+    for (let i = 0; i < children.length; ++i)
+    {
+      if (children[i].childNodes.length > 1)
+      {
+        cards.push(children[i].childNodes[1]);
+      }
+    }
+    let midpoints = [];
+    cards.forEach((card) =>
+    {
+      const c = card['getBoundingClientRect']();
+      midpoints.push(((c.top as number) + (c.bottom as number)) / 2);
+    });
+    this.setState({
+      originalMouseY: event.pageY,
+      midpoints,
+      originalElTop: cr.top,
+      originalElBottom: cr.bottom,
+    });
   }
 
   public handleMouseUp(event)
@@ -416,12 +450,35 @@ class _CardComponent extends TerrainComponent<Props>
     }
     $('body').off('mouseup', this.handleMouseUp);
     $('body').off('mouseleave', this.handleMouseUp);
-    const sibs = Util.siblings(this.refs['card']);
     if (this.props.handleCardReorder)
     {
-      this.props.handleCardReorder(this.props.card, sibs);
+      let index: number;
+      const dY = event.pageY - this.state.originalMouseY;
+      // also check bounds ^^
+      if (dY < 0) // dragged up
+      {
+        for (
+          index = 0;
+          this.state.midpoints[index] < this.state.originalElTop + dY;
+          index++
+        )
+        {
+
+        }
+      }
+      else
+      {
+        for (
+          index = this.state.midpoints.length - 1;
+          this.state.midpoints[index] > this.state.originalElBottom + dY;
+          index--
+        )
+        {
+
+        }
+      }
+      this.props.handleCardReorder(this.props.card, index);
     }
-    // somehow get the index of the cards - maybe just call a parent function ?
   }
 
   public getKeyPath()

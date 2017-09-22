@@ -79,7 +79,7 @@ export interface Props
   hideCreateCardTool?: boolean;
   handleCardDrop?: (type: string) => any;
   tuningMode?: boolean;
-  handleCardReorder?: (card, siblings) => void; // have to add other param for new order
+  handleCardReorder?: (card, index) => void; // have to add other param for new order
 }
 
 interface KeyState
