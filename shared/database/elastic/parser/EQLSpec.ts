@@ -1223,7 +1223,7 @@ const EQLSpec: ESClause[] =
         path: ['match'],
         desc: 'Sets if transpositions are allowed when computing fuzzy matches.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-fuzziness',
-        template: 'true',
+        template: true,
       }),
     new ESEnumClause('slop',
       [0, 1, 2],

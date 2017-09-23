@@ -111,9 +111,15 @@ const KEY_DISPLAY: Display =
 export default class GetCardVisitor extends ESClauseVisitor<any>
 {
 
-  public static getCardType(clause: ESClause): string
+  public static getCardType(clause: ESClause | string): string
   {
-    return 'eql' + clause.type;
+    if (clause instanceof ESClause)
+    {
+      return 'eql' + clause.type;
+    } else
+    {
+      return 'eql' + clause;
+    }
   }
 
   protected static seedCard(clause: ESClause,
@@ -202,13 +208,16 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return _card(obj as any);
   }
 
+  // map the card type name ('eql' + clausename) to the card
   public elasticElasticCards: { [type: string]: any };
+  // an array of the card type name
   public elasticElasticCardDeckTypes: string[];
 
   private clauses: { [name: string]: ESClause };
   private config: EQLConfig;
   private colorIndex: number;
 
+  // Map a variant clause type name to a list of non-variant clauses reached from the variant clause.
   private variantClauseMapping: { [clauseType: string]: string[] } = {};
 
   private customCardTypesMap: { [elasticClauseType: string]: string[] } = {
@@ -231,7 +240,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
     _.mapValues(
       this.clauses,
-      (clause, key) =>
+      (clause) =>
       {
         this.getCard(clause);
       });
@@ -253,7 +262,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       return;
     }
 
-    this.elasticElasticCardDeckTypes.push(GetCardVisitor.getCardType(clause));
+    this.elasticElasticCardDeckTypes.push(cardType);
     this.elasticElasticCards[cardType] = card;
     return card;
   }
@@ -342,7 +351,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESBooleanClause(clause: ESBooleanClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: true,
+      value: clause.template === undefined ? true : clause.template,
 
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.booleanClause),
@@ -567,6 +576,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
   public visitESStructureClause(clause: ESStructureClause): any
   {
+    // accepts are overwritten by getChildOptions
     const accepts = this.getCardTypes(_.values(clause.structure), clause);
     // If there's a template, we need to create seed cards
     //  of the template types when this card is initialized.
@@ -599,13 +609,13 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             clause.template,
             (templateValue, templateKey) =>
             {
-              const clauseType = 'eql' +
-                String(templateValue === null ? clause.structure[templateKey] : templateValue);
-              if (blocksConfig[clauseType])
+              const cardTypeName = GetCardVisitor.getCardType(
+                String(templateValue === null ? clause.structure[templateKey] : templateValue));
+              if (blocksConfig[cardTypeName])
               {
                 // console.log(clauseType, templateKey);
                 return BlockUtils.make(
-                  blocksConfig, clauseType,
+                  blocksConfig, cardTypeName,
                   {
                     key: templateKey,
                     // value: templateValue === null ? undefined : templateValue,
@@ -615,7 +625,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               }
               else
               {
-                console.log('No block for ' + String(templateKey), clauseType, templateValue);
+                console.log('No block for ' + String(templateKey), cardTypeName, templateValue);
               }
             },
           ),
@@ -630,7 +640,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         cards: List([]),
 
-        // provide options of all possible card types
+        // provide options of all possible card types (overwrite static.accepts)
         getChildOptions: (card, backend: Backend) =>
         {
           const seen = new Set();
@@ -722,7 +732,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             {
               displayType: DisplayType.CARDS,
               key: 'cards',
-              hideCreateCardTool: true,
+              hideCreateCardTool: false,
               handleCardDrop: (type: string): any =>
               {
                 return { key: cardTypesToKeys[type] };
@@ -761,113 +771,14 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     });
   }
 
+  // Because we have already computed a list of causes reached from the variant clause
   public visitESVariantClause(clause: ESVariantClause): any
   {
-    const accepts = List(
-      _.map(
-        clause.subtypes,
-        (type: string, jsonType: string) =>
-          'eql' + type,
-      ),
-    );
-
-    const childOptions = List(
-      _.map(
-        clause.subtypes,
-        (type: string, jsonType: string) =>
-          ({
-            text: type,
-            type: 'eql' + type,
-          }),
-      ),
-    );
-
-    return GetCardVisitor.seedCard(clause, {
-      // cards: List([]),
-
-      // provide options of all possible card types
-      getChildOptions: (card) =>
-      {
-        return childOptions;
-      },
-
-      childOptionClickHandler: null, // set in init()
-
-      static:
-      {
-        title: clause.type + ' (Variant)',
-        tql: (block, tqlFn, tqlConfig) =>
-        {
-          return ''; // tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
-        },
-
-        init: (blocksConfig, extraConfig?, skipTemplate?) =>
-        {
-          if (extraConfig !== undefined)
-          {
-            // This can happen if Elastic To Cards tries to generate a Variant card
-            //  we need to try to catch its value, and if it has a value,
-            //  create the type of card appropriate for the value.
-
-            let valueType: string;
-            const { value } = extraConfig;
-            if (value !== undefined)
-            {
-              valueType = typeof value;
-            }
-            else if (extraConfig['cards'] !== undefined)
-            {
-              valueType = 'object';
-            }
-
-            const clauseType = clause.subtypes[valueType];
-            if (clauseType !== undefined)
-            {
-              // we have a matching card type -- override with that type
-              const cardType = GetCardVisitor.getCardType(this.clauses[clauseType]);
-              return ({
-                type: cardType, // override our card type
-              });
-            }
-          }
-
-          return ({
-            childOptionClickHandler:
-            (card: Card, option: { text: string, type: string }): Card =>
-            {
-              // replace current card with newly made card of type
-              return BlockUtils.make(
-                blocksConfig, option.type,
-                {
-                  key: card['key'],
-                },
-                skipTemplate,
-              );
-            },
-          });
-        },
-
-        // accepts,
-
-        display:
-        {
-          provideParentData: true, // need this to grey out the type dropdown
-          displayType: DisplayType.COMPONENT,
-          component: SpecializedCreateCardTool,
-          key: null,
-          // help: ManualConfig.help['score'],
-        },
-        // {
-        //   displayType: DisplayType.CARDS,
-        //   key: null,
-        //   singleChild: true,
-        // },
-        preview: '',
-      },
-    });
+    return null;
   }
 
-  // for computing a variant clause to final subtypes mapping
+  // For computing a variant clause to final subtypes mapping.
+  // Get a list of non-variant clauses reached from this variant clause.
   private computeVariantClauses(clauses: { [name: string]: ESClause })
   {
     const variantClauses: { [clauseType: string]: ESClause } = {};
@@ -895,48 +806,48 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         }
       });
 
-      if (this.customCardTypesMap[clause.type] !== undefined)
-      {
-        types = this.customCardTypesMap[clause.type].concat(types);
-      }
-
       return types;
     };
 
     this.variantClauseMapping = _.mapValues(variantClauses, getClauseTypesForVariant);
   }
 
-  // We need to replace occurences of variant card types with their final types
+  // We need to replace occurrences of variant card types with their final types
   // We also need to splice in some custom types
   private getCardTypes(initialClauseTypes: string[], forClause?: ESClause): List<string>
   {
-    let cardTypes: string[] = [];
+    // all clause types reached from the initialClauseTypes
+    let clauseTypes: string[] = [];
     initialClauseTypes.map((childType) =>
     {
       if (this.variantClauseMapping[childType] !== undefined)
       {
         // variant clause, substitute
-        cardTypes = cardTypes.concat(this.variantClauseMapping[childType]);
+        clauseTypes = clauseTypes.concat(this.variantClauseMapping[childType]);
       }
       else
       {
-        cardTypes.push(childType);
+        clauseTypes.push(childType);
       }
     });
 
+    // turn clause type names to card type names
+    let cardTypes = clauseTypes.map((type) =>
+    {
+      const cardTypeName = GetCardVisitor.getCardType(type);
+      if (this.clauses[type] !== undefined)
+      {
+        return cardTypeName;
+      }
+      console.log('Card ' + cardTypeName + ' is missing.');
+      return null;
+    });
+
+    // add custom card names to the card type names
     if (forClause !== undefined && this.customCardTypesMap[forClause.type] !== undefined)
     {
       cardTypes = this.customCardTypesMap[forClause.type].concat(cardTypes);
     }
-
-    cardTypes = cardTypes.map((type) =>
-    {
-      if (this.clauses[type] !== undefined)
-      {
-        return GetCardVisitor.getCardType(this.clauses[type]);
-      }
-      return type;
-    });
 
     return List(cardTypes);
   }
