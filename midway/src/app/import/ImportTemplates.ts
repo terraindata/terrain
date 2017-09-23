@@ -115,6 +115,7 @@ export class ImportTemplates
         'export',
         'name',
         'originalNames',
+        'persistentAccessToken',
         'primaryKeyDelimiter',
         'primaryKeys',
         'tablename',
@@ -188,7 +189,7 @@ export class ImportTemplates
         {
           return reject('Invalid template id passed');
         }
-        let template: ImportTemplateConfig = results[0] as ImportTemplateConfig;
+        const template: ImportTemplateConfig = results[0] as ImportTemplateConfig;
         template['persistentAccessToken'] = srs({ length: 256 });
         const upserted: ImportTemplateConfigStringified =
           await App.DB.upsert(this.templateTable, this._stringifyConfig(template)) as ImportTemplateConfigStringified;
@@ -217,7 +218,7 @@ export class ImportTemplates
         const persistentAccessToken = srs(
           {
             length: 256,
-          }
+          },
         );
         template['persistentAccessToken'] = persistentAccessToken;
       }

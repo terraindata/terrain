@@ -89,10 +89,10 @@ const appSchemaSQL: string[] = [
      tablename text NOT NULL,
      originalNames text NOT NULL,
      columnTypes text NOT NULL,
+     persistentAccessToken text NOT NULL,
      primaryKeyDelimiter text,
      primaryKeys text NOT NULL,
-     transformations text NOT NULL,
-     accessToken text NOT NULL);`,
+     transformations text NOT NULL);`,
 ];
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
