@@ -91,11 +91,7 @@ const appSchemaSQL: string[] = [
      columnTypes text NOT NULL,
      primaryKeyDelimiter text,
      primaryKeys text NOT NULL,
-     transformations text NOT NULL);`,
-  `CREATE TABLE IF NOT EXISTS persistentAccessTokens 
-    (id integer PRIMARY KEY,
-     userid integer NOT NULL,
-     templateid integer NOT NULL,
+     transformations text NOT NULL,
      accessToken text NOT NULL);`,
 ];
 
