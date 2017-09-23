@@ -94,16 +94,37 @@ Router.post('/update/', async (ctx, next) =>
 
 });
 
-Router.get('/variants/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+// supported parameters:
+// * variantid: list of variantids
+// * start: start time of the interval
+// * end: end time of the interval
+// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
+// * agg (optional): an elastic aggregate operation. if unspecified or `none`, return all raw events between the interval
+// * field (optional; required if *agg* is specified): list of fields to operate on.
+//    if unspecified, it returns or aggregates all of the fields in the event.
+// * interval (required if *agg* is specified): the resolution of interval for aggregation operations.
+//     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
+//     also supported are values such as `1.5h`, `90m` etc.
+//
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const requestObj = JSON.parse(JSON.stringify(ctx.request.query));
-  Util.verifyParameters(requestObj, ['start', 'end', 'eventid']);
-  if (!ctx.params.id)
+  Util.verifyParameters(
+    JSON.parse(JSON.stringify(ctx.request.query)),
+    ['start', 'end', 'eventid', 'variantid'],
+  );
+  winston.info('getting events for variant');
+  const response: object[] = await events.getEventData(ctx.request.query);
+  ctx.body = response.reduce((acc, x) =>
   {
-    throw new Error('missing variant ID');
-  }
-  winston.info('getting events for variant ID ' + String(ctx.params.id));
-  ctx.body = await events.getEventData(Number(ctx.params.id), ctx.request.query);
+    for (const key in x)
+    {
+      if (x.hasOwnProperty(key) !== undefined)
+      {
+        acc[key] = x[key];
+        return acc;
+      }
+    }
+  }, {});
 });
 
 export default Router;
