@@ -135,8 +135,7 @@ class CreateCardOption extends TerrainComponent<Props>
         borderTopWidth: 0,
         borderRightWidth: 0,
         borderBottomWidth: 0,
-        boxShadow: 'none',
-      }
+      },
     );
     return (
       !searchResult ? null :

@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires
+
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -140,7 +142,7 @@ class CardSelector extends TerrainComponent<Props>
           overrideText.get(index).text
         }
         isFocused={this.state.focusedIndex === index}
-        key={'' + index}
+        key={index.toString()}
       />
     );
   }
