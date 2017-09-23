@@ -141,6 +141,7 @@
     "react-dnd-html5-backend": "^2.1.2",
     "react-dnd-text-dragpreview": "^0.2.3",
     "react-dom": "^15.0.1",
+    "react-highlighter": "^0.4.0",
     "react-modal": "^1.4.0",
     "react-redux": "^5.0.5",
     "react-router": "^3.0.2",

@@ -29,6 +29,7 @@
 
 
   .inset-shadow-veil {
+    z-index: 10;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -58,6 +59,7 @@
     }
 
     .create-card-selector-inner {
+
       flex: 1;
       max-height: 250px;
       overflow: auto;
@@ -91,7 +93,9 @@
     }
 
     .card-search-line {
-      padding: @spacing;
+      position: relative;
+      z-index: 1;
+      padding: @quarter-spacing;
       height: 30px;
       border-top: 1px solid;
       .card-search-input {
