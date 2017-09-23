@@ -115,6 +115,7 @@ export class ImportTemplates
         'export',
         'name',
         'originalNames',
+        'persistentAccessToken',
         'primaryKeyDelimiter',
         'primaryKeys',
         'tablename',
