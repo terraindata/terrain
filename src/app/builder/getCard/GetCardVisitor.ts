@@ -732,7 +732,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             {
               displayType: DisplayType.CARDS,
               key: 'cards',
-              hideCreateCardTool: false,
+              hideCreateCardTool: true,
               handleCardDrop: (type: string): any =>
               {
                 return { key: cardTypesToKeys[type] };
