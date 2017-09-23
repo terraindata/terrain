@@ -265,7 +265,7 @@ export class Events
         lte: request['end'],
       });
 
-      if (request['agg'] === 'none' || request['agg'] === undefined)
+      if (!this.isAggregationRequest(request))
       {
         if (request['field'] !== undefined)
         {
@@ -369,6 +369,12 @@ export class Events
     event.payload = JSON.stringify(event.payload);
     return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
+
+  public isAggregationRequest(request: object): boolean
+  {
+    return (request['agg'] !== undefined && request['agg'] !== 'none');
+  }
+
 }
 
 export default Events;
