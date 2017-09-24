@@ -134,6 +134,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         preview: string | ((c: Card) => string);
         display: Display | Display[];
         tql: TQLFn;
+        singleType?: boolean;
+        typeName?: string;
         accepts?: List<string>;
 
         getChildTerms?: (card: Card, schemaState) => List<string>;
@@ -155,6 +157,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: clause.name,
+      clause: clause,
       colors: getCardColors(clause.path[0], Colors().border2),
       language: 'elastic',
       description: clause.desc,
@@ -342,6 +345,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
         },
         tql: (block) => CommonElastic.parseESValue(block['value']),
+        singleType: false,
       },
     });
   }
@@ -363,6 +367,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           ]),
         },
         tql: (boolBlock) => !!boolBlock['value'],
+        singleType: true,
+        typeName: 'boolean',
       },
     });
   }
@@ -382,6 +388,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           dropdownUsesRawValues: true,
         },
         tql: (block) => block['value'],
+        singleType: true,
+        typeName: typeof clause.values[0],
       },
     });
   }
@@ -402,6 +410,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           },
         },
         tql: (stringBlock) => stringBlock['value'],
+        singleType: true,
+        typeName: 'string',
       },
     });
   }
@@ -422,6 +432,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           },
         },
         tql: (stringBlock) => stringBlock['value'],
+        singleType: true,
+        typeName: 'string',
       },
     });
   }
@@ -473,6 +485,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         preview: '',
         display: [],
         tql: () => null,
+        singleType: true,
+        typeName: 'null',
       },
     });
   }
@@ -491,6 +505,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           // TODO autocomplete?
         },
         tql: (numBlock) => +numBlock['value'],
+        singleType: true,
+        typeName: 'number',
       },
     });
   }
@@ -563,6 +579,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           // TODO autocomplete
         },
         tql: (stringBlock) => stringBlock['value'],
+        singleType: true,
+        typeName: 'string',
       },
     });
   }

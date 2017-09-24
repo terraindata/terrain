@@ -70,6 +70,8 @@ export default class ESValueInfo
    */
   public tokens: ESParserToken[];
 
+  public card: any;
+
   /**
    * When this value is the result of substituting in a parameter,
    * this is set to the name of that parameter.
@@ -101,6 +103,43 @@ export default class ESValueInfo
    * in the order in which they were detected, undefined otherwise.
    */
   private _errors: ESParserError[];
+
+  public static fromValue(val): ESValueInfo | null
+  {
+    let valueInfo = null;
+    if (val === null)
+    {
+      valueInfo = new ESValueInfo();
+      valueInfo.jsonType = ESJSONType.null;
+      valueInfo.value = null;
+    }
+    switch (typeof val)
+    {
+      case 'string':
+      {
+        valueInfo = new ESValueInfo();
+        valueInfo.jsonType = ESJSONType.string;
+        valueInfo.value = val;
+        break;
+      }
+      case 'number':
+      {
+        valueInfo = new ESValueInfo();
+        valueInfo.jsonType = ESJSONType.number;
+        valueInfo.value = val;
+        break;
+      }
+      case 'boolean':
+      {
+        valueInfo = new ESValueInfo();
+        valueInfo.jsonType = ESJSONType.boolean;
+        valueInfo.value = val;
+        break;
+      }
+      default:
+    }
+    return valueInfo;
+  }
 
   public constructor()
   {
