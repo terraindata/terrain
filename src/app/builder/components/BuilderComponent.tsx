@@ -390,6 +390,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   onChange: BuilderActions.change,
                   builderState: d.requiresBuilderState && BuilderStore.getState(),
                   language: this.props.language,
+                  handleCardDrop: this.props.handleCardDrop,
                 },
               )
             }
