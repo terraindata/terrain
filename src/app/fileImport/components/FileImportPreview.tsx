@@ -384,7 +384,8 @@ class FileImportPreview extends TerrainComponent<Props>
       const stringQuery: string = ESParseTreeToCode(this.props.query.parseTree.parser, { replaceInputs: true }, this.props.inputs);
       const parsedQuery = JSON.parse(stringQuery);
       const dbName = parsedQuery['index'];
-      Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess, this.props.serverId, dbName);
+      const tableName = parsedQuery['type'];
+      Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess, this.props.serverId, dbName, tableName);
     }
     else
     {

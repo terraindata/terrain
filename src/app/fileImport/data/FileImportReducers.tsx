@@ -410,10 +410,10 @@ FileImportReducers[ActionTypes.setTemplates] =
 FileImportReducers[ActionTypes.saveTemplate] =
   (state, action) =>
   {
-    const { serverId, dbName } = action.payload;
+    const { serverId, dbName, tableName } = action.payload;
     Ajax.saveTemplate(
       dbName !== undefined ? dbName : state.dbName,
-      state.tableName,
+      tableName !== undefined ? tableName : state.tableName,
       serverId !== undefined ? serverId : state.serverId,
       state.originalNames,
       Map<string, ColumnTypesTree>(state.columnNames.map((colName, colId) =>
