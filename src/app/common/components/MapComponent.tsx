@@ -92,6 +92,7 @@ export interface Props
   spotlights?: any;
   inputs?: any;
   field?: any;
+  markerColor?: string;
 
 }
 
@@ -118,32 +119,6 @@ const UNIT_CONVERSIONS =
     nauticalmiles: 1852,
     NM: 1852,
   };
-
-const markerIcon = divIcon({
-  html: `<svg class='map-marker-icon' version="1.1" id="Capa_1"
-    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
-    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-    <g><path d="M256,0C167.641,0,96,71.625,96,160c0,24.75,5.625,48.219,15.672,69.125C112.234,230.313,256,512,256,512l142.594-279.375
-    C409.719,210.844,416,186.156,416,160C416,71.625,344.375,0,256,0z M256,256c-53.016,0-96-43-96-96s42.984-96,96-96
-    c53,0,96,43,96,96S309,256,256,256z"/>
-    </g></svg>
-`,
-  iconSize: [40, 40],
-  className: 'map-marker-container',
-});
-
-const markerIconSmall = divIcon({
-  html: `<svg class='map-marker-icon-small' version="1.1" id="Capa_1"
-    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
-    viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-    <g><path d="M256,0C167.641,0,96,71.625,96,160c0,24.75,5.625,48.219,15.672,69.125C112.234,230.313,256,512,256,512l142.594-279.375
-    C409.719,210.844,416,186.156,416,160C416,71.625,344.375,0,256,0z M256,256c-53.016,0-96-43-96-96s42.984-96,96-96
-    c53,0,96,43,96,96S309,256,256,256z"/>
-    </g></svg>
-`,
-  iconSize: [20, 20],
-  className: 'map-marker-container',
-});
 
 class MapComponent extends TerrainComponent<Props>
 {
@@ -431,13 +406,12 @@ class MapComponent extends TerrainComponent<Props>
     return R * c;
   }
 
-  public markerIconWithStyle(style)
+  public markerIconWithStyle(style, small)
   {
+    const size = small ? [20, 20] : [40, 40];
+    const className = small ? 'map-marker-icon-small' : 'map-marker-icon';
     const styledIcon = divIcon({
-      html: `<?xml version="1.0" encoding="iso-8859-1"?><!-- Generator: Adobe Illustrator 16.0.0,
-        SVG Export Plug-In . SVG Version: 6.00 Build 0)
-        --><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
-        "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class='map-marker-icon' version="1.1" id="Capa_1"
+      html: `<svg class=${className} version="1.1" id="Capa_1"
         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
         viewBox="0 0 512 512" style="enable-background:new 0 0 512 512; ${style}" xml:space="preserve">
         <g><path d="M256,0C167.641,0,96,71.625,96,160c0,24.75,5.625,48.219,15.672,69.125C112.234,230.313,256,512,256,512l142.594-279.375
@@ -445,7 +419,7 @@ class MapComponent extends TerrainComponent<Props>
         c53,0,96,43,96,96S309,256,256,256z"/>
         </g></svg>
     `,
-      iconSize: [40, 40],
+      iconSize: size,
       className: 'map-marker-container',
     });
     return styledIcon;
@@ -504,11 +478,10 @@ class MapComponent extends TerrainComponent<Props>
     });
   }
 
-  public renderMarker(address, location, small?, color?, key?)
+  public renderMarker(address, location, small, color, key?)
   {
     const style = 'fill: ' + String(color) + ' !important;';
-    const icon = color !== undefined ? this.markerIconWithStyle(style) : small ? markerIconSmall : markerIcon;
-
+    const icon = this.markerIconWithStyle(style, small);
     return (
       <Marker
         position={location}
@@ -546,32 +519,37 @@ class MapComponent extends TerrainComponent<Props>
 
   public renderMap()
   {
+    const { location, secondLocation } = this.props;
+    const address = this.props.address !== undefined && this.props.address !== '' ? this.props.address : this.state.address;
+    const color = secondLocation !== undefined ? Colors().builder.cards.categories.filter : 'black';
+    // const secondColor;
+    if (location === undefined || location[0] === undefined ||
+      location[1] === undefined || isNaN(location[0]) || isNaN(location[1]))
+    {
+      return null;
+    }
+
     let center;
     let bounds;
-    if (this.props.secondLocation !== undefined)
+    if (secondLocation !== undefined)
     {
-      if (this.props.location[0] > this.props.secondLocation[0])
+      if (location[0] > secondLocation[0])
       {
-        bounds = [[this.props.location[0] + 0.05, this.props.location[1]],
-        [this.props.secondLocation[0] - 0.05, this.props.secondLocation[1]]];
+        bounds = [[location[0] + 0.05, location[1]],
+        [secondLocation[0] - 0.05, secondLocation[1]]];
       }
       else
       {
-        bounds = [[this.props.location[0] - 0.05, this.props.location[1]],
-        [this.props.secondLocation[0] + 0.05, this.props.secondLocation[1]]];
+        bounds = [[location[0] - 0.05, location[1]],
+        [secondLocation[0] + 0.05, secondLocation[1]]];
       }
     }
     else
     {
-      center = this.props.location;
+      center = location;
     }
-    const address = this.props.address !== undefined && this.props.address !== '' ? this.props.address : this.state.address;
     const mapProps = bounds !== undefined ? { bounds } : { center };
-    if (this.props.location === undefined || this.props.location[0] === undefined ||
-      this.props.location[1] === undefined || isNaN(this.props.location[0]) || isNaN(this.props.location[1]))
-    {
-      return null;
-    }
+
     return (
       <div className='input-map-wrapper'>
         <Map
@@ -583,13 +561,14 @@ class MapComponent extends TerrainComponent<Props>
         >
           {
             this.props.markLocation ?
-              this.renderMarker(address, this.props.location, this.props.secondLocation !== undefined)
+              this.renderMarker(address, location, secondLocation !== undefined, color)
               :
               null
           }
           {
             this.props.secondLocation !== undefined && this.props.showDirectDistance ?
-              this.renderMarker(this.props.secondAddress, this.props.secondLocation, this.props.secondLocation !== undefined)
+              this.renderMarker(this.props.secondAddress, secondLocation, secondLocation !== undefined,
+                this.props.markerColor !== undefined ? this.props.markerColor : 'black')
               :
               null
           }
@@ -602,16 +581,16 @@ class MapComponent extends TerrainComponent<Props>
           {
             this.props.showDistanceCircle ?
               <Circle
-                center={this.props.location}
+                center={location}
                 radius={this.convertDistanceToMeters()}
               />
               :
               null
           }
           {
-            this.props.secondLocation !== undefined && this.props.showDirectDistance ?
+            secondLocation !== undefined && this.props.showDirectDistance ?
               <Polyline
-                positions={[this.props.location, this.props.secondLocation]}
+                positions={[location, secondLocation]}
               />
               :
               null
