@@ -49,7 +49,7 @@ import * as _ from 'lodash';
 import * as SchemaTypes from '../SchemaTypes';
 import Ajax from 'util/Ajax';
 import AjaxM1 from 'util/AjaxM1';
-import { SchemaActions } from './SchemaStore';
+import SchemaActions from 'schema/data/SchemaActions';
 import SchemaActionTypes from './SchemaActionTypes';
 import BackendInstance from '../../../database/types/BackendInstance';
 import * as SchemaParser from './SchemaParser';

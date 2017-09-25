@@ -47,7 +47,8 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions restrict-plus-operands
 
 import * as React from 'react';
-import { SchemaActions, SchemaStore } from '../data/SchemaStore';
+import { SchemaStore } from '../data/SchemaStore';
+import SchemaActions from 'schema/data/SchemaActions';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { columnChildrenConfig, ColumnTreeInfo } from './items/ColumnTreeInfo';

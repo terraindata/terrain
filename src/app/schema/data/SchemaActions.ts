@@ -44,21 +44,62 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
+// tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
 
-import * as _ from 'lodash';
-import { createStore, Store } from 'redux';
+import * as Immutable from 'immutable';
+
+import ActionTypes from 'analytics/data/AnalyticsActionTypes';
+import Util from 'util/Util';
+import SchemaStore from 'schema/data/SchemaStore';
+import SchemaActionTypes from './SchemaActionTypes';
 import * as SchemaTypes from '../SchemaTypes';
-type SchemaState = SchemaTypes.SchemaState;
-import SchemaReducer from 'schema/data/SchemaReducer';
+import BackendInstance from '../../../database/types/BackendInstance';
+import { ItemStatus } from '../../../items/types/Item';
 
-type Server = SchemaTypes.Server;
-type Database = SchemaTypes.Database;
-type Table = SchemaTypes.Table;
-type Column = SchemaTypes.Column;
-type Index = SchemaTypes.Index;
+import Ajax from './../../util/Ajax';
 
-export const SchemaStore: Store<SchemaState> =
-  createStore(SchemaReducer, SchemaTypes._SchemaState());
+const $ = (type: string, payload: any) => SchemaStore.dispatch({ type, payload });
 
-export default SchemaStore;
+const SchemaActions =
+  {
+    fetch:
+    () =>
+      $(SchemaActionTypes.fetch, {}),
+
+    serverCount:
+    (serverCount: number) =>
+      $(SchemaActionTypes.serverCount, { serverCount }),
+
+    error:
+    (error: string) =>
+      $(SchemaActionTypes.error, { error }),
+
+    setServer:
+    (
+      payload: SchemaTypes.SetServerActionPayload,
+    ) =>
+      $(SchemaActionTypes.setServer, payload),
+
+    addDbToServer:
+    (
+      payload: SchemaTypes.AddDbToServerActionPayload,
+    ) =>
+      $(SchemaActionTypes.addDbToServer, payload),
+
+    highlightId:
+    (id: ID, inSearchResults: boolean) =>
+      $(SchemaActionTypes.highlightId, {
+        id,
+        inSearchResults,
+      }),
+
+    selectId:
+    (id: ID) =>
+      $(SchemaActionTypes.selectId, {
+        id,
+      }),
+
+  };
+
+
+export default SchemaActions;
