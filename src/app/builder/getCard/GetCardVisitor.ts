@@ -129,6 +129,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors?: string[]; // optional, filled below
         title?: string; // optional, filled below
+        key?: string; // optional, the default key of the card
 
         preview: string | ((c: Card) => string);
         display: Display | Display[];
@@ -162,13 +163,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
     if (true) // switch this on for wrapper card approach
     {
-      if (obj['key'] !== undefined)
+      if (obj['key'] === undefined)
       {
-        throw new Error('Key method was already defined for block ' + clause.type);
+        obj['key'] = '';
       }
-      // Define a key, which will be optionally used to supply the key
-      //  for a key/val pair, if one is needed
-      obj['key'] = '';
 
       // prepend the display with our standard key text display
       const objStatic = obj['static'];
@@ -578,9 +576,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     // accepts are overwritten by getChildOptions
     const accepts = this.getCardTypes(_.values(clause.structure), clause);
-    // If there's a template, we need to create seed cards
-    //  of the template types when this card is initialized.
-    const cardTypesToKeys: { [type: string]: string } = {};
 
     const init = (blocksConfig, extraConfig?, skipTemplate?) =>
     {
@@ -639,7 +634,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause,
       {
         cards: List([]),
-
+        key: clause.name,
         // provide options of all possible card types (overwrite static.accepts)
         getChildOptions: (card, backend: Backend) =>
         {
@@ -656,11 +651,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               if (card['cards'].find((p) => p.key === key) === undefined)
               {
                 const cardTypes = this.getCardTypes([clauseType]);
-                cardTypes.map((cardType) =>
-                {
-                  cardTypesToKeys[cardType] = key;
-                },
-                );
                 cardTypes.map((cardType) =>
                   result.push({
                     text: key + ': ' + (backend.blocks[cardType].static['title'] as string),
@@ -680,7 +670,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               {
                 const cardConfig = backend.blocks[cardType];
                 const key: string = cardConfig['key'];
-                cardTypesToKeys[cardType] = key;
 
                 if (card['cards'].find((p) => p.key === key) === undefined)
                 {
@@ -733,10 +722,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
               displayType: DisplayType.CARDS,
               key: 'cards',
               hideCreateCardTool: true,
-              handleCardDrop: (type: string): any =>
-              {
-                return { key: cardTypesToKeys[type] };
-              },
             },
             {
               provideParentData: true, // need this to grey out the type dropdown
