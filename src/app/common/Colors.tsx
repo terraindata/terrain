@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import { extend } from 'lodash';
+import UserStore from '../users/data/UserStore';
 
 const Color = require('color');
 
@@ -778,17 +779,26 @@ const LIGHT: Theme =
     },
   };
 
-const Themes: { [name: string]: Theme } =
+export const Themes: { [name: string]: Theme } =
   {
     DARK, LIGHT,
   };
 
-const curTheme = 'LIGHT';
+export const ThemesInt =
+  {
+    DARK: 0,
+    LIGHT: 1,
+  };
+
+const curTheme = 'DARK';
 
 export function Colors()
 {
-  // in the future, you will switch out the theme here.
-  return Themes[curTheme];
+  if (localStorage.getItem('theme') === null)
+  {
+    localStorage.setItem('theme', 'Dark');
+  }
+  return Themes[localStorage.getItem('theme')];
 }
 
 const dynamicMap: any = {

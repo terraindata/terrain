@@ -93,7 +93,7 @@ class DatePicker extends TerrainComponent<Props>
   {
     ColorsActions.setStyle('.date-picker', { background: Colors().bg1, color: Colors().text2 });
     ColorsActions.setStyle('.date-picker .dropdown-wrapper:not(:hover)',
-     { 'box-shadow': getStyle('boxShadow', '0px 0px 0px 1px ' + Colors().boxShadow) });
+      { 'box-shadow': getStyle('boxShadow', '0px 0px 0px 1px ' + Colors().boxShadow) });
     ColorsActions.setStyle('.DayPicker-Weekday', { color: Colors().text2 });
     ColorsActions.setStyle('.DayPicker-Day',
       { 'border-color': Colors().altHighlight, 'background': Colors().altBg1, 'color': Colors().altText3 });

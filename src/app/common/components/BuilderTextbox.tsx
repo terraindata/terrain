@@ -63,12 +63,11 @@ import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
+import ColorsActions from '../../colors/data/ColorsActions';
 import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import SchemaStore from '../../schema/data/SchemaStore';
 import Autocomplete from './Autocomplete';
-import ColorsActions from '../../colors/data/ColorsActions';
-
 
 const shallowCompare = require('react-addons-shallow-compare');
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
@@ -161,7 +160,7 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.builder-tb input &::placeholder ', { color: Colors().text3 + '!important'});
+    ColorsActions.setStyle('.builder-tb input &::placeholder ', { color: Colors().text3 + '!important' });
   }
 
   public getCreatingType(): string

@@ -100,8 +100,8 @@ export class Sidebar extends TerrainComponent<Props>
         <div
           className='sidebar-selected-square'
           style={{
-            'top': (this.props.selectedIndex * linkHeight) + 'px',
-            'backgroundColor': Colors().active,
+            top: (this.props.selectedIndex * linkHeight) + 'px',
+            backgroundColor: Colors().active,
           }}
         />
         {
@@ -127,7 +127,7 @@ export class Sidebar extends TerrainComponent<Props>
                   className={classNames({
                     'sidebar-link-inner': true,
                     'sidebar-link-inner-selected': index === this.props.selectedIndex,
-                  })}  
+                  })}
 
                 >
                   {

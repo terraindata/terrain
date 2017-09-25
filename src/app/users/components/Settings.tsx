@@ -50,6 +50,7 @@ import * as React from 'react';
 import { MidwayError } from 'shared/error/MidwayError';
 import * as UserTypes from '../UserTypes';
 import AuthStore from './../../auth/data/AuthStore';
+import { Colors, Themes, ThemesInt } from './../../common/Colors';
 import CheckBox from './../../common/components/CheckBox';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
@@ -70,7 +71,6 @@ export interface Props
   params?: any;
   history?: any;
   children?: any;
-
 }
 
 class Settings extends TerrainComponent<Props>
@@ -107,6 +107,22 @@ class Settings extends TerrainComponent<Props>
   {
     Actions.fetch();
   }
+
+  // public componentDidMount()
+  // {
+  //   if (localStorage.getItem('theme') === 'Dark')
+  //   {
+  //     this.setState({
+  //       theme: 0
+  //     });
+  //   }
+  //   else
+  //   {
+  //     this.setState({
+  //       theme: 1
+  //     });
+  //   }
+  // }
 
   public componentWillUnmount()
   {
@@ -433,6 +449,45 @@ class Settings extends TerrainComponent<Props>
     );
   }
 
+  public getThemesList()
+  {
+    const themesKeys = Object.keys(Themes);
+    const themesList = themesKeys.map((theme, i) =>
+    {
+      return {
+        value: i,
+        label: theme,
+      };
+    });
+    return themesList;
+  }
+
+  public changeTheme(val)
+  {
+    if (localStorage.getItem('theme') !== val.label)
+    {
+      localStorage.setItem('theme', val.label);
+      location.reload();
+    }
+  }
+
+  public renderTerraformerSettingsContent()
+  {
+    const themesList = this.getThemesList();
+    return (
+      <div className='settings-row'>
+        <Select
+          clearable={false}
+          value={ThemesInt[localStorage.getItem('theme')]}
+          options={themesList}
+          onChange={this.changeTheme}
+          className='settings-timezone-dropdown'
+          searchable={false}
+        />
+      </div>
+    );
+  }
+
   public renderSignOutDescription()
   {
     return (
@@ -544,6 +599,10 @@ class Settings extends TerrainComponent<Props>
           title='Time Zone'
           description={this.renderTimeZoneDescription()}
           content={this.renderTimeZoneContent()}
+        />
+        <AccountEntry
+          title='Terraformer Settings'
+          content={this.renderTerraformerSettingsContent()}
         />
         <Modal
           message={this.state.modalMessage}
