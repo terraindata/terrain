@@ -94,7 +94,8 @@ class TuningColumn extends TerrainComponent<Props>
   };
 
   public tuningCards: Cards = List([]);
-  public prevTuningCards: Cards = List([]);
+  public prevTuningIds: List<string> = List([]);
+  public tuningIds: List<string> = List([]);
 
   public innerHeight: number = -1;
 
@@ -120,7 +121,8 @@ class TuningColumn extends TerrainComponent<Props>
         tuningOrder: List([]),
       });
     }
-    this.prevTuningCards = this.tuningCards;
+    this.prevTuningIds = this.tuningIds;
+    this.tuningIds = List([]);
     this.tuningCards = List([]);
     this.updateTuningCards(newCards);
     this.checkForRemovedCards();
@@ -166,21 +168,23 @@ class TuningColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleCardRemove(card)
+  public handleCardRemove(id)
   {
-    const index = this.state.tuningOrder.indexOf(card.id);
+    const index = this.state.tuningOrder.indexOf(id);
     this.setState({
       tuningOrder: this.state.tuningOrder.remove(index),
     });
   }
 
+  // Issue: if a card value gets changed, it will no longer be in removed cards so this will glitch
+  // and act like the card was removed even though it was just changed
   public checkForRemovedCards()
   {
-    this.prevTuningCards.forEach((card) =>
+    this.prevTuningIds.forEach((id) =>
     {
-      if (this.tuningCards.indexOf(card) === -1)
+      if (this.tuningIds.indexOf(id) === -1)
       {
-        this.handleCardRemove(card);
+        this.handleCardRemove(id);
       }
     });
   }
@@ -192,7 +196,8 @@ class TuningColumn extends TerrainComponent<Props>
       if (card.tuning)
       {
         this.tuningCards = this.tuningCards.push(card);
-        if (this.prevTuningCards.indexOf(card) === -1)
+        this.tuningIds = this.tuningIds.push(card.id);
+        if (this.prevTuningIds.indexOf(card.id) === -1 && this.state.tuningOrder.indexOf(card.id) === -1)
         {
           // new card added
           this.handleCardAdded(card);
@@ -201,7 +206,8 @@ class TuningColumn extends TerrainComponent<Props>
       if (card.key.tuning) // for transform cards
       {
         this.tuningCards = this.tuningCards.push(card.key);
-        if (this.prevTuningCards.indexOf(card.key) === -1)
+        this.tuningIds = this.tuningIds.push(card.key.id);
+        if (this.prevTuningIds.indexOf(card.key.id) === -1 && this.state.tuningOrder.indexOf(card.key.id) === -1)
         {
           // new card added
           this.handleCardAdded(card.key);

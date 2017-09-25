@@ -440,6 +440,7 @@ class _CardComponent extends TerrainComponent<Props>
       originalElTop: cr.top,
       originalElBottom: cr.bottom,
     });
+    event.preventDefault();
   }
 
   public handleMouseUp(event)
@@ -454,7 +455,7 @@ class _CardComponent extends TerrainComponent<Props>
     {
       let index: number;
       const dY = event.pageY - this.state.originalMouseY;
-      // also check bounds ^^
+      // also check bounds
       if (dY < 0) // dragged up
       {
         for (
