@@ -115,12 +115,6 @@ class TuningColumn extends TerrainComponent<Props>
 
   public setTuningCards(newCards)
   {
-    if (this.tuningCards.size === 0)
-    {
-      this.setState({
-        tuningOrder: List([]),
-      });
-    }
     this.prevTuningIds = this.tuningIds;
     this.tuningIds = List([]);
     this.tuningCards = List([]);
@@ -129,7 +123,8 @@ class TuningColumn extends TerrainComponent<Props>
     this.setState({
       allCards: newCards,
     });
-    setTimeout(this.updateTuningOrder, 250);
+    this.updateTuningOrder(this.state.tuningOrder);
+    // setTimeout(this.updateTuningOrder, 250);
   }
 
   public componentWillMount()
@@ -140,18 +135,18 @@ class TuningColumn extends TerrainComponent<Props>
     });
   }
 
-  public updateTuningOrder()
+  public updateTuningOrder(newOrder)
   {
-    if (!_.isEqual(this.state.tuningOrder, BuilderStore.getState().query.tuningOrder))
+    if (!_.isEqual(newOrder, BuilderStore.getState().query.tuningOrder))
     {
       Actions.change(List(this._keyPath('query', 'tuningOrder')),
-        this.state.tuningOrder);
+        newOrder);
     }
   }
 
   public componentWillUnmount()
   {
-    this.updateTuningOrder();
+    this.updateTuningOrder(this.state.tuningOrder);
   }
 
   public sortTuningCards()

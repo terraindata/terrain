@@ -237,7 +237,7 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (nextProps.card.closed !== this.props.card.closed)
+    if (nextProps.card.closed !== this.props.card.closed && !nextProps.tuningMode)
     {
       if (this.state.closing || this.state.opening)
       {
@@ -645,7 +645,7 @@ class _CardComponent extends TerrainComponent<Props>
         className={classNames({
           'card': true,
           'card-dragging': isDragging,
-          'card-closed': this.props.card.closed,
+          'card-closed': this.props.card.closed && !this.props.tuningMode,
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
           'card-hovering': this.state.hovering,
@@ -690,7 +690,7 @@ class _CardComponent extends TerrainComponent<Props>
             <div
               className={classNames({
                 'card-title': true,
-                'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
+                'card-title-closed': !this.props.tuningMode && ((this.props.card.closed && !this.state.opening) || this.state.closing),
                 'card-title-card-hovering': this.state.hovering,
               })}
               style={{
@@ -743,13 +743,15 @@ class _CardComponent extends TerrainComponent<Props>
               }
 
               {
-                !this.props.card.closed ? null :
+                (this.props.card.closed && !this.props.tuningMode) ?
                   <div className={classNames({
                     'card-preview': true,
                     'card-preview-hidden': this.state.opening,
                   })}>
                     {BlockUtils.getPreview(card)}
                   </div>
+                  :
+                  null
               }
             </div>
             {
@@ -796,7 +798,7 @@ class _CardComponent extends TerrainComponent<Props>
             }
           </div>
           {
-            (!this.props.card.closed || this.state.opening) &&
+            (!this.props.card.closed || this.state.opening || this.props.tuningMode) &&
             <div className='card-body-wrapper' ref='cardBody'>
               <div
                 className='card-body'
