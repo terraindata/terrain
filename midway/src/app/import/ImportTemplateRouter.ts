@@ -119,7 +119,7 @@ Router.post('/updateAccessToken', passport.authenticate('access-token-local'), a
   winston.info('update access token');
   const template: ImportTemplateConfig = ctx.request.body.body;
   Util.verifyParameters(template, ['id']);
-  if (template.id !== undefined)
+  if (template.id === undefined)
   {
     throw new Error('Invalid parameter template ID');
   }
