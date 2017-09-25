@@ -167,6 +167,10 @@ export class ImportTemplates
     return this.select([], filter);
   }
 
+  public async loginWithPersistentAccessToken(id: number, persistentAccessToken: string): Promise<ImportTemplateConfig[]>
+  {
+    return this.select([], { id, persistentAccessToken });
+  }
   public async select(columns: string[], filter: object): Promise<ImportTemplateConfig[]>
   {
     return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
