@@ -263,7 +263,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     return (
       <div>
         <div className='library-info-line'>
-          <div>
+          <div style={{'margin-bottom': '6px'}}>
             Default Database
           </div>
           <Dropdown
@@ -276,14 +276,17 @@ class LibraryInfoColumn extends TerrainComponent<Props>
             className='bic-db-dropdown'
           />
         </div>
-        <div className='library-info-users'>
-          {this.renderUser(this.state.me)}
-          {this.renderGroupRoles()}
-          {this.renderRemainingUsers()}
-        </div>
       </div>
     );
   }
+
+  // Group permissions (hidden until reconnected)
+  // <div className='library-info-users'>
+  //   {this.renderUser(this.state.me)}
+  //   {this.renderGroupRoles()}
+  //   {this.renderRemainingUsers()}
+  // </div>
+
 
   public render()
   {
