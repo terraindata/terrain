@@ -137,7 +137,7 @@ const FileImportActions =
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
-    (templateName: string, exporting: boolean, handleTemplateSaveSuccess) =>
+    (templateName: string, exporting: boolean, handleTemplateSaveSuccess, serverId?: number, dbName?: string) =>
       $(ActionTypes.saveTemplate, {
         templateName,
         exporting,
