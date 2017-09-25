@@ -154,7 +154,7 @@ class ResultComponent extends TerrainComponent<Props> {
       return null;
     }
     const color = this.state.isSpotlit ? this.state.spotlightColor : 'black';
-    const value = getResultValue(this.props.result, field, this.props.resultsConfig, overrideFormat, this.props.locations, color);
+    const value = getResultValue(this.props.result, field, this.props.resultsConfig, false, overrideFormat, this.props.locations, color);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
@@ -358,7 +358,7 @@ class ResultComponent extends TerrainComponent<Props> {
     ));
   }
 }
-export function getResultValue(result: Result, field: string, config: ResultsConfig,
+export function getResultValue(result: Result, field: string, config: ResultsConfig, isTitle: boolean,
   overrideFormat?: any, locations?: { [field: string]: any }, color?: string)
 {
   let value: any;
@@ -366,7 +366,7 @@ export function getResultValue(result: Result, field: string, config: ResultsCon
   {
     value = result.fields.get(field);
   }
-  return ResultFormatValue(field, value, config, overrideFormat, locations, color);
+  return ResultFormatValue(field, value, config, isTitle, overrideFormat, locations, color);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -403,10 +403,10 @@ export function getResultName(result: Result, config: ResultsConfig, locations?:
     nameField = _.first(getResultFields(result, config));
   }
 
-  return getResultValue(result, nameField, config, null, locations, color);
+  return getResultValue(result, nameField, config, true, null, locations, color);
 }
 
-export function ResultFormatValue(field: string, value: any, config: ResultsConfig,
+export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean,
   overrideFormat?: any, locations?: { [field: string]: any }, color?: string): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
@@ -440,7 +440,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     }
   }
 
-  if (format)
+  if (format && !isTitle)
   {
     switch (format.type)
     {
