@@ -43,12 +43,51 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import ActionTypes from 'library/data/LibraryActionTypes';
+import reducer from 'library/data/LibraryReducers';
+import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
 
-import * as KoaRouter from 'koa-router';
+describe('LibraryReducers', () =>
+{
+  let library: LibraryState = _LibraryState({});
+  let group = LibraryTypes._Group();
+  const groupId = 1;
+  const groupName = 'Test Group';
+  group = group
+    .set('id', groupId)
+    .set('name', groupName);
 
-import EventRouter from './events/EventRouter';
+  beforeEach(() =>
+  {
+    library = _LibraryState({});
+  });
 
-export const AnalyticsRouter = new KoaRouter();
-AnalyticsRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
+  it('should return the inital state', () =>
+  {
+    expect(reducer(undefined, {})).toEqual(library);
+  });
 
-export default AnalyticsRouter;
+  describe('#groups.create', () =>
+  {
+    it('should handle groups.create', () =>
+    {
+      library = library.set(
+        'groups',
+        Immutable.Map<number, LibraryTypes.Group>({}),
+      );
+
+      const nextState = reducer(library, {
+        type: ActionTypes.groups.create,
+        payload: { group },
+      });
+
+      expect(
+        nextState.groups,
+      ).toEqual(
+        library.groups.set(groupId, group),
+      );
+    });
+  });
+});

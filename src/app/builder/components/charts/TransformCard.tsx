@@ -209,8 +209,14 @@ class TransformCard extends TerrainComponent<Props>
       const newDomain = List([low, high]);
       this.setState({
         chartDomain: newDomain,
-        ...overrideMaxDomain ? { maxDomain: newDomain } : {},
       });
+      if (overrideMaxDomain)
+      {
+        this.setState({
+          maxDomain: newDomain,
+        });
+        this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), newDomain, true);
+      }
     }
   }
 
@@ -385,8 +391,8 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
 
-    const index: string = getIndex();
-    const type: string = getType();
+    const index: string = getIndex('');
+    const type: string = getType('');
 
     if (recomputeDomain)
     {
@@ -425,8 +431,7 @@ class TransformCard extends TerrainComponent<Props>
           this.handleElasticAggregationError(err);
         },
       );
-    }
-    else
+    } else
     {
       const min = maxDomain.get(0);
       const max = maxDomain.get(1);

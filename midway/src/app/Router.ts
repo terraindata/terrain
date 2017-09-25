@@ -50,6 +50,7 @@ import * as send from 'koa-send';
 
 import AuthRouter from './auth/AuthRouter';
 import DatabaseRouter from './database/DatabaseRouter';
+import EventRouter from './events/EventRouter';
 import ImportRouter from './import/ImportRouter';
 import ImportTemplateRouter from './import/ImportTemplateRouter';
 import ItemRouter from './items/ItemRouter';
@@ -64,6 +65,7 @@ import VersionRouter from './versions/VersionRouter';
 const AppRouter = new KoaRouter();
 
 AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
+AppRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
 AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
 AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
 AppRouter.use('/versions', VersionRouter.routes(), VersionRouter.allowedMethods());
@@ -99,6 +101,11 @@ AppRouter.post('/', passport.authenticate('access-token-local'), async (ctx, nex
 
 const MidwayRouter = new KoaRouter();
 MidwayRouter.use('/midway/v1', AppRouter.routes(), AppRouter.allowedMethods());
+
+MidwayRouter.get('/favicon.ico', async (ctx, next) =>
+{
+  await send(ctx, '/midway/src/assets/favicon.ico');
+});
 
 MidwayRouter.get('/', async (ctx, next) =>
 {

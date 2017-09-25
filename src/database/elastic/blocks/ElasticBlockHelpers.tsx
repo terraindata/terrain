@@ -48,6 +48,8 @@ import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
+import { Block } from '../../../blocks/types/Block';
+
 export const enum AutocompleteMatchType
 {
   Index = 1,
@@ -62,7 +64,7 @@ export const ElasticBlockHelpers = {
 
     const state = BuilderStore.getState();
     const cards = state.query.cards;
-    const isIndexCard = (card) => card['type'] === 'eqlindex';
+    const index = getIndex();
     const server = BuilderStore.getState().db.name;
 
     if (matchType === AutocompleteMatchType.Index)
@@ -74,19 +76,8 @@ export const ElasticBlockHelpers = {
       ).toList();
     }
 
-    let indexCard = cards.find(isIndexCard);
-    if (indexCard === undefined)
+    if (index !== null)
     {
-      indexCard = cards.get(0);
-      if (indexCard !== undefined)
-      {
-        indexCard = indexCard['cards'].find(isIndexCard);
-      }
-    }
-
-    if (indexCard !== undefined)
-    {
-      const index = indexCard['value'];
       const indexId = state.db.name + '/' + String(index);
 
       if (matchType === AutocompleteMatchType.Type)
@@ -102,21 +93,9 @@ export const ElasticBlockHelpers = {
 
       // 2. Need to get current type
 
-      const isTypeCard = (card) => card['type'] === 'eqltype';
-
-      let typeCard = cards.find(isTypeCard);
-      if (typeCard === undefined)
+      const type = getType();
+      if (type !== null)
       {
-        typeCard = cards.get(1);
-        if (typeCard !== undefined)
-        {
-          typeCard = typeCard['cards'].find(isTypeCard);
-        }
-      }
-
-      if (typeCard !== undefined)
-      {
-        const type = typeCard['value'];
         const typeId = state.db.name + '/' + String(index) + '.' + String(type);
 
         // 3. Return columns matching this (server+)index+type
@@ -135,32 +114,45 @@ export const ElasticBlockHelpers = {
   },
 };
 
-// return '' when there is no index card.
-export function getIndex(): string
+export function findCardTypeInRoot(name: string): Block | null
 {
   const state = BuilderStore.getState();
-  const cards = state.query.cards;
-  const isIndexCard = (card) => card['type'] === 'eqlindex';
-  const indexCard = cards.find(isIndexCard);
-  if (indexCard === undefined)
+  const rootCard = state.query.cards.get(0);
+  if (rootCard === undefined)
   {
-    return '';
+    return null;
   }
-  return indexCard['value'];
+  const isTheCard = (card) => card['type'] === name;
+  const theCard = rootCard['cards'].find(isTheCard);
+  if (theCard === undefined)
+  {
+    return null;
+  }
+  return theCard;
 }
 
-// return '' when there is no type card.
-export function getType(): string
+export function getIndex(notSetIndex: string = null): string | null
 {
-  const state = BuilderStore.getState();
-  const cards = state.query.cards;
-  const isTypeCard = (card) => card['type'] === 'eqltype';
-  const typeCard = cards.find(isTypeCard);
-  if (typeCard === undefined)
+  const c = findCardTypeInRoot('eqlindex');
+  if (c === null)
   {
-    return '';
+    return notSetIndex;
+  } else
+  {
+    return c['value'];
   }
-  return typeCard['value'];
+}
+
+export function getType(notSetType: string = null): string | null
+{
+  const c = findCardTypeInRoot('eqltype');
+  if (c === null)
+  {
+    return notSetType;
+  } else
+  {
+    return c['value'];
+  }
 }
 
 export default ElasticBlockHelpers;

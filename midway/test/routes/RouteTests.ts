@@ -68,58 +68,58 @@ beforeAll(async (done) =>
     fs.unlinkSync(testDBName);
   }
 
-  const db = new sqlite3.Database(testDBName);
-  const options =
-    {
-      debug: true,
-      db: 'sqlite',
-      dsn: testDBName,
-      port: 43001,
-      databases: [
-        {
-          name: 'My ElasticSearch Instance',
-          type: 'elastic',
-          dsn: 'http://127.0.0.1:9200',
-          host: 'http://127.0.0.1:9200',
-        },
-      ],
-    };
-
-  const app = new App(options);
-  server = await app.start();
-
   try
   {
+    const db = new sqlite3.Database(testDBName);
+    const options =
+      {
+        debug: true,
+        db: 'sqlite',
+        dsn: testDBName,
+        port: 43001,
+        databases: [
+          {
+            name: 'My ElasticSearch Instance',
+            type: 'elastic',
+            dsn: 'http://127.0.0.1:9200',
+            host: 'http://127.0.0.1:9200',
+          },
+        ],
+      };
+
+    const app = new App(options);
+    server = await app.start();
+
     const config: ElasticConfig = {
       hosts: ['http://localhost:9200'],
     };
 
     const elasticController: ElasticController = new ElasticController(config, 0, 'FileImportRouteTests');
     elasticDB = elasticController.getTasty().getDB() as ElasticDB;
+
+    const sql = await readFile('./midway/test/scripts/test.sql');
+    const results = await new Promise((resolve, reject) =>
+    {
+      return db.exec(sql.toString(), (error: Error) =>
+      {
+        if (error !== null && error !== undefined)
+        {
+          reject(error);
+        }
+        resolve();
+      });
+    });
   }
   catch (e)
   {
     fail(e);
   }
 
-  const sql = await readFile('./midway/test/scripts/test.sql');
-  const results = await new Promise((resolve, reject) =>
-  {
-    return db.exec(sql.toString(), (error: Error) =>
-    {
-      if (error !== null && error !== undefined)
-      {
-        reject(error);
-      }
-      resolve();
-    });
-  });
-
   request(server)
     .post('/midway/v1/users/')
     .send({
       id: 1,
-      accessToken: 'AccessToken',
+      accessToken: 'ImAnAdmin',
       body: {
         email: 'test@terraindata.com',
         name: 'Test Person',
@@ -235,7 +235,7 @@ describe('Version route tests', () =>
       .get('/midway/v1/versions')
       .query({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
       })
       .expect(200)
       .then((response) =>
@@ -268,7 +268,7 @@ describe('Item route tests', () =>
       .get('/midway/v1/items/')
       .query({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
       })
       .expect(200)
       .then((response) =>
@@ -314,7 +314,7 @@ describe('Item route tests', () =>
       .post('/midway/v1/items/')
       .send({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
         body: {
           name: 'Test Item',
           status: 'LIVE',
@@ -345,7 +345,7 @@ describe('Item route tests', () =>
       .get('/midway/v1/items/1')
       .query({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
       })
       .expect(200)
       .then((response) =>
@@ -375,7 +375,7 @@ describe('Item route tests', () =>
       .post('/midway/v1/items/2')
       .send({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
         body: insertOjbect,
       })
       .expect(200)
@@ -398,7 +398,7 @@ describe('Item route tests', () =>
       .post('/midway/v1/items/314159265359')
       .send({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
         body: {
           id: 314159265359,
           name: 'Test Item',
@@ -471,7 +471,7 @@ describe('Schema route tests', () =>
       .get('/midway/v1/schema/')
       .query({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
       })
       .expect(200)
       .then((response) =>
@@ -493,7 +493,7 @@ describe('Query route tests', () =>
       .post('/midway/v1/query/')
       .send({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
         body: {
           database: 1,
           type: 'search',
@@ -533,7 +533,7 @@ describe('Query route tests', () =>
       .post('/midway/v1/query/')
       .send({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
         body: {
           database: 1,
           type: 'search',
@@ -576,7 +576,7 @@ describe('Query route tests', () =>
       .post('/midway/v1/query/')
       .send({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
         body: {
           database: 1,
           type: 'wrongtype',
@@ -630,7 +630,7 @@ describe('Query route tests', () =>
         .post('/midway/v1/query/')
         .send({
           id: 1,
-          accessToken: 'AccessToken',
+          accessToken: 'ImAnAdmin',
           body: {
             database: 1,
             type: 'putTemplate',
@@ -653,7 +653,7 @@ describe('Query route tests', () =>
         .post('/midway/v1/query/')
         .send({
           id: 1,
-          accessToken: 'AccessToken',
+          accessToken: 'ImAnAdmin',
           body: {
             database: 1,
             type: 'getTemplate',
@@ -682,7 +682,7 @@ describe('Query route tests', () =>
         .post('/midway/v1/query/')
         .send({
           id: 1,
-          accessToken: 'AccessToken',
+          accessToken: 'ImAnAdmin',
           body: {
             database: 1,
             type: 'deleteTemplate',
@@ -699,7 +699,7 @@ describe('Query route tests', () =>
         .post('/midway/v1/query/')
         .send({
           id: 1,
-          accessToken: 'AccessToken',
+          accessToken: 'ImAnAdmin',
           body: {
             database: 1,
             type: 'getTemplate',
@@ -732,7 +732,7 @@ describe('File import route tests', () =>
   {
     await request(server)
       .post('/midway/v1/import/')
-      .field('accessToken', 'AccessToken')
+      .field('accessToken', 'ImAnAdmin')
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
         col1: { type: 'text' },
@@ -796,7 +796,7 @@ describe('File import route tests', () =>
   {
     await request(server)
       .post('/midway/v1/import/')
-      .field('accessToken', 'AccessToken')
+      .field('accessToken', 'ImAnAdmin')
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
         column1: { type: 'text' },
@@ -862,7 +862,7 @@ describe('File import route tests', () =>
   {
     await request(server)
       .post('/midway/v1/import/')
-      .field('accessToken', 'AccessToken')
+      .field('accessToken', 'ImAnAdmin')
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
         col1: { type: 'text' },
@@ -905,7 +905,7 @@ describe('File import templates route tests', () =>
       .post('/midway/v1/templates/create')
       .send({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
         body: {
           name: 'my_template',
 
@@ -962,7 +962,7 @@ describe('File import templates route tests', () =>
       .get('/midway/v1/templates/')
       .query({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
       })
       .expect(200)
       .then((response) =>
@@ -1001,7 +1001,7 @@ describe('File import templates route tests', () =>
       .post('/midway/v1/templates/')
       .send({
         id: 1,
-        accessToken: 'AccessToken',
+        accessToken: 'ImAnAdmin',
         body: {
           dbid: 1,
           dbname: 'badname',

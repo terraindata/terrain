@@ -920,6 +920,7 @@ const EQLSpec: ESClause[] =
         path: ['filter'],
         desc: 'Matches documents that contain an exact match for the given term.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html',
+        multifield: false,
       }),
     new ESVariantClause('term_value',
       {
@@ -990,6 +991,7 @@ const EQLSpec: ESClause[] =
         path: ['filter'],
         desc: 'Matches documents that have a value within the specified range.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html',
+        multifield: false,
       }),
     new ESStructureClause('range_value',
       {
@@ -1020,6 +1022,7 @@ const EQLSpec: ESClause[] =
         path: ['filter'],
         desc: 'Matches documents that contain terms with the given prefix.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html',
+        multifield: false,
       }),
     new ESVariantClause('prefix_query_value',
       {
@@ -1049,6 +1052,7 @@ const EQLSpec: ESClause[] =
         path: ['filter'],
         desc: 'Matches documents using a wildcard expression.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html',
+        multifield: false,
       }),
     new ESVariantClause('wildcard_query_value',
       {
@@ -1078,6 +1082,7 @@ const EQLSpec: ESClause[] =
         path: ['filter'],
         desc: 'Matches documents using a regular expression.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html',
+        multifield: false,
       }),
     new ESVariantClause('regexp_query_value',
       {
@@ -1107,6 +1112,7 @@ const EQLSpec: ESClause[] =
       {
         desc: 'Can help to make inexact matches in the case of misspellings or multiple spellings of words. The maximum Levenshtein edit distance to expand words (terms) to. The higher this is, the slower and broader queries will be. When applied to a numeric value, the fuzziness is the additional +/- margin that a match can have from the queried value.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html',
+        multifield: false,
       }),
     new ESVariantClause('fuzzy_query_value',
       {
@@ -1166,6 +1172,7 @@ const EQLSpec: ESClause[] =
         path: ['match'],
         desc: 'Does an analyzed (full-text) match on the given term.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html',
+        multifield: false,
       }),
     new ESVariantClause('match_value',
       {
@@ -1237,7 +1244,7 @@ const EQLSpec: ESClause[] =
         path: ['match'],
         desc: 'Sets if transpositions are allowed when computing fuzzy matches.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#query-dsl-match-query-fuzziness',
-        template: 'true',
+        template: true,
       }),
     new ESEnumClause('slop',
       [0, 1, 2],
@@ -1536,6 +1543,7 @@ const EQLSpec: ESClause[] =
         name: 'match phrase query',
         desc: 'Makes a phrase query using analyzed text. Matches documents containing the words (tokens) in the phrase text.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase.html',
+        multifield: false,
       }),
     new ESVariantClause('match_phrase_value',
       {
@@ -1553,6 +1561,7 @@ const EQLSpec: ESClause[] =
         path: ['match'],
         desc: 'Makes a query using analyzed text which matches on all terms and any term starting with the prefix of the last term in the phrase text.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query-phrase-prefix.html',
+        multifield: false,
       }),
     new ESVariantClause('match_phrase_prefix_value',
       {
