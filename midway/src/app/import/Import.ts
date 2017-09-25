@@ -549,7 +549,7 @@ export class Import
         }
 
         try
-        {       
+        {
           await this._streamingUpsert(imprtConf, database, insertTable);
         }
         catch (e)
@@ -951,13 +951,13 @@ export class Import
           }
         }
         break;
-       case 'geo_point':
-         if (item[field] === '')
-         {
-           item[field] = null;
-         }
-         else
-         {
+      case 'geo_point':
+        if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
           try
           {
             if (typeof item[field] === 'string')
@@ -966,7 +966,7 @@ export class Import
             }
           } catch (e)
           {
-              return false;
+            return false;
           }
           if (Array.isArray(item[field]))
           {
@@ -975,8 +975,8 @@ export class Import
               return false;
             }
           }
-         }
-         break;
+        }
+        break;
       default:  // "text" case, leave as string
     }
     return true;
@@ -1393,10 +1393,11 @@ export class Import
             counter++;
             if (counter === this.chunkCount)
             {
-              try {
-              await this._deleteStreamingTempFolder();
-              winston.info('File Import: deleted streaming temp folder.');
-              resolve();
+              try
+              {
+                await this._deleteStreamingTempFolder();
+                winston.info('File Import: deleted streaming temp folder.');
+                resolve();
               }
               catch (e)
               {
