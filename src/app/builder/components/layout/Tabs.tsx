@@ -150,7 +150,7 @@ const Tab = createReactClass<any, any>({
       >
         <div
           className='tab-inner'
-          style={backgroundColor(this.props.selected ? Colors().bg2 : Colors().bg1)}
+          style={backgroundColor(this.props.selected ? '#fff' : Colors().bg1)}
         >
           {
             this.props.name

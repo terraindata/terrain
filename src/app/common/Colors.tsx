@@ -549,9 +549,9 @@ const LIGHT: Theme =
   {
     // Use these colors
 
-    bg1: 'rgb(249, 251, 255)',
+    bg1: 'rgb(225, 227, 231)',
     bg2: 'rgb(237, 239, 243)',
-    bg3: 'rgb(225, 227, 231)',
+    bg3: 'rgb(244, 246, 250)',
 
     emptyBg: '#fff',
 
@@ -575,7 +575,7 @@ const LIGHT: Theme =
     highlight: 'rgba(210,215,219,0.75)', // for slight emphasis
     darkerHighlight: 'rgba(0,0,0,0.15)', // to make a depth effect with highlight
 
-    boxShadow: 'rgba(0, 0, 0, 0.15)',
+    boxShadow: 'rgba(0, 0, 0, 0.05)',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
@@ -670,7 +670,7 @@ const LIGHT: Theme =
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
 
-        cardBgOpacity: 0.45,
+        cardBgOpacity: 0.15,
 
         cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
 
