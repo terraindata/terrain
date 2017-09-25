@@ -313,8 +313,8 @@ const MapUtil = {
     // array type for geopoint
     else if (geopoint[0] !== undefined && geopoint[1] !== undefined)
     {
-      lat = geopoint[0];
-      lon = geopoint[1];
+      lat = geopoint[1];
+      lon = geopoint[0];
     }
     return [lat, lon];
   },
