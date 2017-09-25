@@ -164,8 +164,8 @@ class MapComponent extends TerrainComponent<Props>
     address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
     searchByCoordinate: false,
     error: null,
-    latitude: this.props.location !== undefined && this.props.location[0] !== undefined ? this.props.location[0].toString() : '',
-    longitude: this.props.location !== undefined && this.props.location[1] !== undefined ? this.props.location[1].toString() : '',
+    latitude: this.props.location !== undefined && this.props.location[0] !== undefined ? String(this.props.location[0]) : '',
+    longitude: this.props.location !== undefined && this.props.location[1] !== undefined ? String(this.props.location[1]) : '',
     errorLatitude: false,
     errorLongitude: false,
     inputName: this.props.address !== undefined && this.props.address !== '' && this.props.address[0] === '@' ? this.props.address : '@',
@@ -207,18 +207,18 @@ class MapComponent extends TerrainComponent<Props>
     if (this.props.location !== nextProps.location)
     {
       this.setState({
-        latitude: nextProps.location[0].toString(),
-        longitude: nextProps.location[1].toString(),
+        latitude: String(nextProps.location[0]),
+        longitude: String(nextProps.location[1]),
       });
       // If the location changes with no address (i.e. in cards) fill in the address via reverse-geo
       if (nextProps.keepAddressInSync && (nextProps.address === undefined || nextProps.address === '') && !this.state.usingInput)
       {
         const lat = nextProps.location[0];
         const lng = nextProps.location[1];
-        if (this.reverseGeoCache[[lat, lng].toString()] !== undefined)
+        if (this.reverseGeoCache[String([lat, lng])] !== undefined)
         {
           this.setState({
-            address: this.reverseGeoCache[[lat, lng].toString()],
+            address: this.reverseGeoCache[String([lat, lng])],
           });
         }
         else if (this.props.geocoder === 'photon')
@@ -266,7 +266,7 @@ class MapComponent extends TerrainComponent<Props>
   public handleLocationChange(location, address, inputName?)
   {
     this.geoCache[address] = location;
-    this.reverseGeoCache[location.toString()] = address;
+    this.reverseGeoCache[String(location)] = address;
     if (this.props.onChange !== undefined)
     {
       this.props.onChange({ location, address });
@@ -320,9 +320,9 @@ class MapComponent extends TerrainComponent<Props>
     const lat = parseFloat(this.state.latitude);
     const lng = parseFloat(this.state.longitude);
 
-    if (this.reverseGeoCache[[lat, lng].toString()] !== undefined)
+    if (this.reverseGeoCache[String([lat, lng])] !== undefined)
     {
-      this.handleLocationChange([lat, lng], this.reverseGeoCache[[lat, lng].toString()]);
+      this.handleLocationChange([lat, lng], this.reverseGeoCache[String([lat, lng])]);
       return;
     }
 
@@ -567,6 +567,11 @@ class MapComponent extends TerrainComponent<Props>
     }
     const address = this.props.address !== undefined && this.props.address !== '' ? this.props.address : this.state.address;
     const mapProps = bounds !== undefined ? { bounds } : { center };
+    if (this.props.location === undefined || this.props.location[0] === undefined ||
+      this.props.location[1] === undefined || isNaN(this.props.location[0]) || isNaN(this.props.location[1]))
+    {
+      return null;
+    }
     return (
       <div className='input-map-wrapper'>
         <Map
