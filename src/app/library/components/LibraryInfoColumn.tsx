@@ -263,7 +263,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     return (
       <div>
         <div className='library-info-line'>
-          <div style={{ 'margin-bottom': '6px' }}>
+          <div>
             Default Database
           </div>
           <Dropdown
