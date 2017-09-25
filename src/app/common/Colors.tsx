@@ -796,7 +796,7 @@ export function Colors()
 {
   if (localStorage.getItem('theme') === null)
   {
-    localStorage.setItem('theme', 'Dark');
+    localStorage.setItem('theme', 'DARK');
   }
   return Themes[localStorage.getItem('theme')];
 }
