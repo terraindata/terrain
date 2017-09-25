@@ -142,6 +142,11 @@ const links =
       text: 'Import',
       route: '/import',
     },
+    {
+      icon: <ImportIcon />,
+      text: 'Control',
+      route: '/control',
+    },
     // {
     //   icon: <ReportingIcon />,
     //   text: 'Analytics',
