@@ -928,6 +928,23 @@ export const Ajax =
       );
     },
 
+    getAllTemplates(
+      onLoad: (templates: object[]) => void,
+    )
+    {
+      const payload: object = {};
+
+      Ajax.req(
+        'post',
+        'templates/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+      );
+    },
+
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1

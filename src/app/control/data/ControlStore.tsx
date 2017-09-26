@@ -44,49 +44,40 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires strict-boolean-expressions variable-name
+
 import * as Immutable from 'immutable';
-import * as React from 'react';
+import * as _ from 'lodash';
+import * as Redux from 'redux';
+import * as ReduxActions from 'redux-actions';
+import thunk from 'redux-thunk';
 
-import { Template } from 'fileImport/FileImportTypes';
-import ControlActions from '../data/ControlActions';
-import ControlStore from '../data/ControlStore';
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import Util from 'util/Util';
+import ControlReducers from './ControlReducers';
 
-import Ajax from 'util/Ajax';
-import TerrainComponent from './../../common/components/TerrainComponent';
+type Template = FileImportTypes.Template;
 
 const { List } = Immutable;
 
-export interface Props
+class ControlStateC
 {
-  todo?: string // ignore this for now
+  public templates: List<Template> = List([]);
 }
 
-class AccessTokenControl extends TerrainComponent<Props>
+const ControlState_Record = Immutable.Record(new ControlStateC());
+export interface ControlState extends ControlStateC, IRecord<ControlState> { }
+export const _ControlState = (config?: any) =>
 {
-  public state: {
-    templates: List<Template>;
-  } = {
-    templates: undefined,
-  };
+  return new ControlState_Record(Util.extendId(config || {})) as any as ControlState;
+};
 
-  public componentDidMount()
-  {
-    ControlActions.importExport.fetchTemplates();
-  }
+const DefaultState = _ControlState();
 
-  public printThing()
-  {
-    console.log(ControlStore.getState().get('templates'));
-  }
+export const ControlStore = Redux.createStore(
+  ControlReducers,
+  DefaultState,
+  Redux.applyMiddleware(thunk),
+);
 
-  public render()
-  {
-    return (
-      <div onClick={this.printThing}>
-        Yo whatup
-      </div>
-    );
-  }
-}
-
-export default AccessTokenControl;
+export default ControlStore;

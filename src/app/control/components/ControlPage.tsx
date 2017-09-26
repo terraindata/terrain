@@ -44,8 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires strict-boolean-expressions max-line-length
+
 import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
+
+import TerrainComponent from 'common/components/TerrainComponent';
+import AccessTokenControl from './AccessTokenControl';
+import './ControlPage.less';
+
+// const HTML5Backend = require('react-dnd-html5-backend');
+// import { DragDropContext } from 'react-dnd';
+// const { browserHistory } = require('react-router');
 
 export interface Props
 {
@@ -57,8 +66,15 @@ class ControlPage extends TerrainComponent<Props>
 {
   public render()
   {
-    return <div> Hi </div>;
+    return (
+      <div className='control-body'>
+        <AccessTokenControl/>
+      </div>
+    );
   }
 }
+
+// ReactRouter does not like the output of DragDropContext, hence the `any` cast
+// const ExportControlPage = DragDropContext(HTML5Backend)(ControlPage) as any;
 
 export default ControlPage;

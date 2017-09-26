@@ -43,50 +43,17 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
-import * as React from 'react';
-
-import { Template } from 'fileImport/FileImportTypes';
-import ControlActions from '../data/ControlActions';
-import ControlStore from '../data/ControlStore';
-
-import Ajax from 'util/Ajax';
-import TerrainComponent from './../../common/components/TerrainComponent';
-
-const { List } = Immutable;
-
-export interface Props
-{
-  todo?: string // ignore this for now
-}
-
-class AccessTokenControl extends TerrainComponent<Props>
-{
-  public state: {
-    templates: List<Template>;
-  } = {
-    templates: undefined,
+const ControlActionTypes =
+  {
+    importExport:
+    {
+      setTemplates: '',
+      fetchTemplates: '',
+    },
   };
 
-  public componentDidMount()
-  {
-    ControlActions.importExport.fetchTemplates();
-  }
+Util.setValuesToKeys(ControlActionTypes, '');
 
-  public printThing()
-  {
-    console.log(ControlStore.getState().get('templates'));
-  }
-
-  public render()
-  {
-    return (
-      <div onClick={this.printThing}>
-        Yo whatup
-      </div>
-    );
-  }
-}
-
-export default AccessTokenControl;
+export default ControlActionTypes;

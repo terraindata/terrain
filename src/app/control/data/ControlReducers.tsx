@@ -45,48 +45,55 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
-import * as React from 'react';
-
-import { Template } from 'fileImport/FileImportTypes';
-import ControlActions from '../data/ControlActions';
-import ControlStore from '../data/ControlStore';
 
 import Ajax from 'util/Ajax';
-import TerrainComponent from './../../common/components/TerrainComponent';
+import ActionTypes from './ControlActionTypes';
 
-const { List } = Immutable;
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import { _ControlState, ControlState } from './ControlStore';
+type Template = FileImportTypes.Template;
 
-export interface Props
-{
-  todo?: string // ignore this for now
-}
+const { List, Map } = Immutable;
 
-class AccessTokenControl extends TerrainComponent<Props>
-{
-  public state: {
-    templates: List<Template>;
-  } = {
-    templates: undefined,
+const ControlReducer = {};
+
+ControlReducer[ActionTypes.importExport.fetchTemplates] =
+  (state, action) =>
+  {
+    Ajax.getAllTemplates(
+      (templatesArr) =>
+      {
+        const templates: List<Template> = List<Template>(templatesArr.map((template) =>
+          FileImportTypes._Template({
+            templateId: template['id'],
+            templateName: template['name'],
+            originalNames: List<string>(template['originalNames']),
+            columnTypes: template['columnTypes'],
+            transformations: template['transformations'],
+            primaryKeys: template['primaryKeys'],
+            primaryKeyDelimiter: template['primaryKeyDelimiter'],
+            export: template['export'],
+          }),
+        ));
+        action.payload.setTemplates(templates);
+      },
+    );
+    return state;
   };
 
-  public componentDidMount()
-  {
-    ControlActions.importExport.fetchTemplates();
-  }
+ControlReducer[ActionTypes.importExport.setTemplates] =
+  (state, action) => {
+    return state.set('templates', action.payload.templates)
+  };
 
-  public printThing()
+const ControlReducerWrapper = (state: ControlState = _ControlState(), action) =>
+{
+  let nextState = state;
+  if (ControlReducer[action.type])
   {
-    console.log(ControlStore.getState().get('templates'));
+    nextState = ControlReducer[action.type](state, action);
   }
+  return nextState;
+};
 
-  public render()
-  {
-    return (
-      <div onClick={this.printThing}>
-        Yo whatup
-      </div>
-    );
-  }
-}
-
-export default AccessTokenControl;
+export default ControlReducerWrapper;

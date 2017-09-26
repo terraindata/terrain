@@ -70,7 +70,7 @@ module.exports =
             charts: path.resolve(__dirname, 'src/app/charts'),
             common: path.resolve(__dirname, 'src/app/common'),
             deploy: path.resolve(__dirname, 'src/app/deploy'),
-            fileimport: path.resolve(__dirname, 'src/app/fileimport'),
+            fileImport: path.resolve(__dirname, 'src/app/fileImport'),
             images: path.resolve(__dirname, 'src/images'),
             library: path.resolve(__dirname, 'src/app/library'),
             manual: path.resolve(__dirname, 'src/app/manual'),

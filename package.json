@@ -54,7 +54,7 @@
       "^charts(.*)$": "<rootDir>/src/app/charts$1",
       "^common(.*)$": "<rootDir>/src/app/common$1",
       "^deploy(.*)$": "<rootDir>/src/app/deploy$1",
-      "^fileimport(.*)$": "<rootDir>/src/app/fileimport$1",
+      "^fileImport(.*)$": "<rootDir>/src/app/fileImport$1",
       "^images(.*)$": "<rootDir>/src/images/$1",
       "^library(.*)$": "<rootDir>/src/app/library$1",
       "^manual(.*)$": "<rootDir>/src/app/manual$1",

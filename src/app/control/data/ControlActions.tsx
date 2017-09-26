@@ -44,49 +44,29 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-import * as React from 'react';
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import ActionTypes from './ControlActionTypes';
+import { ControlStore } from './ControlStore';
 
-import { Template } from 'fileImport/FileImportTypes';
-import ControlActions from '../data/ControlActions';
-import ControlStore from '../data/ControlStore';
+type Template = FileImportTypes.Template;
 
-import Ajax from 'util/Ajax';
-import TerrainComponent from './../../common/components/TerrainComponent';
+const $ = (type: string, payload: any) => ControlStore.dispatch({ type, payload });
 
-const { List } = Immutable;
+const ControlActions =
+  {
+    importExport:
+    {
+      setTemplates:
+        (templates: List<Template>) =>
+          $(ActionTypes.importExport.setTemplates, { templates }),
 
-export interface Props
-{
-  todo?: string // ignore this for now
-}
+      fetchTemplates:
+        () =>
+          $(ActionTypes.importExport.fetchTemplates, {
+            setTemplates: ControlActions.importExport.setTemplates,
+          }),
+    }
 
-class AccessTokenControl extends TerrainComponent<Props>
-{
-  public state: {
-    templates: List<Template>;
-  } = {
-    templates: undefined,
   };
 
-  public componentDidMount()
-  {
-    ControlActions.importExport.fetchTemplates();
-  }
-
-  public printThing()
-  {
-    console.log(ControlStore.getState().get('templates'));
-  }
-
-  public render()
-  {
-    return (
-      <div onClick={this.printThing}>
-        Yo whatup
-      </div>
-    );
-  }
-}
-
-export default AccessTokenControl;
+export default ControlActions;

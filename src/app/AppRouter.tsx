@@ -133,7 +133,7 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/schema' component={SchemaPage} />
 
-          <Route path='/control' components={ControlPage} />
+          <Route path='/control' component={ControlPage} />
 
           <Route path='/import' component={FileImport} />
           <Route path='/analytics' onEnter={this.libraryOnEnter}>
