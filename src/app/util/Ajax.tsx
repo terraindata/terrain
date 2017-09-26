@@ -1071,38 +1071,34 @@ export const Ajax =
       );
     },
 
-    getAnalytics(variantId: ID, start: Date, end: Date, metricId: number)
+    getAnalytics(variantId: ID, start: Date, end: Date,
+      metricId: number, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
     {
-      const authState = AuthStore.getState();
-      // jmansor: will need to change Ajax.req to allow calls without prepending
-      // /midway/v1/ to the URL.
-      const headers = new Headers({
-        'Content-Type': 'application/json',
-      });
-      const init: RequestInit = {
-        method: 'GET',
-        headers,
-        cache: 'default',
+      const args = {
+        start: start.toISOString(),
+        end: end.toISOString(),
+        interval: 'day',
+        eventid: metricId.toString(),
+        agg: 'date_histogram',
+        field: '@timestamp',
       };
-      const request = new Request(
-        `http://localhost:3000/events/variants/${variantId}?
-id=1&
-accessToken=${authState.accessToken}&
-start=${start.toISOString()}&
-end=${end.toISOString()}&
-metric=${metricId.toString()}&
-interval=day&
-eventid=1&
-agg=date_histogram&
-field=@timestamp`,
-        init,
-      );
 
-      return fetch(request)
-        .then((response) =>
+      return Ajax.req(
+        'get',
+        `events/variants/${variantId}`,
+        {},
+        (response: any) =>
         {
-          return response.json();
-        });
+          try
+          {
+            onLoad(response);
+          }
+          catch (e)
+          {
+            onError && onError(response as any);
+          }
+        },
+        { urlArgs: args });
     },
   };
 

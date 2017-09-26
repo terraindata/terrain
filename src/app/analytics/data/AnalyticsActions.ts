@@ -57,19 +57,37 @@ import Ajax from './../../util/Ajax';
 
 const Actions =
   {
-    fetch: () => (dispatch) =>
+    fetch: (
+      variantId: number,
+      metricId,
+      callback?: (variantId: ID, analyticsVariants: any) => void,
+    ) => (dispatch) =>
+      {
+        const start = new Date(2015, 5, 2);
+        const end = new Date(2015, 5, 20);
+        const mappedVariantId = variantId > 3 ? variantId % 4 + 1 : variantId;
+        return Ajax.getAnalytics(
+          mappedVariantId,
+          start,
+          end,
+          metricId,
+          (variantAnalytics) =>
+          {
+            dispatch({
+              type: ActionTypes.fetch,
+              payload: { variantId, analytics: variantAnalytics },
+            });
+            callback && callback(variantId, variantAnalytics);
+          },
+        );
+      },
+
+    selectMetric: (metricId) =>
     {
-      const start = new Date(2015, 5, 2);
-      const end = new Date(2015, 5, 4);
-      Ajax.getAnalytics(1, start, end, 2)
-        .then((variantAnalytics) =>
-        {
-          return dispatch({
-            type: ActionTypes.fetch,
-            payload: { variantId: 1, analytics: variantAnalytics },
-          });
-        })
-        .catch((error) => null);
+      return {
+        type: ActionTypes.selectMetric,
+        payload: { metricId },
+      };
     },
   };
 

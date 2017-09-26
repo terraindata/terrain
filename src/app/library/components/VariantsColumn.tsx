@@ -52,6 +52,7 @@ const moment = require('moment');
 
 import * as Immutable from 'immutable';
 
+import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
@@ -86,6 +87,7 @@ export interface Props
   multiselect?: boolean;
   params?: any;
   variantActions?: any;
+  analytics: any;
   analyticsActions?: any;
 }
 
@@ -109,15 +111,16 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    const { multiselect, params } = this.props;
+    const { multiselect, params, analytics } = this.props;
 
     if (multiselect && params && params.variantId)
     {
       const variantIds = params.variantId.split(',');
       variantIds.forEach((id) =>
       {
+        const numericId = parseInt(id, 10);
         this.props.variantActions.select(id);
-        this.props.analyticsActions.fetch(id);
+        this.props.analyticsActions.fetch(numericId, analytics.selectedMetric);
       });
     }
 
@@ -291,6 +294,7 @@ class VariantsColumn extends TerrainComponent<Props>
       basePath,
       groupId,
       algorithmId,
+      analytics,
     } = this.props;
 
     if (multiselect)
@@ -301,7 +305,7 @@ class VariantsColumn extends TerrainComponent<Props>
       } else
       {
         this.props.variantActions.select(id.toString());
-        this.props.analyticsActions.fetch(id);
+        this.props.analyticsActions.fetch(id, analytics.selectedMetric);
       }
     } else
     {
