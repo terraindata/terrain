@@ -45,96 +45,198 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as nodeScheduler from 'node-schedule';
+import * as Client from 'ssh2-sftp-client';
+import * as stream from 'stream';
 import * as winston from 'winston';
+
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import { ExportConfig, Import } from '../import/Import';
+
+export const imprt: Import = new Import();
+
+const sftp = new Client();
+
+const sftpconfig: object =
+  {
+    host: '10.1.1.103',
+    port: 22,
+    username: 'testuser',
+    password: 'Terrain123!',
+  };
 
 export interface SchedulerConfig
 {
   id?: number;
-  jobId: number;
+  jobId?: number;
+  jobType?: string;
+  params?: object;
+  paramsArr?: any[];
   schedule: string;
-  job?: any;
+  sort?: string;
+  transport?: object;
 }
 
 export class Scheduler
 {
   private jobMap: object;
   private scheduleMap: object;
+  private schedulerTable: Tasty.Table;
 
   constructor()
   {
     this.jobMap = {};
     this.scheduleMap = {};
-    this.createJobs();
+    Promise.resolve(this.createJobs());
+
+    this.schedulerTable = new Tasty.Table(
+      'schedules',
+      ['id'],
+      [
+        'jobId',
+        'jobType',
+        'params',
+        'schedule',
+        'sort',
+        'transport',
+      ],
+    );
   }
 
-  public createJobs(): void
+  public async cancelJob(jobID: number): Promise<boolean>
   {
-    this.createJob(async () =>
+    return new Promise<boolean>(async (resolve, reject) =>
     {
-      winston.info('test function');
+      const schedules: any[] = await App.DB.select(this.schedulerTable, [], { jobId: jobID }) as any[];
+      if (schedules.length === 0)
+      {
+        return resolve(false);
+      }
+      for (const schedule of schedules)
+      {
+        if (schedules.hasOwnProperty(schedule))
+        {
+          this.scheduleMap[schedule['id']].cancel();
+        }
+      }
+      return resolve(true);
     });
   }
 
-  public createJob(job: () => void): number
+  public async createJobs(): Promise<void>
   {
-    let lastKey: number = Number(Object.keys(this.jobMap).sort().reverse()[0]);
-    if (lastKey === undefined || isNaN(lastKey))
+    // 0: import via sftp
+    // 1: export via sftp
+    return new Promise<void>(async (resolve, reject) =>
     {
-      lastKey = -1;
-    }
-    lastKey += 1;
-    this.jobMap[lastKey] = job;
-    return lastKey;
+      await this.createJob(async (fields: object, path: string, encoding?: string | null) => // import with sftp
+      {
+        return new Promise<any>(async (resolveJob, rejectJob) =>
+        {
+          encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
+          const wth = await sftp.connect(sftpconfig);
+          winston.info(path.substring(0, path.lastIndexOf('/') + 1));
+          const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
+          const CheckIfFileExists: object[] = checkIfDirectoryExists.filter((filename) =>
+          {
+            return filename['name'] === path.substring(path.lastIndexOf('/') + 1);
+          });
+          if (checkIfDirectoryExists.length > 0 && CheckIfFileExists.length !== 0) // TODO: add permissions checking
+          {
+            winston.info('Starting import with sftp');
+            const readStream: stream.Readable = await sftp.get(path, false, encoding);
+            const result = await imprt.upsert(readStream, fields, true);
+            resolveJob('Success');
+          }
+        });
+      });
+
+      await this.createJob(async (fields: object, path: string, encoding?: string | null) => // export with sftp
+      {
+        return new Promise<any>(async (resolveJob, rejectJob) =>
+        {
+          encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
+          const wth = await sftp.connect(sftpconfig);
+          const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
+          if (checkIfDirectoryExists.length > 0) // TODO: add permissions checking
+          {
+            winston.info('Starting export with sftp');
+            const readStream: stream.Readable = await sftp.put(await imprt.export(fields as ExportConfig, true), path, false, encoding);
+            resolveJob('Success');
+          }
+        });
+      });
+    });
   }
 
-  public async createSchedule(req: SchedulerConfig): Promise<string>
+  public async createJob(job: (...argss) => any): Promise<number>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<number>(async (resolve, reject) =>
     {
-      if (Object.keys(this.jobMap).indexOf(req.jobId.toString()) === -1)
+      let lastKey: number = Number(Object.keys(this.jobMap).sort().reverse()[0]);
+      if (lastKey === undefined || isNaN(lastKey))
       {
-        return reject('Job ID does not exist in jobs');
+        lastKey = -1;
       }
+      lastKey += 1;
+      this.jobMap[lastKey] = job;
+      resolve(lastKey);
+    });
+  }
+
+  public async createCustomSchedule(req: SchedulerConfig): Promise<SchedulerConfig>
+  {
+    return new Promise<SchedulerConfig>(async (resolve, reject) =>
+    {
+      let jobId: number = -1;
+      let argsV: any[] = [];
+
+      if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'sftp')
+      {
+        jobId = 0;
+        argsV = [req['params'], (req['transport'] as any)['filename'], 'utf8'];
+      }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'sftp')
+      {
+        jobId = 1;
+        argsV = [req['params'], (req['transport'] as any)['filename'], 'utf8'];
+      }
+
       let lastKey: number = Number(Object.keys(this.scheduleMap).sort().reverse()[0]);
       if (lastKey === undefined || isNaN(lastKey))
       {
         lastKey = -1;
       }
       lastKey += 1;
-      const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[req.jobId]);
-      this.scheduleMap[lastKey] = { id: lastKey, job, jobId: req.jobId, schedule: req.schedule };
-      resolve(JSON.stringify(this.scheduleMap[lastKey]));
+
+      const job: any = nodeScheduler.scheduleJob(req.schedule,
+        function callJob(unwrappedParams) { this.jobMap[jobId](...unwrappedParams); }.bind(this, argsV));
+      const result: SchedulerConfig = await this.upsert(req);
+      const resultJobId: string = result['id'] !== undefined ? (result['id'] as number).toString() : '-1';
+      this.scheduleMap[resultJobId] = job;
+      return resolve(result);
     });
   }
 
-  public async deleteSchedule(id: number): Promise<string> // TODO
+  public async createStandardSchedule(req: SchedulerConfig): Promise<SchedulerConfig | null>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    return new Promise<SchedulerConfig | null>(async (resolve, reject) =>
     {
-      if (id === undefined || Object.keys(this.scheduleMap).indexOf(id.toString()) === -1)
+      if (req['jobId'] !== undefined && Object.keys(this.jobMap).indexOf((req['jobId'] as number).toString()) !== -1)
       {
-        return reject('ID does not exist in schedules');
+        return resolve(await this.upsert(req));
       }
-      this.scheduleMap[id]['job'].cancel();
-      delete this.scheduleMap[id];
-      resolve('Success');
+      resolve(null);
     });
   }
 
-  public async getSchedule(id: number): Promise<string>
+  public async get(id?: number): Promise<SchedulerConfig[]>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    if (id !== undefined)
     {
-      if (id !== undefined && Object.keys(this.scheduleMap).indexOf(id.toString()) !== -1)
-      {
-        return resolve(JSON.stringify(this.scheduleMap[id]));
-      }
-      if (id !== undefined && Object.keys(this.scheduleMap).indexOf(id.toString()) === -1)
-      {
-        return resolve('ID does not exist in schedules');
-      }
-      resolve(JSON.stringify(this.scheduleMap));
-    });
+      return App.DB.select(this.schedulerTable, [], { id }) as any;
+    }
+    return App.DB.select(this.schedulerTable, [], {}) as any;
   }
 
   public async updateSchedule(req: SchedulerConfig): Promise<string> // TODO
@@ -143,21 +245,46 @@ export class Scheduler
     {
       if (req.id === undefined || Object.keys(this.scheduleMap).indexOf(req.id.toString()) === -1)
       {
-        return reject('ID does not exist in schedules');
+        return reject('ID does not exist in schedules.');
       }
       if (req.id === undefined)
       {
-        return reject('ID must be a parameter');
+        return reject('ID must be a parameter.');
       }
-      if (Object.keys(this.jobMap).indexOf(req.jobId.toString()) === -1)
+      if (req['jobId'] === undefined)
       {
-        return reject('Job ID does not exist in jobs');
+        return reject('Job ID cannot be undefined.');
       }
-      this.scheduleMap[req.id]['job'].cancel();
+
+      if (req['jobId'] !== undefined && Object.keys(this.jobMap).indexOf((req['jobId'] as number).toString()) === -1)
+      {
+        return reject('Job ID does not exist in jobs.');
+      }
+      this.scheduleMap[req.id].cancel();
       delete this.scheduleMap[req.id];
-      const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[req.jobId]);
+      const args: any[] | undefined = req['paramsArr'] !== undefined ? req['paramsArr'] : [];
+      const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[(req['jobId'] as number)](args));
       this.scheduleMap[req.id] = { id: req.id, job, jobId: req.jobId, schedule: req.schedule };
       resolve(JSON.stringify(this.scheduleMap[req.id]));
+    });
+  }
+
+  public async upsert(schedule: SchedulerConfig): Promise<SchedulerConfig>
+  {
+    // TODO: cancel job if it's currently running
+    return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig>;
+  }
+
+  public async delete(id: number): Promise<SchedulerConfig[]>
+  {
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
+    {
+      // TODO: cancel job if it's currently running
+      if (id !== undefined && (await this.get(id)).length !== 0)
+      {
+        return resolve(await App.DB.delete(this.schedulerTable, { id } as object) as SchedulerConfig[]);
+      }
+      return reject('Schedule ID not found.');
     });
   }
 }

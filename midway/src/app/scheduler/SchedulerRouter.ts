@@ -47,8 +47,11 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
+import { UserConfig, Users } from '../users/Users';
 import * as Util from '../Util';
 import { Scheduler, SchedulerConfig } from './Scheduler';
+
+const users = new Users();
 
 export const scheduler: Scheduler = new Scheduler();
 
@@ -57,21 +60,38 @@ const Router = new KoaRouter();
 // Get job by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.getSchedule(ctx.params.id);
+  ctx.body = await scheduler.get(ctx.params.id);
 });
 
 // Post new scheduled job
-Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/create', async (ctx, next) =>
 {
-  const schedule: SchedulerConfig = ctx.request.body.body;
-  Util.verifyParameters(schedule, ['jobId', 'schedule']);
-  ctx.body = await scheduler.createSchedule(schedule);
+  const user: UserConfig | null = await Util.authenticateNormal(ctx.request.body);
+  let authStream: object = {};
+  if (user !== null)
+  {
+    const schedule: SchedulerConfig = ctx.request.body.body;
+    Util.verifyParameters(schedule, ['jobId', 'schedule']);
+    ctx.body = await scheduler.createStandardSchedule(schedule);
+  }
+  else
+  {
+    authStream = await Util.authenticatePersistentAccessToken(ctx.request.body);
+    if (authStream['template'] === null)
+    {
+      ctx.status = 400;
+      return;
+    }
+    const schedule: SchedulerConfig = ctx.request.body.body;
+    Util.verifyParameters(schedule, ['jobId', 'jobType', 'params', 'schedule', 'sort', 'transport']);
+    ctx.body = await scheduler.createCustomSchedule(schedule);
+  }
 });
 
 // Delete scheduled jobs by parameter
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.deleteSchedule(ctx.params.id);
+  ctx.body = await scheduler.delete(ctx.params.id);
 });
 
 // Update job
@@ -80,7 +100,7 @@ Router.post('/update/:id', passport.authenticate('access-token-local'), async (c
   const schedule: SchedulerConfig = ctx.request.body.body;
   schedule.id = ctx.params.id;
   Util.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
-  ctx.body = await scheduler.updateSchedule(schedule);
+  ctx.body = await scheduler.upsert(schedule);
 });
 
 export default Router;

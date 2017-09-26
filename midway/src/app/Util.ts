@@ -53,7 +53,17 @@ import * as sha1 from 'sha1';
 
 import { templates } from './import/ImportTemplateRouter';
 import { ImportTemplateConfig } from './import/ImportTemplates';
-import { users } from './users/UserRouter';
+import { UserConfig, Users } from './users/Users';
+
+const users = new Users();
+
+export async function authenticateNormal(req: object): Promise<UserConfig | null>
+{
+  return new Promise<UserConfig | null>(async (resolve, reject) =>
+  {
+    resolve(await users.loginWithAccessToken(Number(req['id']), req['accessToken']));
+  });
+}
 
 export async function authenticateStream(req: http.IncomingMessage): Promise<object>
 {
