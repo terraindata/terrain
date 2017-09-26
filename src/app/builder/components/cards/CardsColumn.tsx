@@ -61,7 +61,7 @@ import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import ColorsActions from './../../../colors/data/ColorsActions';
 
 import { Cards } from '../../../../blocks/types/Card';

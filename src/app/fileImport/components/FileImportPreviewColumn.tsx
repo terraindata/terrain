@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, link } from '../../common/Colors';
+import { backgroundColor, Colors, link } from '../../colors/Colors';
 import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';

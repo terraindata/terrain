@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 
-import { Colors, getCardColors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';

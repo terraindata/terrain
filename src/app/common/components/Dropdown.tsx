@@ -54,7 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
-import { altStyle, backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { altStyle, backgroundColor, Colors, fontColor } from '../../colors/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
 

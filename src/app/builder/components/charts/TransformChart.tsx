@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import './TransformChart.less';
 
-import { Colors } from '../../../common/Colors';
+import { Colors } from '../../../colors/Colors';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');

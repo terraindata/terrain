@@ -52,7 +52,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
 import ColorsActions from '../../colors/data/ColorsActions';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';

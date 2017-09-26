@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as Radium from 'radium';
 import * as React from 'react';
 import ColorsActions from '../../colors/data/ColorsActions';
-import { borderColor, Colors } from '../../common/Colors';
+import { borderColor, Colors } from '../../colors/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import './CreateLine.less';
 

@@ -55,7 +55,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { altStyle, backgroundColor, Colors, couldHover } from '../../common/Colors';
+import { altStyle, backgroundColor, Colors, couldHover } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 const InfoIcon = require('./../../../images/icon_info.svg');

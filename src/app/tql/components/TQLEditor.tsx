@@ -53,7 +53,7 @@ const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
 import ColorsActions from '../../colors/data/ColorsActions';
-import { Colors } from '../../common/Colors';
+import { Colors } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 // syntax highlighters

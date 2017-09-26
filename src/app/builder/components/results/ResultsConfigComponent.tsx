@@ -54,7 +54,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { _Format, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';

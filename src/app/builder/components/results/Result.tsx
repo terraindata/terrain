@@ -54,7 +54,7 @@ import * as React from 'react';
 import './Result.less';
 const { List } = Immutable;
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction } from '../../data/SpotlightStore';

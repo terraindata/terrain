@@ -64,7 +64,7 @@ import Query from '../../../items/types/Query';
 import ColorsActions from '../../colors/data/ColorsActions';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
 import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';

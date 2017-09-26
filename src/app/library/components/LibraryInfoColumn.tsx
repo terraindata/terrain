@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 const { List } = Immutable;
 import BackendInstance from '../../../database/types/BackendInstance';
-import { backgroundColor, Colors } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../colors/Colors';
 import Dropdown from './../../common/components/Dropdown';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';

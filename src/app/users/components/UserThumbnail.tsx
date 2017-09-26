@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as React from 'react';
 import { Link } from 'react-router';
-import { Colors, fontColor } from '../../common/Colors';
+import { Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserStore from './../data/UserStore';
 import * as UserTypes from './../UserTypes';

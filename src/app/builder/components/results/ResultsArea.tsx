@@ -71,7 +71,7 @@ import ResultsTable from '../results/ResultsTable';
 
 import Radium = require('radium');
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';

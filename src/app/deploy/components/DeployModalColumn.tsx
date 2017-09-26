@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { ItemStatus } from '../../../items/types/Item';
-import { buttonColors, Colors, disabledButtonColors, fontColor } from '../../common/Colors';
+import { buttonColors, Colors, disabledButtonColors, fontColor } from '../../colors/Colors';
 import LibraryStore from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import UserThumbnail from '../../users/components/UserThumbnail';

@@ -73,7 +73,7 @@ import CardHelpTooltip from './CardHelpTooltip';
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { cardStyle, Colors } from '../../../common/Colors';
+import { cardStyle, Colors } from '../../../colors/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';

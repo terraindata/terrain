@@ -74,7 +74,7 @@ type Variant = LibraryTypes.Variant;
 
 // Components
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { backgroundColor, Colors } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../colors/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import FileImportPreviewColumn from '../../fileImport/components/FileImportPreviewColumn';
