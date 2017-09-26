@@ -182,7 +182,7 @@ class App extends TerrainComponent<Props>
 
     noLocalStorage: false,
 
-    stylesTag: Immutable.Map(),
+    stylesTag: Immutable.Map<string, React.CSSProperties>(),
   };
 
   constructor(props: Props)
@@ -403,7 +403,7 @@ class App extends TerrainComponent<Props>
 
         <DeployModal />
         <StyleTag
-          style={this.state.stylesTag.toJS()}
+          style={this.state.stylesTag}
         />
 
         <InAppNotification />
