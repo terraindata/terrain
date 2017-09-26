@@ -46,25 +46,87 @@ THE SOFTWARE.
 
 // tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
 
+import * as _ from 'lodash';
 import * as Immutable from 'immutable';
-
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
 import Util from 'util/Util';
-import SchemaStore from 'schema/data/SchemaStore';
-import SchemaActionTypes from './SchemaActionTypes';
-import * as SchemaTypes from '../SchemaTypes';
+import SchemaActionTypes from 'schema/data/SchemaActionTypes';
+import * as SchemaTypes from 'schema/SchemaTypes';
+import * as SchemaParser from 'schema/data/SchemaParser';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
+import Ajax from 'util/Ajax';
+import AjaxM1 from 'util/AjaxM1';
 
-import Ajax from './../../util/Ajax';
-
-const $ = (type: string, payload: any) => SchemaStore.dispatch({ type, payload });
+const $ = (type: string, payload: any) => {
+  return { type, payload };
+}
 
 const SchemaActions =
   {
     fetch:
-    () =>
-      $(SchemaActionTypes.fetch, {}),
+    () => (dispatch) => {
+      dispatch($(SchemaActionTypes.fetch, {}));
+      Ajax.getDbs(
+        (dbs: object) =>
+        {
+          const m1Dbs: BackendInstance[] = [];
+          const m2Dbs: BackendInstance[] = [];
+          _.map((dbs as any),
+            (db: BackendInstance) =>
+            {
+              if (db.source === 'm1')
+              {
+                m1Dbs.push(db);
+              }
+              else
+              {
+                m2Dbs.push(db);
+              }
+            },
+          );
+          // Group all m1Dbs under a server e.g. "Other Databases"
+          // The m2Dbs are servers, so need to do parsing differently
+          dispatch(SchemaActions.serverCount(Object.keys(m2Dbs).length));
+          _.map((dbs as any),
+            (db: BackendInstance) =>
+              (db.source === 'm1' ? AjaxM1.schema_m1 : Ajax.schema)(
+                db['id'],
+                (schemaData, error) =>
+                {
+                  if (!error)
+                  {
+                    if (db.source === 'm2')
+                    {
+                      if (db['type'] === 'mysql')
+                      {
+                        // Don't support MySQL for now
+                        // SchemaParser.parseMySQLDb(db, schemaData, SchemaActions.setServer);
+                      }
+                      else if (db['type'] === 'elastic')
+                      {
+                        SchemaParser.parseElasticDb(db, schemaData, SchemaActions.setServer, dispatch);
+                      }
+                    }
+                    else
+                    {
+                      // Don't support old midway for now
+                      // SchemaParser.parseMySQLDbs_m1(db, schemaData, SchemaActions.addDbToServer);
+                    }
+                  }
+                },
+                (error) =>
+                {
+                  // TODO consider handling individual DB errors
+                }),
+          );
+        },
+        (dbError) =>
+        {
+          dispatch(SchemaActions.error(JSON.stringify(dbError)));
+        },
+      );
+    }
 
     serverCount:
     (serverCount: number) =>

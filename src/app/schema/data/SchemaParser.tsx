@@ -310,14 +310,14 @@ export function parseMySQLDb(rawServer: object,
       fieldProperties: fieldPropertiesMap,
       tableNames,
       columnNames: columnNamesByTable,
-    });
-
+    }));
   });
 }
 
 export function parseElasticDb(elasticServer: object,
   schemaData: object,
-  setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void)
+  setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void,
+  dispatch)
 {
   let server = SchemaTypes._Server({
     name: elasticServer['name'],
@@ -429,8 +429,7 @@ export function parseElasticDb(elasticServer: object,
       });
 
     databases = databases.set(databaseId, database);
-
-    setServerAction({
+    dispatch(setServerAction({
       server,
       databases,
       tables,

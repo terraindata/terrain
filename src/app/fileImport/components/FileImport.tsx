@@ -61,7 +61,6 @@ import { CSVTypeParser, parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseO
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import SchemaStore from './../../schema/data/SchemaStore';
 import { databaseId, tableId } from './../../schema/SchemaTypes';
 import * as SchemaTypes from './../../schema/SchemaTypes';
 import has = Reflect.has;
@@ -81,6 +80,7 @@ const PREVIEW_CHUNK_SIZE = FileImportTypes.PREVIEW_CHUNK_SIZE;
 
 export interface Props
 {
+  schema: SchemaTypes.SchemaState;
   params?: any;
   location?: any;
   router?: any;
@@ -120,17 +120,17 @@ class FileImport extends TerrainComponent<any>
     this._subscribe(FileImportStore, {
       stateKey: 'fileImportState',
     });
+  }
 
-    this._subscribe(SchemaStore, {
-      updater: (schemaState: SchemaTypes.SchemaState) =>
-      {
-        this.setState({
-          servers: schemaState.servers,
-          dbs: schemaState.databases,
-          tables: schemaState.tables,
-          serverNames: schemaState.servers.keySeq().toList(),
-        });
-      },
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    const { schema } = nextProps;
+
+    this.setState({
+      servers: schema.servers,
+      dbs: schema.databases,
+      tables: schema.tables,
+      serverNames: schema.servers.keySeq().toList(),
     });
   }
 
@@ -874,6 +874,7 @@ class FileImport extends TerrainComponent<any>
 }
 
 // ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const ExportFileImport = DragDropContext(HTML5Backend)(FileImport) as any;
+const FileImportContainer = Util.createContainer(FileImport, ['schema'], {});
+const ExportFileImport = DragDropContext(HTML5Backend)(FileImportContainer) as any;
 
 export default ExportFileImport;

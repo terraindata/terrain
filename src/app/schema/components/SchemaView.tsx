@@ -51,7 +51,6 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import FadeInOut from '../../common/components/FadeInOut';
 import Util from '../../util/Util';
-import { SchemaStore } from '../data/SchemaStore';
 import SchemaActions from 'schema/data/SchemaActions';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -66,6 +65,8 @@ export interface Props
   showSearch: boolean;
   showResults: boolean;
   search?: string;
+  schema: SchemaTypes.SchemaState;
+  schemaActions: any;
 }
 
 const horizontalDivide = 50;
@@ -78,29 +79,10 @@ class SchemaView extends TerrainComponent<Props>
   public state: {
     highlightedIndex: number;
     search: string;
-
-    // from Store
-    servers?: SchemaTypes.ServerMap;
-    highlightedId?: ID;
   } = {
     highlightedIndex: -1,
     search: '',
   };
-
-  constructor(props: Props)
-  {
-    super(props);
-
-    this._subscribe(SchemaStore, {
-      stateKey: 'servers',
-      storeKeyPath: ['servers'],
-    });
-
-    this._subscribe(SchemaStore, {
-      stateKey: 'highlightedId',
-      storeKeyPath: ['highlightedId'],
-    });
-  }
 
   public handleSearchChange(event)
   {
@@ -109,11 +91,12 @@ class SchemaView extends TerrainComponent<Props>
       search,
       highlightedIndex: -1,
     });
-    SchemaActions.highlightId(null, false);
+    this.props.schemaActions.highlightId(null, false);
   }
 
   public handleSearchKeyDown(event)
   {
+    const { schema } = this.props;
     const { highlightedIndex } = this.state;
     let offset: number = 0;
 
@@ -135,7 +118,7 @@ class SchemaView extends TerrainComponent<Props>
           highlightedIndex: index,
         });
 
-        SchemaActions.highlightId(id, inSearchResults);
+        this.props.schemaActions.highlightId(id, inSearchResults);
 
         break;
 
@@ -143,9 +126,9 @@ class SchemaView extends TerrainComponent<Props>
       case 9:
         // enter or tab
 
-        if (this.state.highlightedId)
+        if (schema.highlightedId)
         {
-          SchemaActions.selectId(this.state.highlightedId);
+          this.props.schemaActions.selectId(schema.highlightedId);
         }
 
         // var value = visibleOptions.get(this.state.selectedIndex);
@@ -174,7 +157,7 @@ class SchemaView extends TerrainComponent<Props>
   public render()
   {
     const search = this.props.search || this.state.search;
-    const { showSearch, showResults } = this.props;
+    const { schema, showSearch, showResults } = this.props;
 
     return (
       <div
@@ -228,7 +211,7 @@ class SchemaView extends TerrainComponent<Props>
 
             <SchemaTreeList
               itemType='server'
-              itemIds={this.state.servers && this.state.servers.keySeq().toList()}
+              itemIds={schema.servers && schema.servers.keySeq().toList()}
               label={'Servers'}
               topLevel={true}
               search={search}
@@ -248,7 +231,7 @@ class SchemaView extends TerrainComponent<Props>
             ]}
           >
             <SchemaResults
-              servers={this.state.servers}
+              servers={schema.servers}
             />
           </div>
         }
@@ -290,4 +273,8 @@ const RESULTS_STYLE_COLUMN = {
   height: (100 - verticalDivide) + '%',
 };
 
-export default SchemaView;
+export default Util.createContainer(
+  SchemaView,
+  ['schema'],
+  { schemaActions: SchemaActions },
+);

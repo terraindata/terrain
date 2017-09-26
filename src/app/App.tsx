@@ -93,10 +93,9 @@ import ColorsActions from './colors/data/ColorsActions';
 import ColorsStore from './colors/data/ColorsStore';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
+import SchemaActions from 'schema/data/SchemaActions';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
-import { SchemaStore } from './schema/data/SchemaStore';
-import SchemaActions from 'schema/data/SchemaActions';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
@@ -169,6 +168,7 @@ interface Props
     pathname: string,
   };
   children: any;
+  schemaActions: any;
 }
 
 const APP_STYLE = _.extend({},
@@ -253,11 +253,6 @@ class App extends TerrainComponent<Props>
     //   storeKeyPath: ['loaded'],
     // });
 
-    this._subscribe(SchemaStore, {
-      stateKey: 'schemaLoaded',
-      storeKeyPath: ['loaded'],
-    });
-
     this._subscribe(ColorsStore, {
       stateKey: 'stylesTag',
       storeKeyPath: ['styles'],
@@ -298,7 +293,7 @@ class App extends TerrainComponent<Props>
     UserActions.fetch();
     TerrainStore.dispatch(LibraryActions.fetch());
     LibraryStore.dispatch(LibraryActions.fetch());
-    SchemaActions.fetch();
+    this.props.schemaActions.fetch();
     // RolesActions.fetch();
   }
 
@@ -429,4 +424,8 @@ class App extends TerrainComponent<Props>
   }
 }
 
-export default App;
+export default Util.createContainer(
+  App,
+  [],
+  { schemaActions: SchemaActions }
+);

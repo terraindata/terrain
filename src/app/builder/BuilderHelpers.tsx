@@ -50,13 +50,13 @@ import { Card } from '../../blocks/types/Card';
 import { Input, InputPrefix } from '../../blocks/types/Input';
 
 import * as Immutable from 'immutable';
-import SchemaStore from '../schema/data/SchemaStore';
 import { BuilderState, BuilderStore } from './data/BuilderStore';
+import { SchemaState } from 'schema/SchemaTypes';
 
-export function getTermsForKeyPath(keyPath: KeyPath): List<string>
+export function getTermsForKeyPath(keyPath: KeyPath, schemaState: SchemaState): List<string>
 {
   const state = BuilderStore.getState();
-  const terms = getTermsForKeyPathHelper(keyPath, state);
+  const terms = getTermsForKeyPathHelper(keyPath, state, schemaState);
 
   // TODO migrate inputs reduction to the Query class if we get a query class
   const inputs = state.query && state.query.inputs;
@@ -75,14 +75,14 @@ export function getTermsForKeyPath(keyPath: KeyPath): List<string>
   return terms;
 }
 
-function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<string>
+function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState, schemaState: SchemaState): List<string>
 {
   if (!keyPath.size)
   {
     return Immutable.List([]);
   }
 
-  let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state);
+  let terms = getTermsForKeyPathHelper(keyPath.butLast() as KeyPath, state, schemaState);
 
   const block = BuilderStore.getState().getIn(keyPath);
 
@@ -92,12 +92,12 @@ function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<s
 
     if (card.static.getChildTerms)
     {
-      terms = terms.concat(card.static.getChildTerms(card, SchemaStore.getState())).toList();
+      terms = terms.concat(card.static.getChildTerms(card, schemaState)).toList();
     }
 
     if (card.static.getNeighborTerms)
     {
-      terms = terms.concat(card.static.getNeighborTerms(card, SchemaStore.getState())).toList();
+      terms = terms.concat(card.static.getNeighborTerms(card, schemaState)).toList();
     }
 
     if (card['cards'])
@@ -107,7 +107,7 @@ function getTermsForKeyPathHelper(keyPath: KeyPath, state: BuilderState): List<s
         {
           if (childCard.static.getParentTerms)
           {
-            terms = terms.concat(childCard.static.getParentTerms(childCard, SchemaStore.getState())).toList();
+            terms = terms.concat(childCard.static.getParentTerms(childCard, schemaState)).toList();
           }
         },
       );

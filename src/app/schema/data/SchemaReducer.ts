@@ -49,10 +49,9 @@ import * as _ from 'lodash';
 import * as SchemaTypes from '../SchemaTypes';
 import Ajax from 'util/Ajax';
 import AjaxM1 from 'util/AjaxM1';
-import SchemaActions from 'schema/data/SchemaActions';
 import SchemaActionTypes from './SchemaActionTypes';
 import BackendInstance from '../../../database/types/BackendInstance';
-import * as SchemaParser from './SchemaParser';
+import { _SchemaState } from 'schema/SchemaTypes';
 
 type SchemaState = SchemaTypes.SchemaState;
 
@@ -61,69 +60,9 @@ const SchemaReducer = {};
 SchemaReducer[SchemaActionTypes.fetch] =
 (state: SchemaState) =>
 {
-  Ajax.getDbs(
-    (dbs: object) =>
-    {
-      const m1Dbs: BackendInstance[] = [];
-      const m2Dbs: BackendInstance[] = [];
-      _.map((dbs as any),
-        (db: BackendInstance) =>
-        {
-          if (db.source === 'm1')
-          {
-            m1Dbs.push(db);
-          }
-          else
-          {
-            m2Dbs.push(db);
-          }
-        },
-      );
-      // Group all m1Dbs under a server e.g. "Other Databases"
-      // The m2Dbs are servers, so need to do parsing differently
-      SchemaActions.serverCount(Object.keys(m2Dbs).length);
-      _.map((dbs as any),
-        (db: BackendInstance) =>
-          (db.source === 'm1' ? AjaxM1.schema_m1 : Ajax.schema)(
-            db['id'],
-            (schemaData, error) =>
-            {
-              if (!error)
-              {
-                if (db.source === 'm2')
-                {
-                  if (db['type'] === 'mysql')
-                  {
-                    // Don't support MySQL for now
-                    // SchemaParser.parseMySQLDb(db, schemaData, SchemaActions.setServer);
-                  }
-                  else if (db['type'] === 'elastic')
-                  {
-                    SchemaParser.parseElasticDb(db, schemaData, SchemaActions.setServer);
-                  }
-                }
-                else
-                {
-                  // Don't support old midway for now
-                  // SchemaParser.parseMySQLDbs_m1(db, schemaData, SchemaActions.addDbToServer);
-                }
-              }
-            },
-            (error) =>
-            {
-              // TODO consider handling individual DB errors
-            }),
-      );
-    },
-    (dbError) =>
-    {
-      SchemaActions.error(JSON.stringify(dbError));
-    },
-  );
-
   return state
     .set('loading', true);
-},
+};
 
 SchemaReducer[SchemaActionTypes.serverCount] =
 (
@@ -132,7 +71,7 @@ SchemaReducer[SchemaActionTypes.serverCount] =
     serverCount: number,
   }>,
 ) =>
-  state.set('serverCount', action.payload.serverCount),
+  state.set('serverCount', action.payload.serverCount);
 
 SchemaReducer[SchemaActionTypes.setServer] =
 (
@@ -141,6 +80,7 @@ SchemaReducer[SchemaActionTypes.setServer] =
 ) =>
 {
   const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
+
   if (state.servers.size === state.serverCount - 1)
   {
     state = state.set('loading', false).set('loaded', true);
@@ -155,7 +95,7 @@ SchemaReducer[SchemaActionTypes.setServer] =
     .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
   // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
   // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
-},
+};
 
 SchemaReducer[SchemaActionTypes.addDbToServer] =
 (
@@ -169,7 +109,8 @@ SchemaReducer[SchemaActionTypes.addDbToServer] =
   if (state.servers.get(server.id))
   {
     newServer = state.servers.get(server.id).set('databaseIds',
-      state.servers.get(server.id).databaseIds.concat(server.databaseIds));
+      state.servers.get(server.id).databaseIds.concat(server.databaseIds)
+    );
   }
 
   return state
@@ -181,11 +122,11 @@ SchemaReducer[SchemaActionTypes.addDbToServer] =
     .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
   // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
   // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
-},
+};
 
 SchemaReducer[SchemaActionTypes.selectId] =
 (state: SchemaState, action: Action<{ id: ID }>) =>
-  state.set('selectedId', action.payload.id),
+  state.set('selectedId', action.payload.id);
 
 SchemaReducer[SchemaActionTypes.highlightId] =
 (state: SchemaState, action: Action<{
@@ -193,9 +134,9 @@ SchemaReducer[SchemaActionTypes.highlightId] =
   inSearchResults: boolean,
 }>) =>
   state.set('highlightedId', action.payload.id)
-    .set('highlightedInSearchResults', action.payload.inSearchResults)
+    .set('highlightedInSearchResults', action.payload.inSearchResults);
 
-const SchemaReducerWrapper = (state: any = Immutable.Map({}), action) =>
+const SchemaReducerWrapper = (state: any = _SchemaState(), action) =>
 {
   let nextState = state;
   if (SchemaReducer[action.type])

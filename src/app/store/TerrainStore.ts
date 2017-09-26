@@ -48,6 +48,7 @@ import * as Immutable from 'immutable';
 
 import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
 import LibraryReducer from 'library/data/LibraryReducers';
+import SchemaReducer from 'schema/data/SchemaReducer';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
@@ -58,10 +59,11 @@ import ColorsReducer from '../colors/data/ColorsReducers';
 
 const reducers = {
   analytics: AnalyticsReducer,
+  colors: ColorsReducer,
   library: LibraryReducer,
   roles: RolesReducer,
+  schema: SchemaReducer,
   users: UserReducer,
-  colors: ColorsReducer,
 };
 
 const rootReducer = combineReducers(reducers);
