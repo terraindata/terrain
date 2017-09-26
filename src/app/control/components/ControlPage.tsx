@@ -69,7 +69,7 @@ class ControlPage extends TerrainComponent<Props>
   {
     return (
       <div className='control-body'>
-        <AccessTokenControl/>
+        <AccessTokenControl />
       </div>
     );
   }

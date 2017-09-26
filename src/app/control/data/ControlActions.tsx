@@ -57,14 +57,14 @@ const ControlActions =
     importExport:
     {
       setTemplates:
-        (templates: List<Template>) =>
-          $(ActionTypes.importExport.setTemplates, { templates }),
+      (templates: List<Template>) =>
+        $(ActionTypes.importExport.setTemplates, { templates }),
 
       fetchTemplates:
-        () =>
-          $(ActionTypes.importExport.fetchTemplates, {
-            setTemplates: ControlActions.importExport.setTemplates,
-          }),
+      () =>
+        $(ActionTypes.importExport.fetchTemplates, {
+          setTemplates: ControlActions.importExport.setTemplates,
+        }),
     }
 
   };

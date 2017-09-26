@@ -76,7 +76,7 @@ const TemplateConfig: HeaderConfig = [
   ['ID', (template) => template.templateId],
   ['Name', (template) => template.templateName],
   ['Type', (template) => template.export === 0 ? 'Import' : 'Export'],
-  ['Db ID', (template) => template.dbid],
+  ['Server ID', (template) => template.dbid],
   ['Database', (template) => template.dbname],
   ['Table', (template) => template.tablename],
   ['Access Token', (template) =>
@@ -87,14 +87,15 @@ const TemplateConfig: HeaderConfig = [
   ['Headless Code', (template) =>
     tooltip(
       <div className='curl-code-wrapper'>
-        <CodeIcon className='curl-code-icon'/>
+        <CodeIcon className='curl-code-icon' />
       </div>,
       {
         title: 'Copy to Clipboard',
         position: 'top-start',
+        distance: 0,
       }
     )
-  ]
+  ],
 ];
 
 class AccessTokenControl extends TerrainComponent<Props>
@@ -125,7 +126,8 @@ class AccessTokenControl extends TerrainComponent<Props>
     return (
       <div className='template-info' key={index}>
         {
-          TemplateConfig.map((headerItem: HeaderConfigItem, i: number) => {
+          TemplateConfig.map((headerItem: HeaderConfigItem, i: number) =>
+          {
             return (
               <div className='template-info-data' key={i}>
                 {headerItem[1](template)}
@@ -143,19 +145,20 @@ class AccessTokenControl extends TerrainComponent<Props>
       <div className='import-export-token-control-table'>
         <div
           className={classNames({
-          'template-info-header': true,
+            'template-info-header': true,
           })}
           key='header'
         >
-        {
-          TemplateConfig.map((headerItem: HeaderConfigItem, i: number) => {
-            return (
-              <div className='template-info-data' key={i}>
-                {headerItem[0]}
-              </div>
-            );
-          })
-        }
+          {
+            TemplateConfig.map((headerItem: HeaderConfigItem, i: number) =>
+            {
+              return (
+                <div className='template-info-data' key={i}>
+                  {headerItem[0]}
+                </div>
+              );
+            })
+          }
         </div>
         {this.state.templates.map(this.renderTemplate)}
       </div>
@@ -166,7 +169,7 @@ class AccessTokenControl extends TerrainComponent<Props>
   {
     return (
       <div className='import-export-token-control-page'>
-        <div className='import-export-control-title'> 
+        <div className='import-export-control-title'>
           Templates
         </div>
         {this.renderTable()}

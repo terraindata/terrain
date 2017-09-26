@@ -63,7 +63,8 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
     Ajax.getAllTemplates(
       (templatesArr) =>
       {
-        const templates: List<Template> = List<Template>(templatesArr.map((template) => {
+        const templates: List<Template> = List<Template>(templatesArr.map((template) =>
+        {
           return FileImportTypes._Template({
             templateId: template['id'],
             templateName: template['name'],
@@ -77,7 +78,8 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
             dbname: template['dbname'],
             tablename: template['tablename'],
             export: template['export'],
-          })},
+          })
+        },
         ));
         action.payload.setTemplates(templates);
       },
@@ -86,7 +88,8 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
   };
 
 ControlReducer[ActionTypes.importExport.setTemplates] =
-  (state, action) => {
+  (state, action) =>
+  {
     return state.set('templates', action.payload.templates)
   };
 
