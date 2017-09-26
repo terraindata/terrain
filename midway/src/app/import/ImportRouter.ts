@@ -56,7 +56,7 @@ import * as Util from '../Util';
 import { ExportConfig, Import } from './Import';
 
 const Router = new KoaRouter();
-const imprt: Import = new Import();
+export const imprt: Import = new Import();
 const perm: Permissions = new Permissions();
 
 Router.post('/', async (ctx, next) =>
@@ -92,12 +92,18 @@ Router.post('/export', passport.authenticate('access-token-local'), async (ctx, 
   ctx.body = exportReturn;
 });
 
-Router.post('/export/headless', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/export/headless', async (ctx, next) =>
 {
   const exprtConf: ExportConfig = ctx.request.body.body;
+  const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.body);
+  if (authStream['template'] === null)
+  {
+    ctx.status = 400;
+    return;
+  }
   Util.verifyParameters(exprtConf, ['templateId', 'variantId']);
 
-  await perm.ImportPermissions.verifyExportRoute(ctx.state.user, ctx.request.body.body);
+  // await perm.ImportPermissions.verifyExportRoute(ctx.state.user, ctx.request.body.body);
 
   const exportReturn: stream.Readable | string = await imprt.export(exprtConf, true);
   ctx.body = exportReturn;
@@ -106,8 +112,8 @@ Router.post('/export/headless', passport.authenticate('access-token-local'), asy
 Router.post('/headless', async (ctx, next) =>
 {
   winston.info('importing to database, from file and template id');
-  const authStream: object = await Util.authenticateStream(ctx.req);
-  if (authStream['user'] === null)
+  const authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
+  if (authStream['template'] === null)
   {
     ctx.status = 400;
     return;
@@ -116,7 +122,7 @@ Router.post('/headless', async (ctx, next) =>
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
   // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
 
-  await perm.ImportPermissions.verifyHeadlessRoute(authStream['user'] as UserConfig, authStream['fields']);
+  // await perm.ImportPermissions.verifyHeadlessRoute(authStream['user'] as UserConfig, authStream['fields']);
 
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
 });

@@ -385,7 +385,8 @@ class FileImportPreview extends TerrainComponent<Props>
       const parsedQuery = JSON.parse(stringQuery);
       const dbName = parsedQuery['index'];
       const tableName = parsedQuery['type'];
-      Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess, this.props.serverId, dbName, tableName);
+      Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess,
+        this.props.serverId, dbName, tableName);
     }
     else
     {
