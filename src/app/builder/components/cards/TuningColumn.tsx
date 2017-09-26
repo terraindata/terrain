@@ -284,6 +284,7 @@ class TuningColumn extends TerrainComponent<Props>
               tuningMode={true}
               handleCardReorder={this.handleCardReorder}
               ref='cardsArea'
+              allowTuningDragAndDrop={true}
             />
           </div>
         </div>

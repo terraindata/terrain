@@ -112,6 +112,9 @@ export interface Props
   display?: Display;
 
   handleCardDrop?: (type: string) => any;
+
+  // Tuning column
+  allowTuningDragAndDrop?: boolean;
   tuningMode?: boolean;
   handleCardReorder?: (card, index) => void;
 }
@@ -253,7 +256,8 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (nextProps.card.closed !== this.props.card.closed && !nextProps.tuningMode)
+    if ((nextProps.card.closed !== this.props.card.closed && !nextProps.tuningMode) ||
+      (nextProps.card.tuningClosed !== this.props.card.tuningClosed && nextProps.tuningMode))
     {
       if (this.state.closing || this.state.opening)
       {
@@ -306,8 +310,19 @@ class _CardComponent extends TerrainComponent<Props>
     {
       return; // I just don't want to deal
     }
+    const key = this.props.tuningMode ? 'tuningClosed' : 'closed';
+    const closed = this.props.tuningMode ? this.props.card.tuningClosed : this.props.card.closed;
+    let keyPath = this.getKeyPath();
+    if (this.props.tuningMode)
+    {
+      const keyPaths = Store.getState().cardKeyPaths;
+      if (keyPaths.get(this.props.card.id) !== undefined)
+      {
+        keyPath = keyPaths.get(this.props.card.id);
+      }
+    }
 
-    if (!this.props.card.closed)
+    if (!closed)
     {
       this.setState({
         closing: true,
@@ -316,12 +331,11 @@ class _CardComponent extends TerrainComponent<Props>
       // animate just the body for normal cards,
       //  the entire card for cards inside textboxes
       const ref = this.props.singleCard ? this.refs.card : this.refs.cardBody;
-
       Util.animateToHeight(ref, 0, () =>
       {
         // do this after the animation so the rest of the app picks up on it
         Actions.change(
-          this.getKeyPath().push('closed'),
+          keyPath.push(key),
           true,
         );
       });
@@ -341,7 +355,7 @@ class _CardComponent extends TerrainComponent<Props>
         {
           // do this after the animation so the rest of the app picks up on it
           Actions.change(
-            this.getKeyPath().push('closed'),
+            keyPath.push(key),
             false,
           );
         }),
@@ -741,12 +755,24 @@ class _CardComponent extends TerrainComponent<Props>
     const { title } = card.static;
     const { isDragging, connectDragSource } = this.props;
 
+    let canMove = false;
+    if (this.props.tuningMode && this.props.allowTuningDragAndDrop)
+    {
+      canMove = true;
+    }
+    if (!this.props.tuningMode && this.props.canEdit && !card['cannotBeMoved'])
+    {
+      canMove = true;
+    }
+
+    const closed = this.props.tuningMode ? this.props.card.tuningClosed : this.props.card.closed;
+
     return (
       <div
         className={classNames({
           'card': true,
           'card-dragging': isDragging,
-          'card-closed': this.props.card.closed && !this.props.tuningMode,
+          'card-closed': closed,
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
           'card-hovering': this.state.hovering,
@@ -793,7 +819,7 @@ class _CardComponent extends TerrainComponent<Props>
             <div
               className={classNames({
                 'card-title': true,
-                'card-title-closed': !this.props.tuningMode && ((this.props.card.closed && !this.state.opening) || this.state.closing),
+                'card-title-closed': ((closed && !this.state.opening) || this.state.closing),
                 'card-title-card-hovering': this.state.hovering,
               })}
               style={{
@@ -804,8 +830,7 @@ class _CardComponent extends TerrainComponent<Props>
               onClick={this.handleTitleClick}
             >
               {
-                this.props.canEdit &&
-                !card['cannotBeMoved'] &&
+                canMove &&
                 <div
                   className='card-drag-handle'
                   onMouseDown={this.handleMouseDown}
@@ -819,7 +844,6 @@ class _CardComponent extends TerrainComponent<Props>
               }
               {
                 this.state.hovering &&
-                !this.props.tuningMode &&
                 <ArrowIcon className='card-minimize-icon' onClick={this.toggleClose} />
               }
               {
@@ -846,7 +870,7 @@ class _CardComponent extends TerrainComponent<Props>
               }
 
               {
-                (this.props.card.closed && !this.props.tuningMode) ?
+                (closed) ?
                   <div className={classNames({
                     'card-preview': true,
                     'card-preview-hidden': this.state.opening,
@@ -901,7 +925,7 @@ class _CardComponent extends TerrainComponent<Props>
             }
           </div>
           {
-            (!this.props.card.closed || this.state.opening || this.props.tuningMode) &&
+            (!closed || this.state.opening) &&
             <div
               className='card-body-wrapper'
               ref='cardBody'

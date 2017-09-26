@@ -62,6 +62,9 @@ export interface Card extends IRecord<Card>
   _isBlock: boolean;
   closed: boolean;
   tuning?: boolean; // whether the card is in the tuning section
+  // whether a card in tuning column is collapsed (needs to be sep. from closed)
+  tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
+
   // the following fields are excluded from the server save
   static: {
     language: string;
@@ -155,6 +158,7 @@ export const _card = (config: CardConfig) =>
     _isBlock: true,
     closed: false,
     tuning: false,
+    tuningClosed: false,
   });
 
   if (config.static.metaFields)

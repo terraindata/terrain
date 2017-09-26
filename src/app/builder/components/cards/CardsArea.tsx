@@ -78,7 +78,10 @@ export interface Props
   singleChild?: boolean;
   hideCreateCardTool?: boolean;
   handleCardDrop?: (type: string) => any;
+
+  // Tuning column
   tuningMode?: boolean;
+  allowTuningDragAndDrop?: boolean;
   handleCardReorder?: (card, index) => void; // have to add other param for new order
 }
 
@@ -210,6 +213,7 @@ class CardsArea extends TerrainComponent<Props>
                     helpOn={this.props.helpOn}
                     handleCardDrop={this.props.handleCardDrop}
                     tuningMode={this.props.tuningMode}
+                    allowTuningDragAndDrop={this.props.allowTuningDragAndDrop}
                     handleCardReorder={this.props.handleCardReorder}
                   />
                 </div>
