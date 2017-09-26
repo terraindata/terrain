@@ -92,10 +92,18 @@ class AccessTokenControl extends TerrainComponent<Props>
     return (
       <div className='template-info' key={index}>
         <div className='template-info-data'>
+          {template.templateId}
+        </div>
+        <div className='template-info-data'>
           {template.templateName}
         </div>
         <div className='template-info-data'>
           {template.export}
+        </div>
+        <div className='template-info-data'>
+          <div className='access-token-cell'>
+             {template.persistentAccessToken}
+          </div>
         </div>
       </div>
     );
@@ -103,15 +111,20 @@ class AccessTokenControl extends TerrainComponent<Props>
 
   public render()
   {
-    console.log(this.state.templates);
     return (
       <div className='import-export-token-control'>
         <div className='template-info' key='header'>
+          <div className='template-info-data'>
+            ID
+          </div>
           <div className='template-info-data'>
             Template Name
           </div>
           <div className='template-info-data'>
             Is Export?
+          </div>
+          <div className='template-info-data'>
+            Access Token
           </div>
         </div>
         {this.state.templates.map(this.renderTemplate)}

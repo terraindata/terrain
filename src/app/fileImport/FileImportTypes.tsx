@@ -139,6 +139,7 @@ class TemplateC
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
   public export = false;
+  public persistentAccessToken?: string = '';
 }
 
 const Template_Record = Immutable.Record(new TemplateC());
@@ -152,6 +153,7 @@ export const _Template =
     transformations: List<object>;
     primaryKeys: List<number>;
     primaryKeyDelimiter: string;
+    persistentAccessToken?: string;
     export: boolean;
   }) =>
   {

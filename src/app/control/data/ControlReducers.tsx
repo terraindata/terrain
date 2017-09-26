@@ -63,8 +63,8 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
     Ajax.getAllTemplates(
       (templatesArr) =>
       {
-        const templates: List<Template> = List<Template>(templatesArr.map((template) =>
-          FileImportTypes._Template({
+        const templates: List<Template> = List<Template>(templatesArr.map((template) => {
+          return FileImportTypes._Template({
             templateId: template['id'],
             templateName: template['name'],
             originalNames: List<string>(template['originalNames']),
@@ -72,8 +72,9 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
             transformations: template['transformations'],
             primaryKeys: template['primaryKeys'],
             primaryKeyDelimiter: template['primaryKeyDelimiter'],
+            persistentAccessToken: template['persistentAccessToken'],
             export: template['export'],
-          }),
+          })},
         ));
         action.payload.setTemplates(templates);
       },
