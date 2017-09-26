@@ -43,63 +43,89 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
-import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './RadioButtons.less';
+import ActionTypes from 'analytics/data/AnalyticsActionTypes';
+import reducer from 'analytics/data/AnalyticsReducer';
+import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
+import * as Immutable from 'immutable';
 
-export interface Props
+describe('AnalyticsReducer', () =>
 {
-  selected?: string;
-  options: Array<{
-    value: string;
-    label?: string;
-    onClick: (optionValue?: any) => void
-  }>;
-  optionShadow?: boolean;
-}
+  let analytics: AnalyticsState = _AnalyticsState({});
 
-class RadioButtons extends TerrainComponent<Props>
-{
-  public static defaultProps = { optionShadow: false };
-
-  public renderOption(option)
-  {
-    const { optionShadow } = this.props;
-    const style: any = {};
-
-    if (optionShadow)
+  const analyticsResponse = [
     {
-      style.boxShadow = '2px 2px 2px #222';
-      style.backgroundColor = '#666';
-      style.margin = '10px';
-      style.padding = '5px';
-    }
+      key_as_string: '2015-06-02T00:00:00.000Z',
+      key: 1433203200000,
+      doc_count: 10320,
+    },
+    {
+      key_as_string: '2015-06-03T00:00:00.000Z',
+      key: 1433289600000,
+      doc_count: 12582,
+    },
+    {
+      key_as_string: '2015-06-04T00:00:00.000Z',
+      key: 1433376000000,
+      doc_count: 12279,
+    },
+    {
+      key_as_string: '2015-06-05T00:00:00.000Z',
+      key: 1433462400000,
+      doc_count: 6187,
+    },
+    {
+      key_as_string: '2015-06-06T00:00:00.000Z',
+      key: 1433548800000,
+      doc_count: 937,
+    },
+  ];
 
-    return (
-      <div key={option.value} style={style} className='radio-button-option'>
-        <div
-          onClick={() => option.onClick(option.value)}
-          className={classNames({
-            'radio-button': true,
-            'radio-button-selected': option.value === this.props.selected,
-          })}
-        >
-        </div>
-        {option.label !== undefined ? option.label : option.value}
-        <br />
-      </div>
-    );
-  }
-
-  public render()
+  beforeEach(() =>
   {
-    return (
-      <div>
-        {this.props.options.map(this.renderOption)}
-      </div>
-    );
-  }
-}
+    analytics = _AnalyticsState({});
+  });
 
-export default RadioButtons;
+  it('should return the inital state', () =>
+  {
+    expect(reducer(undefined, {})).toEqual(analytics);
+  });
+
+  describe('#fetch', () =>
+  {
+    it('should handle analytics.fetch', () =>
+    {
+      const nextState = reducer(analytics, {
+        type: ActionTypes.fetch,
+        payload: {
+          variantId: 1,
+          analytics: analyticsResponse,
+        },
+      });
+
+      expect(
+        nextState,
+      ).toEqual(
+        analytics.setIn(['data', 1], analyticsResponse),
+      );
+    });
+  });
+
+  describe('#selectMetric', () =>
+  {
+    it('should handle analytics.selectMetric', () =>
+    {
+      const nextState = reducer(analytics, {
+        type: ActionTypes.selectMetric,
+        payload: {
+          metricId: '100',
+        },
+      });
+
+      expect(
+        nextState.selectedMetric,
+      ).toEqual(
+        '100',
+      );
+    });
+  });
+});
