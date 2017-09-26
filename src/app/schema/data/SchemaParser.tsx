@@ -319,7 +319,6 @@ export function parseElasticDb(elasticServer: object,
   schemaData: object,
   setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void)
 {
-  debugger;
   let server = SchemaTypes._Server({
     name: elasticServer['name'],
     connectionId: elasticServer['id'],
