@@ -137,20 +137,20 @@ class TQLEditor extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('span.cm-atom', { color: Colors().builder.cards.booleanClause + '!important'});
-    ColorsActions.setStyle('span.cm-property ', { color: Colors().builder.cards.structureClause + '!important'});
-    ColorsActions.setStyle('span.cm-attribute', { color: '#f00' /* what is an attribute? */ + '!important'});
-    ColorsActions.setStyle('span.cm-keyword', { color: Colors().builder.cards.mapClause + '!important'});
-    ColorsActions.setStyle('span.cm-builtin', { color: Colors().builder.cards.baseClause + '!important'});
-    ColorsActions.setStyle('span.cm-string', { color: Colors().builder.cards.stringClause + '!important'});
-    ColorsActions.setStyle('span.cm-variable', { color: Colors().builder.cards.fieldClause + '!important'});
-    ColorsActions.setStyle('span.cm-variable-2', { color: Colors().builder.cards.inputParameter + '!important'});
-    ColorsActions.setStyle('span.cm-variable-3', { color: Colors().builder.cards.fieldClause + '!important'});
-    ColorsActions.setStyle('span.es-null', { color: Colors().builder.cards.nullClause + '!important'});
-    ColorsActions.setStyle('span.es-number', { color: Colors().builder.cards.numberClause + '!important'});
-    ColorsActions.setStyle('span.es-boolean', { color: Colors().builder.cards.booleanClause + '!important'});
-    ColorsActions.setStyle('span.es-parameter', { color: Colors().builder.cards.inputParameter + '!important'});
-    ColorsActions.setStyle('span.es-strin', { color: Colors().builder.cards.stringClause + '!important'});
+    ColorsActions.setStyle('span.cm-atom', { color: Colors().builder.cards.booleanClause + '!important' });
+    ColorsActions.setStyle('span.cm-property ', { color: Colors().builder.cards.structureClause + '!important' });
+    ColorsActions.setStyle('span.cm-attribute', { color: '#f00' /* what is an attribute? */ + '!important' });
+    ColorsActions.setStyle('span.cm-keyword', { color: Colors().builder.cards.mapClause + '!important' });
+    ColorsActions.setStyle('span.cm-builtin', { color: Colors().builder.cards.baseClause + '!important' });
+    ColorsActions.setStyle('span.cm-string', { color: Colors().builder.cards.stringClause + '!important' });
+    ColorsActions.setStyle('span.cm-variable', { color: Colors().builder.cards.fieldClause + '!important' });
+    ColorsActions.setStyle('span.cm-variable-2', { color: Colors().builder.cards.inputParameter + '!important' });
+    ColorsActions.setStyle('span.cm-variable-3', { color: Colors().builder.cards.fieldClause + '!important' });
+    ColorsActions.setStyle('span.es-null', { color: Colors().builder.cards.nullClause + '!important' });
+    ColorsActions.setStyle('span.es-number', { color: Colors().builder.cards.numberClause + '!important' });
+    ColorsActions.setStyle('span.es-boolean', { color: Colors().builder.cards.booleanClause + '!important' });
+    ColorsActions.setStyle('span.es-parameter', { color: Colors().builder.cards.inputParameter + '!important' });
+    ColorsActions.setStyle('span.es-strin', { color: Colors().builder.cards.stringClause + '!important' });
   }
 
   public componentWillUnmount()

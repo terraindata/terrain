@@ -44,14 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as Immutable from 'immutable';
 import TerrainComponent from '../../common/components/TerrainComponent';
 
 export interface Props
 {
-  style: IMMap<string, React.CSSProperties>,
+  style: IMMap<string, React.CSSProperties>;
 }
 
 export class StyleTag extends TerrainComponent<Props>
