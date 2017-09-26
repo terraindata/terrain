@@ -51,10 +51,10 @@ import './CardStyle.less';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { DragSource } from 'react-dnd';
-
 const { createDragPreview } = require('react-dnd-text-dragpreview');
 import { Display } from '../../../../blocks/displays/Display';
 import { Card } from '../../../../blocks/types/Card';
@@ -74,7 +74,7 @@ import CardHelpTooltip from './CardHelpTooltip';
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { cardStyle, Colors, getStyle } from '../../../common/Colors';
+import { borderColor, cardStyle, Colors, getStyle } from '../../../common/Colors';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
@@ -134,6 +134,13 @@ class _CardComponent extends TerrainComponent<Props>
     midpoints: number[];
     originalElTop: number;
     originalElBottom: number;
+    moving: boolean;
+    elHeight: number;
+    siblingHeights: number[];
+    minDY: number;
+    maxDY: number;
+    dY: number;
+    index: number;
   };
 
   public refs: {
@@ -157,10 +164,19 @@ class _CardComponent extends TerrainComponent<Props>
       hovering: false,
       closing: false,
       opening: false,
+      // For tuning column DnD
+      moving: false,
       originalMouseY: 0,
       originalElTop: 0,
       originalElBottom: 0,
+      elHeight: 0,
       midpoints: [],
+      siblingHeights: [],
+      minDY: 0,
+      maxDY: 0,
+      dY: 0,
+      index: 0,
+
       menuOptions:
       Immutable.List([
         // {
@@ -253,6 +269,10 @@ class _CardComponent extends TerrainComponent<Props>
         this.toggleClose(null);
       }
     }
+    const sibs = this.getSiblings();
+    _.range(0, sibs.length).map((i) =>
+      sibs[i]['style'].top = 0,
+    );
   }
 
   public componentDidMount()
@@ -406,6 +426,94 @@ class _CardComponent extends TerrainComponent<Props>
     }
   }
 
+  public handleCardDrag(event)
+  {
+    this.setState({
+      dY: this.shiftSiblings(event, false).dY,
+    });
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  public shiftSiblings(evt, shiftSelf: boolean): ({ dY: number, index: number })
+  {
+    const dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
+
+    let index: number;
+
+    if (dY < 0)
+    {
+      // if dragged up, search from top down
+      for (
+        index = 0;
+        this.state.midpoints[index] < this.state.originalElTop + dY;
+        index++
+      )
+      {
+
+      }
+    }
+    else
+    {
+      for (
+        index = this.state.midpoints.length - 1;
+        this.state.midpoints[index] > this.state.originalElBottom + dY;
+        index--
+      )
+      {
+
+      }
+    }
+    const sibs = this.getSiblings();
+    sibs.forEach((sib, i) =>
+    {
+      if (i === this.state.index)
+      {
+        return;
+      }
+      let shift = 0;
+      if (index < this.state.index)
+      {
+        if (i >= index && i < this.state.index)
+        {
+          shift = 1;
+        }
+      }
+      else
+      {
+        if (i > this.state.index && i <= index)
+        {
+          shift = -1;
+        }
+      }
+      sib['style'].top = shift * this.state.elHeight;
+
+    });
+
+    return {
+      dY,
+      index,
+    };
+  }
+
+  public getSiblings()
+  {
+    if (!this.refs['card'])
+    {
+      return [];
+    }
+    const children = Util.siblings(Util.parentNode(this.refs['card']));
+    let cards = [];
+    for (let i = 0; i < children.length; ++i)
+    {
+      if (children[i].childNodes.length > 1)
+      {
+        cards.push(children[i].childNodes[1]);
+      }
+    }
+    return cards;
+  }
+
   public handleMouseDown(event)
   {
     if (!this.props.tuningMode)
@@ -416,29 +524,35 @@ class _CardComponent extends TerrainComponent<Props>
     // but have no effect on the actual layout of cards in builder
     $('body').on('mouseup', this.handleMouseUp);
     $('body').on('mouseleave', this.handleMouseUp);
-    const el = Util.parentNode(this.refs['card']);
+    $('body').on('mousemove', this.handleCardDrag);
+    const el = this.refs['card'];
     const cr = el['getBoundingClientRect']();
+    const parent = Util.parentNode(Util.parentNode(Util.parentNode((this.refs['card']))));
+    const parentCr = parent['getBoundingClientRect']();
+    const minDY = parentCr.top - cr.top;
+    const maxDY = parentCr.bottom - cr.bottom;
 
-    const children = Util.siblings(Util.parentNode(this.refs['card']));
-    let cards = [];
-    for (let i = 0; i < children.length; ++i)
-    {
-      if (children[i].childNodes.length > 1)
-      {
-        cards.push(children[i].childNodes[1]);
-      }
-    }
+    const cards = this.getSiblings();
     let midpoints = [];
+    let siblingHeights = [];
     cards.forEach((card) =>
     {
       const c = card['getBoundingClientRect']();
       midpoints.push(((c.top as number) + (c.bottom as number)) / 2);
+      siblingHeights.push((c.bottom as number) - (c.top as number));
     });
     this.setState({
       originalMouseY: event.pageY,
       midpoints,
       originalElTop: cr.top,
       originalElBottom: cr.bottom,
+      elHeight: cr.height,
+      siblingHeights,
+      minDY,
+      maxDY,
+      dY: 0,
+      index: cards.indexOf(el),
+      moving: true,
     });
     event.preventDefault();
   }
@@ -451,34 +565,14 @@ class _CardComponent extends TerrainComponent<Props>
     }
     $('body').off('mouseup', this.handleMouseUp);
     $('body').off('mouseleave', this.handleMouseUp);
+    $('body').off('mousemove', this.handleCardDrag);
     if (this.props.handleCardReorder)
     {
-      let index: number;
-      const dY = event.pageY - this.state.originalMouseY;
-      // also check bounds
-      if (dY < 0) // dragged up
-      {
-        for (
-          index = 0;
-          this.state.midpoints[index] < this.state.originalElTop + dY;
-          index++
-        )
-        {
-
-        }
-      }
-      else
-      {
-        for (
-          index = this.state.midpoints.length - 1;
-          this.state.midpoints[index] > this.state.originalElBottom + dY;
-          index--
-        )
-        {
-
-        }
-      }
+      const { index } = this.shiftSiblings(event, true);
       this.props.handleCardReorder(this.props.card, index);
+      this.setState({
+        moving: false,
+      });
     }
   }
 
@@ -619,7 +713,14 @@ class _CardComponent extends TerrainComponent<Props>
         keyPath = keyPaths.get(this.props.card.id);
       }
     }
-
+    let style = null;
+    if (this.state.moving)
+    {
+      style = _.extend({}, CARD_COMPONENT_MOVING_STYLE, {
+        top: this.state.dY,
+        zIndex: 999999,
+      });
+    }
     const content = <BuilderComponent
       canEdit={this.props.canEdit}
       data={this.props.card}
@@ -653,10 +754,12 @@ class _CardComponent extends TerrainComponent<Props>
           'card-opening': this.state.opening,
           'card-no-title': card['noTitle'],
           [card.type + '-card']: true,
+          'card-moving': this.state.moving,
         })}
         ref='card'
         id={id}
         onMouseMove={this.handleMouseMove}
+        style={style}
       >
         {!this.props.tuningMode &&
           <CDA
@@ -799,7 +902,10 @@ class _CardComponent extends TerrainComponent<Props>
           </div>
           {
             (!this.props.card.closed || this.state.opening || this.props.tuningMode) &&
-            <div className='card-body-wrapper' ref='cardBody'>
+            <div
+              className='card-body-wrapper'
+              ref='cardBody'
+            >
               <div
                 className='card-body'
                 style={{
@@ -831,6 +937,10 @@ class _CardComponent extends TerrainComponent<Props>
     );
   }
 }
+
+const CARD_COMPONENT_MOVING_STYLE = _.extend({},
+  borderColor(Colors().active),
+);
 
 // Drag and Drop (the bass)
 

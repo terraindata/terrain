@@ -237,6 +237,10 @@ class TuningColumn extends TerrainComponent<Props>
   public handleCardReorder(card, index)
   {
     const oldIndex = this.state.tuningOrder.indexOf(card.id);
+    if (oldIndex === index)
+    {
+      return;
+    }
     if (index < oldIndex)
     {
       this.setState({
