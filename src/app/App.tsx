@@ -74,7 +74,7 @@ import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
 
-import { backgroundColor, Colors, fontColor } from './common/Colors';
+import { backgroundColor, Colors, fontColor } from './colors/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
 import StyleTag from './common/components/StyleTag';
 import DeployModal from './deploy/components/DeployModal';

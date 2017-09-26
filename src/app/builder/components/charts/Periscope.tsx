@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import './Periscope.less';
 
-import { Colors } from '../../../common/Colors';
+import { Colors } from '../../../colors/Colors';
 
 // consider upgrading d3 to v4, which has available types
 // import * as d3 from 'd3';

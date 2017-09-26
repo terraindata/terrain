@@ -57,7 +57,7 @@ import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
 import './Login.less';
 
-import { backgroundColor, borderColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 
 const TerrainIcon = require('./../../../images/logo_mountainCircle.svg?name=TerrainIcon');
 

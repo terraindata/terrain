@@ -56,7 +56,7 @@ import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
-import { Colors, fontColor } from '../../common/Colors';
+import { Colors, fontColor } from '../../colors/Colors';
 import CreateLine from '../../common/components/CreateLine';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';

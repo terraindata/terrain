@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { CardConfig } from '../../../../blocks/types/Card';
-import { borderColor, cardStyle, Colors } from '../../../common/Colors';
+import { borderColor, cardStyle, Colors } from '../../../colors/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CreateCardOption.less';
 

@@ -54,7 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
-import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
 import { CSVTypeParser, parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';

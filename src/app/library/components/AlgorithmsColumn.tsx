@@ -53,7 +53,7 @@ import * as React from 'react';
 import { browserHistory } from 'react-router';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
-import { Colors, fontColor } from '../../common/Colors';
+import { Colors, fontColor } from '../../colors/Colors';
 import CreateLine from '../../common/components/CreateLine';
 import Modal from '../../common/components/Modal';
 import RolesStore from '../../roles/data/RolesStore';

@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors } from '../../colors/Colors';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './TemplateList.less';

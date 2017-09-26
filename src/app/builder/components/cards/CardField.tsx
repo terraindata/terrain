@@ -52,7 +52,7 @@ import * as React from 'react';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import DragHandle from '../../../common/components/DragHandle';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ManualInfo from '../../../manual/components/ManualInfo';

@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { Colors, getStyle } from '../../common/Colors';
+import { Colors, getStyle } from '../../colors/Colors';
 import ColorsActions from './../../colors/data/ColorsActions';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './DragHandleStyle.less';

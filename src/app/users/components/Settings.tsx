@@ -50,7 +50,7 @@ import * as React from 'react';
 import { MidwayError } from 'shared/error/MidwayError';
 import * as UserTypes from '../UserTypes';
 import AuthStore from './../../auth/data/AuthStore';
-import { Colors, Themes, ThemesInt } from './../../common/Colors';
+import { Colors, Themes, ThemesInt } from './../../colors/Colors';
 import CheckBox from './../../common/components/CheckBox';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';

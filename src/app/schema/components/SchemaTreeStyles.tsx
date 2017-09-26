@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import * as _ from 'lodash';
-import Colors from '../../common/Colors';
+import Colors from '../../colors/Colors';
 import Styles from '../../Styles';
 const color = require('color');
 
