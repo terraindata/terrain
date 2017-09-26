@@ -48,6 +48,8 @@ THE SOFTWARE.
 
 'use strict';
 
+import Util from './Util';
+
 const MapUtil = {
   geocodeByAddress(g, address, callback?): any
   {
@@ -284,6 +286,7 @@ const MapUtil = {
   {
     let lat: number;
     let lon: number;
+    geopoint = Util.asJS(geopoint);
     // string = geohash or 0,0 format
     if (typeof geopoint === 'string')
     {
