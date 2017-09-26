@@ -242,7 +242,7 @@ class AccountDropdown extends TerrainComponent<Props>
           onClose={this._toggle('commitLogOpen')}
           pre={true}
         />
-        
+
         <Modal
           message={CREDITS}
           open={this.state.showingCredits}
