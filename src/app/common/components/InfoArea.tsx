@@ -64,6 +64,8 @@ export interface Props
   button?: string;
   onClick?: () => void;
   inline?: boolean; // render inline, rather than absolutely middle
+  secondButton?: string;
+  onSecondClick?: () => void;
 }
 
 @Radium
@@ -75,7 +77,7 @@ class InfoArea extends TerrainComponent<Props>
     Util.bind(this, 'renderThing');
   }
 
-  public renderThing(thing: string, onClick?: boolean)
+  public renderThing(thing: string, onClick?: boolean, onClickFn?: () => void)
   {
     if (!this.props[thing])
     {
@@ -83,7 +85,7 @@ class InfoArea extends TerrainComponent<Props>
     }
 
     let style = fontColor(thing === 'small' ? Colors().text.secondaryLight : Colors().text.baseLight);
-    if (thing === 'button')
+    if (thing === 'button' || thing === 'secondButton')
     {
       style = buttonColors();
     }
@@ -91,8 +93,9 @@ class InfoArea extends TerrainComponent<Props>
     return (
       <div
         className={'info-area-' + thing}
-        onClick={onClick ? this.props.onClick : null}
+        onClick={onClick ? onClickFn : null}
         style={style}
+        key={thing}
       >
         {
           this.props[thing]
@@ -112,7 +115,10 @@ class InfoArea extends TerrainComponent<Props>
       >
         {this.renderThing('large')}
         {this.renderThing('small')}
-        {this.renderThing('button', true)}
+        <div className='info-area-buttons-container'>
+          {this.renderThing('button', true, this.props.onClick)}
+          {this.renderThing('secondButton', true, this.props.onSecondClick)}
+        </div>
       </div>
     );
   }

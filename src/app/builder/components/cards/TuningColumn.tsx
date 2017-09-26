@@ -62,6 +62,7 @@ import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import InfoArea from '../../../common/components/InfoArea';
 import Util from '../../../util/Util';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 
@@ -255,6 +256,38 @@ class TuningColumn extends TerrainComponent<Props>
     }
   }
 
+  public findCardType(cards, type)
+  {
+    cards.forEach((card) =>
+    {
+      if (card.static.title === type)
+      {
+        this.tuningCards = this.tuningCards.push(card);
+        this.tuningIds = this.tuningIds.push(card.id);
+        this.handleCardAdded(card);
+        const keyPaths = BuilderStore.getState().cardKeyPaths;
+        if (keyPaths.get(card.id) !== undefined)
+        {
+          Actions.change(keyPaths.get(card.id).push('tuning'), true);
+        }
+      }
+      if (card.cards !== undefined && card.cards.size > 0)
+      {
+        this.findCardType(card.cards, type);
+      }
+    });
+  }
+
+  public addScoreCards()
+  {
+    this.findCardType(this.state.allCards, 'Terrain Score Sort');
+  }
+
+  public addFilterCards()
+  {
+    this.findCardType(this.state.allCards, 'Filter');
+  }
+
   public render()
   {
     const { canEdit, language, addColumn, columnIndex } = this.props;
@@ -286,6 +319,19 @@ class TuningColumn extends TerrainComponent<Props>
               ref='cardsArea'
               allowTuningDragAndDrop={true}
             />
+            {
+              !this.tuningCards.size ?
+                <InfoArea
+                  large={'Add cards to the tuning column that you are likely to change.'}
+                  small={'Select by pressing the tuning icon on individual cards\n or'}
+                  button={'Add Terrain Sort Score Cards'}
+                  onClick={this.addScoreCards}
+                  inline={false}
+                  secondButton={'Add Terrian Filter Cards'}
+                  onSecondClick={this.addFilterCards}
+                />
+                : null
+            }
           </div>
         </div>
       </div>
