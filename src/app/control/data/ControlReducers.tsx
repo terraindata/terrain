@@ -73,6 +73,9 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
             primaryKeys: template['primaryKeys'],
             primaryKeyDelimiter: template['primaryKeyDelimiter'],
             persistentAccessToken: template['persistentAccessToken'],
+            dbid: template['dbid'],
+            dbname: template['dbname'],
+            tablename: template['tablename'],
             export: template['export'],
           })},
         ));

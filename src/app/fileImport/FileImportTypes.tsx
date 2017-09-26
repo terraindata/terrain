@@ -140,6 +140,9 @@ class TemplateC
   public primaryKeyDelimiter: string = '-';
   public export = false;
   public persistentAccessToken?: string = '';
+  public dbid?: number = -1;
+  public dbname?: string = '';
+  public tablename?: string = '';
 }
 
 const Template_Record = Immutable.Record(new TemplateC());
@@ -154,6 +157,9 @@ export const _Template =
     primaryKeys: List<number>;
     primaryKeyDelimiter: string;
     persistentAccessToken?: string;
+    dbid?: number;
+    dbname?: string;
+    tablename?: string;
     export: boolean;
   }) =>
   {

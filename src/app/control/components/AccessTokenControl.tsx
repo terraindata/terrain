@@ -44,25 +44,58 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires
+
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 
+import TerrainComponent from 'common/components/TerrainComponent';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
+import Ajax from 'util/Ajax';
 import ControlActions from '../data/ControlActions';
 import ControlStore from '../data/ControlStore';
 
-import TerrainComponent from 'common/components/TerrainComponent';
-import Ajax from 'util/Ajax';
-
 import './AccessTokenControl.less';
 
+const CodeIcon = require('images/icon_tqlDropdown.svg');
 const { List } = Immutable;
+
 type Template = FileImportTypes.Template;
 
 export interface Props
 {
   todo?: string // ignore this for now
 }
+
+type HeaderConfigItem = [string, (rowElem) => any];
+type HeaderConfig = HeaderConfigItem[];
+
+const TemplateConfig: HeaderConfig = [
+  ['ID', (template) => template.templateId],
+  ['Name', (template) => template.templateName],
+  ['Type', (template) => template.export === 0 ? 'Import' : 'Export'],
+  ['Db ID', (template) => template.dbid],
+  ['Database', (template) => template.dbname],
+  ['Table', (template) => template.tablename],
+  ['Access Token', (template) =>
+    <div className='access-token-cell'>
+      {template.persistentAccessToken}
+    </div>
+  ],
+  ['Headless Code', (template) =>
+    tooltip(
+      <div className='curl-code-wrapper'>
+        <CodeIcon className='curl-code-icon'/>
+      </div>,
+      {
+        title: 'Copy to Clipboard',
+        position: 'top-start',
+      }
+    )
+  ]
+];
 
 class AccessTokenControl extends TerrainComponent<Props>
 {
@@ -91,20 +124,40 @@ class AccessTokenControl extends TerrainComponent<Props>
   {
     return (
       <div className='template-info' key={index}>
-        <div className='template-info-data'>
-          {template.templateId}
+        {
+          TemplateConfig.map((headerItem: HeaderConfigItem, i: number) => {
+            return (
+              <div className='template-info-data' key={i}>
+                {headerItem[1](template)}
+              </div>
+            );
+          })
+        }
+      </div>
+    );
+  }
+
+  public renderTable()
+  {
+    return (
+      <div className='import-export-token-control-table'>
+        <div
+          className={classNames({
+          'template-info-header': true,
+          })}
+          key='header'
+        >
+        {
+          TemplateConfig.map((headerItem: HeaderConfigItem, i: number) => {
+            return (
+              <div className='template-info-data' key={i}>
+                {headerItem[0]}
+              </div>
+            );
+          })
+        }
         </div>
-        <div className='template-info-data'>
-          {template.templateName}
-        </div>
-        <div className='template-info-data'>
-          {template.export}
-        </div>
-        <div className='template-info-data'>
-          <div className='access-token-cell'>
-             {template.persistentAccessToken}
-          </div>
-        </div>
+        {this.state.templates.map(this.renderTemplate)}
       </div>
     );
   }
@@ -112,24 +165,13 @@ class AccessTokenControl extends TerrainComponent<Props>
   public render()
   {
     return (
-      <div className='import-export-token-control'>
-        <div className='template-info' key='header'>
-          <div className='template-info-data'>
-            ID
-          </div>
-          <div className='template-info-data'>
-            Template Name
-          </div>
-          <div className='template-info-data'>
-            Is Export?
-          </div>
-          <div className='template-info-data'>
-            Access Token
-          </div>
+      <div className='import-export-token-control-page'>
+        <div className='import-export-control-title'> 
+          Templates
         </div>
-        {this.state.templates.map(this.renderTemplate)}
+        {this.renderTable()}
       </div>
-    );
+    )
   }
 }
 

@@ -1,26 +1,89 @@
+@import "../../common/Common.less";
 
-.import-export-token-control {
+@border-style: 1px solid #777;
+@border-radius: 3px;
+@icon-ratio: 1.25;
+@icon-size: calc(1em*@icon-ratio);
+
+.import-export-token-control-page {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  .import-export-control-title {
+    .title-text;
+    padding: 12px;
+  }
+}
+
+.import-export-token-control-table {
   display: table;
-  margin: auto;
   margin-top: 12px;
-  border-left: 1px solid #CCC;
-  border-top: 1px solid #CCC;
+  margin: auto;
+  border-collapse: separate;
+  border-spacing: 0px 12px;
+
   .template-info {
     display: table-row;
+    background-color: #444;
+
     .template-info-data {
-      display: table-cell;
-      padding: 3px;
-      border-right: 1px solid #CCC;
-      border-bottom: 1px solid #CCC;
+      .common-cell-properties;
+      padding: 3px 12px;
+      border-top: @border-style;
+      border-bottom: @border-style;
+
+      &:first-child {
+        border-left: @border-style;
+        border-bottom-left-radius: @border-radius;
+        border-top-left-radius: @border-radius;
+      }
+
+      &:last-child {
+        border-right: @border-style;
+        border-bottom-right-radius: @border-radius;
+        border-top-right-radius: @border-radius;
+      }
     }
+
     .access-token-cell {
-      max-width: 300px;
+      max-width: 150px;
       // word-wrap: break-word;
       // word-break: break-all;
-      // text-overflow: ellipsis;
-      overflow-x: auto;
-      // max-height: 32px;
+      text-overflow: ellipsis;
+      overflow-x: hidden;
       white-space: nowrap;
+    }
+  }
+
+  .template-info-header {
+    display: table-row;
+
+    .template-info-data {
+      .common-cell-properties;
+      padding: 0px 12px;
+    }
+  }
+
+  .common-cell-properties {
+    display: table-cell;
+    .big-text;
+    vertical-align: middle;
+  }
+  
+  .curl-code-wrapper {
+    position: relative;
+    padding: 6px;
+    width: 100%;
+    height: @icon-size;
+    margin: auto;
+    cursor: pointer;
+    .curl-code-icon {
+      height: @icon-size;
+      width: @icon-size;
+      position: absolute;
+      fill: #FFF;
+      left: 50%;
+      transform: translateX(-50%);
     }
   }
 }
