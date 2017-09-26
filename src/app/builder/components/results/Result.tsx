@@ -149,7 +149,7 @@ class ResultComponent extends TerrainComponent<Props> {
       return null;
     }
 
-    const value = getResultValue(this.props.result, field, this.props.resultsConfig, overrideFormat);
+    const value = getResultValue(this.props.result, field, this.props.resultsConfig, false, overrideFormat);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
@@ -353,7 +353,7 @@ class ResultComponent extends TerrainComponent<Props> {
     ));
   }
 }
-export function getResultValue(result: Result, field: string, config: ResultsConfig, overrideFormat?: any): string
+export function getResultValue(result: Result, field: string, config: ResultsConfig, isTitle: boolean, overrideFormat?: any): string
 {
   let value: any;
   if (result)
@@ -364,7 +364,7 @@ export function getResultValue(result: Result, field: string, config: ResultsCon
       value = JSON.stringify(value);
     }
   }
-  return ResultFormatValue(field, value, config, overrideFormat);
+  return ResultFormatValue(field, value, config, isTitle, overrideFormat);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -401,10 +401,10 @@ export function getResultName(result: Result, config: ResultsConfig)
     nameField = _.first(getResultFields(result, config));
   }
 
-  return getResultValue(result, nameField, config);
+  return getResultValue(result, nameField, config, true);
 }
 
-export function ResultFormatValue(field: string, value: string | number, config: ResultsConfig, overrideFormat?: any): any
+export function ResultFormatValue(field: string, value: string | number, config: ResultsConfig, isTitle: boolean, overrideFormat?: any): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const { showRaw } = overrideFormat || format || { showRaw: false };
@@ -430,7 +430,7 @@ export function ResultFormatValue(field: string, value: string | number, config:
     italics = true;
   }
 
-  if (format)
+  if (format && !isTitle)
   {
     switch (format.type)
     {

@@ -65,6 +65,7 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../..
 import ColorsActions from './../../../colors/data/ColorsActions';
 
 import { Cards } from '../../../../blocks/types/Card';
+import { ElasticBlocks } from '../../../../database/elastic/blocks/ElasticBlocks';
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
@@ -193,23 +194,14 @@ class CardsColumn extends TerrainComponent<Props>
     }
   }
 
-  public handleCardDrop(type: string)
+  public handleCardDrop(cardType: string)
   {
-    switch (type)
+    const theCard = ElasticBlocks[cardType];
+    if (theCard !== undefined)
     {
-      case 'eqlfrom':
-        return { key: 'from' };
-      case 'eqltype':
-        return { key: 'type' };
-      case 'eqlindex':
-        return { key: 'index' };
-      case 'eqlsize':
-        return { key: 'size' };
-      case 'eqlbody':
-        return { key: 'body' };
-      default:
-        return { key: '' };
+      return theCard['key'];
     }
+    return '';
   }
 
   public render()

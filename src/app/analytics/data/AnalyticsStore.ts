@@ -43,63 +43,20 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
-import * as React from 'react';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './RadioButtons.less';
+import * as Immutable from 'immutable';
+import Util from 'util/Util';
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 
-export interface Props
+class AnalyticsStateC
 {
-  selected?: string;
-  options: Array<{
-    value: string;
-    label?: string;
-    onClick: (optionValue?: any) => void
-  }>;
-  optionShadow?: boolean;
+  public loaded = false;
+  public data: IMMap<ID, any> = Immutable.Map({});
+  public selectedMetric: ID = 1;
 }
 
-class RadioButtons extends TerrainComponent<Props>
+const AnalyticsState_Record = Immutable.Record(new AnalyticsStateC());
+export interface AnalyticsState extends AnalyticsStateC, IRecord<AnalyticsState> { }
+export const _AnalyticsState = (config?: any) =>
 {
-  public static defaultProps = { optionShadow: false };
-
-  public renderOption(option)
-  {
-    const { optionShadow } = this.props;
-    const style: any = {};
-
-    if (optionShadow)
-    {
-      style.boxShadow = '2px 2px 2px #222';
-      style.backgroundColor = '#666';
-      style.margin = '10px';
-      style.padding = '5px';
-    }
-
-    return (
-      <div key={option.value} style={style} className='radio-button-option'>
-        <div
-          onClick={() => option.onClick(option.value)}
-          className={classNames({
-            'radio-button': true,
-            'radio-button-selected': option.value === this.props.selected,
-          })}
-        >
-        </div>
-        {option.label !== undefined ? option.label : option.value}
-        <br />
-      </div>
-    );
-  }
-
-  public render()
-  {
-    return (
-      <div>
-        {this.props.options.map(this.renderOption)}
-      </div>
-    );
-  }
-}
-
-export default RadioButtons;
+  return new AnalyticsState_Record(Util.extendId(config || {})) as any as AnalyticsState;
+};
