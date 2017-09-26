@@ -47,14 +47,17 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as React from 'react';
 
-import { Template } from 'fileImport/FileImportTypes';
+import * as FileImportTypes from 'fileImport/FileImportTypes';
 import ControlActions from '../data/ControlActions';
 import ControlStore from '../data/ControlStore';
 
+import TerrainComponent from 'common/components/TerrainComponent';
 import Ajax from 'util/Ajax';
-import TerrainComponent from './../../common/components/TerrainComponent';
+
+import './AccessTokenControl.less';
 
 const { List } = Immutable;
+type Template = FileImportTypes.Template;
 
 export interface Props
 {
@@ -66,24 +69,52 @@ class AccessTokenControl extends TerrainComponent<Props>
   public state: {
     templates: List<Template>;
   } = {
-    templates: undefined,
+    templates: List([]),
   };
+
+  constructor(props)
+  {
+    super(props);
+
+    this._subscribe(ControlStore, {
+      stateKey: 'templates',
+      storeKeyPath: ['templates'],
+    });
+  }
 
   public componentDidMount()
   {
     ControlActions.importExport.fetchTemplates();
   }
 
-  public printThing()
+  public renderTemplate(template: Template, index: number)
   {
-    console.log(ControlStore.getState().get('templates'));
+    return (
+      <div className='template-info' key={index}>
+        <div className='template-info-data'>
+          {template.templateName}
+        </div>
+        <div className='template-info-data'>
+          {template.export}
+        </div>
+      </div>
+    );
   }
 
   public render()
   {
+    console.log(this.state.templates);
     return (
-      <div onClick={this.printThing}>
-        Yo whatup
+      <div className='import-export-token-control'>
+        <div className='template-info' key='header'>
+          <div className='template-info-data'>
+            Template Name
+          </div>
+          <div className='template-info-data'>
+            Is Export?
+          </div>
+        </div>
+        {this.state.templates.map(this.renderTemplate)}
       </div>
     );
   }
