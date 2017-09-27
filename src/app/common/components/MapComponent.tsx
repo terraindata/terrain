@@ -562,14 +562,16 @@ class MapComponent extends TerrainComponent<Props>
         >
           {
             this.props.markLocation ?
-              this.renderMarker(address, location, secondLocation !== undefined, color)
+              this.renderMarker(address, location, secondLocation !== undefined,
+                this.props.markerColor !== undefined ? this.props.markerColor : 'black',
+              )
               :
               null
           }
           {
             this.props.secondLocation !== undefined && this.props.showDirectDistance ?
               this.renderMarker(this.props.secondAddress, secondLocation, secondLocation !== undefined,
-                this.props.markerColor !== undefined ? this.props.markerColor : 'black')
+                color)
               :
               null
           }
