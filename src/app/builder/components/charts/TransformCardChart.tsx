@@ -294,6 +294,10 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public onCreate(value, score)
   {
+    if (score < 0)
+    {
+      score = 0;
+    }
     const { points } = this.props;
     let index = 0;
     while (points.get(index) && points.get(index).value < value)
