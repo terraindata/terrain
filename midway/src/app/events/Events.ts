@@ -46,8 +46,6 @@ THE SOFTWARE.
 
 import bodybuilder = require('bodybuilder');
 import * as Elastic from 'elasticsearch';
-import * as srs from 'secure-random-string';
-import * as sha1 from 'sha1';
 import * as winston from 'winston';
 
 import ElasticConfig from '../../database/elastic/ElasticConfig';
@@ -56,11 +54,7 @@ import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
 import { items } from '../items/ItemRouter';
 import * as Util from '../Util';
-import * as EventEncryption from './Encryption';
-
-const timeInterval: number = 5; // minutes before refreshing
-const timePeriods: number = 2; // number of past intervals to check, minimum 1
-const timeSalt: string = srs({ length: 256 }); // time salt
+import * as Encryption from './Encryption';
 
 export interface EventTemplateConfig
 {
@@ -90,6 +84,7 @@ export interface PayloadConfig
 export class Events
 {
   private eventTable: Tasty.Table;
+  private eventInfoTable: Tasty.Table;
   private payloadTable: Tasty.Table;
   private elasticController: ElasticController;
 
@@ -97,6 +92,7 @@ export class Events
   {
     const elasticConfig: ElasticConfig = DBUtil.DSNToConfig('elastic', 'http://127.0.0.1:9200') as ElasticConfig;
     this.elasticController = new ElasticController(elasticConfig, 0, 'Analytics');
+
     this.eventTable = new Tasty.Table(
       'events',
       ['id'],
@@ -121,60 +117,6 @@ export class Events
   }
 
   /*
-   * Decode message from /events/update route
-   *
-   */
-  public async decodeMessage(event: EventConfig): Promise<boolean>
-  {
-    return new Promise<boolean>(async (resolve, reject) =>
-    {
-      const checkTime = this.getClosestTime();
-      const message = event['message'] as string;
-      const emptyPayloadHash: string = Util.buildDesiredHash(event.payload);
-      for (let tp = 0; tp < timePeriods; ++tp)
-      {
-        const newTime: number = checkTime - tp * timeInterval * 60;
-        const privateKey: string = await this.getUniqueId(event.ip as string, event.id, newTime);
-        const decodedMsg: string = await EventEncryption.decrypt(message, privateKey);
-        if (Util.isJSON(decodedMsg) && emptyPayloadHash === Util.buildDesiredHash(JSON.parse(decodedMsg)))
-        {
-
-          await this.storeEvent(event);
-          return resolve(true);
-        }
-      }
-      return resolve(false);
-    });
-  }
-
-  /*
-   * Prep an empty payload with the encoded message
-   *
-   */
-  public async encodeMessage(eventReq: EventConfig): Promise<EventConfig>
-  {
-    return new Promise<EventConfig>(async (resolve, reject) =>
-    {
-      eventReq.payload = await this.getPayload(eventReq.id);
-      const privateKey: string = await this.getUniqueId(eventReq.ip, eventReq.id);
-      eventReq.message = await EventEncryption.encrypt(JSON.stringify(eventReq.payload), privateKey);
-      delete eventReq['ip'];
-      resolve(eventReq);
-    });
-  }
-
-  /*
-   * Return the number of seconds since epoch time rounded to nearest timeInterval
-   *
-   */
-  public getClosestTime(): number
-  {
-    let currSeconds: any = new Date();
-    currSeconds = Math.floor(currSeconds / 1000);
-    return currSeconds - (currSeconds % (timeInterval * 60));
-  }
-
-  /*
    * Get payload from datastore given the id
    *
    */
@@ -193,55 +135,39 @@ export class Events
   }
 
   /*
-   * Generate a random string that will be used as a private key for encryption/decryption
-   *
-   */
-  public async getUniqueId(IPSource: string, uniqueId?: string, currTime?: number): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      currTime = currTime !== undefined ? currTime : this.getClosestTime();
-      uniqueId = uniqueId !== undefined ? uniqueId : '';
-      resolve(sha1(currTime.toString() + IPSource + uniqueId + timeSalt).substring(0, 16));
-    });
-  }
-
-  /*
    * Parse incoming event request event
    *
    */
-  public async JSONHandler(IPSource: string, req: object[]): Promise<string>
+  public async JSONHandler(ip: string, reqs: object[]): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (req === undefined || (Object.keys(req).length === 0 && req.constructor === Object) || req.length === 0)
+      if (reqs === undefined || (Object.keys(reqs).length === 0 && reqs.constructor === Object) || reqs.length === 0)
       {
         return resolve('');
       }
-      const JSONArr: object[] = req;
       const encodedEventArr: EventTemplateConfig[] = [];
-      for (const jsonObj of JSONArr)
+      for (const req of reqs)
       {
-        const payload: PayloadConfig = await this.getPayload(jsonObj['id']);
+        const payload: PayloadConfig = await this.getPayload(req['id']);
         const meta: object = payload.meta;
         delete payload.meta;
         const fullPayload: object = Object.assign(payload, meta);
-        if (jsonObj['id'] === undefined || !(Object.keys(payload).length === 0))
+        if (req['id'] === undefined || !(Object.keys(payload).length === 0))
         {
           continue;
         }
-        const eventRequest: EventConfig =
-          {
-            id: fullPayload['id'],
-            eventType: fullPayload['eventType'],
-            ip: IPSource,
-            name: fullPayload['name'],
-            payload: fullPayload['payload'],
-            type: fullPayload['type'],
-            url: jsonObj['url'] !== undefined ? jsonObj['url'] : fullPayload['url'],
-            variantId: jsonObj['variantId'] !== undefined ? jsonObj['variantId'] : fullPayload['variantId'],
-          };
-        encodedEventArr.push(await this.encodeMessage(eventRequest));
+        const eventRequest: EventConfig = {
+          id: fullPayload['id'],
+          eventType: fullPayload['eventType'],
+          ip,
+          name: fullPayload['name'],
+          payload: fullPayload['payload'],
+          type: fullPayload['type'],
+          url: req['url'] !== undefined ? req['url'] : fullPayload['url'],
+          variantId: req['variantId'] !== undefined ? req['variantId'] : fullPayload['variantId'],
+        };
+        encodedEventArr.push(await Encryption.encodeMessage(eventRequest));
       }
       if (encodedEventArr.length === 0)
       {
@@ -251,83 +177,78 @@ export class Events
     });
   }
 
-  public async getVariantEvents(variantid: number, request: object): Promise<object>
+  public async getHistogram(variantid: number, request: object): Promise<object>
+  {
+    return new Promise<object>(async (resolve, reject) =>
+    {
+      if (request['interval'] === undefined)
+      {
+        reject('Required parameter \"interval\" is missing');
+      }
+
+      const client = this.elasticController.getClient();
+      const body = bodybuilder()
+        .filter('term', 'variantid', variantid)
+        .filter('term', 'eventid', request['eventid'])
+        .filter('range', '@timestamp', {
+          gte: request['start'],
+          lte: request['end'],
+        })
+        .aggregation(
+        request['agg'],
+        request['field'],
+        request['agg'],
+        {
+          interval: request['interval'],
+        },
+      );
+
+      const response = await new Promise((resolveI, rejectI) =>
+      {
+        const query = this.buildAnalyticsQuery(body.build());
+        client.search(query, Util.makePromiseCallback(resolveI, rejectI));
+      });
+      return resolve({
+        [variantid]: response['aggregations'][request['agg']].buckets,
+      });
+    });
+  }
+
+  public async getAllEvents(variantid: number, request: object): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
       const client = this.elasticController.getClient();
+      let body = bodybuilder()
+        .filter('term', 'variantid', variantid)
+        .filter('term', 'eventid', request['eventid'])
+        .filter('range', '@timestamp', {
+          gte: request['start'],
+          lte: request['end'],
+        });
 
-      let body = bodybuilder();
-      body = body.filter('term', 'variantid', variantid);
-      body = body.filter('term', 'eventid', request['eventid']);
-      body = body.filter('range', '@timestamp', {
-        gte: request['start'],
-        lte: request['end'],
+      if (request['field'] !== undefined)
+      {
+        try
+        {
+          const fields = request['field'].split(',');
+          body = body.rawOption('_source', request['field']);
+        }
+        catch (e)
+        {
+          winston.info('Ignoring malformed field value');
+        }
+      }
+
+      const response = await new Promise((resolveI, rejectI) =>
+      {
+        const query = this.buildAnalyticsQuery(body.build());
+        client.search(query, Util.makePromiseCallback(resolveI, rejectI));
       });
 
-      if (!this.isAggregationRequest(request))
-      {
-        if (request['field'] !== undefined)
-        {
-          try
-          {
-            const fields = request['field'].split(',');
-            body = body.rawOption('_source', request['field']);
-          }
-          catch (e)
-          {
-            winston.info('Ignoring malformed field value');
-          }
-        }
-
-        const response = await new Promise((resolveI, rejectI) =>
-        {
-          const query: Elastic.SearchParams = {
-            index: 'terrain-analytics',
-            type: 'events',
-            body: body.build(),
-          };
-          client.search(query, Util.makePromiseCallback(resolveI, rejectI));
-        });
-
-        return resolve({
-          [variantid]: response['hits'].hits.map((e) => e['_source']),
-        });
-      }
-      else
-      {
-        if (request['interval'] === undefined)
-        {
-          reject('Required parameter \"interval\" is missing');
-        }
-
-        if (request['field'] === undefined)
-        {
-          reject('Required parameter \"field\" is missing');
-        }
-
-        body = body.aggregation(
-          request['agg'],
-          request['field'],
-          request['agg'],
-          {
-            interval: request['interval'],
-          },
-        );
-
-        const response = await new Promise((resolveI, rejectI) =>
-        {
-          const query: Elastic.SearchParams = {
-            index: 'terrain-analytics',
-            type: 'events',
-            body: body.build(),
-          };
-          client.search(query, Util.makePromiseCallback(resolveI, rejectI));
-        });
-        return resolve({
-          [variantid]: response['aggregations'][request['agg']].buckets,
-        });
-      }
+      return resolve({
+        [variantid]: response['hits'].hits.map((e) => e['_source']),
+      });
     });
   }
 
@@ -342,7 +263,19 @@ export class Events
     const promises: Array<Promise<any>> = [];
     for (const variantid of variantids)
     {
-      promises.push(this.getVariantEvents(variantid, request));
+      if (this.isAggregationRequest(request))
+      {
+        if (request['field'] === undefined)
+        {
+          throw new Error('Required parameter \"field\" is missing');
+        }
+        const fields = request['field'].split(',');
+        promises.push(this.getHistogram(variantid, request));
+      }
+      else
+      {
+        promises.push(this.getAllEvents(variantid, request));
+      }
     }
     return Promise.all(promises);
   }
@@ -375,6 +308,14 @@ export class Events
     return (request['agg'] !== undefined && request['agg'] !== 'none');
   }
 
+  private buildAnalyticsQuery(body: object): Elastic.SearchParams
+  {
+    return {
+      index: 'terrain-analytics',
+      type: 'events',
+      body,
+    };
+  }
 }
 
 export default Events;

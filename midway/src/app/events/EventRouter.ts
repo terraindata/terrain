@@ -49,7 +49,8 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import { EventConfig, Events } from './Events';
+import * as Encryption from './Encryption';
+import { Events } from './Events';
 
 export const events: Events = new Events();
 
@@ -64,34 +65,17 @@ Router.post('/', async (ctx, next) =>
 // Handle client response for event tracker
 Router.post('/update/', async (ctx, next) =>
 {
-  try
-  {
-    const event: EventConfig =
-      {
-        id: ctx.request.body['id'],
-        ip: ctx.request.ip,
-        message: ctx.request.body['message'],
-        payload: ctx.request.body['payload'],
-        type: ctx.request.body['type'],
-        url: ctx.request.body['url'],
-      };
-    // TODO in production, use this instead
-    // await events.decodeMessage(event);
-    // ctx.body = '';
-    if (await events.decodeMessage(event))
-    {
-      ctx.body = 'Success'; // for dev/testing purposes only
-    }
-    else
-    {
-      ctx.body = '';
-    }
-  }
-  catch (e)
-  {
-    ctx.body = '';
-  }
-
+  const event: any = {
+    id: ctx.request.body['id'],
+    ip: ctx.request.ip,
+    message: ctx.request.body['message'],
+    payload: ctx.request.body['payload'],
+    type: ctx.request.body['type'],
+    url: ctx.request.body['url'],
+  };
+  const msg = await Encryption.decodeMessage(event);
+  await events.storeEvent(msg);
+  ctx.body = '';
 });
 
 // supported parameters:
