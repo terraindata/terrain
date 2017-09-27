@@ -188,7 +188,6 @@ class Library extends TerrainComponent<any>
   public render()
   {
     const { library: libraryState, analytics } = this.props;
-
     const {
       dbs,
       groups,

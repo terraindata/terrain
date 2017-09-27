@@ -106,6 +106,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     creatingNewAlgorithm: boolean;
     newAlgorithmTextboxValue: string;
     newAlgorithmDbIndex: number;
+    duplicatingAlgorithm: boolean;
+    duplicateAlgorithmTextboxValue: string;
+    duplicateAlgorithmId: ID;
   } = {
     rendered: false,
     me: null,
@@ -116,6 +119,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     creatingNewAlgorithm: false,
     newAlgorithmTextboxValue: '',
     newAlgorithmDbIndex: -1,
+    duplicatingAlgorithm: false,
+    duplicateAlgorithmTextboxValue: '',
+    duplicateAlgorithmId: '',
   };
 
   constructor(props)
@@ -185,12 +191,56 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     }
   }
 
-  public handleDuplicate(id: ID)
+  public handleAlgorithmDuplicateClose()
   {
+    this.setState({
+      duplicatingAlgorithm: false,
+      duplicateAlgorithmTextboxValue: '',
+    });
+  }
+
+  public handleAlgoriithmDuplicateConfirm()
+  {
+    const id = this.state.duplicateAlgorithmId;
+    const index = this.props.algorithmsOrder.findIndex((iid) => iid === id);
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    const dbIndex = this.getNewAlgorithmIndex();
     this.props.algorithmActions.duplicate(
       this.props.algorithms.get(id),
       this.props.algorithmsOrder.findIndex((iid) => iid === id),
+      this.state.duplicateAlgorithmTextboxValue,
+      dbs.get(dbIndex),
     );
+    this.setState({
+      duplicatingAlgorithm: false,
+      duplicateAlgorithmTextboxValue: '',
+    });
+  }
+
+  public handleAlgorithmTextboxChange(value)
+  {
+    this.setState({
+      duplicateAlgorithmTextboxValue: value,
+    });
+  }
+
+  public handleDuplicate(id: ID)
+  {
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    const options = dbs ? dbs.filter((db) => db.type === 'elastic').map((db) => db.name + ` (${db.type})`).toList() : [];
+    let selected;
+    const algorithm = this.props.algorithms.get(id);
+    if (algorithm !== undefined)
+    {
+      selected = algorithm.db.name + ` (${algorithm.db.type})`;
+    }
+
+    this.setState({
+      duplicateAlgorithmId: id,
+      duplicateAlgorithmTextboxValue: Util.duplicateNameFor(this.props.algorithms.get(id).name),
+      duplicatingAlgorithm: true,
+      newAlgorithmDbIndex: options.indexOf(selected),
+    });
   }
 
   public handleArchive(id: ID)
@@ -533,7 +583,6 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   {
     const dbs = this.getSortedDatabases(this.props.dbs);
     const options = dbs ? dbs.filter((db) => db.type === 'elastic').map((db) => db.name + ` (${db.type})`).toList() : [];
-
     return (
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
@@ -548,6 +597,28 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         </div>
       </div>
     );
+  }
+
+  public renderDuplicateAlgorithmModal()
+  {
+    const dbs = this.getSortedDatabases(this.props.dbs);
+    const algorithm = this.props.algorithms.get(this.state.duplicateAlgorithmId);
+    return (<Modal
+      open={this.state.duplicatingAlgorithm}
+      showTextbox={true}
+      confirm={true}
+      onClose={this.handleAlgorithmDuplicateClose}
+      onConfirm={this.handleAlgoriithmDuplicateConfirm}
+      onTextboxValueChange={this.handleAlgorithmTextboxChange}
+      textboxValue={this.state.duplicateAlgorithmTextboxValue}
+      title='Duplicate Algorithm'
+      confirmButtonText='Duplicate'
+      message='What would you like to name the duplicate?'
+      textboxPlaceholderValue='Algorithm Name'
+      children={this.renderDatabaseDropdown()}
+      childrenMessage='Please select a database'
+      allowOverflow={true}
+    />);
   }
 
   public renderCreateAlgorithmModal()
@@ -591,6 +662,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       >
         {
           this.renderCreateAlgorithmModal()
+        }
+        {
+          this.renderDuplicateAlgorithmModal()
         }
         {
           algorithmsOrder ?
