@@ -109,6 +109,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     duplicatingAlgorithm: boolean;
     duplicateAlgorithmTextboxValue: string;
     duplicateAlgorithmId: ID;
+    duplicateAlgorithmGroup: string;
   } = {
     rendered: false,
     me: null,
@@ -122,6 +123,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     duplicatingAlgorithm: false,
     duplicateAlgorithmTextboxValue: '',
     duplicateAlgorithmId: '',
+    duplicateAlgorithmGroup: '',
   };
 
   constructor(props)
@@ -240,6 +242,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       duplicateAlgorithmTextboxValue: Util.duplicateNameFor(this.props.algorithms.get(id).name),
       duplicatingAlgorithm: true,
       newAlgorithmDbIndex: options.indexOf(selected),
+      duplicateAlgorithmGroup: 
     });
   }
 
@@ -599,6 +602,47 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
+  public handleDuplicateAlgorithmGroupChange(value)
+  {
+    this.setState({
+      duplicateAlgorithmGroup: value,
+    })
+  }
+
+
+  public renderGroupDropdown()
+  {
+    const groupNames = [];
+    this.props.groups.map((value) => {
+      groupNames.push(value.name);
+    });
+    return (
+      <div className='new-algorithm-modal-child'>
+        <div className='database-dropdown-wrapper'>
+          <div>Select a group for the duplicate algorithm.</div>
+            <Dropdown
+              selectedIndex={this.state.duplicateAlgorithmGroup} //set this to originally be the group of the aglo you're copying
+              options={groupNames}
+              onChange={this.handleDuplicateAlgorithmGroupChange}
+              canEdit={true}
+              directionBias={90}
+              className={'bic-db-dropdown'}
+            />
+        </div>
+      </div>
+    );
+  }
+
+  public renderDuplicateDropdowns()
+  {
+    return (
+      <div>
+        { this.renderDatabaseDropdown() }
+        { this.renderGroupDropdown() }
+      </div>
+    );
+  }
+
   public renderDuplicateAlgorithmModal()
   {
     const dbs = this.getSortedDatabases(this.props.dbs);
@@ -615,7 +659,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       confirmButtonText='Duplicate'
       message='What would you like to name the duplicate?'
       textboxPlaceholderValue='Algorithm Name'
-      children={this.renderDatabaseDropdown()}
+      children={this.renderDuplicateDropdowns()}
       childrenMessage='Please select a database'
       allowOverflow={true}
     />);
