@@ -181,13 +181,9 @@ export class Events
   {
     return new Promise<object>(async (resolve, reject) =>
     {
-      if (request['interval'] === undefined)
-      {
-        reject('Required parameter \"interval\" is missing');
-      }
-
       const client = this.elasticController.getClient();
       const body = bodybuilder()
+        .size(0)
         .filter('term', 'variantid', variantid)
         .filter('term', 'eventid', request['eventid'])
         .filter('range', '@timestamp', {
@@ -195,8 +191,8 @@ export class Events
           lte: request['end'],
         })
         .aggregation(
-        request['agg'],
-        request['field'],
+        'date_histogram',
+        '@timestamp',
         request['agg'],
         {
           interval: request['interval'],
@@ -210,6 +206,95 @@ export class Events
       });
       return resolve({
         [variantid]: response['aggregations'][request['agg']].buckets,
+      });
+    });
+  }
+
+  public async getRate(variantid: number, request: object): Promise<object>
+  {
+    return new Promise<object>(async (resolve, reject) =>
+    {
+      const client = this.elasticController.getClient();
+      const eventids = request['eventid'].split(',');
+      const numerator = request['agg'] + '_' + eventids[0];
+      const denominator = request['agg'] + '_' + eventids[1];
+      const rate = request['agg'] + '_' + eventids[0] + '_' + eventids[1];
+
+      const body = bodybuilder()
+        .size(0)
+        // .orFilter('term', 'eventid', eventids[0])
+        // .orFilter('term', 'eventid', eventids[1])
+        .filter('term', 'variantid', variantid)
+        .filter('range', '@timestamp', {
+          gte: request['start'],
+          lte: request['end'],
+        })
+
+        .aggregation(
+        'date_histogram',
+        '@timestamp',
+        'histogram',
+        {
+          interval: request['interval'],
+        },
+        (agg) => agg.aggregation(
+          'filter',
+          undefined,
+          numerator,
+          {
+            term: {
+              eventid: eventids[0],
+            },
+          },
+          (agg1) => agg1.aggregation(
+            'value_count',
+            'eventid',
+            'count',
+          ),
+        )
+          .aggregation(
+          'filter',
+          undefined,
+          denominator,
+          {
+            term: {
+              eventid: eventids[1],
+            },
+          },
+          (agg1) => agg1.aggregation(
+            'value_count',
+            'eventid',
+            'count',
+          ),
+        )
+          .aggregation(
+          'bucket_script',
+          undefined,
+          rate,
+          {
+            buckets_path: {
+              [numerator]: numerator + '>count',
+              [denominator]: denominator + '>count',
+            },
+            script: 'params.' + numerator + ' / params.' + denominator,
+          }),
+      );
+
+      const response = await new Promise((resolveI, rejectI) =>
+      {
+        const query = this.buildAnalyticsQuery(body.build());
+        client.search(query, Util.makePromiseCallback(resolveI, rejectI));
+      });
+      return resolve({
+        [variantid]: response['aggregations'].histogram.buckets.map(
+          (obj) =>
+          {
+            delete obj[numerator];
+            delete obj[denominator];
+            obj.doc_count = obj[rate].value;
+            delete obj[rate];
+            return obj;
+          }),
       });
     });
   }
@@ -252,27 +337,43 @@ export class Events
     });
   }
 
-  public async getEventData(request: object): Promise<object[]>
+  public async EventHandler(request: object): Promise<object[]>
   {
-    if (request['variantid'] === undefined)
-    {
-      throw new Error('Required parameter \"variantid\" is missing');
-    }
-
     const variantids = request['variantid'].split(',');
     const promises: Array<Promise<any>> = [];
-    for (const variantid of variantids)
+    if (request['agg'] === 'histogram')
     {
-      if (this.isAggregationRequest(request))
+      if (request['interval'] === undefined)
       {
-        if (request['field'] === undefined)
-        {
-          throw new Error('Required parameter \"field\" is missing');
-        }
-        const fields = request['field'].split(',');
+        throw new Error('Required parameter \"interval\" is missing');
+      }
+
+      for (const variantid of variantids)
+      {
         promises.push(this.getHistogram(variantid, request));
       }
-      else
+    }
+    else if (request['agg'] === 'rate')
+    {
+      const eventids = request['eventid'].split(',');
+      if (eventids.length < 2)
+      {
+        throw new Error('Two \"eventid\" values are required to compute a rate');
+      }
+
+      if (request['interval'] === undefined)
+      {
+        throw new Error('Required parameter \"interval\" is missing');
+      }
+
+      for (const variantid of variantids)
+      {
+        promises.push(this.getRate(variantid, request));
+      }
+    }
+    else if (request['agg'] === 'select')
+    {
+      for (const variantid of variantids)
       {
         promises.push(this.getAllEvents(variantid, request));
       }
@@ -301,11 +402,6 @@ export class Events
   {
     event.payload = JSON.stringify(event.payload);
     return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
-  }
-
-  public isAggregationRequest(request: object): boolean
-  {
-    return (request['agg'] !== undefined && request['agg'] !== 'none');
   }
 
   private buildAnalyticsQuery(body: object): Elastic.SearchParams
