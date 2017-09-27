@@ -228,6 +228,11 @@ const Util = {
 
   roundNumber(num, decimalPoints)
   {
+    if (decimalPoints <= 0)
+    {
+      return parseInt(num, 10);
+    }
+
     return Math.round(num * Math.pow(10, decimalPoints)) / Math.pow(10, decimalPoints);
   },
 
