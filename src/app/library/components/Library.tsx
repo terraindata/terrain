@@ -300,6 +300,7 @@ class Library extends TerrainComponent<any>
               variantActions: this.props.libraryVariantActions,
               analytics,
               analyticsActions: this.props.analyticsActions,
+              algorithms,
             }}
           />
           {!variantsMultiselect ?

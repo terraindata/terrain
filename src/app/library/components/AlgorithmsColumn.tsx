@@ -109,7 +109,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     duplicatingAlgorithm: boolean;
     duplicateAlgorithmTextboxValue: string;
     duplicateAlgorithmId: ID;
-    duplicateAlgorithmGroup: string;
+    duplicateAlgorithmGroupIndex: number;
   } = {
     rendered: false,
     me: null,
@@ -123,7 +123,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     duplicatingAlgorithm: false,
     duplicateAlgorithmTextboxValue: '',
     duplicateAlgorithmId: '',
-    duplicateAlgorithmGroup: '',
+    duplicateAlgorithmGroupIndex: 0,
   };
 
   constructor(props)
@@ -207,11 +207,15 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     const index = this.props.algorithmsOrder.findIndex((iid) => iid === id);
     const dbs = this.getSortedDatabases(this.props.dbs);
     const dbIndex = this.getNewAlgorithmIndex();
+    const sorted = this.props.groups.sortBy((group) => group.id);
+    const groupIds = [];
+    sorted.map((value) => { groupIds.push(value.id); });
     this.props.algorithmActions.duplicate(
       this.props.algorithms.get(id),
       this.props.algorithmsOrder.findIndex((iid) => iid === id),
       this.state.duplicateAlgorithmTextboxValue,
       dbs.get(dbIndex),
+      groupIds[this.state.duplicateAlgorithmGroupIndex],
     );
     this.setState({
       duplicatingAlgorithm: false,
@@ -219,10 +223,17 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleAlgorithmTextboxChange(value)
+  public handleDuplicateAlgorithmTextboxChange(value)
   {
     this.setState({
       duplicateAlgorithmTextboxValue: value,
+    });
+  }
+
+  public handleDuplicateAlgorithmGroupChange(value)
+  {
+    this.setState({
+      duplicateAlgorithmGroupIndex: value,
     });
   }
 
@@ -237,13 +248,26 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       selected = algorithm.db.name + ` (${algorithm.db.type})`;
     }
 
+    const groupNames = this.getSortedGroupNames();
+    const currGroupName = this.props.groups.get(algorithm.groupId).name;
     this.setState({
       duplicateAlgorithmId: id,
       duplicateAlgorithmTextboxValue: Util.duplicateNameFor(this.props.algorithms.get(id).name),
       duplicatingAlgorithm: true,
       newAlgorithmDbIndex: options.indexOf(selected),
-      duplicateAlgorithmGroup: 
+      duplicateAlgorithmGroupIndex: groupNames.indexOf(currGroupName),
     });
+  }
+
+  public getSortedGroupNames()
+  {
+    const groupNames = [];
+    const sorted = this.props.groups.sortBy((group) => group.id);
+    sorted.map((value) =>
+    {
+      groupNames.push(value.name);
+    });
+    return groupNames;
   }
 
   public handleArchive(id: ID)
@@ -602,32 +626,21 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
-  public handleDuplicateAlgorithmGroupChange(value)
-  {
-    this.setState({
-      duplicateAlgorithmGroup: value,
-    })
-  }
-
-
   public renderGroupDropdown()
   {
-    const groupNames = [];
-    this.props.groups.map((value) => {
-      groupNames.push(value.name);
-    });
+    const groupNames = this.getSortedGroupNames();
     return (
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
-          <div>Select a group for the duplicate algorithm.</div>
-            <Dropdown
-              selectedIndex={this.state.duplicateAlgorithmGroup} //set this to originally be the group of the aglo you're copying
-              options={groupNames}
-              onChange={this.handleDuplicateAlgorithmGroupChange}
-              canEdit={true}
-              directionBias={90}
-              className={'bic-db-dropdown'}
-            />
+          <div className='duplicate-algorithm-child-message'>Please select a group for the duplicate algorithm.</div>
+          <Dropdown
+            selectedIndex={this.state.duplicateAlgorithmGroupIndex}
+            options={Immutable.List(groupNames)}
+            onChange={this.handleDuplicateAlgorithmGroupChange}
+            canEdit={true}
+            directionBias={90}
+            className={'bic-db-dropdown'}
+          />
         </div>
       </div>
     );
@@ -637,8 +650,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   {
     return (
       <div>
-        { this.renderDatabaseDropdown() }
-        { this.renderGroupDropdown() }
+        {this.renderDatabaseDropdown()}
+        {this.renderGroupDropdown()}
       </div>
     );
   }
@@ -653,15 +666,16 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       confirm={true}
       onClose={this.handleAlgorithmDuplicateClose}
       onConfirm={this.handleAlgoriithmDuplicateConfirm}
-      onTextboxValueChange={this.handleAlgorithmTextboxChange}
+      onTextboxValueChange={this.handleDuplicateAlgorithmTextboxChange}
       textboxValue={this.state.duplicateAlgorithmTextboxValue}
       title='Duplicate Algorithm'
       confirmButtonText='Duplicate'
-      message='What would you like to name the duplicate?'
+      message='What would you like to name the duplicate algorithm?'
       textboxPlaceholderValue='Algorithm Name'
       children={this.renderDuplicateDropdowns()}
-      childrenMessage='Please select a database'
+      childrenMessage='Please select a database for the duplicate algorithm.'
       allowOverflow={true}
+      inputClassName='duplicate-algorithm-modal-input'
     />);
   }
 

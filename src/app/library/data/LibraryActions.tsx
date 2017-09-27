@@ -183,7 +183,7 @@ const Actions =
               (variantId, index) =>
               {
                 const variant = variants.get(variantId);
-                setTimeout(() => dispatch(Actions.variants.duplicate(variant, index, groupId, algorithmId, db)), index * 200);
+                setTimeout(() => dispatch(Actions.variants.duplicate(variant, index, null, groupId, algorithmId, db)), index * 200);
               },
             );
           },
@@ -236,18 +236,19 @@ const Actions =
       },
 
       duplicate:
-      (variant: Variant, index: number, groupId?: ID, algorithmId?: ID, db?: BackendInstance) => (dispatch) =>
+      (variant: Variant, index: number, name?: string, groupId?: ID, algorithmId?: ID, db?: BackendInstance) => (dispatch) =>
       {
         groupId = groupId || variant.groupId;
         algorithmId = algorithmId || variant.algorithmId;
         const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
         db = db || algorithm.db;
+        name = name || Util.duplicateNameFor(variant.name);
         let newVariant = variant
           .set('id', -1)
           .set('parent', algorithmId)
           .set('algorithmId', algorithmId)
           .set('groupId', groupId)
-          .set('name', Util.duplicateNameFor(variant.name))
+          .set('name', name)
           .set('status', ItemStatus.Build)
           .set('db', db)
           .set('language', algorithm.language);
