@@ -57,8 +57,8 @@ import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import Dropdown from './Dropdown';
 
-import ColorsActions from '../../colors/data/ColorsActions';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 
 const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);

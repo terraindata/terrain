@@ -52,8 +52,8 @@ import * as _ from 'lodash';
 const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
-import ColorsActions from '../../colors/data/ColorsActions';
 import { Colors } from '../../colors/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 // syntax highlighters
@@ -151,8 +151,8 @@ class TQLEditor extends TerrainComponent<Props>
     ColorsActions.setStyle('span.es-boolean', { color: Colors().builder.cards.booleanClause + '!important' });
     ColorsActions.setStyle('span.es-parameter', { color: Colors().builder.cards.inputParameter + '!important' });
     ColorsActions.setStyle('span.es-strin', { color: Colors().builder.cards.stringClause + '!important' });
-    ColorsActions.setStyle('.CodeMirror-scroll', {background: Colors().bg3 +'!important' });
-    ColorsActions.setStyle('.CodeMirror-gutters', {background: Colors().bg3 +'!important' });
+    ColorsActions.setStyle('.CodeMirror-scroll', { background: Colors().bg3 + '!important' });
+    ColorsActions.setStyle('.CodeMirror-gutters', { background: Colors().bg3 + '!important' });
   }
 
   public componentWillUnmount()

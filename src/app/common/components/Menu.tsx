@@ -53,8 +53,8 @@ import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Menu.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
-import ColorsActions from '../../colors/data/ColorsActions';
 import { Colors } from '../../colors/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 
 const optionHeight = 30; // coordinate with Menu.less
 

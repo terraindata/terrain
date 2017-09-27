@@ -104,8 +104,6 @@ interface Theme
 
   resultLine: string;
 
-  tooltipBg: string;
-
   tqlEditor: string;
 
   // DO NOT USE these below colors anymore -- these need to be cleaned up
@@ -364,8 +362,6 @@ const DARK: Theme =
 
     resultLine: 'rgba(255,255,255,0.25)',
 
-    tooltipBg: '#fff',
-
     tqlEditor: 'monokai',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
@@ -457,8 +453,6 @@ const DARK: Theme =
           suggest: '#bbfa1e',
           parameter: code.inputParameter,
         },
-
-
 
         //by clause type
         anyClause: code.anyClause,
@@ -599,8 +593,6 @@ const LIGHT: Theme =
     import: '#1efab4',
 
     resultLine: 'rgba(0,0,0,0.25)',
-
-    tooltipBg: 'rgba(0,0,0,0.60)',
 
     tqlEditor: 'default',
 

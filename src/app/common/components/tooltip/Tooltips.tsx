@@ -55,8 +55,8 @@ import * as React from 'react';
 import { Tooltip } from 'react-tippy';
 import 'react-tippy/dist/tippy.css';
 
-import { backgroundColor, borderColor, Colors, fontColor } from './../../../colors/Colors';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { backgroundColor, borderColor, Colors, fontColor } from './../../../colors/Colors';
 
 import './Tooltips.less';
 
@@ -230,8 +230,8 @@ export const TOOLTIP_THEMES: Themes = {
     fontColor: () => Colors().text1,
   },
   alt: {
-    backgroundColor: () => Colors().tooltipBg,
-    fontColor: () => Colors().altText2,
+    backgroundColor: () => '#fff',
+    fontColor: () => '#242424',
   },
   error: {
     backgroundColor: () => Colors().error,

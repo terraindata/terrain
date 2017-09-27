@@ -48,8 +48,8 @@ THE SOFTWARE.
 
 import * as Radium from 'radium';
 import * as React from 'react';
-import ColorsActions from '../../colors/data/ColorsActions';
 import { borderColor, Colors } from '../../colors/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import './CreateLine.less';
 
