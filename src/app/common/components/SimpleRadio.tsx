@@ -43,70 +43,64 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as _ from 'lodash';
+import * as classNames from 'classnames';
+import CheckBox from 'common/components/CheckBox';
+import * as Radium from 'radium';
 import * as React from 'react';
-import { Link } from 'react-router';
+import { backgroundColor, borderColor, Colors } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import MultiSwitchWrapper from './MultiSwitchWrapper';
-import './X.less';
-
-const xes =
-  {
-    // cards:
-    // {
-    //   name: 'Immutable Builder',
-    //   component: XCards,
-    // },
-    multiSwitch:
-    {
-      name: 'Multi Switch Component',
-      component: MultiSwitchWrapper,
-    },
-  };
+import './SimpleRadio.less';
 
 export interface Props
 {
-  params?: any;
-  history?: any;
-  location?: {
-    pathname: string;
-  };
+  on: boolean;
+  label: string;
+
+  small?: boolean;
+  large?: boolean;
+
+  color?: string;
 }
 
-class X extends TerrainComponent<Props>
+@Radium
+class SimpleRadio extends TerrainComponent<Props>
 {
-  constructor(props)
-  {
-    super(props);
-  }
-
   public render()
   {
-    const { x } = this.props.params;
-
-    if (x && xes[x])
+    let { color } = this.props;
+    if (color === undefined)
     {
-      const C = xes[x].component;
-      return <C {...this.props} />;
+      color = Colors().text1;
     }
 
     return (
-      <div className='x-area'>
-        <div className='x-title'>
-          Experiments
+      <div
+        className={classNames({
+          'simple-radio': true,
+          'simple-radio-on': this.props.on,
+          'simple-radio-small': this.props.small,
+          'simple-radio-large': this.props.large,
+        })}
+      >
+        <div
+          className='simple-radio-outline'
+          style={borderColor(color)}
+        >
+          <div
+            className='simple-radio-fill'
+            style={backgroundColor(color)}
+          />
         </div>
-        {
-          _.keys(xes).map((indX) =>
-            <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
-                {xes[indX].name}
-              </div>
-            </Link>,
-          )
-        }
+        <div
+          className='simple-radio-label'
+        >
+          {
+            this.props.label
+          }
+        </div>
       </div>
     );
   }
 }
 
-export default X;
+export default SimpleRadio;

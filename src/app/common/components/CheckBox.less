@@ -10,9 +10,37 @@
     height: 12px;
     margin-right: 10px;
     text-align: center;
+    position: relative;
+    
+    .checkbox-veil {
+        height: 100%;
+        width: 0px;
+        overflow: hidden;
+        .transition(~"all 0.25s");
+        position: relative;
+        
+        .check-mark-icon {
+            position: absolute;
+            left: 2px;
+        	width: 8px;
+        	margin-top: 3px;
+        }
+    }
+    
+    &.checkbox-checked {
+        .checkbox-veil {
+            width: 100%;
+        }
+    }
 }
 
-.check-mark-icon {
-	height: 7px;
-	margin-top: 2px;
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    
+    .checkbox-label {
+        flex-grow: 1;
+        margin-left: @spacing;
+    }
 }
