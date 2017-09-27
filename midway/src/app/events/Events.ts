@@ -56,6 +56,17 @@ import { items } from '../items/ItemRouter';
 import * as Util from '../Util';
 import * as Encryption from './Encryption';
 
+export interface AggregationRequest
+{
+  variantid: string;
+  eventid: string;
+  start: string;
+  end: string;
+  agg: string;
+  field?: string;
+  interval?: string;
+}
+
 export interface EventTemplateConfig
 {
   id: string;
@@ -177,7 +188,7 @@ export class Events
     });
   }
 
-  public async getHistogram(variantid: number, request: object): Promise<object>
+  public async getHistogram(variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
@@ -185,17 +196,17 @@ export class Events
       const body = bodybuilder()
         .size(0)
         .filter('term', 'variantid', variantid)
-        .filter('term', 'eventid', request['eventid'])
+        .filter('term', 'eventid', request.eventid)
         .filter('range', '@timestamp', {
-          gte: request['start'],
-          lte: request['end'],
+          gte: request.start,
+          lte: request.end,
         })
         .aggregation(
         'date_histogram',
         '@timestamp',
-        request['agg'],
+        request.agg,
         {
-          interval: request['interval'],
+          interval: request.interval,
         },
       );
 
@@ -205,20 +216,20 @@ export class Events
         client.search(query, Util.makePromiseCallback(resolveI, rejectI));
       });
       return resolve({
-        [variantid]: response['aggregations'][request['agg']].buckets,
+        [variantid]: response['aggregations'][request.agg].buckets,
       });
     });
   }
 
-  public async getRate(variantid: number, request: object): Promise<object>
+  public async getRate(variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
       const client = this.elasticController.getClient();
-      const eventids = request['eventid'].split(',');
-      const numerator = request['agg'] + '_' + eventids[0];
-      const denominator = request['agg'] + '_' + eventids[1];
-      const rate = request['agg'] + '_' + eventids[0] + '_' + eventids[1];
+      const eventids: string[] = request.eventid.split(',');
+      const numerator = request.agg + '_' + eventids[0];
+      const denominator = request.agg + '_' + eventids[1];
+      const rate = request.agg + '_' + eventids[0] + '_' + eventids[1];
 
       const body = bodybuilder()
         .size(0)
@@ -226,8 +237,8 @@ export class Events
         // .orFilter('term', 'eventid', eventids[1])
         .filter('term', 'variantid', variantid)
         .filter('range', '@timestamp', {
-          gte: request['start'],
-          lte: request['end'],
+          gte: request.start,
+          lte: request.end,
         })
 
         .aggregation(
@@ -235,7 +246,7 @@ export class Events
         '@timestamp',
         'histogram',
         {
-          interval: request['interval'],
+          interval: request.interval,
         },
         (agg) => agg.aggregation(
           'filter',
@@ -299,25 +310,25 @@ export class Events
     });
   }
 
-  public async getAllEvents(variantid: number, request: object): Promise<object>
+  public async getAllEvents(variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
       const client = this.elasticController.getClient();
       let body = bodybuilder()
         .filter('term', 'variantid', variantid)
-        .filter('term', 'eventid', request['eventid'])
+        .filter('term', 'eventid', request.eventid)
         .filter('range', '@timestamp', {
-          gte: request['start'],
-          lte: request['end'],
+          gte: request.start,
+          lte: request.end,
         });
 
-      if (request['field'] !== undefined)
+      if (request.field !== undefined)
       {
         try
         {
-          const fields = request['field'].split(',');
-          body = body.rawOption('_source', request['field']);
+          const fields = request.field.split(',');
+          body = body.rawOption('_source', request.field);
         }
         catch (e)
         {
@@ -337,7 +348,7 @@ export class Events
     });
   }
 
-  public async EventHandler(request: object): Promise<object[]>
+  public async EventHandler(request: AggregationRequest): Promise<object[]>
   {
     const variantids = request['variantid'].split(',');
     const promises: Array<Promise<any>> = [];
