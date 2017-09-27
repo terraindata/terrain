@@ -87,35 +87,44 @@ export interface Props
   route?: any;
 }
 
+interface State {
+  fileImportState: FileImportTypes.FileImportState;
+  columnOptionNames: List<string>;
+  stepId: number;
+  servers?: SchemaTypes.ServerMap;
+  serverNames: List<string>;
+  serverIndex: number;
+  dbs?: SchemaTypes.DatabaseMap;
+  dbNames: List<string>;
+  tables?: SchemaTypes.TableMap;
+  tableNames: List<string>;
+  fileSelected: boolean;
+}
+
 @Radium
 class FileImport extends TerrainComponent<any>
 {
-  public state: {
-    fileImportState: FileImportTypes.FileImportState;
-    columnOptionNames: List<string>;
-    stepId: number;
-    servers?: SchemaTypes.ServerMap;
-    serverNames: List<string>;
-    serverIndex: number;
-    dbs?: SchemaTypes.DatabaseMap;
-    dbNames: List<string>;
-    tables?: SchemaTypes.TableMap;
-    tableNames: List<string>;
-    fileSelected: boolean;
-  } = {
-    fileImportState: FileImportStore.getState(),
-    columnOptionNames: List([]),
-    stepId: 0,
-    serverIndex: -1,
-    serverNames: List([]),
-    dbNames: List([]),
-    tableNames: List([]),
-    fileSelected: false,
-  };
+  public state: State;
 
   constructor(props)
   {
     super(props);
+
+    const { schema } = props;
+
+    this.state = {
+      fileImportState: FileImportStore.getState(),
+      columnOptionNames: List([]),
+      stepId: 0,
+      serverIndex: -1,
+      dbNames: List([]),
+      tableNames: List([]),
+      fileSelected: false,
+      servers: schema.servers,
+      dbs: schema.databases,
+      tables: schema.tables,
+      serverNames: schema.servers.keySeq().toList(),
+    };
 
     this._subscribe(FileImportStore, {
       stateKey: 'fileImportState',
