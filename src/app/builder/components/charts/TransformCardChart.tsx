@@ -177,7 +177,7 @@ class TransformCardChart extends TerrainComponent<Props>
   public updatePoints(points: ScorePoints, isConcrete?: boolean)
   {
     const domainRange = this.props.domain.get(1) - this.props.domain.get(0);
-    const decimalPoints = 4 - Math.log10(domainRange);
+    const decimalPoints = 4 - Math.floor(Math.log10(domainRange));
 
     points = points.map(
       (scorePoint) =>

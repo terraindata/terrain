@@ -169,12 +169,11 @@ class MultiSwitch extends TerrainComponent<Props>
 const SWITCH_STYLE = {
   backgroundColor: Colors().bg3,
   color: Colors().text2,
-
 };
 
 const ACTIVE_OPTION_STYLE = {
-  color: Colors().text1,
-  backgroundColor: Colors().active,
+  'color': Colors().text1,
+  'backgroundColor': Colors().active,
   ':hover': {
     color: Colors().text1,
     backgroundColor: Colors().active,
