@@ -55,8 +55,6 @@ import { ExportConfig, Import } from '../import/Import';
 
 export const imprt: Import = new Import();
 
-const sftp = new Client();
-
 const sftpconfig: object =
   {
     host: '10.1.1.103',
@@ -67,14 +65,19 @@ const sftpconfig: object =
 
 export interface SchedulerConfig
 {
-  id?: number;
-  jobId?: number;
-  jobType?: string;
-  params?: object;
-  paramsArr?: any[];
-  schedule: string;
-  sort?: string;
-  transport?: object;
+  active?: number;                   // whether the schedule is running (different from currentlyRunning)
+  archived?: number;                 // whether the schedule has been archived (deleted) or not
+  currentlyRunning?: number;         // whether the job is currently running
+  id?: number;                       // schedule ID
+  jobId?: number;                    // corresponds to job ID
+  jobType?: string;                  // import or export etc.
+  paramsJob?: object;                // parameters passed for the job, excluding info like filename
+  paramsScheduleArr?: any[];         // parameters passed for the schedule
+  paramsScheduleStr?: string;        // JSON stringified representation of paramsScheduleArr
+  schedule: string;                  // cronjob format for when the schedule should run
+  sort?: string;                     // for regex expression file matching, which end of the list should be used
+  transport?: object;                // sftp and relevant parameters, https, local filesystem, etc.
+  transportStr?: string;             // JSON stringified representation of transport
 }
 
 export class Scheduler
@@ -87,20 +90,43 @@ export class Scheduler
   {
     this.jobMap = {};
     this.scheduleMap = {};
-    Promise.resolve(this.createJobs());
 
     this.schedulerTable = new Tasty.Table(
       'schedules',
       ['id'],
       [
+        'active',
+        'archived',
+        'currentlyRunning',
         'jobId',
         'jobType',
-        'params',
+        'paramsScheduleStr',
         'schedule',
         'sort',
-        'transport',
+        'transportStr',
       ],
     );
+  }
+
+  public async archive(id: number): Promise<SchedulerConfig[]>
+  {
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
+    {
+      // TODO: cancel job if it's currently running
+      if (id !== undefined)
+      {
+        const schedules: SchedulerConfig[] = await this.get(id) as SchedulerConfig[];
+        if (schedules.length !== 0)
+        {
+          for (const schedule of schedules)
+          {
+            schedule.archived = 1;
+          }
+          return resolve(await App.DB.upsert(this.schedulerTable, { id } as object) as SchedulerConfig[]);
+        }
+      }
+      return reject('Schedule ID not found.');
+    });
   }
 
   public async cancelJob(jobID: number): Promise<boolean>
@@ -116,56 +142,10 @@ export class Scheduler
       {
         if (schedules.hasOwnProperty(schedule))
         {
-          this.scheduleMap[schedule['id']].cancel();
+          this.scheduleMap[schedule['id']].cancelNext();
         }
       }
       return resolve(true);
-    });
-  }
-
-  public async createJobs(): Promise<void>
-  {
-    // 0: import via sftp
-    // 1: export via sftp
-    return new Promise<void>(async (resolve, reject) =>
-    {
-      await this.createJob(async (fields: object, path: string, encoding?: string | null) => // import with sftp
-      {
-        return new Promise<any>(async (resolveJob, rejectJob) =>
-        {
-          encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
-          const wth = await sftp.connect(sftpconfig);
-          winston.info(path.substring(0, path.lastIndexOf('/') + 1));
-          const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
-          const CheckIfFileExists: object[] = checkIfDirectoryExists.filter((filename) =>
-          {
-            return filename['name'] === path.substring(path.lastIndexOf('/') + 1);
-          });
-          if (checkIfDirectoryExists.length > 0 && CheckIfFileExists.length !== 0) // TODO: add permissions checking
-          {
-            winston.info('Starting import with sftp');
-            const readStream: stream.Readable = await sftp.get(path, false, encoding);
-            const result = await imprt.upsert(readStream, fields, true);
-            resolveJob('Success');
-          }
-        });
-      });
-
-      await this.createJob(async (fields: object, path: string, encoding?: string | null) => // export with sftp
-      {
-        return new Promise<any>(async (resolveJob, rejectJob) =>
-        {
-          encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
-          const wth = await sftp.connect(sftpconfig);
-          const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
-          if (checkIfDirectoryExists.length > 0) // TODO: add permissions checking
-          {
-            winston.info('Starting export with sftp');
-            const readStream: stream.Readable = await sftp.put(await imprt.export(fields as ExportConfig, true), path, false, encoding);
-            resolveJob('Success');
-          }
-        });
-      });
     });
   }
 
@@ -188,33 +168,38 @@ export class Scheduler
   {
     return new Promise<SchedulerConfig>(async (resolve, reject) =>
     {
+      if (req.id !== undefined)
+      {
+        return reject('Cannot create a custom schedule with a passed ID.');
+      }
+      if (req.jobId !== undefined)
+      {
+        return reject('Cannot create a custom schedule with a passed job ID.');
+      }
       let jobId: number = -1;
-      let argsV: any[] = [];
+      let packedParamsSchedule: any[] = [];
 
       if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'sftp')
       {
         jobId = 0;
-        argsV = [req['params'], (req['transport'] as any)['filename'], 'utf8'];
+        packedParamsSchedule = [req['paramsJob'], (req['transport'] as any)['filename'], 'utf8'];
       }
       else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'sftp')
       {
         jobId = 1;
-        argsV = [req['params'], (req['transport'] as any)['filename'], 'utf8'];
+        packedParamsSchedule = [req['paramsJob'], (req['transport'] as any)['filename'], 'utf8'];
       }
-
-      let lastKey: number = Number(Object.keys(this.scheduleMap).sort().reverse()[0]);
-      if (lastKey === undefined || isNaN(lastKey))
-      {
-        lastKey = -1;
-      }
-      lastKey += 1;
-
+      req.active = 1;
+      req.archived = 0;
+      req.jobId = jobId;
+      req.paramsScheduleArr = packedParamsSchedule;
+      const newScheduledJob: SchedulerConfig[] = await this.upsert(req);
+      const resultJobId: string = newScheduledJob[0]['id'] !== undefined ? (newScheduledJob[0]['id'] as any).toString() : '-1';
+      packedParamsSchedule = [resultJobId].concat(packedParamsSchedule);
       const job: any = nodeScheduler.scheduleJob(req.schedule,
-        function callJob(unwrappedParams) { this.jobMap[jobId](...unwrappedParams); }.bind(this, argsV));
-      const result: SchedulerConfig = await this.upsert(req);
-      const resultJobId: string = result['id'] !== undefined ? (result['id'] as number).toString() : '-1';
+        function callJob(unwrappedParams) { this.jobMap[jobId](...unwrappedParams); }.bind(this, packedParamsSchedule));
       this.scheduleMap[resultJobId] = job;
-      return resolve(result);
+      return resolve(newScheduledJob[0]);
     });
   }
 
@@ -224,67 +209,240 @@ export class Scheduler
     {
       if (req['jobId'] !== undefined && Object.keys(this.jobMap).indexOf((req['jobId'] as number).toString()) !== -1)
       {
-        return resolve(await this.upsert(req));
+        req.active = 1;
+        req.archived = 0;
+        const newScheduledJob: SchedulerConfig[] = await this.upsert(req);
+        const resultJobId: string = newScheduledJob[0]['id'] !== undefined ? (newScheduledJob[0]['id'] as any).toString() : '-1';
+        const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[resultJobId]);
+        this.scheduleMap[resultJobId] = job;
+        return resolve(newScheduledJob[0]);
       }
       resolve(null);
     });
   }
 
-  public async get(id?: number): Promise<SchedulerConfig[]>
+  public async get(id?: number, archived?: boolean): Promise<SchedulerConfig[]>
   {
+    const archivedInt: number = archived === true ? 1 : 0;
     if (id !== undefined)
     {
-      return App.DB.select(this.schedulerTable, [], { id }) as any;
+      return App.DB.select(this.schedulerTable, [], { id, archived: archivedInt }) as any;
     }
-    return App.DB.select(this.schedulerTable, [], {}) as any;
+    return App.DB.select(this.schedulerTable, [], { archived: archivedInt }) as any;
   }
 
-  public async updateSchedule(req: SchedulerConfig): Promise<string> // TODO
+  public async initializeJobs(): Promise<void>
   {
-    return new Promise<string>(async (resolve, reject) =>
+    // 0: import via sftp
+    // 1: export via sftp
+    await this.createJob(async (scheduleID: number, fields: object,
+      path: string, encoding?: string | null): Promise<any> => // import with sftp
     {
-      if (req.id === undefined || Object.keys(this.scheduleMap).indexOf(req.id.toString()) === -1)
+      return new Promise<any>(async (resolveJob, rejectJob) =>
       {
-        return reject('ID does not exist in schedules.');
-      }
-      if (req.id === undefined)
-      {
-        return reject('ID must be a parameter.');
-      }
-      if (req['jobId'] === undefined)
-      {
-        return reject('Job ID cannot be undefined.');
-      }
+        const sftp = new Client();
+        try
+        {
+          await this.setJobStatus(scheduleID, 1);
+          encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
+          await sftp.connect(sftpconfig);
+          winston.info(path.substring(0, path.lastIndexOf('/') + 1));
+          const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
+          const CheckIfFileExists: object[] = checkIfDirectoryExists.filter((filename) =>
+          {
+            return filename['name'] === path.substring(path.lastIndexOf('/') + 1);
+          });
+          if (checkIfDirectoryExists.length > 0 && CheckIfFileExists.length !== 0) // TODO: add permissions checking
+          {
+            winston.info('Starting import with sftp');
+            const readStream: stream.Readable = await sftp.get(path, false, encoding);
+            const result = await imprt.upsert(readStream, fields, true);
+            await this.setJobStatus(scheduleID, 0);
+            await sftp.end();
+            winston.info('Successfully completed scheduled import with sftp.');
+            return resolveJob('Success');
+          }
+          return resolveJob('Failed to import.');
+        }
+        catch (e)
+        {
+          winston.info('Exception caught: ' + (e.toString() as string));
+          await this.setJobStatus(scheduleID, 0);
+          await sftp.end();
+          return rejectJob(e.toString());
+        }
+      });
+    });
 
-      if (req['jobId'] !== undefined && Object.keys(this.jobMap).indexOf((req['jobId'] as number).toString()) === -1)
+    await this.createJob(async (scheduleID: number, fields: object, path: string, encoding?: string | null) => // export with sftp
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
       {
-        return reject('Job ID does not exist in jobs.');
-      }
-      this.scheduleMap[req.id].cancel();
-      delete this.scheduleMap[req.id];
-      const args: any[] | undefined = req['paramsArr'] !== undefined ? req['paramsArr'] : [];
-      const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[(req['jobId'] as number)](args));
-      this.scheduleMap[req.id] = { id: req.id, job, jobId: req.jobId, schedule: req.schedule };
-      resolve(JSON.stringify(this.scheduleMap[req.id]));
+        const sftp = new Client();
+        try
+        {
+          await this.setJobStatus(scheduleID, 1);
+          encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
+          await sftp.connect(sftpconfig);
+          const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
+          if (checkIfDirectoryExists.length > 0) // TODO: add permissions checking
+          {
+            winston.info('Starting export with sftp');
+            const readStream: stream.Readable = await sftp.put(await imprt.export(fields as ExportConfig, true), path, false, encoding);
+            await sftp.end();
+            winston.info('Successfully completed scheduled export with sftp.');
+            return resolveJob('Success');
+          }
+        }
+        catch (e)
+        {
+          winston.info('Exception caught: ' + (e.toString() as string));
+          await this.setJobStatus(scheduleID, 0);
+          await sftp.end();
+          return rejectJob(e.toString());
+        }
+      });
     });
   }
 
-  public async upsert(schedule: SchedulerConfig): Promise<SchedulerConfig>
+  public async initializeSchedules(): Promise<void>
   {
-    // TODO: cancel job if it's currently running
-    return App.DB.upsert(this.schedulerTable, schedule) as Promise<SchedulerConfig>;
+    const schedules: SchedulerConfig[] = await this.get() as SchedulerConfig[];
+    for (const scheduleInd in schedules)
+    {
+      if (schedules[scheduleInd].active !== undefined && schedules[scheduleInd].active === 1) // only start active schedules
+      {
+        const schedule: SchedulerConfig = schedules[scheduleInd];
+        const scheduleJobId: string = schedule['id'] !== undefined ? (schedule['id'] as number).toString() : '-1';
+        try
+        {
+          if (schedule.paramsScheduleStr !== undefined)
+          {
+            schedule.paramsScheduleArr = JSON.parse(schedule.paramsScheduleStr as string);
+          }
+          else
+          {
+            winston.info('Schedule ' + ((schedule['id'] as any).toString() as string) + ' does not have a valid schedule params object.');
+          }
+        }
+        catch (e)
+        {
+          winston.info('Schedule ' + ((schedule['id'] as any).toString() as string) + ' does not have a valid schedule params object.');
+        }
+
+        try
+        {
+          if (schedule.paramsScheduleStr !== undefined)
+          {
+            schedule.transport = JSON.parse(schedule.transportStr as string);
+          }
+          else
+          {
+            winston.info('Schedule ' + ((schedule['id'] as any).toString() as string) + ' does not have a valid transport object.');
+          }
+        }
+        catch (e)
+        {
+          winston.info('Schedule ' + ((schedule['id'] as any).toString() as string) + ' does not have a valid transport object.');
+        }
+        const appendedParamsArr: any[] = [scheduleJobId].concat(JSON.parse(schedule.paramsScheduleStr as string));
+        const job: any = nodeScheduler.scheduleJob(schedule.schedule,
+          function callJob(unwrappedParams)
+          {
+            this.jobMap[(schedule['jobId'] as number)](...unwrappedParams);
+          }.bind(this, appendedParamsArr));
+        this.scheduleMap[scheduleJobId] = job;
+      }
+    }
   }
 
-  public async delete(id: number): Promise<SchedulerConfig[]>
+  public async setJobStatus(scheduleID: number, status: number): Promise<boolean>
   {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      const schedules: SchedulerConfig[] = await this.get(scheduleID) as SchedulerConfig[];
+      if (schedules.length !== 0)
+      {
+        const schedule: SchedulerConfig = schedules[0];
+        schedule.currentlyRunning = status;
+        return resolve(true);
+      }
+      return resolve(false);
+    });
+  }
+
+  public async upsert(schedule: SchedulerConfig): Promise<SchedulerConfig[]>
+  {
+    // TODO: cancel job if it's currently running
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      // TODO: cancel job if it's currently running
-      if (id !== undefined && (await this.get(id)).length !== 0)
+      schedule.paramsScheduleStr = Array.isArray(schedule.paramsScheduleArr) ?
+        JSON.stringify(schedule.paramsScheduleArr) : schedule.paramsScheduleStr;
+      if (schedule.transportStr === undefined)
       {
-        return resolve(await App.DB.delete(this.schedulerTable, { id } as object) as SchedulerConfig[]);
+        try
+        {
+          if (schedule.transport !== undefined)
+          {
+            schedule.transportStr = JSON.stringify(schedule.transport as object);
+          }
+          else
+          {
+            return reject('Transport is not defined.');
+          }
+        }
+        catch (e)
+        {
+          return reject('Transport is not a valid object.');
+        }
       }
-      return reject('Schedule ID not found.');
+
+      if (schedule.jobId === undefined)
+      {
+        return reject('Cannot upsert without a JobID.');
+      }
+      schedule.jobType = schedule.jobType === undefined ? '' : schedule.jobType;
+      schedule.sort = schedule.sort === undefined ? '' : schedule.sort;
+      if (schedule.schedule === undefined)
+      {
+        return reject('Must provide a schedule in cronjob format.');
+      }
+      if (schedule.id !== undefined) // update existing schedule
+      {
+        const schedules: SchedulerConfig[] = await this.get(schedule.id) as SchedulerConfig[];
+        if (schedules.length !== 0)
+        {
+          for (const scheduleObj of schedules)
+          {
+            if (scheduleObj.archived !== undefined && scheduleObj.archived === 1)
+            {
+              return reject('Cannot upsert on an archived schedule.');
+            }
+            if (scheduleObj.currentlyRunning !== undefined && scheduleObj.currentlyRunning === 1)
+            {
+              this.scheduleMap[(scheduleObj['id'] as number)].cancelNext();
+              if (scheduleObj.active === 1)
+              {
+                const resultJobId: string = schedule.id !== undefined ? (schedule['id'] as number).toString() : '-1';
+                const appendedParamsArr: any[] = [schedule.paramsScheduleArr];
+                const job: any = nodeScheduler.scheduleJob(schedule.schedule,
+                  function callJob(unwrappedParams)
+                  {
+                    this.jobMap[(schedule['jobId'] as number)](...unwrappedParams);
+                  }.bind(this, appendedParamsArr));
+                this.scheduleMap[resultJobId] = job;
+              }
+            }
+          }
+        }
+      }
+      else
+      {
+        schedule.active = schedule.active !== undefined ? schedule.active : 0;
+        schedule.archived = 0;
+        schedule.currentlyRunning = 0;
+      }
+      return resolve(await App.DB.upsert(this.schedulerTable, schedule) as SchedulerConfig[]);
     });
   }
 }

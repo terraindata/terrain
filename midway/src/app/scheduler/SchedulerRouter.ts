@@ -83,7 +83,7 @@ Router.post('/create', async (ctx, next) =>
       return;
     }
     const schedule: SchedulerConfig = ctx.request.body.body;
-    Util.verifyParameters(schedule, ['jobId', 'jobType', 'params', 'schedule', 'sort', 'transport']);
+    Util.verifyParameters(schedule, ['jobType', 'paramsJob', 'schedule', 'sort', 'transport']);
     ctx.body = await scheduler.createCustomSchedule(schedule);
   }
 });
@@ -91,7 +91,7 @@ Router.post('/create', async (ctx, next) =>
 // Delete scheduled jobs by parameter
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.delete(ctx.params.id);
+  ctx.body = await scheduler.archive(ctx.params.id);
 });
 
 // Update job
