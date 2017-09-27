@@ -150,7 +150,10 @@ class TQLResultsBar extends TerrainComponent<Props>
         style={backgroundColor(Colors().bg1)}
         onClick={this.props.onToggle}
       >
-        <div className='tql-results-bar-inner'>
+        <div 
+          className='tql-results-bar-inner'
+          style={backgroundColor(Colors().bg2)}
+        >
           {
             this.renderResults()
           }

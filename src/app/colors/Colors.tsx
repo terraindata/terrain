@@ -297,7 +297,7 @@ const code =
     arrayClause: '#b161bc',
 
     enumClause: 'rgb(255, 189, 86)',
-    fieldClause: '#fad14b', // pastel purple: 'rgb(144, 118, 170)',
+    fieldClause: '#f99c49', // pastel purple: 'rgb(144, 118, 170)',
 
     structureClause: '#4fc0ba',
     mapClause: '#4fc0ba',
@@ -458,6 +458,8 @@ const DARK: Theme =
           parameter: code.inputParameter,
         },
 
+
+
         //by clause type
         anyClause: code.anyClause,
         arrayClause: code.arrayClause,
@@ -551,9 +553,9 @@ const LIGHT: Theme =
 
     bg1: 'rgb(225, 227, 231)',
     bg2: 'rgb(237, 239, 243)',
-    bg3: 'rgb(244, 246, 250)',
+    bg3: '#fff',
 
-    emptyBg: '#fff',
+    emptyBg: 'rgb(249, 251, 255)',
 
     border1: 'rgb(200, 202, 206)',
     border2: 'rgb(100,105,107)',
@@ -579,7 +581,7 @@ const LIGHT: Theme =
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
-    inputBg: 'rgba(0,0,0,0.15)',
+    inputBg: 'rgb(237, 239, 243)',
 
     active: darkActive,
     activeText: '#fff',
@@ -679,14 +681,14 @@ const LIGHT: Theme =
         //by category
         categories: {
           primary: '#4fc0ba',
-          control: '#fad14b',
+          control: '#f99c49',
           sort: '#1eb4fa',
           filter: '#38fa1e',
           match: '#b161bc',
           score: '#1eb4fa',
           script: '#4fc0ba',
-          compound: '#fad14b',
-          join: '#fad14b',
+          compound: '#f99c49',
+          join: '#f99c49',
           geo: '#0ee06b',
           suggest: '#bbfa1e',
           parameter: code.inputParameter,
