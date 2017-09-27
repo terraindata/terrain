@@ -763,6 +763,7 @@ export const Ajax =
       transformations: Immutable.List<object>,
       query: string,
       rank: boolean,
+      objectKey: string,
       downloadFilename: string,
       onLoad: (resp: any) => void,
       onError?: (ev: string) => void,
@@ -775,6 +776,7 @@ export const Ajax =
         columnTypes,
         query,
         rank,
+        objectKey,
         transformations,
       };
       const onLoadHandler = (resp) =>
