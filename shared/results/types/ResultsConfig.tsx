@@ -68,7 +68,11 @@ export const _Format = (config?: any) =>
 export class ResultsConfig
 {
   name: string = '';
-  score: string = '';
+  score: string = '_score';
+  fields: List<string> = List([]);
+  enabled: boolean = false;
+  formats: IMMap<string, Format> = Map<string, Format>({});
+  primaryKeys: List<string> = List(['_id']);;
   fields: List<string> = List([]);
   enabled: boolean = false;
   formats: IMMap<string, Format> = Map<string, Format>({});
