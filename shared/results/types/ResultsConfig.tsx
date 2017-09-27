@@ -72,10 +72,6 @@ export class ResultsConfig
   fields: List<string> = List([]);
   enabled: boolean = false;
   formats: IMMap<string, Format> = Map<string, Format>({});
-  primaryKeys: List<string> = List(['_id']);;
-  fields: List<string> = List([]);
-  enabled: boolean = false;
-  formats: IMMap<string, Format> = Map<string, Format>({});
   primaryKeys: List<string> = List(['_id']);
 
   set: (f: string, v: any) => ResultsConfig;
