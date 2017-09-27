@@ -50,8 +50,8 @@ import { Card } from '../../blocks/types/Card';
 import { Input, InputPrefix } from '../../blocks/types/Input';
 
 import * as Immutable from 'immutable';
-import { BuilderState, BuilderStore } from './data/BuilderStore';
 import { SchemaState } from 'schema/SchemaTypes';
+import { BuilderState, BuilderStore } from './data/BuilderStore';
 
 export function getTermsForKeyPath(keyPath: KeyPath, schemaState: SchemaState): List<string>
 {

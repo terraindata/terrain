@@ -87,13 +87,13 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 
 // data that needs to be loaded
 import TerrainTools from 'util/TerrainTools';
+import SchemaActions from 'schema/data/SchemaActions';
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
 import ColorsActions from './colors/data/ColorsActions';
 import ColorsStore from './colors/data/ColorsStore';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
-import SchemaActions from 'schema/data/SchemaActions';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
@@ -427,5 +427,5 @@ class App extends TerrainComponent<Props>
 export default Util.createContainer(
   App,
   [],
-  { schemaActions: SchemaActions }
+  { schemaActions: SchemaActions },
 );

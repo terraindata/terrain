@@ -58,10 +58,10 @@ import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
 const Radium = require('radium');
 import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
+import Util from 'util/Util';
 import FadeInOut from '../../common/components/FadeInOut';
 import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
 import SchemaTreeList from './SchemaTreeList';
-import Util from 'util/Util';
 
 export interface Props
 {
@@ -139,7 +139,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
   public lastHeaderClickTime: number = 0;
   public lastArrowClickTime: number = 0;
 
-  public componentWillReceiveProps(nextProps: Props) {
+  public componentWillReceiveProps(nextProps: Props)
+  {
     const { schema: state } = nextProps;
     if (this.state.childCount === -1) // assumes that schema data does not change
     {
@@ -321,13 +322,13 @@ class SchemaTreeItem extends TerrainComponent<Props>
           <div>
             {
               ['server', 'database', 'table', 'column'].map(
-                (type) =>
+                (itemType) =>
                 {
-                  const id = item[type + 'Id'];
+                  const itemId = item[itemType + 'Id'];
 
-                  if (id)
+                  if (itemId)
                   {
-                    const parentItem = schema.getIn([type + 's', id]);
+                    const parentItem = schema.getIn([itemType + 's', itemId]);
                     return parentItem && parentItem.name + ' > ';
                   }
                 },

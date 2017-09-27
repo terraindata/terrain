@@ -310,7 +310,7 @@ export function parseMySQLDb(rawServer: object,
       fieldProperties: fieldPropertiesMap,
       tableNames,
       columnNames: columnNamesByTable,
-    }));
+    });
   });
 }
 
@@ -438,7 +438,7 @@ export function parseElasticDb(elasticServer: object,
       fieldProperties: fieldPropertiesMap,
       tableNames,
       columnNames: columnNamesByTable,
-    });
+    }));
 
     didSetServer = true;
   });

@@ -50,14 +50,14 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const Radium = require('radium');
 import * as React from 'react';
+import { SchemaState } from 'schema/SchemaTypes';
+import Util from 'util/Util';
 import FadeInOut from '../../common/components/FadeInOut';
 import Styles from '../../Styles';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaTreeItem from './SchemaTreeItem';
 import SchemaTreeStyles from './SchemaTreeStyles';
-import { SchemaState } from 'schema/SchemaTypes';
-import Util from 'util/Util';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 
 export interface Props
@@ -291,5 +291,5 @@ class SchemaSearchResults extends TerrainComponent<Props>
 export default Util.createContainer(
   SchemaSearchResults,
   ['schema'],
-  {}
+  {},
 );

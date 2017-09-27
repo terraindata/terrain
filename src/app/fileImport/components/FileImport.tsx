@@ -87,7 +87,8 @@ export interface Props
   route?: any;
 }
 
-interface State {
+interface State
+{
   fileImportState: FileImportTypes.FileImportState;
   columnOptionNames: List<string>;
   stepId: number;

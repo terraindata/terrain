@@ -53,13 +53,13 @@ import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 import * as PropTypes from 'prop-types';
+import Util from 'util/Util';
 import { _ResultsConfig } from '../../../../shared/results/types/ResultsConfig';
 import { _Query, Query } from '../../../items/types/Query';
 import ResultsArea from '../../builder/components/results/ResultsArea';
 import { ResultsManager } from '../../builder/components/results/ResultsManager';
 import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
 import InfoArea from '../../common/components/InfoArea';
-import Util from 'util/Util';
 
 import { AllBackendsMap } from '../../../database/AllBackends';
 
@@ -252,5 +252,5 @@ class SchemaResults extends TerrainComponent<Props>
 export default Util.createContainer(
   SchemaResults,
   ['schema'],
-  {}
+  {},
 );

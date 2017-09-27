@@ -46,26 +46,28 @@ THE SOFTWARE.
 
 // tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
 
-import * as _ from 'lodash';
-import * as Immutable from 'immutable';
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import Util from 'util/Util';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import SchemaActionTypes from 'schema/data/SchemaActionTypes';
-import * as SchemaTypes from 'schema/SchemaTypes';
 import * as SchemaParser from 'schema/data/SchemaParser';
-import BackendInstance from '../../../database/types/BackendInstance';
-import { ItemStatus } from '../../../items/types/Item';
+import * as SchemaTypes from 'schema/SchemaTypes';
 import Ajax from 'util/Ajax';
 import AjaxM1 from 'util/AjaxM1';
+import Util from 'util/Util';
+import BackendInstance from '../../../database/types/BackendInstance';
+import { ItemStatus } from '../../../items/types/Item';
 
-const $ = (type: string, payload: any) => {
+const $ = (type: string, payload: any) =>
+{
   return { type, payload };
-}
+};
 
 const SchemaActions =
   {
     fetch:
-    () => (dispatch) => {
+    () => (dispatch) =>
+    {
       dispatch($(SchemaActionTypes.fetch, {}));
       Ajax.getDbs(
         (dbs: object) =>
@@ -126,7 +128,7 @@ const SchemaActions =
           dispatch(SchemaActions.error(JSON.stringify(dbError)));
         },
       );
-    }
+    },
 
     serverCount:
     (serverCount: number) =>
@@ -162,6 +164,5 @@ const SchemaActions =
       }),
 
   };
-
 
 export default SchemaActions;

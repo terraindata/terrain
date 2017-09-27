@@ -49,9 +49,9 @@ THE SOFTWARE.
 const Radium = require('radium');
 import * as $ from 'jquery';
 import * as React from 'react';
+import SchemaActions from 'schema/data/SchemaActions';
 import FadeInOut from '../../common/components/FadeInOut';
 import Util from '../../util/Util';
-import SchemaActions from 'schema/data/SchemaActions';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaResults from './SchemaResults';

@@ -52,10 +52,11 @@ import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as BlockUtils from '../../../blocks/BlockUtils';
 import Util from 'util/Util';
+import * as BlockUtils from '../../../blocks/BlockUtils';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { SchemaState } from 'schema/SchemaTypes';
 import { Display } from '../../../blocks/displays/Display';
 import { Card, CardString } from '../../../blocks/types/Card';
 import { isInput } from '../../../blocks/types/Input';
@@ -65,7 +66,6 @@ import CardDropArea from '../../builder/components/cards/CardDropArea';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
 import Store from '../../builder/data/BuilderStore';
-import { SchemaState } from 'schema/SchemaTypes';
 import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../common/Colors';
 import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
@@ -573,5 +573,5 @@ class BuilderTextbox extends TerrainComponent<Props>
 export default Util.createContainer(
   BuilderTextbox,
   ['schema'],
-  {}
+  {},
 );

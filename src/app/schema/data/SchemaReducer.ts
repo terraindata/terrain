@@ -44,97 +44,97 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable'
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import * as SchemaTypes from '../SchemaTypes';
+import { _SchemaState } from 'schema/SchemaTypes';
 import Ajax from 'util/Ajax';
 import AjaxM1 from 'util/AjaxM1';
-import SchemaActionTypes from './SchemaActionTypes';
 import BackendInstance from '../../../database/types/BackendInstance';
-import { _SchemaState } from 'schema/SchemaTypes';
+import * as SchemaTypes from '../SchemaTypes';
+import SchemaActionTypes from './SchemaActionTypes';
 
 type SchemaState = SchemaTypes.SchemaState;
 
 const SchemaReducer = {};
 
 SchemaReducer[SchemaActionTypes.fetch] =
-(state: SchemaState) =>
-{
-  return state
-    .set('loading', true);
-};
+  (state: SchemaState) =>
+  {
+    return state
+      .set('loading', true);
+  };
 
 SchemaReducer[SchemaActionTypes.serverCount] =
-(
-  state: SchemaState,
-  action: Action<{
-    serverCount: number,
-  }>,
-) =>
-  state.set('serverCount', action.payload.serverCount);
+  (
+    state: SchemaState,
+    action: Action<{
+      serverCount: number,
+    }>,
+  ) =>
+    state.set('serverCount', action.payload.serverCount);
 
 SchemaReducer[SchemaActionTypes.setServer] =
-(
-  state: SchemaState,
-  action: Action<SchemaTypes.SetServerActionPayload>,
-) =>
-{
-  const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
-
-  if (state.servers.size === state.serverCount - 1)
+  (
+    state: SchemaState,
+    action: Action<SchemaTypes.SetServerActionPayload>,
+  ) =>
   {
-    state = state.set('loading', false).set('loaded', true);
-  }
+    const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
 
-  return state
-    .setIn(['servers', server.id], server)
-    .set('databases', state.databases.merge(databases))
-    .set('tables', state.tables.merge(tables))
-    .set('columns', state.columns.merge(columns))
-    .set('indexes', state.indexes.merge(indexes))
-    .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
-  // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
-  // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
-};
+    if (state.servers.size === state.serverCount - 1)
+    {
+      state = state.set('loading', false).set('loaded', true);
+    }
+
+    return state
+      .setIn(['servers', server.id], server)
+      .set('databases', state.databases.merge(databases))
+      .set('tables', state.tables.merge(tables))
+      .set('columns', state.columns.merge(columns))
+      .set('indexes', state.indexes.merge(indexes))
+      .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
+    // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
+    // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
+  };
 
 SchemaReducer[SchemaActionTypes.addDbToServer] =
-(
-  state: SchemaState,
-  action: Action<SchemaTypes.AddDbToServerActionPayload>,
-) =>
-{
-  const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
-
-  let newServer = server;
-  if (state.servers.get(server.id))
+  (
+    state: SchemaState,
+    action: Action<SchemaTypes.AddDbToServerActionPayload>,
+  ) =>
   {
-    newServer = state.servers.get(server.id).set('databaseIds',
-      state.servers.get(server.id).databaseIds.concat(server.databaseIds)
-    );
-  }
+    const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
 
-  return state
-    .setIn(['servers', server.id], newServer)
-    .set('databases', state.databases.merge(databases))
-    .set('tables', state.tables.merge(tables))
-    .set('columns', state.columns.merge(columns))
-    .set('indexes', state.indexes.merge(indexes))
-    .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
-  // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
-  // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
-};
+    let newServer = server;
+    if (state.servers.get(server.id) !== undefined)
+    {
+      newServer = state.servers.get(server.id).set('databaseIds',
+        state.servers.get(server.id).databaseIds.concat(server.databaseIds),
+      );
+    }
+
+    return state
+      .setIn(['servers', server.id], newServer)
+      .set('databases', state.databases.merge(databases))
+      .set('tables', state.tables.merge(tables))
+      .set('columns', state.columns.merge(columns))
+      .set('indexes', state.indexes.merge(indexes))
+      .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
+    // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
+    // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
+  };
 
 SchemaReducer[SchemaActionTypes.selectId] =
-(state: SchemaState, action: Action<{ id: ID }>) =>
-  state.set('selectedId', action.payload.id);
+  (state: SchemaState, action: Action<{ id: ID }>) =>
+    state.set('selectedId', action.payload.id);
 
 SchemaReducer[SchemaActionTypes.highlightId] =
-(state: SchemaState, action: Action<{
-  id: ID,
-  inSearchResults: boolean,
-}>) =>
-  state.set('highlightedId', action.payload.id)
-    .set('highlightedInSearchResults', action.payload.inSearchResults);
+  (state: SchemaState, action: Action<{
+    id: ID,
+    inSearchResults: boolean,
+  }>) =>
+    state.set('highlightedId', action.payload.id)
+      .set('highlightedInSearchResults', action.payload.inSearchResults);
 
 const SchemaReducerWrapper = (state: any = _SchemaState(), action) =>
 {

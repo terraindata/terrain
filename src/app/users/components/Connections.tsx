@@ -51,6 +51,8 @@ import { List, Map } from 'immutable';
 import * as React from 'react';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { SchemaState } from 'schema/SchemaTypes';
+import Util from 'util/Util';
 import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from '../../auth/data/AuthStore';
 import CreateItem from '../../common/components/CreateItem';
@@ -62,8 +64,6 @@ import Ajax from '../../util/Ajax';
 import UserActions from '../data/UserActions';
 import UserStore from '../data/UserStore';
 import * as UserTypes from '../UserTypes';
-import { SchemaState } from 'schema/SchemaTypes';
-import Util from 'util/Util';
 
 const CloseIcon = require('../../../images/icon_close_8x8.svg');
 
@@ -408,5 +408,5 @@ class Connections extends TerrainComponent<Props>
 export default Util.createContainer(
   Connections,
   ['schema'],
-  {}
+  {},
 );
