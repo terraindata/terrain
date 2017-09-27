@@ -121,8 +121,8 @@ export class Scheduler
           for (const schedule of schedules)
           {
             schedule.archived = 1;
+            return resolve(await App.DB.upsert(this.schedulerTable, schedule as object) as SchedulerConfig[]);
           }
-          return resolve(await App.DB.upsert(this.schedulerTable, { id } as object) as SchedulerConfig[]);
         }
       }
       return reject('Schedule ID not found.');
@@ -146,6 +146,27 @@ export class Scheduler
         }
       }
       return resolve(true);
+    });
+  }
+
+  public async changeActiveStatus(id: number, status: number): Promise<SchedulerConfig[]>
+  {
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
+    {
+      // TODO: cancel job if it's currently running
+      if (id !== undefined)
+      {
+        const schedules: SchedulerConfig[] = await this.get(id) as SchedulerConfig[];
+        if (schedules.length !== 0)
+        {
+          for (const schedule of schedules)
+          {
+            schedule.active = status;
+            return resolve(await App.DB.upsert(this.schedulerTable, schedule as object) as SchedulerConfig[]);
+          }
+        }
+      }
+      return reject('Schedule ID not found.');
     });
   }
 

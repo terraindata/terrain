@@ -88,6 +88,18 @@ Router.post('/create', async (ctx, next) =>
   }
 });
 
+// update scheduled job's status: set active to 1
+Router.post('/active/:id', async (ctx, next) =>
+{
+  ctx.body = await scheduler.changeActiveStatus(ctx.params.id, 1);
+});
+
+// update scheduled job's status: set active to 0
+Router.post('/inactive/:id', async (ctx, next) =>
+{
+  ctx.body = await scheduler.changeActiveStatus(ctx.params.id, 0);
+});
+
 // Delete scheduled jobs by parameter
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
