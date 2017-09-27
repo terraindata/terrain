@@ -463,7 +463,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         onUnarchive={this.handleUnarchive}
       >
         <div className='flex-container'>
-          <UserThumbnail userId={userId} medium={true} extra={role} />
+          <UserThumbnail userId={userId} medium={true} />
           <div className='flex-grow'>
             <div className='library-item-line'>
               <Scoreline
