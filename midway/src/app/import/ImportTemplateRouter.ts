@@ -60,6 +60,12 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   ctx.body = await templates.get();
 });
 
+Router.get('/stringified', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting all templates, in both ImportConfigTemplate and ImportConfigTemplateStringified formats');
+  ctx.body = await templates.getStringified();
+});
+
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting template ID ' + String(ctx.params.id));
