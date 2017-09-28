@@ -100,11 +100,9 @@ class TuningColumn extends TerrainComponent<Props>
   };
 
   public tuningCards: Cards = List([]);
-  public prevTuningIds: List<string> = List([]);
   public tuningIds: List<string> = List([]);
-
-  public innerHeight: number = -1;
-
+  public prevTuningIds: List<string> = List([]);
+  public tempTuningOrder: List<string> = List([]);
   public constructor(props: Props)
   {
     super(props);
@@ -121,16 +119,17 @@ class TuningColumn extends TerrainComponent<Props>
 
   public setTuningCards(newCards)
   {
-    this.prevTuningIds = this.tuningIds;
+    this.tempTuningOrder = this.state.tuningOrder;
+    this.prevTuningIds = this.state.tuningOrder;
     this.tuningIds = List([]);
     this.tuningCards = List([]);
     this.updateTuningCards(newCards);
     this.checkForRemovedCards();
     this.setState({
       allCards: newCards,
+      tuningOrder: this.tempTuningOrder,
     });
-    this.updateTuningOrder(this.state.tuningOrder);
-    // setTimeout(this.updateTuningOrder, 250);
+    this.updateTuningOrder(this.tempTuningOrder);
   }
 
   public componentWillMount()
@@ -164,21 +163,15 @@ class TuningColumn extends TerrainComponent<Props>
 
   public handleCardAdded(card)
   {
-    this.setState({
-      tuningOrder: this.state.tuningOrder.push(card.id),
-    });
+    this.tempTuningOrder = this.tempTuningOrder.push(card.id);
   }
 
   public handleCardRemove(id)
   {
-    const index = this.state.tuningOrder.indexOf(id);
-    this.setState({
-      tuningOrder: this.state.tuningOrder.remove(index),
-    });
+    const index = this.tempTuningOrder.indexOf(id);
+    this.tempTuningOrder = this.tempTuningOrder.remove(index);
   }
 
-  // Issue: if a card value gets changed, it will no longer be in removed cards so this will glitch
-  // and act like the card was removed even though it was just changed
   public checkForRemovedCards()
   {
     this.prevTuningIds.forEach((id) =>
@@ -198,7 +191,7 @@ class TuningColumn extends TerrainComponent<Props>
       {
         this.tuningCards = this.tuningCards.push(card);
         this.tuningIds = this.tuningIds.push(card.id);
-        if (this.prevTuningIds.indexOf(card.id) === -1 && this.state.tuningOrder.indexOf(card.id) === -1)
+        if (this.prevTuningIds.indexOf(card.id) === -1)
         {
           // new card added
           this.handleCardAdded(card);
@@ -208,7 +201,7 @@ class TuningColumn extends TerrainComponent<Props>
       {
         this.tuningCards = this.tuningCards.push(card.key);
         this.tuningIds = this.tuningIds.push(card.key.id);
-        if (this.prevTuningIds.indexOf(card.key.id) === -1 && this.state.tuningOrder.indexOf(card.key.id) === -1)
+        if (this.prevTuningIds.indexOf(card.key.id) === -1)
         {
           // new card added
           this.handleCardAdded(card.key);
@@ -247,18 +240,19 @@ class TuningColumn extends TerrainComponent<Props>
     {
       return;
     }
+    let newOrder = List([]);
     if (index < oldIndex)
     {
-      this.setState({
-        tuningOrder: this.state.tuningOrder.insert(index, card.id).remove(oldIndex + 1),
-      });
+      newOrder = this.state.tuningOrder.insert(index, card.id).remove(oldIndex + 1);
     }
     else
     {
-      this.setState({
-        tuningOrder: this.state.tuningOrder.remove(oldIndex).insert(index, card.id),
-      });
+      newOrder = this.state.tuningOrder.remove(oldIndex).insert(index, card.id);
     }
+    this.setState({
+      tuningOrder: newOrder,
+    });
+    this.updateTuningOrder(newOrder);
   }
 
   public findCardType(cards, type)
@@ -270,10 +264,11 @@ class TuningColumn extends TerrainComponent<Props>
         this.tuningCards = this.tuningCards.push(card);
         this.tuningIds = this.tuningIds.push(card.id);
         this.handleCardAdded(card);
-        const keyPaths = BuilderStore.getState().cardKeyPaths;
+        const keyPaths = Immutable.Map(BuilderStore.getState().query.cardKeyPaths);
         if (keyPaths.get(card.id) !== undefined)
         {
-          Actions.change(keyPaths.get(card.id).push('tuning'), true);
+          const keyPath = Immutable.List(keyPaths.get(card.id));
+          Actions.change(keyPath.push('tuning'), true);
         }
       }
       if (card.cards !== undefined && card.cards.size > 0)

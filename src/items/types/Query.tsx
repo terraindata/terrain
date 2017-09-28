@@ -95,6 +95,7 @@ class QueryC
 
   //what order the cards are in the tuning column
   tuningOrder: List<string> = List([]);
+  cardKeyPaths: Map<ID, KeyPath> = Map<ID, KeyPath>({});
 
 }
 const Query_Record = Record(new QueryC());
@@ -108,6 +109,7 @@ export const _Query = (config?: object) =>
   config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
   config['meta'] = Map<string, any>(config['meta']);
+  config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);
   const query = new Query_Record(config) as any as Query;
 
   return query;

@@ -323,10 +323,10 @@ class _CardComponent extends TerrainComponent<Props>
     let keyPath = this.getKeyPath();
     if (this.props.tuningMode)
     {
-      const keyPaths = Store.getState().cardKeyPaths;
+      const keyPaths = Immutable.Map(Store.getState().query.cardKeyPaths);
       if (keyPaths.get(this.props.card.id) !== undefined)
       {
-        keyPath = keyPaths.get(this.props.card.id);
+        keyPath = Immutable.List(keyPaths.get(this.props.card.id));
       }
     }
 
@@ -636,10 +636,11 @@ class _CardComponent extends TerrainComponent<Props>
   {
     if (this.props.tuningMode)
     {
-      const keyPaths = Store.getState().cardKeyPaths;
+      const keyPaths = Immutable.Map(Store.getState().query.cardKeyPaths);
       if (keyPaths.get(this.props.card.id) !== undefined)
       {
-        Actions.change(keyPaths.get(this.props.card.id).push('tuning'), false);
+        const keyPath = Immutable.List(keyPaths.get(this.props.card.id));
+        Actions.change(keyPath.push('tuning'), false);
       }
     }
     else
@@ -734,10 +735,10 @@ class _CardComponent extends TerrainComponent<Props>
     let keyPath = this.state.keyPath;
     if (this.props.tuningMode)
     {
-      const keyPaths = Store.getState().cardKeyPaths;
+      const keyPaths = Immutable.Map(Store.getState().query.cardKeyPaths);
       if (keyPaths.get(this.props.card.id) !== undefined)
       {
-        keyPath = keyPaths.get(this.props.card.id);
+        keyPath = Immutable.List(keyPaths.get(this.props.card.id));
       }
     }
     let style = null;

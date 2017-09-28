@@ -49,7 +49,7 @@ THE SOFTWARE.
 import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -342,10 +342,10 @@ class BuilderTextbox extends TerrainComponent<Props>
     let keyPath = this.props.keyPath;
     if (this.props.tuningMode)
     {
-      const keyPaths = Store.getState().cardKeyPaths;
+      const keyPaths = Map(Store.getState().query.cardKeyPaths);
       if (keyPaths.get(card.id) !== undefined)
       {
-        keyPath = keyPaths.get(card.id);
+        keyPath = List(keyPaths.get(card.id));
       }
     }
     Actions.change(keyPath.push(key), !this.props.value[key]);

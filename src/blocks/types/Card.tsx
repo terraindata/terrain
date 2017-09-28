@@ -145,7 +145,7 @@ export interface CardConfig
   };
 }
 
-export const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
+export const allCardsMetaFields = allBlocksMetaFields.concat(['closed', 'tuning', 'tuningClosed']);
 
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
