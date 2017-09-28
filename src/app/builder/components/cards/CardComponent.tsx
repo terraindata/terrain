@@ -256,6 +256,18 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    if (this.props.keyPath !== nextProps.keyPath || this.props.index !== nextProps.index)
+    {
+      if (!nextProps.tuningMode)
+      {
+        const newKeyPath = nextProps.singleCard ? nextProps.keyPath
+          : this._ikeyPath(nextProps.keyPath, nextProps.index);
+        this.setState({
+          keyPath: newKeyPath,
+        });
+        Actions.updateKeyPath(nextProps.card.id, newKeyPath);
+      }
+    }
     if ((nextProps.card.closed !== this.props.card.closed && !nextProps.tuningMode) ||
       (nextProps.card.tuningClosed !== this.props.card.tuningClosed && nextProps.tuningMode))
     {
