@@ -270,6 +270,7 @@ class Library extends TerrainComponent<any>
               params,
               basePath,
               groupActions: this.props.libraryGroupActions,
+              variants,
             }}
             isFocused={algorithm === undefined}
           />
