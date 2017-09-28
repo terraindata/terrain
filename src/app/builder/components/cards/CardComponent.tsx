@@ -285,10 +285,6 @@ class _CardComponent extends TerrainComponent<Props>
         this.toggleClose(null);
       }
     }
-    const sibs = this.getSiblings();
-    _.range(0, sibs.length).map((i) =>
-      sibs[i]['style'].top = 0,
-    );
   }
 
   public componentDidMount()
@@ -455,13 +451,13 @@ class _CardComponent extends TerrainComponent<Props>
   public handleCardDrag(event)
   {
     this.setState({
-      dY: this.shiftSiblings(event, false).dY,
+      dY: this.shiftSiblings(event, true).dY,
     });
     event.preventDefault();
     event.stopPropagation();
   }
 
-  public shiftSiblings(evt, shiftSelf: boolean): ({ dY: number, index: number })
+  public shiftSiblings(evt, shiftSiblings: boolean): ({ dY: number, index: number })
   {
     const dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
 
@@ -490,32 +486,33 @@ class _CardComponent extends TerrainComponent<Props>
 
       }
     }
-    const sibs = this.getSiblings();
-    sibs.forEach((sib, i) =>
+    if (shiftSiblings)
     {
-      if (i === this.state.index)
+      const sibs = this.getSiblings();
+      sibs.forEach((sib, i) =>
       {
-        return;
-      }
-      let shift = 0;
-      if (index < this.state.index)
-      {
-        if (i >= index && i < this.state.index)
+        if (i === this.state.index)
+          {
+            return;
+          }
+          let shift = 0;
+        if (index < this.state.index)
         {
-          shift = 1;
+          if (i >= index && i < this.state.index)
+          {
+            shift = 1;
+          }
         }
-      }
-      else
-      {
-        if (i > this.state.index && i <= index)
+        else
         {
-          shift = -1;
+          if (i > this.state.index && i <= index)
+          {
+            shift = -1;
+          }
         }
-      }
-      sib['style'].top = shift * this.state.elHeight;
-
-    });
-
+        sib['style'].top = shift * this.state.elHeight;
+      });
+    }
     return {
       dY,
       index,
@@ -594,7 +591,11 @@ class _CardComponent extends TerrainComponent<Props>
     $('body').off('mousemove', this.handleCardDrag);
     if (this.props.handleCardReorder)
     {
-      const { index } = this.shiftSiblings(event, true);
+      const { index } = this.shiftSiblings(event, false);
+      const sibs = this.getSiblings();
+      _.range(0, sibs.length).map((i) =>
+        sibs[i]['style'].top = 0,
+      );
       this.props.handleCardReorder(this.props.card, index);
       this.setState({
         moving: false,
