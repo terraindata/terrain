@@ -195,6 +195,7 @@ class GroupsColumn extends TerrainComponent<Props>
         canArchive={(canEdit || canDrag) && group.status !== ItemStatus.Archive}
         canDuplicate={false}
         canUnarchive={group.status === ItemStatus.Archive}
+        canRename={true}
         onUnarchive={this.handleUnarchive}
         canCreate={canCreate}
         isSelected={+group.id === +params.groupId}
