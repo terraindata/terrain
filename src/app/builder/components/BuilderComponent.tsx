@@ -444,6 +444,7 @@ class BuilderComponent extends TerrainComponent<Props>
             autoDisabled={d.autoDisabled}
             getAutoTerms={d.getAutoTerms}
             language={this.props.language}
+            tuningMode={this.props.tuningMode}
             {...{
               keyPath,
               value,

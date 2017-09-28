@@ -492,10 +492,10 @@ class _CardComponent extends TerrainComponent<Props>
       sibs.forEach((sib, i) =>
       {
         if (i === this.state.index)
-          {
-            return;
-          }
-          let shift = 0;
+        {
+          return;
+        }
+        let shift = 0;
         if (index < this.state.index)
         {
           if (i >= index && i < this.state.index)
@@ -777,9 +777,7 @@ class _CardComponent extends TerrainComponent<Props>
     {
       canMove = true;
     }
-
     const closed = this.props.tuningMode ? this.props.card.tuningClosed : this.props.card.closed;
-
     return (
       <div
         className={classNames({

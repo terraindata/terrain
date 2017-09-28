@@ -64,8 +64,8 @@ export interface Props
   button?: string;
   onClick?: () => void;
   inline?: boolean; // render inline, rather than absolutely middle
-  secondButton?: string;
-  onSecondClick?: () => void;
+  buttons?: string[];
+  buttonFunctions?: [() => void];
 }
 
 @Radium
@@ -77,7 +77,7 @@ class InfoArea extends TerrainComponent<Props>
     Util.bind(this, 'renderThing');
   }
 
-  public renderThing(thing: string, onClick?: boolean, onClickFn?: () => void)
+  public renderThing(thing: string, onClick?: boolean)
   {
     if (!this.props[thing])
     {
@@ -85,7 +85,7 @@ class InfoArea extends TerrainComponent<Props>
     }
 
     let style = fontColor(thing === 'small' ? Colors().text.secondaryLight : Colors().text.baseLight);
-    if (thing === 'button' || thing === 'secondButton')
+    if (thing === 'button')
     {
       style = buttonColors();
     }
@@ -93,7 +93,7 @@ class InfoArea extends TerrainComponent<Props>
     return (
       <div
         className={'info-area-' + thing}
-        onClick={onClick ? onClickFn : null}
+        onClick={onClick ? this.props.onClick : null}
         style={style}
         key={thing}
       >
@@ -101,6 +101,25 @@ class InfoArea extends TerrainComponent<Props>
           this.props[thing]
         }
       </div>
+    );
+  }
+
+  public renderButtons()
+  {
+    const style = buttonColors();
+    return (
+      this.props.buttons.map((button, i) =>
+        <div
+          className={'info-area-button'}
+          onClick={this.props.buttonFunctions[i]}
+          style={style}
+          key={'button_' + String(i)}
+        >
+          {
+            this.props.buttons[i]
+          }
+        </div>,
+      )
     );
   }
 
@@ -116,8 +135,8 @@ class InfoArea extends TerrainComponent<Props>
         {this.renderThing('large')}
         {this.renderThing('small')}
         <div className='info-area-buttons-container'>
-          {this.renderThing('button', true, this.props.onClick)}
-          {this.renderThing('secondButton', true, this.props.onSecondClick)}
+          {this.renderThing('button', true)}
+          {this.props.buttons !== undefined ? this.renderButtons() : null}
         </div>
       </div>
     );

@@ -63,6 +63,7 @@ const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
 import InfoArea from '../../../common/components/InfoArea';
+import Modal from '../../../common/components/Modal';
 import Util from '../../../util/Util';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 
@@ -88,10 +89,14 @@ class TuningColumn extends TerrainComponent<Props>
     keyPath: KeyPath;
     allCards: Cards,
     tuningOrder: List<string>,
+    showNoCardsModal: boolean,
+    noCardsMessage: string,
   } = {
     keyPath: this.computeKeyPath(this.props),
     allCards: List([]),
     tuningOrder: List([]),
+    showNoCardsModal: false,
+    noCardsMessage: '',
   };
 
   public tuningCards: Cards = List([]);
@@ -281,11 +286,57 @@ class TuningColumn extends TerrainComponent<Props>
   public addScoreCards()
   {
     this.findCardType(this.state.allCards, 'Terrain Score Sort');
+    if (this.tuningCards.size === 0)
+    {
+      this.setState({
+        showNoCardsModal: true,
+        noCardsMessage: 'There are currently no Terrain Score cards in your query',
+      });
+    }
   }
 
   public addFilterCards()
   {
     this.findCardType(this.state.allCards, 'Filter');
+    if (this.tuningCards.size === 0)
+    {
+      this.setState({
+        showNoCardsModal: true,
+        noCardsMessage: 'There are currently no Terrain Filter cards in your query',
+      });
+    }
+  }
+
+  public addScoreAndFilterCards()
+  {
+    this.findCardType(this.state.allCards, 'Filter');
+    this.findCardType(this.state.allCards, 'Terrain Score Sort');
+    if (this.tuningCards.size === 0)
+    {
+      this.setState({
+        showNoCardsModal: true,
+        noCardsMessage: 'There are currently no Terrain Score or Filter cards in your query',
+      });
+    }
+  }
+
+  public closeModal()
+  {
+    this.setState({
+      showNoCardsModal: false,
+    });
+  }
+
+  public renderNoCardsModal()
+  {
+    return (
+      <Modal
+        open={this.state.showNoCardsModal}
+        message={this.state.noCardsMessage}
+        title={'No Cards to Add'}
+        onClose={this.closeModal}
+      />
+    );
   }
 
   public render()
@@ -305,6 +356,7 @@ class TuningColumn extends TerrainComponent<Props>
           <div
             id='cards-column-inner'
           >
+            {this.renderNoCardsModal()}
             <CardsArea
               cards={this.tuningCards}
               language={language}
@@ -322,13 +374,11 @@ class TuningColumn extends TerrainComponent<Props>
             {
               !this.tuningCards.size ?
                 <InfoArea
-                  large={'Add cards to the tuning column that you are likely to change.'}
-                  small={'Select by pressing the tuning icon on individual cards\n or'}
-                  button={'Add Terrain Sort Score Cards'}
-                  onClick={this.addScoreCards}
+                  large={'Build a customized control panel by adding cards to the tuning column that you are most likely to change'}
+                  small={'Add cards to this view by selecting individual cards or by choosing one of the following'}
+                  buttons={['Add Terrain Score Cards', 'Add Terrain Filter Cards', 'Add Terrain Score and Filter Cards']}
+                  buttonFunctions={[this.addScoreCards, this.addFilterCards, this.addScoreAndFilterCards]}
                   inline={false}
-                  secondButton={'Add Terrian Filter Cards'}
-                  onSecondClick={this.addFilterCards}
                 />
                 : null
             }
