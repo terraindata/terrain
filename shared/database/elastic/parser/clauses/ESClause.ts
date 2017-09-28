@@ -100,6 +100,7 @@ abstract class ESClause
   public required: string[]; // required members (used for object types)
   public suggestions: any[]; // suggested autocomplete values or keys
   public multifield: boolean;
+  public rewrite: (ESInterpreter, ESValueInfo) => void;
 
   /**
    * @param type the name to refer to this clause (type)
@@ -120,6 +121,7 @@ abstract class ESClause
     this.setDefaultProperty('required', () => []);
     this.setDefaultProperty('suggestions', () => []);
     this.setDefaultProperty('multifield', () => true);
+    this.setDefaultProperty('rewrite', () => undefined);
   }
 
   public init(config: EQLConfig): void
@@ -174,7 +176,13 @@ abstract class ESClause
     }
   }
 
-  public abstract mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void;
+  public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
+  {
+    if (this.rewrite !== undefined)
+    {
+      this.rewrite(interpreter, valueInfo);
+    }
+  }
 
   protected typeCheck(interpreter: ESInterpreter,
     valueInfo: ESValueInfo,

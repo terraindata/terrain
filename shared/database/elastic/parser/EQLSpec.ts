@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESTerrainClauseUtil from 'shared/database/elastic/parser/clauses/ESTerrainClauseUtil';
 import ESAnyClause from './clauses/ESAnyClause';
 import ESArrayClause from './clauses/ESArrayClause';
 import ESBaseClause from './clauses/ESBaseClause';
@@ -189,7 +190,24 @@ const EQLSpec: ESClause[] =
         path: ['primary'],
         desc: 'The outermost clause object that contains an entire search query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template: { index: null, type: null, from: null, size: null, body: null },
+        template:
+        {
+          'index:index': null,
+          'type:type': null,
+          'from:from': null,
+          'size:size': null,
+          'body:body':
+          {
+            'query:query':
+            {
+              'Filter:elasticFilter': null,
+              //                    'bool:bool_query': {
+              //                      'must:query[]': [{'term:query': null}],
+              //                    }
+            },
+            'sort:elasticScore': null,
+          },
+        },
         suggestions: ['body', 'index', 'type', 'from', 'size'],
       }),
     new ESIndexClause('index',
@@ -249,7 +267,7 @@ const EQLSpec: ESClause[] =
         path: ['primary'],
         desc: 'The object containing the filtering, sorting, matching, and aggregation logic for a query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template: { query: null },
+        template: { 'query:query': null },
         suggestions: ['query', 'sort', 'from', 'size'],
       }),
     new ESVariantClause('sort_object',
@@ -836,6 +854,7 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
         // template: { must: null, must_not: null, should: null, minimum_should_match: null },
         suggestions: ['must', 'must_not', 'filter', 'should', 'minimum_should_match'],
+        rewrite: ESTerrainClauseUtil.bool2filter,
       }),
     new ESVariantClause('must',
       {
@@ -1184,8 +1203,8 @@ const EQLSpec: ESClause[] =
         desc: 'Settings for a match clause.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html',
         template: {
-          query: '',
-          operator: null,
+          'query:string': '',
+          'operator:match_operator': null,
         },
         required: ['query'],
         suggestions: ['query', 'operator', 'analyzer', 'max_expansions', 'slop', 'lenient'],
@@ -1670,9 +1689,9 @@ const EQLSpec: ESClause[] =
         desc: 'Queries nested documents.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html',
         template: {
-          path: '',
-          score_mode: null,
-          query: null,
+          'path:field': '',
+          'score_mode:nested_score_mode': null,
+          'query:query': null,
         },
         required: ['path', 'query'],
         suggestions: ['path', 'score_mode', 'query'],
@@ -1700,9 +1719,9 @@ const EQLSpec: ESClause[] =
         desc: 'Matches documents that have nested (child) documents that match this query',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-has-child-query.html',
         template: {
-          type: '',
-          score_mode: null,
-          query: null,
+          'type:field': '',
+          'score_mode:has_child_score_mode': null,
+          'query:query': null,
         },
         required: ['type', 'query'],
         suggestions: ['type', 'query', 'score_mode'],
@@ -1728,9 +1747,9 @@ const EQLSpec: ESClause[] =
         desc: 'Query that returns nested (child) documents that have parents that match the query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-has-parent-query.html',
         template: {
-          parent_type: '',
-          score: null,
-          query: null,
+          'parent_type:type': '',
+          'score:has_parent_score': null,
+          'query:query': null,
         },
         required: ['parent_type', 'query'],
       }),

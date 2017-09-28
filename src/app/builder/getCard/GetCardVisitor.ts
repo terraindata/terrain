@@ -315,11 +315,36 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         },
 
         init: (blocksConfig, extraConfig?, skipTemplate?) =>
-          ({
-            cards: List([
-              // BlockUtils.make(blocksConfig, 'eql' + clause.elementID, extraConfig, skipTemplate),
-            ]),
-          }),
+        {
+          const config = {};
+          let template;
+          if (extraConfig !== undefined && extraConfig.template)
+          {
+            template = extraConfig.template;
+          } else if (clause.template)
+          {
+            template = clause.template;
+          }
+
+          // template : [ card1, card2, ...]
+          const cards = _.compact(
+            _.map(
+              template,
+              (templateValue, templateIndex) =>
+              {
+                //                console.log("Array ->" + templateIndex + " : " + templateValue);
+                const cardTypeName = GetCardVisitor.getCardType(clause.elementID);
+                return BlockUtils.make(
+                  blocksConfig, cardTypeName,
+                  {
+                    key: String(templateIndex),
+                    template: templateValue,
+                  },
+                );
+              }));
+          config['cards'] = List(cards);
+          return config;
+        },
 
         tql: (block, tqlFn, tqlConfig) =>
         {
@@ -596,23 +621,37 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         },
       };
 
-      if (clause.template && skipTemplate !== true)
+      let template;
+      if (extraConfig && extraConfig.template)
+      {
+        template = extraConfig.template;
+      } else if (clause.template)
+      {
+        template = clause.template;
+      }
+
+      if (template && skipTemplate !== true)
       {
         // create the card list from the template
         const cards = _.compact(
           _.map(
-            clause.template,
+            template,
             (templateValue, templateKey) =>
             {
-              const cardTypeName = GetCardVisitor.getCardType(
-                String(templateValue === null ? clause.structure[templateKey] : templateValue));
+              //              console.log(templateKey + ":" + templateValue);
+              const cardKeyType = templateKey.split(':');
+              let cardTypeName = cardKeyType[1];
+              if (!cardTypeName.startsWith('elastic'))
+              {
+                cardTypeName = GetCardVisitor.getCardType(cardKeyType[1]);
+              }
               if (blocksConfig[cardTypeName])
               {
-                // console.log(clauseType, templateKey);
                 return BlockUtils.make(
                   blocksConfig, cardTypeName,
                   {
-                    key: templateKey,
+                    key: cardKeyType[0],
+                    template: templateValue,
                     // value: templateValue === null ? undefined : templateValue,
                     // all base cards have a 'value' key
                   },
@@ -685,7 +724,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
           clause.suggestions.forEach(handler);
           clause.required.forEach(handler);
-          Object.keys(clause.template).forEach(handler);
           Object.keys(clause.structure).forEach(handler);
 
           return List(result);
