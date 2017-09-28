@@ -175,14 +175,11 @@ class Library extends TerrainComponent<any>
   public handleRadioButtonClick(optionValue)
   {
     const { selectedVariants } = this.props.library;
-    selectedVariants
-      .forEach((variantId) =>
-      {
-        const numericVariantId = parseInt(variantId, 10);
-        const numericOptionValue = parseInt(optionValue, 10);
-        this.props.analyticsActions.fetch(numericVariantId, numericOptionValue);
-        this.props.analyticsActions.selectMetric(optionValue);
-      });
+    const selectedVariantIds = selectedVariants.toJS();
+    const numericOptionValue = parseInt(optionValue, 10);
+
+    this.props.analyticsActions.fetch(selectedVariantIds, numericOptionValue);
+    this.props.analyticsActions.selectMetric(optionValue);
   }
 
   public render()
