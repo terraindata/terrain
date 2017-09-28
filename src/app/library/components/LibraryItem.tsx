@@ -333,17 +333,17 @@ class LibraryItem extends TerrainComponent<Props>
             (
               (canArchive && canRename) ? this.menuOptions.archiveRename :
                 (
-                  (canDuplicate && canRename) ? this.menuOptions.duplicateRenamde : 
+                  (canDuplicate && canRename) ? this.menuOptions.duplicateRename :
                     (
                       (canUnarchive && canRename) ? this.menuOptions.unarchiveRename :
-                        ( 
+                        (
                           (canUnarchive ? this.menuOptions.unarchive :
                             (
-                              (canArchive ? this.menuOptions.archive : 
+                              (canArchive ? this.menuOptions.archive :
                                 (
                                   canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
                                 )
-                              )    
+                              )
                             )
                           )
                         )
@@ -351,22 +351,7 @@ class LibraryItem extends TerrainComponent<Props>
                 )
             )
         );
-        if (canUnarchive)
-        {
-          console.log(menuOptions);
 
-        }
-
-        // (canArchive && canDuplicate) ? this.menuOptions.duplicateArchive :
-        // (
-        //   canArchive ? this.menuOptions.archive :
-        //     (
-        //       canUnarchive ? this.menuOptions.unarchive :
-        //         (
-        //           canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
-        //         )
-        //     )
-        // );
     let shiftedUp: boolean;
     let shiftedDown: boolean;
 

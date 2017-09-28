@@ -372,7 +372,7 @@ class VariantsColumn extends TerrainComponent<Props>
         canArchive={canDrag && variant.status !== ItemStatus.Archive}
         canDuplicate={canEdit}
         canUnarchive={variant.status === ItemStatus.Archive}
-        canRename={ variant.status !== ItemStatus.Live && variant.status !== ItemStatus.Default}
+        canRename={variant.status !== ItemStatus.Live && variant.status !== ItemStatus.Default}
         key={variant.id}
         to={`/${basePath}/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'
