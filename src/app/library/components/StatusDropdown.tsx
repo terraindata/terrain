@@ -58,6 +58,8 @@ import Util from '../../util/Util';
 import * as LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import { tooltip } from 'common/components/tooltip/Tooltips';
+
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -73,16 +75,19 @@ class StatusDropdown extends TerrainComponent<Props>
 {
   public state = {
     isSuperUser: false,
-    isBuilder: false,
+    isBuilder: true,
   };
 
   public componentDidMount()
   {
-    this._subscribe(RolesStore, {
-      updater: () =>
+    this._subscribe(UserStore, {
+      updater: (userState) =>
       {
-        const isSuperUser = Util.haveRole(this.props.variant.groupId, 'admin', UserStore, RolesStore);
-        const isBuilder = Util.haveRole(this.props.variant.groupId, 'builder', UserStore, RolesStore);
+        const currentUser = userState.get('currentUser');
+        const isSuperUser = currentUser === undefined ? false : currentUser.isSuperUser;
+        // Util.haveRole(this.props.variant.groupId, 'admin', UserStore, RolesStore);
+        const isBuilder = true;
+        // Util.haveRole(this.props.variant.groupId, 'builder', UserStore, RolesStore);
         if (isSuperUser !== this.state.isSuperUser || isBuilder !== this.state.isBuilder)
         {
           this.setState({
@@ -105,7 +110,7 @@ class StatusDropdown extends TerrainComponent<Props>
   {
     const { variant } = this.props;
     return this.state.isSuperUser ||
-      (this.state.isBuilder && variant.status !== Status.Live);
+      (this.state.isBuilder && variant.status !== Status.Live && variant.status !== Status.Default);
   }
 
   public getOptions(): List<string> // List<El>
@@ -161,28 +166,37 @@ class StatusDropdown extends TerrainComponent<Props>
   {
     const { variant } = this.props;
 
-    let tooltip = '';
+    let tooltipText = '';
     if (!this.canEdit())
     {
       if (!this.state.isBuilder)
       {
-        tooltip = "You aren't a Builder in this group,<br />so you can't edit this Variant's status.";
+        tooltipText = "You aren't a Builder in this group,<br />so you can't edit this Variant's status.";
       }
       else if (!this.state.isSuperUser)
       {
-        tooltip = "This Variant is Live and you aren't<br />an Admin in this Group, so you<br />can't edit its status.";
+        tooltipText = "This Variant is Live and you aren't<br />an Admin in this Group, so you<br />can't edit its status.";
       }
     }
 
     return (
+      <div> {
+        tooltip(
       <Dropdown
         options={this.getOptions()}
         selectedIndex={this.getSelectedIndex()}
         onChange={this.handleChange}
         canEdit={this.canEdit()}
         tooltips={this.props.tooltips}
-      />
-    );
+      />,
+      {
+        title: this.canEdit() ? 'Click to change the Variant\'s status, e.g. to Deploy or Archive' : 
+          tooltipText,
+        position: 'right',
+      }
+    ) }
+        </div>
+        );
     // <div className='status-dropdown-wrapper'>
     //   <div
     //     className={classNames({
@@ -250,9 +264,10 @@ const BuilderOptionsOrder =
   ];
 const BuilderOptions = List(BuilderOptionsOrder.map(getOption));
 
-const LockedOptions = _.map(Status, (status) =>
+const LockedOptions = {};
+_.map(Status, (status, statusKey) =>
 {
-  return List([getOption(status)]);
+  LockedOptions[status] = List([getOption(status)]);
 });
 
 export default StatusDropdown;
