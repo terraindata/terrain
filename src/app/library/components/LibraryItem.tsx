@@ -130,15 +130,17 @@ class LibraryItem extends TerrainComponent<Props>
     List([
       {
         text: 'Duplicate',
-        // icon: '',
         onClick: this.handleDuplicate,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
       },
     ]),
     duplicateRename:
     List([
       {
         text: 'Duplicate',
-        // icon: '',
         onClick: this.handleDuplicate,
       },
       {
@@ -151,6 +153,10 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Archive',
         onClick: this.handleArchive,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
       },
     ]),
     archiveRename:
@@ -169,6 +175,10 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Unarchive',
         onClick: this.handleUnarchive,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
       },
     ]),
     unarchiveRename:
@@ -191,6 +201,10 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Archive',
         onClick: this.handleArchive,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
       },
     ]),
     duplicateRenameArchive:
