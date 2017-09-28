@@ -731,6 +731,12 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderAdvancedModal()
   {
+    const dropdownTooltips = Immutable.List(
+      [
+        'Creates a json file where the data is an array of all results', 
+        'Creates a json file where the data is an object with a single key with an array of all results as it\'s key',
+        'Creates a csv file',
+      ]);
     const advancedModalContent = this.props.exporting ?
       <div
         className='fi-advanced-fields'
@@ -760,6 +766,7 @@ class FileImportPreview extends TerrainComponent<Props>
           canEdit={true}
           className={'fi-advanced-fields-dropdown'}
           openDown={true}
+          tooltips= {dropdownTooltips}
         />
         {
           this.state.exportFiletype === 'json [type object]' ?
