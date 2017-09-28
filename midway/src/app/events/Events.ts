@@ -85,18 +85,10 @@ export interface EventConfig extends EventTemplateConfig
   type: string;
 }
 
-export interface PayloadConfig
-{
-  id: string;
-  meta: any;
-  payload: any;
-}
-
 export class Events
 {
   private eventTable: Tasty.Table;
   private eventInfoTable: Tasty.Table;
-  private payloadTable: Tasty.Table;
   private elasticController: ElasticController;
 
   constructor()
@@ -115,41 +107,13 @@ export class Events
       ],
       'terrain-analytics',
     );
-
-    this.payloadTable = new Tasty.Table(
-      'payload',
-      ['id'],
-      [
-        'meta',
-        'payload',
-      ],
-      'terrain-analytics',
-    );
-  }
-
-  /*
-   * Get payload from datastore given the id
-   *
-   */
-  public async getPayload(id: string): Promise<PayloadConfig>
-  {
-    return new Promise<PayloadConfig>(async (resolve, reject) =>
-    {
-      const payloads: PayloadConfig[] = await this.elasticController.getTasty().select(
-        this.payloadTable, [], { id }) as PayloadConfig[];
-      if (payloads.length === 0)
-      {
-        return resolve({} as PayloadConfig);
-      }
-      resolve(payloads[0] as PayloadConfig);
-    });
   }
 
   /*
    * Parse incoming event request event
    *
    */
-  public async JSONHandler(ip: string, reqs: object[]): Promise<string>
+  public async registerEventHandler(ip: string, reqs: object[]): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
@@ -157,34 +121,21 @@ export class Events
       {
         return resolve('');
       }
-      const encodedEventArr: EventTemplateConfig[] = [];
+      const encodedEvents: EventTemplateConfig[] = [];
       for (const req of reqs)
       {
-        const payload: PayloadConfig = await this.getPayload(req['id']);
-        const meta: object = payload.meta;
-        delete payload.meta;
-        const fullPayload: object = Object.assign(payload, meta);
-        if (req['id'] === undefined || !(Object.keys(payload).length === 0))
+        if (req['ip'] === undefined)
         {
-          continue;
+          req['ip'] = ip;
         }
-        const eventRequest: EventConfig = {
-          id: fullPayload['id'],
-          eventType: fullPayload['eventType'],
-          ip,
-          name: fullPayload['name'],
-          payload: fullPayload['payload'],
-          type: fullPayload['type'],
-          url: req['url'] !== undefined ? req['url'] : fullPayload['url'],
-          variantId: req['variantId'] !== undefined ? req['variantId'] : fullPayload['variantId'],
-        };
-        encodedEventArr.push(await Encryption.encodeMessage(eventRequest));
+        encodedEvents.push(await Encryption.encodeMessage(req));
       }
-      if (encodedEventArr.length === 0)
+      if (encodedEvents.length === 0)
       {
         return resolve('');
       }
-      resolve(JSON.stringify(encodedEventArr));
+
+      return resolve(JSON.stringify(encodedEvents));
     });
   }
 
@@ -390,19 +341,6 @@ export class Events
       }
     }
     return Promise.all(promises);
-  }
-
-  /*
-   * Check if id exists in payload table
-   *
-   */
-  public async payloadExists(id: string): Promise<boolean>
-  {
-    return new Promise<boolean>(async (resolve, reject) =>
-    {
-      const payloads: object[] = await this.elasticController.getTasty().select(this.payloadTable, [], { id }) as object[];
-      return resolve(payloads.length === 0 ? false : true);
-    });
   }
 
   /*
