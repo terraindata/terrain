@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 'react-leaflet';
 
+import Switch from 'common/components/Switch';
 import Actions from '../../builder/data/BuilderActions';
 import MapUtil from '../../util/MapUtil';
 import { backgroundColor, Colors } from '../Colors';
@@ -696,17 +697,13 @@ class MapComponent extends TerrainComponent<Props>
             null
             :
             <div className='input-map-search-settings-row' >
-              <CheckBox
-                checked={this.state.searchByCoordinate}
+              <Switch
+                first='Text Search'
+                second='Coordinates'
+                selected={this.state.searchByCoordinate ? 2 : 1}
                 onChange={this._toggle('searchByCoordinate')}
-                className='input-map-checkbox'
+                darker={true}
               />
-              <label
-                onClick={this._toggle('searchByCoordinate')}
-                className='input-map-checkbox-label'
-              >
-                Search by coordinate
-            </label>
             </div>
         }
       </div>

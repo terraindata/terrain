@@ -287,7 +287,6 @@ class LibraryInfoColumn extends TerrainComponent<Props>
   //   {this.renderRemainingUsers()}
   // </div>
 
-
   public render()
   {
     const item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group =
