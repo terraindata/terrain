@@ -53,17 +53,10 @@ import * as Encryption from './Encryption';
 import { Events } from './Events';
 
 export const events: Events = new Events();
-
 const Router = new KoaRouter();
 
-// Get an event tracker.
-Router.post('/', async (ctx, next) =>
-{
-  ctx.body = await events.registerEventHandler(ctx.request.ip, ctx.request.body.body);
-});
-
 // Handle client response for event tracker
-Router.post('/update/', async (ctx, next) =>
+Router.post('/', async (ctx, next) =>
 {
   const event: any = {
     id: ctx.request.body['id'],

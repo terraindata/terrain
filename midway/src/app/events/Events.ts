@@ -109,36 +109,6 @@ export class Events
     );
   }
 
-  /*
-   * Parse incoming event request event
-   *
-   */
-  public async registerEventHandler(ip: string, reqs: object[]): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      if (reqs === undefined || (Object.keys(reqs).length === 0 && reqs.constructor === Object) || reqs.length === 0)
-      {
-        return resolve('');
-      }
-      const encodedEvents: EventTemplateConfig[] = [];
-      for (const req of reqs)
-      {
-        if (req['ip'] === undefined)
-        {
-          req['ip'] = ip;
-        }
-        encodedEvents.push(await Encryption.encodeMessage(req));
-      }
-      if (encodedEvents.length === 0)
-      {
-        return resolve('');
-      }
-
-      return resolve(JSON.stringify(encodedEvents));
-    });
-  }
-
   public generateHistogramQuery(variantid: string, request: AggregationRequest): Elastic.SearchParams
   {
     const body = bodybuilder()
