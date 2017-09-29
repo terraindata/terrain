@@ -32,23 +32,39 @@
 	top: -10px;
 }
 
-.input-map-search-settings-row {
+.map-component-search-bar {
+	display: flex;
+	flex-wrap: wrap;
+	width: 95%;
+}
+
+.map-component-address-input {
+	display: inherit;
 	margin-bottom: 18px;
-    margin-top: -12px;
-    display: inline-flex;
-    .input-map-checkbox {
-    	margin-right: 6px !important;
-    }
-    .input-map-checkbox-label {
-    	cursor: pointer;
-    }
+	flex-grow: 1;
+	flex-wrap: wrap;
+	min-width: 120px;
 }
 
 .input-map-coordinates {
+	display: inherit;
+	flex-grow: 1;
+}
+
+.input-map-coordinates-latitude, .input-map-coordinates-longitude {
+	display: inline;
 	margin-bottom: 18px;
-	.input-map-longitude {
-		margin-top: 6px;
+	flex-grow: 1;
+	flex-wrap: wrap;
+	min-width: 80px;
+	input {
+		padding: 10px;
 	}
+}
+
+.input-map-coordinates-longitude
+{
+	margin-left: 3px;
 }
 
 .input-map-input-error {
@@ -72,38 +88,10 @@
 }
 
 .input-map-search-settings-row {
-	margin-bottom: 18px;
-    margin-top: -12px;
-    display: inline-flex;
-    .input-map-checkbox {
-    	margin-right: 6px !important;
-    }
-    .input-map-checkbox-label {
-    	cursor: pointer;
-    }
-}
-
-.input-map-coordinates {
-	margin-bottom: 18px;
-	.input-map-longitude {
-		margin-top: 6px;
-	}
-}
-
-.input-map-input-error {
-	background: rgba(255, 0, 0, 0.3);
-}
-
-.input-map-distance-tools {
-	.input-map-distance-tools-dropdown {
-		max-width: 10%;
-		position: relative;
-		top: -30px;
-		left: 25%;
-	}
-	.input-map-distance-tools-input {
-		max-width: 25%;
-	}
+	flex-wrap: wrap;
+	top: 7px !important;
+    left: 6px !important;
+    position: relative;
 }
 
 /* required styles */

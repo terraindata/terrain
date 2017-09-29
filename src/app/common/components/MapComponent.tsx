@@ -613,27 +613,30 @@ class MapComponent extends TerrainComponent<Props>
   {
     return (
       <div className='input-map-coordinates'>
-        <input
-          type='text'
-          value={this.state.latitude}
-          placeholder={'Latitude'}
-          onChange={this.handleLatitudeChange}
-          onKeyPress={this.handleKeyPress}
-          className={classNames({
-            'input-map-input-error': this.state.errorLatitude,
-          })}
-        />
-        <input
-          type='text'
-          value={this.state.longitude}
-          placeholder={'Latitude'}
-          onChange={this.handleLongitudeChange}
-          onKeyPress={this.reverseGeocode}
-          className={classNames({
-            'input-map-longitude': true,
-            'input-map-input-error': this.state.errorLongitude,
-          })}
-        />
+        <div className='input-map-coordinates-latitude'>
+          <input
+            type='text'
+            value={this.state.latitude}
+            placeholder={'Latitude'}
+            onChange={this.handleLatitudeChange}
+            onKeyPress={this.handleKeyPress}
+            className={classNames({
+              'input-map-input-error': this.state.errorLatitude,
+            })}
+          />
+        </div>
+        <div className='input-map-coordinates-longitude'>
+          <input
+            type='text'
+            value={this.state.longitude}
+            placeholder={'Latitude'}
+            onChange={this.handleLongitudeChange}
+            onKeyPress={this.reverseGeocode}
+            className={classNames({
+              'input-map-input-error': this.state.errorLongitude,
+            })}
+          />
+        </div>
       </div>
     );
   }
@@ -675,7 +678,7 @@ class MapComponent extends TerrainComponent<Props>
     };
 
     return (
-      <div>
+      <div className='map-component-search-bar'>
         {
           this.state.searchByCoordinate ?
             this.renderCoordinateInputs()
@@ -685,6 +688,7 @@ class MapComponent extends TerrainComponent<Props>
               onEnterKeyDown={this.geocode}
               styles={{ input: inputStyle }}
               geocoder={this.props.geocoder}
+              classNames={{ root: 'map-component-address-input' }}
             />
         }
         {
