@@ -182,8 +182,8 @@ class GroupsColumn extends TerrainComponent<Props>
         {
           return !(v.status === ItemStatus.Live || v.status === ItemStatus.Default);
         }
-        return true; 
-      }
+        return true;
+      },
 
     );
 
