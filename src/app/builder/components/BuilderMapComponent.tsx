@@ -120,9 +120,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
         field={field}
         keepAddressInSync={true}
         canEdit={this.props.canEdit}
-      />
-    );
-            
+      />    
     );
   }
 }
