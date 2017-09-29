@@ -273,6 +273,15 @@ class PlacesAutocomplete extends TerrainComponent<Props>
     this.handleSelect(address, placeId);
   }
 
+  public selectAndSetAddress(address, placeId)
+  {
+    this.selectAddress(address, placeId);
+    if(this.props.onEnterKeyDown !== undefined)
+    {
+      setTimeout(this.props.onEnterKeyDown, 100);
+    }
+  }
+
   public handleSelect(address, placeId)
   {
     this.props.onSelect !== undefined ? this.props.onSelect(address, placeId) : this.props.inputProps.onChange(address);
@@ -312,7 +321,7 @@ class PlacesAutocomplete extends TerrainComponent<Props>
     }
     else
     {
-      this.selectAddress(activeItem.suggestion, activeItem.placeId);
+      this.selectAndSetAddress(activeItem.suggestion, activeItem.placeId);
     }
   }
 
@@ -486,7 +495,8 @@ class PlacesAutocomplete extends TerrainComponent<Props>
                     <div
                       key={p.placeId}
                       onMouseOver={() => this.setActiveItemAtIndex(p.index)}
-                      onMouseDown={() => this.selectAddress(p.suggestion, p.placeId)}
+                      onMouseDown={() => this.selectAndSetAddress(p.suggestion, p.placeId)}
+                      onClick={() => this.selectAndSetAddress(p.suggesetion, p.placeId)}
                       style={p.active ? this.getStyleFor('autocompleteItemActive') : this.getStyleFor('autocompleteItem')}
                     >
                       {this.autocompleteItem(p.suggestion)}

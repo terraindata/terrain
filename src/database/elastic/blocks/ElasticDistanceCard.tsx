@@ -51,7 +51,7 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 
 import { Colors, getCardColors } from '../../../app/common/Colors';
-import MapComponent from '../../../app/common/components/MapComponent';
+import BuilderMapComponent from '../../../app/builder/components/BuilderMapComponent';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
@@ -178,7 +178,7 @@ export const elasticDistance = _card({
       {
         displayType: DisplayType.MAP,
         key: 'geopoint',
-        component: MapComponent,
+        component: BuilderMapComponent,
       },
     ],
   },

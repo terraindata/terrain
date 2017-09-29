@@ -91,35 +91,9 @@ class BuilderComponent extends TerrainComponent<Props>
   public state:
   {
     showExpanded: boolean,
-    inputs: any,
-    spotlights: any,
   } = {
     showExpanded: false,
-    inputs: null,
-    spotlights: null,
   };
-
-  public constructor(props: Props)
-  {
-    super(props);
-    this._subscribe(SpotlightStore, {
-      isMounted: false,
-      storeKeyPath: ['spotlights'],
-      stateKey: 'spotlights',
-    });
-    this._subscribe(BuilderStore, {
-      stateKey: 'builderState',
-      updater: (builderState: BuilderState) =>
-      {
-        if (builderState.query.inputs !== this.state.inputs)
-        {
-          this.setState({
-            inputs: builderState.query.inputs,
-          });
-        }
-      },
-    });
-  }
 
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {
@@ -399,7 +373,6 @@ class BuilderComponent extends TerrainComponent<Props>
         break;
       case DisplayType.MAP:
         const MapComp = d.component as any;
-        const { distance, distanceUnit, geopoint, map_text, field } = this.props.data;
         content = (
           <div
             key={key}
@@ -410,23 +383,10 @@ class BuilderComponent extends TerrainComponent<Props>
                 <MapComp />,
                 {
                   keyPath,
-                  location: geopoint.toJS !== undefined ? geopoint.toJS() : geopoint,
-                  address: map_text !== undefined ? map_text : '',
-                  markLocation: true,
-                  showDistanceCircle: true,
-                  routing: false,
-                  showSearchBar: true,
-                  zoomControl: true,
-                  distance: parseFloat(distance),
-                  distanceUnit,
-                  geocoder: 'photon',
-                  hideSearchSettings: true,
-                  inputs: this.state.inputs,
-                  textKeyPath: this._ikeyPath(parentKeyPath, 'map_text'),
-                  spotlights: this.state.spotlights,
-                  field,
-                  keepAddressInSync: true,
+                  data,
+                  parentKeyPath,
                   canEdit: this.props.canEdit,
+                  helpOn: this.props.helpOn,
                 },
               )
             }
