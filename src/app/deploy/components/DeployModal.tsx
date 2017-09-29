@@ -169,16 +169,31 @@ class DeployModal extends TerrainComponent<Props>
       <div className='deploy-modal-tql'>
         <div className='deploy-modal-tql-wrapper'>
           <TQLEditor
+            language={'elastic'}
             canEdit={false}
             tql={tql}
             isDiff={this.state.defaultChecked && defaultTql !== null}
             diffTql={defaultTql}
             placeholder={'Your algorithm is blank'}
+            highlightedLine={-2}
           />
         </div>
       </div>
     );
   }
+
+            // tql={this.state.tql}
+            // language={this.props.language}
+            // canEdit={this.props.canEdit}
+            // theme={this.state.theme}
+
+            // onChange={this.updateTql}
+
+            // highlightedLine={this.state.highlightedLine}
+            // toggleSyntaxPopup={this.toggleSyntaxPopup}
+            // defineTerm={this.defineTerm}
+            // turnSyntaxPopupOff={this.turnSyntaxPopupOff}
+            // hideTermDefinition={this.hideTermDefinition}
 
   public toggleErrorModal()
   {
@@ -239,6 +254,7 @@ class DeployModal extends TerrainComponent<Props>
             <div
               className={classNames({
                 'deploy-modal': true,
+                'altBg': true,
               })}
             >
               {

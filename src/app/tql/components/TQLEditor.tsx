@@ -99,7 +99,7 @@ export interface Props
   language?: string;
   canEdit: boolean;
 
-  theme?: string;
+  // theme?: string;
   highlightedLine?: number;
 
   isDiff?: boolean;
@@ -153,7 +153,7 @@ class TQLEditor extends TerrainComponent<Props>
           'Ctrl-Enter': this.issueQuery,
         },
         lineWrapping: true,
-        theme: this.props.theme || localStorage.getItem('theme') || 'default',
+        theme: Colors().tqlEditor,
         matchBrackets: true,
         autoCloseBrackets: true,
         foldGutter: true,
