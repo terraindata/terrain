@@ -50,25 +50,65 @@ import * as winston from 'winston';
 
 import * as Util from '../Util';
 import * as Encryption from './Encryption';
-import { Events } from './Events';
+import { EventConfig, Events } from './Events';
 
 export const events: Events = new Events();
 const Router = new KoaRouter();
 
-// Handle client response for event tracker
+// Handle analytics event ingestion
 Router.post('/', async (ctx, next) =>
 {
-  const event: any = {
-    id: ctx.request.body['id'],
-    ip: ctx.request.ip,
-    message: ctx.request.body['message'],
-    payload: ctx.request.body['payload'],
-    type: ctx.request.body['type'],
-    url: ctx.request.body['url'],
+  const production = process.env.NODE_ENV === 'production';
+  if (!production &&
+    ctx.request.body !== undefined &&
+    ctx.request.query !== undefined)
+  {
+    throw new Error('Both request query and body cannot be set.');
+  }
+
+  if (!production &&
+    ctx.request.body === undefined &&
+    ctx.request.query === undefined)
+  {
+    throw new Error('Either request query or body parameters are required.');
+  }
+
+  let request: object = ctx.request.body;
+  if (request === undefined)
+  {
+    request = ctx.request.query;
+  }
+
+  const event: EventConfig = {
+    eventid: request['eventid'],
+    variantid: request['variantid'],
+    visitorid: request['variantid'],
+    source: {
+      ip: ctx.request.ip,
+      host: ctx.request.host,
+      url: ctx.request.url,
+    },
+    timestamp: request['timestamp'],
+    meta: request['meta'],
   };
-  const msg = await Encryption.decodeMessage(event);
-  await events.storeEvent(msg);
+
+  // const msg = await Encryption.decodeMessage(event);
   ctx.body = '';
+  try
+  {
+    await events.storeEvent(event);
+  }
+  catch (e)
+  {
+    if (process.env.NODE_ENV === 'production')
+    {
+      return;
+    }
+    else
+    {
+      throw new Error('Error storing analytics event:' + e);
+    }
+  }
 });
 
 // * variantid: list of variantids

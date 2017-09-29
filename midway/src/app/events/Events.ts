@@ -67,28 +67,23 @@ export interface AggregationRequest
   interval?: string;
 }
 
-export interface EventTemplateConfig
+export interface EventConfig
 {
-  id: string;
-  ip: string;
-  url?: string;
-  variantId?: string;
-}
-
-export interface EventConfig extends EventTemplateConfig
-{
-  eventType?: string;
-  date?: string;
-  message?: string;
-  name?: string;
-  payload?: any;
-  type: string;
+  eventid: number | string;
+  variantid: number | string;
+  visitorid: number | string;
+  timestamp: Date | string;
+  source: {
+    ip: string;
+    host: string;
+    url: string;
+  };
+  meta?: any;
 }
 
 export class Events
 {
   private eventTable: Tasty.Table;
-  private eventInfoTable: Tasty.Table;
   private elasticController: ElasticController;
 
   constructor()
@@ -98,15 +93,23 @@ export class Events
 
     this.eventTable = new Tasty.Table(
       'events',
-      ['id'],
+      ['timestamp'],
       [
-        'date',
-        'ip',
-        'payload',
-        'type',
+        'eventid',
+        'variantid',
+        'visitorid',
+        'source',
       ],
       'terrain-analytics',
     );
+  }
+
+  /*
+   * Store an analytics event in ES
+   */
+  public async storeEvent(event: EventConfig): Promise<EventConfig>
+  {
+    return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 
   public generateHistogramQuery(variantid: string, request: AggregationRequest): Elastic.SearchParams
@@ -325,15 +328,6 @@ export class Events
       }
     }
     return Promise.all(promises);
-  }
-
-  /*
-   * Store the validated event in the datastore
-   */
-  public async storeEvent(event: EventConfig): Promise<EventConfig>
-  {
-    event.payload = JSON.stringify(event.payload);
-    return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 
   private buildQuery(body: object): Elastic.SearchParams
