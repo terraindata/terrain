@@ -276,7 +276,7 @@ class PlacesAutocomplete extends TerrainComponent<Props>
   public selectAndSetAddress(address, placeId)
   {
     this.selectAddress(address, placeId);
-    if(this.props.onEnterKeyDown !== undefined)
+    if (this.props.onEnterKeyDown !== undefined)
     {
       setTimeout(this.props.onEnterKeyDown, 100);
     }

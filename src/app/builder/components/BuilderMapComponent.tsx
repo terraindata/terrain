@@ -102,7 +102,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
   {
     const { distance, distanceUnit, geopoint, map_text, field } = this.props.data;
     return (
-      <MapComponent   
+      <MapComponent
         keyPath={this.props.keyPath}
         location={geopoint.toJS !== undefined ? geopoint.toJS() : geopoint}
         address={map_text !== undefined ? map_text : ''}

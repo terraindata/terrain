@@ -680,12 +680,12 @@ class MapComponent extends TerrainComponent<Props>
           this.state.searchByCoordinate ?
             this.renderCoordinateInputs()
             :
-              <PlacesAutocomplete
-                inputProps={inputProps}
-                onEnterKeyDown={this.geocode}
-                styles={{ input: inputStyle }}
-                geocoder={this.props.geocoder}
-              />
+            <PlacesAutocomplete
+              inputProps={inputProps}
+              onEnterKeyDown={this.geocode}
+              styles={{ input: inputStyle }}
+              geocoder={this.props.geocoder}
+            />
         }
         {
           this.props.hideSearchSettings ?
