@@ -175,14 +175,16 @@ class GroupsColumn extends TerrainComponent<Props>
     const canDrag = false;
 
     let canRename = true;
-    this.props.variants.map(
+    canRename = this.props.variants.every(
       (v: Variant) =>
       {
-        if (v.status === ItemStatus.Live || v.status === ItemStatus.Default)
+        if (id === v.groupId)
         {
-          canRename = false;
+          return !(v.status === ItemStatus.Live || v.status === ItemStatus.Default);
         }
-      },
+        return true; 
+      }
+
     );
 
     // onDuplicate={this.handleDuplicate}
