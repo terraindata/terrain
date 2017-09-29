@@ -52,9 +52,15 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import './MultiSwitch.less';
 import SimpleRadio from './SimpleRadio';
 
+interface Option
+{
+  value: string;
+  label: string;
+}
+
 export interface Props
 {
-  options: List<string>;
+  options: List<Option>;
 
   // can pass the value in as an index, a string value, or an array of either
   //  (in the case of multiple selections)
@@ -74,7 +80,7 @@ class MultiSwitch extends TerrainComponent<Props>
   public optionIsOn(index: number): boolean
   {
     const { allowsMultiple, usesValues, value, options } = this.props;
-    const rawValue = usesValues ? options.get(index) : index;
+    const rawValue = usesValues ? options.get(index).value : index;
 
     if (allowsMultiple)
     {
@@ -90,7 +96,7 @@ class MultiSwitch extends TerrainComponent<Props>
   {
     const { allowsMultiple, usesValues, onChange, options } = this.props;
     let { value } = this.props;
-    const rawValue = usesValues ? options.get(index) : index;
+    const rawValue = usesValues ? options.get(index).value : index;
 
     if (allowsMultiple)
     {
@@ -132,7 +138,7 @@ class MultiSwitch extends TerrainComponent<Props>
     );
   }
 
-  private renderOption(option: string, index: number)
+  private renderOption(option: Option, index: number)
   {
     const isOn = this.optionIsOn(index);
     return (
@@ -151,14 +157,14 @@ class MultiSwitch extends TerrainComponent<Props>
               checked={isOn}
               onChange={this._fn(this.handleSelect, index)}
               color={Colors().text1}
-              label={option}
+              label={option.label}
             />
             :
             <SimpleRadio
               on={isOn}
               large={this.props.large}
               small={this.props.small}
-              label={option}
+              label={option.label}
             />
         }
       </div>
