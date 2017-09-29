@@ -262,8 +262,11 @@ export class Events
             {
               delete obj[numerator];
               delete obj[denominator];
-              obj.doc_count = obj[rate].value;
-              delete obj[rate];
+              if (obj[rate] !== undefined)
+              {
+                obj.doc_count = obj[rate].value;
+                delete obj[rate];
+              }
               return obj;
             }),
         });
