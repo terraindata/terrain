@@ -79,7 +79,7 @@ describe('AnalyticsReducer', () =>
         key: 1433548800000,
         doc_count: 937,
       },
-    ]
+    ],
   };
 
   beforeEach(() =>

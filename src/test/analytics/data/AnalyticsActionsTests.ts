@@ -97,11 +97,11 @@ describe('AnalyticsActions', () =>
     {
       Ajax.getAnalytics = (
         variantIds: ID[],
-        start: Date,
-        end: Date,
-        metricId: number,
+        startParam: Date,
+        endParam: Date,
+        metricIdParam: number,
         onLoad: (response: any) => void,
-        onError?: (ev: Event) => void
+        onError?: (ev: Event) => void,
       ) => onLoad(analyticsResponse);
 
       const expectedActions = [

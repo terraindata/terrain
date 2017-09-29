@@ -51,9 +51,9 @@ import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
-import Ajax from 'util/Ajax';
 import RolesReducer from 'roles/data/RolesReducers';
 import UserReducer from 'users/data/UserReducers';
+import Ajax from 'util/Ajax';
 import ColorsReducer from '../colors/data/ColorsReducers';
 
 const reducers = {
