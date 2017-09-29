@@ -47,9 +47,7 @@ import Actions from 'analytics/data/AnalyticsActions';
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import * as Immutable from 'immutable';
-import * as nock from 'nock';
-import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import { Ajax, createMockStore } from '../../helpers';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
@@ -81,10 +79,7 @@ const analyticsResponse = [
   },
 ];
 
-const Ajax = {};
-
-const middlewares = [thunk.withExtraArgument(Ajax)];
-const mockStore = configureMockStore(middlewares);
+const mockStore = createMockStore();
 
 describe('AnalyticsActions', () =>
 {
@@ -97,11 +92,6 @@ describe('AnalyticsActions', () =>
     const accessToken = 'valid-access-token';
     const start = new Date(2015, 5, 2);
     const end = new Date(2015, 5, 20);
-
-    afterEach(() =>
-    {
-      nock.cleanAll();
-    });
 
     it('should create a analytics.fetch action after the variant analytics have been fetched', (done) =>
     {
