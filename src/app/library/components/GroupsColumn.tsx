@@ -65,6 +65,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 const GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
 type Group = LibraryTypes.Group;
+type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
@@ -74,6 +75,7 @@ export interface Props
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
   groupActions: any;
+  variants: Immutable.Map<ID, Variant>;
 }
 
 class GroupsColumn extends TerrainComponent<Props>
@@ -172,6 +174,19 @@ class GroupsColumn extends TerrainComponent<Props>
     const canEdit = canCreate || (me && me.isSuperUser);
     const canDrag = false;
 
+    let canRename = true;
+    canRename = this.props.variants.every(
+      (v: Variant) =>
+      {
+        if (id === v.groupId)
+        {
+          return !(v.status === ItemStatus.Live || v.status === ItemStatus.Default);
+        }
+        return true;
+      },
+
+    );
+
     // onDuplicate={this.handleDuplicate}
     return (
       <LibraryItem
@@ -195,6 +210,7 @@ class GroupsColumn extends TerrainComponent<Props>
         canArchive={(canEdit || canDrag) && group.status !== ItemStatus.Archive}
         canDuplicate={false}
         canUnarchive={group.status === ItemStatus.Archive}
+        canRename={canRename}
         onUnarchive={this.handleUnarchive}
         canCreate={canCreate}
         isSelected={+group.id === +params.groupId}
