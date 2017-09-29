@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as React from 'react';
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import AccessTokenControl from './AccessTokenControl';
+import TemplateControlList from './TemplateControlList';
 
 import './ControlPage.less';
 
@@ -69,7 +69,7 @@ class ControlPage extends TerrainComponent<Props>
   {
     return (
       <div className='control-body'>
-        <AccessTokenControl />
+        <TemplateControlList />
       </div>
     );
   }

@@ -46,7 +46,7 @@
     }
 
     .access-token-cell {
-      max-width: 150px;
+      max-width: 100px;
       text-overflow: ellipsis;
       overflow-x: hidden;
       white-space: nowrap;
@@ -68,20 +68,15 @@
     vertical-align: middle;
   }
   
-  .curl-code-wrapper {
+  .template-menu-options-wrapper {
     position: relative;
     padding: @half-spacing;
-    width: 100%;
+    width: @icon-size;
     height: @icon-size;
     margin: auto;
-    cursor: pointer;
-    .curl-code-icon {
-      height: @icon-size;
-      width: @icon-size;
-      position: absolute;
-      fill: #FFF;
-      left: 50%;
-      transform: translateX(-50%);
+
+    .template-menu-option-icon {
+      fill: currentColor;
     }
   }
 }

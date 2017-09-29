@@ -90,7 +90,24 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
 ControlReducer[ActionTypes.importExport.setTemplates] =
   (state, action) =>
   {
-    return state.set('templates', action.payload.templates)
+    return state.set('importExportTemplates', action.payload.templates)
+  };
+
+ControlReducer[ActionTypes.importExport.deleteTemplate] =
+  (state, action) =>
+  {
+    Ajax.deleteTemplate(action.payload.templateId,
+      () =>
+      {
+        action.payload.handleDeleteTemplateSuccess(action.payload.templateName);
+        action.payload.fetchTemplates();
+      },
+      (err: string) =>
+      {
+        action.payload.handleDeleteTemplateError(err);
+      },
+    );
+    return state;
   };
 
 const ControlReducerWrapper = (state: ControlState = _ControlState(), action) =>

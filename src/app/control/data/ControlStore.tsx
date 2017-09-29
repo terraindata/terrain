@@ -62,7 +62,7 @@ const { List } = Immutable;
 
 class ControlStateC
 {
-  public templates: List<Template> = List([]);
+  public importExportTemplates: List<Template> = List([]);
 }
 
 const ControlState_Record = Immutable.Record(new ControlStateC());

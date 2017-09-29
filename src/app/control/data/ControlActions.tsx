@@ -65,6 +65,16 @@ const ControlActions =
         $(ActionTypes.importExport.fetchTemplates, {
           setTemplates: ControlActions.importExport.setTemplates,
         }),
+
+      deleteTemplate:
+      (templateId: number, handleDeleteTemplateSuccess, handleDeleteTemplateError, templateName: string) =>
+        $(ActionTypes.importExport.deleteTemplate, {
+          templateId,
+          handleDeleteTemplateSuccess,
+          handleDeleteTemplateError,
+          fetchTemplates: ControlActions.importExport.fetchTemplates,
+          templateName,
+        }),
     }
 
   };
