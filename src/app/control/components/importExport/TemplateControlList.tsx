@@ -50,15 +50,16 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 
+import { backgroundColor, borderColor, Colors, fontColor } from 'common/Colors';
 import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import Ajax from 'util/Ajax';
-import ControlActions from '../data/ControlActions';
-import ControlStore from '../data/ControlStore';
+import ControlActions from '../../data/ControlActions';
 
+import CreateHeadlessCommand from './CreateHeadlessCommand';
 import './TemplateControlList.less';
 // const CodeIcon = require('images/icon_tqlDropdown.svg');
 const DeleteIcon = require('images/icon_close.svg');
@@ -75,7 +76,7 @@ type HeaderConfig = HeaderConfigItem[];
 
 export interface Props
 {
-  todo?: string // ignore this for now
+  templates: List<Template>;
 }
 
 type ConfirmActionType = 'DELETE' | 'RESET';
@@ -83,7 +84,7 @@ type ConfirmActionType = 'DELETE' | 'RESET';
 class AccessTokenControl extends TerrainComponent<Props>
 {
   public state: {
-    templates: List<Template>;
+    // templates: List<Template>;
     responseModalOpen: boolean;
     responseModalMessage: string;
     responseModalTitle: string;
@@ -93,9 +94,10 @@ class AccessTokenControl extends TerrainComponent<Props>
     confirmModalTitle: string;
     confirmModalIsError: boolean;
     confirmModalType: ConfirmActionType;
-    confirmModalTemplate: Template;
+    currentActiveTemplate: Template;
+    headlessModalOpen: boolean;
   } = {
-    templates: List([]),
+    // templates: List([]),
     responseModalOpen: false,
     responseModalMessage: '',
     responseModalTitle: '',
@@ -105,7 +107,8 @@ class AccessTokenControl extends TerrainComponent<Props>
     confirmModalTitle: '',
     confirmModalIsError: false,
     confirmModalType: 'DELETE',
-    confirmModalTemplate: undefined,
+    currentActiveTemplate: undefined,
+    headlessModalOpen: false,
   };
 
   public templateConfig: HeaderConfig;
@@ -113,31 +116,26 @@ class AccessTokenControl extends TerrainComponent<Props>
   constructor(props)
   {
     super(props);
-    this._subscribe(ControlStore, {
-      stateKey: 'templates',
-      storeKeyPath: ['importExportTemplates'],
-    });
   }
 
-  public getOptions(template)
+  public getOptions(template: Template)
   {
-   return List([
+    const typeText = template.export === 1 ? 'Export' : 'Import';
+    return List([
       {
         text: 'Delete Template',
-        onClick: () => {
-          this.requestDeleteTemplate(template);
-        },
+        onClick: () => this.requestDeleteTemplate(template),
         icon: <DeleteIcon className='template-menu-option-icon'/>,
         iconColor: '#555',
       },
       {
-        text: 'Headless Import',
-        onClick: () => undefined,
+        text: `Headless ${typeText}`,
+        onClick: () => this.requestCreateHeadless(template),
         icon: <ImportIcon className='template-menu-option-icon'/>,
         iconColor: '#555',
       },
       {
-        text: 'Schedule Import',
+        text: `Schedule ${typeText}`,
         onClick: () => undefined,
         icon: <ScheduleIcon className='template-menu-option-icon'/>,
         iconColor: '#555',
@@ -180,19 +178,27 @@ class AccessTokenControl extends TerrainComponent<Props>
     ];
   }
 
+  public requestCreateHeadless(template: Template)
+  {
+    this.setState({
+      headlessModalOpen: true,
+      currentActiveTemplate: template,
+    })
+  }
+
   public confirmConfirmModal()
   {
     if (this.state.confirmModalType === 'DELETE')
     {
-      if (this.state.confirmModalTemplate === undefined)
+      if (this.state.currentActiveTemplate === undefined)
       {
         return;
       }
       ControlActions.importExport.deleteTemplate(
-        this.state.confirmModalTemplate.templateId,
+        this.state.currentActiveTemplate.templateId,
         this.handleDeleteTemplateSuccess,
         this.handleDeleteTemplateError,
-        this.state.confirmModalTemplate.templateName
+        this.state.currentActiveTemplate.templateName
       );
     }
     else if (this.state.confirmModalType === 'RESET')
@@ -204,9 +210,9 @@ class AccessTokenControl extends TerrainComponent<Props>
   public requestDeleteTemplate(template)
   {
     this.setState({
-      confirmModalTemplate: template,
+      currentActiveTemplate: template,
       confirmModalOpen: true,
-      confirmModalMessage: `Are you sure you want to delete template "${template.templateName}"`,
+      confirmModalMessage: `Are you sure you want to delete template "${template.templateName}"?`,
       confirmModalTitle: 'Confirm Action',
       confirmModalIsError: false,
     });
@@ -245,20 +251,23 @@ class AccessTokenControl extends TerrainComponent<Props>
       responseModalOpen: false,
     });
   }
-  public componentDidMount()
+
+  public headlessCloseModal()
   {
-    ControlActions.importExport.fetchTemplates();
+    this.setState({
+      headlessModalOpen: false,
+    });
   }
 
   public renderTemplate(template: Template, index: number)
   {
     return (
-      <div className='template-info' key={index}>
+      <div className='template-info' key={index} style={backgroundColor(Colors().bg3)}>
         {
           this.getTemplateConfig().map((headerItem: HeaderConfigItem, i: number) =>
           {
             return (
-              <div className='template-info-data' key={i}>
+              <div className='template-info-data' key={i} style={borderColor(Colors().border3)}>
                 {headerItem[1](template)}
               </div>
             );
@@ -289,18 +298,23 @@ class AccessTokenControl extends TerrainComponent<Props>
             })
           }
         </div>
-        {this.state.templates.map(this.renderTemplate)}
+        {this.props.templates.map(this.renderTemplate)}
       </div>
     );
   }
 
+  public renderCreateHeadlessCommand()
+  {
+    return <CreateHeadlessCommand template={this.state.currentActiveTemplate}/>
+  }
+
   public render()
   {
+    const typeText = (this.state.currentActiveTemplate !== undefined &&
+      this.state.currentActiveTemplate.export === 1) ? 'Export' : 'Import';
+
     return (
-      <div className='import-export-token-control-page'>
-        <div className='import-export-control-title'>
-          Manage Templates
-        </div>
+      <div>
         {this.renderTable()}
         <Modal
           open={this.state.responseModalOpen}
@@ -319,6 +333,12 @@ class AccessTokenControl extends TerrainComponent<Props>
           onConfirm={this.confirmConfirmModal}
           confirm={true}
           closeOnConfirm={true}
+        />
+        <Modal
+          open={this.state.headlessModalOpen}
+          title={`Compose ${typeText} Command`}
+          onClose={this.headlessCloseModal}
+          children={this.renderCreateHeadlessCommand()}
         />
       </div>
     )

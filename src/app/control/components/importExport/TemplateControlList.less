@@ -1,19 +1,9 @@
-@import "../../common/Common.less";
+@import "../../../common/Common.less";
 
-@border-style: 1px solid #777;
+@border-style: 1px solid;
 @border-radius: 3px;
 @icon-ratio: 1.25;
 @icon-size: calc(1em*@icon-ratio);
-
-.import-export-token-control-page {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  .import-export-control-title {
-    .title-text;
-    padding: @spacing;
-  }
-}
 
 .import-export-token-control-table {
   display: table;
@@ -24,7 +14,6 @@
 
   .template-info {
     display: table-row;
-    background-color: #444;
 
     .template-info-data {
       .common-cell-properties;

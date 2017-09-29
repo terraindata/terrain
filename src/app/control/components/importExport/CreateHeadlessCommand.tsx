@@ -46,29 +46,50 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
+import * as Immutable from 'immutable';
 import * as React from 'react';
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import ImportExportControl from './importExport/ImportExportControl';
+import * as FileImportTypes from 'fileImport/FileImportTypes';
 
-import './ControlPage.less';
+import ControlActions from '../../data/ControlActions';
+
+import './CreateHeadlessCommand.less';
+
+const { List } = Immutable;
+type Template = FileImportTypes.Template;
 
 export interface Props
 {
-  params?: any;
-  location?: any;
+  template: Template;
 }
 
-class ControlPage extends TerrainComponent<Props>
+class CreateHeadlessCommand extends TerrainComponent<Props>
 {
+  public state: {
+    templates: List<Template>;
+  } = {
+    templates: List([]),
+  };
+
+  public componentDidMount()
+  {
+    ControlActions.importExport.fetchTemplates();
+  }
+
   public render()
   {
+    const typeText = this.props.template.export === 1 ? 'export' : 'import';
     return (
-      <div className='control-body'>
-        <ImportExportControl />
+      <div className='headless-command-generator'>
+        <div className='headless-generator-title'>
+          Use this form to compose a headless {typeText} command.
+        </div>
+        <div className='headless-entry-row'>
+          Template: {this.props.template.templateName}
+        </div>
       </div>
-    );
   }
 }
 
-export default ControlPage;
+export default CreateHeadlessCommand;

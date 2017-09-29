@@ -46,26 +46,56 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
+import * as Immutable from 'immutable';
 import * as React from 'react';
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import ImportExportControl from './importExport/ImportExportControl';
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import TemplateControlList from './TemplateControlList';
 
-import './ControlPage.less';
+import ControlActions from '../../data/ControlActions';
+import ControlStore from '../../data/ControlStore';
+
+import './ImportExportControl.less';
+
+const { List } = Immutable;
+type Template = FileImportTypes.Template;
 
 export interface Props
 {
-  params?: any;
-  location?: any;
+  placeholder?: string;
 }
 
 class ControlPage extends TerrainComponent<Props>
 {
+  public state: {
+    templates: List<Template>;
+  } = {
+    templates: List([]),
+  };
+
+  constructor(props)
+  {
+    super(props);
+    this._subscribe(ControlStore, {
+      stateKey: 'templates',
+      storeKeyPath: ['importExportTemplates'],
+    });
+  }
+
+  public componentDidMount()
+  {
+    ControlActions.importExport.fetchTemplates();
+  }
+
   public render()
   {
     return (
-      <div className='control-body'>
-        <ImportExportControl />
+      <div className='import-export-token-control-page'>
+        <div className='import-export-control-title'>
+          Manage Templates
+        </div>
+        <TemplateControlList templates={this.state.templates}/>
       </div>
     );
   }

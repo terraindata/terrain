@@ -101,7 +101,7 @@ Router.post('/export/headless', async (ctx, next) =>
     ctx.status = 400;
     return;
   }
-  Util.verifyParameters(exprtConf, ['templateId', 'variantId']);
+  Util.verifyParameters(exprtConf, ['dbid', 'templateId', 'variantId']);
 
   // await perm.ImportPermissions.verifyExportRoute(ctx.state.user, ctx.request.body.body);
 
