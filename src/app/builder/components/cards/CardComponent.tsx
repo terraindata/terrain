@@ -144,6 +144,7 @@ class _CardComponent extends TerrainComponent<Props>
     maxDY: number;
     dY: number;
     index: number;
+    cardTransition: boolean;
   };
 
   public refs: {
@@ -179,6 +180,7 @@ class _CardComponent extends TerrainComponent<Props>
       maxDY: 0,
       dY: 0,
       index: 0,
+      cardTransition: true,
 
       menuOptions:
       Immutable.List([
@@ -285,6 +287,9 @@ class _CardComponent extends TerrainComponent<Props>
         this.toggleClose(null);
       }
     }
+    this.setState({
+      cardTransition: true,
+    });
   }
 
   public componentDidMount()
@@ -592,6 +597,7 @@ class _CardComponent extends TerrainComponent<Props>
     if (this.props.handleCardReorder)
     {
       const { index } = this.shiftSiblings(event, false);
+      $('.card-transition').removeClass('card-transition');
       const sibs = this.getSiblings();
       _.range(0, sibs.length).map((i) =>
         sibs[i]['style'].top = 0,
@@ -793,6 +799,7 @@ class _CardComponent extends TerrainComponent<Props>
           'card-no-title': card['noTitle'],
           [card.type + '-card']: true,
           'card-moving': this.state.moving,
+          'card-transition': this.state.cardTransition,
         })}
         ref='card'
         id={id}
