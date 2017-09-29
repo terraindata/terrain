@@ -53,7 +53,37 @@ import thunk from 'redux-thunk';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
-const middlewares = [thunk];
+const analyticsResponse = [
+  {
+    key_as_string: '2015-06-02T00:00:00.000Z',
+    key: 1433203200000,
+    doc_count: 10320,
+  },
+  {
+    key_as_string: '2015-06-03T00:00:00.000Z',
+    key: 1433289600000,
+    doc_count: 12582,
+  },
+  {
+    key_as_string: '2015-06-04T00:00:00.000Z',
+    key: 1433376000000,
+    doc_count: 12279,
+  },
+  {
+    key_as_string: '2015-06-05T00:00:00.000Z',
+    key: 1433462400000,
+    doc_count: 6187,
+  },
+  {
+    key_as_string: '2015-06-06T00:00:00.000Z',
+    key: 1433548800000,
+    doc_count: 937,
+  },
+];
+
+const Ajax = {};
+
+const middlewares = [thunk.withExtraArgument(Ajax)];
 const mockStore = configureMockStore(middlewares);
 
 describe('AnalyticsActions', () =>
@@ -68,58 +98,26 @@ describe('AnalyticsActions', () =>
     const start = new Date(2015, 5, 2);
     const end = new Date(2015, 5, 20);
 
-    const analyticsResponse = [
-      {
-        key_as_string: '2015-06-02T00:00:00.000Z',
-        key: 1433203200000,
-        doc_count: 10320,
-      },
-      {
-        key_as_string: '2015-06-03T00:00:00.000Z',
-        key: 1433289600000,
-        doc_count: 12582,
-      },
-      {
-        key_as_string: '2015-06-04T00:00:00.000Z',
-        key: 1433376000000,
-        doc_count: 12279,
-      },
-      {
-        key_as_string: '2015-06-05T00:00:00.000Z',
-        key: 1433462400000,
-        doc_count: 6187,
-      },
-      {
-        key_as_string: '2015-06-06T00:00:00.000Z',
-        key: 1433548800000,
-        doc_count: 937,
-      },
-    ];
-
     afterEach(() =>
     {
       nock.cleanAll();
     });
 
-    it('should create a analytics.fetch action after the variant analytics have been fetched', () =>
+    it('should create a analytics.fetch action after the variant analytics have been fetched', (done) =>
     {
-      nock(MIDWAY_BASE_URL)
-        .get(`/events/variants/${variantId}?
-id=1&
-accessToken=${accessToken}&
-start=${start.toISOString()}&
-end=${end.toISOString()}&
-metric=${metricId.toString()}&
-interval=day&
-eventid=${metricId.toString()}&
-agg=date_histogram&
-field=@timestamp`)
-        .reply(200, analyticsResponse);
+      Ajax.getAnalytics = (
+        variantIds: ID[],
+        start: Date,
+        end: Date,
+        metricId: number,
+        onLoad: (response: any) => void,
+        onError?: (ev: Event) => void
+      ) => onLoad(analyticsResponse);
 
       const expectedActions = [
         {
           type: ActionTypes.fetch,
-          payload: { variantId, analytics: analyticsResponse },
+          payload: { analytics: analyticsResponse },
         },
       ];
 
@@ -129,6 +127,7 @@ field=@timestamp`)
         Actions.fetch([variantId], metricId, (analyticsResponseParam) =>
         {
           expect(store.getActions()).toEqual(expectedActions);
+          done();
         }),
       );
     });
