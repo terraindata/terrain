@@ -344,7 +344,7 @@ class TuningColumn extends TerrainComponent<Props>
         className='cards-column'
       >
         <div
-          className='cards-column-cards-area'
+          className='tuning-column-cards-area'
 
           id='cards-column'
         >

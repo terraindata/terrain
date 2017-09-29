@@ -658,7 +658,7 @@ class _CardComponent extends TerrainComponent<Props>
   public render()
   {
     const { id } = this.props.card;
-    this.cardEl = document.getElementById(this.props.card.id); // memoize?
+    this.cardEl = $('cards-column-cards-area #' + this.props.card.id) as any; // memoize?
     if (this.cardEl)
     {
       const { columnTop, columnHeight, columnScroll } = this.state.scrollState;
@@ -689,7 +689,7 @@ class _CardComponent extends TerrainComponent<Props>
           //  cardHeight ad infinitum
           return (
             <div
-              className='card card-placeholder'
+              className='card card-placeholder card-transition'
               id={id}
               style={{
                 height: cardHeight,
@@ -708,7 +708,7 @@ class _CardComponent extends TerrainComponent<Props>
 
       return (
         <div
-          className='card card-placeholder'
+          className='card card-placeholder card-transition'
           id={id}
           style={{
             minHeight: CARD_HEIGHT_MAP[id] || 50,
