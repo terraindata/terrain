@@ -195,15 +195,15 @@ const EQLSpec: ESClause[] =
           'index:index': null,
           'type:type': null,
           'from:from': null,
-          'size:size': null,
+          'size:size': 1000,
           'body:body':
           {
             'query:query':
             {
-              'Filter:elasticFilter': null,
-              //                    'bool:bool_query': {
-              //                      'must:query[]': [{'term:query': null}],
-              //                    }
+              'bool:elasticFilter': null,
+              //              'bool:bool_query': {
+              //                'must:query[]': [{'term:term_query': ''}],
+              //              }
             },
             'sort:elasticScore': null,
           },
@@ -232,7 +232,7 @@ const EQLSpec: ESClause[] =
         path: ['control'],
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
-        template: 1000,
+        template: '1000',
       }),
     new ESStructureClause('body',
       {
