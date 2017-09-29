@@ -106,7 +106,7 @@ Router.post('/', async (ctx, next) =>
     }
     else
     {
-      throw new Error('Error storing analytics event:' + e);
+      throw new Error('Error storing analytics event:' + String(e));
     }
   }
 });
