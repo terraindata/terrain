@@ -100,7 +100,7 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
     ['start', 'end', 'eventid', 'variantid', 'agg'],
   );
   winston.info('getting events for variant');
-  const response: object[] = await events.EventHandler(ctx.request.query);
+  const response: object[] = await events.AggregationHandler(ctx.request.query);
   ctx.body = response.reduce((acc, x) =>
   {
     for (const key in x)
