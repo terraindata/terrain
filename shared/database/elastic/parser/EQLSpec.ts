@@ -208,7 +208,7 @@ const EQLSpec: ESClause[] =
         terminateAfter: 'number',
         stats: 'string[]',
         suggestField: 'string',
-        suggestMode: 'suggest_mode', //enum suggest_mode
+        suggestMode: 'suggest_mode', // enum suggest_mode
         suggestSize: 'number',
         suggestText: 'string',
         timeout: 'time_string',
