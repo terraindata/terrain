@@ -194,7 +194,7 @@ const EQLSpec: ESClause[] =
         from: 'from',
         ignoreUnavailable: 'boolean',
         allowNoIndices: 'boolean',
-        explainWildcards: 'explainWildcards',
+        explainWildcards: 'explain_wildcards',
         lenient: 'boolean',
         preference: 'string',
         q: 'string',
@@ -257,6 +257,13 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
         template: 1000,
       }),
+    new ESEnumClause('explain_wildcards',
+      ['open', 'closed', 'none', 'all'],
+      {
+        path: ['control'],
+        desc: 'Explain wildcards.',
+        template: 'open',
+      }),
     new ESStructureClause('body',
       {
         // value
@@ -276,8 +283,8 @@ const EQLSpec: ESClause[] =
         post_filter: 'post_filter', // object
         script_fields: 'script_fields', // object
         indices_boost: 'index_boost[]', // array
-        aggregations: 'any',
-        aggs: 'any',
+        aggregations: 'aggs_query',
+        aggs: 'aggs_query',
         highlight: 'highlight',
         suggest: 'suggest',
         rescore: 'rescore', // object or array
@@ -314,6 +321,49 @@ const EQLSpec: ESClause[] =
         name: 'slice',
         desc: 'A slice allowing to split a scroll in multiple partitions',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html',
+      }),
+    // aggregation
+    // AggregatorFactories.java
+    new ESMapClause('aggs_query',
+        'aggregation_name',
+        'aggregation_builder',
+      {
+        path: ['aggregation'],
+        name: 'aggregation query',
+        desc: 'Create and name an aggregation query.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations',
+      }),
+    new ESStringClause('aggregation_name',
+      {
+        path: ['aggregation'],
+        desc: 'names this aggregation, must be alpha-numeric and can only contain \'_\' and \'-\'',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations',
+      }),
+    new ESStructureClause('aggregation_builder',
+      {
+        aggs: 'aggs_query',
+        aggregations: 'aggs_query',
+        avg: 'metrics_avg',
+      },
+      {
+        path: ['aggregation'],
+        desc: 'Provides aggregated data based on the aggregation query.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations.',
+      }),
+    // AvgAggregationBuilder.java
+    // ValuesSourceParserHelper.declareNumericFields(PARSER, true, true, false);
+    new ESStructureClause('metrics_avg',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that computes the average of numeric values that are extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-avg-aggregation.html',
       }),
     new ESVariantClause('sort_object',
       {
