@@ -60,6 +60,7 @@ import Query from './../../../items/types/Query';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import { notificationManager } from './../../common/components/InAppNotification';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
 import Switch from './../../common/components/Switch';
@@ -361,12 +362,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleTemplateSaveSuccess()
   {
-    this.setState({
-      showResponseModal: true,
-      responseModalContent: 'Successfully saved template: "' + this.state.saveTemplateName + '"',
-      responseModalTitle: 'Template Saved',
-      responseModalError: false,
-    });
+    notificationManager.addNotification('Template Saved', 'Successfully saved "' + this.state.saveTemplateName + '"', 'info', 4);
   }
 
   public handleSaveTemplate()
@@ -430,12 +426,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleUpdateTemplateSuccess(templateName: string)
   {
-    this.setState({
-      showResponseModal: true,
-      responseModalContent: 'Successfully updated template: "' + templateName + '"',
-      responseModalTitle: 'Template Updated',
-      responseModalError: false,
-    });
+    notificationManager.addNotification('Template Updated', 'Successfully updated "' + templateName + '"', 'info', 4);
   }
 
   public handleUpdateTemplateError(error: string)
@@ -471,12 +462,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleDeleteTemplateSuccess(templateName: string)
   {
-    this.setState({
-      showResponseModal: true,
-      responseModalContent: 'Successfully deleted template: "' + templateName + '"',
-      responseModalTitle: 'Template Deleted',
-      responseModalError: false,
-    });
+    notificationManager.addNotification('Template Deleted', 'Successfully deleted "' + templateName + '"', 'info', 4);
   }
 
   public handleDeleteTemplate(itemIndex: number)
@@ -604,14 +590,8 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleFileExportSuccess()
   {
-    console.log('success');
     const filename = this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype;
-    this.setState({
-      showResponseModal: true,
-      responseModalContent: 'Successfully exported data to ' + filename,
-      responseModalTitle: 'Data Exported',
-      responseModalError: false,
-    });
+    notificationManager.addNotification('Data Exported', 'Exported data to ' + filename, 'info', 4);
   }
 
   public handleFileExportError(error: string)
