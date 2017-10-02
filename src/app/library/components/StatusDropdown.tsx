@@ -182,21 +182,21 @@ class StatusDropdown extends TerrainComponent<Props>
     return (
       <div> {
         tooltip(
-      <Dropdown
-        options={this.getOptions()}
-        selectedIndex={this.getSelectedIndex()}
-        onChange={this.handleChange}
-        canEdit={this.canEdit()}
-        tooltips={this.props.tooltips}
-      />,
-      {
-        title: this.canEdit() ? 'Click to change the Variant\'s status, e.g. to Deploy or Archive' : 
-          tooltipText,
-        position: 'right',
-      }
-    ) }
-        </div>
-        );
+          <Dropdown
+            options={this.getOptions()}
+            selectedIndex={this.getSelectedIndex()}
+            onChange={this.handleChange}
+            canEdit={this.canEdit()}
+            tooltips={this.props.tooltips}
+          />,
+          {
+            title: this.canEdit() ? 'Click to change the Variant\'s status, e.g. to Deploy or Archive' :
+              tooltipText,
+            position: 'right',
+          }
+        )}
+      </div>
+    );
     // <div className='status-dropdown-wrapper'>
     //   <div
     //     className={classNames({
