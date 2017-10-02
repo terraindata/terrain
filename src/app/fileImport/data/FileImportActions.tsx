@@ -43,45 +43,82 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as _ from 'underscore';
+import { SchemaActions } from '../../schema/data/SchemaStore';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
+
+type Transform = FileImportTypes.Transform;
+type Template = FileImportTypes.Template;
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 const $ = (type: string, payload: any) => FileImportStore.dispatch({ type, payload });
 
 const FileImportActions =
   {
     changeServer:
-    (connectionId: number, name: string) =>
-      $(ActionTypes.changeServer, { connectionId, name }),
+    (serverId: number, name: string) =>
+      $(ActionTypes.changeServer, { serverId, name }),
 
-    changeDbText:
-    (dbText: string) =>
-      $(ActionTypes.changeDbText, { dbText }),
+    changeDbName:
+    (dbName: string) =>
+      $(ActionTypes.changeDbName, { dbName }),
 
-    changeTableText:
-    (tableText: string) =>
-      $(ActionTypes.changeTableText, { tableText }),
+    changeTableName:
+    (tableName: string) =>
+      $(ActionTypes.changeTableName, { tableName }),
 
     changeHasCsvHeader:
-    () =>
-      $(ActionTypes.changeHasCsvHeader, {}),
+    (hasCsvHeader: boolean) =>
+      $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),
+
+    changeIsNewlineSeparatedJSON:
+    (isNewlineSeparatedJSON: boolean) =>
+      $(ActionTypes.changeIsNewlineSeparatedJSON, { isNewlineSeparatedJSON }),
 
     changePrimaryKey:
     (columnId: number) =>
       $(ActionTypes.changePrimaryKey, { columnId }),
 
-    chooseFile:
-    (file: string, filetype: string, preview: List<List<string>>, originalNames: List<string>) =>
-      $(ActionTypes.chooseFile, { file, filetype, preview, originalNames }),
+    changePrimaryKeyDelimiter:
+    (delim: string) =>
+      $(ActionTypes.changePrimaryKeyDelimiter, { delim }),
 
-    uploadFile:
-    () =>
-      $(ActionTypes.uploadFile, { changeUploadInProgress: FileImportActions.changeUploadInProgress }),
+    chooseFile:
+    (filetype: string, filesize: number, preview: List<List<string>>, originalNames: List<string>, columnTypes?: List<ColumnTypesTree>) =>
+      $(ActionTypes.chooseFile, {
+        filetype,
+        filesize,
+        preview,
+        originalNames,
+        columnTypes,
+      }),
+
+    importFile:
+    (handleFileImportSuccess) =>
+      $(ActionTypes.importFile, {
+        setErrorMsg: FileImportActions.setErrorMsg,
+        changeUploadInProgress: FileImportActions.changeUploadInProgress,
+        fetchSchema: SchemaActions.fetch,
+        handleFileImportSuccess,
+      }),
+
+    exportFile:
+    (query: string, serverId: number, dbName: string, rank: boolean, objectKey: string, downloadFilename: string,
+      handleFileExportSuccess, handleFileExportError) =>
+      $(ActionTypes.exportFile, {
+        query,
+        serverId,
+        dbName,
+        rank,
+        objectKey,
+        downloadFilename,
+        handleFileExportSuccess,
+        handleFileExportError,
+      }),
 
     addTransform:
-    (transform: FileImportTypes.Transform) =>
+    (transform: Transform) =>
       $(ActionTypes.addTransform, { transform }),
 
     setColumnToInclude:
@@ -89,40 +126,104 @@ const FileImportActions =
       $(ActionTypes.setColumnToInclude, { columnId }),
 
     setColumnName:
-    (columnId: number, colName: string, newName: string) =>
-      $(ActionTypes.setColumnName, { columnId, colName, newName }),
+    (columnId: number, newName: string) =>
+      $(ActionTypes.setColumnName, { columnId, newName }),
 
     setColumnType:
-    (columnId: number, recursionDepth: number, typeIndex: number) =>
-      $(ActionTypes.setColumnType, { columnId, recursionDepth, typeIndex }),
+    (columnId: number, recursionDepth: number, type: string) =>
+      $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
     updatePreviewRows:
-    (transform: FileImportTypes.Transform) =>
+    (transform: Transform) =>
       $(ActionTypes.updatePreviewRows, { transform }),
 
     saveTemplate:
-    (templateText: string) =>
-      $(ActionTypes.saveTemplate, { templateText, fetchTemplates: FileImportActions.fetchTemplates }),
+    (templateName: string, exporting: boolean, handleTemplateSaveSuccess) =>
+      $(ActionTypes.saveTemplate, {
+        templateName,
+        exporting,
+        setErrorMsg: FileImportActions.setErrorMsg,
+        fetchTemplates: FileImportActions.fetchTemplates,
+        handleTemplateSaveSuccess,
+      }),
+
+    updateTemplate:
+    (templateId: number, exporting: boolean, handleUpdateTemplateSuccess, handleUpdateTemplateError, templateName: string) =>
+      $(ActionTypes.updateTemplate, {
+        templateId,
+        exporting,
+        fetchTemplates: FileImportActions.fetchTemplates,
+        handleUpdateTemplateSuccess,
+        handleUpdateTemplateError,
+        templateName,
+      }),
 
     fetchTemplates:
-    () =>
-      $(ActionTypes.fetchTemplates, { setTemplates: FileImportActions.setTemplates }),
+    (exporting: boolean) =>
+      $(ActionTypes.fetchTemplates, {
+        exporting,
+        setTemplates: FileImportActions.setTemplates,
+      }),
 
     setTemplates:
-    (templates: List<FileImportTypes.Template>) =>
+    (templates: List<Template>) =>
       $(ActionTypes.setTemplates, { templates }),
 
-    loadTemplate:
-    (templateId: number) =>
-      $(ActionTypes.loadTemplate, { templateId }),
+    applyTemplate:
+    (templateId: number, newColumns: List<string>) =>
+      $(ActionTypes.applyTemplate, {
+        templateId,
+        newColumns,
+      }),
+
+    deleteTemplate:
+    (templateId: number, exporting: boolean, handleDeleteTemplateSuccess, handleDeleteTemplateError, templateName: string) =>
+    {
+      $(ActionTypes.deleteTemplate, {
+        templateId,
+        exporting,
+        fetchTemplates: FileImportActions.fetchTemplates,
+        handleDeleteTemplateSuccess,
+        handleDeleteTemplateError,
+        templateName,
+      });
+    },
+
+    saveFile:
+    (file: File, filetype: string) =>
+      $(ActionTypes.saveFile, { file, filetype }),
 
     changeUploadInProgress:
     (uploading: boolean) =>
       $(ActionTypes.changeUploadInProgress, { uploading }),
 
     changeElasticUpdate:
-    () =>
-      $(ActionTypes.changeElasticUpdate, {}),
+    (elasticUpdate: boolean) =>
+      $(ActionTypes.changeElasticUpdate, { elasticUpdate }),
+
+    addPreviewColumn:
+    (columnName: string) =>
+      $(ActionTypes.addPreviewColumn, { columnName }),
+
+    togglePreviewColumn:
+    (requireJSONHaveAllFields: boolean) =>
+      $(ActionTypes.togglePreviewColumn, { requireJSONHaveAllFields }),
+
+    setErrorMsg:
+    (err: string) =>
+      $(ActionTypes.setErrorMsg, { err }),
+
+    setExportFiletype:
+    (exportFiletype: string) =>
+      $(ActionTypes.setExportFiletype, { exportFiletype }),
+
+    toggleExportRank:
+    (exportRank: boolean) =>
+      $(ActionTypes.toggleExportRank, { exportRank }),
+
+    setTypeObjectKey:
+    (typeObjectKey: string) =>
+      $(ActionTypes.setTypeObjectKey, { typeObjectKey }),
   };
 
 export default FileImportActions;

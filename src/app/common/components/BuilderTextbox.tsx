@@ -49,31 +49,26 @@ THE SOFTWARE.
 import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
-import * as ReactDOM from 'react-dom';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display } from '../../../blocks/displays/Display';
-import { Block } from '../../../blocks/types/Block';
 import { Card, CardString } from '../../../blocks/types/Card';
 import { isInput } from '../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
-import CardComponent from '../../builder/components/cards/CardComponent';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
-import CreateCardTool from '../../builder/components/cards/CreateCardTool';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
-import { borderColor, cardStyle, Colors, getStyle } from '../../common/Colors';
+import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import ManualInfo from '../../manual/components/ManualInfo';
 import SchemaStore from '../../schema/data/SchemaStore';
-import Util from '../../util/Util';
 import Autocomplete from './Autocomplete';
 
+const shallowCompare = require('react-addons-shallow-compare');
 const AddCardIcon = require('./../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
 const TextIcon = require('./../../../images/icon_text_12x18.svg?name=TextIcon');
 const CloseIcon = require('./../../../images/icon_close.svg');
@@ -120,28 +115,45 @@ export interface Props
   textStyle?: React.CSSProperties;
 }
 
+interface State
+{
+  // store these in state to avoid unnecessary calls to Store.getState()
+  //  might be unnecessary with container components and connect/provide
+  valueIsWrongType: boolean;
+  valueIsInput: boolean;
+
+  isSwitching: boolean;
+  backupString: number | string | Card;
+  options: List<string>;
+
+  focused: boolean;
+  boxValue: any;
+
+  boxValueBuffer: any;
+}
+
 class BuilderTextbox extends TerrainComponent<Props>
 {
-  public state: {
-    wrongType: boolean;
-    isSwitching: boolean;
-    value: CardString;
-    backupString: CardString;
-    options: List<string>;
-  };
+  public state: State;
 
   constructor(props: Props)
   {
     super(props);
-    this.executeChange = _.debounce(this.executeChange, 300);
+    this.debouncedChange = _.debounce(this.debouncedChange, 300);
 
-    const value: any = this.props.value;
     this.state = {
-      wrongType: this.props.isNumber ? isNaN(value) : false,
+      // store these in state to avoid unnecessary calls to Store.getState()
+      //  might be unnecessary with container components and connect/provide
+      valueIsInput: this.valueIsInput(props, props.value),
+      valueIsWrongType: this.valueIsWrongType(props, props.value),
+
       isSwitching: false,
-      value,
-      backupString: value,
-      options: Immutable.List([]),
+      backupString: props.value,
+      options: List([]),
+
+      focused: false,
+      boxValue: props.value,
+      boxValueBuffer: null,
     };
   }
 
@@ -162,7 +174,9 @@ class BuilderTextbox extends TerrainComponent<Props>
     // If you want two-way backups, use this line
     // (value && this.props.value === '' && value['type'] === this.getCreatingType()) ||
     if (
-      (this.props.value && this.props.value['type'] === this.getCreatingType() && value === '')
+      this.props.value !== undefined
+      && this.props.value['type'] !== undefined && this.props.value['type'] === this.getCreatingType()
+      && value === ''
     )
     {
       if (this.state.backupString)
@@ -176,9 +190,6 @@ class BuilderTextbox extends TerrainComponent<Props>
       return;
     }
 
-    this.setState({
-      wrongType: newProps.isNumber ? isNaN(value) : false,
-    });
     if (this.refs['input'])
     {
       if (this.refs['input'] !== document.activeElement)
@@ -187,15 +198,29 @@ class BuilderTextbox extends TerrainComponent<Props>
         this.refs['input']['value'] = newProps.value;
       }
     }
+
+    if (!this.state.focused)
+    {
+      this.setState({
+        boxValue: value,
+        boxValueBuffer: null,
+      });
+    }
+    else
+    {
+      this.setState({
+        boxValueBuffer: value,
+      });
+    }
   }
 
   public componentWillUnmount()
   {
-    this.executeChange.flush();
+    this.debouncedChange.flush();
   }
 
   // throttled event handler - becomes a lodash debounce object
-  public executeChange: any = (value) =>
+  public debouncedChange: any = (value) =>
   {
     // if(this.props.isNumber)
     // {
@@ -204,6 +229,15 @@ class BuilderTextbox extends TerrainComponent<Props>
 
     Actions.change(this.props.keyPath, value);
     this.props.onChange && this.props.onChange(value);
+  }
+
+  public executeChange(value)
+  {
+    this.setState({
+      boxValue: value,
+      boxValueBuffer: null,
+    });
+    this.debouncedChange(value);
   }
 
   public handleCardDrop(item)
@@ -219,12 +253,6 @@ class BuilderTextbox extends TerrainComponent<Props>
   public handleAutocompleteChange(value)
   {
     this.executeChange(value);
-    if (this.props.isNumber)
-    {
-      this.setState({
-        wrongType: isNaN(value),
-      });
-    }
   }
 
   public isText()
@@ -239,31 +267,43 @@ class BuilderTextbox extends TerrainComponent<Props>
       AllBackendsMap[this.props.language].blocks, this.getCreatingType(),
     ) : '';
     this.setState({
-      value,
       backupString: typeof this.props.value === 'string' ? this.props.value : null,
     });
     this.executeChange(value);
-
   }
 
   public handleFocus(event: React.FocusEvent<any>)
   {
     this.props.onFocus && this.props.onFocus(this, event.target['value'], event);
     this.computeOptions(); // need to lazily compute autocomplete options when needed
+    this.setState({
+      focused: true,
+    });
   }
 
   public handleBlur(event: React.FocusEvent<any>, value: string)
   {
-    this.executeChange.flush();
+    this.debouncedChange.flush();
     this.props.onBlur && this.props.onBlur(this, value, event);
+    this.setState({
+      focused: false,
+    });
+    if (this.state.boxValueBuffer !== null)
+    {
+      this.setState({
+        boxValue: this.state.boxValueBuffer,
+        boxValueBuffer: null,
+      });
+    }
   }
 
   public handleCardToolClose()
   {
     this.executeChange('');
-    this.executeChange.flush();
+    this.debouncedChange.flush();
     this.setState({
       value: '',
+      focused: false,
     });
   }
 
@@ -275,18 +315,20 @@ class BuilderTextbox extends TerrainComponent<Props>
     }
 
     return (
-      <a
-        className={classNames({
-          'builder-tb-switch': this.isText(),
-          'close-icon-builder-textbox': !this.isText(),
-        })}
-        onClick={this.handleSwitch}
-        data-tip={this.isText() ? 'Convert to cards' : ''}
-      >
-        {
-          this.isText() ? <AddCardIcon /> : <CloseIcon />
-        }
-      </a>
+      tooltip(
+        <a
+          className={classNames({
+            'builder-tb-switch': this.isText(),
+            'close-icon-builder-textbox': !this.isText(),
+          })}
+          onClick={this.handleSwitch}
+        >
+          {
+            this.isText() ? <AddCardIcon /> : <CloseIcon />
+          }
+        </a>,
+        this.isText() ? 'Convert to cards' : '',
+      )
     );
   }
 
@@ -321,20 +363,36 @@ class BuilderTextbox extends TerrainComponent<Props>
     }
   }
 
+  public componentWillUpdate(nextProps: Props, nextState)
+  {
+    this.setState({
+      valueIsInput: this.valueIsInput(nextProps, nextState.boxValue),
+      valueIsWrongType: this.valueIsWrongType(nextProps, nextState.boxValue),
+    });
+  }
+
   public render()
   {
     if (this.isText())
     {
       const { isOverCurrent, connectDropTarget, placeholder } = this.props;
-
       const { options } = this.state;
+      const { valueIsWrongType, valueIsInput } = this.state;
 
       const textStyle = this.props.textStyle || {};
-      if (typeof this.props.value === 'string' &&
-        isInput(this.props.value as string, BuilderStore.getState().query.inputs)
-      )
+      if (valueIsInput)
       {
-        textStyle.color = Colors().builder.cards.inputParameter[0];
+        textStyle.color = getCardColors('parameter', Colors().builder.cards.inputParameter);
+      }
+
+      let value;
+      if (typeof (this.state.boxValue) === 'number')
+      {
+        value = this.state.boxValue.toString();
+      }
+      else
+      {
+        value = this.state.boxValue as string;
       }
 
       return (
@@ -352,7 +410,7 @@ class BuilderTextbox extends TerrainComponent<Props>
               <textarea
                 ref='input'
                 disabled={!this.props.canEdit}
-                defaultValue={this.props.value as string}
+                defaultValue={value || ''}
                 onChange={this.handleTextareaChange}
                 className={this.props.className}
                 placeholder={placeholder}
@@ -361,12 +419,13 @@ class BuilderTextbox extends TerrainComponent<Props>
               <Autocomplete
                 ref='input'
                 disabled={!this.props.canEdit}
-                value={this.props.value as string}
+                value={value || ''}
                 options={options}
                 onChange={this.handleAutocompleteChange}
                 placeholder={placeholder}
-                help={this.state && this.state.wrongType ? this.props.typeErrorMessage : this.props.help}
-                className={this.state && this.state.wrongType ? 'ac-wrong-type' : null}
+                help={valueIsWrongType ? this.props.typeErrorMessage : this.props.help}
+                helpIsError={valueIsWrongType}
+                className={valueIsWrongType ? 'ac-wrong-type' : null}
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
                 style={this.props.textStyle}
@@ -401,7 +460,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     // var card = cards.get(0);
     const color = card.static.colors[0] as string;
     const title: string = card.static.title;
-    const preview = card.closed ? null : BlockUtils.getPreview(card);
+    const preview = BlockUtils.getPreview(card);
     // }
     // else
     // {
@@ -436,17 +495,9 @@ class BuilderTextbox extends TerrainComponent<Props>
             </div>
             <div className='builder-tb-cards-input-value-text'>
               {
-                title
+                preview
               }
             </div>
-            {
-              preview &&
-              <div className='card-preview'>
-                {
-                  preview
-                }
-              </div>
-            }
             {
               !card['cannotBeMoved'] &&
               this.renderSwitch()
@@ -458,6 +509,29 @@ class BuilderTextbox extends TerrainComponent<Props>
         </div>
       </div>
     );
+  }
+
+  private valueIsInput(props: Props, value): boolean
+  {
+    if (typeof value === 'string' &&
+      isInput(value as string, BuilderStore.getState().query.inputs))
+    {
+      return true;
+    }
+
+    return false;
+  }
+
+  private valueIsWrongType(props: Props, value): boolean
+  {
+    const { isNumber } = props;
+
+    if (!isNumber || this.valueIsInput(props, value))
+    {
+      return false;
+    }
+
+    return isNaN(value as number);
   }
 }
 

@@ -49,24 +49,22 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import createReactClass = require('create-react-class');
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 import './BuilderColumn.less';
 const { List } = Immutable;
-import InfoArea from '../../common/components/InfoArea';
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
 import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
-import Util from '../../util/Util';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
-import Ajax from './../../util/Ajax';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import CardsColumn from './cards/CardsColumn';
@@ -123,6 +121,7 @@ const BuilderColumn = createReactClass<any, any>(
     {
       query: PropTypes.object.isRequired,
       resultsState: PropTypes.object.isRequired,
+      exportState: PropTypes.object.isRequired,
       variant: PropTypes.object.isRequired,
       className: PropTypes.string,
       index: PropTypes.number,
@@ -220,7 +219,6 @@ const BuilderColumn = createReactClass<any, any>(
             addColumn={this.props.onAddManualColumn}
             columnIndex={this.props.index}
             cardsAndCodeInSync={query.cardsAndCodeInSync}
-            parseError={query.parseError}
             language={query.language}
           />;
 
@@ -239,6 +237,10 @@ const BuilderColumn = createReactClass<any, any>(
             variantName={this.props.variant.name}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
+            showExport={true}
+            showCustomizeView={true}
+            allowSpotlights={true}
+            exportState={this.props.exportState}
           />;
 
         case COLUMNS.Editor:
@@ -256,6 +258,7 @@ const BuilderColumn = createReactClass<any, any>(
           return <SchemaView
             fullPage={false}
             showSearch={true}
+            showResults={false}
           />;
         // case COLUMNS.Manual:
         //   return <Manual
@@ -333,38 +336,46 @@ const BuilderColumn = createReactClass<any, any>(
                 </div>
               )
             }
+            <div ref='handle' className='builder-title-bar-drag-handle'>
+              <DragHandle
+                key={'builder-column-handle-' + this.props.index}
+                showWhenHoveringClassName='builder-title-bar'
+              />
+            </div>
             <div
               className='builder-title-bar-title'
               style={fontColor(Colors().text2)}
             >
-              <span ref='handle'>
+              <span>
                 {
                   COLUMNS[this.state.column]
                 }
                 {
                   !canEdit &&
-                  <LockedIcon
-                    data-tip={cantEditReason}
-                  />
+                  tooltip(<LockedIcon />, cantEditReason)
                 }
               </span>
             </div>
             <div className='builder-title-bar-options'>
               {
                 this.props.canCloseColumn &&
-                <CloseIcon
-                  onClick={this.handleCloseColumn}
-                  className='close close-builder-title-bar'
-                  data-tip='Close Column'
-                />
+                tooltip(
+                  <CloseIcon
+                    onClick={this.handleCloseColumn}
+                    className='close close-builder-title-bar'
+                  />,
+                  'Close Column',
+                )
               }
               {
                 this.props.canAddColumn &&
-                <SplitScreenIcon
-                  onClick={this.handleAddColumn}
-                  className='bc-options-svg builder-split-screen'
-                  data-tip='Add Column'
-                />
+                tooltip(
+                  <SplitScreenIcon
+                    onClick={this.handleAddColumn}
+                    className='bc-options-svg builder-split-screen'
+                  />,
+                  'Add Column',
+                )
               }
               <Menu
                 options={this.getMenuOptions()}

@@ -43,19 +43,22 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import Util from './../../util/Util';
 
 const FileImportActionTypes =
   {
     changeServer: '',
+    changeDbName: '',
+    changeTableName: '',
     changeDbText: '',
     changeTableText: '',
     changeHasCsvHeader: '',
+    changeIsNewlineSeparatedJSON: '',
     changePrimaryKey: '',
+    changePrimaryKeyDelimiter: '',
     chooseFile: '',
-    uploadFile: '',
+    importFile: '',
+    exportFile: '',
     addTransform: '',
     setColumnToInclude: '',
     setColumnName: '',
@@ -64,9 +67,18 @@ const FileImportActionTypes =
     saveTemplate: '',
     fetchTemplates: '',
     setTemplates: '',
-    loadTemplate: '',
+    applyTemplate: '',
+    deleteTemplate: '',
+    updateTemplate: '',
+    saveFile: '',
     changeUploadInProgress: '',
     changeElasticUpdate: '',
+    addPreviewColumn: '',
+    togglePreviewColumn: '',
+    setExportFiletype: '',
+    toggleExportRank: '',
+    setTypeObjectKey: '',
+    setErrorMsg: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

@@ -43,23 +43,24 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
+import Library from 'library/components/Library';
+import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
-import Library from '../../../app/library/components/Library';
-import { _LibraryState, LibraryState } from '../../../app/library/data/LibraryStore';
-import * as LibraryTypes from '../../../app/library/LibraryTypes';
 import { ItemType } from '../../../items/types/Item';
 
 describe('Library', () =>
 {
-  let initialState: LibraryState = _LibraryState({
+  let library: LibraryState = _LibraryState({
     groups: Immutable.Map<number, LibraryTypes.Group>({}),
     variants: Immutable.Map<number, LibraryTypes.Variant>({}),
   });
 
-  initialState = initialState.set('groups', initialState.groups.set(1, LibraryTypes._Group({
+  library = library.set('groups', library.groups.set(1, LibraryTypes._Group({
     type: ItemType.Group,
     id: 1,
     name: 'Group 1',
@@ -71,31 +72,77 @@ describe('Library', () =>
     parent: 0,
   })));
 
-  initialState = initialState.set('variants', initialState.variants.set(3, LibraryTypes._Variant({
+  library = library.set('variants', library.variants.set(3, LibraryTypes._Variant({
     id: 3,
     name: 'Variant 1',
   })));
 
-  const mockStore = configureStore();
-  let store = null;
+  const analytics: AnalyticsState = _AnalyticsState({
+    loaded: false,
+    data: Immutable.Map({}),
+    selectedMetric: 1,
+  });
+
   let libraryComponent = null;
 
   beforeEach(() =>
   {
-    store = mockStore(initialState);
     libraryComponent = shallow(
       <Library
-        store={store}
+        library={library}
+        analytics={analytics}
         router={{ params: { groupId: '1' } }}
       />,
     );
   });
 
-  it('should have 3 columns', () =>
+  describe('when props.variantsMultiselect is true', () =>
   {
-    // Render a checkbox with label in the document
-    expect(libraryComponent.find('GroupsColumn').length).toEqual(1);
-    expect(libraryComponent.find('AlgorithmsColumn').length).toEqual(1);
-    expect(libraryComponent.find('VariantsColumn').length).toEqual(1);
+    beforeEach(() =>
+    {
+      libraryComponent.setProps({ variantsMultiselect: true });
+    });
+
+    describe('and props.selectedVariants is empty', () =>
+    {
+      it('should have 3 columns', () =>
+      {
+        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
+        expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(0);
+      });
+    });
+
+    describe('and props.selectedVariants is NOT empty', () =>
+    {
+      it('should have 3 columns and display the analytics chart', () =>
+      {
+        const selectedVariants = library.get('selectedVariants');
+        const nextLibrary = library.set('selectedVariants', selectedVariants.push(1));
+        libraryComponent.setProps({
+          library: nextLibrary,
+        });
+
+        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
+        expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
+        expect(libraryComponent.find('RadioButtons')).toHaveLength(1);
+      });
+    });
+  });
+
+  describe('when variantsMultiselect prop is false', () =>
+  {
+    it('should have 4 columns', () =>
+    {
+      expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
+      expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+      expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
+      expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(1);
+    });
   });
 });

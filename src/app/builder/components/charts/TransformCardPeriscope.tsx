@@ -49,10 +49,12 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import './TransformCardPeriscope.less';
 const { Map, List } = Immutable;
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
-import BuilderTextbox from '../../../common/components/BuilderTextbox';
+
+import Autocomplete from 'common/components/Autocomplete';
+// import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
@@ -70,9 +72,11 @@ export interface Props
   canEdit: boolean;
   width: number;
   language: string;
+  colors: [string, string];
 }
 
 const MAX_BARS = 100;
+const EMPTY_OPTIONS = List([]);
 
 class TransformCardPeriscope extends TerrainComponent<Props>
 {
@@ -81,11 +85,19 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     chartState: IMMap<string, any>,
     initialVal: number,
     bars: Bars,
+    maxDomainLow: number,
+    maxDomainHigh: number,
+    maxDomainLowErrorText: string,
+    maxDomainHighErrorText: string,
   } = {
     chartState: null,
     initialDomain: null,
     initialVal: 0,
     bars: null,
+    maxDomainLow: this.props.maxDomain.get(0),
+    maxDomainHigh: this.props.maxDomain.get(1),
+    maxDomainLowErrorText: '',
+    maxDomainHighErrorText: '',
   };
 
   public refs: {
@@ -141,6 +153,16 @@ class TransformCardPeriscope extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    const maxDomainLow = nextProps.maxDomain.get(0);
+    const maxDomainHigh = nextProps.maxDomain.get(1);
+    if (this.props.maxDomain.get(0) !== maxDomainLow || this.props.maxDomain.get(1) !== maxDomainHigh)
+    {
+      this.setState({
+        maxDomainLow,
+        maxDomainHigh,
+      });
+    }
+
     if (this.shouldComponentUpdate(nextProps, this.state))
     {
       let bars = this.state.bars;
@@ -197,6 +219,31 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     Actions.change(this._ikeyPath(this.props.keyPath, 'hasCustomDomain'), true);
   }
 
+  public handleDomainLowChange(value)
+  {
+    this.setState({
+      maxDomainLow: value,
+    });
+    this.verifyAndSetDomainValues(value, this.state.maxDomainHigh);
+  }
+
+  public handleDomainHighChange(value)
+  {
+    this.setState({
+      maxDomainHigh: value,
+    });
+    this.verifyAndSetDomainValues(this.state.maxDomainLow, value);
+  }
+
+  public verifyAndSetDomainValues(maxDomainLow, maxDomainHigh)
+  {
+    if (!isNaN(maxDomainLow) && !isNaN(maxDomainHigh) && maxDomainLow < maxDomainHigh)
+    {
+      Actions.change(this._ikeyPath(this.props.keyPath, 'domain'), List([maxDomainLow, maxDomainHigh]));
+      this.handleDomainTextChange();
+    }
+  }
+
   public getChartState(overrideState = {}): IMMap<string, any>
   {
     const chartState = Map<string, any>({
@@ -210,6 +257,7 @@ class TransformCardPeriscope extends TerrainComponent<Props>
       onDomainChangeStart: this.handleDomainChangeStart,
       width: (overrideState && overrideState['width']) || this.props.width,
       height: 40,
+      colors: this.props.colors,
     });
 
     return chartState;
@@ -228,26 +276,22 @@ class TransformCardPeriscope extends TerrainComponent<Props>
         <div ref='chart' />
 
         <div className='tp-text-wrapper'>
-          <BuilderTextbox
-            value={this.props.maxDomain.get(0)}
-            keyPath={this._ikeyPath(this.props.keyPath, 'domain', 0)}
-            isNumber={true}
-            className='tp-tb-left'
-            canEdit={this.props.canEdit}
-            onChange={this.handleDomainTextChange}
-            autoDisabled={true}
-            language={this.props.language}
-          />
-          <BuilderTextbox
-            value={this.props.maxDomain.get(1)}
-            keyPath={this._ikeyPath(this.props.keyPath, 'domain', 1)}
-            isNumber={true}
-            className='tp-tb-right'
-            canEdit={this.props.canEdit}
-            onChange={this.handleDomainTextChange}
-            autoDisabled={true}
-            language={this.props.language}
-          />
+          <div className='tp-tb-left'>
+            <Autocomplete
+              value={this.state.maxDomainLow.toString()}
+              options={EMPTY_OPTIONS}
+              disabled={!this.props.canEdit}
+              onChange={this.handleDomainLowChange}
+            />
+          </div>
+          <div className='tp-tb-right'>
+            <Autocomplete
+              value={this.state.maxDomainHigh.toString()}
+              options={EMPTY_OPTIONS}
+              disabled={!this.props.canEdit}
+              onChange={this.handleDomainHighChange}
+            />
+          </div>
         </div>
 
       </div>

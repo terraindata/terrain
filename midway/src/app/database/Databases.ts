@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as winston from 'winston';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 
@@ -151,12 +150,11 @@ export class Databases
 
     const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
     DatabaseRegistry.set(db.id, controller);
-    db.status = 'CONNECTED';
 
     // try to provision built-in scripts to the connected database
     await Scripts.provisionScripts(controller);
 
-    return this.upsert(user, db);
+    return this.upsert(user, { id, status: 'CONNECTED' } as DatabaseConfig);
   }
 
   public async disconnect(user: UserConfig, id: number): Promise<DatabaseConfig>

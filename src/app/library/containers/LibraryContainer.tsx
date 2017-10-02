@@ -44,12 +44,48 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as KoaRouter from 'koa-router';
+import AnalyticsActions from 'analytics/data/AnalyticsActions';
+import Library from 'library/components/Library';
+import LibraryActions from 'library/data/LibraryActions';
+import { LibraryState } from 'library/data/LibraryStore';
+import * as _ from 'lodash';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import RolesActions from 'roles/data/RolesActions';
+import UserActions from 'users/data/UserActions';
 
-import EventRouter from './events/EventRouter';
-import * as Util from './Util';
+const mapStateToProps = (state) =>
+{
+  return {
+    analytics: state.get('analytics'),
+    library: state.get('library'),
+    roles: state.get('roles'),
+    users: state.get('users'),
+  };
+};
 
-export const AnalyticsRouter = new KoaRouter();
-AnalyticsRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
+function mapDispatchToProps(dispatch)
+{
+  return {
+    analyticsActions: bindActionCreators(AnalyticsActions, dispatch),
+    libraryGroupActions: bindActionCreators(LibraryActions.groups, dispatch),
+    libraryAlgorithmActions: bindActionCreators(LibraryActions.algorithms, dispatch),
+    libraryVariantActions: bindActionCreators(LibraryActions.variants, dispatch),
+    libraryActions: bindActionCreators(
+      _.pick(
+        LibraryActions,
+        ['loadState', 'setDbs', 'fetch'],
+      ),
+      dispatch,
+    ),
+    roleActions: bindActionCreators(RolesActions, dispatch),
+    userActions: bindActionCreators(UserActions, dispatch),
+  };
+}
 
-export default AnalyticsRouter;
+const LibraryContainer = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Library);
+
+export default LibraryContainer;

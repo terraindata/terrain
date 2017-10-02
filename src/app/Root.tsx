@@ -45,9 +45,12 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 import AppRouter from './AppRouter';
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
+import ColorsStore from './colors/data/ColorsStore';
 import LibraryStore from './library/data/LibraryStore';
+import TerrainStore from './store/TerrainStore';
 import UserStore from './users/data/UserStore';
 
 if (!DEV)
@@ -61,6 +64,7 @@ if (!DEV)
     const libraryState = JSON.stringify(LibraryStore.getState().toJS());
     const builderState = JSON.stringify(BuilderStore.getState().toJS());
     const location = JSON.stringify(window.location);
+    const colorsState = JSON.stringify(ColorsStore.getState().toJS());
 
     const msg = `${errorMsg} by ${userId}
       Location:
@@ -71,6 +75,9 @@ if (!DEV)
 
       Builder State:
       ${builderState}
+
+      Colors State:
+      ${colorsState}
 
       Error Stack:
       ${(error != null && error.stack != null) ? error.stack : ''}
@@ -85,7 +92,11 @@ if (!DEV)
   };
 }
 
-ReactDOM.render(<AppRouter />, document.getElementById('app'), () =>
-{
-  // tests can go here
-});
+ReactDOM.render(
+  <Provider store={TerrainStore}>
+    <AppRouter />
+  </Provider>,
+  document.getElementById('app'), () =>
+  {
+    // tests can go here
+  });

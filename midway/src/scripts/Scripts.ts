@@ -49,7 +49,6 @@ import * as winston from 'winston';
 
 import DatabaseController from '../database/DatabaseController';
 import ElasticClient from '../database/elastic/client/ElasticClient';
-import * as Tasty from '../tasty/Tasty';
 import { makePromiseCallback } from '../tasty/Utils';
 import * as Util from './Utils';
 
@@ -93,6 +92,20 @@ export async function provisionScripts(controller: DatabaseController)
     {
       try
       {
+        const alive: boolean = await new Promise<boolean>(
+          (resolve, reject) =>
+          {
+            client.ping({
+              requestTimeout: 100,
+            }, (error) => resolve(!error));
+          });
+
+        if (alive === false)
+        {
+          winston.info('Skipped provisioning script ' + script.id + ' for offline database ' + controller.getName());
+          continue;
+        }
+
         await new Promise(
           (resolve, reject) =>
           {

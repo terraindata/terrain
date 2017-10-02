@@ -43,10 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
+
 import * as React from 'react';
-import CommonSQL from '../../../shared/database/mysql/syntax/CommonSQL';
-const { Combinators, Operators } = CommonSQL;
 
 // import * as SchemaTypes from '../schema/SchemaTypes';
 // const ManualConfig = require('./../manual/ManualConfig.json');
@@ -63,6 +61,7 @@ export enum DisplayType
   FLEX, // a single row, doesn't require a key
   COMPONENT,
   LABEL, // strict text to paste in to HTML
+  EXPANDABLE,
 }
 
 export interface RowDisplay
@@ -89,8 +88,9 @@ export interface Display
   // for dropdown
   options?: List<(string | El)>;
   centerDropdown?: boolean;
-  optionsDisplayName?: Map<any, string>; // maps value to display name
+  optionsDisplayName?: Immutable.Map<any, string>; // maps value to display name
   dropdownUsesRawValues?: boolean; // use the raw values, instead of the indices
+  dropdownTooltips?: List<any>;
 
   // for labels
   label?: string;
@@ -136,6 +136,14 @@ export interface Display
   //  let's change that in the future by having the histogram bars be
   //  computed at a higher level
   requiresBuilderState?: boolean;
+
+  handleCardDrop?: (type: string) => any;
+
+  // for expandable sections of display
+  // section that toggles whether or not expanded section is visible
+  expandToggle?: Display | Display[];
+  // section shown or hidden by the toggle
+  expandContent?: Display | Display[];
 }
 
 // Section: Re-useable displays

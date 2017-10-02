@@ -44,18 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression
+// tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression no-var-requires
 
 import './Autocomplete.less';
 
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
-import { altStyle, backgroundColor, Colors, couldHover, fontColor } from '../../common/Colors';
-import Util from '../../util/Util';
+
+import { tooltip } from 'common/components/tooltip/Tooltips';
+import { altStyle, backgroundColor, Colors, couldHover } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+
+const InfoIcon = require('./../../../images/icon_info.svg');
 
 export interface Props
 {
@@ -66,12 +69,16 @@ export interface Props
 
   placeholder?: string;
   help?: string;
+  helpIsError?: boolean;
+
   ref?: string;
   className?: string;
   disabled?: boolean;
 
   onFocus?: (event: React.FocusEvent<any>) => void;
   onBlur?: (event: React.FocusEvent<any>, value: string) => void;
+  onEnter?: (value: string) => void;
+  onSelectOption?: (value: string) => void;
 }
 
 @Radium
@@ -147,6 +154,10 @@ class Autocomplete extends TerrainComponent<Props>
   public handleSelect(value)
   {
     this.props.onChange(value);
+    if (this.props.onSelectOption !== undefined)
+    {
+      this.props.onSelectOption(value);
+    }
     this.setState({
       value,
       open: false,
@@ -185,6 +196,19 @@ class Autocomplete extends TerrainComponent<Props>
   {
     if (!this.props.options)
     {
+      // still be able to hit enter when there are no options
+      if (event.keyCode === 13)
+      {
+        const value = event.target.value;
+        this.setState({
+          open: false,
+          value,
+        });
+        this.blurValue = value;
+        this.props.onChange(value);
+        this.props.onEnter && this.props.onEnter(value);
+        this.refs['input']['blur']();
+      }
       return;
     }
     const visibleOptions = this.props.options && this.props.options.filter(this.showOption);
@@ -213,6 +237,7 @@ class Autocomplete extends TerrainComponent<Props>
         });
         this.blurValue = value;
         this.props.onChange(value);
+        this.props.onEnter && this.props.onEnter(value);
         this.refs['input']['blur']();
         break;
       case 27:
@@ -285,23 +310,56 @@ class Autocomplete extends TerrainComponent<Props>
 
     const open = this.state.open && !!options && options.size > 0;
 
+    const inputStyle = this.props.disabled ?
+      _.extend({}, this.props.style ? this.props.style : {},
+        backgroundColor(Colors().darkerHighlight),
+      )
+      :
+      this.props.style;
+
+    const inputElem =
+      <input
+        style={inputStyle}
+        ref='input'
+        type='text'
+        className={classNames({
+          [inputClassName]: true,
+          'ac-input-disabled': this.props.disabled,
+          'ac-input-has-tooltip': this.props.help !== undefined,
+        })}
+        value={this.state.value}
+        onChange={this.handleChange}
+        onFocus={this.handleFocus}
+        onBlur={this.handleBlur}
+        onKeyDown={this.handleKeydown}
+        disabled={this.props.disabled}
+        placeholder={this.props.placeholder}
+      />;
+
     return (
       <div className='autocomplete'>
-        <input
-          style={this.props.style}
-          ref='input'
-          type='text'
-          className={inputClassName}
-          value={this.state.value}
-          onChange={this.handleChange}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-          onKeyDown={this.handleKeydown}
-          disabled={this.props.disabled}
-          placeholder={this.props.placeholder}
-          data-tip={this.props.help}
-          data-html={true}
-        />
+        {inputElem}
+        {
+          this.props.help &&
+          <div className='tooltip-icon-positioning'>
+            {
+              tooltip(
+                <InfoIcon
+                  className={classNames({
+                    'tooltip-icon': true,
+                    'tooltip-is-error': this.props.helpIsError,
+                  })}
+                />,
+                {
+                  title: this.props.help,
+                  position: 'top-end',
+                  theme: this.props.helpIsError ? 'error' : undefined,
+                },
+              )
+            }
+          </div>
+        }
+
         {!open ? null :
           <div
             className={classNames({

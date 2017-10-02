@@ -48,13 +48,13 @@ THE SOFTWARE.
 
 import './TransformChart.less';
 
-import * as Colors from '../../../common/Colors';
+import { Colors } from '../../../common/Colors';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');
 // import * as d3 from 'd3';
 import * as $ from 'jquery';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import Util from '../../../util/Util';
 
 const xMargin = 45;
@@ -81,7 +81,8 @@ const TransformChart = {
       ;
 
     svg.append('rect')
-      .attr('class', 'bg');
+      .attr('class', 'bg')
+      .attr('fill', Colors().altBg1);
 
     svg.append('g')
       .attr('class', 'yLeftAxis');
@@ -107,10 +108,13 @@ const TransformChart = {
       .attr('class', 'bars');
     innerSvg.append('g')
       .append('path')
-      .attr('class', 'lines-bg');
+      .attr('class', 'lines-bg')
+      .attr('fill', state.colors[0]);
+
     innerSvg.append('g')
       .append('path')
-      .attr('class', 'lines');
+      .attr('class', 'lines')
+      .attr('style', 'stroke: ' + state.colors[0]);
 
     innerSvg.append('g')
       .attr('class', 'points');
@@ -122,6 +126,18 @@ const TransformChart = {
       .attr('class', 'spotlights');
 
     this.update(el, state);
+
+    // apply CSS styles
+
+    const styleCSS = `
+    .transform-chart .tick {
+      stroke: ${Colors().altHighlight};
+    }
+    .transform-chart .tick text {
+      fill: ${Colors().text2} !important;
+    }
+    `;
+    const style = $(el).append(`<style>${styleCSS}</style>`);
   },
 
   update(el, state)
@@ -148,22 +164,14 @@ const TransformChart = {
 
     const barsData = state._cache.computedBarsData;
     const scales = this._scales(el, state.domain, barsData, state.width, state.height);
+
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
-      state.canEdit);
+      state.canEdit, state.colors);
 
     d3.select(el).select('.inner-svg').on('mousedown', () =>
     {
-      if (!d3.event['shiftKey'] &&
-        !d3.event['altKey'] &&
-        d3.event['target'].tagName !== 'LABEL' &&
-        d3.event['target'].tagName !== 'DIV' &&
-        d3.event['target'].tagName !== 'INPUT')
-      {
-        state.onSelect(null);
-        d3.select(el).select('.point-edit-menu').remove();
-      }
       d3.select(el).select('.right-menu').remove();
       d3.select(el).selectAll('.crosshairs').remove();
       d3.select(el).selectAll('.transform-tooltip').remove();
@@ -194,7 +202,7 @@ const TransformChart = {
       {
         if (d3.event['ctrlKey'] || d3.event['shiftKey'])
         {
-          drawCrossHairs(el, d3.mouse(this), scales, d3.mouse(this)[0]);
+          drawCrossHairs(el, d3.mouse(this), scales, d3.mouse(this)[0], undefined, state.colors);
         }
         return false;
       });
@@ -208,11 +216,14 @@ const TransformChart = {
         }
       });
 
-      // Stop normal right click functioning from happening
-      d3.select(el).select('.inner-svg').on('contextmenu', () =>
-      {
-        d3.event['preventDefault']();
-      });
+      d3.select(el).select('.inner-svg').on('contextmenu',
+        this._rightClickChartFactory(
+          el,
+          state.contextOptions,
+          scales,
+          state.colors,
+        ),
+      );
 
       // Delete selected points on del/backspace key press
       const deletePoints = this._deletePoints;
@@ -297,6 +308,74 @@ const TransformChart = {
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY));
   },
 
+  _drawDisabledOverlay(el, scales)
+  {
+    d3.select(el).select('.inner-svg').select('.overlay').remove();
+    d3.select(el).select('.inner-svg').select('.no-point-overlay').remove();
+    const overlay = d3.select(el).select('.inner-svg').append('g')
+      .attr('class', 'overlay');
+
+    const width = scaleMax(scales.x) - scaleMin(scales.x);
+    const height = scaleMin(scales.pointY) - scaleMax(scales.pointY);
+
+    overlay.append('rect')
+      .attr('x', 0)
+      .attr('width', width)
+      .attr('y', 0)
+      .attr('height', height)
+      .attr('fill', Colors().bg1)
+      .attr('opacity', 0.5);
+
+    overlay.append('text')
+      .attr('x', 75)
+      .attr('y', height / 2)
+      .attr('text-anchor', 'start')
+      .attr('fill', Colors().text1)
+      .text('Select an input field using the textbox above to begin');
+  },
+
+  _overlayMouseoverFactory: (el) => (overlay) =>
+  {
+    d3.select(el).select('.inner-svg').select('.no-point-overlay').remove();
+  },
+
+  _overlayMouseoutFactory: (el, scales, drawNoPointsOverlay) => (overlay) =>
+  {
+    drawNoPointsOverlay(el, scales);
+    return false;
+  },
+
+  _drawNoPointsOverlay(el, scales)
+  {
+    d3.select(el).select('.inner-svg').select('.overlay').remove();
+    d3.select(el).select('.inner-svg').select('.no-point-overlay').remove();
+    const overlay = d3.select(el).select('.inner-svg').append('g')
+      .attr('class', 'no-point-overlay');
+
+    const width = scaleMax(scales.x) - scaleMin(scales.x);
+    const height = scaleMin(scales.pointY) - scaleMax(scales.pointY);
+
+    overlay.append('rect')
+      .attr('x', 0)
+      .attr('width', width)
+      .attr('y', 0)
+      .attr('height', height)
+      .attr('fill', Colors().bg1)
+      .attr('opacity', 0.5);
+
+    overlay.append('text')
+      .attr('x', 60)
+      .attr('y', height / 2)
+      .attr('text-anchor', 'start')
+      .attr('fill', Colors().text1)
+      .text('Double click anywhere on the graph to add a Transform point');
+
+    const self = this;
+    overlay.on('mouseout', this._overlayMouseoutFactory(el, scales, self._drawNoPointsOverlay));
+    overlay.on('mouseover', this._overlayMouseoverFactory(el));
+    // overlay.on('mouseleave', onMouseLeave(this, el, scales, onMouseEnter, onMouseLeave));
+  },
+
   _drawAxes(el, scales, width, height)
   {
     const yLeftAxis = d3.svg.axis()
@@ -347,7 +426,7 @@ const TransformChart = {
       });
   },
 
-  _drawBars(el, scales, barsData)
+  _drawBars(el, scales, barsData, colors)
   {
     const g = d3.select(el).selectAll('.bars');
 
@@ -368,7 +447,8 @@ const TransformChart = {
 
     bar.enter()
       .append('rect')
-      .attr('class', 'bar');
+      .attr('class', 'bar')
+      .attr('fill', colors[0]);
 
     bar
       .attr('x', (d) => scales.realX(d['range']['min']) + xPadding)
@@ -385,21 +465,21 @@ const TransformChart = {
 
     const spotlight = g.selectAll('.spotlight')
       .data(
-      spotlights.filter((d) => d[inputKey] !== undefined),
-      (d) => d['id'],
+      spotlights.filter((d) => d['fields'][inputKey] !== undefined),
+      (d) => d['fields']['_id'],
     );
 
     const spotlightEnter = spotlight.enter()
       .append('g')
       .attr('class', 'spotlight')
-      .attr('_id', (d) => d['id']);
+      .attr('id', (d) => d['fields']['_id']);
     spotlightEnter.append('circle');
     spotlightEnter.append('rect');
     spotlightEnter.append('text');
 
     const minX = scaleDomainMin(scales.realX);
     const maxX = scaleDomainMax(scales.realX);
-    const getSpotlightX = (d) => Util.valueMinMax(d[inputKey], minX, maxX);
+    const getSpotlightX = (d) => Util.valueMinMax(d['fields'][inputKey], minX, maxX);
 
     const SPOTLIGHT_SIZE = 12;
     const SPOTLIGHT_PADDING = 6;
@@ -737,9 +817,8 @@ const TransformChart = {
   },
 
   // needs to be "function" for d3.mouse(this)
-  _mousedownFactory: (el, onMove, onRelease, scales, onSelect, onPointMoveStart, drawCrossHairs, point) => function(d)
+  _mousedownFactory: (el, onMove, onRelease, scales, onSelect, onPointMoveStart, drawCrossHairs, point, colors) => function(d)
   {
-
     if (d3.event['shiftKey'] || d3.event['altKey'])
     {
       onSelect(d.id, d3.event['shiftKey']);
@@ -749,7 +828,7 @@ const TransformChart = {
       onSelect(null);
       onSelect(d.id);
     }
-    d3.event['stopPropagation']();
+    d3.event['pointClicked'] = true;
     const del = d3.select(el);
     const point = d3.select(this);
     const startY = scales.realPointY.invert(parseFloat(point.attr('cy')));
@@ -758,6 +837,7 @@ const TransformChart = {
     const t = this;
 
     point.attr('active', '1');
+
     const move = function(event)
     {
       let newY = scales.realPointY.invert(d3.mouse(t)[1]);
@@ -769,11 +849,30 @@ const TransformChart = {
         return scales.realX.invert(parseFloat(point.getAttribute('cx')));
       });
       onMove(point.attr('_id'), newY, newX, pointValues, cx, d3.event['altKey']);
-      drawCrossHairs(el, d3.mouse(this), scales, parseFloat(point.attr('cx')), newY);
+      drawCrossHairs(el, d3.mouse(this), scales, parseFloat(point.attr('cx')), newY, colors);
     };
 
     del.on('mousemove', move);
     del.on('touchmove', move);
+
+    const deselectPoints = () =>
+    {
+      if (!el.contains(d3.event.target) ||
+        (
+          !d3.event['shiftKey'] &&
+          !d3.event['altKey'] &&
+          d3.event['target'].tagName !== 'LABEL' &&
+          d3.event['target'].tagName !== 'DIV' &&
+          d3.event['target'].tagName !== 'INPUT' &&
+          !d3.event['pointClicked']
+        )
+      )
+      {
+        onSelect(null);
+        d3.select(el).select('.point-edit-menu').remove();
+        d3.select('body').on('mousedown', null);
+      }
+    };
 
     const offFn = () =>
     {
@@ -785,13 +884,14 @@ const TransformChart = {
       del.on('mouseleave', null);
       point.attr('active', '0');
       onRelease && onRelease();
+      d3.select('body').on('mousedown', deselectPoints);
     };
     del.on('mouseup', offFn);
     del.on('touchend', offFn);
     del.on('mouseleave', offFn);
   },
 
-  _drawCrossHairs(el, mouse, scales, x, newY)
+  _drawCrossHairs(el, mouse, scales, x, newY, colors)
   {
     if (!x)
     {
@@ -800,7 +900,6 @@ const TransformChart = {
     d3.select(el).selectAll('.crosshairs').remove();
     d3.select(el).select('.transform-tooltip').remove();
     d3.select(el).select('.point-edit-menu').remove();
-
     const y = newY || scales.realPointY.invert(mouse[1]);
     const pos_y = scales.realPointY(y);
     const text_x = 'X:  ' + Util.formatNumber(scales.realX.invert(x));
@@ -820,18 +919,21 @@ const TransformChart = {
       .attr('rx', 5)
       .attr('ry', 5)
       .attr('width', w)
-      .attr('height', h);
+      .attr('height', h)
+      .attr('fill', colors[0]);
 
     crosshairs.append('text')
       .attr('x', menuX + 6)
       .attr('y', menuY + 14)
       .attr('text-anchor', 'start')
+      .attr('fill', Colors().altBg1)
       .text(text_x);
 
     crosshairs.append('text')
       .attr('x', menuX + 6)
       .attr('y', menuY + 14 * 2)
       .attr('text-anchor', 'start')
+      .attr('fill', Colors().altBg1)
       .text(text_y);
 
     const crosshairLines = d3.select(el).select('.inner-svg').insert('g', '.points').attr('class', 'crosshairs');
@@ -841,14 +943,16 @@ const TransformChart = {
       .attr('x1', x)
       .attr('y1', 0)
       .attr('x2', x)
-      .attr('y2', containerHeight);
+      .attr('y2', containerHeight)
+      .attr('style', 'stroke: ' + colors[0]);
 
     crosshairLines.append('line')
       .attr('class', 'crosshairs-line')
       .attr('x1', 0)
       .attr('y1', pos_y)
       .attr('x2', containerWidth)
-      .attr('y2', pos_y);
+      .attr('y2', pos_y)
+      .attr('style', 'stroke: ' + colors[0]);
 
     // When mouse leaves transform area, remove, the crosshairs
     d3.select(el).select('.inner-svg').on('mouseleave', () =>
@@ -860,7 +964,7 @@ const TransformChart = {
     });
   },
 
-  _drawToolTip(el, mouse, scales, point)
+  _drawToolTip(el, mouse, scales, point, colors)
   {
     d3.select(el).selectAll('.transform-tooltip').remove();
 
@@ -885,18 +989,21 @@ const TransformChart = {
       .attr('rx', 5)
       .attr('ry', 5)
       .attr('width', w)
-      .attr('height', h);
+      .attr('height', h)
+      .attr('fill', colors[0]);
 
     tooltip.append('text')
       .attr('x', x + 6)
       .attr('y', y + 14)
       .attr('text-anchor', 'start')
+      .attr('fill', Colors().altBg1)
       .text(text_x);
 
     tooltip.append('text')
       .attr('x', x + 6)
       .attr('y', y + 14 * 2)
       .attr('text-anchor', 'start')
+      .attr('fill', Colors().altBg1)
       .text(text_y);
 
   },
@@ -933,7 +1040,7 @@ const TransformChart = {
     TransformChart._movePointEditMenu(el);
   },
 
-  _drawPointEditMenu(el, scales, onMove, onRelease)
+  _drawPointEditMenu(el, scales, onMove, onRelease, colors, editPointPosition)
   {
     const point = d3.select(el).select('.point-selected');
     if (!point[0][0] || d3.select(el).selectAll('.point-selected')[0].length > 1)
@@ -979,6 +1086,7 @@ const TransformChart = {
       .attr('width', w)
       .attr('height', h)
       .attr('class', 'point-edit-menu')
+      .attr('style', 'background: ' + colors[0])
       .on('keydown', () =>
       {
         if (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) // delete/backspace key
@@ -998,7 +1106,8 @@ const TransformChart = {
       .attr('style', 'display: inline-flex');
 
     div1.append('label')
-      .text('X: ');
+      .text('X: ')
+      .attr('style', 'color: ' + Colors().altBg1);
 
     div1.append('input')
       .attr('type', 'number')
@@ -1008,14 +1117,15 @@ const TransformChart = {
       .attr('value', f(value))
       .attr('raw_value', value)
       .attr('id', 'xVal')
+      .attr('style', 'background-color: ' + Colors().altBg1 + '; color: ' + colors[0])
       .on('change', function()
       {
-        this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
-      })
+        editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
+      }.bind(this))
       .on('input', function()
       {
-        this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
-      })
+        editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
+      }.bind(this))
       .on('keydown', () =>
       {
         const xNode: any = d3.select(el).select('#xVal').node();
@@ -1029,7 +1139,8 @@ const TransformChart = {
       });
 
     div2.append('label')
-      .text('Y: ');
+      .text('Y: ')
+      .attr('style', 'color: ' + Colors().altBg1);
 
     div2.append('input')
       .attr('type', 'number')
@@ -1039,13 +1150,14 @@ const TransformChart = {
       .attr('value', f(score))
       .attr('raw_value', score)
       .attr('id', 'yVal')
+      .attr('style', 'background-color: ' + Colors().altBg1 + '; color: ' + colors[0])
       .on('change', (value) =>
       {
-        this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
+        editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
       })
       .on('input', function()
       {
-        this._editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
+        editPointPosition(el, scales, onMove, onRelease, { containerWidth, containerHeight, w, h });
       })
       .on('keydown', () =>
       {
@@ -1083,10 +1195,11 @@ const TransformChart = {
     }
   },
 
-  _drawMenu(el, mouse, text, fn, scales)
+  _drawMenu(el, mouse, text, fn, scales, colors)
   {
     d3.select(el).select('.right-menu').remove();
-
+    d3.select(el).selectAll('.transform-tooltip').remove();
+    d3.select(el).select('.point-edit-menu').remove();
     const menu = d3.select(el).select('.inner-svg').append('g')
       .attr('class', 'right-menu');
 
@@ -1106,7 +1219,8 @@ const TransformChart = {
       .transition()
       .duration(50)
       .attr('width', w)
-      .attr('height', h);
+      .attr('height', h)
+      .attr('fill', colors[0]);
 
     menu.append('text')
       .attr('x', x + w / 2)
@@ -1117,14 +1231,30 @@ const TransformChart = {
       .transition()
       .delay(100)
       .duration(50)
-      .attr('opacity', 1);
-    console.log(mouse[0]);
+      .attr('opacity', 1)
+      .attr('fill', Colors().altBg1);
+
     menu.append('circle')
       .attr('cx', mouse[0])
       .attr('cy', mouse[1])
       .attr('r', 3)
+      .attr('fill', Colors().altHighlight)
       .transition()
       .duration(50);
+
+    menu.append('rect')
+      .attr('x', x)
+      .attr('y', mouse[1] - 10)
+      .attr('rx', 5)
+      .attr('ry', 5)
+      .attr('width', 0)
+      .attr('height', 0)
+      .transition()
+      .duration(50)
+      .attr('width', w)
+      .attr('height', h)
+      .attr('fill', 'rgba(0,0,0,0)')
+      .attr('class', 'menu-hover-rect');
 
     const isvg = d3.select(el).select('.inner-svg');
     menu.on('mousedown', () =>
@@ -1140,23 +1270,87 @@ const TransformChart = {
     });
   },
 
-  _rightClickFactory: (el, onDelete, scales, drawMenu) => function(point)
+  _rightClickFactory: (el, onDelete, scales, colors, drawMenu) => function(point)
   {
-    drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales);
+    drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales, colors);
     return false;
   },
 
-  _mouseoverFactory: (el, scales, drawToolTip) => function(point)
+  // menuOptions maps menu text to click handlers
+  _rightClickChartFactory: (el, menuOptions, scales, colors) => function(chart)
   {
-    drawToolTip(el, d3.mouse(this), scales, this);
+    // Stop normal right click functioning from happening
+    d3.event['preventDefault']();
+    if (d3.event.target.classList.contains('point'))
+    {
+      return;
+    }
+
+    const mouse = d3.mouse(this);
+    d3.select(el).select('.right-menu').remove();
+    d3.select(el).selectAll('.transform-tooltip').remove();
+    d3.select(el).select('.point-edit-menu').remove();
+
+    const menu = d3.select(el)
+      .append('div')
+      .attr('width', 0)
+      .attr('height', 0)
+      .attr('class', 'right-menu context-menu')
+      .attr('style', 'background: ' + colors[0]);
+
+    const bounds = d3.select(el)[0][0]['getBoundingClientRect']();
+    const containerWidth = parseFloat(d3.select(el).select('.inner-svg').attr('width'));
+    const containerHeight = parseFloat(d3.select(el).select('.inner-svg').attr('height'));
+    const dx = (bounds.width - containerWidth) / 2;
+    const dy = (bounds.height - containerHeight) / 2;
+
+    const clipAllowanceWidth = 140 - dx; // should approximately match context-menu max-width
+    const clipAllowanceHeight = 20 * Object.keys(menuOptions).length - dy; // should approximately match context-menu-item height
+
+    if (mouse[0] + clipAllowanceWidth < containerWidth)
+    {
+      menu.style('left', `${mouse[0] + dx + 2}px`);
+    }
+    else
+    {
+      menu.style('right', `${(containerWidth - mouse[0]) + dx}px`);
+    }
+
+    if (mouse[1] + clipAllowanceHeight < containerHeight)
+    {
+      menu.style('top', `${mouse[1] + dy - 2}px`);
+    }
+    else
+    {
+      menu.style('bottom', `${(containerHeight - mouse[1]) + dy + 2}px`);
+    }
+
+    menu.on('mousedown', () =>
+    {
+      d3.select('.right-menu').remove();
+    });
+
+    for (const menuText of Object.keys(menuOptions))
+    {
+      const item = menu.append('div');
+      item.attr('style', `display: block; color: ${Colors().altBg1}`)
+        .attr('class', 'chart-context-menu-item')
+        .text(menuText);
+      item.on('mousedown', () => { menuOptions[menuText](d3.select(el), d3.mouse(this)); });
+    }
+  },
+
+  _mouseoverFactory: (el, scales, colors, drawToolTip) => function(point)
+  {
+    drawToolTip(el, d3.mouse(this), scales, this, colors);
     return false;
   },
 
-  _mouseClickFactory: (el, scales, onMove, onRelease, drawPointEditMenu) => function(point)
+  _mouseClickFactory: (el, scales, onMove, onRelease, colors, editPointPosition, drawPointEditMenu) => function(point)
   {
     if (!d3.event['shiftKey'] && !d3.event['altKey'])
     {
-      drawPointEditMenu(el, scales, onMove, onRelease);
+      drawPointEditMenu(el, scales, onMove, onRelease, colors, editPointPosition);
     }
     return false;
   }.bind(this),
@@ -1171,7 +1365,7 @@ const TransformChart = {
     d3.event['stopPropagation']();
   },
 
-  _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit)
+  _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors)
   {
     const g = d3.select(el).selectAll('.points');
 
@@ -1184,6 +1378,8 @@ const TransformChart = {
     point
       .attr('cx', (d) => scales.realX(d['x']))
       .attr('cy', (d) => scales.realPointY(d['y']))
+      .attr('fill', Colors().altBg1)
+      .attr('style', (d) => 'stroke: ' + (d['selected'] ? Colors().error : colors[0]))
       .attr('class', (d) =>
         'point' + (d['selected'] ? ' point-selected' : '')
         + (canEdit ? '' : ' point-disabled'))
@@ -1194,11 +1390,11 @@ const TransformChart = {
 
     if (canEdit)
     {
-      point.on('mousedown', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point));
-      point.on('touchstart', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point));
-      point.on('mouseover', this._mouseoverFactory(el, scales, this._drawToolTip));
-      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, this._drawMenu));
-      point.on('click', this._mouseClickFactory(el, scales, onMove, onRelease, this._drawPointEditMenu));
+      point.on('mousedown', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
+      point.on('touchstart', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
+      point.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
+      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, colors, this._drawMenu));
+      point.on('click', this._mouseClickFactory(el, scales, onMove, onRelease, colors, this._editPointPosition, this._drawPointEditMenu));
       point.on('mouseout', this._mouseoutFactory(el));
       point.on('dblclick', this._doubleclickFactory(el));
     }
@@ -1206,7 +1402,7 @@ const TransformChart = {
     point.exit().remove();
   },
 
-  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit)
+  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit, colors)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -1214,10 +1410,22 @@ const TransformChart = {
 
     this._drawBg(el, scales);
     this._drawAxes(el, scales, width, height);
-    this._drawBars(el, scales, barsData);
+    if (inputKey === '' || inputKey === undefined)
+    {
+      this._drawDisabledOverlay(el, scales);
+      return;
+    }
+    d3.select(el).select('.inner-svg').select('.overlay').remove();
+    this._drawBars(el, scales, barsData, colors);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
+    if (!pointsData.length)
+    {
+      this._drawNoPointsOverlay(el, scales);
+      return;
+    }
+    d3.select(el).select('.inner-svg').select('.no-point-overlay').remove();
     this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
-    this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit);
+    this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors);
     this._movePointEditMenu(el, height);
   },
 

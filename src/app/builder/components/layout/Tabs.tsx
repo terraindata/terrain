@@ -51,21 +51,16 @@ import './Tabs.less';
 const moment = require('moment');
 import * as classNames from 'classnames';
 import createReactClass = require('create-react-class');
-import * as Immutable from 'immutable';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import * as _ from 'underscore';
 import LibraryActions from '../../../library/data/LibraryActions';
-import Util from '../../../util/Util';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
-import BuilderStore from './../../../builder/data/BuilderStore';
-import InfoArea from './../../../common/components/InfoArea';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import { LibraryState, LibraryStore } from './../../../library/data/LibraryStore';
-const ReactTooltip = require('react-tooltip');
-import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import { LibraryStore } from './../../../library/data/LibraryStore';
+
+import { backgroundColor, Colors } from '../../../common/Colors';
 
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');

@@ -46,20 +46,29 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import * as _ from 'underscore';
+import * as _ from 'lodash';
+import Colors from '../../common/Colors';
 import Styles from '../../Styles';
 const color = require('color');
 
 const itemHeaderHeight = 22;
 
 const arrowSvgStyles = {
-  width: '12px',
-  fill: Styles.colors.transBlack,
+  'width': '12px',
+  'height': '12px',
+  'fill': Colors().text3,
+  'cursor': 'pointer',
+  // fill: Styles.colors.transBlack,
   // fill: 'rgba(0,0,0,0)',
   // stroke: Styles.colors.transBlack,
   // strokeWidth: 20,
-  cursor: 'pointer',
-  marginLeft: 6,
+  'marginLeft': 5.5,
+  // 'position': 'relative',
+  // 'top': 5,
+  'marginTop': 4,
+  ':hover': {
+    fill: Colors().text2,
+  },
 };
 
 const headerHighlightedColor = color(Styles.colors.active).fade('0.85').string();
@@ -87,6 +96,10 @@ const SchemaTreeStyles =
     ],
 
     arrow: _.extend(
+      {
+        width: '12px',
+        height: '12px',
+      },
       arrowSvgStyles,
       Styles.rotate90,
       Styles.transition,
@@ -96,7 +109,9 @@ const SchemaTreeStyles =
       {},
       arrowSvgStyles,
       {
-        fill: Styles.colors.active,
+        width: '12px',
+        height: '12px',
+        fill: Colors().active,
         // stroke: Styles.colors.active,
       },
       Styles.rotate180,
@@ -106,12 +121,12 @@ const SchemaTreeStyles =
     treeItemHeader: [{
       'display': 'flex',
       'cursor': 'pointer',
-      'height': itemHeaderHeight,
+      // 'height': itemHeaderHeight,
 
       'borderRadius': 4,
 
       ':hover': {
-        background: headerHighlightedColor,
+        background: Colors().inactiveHover,
       },
     },
     Styles.transition,
@@ -119,15 +134,15 @@ const SchemaTreeStyles =
 
     treeItemHeaderSelected:
     {
-      'background': headerSelectedColor,
+      'background': Colors().inactiveHover,
       ':hover': {
-        background: headerSelectedColor,
+        background: Colors().inactiveHover,
       },
     },
 
     treeItemHeaderHighlighted:
     {
-      background: headerHighlightedColor,
+      background: Colors().inactiveHover,
     },
 
     name: {
@@ -175,7 +190,20 @@ const SchemaTreeStyles =
 
     searchTextEmphasis: {
       fontWeight: 1000,
-      color: Styles.colors.active,
+      color: Colors().active,
+    },
+
+    link: {
+      'color': Colors().active,
+      'cursor': 'pointer',
+
+      ':hover':
+      {
+        color: Colors().activeText,
+      },
+
+      'float': 'left',
+      'width': '100px',
     },
 
     margin: Styles.margin,

@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file
 
+import Radium = require('radium');
 import * as React from 'react';
 import * as SchemaTypes from '../../SchemaTypes';
 import Styles from '../SchemaTreeStyles';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import Radium = require('radium');
 
 export interface Props
 {
@@ -81,19 +81,7 @@ export class TableTreeInfo extends TerrainComponent<Props>
             style={Styles.infoPieceNumber as any}
           >
             {table.columnIds.size}
-          </span> columns
-        </div>
-
-        <div
-          style={Styles.infoPiece as any}
-        >
-          <span
-            style={Styles.infoPieceNumber as any}
-          >
-            {
-              table.indexIds.size
-            }
-          </span> indexes
+          </span> {table.columnIds.size === 1 ? 'field' : 'fields'}
         </div>
       </div>
     );
@@ -103,12 +91,8 @@ export class TableTreeInfo extends TerrainComponent<Props>
 export const tableChildrenConfig: SchemaTypes.ISchemaTreeChildrenConfig =
   [
     {
-      label: 'Columns',
+      label: 'Fields',
       type: 'column',
-    },
-    {
-      label: 'Indexes',
-      type: 'index',
     },
   ];
 

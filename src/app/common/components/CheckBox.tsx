@@ -47,36 +47,82 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 
 import * as classNames from 'classnames';
-import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
-import Util from '../../util/Util';
+import { borderColor, Colors, getStyle } from '../Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './CheckBox.less';
+
 const CheckMark = require('./../../../images/icon_checkMark.svg');
 
 export interface Props
 {
   checked: boolean;
   onChange: () => void;
+  className?: string;
+
+  label?: string;
+  color?: string;
 }
 
 class CheckBox extends TerrainComponent<Props>
 {
   public render()
   {
-    return (
+    const { color, label } = this.props;
+    let style = this.props.checked ? CHECKED_STYLE : UNCHECKED_STYLE;
+
+    if (this.props.color !== undefined)
+    {
+      style = _.extend({}, style,
+        borderColor(color),
+        getStyle('fill', color),
+      );
+    }
+
+    const checkedContent = (
       <div
         className={classNames({
           'checkbox': true,
           'checkbox-checked': this.props.checked,
+          [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
         })}
+        style={style}
         onClick={this.props.onChange}
       >
-        {this.props.checked ? <CheckMark className='check-mark-icon' /> : 'O'}
+        <div className='checkbox-veil'>
+          <CheckMark className='check-mark-icon' />
+        </div>
       </div>
     );
+
+    if (label !== undefined)
+    {
+      return (
+        <div className='checkbox-wrapper'>
+          {
+            checkedContent
+          }
+          <div className='checkbox-label'>
+            {
+              this.props.label
+            }
+          </div>
+        </div>
+      );
+    }
+
+    return checkedContent;
   }
 }
+
+const CHECKED_STYLE = _.extend({},
+  borderColor(Colors().active),
+  getStyle('fill', Colors().active),
+);
+
+const UNCHECKED_STYLE = _.extend({},
+  borderColor(Colors().border2),
+);
 
 export default CheckBox;

@@ -46,10 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands no-unused-expression strict-boolean-expressions no-console
 
-const _ = require('underscore');
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import List = Immutable.List;
-import Map = Immutable.Map;
 
 import CommonSQL from '../../../../shared/database/mysql/syntax/CommonSQL';
 import AjaxM1 from '../../../app/util/AjaxM1'; // TODO change / remove
@@ -102,7 +101,6 @@ const parseTreeLoaded = (response, context) =>
   if (error)
   {
     query = query
-      .set('parseError', error)
       .set('cardsAndCodeInSync', false);
   }
   else
@@ -124,7 +122,6 @@ const parseTreeError = (error, context) =>
 
   query = query.setIn(['meta', 'parseTreeReq'], null);
   query = query
-    .set('parseError', (error && error.errorMessage) || error)
     .set('cardsAndCodeInSync', false);
 
   // alert the state that the query needs to change

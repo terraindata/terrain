@@ -50,46 +50,28 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import './LibraryVariantInfo.less';
 const { List } = Immutable;
-import BackendInstance from '../../../database/types/BackendInstance';
-import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import Util from './../../util/Util';
-import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
-import VariantVersions from './VariantVersions';
 
 type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
   variant: Variant;
-  dbs: List<BackendInstance>;
   isSuperUser: boolean;
   isBuilder: boolean;
+  variantActions: any;
 }
 
 // TODO MOD centralize
+// TODO Re-add VariantVersions
 const LANGUAGES = Immutable.List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends TerrainComponent<Props>
 {
-  public handleDbChange(dbIndex: number)
-  {
-    Actions.variants.change(this.props.variant.set('db', this.props.dbs.get(dbIndex)));
-  }
-
-  public handleLanguageChange(langIndex: number)
-  {
-    const language = LANGUAGES.get(langIndex);
-    Actions.variants.change(
-      this.props.variant
-        .set('language', language)
-        .setIn(['query', 'language'], language), // TODO change once we remove query from variant
-    );
-  }
-
   public render()
   {
     if (!this.props.variant)
@@ -115,36 +97,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
               <div className='biv-cell-second'>
                 <StatusDropdown
                   variant={this.props.variant}
-                />
-              </div>
-            </div>
-            <div className='biv-row'>
-              <div className='biv-cell-first'>
-                Language
-              </div>
-              <div className='biv-cell-second'>
-                <Dropdown
-                  selectedIndex={LANGUAGES.indexOf(this.props.variant.language)}
-                  options={LANGUAGES}
-                  onChange={this.handleLanguageChange}
-                  canEdit={isBuilder || isSuperUser}
-                  className='bic-db-dropdown'
-                />
-              </div>
-            </div>
-            <div className='biv-row'>
-              <div className='biv-cell-first'>
-                Database
-              </div>
-              <div className='biv-cell-second'>
-                <Dropdown
-                  selectedIndex={this.props.dbs && this.props.dbs.findIndex(
-                    (db) => db.id === this.props.variant.db.id,
-                  )}
-                  options={this.props.dbs.map((db) => db.name + ' (' + db.type + ')').toList()}
-                  onChange={this.handleDbChange}
-                  canEdit={isBuilder || isSuperUser}
-                  className='bic-db-dropdown'
+                  variantActions={this.props.variantActions}
                 />
               </div>
             </div>
@@ -173,10 +126,6 @@ class LibraryInfoColumn extends TerrainComponent<Props>
             </div>
           </div>
         </div>
-
-        <VariantVersions
-          variant={this.props.variant}
-        />
       </div>
     );
   }

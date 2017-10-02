@@ -44,15 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const
+// tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-var-requires
 
 import './BuilderComponent.less';
 
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import FadeInOut from 'common/components/FadeInOut';
 import * as React from 'react';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
-import { getStyle } from '../../common/Colors';
 import BuilderTextbox from '../../common/components/BuilderTextbox';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
 import Dropdown from '../../common/components/Dropdown';
@@ -62,6 +60,8 @@ import BuilderActions from '../data/BuilderActions';
 import BuilderStore from '../data/BuilderStore';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
+
+const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 export interface Props
 {
@@ -79,12 +79,21 @@ export interface Props
   columnIndex?: number;
 
   textStyle?: React.CSSProperties;
+
+  handleCardDrop?: (type: string) => any;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
 }
 
 class BuilderComponent extends TerrainComponent<Props>
 {
+  public state:
+  {
+    showExpanded: boolean,
+  } = {
+    showExpanded: false,
+  };
+
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {
     BuilderActions.create(keyPath, index + 1, display.factoryType);
@@ -151,7 +160,7 @@ class BuilderComponent extends TerrainComponent<Props>
       // special type that is unrelated to the data
       return <div
         className='builder-label'
-        key={keySeed + '-label'}
+        key={keySeed + '-label-' + d.label}
         style={d.style}
       >
         {d.label}
@@ -193,6 +202,7 @@ class BuilderComponent extends TerrainComponent<Props>
           singleChild={d.singleChild}
           language={this.props.language}
           hideCreateCardTool={d.hideCreateCardTool}
+          handleCardDrop={d.handleCardDrop ? d.handleCardDrop : this.props.handleCardDrop}
         />;
         break;
       case DisplayType.CARDTEXT:
@@ -215,7 +225,6 @@ class BuilderComponent extends TerrainComponent<Props>
         break;
       case DisplayType.DROPDOWN:
         let selectedIndex = d.options.indexOf(typeof value === 'string' ? value : JSON.stringify(value));
-
         content = (
           <div key={key} className='builder-component-wrapper  builder-component-wrapper-wide'>
             <Dropdown
@@ -228,6 +237,7 @@ class BuilderComponent extends TerrainComponent<Props>
               optionsDisplayName={d.optionsDisplayName}
               values={d.dropdownUsesRawValues ? d.options : undefined}
               textColor={this.props.textStyle && this.props.textStyle.color}
+              tooltips={d.dropdownTooltips}
             />
             {this.props.helpOn && d.help ?
               <ManualInfo
@@ -236,6 +246,40 @@ class BuilderComponent extends TerrainComponent<Props>
               />
               : null
             }
+          </div>
+        );
+        break;
+      case DisplayType.EXPANDABLE:
+        content = (
+          <div key={key}>
+            <div
+              className={this.state.showExpanded ? 'bc-expandable-expanded' : 'bc-expandable-collapsed'}
+              onClick={this._toggle('showExpanded')}
+            >
+              <ArrowIcon className='bc-minimize-icon' />
+              <BuilderComponent
+                display={d.expandToggle}
+                keyPath={this.props.keyPath}
+                data={data}
+                canEdit={this.props.canEdit}
+                parentData={this.props.parentData}
+                language={this.props.language}
+                textStyle={this.props.textStyle}
+              />
+            </div>
+            <FadeInOut
+              open={this.state.showExpanded}
+            >
+              <BuilderComponent
+                display={d.expandContent}
+                keyPath={this.props.keyPath}
+                data={data}
+                canEdit={this.props.canEdit}
+                parentData={this.props.parentData}
+                language={this.props.language}
+                textStyle={this.props.textStyle}
+              />
+            </FadeInOut>
           </div>
         );
         break;
@@ -319,6 +363,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   columnIndex={this.props.columnIndex}
                   isFirstRow={i === 0}
                   isOnlyRow={value.size === 1}
+                  handleCardDrop={d.handleCardDrop}
                 />
               ))
             }
@@ -345,6 +390,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   onChange: BuilderActions.change,
                   builderState: d.requiresBuilderState && BuilderStore.getState(),
                   language: this.props.language,
+                  handleCardDrop: this.props.handleCardDrop,
                 },
               )
             }

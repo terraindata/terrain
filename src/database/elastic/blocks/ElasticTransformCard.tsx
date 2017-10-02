@@ -46,16 +46,13 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands max-line-length
 
-import { List, Map } from 'immutable';
-import * as _ from 'underscore';
+import { List } from 'immutable';
 
-import { Colors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/common/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
-import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
+import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
-import { _card, Card, CardString } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
+import { _card } from '../../../blocks/types/Card';
 
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
@@ -79,7 +76,8 @@ export const elasticTransform = _card(
     input: '',
     scorePoints: List([]),
 
-    domain: List([0, 100]),
+    // make this list<string> since the values passed from BuilderTextBox are string.
+    domain: List(['0', '100']),
     hasCustomDomain: false, // has the user set a custom domain
 
     noTitle: true,
@@ -88,17 +86,27 @@ export const elasticTransform = _card(
     static: {
       language: 'elastic',
       // manualEntry: ManualConfig.cards['transform'],
-      colors: Colors().builder.cards.inputParameter,
+      colors: getCardColors('score', Colors().builder.cards.inputParameter),
       title: 'Transform',
-      preview: '',
-      // preview: (card: any) =>
-      // {
-      //   if (card.input._isCard)
-      //   {
-      //     return '' + BlockUtils.getPreview(card.input);
-      //   }
-      //   return '' + card.input;
-      // },
+      preview: (card: any) =>
+      {
+        let preview = '';
+        if (card.input._isCard)
+        {
+          preview = '' + BlockUtils.getPreview(card.input);
+        }
+        else
+        {
+          preview = '' + card.input;
+        }
+
+        if (preview.length === 0)
+        {
+          preview = 'No input set';
+        }
+
+        return preview;
+      },
       display: [
         {
           displayType: DisplayType.TEXT,
@@ -139,20 +147,11 @@ export const elasticTransform = _card(
         };
       },
 
-      init: (blocksConfig) => (
-        {
-          scorePoints: List([
-            BlockUtils.make(blocksConfig, 'scorePoint', {
-              value: 2,
-              score: 0.2,
-            }),
-            BlockUtils.make(blocksConfig, 'scorePoint', {
-              value: 15,
-              score: 0.5,
-            }),
-          ]),
-        }
-      ),
+      // init: (blocksConfig) => (
+      //   {
+      //     scorePoints: List([]),
+      //   }
+      // ),
 
       metaFields: ['domain', 'hasCustomDomain'],
     },

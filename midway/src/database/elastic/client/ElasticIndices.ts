@@ -104,6 +104,16 @@ class ElasticIndices
     return this.delegate.indices.putMapping(params, callback);
   }
 
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-indices-refresh
+   * @param params
+   * @param callback
+   */
+  public refresh(params: Elastic.IndicesRefreshParams, callback: (err: any, response: any) => void): void
+  {
+    return this.delegate.indices.refresh(params, callback);
+  }
+
   private log(methodName: string, info: any)
   {
     this.controller.log('ElasticIndices.' + methodName, info);

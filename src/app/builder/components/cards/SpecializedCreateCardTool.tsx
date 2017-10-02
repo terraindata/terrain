@@ -46,15 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions member-access
 
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import * as _ from 'underscore';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { Card } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 
 import CreateCardTool from './CreateCardTool';
@@ -69,6 +65,7 @@ export interface Props
   onChange: (keyPath: KeyPath, value: any, notDirty: boolean) => void;
   // builderState: d.requiresBuilderState && BuilderStore.getState(),
   language: string;
+  handleCardDrop: (cardType: string) => any;
 }
 
 const emptyList = Immutable.List([]);
@@ -138,6 +135,9 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
 
   public render()
   {
+    // const accepts = this.props.data.static[] !== undefined ? this.props.data.static.accepts : emptyList;
+    const st = this.props.data.get('static');
+    const accepts = st.accepts !== undefined ? st.accepts : emptyList;
     return (
       <div style={STYLE} >
         <CreateCardTool
@@ -147,7 +147,8 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
           canEdit={this.props.canEdit}
           language={this.props.language}
           className={this.props.className}
-          accepts={emptyList}
+          accepts={accepts}
+          handleCardDrop={this.props.handleCardDrop}
 
           open={this.state.open}
           onToggle={this._toggle('open')}

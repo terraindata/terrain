@@ -49,9 +49,8 @@ THE SOFTWARE.
 import './LibraryItemCategory.less';
 
 import * as React from 'react';
-import { DragSource, DropTarget } from 'react-dnd';
+import { DropTarget } from 'react-dnd';
 import { ItemStatus } from '../../../items/types/Item';
-import * as LibraryTypes from '../LibraryTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props
@@ -59,6 +58,7 @@ export interface Props
   status: string;
   type: string;
   onHover: (status: string, id: ID) => void;
+  onDrop?: (status: string, id: ID) => void;
   connectDropTarget?: (c: any) => any;
   titleHidden?: boolean;
   dropDisabled?: boolean;
@@ -125,6 +125,15 @@ const target =
       {
         const item = monitor.getItem();
         props.onHover(props.status, item.id);
+      }
+    },
+
+    drop(props, monitor, component)
+    {
+      const item = monitor.getItem();
+      if (props.onDrop)
+      {
+        props.onDrop(props.status, item.id);
       }
     },
   };

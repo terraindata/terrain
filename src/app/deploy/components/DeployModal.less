@@ -1,47 +1,57 @@
 @import "../../common/Common.less";
 
+
+.deploy-modal-wrapper {
+  overflow: hidden;
+  max-width: 900px;
+}
+.deploy-modal-content {
+  max-width: 900px;
+  overflow: hidden;
+}
+
 .deploy-modal {
   font-size: 0px;
   height: calc(~"100% - 38px");
-  
+  max-width: 900px;
   .deploy-modal-tql,
   .deploy-modal-deploy-column,
   .deploy-modal-tql-default {
     display: inline-block;
     width: 50%;
-    .normal-text;
+    font-size: @font-size;
     height: 100%;
     box-sizing: border-box;
     .transition;
   }
-  
+
   .deploy-modal-deploy-column {
-    overflow: auto; 
+    overflow: auto;
   }
-  
+
   .deploy-modal-tql,
   .deploy-modal-tql-default {
     overflow: hidden;
   }
-  
+
   .deploy-modal-tql-default {
     width: 33.33%;
     margin-left: -33.33%;
   }
-  
+
   .deploy-modal-tql-wrapper {
     position: relative;
     @tql-title-h: 30px;
-    
+
     .deploy-modal-tql-title {
       position: absolute;
       top: 0px;
       left: 0px;
       width: 100%;
       .big-text;
-      
+
       z-index: 99;
-      
+
       height: 30px;
       padding: 6px;
       box-sizing: border-box;
@@ -49,32 +59,45 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    
+
     .CodeMirror {
       // padding-top: @tql-title-h;
       // height: calc(~"100% - @{tql-title-h}") !important;
     }
   }
-  
+
   .deploy-modal-deploy-column {
     background: #f5f5f5;
-    
+
     .deploy-modal-message {
       padding: 6px;
       margin: 6px;
       border-radius: 4px;
       // background: #fff;
     }
-    
+
     .deploy-modal-info {
+      @w: 32px;
       padding: 6px;
       margin: 6px;
       border-radius: 4px;
       background: #fff;
-      
+
+      &.deploy-modal-info-status {
+        font-size: 20px;
+        padding-bottom: 18px;
+
+        .deploy-modal-info-row-lower {
+          span {
+            &.display-modal-info-bold {
+              font-weight: @bold-font-weight;
+            }
+          }
+        }
+      }
+
       .big-text;
-      
-      @w: 32px;
+
       .deploy-modal-info-row {
         .deploy-modal-info-icon {
           width: @w;
@@ -88,20 +111,24 @@
           .title-text;
         }
       }
-      
+
       .deploy-modal-info-row-lower {
         margin-left: @w + 6px;
-        
+
+        .deploy-modal-info-last-changed {
+          marign-top: 12px;
+        }
+
         span {
           display: inline-block;
           vertical-align: middle;
           margin-right: 6px;
           &.deploy-modal-info-bold {
-            .semi-bold-big-text;
+            font-weight: 400;
           }
         }
       }
-      
+
       .deploy-modal-info-status-row {
         margin-top: 12px;
       }
@@ -113,76 +140,50 @@
       border-radius: 4px;
       background: #fff;
       .transition;
-      
-      &.deploy-modal-check-wrapper-checked {
-        background: @sea-green;
-        color: #fff;
-      }
-      
-      input, label {
+
+      label {
         display: inline-block;
         vertical-align: middle;
         cursor: pointer;
-      }
-      
-      label {
         margin-left: 6px;
         flex-grow: 1;
+        max-width: 92%;
       }
-      
-      input {
-        width: 15px;
-        height: 15px;
-        border: 1px solid #000;
-        border-radius: 3px;
-        border: 1px solid rgba(0,0,0,0.3);
-        background: #fff;
-        position: relative;
-        
-        &:after {
-          content: 'x';
-          font-size: 8px;
-          color: #333;
-          .dead-center;
-          margin-top: -2px;
-          opacity: 0;
-          .transition;
-        }
-        
-        &:checked {
-          &:after {
-            opacity: 1;
-          }
+
+      .deploy-modal-checkbox {
+        height: 17px;
+        width: 17px;
+        margin-right: 3px;
+
+        .check-mark-icon {
+          height: 11px !important;
+          margin-top: 3px !important;
+          margin-left: 1px;
         }
       }
     }
-    
+
     .info {
       padding: 0px 12px;
     }
-    
+
   }
-  
+
   .deploy-modal-button {
     text-align: center;
     padding: 6px 12px;
     margin: 6px;
     border-radius: 4px;
     .title-text;
-    background: #eee;
-    color: @trans-black;
-    cursor: pointer;
-    
+
+
+    &.deploy-modal-button-cancel {
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
     &.deploy-modal-button-lit {
-      @bg: @sea-green;
-      background: @bg;
-      color: #fff;
-      &:hover {
-        background: brighten(@bg, 10%);
-      }
-      &:focus {
-        background: brighten(@bg, 25%);
-      }
+      cursor: pointer;
     }
   }
 }

@@ -47,20 +47,18 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as React from 'react';
-import { Link } from 'react-router';
+import { MidwayError } from 'shared/error/MidwayError';
 import * as UserTypes from '../UserTypes';
-import AuthActions from './../../auth/data/AuthActions';
 import AuthStore from './../../auth/data/AuthStore';
 import CheckBox from './../../common/components/CheckBox';
-import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import UserStore from './../../users/data/UserStore';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import Store from './../data/UserStore';
 import AccountEntry from './AccountEntry';
 import './Settings.less';
 type User = UserTypes.User;
+import { notificationManager } from './../../common/components/InAppNotification';
 import Modal from './../../common/components/Modal';
 import PasswordStrengthInput from './PasswordStrengthInput';
 
@@ -186,15 +184,11 @@ class Settings extends TerrainComponent<Props>
     Ajax.changePassword(+userId, currentPassword, newPassword, () =>
     {
       Actions.fetch();
-      this.setState({
-        modalMessage: 'Your password has been changed.',
-        errorModal: false,
-      });
-      this.toggleModal();
+      notificationManager.addNotification('Success', 'Updated password', 'info', 4);
     }, (error) =>
       {
         this.setState({
-          modalMessage: 'Error changing your password: ' + JSON.stringify(error.error),
+          modalMessage: 'Error changing your password: ' + MidwayError.fromJSON(error).getDetail(),
           errorModal: true,
         });
         this.toggleModal();
@@ -247,7 +241,7 @@ class Settings extends TerrainComponent<Props>
           <div className='settings-white-space' />
         </div>
         <div className='settings-row settings-bottom-margin'>
-          <CheckBox checked={this.state.showPassword} onChange={this.toggleShowPassword} />
+          <CheckBox checked={this.state.showPassword} onChange={this.toggleShowPassword} className='settings-checkbox' />
           <div className='settings-field-info settings-left-shift' onClick={this.toggleShowPassword}>Show password</div>
         </div>
         <div className='settings-row'>

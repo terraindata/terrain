@@ -47,11 +47,10 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions
 
 import * as React from 'react';
-import SchemaStore from '../data/SchemaStore';
-import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaTreeItem from './SchemaTreeItem';
 const Radium = require('radium');
+import Colors from '../../common/Colors';
 import FadeInOut from '../../common/components/FadeInOut';
 import Styles from '../../Styles';
 import SchemaTreeStyles from './SchemaTreeStyles';
@@ -72,7 +71,7 @@ class State
 }
 
 const NORMAL_STYLE = {
-  borderLeft: ('0.5px solid ' + Styles.colors.active),
+  borderLeft: ('1px solid ' + Colors().active),
   paddingLeft: Styles.margin,
 };
 

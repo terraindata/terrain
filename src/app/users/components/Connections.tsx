@@ -49,8 +49,8 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as React from 'react';
-import { Link } from 'react-router';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from '../../auth/data/AuthStore';
 import CreateItem from '../../common/components/CreateItem';
@@ -58,15 +58,13 @@ import Dropdown from '../../common/components/Dropdown';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import SchemaActionTypes from '../../schema/data/SchemaActionTypes';
-import { SchemaActions, SchemaStore } from '../../schema/data/SchemaStore';
-import * as SchemaTypes from '../../schema/SchemaTypes';
+import { SchemaStore } from '../../schema/data/SchemaStore';
 import Ajax from '../../util/Ajax';
 import UserActions from '../data/UserActions';
 import UserStore from '../data/UserStore';
 import * as UserTypes from '../UserTypes';
 
-const CloseIcon = require('../../../images/icon_close_8x8_gray.svg');
+const CloseIcon = require('../../../images/icon_close_8x8.svg');
 
 import './Connections.less';
 
@@ -238,12 +236,17 @@ class Connections extends TerrainComponent<Props>
               </div>
             </div>
           </div>
-          <div
-            className='connections-remove'
-            onClick={this._fn(this.removeConnection, id)}
-            data-tip='Remove'>
-            <CloseIcon />
-          </div>
+          {
+            tooltip(
+              <div
+                className='connections-remove'
+                onClick={this._fn(this.removeConnection, id)}
+              >
+                <CloseIcon />
+              </div>,
+              'Remove',
+            )
+          }
         </div>
         {
           connInfo

@@ -48,14 +48,10 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 
 import { Card, Cards } from '../../../../blocks/types/Card';
-import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 import { CardComponent, CardItem } from '../cards/CardComponent';
@@ -64,7 +60,6 @@ import CreateCardTool from './CreateCardTool';
 const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
-import { backgroundColor, Colors, fontColor, link } from '../../../common/Colors';
 
 export interface Props
 {
@@ -82,6 +77,7 @@ export interface Props
   noCardTool?: boolean;
   singleChild?: boolean;
   hideCreateCardTool?: boolean;
+  handleCardDrop?: (type: string) => any;
 }
 
 interface KeyState
@@ -146,13 +142,6 @@ class CardsArea extends TerrainComponent<Props>
     });
   }
 
-  public componentWillReceiveProps(nextProps: Props)
-  {
-    this.setState({
-      cardToolOpen: nextProps.cards.size === 0,
-    });
-  }
-
   public copy() { }
 
   public clear() { }
@@ -209,6 +198,7 @@ class CardsArea extends TerrainComponent<Props>
                   singleChild={this.props.singleChild}
                   wrapType={card.type}
                   language={this.props.language}
+                  handleCardDrop={this.props.handleCardDrop}
                 />
                 <CardComponent
                   card={card}
@@ -223,6 +213,7 @@ class CardsArea extends TerrainComponent<Props>
                   addColumn={this.props.addColumn}
                   columnIndex={this.props.columnIndex}
                   helpOn={this.state.learningMode || this.props.helpOn}
+                  handleCardDrop={this.props.handleCardDrop}
                 />
               </div>,
             )
@@ -239,6 +230,7 @@ class CardsArea extends TerrainComponent<Props>
             wrapType={this.props.singleChild && cards && cards.size === 1 && cards.get(0).type}
             wrapUp={true}
             language={this.props.language}
+            handleCardDrop={this.props.handleCardDrop}
           />
 
           {
@@ -253,8 +245,9 @@ class CardsArea extends TerrainComponent<Props>
               className='nested-create-card-tool-wrapper'
               accepts={this.props.accepts}
               onToggle={this._toggle('cardToolOpen')}
-              hidePlaceholder={this.props.singleChild || cards.size === 0}
+              hidePlaceholder={this.props.singleChild}
               cannotClose={cards.size === 0}
+              handleCardDrop={this.props.handleCardDrop}
             />
           }
 

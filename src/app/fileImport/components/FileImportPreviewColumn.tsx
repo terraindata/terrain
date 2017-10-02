@@ -43,37 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires
+
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import Util from '../../util/Util';
+import { backgroundColor, Colors, link } from '../../common/Colors';
+import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
-import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import TransformBox from './../components/TransformBox';
 import TypeDropdown from './../components/TypeDropdown';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
-import shallowCompare = require('react-addons-shallow-compare');
 import './FileImportPreviewColumn.less';
+
+const KeyIcon = require('./../../../images/icon_key-1.svg');
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 export interface Props
 {
   columnId: number;
   columnName: string;
-  columnNames: List<string>; // TODO: move to parent component while preserving merge transformation options
+  columnNames: List<string>; // TODO: move to parent component while preserving split/merge functionality
   isIncluded: boolean;
-  columnType: IMMap<string, any>;
+  columnType: ColumnTypesTree;
   isPrimaryKey: boolean;
   columnOptions: List<string>;
-  editing: boolean;
-  handleEditColumnChange(editColumnId: number);
+  exporting: boolean;
   onColumnNameChange(columnId: number, localColumnName: string);
+  onTransform(columnId: number);
 }
 
 @Radium
@@ -85,18 +85,27 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     localColumnName: this.props.columnName,
   };
 
-  public handleEditClick()
-  {
-    this.props.handleEditColumnChange(this.props.columnId);
-  }
-
   public handleIncludedChange()
   {
+    if (this.props.isIncluded && this.props.isPrimaryKey)
+    {
+      Actions.changePrimaryKey(this.props.columnId);
+    }
     Actions.setColumnToInclude(this.props.columnId);
+  }
+
+  public handleCheckboxChange()
+  {
+    return;
   }
 
   public handlePrimaryKeyChange()
   {
+    if (!this.props.isIncluded && !this.props.isPrimaryKey)
+    {
+      Actions.setErrorMsg('Cannot set a column not included as a primary key');
+      return;
+    }
     Actions.changePrimaryKey(this.props.columnId);
   }
 
@@ -107,9 +116,9 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleBlur()
+  public handleRename()
   {
-    const success = this.props.onColumnNameChange(this.props.columnId, this.state.localColumnName);
+    const success: boolean = this.props.onColumnNameChange(this.props.columnId, this.state.localColumnName);
     if (!success)
     {
       this.setState({
@@ -128,29 +137,65 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     }
   }
 
-  public renderColumn()
+  public renderHeader()
   {
     return (
       <div
-        className='fi-preview-column'
-        style={backgroundColor(Colors().fileimport.preview.column.base)}
+        className='flex-container fi-preview-column-header'
+        style={{
+          border: this.props.isIncluded ? 'solid 1px ' + Colors().active : 'solid 1px ' + Colors().border3,
+        }}
       >
         <div
-          className='fi-preview-misc'
+          className='flex-container fi-preview-column-header-include clickable'
+          onClick={this.handleIncludedChange}
         >
-          include
           <CheckBox
             checked={this.props.isIncluded}
-            onChange={this.handleIncludedChange}
+            onChange={this.handleCheckboxChange}
           />
-          primary key
-          <CheckBox
-            checked={this.props.isPrimaryKey}
-            onChange={this.handlePrimaryKeyChange}
-          />
+          <span
+            className='fi-preview-column-header-include-text clickable'
+            style={{
+              color: this.props.isIncluded ? Colors().active : Colors().border3,
+            }}
+          >
+            Include
+          </span>
         </div>
+        {
+          !this.props.exporting &&
+          tooltip(
+            <div
+              className={classNames({
+                'fi-preview-column-header-key clickable': true,
+                'fi-preview-column-header-key-selected': this.props.isPrimaryKey,
+              })}
+              onClick={this.handlePrimaryKeyChange}
+              style={{
+                background: this.props.isPrimaryKey ? Colors().active : Colors().bg2,
+              }}
+            >
+              <KeyIcon />
+            </div>,
+            !this.props.isIncluded ?
+              'Include this column to set it as a primary key'
+              :
+              this.props.isPrimaryKey ? 'Remove this column as a primary key' : 'Make this column a primary key',
+          )
+        }
+      </div>
+    );
+  }
+
+  public renderName()
+  {
+    return (
+      <div
+        className='flex-container fi-preview-column-field'
+      >
         <div
-          className='fi-preview-column-name'
+          className='fi-preview-column-field-content'
         >
           <Autocomplete
             value={this.state.localColumnName}
@@ -158,47 +203,92 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             onChange={this.handleLocalColumnNameChange}
             placeholder={''}
             disabled={false}
-            onBlur={this.handleBlur}
+            onEnter={this.handleRename}
+            onSelectOption={this.handleRename}
+            onBlur={this.handleRename}
           />
         </div>
-        <div
-          className='fi-preview-type-dropdown-container'
-        >
-          <TypeDropdown
-            columnId={this.props.columnId}
-            recursionDepth={0}
-            columnType={this.props.columnType}
-            editing={this.props.editing}
-          />
-        </div>
-        <TransformBox
-          datatype={FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')]}
-          colName={this.props.columnName}
-          columnNames={this.props.columnNames}
-          setLocalColumnName={this.handleLocalColumnNameChange}
-        />
       </div>
     );
   }
 
-  public renderColumnTitle()
+  public renderType()
+  {
+    if (!this.props.exporting)
+    {
+      return (
+        <div
+          className='flex-container fi-preview-column-field flex-grow'
+        >
+          <div
+            className='fi-preview-column-field-content'
+          >
+            <TypeDropdown
+              columnId={this.props.columnId}
+              recursionDepth={0}
+              columnType={this.props.columnType}
+            />
+          </div>
+        </div>
+      );
+    }
+  }
+
+  public renderTransform()
   {
     return (
       <div
-        className='fi-preview-column-title'
-        style={backgroundColor(Colors().fileimport.preview.column.base)}
+        className='flex-container fi-preview-column-field'
       >
-        <div className='fi-preview-column-title-name'>
-          {this.props.columnName}
-        </div>
-        <div className='fi-preview-column-title-type'>
-          {FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')]}
+        {
+          tooltip(
+            <div
+              className='fi-preview-column-field-content clickable'
+              onClick={this._fn(this.props.onTransform, this.props.columnId)}
+              style={link()}
+            >
+              Transform
+            </div>,
+            'Use transformations to modify the data in this column before importing',
+          )
+        }
+      </div>
+    );
+  }
+
+  public renderColumn()
+  {
+    return (
+      <div
+        className={classNames({
+          'fi-preview-column': true,
+          'fi-preview-column-disabled': !this.props.isIncluded,
+        })}
+        style={{
+          background: Colors().bg2,
+          text: Colors().text1,
+        }}
+      >
+        {
+          this.renderHeader()
+        }
+        {
+          this.renderName()
+        }
+        <div
+          className='flex-container-center'
+        >
+          {
+            this.renderType()
+          }
+          {
+            this.renderTransform()
+          }
         </div>
         <div
-          className='fi-preview-column-edit-button'
-          onClick={this.handleEditClick}
+          className='fi-preview-column-disabled-veil'
+          style={backgroundColor(Colors().bg3)}
         >
-          Edit
         </div>
       </div>
     );
@@ -206,7 +296,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public render()
   {
-    return this.props.editing ? this.renderColumn() : this.renderColumnTitle();
+    return this.renderColumn();
   }
 }
 

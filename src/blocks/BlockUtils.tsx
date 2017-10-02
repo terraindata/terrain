@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:forin no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-unused-expression no-console
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 const { Map, List } = Immutable;
 
 import { Block, BlockConfig } from './types/Block';
@@ -128,13 +128,20 @@ export function forAllBlocks(
 
 export function transformAlias(transformCard: Card): string
 {
-  return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
+  if (typeof transformCard['input'] === 'string')
+  {
+    return transformCard['input'];
+  }
+  else
+  {
+    return 'transform' + transformCard.id.replace(/[^a-zA-Z0-9]/g, '');
+  }
 }
 
 // This creates a new instance of a card / block
 // Usage: BlockUtils.make(MySQLBlocks, 'sort')
 export const make = (blocksConfig: { [type: string]: BlockConfig },
-  blockType: string, extraConfig?: { [key: string]: any }) =>
+  blockType: string, extraConfig?: { [key: string]: any }, skipTemplate?: boolean) =>
 {
   let block = blocksConfig[blockType];
 
@@ -150,7 +157,7 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
 
   if (block.static.init)
   {
-    block = _.extend({}, block, block.static.init(blocksConfig));
+    block = _.extend({}, block, block.static.init(blocksConfig, extraConfig, skipTemplate));
   }
 
   if (extraConfig)

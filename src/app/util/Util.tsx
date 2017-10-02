@@ -50,9 +50,9 @@ import * as $ from 'jquery';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 const suffixes = ['', ' k', ' M', ' B'];
@@ -209,25 +209,30 @@ const Util = {
   {
     const then = moment(date);
     const now = moment();
-    const hour = ' at ' + then.format('h:mma');
 
     if (then.format('MMMM Do YYYY') === now.format('MMMM Do YYYY'))
     {
       // it was today
-      return 'Today at' + hour;
+      const hour = then.format('h:mma');
+      return 'Today, ' + hour;
     }
 
     if (then.format('YYYY') === now.format('YYYY'))
     {
       // same year
-      return then.format('MM/DD/YY') + hour;
+      return then.format('MM/DD/YY');
     }
 
-    return then.format('MM/DD/YY') + hour;
+    return then.format('MM/DD/YY');
   },
 
   roundNumber(num, decimalPoints)
   {
+    if (decimalPoints <= 0)
+    {
+      return parseInt(num, 10);
+    }
+
     return Math.round(num * Math.pow(10, decimalPoints)) / Math.pow(10, decimalPoints);
   },
 
@@ -270,8 +275,14 @@ const Util = {
   },
 
   // for SQL
-  formatInputDate(date: Date): string
+  formatInputDate(date: Date, language: string = 'elastic'): string
   {
+    if (language === 'elastic')
+    {
+      const day = moment(date).format('YYYY-MM-DD');
+      const time = moment(date).format('HH:mm:ssZ');
+      return day + 'T' + time;
+    }
     return moment(date).format('YYYY-MM-DD HH:mm:ss');
   },
 
@@ -430,6 +441,20 @@ const Util = {
   parentNode(reactNode): Node
   {
     return ReactDOM.findDOMNode(reactNode).parentNode;
+  },
+
+  findParentNode(reactNode, checkParent: (parentNode) => boolean, maxDepth: number = 4): Node | null
+  {
+    while (maxDepth > 0)
+    {
+      if (checkParent(reactNode))
+      {
+        return reactNode;
+      }
+      reactNode = Util.parentNode(reactNode);
+      maxDepth--;
+    }
+    return null;
   },
 
   siblings(reactNode): NodeList
@@ -613,6 +638,19 @@ const Util = {
       return 0; // It is not IE
     }
   },
+
+  sortDatabases(dbs)
+  {
+    return dbs.sort((a, b) =>
+    {
+      if (a.type === b.type)
+      {
+        return a.name.localeCompare(b.name);
+      }
+      return a.type.localeCompare(b.type);
+    });
+  },
+
 };
 
 export default Util;

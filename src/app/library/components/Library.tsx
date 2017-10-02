@@ -44,18 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import RadioButtons from 'common/components/RadioButtons';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import * as _ from 'underscore';
-import TerrainAreaChart from '../../charts/TerrainAreaChart';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
-import InfoArea from './../../common/components/InfoArea';
+import MultipleAreaChart from '../../charts/components/MultipleAreaChart';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
-import UserActions from './../../users/data/UserActions';
-import Actions from './../data/LibraryActions';
 import { LibraryState } from './../data/LibraryStore';
-import Store from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
 import GroupsColumn from './GroupsColumn';
@@ -98,13 +94,6 @@ class Library extends TerrainComponent<any>
     zoomDomain: {},
   };
 
-  constructor(props)
-  {
-    super(props);
-
-    this.state.libraryState = props.store ? props.store.getState() : Store.getState();
-  }
-
   public componentWillMount()
   {
     const { basePath } = this.props;
@@ -122,26 +111,35 @@ class Library extends TerrainComponent<any>
 
   public componentDidMount()
   {
-    this._subscribe(Store, {
-      stateKey: 'libraryState',
-      isMounted: true,
-    });
-
-    RolesActions.fetch();
-    UserActions.fetch();
+    this.props.roleActions.fetch();
+    this.props.userActions.fetch();
   }
 
-  public getData()
+  public getData(variantId: ID)
   {
-    return [...Array(20).keys()].map((i) =>
+    const { analytics } = this.props;
+
+    // Remove when analytics mock up have valid variant ids.
+    let data = [];
+
+    const analyticsData = analytics.data.get(variantId);
+    if (analyticsData !== undefined)
     {
-      return { x: i, y: _.random(1, 100) };
-    });
+      data = analyticsData;
+    }
+
+    // return [...Array(20).keys()].map((i) =>
+    // {
+    //  const time = new Date(2017, 8, i, 0, 0, 0);
+    //  return { time, value: _.random(1, 100) };
+    // });
+    // TODO: Replace by variantId when analytics mock data have correct variant ids.
+    return data;
   }
 
   public getDatasets()
   {
-    const { libraryState } = this.state;
+    const { library: libraryState } = this.props;
     const { variants, selectedVariants } = libraryState;
 
     const datasets = variants
@@ -151,10 +149,10 @@ class Library extends TerrainComponent<any>
       })
       .map((variant) =>
       {
-        return { id: +variant.id, name: variant.name, data: this.getData() };
+        return { id: variant.id, label: variant.name, data: this.getData(variant.id) };
       });
 
-    return datasets.toList();
+    return datasets.toMap();
   }
 
   public getLastPath()
@@ -174,11 +172,31 @@ class Library extends TerrainComponent<any>
     localStorage.setItem(lastPath, location.pathname);
   }
 
+  public handleRadioButtonClick(optionValue)
+  {
+    const { selectedVariants } = this.props.library;
+    const selectedVariantIds = selectedVariants.toJS();
+    const numericOptionValue = parseInt(optionValue, 10);
+
+    this.props.analyticsActions.fetch(selectedVariantIds, numericOptionValue);
+    this.props.analyticsActions.selectMetric(optionValue);
+  }
+
   public render()
   {
-    const { libraryState } = this.state;
+    const { library: libraryState, analytics } = this.props;
 
-    const { groups, algorithms, variants, selectedVariants, groupsOrder } = libraryState;
+    const {
+      dbs,
+      groups,
+      algorithms,
+      variants,
+      selectedVariants,
+      groupsOrder,
+    } = libraryState;
+
+    const { selectedMetric } = analytics;
+
     const { router, basePath, variantsMultiselect } = this.props;
     const { params } = router;
 
@@ -248,17 +266,22 @@ class Library extends TerrainComponent<any>
               groupsOrder,
               params,
               basePath,
+              groupActions: this.props.libraryGroupActions,
+              variants,
             }}
             isFocused={algorithm === undefined}
           />
           <AlgorithmsColumn
             {...{
+              dbs,
+              groups,
               algorithms,
               variants,
               algorithmsOrder,
               groupId,
               params,
               basePath,
+              algorithmActions: this.props.libraryAlgorithmActions,
             }}
             isFocused={variantIds !== null && variantIds.length === 0}
           />
@@ -273,20 +296,50 @@ class Library extends TerrainComponent<any>
               multiselect: variantsMultiselect,
               basePath,
               router,
+              variantActions: this.props.libraryVariantActions,
+              analytics,
+              analyticsActions: this.props.analyticsActions,
             }}
           />
           {!variantsMultiselect ?
             <LibraryInfoColumn
               {...{
+                dbs,
                 group,
                 algorithm,
                 variant,
+                groupActions: this.props.libraryGroupActions,
+                algorithmActions: this.props.libraryAlgorithmActions,
+                variantActions: this.props.libraryVariantActions,
+                libraryActions: this.props.libraryActions,
+                roleActions: this.props.roleActions,
               }}
             /> : null}
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
-            <TerrainAreaChart datasets={datasets} />
+            <div style={{ width: '80%', height: '100%' }}>
+              <MultipleAreaChart
+                datasets={datasets}
+                xDataKey={'key'}
+                yDataKey={'doc_count'}
+              />
+            </div>
+            <div style={{
+              width: '20%',
+              height: '100%',
+              backgroundColor: '#333',
+              marginLeft: '10px',
+            }}>
+              <RadioButtons
+                optionShadow={true}
+                selected={selectedMetric.toString()}
+                options={[
+                  { value: '1', label: 'CTR', onClick: this.handleRadioButtonClick },
+                  { value: '2', label: 'Conversions', onClick: this.handleRadioButtonClick },
+                ]}
+              />
+            </div>
           </div> : null
         }
       </div>

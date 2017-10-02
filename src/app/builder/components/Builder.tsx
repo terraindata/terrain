@@ -49,11 +49,9 @@ THE SOFTWARE.
 // Libraries
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { browserHistory } from 'react-router';
 import { withRouter } from 'react-router';
@@ -61,12 +59,13 @@ import { withRouter } from 'react-router';
 // Data
 import { ItemStatus } from '../../../items/types/Item';
 import Query from '../../../items/types/Query';
+import FileImportStore from '../../fileImport/data/FileImportStore';
+import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import LibraryActions from '../../library/data/LibraryActions';
-import { LibraryState, LibraryStore } from '../../library/data/LibraryStore';
+import { LibraryStore } from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
-import RolesActions from '../../roles/data/RolesActions';
 import RolesStore from '../../roles/data/RolesStore';
-import UserActions from '../../users/data/UserActions';
+import TerrainStore from '../../store/TerrainStore';
 import UserStore from '../../users/data/UserStore';
 import Util from './../../util/Util';
 import Actions from './../data/BuilderActions';
@@ -74,13 +73,13 @@ import { BuilderState, BuilderStore } from './../data/BuilderStore';
 type Variant = LibraryTypes.Variant;
 
 // Components
-
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { tooltip } from 'common/components/tooltip/Tooltips';
+import { backgroundColor, Colors } from '../../common/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
+import FileImportPreviewColumn from '../../fileImport/components/FileImportPreviewColumn';
 import { notificationManager } from './../../common/components/InAppNotification';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import Ajax from './../../util/Ajax';
 import BuilderColumn from './BuilderColumn';
 import LayoutManager from './layout/LayoutManager';
 import { TabAction, Tabs } from './layout/Tabs';
@@ -104,6 +103,7 @@ export interface Props
 class Builder extends TerrainComponent<Props>
 {
   public state: {
+    exportState: FileImportTypes.FileImportState,
     builderState: BuilderState,
     variants: IMMap<ID, Variant>,
 
@@ -126,6 +126,7 @@ class Builder extends TerrainComponent<Props>
     savingAs?: boolean;
 
   } = {
+    exportState: FileImportStore.getState(),
     builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
 
@@ -177,6 +178,10 @@ class Builder extends TerrainComponent<Props>
       storeKeyPath: ['variants'],
     });
 
+    this._subscribe(FileImportStore, {
+      stateKey: 'exportState',
+    });
+
     let colKeys: List<number>;
 
     if (localStorage.getItem('colKeys'))
@@ -207,6 +212,9 @@ class Builder extends TerrainComponent<Props>
     this.initialColSizes = colSizes;
   }
 
+  public unregisterLeaveHook1: any = () => undefined;
+  public unregisterLeaveHook2: any = () => undefined;
+
   public componentWillMount()
   {
     this.checkConfig(this.props);
@@ -234,11 +242,13 @@ class Builder extends TerrainComponent<Props>
       }
     };
 
-    this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
+    this.unregisterLeaveHook1 = this.props.router.setRouteLeaveHook(this.props.route, this.routerWillLeave);
   }
 
   public componentWillUnmount()
   {
+    this.unregisterLeaveHook1();
+    this.unregisterLeaveHook2();
     window.onbeforeunload = null;
   }
 
@@ -294,7 +304,7 @@ class Builder extends TerrainComponent<Props>
       this.confirmedLeave = false;
       if (!nextProps.location.query || !nextProps.location.query.o)
       {
-        this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
+        this.unregisterLeaveHook2 = this.props.router.setRouteLeaveHook(nextProps.route, this.routerWillLeave);
       }
       this.checkConfig(nextProps);
     }
@@ -520,7 +530,7 @@ class Builder extends TerrainComponent<Props>
     const variant = this.getVariant();
     if (variant)
     {
-      if (variant.status === ItemStatus.Live)
+      if (variant.status === ItemStatus.Live || variant.status === ItemStatus.Approve)
       {
         return false;
       }
@@ -540,40 +550,42 @@ class Builder extends TerrainComponent<Props>
   public save()
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
-    variant = variant.set('query', this.getQuery());
-
-    this.setState({
-      saving: true,
-    });
-
-    // TODO remove if queries/variants model changes
-    LibraryActions.variants.change(variant);
-    this.onSaveSuccess(variant);
-    Actions.save(); // register that we are saving
-
-    let configArr = window.location.pathname.split('/')[2].split(',');
-    let currentVariant;
-    configArr = configArr.map((tab) =>
+    if (this.shouldSave())
     {
-      if (tab.substr(0, 1) === '!')
+      variant = variant.set('query', this.getQuery());
+      this.setState({
+        saving: true,
+      });
+
+      // TODO remove if queries/variants model changes
+      TerrainStore.dispatch(LibraryActions.variants.change(variant));
+      this.onSaveSuccess(variant);
+      Actions.save(); // register that we are saving
+
+      let configArr = window.location.pathname.split('/')[2].split(',');
+      let currentVariant;
+      configArr = configArr.map((tab) =>
       {
-        currentVariant = tab.substr(1).split('@')[0];
-        return '!' + currentVariant;
-      }
-      return tab;
-    },
-    );
-    for (let i = 0; i < configArr.length; i++)
-    {
-      if (configArr[i] === currentVariant)
+        if (tab.substr(0, 1) === '!')
+        {
+          currentVariant = tab.substr(1).split('@')[0];
+          return '!' + currentVariant;
+        }
+        return tab;
+      },
+      );
+      for (let i = 0; i < configArr.length; i++)
       {
-        configArr.splice(i, 1);
+        if (configArr[i] === currentVariant)
+        {
+          configArr.splice(i, 1);
+        }
       }
-    }
-    const newConfig = configArr.join(',');
-    if (newConfig !== this.props.params.config)
-    {
-      browserHistory.replace(`/builder/${newConfig}`);
+      const newConfig = configArr.join(',');
+      if (newConfig !== this.props.params.config)
+      {
+        browserHistory.replace(`/builder/${newConfig}`);
+      }
     }
   }
 
@@ -630,6 +642,7 @@ class Builder extends TerrainComponent<Props>
       content: query && <BuilderColumn
         query={query}
         resultsState={this.state.builderState.resultsState}
+        exportState={this.state.exportState}
         index={index}
         colKey={key}
         variant={variant}
@@ -770,13 +783,15 @@ class Builder extends TerrainComponent<Props>
           <div className='builder-white-space' />
           {
             this.canEdit() &&
-            <div
-              className='button builder-revert-button'
-              onClick={this.revertVersion}
-              data-tip="Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history."
-            >
-              Revert to this version
-              </div>
+            tooltip(
+              <div
+                className='button builder-revert-button'
+                onClick={this.revertVersion}
+              >
+                Revert to this version
+              </div>,
+              "Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history.",
+            )
           }
         </div>
       );
@@ -826,7 +841,7 @@ class Builder extends TerrainComponent<Props>
   {
     let variant = LibraryTypes.touchVariant(this.getVariant());
     variant = variant.set('query', this.getQuery());
-    LibraryActions.variants.duplicateAs(variant, variant.get('index'), this.state.saveAsTextboxValue,
+    TerrainStore.dispatch(LibraryActions.variants.duplicateAs(variant, variant.get('index'), this.state.saveAsTextboxValue,
       (response, newVariant) =>
       {
         this.onSaveSuccess(newVariant);
@@ -860,7 +875,8 @@ class Builder extends TerrainComponent<Props>
         {
           browserHistory.replace(`/builder/${newConfig}`);
         }
-      });
+      }),
+    );
   }
 
   public handleModalSaveAsCancel()
@@ -875,6 +891,8 @@ class Builder extends TerrainComponent<Props>
     const config = this.props.params.config;
     const variant = this.getVariant();
     const query = this.getQuery();
+    const variantIdentifier = variant === undefined ? '' :
+      `${variant.groupId},${variant.algorithmId},${variant.id}`;
 
     return (
       <div
@@ -934,6 +952,7 @@ class Builder extends TerrainComponent<Props>
         />
         <ResultsManager
           query={query}
+          variantPath={variantIdentifier}
           resultsState={this.state.builderState.resultsState}
           db={this.state.builderState.db}
           onResultsStateChange={Actions.results}

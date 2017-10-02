@@ -47,14 +47,16 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { ItemStatus } from '../../../items/types/Item';
-import UserThumbnail from '../../users/components/UserThumbnail';
-import Util from '../../util/Util';
-import TerrainComponent from './../../common/components/TerrainComponent';
-
+import { buttonColors, Colors, disabledButtonColors, fontColor } from '../../common/Colors';
 import LibraryStore from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
+import UserThumbnail from '../../users/components/UserThumbnail';
+import Util from '../../util/Util';
+import CheckBox from './../../common/components/CheckBox';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
@@ -67,6 +69,7 @@ const TEXT =
       main: 'You are deploying the following variant to Live. The variant query will be pushed to the database servers.',
       confirm: 'I approve of deploying this query to Live for this variant.',
       button: 'Deploy to Live',
+      cancelButton: 'Cancel and Do Not Deploy',
     },
 
     default:
@@ -74,6 +77,7 @@ const TEXT =
       main: 'You are deploying the following variant to Live. The variant query will be pushed to the database servers.',
       confirm: 'I approve of deploying this query to Live for this variant, and making it the Default for this algorithm.',
       button: 'Deploy to Live and Make Default',
+      cancelButton: 'Cancel and Do Not Deploy',
     },
 
     notLive:
@@ -81,6 +85,7 @@ const TEXT =
       main: 'You are removing the following variant from Live. The variant query will be removed from the database servers.',
       confirm: 'I approve of removing this query from Live for this variant.',
       button: 'Remove from Live',
+      cancelButton: 'Cancel and Do Not Remove',
     },
   };
 
@@ -92,6 +97,7 @@ export interface Props
   defaultVariant: LibraryTypes.Variant;
   onDefaultCheckedChange(defaultChecked: boolean);
   onDeploy();
+  onCancelDeploy();
 }
 
 class DeployModalColumn extends TerrainComponent<Props>
@@ -112,7 +118,7 @@ class DeployModalColumn extends TerrainComponent<Props>
     }
   }
 
-  public handleDefaultCheckedChange(c)
+  public handleDefaultCheckedChange()
   {
     this.props.onDefaultCheckedChange(!this.props.defaultChecked);
     this.setState({
@@ -120,7 +126,7 @@ class DeployModalColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleConfirmCheckedChange(c)
+  public handleConfirmCheckedChange()
   {
     this.setState({
       confirmChecked: !this.state.confirmChecked,
@@ -129,7 +135,15 @@ class DeployModalColumn extends TerrainComponent<Props>
 
   public handleDeploy()
   {
-    this.props.onDeploy();
+    if (this.state.confirmChecked)
+    {
+      this.props.onDeploy();
+    }
+  }
+
+  public handleCancelDeploy()
+  {
+    this.props.onCancelDeploy();
   }
 
   public render()
@@ -199,28 +213,44 @@ class DeployModalColumn extends TerrainComponent<Props>
               />
             </span>
           </div>
-          <div className='deploy-modal-info-row-lower'>
+          <div className='deploy-modal-info-row-lower deploy-modal-info-last-changed'>
+            <span>
+              Last changed:
+            </span>
             <span className='deploy-modal-info-bold'>
               {
                 Util.formatDate(variant.lastEdited)
               }
             </span>
           </div>
+        </div>
+
+        <div className='deploy-modal-info deploy-modal-info-status'>
           <div className='deploy-modal-info-row-lower deploy-modal-info-status-row'>
-            <span>
+            <span
+              style={fontColor(Colors().altText2)}
+            >
               Current status:
-            </span>
-            <span className='deploy-modal-info-bold'>
+              </span>
+            <span
+              className='deploy-modal-info-bold'
+              style={fontColor(Colors().altText1)}
+            >
               {
                 variant.status
               }
             </span>
           </div>
           <div className='deploy-modal-info-row-lower'>
-            <span>
+            <span
+              style={fontColor(Colors().altText2)}
+            >
               Changing to status:
-            </span>
-            <span className='deploy-modal-info-bold'>
+              </span>
+            <span
+              className='deploy-modal-info-bold'
+              style={fontColor(Colors().altText1)}
+            >
               {
                 status
               }
@@ -237,11 +267,10 @@ class DeployModalColumn extends TerrainComponent<Props>
                 'deploy-modal-check-wrapper-checked': this.props.defaultChecked,
               })}
             >
-              <input
-                type='checkbox'
+              <CheckBox
                 checked={this.props.defaultChecked}
                 onChange={this.handleDefaultCheckedChange}
-                id='deploy-modal-default-check'
+                className='deploy-modal-checkbox'
               />
               <label
                 htmlFor='deploy-modal-default-check'
@@ -277,14 +306,14 @@ class DeployModalColumn extends TerrainComponent<Props>
             'deploy-modal-check-wrapper-checked': this.state.confirmChecked,
           })}
         >
-          <input
-            type='checkbox'
+          <CheckBox
             checked={this.state.confirmChecked}
             onChange={this.handleConfirmCheckedChange}
-            id='deploy-modal-confirm-check'
+            className='deploy-modal-checkbox'
           />
           <label
             htmlFor='deploy-modal-confirm-check'
+            onClick={this.handleConfirmCheckedChange}
           >
             {
               text.confirm
@@ -297,12 +326,23 @@ class DeployModalColumn extends TerrainComponent<Props>
             'deploy-modal-button': true,
             'deploy-modal-button-lit': this.state.confirmChecked,
           })}
+          style={this.state.confirmChecked ? buttonColors() : disabledButtonColors()}
           onClick={this.handleDeploy}
         >
           {
             text.button
           }
         </div>
+        <div
+          className='deploy-modal-button deploy-modal-button-cancel'
+          style={buttonColors()}
+          onClick={this.handleCancelDeploy}
+        >
+          {
+            text.cancelButton
+          }
+        </div>
+
       </div>
     );
   }

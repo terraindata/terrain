@@ -47,12 +47,10 @@ THE SOFTWARE.
 // tslint:disable:no-empty
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import AuthStore from './../../auth/data/AuthStore';
 import Ajax from './../../util/Ajax';
-import Util from './../../util/Util';
 import * as UserTypes from './../UserTypes';
-import Actions from './UserActions';
 import ActionTypes from './UserActionTypes';
 
 const UserReducers = {};
@@ -115,4 +113,15 @@ UserReducers[ActionTypes.completeTutorial] =
     return state;
   };
 
-export default UserReducers;
+const UserReducersWrapper = (state: Immutable.Map<ID, any> = Immutable.Map({}), action) =>
+{
+  let nextState = state;
+  if (UserReducers[action.type] !== undefined)
+  {
+    nextState = UserReducers[action.type](state, action);
+  }
+
+  return nextState;
+};
+
+export default UserReducersWrapper;

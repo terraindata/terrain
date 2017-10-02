@@ -46,12 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires member-access
 
-import { List, Map } from 'immutable';
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import { List } from 'immutable';
 import { make } from '../../blocks/BlockUtils';
 import { Backend, cardsDeckToList } from '../types/Backend';
-import CardsToCodeOptions from '../types/CardsToCodeOptions';
 import ElasticBlocks from './blocks/ElasticBlocks';
 import ElasticCardsDeck from './blocks/ElasticCardsDeck';
 import CardsToElastic from './conversion/CardsToElastic';
@@ -93,12 +90,9 @@ class ElasticBackend implements Backend
 
   getRootCards = () =>
   {
+    // The Elastic cards always start from the root card.
     return List([
-      make(ElasticBlocks, 'eqlindex', { key: 'index' }),
-      make(ElasticBlocks, 'eqltype', { key: 'type' }),
-      make(ElasticBlocks, 'eqlfrom', { key: 'from' }),
-      make(ElasticBlocks, 'eqlsize', { key: 'size' }),
-      make(ElasticBlocks, 'eqlbody', { key: 'body' }),
+      make(ElasticBlocks, 'eqlroot', { key: 'root' }),
     ]);
   }
 

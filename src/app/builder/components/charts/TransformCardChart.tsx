@@ -55,6 +55,7 @@ import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
+import Actions from '../../data/BuilderActions';
 
 interface ScorePoint
 {
@@ -65,6 +66,8 @@ interface ScorePoint
 }
 type ScorePoints = List<ScorePoint>;
 
+const ZOOM_FACTOR = 2.0;
+
 import TransformChart from './TransformChart';
 
 export interface Props
@@ -73,12 +76,15 @@ export interface Props
   bars: any;
   domain: List<number>;
   range: List<number>;
+  keyPath: KeyPath;
   canEdit: boolean;
   inputKey: string;
   updatePoints: (points: ScorePoints, released?: boolean) => void;
+  onRequestDomainChange: (domain: List<number>, overrideMaxDomain: boolean) => void;
+  onRequestZoomToData: () => void;
   width: number;
   language: string;
-
+  colors: [string, string];
   spotlights: any; // TODO spawtlights
 }
 
@@ -87,7 +93,8 @@ export interface Props
 class TransformCardChart extends TerrainComponent<Props>
 {
   public state: {
-    pointsCache: ScorePoints;
+    pointsCache: ScorePoints; //  this component points
+    pointsBuffer: ScorePoints; // parent component points
     selectedPointIds: IMMap<string, boolean>;
     lastSelectedPointId?: string;
     initialScore?: number;
@@ -97,11 +104,14 @@ class TransformCardChart extends TerrainComponent<Props>
     // these move seeds are use to identify fluid point movements, which should all be undone in the same action
     moveSeed: number;
     movedSeed: number;
+    dragging: boolean;
   } = {
     pointsCache: this.props.points,
+    pointsBuffer: null,
     selectedPointIds: Map<string, boolean>({}),
     moveSeed: 0,
     movedSeed: -1,
+    dragging: false,
   };
 
   constructor(props: Props)
@@ -146,7 +156,7 @@ class TransformCardChart extends TerrainComponent<Props>
     }
     else
     {
-      selectedPointIds = Map<string, boolean>({});
+      selectedPointIds = Map<string, boolean>();
     }
     // else, a click to unselect things
 
@@ -166,14 +176,18 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public updatePoints(points: ScorePoints, isConcrete?: boolean)
   {
+    const domainRange = this.props.domain.get(1) - this.props.domain.get(0);
+    const valueDecimalPoints = 4 - Math.floor(Math.log10(domainRange));
+
     points = points.map(
       (scorePoint) =>
         scorePoint
           .set('score', Util.roundNumber(scorePoint.score, 4))
-          .set('value', Util.roundNumber(scorePoint.value, 4)),
+          .set('value', Util.roundNumber(scorePoint.value, valueDecimalPoints)),
     ).toList();
     this.setState({
       pointsCache: points,
+      pointsBuffer: null,
     });
     this.debouncedUpdatePoints(points, isConcrete);
     if (isConcrete)
@@ -189,6 +203,7 @@ class TransformCardChart extends TerrainComponent<Props>
       initialValue,
       initialPoints: this.state.pointsCache,
       moveSeed: this.state.moveSeed + 1,
+      dragging: true,
     });
   }
 
@@ -221,12 +236,16 @@ class TransformCardChart extends TerrainComponent<Props>
           }
           else
           {
+            const domainMin = this.props.domain.get(0);
+            const domainMax = this.props.domain.get(1);
+            const domainRange = domainMax - domainMin;
+
             min = (index - 1) >= 0 ?
-              Math.max(this.props.domain.get(0), pointValues[index - 1] + .01)
-              : this.props.domain.get(0);
+              Math.max(this.props.domain.get(0), pointValues[index - 1] + domainRange / 1000)
+              : domainMin;
             max = (index + 1) < pointValues.length ?
-              Math.min(this.props.domain.get(1), pointValues[index + 1] - .01)
-              : this.props.domain.get(1);
+              Math.min(this.props.domain.get(1), pointValues[index + 1] - domainRange / 1000)
+              : domainMax;
           }
           scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
         }
@@ -244,12 +263,21 @@ class TransformCardChart extends TerrainComponent<Props>
   public onPointRelease()
   {
     this.debouncedUpdatePoints.flush();
+    this.setState({
+      dragging: false,
+    });
+    if (this.state.pointsBuffer !== null)
+    {
+      this.setState({
+        pointsCache: this.state.pointsBuffer,
+        pointsBuffer: null,
+      });
+    }
   }
 
   public onLineClick(x, y)
   {
     this.setState({
-      lineMoving: true,
       initialLineY: y,
       initialPoints: this.state.pointsCache,
     });
@@ -273,6 +301,10 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public onCreate(value, score)
   {
+    if (score < 0)
+    {
+      score = 0;
+    }
     const { points } = this.props;
     let index = 0;
     while (points.get(index) && points.get(index).value < value)
@@ -293,6 +325,70 @@ class TransformCardChart extends TerrainComponent<Props>
     );
   }
 
+  public changeDomain(domain, override = false)
+  {
+    if (isNaN(domain.get(0)) || isNaN(domain.get(1)) || domain.get(0) >= domain.get(1))
+    {
+      return;
+    }
+    this.props.onRequestDomainChange(domain, override);
+  }
+
+  public onZoom(el, mouse, zoomFactor)
+  {
+    const canvasWidth = el.select('.inner-svg').attr('width');
+    const mousePositionRatio = canvasWidth < 1 ? 0 : mouse[0] / canvasWidth;
+    const currentMin = this.props.domain.get(0);
+    const currentMax = this.props.domain.get(1);
+    const domainWidth = currentMax - currentMin;
+    const spreadDistance = domainWidth / zoomFactor * 0.5;
+    const mouseDomainPosition = currentMin + mousePositionRatio * domainWidth;
+    const newDomain = List([mouseDomainPosition - spreadDistance, mouseDomainPosition + spreadDistance]);
+    this.changeDomain(newDomain);
+  }
+
+  public onZoomIn(el, mouse)
+  {
+    this.onZoom(el, mouse, ZOOM_FACTOR);
+  }
+
+  public onZoomOut(el, mouse)
+  {
+    this.onZoom(el, mouse, 1.0 / ZOOM_FACTOR);
+  }
+
+  public onZoomToFit(el, mouse) // zoom to fit all bars data or all points
+  {
+    if (this.state.pointsCache && this.state.pointsCache.size > 0)
+    {
+      const max = this.state.pointsCache.max((a, b) => a.value - b.value).value;
+      const min = this.state.pointsCache.min((a, b) => a.value - b.value).value;
+      const tailWidth = this.state.pointsCache.size === 1 ? 1 : (max - min) * 0.05;
+      this.changeDomain(List([min - tailWidth, max + tailWidth]), true);
+    }
+  }
+
+  public onZoomToData(el, mouse)
+  {
+    this.props.onRequestZoomToData();
+  }
+
+  public onClearAll(el, mouse)
+  {
+    this.updatePoints(List<ScorePoint>(), true);
+  }
+
+  public getContextOptions()
+  {
+    return {
+      'Zoom in': this.onZoomIn,
+      'Zoom out': this.onZoomOut,
+      'Auto-center on curve': this.onZoomToFit,
+      'Auto-center on data': this.onZoomToData,
+      'Clear all points': this.onClearAll,
+    };
+  }
+
   public componentDidUpdate()
   {
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState());
@@ -309,6 +405,14 @@ class TransformCardChart extends TerrainComponent<Props>
       selected: !!this.state.selectedPointIds.get(scorePoint.id),
     }));
 
+    const spotlights = overrideState.spotlights || this.props.spotlights || [];
+    _.map(spotlights, (spotlight) =>
+    {
+      spotlight.id = spotlight.id.replace(/\.|#/g, '-');
+      spotlight.primaryKey = spotlight.primaryKey.replace(/\.|#/g, '-');
+    },
+    );
+
     const chartState = {
       barsData: (overrideState.bars || this.props.bars).toJS(),
       pointsData: points.toJS(),
@@ -320,7 +424,7 @@ class TransformCardChart extends TerrainComponent<Props>
       onRelease: this.onPointRelease,
       onLineClick: this.onLineClick,
       onLineMove: this.onLineMove,
-      spotlights: overrideState.spotlights || this.props.spotlights || [], // TODO toJS()
+      spotlights, // TODO toJS()
       onSelect: this.onSelect,
       onDelete: this.onDelete,
       onCreate: this.onCreate,
@@ -329,6 +433,8 @@ class TransformCardChart extends TerrainComponent<Props>
       height: 300,
       canEdit: this.props.canEdit,
       inputKey: overrideState.inputKey || this.props.inputKey,
+      colors: this.props.colors,
+      contextOptions: this.getContextOptions(),
     };
 
     return chartState;
@@ -336,6 +442,9 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
+    this.setState({
+      dragging: false,
+    });
     this.debouncedUpdatePoints.flush();
     const el = ReactDOM.findDOMNode(this);
     TransformChart.destroy(el);
@@ -344,10 +453,18 @@ class TransformCardChart extends TerrainComponent<Props>
   // happens on undos/redos
   public componentWillReceiveProps(nextProps)
   {
-    if (nextProps.points !== this.state.pointsCache)
+    if (!this.state.dragging)
     {
+      this.debouncedUpdatePoints.flush();
       this.setState({
         pointsCache: nextProps.points,
+        pointsBuffer: null,
+      });
+    }
+    else
+    {
+      this.setState({
+        pointsBuffer: nextProps.points,
       });
     }
   }

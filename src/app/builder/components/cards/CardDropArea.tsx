@@ -47,12 +47,12 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 // an invisible area covering the upper or lower half of a card, sensing that a card can be dropped
-import * as Immutable from 'immutable';
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDropArea.less';
 const classNames = require('classnames');
+import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import Actions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
@@ -111,8 +111,17 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
 
     if (item['new'])
     {
-      // is a new card
-      Actions.create(targetProps.keyPath, targetIndex, type);
+      if (targetProps.handleCardDrop !== undefined)
+      {
+        const card = BlockUtils.make(
+          AllBackendsMap[targetProps.language].blocks, type, targetProps.handleCardDrop(type),
+        );
+        Actions.create(targetProps.keyPath, targetIndex, type, card);
+      }
+      else
+      {
+        Actions.create(targetProps.keyPath, targetIndex, type);
+      }
     }
     else
     {
@@ -161,6 +170,8 @@ export interface Props
   wrapType?: string;
 
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
+
+  handleCardDrop?: (type: string) => any;
 }
 
 class CardDropArea extends TerrainComponent<Props>
@@ -210,6 +221,7 @@ class CardDropArea extends TerrainComponent<Props>
         keyPath={this.props.keyPath}
         index={this.props.index}
         language={this.props.language}
+        handleCardDrop={this.props.handleCardDrop}
       />
     );
   }

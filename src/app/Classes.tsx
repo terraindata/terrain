@@ -85,7 +85,7 @@ export const _TestClass = (config?: {[key:string]: any}) =>
 */
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 import Util from './util/Util';
 
 export class BaseClass

@@ -48,27 +48,30 @@ import * as http from 'http';
 import * as Koa from 'koa';
 import * as winston from 'winston';
 
-import babelRegister = require('babel-register');
+import cors = require('kcors');
 import session = require('koa-session');
 import serve = require('koa-static-server');
-import cors = require('kcors');
 import srs = require('secure-random-string');
+import v8 = require('v8');
 
 import * as DBUtil from '../database/Util';
 import RouteError from '../error/RouteError';
 import * as Tasty from '../tasty/Tasty';
-import AnalyticsRouter from './AnalyticsRouter';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
+import { databases } from './database/DatabaseRouter';
 import './Logging';
 import Middleware from './Middleware';
+import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
 import * as Schema from './Schema';
+import { users } from './users/UserRouter';
 import Users from './users/Users';
 
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
+export let HA: number;
 
 class App
 {
@@ -94,6 +97,7 @@ class App
   private DB: Tasty.Tasty;
   private app: Koa;
   private config: Config.Config;
+  private heapAvail: number;
 
   constructor(config: Config.Config = CmdLineArgs)
   {
@@ -112,19 +116,17 @@ class App
     this.app = new Koa();
     this.app.proxy = true;
     this.app.keys = [srs({ length: 256 })];
+    this.app.use(async (ctx, next) =>
+    {
+      // tslint:disable-next-line:no-empty
+      ctx.req.setTimeout(0, () => { });
+      await next();
+    });
     this.app.use(cors());
     this.app.use(session(undefined, this.app));
 
-    this.app.use(async (ctx, next) =>
-    {
-      if (ctx.path === '/midway/v1/import/headless')
-      {
-        ctx['disableBodyParser'] = true;
-      }
-      await next();
-    });
     this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
-    this.app.use(Middleware.favicon('../../../src/app/favicon.ico'));
+    this.app.use(Middleware.favicon(__dirname + '/../../../src/app/favicon.ico'));
     this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
     this.app.use(Middleware.passport.initialize());
@@ -133,16 +135,36 @@ class App
     // make sure we insert the RouteErrorHandler first
     this.app.use(RouteError.RouteErrorHandler);
     this.app.use(MidwayRouter.routes());
-    this.app.use(AnalyticsRouter.routes());
     this.app.use(serve({ rootDir: './midway/src/assets', rootPath: '/midway/v1/assets' }));
+    this.app.use(NotFoundRouter.routes());
   }
 
   public async start(): Promise<http.Server>
   {
     // tslint:disable-next-line:no-floating-promises
+
+    // create application schema
     await Schema.createAppSchema(this.config.db as string, this.DB);
+
+    // process configuration options
     await Config.handleConfig(this.config);
-    await Users.initializeDefaultUser();
+
+    // create a default seed user
+    await users.initializeDefaultUser();
+
+    // connect to configured databases
+    const dbs = await databases.select(['id'], {});
+    for (const db of dbs)
+    {
+      if (db.id !== undefined)
+      {
+        await databases.connect({} as any, db.id);
+      }
+    }
+
+    const heapStats: object = v8.getHeapStatistics();
+    this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));
+    HA = this.heapAvail;
 
     winston.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);

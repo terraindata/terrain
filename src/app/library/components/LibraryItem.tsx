@@ -54,7 +54,7 @@ const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../common/Colors';
 import Menu from './../../common/components/Menu';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -67,8 +67,10 @@ export interface Props
   name: string;
   onDuplicate: (id: ID) => void;
   onArchive: (id: ID) => void;
+  onUnarchive: (id: ID) => void;
   canArchive: boolean;
   canDuplicate: boolean;
+  canUnarchive: boolean;
   icon: any;
   to?: string;
   type: string;
@@ -78,11 +80,14 @@ export interface Props
   canEdit: boolean;
   canDrag: boolean;
   canCreate: boolean;
+  canRename: boolean;
 
   onHover: (index: number, type: string, id: ID) => void;
   // ^ called on target
   onDropped: (id: ID, targetType: string, targetItem: any, shiftKey: boolean) => void;
   // ^ called on dragged element
+  onDragFinish: () => void;
+  // ^ called on target even if no drop occurs
 
   draggingItemIndex: number;
   draggingOverIndex: number;
@@ -125,7 +130,17 @@ class LibraryItem extends TerrainComponent<Props>
     List([
       {
         text: 'Duplicate',
-        // icon: '',
+        onClick: this.handleDuplicate,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
+      },
+    ]),
+    duplicateRename:
+    List([
+      {
+        text: 'Duplicate',
         onClick: this.handleDuplicate,
       },
       {
@@ -136,6 +151,17 @@ class LibraryItem extends TerrainComponent<Props>
     archive:
     List([
       {
+        text: 'Archive',
+        onClick: this.handleArchive,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
+      },
+    ]),
+    archiveRename:
+    List([
+      {
         text: 'Rename',
         onClick: this.showTextfield,
       },
@@ -144,11 +170,47 @@ class LibraryItem extends TerrainComponent<Props>
         onClick: this.handleArchive,
       },
     ]),
+    unarchive:
+    List([
+      {
+        text: 'Unarchive',
+        onClick: this.handleUnarchive,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
+      },
+    ]),
+    unarchiveRename:
+    List([
+      {
+        text: 'Rename',
+        onClick: this.showTextfield,
+      },
+      {
+        text: 'Unarchive',
+        onClick: this.handleUnarchive,
+      },
+    ]),
     duplicateArchive:
     List([
       {
         text: 'Duplicate',
-        // icon: '',
+        onClick: this.handleDuplicate,
+      },
+      {
+        text: 'Archive',
+        onClick: this.handleArchive,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
+      },
+    ]),
+    duplicateRenameArchive:
+    List([
+      {
+        text: 'Duplicate',
         onClick: this.handleDuplicate,
       },
       {
@@ -196,6 +258,11 @@ class LibraryItem extends TerrainComponent<Props>
   public handleArchive()
   {
     this.props.onArchive(this.props.id);
+  }
+
+  public handleUnarchive()
+  {
+    this.props.onUnarchive(this.props.id);
   }
 
   public handleKeyDown(event)
@@ -272,13 +339,30 @@ class LibraryItem extends TerrainComponent<Props>
     const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging, isSelected } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
 
-    const { canArchive, canDuplicate } = this.props;
+    const { canArchive, canDuplicate, canUnarchive, canRename } = this.props;
     const menuOptions =
-      (canArchive && canDuplicate) ? this.menuOptions.duplicateArchive :
+      (canArchive && canDuplicate && canRename) ? this.menuOptions.duplicateRenameArchive :
         (
-          canArchive ? this.menuOptions.archive :
+          (canArchive && canDuplicate) ? this.menuOptions.duplicateArchive :
             (
-              canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
+              (canArchive && canRename) ? this.menuOptions.archiveRename :
+                (
+                  (canDuplicate && canRename) ? this.menuOptions.duplicateRename :
+                    (
+                      (canUnarchive && canRename) ? this.menuOptions.unarchiveRename :
+                        (
+                          (canUnarchive ? this.menuOptions.unarchive :
+                            (
+                              (canArchive ? this.menuOptions.archive :
+                                (
+                                  canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
+                                )
+                              )
+                            )
+                          )
+                        )
+                    )
+                )
             )
         );
 
@@ -419,6 +503,7 @@ const source =
 
     endDrag(props, monitor, component)
     {
+      props.onDragFinish();
       if (!monitor.didDrop())
       {
         return;

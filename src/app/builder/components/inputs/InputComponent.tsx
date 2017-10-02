@@ -46,10 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this no-var-requires strict-boolean-expressions
 
-import { List, Map } from 'immutable';
+import { List } from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
 import BuilderTextbox from '../../../common/components/BuilderTextbox';
 import CreateLine from '../../../common/components/CreateLine';
 import DatePicker from '../../../common/components/DatePicker';
@@ -57,17 +56,16 @@ import Dropdown from '../../../common/components/Dropdown';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
-import PanelMixin from '../layout/PanelMixin';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
-import { backgroundColor, borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../common/Colors';
+import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
 const NumberIcon = require('./../../../../images/icon_numberDropdown.svg');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg');
 
-import { Input, InputType } from '../../../../blocks/types/Input';
+import { InputType } from '../../../../blocks/types/Input';
 
 interface Props
 {
@@ -75,6 +73,7 @@ interface Props
   index: number;
   canEdit: boolean;
   onCreateInput: (index: number) => void;
+  language: string;
 }
 
 const TYPE_OPTIONS =
@@ -89,11 +88,11 @@ const colorForInputType = (inputType: InputType): string =>
   switch (inputType)
   {
     case InputType.NUMBER:
-      return Colors().builder.cards.numberClause[0];
+      return Colors().builder.cards.numberClause;
     case InputType.TEXT:
-      return Colors().builder.cards.stringClause[0];
+      return Colors().builder.cards.stringClause;
     case InputType.DATE:
-      return Colors().builder.cards.enumClause[0];
+      return Colors().builder.cards.enumClause;
     default:
       return '#f00';
   }
@@ -123,7 +122,7 @@ class InputComponent extends TerrainComponent<Props>
       {
         date = new Date();
       }
-      const value = Util.formatInputDate(date);
+      const value = Util.formatInputDate(date, this.props.language);
       Actions.change(this.getKeyPath('value'), value);
     }
   }
@@ -157,6 +156,7 @@ class InputComponent extends TerrainComponent<Props>
             date={this.props.input.value}
             onChange={this.changeValue}
             canEdit={true}
+            language={this.props.language}
           />
         </div>
       );
@@ -202,8 +202,9 @@ class InputComponent extends TerrainComponent<Props>
   public render()
   {
     const { input } = this.props;
-    const inputColor = Colors().builder.cards.inputParameter[0];
-    const inputBg = Colors().builder.cards.inputParameter[1];
+    const inputColors = getCardColors('parameter', Colors().builder.cards.inputParameter);
+    const inputColor = inputColors[0];
+    const inputBg = inputColors[1];
 
     return (
       <div className='input' ref='input'>

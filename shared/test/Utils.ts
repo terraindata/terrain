@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
-import * as winston from 'winston';
 
 export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
 {

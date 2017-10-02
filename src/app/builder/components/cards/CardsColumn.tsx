@@ -50,9 +50,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import * as _ from 'underscore';
 import InfoArea from '../../../common/components/InfoArea';
-import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
 import Switch from './../../../common/components/Switch';
@@ -63,9 +61,10 @@ import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import { altStyle, Colors, fontColor } from '../../../common/Colors';
 
-import { Card, Cards } from '../../../../blocks/types/Card';
+import { Cards } from '../../../../blocks/types/Card';
+import { ElasticBlocks } from '../../../../database/elastic/blocks/ElasticBlocks';
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
@@ -79,7 +78,6 @@ export interface Props
   addColumn: (number, string?) => void;
   columnIndex: number;
   cardsAndCodeInSync: boolean;
-  parseError: string;
 
   containerWidth?: number;
   containerHeight?: number;
@@ -187,6 +185,16 @@ class CardsColumn extends TerrainComponent<Props>
     }
   }
 
+  public handleCardDrop(cardType: string)
+  {
+    const theCard = ElasticBlocks[cardType];
+    if (theCard !== undefined)
+    {
+      return theCard['key'];
+    }
+    return '';
+  }
+
   public render()
   {
     const { props } = this;
@@ -199,7 +207,7 @@ class CardsColumn extends TerrainComponent<Props>
         className={classNames({
           'cards-column': true,
           'cards-column-deck-open': canHaveDeck && this.props.deckOpen,
-          'cards-column-has-tql-parse-error': !!this.props.parseError,
+          'cards-column-has-tql-parse-error': !this.props.cardsAndCodeInSync,
         })}
       >
         {
@@ -228,6 +236,7 @@ class CardsColumn extends TerrainComponent<Props>
               heightOffset={12}
               accepts={this.getPossibleCards()}
               language={this.props.language}
+              handleCardDrop={this.handleCardDrop}
             />
             <CardsArea
               cards={cards}
@@ -238,6 +247,7 @@ class CardsColumn extends TerrainComponent<Props>
               columnIndex={this.props.columnIndex}
               noCardTool={true}
               accepts={this.getPossibleCards()}
+              handleCardDrop={this.handleCardDrop}
             />
             {
               !cards.size ? /* "Create your first card." */

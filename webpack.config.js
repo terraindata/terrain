@@ -43,10 +43,9 @@ THE SOFTWARE.
 */
 
 
-let CircularDependencyPlugin = require('circular-dependency-plugin');
-
 var webpack = require("webpack");
 var path = require("path");
+var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports =
 {
@@ -64,6 +63,26 @@ module.exports =
     {
         // it is important that .tsx is before .less, so that it resolves first, so that files that share a name resolve correctly
         extensions: [ ".js", ".tsx", ".jsx", ".ts", ".css", ".less", ".json", ".svg" ],
+        alias: {
+            auth: path.resolve(__dirname, 'src/app/auth'),
+            analytics: path.resolve(__dirname, 'src/app/analytics'),
+            builder: path.resolve(__dirname, 'src/app/builder'),
+            charts: path.resolve(__dirname, 'src/app/charts'),
+            common: path.resolve(__dirname, 'src/app/common'),
+            deploy: path.resolve(__dirname, 'src/app/deploy'),
+            fileimport: path.resolve(__dirname, 'src/app/fileimport'),
+            images: path.resolve(__dirname, 'src/images'),
+            library: path.resolve(__dirname, 'src/app/library'),
+            manual: path.resolve(__dirname, 'src/app/manual'),
+            roles: path.resolve(__dirname, 'src/app/roles'),
+            schema: path.resolve(__dirname, 'src/app/schema'),
+            shared: path.resolve(__dirname, 'shared'),
+            store: path.resolve(__dirname, 'src/app/store'),
+            tql: path.resolve(__dirname, 'src/app/tql'),
+            users: path.resolve(__dirname, 'src/app/users'),
+            util: path.resolve(__dirname, 'src/app/util'),
+            x: path.resolve(__dirname, 'src/app/x'),
+        },
     },
 
     module:
@@ -73,19 +92,23 @@ module.exports =
             // note: this first loader string gets updated in webpack.config.prod.js
             //  keep it first in this list
             {
-                test: /\.(ts|tsx)$/,
-                exclude: [/midway/, /node_modules/],
+                test: /\.ts(x?)$/,
+                exclude: [/midway/, /analytics.js/, /node_modules/],
                 loader:
-                    "babel-loader?presets[]=react&presets[]=latest!ts-loader?"
+                    "babel-loader!thread-loader!ts-loader?happyPackMode=true"
                     + JSON.stringify({
                         compilerOptions: {
                         },
                     }),
             },
+            {
+                test: /\.js(x?)$/,
+                exclude: [/midway/, /analytics.js/, /node_modules/],
+                loader: "babel-loader!thread-loader"
+            },
             { test: /\.css$/, exclude: /midway/, loader: "style-loader!css-loader" },
             { test: /\.less$/, exclude: /midway/, loader: "style-loader!css-loader!less-loader?strictMath&noIeCompat" }, /* Note: strictMath enabled; noIeCompat also */
-            { test: /\.jsx?$/, exclude: /node_modules/, loader: "babel-loader?presets[]=react&presets[]=latest" },
-            { test: /\.woff(2)?$/,   loader: "url-loader?limit=10000&mimetype=application/font-woff" },
+            { test: /\.woff(2?)$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
             { test: /\.ttf$/, loader: "file-loader" },
             { test: /\.eot$/, loader: "file-loader" },
             { test: /\.jpg$/, loader: "file-loader" },
@@ -93,10 +116,10 @@ module.exports =
             { test: /\.png$/, loader: "url-loader?limit=4000000" },
             { test: require.resolve("jquery"), use: [{ loader: "expose-loader", options: "$" }]},
             {
-		      test: /\.svg(\?name=[a-zA-Z]*)*$/, loader: "babel-loader?presets[]=react&presets[]=latest!svg-react-loader" +
-		              // removes data-name attributes
-		              "!string-replace-loader?search=%20data-name%3D%22%5B%5Cw%5Cs_-%5D*%22&replace=&flags=ig",
-	        },
+                test: /\.svg(\?name=[a-zA-Z]*)*$/,
+                exclude: [/midway/, /node_modules/],
+                loader: "svg-react-loader",
+            },
             { test: /\.txt$/, exclude: /midway/, loader: "raw-loader" },
         ],
     },
@@ -104,19 +127,9 @@ module.exports =
     plugins:
     [
         new webpack.DefinePlugin({
-            OLD_MIDWAY_HOST: "'//" + process.env.OLD_MIDWAY_HOST + ":40080'",
-            TDB_HOST: "'//" + process.env.TDB_HOST + ":7344'",
-            MIDWAY_HOST: "'http://" + process.env.MIDWAY_HOST + "'",
+            MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || "localhost:3000") + "'",
             DEV: true,
         }),
-        new webpack.optimize.AggressiveMergingPlugin(),
-	
-	// You can enable this plugin to detect for circular dependencies
-	// new CircularDependencyPlugin({
-	//	// exclude detection of files based on a RegExp 
-	//	exclude: /a\.js|node_modules/,
-	//	// add errors to webpack instead of warnings 
-	//	failOnError: false
-	//    })
+        new ForkTsCheckerWebpackPlugin(),
     ],
 };

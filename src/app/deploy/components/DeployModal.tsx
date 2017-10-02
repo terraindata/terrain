@@ -47,18 +47,16 @@ THE SOFTWARE.
 // tslint:disable:no-empty-interface strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import TerrainComponent from './../../common/components/TerrainComponent';
 import './DeployModal.less';
 
-import BackendInstance from '../../../database/types/BackendInstance';
+import Modal from 'common/components/Modal';
+import LibraryActions from 'library/data/LibraryActions';
+import LibraryStore from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
+import TerrainStore from 'store/TerrainStore';
 import { ItemStatus } from '../../../items/types/Item';
-import Modal from '../../common/components/Modal';
-import LibraryActions from '../../library/data/LibraryActions';
-import LibraryStore from '../../library/data/LibraryStore';
-import * as LibraryTypes from '../../library/LibraryTypes';
 import TQLEditor from '../../tql/components/TQLEditor';
 import DeployModalColumn from './DeployModalColumn';
 
@@ -77,11 +75,15 @@ class DeployModal extends TerrainComponent<Props>
     changingStatusOf: LibraryTypes.Variant;
     changingStatusTo: ItemStatus;
     defaultChecked: boolean;
+    errorModalMessage: string;
+    showErrorModal: boolean;
   } = {
     changingStatus: false,
     changingStatusOf: null,
     changingStatusTo: null,
     defaultChecked: false,
+    errorModalMessage: '',
+    showErrorModal: false,
   };
 
   public componentDidMount()
@@ -110,7 +112,7 @@ class DeployModal extends TerrainComponent<Props>
 
   public handleClose()
   {
-    LibraryActions.variants.status(null, null);
+    TerrainStore.dispatch(LibraryActions.variants.status(null, null));
   }
 
   public handleDeploy()
@@ -121,18 +123,22 @@ class DeployModal extends TerrainComponent<Props>
     const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
     const id: string = group.name + '.' + algorithm.name + '.' + variant.name;
+    const { changingStatusTo } = this.state;
 
-    if (this.state.changingStatusTo === ItemStatus.Live && variant.status !== 'LIVE')
+    if ((changingStatusTo === ItemStatus.Live && variant.status !== 'LIVE')
+      || (changingStatusTo === ItemStatus.Default && variant.status !== 'DEFAULT'))
     {
       const tql = variant ? variant.query.tql : '';
       const parser: ESJSONParser = new ESJSONParser(tql);
       const valueInfo: ESValueInfo = parser.getValueInfo();
       if (parser.getErrors().length > 0)
       {
-        // TODO: handle and display error.
+        this.setState({
+          errorModalMessage: 'Error changing status of ' + this.state.changingStatusOf.name + ' to ' + changingStatusTo,
+        });
+        this.toggleErrorModal();
         return;
       }
-
       const template = EQLTemplateGenerator.generate(valueInfo);
       const body: object = {
         id,
@@ -140,15 +146,16 @@ class DeployModal extends TerrainComponent<Props>
           template,
         },
       };
-      LibraryActions.variants.deploy(variant, 'putTemplate', body, this.state.changingStatusTo);
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'putTemplate', body, changingStatusTo));
     }
-    else if (this.state.changingStatusTo !== ItemStatus.Live && variant.status === 'LIVE')
+    else if ((changingStatusTo !== ItemStatus.Live && variant.status === 'LIVE')
+      || (changingStatusTo !== ItemStatus.Default && variant.status === 'DEFAULT'))
     {
       // undeploy this variant
       const body: object = {
         id,
       };
-      LibraryActions.variants.deploy(variant, 'deleteTemplate', body, this.state.changingStatusTo);
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'deleteTemplate', body, changingStatusTo));
     }
   }
 
@@ -158,7 +165,6 @@ class DeployModal extends TerrainComponent<Props>
     const defaultTql =
       (this.state.defaultChecked && defaultVariant) ? defaultVariant.query.tql : null;
     const tql = variant ? variant.query.tql : '';
-
     return (
       <div className='deploy-modal-tql'>
         <div className='deploy-modal-tql-wrapper'>
@@ -167,10 +173,18 @@ class DeployModal extends TerrainComponent<Props>
             tql={tql}
             isDiff={this.state.defaultChecked && defaultTql !== null}
             diffTql={defaultTql}
+            placeholder={'Your algorithm is blank'}
           />
         </div>
       </div>
     );
+  }
+
+  public toggleErrorModal()
+  {
+    this.setState({
+      showErrorModal: !this.state.showErrorModal,
+    });
   }
 
   public handleDefaultCheckedChange(defaultChecked: boolean)
@@ -191,7 +205,11 @@ class DeployModal extends TerrainComponent<Props>
     const name = (changingStatusOf && changingStatusOf.name);
 
     let title = 'Deploy "' + name + '" to Live';
-    if (changingStatusTo !== ItemStatus.Live)
+    if (changingStatusTo === ItemStatus.Default)
+    {
+      title = 'Make "' + name + '" Default';
+    }
+    else if (changingStatusTo !== ItemStatus.Live)
     {
       title = 'Remove "' + name + '" from Live';
     }
@@ -206,35 +224,45 @@ class DeployModal extends TerrainComponent<Props>
     }
 
     return (
-      <Modal
-        open={this.state.changingStatus}
-        message={null}
-        onClose={this.handleClose}
-        title={title}
-        confirm={false}
-        fill={true}
-      >
-        {
-          changingStatusOf &&
-          <div
-            className={classNames({
-              'deploy-modal': true,
-            })}
-          >
-            {
-              this.renderTQLColumn(defaultVariant)
-            }
-            <DeployModalColumn
-              variant={changingStatusOf}
-              status={changingStatusTo}
-              onDeploy={this.handleDeploy}
-              defaultChecked={this.state.defaultChecked}
-              defaultVariant={defaultVariant}
-              onDefaultCheckedChange={this.handleDefaultCheckedChange}
-            />
-          </div>
-        }
-      </Modal>
+      <div>
+        <Modal
+          open={this.state.changingStatus}
+          message={null}
+          onClose={this.handleClose}
+          title={title}
+          confirm={false}
+          fill={true}
+          className={'deploy-modal-wrapper'}
+        >
+          {
+            changingStatusOf &&
+            <div
+              className={classNames({
+                'deploy-modal': true,
+              })}
+            >
+              {
+                this.renderTQLColumn(defaultVariant)
+              }
+              <DeployModalColumn
+                variant={changingStatusOf}
+                status={changingStatusTo}
+                onDeploy={this.handleDeploy}
+                defaultChecked={this.state.defaultChecked}
+                defaultVariant={defaultVariant}
+                onDefaultCheckedChange={this.handleDefaultCheckedChange}
+                onCancelDeploy={this.handleClose}
+              />
+            </div>
+          }
+          <Modal
+            message={this.state.errorModalMessage}
+            onClose={this.toggleErrorModal}
+            open={this.state.showErrorModal}
+            error={true}
+          />
+        </Modal>
+      </div>
     );
   }
 }

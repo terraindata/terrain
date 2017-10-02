@@ -47,15 +47,14 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-unused-expression member-access max-line-length
 
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { Card, CardConfig } from '../../../../blocks/types/Card';
+import { CardConfig } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import { backgroundColor, Colors } from '../../../common/Colors';
 import CreateLine from '../../../common/components/CreateLine';
-import FadeInOut from '../../../common/components/FadeInOut';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
@@ -90,6 +89,8 @@ export interface Props
     type: string;
   }>; // can override the options displayed
   overrideClick?: (index: number) => void; // override the click handler
+
+  handleCardDrop?: (cardType: string) => any;
 }
 
 @Radium
@@ -224,7 +225,7 @@ class CreateCardTool extends TerrainComponent<Props>
 
   public renderPlaceholder()
   {
-    if (this.props.hidePlaceholder || this.props.cannotClose) // || this.props.open)
+    if (this.props.hidePlaceholder || (this.props.cannotClose && this.props.open))
     {
       return null;
     }
@@ -307,7 +308,6 @@ class CreateCardTool extends TerrainComponent<Props>
     }
 
     const cardTypeList = this.getCardTypeList();
-
     return (
       <div
         className={classes}
@@ -325,9 +325,10 @@ class CreateCardTool extends TerrainComponent<Props>
         <CardDropArea
           index={this.props.index}
           keyPath={this.props.keyPath}
-          accepts={this.props.accepts}
+          accepts={this.getCardTypeList()}
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
+          handleCardDrop={this.props.handleCardDrop}
         />
         <KeyboardFocus
           onFocus={this.handleFocus}

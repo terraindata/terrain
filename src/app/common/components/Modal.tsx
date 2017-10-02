@@ -47,12 +47,15 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as classNames from 'classnames';
+import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import FadeInOut from './FadeInOut';
 import './Modal.less';
+
+const Color = require('color');
 
 export interface Props
 {
@@ -66,6 +69,7 @@ export interface Props
   onConfirm?: () => void;
   onClose: () => void;
   children?: any;
+  childrenMessage?: string;
   thirdButtonText?: string;
   onThirdButton?: () => void;
   pre?: boolean;
@@ -74,12 +78,22 @@ export interface Props
   initialTextboxValue?: string;
   textboxPlaceholderValue?: string;
   onTextboxValueChange?: (newValue: string) => void;
+  allowOverflow?: boolean;
+  closeOnConfirm?: boolean;
+  className?: string;
+  noFooterPadding?: boolean; // TODO: find better way
 }
 
+@Radium
 class Modal extends TerrainComponent<Props>
 {
   public closeModalSuccess()
   {
+    if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
+    {
+      this.props.onConfirm ? this.props.onConfirm() : null;
+      return;
+    }
     this.props.onClose();
     this.props.onConfirm ? this.props.onConfirm() : null;
   }
@@ -94,9 +108,17 @@ class Modal extends TerrainComponent<Props>
 
   public render()
   {
-    const defaultTitle = this.props.error ? 'Alert' : 'Please Confirm';
+    const defaultTitle = this.props.error ? 'Error' : 'Please Confirm';
 
     const msgTag = this.props.pre ? <pre /> : <div />;
+
+    const messageStyle = fontColor(Colors().altText2);
+    const buttonTextColor = Color(Colors().altText2);
+    const buttonStyle = [
+      fontColor(Colors().altText3, buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
+      backgroundColor(Colors().altBg1),
+      borderColor(Colors().altBg2),
+    ];
 
     return (
       <FadeInOut
@@ -107,21 +129,39 @@ class Modal extends TerrainComponent<Props>
             contentLabel={''}
             isOpen={true}
             overlayClassName='modal-overlay'
+            style={
+              {
+                overlay: backgroundColor(Colors().fadedOutBg),
+                content: getStyle('boxShadow', `0px 0px 5px 2px ${Colors().boxShadow}`),
+              }
+            }
             className={classNames({
               'modal-content': true,
               'modal-content-fill': this.props.fill,
+              'modal-content-allow-overflow': this.props.allowOverflow,
+              [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
             })}
           >
             <div
-              className='modal-dialog'
-              style={MODAL_BODY_STYLE}
+              className={classNames({
+                'modal-dialog': true,
+                'modal-dialog-no-footer': !this.props.confirm,
+                'modal-dialog-no-footer-padding': this.props.noFooterPadding,
+              })}
+              style={[
+                fontColor(Colors().altText1),
+                backgroundColor(Colors().altBg1),
+              ]}
             >
               <div
                 className={classNames({
                   'modal-title': true,
                   'modal-title-error': this.props.error,
                 })}
-                style={MODAL_HEADER_FOOTER_STYLE}
+                style={[
+                  fontColor(Colors().text1),
+                  this.props.error ? backgroundColor(Colors().error) : backgroundColor(Colors().bg3),
+                ]}
               >
                 {
                   this.props.error ?
@@ -153,8 +193,8 @@ class Modal extends TerrainComponent<Props>
                   {
                     className: classNames({
                       'modal-message': true,
-                      'modal-message-error': this.props.error,
                     }),
+                    style: messageStyle,
                     children: this.props.message,
                   },
                 )
@@ -162,6 +202,10 @@ class Modal extends TerrainComponent<Props>
               {
                 this.props.showTextbox &&
                 <input
+                  style={[
+                    fontColor(Colors().altText2),
+                    backgroundColor(Colors().altBg1),
+                  ]}
                   type='text'
                   className='standard-input'
                   placeholder={this.props.textboxPlaceholderValue}
@@ -171,19 +215,37 @@ class Modal extends TerrainComponent<Props>
                 />
               }
               {
+                this.props.childrenMessage &&
+                React.cloneElement(
+                  msgTag,
+                  {
+                    className: classNames({
+                      'modal-message': true,
+                    }),
+                    style: messageStyle,
+                    children: this.props.childrenMessage,
+                  },
+                )
+              }
+              {
                 this.props.children
               }
               {
                 this.props.confirm &&
                 <div
                   className='modal-buttons'
-                  style={MODAL_HEADER_FOOTER_STYLE}
+                  style={[
+                    fontColor(Colors().altText1),
+                    backgroundColor(Colors().altBg2),
+                  ]}
                 >
                   {
                     this.props.thirdButtonText &&
                     <div
                       className='button modal-third-button'
                       onClick={this.props.onThirdButton}
+                      style={buttonStyle}
+                      key='modal-third-button'
                     >
                       {
                         this.props.thirdButtonText
@@ -195,6 +257,12 @@ class Modal extends TerrainComponent<Props>
                       <div
                         className='button modal-confirm-button'
                         onClick={this.closeModalSuccess}
+                        style={[
+                          backgroundColor(Colors().active, Colors().activeHover),
+                          borderColor(Colors().active, Colors().activeHover),
+                          fontColor(Colors().activeText),
+                        ]}
+                        key='modal-confirm-button'
                       >
                         {
                           this.props.confirmButtonText ? this.props.confirmButtonText : 'Continue'
@@ -205,7 +273,9 @@ class Modal extends TerrainComponent<Props>
                   }
                   <div
                     className='button modal-close-button'
+                    style={buttonStyle}
                     onClick={this.props.onClose}
+                    key='modal-close-button'
                   >
                     Cancel
                     </div>
@@ -222,19 +292,5 @@ class Modal extends TerrainComponent<Props>
 const ReactModal = require('react-modal');
 const InfoIcon = require('./../../../images/icon_info.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
-
-const MODAL_BODY_STYLE = {
-  fontColor: Colors().altText1,
-  backgroundColor: Colors().altBg1,
-};
-
-const MODAL_HEADER_FOOTER_STYLE = {
-  fontColor: Colors().altText1,
-  backgroundColor: Colors().altBg2,
-};
-
-const MODAL_OVERLAY_STYLE = {
-  backgroundColor: Colors().fadedOutBg,
-};
 
 export default Modal;

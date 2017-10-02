@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires no-shadowed-variable strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 const Radium = require('radium');
 import * as React from 'react';
 import FadeInOut from '../../common/components/FadeInOut';
@@ -141,6 +141,7 @@ class SchemaSearchResults extends TerrainComponent<Props>
     const items = this.state.items.get(stateKey);
     const renderItems: SchemaBaseClass[] = [];
     let couldShowMore = false; // are there additional entries to show?
+    let couldShowLess = false; // do we have more than the minimum number of entries to show?
 
     while (renderItems.length <= max && index < items.size && !couldShowMore)
     {
@@ -158,6 +159,11 @@ class SchemaSearchResults extends TerrainComponent<Props>
         }
       }
       index++;
+    }
+
+    if (max > INIT_SHOWING_COUNT.get(stateKey))
+    {
+      couldShowLess = true;
     }
 
     const showSection = !!renderItems.length;
@@ -193,17 +199,26 @@ class SchemaSearchResults extends TerrainComponent<Props>
             )
           }
 
-          <FadeInOut
-            open={couldShowMore}
-          >
+          {
+            couldShowMore &&
             <div
-              style={Styles.link}
+              style={SchemaTreeStyles.link}
               onClick={this._fn(this.handleShowMore, stateKey)}
               key={'show-more-' + stateKey}
             >
               Show More
             </div>
-          </FadeInOut>
+          }
+          {
+            couldShowLess &&
+            <div
+              style={SchemaTreeStyles.link}
+              onClick={this._fn(this.handleShowLess, stateKey)}
+              key={'show-less-' + stateKey}
+            >
+              Show Less
+            </div>
+          }
         </div>
       </FadeInOut>
     );
@@ -216,6 +231,18 @@ class SchemaSearchResults extends TerrainComponent<Props>
     this.setState({
       showingCount,
     });
+  }
+
+  public handleShowLess(stateKey: string)
+  {
+    let { showingCount } = this.state;
+    if (showingCount.get(stateKey) - SHOW_MORE_INCREMENT >= INIT_SHOWING_COUNT.get(stateKey))
+    {
+      showingCount = showingCount.set(stateKey, showingCount.get(stateKey) - SHOW_MORE_INCREMENT);
+      this.setState({
+        showingCount,
+      });
+    }
   }
 
   public render()
@@ -247,20 +274,20 @@ class SchemaSearchResults extends TerrainComponent<Props>
           }
 
           {
-            this.renderSection('databases', 'database', 'Databases')
+            this.renderSection('databases', 'database', 'Indices')
           }
 
           {
-            this.renderSection('tables', 'table', 'Tables')
+            this.renderSection('tables', 'table', 'Types')
           }
 
           {
-            this.renderSection('columns', 'column', 'Columns')
+            this.renderSection('columns', 'column', 'Fields')
           }
 
-          {
+          {/*
             this.renderSection('indexes', 'index', 'Indexes')
-          }
+          */}
         </div>
       </div>
     );

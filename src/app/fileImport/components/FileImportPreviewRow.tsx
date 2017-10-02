@@ -44,19 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
-import Util from '../../util/Util';
+import { backgroundColor, Colors } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './FileImportPreviewRow.less';
 
 export interface Props
 {
   items: List<string>;
+  columnsToInclude?: List<boolean>;
 }
 
 @Radium
@@ -64,23 +61,39 @@ class FileImportPreviewRow extends TerrainComponent<Props>
 {
   public render()
   {
+    const { columnsToInclude } = this.props;
     return (
       <div
-        className='fi-preview-row'
+        className='flex-container fi-preview-row'
       >
         {
           this.props.items.map((value, key) =>
             <div
               key={key}
-              className='fi-preview-row-cell'
-              style={backgroundColor(Colors().fileimport.preview.cell)}
+              className='fi-preview-row-cell-wrapper'
             >
               <div
-                className='fi-preview-row-cell-text'
+                className={classNames({
+                  'fi-preview-row-cell': true,
+                  'fi-preview-row-cell-disabled': columnsToInclude !== undefined && !columnsToInclude.get(key),
+                })}
+                style={{
+                  background: Colors().bg2,
+                  color: Colors().text1,
+                }}
               >
-                {
-                  value
-                }
+                <div
+                  className='fi-preview-row-cell-text'
+                >
+                  {
+                    value
+                  }
+                </div>
+                <div
+                  className='fi-preview-row-disabled-veil'
+                  style={backgroundColor(Colors().bg3)}
+                >
+                </div>
               </div>
             </div>,
           )

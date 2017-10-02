@@ -56,15 +56,16 @@ import * as UserTypes from '../../users/UserTypes';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import Actions from './../data/LibraryActions';
 import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 
+import { tooltip } from 'common/components/tooltip/Tooltips';
 const GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
 type Group = LibraryTypes.Group;
+type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
@@ -73,6 +74,8 @@ export interface Props
   groupsOrder: Immutable.List<ID>;
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
+  groupActions: any;
+  variants: Immutable.Map<ID, Variant>;
 }
 
 class GroupsColumn extends TerrainComponent<Props>
@@ -113,13 +116,19 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public handleArchive(id: ID)
   {
-    Actions.groups.change(this.props.groups.find((g) => g.id === id)
+    this.props.groupActions.change(this.props.groups.find((g) => g.id === id)
       .set('status', ItemStatus.Archive) as Group);
+  }
+
+  public handleUnarchive(id: ID)
+  {
+    this.props.groupActions.change(this.props.groups.find((g) => g.id === id)
+      .set('status', ItemStatus.Build) as Group);
   }
 
   public handleNameChange(id: ID, name: string)
   {
-    Actions.groups.change(
+    this.props.groupActions.change(
       this.props.groups.get(id)
         .set('name', name) as Group,
     );
@@ -127,7 +136,7 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public handleCreate()
   {
-    Actions.groups.create();
+    this.props.groupActions.create();
   }
 
   public handleHover(index: number, type: string, id: ID)
@@ -140,11 +149,16 @@ class GroupsColumn extends TerrainComponent<Props>
         lastMoved: index + ' ' + itemIndex,
       });
       const target = this.props.groups.get(this.props.groupsOrder.get(index));
-      Actions.groups.move(this.props.groups.get(id).set('status', target.status) as Group, index);
+      this.props.groupActions.move(this.props.groups.get(id).set('status', target.status) as Group, index);
     }
   }
 
   public handleDropped(id: ID, targetType: string, targetItem: any, shifted: boolean)
+  {
+
+  }
+
+  public handleDragFinish()
   {
 
   }
@@ -159,6 +173,19 @@ class GroupsColumn extends TerrainComponent<Props>
     const canCreate = (me && groupRoles && groupRoles.getIn([me.id, 'admin']));
     const canEdit = canCreate || (me && me.isSuperUser);
     const canDrag = false;
+
+    let canRename = true;
+    canRename = this.props.variants.every(
+      (v: Variant) =>
+      {
+        if (id === v.groupId)
+        {
+          return !(v.status === ItemStatus.Live || v.status === ItemStatus.Default);
+        }
+        return true;
+      },
+
+    );
 
     // onDuplicate={this.handleDuplicate}
     return (
@@ -176,11 +203,15 @@ class GroupsColumn extends TerrainComponent<Props>
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
+        onDragFinish={this.handleDragFinish}
         item={group}
         canEdit={canEdit || canDrag}
         canDrag={canDrag}
-        canArchive={canEdit || canDrag}
+        canArchive={(canEdit || canDrag) && group.status !== ItemStatus.Archive}
         canDuplicate={false}
+        canUnarchive={group.status === ItemStatus.Archive}
+        canRename={canRename}
+        onUnarchive={this.handleUnarchive}
         canCreate={canCreate}
         isSelected={+group.id === +params.groupId}
         isFocused={this.props.isFocused}
@@ -225,7 +256,7 @@ class GroupsColumn extends TerrainComponent<Props>
     const status = ItemStatus[statusString];
     if (g.status !== status)
     {
-      Actions.groups.change(g.set('status', status) as Group);
+      this.props.groupActions.change(g.set('status', status) as Group);
     }
   }
 
@@ -249,11 +280,14 @@ class GroupsColumn extends TerrainComponent<Props>
           ids.size === 0 && <div className='library-category-none'>None</div>
         }
         {
-          status === ItemStatus.Build && canCreate &&
-          <CreateLine
-            onClick={this.handleCreate}
-            open={false}
-          />
+          status === ItemStatus.Build && !!canCreate &&
+          tooltip(
+            <CreateLine onClick={this.handleCreate} open={false} />,
+            {
+              title: 'Create a New Group',
+              position: 'top',
+            },
+          )
         }
       </LibraryItemCategory>
     );

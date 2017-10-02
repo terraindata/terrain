@@ -63,6 +63,7 @@ export interface Props
 {
   fullPage: boolean;
   showSearch: boolean;
+  showResults: boolean;
   search?: string;
 }
 
@@ -172,7 +173,7 @@ class SchemaView extends TerrainComponent<Props>
   public render()
   {
     const search = this.props.search || this.state.search;
-    const { showSearch } = this.props;
+    const { showSearch, showResults } = this.props;
 
     return (
       <div
@@ -185,6 +186,8 @@ class SchemaView extends TerrainComponent<Props>
             {
               padding: Styles.margin,
               overflow: 'auto',
+              width: !showResults ? '100%' : this.props.fullPage ? SCHEMA_STYLE_FULL_PAGE.width : SCHEMA_STYLE_COLUMN.width,
+              height: !showResults ? '100%' : this.props.fullPage ? SCHEMA_STYLE_FULL_PAGE.height : SCHEMA_STYLE_COLUMN.height,
             } as any,
           ]}
         >
@@ -236,13 +239,18 @@ class SchemaView extends TerrainComponent<Props>
           </div>
         </div>
 
-        <div
-          style={[
-            SECTION_STYLE,
-            this.props.fullPage ? RESULTS_STYLE_FULL_PAGE : RESULTS_STYLE_COLUMN,
-          ]}
-        >
-        </div>
+        {showResults &&
+          <div
+            style={[
+              SECTION_STYLE,
+              this.props.fullPage ? RESULTS_STYLE_FULL_PAGE : RESULTS_STYLE_COLUMN,
+            ]}
+          >
+            <SchemaResults
+              servers={this.state.servers}
+            />
+          </div>
+        }
       </div>
     );
   }

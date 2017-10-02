@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as React from 'react';
-
 import ESJSONParser from '../parser/ESJSONParser';
 
 export function parseESValue(value: any): any

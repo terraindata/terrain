@@ -71,27 +71,6 @@ export interface UserConfig
 
 export class Users
 {
-  public static initializeDefaultUser()
-  {
-    // tslint:disable-next-line
-    (new Users()).create({
-      accessToken: 'ImALuser',
-      email: 'luser@terraindata.com',
-      isSuperUser: 1,
-      name: 'Terrain Admin',
-      password: 'secret',
-      isDisabled: 0,
-      timezone: '',
-    })
-      .catch((error: string) =>
-      {
-        if (error !== 'User with email luser@terraindata.com already exists.')
-        {
-          throw new Error('Problem creating default user: ' + error);
-        }
-      });
-  }
-
   private readonly saltRounds = 10;
   private userTable: Tasty.Table;
 
@@ -114,37 +93,58 @@ export class Users
     );
   }
 
-  public async create(user: UserConfig): Promise<UserConfig>
+  public async initializeDefaultUser(): Promise<void>
   {
-    return new Promise<UserConfig>(async (resolve, reject) =>
+    const userExists = await this.select(['id'], { email: 'admin@terraindata.com' });
+    if (userExists.length === 0)
     {
-      if (user.email === undefined || user.password === undefined)
+      try
       {
-        return reject('Require both email and password for user creation');
+        await this.create({
+          accessToken: 'ImAnAdmin',
+          email: 'admin@terraindata.com',
+          isSuperUser: 1,
+          name: 'Terrain Admin',
+          password: 'secret',
+          isDisabled: 0,
+          timezone: '',
+        });
       }
-
-      const existingUsers = await this.select([], { email: user.email });
-      if (existingUsers.length !== 0)
+      catch (e)
       {
-        return reject('User with email ' + String(user.email) + ' already exists.');
+        throw new Error('Problem creating default user: ' + String(e));
       }
-
-      const newUser: UserConfig =
-        {
-          accessToken: '',
-          email: user.email,
-          isDisabled: user.isDisabled === undefined ? 0 : user.isDisabled,
-          isSuperUser: user.isSuperUser === undefined ? 0 : user.isSuperUser,
-          name: user.name === undefined ? '' : user.name,
-          password: await this.hashPassword(user.password),
-          timezone: user.timezone === undefined ? '' : user.timezone,
-          meta: user.meta === undefined ? '{}' : user.meta,
-        };
-      resolve(await this.upsert(newUser));
-    });
+    }
   }
 
-  public async update(isSuperUser: boolean, user: UserConfig): Promise<UserConfig>
+  public async create(user: UserConfig): Promise<UserConfig>
+  {
+    if (user.email === undefined || user.password === undefined)
+    {
+      throw new Error('Require both email and password for user creation');
+    }
+
+    const existingUsers = await this.select(['id'], { email: user.email });
+    if (existingUsers.length !== 0)
+    {
+      throw new Error('User with email ' + String(user.email) + ' already exists.');
+    }
+
+    const newUser: UserConfig =
+      {
+        accessToken: user.accessToken === undefined ? '' : user.accessToken,
+        email: user.email,
+        isDisabled: user.isDisabled === undefined ? 0 : user.isDisabled,
+        isSuperUser: user.isSuperUser === undefined ? 0 : user.isSuperUser,
+        name: user.name === undefined ? '' : user.name,
+        password: await this.hashPassword(user.password),
+        timezone: user.timezone === undefined ? '' : user.timezone,
+        meta: user.meta === undefined ? '{}' : user.meta,
+      };
+    return this.upsert(newUser);
+  }
+
+  public async update(user: UserConfig): Promise<UserConfig>
   {
     return new Promise<UserConfig>(async (resolve, reject) =>
     {
@@ -155,10 +155,6 @@ export class Users
       }
 
       const oldUser = results[0];
-      if (!isSuperUser && (user.isDisabled !== undefined || user.isSuperUser !== undefined))
-      {
-        return reject('Only superuser can change user privileges or status');
-      }
 
       // authenticate if email change or password change
       if (user.email !== oldUser.email || user.oldPassword !== undefined)
@@ -168,19 +164,15 @@ export class Users
           return reject('Must provide password if updating email or password');
         }
 
+        const unhashedPassword: string = user.oldPassword === undefined ? user.password : user.oldPassword;
         user.password = await this.hashPassword(user.password);
-        let hashedPassword: string;
+
         if (user.oldPassword !== undefined)
         {
           user.oldPassword = await this.hashPassword(user.oldPassword);
-          hashedPassword = user.oldPassword;
-        }
-        else
-        {
-          hashedPassword = user.password;
         }
 
-        const passwordsMatch: boolean = await this.comparePassword(hashedPassword, oldUser.password);
+        const passwordsMatch: boolean = await this.comparePassword(unhashedPassword, oldUser.password);
         if (!passwordsMatch)
         {
           return reject('Password does not match');

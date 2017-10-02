@@ -46,8 +46,6 @@ THE SOFTWARE.
 
 import ESJSONParser from '../parser/ESJSONParser';
 import ESJSONType from '../parser/ESJSONType';
-import ESParserToken from '../parser/ESParserToken';
-import ESParserValueInfo from '../parser/ESValueInfo';
 import { ESParserTokenizer, FlaggedToken } from './ESParserTokenizer';
 
 function assertUnreachable(param: never): never

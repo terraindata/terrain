@@ -46,16 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-console
 
-import { List, Map } from 'immutable';
-import * as _ from 'underscore';
+import { List } from 'immutable';
+import * as _ from 'lodash';
 
-import * as CommonElastic from '../../../../shared/database/elastic/syntax/CommonElastic';
-import AjaxM1 from '../../../app/util/AjaxM1'; // TODO change / remove
+// TODO change / remove
 import Query from '../../../items/types/Query';
 
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
-import { Card, Cards, CardString } from '../../../blocks/types/Card';
+import { Card } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
@@ -72,19 +71,17 @@ export default function ElasticToCards(
   {
     // TODO: we may want to show some error messages on the cards.
     return query
-      .set('cardsAndCodeInSync', false)
-      .set('parseError', true);
+      .set('cardsAndCodeInSync', false);
   } else
   {
     try
     {
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      let cards = parseCardFromValueInfo(rootValueInfo)['cards'];
-      cards = BlockUtils.reconcileCards(query.cards, cards);
+      const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'root');
+      const cards = BlockUtils.reconcileCards(query.cards, List([rootCard]));
       return query
         .set('cards', cards)
-        .set('cardsAndCodeInSync', true)
-        .set('parseError', false);
+        .set('cardsAndCodeInSync', true);
     }
     catch (e)
     {
@@ -98,7 +95,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
 {
   if (!valueInfo)
   {
-    return make(Blocks, 'eqlnull');
+    return make(Blocks, 'eqlnull', null, true);
   }
 
   const valueMap: { value?: any, cards?: List<Card> } = {};
@@ -118,12 +115,15 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       Blocks, 'elasticFilter',
       {
         filters: List(filters),
-      });
+      }, true);
   }
   else if (isScoreCard(valueInfo))
   {
+    const _scriptValueInfo = valueInfo.objectChildren._script.propertyValue;
+    const scriptValueInfo = _scriptValueInfo && _scriptValueInfo.objectChildren.script.propertyValue;
+
     const weights = [];
-    for (const factor of valueInfo.value.params.factors)
+    for (const factor of scriptValueInfo.value.params.factors)
     {
       const weight = parseElasticWeightBlock(factor);
       if (weight)
@@ -131,11 +131,33 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         weights.push(weight);
       }
     }
+
+    let sortOrder;
+    if (_scriptValueInfo && _scriptValueInfo.objectChildren.order)
+    {
+      sortOrder = _scriptValueInfo.objectChildren.order.propertyValue.value;
+    }
+
+    let sortMode = 'auto';
+    if (_scriptValueInfo && _scriptValueInfo.objectChildren.mode)
+    {
+      sortMode = _scriptValueInfo.objectChildren.mode.propertyValue.value;
+    }
+
+    let sortType;
+    if (_scriptValueInfo && _scriptValueInfo.objectChildren.type)
+    {
+      sortType = _scriptValueInfo.objectChildren.type.propertyValue.value;
+    }
+
     return make(
       Blocks, 'elasticScore',
       {
         weights: List(weights),
-      });
+        sortOrder,
+        sortMode,
+        sortType,
+      }, true);
   }
 
   const clauseCardType = 'eql' + valueInfo.clause.type;
@@ -166,7 +188,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
     ));
   }
 
-  return make(Blocks, clauseCardType, valueMap);
+  return make(Blocks, clauseCardType, valueMap, true);
 };
 
 function isFilterCard(valueInfo: ESValueInfo): boolean
@@ -182,12 +204,18 @@ function isFilterCard(valueInfo: ESValueInfo): boolean
         if (Array.isArray(value))
         {
           validFilter = _.reduce(value,
-            (memo0, value0) => memo0 && (value0['range'] || value0['term']),
+            (memo0, value0) => memo0 &&
+              (value0['range'] ||
+                value0['term'] ||
+                value0['match']),
             true);
         }
         else
         {
-          validFilter = (value['range'] !== undefined) || (value['term'] !== undefined);
+          validFilter =
+            (value['range'] !== undefined) ||
+            (value['term'] !== undefined) ||
+            (value['match'] !== undefined);
         }
         return memo && validFilter;
       }, true);
@@ -199,6 +227,7 @@ const esFilterOperatorsMap = {
   lt: '<',
   lte: '≤',
   term: '=',
+  match: '≈',
 };
 
 function parseFilterBlock(boolQuery: string, filters: any): Block[]
@@ -213,7 +242,8 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
     return parseFilterBlock(boolQuery, [filters]);
   }
 
-  const filterBlocks = filters.map((obj: object) =>
+  let filterBlocks = [];
+  filters.forEach((obj: object) =>
   {
     let field;
     let filterOp;
@@ -222,8 +252,14 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
     if (obj['range'] !== undefined)
     {
       field = Object.keys(obj['range'])[0];
-      filterOp = Object.keys(obj['range'][field])[0];
+      const filterOps = Object.keys(obj['range'][field]);
+      filterOp = filterOps[0];
       value = obj['range'][field][filterOp];
+      if (filterOps.length > 1)
+      {
+        delete obj['range'][field][filterOp];
+        filterBlocks = filterBlocks.concat(parseFilterBlock(boolQuery, [obj]));
+      }
       filterOp = esFilterOperatorsMap[filterOp];
     }
     else if (obj['term'] !== undefined)
@@ -232,22 +268,43 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
       filterOp = '=';
       value = obj['term'][field];
     }
+    else if (obj['match'] !== undefined)
+    {
+      field = Object.keys(obj['match'])[0];
+      filterOp = '≈';
+      value = obj['match'][field];
+    }
 
-    return make(Blocks, 'elasticFilterBlock', {
-      field,
-      value,
-      boolQuery,
-      filterOp,
-    });
+    filterBlocks.push(
+      make(Blocks, 'elasticFilterBlock', {
+        field,
+        value,
+        boolQuery,
+        filterOp,
+      }, true),
+    );
   });
-
+  console.log(filterBlocks);
   return filterBlocks;
 }
 
 function isScoreCard(valueInfo: ESValueInfo): boolean
 {
-  return (valueInfo.clause.clauseType === ESClauseType.ESScriptClause) &&
-    (valueInfo.objectChildren.stored.propertyValue.value === 'Terrain.Score.PWL');
+  const isScriptSort = (valueInfo.clause.clauseType === ESClauseType.ESStructureClause) &&
+    (valueInfo.clause.name === 'script sort');
+
+  if (isScriptSort)
+  {
+    const _scriptValueInfo = valueInfo.objectChildren._script.propertyValue;
+    const scriptValueInfo = _scriptValueInfo && _scriptValueInfo.objectChildren.script.propertyValue;
+
+    return scriptValueInfo && (scriptValueInfo.clause.clauseType === ESClauseType.ESScriptClause) &&
+      (scriptValueInfo.objectChildren.stored.propertyValue.value === 'Terrain.Score.PWL');
+  }
+  else
+  {
+    return false;
+  }
 }
 
 function parseElasticWeightBlock(obj: object): Block
@@ -264,16 +321,16 @@ function parseElasticWeightBlock(obj: object): Block
       make(Blocks, 'scorePoint', {
         value: obj['ranges'][i],
         score: obj['outputs'][i],
-      }));
+      }, true));
   }
 
   const card = make(Blocks, 'elasticTransform', {
     input: obj['numerators'][0][0],
     scorePoints: List(scorePoints),
-  });
+  }, true);
 
   return make(Blocks, 'elasticWeight', {
     key: card,
     weight: obj['weight'],
-  });
+  }, true);
 }

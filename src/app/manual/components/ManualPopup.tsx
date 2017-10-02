@@ -48,10 +48,8 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
-import ManualEntry from '../../../blocks/types/ManualEntry';
-import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './ManualPopup.less';
 const InfoIcon = require('./../../../images/icon_info.svg');

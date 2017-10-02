@@ -46,30 +46,25 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
-import Util from '../../util/Util';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './TypeDropdown.less';
-import shallowCompare = require('react-addons-shallow-compare');
-import { backgroundColor, buttonColors, Colors, fontColor, link } from '../../common/Colors';
 const { List } = Immutable;
 
-const DATATYPES = List(FileImportTypes.ELASTIC_TYPES);
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
+const ELASTIC_TYPES = List(FileImportTypes.ELASTIC_TYPES);
 
 export interface Props
 {
   columnId: number;
   recursionDepth: number;
-  columnType: IMMap<string, any>;
-  editing: boolean;
+  columnType: ColumnTypesTree;
+  tooltips?: List<any>;
 }
 
 @Radium
@@ -77,7 +72,8 @@ class TypeDropdown extends TerrainComponent<Props>
 {
   public handleTypeChange(typeIndex: number)
   {
-    Actions.setColumnType(this.props.columnId, this.props.recursionDepth, typeIndex);
+    const type = FileImportTypes.ELASTIC_TYPES[typeIndex];
+    Actions.setColumnType(this.props.columnId, this.props.recursionDepth, type);
   }
 
   public render()
@@ -85,25 +81,26 @@ class TypeDropdown extends TerrainComponent<Props>
     return (
       <div
         className='fi-type-dropdown'
-        style={backgroundColor(Colors().fileimport.preview.column.typeDropdown)}
       >
         <div
-          className='fi-type-dropdown-dropdown'
+          className='fi-type-dropdown-wrapper'
         >
           <Dropdown
-            selectedIndex={Number(this.props.columnType.get('type'))}
-            options={DATATYPES}
+            selectedIndex={FileImportTypes.ELASTIC_TYPES.indexOf(this.props.columnType.type)}
+            options={ELASTIC_TYPES}
             onChange={this.handleTypeChange}
             canEdit={true}
+            className='fi-type-dropdown-dropdown'
+            tooltips={this.props.tooltips}
           />
         </div>
         {
-          FileImportTypes.ELASTIC_TYPES[this.props.columnType.get('type')] === 'array' &&
+          this.props.columnType.type === 'array' &&
           <TypeDropdown
             columnId={this.props.columnId}
             recursionDepth={this.props.recursionDepth + 1}
-            columnType={this.props.columnType.get('innerType')}
-            editing={this.props.editing}
+            columnType={this.props.columnType.innerType}
+            tooltips={this.props.tooltips}
           />
         }
       </div>

@@ -48,7 +48,6 @@ THE SOFTWARE.
 
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import * as _ from 'underscore';
 import './panel.less';
 const shallowCompare = require('react-addons-shallow-compare');
 import * as ReactDOM from 'react-dom';
@@ -229,7 +228,12 @@ const Panel = {
 
     if (this.props.handleRef)
     {
-      if (event.target !== this.refs[this.props.handleRef])
+      const checkParent = (parentNode: Node) =>
+      {
+        return parentNode === this.refs[this.props.handleRef];
+      };
+
+      if (event.target !== this.refs[this.props.handleRef] && Util.findParentNode(event.target, checkParent, 4) === null)
       {
         // a handleRef is set, so only respond to mouse events on our handle
         return;

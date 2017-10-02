@@ -50,17 +50,18 @@ THE SOFTWARE.
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
 import ESParserToken from '../../../../shared/database/elastic/parser/ESParserToken';
-import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 
 // interpreter and clause imports
-import ESClause from '../../../../shared/database/elastic/parser/clauses/ESClause';
-import ESStructureClause from '../../../../shared/database/elastic/parser/clauses/ESStructureClause';
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 
 // other imports
+import { MarkerAnnotation } from 'tql/components/TQLEditor';
 import { ESParserTokenizer, FlaggedToken } from '../../../../shared/database/elastic/formatter/ESParserTokenizer';
 import SyntaxHighlighter from './SyntaxHighlighter';
+
+import { BuilderStore } from 'builder/data/BuilderStore';
+import { toInputMap } from '../../../blocks/types/Input';
 
 /*
  *  Errors involving this function probably mean a missing a case on a switch.
@@ -93,18 +94,34 @@ class ElasticHighlighter extends SyntaxHighlighter
   {
     this.clearMarkers(instance);
     const parser = new ESJSONParser(instance.getValue());
-    const interpreter = new ESInterpreter(parser);
+    const state = BuilderStore.getState();
+    const inputs = state.query && state.query.inputs;
+    const params: { [name: string]: any; } = toInputMap(inputs);
+    const interpreter = new ESInterpreter(parser, params);
     const rootValueInfo: ESValueInfo = parser.getValueInfo();
     const tokens = ESParserTokenizer.getTokens(parser);
     for (const fToken of tokens)
     {
       const token: ESParserToken = fToken.parserToken;
       const style: string = this.getStyle(fToken);
-      instance.markText(
+      const marker = instance.markText(
         { line: token.row, ch: token.col },
         { line: token.toRow, ch: token.toCol },
         { className: style },
       );
+      if (token.errors.length > 0)
+      {
+        let message = 'Error:';
+        for (const e of token.errors)
+        {
+          message += '\n' + e.message;
+        }
+        const errorAnnotation: MarkerAnnotation = { showing: false, msg: message };
+        const errMarker = instance.markText(
+          { line: token.row, ch: token.col },
+          { line: token.toRow, ch: token.toCol },
+          { className: 'CodeMirror-lint-mark-error', __annotation: errorAnnotation });
+      }
     }
   }
 

@@ -46,17 +46,16 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions max-line-length no-shadowed-variable
 
-import { List, Map } from 'immutable';
-import * as _ from 'underscore';
+import { List } from 'immutable';
 const Color = require('color');
 
 import CommonSQL from '../../../../shared/database/mysql/syntax/CommonSQL';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import * as CommonBlocks from '../../../blocks/CommonBlocks';
-import { Display, DisplayType, firstSecondDisplay, getCardStringDisplay, letVarDisplay, stringValueDisplay, valueDisplay, wrapperDisplay, wrapperSingleChildDisplay } from '../../../blocks/displays/Display';
-import { _block, Block, TQLFn } from '../../../blocks/types/Block';
+import { DisplayType, firstSecondDisplay } from '../../../blocks/displays/Display';
+import { _block, Block } from '../../../blocks/types/Block';
 import { _card, Card, CardString } from '../../../blocks/types/Card';
-import { Input, InputType } from '../../../blocks/types/Input';
+import { InputType } from '../../../blocks/types/Input';
 
 import Util from '../../../app/util/Util';
 
@@ -926,21 +925,21 @@ export const MySQLBlocks =
             {
               scorePoints:
               List([
-                make(MySQLBlocks, 'scorePoint', {
-                  id: 'a',
-                  value: 0,
-                  score: 0.0,
-                }),
-                make(MySQLBlocks, 'scorePoint', {
-                  id: 'b',
-                  value: 50,
-                  score: 0.5,
-                }),
-                make(MySQLBlocks, 'scorePoint', {
-                  id: 'c',
-                  value: 100,
-                  score: 1.0,
-                }),
+                //   make(MySQLBlocks, 'scorePoint', {
+                //     id: 'a',
+                //     value: 0,
+                //     score: 0.0,
+                //   }),
+                //   make(MySQLBlocks, 'scorePoint', {
+                //     id: 'b',
+                //     value: 50,
+                //     score: 0.5,
+                //   }),
+                //   make(MySQLBlocks, 'scorePoint', {
+                //     id: 'c',
+                //     value: 100,
+                //     score: 1.0,
+                //   }),
               ]),
             }
           ),

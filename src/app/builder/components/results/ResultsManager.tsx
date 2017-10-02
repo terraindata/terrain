@@ -46,29 +46,30 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands radix prefer-const no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
-import { line } from 'd3-shape';
 import { List, Map } from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as _ from 'underscore';
 
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
+import Actions from '../../../fileImport/data/FileImportActions';
+import * as FileImportTypes from '../../../fileImport/FileImportTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
-import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
+import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-
-import { _Result, _ResultsState, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
+import { _Result, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
 
 export interface Props
 {
   query: Query;
+  variantPath?: string;
   resultsState: ResultsState;
   db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
@@ -166,7 +167,10 @@ export class ResultsManager extends TerrainComponent<Props>
     this.mapQueries(
       (query) =>
       {
-        AjaxM1.killQuery(query.queryId);
+        if (this.props.db.source === 'm1')
+        {
+          AjaxM1.killQuery(query.queryId);
+        }
         query.xhr.abort();
       },
     );
@@ -174,20 +178,22 @@ export class ResultsManager extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (
-      nextProps.query
-      && nextProps.query.tql
-      && (!this.props.query ||
-        (
-          this.props.query.tql !== nextProps.query.tql ||
-          this.props.query.cards !== nextProps.query.cards ||
-          this.props.query.inputs !== nextProps.query.inputs
+    // TODO: the logic here is potentially broken since props appear to be updated at different times and are not consistent with eachother
+    if (this.props.db !== nextProps.db ||
+      (
+        nextProps.query
+        && nextProps.query.tql
+        && (!this.props.query ||
+          (
+            this.props.query.tql !== nextProps.query.tql ||
+            this.props.query.cards !== nextProps.query.cards ||
+            this.props.query.inputs !== nextProps.query.inputs
+          )
         )
       )
     )
     {
       this.queryResults(nextProps.query, nextProps.db);
-
       if (!this.props.query || nextProps.query.id !== this.props.query.id)
       {
         this.changeResults({
@@ -196,42 +202,49 @@ export class ResultsManager extends TerrainComponent<Props>
       }
     }
 
-    // if(nextProps.resultsState.results !== this.props.resultsState.results)
-    // {
-    //   // update spotlights
-    //   let nextState = nextProps.resultsState;
-    //   let {resultsConfig} = nextProps.query;
+    if (this.props.variantPath !== undefined && (this.props.variantPath !== nextProps.variantPath))
+    {
+      this.changeResults({
+        results: List([]),
+      });
+    }
 
-    //   SpotlightStore.getState().spotlights.map(
-    //     (spotlight, id) =>
-    //     {
-    //       let resultIndex = nextState.results && nextState.results.findIndex(
-    //         r => getPrimaryKeyFor(r, resultsConfig) === id
-    //       );
-    //       if(resultIndex !== -1)
-    //       {
-    //         spotlightAction(id, _.extend({
-    //             color: spotlight.color,
-    //             name: spotlight.name,
-    //           },
-    //           nextState.results.get(resultIndex).toJS()
-    //         ));
-    //         // TODO something more like this
-    //         // spotlightAction(id,
-    //         //   {
-    //         //     color: spotlight.color,
-    //         //     name: spotlight.name,
-    //         //     result: nextState.results.get(resultIndex),
-    //         //   }
-    //         // );
-    //       }
-    //       else
-    //       {
-    //         spotlightAction(id, null);
-    //       }
-    //     }
-    //   );
-    // }
+    if (nextProps.resultsState.results !== this.props.resultsState.results)
+    {
+      // update spotlights
+      let nextState = nextProps.resultsState;
+      let { resultsConfig } = nextProps.query;
+
+      SpotlightStore.getState().spotlights.map(
+        (spotlight, id) =>
+        {
+          let resultIndex = nextState.results && nextState.results.findIndex(
+            (r) => getPrimaryKeyFor(r, resultsConfig) === id,
+          );
+          if (resultIndex !== -1)
+          {
+            spotlightAction(id, _.extend({
+              color: spotlight.color,
+              name: spotlight.name,
+            },
+              nextState.results.get(resultIndex).toJS(),
+            ));
+            // TODO something more like this
+            // spotlightAction(id,
+            //   {
+            //     color: spotlight.color,
+            //     name: spotlight.name,
+            //     result: nextState.results.get(resultIndex),
+            //   }
+            // );
+          }
+          else
+          {
+            spotlightAction(id, null);
+          }
+        },
+      );
+    }
   }
 
   public handleCountResponse(response: M1QueryResponse)
@@ -278,13 +291,19 @@ export class ResultsManager extends TerrainComponent<Props>
     // );
   }
 
-  public changeResults(changes: { [key: string]: any })
+  public changeResults(changes: { [key: string]: any }, exportChanges?: { [key: string]: any })
   {
     let { resultsState } = this.props;
     _.map(changes,
       (value: any, key: string) =>
         resultsState = resultsState.set(key, value),
     );
+
+    if (exportChanges)
+    {
+      const { filetype, filesize, preview, originalNames } = exportChanges;
+      Actions.chooseFile(filetype, filesize, preview, originalNames);
+    }
 
     this.props.onResultsStateChange(resultsState);
   }
@@ -509,7 +528,19 @@ export class ResultsManager extends TerrainComponent<Props>
       changes['count'] = results.size;
     }
 
-    this.changeResults(changes);
+    const filteredFields = List(_.filter(fields.toArray(), (val) => !(val.charAt(0) === '_')));
+    const exportChanges: any = {
+      filetype: 'csv',
+      originalNames: filteredFields,
+      preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
+        filteredFields.map((field, index) =>
+        {
+          const value = result.fields.get(String(field));
+          return Array.isArray(value) || typeof (value) === 'boolean' ? JSON.stringify(value) : value;
+        }),
+      )),
+    };
+    this.changeResults(changes, exportChanges);
   }
 
   private handleM1QueryResponse(response: M1QueryResponse, isAllFields: boolean)
@@ -671,12 +702,12 @@ export class ResultsManager extends TerrainComponent<Props>
   }
 }
 
-function getPrimaryKeyFor(result: Result, config: ResultsConfig, index: number): string
+function getPrimaryKeyFor(result: Result, config: ResultsConfig, index?: number): string
 {
   if (config && config.primaryKeys.size)
   {
     return config.primaryKeys.map(
-      (field) => result.fields[field],
+      (field) => result.fields.get(field),
     ).join('-and-');
   }
 

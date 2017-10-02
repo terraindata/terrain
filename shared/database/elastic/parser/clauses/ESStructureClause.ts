@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'underscore';
+import * as _ from 'lodash';
 
 import EQLConfig from '../EQLConfig';
 import ESClauseSettings from '../ESClauseSettings';
@@ -90,14 +90,7 @@ export default class ESStructureClause extends ESClause
     const children: { [name: string]: ESPropertyInfo } = valueInfo.objectChildren;
     const propertyClause: ESClause = interpreter.config.getClause('property');
 
-    // check required members
-    this.required.forEach((name: string): void =>
-    {
-      if (children[name] === undefined)
-      {
-        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
-      }
-    });
+    this.validateRequiredMembers(interpreter, children, valueInfo);
 
     // mark properties
     valueInfo.forEachProperty(
@@ -114,12 +107,11 @@ export default class ESStructureClause extends ESClause
 
         if (!this.structure.hasOwnProperty(name))
         {
-          interpreter.accumulateError(viTuple.propertyName,
-            'Unknown property \"' + name +
-            '\". Expected one of these properties: ' +
-            JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
-            true);
-          return;
+          const shouldReturn = this.unknownPropertyName(interpreter, children, viTuple);
+          if (shouldReturn)
+          {
+            return;
+          }
         }
         else if (viTuple.propertyValue === null)
         {
@@ -131,6 +123,28 @@ export default class ESStructureClause extends ESClause
           viTuple.propertyValue.clause = valueClause;
         }
       });
+  }
+
+  protected unknownPropertyName(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, viTuple: ESPropertyInfo)
+  {
+    interpreter.accumulateError(viTuple.propertyName,
+      'Unknown property \"' + String(name) +
+      '\". Expected one of these properties: ' +
+      JSON.stringify(_.difference(Object.keys(this.structure), Object.keys(children)), null, 2),
+      true);
+    return true;
+  }
+
+  protected validateRequiredMembers(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, valueInfo: ESValueInfo)
+  {
+    // check required members
+    this.required.forEach((name: string): void =>
+    {
+      if (children[name] === undefined)
+      {
+        interpreter.accumulateError(valueInfo, 'Missing required property "' + name + '"');
+      }
+    });
   }
 
   protected checkValidAndUniqueProperties(names: string[], listName: string): void

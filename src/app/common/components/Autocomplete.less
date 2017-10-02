@@ -4,7 +4,7 @@
 
 .autocomplete {
   position: relative;
-
+  display: flex;
   .ac-options {
     max-height: 200px;
     overflow-y: auto;
@@ -44,8 +44,34 @@
       
     }
   }
+
+  .ac-input-has-tooltip {
+    padding-right: 30px;
+  }
+
+  .tooltip-icon-positioning {
+    margin-left: -24px;
+    margin-right: 3px;
+    display: inline-flex;
+    justify-content: center;
+    flex-direction: column;
+
+    .tooltip-icon {
+      height: 16px;
+      width: 16px;
+      padding: 1px;
+      fill: #FFF;
+
+      &.tooltip-is-error {
+        fill: #d14f42;
+        transform: rotate(180deg);
+      }
+    }
+
+  }
+
 }
 
 .ac-wrong-type {
-  background: fade(#e27d7d, 50%) !important;
+  // background: fade(#e27d7d, 50%) !important;
 }

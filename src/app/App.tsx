@@ -54,10 +54,9 @@ require('babel-polyfill');
 import './App.less';
 
 // Libraries
-import * as $ from 'jquery';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import * as _ from 'underscore';
 
 const Perf = require('react-addons-perf');
 
@@ -67,13 +66,14 @@ window['PerfStart'] = Perf.start;
 window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.getLastMeasurements()), 250); };
 
 // Components
+import { generateThemeStyles } from 'common/components/tooltip/Tooltips';
 import Login from './auth/components/Login';
 import LayoutManager from './builder/components/layout/LayoutManager';
 import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
-const ReactTooltip = require('./common/components/tooltip/react-tooltip.js');
+
 import { backgroundColor, Colors, fontColor } from './common/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
 import StyleTag from './common/components/StyleTag';
@@ -83,18 +83,19 @@ import Util from './util/Util';
 import EasterEggs from './x/components/EasterEggs';
 
 import BuilderActions from './builder/data/BuilderActions'; // for card hovering
-import BuilderStore from './builder/data/BuilderStore'; // for error reporting
+// for error reporting
 
 // data that needs to be loaded
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
-import FileImportActions from './fileImport/data/FileImportActions';
-import FileImportStore from './fileImport/data/FileImportStore';
+import ColorsActions from './colors/data/ColorsActions';
+import ColorsStore from './colors/data/ColorsStore';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
 import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
+import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
 
@@ -102,8 +103,9 @@ import UserStore from './users/data/UserStore';
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
-const BuilderIcon = require('./../images/icon_reporting_18x18.svg?name=BuilderIcon');
+const BuilderIcon = require('./../images/icon_bldr-3.svg');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
+const SchemaIcon = require('./../images/icon_schema.svg?name=SchemaIcon');
 const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
@@ -131,7 +133,7 @@ const links =
       route: '/builder',
     },
     {
-      icon: <ReportingIcon />,
+      icon: <SchemaIcon />,
       text: 'Schema',
       route: '/schema',
     },
@@ -140,11 +142,11 @@ const links =
       text: 'Import',
       route: '/import',
     },
-    {
-      icon: <ReportingIcon />,
-      text: 'Analytics',
-      route: '/analytics',
-    },
+    // {
+    //   icon: <ReportingIcon />,
+    //   text: 'Analytics',
+    //   route: '/analytics',
+    // },
     // {
     //   icon: <ManualIcon />,
     //   text: 'Manual',
@@ -179,6 +181,8 @@ class App extends TerrainComponent<Props>
     usersLoaded: false,
 
     noLocalStorage: false,
+
+    stylesTag: Immutable.Map(),
   };
 
   constructor(props: Props)
@@ -245,6 +249,11 @@ class App extends TerrainComponent<Props>
       storeKeyPath: ['loaded'],
     });
 
+    this._subscribe(ColorsStore, {
+      stateKey: 'stylesTag',
+      storeKeyPath: ['styles'],
+    });
+
     // Retrieve logged-in state from persistent storage.
     const accessToken = localStorage['accessToken'];
     const id = localStorage['id'];
@@ -254,10 +263,25 @@ class App extends TerrainComponent<Props>
     }
   }
 
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('input', { background: Colors().inputBg, color: Colors().text1 });
+    ColorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
+    ColorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
+    ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
+
+    const tooltipStyles = generateThemeStyles();
+    _.map(tooltipStyles, (value, key) =>
+    {
+      ColorsActions.setStyle(key, value);
+    });
+  }
+
   public fetchData()
   {
     UserActions.fetch();
-    LibraryActions.fetch();
+    TerrainStore.dispatch(LibraryActions.fetch());
+    LibraryStore.dispatch(LibraryActions.fetch());
     SchemaActions.fetch();
     // RolesActions.fetch();
   }
@@ -377,16 +401,8 @@ class App extends TerrainComponent<Props>
         </div>
 
         <DeployModal />
-
-        <ReactTooltip
-          place='bottom'
-          effect='solid'
-          class='tooltip'
-          hideOnClick={true}
-        />
-
         <StyleTag
-          style={COMMON_THEME_COLOR_STYLE}
+          style={this.state.stylesTag.toJS()}
         />
 
         <InAppNotification />
@@ -396,18 +412,5 @@ class App extends TerrainComponent<Props>
     );
   }
 }
-
-const COMMON_THEME_COLOR_STYLE = {
-  '::-webkit-scrollbar-track': {
-    background: Colors().scrollbarBG,
-  },
-  '::-webkit-scrollbar-thumb': {
-    background: Colors().scrollbarPiece,
-  },
-  'input': {
-    background: Colors().inputBg,
-    color: Colors().text1,
-  },
-};
 
 export default App;

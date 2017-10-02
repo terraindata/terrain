@@ -43,8 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'underscore';
 import Util from './../../util/Util';
 
 const create = '';
@@ -63,6 +61,7 @@ const UserActionTypes =
     completeTutorial: '',
   };
 
-Util.setValuesToKeys(UserActionTypes, '');
+// jmansor: Because we'll have a global store, action types need to be unique.
+Util.setValuesToKeys(UserActionTypes, 'users');
 
 export default UserActionTypes;

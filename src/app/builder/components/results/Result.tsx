@@ -48,23 +48,22 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as _ from 'underscore';
 import './Result.less';
 const { List } = Immutable;
-import { _ResultsConfig, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
-import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
-import { spotlightAction } from '../../data/SpotlightStore';
+import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import { MAX_RESULTS, Result } from './ResultTypes';
+import { Result } from './ResultTypes';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
+const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
 
 const MAX_DEFAULT_FIELDS = 4;
 
@@ -77,6 +76,7 @@ export interface Props
   primaryKey: string;
   onExpand: (index: number) => void;
   expanded?: boolean;
+  allowSpotlights: boolean;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -87,13 +87,13 @@ export interface Props
 
 @Radium
 class ResultComponent extends TerrainComponent<Props> {
-  // state: {
-  //   isSpotlit: boolean;
-  //   spotlightColor: string;
-  // } = {
-  //   isSpotlit: false,
-  //   spotlightColor: "",
-  // };
+  public state: {
+    isSpotlit: boolean;
+    spotlightColor: string;
+  } = {
+    isSpotlit: false,
+    spotlightColor: '',
+  };
 
   public menuOptions =
   [
@@ -114,20 +114,37 @@ class ResultComponent extends TerrainComponent<Props> {
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
+    const prevSpotlights = SpotlightStore.getState().spotlights;
     for (const key in nextProps)
     {
       if (key !== 'result' && this.props[key] !== nextProps[key])
+      {
+        if (prevSpotlights.get(nextProps.primaryKey))
+        {
+          this.setState({
+            isSpotlit: true,
+            spotlightColor: prevSpotlights.get(nextProps.primaryKey).color,
+          });
+        }
+        else
+        {
+          this.setState({
+            isSpotlit: false,
+          });
+        }
+        return true;
+      }
+    }
+
+    for (const key in nextState)
+    {
+      if (this.state[key] !== nextState[key])
       {
         return true;
       }
     }
 
-    if (!_.isEqual(this.props.result.toJS(), nextProps.result.toJS()))
-    {
-      return true;
-    }
-
-    return false;
+    return !_.isEqual(this.props.result.toJS(), nextProps.result.toJS());
   }
 
   public renderExpandedField(value, field)
@@ -145,7 +162,7 @@ class ResultComponent extends TerrainComponent<Props> {
       return null;
     }
 
-    const value = getResultValue(this.props.result, field, this.props.resultsConfig, overrideFormat);
+    const value = getResultValue(this.props.result, field, this.props.resultsConfig, false, overrideFormat);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
@@ -180,20 +197,21 @@ class ResultComponent extends TerrainComponent<Props> {
     );
   }
 
-  public spotlight()
+  public spotlight(overrideId?, overrideColor?)
   {
-    const id = this.props.primaryKey;
-    const spotlightColor = ColorManager.altColorForKey(id);
+    const id = overrideId || this.props.primaryKey;
+    const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
     this.setState({
       isSpotlit: true,
       spotlightColor,
-    });
-
-    const spotlightData = this.props.result.toJS();
-    spotlightData['name'] = getResultName(this.props.result, this.props.resultsConfig);
-    spotlightData['color'] = spotlightColor;
-    spotlightData['id'] = id;
-    spotlightAction(id, spotlightData);
+    }, function()
+      {
+        const spotlightData = this.props.result.toJS();
+        spotlightData['name'] = getResultName(this.props.result, this.props.resultsConfig);
+        spotlightData['color'] = spotlightColor;
+        spotlightData['id'] = id;
+        spotlightAction(id, spotlightData);
+      });
   }
 
   public unspotlight()
@@ -206,7 +224,7 @@ class ResultComponent extends TerrainComponent<Props> {
 
   public renderSpotlight()
   {
-    if (!this.props.result.spotlight)
+    if (!this.state.isSpotlit)
     {
       return null;
     }
@@ -309,15 +327,25 @@ class ResultComponent extends TerrainComponent<Props> {
               {
                 name
               }
+              {
+                this.props.expanded &&
+                <div
+                  onClick={this.expand}
+                  className='result-expanded-close-button'
+                >
+                  <CloseIcon className='close close-icon' />
+                </div>
+              }
             </div>
           </div>
-
-          <Menu
-            options={
-              this.menuOptions[result.spotlight ? 1 : 0]
-            }
-          />
-
+          {
+            this.props.allowSpotlights &&
+            <Menu
+              options={
+                this.menuOptions[this.state.isSpotlit ? 1 : 0]
+              }
+            />
+          }
           {
             scoreArea
           }
@@ -338,14 +366,18 @@ class ResultComponent extends TerrainComponent<Props> {
     ));
   }
 }
-export function getResultValue(result: Result, field: string, config: ResultsConfig, overrideFormat?: any): string
+export function getResultValue(result: Result, field: string, config: ResultsConfig, isTitle: boolean, overrideFormat?: any): string
 {
   let value: any;
   if (result)
   {
     value = result.fields.get(field);
+    if (List.isList(value))
+    {
+      value = JSON.stringify(value);
+    }
   }
-  return ResultFormatValue(field, value, config, overrideFormat);
+  return ResultFormatValue(field, value, config, isTitle, overrideFormat);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -382,10 +414,10 @@ export function getResultName(result: Result, config: ResultsConfig)
     nameField = _.first(getResultFields(result, config));
   }
 
-  return getResultValue(result, nameField, config);
+  return getResultValue(result, nameField, config, true);
 }
 
-export function ResultFormatValue(field: string, value: string | number, config: ResultsConfig, overrideFormat?: any): any
+export function ResultFormatValue(field: string, value: string | number, config: ResultsConfig, isTitle: boolean, overrideFormat?: any): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const { showRaw } = overrideFormat || format || { showRaw: false };
@@ -411,7 +443,7 @@ export function ResultFormatValue(field: string, value: string | number, config:
     italics = true;
   }
 
-  if (format)
+  if (format && !isTitle)
   {
     switch (format.type)
     {

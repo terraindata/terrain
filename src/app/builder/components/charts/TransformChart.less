@@ -1,11 +1,6 @@
 @import "../../../common/Common.less";
 
-@line: #005d69;
-@bar: #0acee9;
-@lineFill: #01a8bf;
-@axis: #b1e0e6;
-@bg: #dbf7fb;
-@text: fade(@trans-black, 50%);
+@hover-overlay: rgba(255,255,255,0.25);
 
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
@@ -19,7 +14,6 @@ input[type=number]::-webkit-outer-spin-button {
   .point-edit-menu {
     position: absolute;
     width: 70px;
-    background: #14849f;
     border-radius: 6px;
     padding: 4px 8px 6px 8px;
     
@@ -29,65 +23,61 @@ input[type=number]::-webkit-outer-spin-button {
       font-size: 12px;
       height: 14px;
       width: 58px;
-      background-color: #c6ebf0;
-      color: #14849f;
     }
     
     label {
-      color: white;
       font-size: 14px;
       margin-right: 1px;
     }
   }
+
+  .context-menu {
+    position: absolute;
+    max-width: 160px;
+    border-radius: 3px;
+    overflow: hidden;
+
+    .chart-context-menu-item {
+      font-size: 12px;
+      padding: 3px 12px 3px 12px;
+      text-align: left;
+      cursor: pointer;
+      &:hover {
+        background: @hover-overlay;
+      }
+    }
+
+  }
 }
 
-
-
 .transform-chart {
-  .bg {
-    fill: @bg;
-  }
-  
-  .tick text {
-    fill: @text;
-  }
   
   .tick line {
-    stroke: @axis;
     stroke-width: 1px;
   }
   
   .domain {
     fill: none;
-    stroke: @text;
     stroke-width: 0px;
   }
   
   .point {
     cursor: pointer;
     transition: stroke-width 0.15s, stroke 0.15s;
-    fill: #fff;
-    stroke: @line;
     stroke-width: 3px;
     &:not(.point-disabled) {
       &:hover,
       &[active="1"] {
         stroke-width: 5px;
       }
-      
-      &.point-selected,
-      &[active="1"] {
-        stroke: #fc5218;
-      }
     }
   }
   
   .lines-bg {
-    fill: fade(@lineFill, 30%);
+    opacity: .5;
   }
   
   .lines {
-    stroke: @line;
     stroke-width: 5px;
     fill: none;
     .transition(~"stroke 0.15s");
@@ -102,7 +92,7 @@ input[type=number]::-webkit-outer-spin-button {
   }
   
   .bar {
-    fill: @bar;
+    opacity: .5;
   }
   
   .spotlight,
@@ -130,36 +120,25 @@ input[type=number]::-webkit-outer-spin-button {
   }
   
   .right-menu {
-    rect {
-       fill: #14849f;  
-    }
-
-    &:hover {
-      rect {
-        fill: #1db7ca;
-      }
-    }
-    circle {
-      fill: #999;
-    }
+    cursor: pointer;
     
     text {
-      fill: #fff;
       font-size: 12px;
-      // font-weight: 200;
       letter-spacing: 0.3px;
+    }
+
+    .menu-hover-rect {
+      background: none;
+      &:hover {
+        fill: @hover-overlay;
+      }
     }
   }
 
   .crosshairs, .transform-tooltip {
-    rect {
-      fill: #14849f;
-    } 
     
     text {
-      fill: #fff;
       font-size: 12px;
-      // font-weight: 200;
       letter-spacing: 0.3px;
       text-anchor: start;
     }
@@ -168,7 +147,6 @@ input[type=number]::-webkit-outer-spin-button {
   .crosshairs-line {
       fill: none;
       stroke-width: 1px;
-      stroke: #14849f;
       pointer-events: none;
     }
 }
