@@ -201,21 +201,19 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleAlgoriithmDuplicateConfirm()
+  public handleAlgorithmDuplicateConfirm()
   {
     const id = this.state.duplicateAlgorithmId;
     const index = this.props.algorithmsOrder.findIndex((iid) => iid === id);
     const dbs = this.getSortedDatabases(this.props.dbs);
     const dbIndex = this.getNewAlgorithmIndex();
     const sorted = this.props.groups.sortBy((group) => group.id);
-    const groupIds = [];
-    sorted.map((value) => { groupIds.push(value.id); });
     this.props.algorithmActions.duplicate(
       this.props.algorithms.get(id),
       this.props.algorithmsOrder.findIndex((iid) => iid === id),
       this.state.duplicateAlgorithmTextboxValue,
       dbs.get(dbIndex),
-      groupIds[this.state.duplicateAlgorithmGroupIndex],
+      sorted[this.state.duplicateAlgorithmGroupIndex].id,
     );
     this.setState({
       duplicatingAlgorithm: false,
@@ -665,7 +663,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       showTextbox={true}
       confirm={true}
       onClose={this.handleAlgorithmDuplicateClose}
-      onConfirm={this.handleAlgoriithmDuplicateConfirm}
+      onConfirm={this.handleAlgorithmDuplicateConfirm}
       onTextboxValueChange={this.handleDuplicateAlgorithmTextboxChange}
       textboxValue={this.state.duplicateAlgorithmTextboxValue}
       title='Duplicate Algorithm'

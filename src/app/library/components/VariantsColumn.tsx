@@ -395,14 +395,13 @@ class VariantsColumn extends TerrainComponent<Props>
   public renderDuplicateDropdown()
   {
     const sorted = this.getSortedAlgorithms();
-    const algorithmNames = [];
-    sorted.map((value) => algorithmNames.push(value.name));
+    const algorithmNames = sorted.map((value) => value.name);
     return (
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
           <Dropdown
             selectedIndex={this.state.duplicateVariantAlgorithmIndex}
-            options={Immutable.List(algorithmNames)}
+            options={algorithmNames.toList()}
             onChange={this.handleVariantAlgorithmIndexChange}
             canEdit={true}
             directionBias={90}
