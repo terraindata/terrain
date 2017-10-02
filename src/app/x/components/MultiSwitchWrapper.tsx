@@ -67,7 +67,7 @@ export interface Props
 class MultiSwitchWrapper extends TerrainComponent<Props>
 {
   public state = {
-    first: 0,
+    first: 1,
     second: '20',
     third: List([0, 2]),
     fourth: List(['40', '43']),
@@ -84,10 +84,10 @@ class MultiSwitchWrapper extends TerrainComponent<Props>
       >
         <MultiSwitch
           options={List([
-            { value: '10', label: 'John' },
-            { value: '11', label: 'Danny' },
-            { value: '12', label: 'Meg' },
-            { value: '13', label: 'Kevin' },
+            'John',
+            'Danny',
+            'Meg',
+            'Kevin',
           ])}
           value={this.state.first}
           onChange={this.setFirst}
