@@ -68,6 +68,7 @@ class FileImportStateC extends BaseClass
   public hasCsvHeader: boolean = false;
   public isNewlineSeparatedJSON: boolean = false;
   public requireJSONHaveAllFields: boolean = true;
+  public objectKey: string = 'Products';
   public exportRank: boolean = true;
 
   public originalNames: List<string> = List([]);
@@ -193,6 +194,7 @@ export const MIN_PROGRESSBAR_FILESIZE = 500000; // (500kb) - threshold to displa
 export const FILE_TYPES =
   [
     'json',
+    'json [type object]',
     'csv',
   ];
 

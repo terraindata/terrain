@@ -104,13 +104,14 @@ const FileImportActions =
       }),
 
     exportFile:
-    (query: string, serverId: number, dbName: string, rank: boolean, downloadFilename: string,
+    (query: string, serverId: number, dbName: string, rank: boolean, objectKey: string, downloadFilename: string,
       handleFileExportSuccess, handleFileExportError) =>
       $(ActionTypes.exportFile, {
         query,
         serverId,
         dbName,
         rank,
+        objectKey,
         downloadFilename,
         handleFileExportSuccess,
         handleFileExportError,
@@ -222,6 +223,10 @@ const FileImportActions =
     toggleExportRank:
     (exportRank: boolean) =>
       $(ActionTypes.toggleExportRank, { exportRank }),
+
+    setTypeObjectKey:
+    (typeObjectKey: string) =>
+      $(ActionTypes.setTypeObjectKey, { typeObjectKey }),
   };
 
 export default FileImportActions;

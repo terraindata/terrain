@@ -43,70 +43,129 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as _ from 'lodash';
+import MultiSwitch from 'common/components/MultiSwitch';
+import { List } from 'immutable';
 import * as React from 'react';
-import { Link } from 'react-router';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import MultiSwitchWrapper from './MultiSwitchWrapper';
-import './X.less';
-
-const xes =
-  {
-    // cards:
-    // {
-    //   name: 'Immutable Builder',
-    //   component: XCards,
-    // },
-    multiSwitch:
-    {
-      name: 'Multi Switch Component',
-      component: MultiSwitchWrapper,
-    },
-  };
 
 export interface Props
 {
-  params?: any;
-  history?: any;
-  location?: {
-    pathname: string;
-  };
+  options: List<string>;
+
+  // can pass the value in as an index, a string value, or an array of either
+  //  (in the case of multiple selections)
+  value: number | string | List<number> | List<string>;
+  onChange: (value: number | string | List<number> | List<string>) => void;
+
+  allowsMultiple: boolean;
+  usesValues: boolean; // indicates if it uses values instead of indices
+
+  small?: boolean;
+  large?: boolean;
 }
 
-class X extends TerrainComponent<Props>
+class MultiSwitchWrapper extends TerrainComponent<Props>
 {
-  constructor(props)
-  {
-    super(props);
-  }
+  public state = {
+    first: 0,
+    second: 'Don',
+    third: List([0, 2]),
+    fourth: List(['Chandler', 'Monica']),
+  };
 
   public render()
   {
-    const { x } = this.props.params;
-
-    if (x && xes[x])
-    {
-      const C = xes[x].component;
-      return <C {...this.props} />;
-    }
-
     return (
-      <div className='x-area'>
-        <div className='x-title'>
-          Experiments
-        </div>
-        {
-          _.keys(xes).map((indX) =>
-            <Link to={`/x/${indX}`} key={indX}>
-              <div className='x-x'>
-                {xes[indX].name}
-              </div>
-            </Link>,
-          )
-        }
+      <div
+        style={{
+          paddingLeft: 12,
+          maxWidth: 300,
+        }}
+      >
+        <MultiSwitch
+          options={List([
+            'John',
+            'Danny',
+            'Meg',
+            'Kevin',
+          ])}
+          value={this.state.first}
+          onChange={this.setFirst}
+        />
+        <br />
+        <MultiSwitch
+          options={List([
+            'Don',
+            'Peggy',
+            'Roger',
+            'Pete',
+            'Kenny',
+          ])}
+          value={this.state.second}
+          onChange={this.setSecond}
+          usesValues={true}
+          large={true}
+        />
+        <br />
+        <MultiSwitch
+          options={List([
+            'El',
+            'Dustin',
+            'Mike',
+            'Lucas',
+          ])}
+          value={this.state.third}
+          onChange={this.setThird}
+          allowsMultiple={true}
+        />
+        <br />
+        <MultiSwitch
+          options={List([
+            'Chandler',
+            'Joey',
+            'Ross',
+            'Monica',
+            'Rachel',
+            'Phoebe',
+          ])}
+          value={this.state.fourth}
+          large={true}
+          onChange={this.setFourth}
+          allowsMultiple={true}
+          usesValues={true}
+        />
       </div>
     );
   }
+
+  private setFirst(v)
+  {
+    this.setState({
+      first: v,
+    });
+  }
+
+  private setSecond(v)
+  {
+    this.setState({
+      second: v,
+    });
+  }
+
+  private setThird(v)
+  {
+    this.setState({
+      third: v,
+    });
+  }
+
+  private setFourth(v)
+  {
+    this.setState({
+      fourth: v,
+    });
+  }
+
 }
 
-export default X;
+export default MultiSwitchWrapper;

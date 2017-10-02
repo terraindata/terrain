@@ -1659,11 +1659,11 @@ body-parser@^1.16.1:
     raw-body "~2.2.0"
     type-is "~1.6.15"
 
-bodybuilder@^2.1.0:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/bodybuilder/-/bodybuilder-2.2.1.tgz#39797fa1c87e5960c30ad229fa6e0a91358bb617"
+bodybuilder@^2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/bodybuilder/-/bodybuilder-2.2.6.tgz#af93b039f86d339dc897630d53aeacf8f342e164"
   dependencies:
-    lodash "4.9.0"
+    lodash "^4.9.0"
 
 bonjour@^3.5.0:
   version "3.5.0"
@@ -5550,15 +5550,11 @@ lodash@2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-2.4.2.tgz#fadd834b9683073da179b3eae6d9c0d15053f73e"
 
-lodash@4.9.0:
-  version "4.9.0"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.9.0.tgz#4c20d742f03ce85dc700e0dd7ab9bcab85e6fc14"
-
 lodash@^3.10.1, lodash@^3.8.0:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.14.0, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.5.0, lodash@~4.17.2:
+lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.14.0, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.5.0, lodash@^4.9.0, lodash@~4.17.2:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 

@@ -43,54 +43,64 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as classNames from 'classnames';
+import CheckBox from 'common/components/CheckBox';
+import * as Radium from 'radium';
+import * as React from 'react';
+import { backgroundColor, borderColor, Colors } from '../../common/Colors';
+import TerrainComponent from './../../common/components/TerrainComponent';
+import './SimpleRadio.less';
 
-// tslint:disable:variable-name max-classes-per-file member-access strict-boolean-expressions
-
-import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
-
-export class Format
+export interface Props
 {
-  type: string = '';
-  template: string = '';
-  showRaw: boolean = false;
-  showField: boolean = false;
+  on: boolean;
+  label: string;
 
-  set: (f: string, v: any) => Format;
-  setIn: (f: string[], v: any) => Format;
+  small?: boolean;
+  large?: boolean;
+
+  color?: string;
 }
-const Format_Record = Immutable.Record(new Format());
-export const _Format = (config?: any) =>
-{
-  return new Format_Record(config || {}) as any as Format;
-};
 
-export class ResultsConfig
+@Radium
+class SimpleRadio extends TerrainComponent<Props>
 {
-  name: string = '';
-  score: string = '_score';
-  fields: List<string> = List([]);
-  enabled: boolean = false;
-  formats: IMMap<string, Format> = Map<string, Format>({});
-  primaryKeys: List<string> = List(['_id']);
+  public render()
+  {
+    let { color } = this.props;
+    if (color === undefined)
+    {
+      color = Colors().text1;
+    }
 
-  set: (f: string, v: any) => ResultsConfig;
-  setIn: (f: string[], v: any) => ResultsConfig;
-  toJS: () => any;
+    return (
+      <div
+        className={classNames({
+          'simple-radio': true,
+          'simple-radio-on': this.props.on,
+          'simple-radio-small': this.props.small,
+          'simple-radio-large': this.props.large,
+        })}
+      >
+        <div
+          className='simple-radio-outline'
+          style={borderColor(color)}
+        >
+          <div
+            className='simple-radio-fill'
+            style={backgroundColor(color)}
+          />
+        </div>
+        <div
+          className='simple-radio-label'
+        >
+          {
+            this.props.label
+          }
+        </div>
+      </div>
+    );
+  }
 }
-const ResultsConfig_Record = Immutable.Record(new ResultsConfig());
-export const _ResultsConfig = (config?: any) =>
-{
-  let conf = new ResultsConfig_Record(config || {}) as any as ResultsConfig;
 
-  conf = conf.set('formats', Map<string, Format>(conf.formats));
-  conf = conf
-    .set('formats', conf.formats.map((format) => _Format(format)))
-    .set('fields', List(conf.fields))
-    .set('primaryKeys', List(conf.primaryKeys));
-
-  return conf;
-};
-export const DefaultResultsConfig = _ResultsConfig();
-
-export default ResultsConfig;
+export default SimpleRadio;
