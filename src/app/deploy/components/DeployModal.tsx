@@ -165,6 +165,8 @@ class DeployModal extends TerrainComponent<Props>
     const defaultTql =
       (this.state.defaultChecked && defaultVariant) ? defaultVariant.query.tql : null;
     const tql = variant ? variant.query.tql : '';
+    // console.log(variant);
+    // console.log(tql);
     return (
       <div className='deploy-modal-tql'>
         <div className='deploy-modal-tql-wrapper'>
@@ -172,28 +174,28 @@ class DeployModal extends TerrainComponent<Props>
             language={'elastic'}
             canEdit={false}
             tql={tql}
+            theme={'monokai'}
             isDiff={this.state.defaultChecked && defaultTql !== null}
             diffTql={defaultTql}
             placeholder={'Your algorithm is blank'}
-            highlightedLine={-2}
           />
         </div>
       </div>
     );
   }
 
-            // tql={this.state.tql}
-            // language={this.props.language}
-            // canEdit={this.props.canEdit}
-            // theme={this.state.theme}
+  // tql={this.state.tql}
+  // language={this.props.language}
+  // canEdit={this.props.canEdit}
+  // theme={this.state.theme}
 
-            // onChange={this.updateTql}
+  // onChange={this.updateTql}
 
-            // highlightedLine={this.state.highlightedLine}
-            // toggleSyntaxPopup={this.toggleSyntaxPopup}
-            // defineTerm={this.defineTerm}
-            // turnSyntaxPopupOff={this.turnSyntaxPopupOff}
-            // hideTermDefinition={this.hideTermDefinition}
+  // highlightedLine={this.state.highlightedLine}
+  // toggleSyntaxPopup={this.toggleSyntaxPopup}
+  // defineTerm={this.defineTerm}
+  // turnSyntaxPopupOff={this.turnSyntaxPopupOff}
+  // hideTermDefinition={this.hideTermDefinition}
 
   public toggleErrorModal()
   {

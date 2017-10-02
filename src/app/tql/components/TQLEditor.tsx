@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
+import { BuilderStore } from '../../builder/data/BuilderStore';
 import { Colors } from '../../common/Colors';
 import StyleTag from '../../common/components/StyleTag';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -99,7 +100,7 @@ export interface Props
   language?: string;
   canEdit: boolean;
 
-  // theme?: string;
+  theme?: string;
   highlightedLine?: number;
 
   isDiff?: boolean;
@@ -187,9 +188,14 @@ class TQLEditor extends TerrainComponent<Props>
           ref='cm2'
           className='codemirror-text'
           options={options}
+          //  value={this.props.tql || ''}
 
           isDiff={true}
           diff={this.props.diffTql}
+
+        //  highlightedLine={this.props.highlightedLine}
+        //  onFocusChange={this.handleFocusChange}
+        // onCodeMirrorMount={this.registerCodeMirror}
         />
       );
     }
@@ -211,7 +217,6 @@ class TQLEditor extends TerrainComponent<Props>
           this.props.placeholder : 'Write your query here'}
       />
     );
-
     return (
       <div>
         {

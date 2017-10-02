@@ -329,9 +329,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
     // cardList[this.state.cardName] &&
     //    BuilderTypes.Blocks[cardList[this.state.cardName]].static.manualEntry;
-    console.log(this.props.language);
-    console.log(this.state.highlightedLine);
-    console.log(this.defineTerm);
     return (
       <div
         className={classNames({
