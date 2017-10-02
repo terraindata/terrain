@@ -44,11 +44,16 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires strict-boolean-expressions
 
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
+import { backgroundColor, borderColor, Colors, fontColor } from 'common/Colors';
+import Dropdown from 'common/components/Dropdown';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 
@@ -56,39 +61,176 @@ import ControlActions from '../../data/ControlActions';
 
 import './CreateHeadlessCommand.less';
 
+const Color = require('color');
 const { List } = Immutable;
 type Template = FileImportTypes.Template;
 
 export interface Props
 {
-  template: Template;
+  templates: List<Template>;
+  index: number;
 }
 
 class CreateHeadlessCommand extends TerrainComponent<Props>
 {
   public state: {
-    templates: List<Template>;
+    index: number;
   } = {
-    templates: List([]),
+    index: this.props.index,
   };
+
+  public constructor(props)
+  {
+    super(props);
+    this.getTemplateTextList = memoizeOne(this.getTemplateTextList);
+  }
 
   public componentDidMount()
   {
-    ControlActions.importExport.fetchTemplates();
+    this.setState({
+      index: this.props.index,
+    });
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (this.props.index !== nextProps.index)
+    {
+      this.setState({
+        index: nextProps.index,
+      });
+    }
+  }
+
+  public getTemplateTextList(): List<string>
+  {
+    return this.props.templates.map((template, index) => {
+        // const typeText = template.export ? 'Export' : 'Import';
+        return `${template.templateName}`
+      }).toList();
+  }
+
+  public handleTemplateDropdownChange(index, event)
+  {
+    this.setState({
+      index,
+    });
+  }
+
+  public renderInfoTable(template)
+  {
+    const typeText = template !== undefined ? (template.export ? 'Export' : 'Import') : '';
+    const fadedStyle = fontColor(Colors().altText3);
+
+    return (
+      <div className='headless-generator-data'>
+        <div className='headless-generator-column'>
+          <table className='headless-generator-info-table'>
+            <tbody>
+              <tr>
+                <td> Template Type </td><td style={fadedStyle}> {typeText} </td>
+              </tr>
+              <tr>
+                <td> Template ID </td><td style={fadedStyle}> {template.templateId} </td>
+              </tr>
+              <tr>
+                <td> Access token </td><td className='access-token-cell' style={fadedStyle}> {template.persistentAccessToken} </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className='headless-generator-column'>
+          <table className='headless-generator-info-table'>
+            <tbody>
+              <tr>
+                <td> Server ID </td><td style={fadedStyle}> {template.dbid} </td>
+              </tr>
+              <tr>
+                <td> Index </td><td style={fadedStyle}> {template.dbname} </td>
+              </tr>
+              <tr>
+                <td> Type </td><td style={fadedStyle}> {template.tablename} </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
+  public renderExportOptions(template)
+  {
+    const fileTypeOptions = List(['JSON', 'CSV']);
+    return (
+      <div>
+        <div className='headless-entry-row'>
+          <div className='headless-entry-label'>
+            File Type
+          </div>
+          <div className='headless-entry-input'>
+            <Dropdown
+              options={fileTypeOptions}
+              selectedIndex={0}
+              canEdit={true}
+            />
+          </div>
+          <div className='headless-entry-label'>
+            URL
+          </div>
+          <div className='headless-entry-input'>
+            <input value='localhost'/>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  public renderImportOptions(template)
+  {
+
+  }
+
+  public computeCommand()
+  {
+    return 'Please fill in the required information';
   }
 
   public render()
   {
-    const typeText = this.props.template.export === 1 ? 'export' : 'import';
+    const template: Template = this.state.index !== -1 ? this.props.templates.get(this.state.index) : undefined;
+    const typeText = template !== undefined ? (template.export ? 'Export' : 'Import') : '';
+
     return (
       <div className='headless-command-generator'>
-        <div className='headless-generator-title'>
-          Use this form to compose a headless {typeText} command.
-        </div>
         <div className='headless-entry-row'>
-          Template: {this.props.template.templateName}
+          <div className='headless-entry-label'>
+            Template
+          </div>
+          <div className='headless-entry-input'>
+            <Dropdown
+              options={this.getTemplateTextList()}
+              selectedIndex={this.state.index}
+              onChange={this.handleTemplateDropdownChange}
+              canEdit={true}
+              directionBias={90}
+            />
+          </div>
+        </div>
+        {
+          template !== undefined && this.renderInfoTable(template)
+        }
+        {
+          template !== undefined && template.export ? this.renderExportOptions(template) : this.renderImportOptions(template)
+        }
+        <div className='headless-command-title'> Headless Command </div>
+        <div
+          className='headless-command-content'
+          style={_.extend({}, borderColor(Colors().bg3), backgroundColor(Colors().bg3), fontColor(Colors().text2))}
+        >
+          {this.computeCommand()}
         </div>
       </div>
+    );
   }
 }
 

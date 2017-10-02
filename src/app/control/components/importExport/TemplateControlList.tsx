@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -71,7 +71,7 @@ const ViewIcon = require('images/icon_search.svg');
 const { List } = Immutable;
 
 type Template = FileImportTypes.Template;
-type HeaderConfigItem = [string, (rowElem) => any];
+type HeaderConfigItem = [string, (rowElem, index) => any];
 type HeaderConfig = HeaderConfigItem[];
 
 export interface Props
@@ -95,6 +95,7 @@ class AccessTokenControl extends TerrainComponent<Props>
     confirmModalIsError: boolean;
     confirmModalType: ConfirmActionType;
     currentActiveTemplate: Template;
+    currentActiveIndex: number;
     headlessModalOpen: boolean;
   } = {
     // templates: List([]),
@@ -108,6 +109,7 @@ class AccessTokenControl extends TerrainComponent<Props>
     confirmModalIsError: false,
     confirmModalType: 'DELETE',
     currentActiveTemplate: undefined,
+    currentActiveIndex: -1,
     headlessModalOpen: false,
   };
 
@@ -118,20 +120,26 @@ class AccessTokenControl extends TerrainComponent<Props>
     super(props);
   }
 
-  public getOptions(template: Template)
+  public getOptions(template: Template, index: number)
   {
-    const typeText = template.export === 1 ? 'Export' : 'Import';
+    const typeText = template.export ? 'Export' : 'Import';
     return List([
       {
         text: 'Delete Template',
-        onClick: () => this.requestDeleteTemplate(template),
+        onClick: () => this.requestDeleteTemplate(template, index),
         icon: <DeleteIcon className='template-menu-option-icon'/>,
         iconColor: '#555',
       },
       {
         text: `Headless ${typeText}`,
-        onClick: () => this.requestCreateHeadless(template),
-        icon: <ImportIcon className='template-menu-option-icon'/>,
+        onClick: () => this.requestCreateHeadless(template, index),
+        icon:
+          <ImportIcon
+            className={classNames({
+              'template-menu-option-icon': true,
+              'template-icon-export': template.export,
+            })}
+          />,
         iconColor: '#555',
       },
       {
@@ -147,7 +155,7 @@ class AccessTokenControl extends TerrainComponent<Props>
         iconColor: '#555',
       },
       {
-        text: 'View Details',
+        text: 'View Raw',
         onClick: () => undefined,
         icon: <ViewIcon className='template-menu-option-icon'/>,
         iconColor: '#555',
@@ -155,34 +163,35 @@ class AccessTokenControl extends TerrainComponent<Props>
     ]);
   }
 
-  public getTemplateConfig()
+  public getTemplateConfig(): HeaderConfig
   {
     // const menuOptions = List([option1]);
     return [
-      ['ID', (template) => template.templateId],
-      ['Name', (template) => template.templateName],
-      ['Template Type', (template) => template.export === 0 ? 'Import' : 'Export'],
-      ['Server ID', (template) => template.dbid],
-      ['Index', (template) => template.dbname],
-      ['Type', (template) => template.tablename],
-      ['Access Token', (template) =>
+      ['ID', (template, index) => template.templateId],
+      ['Name', (template, index) => template.templateName],
+      ['Template Type', (template, index) => template.export ? 'Export' : 'Import'],
+      ['Server ID', (template, index) => template.dbid],
+      ['Index', (template, index) => template.dbname],
+      ['Type', (template, index) => template.tablename],
+      ['Access Token', (template, index) =>
         <div className='access-token-cell'>
           {template.persistentAccessToken}
         </div>
       ],
-      ['', (template) =>
+      ['', (template, index) =>
         <div className='template-menu-options-wrapper'>
-          <Menu options={this.getOptions(template)}/>
+          <Menu options={this.getOptions(template, index)}/>
         </div>
       ],
     ];
   }
 
-  public requestCreateHeadless(template: Template)
+  public requestCreateHeadless(template: Template, index: number)
   {
     this.setState({
       headlessModalOpen: true,
       currentActiveTemplate: template,
+      currentActiveIndex: index,
     })
   }
 
@@ -207,10 +216,11 @@ class AccessTokenControl extends TerrainComponent<Props>
     }
   }
 
-  public requestDeleteTemplate(template)
+  public requestDeleteTemplate(template, index)
   {
     this.setState({
       currentActiveTemplate: template,
+      currentActiveIndex: index,
       confirmModalOpen: true,
       confirmModalMessage: `Are you sure you want to delete template "${template.templateName}"?`,
       confirmModalTitle: 'Confirm Action',
@@ -268,7 +278,7 @@ class AccessTokenControl extends TerrainComponent<Props>
           {
             return (
               <div className='template-info-data' key={i} style={borderColor(Colors().border3)}>
-                {headerItem[1](template)}
+                {headerItem[1](template, index)}
               </div>
             );
           })
@@ -305,41 +315,52 @@ class AccessTokenControl extends TerrainComponent<Props>
 
   public renderCreateHeadlessCommand()
   {
-    return <CreateHeadlessCommand template={this.state.currentActiveTemplate}/>
+    return <CreateHeadlessCommand templates={this.props.templates} index={this.state.currentActiveIndex}/>
   }
 
   public render()
   {
     const typeText = (this.state.currentActiveTemplate !== undefined &&
-      this.state.currentActiveTemplate.export === 1) ? 'Export' : 'Import';
+      this.state.currentActiveTemplate.export) ? 'Export' : 'Import';
 
     return (
       <div>
         {this.renderTable()}
-        <Modal
-          open={this.state.responseModalOpen}
-          message={this.state.responseModalMessage}
-          title={this.state.responseModalTitle}
-          error={this.state.responseModalIsError}
-          onClose={this.responseCloseModal}
-          confirm={false}
-        />
-        <Modal
-          open={this.state.confirmModalOpen}
-          message={this.state.confirmModalMessage}
-          title={this.state.confirmModalTitle}
-          error={this.state.confirmModalIsError}
-          onClose={this.confirmCloseModal}
-          onConfirm={this.confirmConfirmModal}
-          confirm={true}
-          closeOnConfirm={true}
-        />
-        <Modal
-          open={this.state.headlessModalOpen}
-          title={`Compose ${typeText} Command`}
-          onClose={this.headlessCloseModal}
-          children={this.renderCreateHeadlessCommand()}
-        />
+        {
+          this.state.responseModalOpen &&
+          <Modal
+            open={this.state.responseModalOpen}
+            message={this.state.responseModalMessage}
+            title={this.state.responseModalTitle}
+            error={this.state.responseModalIsError}
+            onClose={this.responseCloseModal}
+            confirm={false}
+          />
+        }
+        {
+          this.state.confirmModalOpen &&
+          <Modal
+            open={this.state.confirmModalOpen}
+            message={this.state.confirmModalMessage}
+            title={this.state.confirmModalTitle}
+            error={this.state.confirmModalIsError}
+            onClose={this.confirmCloseModal}
+            onConfirm={this.confirmConfirmModal}
+            confirm={true}
+            closeOnConfirm={true}
+          />
+        }
+        {
+          this.state.headlessModalOpen &&
+          <Modal
+            open={this.state.headlessModalOpen}
+            title={`Compose Headless Command`}
+            onClose={this.headlessCloseModal}
+            children={this.renderCreateHeadlessCommand()}
+            allowOverflow={true}
+            wide={true}
+          />
+        }
       </div>
     )
   }

@@ -1,21 +1,79 @@
 @import "../../../common/Common.less";
+@border-radius: 3px;
 
 .headless-command-generator {
   margin: auto;
   display: flex;
   padding: @spacing;
   flex-direction: column;
-  
-  .generator-row {
-    margin: @half-spacing;
-  }
-
-  .headless-generator-title {  
-    .generator-row;
-  }
 
   .headless-entry-row {
-    .generator-row;
+    margin: @spacing;
+    display: flex;
+
     .big-text;
+
+    .headless-entry-label {
+      padding: @half-spacing;
+    }
+
+    .headless-entry-input {
+      margin-left: @spacing;
+    }
+  }
+
+  .headless-generator-data {
+    display: flex;
+    justify-content: center;
+
+    .headless-generator-column {
+      flex: 1 1 1;
+
+      &:first-child {
+        margin-right: calc(4*@spacing);
+      }
+    }
+
+    .headless-generator-info-table {
+      width: 250px;
+      margin-left: @half-spacing;
+      tr {
+        td {
+          &:first-child {
+            padding-right: @half-spacing;
+
+          }
+
+          &:last-child {
+
+          }
+
+          padding: @quarter-spacing 0px;
+        }
+      }
+
+      .access-token-cell {
+        max-width: 60px;
+        text-overflow: ellipsis;
+        overflow-x: hidden;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .headless-command-title {
+    margin: @spacing;
+    margin-bottom: @half-spacing;
+  }
+
+  .headless-command-content {
+    .normal-text;
+    font-family: monospace;
+    margin: @spacing;
+    margin-top: 0px;
+    border: 1px solid;
+    background-color: rgba(0,0,0,0);
+    border-radius: @border-radius;
+    padding: @spacing;
   }
 }
