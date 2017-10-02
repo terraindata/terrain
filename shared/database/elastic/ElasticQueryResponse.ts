@@ -78,9 +78,8 @@ export interface ElasticQueryResult
   took: number;
   timed_out: boolean;
   hits: ElasticQueryHits;
-  aggregations?: any;
   _shards: ElasticQueryShards;
-
+  aggregations?: any;
 }
 
 export default ElasticQueryResult;
