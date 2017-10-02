@@ -66,7 +66,7 @@ export class ElasticDB implements TastyDB
 
   public generate(query: TastyQuery)
   {
-    return new ElasticGenerator(query).esQuery;
+    return [new ElasticGenerator(query).esQuery];
   }
 
   public generateString(query: TastyQuery)
