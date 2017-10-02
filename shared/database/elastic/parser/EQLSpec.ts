@@ -344,7 +344,8 @@ const EQLSpec: ESClause[] =
         aggs: 'aggs_query',
         aggregations: 'aggs_query',
         avg: 'metrics_avg',
-        histogram: 'histogram',
+        histogram: 'histogram_aggregation',
+        terms: 'terms_aggregation',
       },
       {
         path: ['aggregation'],
@@ -353,7 +354,35 @@ const EQLSpec: ESClause[] =
       }),
     // AvgAggregationBuilder.java
     // ValuesSourceParserHelper.declareNumericFields(PARSER, true, true, false);
-    new ESStructureClause('histogram',
+    new ESStructureClause('terms_aggregation',
+      {
+        field: 'field',
+        size: 'number',
+        shard_size: 'number',
+        order: 'aggregation_order',
+        aggs: 'aggs_query',
+        min_doc_count: 'number',
+        include: 'include_exclude',
+        exclude: 'include_exclude',
+        collect_mode: 'collect_mode',
+      }),
+    new ESEnumClause('collect_mode',
+      [
+        'breadth_first',
+        'depth_first',
+      ]),
+    new ESVariantClause('include_exclude',
+      {
+        string: 'string',
+        array: 'string[]',
+        partition: 'partition',
+      }),
+    new ESStructureClause('partition',
+      {
+        partition: 'number',
+        num_partitions: 'number',
+      }),
+    new ESStructureClause('histogram_aggregation',
       {
         field: 'field',
         interval: 'number',
