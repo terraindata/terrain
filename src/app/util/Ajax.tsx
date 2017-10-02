@@ -1087,7 +1087,7 @@ export const Ajax =
         end: end.toISOString(),
         interval: 'day',
         eventid: metricId.toString(),
-        agg: 'date_histogram',
+        agg: 'histogram',
         field: '@timestamp',
       };
 
