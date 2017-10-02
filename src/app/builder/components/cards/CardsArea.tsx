@@ -82,8 +82,7 @@ export interface Props
   // Tuning column
   tuningMode?: boolean;
   allowTuningDragAndDrop?: boolean;
-  handleCardReorder?: (card, index) => void; // have to add other param for new order
-}
+  handleCardReorder?: (card, index) => void;
 
 interface KeyState
 {
