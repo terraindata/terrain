@@ -55,45 +55,46 @@ import { EventConfig, Events } from './Events';
 export const events: Events = new Events();
 const Router = new KoaRouter();
 
-// Handle analytics event ingestion
-Router.post('/', async (ctx, next) =>
+async function storeEvent(request: any)
 {
   const production = process.env.NODE_ENV === 'production';
   if (!production &&
-    ctx.request.body !== undefined &&
-    ctx.request.query !== undefined)
+    request.body !== undefined && Object.keys(request.body).length > 0 &&
+    request.query !== undefined && Object.keys(request.body).length > 0)
   {
     throw new Error('Both request query and body cannot be set.');
   }
 
   if (!production &&
-    ctx.request.body === undefined &&
-    ctx.request.query === undefined)
+    (request.body === undefined ||
+      request.body !== undefined && Object.keys(request.body).length === 0) &&
+    (request.query === undefined ||
+      request.query !== undefined && Object.keys(request.query).length === 0))
   {
     throw new Error('Either request query or body parameters are required.');
   }
 
-  let request: object = ctx.request.body;
-  if (request === undefined)
+  let req: object = request.body;
+  if (req === undefined || (req !== undefined && Object.keys(req).length === 0))
   {
-    request = ctx.request.query;
+    req = request.query;
   }
 
   const event: EventConfig = {
-    eventid: request['eventid'],
-    variantid: request['variantid'],
-    visitorid: request['variantid'],
+    eventid: req['eventid'],
+    variantid: req['variantid'],
+    visitorid: req['visitorid'],
     source: {
-      ip: ctx.request.ip,
-      host: ctx.request.host,
-      url: ctx.request.url,
+      ip: request.ip,
+      host: request.host,
+      useragent: request.useragent,
+      referer: request.header.referer,
     },
-    timestamp: request['timestamp'],
-    meta: request['meta'],
+    timestamp: req['timestamp'],
+    meta: req['meta'],
   };
 
   // const msg = await Encryption.decodeMessage(event);
-  ctx.body = '';
   try
   {
     await events.storeEvent(event);
@@ -109,12 +110,25 @@ Router.post('/', async (ctx, next) =>
       throw new Error('Error storing analytics event:' + String(e));
     }
   }
+}
+
+// Handle analytics event ingestion
+Router.post('/', async (ctx, next) =>
+{
+  await storeEvent(ctx.request);
+  ctx.body = '';
 });
 
+Router.get('/', async (ctx, next) =>
+{
+  await storeEvent(ctx.request);
+  ctx.body = '';
+});
+
+// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
 // * variantid: list of variantids
 // * start: start time of the interval
 // * end: end time of the interval
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
 // * agg: supported aggregation operations are:
 //     `select` - returns all events between the specified interval
 //     `histogram` - returns a histogram of events between the specified interval
@@ -126,7 +140,7 @@ Router.post('/', async (ctx, next) =>
 //     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
 //     also supported are values such as `1.5h`, `90m` etc.
 //
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   Util.verifyParameters(
     JSON.parse(JSON.stringify(ctx.request.query)),

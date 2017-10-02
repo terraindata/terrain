@@ -1026,7 +1026,7 @@ describe('Analytics aggregation route tests', () =>
   test('GET /midway/v1/events/ (select)', async () =>
   {
     await request(server)
-      .get('/midway/v1/events/')
+      .get('/midway/v1/events/agg')
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',
@@ -1052,7 +1052,7 @@ describe('Analytics aggregation route tests', () =>
   test('GET /midway/v1/events/ (histogram)', async () =>
   {
     await request(server)
-      .get('/midway/v1/events/')
+      .get('/midway/v1/events/agg')
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',
@@ -1079,7 +1079,7 @@ describe('Analytics aggregation route tests', () =>
   test('GET /midway/v1/events/ (rate)', async () =>
   {
     await request(server)
-      .get('/midway/v1/events/')
+      .get('/midway/v1/events/agg')
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',

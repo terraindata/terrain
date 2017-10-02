@@ -76,7 +76,8 @@ export interface EventConfig
   source: {
     ip: string;
     host: string;
-    url: string;
+    useragent: string;
+    referer?: string;
   };
   meta?: any;
 }
@@ -93,12 +94,13 @@ export class Events
 
     this.eventTable = new Tasty.Table(
       'events',
-      ['timestamp'],
+      [],
       [
         'eventid',
         'variantid',
         'visitorid',
         'source',
+        'timestamp',
       ],
       'terrain-analytics',
     );
@@ -109,6 +111,10 @@ export class Events
    */
   public async storeEvent(event: EventConfig): Promise<EventConfig>
   {
+    if (event.timestamp === undefined)
+    {
+      event.timestamp = new Date();
+    }
     return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 

@@ -1093,7 +1093,7 @@ export const Ajax =
 
       return Ajax.req(
         'get',
-        `events`,
+        `events/agg`,
         {},
         (response: any) =>
         {
