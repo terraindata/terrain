@@ -188,14 +188,9 @@ class TQLEditor extends TerrainComponent<Props>
           ref='cm2'
           className='codemirror-text'
           options={options}
-          //  value={this.props.tql || ''}
 
           isDiff={true}
           diff={this.props.diffTql}
-
-        //  highlightedLine={this.props.highlightedLine}
-        //  onFocusChange={this.handleFocusChange}
-        // onCodeMirrorMount={this.registerCodeMirror}
         />
       );
     }

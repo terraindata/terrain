@@ -165,8 +165,6 @@ class DeployModal extends TerrainComponent<Props>
     const defaultTql =
       (this.state.defaultChecked && defaultVariant) ? defaultVariant.query.tql : null;
     const tql = variant ? variant.query.tql : '';
-    // console.log(variant);
-    // console.log(tql);
     return (
       <div className='deploy-modal-tql'>
         <div className='deploy-modal-tql-wrapper'>
@@ -183,19 +181,6 @@ class DeployModal extends TerrainComponent<Props>
       </div>
     );
   }
-
-  // tql={this.state.tql}
-  // language={this.props.language}
-  // canEdit={this.props.canEdit}
-  // theme={this.state.theme}
-
-  // onChange={this.updateTql}
-
-  // highlightedLine={this.state.highlightedLine}
-  // toggleSyntaxPopup={this.toggleSyntaxPopup}
-  // defineTerm={this.defineTerm}
-  // turnSyntaxPopupOff={this.turnSyntaxPopupOff}
-  // hideTermDefinition={this.hideTermDefinition}
 
   public toggleErrorModal()
   {
