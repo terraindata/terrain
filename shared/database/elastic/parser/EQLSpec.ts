@@ -208,7 +208,7 @@ const EQLSpec: ESClause[] =
         terminateAfter: 'number',
         stats: 'string[]',
         suggestField: 'string',
-        suggestMode: 'suggest_mode' //enum suggest_mode
+        suggestMode: 'suggest_mode', //enum suggest_mode
         suggestSize: 'number',
         suggestText: 'string',
         timeout: 'time_string',
@@ -297,10 +297,10 @@ const EQLSpec: ESClause[] =
         ignore_failure: 'boolean',
         all_fields: 'boolean',
         // ext: 'ext', not much documents about the usage of this ext
-//        _name: 'query_name',
-//        inner_hits: 'inner_hits',
-//      cutoff_frequency: 'cutoff_frequency',
-//        minimum_should_match: 'minimum_should_match',
+        //        _name: 'query_name',
+        //        inner_hits: 'inner_hits',
+        //      cutoff_frequency: 'cutoff_frequency',
+        //        minimum_should_match: 'minimum_should_match',
       },
       {
         name: 'body',
@@ -325,8 +325,8 @@ const EQLSpec: ESClause[] =
     // aggregation
     // AggregatorFactories.java
     new ESMapClause('aggs_query',
-        'aggregation_name',
-        'aggregation_builder',
+      'aggregation_name',
+      'aggregation_builder',
       {
         path: ['aggregation'],
         name: 'aggregation query',
