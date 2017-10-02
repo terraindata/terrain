@@ -101,6 +101,8 @@ interface Theme
 
   import: string;
 
+  tqlEditor: string;
+
   // DO NOT USE these below colors anymore -- these need to be cleaned up
 
   // text
@@ -359,6 +361,8 @@ const DARK: Theme =
     error: '#d14f42',
 
     import: '#1efab4',
+
+    tqlEditor: 'monokai',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
