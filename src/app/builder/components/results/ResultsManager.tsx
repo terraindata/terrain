@@ -554,8 +554,8 @@ export class ResultsManager extends TerrainComponent<Props>
       this.handleM1Error(response, isAllFields);
       return;
     }
-    const resultsData = response.results as any[];
-    this.updateResults(resultsData, isAllFields);
+    const resultsData = response.results as any;
+    this.updateResults(resultsData.hits, isAllFields);
   }
 
   private handleM2QueryResponse(response: MidwayQueryResponse, isAllFields: boolean)
@@ -575,7 +575,8 @@ export class ResultsManager extends TerrainComponent<Props>
       return;
     }
     const resultsData = response.getResultsData();
-    this.updateResults(resultsData, isAllFields);
+    console.log(resultsData);
+    this.updateResults(resultsData.hits, isAllFields);
   }
 
   private handleM1Error(response: any, isAllFields?: boolean)
