@@ -344,6 +344,7 @@ const EQLSpec: ESClause[] =
         aggs: 'aggs_query',
         aggregations: 'aggs_query',
         avg: 'metrics_avg',
+        histogram: 'histogram',
       },
       {
         path: ['aggregation'],
@@ -352,6 +353,40 @@ const EQLSpec: ESClause[] =
       }),
     // AvgAggregationBuilder.java
     // ValuesSourceParserHelper.declareNumericFields(PARSER, true, true, false);
+    new ESStructureClause('histogram',
+      {
+        field: 'field',
+        interval: 'number',
+        min_doc_count: 'number',
+        extended_bounds: 'extended_bounds',
+        order: 'aggregation_order',
+        missing: 'number',
+        keyed: 'boolean',
+      },
+      {
+        path: ['histogram'],
+        desc: 'A multi-bucket values source based aggregation that can be applied on numeric values extracted from the documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-histogram-aggregation.html',
+      }),
+    new ESMapClause(
+      'aggregation_order',
+      'field',
+      'sort_order',
+      {
+        path: ['sort'],
+        desc: 'Sort by a single field, either ascending or descending.',
+      },
+    ),
+    new ESStructureClause('extended_bounds',
+      {
+        min: 'number',
+        max: 'number',
+      },
+      {
+        path: ['extended_bounds'],
+        desc: 'Bounds for buckets of a histogram aggregation',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-histogram-aggregation.html',
+      }),
     new ESStructureClause('metrics_avg',
       {
         field: 'field', // numerical field
