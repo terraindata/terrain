@@ -392,6 +392,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     const { me, roles } = this.state;
     const canArchive = (algorithm.status !== ItemStatus.Archive); // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
     const canDuplicate = true;
+    const canRename = (scores[ItemStatus.Live].score === 0 && scores[ItemStatus.Default].score === 0);
     const canDrag = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
     const canEdit = canDrag; // ||me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
     // (me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
@@ -430,7 +431,6 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         role = 'Builder';
       }
     }
-
     return (
       <LibraryItem
         index={index}
@@ -457,6 +457,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         canCreate={canDrag}
         canArchive={canArchive}
         canDuplicate={canDuplicate}
+        canRename={canRename}
         isSelected={+algorithm.id === +params.algorithmId}
         isFocused={this.props.isFocused}
         canUnarchive={algorithm.status === ItemStatus.Archive}

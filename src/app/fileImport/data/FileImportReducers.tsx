@@ -246,6 +246,13 @@ FileImportReducers[ActionTypes.toggleExportRank] =
       .set('exportRank', action.payload.exportRank)
   ;
 
+FileImportReducers[ActionTypes.setTypeObjectKey] =
+  (state, action) =>
+    state
+      .set('isDirty', true)
+      .set('objectKey', action.payload.setTypeObjectKey)
+  ;
+
 FileImportReducers[ActionTypes.changePrimaryKey] =
   (state, action) =>
   {
@@ -389,6 +396,7 @@ FileImportReducers[ActionTypes.exportFile] =
       state.transforms,
       action.payload.query,
       action.payload.rank,
+      action.payload.objectKey,
       action.payload.downloadFilename,
       (resp: any) =>
       {
