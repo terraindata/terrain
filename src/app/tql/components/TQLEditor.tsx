@@ -100,7 +100,6 @@ export interface Props
   language?: string;
   canEdit: boolean;
 
-  theme?: string;
   highlightedLine?: number;
 
   isDiff?: boolean;

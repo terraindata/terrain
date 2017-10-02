@@ -172,7 +172,6 @@ class DeployModal extends TerrainComponent<Props>
             language={'elastic'}
             canEdit={false}
             tql={tql}
-            theme={'monokai'}
             isDiff={this.state.defaultChecked && defaultTql !== null}
             diffTql={defaultTql}
             placeholder={'Your algorithm is blank'}
