@@ -925,21 +925,21 @@ export const MySQLBlocks =
             {
               scorePoints:
               List([
-                make(MySQLBlocks, 'scorePoint', {
-                  id: 'a',
-                  value: 0,
-                  score: 0.0,
-                }),
-                make(MySQLBlocks, 'scorePoint', {
-                  id: 'b',
-                  value: 50,
-                  score: 0.5,
-                }),
-                make(MySQLBlocks, 'scorePoint', {
-                  id: 'c',
-                  value: 100,
-                  score: 1.0,
-                }),
+                //   make(MySQLBlocks, 'scorePoint', {
+                //     id: 'a',
+                //     value: 0,
+                //     score: 0.0,
+                //   }),
+                //   make(MySQLBlocks, 'scorePoint', {
+                //     id: 'b',
+                //     value: 50,
+                //     score: 0.5,
+                //   }),
+                //   make(MySQLBlocks, 'scorePoint', {
+                //     id: 'c',
+                //     value: 100,
+                //     score: 1.0,
+                //   }),
               ]),
             }
           ),

@@ -43,63 +43,129 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
+import MultiSwitch from 'common/components/MultiSwitch';
+import { List } from 'immutable';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import './RadioButtons.less';
 
 export interface Props
 {
-  selected?: string;
-  options: Array<{
-    value: string;
-    label?: string;
-    onClick: (optionValue?: any) => void
-  }>;
-  optionShadow?: boolean;
+  options: List<string>;
+
+  // can pass the value in as an index, a string value, or an array of either
+  //  (in the case of multiple selections)
+  value: number | string | List<number> | List<string>;
+  onChange: (value: number | string | List<number> | List<string>) => void;
+
+  allowsMultiple: boolean;
+  usesValues: boolean; // indicates if it uses values instead of indices
+
+  small?: boolean;
+  large?: boolean;
 }
 
-class RadioButtons extends TerrainComponent<Props>
+class MultiSwitchWrapper extends TerrainComponent<Props>
 {
-  public static defaultProps = { optionShadow: false };
-
-  public renderOption(option)
-  {
-    const { optionShadow } = this.props;
-    const style: any = {};
-
-    if (optionShadow)
-    {
-      style.boxShadow = '2px 2px 2px #222';
-      style.backgroundColor = '#666';
-      style.margin = '10px';
-      style.padding = '5px';
-    }
-
-    return (
-      <div key={option.value} style={style} className='radio-button-option'>
-        <div
-          onClick={() => option.onClick(option.value)}
-          className={classNames({
-            'radio-button': true,
-            'radio-button-selected': option.value === this.props.selected,
-          })}
-        >
-        </div>
-        {option.label !== undefined ? option.label : option.value}
-        <br />
-      </div>
-    );
-  }
+  public state = {
+    first: 0,
+    second: 'Don',
+    third: List([0, 2]),
+    fourth: List(['Chandler', 'Monica']),
+  };
 
   public render()
   {
     return (
-      <div>
-        {this.props.options.map(this.renderOption)}
+      <div
+        style={{
+          paddingLeft: 12,
+          maxWidth: 300,
+        }}
+      >
+        <MultiSwitch
+          options={List([
+            'John',
+            'Danny',
+            'Meg',
+            'Kevin',
+          ])}
+          value={this.state.first}
+          onChange={this.setFirst}
+        />
+        <br />
+        <MultiSwitch
+          options={List([
+            'Don',
+            'Peggy',
+            'Roger',
+            'Pete',
+            'Kenny',
+          ])}
+          value={this.state.second}
+          onChange={this.setSecond}
+          usesValues={true}
+          large={true}
+        />
+        <br />
+        <MultiSwitch
+          options={List([
+            'El',
+            'Dustin',
+            'Mike',
+            'Lucas',
+          ])}
+          value={this.state.third}
+          onChange={this.setThird}
+          allowsMultiple={true}
+        />
+        <br />
+        <MultiSwitch
+          options={List([
+            'Chandler',
+            'Joey',
+            'Ross',
+            'Monica',
+            'Rachel',
+            'Phoebe',
+          ])}
+          value={this.state.fourth}
+          large={true}
+          onChange={this.setFourth}
+          allowsMultiple={true}
+          usesValues={true}
+        />
       </div>
     );
   }
+
+  private setFirst(v)
+  {
+    this.setState({
+      first: v,
+    });
+  }
+
+  private setSecond(v)
+  {
+    this.setState({
+      second: v,
+    });
+  }
+
+  private setThird(v)
+  {
+    this.setState({
+      third: v,
+    });
+  }
+
+  private setFourth(v)
+  {
+    this.setState({
+      fourth: v,
+    });
+  }
+
 }
 
-export default RadioButtons;
+export default MultiSwitchWrapper;

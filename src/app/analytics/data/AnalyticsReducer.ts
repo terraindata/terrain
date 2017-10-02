@@ -47,17 +47,33 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import Ajax from 'util/Ajax';
 import ActionTypes from './AnalyticsActionTypes';
+import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
 
 const AnalyticsReducer = {};
 
 AnalyticsReducer[ActionTypes.fetch] =
-  (state, action: Action<{ variantId: ID, analytics: any }>) =>
+  (state, action: Action<{ analytics: any }>) =>
   {
-    const { variantId, analytics } = action.payload;
-    return state.set(variantId, analytics);
+    const { analytics } = action.payload;
+    let nextState = state;
+
+    Object.keys(analytics).forEach((variantId) =>
+    {
+      const variantAnalytics = analytics[variantId];
+      nextState = nextState.setIn(['data', parseInt(variantId, 10)], variantAnalytics);
+    });
+
+    return nextState;
   };
 
-const AnalyticsReducerWrapper = (state: any = Immutable.Map({}), action) =>
+AnalyticsReducer[ActionTypes.selectMetric] =
+  (state, action: Action<{ metricId: ID }>) =>
+  {
+    const { metricId } = action.payload;
+    return state.set('selectedMetric', metricId);
+  };
+
+const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
 {
   let nextState = state;
   if (AnalyticsReducer[action.type])

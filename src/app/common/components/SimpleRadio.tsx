@@ -44,62 +44,63 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
+import CheckBox from 'common/components/CheckBox';
+import * as Radium from 'radium';
 import * as React from 'react';
+import { backgroundColor, borderColor, Colors } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import './RadioButtons.less';
+import './SimpleRadio.less';
 
 export interface Props
 {
-  selected?: string;
-  options: Array<{
-    value: string;
-    label?: string;
-    onClick: (optionValue?: any) => void
-  }>;
-  optionShadow?: boolean;
+  on: boolean;
+  label: string;
+
+  small?: boolean;
+  large?: boolean;
+
+  color?: string;
 }
 
-class RadioButtons extends TerrainComponent<Props>
+@Radium
+class SimpleRadio extends TerrainComponent<Props>
 {
-  public static defaultProps = { optionShadow: false };
-
-  public renderOption(option)
+  public render()
   {
-    const { optionShadow } = this.props;
-    const style: any = {};
-
-    if (optionShadow)
+    let { color } = this.props;
+    if (color === undefined)
     {
-      style.boxShadow = '2px 2px 2px #222';
-      style.backgroundColor = '#666';
-      style.margin = '10px';
-      style.padding = '5px';
+      color = Colors().text1;
     }
 
     return (
-      <div key={option.value} style={style} className='radio-button-option'>
+      <div
+        className={classNames({
+          'simple-radio': true,
+          'simple-radio-on': this.props.on,
+          'simple-radio-small': this.props.small,
+          'simple-radio-large': this.props.large,
+        })}
+      >
         <div
-          onClick={() => option.onClick(option.value)}
-          className={classNames({
-            'radio-button': true,
-            'radio-button-selected': option.value === this.props.selected,
-          })}
+          className='simple-radio-outline'
+          style={borderColor(color)}
         >
+          <div
+            className='simple-radio-fill'
+            style={backgroundColor(color)}
+          />
         </div>
-        {option.label !== undefined ? option.label : option.value}
-        <br />
-      </div>
-    );
-  }
-
-  public render()
-  {
-    return (
-      <div>
-        {this.props.options.map(this.renderOption)}
+        <div
+          className='simple-radio-label'
+        >
+          {
+            this.props.label
+          }
+        </div>
       </div>
     );
   }
 }
 
-export default RadioButtons;
+export default SimpleRadio;

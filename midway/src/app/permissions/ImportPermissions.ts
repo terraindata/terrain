@@ -64,10 +64,6 @@ export class ImportPermissions
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (user.isSuperUser === 0)
-      {
-        return reject('User must be a super user.');
-      }
       return resolve();
     });
   }

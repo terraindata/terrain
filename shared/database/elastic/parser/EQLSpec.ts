@@ -102,6 +102,12 @@ const EQLSpec: ESClause[] =
         desc: 'A string. Strings are enclosed in double quotes ("example string"). Quotes and other special symbols can be encoded by escaping them. See json.org for more information.',
         url: 'http://www.json.org/',
       }),
+    new ESStringClause('time_string',
+      {
+        path: ['value'],
+        desc: 'A string that represents a duration of time with a number followed by an elasticsearch time unit. 30m is thirty minutes, 2d is two days, and so on.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#time-units',
+      }),
     new ESObjectClause('object',
       {
         path: ['value'],
@@ -175,20 +181,55 @@ const EQLSpec: ESClause[] =
         'NM',
       ],
       {}),
+    // node_modules/elasticsearch/src/lib/apis/6_x.js
     new ESStructureClause('root',
       {
+        analyzer: 'analyzer',
+        analyzeWildcard: 'boolean', // name analyze_wildcard
+        defaultOperator: 'query_string_default_operator',
+        df: 'query_string_default_field',
+        explain: 'explain',
+        storedFields: 'field[]',
+        docvalueFields: 'field[]',
+        from: 'from',
+        ignoreUnavailable: 'boolean',
+        allowNoIndices: 'boolean',
+        explainWildcards: 'explain_wildcards',
+        lenient: 'boolean',
+        preference: 'string',
+        q: 'string',
+        routing: 'string[]',
+        scroll: 'time_string',
+        searchType: 'search_type',
+        sort: 'string[]',
+        _source: 'string[]',
+        _sourceExclude: 'string[]',
+        _sourceInclude: 'string[]',
+        terminateAfter: 'number',
+        stats: 'string[]',
+        suggestField: 'string',
+        suggestMode: 'suggest_mode', // enum suggest_mode
+        suggestSize: 'number',
+        suggestText: 'string',
+        timeout: 'time_string',
+        trackScores: 'boolean',
+        trackTotalHits: 'boolean',
+        typedKeys: 'boolean',
+        version: 'boolean',
+        requestCache: 'boolean',
+        batchedReduceSize: 'number', // name batched_reduce_size
+        maxConcurrentShardRequests: 'number', // max_concurrent_shard_requests
+        preFilterShardSize: 'number', // pre_filter_shard_size
         index: 'index',
         type: 'type',
-        from: 'from',
         size: 'size',
         body: 'body',
-        search_type: 'search_type',
       },
       {
         name: 'root clause',
         path: ['primary'],
         desc: 'The outermost clause object that contains an entire search query.',
-        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/6.x/search-search.html',
         template: { index: null, type: null, from: null, size: null, body: null },
         suggestions: ['body', 'index', 'type', 'from', 'size'],
       }),
@@ -216,33 +257,50 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
         template: 1000,
       }),
+    new ESEnumClause('explain_wildcards',
+      ['open', 'closed', 'none', 'all'],
+      {
+        path: ['control'],
+        desc: 'Explain wildcards.',
+        template: 'open',
+      }),
     new ESStructureClause('body',
       {
-        from: 'from',
-        size: 'size',
-        sort: 'sort_clause',
-        track_scores: 'track_scores',
-        query: 'query',
-        _source: '_source',
-        _name: 'query_name',
-        stored_fields: 'field[]',
-        script_fields: 'script_fields',
-        docvalue_fields: 'field[]',
-        post_filter: 'post_filter',
-        highlight: 'highlight',
-        rescore: 'rescore',
-        explain: 'explain',
+        // value
+        from: 'from', // value
+        size: 'size', // value
+        timeout: 'time_string', // value
+        terminate_after: 'number', // value
+        min_score: 'number',
         version: 'version',
-        indices_boost: 'index_boost[]',
-        min_score: 'min_score',
-        inner_hits: 'inner_hits',
-        collapse: 'collapse', // TODO: continue adding from here
-        search_after: 'search_after',
+        explain: 'explain',
+        track_scores: 'track_scores',
+        _source: '_source', // value or object or array
+        stored_fields: 'field[]', // value or array
+        sort: 'sort_clause',  // value or object or array
+        profile: 'boolean',
+        query: 'query', // object
+        post_filter: 'post_filter', // object
+        script_fields: 'script_fields', // object
+        indices_boost: 'index_boost[]', // array
+        aggregations: 'aggs_query',
+        aggs: 'aggs_query',
+        highlight: 'highlight',
         suggest: 'suggest',
-        aggregations: 'any[]',
-        aggs: 'any',
-        cutoff_frequency: 'cutoff_frequency',
-        minimum_should_match: 'minimum_should_match',
+        rescore: 'rescore', // object or array
+        slice: 'slice', // object
+        collapse: 'collapse', // TODO: continue adding from here object
+        script: 'script',
+        docvalue_fields: 'field[]', // array
+        stats: 'number[]',
+        search_after: 'search_after',
+        ignore_failure: 'boolean',
+        all_fields: 'boolean',
+        // ext: 'ext', not much documents about the usage of this ext
+        //        _name: 'query_name',
+        //        inner_hits: 'inner_hits',
+        //      cutoff_frequency: 'cutoff_frequency',
+        //        minimum_should_match: 'minimum_should_match',
       },
       {
         name: 'body',
@@ -251,6 +309,61 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: { query: null },
         suggestions: ['query', 'sort', 'from', 'size'],
+      }),
+    new ESStructureClause('slice',
+      {
+        field: 'field',
+        id: 'number',
+        max: 'number',
+      },
+      {
+        path: ['primary'],
+        name: 'slice',
+        desc: 'A slice allowing to split a scroll in multiple partitions',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html',
+      }),
+    // aggregation
+    // AggregatorFactories.java
+    new ESMapClause('aggs_query',
+      'aggregation_name',
+      'aggregation_builder',
+      {
+        path: ['aggregation'],
+        name: 'aggregation query',
+        desc: 'Create and name an aggregation query.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations',
+      }),
+    new ESStringClause('aggregation_name',
+      {
+        path: ['aggregation'],
+        desc: 'names this aggregation, must be alpha-numeric and can only contain \'_\' and \'-\'',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations',
+      }),
+    new ESStructureClause('aggregation_builder',
+      {
+        aggs: 'aggs_query',
+        aggregations: 'aggs_query',
+        avg: 'metrics_avg',
+      },
+      {
+        path: ['aggregation'],
+        desc: 'Provides aggregated data based on the aggregation query.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations.',
+      }),
+    // AvgAggregationBuilder.java
+    // ValuesSourceParserHelper.declareNumericFields(PARSER, true, true, false);
+    new ESStructureClause('metrics_avg',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that computes the average of numeric values that are extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-avg-aggregation.html',
       }),
     new ESVariantClause('sort_object',
       {
@@ -741,6 +854,7 @@ const EQLSpec: ESClause[] =
         desc: 'The name of the stored script to call.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting-using.html#modules-scripting-stored-scripts',
       }),
+    // FetchSourceContext.java
     new ESVariantClause('_source',
       {
         object: 'includeExclude',

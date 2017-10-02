@@ -129,7 +129,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors?: string[]; // optional, filled below
         title?: string; // optional, filled below
-        key?: string; // optional, the default key of the card
 
         preview: string | ((c: Card) => string);
         display: Display | Display[];
@@ -410,6 +409,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template === undefined ? '' : clause.template,
+      key: 'index',
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.indexClause),
         preview: '[value]',
@@ -634,7 +634,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     return GetCardVisitor.seedCard(clause,
       {
         cards: List([]),
-        key: clause.name,
         // provide options of all possible card types (overwrite static.accepts)
         getChildOptions: (card, backend: Backend) =>
         {
@@ -740,6 +739,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: typeof clause.template === 'string' ? clause.template : '',
+      key: 'type',
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.typeClause),
         preview: '[value]',

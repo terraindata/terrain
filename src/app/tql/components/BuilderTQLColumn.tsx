@@ -92,7 +92,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     resultsBarOpen: boolean;
   } = {
     tql: this.props.query.tql,
-    theme: localStorage.getItem('theme') || 'monokai',
+    theme: 'monokai',
     runMode: 'auto',
     highlightedLine: null,
     theme_index: 0,
@@ -174,32 +174,32 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     BuilderActions.changeTQL(this.state.tql);
   }
 
-  public changeThemeDefault()
-  {
-    localStorage.setItem('theme', 'default');
-    this.setState({
-      theme: 'default',
-      theme_index: 0,
-    });
-  }
+  // public changeThemeDefault()
+  // {
+  //   localStorage.setItem('theme', 'default');
+  //   this.setState({
+  //     theme: 'default',
+  //     theme_index: 0,
+  //   });
+  // }
 
-  public changeThemeMonokai()
-  {
-    localStorage.setItem('theme', 'monokai');
-    this.setState({
-      theme: 'monokai',
-      theme_index: 0,
-    });
-  }
+  // public changeThemeMonokai()
+  // {
+  //   localStorage.setItem('theme', 'monokai');
+  //   this.setState({
+  //     theme: 'monokai',
+  //     theme_index: 0,
+  //   });
+  // }
 
-  public getThemeIndex()
-  {
-    switch (this.state.theme)
-    {
-      default:
-        return 0;
-    }
-  }
+  // public getThemeIndex()
+  // {
+  //   switch (this.state.theme)
+  //   {
+  //     default:
+  //       return 0;
+  //   }
+  // }
 
   public changeRunModeToAuto()
   {

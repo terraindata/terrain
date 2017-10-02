@@ -47,6 +47,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { Link } from 'react-router';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import MultiSwitchWrapper from './MultiSwitchWrapper';
 import './X.less';
 
 const xes =
@@ -56,6 +57,11 @@ const xes =
     //   name: 'Immutable Builder',
     //   component: XCards,
     // },
+    multiSwitch:
+    {
+      name: 'Multi Switch Component',
+      component: MultiSwitchWrapper,
+    },
   };
 
 export interface Props

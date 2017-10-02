@@ -82,6 +82,7 @@ export interface ExportConfig extends ImportConfig, ExportTemplateConfig
 {
   filetype: string;
   rank?: boolean;
+  objectKey?: string;
 }
 
 export class Import
@@ -133,7 +134,7 @@ export class Import
 
       const dbSchema: Tasty.Schema = await database.getTasty().schema();
 
-      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json')
+      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json' && exprt.filetype !== 'json [type object]')
       {
         return reject('Filetype must be either CSV or JSON.');
       }
@@ -212,15 +213,21 @@ export class Import
       {
         writer = csvWriter();
       }
-      else if (exprt.filetype === 'json')
+      else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
       {
         writer = new stream.PassThrough();
       }
       const pass = new stream.PassThrough();
       writer.pipe(pass);
 
-      if (exprt.filetype === 'json')
+      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
       {
+        if (exprt.filetype === 'json [type object]')
+        {
+          writer.write('{ \"');
+          writer.write(exprt.objectKey);
+          writer.write('\":');
+        }
         writer.write('[');
       }
 
@@ -311,7 +318,7 @@ export class Import
           {
             writer.write(returnDoc);
           }
-          else if (exprt.filetype === 'json')
+          else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
           {
             isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
             writer.write(JSON.stringify(returnDoc));
@@ -326,9 +333,13 @@ export class Import
         }
         else
         {
-          if (exprt.filetype === 'json')
+          if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
           {
             writer.write(']');
+            if (exprt.filetype === 'json [type object]')
+            {
+              writer.write('}');
+            }
           }
           writer.end();
           resolve(pass);

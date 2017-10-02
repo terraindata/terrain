@@ -92,6 +92,7 @@ export interface Props
   columnTypes: List<ColumnTypesTree>;
   filetype: string;
   requireJSONHaveAllFields: boolean;
+  objectKey: string;
 
   columnOptions: List<string>;
   templates: List<Template>;
@@ -133,6 +134,7 @@ class FileImportPreview extends TerrainComponent<Props>
     addColumnName: string,
     previewErrorMsg: string,
     advancedCheck: boolean,
+    typeObjectKey: string,
     advancedExportRank: boolean,
     exportFiletype: string,
     leaving: boolean,
@@ -157,6 +159,7 @@ class FileImportPreview extends TerrainComponent<Props>
     addColumnName: '',
     previewErrorMsg: '',
     advancedCheck: this.props.requireJSONHaveAllFields,
+    typeObjectKey: this.props.objectKey,
     advancedExportRank: this.props.exportRank,
     exportFiletype: 'csv',
     leaving: false,
@@ -393,12 +396,36 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleAdvanced()
   {
+    if (this.state.exportFiletype === 'json [type object]')
+    {
+      if (this.state.typeObjectKey === '')
+      {
+        this.setState({
+          showResponseModal: true,
+          responseModalContent: 'Must enter an object key value',
+          responseModalTitle: 'Error saving template',
+          responseModalError: true,
+
+        });
+        this.showAdvanced();
+      }
+    }
+
     if (this.props.exporting)
     {
       Actions.setExportFiletype(this.state.exportFiletype);
       Actions.toggleExportRank(this.state.advancedExportRank);
+      Actions.setTypeObjectKey(this.state.typeObjectKey);
     }
     Actions.togglePreviewColumn(this.state.advancedCheck);
+  }
+
+  public handleObjectKeyInput(ev: any)
+  {
+    const { value } = ev.target;
+    this.setState({
+      typeObjectKey: value,
+    });
   }
 
   public handleUpdateTemplateSuccess(templateName: string)
@@ -616,6 +643,7 @@ class FileImportPreview extends TerrainComponent<Props>
         this.props.serverId,
         dbName,
         this.props.exportRank,
+        this.state.typeObjectKey,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,
         this.handleFileExportSuccess,
         this.handleFileExportError,
@@ -703,6 +731,12 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderAdvancedModal()
   {
+    const dropdownTooltips = Immutable.List(
+      [
+        'Creates a json file where the data is an array of all results',
+        'Creates a json file where the data is an object with a single key with an array of all results as it\'s key',
+        'Creates a csv file',
+      ]);
     const advancedModalContent = this.props.exporting ?
       <div
         className='fi-advanced-fields'
@@ -732,7 +766,26 @@ class FileImportPreview extends TerrainComponent<Props>
           canEdit={true}
           className={'fi-advanced-fields-dropdown'}
           openDown={true}
+          tooltips={dropdownTooltips}
         />
+        {
+          this.state.exportFiletype === 'json [type object]' ?
+            <div className='fi-advanced-bottom-margin'>
+              <div className='fi-advanced-fields-dropdown-label'>
+                Key for Type Object:
+              </div>
+              <input
+                key={'object-key-input'}
+                id='object-key-id'
+                type='text'
+                value={this.state.typeObjectKey}
+                onChange={this.handleObjectKeyInput}
+                className={'fi-advanced-fields-input'}
+              />
+            </div>
+            :
+            <div className='fi-advanced-bottom-margin' />
+        }
       </div>
       :
       <div

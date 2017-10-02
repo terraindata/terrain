@@ -147,20 +147,11 @@ export const elasticTransform = _card(
         };
       },
 
-      init: (blocksConfig) => (
-        {
-          scorePoints: List([
-            BlockUtils.make(blocksConfig, 'scorePoint', {
-              value: 2,
-              score: 0.2,
-            }),
-            BlockUtils.make(blocksConfig, 'scorePoint', {
-              value: 15,
-              score: 0.5,
-            }),
-          ]),
-        }
-      ),
+      // init: (blocksConfig) => (
+      //   {
+      //     scorePoints: List([]),
+      //   }
+      // ),
 
       metaFields: ['domain', 'hasCustomDomain'],
     },
