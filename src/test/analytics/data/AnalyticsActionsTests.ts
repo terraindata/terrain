@@ -126,7 +126,7 @@ field=@timestamp`)
       const store = mockStore({ analytics });
 
       store.dispatch(
-        Actions.fetch(variantId, metricId, (variantIdParam, analyticsResponseParam) =>
+        Actions.fetch([variantId], metricId, (analyticsResponseParam) =>
         {
           expect(store.getActions()).toEqual(expectedActions);
         }),

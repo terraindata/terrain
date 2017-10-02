@@ -1073,10 +1073,16 @@ export const Ajax =
       );
     },
 
-    getAnalytics(variantId: ID, start: Date, end: Date,
-      metricId: number, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
+    getAnalytics(
+      variantIds: ID[],
+      start: Date,
+      end: Date,
+      metricId: number,
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void)
     {
       const args = {
+        variantid: variantIds.join(','),
         start: start.toISOString(),
         end: end.toISOString(),
         interval: 'day',
@@ -1087,7 +1093,7 @@ export const Ajax =
 
       return Ajax.req(
         'get',
-        `events/variants/${variantId}`,
+        `events`,
         {},
         (response: any) =>
         {
@@ -1100,7 +1106,7 @@ export const Ajax =
             onError && onError(response as any);
           }
         },
-        { urlArgs: args });
+        { onError, urlArgs: args });
     },
   };
 

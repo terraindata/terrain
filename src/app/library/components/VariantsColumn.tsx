@@ -120,7 +120,7 @@ class VariantsColumn extends TerrainComponent<Props>
       {
         const numericId = parseInt(id, 10);
         this.props.variantActions.select(id);
-        this.props.analyticsActions.fetch(numericId, analytics.selectedMetric);
+        this.props.analyticsActions.fetch([numericId], analytics.selectedMetric);
       });
     }
 
@@ -305,7 +305,7 @@ class VariantsColumn extends TerrainComponent<Props>
       } else
       {
         this.props.variantActions.select(id.toString());
-        this.props.analyticsActions.fetch(id, analytics.selectedMetric);
+        this.props.analyticsActions.fetch([id], analytics.selectedMetric);
       }
     } else
     {
@@ -358,7 +358,6 @@ class VariantsColumn extends TerrainComponent<Props>
     //     role = 'Builder';
     //   }
     // }
-
     return (
       <LibraryItem
         index={index}
@@ -373,6 +372,7 @@ class VariantsColumn extends TerrainComponent<Props>
         canArchive={canDrag && variant.status !== ItemStatus.Archive}
         canDuplicate={canEdit}
         canUnarchive={variant.status === ItemStatus.Archive}
+        canRename={variant.status !== ItemStatus.Live && variant.status !== ItemStatus.Default}
         key={variant.id}
         to={`/${basePath}/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'
