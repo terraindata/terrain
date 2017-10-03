@@ -343,7 +343,20 @@ const EQLSpec: ESClause[] =
       {
         aggs: 'aggs_query',
         aggregations: 'aggs_query',
-        avg: 'metrics_avg',
+        avg: 'metric_avg',
+        cardinality: 'metric_cardinality',
+        extended_stats: 'metric_extend_stats',
+        geo_bounds: 'metric_geo_bounds',
+        centroid: 'metric_centroid',
+        percentiles: 'metric_percentiles',
+        percentile_ranks: 'metric_percentiles',
+        stats: 'metric_stats',
+        sum: 'metric_sum',
+        top_hits: 'inner_hits',
+        value_count: 'metric_value_count',
+        scripted_metric: 'scripted_metric',
+        max: 'metric_max',
+        min: 'metric_min',
         histogram: 'histogram_aggregation',
         terms: 'terms_aggregation',
         range: 'range_aggregation',
@@ -353,8 +366,6 @@ const EQLSpec: ESClause[] =
         desc: 'Provides aggregated data based on the aggregation query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations.',
       }),
-    // AvgAggregationBuilder.java
-    // ValuesSourceParserHelper.declareNumericFields(PARSER, true, true, false);
     new ESStructureClause('terms_aggregation',
       {
         field: 'field',
@@ -448,7 +459,9 @@ const EQLSpec: ESClause[] =
         desc: 'Bounds for buckets of a histogram aggregation',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-histogram-aggregation.html',
       }),
-    new ESStructureClause('metrics_avg',
+    // AvgAggregationBuilder.java
+    // ValuesSourceParserHelper.declareNumericFields(PARSER, true, true, false);
+    new ESStructureClause('metric_avg',
       {
         field: 'field', // numerical field
         missing: 'number',
@@ -461,6 +474,187 @@ const EQLSpec: ESClause[] =
         desc: 'A single-value metrics aggregation that computes the average of numeric values that are extracted from the aggregated documents.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-avg-aggregation.html',
       }),
+    // CardinalityAggregationBuilder.java
+    // ValuesSourceParserHelper.declareAnyFields(PARSER, true, false);
+    // PARSER.declareLong(CardinalityAggregationBuilder::precisionThreshold, CardinalityAggregationBuilder.PRECISION_THRESHOLD_FIELD);
+    new ESStructureClause('metric_cardinality',
+      {
+        field: 'field', // any field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        precision_threshold: 'number',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that calculates an approximate count of distinct values.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-cardinality-aggregation.html#_counts_are_approximate',
+      }),
+    // ExtendedStatsAggregationBuilder.java
+    //        ValuesSourceParserHelper.declareNumericFields(PARSER, true, true, false);
+    // PARSER.declareDouble(ExtendedStatsAggregationBuilder::sigma, ExtendedStatsAggregator.SIGMA_FIELD);
+    new ESStructureClause('metric_extend_stats',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+        sigma: 'number',
+      },
+      {
+        name: 'extend stats aggregation',
+        path: ['metric aggregation'],
+        desc: 'A multi-value metrics aggregation that computes stats over numeric values extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-avg-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_geo_bounds',
+      {
+        field: 'field', // GEOPOINT field
+        missing: 'number',
+        value_type: 'string',
+        wrap_longitude: 'boolean',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A metric aggregation that computes the bounding box containing all geo_point values for a field.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-geobounds-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_centroid',
+      {
+        field: 'field', // GEOPOINT field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A metric aggregation that computes the weighted centroid from all coordinate values for a Geo-point datatype field.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-geocentroid-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_max',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that keeps track and returns the maximum value.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-max-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_value_count',
+      {
+        field: 'field', // any field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that counts the number of values that are extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-valuecount-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_min',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that keeps track and returns the minimum value.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-min-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_percentiles',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+        percents: 'number[]', // double array
+        keyed: 'boolean',
+        tdigest: 'percentiles_tdigest',
+        hdr: 'percentiles_hdr',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A multi-value metrics aggregation that calculates one or more percentiles over numeric values extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-percentile-aggregation.html',
+      }),
+
+    new ESStructureClause('percentiles_tdigest',
+      {
+        compression: 'number',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'Compression controls memory usage and approximation error',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-percentile-aggregation.html#search-aggregations-metrics-percentile-aggregation-compression',
+      }),
+
+    new ESStructureClause('percentiles_hdr',
+      {
+        number_of_significant_value_digits: 'number',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'Uses HDR Histogram to compute percentiles.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-percentile-aggregation.html#_hdr_histogram',
+      }),
+
+    new ESStructureClause('scripted_metric',
+      {
+        init_script: 'script',
+        map_script: 'script',
+        combine_script: 'script',
+        reduce_script: 'script',
+        params: 'script_params',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A metric aggregation that executes using scripts to provide a metric output. (experimental)',
+        url: 'A metric aggregation that executes using scripts to provide a metric output.',
+      }),
+    new ESStructureClause('metric_stats',
+      {
+        field: 'field', // numeric field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A multi-value metrics aggregation that computes stats over numeric values extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-stats-aggregation.html',
+      }),
+    new ESStructureClause('metric_sum',
+      {
+        field: 'field', // numeric field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that sums up numeric values that are extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-sum-aggregation.html',
+      }),
+
     new ESVariantClause('sort_object',
       {
         'object:_script': 'script_sort',
