@@ -52,6 +52,8 @@ import * as winston from 'winston';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { ExportConfig, Import } from '../import/Import';
+import { UserConfig } from '../users/Users';
+import { versions } from '../versions/VersionRouter';
 
 export const imprt: Import = new Import();
 
@@ -108,7 +110,7 @@ export class Scheduler
     );
   }
 
-  public async archive(id: number): Promise<SchedulerConfig[]>
+  public async archive(user: UserConfig, id: number): Promise<SchedulerConfig[]>
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -149,7 +151,7 @@ export class Scheduler
     });
   }
 
-  public async changeActiveStatus(id: number, status: number): Promise<SchedulerConfig[]>
+  public async changeActiveStatus(user: UserConfig, id: number, status: number): Promise<SchedulerConfig[]>
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
@@ -170,22 +172,7 @@ export class Scheduler
     });
   }
 
-  public async createJob(job: (...argss) => any): Promise<number>
-  {
-    return new Promise<number>(async (resolve, reject) =>
-    {
-      let lastKey: number = Number(Object.keys(this.jobMap).sort().reverse()[0]);
-      if (lastKey === undefined || isNaN(lastKey))
-      {
-        lastKey = -1;
-      }
-      lastKey += 1;
-      this.jobMap[lastKey] = job;
-      resolve(lastKey);
-    });
-  }
-
-  public async createCustomSchedule(req: SchedulerConfig): Promise<SchedulerConfig>
+  public async createCustomSchedule(user: UserConfig, req: SchedulerConfig): Promise<SchedulerConfig>
   {
     return new Promise<SchedulerConfig>(async (resolve, reject) =>
     {
@@ -214,7 +201,7 @@ export class Scheduler
       req.archived = 0;
       req.jobId = jobId;
       req.paramsScheduleArr = packedParamsSchedule;
-      const newScheduledJob: SchedulerConfig[] = await this.upsert(req);
+      const newScheduledJob: SchedulerConfig[] = await this.upsert(user, req);
       const resultJobId: string = newScheduledJob[0]['id'] !== undefined ? (newScheduledJob[0]['id'] as any).toString() : '-1';
       packedParamsSchedule = [resultJobId].concat(packedParamsSchedule);
       const job: any = nodeScheduler.scheduleJob(req.schedule,
@@ -224,7 +211,22 @@ export class Scheduler
     });
   }
 
-  public async createStandardSchedule(req: SchedulerConfig): Promise<SchedulerConfig | null>
+  public async createJob(job: (...argss) => any): Promise<number>
+  {
+    return new Promise<number>(async (resolve, reject) =>
+    {
+      let lastKey: number = Number(Object.keys(this.jobMap).sort().reverse()[0]);
+      if (lastKey === undefined || isNaN(lastKey))
+      {
+        lastKey = -1;
+      }
+      lastKey += 1;
+      this.jobMap[lastKey] = job;
+      resolve(lastKey);
+    });
+  }
+
+  public async createStandardSchedule(user: UserConfig, req: SchedulerConfig): Promise<SchedulerConfig | null>
   {
     return new Promise<SchedulerConfig | null>(async (resolve, reject) =>
     {
@@ -232,7 +234,7 @@ export class Scheduler
       {
         req.active = 1;
         req.archived = 0;
-        const newScheduledJob: SchedulerConfig[] = await this.upsert(req);
+        const newScheduledJob: SchedulerConfig[] = await this.upsert(user, req);
         const resultJobId: string = newScheduledJob[0]['id'] !== undefined ? (newScheduledJob[0]['id'] as any).toString() : '-1';
         const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[resultJobId]);
         this.scheduleMap[resultJobId] = job;
@@ -392,7 +394,7 @@ export class Scheduler
     });
   }
 
-  public async upsert(schedule: SchedulerConfig): Promise<SchedulerConfig[]>
+  public async upsert(user: UserConfig, schedule: SchedulerConfig): Promise<SchedulerConfig[]>
   {
     // TODO: cancel job if it's currently running
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
@@ -455,6 +457,8 @@ export class Scheduler
               }
             }
           }
+          // insert a version to save the past state of this schedule
+          await versions.create(user, 'schedules', schedule.id, schedule);
         }
       }
       else
