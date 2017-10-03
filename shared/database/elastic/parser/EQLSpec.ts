@@ -383,7 +383,7 @@ const EQLSpec: ESClause[] =
         partition: 'number',
         num_partitions: 'number',
       }),
-    new ESStructureClause('range_aggregation', 
+    new ESStructureClause('range_aggregation',
       {
         field: 'field',
         ranges: 'ranges[]',
@@ -395,7 +395,7 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-aggregations-bucket-range-aggregation.html',
       },
     ),
-    new ESStructureClause('ranges', 
+    new ESStructureClause('ranges',
       {
         to: 'number',
         from: 'number',
@@ -406,13 +406,13 @@ const EQLSpec: ESClause[] =
         name: 'To From',
         desc: 'Ranges for buckets of a range aggregation',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-aggregations-bucket-range-aggregation.html',
-      }
+      },
     ),
-    new ESStructureClause('to_from', 
+    new ESStructureClause('to_from',
       {
         to: 'number',
         from: 'number',
-      }
+      },
     ),
     new ESStructureClause('histogram_aggregation',
       {
