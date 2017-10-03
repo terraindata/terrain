@@ -180,6 +180,8 @@ const BuilderColumn = createReactClass<any, any>(
 
       ColorsActions.setStyle('.builder-column .builder-title-bar-options .bc-options-svg .cls-1 ', { fill: Colors().altBg1 });
       ColorsActions.setStyle('.builder-column .builder-title-bar-options .menu-wrapper ', { 'border-color': Colors().altBg1 });
+      ColorsActions.setStyle('.builder-column .builder-title-bar .builder-title-bar-title svg .cls-1', { fill: Colors().altBg1 });
+
     },
 
     componentWillUnmount()
@@ -356,7 +358,7 @@ const BuilderColumn = createReactClass<any, any>(
                 }
                 {
                   !canEdit &&
-                  tooltip(<LockedIcon />, cantEditReason)
+                  tooltip( <LockedIcon />, cantEditReason)
                 }
               </span>
             </div>

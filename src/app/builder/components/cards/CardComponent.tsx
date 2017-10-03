@@ -74,6 +74,7 @@ const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { cardStyle, Colors } from '../../../colors/Colors';
+import ColorsActions from '../../../colors/data/ColorsActions';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
@@ -169,6 +170,11 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillMount()
   {
+    ColorsActions.setStyle('.card-drag-handle svg', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', {fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-minimize-icon .st0', {fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-help-icon', {fill: Colors().altBg1});
+
     // TODO
     // this._subscribe(Store, {
     //   stateKey: 'selected',
