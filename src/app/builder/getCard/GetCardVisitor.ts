@@ -125,7 +125,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   protected static seedCard(clause: ESClause,
     obj: {
       [field: string]: any;
-
       static: {
         colors?: string[]; // optional, filled below
         title?: string; // optional, filled below
@@ -140,7 +139,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         getParentTerms?: (card: Card, schemaState) => List<string>;
 
         metaFields?: string[];
-
         init?: InitFn;
       };
     }): any
@@ -440,7 +438,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: getCardColors(clause.path[0], Colors().builder.cards.mapClause),
         preview: '[cards.size] properties',
-
         display:
         {
           displayType: DisplayType.CARDS,
@@ -505,7 +502,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: getCardColors(clause.path[0], Colors().builder.cards.objectClause),
         preview: '[cards.size] properties',
-
         display:
         {
           displayType: DisplayType.CARDS,
@@ -556,7 +552,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.stringClause),
         preview: '[value]',
-
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -709,7 +704,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             );
             return json;
           },
-
           colors: getCardColors(clause.path[0], Colors().builder.cards.structureClause),
           preview: '[cards.size] Properties',
 

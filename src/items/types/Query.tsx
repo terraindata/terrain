@@ -92,6 +92,11 @@ class QueryC
   excludeFields = ['dbFields', 'excludeFields'];
 
   modelVersion = 2; // 2 is for the first version of Node midway
+
+  //what order the cards are in the tuning column
+  tuningOrder: List<string> = List([]);
+  cardKeyPaths: Map<ID, KeyPath> = Map<ID, KeyPath>({});
+
 }
 const Query_Record = Record(new QueryC());
 export interface Query extends QueryC, IRecord<Query> { }
@@ -104,7 +109,8 @@ export const _Query = (config?: object) =>
   config['inputs'] = BlockUtils.recordFromJS(config['inputs'] || [], Blocks);
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
   config['meta'] = Map<string, any>(config['meta']);
-
+  config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);
+  config['tuningOrder'] = List<string>(config['tuningOrder']);
   const query = new Query_Record(config) as any as Query;
 
   return query;

@@ -442,6 +442,12 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     [ActionTypes.results]: (state: BuilderState,
       action: Action<{ resultsState, exportState }>) =>
       state.set('resultsState', action.payload.resultsState),
+
+    [ActionTypes.updateKeyPath]: (state: BuilderState, action: Action<{
+      id: ID,
+      keyPath: KeyPath,
+    }>) =>
+      state.setIn(['query', 'cardKeyPaths', action.payload.id], action.payload.keyPath),
   };
 
 function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
