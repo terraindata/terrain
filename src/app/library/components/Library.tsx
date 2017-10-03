@@ -185,7 +185,6 @@ class Library extends TerrainComponent<any>
   public render()
   {
     const { library: libraryState, analytics } = this.props;
-
     const {
       dbs,
       groups,
@@ -299,6 +298,7 @@ class Library extends TerrainComponent<any>
               variantActions: this.props.libraryVariantActions,
               analytics,
               analyticsActions: this.props.analyticsActions,
+              algorithms,
             }}
           />
           {!variantsMultiselect ?
