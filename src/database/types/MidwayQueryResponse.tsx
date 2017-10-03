@@ -67,24 +67,7 @@ export default class MidwayQueryResponse extends QueryResponse
 
   public static formatElasticResult(result: QueryResult): any
   {
-    const r = result as ElasticQueryResult;
-    // format hits (main results)
-    const hits = result.hits.hits;
-    const results = hits.map((hit) =>
-    {
-      const source = hit._source;
-      source._index = hit._index;
-      source._type = hit._type;
-      source._id = hit._id;
-      source._score = hit._score;
-      if (hit.sort !== undefined)
-      {
-        source._sort = hit.sort[0];
-      }
-      return source;
-    });
-    r.hits = results;
-    return r;
+    return result;
   }
 
   public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request: QueryRequest)
