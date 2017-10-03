@@ -372,7 +372,6 @@ const EQLSpec: ESClause[] =
         size: 'number',
         shard_size: 'number',
         order: 'aggregation_order',
-        aggs: 'aggs_query',
         min_doc_count: 'number',
         include: 'include_exclude',
         exclude: 'include_exclude',
