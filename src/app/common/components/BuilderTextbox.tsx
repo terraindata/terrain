@@ -161,6 +161,8 @@ class BuilderTextbox extends TerrainComponent<Props>
   public componentWillMount()
   {
     ColorsActions.setStyle('.builder-tb input &::placeholder ', { color: Colors().text3 + '!important' });
+    ColorsActions.setStyle('.builder-tb input ', { color: Colors().text1 });
+
   }
 
   public getCreatingType(): string

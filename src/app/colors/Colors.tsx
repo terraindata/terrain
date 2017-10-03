@@ -93,6 +93,7 @@ interface Theme
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
   inputBg: string;
+  inputBorder: string;
 
   scrollbarBG: string;
   scrollbarPiece: string;
@@ -344,6 +345,7 @@ const DARK: Theme =
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
     inputBg: 'rgba(0,0,0,0.25)',
+    inputBorder: 'none',
 
     active: darkActive,
     activeText: '#fff',
@@ -576,6 +578,7 @@ const LIGHT: Theme =
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
     inputBg: 'rgb(237, 239, 243)',
+    inputBorder: '1px solid rgb(200, 202, 206)',
 
     active: darkActive,
     activeText: '#fff',

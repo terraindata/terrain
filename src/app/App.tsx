@@ -265,10 +265,13 @@ class App extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('input', { background: Colors().inputBg, color: Colors().text1 });
+    ColorsActions.setStyle('input', { background: Colors().inputBg, color: Colors().text1, border: Colors().inputBorder });
+    ColorsActions.setStyle('input:hover', { background: Colors().inputBg + ' !important', border: Colors().inputBorder + ' !important' });
+    ColorsActions.setStyle('input:focus', { background: Colors().inputBg + ' !important', border: Colors().inputBorder + ' !important' });
     ColorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
     ColorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
     ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
+    ColorsActions.setStyle('.card-muted-input input:hover', { background: Colors().inputBg + ' !important', border: Colors().inputBorder });
     ColorsActions.setStyle('.close', { fill: Colors().altBg1 });
 
     const tooltipStyles = generateThemeStyles();
