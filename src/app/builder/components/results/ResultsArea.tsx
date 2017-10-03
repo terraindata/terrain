@@ -73,8 +73,10 @@ import Radium = require('radium');
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
+import MapComponent from '../../../common/components/MapComponent';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
+import MapUtil from '../../../util/MapUtil';
 import { MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultTypes';
 
 const RESULTS_PAGE_SIZE = 20;
@@ -219,6 +221,55 @@ class ResultsArea extends TerrainComponent<Props>
   {
     const { query } = this.props;
     return !query || (!query.tql && !query.cards.size);
+  }
+
+  /*
+  The code below is code to build an aggregation map that shows the target location and
+  all the numbered locations of the reuslts.
+  To use this method and render a map(s):
+  // locations is created in renderResults() and is a map of fieldName: locationValue from the query
+  // results is from this.props.query.results
+  const mapData = this.buildAggregationMap(locations, results);
+  if (mapData !== undefined && mapData.length > 0)
+    {
+      return (
+        mapData.map((data, index) =>
+          <MapComponent
+            location={data.target}
+            multiLocations={data.multiLocations}
+            markLocation={true}
+            showSearchBar={false}
+            showDistanceCircle={false}
+            hideSearchSettings={true}
+            zoomControl={true}
+            colorMarker={true}
+            key={index}
+          />
+        )
+      );
+    }
+  */
+  public buildAggregationMap(locations, results)
+  {
+    const allMapsData = [];
+    _.keys(locations).forEach((field) =>
+    {
+      let multiLocations = [];
+      const target = MapUtil.getCoordinatesFromGeopoint(locations[field]);
+      results.forEach((result, i) =>
+      {
+        const { resultsConfig } = this.props.query;
+        const name = resultsConfig.enabled && resultsConfig.name !== undefined ?
+          result.fields.get(resultsConfig.name) : result.fields.get('_id');
+        multiLocations.push({
+          location: result.fields.get(field),
+          name,
+          index: i + 1,
+        });
+      });
+      allMapsData.push({ target, multiLocations });
+    });
+    return allMapsData;
   }
 
   public renderResults()

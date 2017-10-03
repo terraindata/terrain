@@ -484,19 +484,19 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
 
       case 'map':
         const resultLocation = MapUtil.getCoordinatesFromGeopoint(value);
-        let fieldLocation: [number, number];
+        let targetLocation: [number, number];
         if (locations !== undefined && locations[field] !== undefined)
         {
-          fieldLocation = MapUtil.getCoordinatesFromGeopoint(locations[field]) as [number, number];
+          targetLocation = MapUtil.getCoordinatesFromGeopoint(locations[field]) as [number, number];
         }
 
         return (
           <div className='result-field-value-map-wrapper'>
             <MapComponent
               address={''}
-              location={fieldLocation}
+              location={targetLocation}
               markLocation={true}
-              showDirectDistance={fieldLocation !== undefined}
+              showDirectDistance={targetLocation !== undefined}
               showSearchBar={false}
               zoomControl={false}
               secondLocation={resultLocation}

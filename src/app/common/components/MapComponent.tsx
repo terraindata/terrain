@@ -96,7 +96,18 @@ export interface Props
   field?: any;
   secondaryMarkerColor?: string;
 
+  // For displaying an aggregate map of locations
+  multiLocations?: LocationData[];
+
   className?: string;
+}
+
+interface LocationData
+{
+  location: any;
+  name: string;
+  index: number;
+  color?: string;
 }
 
 // for map markers, distances must be converted to meters
@@ -409,10 +420,34 @@ class MapComponent extends TerrainComponent<Props>
     return R * c;
   }
 
-  public markerIconWithStyle(style, small)
+  public markerIconWithStyle(style, small, index)
   {
     const size = small ? [20, 20] : [40, 40];
     const className = small ? 'map-marker-icon-small' : 'map-marker-icon';
+    const text = index >= 0 ? String(index) : '';
+    let textPos = 0;
+    let textSize = 130;
+
+    // This is hacky, can be improved ?
+    switch (String(index).length)
+    {
+      case 0:
+        textPos = 0;
+        break;
+      case 1:
+        textPos = 217;
+        break;
+      case 2:
+        textPos = 181;
+        break;
+      case 3:
+        textPos = 155;
+        textSize = 100;
+        break;
+      default:
+        break;
+    }
+
     const styledIcon = divIcon({
       html: `<svg class=${className} version="1.1" id="Capa_1"
         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
@@ -421,6 +456,7 @@ class MapComponent extends TerrainComponent<Props>
         C409.719,210.844,416,186.156,416,160C416,71.625,344.375,0,256,0z M256,256c-53.016,0-96-43-96-96s42.984-96,96-96
         c53,0,96,43,96,96S309,256,256,256z"/>
         <circle cx="257" cy="161" r="94" stroke="black" stroke-width="0" fill="white" />
+        <text x="${textPos}" y="209" font-family="Verdana" font-size="${textSize}">${text}</text>
         </g></svg>
     `,
       iconSize: size,
@@ -482,10 +518,10 @@ class MapComponent extends TerrainComponent<Props>
     });
   }
 
-  public renderMarker(address, location, small, color, key?)
+  public renderMarker(address, location, small, index, color, key?)
   {
     const style = 'fill: ' + String(color) + ' !important;';
-    const icon = this.markerIconWithStyle(style, small);
+    const icon = this.markerIconWithStyle(style, small, index);
     return (
       <Marker
         position={location}
@@ -516,7 +552,19 @@ class MapComponent extends TerrainComponent<Props>
     {
       const location = MapUtil.getCoordinatesFromGeopoint(spotlight.fields[this.props.field]);
       const address = spotlight.name;
-      return this.renderMarker(address, location, false, spotlight.color, String(address) + '_' + String(index));
+      return this.renderMarker(address, location, false, -1, spotlight.color, String(address) + '_' + String(index));
+    }
+    return null;
+  }
+
+  public renderMultiLocationMarkers(locationData, index)
+  {
+    if (locationData !== undefined)
+    {
+      const location = MapUtil.getCoordinatesFromGeopoint(locationData.location);
+      const name = locationData.name;
+      const color = locationData.color !== undefined ? locationData.color : 'black';
+      return this.renderMarker(name, location, false, locationData.index, color, String(name) + '_' + String(index));
     }
     return null;
   }
@@ -565,7 +613,7 @@ class MapComponent extends TerrainComponent<Props>
         >
           {
             this.props.markLocation ?
-              this.renderMarker(address, location, secondLocation !== undefined,
+              this.renderMarker(address, location, secondLocation !== undefined, -1,
                 primaryMarkerColor,
               )
               :
@@ -573,7 +621,7 @@ class MapComponent extends TerrainComponent<Props>
           }
           {
             this.props.secondLocation !== undefined && this.props.showDirectDistance ?
-              this.renderMarker(this.props.secondAddress, secondLocation, secondLocation !== undefined,
+              this.renderMarker(this.props.secondAddress, secondLocation, secondLocation !== undefined, -1,
                 this.props.secondaryMarkerColor !== undefined ? this.props.secondaryMarkerColor : 'black')
               :
               null
@@ -581,6 +629,12 @@ class MapComponent extends TerrainComponent<Props>
           {
             this.props.spotlights !== undefined && this.props.spotlights !== null && this.props.spotlights.size > 0 ?
               _.map(this.props.spotlights.toJS(), this.renderSpotlightMarkers)
+              :
+              null
+          }
+          {
+            this.props.multiLocations !== undefined && this.props.multiLocations.length > 0 ?
+              _.map(this.props.multiLocations, this.renderMultiLocationMarkers)
               :
               null
           }
