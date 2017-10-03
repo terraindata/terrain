@@ -60,6 +60,7 @@ import Query from './../../../items/types/Query';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
 import Dropdown from './../../common/components/Dropdown';
+import { notificationManager } from './../../common/components/InAppNotification';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -87,6 +88,8 @@ export interface Props
   columnsToInclude: List<boolean>;
   columnNames: List<string>;
   columnTypes: List<ColumnTypesTree>;
+  objectKey: string;
+
   columnOptions: List<string>;
   templates: List<Template>;
   transforms: List<Transform>;
@@ -130,6 +133,7 @@ class FileImportPreview extends TerrainComponent<Props>
     showingAddColumn: boolean,
     addColumnName: string,
     advancedCheck: boolean,
+    typeObjectKey: string,
     advancedExportRank: boolean,
     exportFiletype: string,
 
@@ -157,6 +161,7 @@ class FileImportPreview extends TerrainComponent<Props>
     showingAddColumn: false,
     addColumnName: '',
     advancedCheck: this.props.requireJSONHaveAllFields,
+    typeObjectKey: this.props.objectKey,
     advancedExportRank: this.props.exportRank,
     exportFiletype: 'csv',
 
@@ -361,12 +366,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleTemplateSaveSuccess()
   {
-    this.setState({
-      showResponseModal: true,
-      responseModalContent: 'Successfully saved template: "' + this.state.saveTemplateName + '"',
-      responseModalTitle: 'Template Saved',
-      responseModalError: false,
-    });
+    notificationManager.addNotification('Template Saved', 'Successfully saved "' + this.state.saveTemplateName + '"', 'info', 4);
   }
 
   public handleSaveTemplate()
@@ -396,22 +396,41 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleAdvanced()
   {
+    if (this.state.exportFiletype === 'json [type object]')
+    {
+      if (this.state.typeObjectKey === '')
+      {
+        this.setState({
+          showResponseModal: true,
+          responseModalContent: 'Must enter an object key value',
+          responseModalTitle: 'Error saving template',
+          responseModalError: true,
+
+        });
+        this.showAdvanced();
+      }
+    }
+
     if (this.props.exporting)
     {
       Actions.setExportFiletype(this.state.exportFiletype);
       Actions.toggleExportRank(this.state.advancedExportRank);
+      Actions.setTypeObjectKey(this.state.typeObjectKey);
     }
     Actions.togglePreviewColumn(this.state.advancedCheck);
   }
 
+  public handleObjectKeyInput(ev: any)
+  {
+    const { value } = ev.target;
+    this.setState({
+      typeObjectKey: value,
+    });
+  }
+
   public handleUpdateTemplateSuccess(templateName: string)
   {
-    this.setState({
-      showResponseModal: true,
-      responseModalContent: 'Successfully updated template: "' + templateName + '"',
-      responseModalTitle: 'Template Updated',
-      responseModalError: false,
-    });
+    notificationManager.addNotification('Template Updated', 'Successfully updated "' + templateName + '"', 'info', 4);
   }
 
   public handleUpdateTemplateError(error: string)
@@ -447,12 +466,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleDeleteTemplateSuccess(templateName: string)
   {
-    this.setState({
-      showResponseModal: true,
-      responseModalContent: 'Successfully deleted template: "' + templateName + '"',
-      responseModalTitle: 'Template Deleted',
-      responseModalError: false,
-    });
+    notificationManager.addNotification('Template Deleted', 'Successfully deleted "' + templateName + '"', 'info', 4);
   }
 
   public handleDeleteTemplate(itemIndex: number)
@@ -582,12 +596,7 @@ class FileImportPreview extends TerrainComponent<Props>
   public handleFileExportSuccess()
   {
     const filename = this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype;
-    this.setState({
-      showResponseModal: true,
-      responseModalContent: 'Successfully exported data to ' + filename,
-      responseModalTitle: 'Data Exported',
-      responseModalError: false,
-    });
+    notificationManager.addNotification('Data Exported', 'Exported data to ' + filename, 'info', 4);
   }
 
   public handleFileExportError(error: string)
@@ -619,6 +628,7 @@ class FileImportPreview extends TerrainComponent<Props>
         this.props.serverId,
         dbName,
         this.props.exportRank,
+        this.state.typeObjectKey,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,
         this.handleFileExportSuccess,
         this.handleFileExportError,
@@ -722,6 +732,12 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderAdvancedModal()
   {
+    const dropdownTooltips = Immutable.List(
+      [
+        'Creates a json file where the data is an array of all results',
+        'Creates a json file where the data is an object with a single key with an array of all results as it\'s key',
+        'Creates a csv file',
+      ]);
     const advancedModalContent = this.props.exporting ?
       <div
         className='fi-advanced-fields'
@@ -751,7 +767,26 @@ class FileImportPreview extends TerrainComponent<Props>
           canEdit={true}
           className={'fi-advanced-fields-dropdown'}
           openDown={true}
+          tooltips={dropdownTooltips}
         />
+        {
+          this.state.exportFiletype === 'json [type object]' ?
+            <div className='fi-advanced-bottom-margin'>
+              <div className='fi-advanced-fields-dropdown-label'>
+                Key for Type Object:
+              </div>
+              <input
+                key={'object-key-input'}
+                id='object-key-id'
+                type='text'
+                value={this.state.typeObjectKey}
+                onChange={this.handleObjectKeyInput}
+                className={'fi-advanced-fields-input'}
+              />
+            </div>
+            :
+            <div className='fi-advanced-bottom-margin' />
+        }
       </div>
       :
       <div

@@ -1,0 +1,66 @@
+@import "../../common/Common.less";
+
+.simple-radio {
+  display: flex;
+  align-items: center;
+  
+  .simple-radio-outline {
+    border-radius: 99px;
+    border: 1px solid;
+    .transition;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    width: 12px;
+    height: 12px;
+    
+    .simple-radio-fill {
+      border-radius: 99px;
+      .transition(~"all 0.25s");
+      width: 0;
+      height: 0;
+    }
+  }
+  
+  .simple-radio-label {
+    margin-left: @spacing;
+    flex-grow: 1;
+    font-size: @font-size;
+  }
+  
+  &.simple-radio-on {
+    .simple-radio-fill {
+      width: calc(~"100% - 2px");
+      height: calc(~"100% - 2px");
+    }
+  }
+  
+  &.simple-radio-small {
+    font-size: @small-font-size;
+    
+    .simple-radio-outline {
+      width: 8px;
+      height: 8px;
+    }
+    
+    .simple-radio-label {
+      margin-left: @spacing / 2;
+    }
+  }
+  
+  &.simple-radio-large {
+    .simple-radio-label {
+      font-size: @pretty-large-font-size;
+    }
+    
+    .simple-radio-outline {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .simple-radio-label {
+      margin-left: @spacing * 3 / 2;
+    }
+  }
+}

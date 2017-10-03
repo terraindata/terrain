@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import RadioButtons from 'common/components/RadioButtons';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
@@ -118,11 +119,13 @@ class Library extends TerrainComponent<any>
   {
     const { analytics } = this.props;
 
+    // Remove when analytics mock up have valid variant ids.
     let data = [];
 
-    if (analytics.get(1) !== undefined)
+    const analyticsData = analytics.data.get(variantId);
+    if (analyticsData !== undefined)
     {
-      data = analytics.get(1);
+      data = analyticsData;
     }
 
     // return [...Array(20).keys()].map((i) =>
@@ -169,10 +172,19 @@ class Library extends TerrainComponent<any>
     localStorage.setItem(lastPath, location.pathname);
   }
 
+  public handleRadioButtonClick(optionValue)
+  {
+    const { selectedVariants } = this.props.library;
+    const selectedVariantIds = selectedVariants.toJS();
+    const numericOptionValue = parseInt(optionValue, 10);
+
+    this.props.analyticsActions.fetch(selectedVariantIds, numericOptionValue);
+    this.props.analyticsActions.selectMetric(optionValue);
+  }
+
   public render()
   {
-    const { library: libraryState } = this.props;
-
+    const { library: libraryState, analytics } = this.props;
     const {
       dbs,
       groups,
@@ -181,6 +193,8 @@ class Library extends TerrainComponent<any>
       selectedVariants,
       groupsOrder,
     } = libraryState;
+
+    const { selectedMetric } = analytics;
 
     const { router, basePath, variantsMultiselect } = this.props;
     const { params } = router;
@@ -252,6 +266,7 @@ class Library extends TerrainComponent<any>
               params,
               basePath,
               groupActions: this.props.libraryGroupActions,
+              variants,
             }}
             isFocused={algorithm === undefined}
           />
@@ -281,7 +296,9 @@ class Library extends TerrainComponent<any>
               basePath,
               router,
               variantActions: this.props.libraryVariantActions,
+              analytics,
               analyticsActions: this.props.analyticsActions,
+              algorithms,
             }}
           />
           {!variantsMultiselect ?
@@ -301,11 +318,28 @@ class Library extends TerrainComponent<any>
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
-            <MultipleAreaChart
-              datasets={datasets}
-              xDataKey={'key'}
-              yDataKey={'doc_count'}
-            />
+            <div style={{ width: '80%', height: '100%' }}>
+              <MultipleAreaChart
+                datasets={datasets}
+                xDataKey={'key'}
+                yDataKey={'doc_count'}
+              />
+            </div>
+            <div style={{
+              width: '20%',
+              height: '100%',
+              backgroundColor: '#333',
+              marginLeft: '10px',
+            }}>
+              <RadioButtons
+                optionShadow={true}
+                selected={selectedMetric.toString()}
+                options={[
+                  { value: '1', label: 'CTR', onClick: this.handleRadioButtonClick },
+                  { value: '2', label: 'Conversions', onClick: this.handleRadioButtonClick },
+                ]}
+              />
+            </div>
           </div> : null
         }
       </div>

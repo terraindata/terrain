@@ -65,6 +65,7 @@ export interface Props
   onChange: (keyPath: KeyPath, value: any, notDirty: boolean) => void;
   // builderState: d.requiresBuilderState && BuilderStore.getState(),
   language: string;
+  handleCardDrop: (cardType: string) => any;
 }
 
 const emptyList = Immutable.List([]);
@@ -147,6 +148,7 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
           language={this.props.language}
           className={this.props.className}
           accepts={accepts}
+          handleCardDrop={this.props.handleCardDrop}
 
           open={this.state.open}
           onToggle={this._toggle('open')}

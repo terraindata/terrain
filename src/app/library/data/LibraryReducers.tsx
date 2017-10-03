@@ -169,7 +169,8 @@ LibraryReducers[ActionTypes.variants.status] =
 
     if (
       !confirmed &&
-      (status === ItemStatus.Live || variant.status === ItemStatus.Live)
+      (status === ItemStatus.Live || variant.status === ItemStatus.Live
+        || status === ItemStatus.Default || variant.status === ItemStatus.Default)
     )
     {
       return state

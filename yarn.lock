@@ -1659,11 +1659,11 @@ body-parser@^1.16.1:
     raw-body "~2.2.0"
     type-is "~1.6.15"
 
-bodybuilder@^2.1.0:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/bodybuilder/-/bodybuilder-2.2.1.tgz#39797fa1c87e5960c30ad229fa6e0a91358bb617"
+bodybuilder@^2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/bodybuilder/-/bodybuilder-2.2.6.tgz#af93b039f86d339dc897630d53aeacf8f342e164"
   dependencies:
-    lodash "4.9.0"
+    lodash "^4.9.0"
 
 bonjour@^3.5.0:
   version "3.5.0"
@@ -5550,15 +5550,11 @@ lodash@2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-2.4.2.tgz#fadd834b9683073da179b3eae6d9c0d15053f73e"
 
-lodash@4.9.0:
-  version "4.9.0"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.9.0.tgz#4c20d742f03ce85dc700e0dd7ab9bcab85e6fc14"
-
 lodash@^3.10.1, lodash@^3.8.0:
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.14.0, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.5.0, lodash@~4.17.2:
+lodash@^4, lodash@^4.0.0, lodash@^4.0.1, lodash@^4.14.0, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.2.0, lodash@^4.2.1, lodash@^4.5.0, lodash@^4.9.0, lodash@~4.17.2:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
@@ -8852,17 +8848,17 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-victory-chart@^21.6.0:
-  version "21.6.1"
-  resolved "https://registry.yarnpkg.com/victory-chart/-/victory-chart-21.6.1.tgz#afe5c4957d7542dc10db6354b416a51a0f176199"
+victory-chart@^22.0.0:
+  version "22.0.0"
+  resolved "https://registry.yarnpkg.com/victory-chart/-/victory-chart-22.0.0.tgz#55f0a85c7d14d4f87ab50b761af0ec1731773e6b"
   dependencies:
     d3-voronoi "^1.1.2"
     lodash "^4.17.4"
-    victory-core "^17.1.0"
+    victory-core "^18.0.0"
 
-victory-core@^17.0.0, victory-core@^17.1.0, victory-core@^17.2.1:
-  version "17.2.5"
-  resolved "https://registry.yarnpkg.com/victory-core/-/victory-core-17.2.5.tgz#b0814383e93a75147148fdc34031e165cca39a7c"
+victory-core@^18.0.0, victory-core@^18.0.2:
+  version "18.0.2"
+  resolved "https://registry.yarnpkg.com/victory-core/-/victory-core-18.0.2.tgz#5a962865d1ce47b1cec740a34a39f8274b6d4e68"
   dependencies:
     d3-ease "^1.0.0"
     d3-interpolate "^1.1.1"
@@ -8871,21 +8867,21 @@ victory-core@^17.0.0, victory-core@^17.1.0, victory-core@^17.2.1:
     d3-timer "^1.0.0"
     lodash "^4.17.4"
 
-victory-pie@^11.4.1:
-  version "11.4.2"
-  resolved "https://registry.yarnpkg.com/victory-pie/-/victory-pie-11.4.2.tgz#333722696bea2b973fcb5420197721c5b02109de"
+victory-pie@^12.0.0:
+  version "12.0.0"
+  resolved "https://registry.yarnpkg.com/victory-pie/-/victory-pie-12.0.0.tgz#60c734d2976be2d011446fdfa9024e0a5922a605"
   dependencies:
     d3-shape "^1.0.0"
     lodash "^4.17.4"
-    victory-core "^17.0.0"
+    victory-core "^18.0.0"
 
-victory@^0.21.3:
-  version "0.21.4"
-  resolved "https://registry.yarnpkg.com/victory/-/victory-0.21.4.tgz#2f1cfbc48d33c9b5f68f1655babbd102e7ce20ce"
+victory@^0.22.0:
+  version "0.22.2"
+  resolved "https://registry.yarnpkg.com/victory/-/victory-0.22.2.tgz#d0c1ab8c77d9cd0b43bd15ba683f1250dae7ba7b"
   dependencies:
-    victory-chart "^21.6.0"
-    victory-core "^17.2.1"
-    victory-pie "^11.4.1"
+    victory-chart "^22.0.0"
+    victory-core "^18.0.2"
+    victory-pie "^12.0.0"
 
 vinyl@^0.5.0:
   version "0.5.3"

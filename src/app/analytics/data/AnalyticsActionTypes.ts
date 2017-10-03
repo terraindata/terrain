@@ -49,6 +49,7 @@ import Util from 'util/Util';
 export const AnalyticsActionTypes =
   {
     fetch: '',
+    selectMetric: '',
   };
 
 Util.setValuesToKeys(AnalyticsActionTypes, 'analytics');
