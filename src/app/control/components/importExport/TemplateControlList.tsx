@@ -128,7 +128,7 @@ class AccessTokenControl extends TerrainComponent<Props>
         text: 'Delete Template',
         onClick: () => this.requestDeleteTemplate(template, index),
         icon: <DeleteIcon className='template-menu-option-icon'/>,
-        iconColor: '#555',
+        iconColor: '#555', // iconColor doesn't work right now
       },
       {
         text: `Headless ${typeText}`,

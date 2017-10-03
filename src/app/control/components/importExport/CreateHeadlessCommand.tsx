@@ -50,11 +50,13 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
+import * as Radium from 'radium';
 import * as React from 'react';
 
 import { backgroundColor, borderColor, Colors, fontColor } from 'common/Colors';
 import Dropdown from 'common/components/Dropdown';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 
 import ControlActions from '../../data/ControlActions';
@@ -63,6 +65,8 @@ import './CreateHeadlessCommand.less';
 
 const Color = require('color');
 const { List } = Immutable;
+const ViewIcon = require('images/icon_search.svg');
+
 type Template = FileImportTypes.Template;
 
 export interface Props
@@ -71,12 +75,17 @@ export interface Props
   index: number;
 }
 
+@Radium
 class CreateHeadlessCommand extends TerrainComponent<Props>
 {
   public state: {
     index: number;
+    fileTypeIndex: number;
+    midwayURLValue: string;
   } = {
     index: this.props.index,
+    fileTypeIndex: 0,
+    midwayURLValue: 'localhost:3000',
   };
 
   public constructor(props)
@@ -117,6 +126,21 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     });
   }
 
+  public handleFileTypeDropdownChange(fileTypeIndex, event)
+  {
+    this.setState({
+      fileTypeIndex
+    });
+  }
+
+  public handleURLChange(ev: any)
+  {
+    const { value } = ev.target;
+    this.setState({
+      midwayURLValue: value,
+    })
+  }
+
   public renderInfoTable(template)
   {
     const typeText = template !== undefined ? (template.export ? 'Export' : 'Import') : '';
@@ -128,13 +152,13 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
           <table className='headless-generator-info-table'>
             <tbody>
               <tr>
-                <td> Template Type </td><td style={fadedStyle}> {typeText} </td>
+                <td style={fadedStyle}> Template Type </td><td> {typeText} </td>
               </tr>
               <tr>
-                <td> Template ID </td><td style={fadedStyle}> {template.templateId} </td>
+                <td style={fadedStyle}> Template ID </td><td> {template.templateId} </td>
               </tr>
               <tr>
-                <td> Access token </td><td className='access-token-cell' style={fadedStyle}> {template.persistentAccessToken} </td>
+                <td style={fadedStyle}> Access token </td><td className='access-token-cell'> {template.persistentAccessToken} </td>
               </tr>
             </tbody>
           </table>
@@ -143,13 +167,13 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
           <table className='headless-generator-info-table'>
             <tbody>
               <tr>
-                <td> Server ID </td><td style={fadedStyle}> {template.dbid} </td>
+                <td style={fadedStyle}> Server ID </td><td> {template.dbid} </td>
               </tr>
               <tr>
-                <td> Index </td><td style={fadedStyle}> {template.dbname} </td>
+                <td style={fadedStyle}> Index </td><td> {template.dbname} </td>
               </tr>
               <tr>
-                <td> Type </td><td style={fadedStyle}> {template.tablename} </td>
+                <td style={fadedStyle}> Type </td><td> {template.tablename} </td>
               </tr>
             </tbody>
           </table>
@@ -170,15 +194,17 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
           <div className='headless-entry-input'>
             <Dropdown
               options={fileTypeOptions}
-              selectedIndex={0}
+              selectedIndex={this.state.fileTypeIndex}
               canEdit={true}
+              onChange={this.handleFileTypeDropdownChange}
+              openDown={true}
             />
           </div>
           <div className='headless-entry-label'>
-            URL
+            Midway URL
           </div>
           <div className='headless-entry-input'>
-            <input value='localhost'/>
+            <input value={this.state.midwayURLValue} onChange={this.handleURLChange}/>
           </div>
         </div>
       </div>
@@ -199,9 +225,8 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
   {
     const template: Template = this.state.index !== -1 ? this.props.templates.get(this.state.index) : undefined;
     const typeText = template !== undefined ? (template.export ? 'Export' : 'Import') : '';
-
     return (
-      <div className='headless-command-generator'>
+      <div className='headless-command-generator' style={backgroundColor(Colors().altBg1)}>
         <div className='headless-entry-row'>
           <div className='headless-entry-label'>
             Template
@@ -215,10 +240,23 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
               directionBias={90}
             />
           </div>
-        </div>
-        {
-          template !== undefined && this.renderInfoTable(template)
-        }
+            <div className='headless-entry-icon-wrapper'
+              style={fontColor('#555')}
+              key='icon-wrapper'
+            >
+            {
+              template !== undefined && tooltip(
+                <ViewIcon className='headless-entry-icon'/>,
+                {
+                  html: this.renderInfoTable(template),
+                  trigger: 'click',
+                  position: 'right',
+                  style: {display: 'inline'},
+                }
+              )
+            }
+            </div>
+          </div>
         {
           template !== undefined && template.export ? this.renderExportOptions(template) : this.renderImportOptions(template)
         }

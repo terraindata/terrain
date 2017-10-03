@@ -1,5 +1,6 @@
 @import "../../../common/Common.less";
 @border-radius: 3px;
+@icon-size: 16px;
 
 .headless-command-generator {
   margin: auto;
@@ -9,54 +10,34 @@
 
   .headless-entry-row {
     margin: @spacing;
+    margin-bottom: @quarter-spacing;
     display: flex;
 
     .big-text;
 
     .headless-entry-label {
+      margin: @half-spacing 0px;
       padding: @half-spacing;
     }
 
     .headless-entry-input {
-      margin-left: @spacing;
-    }
-  }
-
-  .headless-generator-data {
-    display: flex;
-    justify-content: center;
-
-    .headless-generator-column {
-      flex: 1 1 1;
-
-      &:first-child {
-        margin-right: calc(4*@spacing);
-      }
+      margin: @half-spacing @spacing;
     }
 
-    .headless-generator-info-table {
-      width: 250px;
-      margin-left: @half-spacing;
-      tr {
-        td {
-          &:first-child {
-            padding-right: @half-spacing;
+    .headless-entry-icon-wrapper {
+      padding: @quarter-spacing;
+      position: relative;
+      width: @icon-size + 2px;
 
-          }
-
-          &:last-child {
-
-          }
-
-          padding: @quarter-spacing 0px;
-        }
-      }
-
-      .access-token-cell {
-        max-width: 60px;
-        text-overflow: ellipsis;
-        overflow-x: hidden;
-        white-space: nowrap;
+      .headless-entry-icon {
+        cursor: pointer;
+        position: relative;
+        top: 50%;
+        padding: 1px;
+        transform: translateY(-50%);
+        width: @icon-size;
+        height: @icon-size;
+        fill: currentColor;
       }
     }
   }
@@ -75,5 +56,36 @@
     background-color: rgba(0,0,0,0);
     border-radius: @border-radius;
     padding: @spacing;
+  }
+}
+
+.headless-generator-data {
+  display: flex;
+
+  .headless-generator-column {
+    &:first-child {
+      margin-right: @double-spacing;
+    }
+  }
+
+  .headless-generator-info-table {
+    width: 200px;
+    margin-left: @half-spacing;
+    tr {
+      td {
+        &:first-child {
+          padding-right: @half-spacing;
+        }
+
+        padding: @quarter-spacing 0px;
+      }
+    }
+
+    .access-token-cell {
+      max-width: 60px;
+      text-overflow: ellipsis;
+      overflow-x: hidden;
+      white-space: nowrap;
+    }
   }
 }
