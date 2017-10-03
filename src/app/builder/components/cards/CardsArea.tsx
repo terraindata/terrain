@@ -83,6 +83,7 @@ export interface Props
   tuningMode?: boolean;
   allowTuningDragAndDrop?: boolean;
   handleCardReorder?: (card, index) => void;
+}
 
 interface KeyState
 {
@@ -180,44 +181,40 @@ class CardsArea extends TerrainComponent<Props>
         >
           {
             cards.map((card: Card, index: number) =>
-            {
-              return (
-                <div
-                  key={card.id}
-                >
-                  <CardDragPreview
-                    cardItem={draggingCardItem}
-                    isInList={true}
-                    visible={isDraggingCardOver && draggingOverIndex === index}
-                    index={index}
-                    keyPath={keyPath}
-                    accepts={this.props.accepts}
-                    singleChild={this.props.singleChild}
-                    wrapType={card.type}
-                    language={this.props.language}
-                    handleCardDrop={this.props.handleCardDrop}
-                  />
-                  <CardComponent
-                    card={card}
-                    language={this.props.language}
-                    index={index}
-                    singleCard={false}
-                    canEdit={this.props.canEdit}
-                    keyPath={this.props.keyPath}
-                    accepts={this.props.accepts}
-                    singleChild={this.props.singleChild}
+              <div
+                key={card.id}
+              >
+                <CardDragPreview
+                  cardItem={draggingCardItem}
+                  isInList={true}
+                  visible={isDraggingCardOver && draggingOverIndex === index}
+                  index={index}
+                  keyPath={keyPath}
+                  accepts={this.props.accepts}
+                  singleChild={this.props.singleChild}
+                  wrapType={card.type}
+                  language={this.props.language}
+                  handleCardDrop={this.props.handleCardDrop}
+                />
+                <CardComponent
+                  card={card}
+                  language={this.props.language}
+                  index={index}
+                  singleCard={false}
+                  canEdit={this.props.canEdit}
+                  keyPath={this.props.keyPath}
+                  accepts={this.props.accepts}
+                  singleChild={this.props.singleChild}
 
-                    addColumn={this.props.addColumn}
-                    columnIndex={this.props.columnIndex}
-                    helpOn={this.props.helpOn}
-                    handleCardDrop={this.props.handleCardDrop}
-                    tuningMode={this.props.tuningMode}
-                    allowTuningDragAndDrop={this.props.allowTuningDragAndDrop}
-                    handleCardReorder={this.props.handleCardReorder}
-                  />
-                </div>
-              );
-            },
+                  addColumn={this.props.addColumn}
+                  columnIndex={this.props.columnIndex}
+                  helpOn={this.props.helpOn}
+                  handleCardDrop={this.props.handleCardDrop}
+                  tuningMode={this.props.tuningMode}
+                  allowTuningDragAndDrop={this.props.allowTuningDragAndDrop}
+                  handleCardReorder={this.props.handleCardReorder}
+                />
+              </div>,
             )
           }
 

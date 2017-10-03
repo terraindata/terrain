@@ -110,6 +110,7 @@ export const _Query = (config?: object) =>
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
   config['meta'] = Map<string, any>(config['meta']);
   config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);
+  config['tuningOrder'] = List<string>(config['tuningOrder']);
   const query = new Query_Record(config) as any as Query;
 
   return query;

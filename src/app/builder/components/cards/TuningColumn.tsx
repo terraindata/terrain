@@ -60,14 +60,14 @@ import CardsArea from './CardsArea';
 import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
+import { forAllCards } from '../../../../blocks/BlockUtils';
+import { Cards } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import Util from '../../../util/Util';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
-
-import { Cards } from '../../../../blocks/types/Card';
 const { List, Map } = Immutable;
 
 export interface Props
@@ -119,17 +119,21 @@ class TuningColumn extends TerrainComponent<Props>
 
   public setTuningCards(newCards)
   {
+    // Set up buffers for getting tuning cards
     this.tempTuningOrder = this.state.tuningOrder;
     this.prevTuningIds = this.state.tuningOrder;
     this.tuningIds = List([]);
     this.tuningCards = List([]);
+    // Get cards that were added to tuning
     this.updateTuningCards(newCards);
-    this.checkForRemovedCards();
+    // Remove any cards that were removed from tuning
+    this.removeCardsFromBuffer();
     this.setState({
       allCards: newCards,
       tuningOrder: this.tempTuningOrder,
     });
-    this.updateTuningOrder(this.tempTuningOrder);
+    // Update tuning order in the BuilderStore
+    this.changeTuningOrder(this.tempTuningOrder);
   }
 
   public componentWillMount()
@@ -140,7 +144,7 @@ class TuningColumn extends TerrainComponent<Props>
     });
   }
 
-  public updateTuningOrder(newOrder)
+  public changeTuningOrder(newOrder)
   {
     if (!_.isEqual(newOrder, BuilderStore.getState().query.tuningOrder))
     {
@@ -151,41 +155,33 @@ class TuningColumn extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
-    this.updateTuningOrder(this.state.tuningOrder);
+    this.changeTuningOrder(this.state.tuningOrder);
   }
 
+  // Sort tuning cards using tuning order
   public sortTuningCards()
   {
     this.tuningCards = this.tuningCards.sortBy((card) =>
       this.state.tuningOrder.indexOf(card.id),
-    ) as any;
+    ).toList();
   }
 
-  public handleCardAdded(card)
-  {
-    this.tempTuningOrder = this.tempTuningOrder.push(card.id);
-  }
-
-  public handleCardRemove(id)
-  {
-    const index = this.tempTuningOrder.indexOf(id);
-    this.tempTuningOrder = this.tempTuningOrder.remove(index);
-  }
-
-  public checkForRemovedCards()
+  // Look for cards that have been removed from tuning and remove them from order
+  public removeCardsFromBuffer()
   {
     this.prevTuningIds.forEach((id) =>
     {
       if (this.tuningIds.indexOf(id) === -1)
       {
-        this.handleCardRemove(id);
+        const index = this.tempTuningOrder.indexOf(id);
+        this.tempTuningOrder = this.tempTuningOrder.remove(index);
       }
     });
   }
 
   public updateTuningCards(cards)
   {
-    cards.forEach((card) =>
+    forAllCards(cards, (card, keyPath) =>
     {
       if (card.tuning)
       {
@@ -193,27 +189,8 @@ class TuningColumn extends TerrainComponent<Props>
         this.tuningIds = this.tuningIds.push(card.id);
         if (this.prevTuningIds.indexOf(card.id) === -1)
         {
-          // new card added
-          this.handleCardAdded(card);
+          this.tempTuningOrder = this.tempTuningOrder.push(card.id);
         }
-      }
-      if (card.key.tuning) // for transform cards
-      {
-        this.tuningCards = this.tuningCards.push(card.key);
-        this.tuningIds = this.tuningIds.push(card.key.id);
-        if (this.prevTuningIds.indexOf(card.key.id) === -1)
-        {
-          // new card added
-          this.handleCardAdded(card.key);
-        }
-      }
-      if (card.cards !== undefined && card.cards.size > 0)
-      {
-        this.updateTuningCards(card.cards);
-      }
-      if (card.weights !== undefined && card.weights.size > 0)
-      {
-        this.updateTuningCards(card.weights);
       }
     });
   }
@@ -252,18 +229,18 @@ class TuningColumn extends TerrainComponent<Props>
     this.setState({
       tuningOrder: newOrder,
     });
-    this.updateTuningOrder(newOrder);
+    this.changeTuningOrder(newOrder);
   }
 
   public findCardType(cards, type)
   {
-    cards.forEach((card) =>
+    forAllCards(cards, (card, kp) =>
     {
-      if (card.static.title === type)
+      if (card.type === type)
       {
         this.tuningCards = this.tuningCards.push(card);
         this.tuningIds = this.tuningIds.push(card.id);
-        this.handleCardAdded(card);
+        this.tempTuningOrder = this.tempTuningOrder.push(card.id);
         const keyPaths = Immutable.Map(BuilderStore.getState().query.cardKeyPaths);
         if (keyPaths.get(card.id) !== undefined)
         {
@@ -271,16 +248,12 @@ class TuningColumn extends TerrainComponent<Props>
           Actions.change(keyPath.push('tuning'), true);
         }
       }
-      if (card.cards !== undefined && card.cards.size > 0)
-      {
-        this.findCardType(card.cards, type);
-      }
     });
   }
 
   public addScoreCards()
   {
-    this.findCardType(this.state.allCards, 'Terrain Score Sort');
+    this.findCardType(this.state.allCards, 'elasticScore');
     if (this.tuningCards.size === 0)
     {
       this.setState({
@@ -292,7 +265,7 @@ class TuningColumn extends TerrainComponent<Props>
 
   public addFilterCards()
   {
-    this.findCardType(this.state.allCards, 'Filter');
+    this.findCardType(this.state.allCards, 'elasticFilter');
     if (this.tuningCards.size === 0)
     {
       this.setState({
@@ -304,8 +277,8 @@ class TuningColumn extends TerrainComponent<Props>
 
   public addScoreAndFilterCards()
   {
-    this.findCardType(this.state.allCards, 'Filter');
-    this.findCardType(this.state.allCards, 'Terrain Score Sort');
+    this.findCardType(this.state.allCards, 'elasticFilter');
+    this.findCardType(this.state.allCards, 'elasticScore');
     if (this.tuningCards.size === 0)
     {
       this.setState({
@@ -360,7 +333,6 @@ class TuningColumn extends TerrainComponent<Props>
               addColumn={addColumn}
               columnIndex={columnIndex}
               noCardTool={true}
-              accepts={this.getPossibleCards()}
               tuningMode={true}
               handleCardReorder={this.handleCardReorder}
               ref='cardsArea'
@@ -381,11 +353,6 @@ class TuningColumn extends TerrainComponent<Props>
         </div>
       </div>
     );
-  }
-
-  private getPossibleCards()
-  {
-    return AllBackendsMap[this.props.language].cardsList;
   }
 }
 
