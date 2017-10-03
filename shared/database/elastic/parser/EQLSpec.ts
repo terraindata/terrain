@@ -349,7 +349,7 @@ const EQLSpec: ESClause[] =
         range: 'range_aggregation',
       },
       {
-        path: ['aggregation'],
+        path: ['aggregations'],
         desc: 'Provides aggregated data based on the aggregation query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations.',
       }),
@@ -386,9 +386,9 @@ const EQLSpec: ESClause[] =
     new ESStructureClause('range_aggregation', 
       {
         field: 'field',
-        ranges: 'ranges',
+        ranges: 'ranges[]',
         keyed: 'boolean',
-      }
+      },
       {
         path: ['range'],
         desc: 'A multi-bucket value source based aggregation that enables the user to define a set of ranges - each representing a bucket.',
@@ -399,12 +399,19 @@ const EQLSpec: ESClause[] =
       {
         to: 'number',
         from: 'number',
-
+        key: 'string',
       },
       {
         path: ['ranges'],
-        desc: 'Ranges for buckets of a range aggregation'
+        name: 'To From',
+        desc: 'Ranges for buckets of a range aggregation',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-aggregations-bucket-range-aggregation.html',
+      }
+    ),
+    new ESStructureClause('to_from', 
+      {
+        to: 'number',
+        from: 'number',
       }
     ),
     new ESStructureClause('histogram_aggregation',
