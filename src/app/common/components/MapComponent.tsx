@@ -81,6 +81,7 @@ export interface Props
   zoomControl?: boolean;
   keepAddressInSync?: boolean;
   canEdit?: boolean;
+  colorMarker?: boolean;
 
   distance?: number;
   distanceUnit?: string;
@@ -93,7 +94,7 @@ export interface Props
   spotlights?: any;
   inputs?: any;
   field?: any;
-  markerColor?: string;
+  secondaryMarkerColor?: string;
 
 }
 
@@ -523,7 +524,7 @@ class MapComponent extends TerrainComponent<Props>
   {
     const { location, secondLocation } = this.props;
     const address = this.props.address !== undefined && this.props.address !== '' ? this.props.address : this.state.address;
-    const color = secondLocation !== undefined ? Colors().builder.cards.categories.filter : 'black';
+    const primaryMarkerColor = this.props.colorMarker ? Colors().builder.cards.categories.filter : 'black';
     // const secondColor;
     if (location === undefined || location[0] === undefined ||
       location[1] === undefined || isNaN(location[0]) || isNaN(location[1]))
@@ -564,7 +565,7 @@ class MapComponent extends TerrainComponent<Props>
           {
             this.props.markLocation ?
               this.renderMarker(address, location, secondLocation !== undefined,
-                this.props.markerColor !== undefined ? this.props.markerColor : 'black',
+                primaryMarkerColor,
               )
               :
               null
@@ -572,7 +573,7 @@ class MapComponent extends TerrainComponent<Props>
           {
             this.props.secondLocation !== undefined && this.props.showDirectDistance ?
               this.renderMarker(this.props.secondAddress, secondLocation, secondLocation !== undefined,
-                color)
+                this.props.secondaryMarkerColor !== undefined ? this.props.secondaryMarkerColor : 'black')
               :
               null
           }

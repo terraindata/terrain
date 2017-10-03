@@ -57,8 +57,8 @@ import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
-import MapComponent from './../../../common/components/MapComponent';
 import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
+import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 
 import MapUtil from '../../../util/MapUtil';
@@ -482,26 +482,27 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
         );
 
       case 'map':
-        const location = MapUtil.getCoordinatesFromGeopoint(value);
-        let secondLocation: [number, number];
+        const resultLocation = MapUtil.getCoordinatesFromGeopoint(value);
+        let fieldLocation: [number, number];
         if (locations !== undefined && locations[field] !== undefined)
         {
-          secondLocation = MapUtil.getCoordinatesFromGeopoint(locations[field]) as [number, number];
+          fieldLocation = MapUtil.getCoordinatesFromGeopoint(locations[field]) as [number, number];
         }
 
         return (
           <div className='result-field-value-map-wrapper'>
             <MapComponent
               address={''}
-              location={location}
+              location={fieldLocation}
               markLocation={true}
-              showDirectDistance={secondLocation !== undefined}
+              showDirectDistance={fieldLocation !== undefined}
               showSearchBar={false}
               zoomControl={false}
-              secondLocation={secondLocation}
+              secondLocation={resultLocation}
               keepAddressInSync={false}
               geocoder='photon'
-              markerColor={color}
+              secondaryMarkerColor={color}
+              colorMarker={true}
             />
           </div>
         );
