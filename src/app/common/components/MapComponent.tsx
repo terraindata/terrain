@@ -602,6 +602,7 @@ class MapComponent extends TerrainComponent<Props>
     }
     const mapProps = bounds !== undefined ? { bounds } : { center };
 
+    console.log('HERE');
     return (
       <div className={this.props.className}>
         <Map
