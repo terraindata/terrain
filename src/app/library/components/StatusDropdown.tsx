@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import './StatusDropdown.less';
 const { List } = Immutable;
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { ItemStatus as Status } from '../../../items/types/Item';
 import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
@@ -58,8 +59,6 @@ import Util from '../../util/Util';
 import * as LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import { tooltip } from 'common/components/tooltip/Tooltips';
-
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
@@ -193,7 +192,7 @@ class StatusDropdown extends TerrainComponent<Props>
             title: this.canEdit() ? 'Click to change the Variant\'s status, e.g. to Deploy or Archive' :
               tooltipText,
             position: 'right',
-          }
+          },
         )}
       </div>
     );
