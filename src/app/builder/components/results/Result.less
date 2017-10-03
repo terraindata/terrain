@@ -164,6 +164,10 @@
       max-width: 150px;
     }
   }
+
+  .result-field-value-show-overflow {
+    overflow: visible !important;
+  }
   
   .result-pin-icon {
     display: none;
@@ -203,7 +207,9 @@
 
 .result-field-value-map-wrapper {
     position: relative;
-    width: 100%;
+    width: calc(~"100% + 12px");
+    margin-left: -4px;
+    margin-bottom: -4px;
 
   .leaflet-container {
     width: 100%;

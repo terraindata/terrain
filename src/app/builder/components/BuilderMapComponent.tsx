@@ -121,6 +121,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
         keepAddressInSync={true}
         canEdit={this.props.canEdit}
         colorMarker={true}
+        className={'builder-map-component-wrapper'}
       />
     );
   }

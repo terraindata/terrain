@@ -192,6 +192,7 @@ class ResultComponent extends TerrainComponent<Props> {
             'result-field-value': true,
             'result-field-value-short': (field + value).length < 0,
             'result-field-value-number': typeof value === 'number',
+            'result-field-value-show-overflow': format && format.type === 'map',
           })}
         >
           {

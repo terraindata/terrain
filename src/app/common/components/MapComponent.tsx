@@ -96,6 +96,7 @@ export interface Props
   field?: any;
   secondaryMarkerColor?: string;
 
+  className?: string;
 }
 
 // for map markers, distances must be converted to meters
@@ -554,7 +555,7 @@ class MapComponent extends TerrainComponent<Props>
     const mapProps = bounds !== undefined ? { bounds } : { center };
 
     return (
-      <div className='input-map-wrapper'>
+      <div className={this.props.className}>
         <Map
           {...mapProps}
           zoomControl={this.props.zoomControl}
