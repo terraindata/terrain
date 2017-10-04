@@ -176,12 +176,12 @@ class AccessTokenControl extends TerrainComponent<Props>
       ['Access Token', (template, index) =>
         <div className='access-token-cell'>
           {template.persistentAccessToken}
-        </div>
+        </div>,
       ],
       ['', (template, index) =>
         <div className='template-menu-options-wrapper'>
           <Menu options={this.getOptions(template, index)}/>
-        </div>
+        </div>,
       ],
     ];
   }
@@ -192,7 +192,7 @@ class AccessTokenControl extends TerrainComponent<Props>
       headlessModalOpen: true,
       currentActiveTemplate: template,
       currentActiveIndex: index,
-    })
+    });
   }
 
   public confirmConfirmModal()
@@ -207,7 +207,7 @@ class AccessTokenControl extends TerrainComponent<Props>
         this.state.currentActiveTemplate.templateId,
         this.handleDeleteTemplateSuccess,
         this.handleDeleteTemplateError,
-        this.state.currentActiveTemplate.templateName
+        this.state.currentActiveTemplate.templateName,
       );
     }
     else if (this.state.confirmModalType === 'RESET')
@@ -315,7 +315,7 @@ class AccessTokenControl extends TerrainComponent<Props>
 
   public renderCreateHeadlessCommand()
   {
-    return <CreateHeadlessCommand templates={this.props.templates} index={this.state.currentActiveIndex}/>
+    return <CreateHeadlessCommand templates={this.props.templates} index={this.state.currentActiveIndex}/>;
   }
 
   public render()
@@ -359,10 +359,11 @@ class AccessTokenControl extends TerrainComponent<Props>
             children={this.renderCreateHeadlessCommand()}
             allowOverflow={true}
             wide={true}
+            noFooterPadding={true}
           />
         }
       </div>
-    )
+    );
   }
 }
 

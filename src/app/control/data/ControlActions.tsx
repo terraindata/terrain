@@ -75,7 +75,7 @@ const ControlActions =
           fetchTemplates: ControlActions.importExport.fetchTemplates,
           templateName,
         }),
-    }
+    },
 
   };
 

@@ -78,7 +78,7 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
             dbname: template['dbname'],
             tablename: template['tablename'],
             export: template['export'],
-          })
+          });
         },
         ));
         action.payload.setTemplates(templates);
@@ -90,7 +90,7 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
 ControlReducer[ActionTypes.importExport.setTemplates] =
   (state, action) =>
   {
-    return state.set('importExportTemplates', action.payload.templates)
+    return state.set('importExportTemplates', action.payload.templates);
   };
 
 ControlReducer[ActionTypes.importExport.deleteTemplate] =
