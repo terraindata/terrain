@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
+import { BuilderStore } from '../../builder/data/BuilderStore';
 import { Colors } from '../../common/Colors';
 import StyleTag from '../../common/components/StyleTag';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -99,7 +100,6 @@ export interface Props
   language?: string;
   canEdit: boolean;
 
-  theme?: string;
   highlightedLine?: number;
 
   isDiff?: boolean;
@@ -153,7 +153,7 @@ class TQLEditor extends TerrainComponent<Props>
           'Ctrl-Enter': this.issueQuery,
         },
         lineWrapping: true,
-        theme: this.props.theme || localStorage.getItem('theme') || 'default',
+        theme: Colors().tqlEditor,
         matchBrackets: true,
         autoCloseBrackets: true,
         foldGutter: true,
@@ -211,7 +211,6 @@ class TQLEditor extends TerrainComponent<Props>
           this.props.placeholder : 'Write your query here'}
       />
     );
-
     return (
       <div>
         {

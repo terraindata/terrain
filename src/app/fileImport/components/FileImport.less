@@ -22,18 +22,34 @@
     margin-left: 31px;
   }
   .fi-advanced-fields-dropdown {
-    margin-bottom: 30px;    
+    margin-bottom: 30px;
+    // margin-bottom: 30px;    
+
     width: 75%;
     margin-left: 31px;
+    
+    .dropdown-options-wrapper {
+      max-height: 56px;
+      overflow-y: scroll;
+    }
+  }
+  .fi-advanced-fields-input {
+    width: 75%;
+    margin-left: 31px;
+    // margin-bottom: 30px;
+  }
+  .fi-advanced-bottom-margin {
+    margin-top: 10px;
+    margin-bottom: 30px;
   }
 }
 
 .file-import {
 	height: 100%;
 	position: relative;
-  display: flex; // applies Flexbox to child elements
-  align-items: center; // center horizontally
-  justify-content: center; // center vertically
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 
   // TODO: find better way of preventing dropdown option clipping
@@ -43,7 +59,7 @@
   }
 
 	.file-import-inner {
-  
+
     &.file-import-inner-scroll {
       overflow: auto !important;
     }
@@ -70,12 +86,11 @@
     }
 
     .fi-content {
-      margin-top: 24px;
       width: auto;
+      margin: 24px 12px 12px 12px;
       padding: 12px;
       border-radius: 3px;
       max-width: 100%;
-      margin: 12px;
 
       .fi-import-success-wrapper {
         width: 550px;
@@ -98,7 +113,6 @@
             padding: 10px 6px;
             font-size: 16px;
             border-radius: 3px;
-            cursor: pointer;
         }
         .fi-import-success-info {
           margin-top: 30px;
@@ -118,9 +132,9 @@
         }
       }
 
-      .fi-content-csv {
+      .fi-content-csv-wrapper {
 
-        .fi-content-csv-wrapper {
+        .fi-content-csv {
           text-align: center;
           margin-bottom: 12px;
 
@@ -129,15 +143,40 @@
           }
         }
 
-        .fi-content-rows-container {
+        .fi-content-preview-columns-wrapper {
           overflow: auto;
-          padding-bottom: 6px;
+
+          .fi-content-preview-columns {
+            flex-direction: row;
+
+            .fi-content-preview-columns-column {
+              flex-direction: column;
+              margin-right: 6px;
+
+              .fi-content-preview-columns-column-cell {
+                width: 300px;
+                height: 40px;
+                margin-top: 3px;
+                overflow: auto;
+                overflow-y: hidden;
+                white-space: nowrap;
+
+                &::-webkit-scrollbar {
+                  height: 5px;
+                }
+
+                .fi-content-preview-columns-column-cell-text {
+                  padding: 12px;
+                }
+              }
+            }
+          }
         }
       }
 
-      .fi-content-json {
+      .fi-content-json-wrapper {
 
-        .fi-content-json-wrapper {
+        .fi-content-json {
           text-align: center;
 
           .fi-content-json-option {

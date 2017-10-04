@@ -554,7 +554,18 @@ export class ResultsManager extends TerrainComponent<Props>
       this.handleM1Error(response, isAllFields);
       return;
     }
-    const resultsData = response.results as any[];
+    const resultsData = response.results as any;
+    // how is the data formatted?
+    const hits = resultsData.hits.hits.map((hit) =>
+    {
+      const sort = hit.sort !== undefined ? { _sort: hit.sort[0] } : {};
+      return _.extend({}, hit._source, sort, {
+        _index: hit._index,
+        _type: hit._type,
+        _score: hit._score,
+        _id: hit._id,
+      });
+    });
     this.updateResults(resultsData, isAllFields);
   }
 
@@ -575,7 +586,17 @@ export class ResultsManager extends TerrainComponent<Props>
       return;
     }
     const resultsData = response.getResultsData();
-    this.updateResults(resultsData, isAllFields);
+    const hits = resultsData.hits.hits.map((hit) =>
+    {
+      const sort = hit.sort !== undefined ? { _sort: hit.sort[0] } : {};
+      return _.extend({}, hit._source, sort, {
+        _index: hit._index,
+        _type: hit._type,
+        _score: hit._score,
+        _id: hit._id,
+      });
+    });
+    this.updateResults(hits, isAllFields);
   }
 
   private handleM1Error(response: any, isAllFields?: boolean)

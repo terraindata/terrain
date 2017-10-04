@@ -10,6 +10,16 @@
 @card-padding-vertical: 7px;
 @title-help-width: 24px;
 
+.card-moving {
+  padding: 3px !important;
+  border-radius: 3px;
+  border-style: solid;
+  border-width: 1px;
+}
+.card-transition {
+  .transition;
+}
+
 .card {
   position: relative;
   // border-radius: @card-border-radius;
@@ -17,7 +27,6 @@
   box-sizing: border-box;
   padding-right: 0px;
   padding-top: 0px;
-
   &.single-card {
     padding-top: 6px;
   }
@@ -45,11 +54,12 @@
   }
 
   &.card-hovering {
-    .menu-wrapper, .manual-popup-wrapper {
+    .menu-wrapper, .manual-popup-wrapper, .card-tuning-icon:not(.card-tuning-icon-off) {
       opacity: 1;
     }
     .card {
-      .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open) {
+      .menu-wrapper:not(.menu-open), .manual-popup-wrapper:not(.manual-popup-open), 
+      .card-tuning-icon:not(.card-tuning-icon-on) {
         opacity: 0;
       }
     }
@@ -162,7 +172,7 @@
 
 .card-help-wrapper {
   position: absolute;
-  top: 11px;
+  top: 13px;
   right: 10px;
 }
 
@@ -178,6 +188,42 @@
   &:hover {
     fill: #fff;
   }
+}
+
+.elasticTransform-card {
+  .card-tuning-wrapper {
+    top: 20px;
+    right: 26px;
+  }
+}
+
+.card-tuning-wrapper {
+  position: absolute;
+  top: 13px;
+  right: 34px;
+}
+
+.card-tuning-icon {
+  stroke: rgba(255, 255, 255, 0.5);
+  width: 16px;
+  height: 20px;
+  position: relative;
+  cursor: pointer;
+  z-index: 99999;
+  .transition;
+  opacity: 0;
+  &:hover {
+    stroke: #fff;
+  }
+}
+
+.card-tuning-icon-on {
+  opacity: 1;
+}
+
+.card-tuning-icon-off {
+  opacity: 0;
+  display: none;
 }
 
 .card-hovering {
@@ -528,7 +574,7 @@
   display: block;
   position: absolute;
   top: 8px;
-  left: 120px;
+  left: 90px;
   padding: 2px 10px;
   border-radius: @card-border-radius;
   background: rgba(255,255,255,0.5);

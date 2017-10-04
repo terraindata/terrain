@@ -44,63 +44,63 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
+import CheckBox from 'common/components/CheckBox';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors } from '../../common/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import './FileImportPreviewRow.less';
+import './SimpleRadio.less';
 
 export interface Props
 {
-  items: List<string>;
-  columnsToInclude?: List<boolean>;
+  on: boolean;
+  label: string;
+
+  small?: boolean;
+  large?: boolean;
+
+  color?: string;
 }
 
 @Radium
-class FileImportPreviewRow extends TerrainComponent<Props>
+class SimpleRadio extends TerrainComponent<Props>
 {
   public render()
   {
-    const { columnsToInclude } = this.props;
+    let { color } = this.props;
+    if (color === undefined)
+    {
+      color = Colors().text1;
+    }
+
     return (
       <div
-        className='flex-container fi-preview-row'
+        className={classNames({
+          'simple-radio': true,
+          'simple-radio-on': this.props.on,
+          'simple-radio-small': this.props.small,
+          'simple-radio-large': this.props.large,
+        })}
       >
-        {
-          this.props.items.map((value, key) =>
-            <div
-              key={key}
-              className='fi-preview-row-cell-wrapper'
-            >
-              <div
-                className={classNames({
-                  'fi-preview-row-cell': true,
-                  'fi-preview-row-cell-disabled': columnsToInclude !== undefined && !columnsToInclude.get(key),
-                })}
-                style={{
-                  background: Colors().bg2,
-                  color: Colors().text1,
-                }}
-              >
-                <div
-                  className='fi-preview-row-cell-text'
-                >
-                  {
-                    value
-                  }
-                </div>
-                <div
-                  className='fi-preview-row-disabled-veil'
-                  style={backgroundColor(Colors().bg3)}
-                >
-                </div>
-              </div>
-            </div>,
-          )
-        }
+        <div
+          className='simple-radio-outline'
+          style={borderColor(color)}
+        >
+          <div
+            className='simple-radio-fill'
+            style={backgroundColor(color)}
+          />
+        </div>
+        <div
+          className='simple-radio-label'
+        >
+          {
+            this.props.label
+          }
+        </div>
       </div>
     );
   }
 }
 
-export default FileImportPreviewRow;
+export default SimpleRadio;

@@ -46,74 +46,116 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
+import * as Encryption from './Encryption';
 import { EventConfig, Events } from './Events';
 
 export const events: Events = new Events();
-
 const Router = new KoaRouter();
 
-// Get an event tracker.
-Router.post('/', async (ctx, next) =>
+function logError(error: string)
 {
-  ctx.body = await events.JSONHandler(ctx.request.ip, ctx.request.body.body);
-});
+  if (process.env.NODE_ENV === 'production')
+  {
+    return;
+  }
+  else
+  {
+    throw new Error(error);
+  }
+}
 
-// Handle client response for event tracker
-Router.post('/update/', async (ctx, next) =>
+async function storeEvent(request: any)
 {
+  if (request.body !== undefined && Object.keys(request.body).length > 0 &&
+    request.query !== undefined && Object.keys(request.body).length > 0)
+  {
+    logError('Both request query and body cannot be set.');
+  }
+
+  if ((request.body === undefined ||
+    request.body !== undefined && Object.keys(request.body).length === 0) &&
+    (request.query === undefined ||
+      request.query !== undefined && Object.keys(request.query).length === 0))
+  {
+    logError('Either request query or body parameters are required.');
+  }
+
+  let req: object = request.body;
+  if (req === undefined || (req !== undefined && Object.keys(req).length === 0))
+  {
+    req = request.query;
+  }
+
+  const event: EventConfig = {
+    eventid: req['eventid'],
+    variantid: req['variantid'],
+    visitorid: req['visitorid'],
+    source: {
+      ip: request.ip,
+      host: request.host,
+      useragent: request.useragent,
+      referer: request.header.referer,
+    },
+    timestamp: req['timestamp'],
+    meta: req['meta'],
+  };
+
+  if (_.difference(Object.keys(req), Object.keys(event).concat(['id', 'accessToken'])).length > 0)
+  {
+    return logError('Error storing analytics event: unexpected fields encountered');
+  }
+
+  // const msg = await Encryption.decodeMessage(event);
   try
   {
-    const event: EventConfig =
-      {
-        id: ctx.request.body['id'],
-        ip: ctx.request.ip,
-        message: ctx.request.body['message'],
-        payload: ctx.request.body['payload'],
-        type: ctx.request.body['type'],
-        url: ctx.request.body['url'],
-      };
-    // TODO in production, use this instead
-    // await events.decodeMessage(event);
-    // ctx.body = '';
-    if (await events.decodeMessage(event))
-    {
-      ctx.body = 'Success'; // for dev/testing purposes only
-    }
-    else
-    {
-      ctx.body = '';
-    }
+    await events.storeEvent(event);
   }
   catch (e)
   {
-    ctx.body = '';
+    return logError('Error storing analytics event:' + String(e));
   }
+}
 
+// Handle analytics event ingestion
+Router.post('/', async (ctx, next) =>
+{
+  await storeEvent(ctx.request);
+  ctx.body = '';
 });
 
-// supported parameters:
+Router.get('/', async (ctx, next) =>
+{
+  await storeEvent(ctx.request);
+  ctx.body = '';
+});
+
+// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
 // * variantid: list of variantids
 // * start: start time of the interval
 // * end: end time of the interval
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
-// * agg (optional): an elastic aggregate operation. if unspecified or `none`, return all raw events between the interval
-// * field (optional; required if *agg* is specified): list of fields to operate on.
-//    if unspecified, it returns or aggregates all of the fields in the event.
-// * interval (required if *agg* is specified): the resolution of interval for aggregation operations.
+// * agg: supported aggregation operations are:
+//     `select` - returns all events between the specified interval
+//     `histogram` - returns a histogram of events between the specified interval
+//     `rate` - returns a ratio of two events between the specified interval
+// * field (optional):
+//     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
+// * interval (optional; required if `agg` is `histogram` or `rate`):
+//     the resolution of interval for aggregation operations.
 //     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
 //     also supported are values such as `1.5h`, `90m` etc.
 //
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   Util.verifyParameters(
     JSON.parse(JSON.stringify(ctx.request.query)),
-    ['start', 'end', 'eventid', 'variantid'],
+    ['start', 'end', 'eventid', 'variantid', 'agg'],
   );
   winston.info('getting events for variant');
-  const response: object[] = await events.getEventData(ctx.request.query);
+  const response: object[] = await events.AggregationHandler(ctx.request.query);
   ctx.body = response.reduce((acc, x) =>
   {
     for (const key in x)

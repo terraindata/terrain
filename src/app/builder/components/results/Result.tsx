@@ -57,7 +57,7 @@ import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
-import { spotlightAction } from '../../data/SpotlightStore';
+import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { Result } from './ResultTypes';
 
@@ -114,11 +114,24 @@ class ResultComponent extends TerrainComponent<Props> {
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
+    const prevSpotlights = SpotlightStore.getState().spotlights;
     for (const key in nextProps)
     {
       if (key !== 'result' && this.props[key] !== nextProps[key])
       {
-        this.unspotlight();
+        if (prevSpotlights.get(nextProps.primaryKey))
+        {
+          this.setState({
+            isSpotlit: true,
+            spotlightColor: prevSpotlights.get(nextProps.primaryKey).color,
+          });
+        }
+        else
+        {
+          this.setState({
+            isSpotlit: false,
+          });
+        }
         return true;
       }
     }
@@ -184,10 +197,10 @@ class ResultComponent extends TerrainComponent<Props> {
     );
   }
 
-  public spotlight()
+  public spotlight(overrideId?, overrideColor?)
   {
-    const id = this.props.primaryKey;
-    const spotlightColor = ColorManager.altColorForKey(id);
+    const id = overrideId || this.props.primaryKey;
+    const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
     this.setState({
       isSpotlit: true,
       spotlightColor,
