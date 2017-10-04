@@ -133,12 +133,13 @@ class TerrainComponent<T> extends React.Component<T, any>
 
   public setStateWrapper(key, ...path: string[]): (val) => void
   {
-    return (val, ...args: any[]) => {
+    return (val, ...args: any[]) =>
+    {
       for (const property of path)
       {
         val = val[property];
       }
-      this.setState({[key]: val});
+      this.setState({ [key]: val });
     };
   }
 

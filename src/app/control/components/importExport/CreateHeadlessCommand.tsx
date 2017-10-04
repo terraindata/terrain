@@ -81,6 +81,104 @@ export interface Props
   index: number;
 }
 
+export interface HeadlessCommandData
+{
+  command: string;
+  errors: string[];
+  requests: string[];
+}
+
+interface HeadlessCommandArgs
+{
+  template: Template;
+  fileType: string;
+  midwayURL: string;
+  variantId?: number; // for export
+  filename?: string; // for import
+}
+
+const fileTypeOptions = List(FileImportTypes.FILE_TYPES) as List<string>;
+
+export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): HeadlessCommandData
+{
+  const { template, fileType, midwayURL } = headlessArgs;
+
+  const errors = [];
+  const requests = [];
+  let command = '';
+
+  if (template === undefined)
+  {
+    requests.push('Please Select a Template');
+  }
+  else
+  {
+    if (template.templateId === -1 || template.templateId === undefined)
+    {
+      errors.push('Template has no ID');
+    }
+    if (template.dbid === -1 || template.dbid === undefined)
+    {
+      errors.push('Template has no database');
+    }
+    if (template.persistentAccessToken === '' || template.persistentAccessToken === undefined)
+    {
+      errors.push('Template has no access token');
+    }
+    if (midwayURL === '')
+    {
+      requests.push('Please Enter a URL for Midway');
+    }
+
+    let contentTypeText; // for export
+    let fileTypeText;
+    switch (fileType)
+    {
+      case fileTypeOptions.get(0): // json
+      case fileTypeOptions.get(1): // json [type object]
+        contentTypeText = 'application/json';
+        fileTypeText = 'json';
+        break;
+      case fileTypeOptions.get(2): // csv
+        contentTypeText = 'text/plain';
+        fileTypeText = 'csv';
+        break;
+    }
+
+    if (template.export) // export
+    {
+      const { variantId } = headlessArgs;
+
+      if (variantId === -1)
+      {
+        requests.push('Please Select a Variant');
+      }
+
+      command = `curl -X POST  -H 'Content-Type: ${contentTypeText}' ` +
+        `-H 'Accept: application/json' -d ` +
+        `'{"id": ${template.templateId}, "persistentAccessToken": ${template.persistentAccessToken}, ` +
+        `"body": {"dbid": ${template.dbid}, "filetype": ${fileTypeText}, ` +
+        `"templateId": ${template.templateId}, "variantId": ${variantId}}}' ` +
+        `${midwayURL}/midway/v1/import/export/headless`;
+    }
+    else // import
+    {
+      const { filename } = headlessArgs;
+
+      if (filename === '' || filename === undefined)
+      {
+        requests.push('Please Enter Filename');
+      }
+
+      command = `curl -X POST ${midwayURL}/midway/v1/import/headless ` +
+        `-F id=${template.templateId} -F persistentAccessToken=${template.persistentAccessToken} ` +
+        `-F filetype=${fileTypeText} -F templateId=${template.templateId} -F file=@${filename}`;
+    }
+  }
+
+  return { command, errors, requests };
+}
+
 @Radium
 class CreateHeadlessCommand extends TerrainComponent<Props>
 {
@@ -121,10 +219,10 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
 
   public getTemplateTextList(): List<string>
   {
-    return this.props.templates.map((template, index) => {
-        // const typeText = template.export ? 'Export' : 'Import';
-        return `${template.templateName}`;
-      }).toList();
+    return this.props.templates.map((template, index) =>
+    {
+      return `${template.templateName}`;
+    }).toList();
   }
 
   public renderInfoTable(template)
@@ -171,7 +269,6 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
   public renderExportOptions(template)
   {
     const inputStyle = getStyle('borderRadius', '3px');
-    const fileTypeOptions = List(['JSON', 'CSV']);
     return (
       <div>
         <div className='headless-entry-row'>
@@ -198,11 +295,6 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             />
           </div>
         </div>
-        <div className='headless-entry-row'>
-          <div className='headless-entry-label'>
-            Choose a Variant to Export Results From
-          </div>
-        </div>
         <VariantSelector
           libraryState={LibraryStore.getState()}
           onChangeSelection={this.setStateWrapper('selectedIds')}
@@ -217,15 +309,47 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
 
   }
 
-  public computeCommand()
+  public renderCommandContent(command, requests, errors)
   {
-    return 'Please fill in the required information';
+    return (
+      <div
+        className='headless-command-content'
+        style={_.extend({}, backgroundColor(Colors().bg3), fontColor(Colors().text2))}
+      >
+        {(errors.length !== 0 || requests.length !== 0) &&
+          <div className='headless-command-veil' style={backgroundColor(Colors().fadedOutBg)} />
+        }
+        {errors.length > 0 &&
+          <div className='headless-command-errors' style={fontColor(Colors().error)}>
+            <div className='headless-command-errors-spacer'> {`ERROR: ${JSON.stringify(errors)}`} </div>
+          </div>
+        }
+        {requests.length > 0 && errors.length === 0 &&
+          <div className='headless-command-requests'>
+            <div className='headless-command-requests-spacer'> {requests.length === 0 ? '' : requests[0]} </div>
+          </div>
+        }
+        {
+          <div className='headless-command-command'>
+            {command}
+          </div>
+        }
+      </div>
+    );
   }
 
   public render()
   {
     const template: Template = this.state.index !== -1 ? this.props.templates.get(this.state.index) : undefined;
     const typeText = template !== undefined ? (template.export ? 'Export' : 'Import') : '';
+    const templateTextList = this.getTemplateTextList();
+    const { command, requests, errors } = computeHeadlessCommand({
+      template,
+      fileType: fileTypeOptions.get(this.state.fileTypeIndex),
+      midwayURL: this.state.midwayURLValue,
+      variantId: this.state.selectedIds.get(2),
+    });
+
     return (
       <div className='headless-command-generator' style={backgroundColor(Colors().altBg2)}>
         <div className='headless-entry-row'>
@@ -234,41 +358,36 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
           </div>
           <div className='headless-entry-input'>
             <Dropdown
-              options={this.getTemplateTextList()}
+              options={templateTextList.size !== 0 ? templateTextList : undefined}
               selectedIndex={this.state.index}
               onChange={this.setStateWrapper('index')}
               canEdit={true}
               directionBias={90}
             />
           </div>
-            <div className='headless-entry-icon-wrapper'
-              style={fontColor('#555')}
-              key='icon-wrapper'
-            >
+          <div className='headless-entry-icon-wrapper'
+            style={fontColor('#555')}
+            key='icon-wrapper'
+          >
             {
               template !== undefined && tooltip(
-                <ViewIcon className='headless-entry-icon'/>,
+                <ViewIcon className='headless-entry-icon' />,
                 {
                   html: this.renderInfoTable(template),
                   trigger: 'click',
                   position: 'right',
-                  style: {display: 'inline'},
+                  style: { display: 'inline' },
                   interactive: true,
                 },
               )
             }
-            </div>
           </div>
+        </div>
         {
           template !== undefined && template.export ? this.renderExportOptions(template) : this.renderImportOptions(template)
         }
         <div className='headless-command-title'> Headless Command </div>
-        <div
-          className='headless-command-content'
-          style={_.extend({}, borderColor(Colors().bg3), backgroundColor(Colors().bg3), fontColor(Colors().text2))}
-        >
-          {this.computeCommand()}
-        </div>
+        {this.renderCommandContent(command, requests, errors)}
       </div>
     );
   }

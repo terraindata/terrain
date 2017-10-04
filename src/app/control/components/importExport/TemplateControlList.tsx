@@ -127,37 +127,37 @@ class AccessTokenControl extends TerrainComponent<Props>
       {
         text: 'Delete Template',
         onClick: () => this.requestDeleteTemplate(template, index),
-        icon: <DeleteIcon className='template-menu-option-icon'/>,
+        icon: <DeleteIcon className='template-menu-option-icon' />,
         iconColor: '#555', // iconColor doesn't work right now
       },
       {
         text: `Headless ${typeText}`,
         onClick: () => this.requestCreateHeadless(template, index),
         icon:
-          <ImportIcon
-            className={classNames({
-              'template-menu-option-icon': true,
-              'template-icon-export': template.export,
-            })}
-          />,
+        <ImportIcon
+          className={classNames({
+            'template-menu-option-icon': true,
+            'template-icon-export': template.export,
+          })}
+        />,
         iconColor: '#555',
       },
       {
         text: `Schedule ${typeText}`,
         onClick: () => undefined,
-        icon: <ScheduleIcon className='template-menu-option-icon'/>,
+        icon: <ScheduleIcon className='template-menu-option-icon' />,
         iconColor: '#555',
       },
       {
         text: 'Reset Access Token',
         onClick: () => undefined,
-        icon: <AccessIcon className='template-menu-option-icon'/>,
+        icon: <AccessIcon className='template-menu-option-icon' />,
         iconColor: '#555',
       },
       {
         text: 'View Raw',
         onClick: () => undefined,
-        icon: <ViewIcon className='template-menu-option-icon'/>,
+        icon: <ViewIcon className='template-menu-option-icon' />,
         iconColor: '#555',
       },
     ]);
@@ -180,7 +180,7 @@ class AccessTokenControl extends TerrainComponent<Props>
       ],
       ['', (template, index) =>
         <div className='template-menu-options-wrapper'>
-          <Menu options={this.getOptions(template, index)}/>
+          <Menu options={this.getOptions(template, index)} />
         </div>,
       ],
     ];
@@ -315,7 +315,7 @@ class AccessTokenControl extends TerrainComponent<Props>
 
   public renderCreateHeadlessCommand()
   {
-    return <CreateHeadlessCommand templates={this.props.templates} index={this.state.currentActiveIndex}/>;
+    return <CreateHeadlessCommand templates={this.props.templates} index={this.state.currentActiveIndex} />;
   }
 
   public render()

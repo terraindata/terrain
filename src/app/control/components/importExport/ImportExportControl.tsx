@@ -95,7 +95,7 @@ class ControlPage extends TerrainComponent<Props>
         <div className='import-export-control-title'>
           Manage Templates
         </div>
-        <TemplateControlList templates={this.state.templates}/>
+        <TemplateControlList templates={this.state.templates} />
       </div>
     );
   }

@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
@@ -72,23 +72,33 @@ type Algorithm = LibraryTypes.Algorithm;
 export interface Props
 {
   libraryState: LibraryState;
-  ids: List<number>; // group id, algorithm id, variant id
+  ids: List<number>; // [group id, algorithm id, variant id]
   onChangeSelection: (ids: List<number>) => void;
 }
 
 type LibraryItem = Group | Variant | Algorithm;
 type AvailableItemsType = [List<LibraryItem>, List<string>, number];
 
-const findBaseFunction = (id, value, i) => value.id === id;
-
 @Radium
 class VariantSelector extends TerrainComponent<Props>
 {
+  public constructor(props)
+  {
+    super(props);
+    this.getAvailableGroups = memoizeOne(this.getAvailableGroups);
+    this.getAvailableAlgorithms = memoizeOne(this.getAvailableAlgorithms);
+    this.getAvailableVariants = memoizeOne(this.getAvailableVariants);
+  }
+
   public handleGroupChange(index, event)
   {
     const [groups, groupNames, groupIndex] =
       this.getAvailableGroups(this.props.libraryState, this.props.ids.get(0));
     const id = groups.get(index).id;
+    if (id === this.props.ids.get(0)) // nothing changed
+    {
+      return;
+    }
     this.props.onChangeSelection(List([id as number, -1, -1]));
   }
 
@@ -97,6 +107,10 @@ class VariantSelector extends TerrainComponent<Props>
     const [algorithms, algorithmNames, algorithmIndex] =
       this.getAvailableAlgorithms(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
     const id = algorithms.get(index).id;
+    if (id === this.props.ids.get(1)) // nothing changed
+    {
+      return;
+    }
     this.props.onChangeSelection(List([this.props.ids.get(0), id as number, -1]));
   }
 
@@ -105,6 +119,10 @@ class VariantSelector extends TerrainComponent<Props>
     const [variants, variantNames, variantIndex] =
       this.getAvailableVariants(this.props.libraryState, this.props.ids.get(1), this.props.ids.get(2));
     const id = variants.get(index).id;
+    if (id === this.props.ids.get(2)) // nothing changed
+    {
+      return;
+    }
     this.props.onChangeSelection(List([this.props.ids.get(0), this.props.ids.get(1), id as number]));
   }
 
@@ -118,7 +136,7 @@ class VariantSelector extends TerrainComponent<Props>
   public getAvailableAlgorithms(libraryState: LibraryState, groupId: ID, algorithmId: ID): AvailableItemsType
   {
     const items = libraryState.algorithms.filter(
-      (v, k) => v.groupId === groupId
+      (v, k) => v.groupId === groupId,
     ).toList();
     const index = items.findIndex((v, i) => v.id === algorithmId);
     return [items, this.itemsToText(items), index];
@@ -146,48 +164,54 @@ class VariantSelector extends TerrainComponent<Props>
       this.getAvailableVariants(this.props.libraryState, this.props.ids.get(1), this.props.ids.get(2));
 
     return (
-      <div className='variant-selector-wrapper'>>
-        <div className='variant-selector-row'>
+      <div className='variant-selector-wrapper'>
+        <div className='variant-selector-column'>
           <div className='variant-selector-label'>
             Group
           </div>
-          <div className='variant-selector-label'>
-            Algorithm
-          </div>
-          <div className='variant-selector-label'>
-            Variant
-          </div>
-        </div>
-        <div className='variant-selector-row'>
           <div className='variant-selector-input'>
             <Dropdown
-              options={groupNames}
+              options={groupNames.size !== 0 ? groupNames : undefined}
               selectedIndex={groupIndex}
               canEdit={true}
               onChange={this.handleGroupChange}
               openDown={true}
+              width='220px'
             />
+          </div>
+        </div>
+        <div className='variant-selector-column'>
+          <div className='variant-selector-label'>
+            Algorithm
           </div>
           <div className='variant-selector-input'>
             <Dropdown
-              options={algorithmNames}
+              options={algorithmNames.size !== 0 ? algorithmNames : undefined}
               selectedIndex={algorithmIndex}
               canEdit={true}
               onChange={this.handleAlgorithmChange}
               openDown={true}
+              width='220px'
             />
+          </div>
+        </div>
+        <div className='variant-selector-column'>
+          <div className='variant-selector-label'>
+            Variant
           </div>
           <div className='variant-selector-input'>
             <Dropdown
-              options={variantNames}
+              options={variantNames.size !== 0 ? variantNames : undefined}
               selectedIndex={variantIndex}
               canEdit={true}
               onChange={this.handleVariantChange}
               openDown={true}
+              width='220px'
             />
           </div>
         </div>
       </div>
+
     );
   }
 }

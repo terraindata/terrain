@@ -1,6 +1,7 @@
 @import "../../../common/Common.less";
 @border-radius: 3px;
 @icon-size: 16px;
+@comand-content-height: 100px;
 
 .headless-command-generator {
   margin: auto;
@@ -16,7 +17,7 @@
 
     .headless-entry-label {
       margin: @half-spacing 0px;
-      padding: @half-spacing;
+      padding: @half-spacing 0px;
     }
 
     .headless-entry-input {
@@ -47,15 +48,67 @@
   }
 
   .headless-command-content {
-    .normal-text;
-    font-family: monospace;
+    height: @comand-content-height;
+    overflow: hidden;
     margin: @spacing;
     margin-top: 0px;
-    border: 1px solid;
-    background-color: rgba(0,0,0,0);
     border-radius: @border-radius;
-    padding: @spacing;
+    word-break: break-all;
+    position: relative;
+    
+    .headless-content-floating {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: @comand-content-height;
+      position: absolute;  
+      z-index: 2;
+    }
+
+    .headless-command-requests {
+      .headless-content-floating;
+      font-size: 125%;
+    }
+
+    .headless-command-errors {
+      .headless-content-floating;
+      .normal-text;
+      font-family: monospace;
+    }
+
+    .headless-command-requsts-spacer
+    {
+      padding: @spacing;
+    }
+
+    .headless-command-errors-spacer
+    {
+      height: @comand-content-height - @spacing;
+      padding: @half-spacing;
+      overflow-y: auto;
+    }
+
+    .headless-command-command {
+      overflow: auto;
+      position: relative;
+      margin: @spacing;
+      .normal-text;
+      font-family: monospace;
+      z-index: 0;
+    }
+
+    .headless-command-veil {
+      position: absolute;
+      top: -5%;
+      left: -5%;
+      width: 110%;
+      height: 110%;
+      z-index: 1;
+    }
   }
+
+
 }
 
 .headless-generator-data {
