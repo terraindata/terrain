@@ -100,7 +100,7 @@ async function storeEvent(request: any)
       useragent: request.useragent,
       referer: request.header.referer,
     },
-    timestamp: req['timestamp'],
+    timestamp: new Date().toJSON(),
     meta: req['meta'],
   };
 
@@ -131,6 +131,11 @@ Router.get('/', async (ctx, next) =>
 {
   await storeEvent(ctx.request);
   ctx.body = '';
+});
+
+Router.get('/time', async (ctx, next) =>
+{
+  ctx.body = new Date().toJSON();
 });
 
 // * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
