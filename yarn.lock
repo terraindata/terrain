@@ -2538,8 +2538,8 @@ cycle@1.0.x:
   resolved "https://registry.yarnpkg.com/cycle/-/cycle-1.0.3.tgz#21e80b2be8580f98b468f379430662b046c34ad2"
 
 d3-array@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-1.2.0.tgz#147d269720e174c4057a7f42be8b0f3f2ba53108"
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/d3-array/-/d3-array-1.2.1.tgz#d1ca33de2f6ac31efadb8e050a021d7e2396d5dc"
 
 d3-collection@1:
   version "1.0.4"
@@ -2596,8 +2596,8 @@ d3-time@1:
   resolved "https://registry.yarnpkg.com/d3-time/-/d3-time-1.0.7.tgz#94caf6edbb7879bb809d0d1f7572bc48482f7270"
 
 d3-timer@^1.0.0:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/d3-timer/-/d3-timer-1.0.6.tgz#4044bf15d7025c06ce7d1149f73cd07b54dbd784"
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/d3-timer/-/d3-timer-1.0.7.tgz#df9650ca587f6c96607ff4e60cc38229e8dd8531"
 
 d3-voronoi@^1.1.2:
   version "1.1.2"
@@ -8690,17 +8690,17 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-victory-chart@^22.0.0:
-  version "22.0.0"
-  resolved "https://registry.yarnpkg.com/victory-chart/-/victory-chart-22.0.0.tgz#55f0a85c7d14d4f87ab50b761af0ec1731773e6b"
+victory-chart@^23.0.0:
+  version "23.0.0"
+  resolved "https://registry.yarnpkg.com/victory-chart/-/victory-chart-23.0.0.tgz#ff2574aa1ac86478e6946a4ffdacd96bcb33d68e"
   dependencies:
     d3-voronoi "^1.1.2"
     lodash "^4.17.4"
-    victory-core "^18.0.0"
+    victory-core "^19.0.0"
 
-victory-core@^18.0.0, victory-core@^18.0.2:
-  version "18.0.2"
-  resolved "https://registry.yarnpkg.com/victory-core/-/victory-core-18.0.2.tgz#5a962865d1ce47b1cec740a34a39f8274b6d4e68"
+victory-core@^19.0.0:
+  version "19.0.2"
+  resolved "https://registry.yarnpkg.com/victory-core/-/victory-core-19.0.2.tgz#24857fedfb6d6c438e2c63765477810b392fb9fe"
   dependencies:
     d3-ease "^1.0.0"
     d3-interpolate "^1.1.1"
@@ -8709,21 +8709,21 @@ victory-core@^18.0.0, victory-core@^18.0.2:
     d3-timer "^1.0.0"
     lodash "^4.17.4"
 
-victory-pie@^12.0.0:
-  version "12.0.0"
-  resolved "https://registry.yarnpkg.com/victory-pie/-/victory-pie-12.0.0.tgz#60c734d2976be2d011446fdfa9024e0a5922a605"
+victory-pie@^13.0.0:
+  version "13.0.0"
+  resolved "https://registry.yarnpkg.com/victory-pie/-/victory-pie-13.0.0.tgz#081cd49312504190e88a0660e8213a90dcbeedfa"
   dependencies:
     d3-shape "^1.0.0"
     lodash "^4.17.4"
-    victory-core "^18.0.0"
+    victory-core "^19.0.0"
 
-victory@^0.22.0:
-  version "0.22.2"
-  resolved "https://registry.yarnpkg.com/victory/-/victory-0.22.2.tgz#d0c1ab8c77d9cd0b43bd15ba683f1250dae7ba7b"
+victory@^0.23.0:
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/victory/-/victory-0.23.0.tgz#74852546edd1b9e3a1feb0a89b3c2516356e0e15"
   dependencies:
-    victory-chart "^22.0.0"
-    victory-core "^18.0.2"
-    victory-pie "^12.0.0"
+    victory-chart "^23.0.0"
+    victory-core "^19.0.0"
+    victory-pie "^13.0.0"
 
 vinyl@^0.5.0:
   version "0.5.3"

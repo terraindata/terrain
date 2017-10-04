@@ -133,9 +133,9 @@ const FileImportActions =
     (columnId: number, recursionDepth: number, type: string) =>
       $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
-    updatePreviewRows:
+    updatePreviewColumns:
     (transform: Transform) =>
-      $(ActionTypes.updatePreviewRows, { transform }),
+      $(ActionTypes.updatePreviewColumns, { transform }),
 
     saveTemplate:
     (templateName: string, exporting: boolean, handleTemplateSaveSuccess) =>

@@ -688,6 +688,26 @@ export const Ajax =
       );
     },
 
+    getStreamingProgress(onLoad: (resp: any) => void,
+      onError: (resp: any) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'import/progress/',
+        {},
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
     importFile(file: File,
       filetype: string,
       dbname: string,

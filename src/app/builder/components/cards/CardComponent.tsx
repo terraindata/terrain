@@ -875,7 +875,7 @@ class _CardComponent extends TerrainComponent<Props>
                 />
               }
               {
-                !(this.props.card && this.props.card['noTitle']) &&
+                !(this.props.card && this.props.card['noTitle']) && !closed &&
                 <div
                   className='card-title-inner'
                   style={{
@@ -894,7 +894,7 @@ class _CardComponent extends TerrainComponent<Props>
                     'card-preview': true,
                     'card-preview-hidden': this.state.opening,
                   })}>
-                    {BlockUtils.getPreview(card)}
+                    {this.props.card.static.title + ' (' + BlockUtils.getPreview(this.props.card) + ')'}
                   </div>
                   :
                   null
