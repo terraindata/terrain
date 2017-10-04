@@ -237,6 +237,7 @@ export function parseCSV(file, config: ParseCSVConfig)
     arr[row][col] = '';
   }
 
+  // remove blank lines
   arr = arr.filter((arrRow) =>
     arrRow.length > 1 || arrRow[0].length > newLineLength,
   );
@@ -256,7 +257,7 @@ export function parseCSV(file, config: ParseCSVConfig)
   return arr;
 }
 
-export function parseJSONSubset(file: string, numLines: number): object[]
+export function parseObjectListJSONSubset(file: string, numLines: number): object[]
 {
   let lineCount = 0;
   let openBracketCount = 0;
@@ -295,7 +296,7 @@ export function parseJSONSubset(file: string, numLines: number): object[]
   return JSON.parse(file.substring(0, c) + ']');
 }
 
-export function parseNewlineJSON(file: string, numLines: number): object[] | string
+export function parseNewlineJSONSubset(file: string, numLines: number): object[] | string
 {
   const items: object[] = [];
   let ind: number = 0;

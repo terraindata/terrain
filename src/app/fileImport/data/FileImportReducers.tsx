@@ -71,17 +71,9 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
   {
     return state
       .set('isDirty', true)
-      .set('previewRows', List(state.previewRows.map((row, i) =>
-        row.map((col, j) =>
-        {
-          if (j === transformCol)
-          {
-            return transform.name === 'append' ? col + transform.args.text : transform.args.text + col;
-          }
-          return col;
-        }),
-      )),
-    );
+      .setIn(['previewColumns', transformCol], List(state.previewColumns.get(transformCol).map((item) =>
+        transform.name === 'append' ? item + transform.args.text : transform.args.text + item,
+      )));
   }
   else if (transform.name === 'duplicate')
   {
@@ -89,15 +81,10 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
     return state
       .set('isDirty', true)
       .set('primaryKeys', primaryKeys)
-      .set('columnNames', state.columnNames
-        .insert(transformCol + 1, transform.args.newName as string))
       .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
       .set('columnTypes', state.columnTypes.insert(transformCol + 1, state.columnTypes.get(transformCol)))
-      .set('previewRows', List(state.previewRows.map((row: any, i) =>
-        [].concat(...row.map((col, j) =>           // convoluted way of mapping an array and returning a larger array
-          j === transformCol ? [col, col] : col,    // since one column needs to be added (same for split below)
-        )),
-      )));
+      .set('columnNames', state.columnNames.insert(transformCol + 1, transform.args.newName as string))
+      .set('previewColumns', state.previewColumns.insert(transformCol + 1, state.previewColumns.get(transformCol)));
   }
   else if (transform.name === 'split')
   {
@@ -105,27 +92,19 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
     return state
       .set('isDirty', true)
       .set('primaryKeys', primaryKeys)
+      .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
+      .set('columnTypes', state.columnTypes.insert(transformCol + 1, FileImportTypes._ColumnTypesTree()))
       .set('columnNames', state.columnNames
         .set(transformCol, transform.args.newName[0])
         .insert(transformCol + 1, transform.args.newName[1]))
-      .set('columnsToInclude', state.columnsToInclude.insert(transformCol + 1, true))
-      .set('columnTypes', state.columnTypes.insert(transformCol + 1, FileImportTypes._ColumnTypesTree()))
-      .set('previewRows', List(state.previewRows.map((row: any, i) =>
-        [].concat(...row.map((col, j) =>
-        {
-          if (j === transformCol)
-          {
-            const index = col.indexOf(transform.args.text);
-            if (index === -1)
-            {
-              return [col, ''];
-            }
-            return [col.substring(0, index), col.substring(index + transform.args.text.length)];
-          }
-          return col;
-        },
-        )),
-      )));
+      .set('previewColumns', state.previewColumns
+        .insert(transformCol + 1, List(state.previewColumns.get(transformCol).map((item) =>
+          item.substring(item.indexOf(transform.args.text) + transform.args.text.length),
+        )))
+        .set(transformCol, List(state.previewColumns.get(transformCol).map((item) =>
+          item.substring(0, item.indexOf(transform.args.text)),
+        ))),
+    );
   }
   else if (transform.name === 'merge')
   {
@@ -146,33 +125,31 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
     return state
       .set('isDirty', true)
       .set('primaryKeys', primaryKeys)
+      .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
+      .set('columnTypes', state.columnTypes.delete(mergeCol))
       .set('columnNames', state.columnNames
         .set(transformCol, transform.args.newName as string)
         .delete(mergeCol))
-      .set('columnsToInclude', state.columnsToInclude.delete(mergeCol))
-      .set('columnTypes', state.columnTypes.delete(mergeCol))
-      .set('previewRows', List(state.previewRows.map((row, i) =>
-        row.map((col, j) =>
-        {
-          return j === transformCol ? col + transform.args.text + row[mergeCol] : col;
-        }).filter((col, j) =>
-          j !== mergeCol,
-        ),
-      )));
+      .set('previewColumns', state.previewColumns
+        .set(transformCol, List(state.previewColumns.get(transformCol).map((item, index) =>
+          item + transform.args.text + state.previewColumns.get(mergeCol).get(index),
+        )))
+        .delete(mergeCol),
+    );
   }
   return state;
 };
 
 const addPreviewColumn = (state: FileImportTypes.FileImportState, columnName: string) =>
 {
-  const { originalNames, columnNames, columnTypes, columnsToInclude, previewRows } = state;
+  const { originalNames, columnNames, columnTypes, columnsToInclude, previewColumns } = state;
   return state
     .set('isDirty', true)
     .set('originalNames', originalNames.push(columnName))
     .set('columnNames', columnNames.push(columnName))
     .set('columnTypes', columnTypes.push(FileImportTypes._ColumnTypesTree()))
     .set('columnsToInclude', columnsToInclude.push(true))
-    .set('previewRows', previewRows.map((row) => row.concat('')));
+    .set('previewColumns', previewColumns.map((row) => row.concat('')));
 };
 
 FileImportReducers[ActionTypes.setErrorMsg] =
@@ -319,7 +296,7 @@ FileImportReducers[ActionTypes.addTransform] =
       .set('transforms', state.transforms.push(action.payload.transform))
   ;
 
-FileImportReducers[ActionTypes.updatePreviewRows] =
+FileImportReducers[ActionTypes.updatePreviewColumns] =
   (state, action) =>
     applyTransform(state, action.payload.transform)
   ;
@@ -334,7 +311,7 @@ FileImportReducers[ActionTypes.chooseFile] =
       .set('filesize', action.payload.filesize)
       .set('primaryKeys', List([]))
       .set('primaryKeyDelimiter', '-')
-      .set('previewRows', action.payload.preview)
+      .set('previewColumns', action.payload.preview)
       .set('originalNames', action.payload.originalNames)
       .set('columnNames', action.payload.originalNames)
       .set('columnsToInclude', List(action.payload.originalNames.map(() => true)))
@@ -501,6 +478,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
           FileImportTypes._Template({
+            export: template['export'],
             templateId: template['id'],
             templateName: template['name'],
             originalNames: List<string>(template['originalNames']),
@@ -508,7 +486,6 @@ FileImportReducers[ActionTypes.fetchTemplates] =
             transformations: template['transformations'],
             primaryKeys: template['primaryKeys'],
             primaryKeyDelimiter: template['primaryKeyDelimiter'],
-            export: template['export'],
           }),
         ));
         action.payload.setTemplates(templates);
@@ -530,13 +507,11 @@ FileImportReducers[ActionTypes.applyTemplate] =
     {
       state = applyTransform(state, transform);
     });
-    const { columnNames, previewRows } = state;
+    const { columnNames, previewColumns } = state;
     return state
       .set('originalNames', List(template.originalNames))
       .set('primaryKeys', List(template.primaryKeys.map((pkey) => columnNames.indexOf(pkey))))
-      .set('transforms', List<FileImportTypes.Transform>(template.transformations))
       .set('columnNames', columnNames)
-      .set('originalNames', List(template.originalNames))
       .set('transforms', List<Transform>(template.transformations))
       .set('columnTypes', List(columnNames.map((colName) =>
         template.columnTypes[colName] ?
@@ -545,7 +520,7 @@ FileImportReducers[ActionTypes.applyTemplate] =
           FileImportTypes._ColumnTypesTree(),
       )))
       .set('columnsToInclude', List(columnNames.map((colName) => !!template.columnTypes[colName])))
-      .set('previewRows', previewRows)
+      .set('previewColumns', previewColumns)
       .set('primaryKeyDelimiter', template.primaryKeyDelimiter)
       .set('isDirty', false);
   };
@@ -559,6 +534,7 @@ FileImportReducers[ActionTypes.saveFile] =
   (state, action) =>
     state.set('file', action.payload.file)
       .set('filetype', action.payload.filetype)
-      .set('isDirty', false);
+      .set('isDirty', false)
+  ;
 
 export default FileImportReducers;

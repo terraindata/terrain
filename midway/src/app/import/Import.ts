@@ -137,6 +137,10 @@ export class Import
       {
         return reject('Filetype must be either CSV or JSON.');
       }
+      if (exprt.filetype === 'json [type object]' && exprt.objectKey === undefined)
+      {
+        return reject('Must provide an object key if exporting in json [type object] format.');
+      }
       if (headless)
       {
         // get a template given the template ID

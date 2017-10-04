@@ -80,10 +80,8 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 {
   public state: {
     tql: string;
-    theme: string;
     runMode: string;
     highlightedLine: number;
-    theme_index: number;
     syntaxHelpOpen: boolean;
     syntaxHelpPos: any;
     cardName: string;
@@ -92,10 +90,8 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     resultsBarOpen: boolean;
   } = {
     tql: this.props.query.tql,
-    theme: 'monokai',
     runMode: 'auto',
     highlightedLine: null,
-    theme_index: 0,
     syntaxHelpOpen: false,
     syntaxHelpPos: {},
     cardName: '',
@@ -333,7 +329,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
       <div
         className={classNames({
           'tql-column': true,
-          [this.state.theme + '-tql-theme']: true,
+          // [this.state.theme + '-tql-theme']: true,
           'tql-column-results-bar-open': this.state.resultsBarOpen,
         })}
       >
@@ -349,7 +345,6 @@ class BuilderTQLColumn extends TerrainComponent<Props>
             tql={this.state.tql}
             language={this.props.language}
             canEdit={this.props.canEdit}
-            theme={this.state.theme}
 
             onChange={this.updateTql}
 

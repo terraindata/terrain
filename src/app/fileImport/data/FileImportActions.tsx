@@ -133,9 +133,9 @@ const FileImportActions =
     (columnId: number, recursionDepth: number, type: string) =>
       $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
-    updatePreviewRows:
+    updatePreviewColumns:
     (transform: Transform) =>
-      $(ActionTypes.updatePreviewRows, { transform }),
+      $(ActionTypes.updatePreviewColumns, { transform }),
 
     saveTemplate: // if the database, server, and table haven't been selected in the file import process, they need to be given here
     (templateName: string, exporting: boolean, handleTemplateSaveSuccess, serverId?: number, dbName?: string, tableName?: string) =>

@@ -462,6 +462,11 @@ const Util = {
     return Util.parentNode(reactNode).childNodes;
   },
 
+  children(reactNode): NodeList
+  {
+    return ReactDOM.findDOMNode(reactNode).childNodes;
+  },
+
   selectText(field, start, end)
   {
     if (field.createTextRange)

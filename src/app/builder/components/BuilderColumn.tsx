@@ -68,6 +68,7 @@ import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import CardsColumn from './cards/CardsColumn';
+import TuningColumn from './cards/TuningColumn';
 import InputsArea from './inputs/InputsArea';
 import ResultsArea from './results/ResultsArea';
 
@@ -80,6 +81,7 @@ const ResultsIcon = require('./../../../images/icon_resultsDropdown.svg');
 const TQLIcon = require('./../../../images/icon_tql.svg');
 const InputsIcon = require('./../../../images/icon_input.svg');
 const ManualIcon = require('./../../../images/icon_info.svg');
+const TuningIcon = require('./../../../images/icon_tuning.svg');
 
 enum COLUMNS
 {
@@ -88,9 +90,10 @@ enum COLUMNS
   Editor,
   Inputs,
   Schema,
+  Tuning,
 }
 // Manual,
-const NUM_COLUMNS = 5;
+const NUM_COLUMNS = 6;
 
 const menuIcons = [
   { icon: <BuilderIcon />, color: '#76a2c1' },
@@ -98,6 +101,7 @@ const menuIcons = [
   { icon: <TQLIcon />, color: '#d47884' },
   { icon: <InputsIcon />, color: '#c2b694' },
   { icon: <ManualIcon />, color: '#a98abf' },
+  { icon: <TuningIcon />, color: 'black' },
 ]; // TODO add schema icon above
 
 // interface Props
@@ -259,6 +263,14 @@ const BuilderColumn = createReactClass<any, any>(
             fullPage={false}
             showSearch={true}
             showResults={false}
+          />;
+        case COLUMNS.Tuning:
+          return <TuningColumn
+            canEdit={canEdit}
+            addColumn={this.props.onAddManualColumn}
+            columnIndex={this.props.index}
+            cardsAndCodeInSync={query.cardsAndCodeInSync}
+            language={query.language}
           />;
         // case COLUMNS.Manual:
         //   return <Manual

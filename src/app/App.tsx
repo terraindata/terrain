@@ -144,15 +144,15 @@ const links =
       route: '/import',
     },
     {
+      icon: <ReportingIcon />,
+      text: 'Analytics',
+      route: '/analytics',
+    },
+    {
       icon: <ControlIcon />,
       text: 'Control',
       route: '/control',
     },
-    // {
-    //   icon: <ReportingIcon />,
-    //   text: 'Analytics',
-    //   route: '/analytics',
-    // },
     // {
     //   icon: <ManualIcon />,
     //   text: 'Manual',

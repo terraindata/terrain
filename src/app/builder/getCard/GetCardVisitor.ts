@@ -93,6 +93,12 @@ const KEY_INLINE_DISPLAYS = [
   DisplayType.DROPDOWN,
 ];
 
+// Clause types that have static keys
+const STATIC_KEY_CLAUSE_TYPES = [
+  ESClauseType.ESStructureClause,
+  ESClauseType.ESWildcardStructureClause,
+];
+
 const KEY_DISPLAY: Display =
   {
     displayType: DisplayType.TEXT,
@@ -103,6 +109,17 @@ const KEY_DISPLAY: Display =
     style: {
       maxWidth: 100,
     },
+  };
+
+const STATIC_KEY_DISPLAY: Display =
+  {
+    displayType: DisplayType.LABEL,
+    key: 'key',
+    style: {
+      maxWidth: 100,
+      fontSize: 16,
+    },
+    className: 'card-elastic-key-label',
   };
 
 /**
@@ -125,7 +142,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   protected static seedCard(clause: ESClause,
     obj: {
       [field: string]: any;
-
       static: {
         colors?: string[]; // optional, filled below
         title?: string; // optional, filled below
@@ -140,7 +156,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         getParentTerms?: (card: Card, schemaState) => List<string>;
 
         metaFields?: string[];
-
         init?: InitFn;
       };
     }): any
@@ -170,13 +185,15 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       // prepend the display with our standard key text display
       const objStatic = obj['static'];
       const display = objStatic['display'];
+      const keyDisplay = STATIC_KEY_CLAUSE_TYPES.indexOf(clause.clauseType) !== -1 ?
+        _.extend({}, STATIC_KEY_DISPLAY, { label: clause.type }) : KEY_DISPLAY;
       if (display === undefined)
       {
-        objStatic['display'] = KEY_DISPLAY;
+        objStatic['display'] = keyDisplay;
       }
       else if (Array.isArray(display))
       {
-        (display as Display[]).unshift(KEY_DISPLAY);
+        (display as Display[]).unshift(keyDisplay);
       }
       else
       {
@@ -187,7 +204,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             displayType: DisplayType.FLEX,
             key: null,
             flex: [
-              KEY_DISPLAY,
+              keyDisplay,
               display,
             ],
           };
@@ -195,7 +212,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         else
         {
           objStatic['display'] = [
-            KEY_DISPLAY,
+            keyDisplay,
             objStatic['display'],
           ] as any;
         }
@@ -440,7 +457,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: getCardColors(clause.path[0], Colors().builder.cards.mapClause),
         preview: '[cards.size] properties',
-
         display:
         {
           displayType: DisplayType.CARDS,
@@ -505,7 +521,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       {
         colors: getCardColors(clause.path[0], Colors().builder.cards.objectClause),
         preview: '[cards.size] properties',
-
         display:
         {
           displayType: DisplayType.CARDS,
@@ -556,7 +571,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.stringClause),
         preview: '[value]',
-
         display: {
           displayType: DisplayType.TEXT,
           key: 'value',
@@ -709,7 +723,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             );
             return json;
           },
-
           colors: getCardColors(clause.path[0], Colors().builder.cards.structureClause),
           preview: '[cards.size] Properties',
 

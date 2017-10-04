@@ -83,6 +83,7 @@ export interface Props
   closeOnConfirm?: boolean;
   className?: string;
   noFooterPadding?: boolean; // TODO: find better way
+  inputClassName?: string;
 }
 
 @Radium
@@ -209,7 +210,10 @@ class Modal extends TerrainComponent<Props>
                     backgroundColor(Colors().altBg1),
                   ]}
                   type='text'
-                  className='standard-input'
+                  className={classNames({
+                    'standard-input': true,
+                    [this.props.inputClassName]: this.props.inputClassName !== undefined && this.props.inputClassName !== '',
+                  })}
                   placeholder={this.props.textboxPlaceholderValue}
                   defaultValue={this.props.initialTextboxValue}
                   value={this.props.textboxValue}

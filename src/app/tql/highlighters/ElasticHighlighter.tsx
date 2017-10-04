@@ -47,6 +47,8 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 // parser imports
+import * as Immutable from 'immutable';
+
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
 import ESParserToken from '../../../../shared/database/elastic/parser/ESParserToken';
@@ -95,7 +97,11 @@ class ElasticHighlighter extends SyntaxHighlighter
     this.clearMarkers(instance);
     const parser = new ESJSONParser(instance.getValue());
     const state = BuilderStore.getState();
-    const inputs = state.query && state.query.inputs;
+    let inputs = state.query && state.query.inputs;
+    if (inputs === null)
+    {
+      inputs = Immutable.List([]);
+    }
     const params: { [name: string]: any; } = toInputMap(inputs);
     const interpreter = new ESInterpreter(parser, params);
     const rootValueInfo: ESValueInfo = parser.getValueInfo();

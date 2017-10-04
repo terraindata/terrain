@@ -62,7 +62,7 @@ class FileImportStateC extends BaseClass
   public filetype: string = '';
   public filesize: number = 0;
 
-  public previewRows: List<List<string>> = List([]);
+  public previewColumns: List<List<string>> = List([]);
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
   public hasCsvHeader: boolean = false;
@@ -131,15 +131,14 @@ export const _Transform =
 
 class TemplateC
 {
+  public export = false;
   public templateId = -1;
   public templateName = '';
   public originalNames: List<string> = List([]);
   public columnTypes: List<ColumnTypesTree> = List([]);
   public transformations: List<Transform> = List([]);
-  public hasCsvHeader: boolean = true;
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
-  public export = false;
   public persistentAccessToken?: string = '';
   public dbid?: number = -1;
   public dbname?: string = '';
@@ -150,6 +149,7 @@ const Template_Record = Immutable.Record(new TemplateC());
 export interface Template extends TemplateC, IRecord<Template> { }
 export const _Template =
   (config: {
+    export: boolean;
     templateId: number;
     templateName: string;
     originalNames: List<string>;
@@ -161,7 +161,6 @@ export const _Template =
     dbid?: number;
     dbname?: string;
     tablename?: string;
-    export: boolean;
   }) =>
   {
     return new Template_Record(config) as any as Template;
@@ -186,10 +185,8 @@ export const _ColumnTypesTree = (config?: any) =>
 };
 
 export const NUMBER_PREVIEW_ROWS = 5;
-
-export const PREVIEW_CHUNK_SIZE = 10000000; // (10mb) - amount to read in order to extract preview rows
-
-export const MIN_PROGRESSBAR_FILESIZE = 500000; // (500kb) - threshold to display progressbar (spinning wheel)
+export const PREVIEW_CHUNK_SIZE = 10000000; // (10mb) amount to read in order to extract preview rows
+export const MIN_PROGRESSBAR_FILESIZE = 500000; // (500kb) threshold to display progressbar
 
 export const FILE_TYPES =
   [

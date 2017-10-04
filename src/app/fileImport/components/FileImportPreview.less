@@ -1,8 +1,5 @@
 @import "../../common/Common.less";
 
-@padding: 6px;
-@primary-key-padding: 12px 12px;
-
 .fi-preview {
   white-space: nowrap;
 
@@ -15,21 +12,19 @@
     padding: 24px;
   }
 
-  .fi-preview-loading-container {
-    text-align: center;
-    border-bottom: 1px solid #ccc;
-    margin-top: 24px;
-    margin-bottom: 24px;
-    padding-bottom: 24px;
-    .transition(~"all 0.5s");
+  .fi-preview-table-container {
+    overflow: auto;
+
+    .fi-preview-columns-container {
+    }
   }
 
   .fi-preview-topbar {
     justify-content: space-between;
 
-    .fi-preview-template {
+    .fi-preview-template-wrapper {
 
-      .fi-preview-template-wrapper {
+      .fi-preview-template {
         align-items: center;
         margin-bottom: 12px;
         margin-left: 12px;
@@ -39,19 +34,19 @@
       }
     }
 
-    .fi-preview-pkeys {
+    .fi-preview-pkeys-wrapper {
       margin-left: 6px;
       margin-bottom: 6px;
       min-height: 50px;
       flex-wrap: wrap;
 
-      .fi-preview-pkeys-wrapper {
+      .fi-preview-pkeys {
 
         .fi-preview-pkeys-pkey {
           margin-bottom: 3px;
           border-radius: 3px;
 
-          .delete-primary-key {
+          .delete-pkey {
             margin-left: 6px;
           }
         }
@@ -69,37 +64,42 @@
         }
       }
 
-      .fi-preview-pkeys-wrapper > * {
+      .fi-preview-pkeys > * {
         .big-text;
-        padding: @primary-key-padding;
+        padding: 12px;
       }
 
       .fi-preview-pkeys-nokey {
         .big-text;
-        padding: @primary-key-padding;
+        padding: 12px;
         vertical-align: middle;
       }
     }
   }
 
+  // right-align templates in export where there are no primary keys
   .fi-preview-topbar-export {
     justify-content: flex-end;
   }
 
-  .fi-preview-table-container {
-    overflow: auto;
-
-    .fi-preview-columns-container {
-    }
-
-    .fi-preview-rows-container {
-    }
-  }
-
-  .fi-import-button-wrapper {
+  .fi-preview-bottombar {
     flex-direction: column;
     justify-content: center;
     margin-top: 12px;
+
+    .fi-preview-loading {
+      text-align: center;
+      border-bottom: 1px solid #ccc;
+      margin: 24px 0px;
+      padding-bottom: 24px;
+      .transition(~'all 0.5s');
+    }
+
+    .fi-preview-import {
+      margin-left: 12px;
+      align-self: flex-end;
+      height: 30px;
+    }
 
     .fi-preview-update {
       flex-direction: column;
@@ -139,15 +139,8 @@
         }
 
         .fi-preview-update-button-subtext {
-
         }
       }
     }
-  }
-
-  .fi-preview-import-button {
-    margin-left: 12px;
-    align-self: flex-end;
-    height: 30px;
   }
 }
