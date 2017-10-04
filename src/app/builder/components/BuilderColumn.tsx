@@ -333,6 +333,7 @@ const BuilderColumn = createReactClass<any, any>(
         >
           <div
             className='builder-title-bar'
+            style={{ 'box-shadow': '0px 3px 9px ' + Colors().boxShadow }}
           >
             {
               this.props.index === 0 ? null : (
@@ -358,7 +359,7 @@ const BuilderColumn = createReactClass<any, any>(
                 }
                 {
                   !canEdit &&
-                  tooltip( <LockedIcon />, cantEditReason)
+                  tooltip(<LockedIcon />, cantEditReason)
                 }
               </span>
             </div>

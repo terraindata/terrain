@@ -1235,6 +1235,7 @@ class FileImportPreview extends TerrainComponent<Props>
           'fi-preview': true,
           'fi-preview-export': this.props.exporting,
         })}
+        style={backgroundColor(Colors().emptyBg)}
       >
         {
           this.props.exporting && !this.props.query ?

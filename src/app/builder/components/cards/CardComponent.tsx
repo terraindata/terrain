@@ -171,9 +171,9 @@ class _CardComponent extends TerrainComponent<Props>
   public componentWillMount()
   {
     ColorsActions.setStyle('.card-drag-handle svg', { fill: Colors().altBg1 });
-    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', {fill: Colors().altBg1 });
-    ColorsActions.setStyle('.card-minimize-icon .st0', {fill: Colors().altBg1 });
-    ColorsActions.setStyle('.card-help-icon', {fill: Colors().altBg1});
+    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-minimize-icon .st0', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-help-icon', { fill: Colors().altBg1 });
 
     // TODO
     // this._subscribe(Store, {

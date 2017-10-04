@@ -372,6 +372,10 @@ class LibraryItem extends TerrainComponent<Props>
                     'library-item-title-bar': true,
                     'library-item-title-bar-editing': this.state.nameEditing,
                   })}
+                  style={
+                    isSelected ? backgroundColor(Colors().active) :
+                      backgroundColor(Colors().bg2, Colors().inactiveHover)
+                  }
                 >
                   <div
                     className='library-item-icon'

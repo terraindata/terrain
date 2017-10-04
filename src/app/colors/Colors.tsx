@@ -547,7 +547,7 @@ const LIGHT: Theme =
   {
     // Use these colors
 
-    bg1: 'rgb(225, 227, 231)',
+    bg1: 'rgb(215, 217, 221)',
     bg2: 'rgb(237, 239, 243)',
     bg3: '#fff',
 
@@ -573,7 +573,7 @@ const LIGHT: Theme =
     highlight: 'rgba(210,215,219,0.75)', // for slight emphasis
     darkerHighlight: 'rgb(235, 235, 238)', // to make a depth effect with highlight
 
-    boxShadow: 'rgba(0, 0, 0, 0.05)',
+    boxShadow: 'rgba(130,130,130,0.4)',
 
     fadedOutBg: 'rgba(255, 255, 255, 0.75)', // bg to cover up things when they are faded out
 
@@ -840,6 +840,8 @@ export function altStyle()
 export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean, hovered?: boolean)
 {
   const key = 'card-' + strongColor + bgColor + hoverBg + small + hovered;
+  const smallWeight = (localStorage.getItem('theme') === 'DARK') ? ' 2px 2px 4px 1px' : ' 1px 1px 2px 1px';
+  const largeWeight = (localStorage.getItem('theme') === 'DARK') ? ' 3px 3px 5px 2px ' : ' 2px 2px 3px 1px';
 
   if (!CACHE[key])
   {
@@ -850,8 +852,9 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
       background: hovered ? backgroundHover : bgColor,
       color: strongColor,
 
-      boxShadow: small ? Colors().boxShadow + ' 2px 2px 4px 1px' :
-        '3px 3px 5px 2px ' + Colors().boxShadow,
+      boxShadow: small ? Colors().boxShadow + smallWeight :
+        Colors().boxShadow + largeWeight,
+
       borderWidth: 1,
       borderStyle: 'solid',
       borderLeftWidth: '3px',

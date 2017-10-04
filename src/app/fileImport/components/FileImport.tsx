@@ -804,13 +804,14 @@ class FileImport extends TerrainComponent<any>
           <div
             className='fi-next-button button'
             onClick={nextEnabled ? this.incrementStep : this._fn(this.setError, errorMsg)}
-            style={nextEnabled ?
+            style={[nextEnabled ?
               buttonColors()
               :
               {
                 background: Colors().bg3,
-              }
-            }
+              },
+            fontColor(Colors().text1),
+            ]}
             ref='fi-next-button'
           >
             Next

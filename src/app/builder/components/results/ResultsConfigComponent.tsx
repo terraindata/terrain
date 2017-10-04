@@ -279,7 +279,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               Drag fields to/from the sample result below to customize
               how this algorithm's results look in the Builder.
             </div>
-            <div className='results-config-config' style={[backgroundColor(Colors().bg2), shadowStyle]}>
+            <div className='results-config-config' style={[backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3), shadowStyle]}>
               <CRTarget
                 className='results-config-name'
                 type='name'

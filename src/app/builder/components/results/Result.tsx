@@ -297,7 +297,7 @@ class ResultComponent extends TerrainComponent<Props> {
           className='result-inner'
           style={[
             borderColor(Colors().resultLine),
-            backgroundColor(Colors().emptyBg),
+            backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
           ]}
         >
           <div className='result-name'>

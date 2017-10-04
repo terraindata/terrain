@@ -153,7 +153,7 @@ class Modal extends TerrainComponent<Props>
               })}
               style={[
                 fontColor(Colors().altText1),
-                backgroundColor(Colors().altBg1),
+                backgroundColor('#fff'),
               ]}
             >
               <div
@@ -163,7 +163,9 @@ class Modal extends TerrainComponent<Props>
                 })}
                 style={[
                   fontColor(Colors().text1),
-                  this.props.error ? backgroundColor(Colors().error) : backgroundColor(Colors().bg3),
+                  this.props.error ? backgroundColor(Colors().error) :
+                    (localStorage.getItem('theme') === 'DARK') ? backgroundColor(Colors().bg3) : backgroundColor(Colors().bg2),
+
                 ]}
               >
                 {
@@ -205,10 +207,6 @@ class Modal extends TerrainComponent<Props>
               {
                 this.props.showTextbox &&
                 <input
-                  style={[
-                    fontColor(Colors().altText2),
-                    backgroundColor(Colors().altBg1),
-                  ]}
                   type='text'
                   className='standard-input'
                   placeholder={this.props.textboxPlaceholderValue}

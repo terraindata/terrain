@@ -322,7 +322,6 @@ class Dropdown extends TerrainComponent<Props>
       optionsEl =
         <div
           className='dropdown-options-wrapper'
-          style={altStyle()}
         >
           {
             this.props.options ?
