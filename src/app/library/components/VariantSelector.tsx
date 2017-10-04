@@ -49,22 +49,18 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import memoizeOne from 'memoize-one';
-import * as Radium from 'radium';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'common/Colors';
 import Dropdown from 'common/components/Dropdown';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as FileImportTypes from 'fileImport/FileImportTypes';
 import { LibraryState } from 'library/data/LibraryStore';
 import * as LibraryTypes from 'library/LibraryTypes';
 
 import './VariantSelector.less';
 
 const Color = require('color');
-const { List, Map } = Immutable;
+const { List } = Immutable;
 
-type Template = FileImportTypes.Template;
 type Variant = LibraryTypes.Variant;
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
@@ -79,7 +75,6 @@ export interface Props
 type LibraryItem = Group | Variant | Algorithm;
 type AvailableItemsType = [List<LibraryItem>, List<string>, number];
 
-@Radium
 class VariantSelector extends TerrainComponent<Props>
 {
   public constructor(props)
