@@ -1020,3 +1020,86 @@ describe('File import templates route tests', () =>
       });
   });
 });
+
+describe('Analytics aggregation route tests', () =>
+{
+  test('GET /midway/v1/events/ (select)', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/events/agg')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        start: new Date(2015, 5, 2, 1, 27, 4),
+        end: new Date(2015, 5, 2, 1, 27, 14),
+        eventid: 1,
+        variantid: 1,
+        agg: 'select',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['1'].length).toEqual(2);
+      });
+  });
+
+  test('GET /midway/v1/events/ (histogram)', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/events/agg')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        start: new Date(2015, 5, 2, 1, 27, 4),
+        end: new Date(2015, 5, 2, 1, 27, 14),
+        eventid: 1,
+        variantid: 1,
+        agg: 'histogram',
+        interval: 'second',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['1'].length).toEqual(4);
+      });
+  });
+
+  test('GET /midway/v1/events/ (rate)', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/events/agg')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        start: new Date(2015, 5, 2, 1, 27, 4),
+        end: new Date(2015, 5, 2, 3, 27, 4),
+        eventid: '2,1',
+        variantid: 1,
+        agg: 'rate',
+        interval: 'hour',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['1'].length).toEqual(3);
+      });
+  });
+});
