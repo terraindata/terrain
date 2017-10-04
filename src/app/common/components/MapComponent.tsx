@@ -642,6 +642,8 @@ class MapComponent extends TerrainComponent<Props>
               <Circle
                 center={location}
                 radius={this.convertDistanceToMeters()}
+                color={'red'}
+                fillColor={'red'}
               />
               :
               null

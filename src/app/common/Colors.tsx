@@ -439,7 +439,7 @@ const DARK: Theme =
           primary: '#4fc0ba',
           control: '#fad14b',
           sort: '#1eb4fa',
-          filter: '#38fa1e',
+          filter: '#77f067',
           match: '#b161bc',
           score: '#1eb4fa',
           script: '#4fc0ba',
