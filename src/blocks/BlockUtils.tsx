@@ -276,7 +276,6 @@ export function getPreview(card: Card): string
   {
     return preview.replace(/\[[a-z\.]*\]/g, (str) =>
     {
-      const key = (card as any).key;
       const pattern = str.substr(1, str.length - 2);
       const keys = pattern.split('.');
       if (keys.length === 1)
@@ -286,13 +285,13 @@ export function getPreview(card: Card): string
         {
           return getPreview(value);
         }
-        return key + ': ' + value; // add key of card so key: value is preview
+        return value; // add key of card so key: value is preview
       }
       if (keys[1] === 'length' || keys[1] === 'size')
       {
-        return key + ': ' + card[keys[0]].size;
+        return card[keys[0]].size;
       }
-      return key + ': ' + card[keys[0]].toArray().map(
+      return card[keys[0]].toArray().map(
         (v) =>
           getPreview(v[keys[1]]),
       ).join(', ');
@@ -300,7 +299,7 @@ export function getPreview(card: Card): string
   }
   else if (typeof preview === 'function')
   {
-    return (card as any).key + ': ' + preview(card);
+    return ': ' + preview(card);
   }
   return 'No preview';
 }
