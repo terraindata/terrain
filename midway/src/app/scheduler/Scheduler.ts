@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as naturalSort from 'javascript-natural-sort';
 import * as nodeScheduler from 'node-schedule';
 import * as Client from 'ssh2-sftp-client';
 import * as stream from 'stream';
@@ -186,16 +187,17 @@ export class Scheduler
       }
       let jobId: number = -1;
       let packedParamsSchedule: any[] = [];
+      req['sort'] = req['sort'] === undefined ? 'asc' : req['sort'];
 
       if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'sftp')
       {
         jobId = 0;
-        packedParamsSchedule = [req['paramsJob'], (req['transport'] as any)['filename'], 'utf8'];
+        packedParamsSchedule = [req['paramsJob'], (req['transport'] as any)['filename'], req['sort'], 'utf8'];
       }
       else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'sftp')
       {
         jobId = 1;
-        packedParamsSchedule = [req['paramsJob'], (req['transport'] as any)['filename'], 'utf8'];
+        packedParamsSchedule = [req['paramsJob'], (req['transport'] as any)['filename'], req['sort'], 'utf8'];
       }
       req.active = 1;
       req.archived = 0;
@@ -259,7 +261,7 @@ export class Scheduler
     // 0: import via sftp
     // 1: export via sftp
     await this.createJob(async (scheduleID: number, fields: object,
-      path: string, encoding?: string | null): Promise<any> => // import with sftp
+      path: string, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
@@ -269,21 +271,43 @@ export class Scheduler
           await this.setJobStatus(scheduleID, 1);
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
           await sftp.connect(sftpconfig);
-          winston.info(path.substring(0, path.lastIndexOf('/') + 1));
-          const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
+          const checkIfDirectoryExists: object[] = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
+          let importFilename: string = '';
+          let matches: string[] = [];
           const CheckIfFileExists: object[] = checkIfDirectoryExists.filter((filename) =>
           {
-            return filename['name'] === path.substring(path.lastIndexOf('/') + 1);
+            const match = filename['name'].match(path.substring(path.lastIndexOf('/') + 1).replace(/\*/g, '.*'));
+            if (match !== null && match.length > 0)
+            {
+              matches = matches.concat(match[0]);
+              return filename['name'];
+            }
           });
-          if (checkIfDirectoryExists.length > 0 && CheckIfFileExists.length !== 0) // TODO: add permissions checking
+          matches.sort(naturalSort);
+          if (matches.length === 0)
+          {
+            importFilename = path;
+          }
+          else
+          {
+            importFilename = sort.toLowerCase() === 'asc' ? path.substring(0, path.lastIndexOf('/') + 1) + matches[matches.length - 1]
+              : path.substring(0, path.lastIndexOf('/') + 1) + matches[0];
+          }
+
+          // TODO: add permissions checking
+          if (checkIfDirectoryExists.length > 0 && CheckIfFileExists.length !== 0 && importFilename !== '')
           {
             winston.info('Starting import with sftp');
-            const readStream: stream.Readable = await sftp.get(path, false, encoding);
+            const readStream: stream.Readable = await sftp.get(importFilename, false, encoding);
             const result = await imprt.upsert(readStream, fields, true);
             await this.setJobStatus(scheduleID, 0);
             await sftp.end();
             winston.info('Successfully completed scheduled import with sftp.');
             return resolveJob('Success');
+          }
+          else
+          {
+            winston.info('Failed to complete scheduled import with sftp.');
           }
           return resolveJob('Failed to import.');
         }
@@ -297,7 +321,8 @@ export class Scheduler
       });
     });
 
-    await this.createJob(async (scheduleID: number, fields: object, path: string, encoding?: string | null) => // export with sftp
+    await this.createJob(async (scheduleID: number, fields: object, path: string,
+      sort: string, encoding?: string | null) => // export with sftp
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
@@ -308,7 +333,7 @@ export class Scheduler
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
           await sftp.connect(sftpconfig);
           const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
-          if (checkIfDirectoryExists.length > 0) // TODO: add permissions checking
+          if (checkIfDirectoryExists.length === 1) // TODO: add permissions checking
           {
             winston.info('Starting export with sftp');
             const readStream: stream.Readable = await sftp.put(await imprt.export(fields as ExportConfig, true), path, false, encoding);
