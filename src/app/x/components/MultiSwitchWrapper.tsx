@@ -50,7 +50,7 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props
 {
-  options: List<string>;
+  options: List<{ value: string, label: string }>;
 
   // can pass the value in as an index, a string value, or an array of either
   //  (in the case of multiple selections)
@@ -67,10 +67,10 @@ export interface Props
 class MultiSwitchWrapper extends TerrainComponent<Props>
 {
   public state = {
-    first: 0,
-    second: 'Don',
+    first: 1,
+    second: '20',
     third: List([0, 2]),
-    fourth: List(['Chandler', 'Monica']),
+    fourth: List(['40', '43']),
   };
 
   public render()
@@ -95,11 +95,11 @@ class MultiSwitchWrapper extends TerrainComponent<Props>
         <br />
         <MultiSwitch
           options={List([
-            'Don',
-            'Peggy',
-            'Roger',
-            'Pete',
-            'Kenny',
+            { value: '20', label: 'Don' },
+            { value: '21', label: 'Peggy' },
+            { value: '22', label: 'Roger' },
+            { value: '23', label: 'Pete' },
+            { value: '24', label: 'Kenny' },
           ])}
           value={this.state.second}
           onChange={this.setSecond}
@@ -109,10 +109,10 @@ class MultiSwitchWrapper extends TerrainComponent<Props>
         <br />
         <MultiSwitch
           options={List([
-            'El',
-            'Dustin',
-            'Mike',
-            'Lucas',
+            { value: '30', label: 'El' },
+            { value: '31', label: 'Dustin' },
+            { value: '32', label: 'Mike' },
+            { value: '33', label: 'Lucas' },
           ])}
           value={this.state.third}
           onChange={this.setThird}
@@ -121,12 +121,12 @@ class MultiSwitchWrapper extends TerrainComponent<Props>
         <br />
         <MultiSwitch
           options={List([
-            'Chandler',
-            'Joey',
-            'Ross',
-            'Monica',
-            'Rachel',
-            'Phoebe',
+            { value: '40', label: 'Chandler' },
+            { value: '41', label: 'Joey' },
+            { value: '42', label: 'Ross' },
+            { value: '43', label: 'Monica' },
+            { value: '44', label: 'Rachel' },
+            { value: '45', label: 'Phoebe' },
           ])}
           value={this.state.fourth}
           large={true}

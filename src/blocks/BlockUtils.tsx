@@ -144,7 +144,6 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
   blockType: string, extraConfig?: { [key: string]: any }, skipTemplate?: boolean) =>
 {
   let block = blocksConfig[blockType];
-
   if (!block)
   {
     console.log(blocksConfig, blockType, extraConfig);

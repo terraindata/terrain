@@ -78,6 +78,11 @@ export interface Props
   singleChild?: boolean;
   hideCreateCardTool?: boolean;
   handleCardDrop?: (type: string) => any;
+
+  // Tuning column
+  tuningMode?: boolean;
+  allowTuningDragAndDrop?: boolean;
+  handleCardReorder?: (card, index) => void;
 }
 
 interface KeyState
@@ -87,7 +92,6 @@ interface KeyState
 
 interface State extends KeyState
 {
-  learningMode: boolean;
   cardToolOpen: boolean;
   isDraggingCardOver: boolean;
   draggingOverIndex: number;
@@ -99,7 +103,6 @@ class CardsArea extends TerrainComponent<Props>
 {
   public state: State = {
     keyPath: null,
-    learningMode: this.props.helpOn,
     cardToolOpen: true,
     isDraggingCardOver: false,
     draggingOverIndex: -1,
@@ -149,13 +152,6 @@ class CardsArea extends TerrainComponent<Props>
   public createFromCard()
   {
     Actions.create(this.props.keyPath, 0, 'sfw');
-  }
-
-  public toggleView()
-  {
-    this.setState({
-      learningMode: !this.state.learningMode,
-    });
   }
 
   public toggleCardTool()
@@ -212,8 +208,11 @@ class CardsArea extends TerrainComponent<Props>
 
                   addColumn={this.props.addColumn}
                   columnIndex={this.props.columnIndex}
-                  helpOn={this.state.learningMode || this.props.helpOn}
+                  helpOn={this.props.helpOn}
                   handleCardDrop={this.props.handleCardDrop}
+                  tuningMode={this.props.tuningMode}
+                  allowTuningDragAndDrop={this.props.allowTuningDragAndDrop}
+                  handleCardReorder={this.props.handleCardReorder}
                 />
               </div>,
             )
@@ -235,6 +234,7 @@ class CardsArea extends TerrainComponent<Props>
 
           {
             !this.props.hideCreateCardTool &&
+            !this.props.tuningMode &&
             renderCardTool &&
             <CreateCardTool
               language={this.props.language}

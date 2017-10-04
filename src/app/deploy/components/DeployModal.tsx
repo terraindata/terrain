@@ -169,6 +169,7 @@ class DeployModal extends TerrainComponent<Props>
       <div className='deploy-modal-tql'>
         <div className='deploy-modal-tql-wrapper'>
           <TQLEditor
+            language={'elastic'}
             canEdit={false}
             tql={tql}
             isDiff={this.state.defaultChecked && defaultTql !== null}
@@ -239,6 +240,7 @@ class DeployModal extends TerrainComponent<Props>
             <div
               className={classNames({
                 'deploy-modal': true,
+                'altBg': true,
               })}
             >
               {
