@@ -127,7 +127,20 @@ class TerrainComponent<T> extends React.Component<T, any>
       unmountFn && unmountFn();
     };
 
+    this.setStateWrapper = _.memoize(this.setStateWrapper);
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
+  }
+
+  public setStateWrapper(key, ...path: string[]): (val) => void
+  {
+    return (val, ...args: any[]) =>
+    {
+      for (const property of path)
+      {
+        val = val[property];
+      }
+      this.setState({ [key]: val });
+    };
   }
 
   public shouldComponentUpdate(nextProps: T, nextState: any)
