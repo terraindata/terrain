@@ -360,66 +360,68 @@ class LibraryItem extends TerrainComponent<Props>
             }
           >
             {connectDragSource(
-              <div style={fontColor(Colors().text1)}>
               <div
                 className={'library-item ' + this.props.className}
-                style={
-                  isSelected ? backgroundColor(Colors().active) :
-                    backgroundColor(Colors().bg3, Colors().inactiveHover)
-                }
+                style={fontColor(Colors().text1)}
               >
                 <div
-                  className={classNames({
-                    'library-item-title-bar': true,
-                    'library-item-title-bar-editing': this.state.nameEditing,
-                  })}
                   style={
                     isSelected ? backgroundColor(Colors().active) :
-                      backgroundColor(Colors().bg2, Colors().inactiveHover)
+                      backgroundColor(Colors().bg3, Colors().inactiveHover)
                   }
                 >
                   <div
-                    className='library-item-icon'
-                  >
-                    {
-                      this.props.icon
+                    className={classNames({
+                      'library-item-title-bar': true,
+                      'library-item-title-bar-editing': this.state.nameEditing,
+                    })}
+                    style={
+                      isSelected ? backgroundColor(Colors().active) :
+                        backgroundColor(Colors().bg2, Colors().inactiveHover)
                     }
-                  </div>
-                  <div
-                    className='library-item-name'
-                    style={fontColor(Colors().text1)}
                   >
-                    {
-                      this.props.name.length ? this.props.name : <em>Untitled</em>
-                    }
-                  </div>
-                  <input
-                    className='library-item-name-input'
-                    defaultValue={this.props.name}
-                    placeholder={this.props.type.substr(0, 1).toUpperCase() + this.props.type.substr(1) + ' name'}
-                    onBlur={this.hideTextfield}
-                    onFocus={this.handleFocus}
-                    onKeyDown={this.handleKeyDown}
-                    ref='input'
-                  />
-                  {
-                    this.props.isStarred &&
                     <div
-                      className='library-item-star'
+                      className='library-item-icon'
                     >
-                      <StarIcon />
+                      {
+                        this.props.icon
+                      }
                     </div>
-                  }
-                  <Menu
-                    options={menuOptions}
-                  />
+                    <div
+                      className='library-item-name'
+                      style={fontColor(Colors().text1)}
+                    >
+                      {
+                        this.props.name.length ? this.props.name : <em>Untitled</em>
+                      }
+                    </div>
+                    <input
+                      className='library-item-name-input'
+                      defaultValue={this.props.name}
+                      placeholder={this.props.type.substr(0, 1).toUpperCase() + this.props.type.substr(1) + ' name'}
+                      onBlur={this.hideTextfield}
+                      onFocus={this.handleFocus}
+                      onKeyDown={this.handleKeyDown}
+                      ref='input'
+                    />
+                    {
+                      this.props.isStarred &&
+                      <div
+                        className='library-item-star'
+                      >
+                        <StarIcon />
+                      </div>
+                    }
+                    <Menu
+                      options={menuOptions}
+                    />
+                  </div>
+                  <div className='library-item-content'>
+                    {
+                      this.props['children']
+                    }
+                  </div>
                 </div>
-                <div className='library-item-content'>
-                  {
-                    this.props['children']
-                  }
-                </div>
-              </div>
               </div>,
             )}
           </div>

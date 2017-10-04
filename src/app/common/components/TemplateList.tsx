@@ -49,7 +49,8 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, buttonColors, Colors } from '../../colors/Colors';
+import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './TemplateList.less';
@@ -80,6 +81,12 @@ class TemplateList extends TerrainComponent<Props>
     deleteIndex: -1,
     errorMsg: '',
   };
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.list-items-item-wrapper .st1', { fill: Colors().altBg1 });
+
+  }
 
   public setErrorMsg(errorMsg: string)
   {
@@ -151,6 +158,7 @@ class TemplateList extends TerrainComponent<Props>
     // TODO: button changes colors on delete
     if (this.props.items.size > 0)
     {
+
       return (
         <div
           className='list-apply button'
@@ -163,7 +171,11 @@ class TemplateList extends TerrainComponent<Props>
             buttonColors()
           }
         >
-          Apply
+          <div
+            style={fontColor(Colors().text1)}
+          >
+            Apply
+          </div>
         </div>
       );
     }

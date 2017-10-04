@@ -593,7 +593,7 @@ const LIGHT: Theme =
 
     error: '#d14f42',
 
-    import: '#1efab4',
+    import: 'rgba(30, 180, 250, 0.75)',
 
     resultLine: 'rgba(0,0,0,0.25)',
 
