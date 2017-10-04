@@ -60,6 +60,8 @@ describe('AnalyticsActions', () =>
 {
   const analytics: AnalyticsState = _AnalyticsState({});
   const metricId = 1;
+  const intervalId = 'day';
+  const dateRangeId = 1;
 
   describe('#fetch', () =>
   {
@@ -126,7 +128,7 @@ field=@timestamp`)
       const store = mockStore({ analytics });
 
       store.dispatch(
-        Actions.fetch([variantId], metricId, (analyticsResponseParam) =>
+        Actions.fetch([variantId], metricId, intervalId, (analyticsResponseParam) =>
         {
           expect(store.getActions()).toEqual(expectedActions);
         }),
@@ -148,6 +150,42 @@ field=@timestamp`)
       const store = mockStore({ analytics });
 
       store.dispatch(Actions.selectMetric(metricId));
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+
+  describe('#selectInterval', () =>
+  {
+    it('should create a analytics.selectInterval', () =>
+    {
+      const expectedActions = [
+        {
+          type: ActionTypes.selectInterval,
+          payload: { intervalId },
+        },
+      ];
+
+      const store = mockStore({ analytics });
+
+      store.dispatch(Actions.selectInterval(intervalId));
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+
+  describe('#selectDateRange', () =>
+  {
+    it('should create a analytics.selectDateRange', () =>
+    {
+      const expectedActions = [
+        {
+          type: ActionTypes.selectDateRange,
+          payload: { dateRangeId },
+        },
+      ];
+
+      const store = mockStore({ analytics });
+
+      store.dispatch(Actions.selectDateRange(dateRangeId));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });

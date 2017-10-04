@@ -174,14 +174,51 @@ class Library extends TerrainComponent<any>
     localStorage.setItem(lastPath, location.pathname);
   }
 
-  public handleRadioButtonClick(optionValue)
+  public handleMetricRadioButtonClick(optionValue)
   {
+    const { analytics } = this.props;
     const { selectedVariants } = this.props.library;
     const selectedVariantIds = selectedVariants.toJS();
     const numericOptionValue = parseInt(optionValue, 10);
 
-    this.props.analyticsActions.fetch(selectedVariantIds, numericOptionValue);
     this.props.analyticsActions.selectMetric(optionValue);
+    this.props.analyticsActions.fetch(
+      selectedVariantIds,
+      numericOptionValue,
+      analytics.selectedInterval,
+      analytics.selectedDateRange,
+    );
+  }
+
+  public handleIntervalRadioButtonClick(optionValue)
+  {
+    const { analytics } = this.props;
+    const { selectedVariants } = this.props.library;
+    const selectedVariantIds = selectedVariants.toJS();
+
+    this.props.analyticsActions.selectInterval(optionValue);
+    this.props.analyticsActions.fetch(
+      selectedVariantIds,
+      analytics.selectedMetric,
+      optionValue,
+      analytics.selectedDateRange,
+    );
+  }
+
+  public handleDateRangeRadioButtonClick(optionValue)
+  {
+    const { analytics } = this.props;
+    const { selectedVariants } = this.props.library;
+    const selectedVariantIds = selectedVariants.toJS();
+    const numericOptionValue = parseInt(optionValue, 10);
+
+    this.props.analyticsActions.selectDateRange(optionValue);
+    this.props.analyticsActions.fetch(
+      selectedVariantIds,
+      analytics.selectedMetric,
+      analytics.selectedInterval,
+      numericOptionValue,
+    );
   }
 
   public render()
@@ -196,7 +233,7 @@ class Library extends TerrainComponent<any>
       groupsOrder,
     } = libraryState;
 
-    const { selectedMetric } = analytics;
+    const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
 
     const { router, basePath, variantsMultiselect } = this.props;
     const { params } = router;
@@ -332,15 +369,40 @@ class Library extends TerrainComponent<any>
               height: '100%',
               backgroundColor: '#333',
               marginLeft: '10px',
+              overflowY: 'scroll',
             }}>
+              <p>Metric</p>
               <MultiSwitch
                 options={Immutable.List([
-                  { value: '1', label: 'CTR' },
-                  { value: '2', label: 'Conversions' },
+                  { value: '1', label: 'Impressions' },
+                  { value: '2', label: 'CTR' },
+                  { value: '3', label: 'Conversions' },
                 ])}
                 value={selectedMetric.toString()}
                 usesValues
-                onChange={this.handleRadioButtonClick}
+                onChange={this.handleMetricRadioButtonClick}
+              />
+              <p>Interval</p>
+              <MultiSwitch
+                options={Immutable.List([
+                  { value: 'day', label: 'Daily' },
+                  { value: 'week', label: 'Weekly' },
+                  { value: 'month', label: 'Monthly' },
+                ])}
+                value={selectedInterval}
+                usesValues
+                onChange={this.handleIntervalRadioButtonClick}
+              />
+              <p>Date Range</p>
+              <MultiSwitch
+                options={Immutable.List([
+                  { value: '1', label: 'Today' },
+                  { value: '2', label: 'Last 7 days' },
+                  { value: '3', label: 'Last Month' },
+                ])}
+                value={selectedDateRange.toString()}
+                usesValues
+                onChange={this.handleDateRangeRadioButtonClick}
               />
             </div>
           </div> : null

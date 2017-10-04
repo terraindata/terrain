@@ -50,6 +50,8 @@ export const AnalyticsActionTypes =
   {
     fetch: '',
     selectMetric: '',
+    selectInterval: '',
+    selectDateRange: '',
   };
 
 Util.setValuesToKeys(AnalyticsActionTypes, 'analytics');

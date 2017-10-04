@@ -128,4 +128,42 @@ describe('AnalyticsReducer', () =>
       );
     });
   });
+
+  describe('#selectInterval', () =>
+  {
+    it('should handle analytics.selectInterval', () =>
+    {
+      const nextState = reducer(analytics, {
+        type: ActionTypes.selectInterval,
+        payload: {
+          intervalId: 'day',
+        },
+      });
+
+      expect(
+        nextState.selectedInterval,
+      ).toEqual(
+        'day',
+      );
+    });
+  });
+
+  describe('#selectDateRange', () =>
+  {
+    it('should handle analytics.selectDateRange', () =>
+    {
+      const nextState = reducer(analytics, {
+        type: ActionTypes.selectDateRange,
+        payload: {
+          dateRangeId: '2',
+        },
+      });
+
+      expect(
+        nextState.selectedDateRange,
+      ).toEqual(
+        '2',
+      );
+    });
+  });
 });

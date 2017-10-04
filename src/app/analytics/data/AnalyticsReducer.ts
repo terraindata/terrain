@@ -73,6 +73,20 @@ AnalyticsReducer[ActionTypes.selectMetric] =
     return state.set('selectedMetric', metricId);
   };
 
+AnalyticsReducer[ActionTypes.selectInterval] =
+  (state, action: Action<{ intervalId: string }>) =>
+  {
+    const { intervalId } = action.payload;
+    return state.set('selectedInterval', intervalId);
+  };
+
+AnalyticsReducer[ActionTypes.selectDateRange] =
+  (state, action: Action<{ dateRangeId: string }>) =>
+  {
+    const { dateRangeId } = action.payload;
+    return state.set('selectedDateRange', dateRangeId);
+  };
+
 const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
 {
   let nextState = state;

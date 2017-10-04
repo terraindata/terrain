@@ -134,7 +134,11 @@ class VariantsColumn extends TerrainComponent<Props>
       {
         const numericId = parseInt(id, 10);
         this.props.variantActions.select(id);
-        this.props.analyticsActions.fetch([numericId], analytics.selectedMetric);
+        this.props.analyticsActions.fetch(
+          [numericId],
+          analytics.selectedMetric,
+          analytics.selectedInterval,
+        );
       });
     }
 

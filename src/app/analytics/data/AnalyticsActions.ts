@@ -55,23 +55,59 @@ import { ItemStatus } from '../../../items/types/Item';
 
 import Ajax from './../../util/Ajax';
 
+function calculateDateRange(dateRangeId: number)
+{
+  const currentDate = new Date();
+  const timestamp = currentDate.getTime();
+
+  let start = null;
+  let end = null;
+
+  switch (dateRangeId)
+  {
+    case 1: // Today
+      start = new Date(2015, 5, 2);
+      end = new Date(2015, 5, 2, 23, 59, 59);
+      break;
+    case 2:
+      start = new Date(2015, 5, 2);
+      end = new Date(2015, 5, 9);
+      break;
+    case 3:
+      start = new Date(2015, 5, 1);
+      end = new Date(2015, 5, 31);
+      break;
+    default:
+      start = new Date(2015, 5, 2);
+      end = new Date(2015, 5, 20);
+      break;
+  }
+
+  return { start, end };
+}
+
 const Actions =
   {
     fetch: (
       variantIds: ID[],
       metricId,
+      intervalId,
+      dateRangeId,
       callback?: (analyticsVariants: any) => void,
       errorCallback?: (response) => void,
     ) => (dispatch) =>
       {
-        const start = new Date(2015, 5, 2);
-        const end = new Date(2015, 5, 20);
+        const numericDateRangeId = parseInt(dateRangeId, 10);
+        const dateRange = calculateDateRange(numericDateRangeId);
+        const start = dateRange.start;
+        const end = dateRange.end;
 
         return Ajax.getAnalytics(
           variantIds,
           start,
           end,
           metricId,
+          intervalId,
           (variantAnalytics) =>
           {
             dispatch({
@@ -90,6 +126,22 @@ const Actions =
       return {
         type: ActionTypes.selectMetric,
         payload: { metricId },
+      };
+    },
+
+    selectInterval: (intervalId) =>
+    {
+      return {
+        type: ActionTypes.selectInterval,
+        payload: { intervalId },
+      };
+    },
+
+    selectDateRange: (dateRangeId) =>
+    {
+      return {
+        type: ActionTypes.selectDateRange,
+        payload: { dateRangeId },
       };
     },
   };
