@@ -360,6 +360,7 @@ class LibraryItem extends TerrainComponent<Props>
             }
           >
             {connectDragSource(
+              <div style={fontColor(Colors().text1)}>
               <div
                 className={'library-item ' + this.props.className}
                 style={
@@ -418,6 +419,7 @@ class LibraryItem extends TerrainComponent<Props>
                     this.props['children']
                   }
                 </div>
+              </div>
               </div>,
             )}
           </div>

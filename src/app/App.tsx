@@ -273,7 +273,9 @@ class App extends TerrainComponent<Props>
     ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
     ColorsActions.setStyle('.card-muted-input input:hover', { background: Colors().inputBg + ' !important', border: Colors().inputBorder });
     ColorsActions.setStyle('.close', { fill: Colors().altBg1 });
-    ColorsActions.setStyle('.dropdown-value', { border: Colors().inputBorder });
+    ColorsActions.setStyle('.dropdown-value', { border: Colors().inputBorder});
+    ColorsActions.setStyle('.dropdown-value:before', { 'border-top': 'red'});
+
 
     const tooltipStyles = generateThemeStyles();
     _.map(tooltipStyles, (value, key) =>
