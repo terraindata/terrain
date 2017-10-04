@@ -253,6 +253,11 @@ class CardDropArea extends TerrainComponent<Props>
       return null;
     }
 
+    if (this.state.draggingCardItem.props && this.state.draggingCardItem.props.tuningMode)
+    {
+      return null;
+    }
+
     let style = null;
     if (this.props.height)
     {

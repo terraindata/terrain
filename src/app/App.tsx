@@ -142,11 +142,11 @@ const links =
       text: 'Import',
       route: '/import',
     },
-    // {
-    //   icon: <ReportingIcon />,
-    //   text: 'Analytics',
-    //   route: '/analytics',
-    // },
+    {
+      icon: <ReportingIcon />,
+      text: 'Analytics',
+      route: '/analytics',
+    },
     // {
     //   icon: <ManualIcon />,
     //   text: 'Manual',

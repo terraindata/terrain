@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import MultiSwitch from 'common/components/MultiSwitch';
 import RadioButtons from 'common/components/RadioButtons';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
@@ -175,20 +177,16 @@ class Library extends TerrainComponent<any>
   public handleRadioButtonClick(optionValue)
   {
     const { selectedVariants } = this.props.library;
-    selectedVariants
-      .forEach((variantId) =>
-      {
-        const numericVariantId = parseInt(variantId, 10);
-        const numericOptionValue = parseInt(optionValue, 10);
-        this.props.analyticsActions.fetch(numericVariantId, numericOptionValue);
-        this.props.analyticsActions.selectMetric(optionValue);
-      });
+    const selectedVariantIds = selectedVariants.toJS();
+    const numericOptionValue = parseInt(optionValue, 10);
+
+    this.props.analyticsActions.fetch(selectedVariantIds, numericOptionValue);
+    this.props.analyticsActions.selectMetric(optionValue);
   }
 
   public render()
   {
     const { library: libraryState, analytics } = this.props;
-
     const {
       dbs,
       groups,
@@ -270,6 +268,7 @@ class Library extends TerrainComponent<any>
               params,
               basePath,
               groupActions: this.props.libraryGroupActions,
+              variants,
             }}
             isFocused={algorithm === undefined}
           />
@@ -301,6 +300,7 @@ class Library extends TerrainComponent<any>
               variantActions: this.props.libraryVariantActions,
               analytics,
               analyticsActions: this.props.analyticsActions,
+              algorithms,
             }}
           />
           {!variantsMultiselect ?
@@ -333,13 +333,14 @@ class Library extends TerrainComponent<any>
               backgroundColor: '#333',
               marginLeft: '10px',
             }}>
-              <RadioButtons
-                optionShadow={true}
-                selected={selectedMetric.toString()}
-                options={[
-                  { value: '1', label: 'CTR', onClick: this.handleRadioButtonClick },
-                  { value: '2', label: 'Conversions', onClick: this.handleRadioButtonClick },
-                ]}
+              <MultiSwitch
+                options={Immutable.List([
+                  { value: '1', label: 'CTR' },
+                  { value: '2', label: 'Conversions' },
+                ])}
+                value={selectedMetric.toString()}
+                usesValues
+                onChange={this.handleRadioButtonClick}
               />
             </div>
           </div> : null

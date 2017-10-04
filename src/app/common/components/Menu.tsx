@@ -115,6 +115,7 @@ export class Menu extends TerrainComponent<Props>
           className='menu-option-icon'
           style={{
             fill: option.iconColor || 'black',
+            stroke: option.iconColor || 'black',
           }}>
           {
             option.icon

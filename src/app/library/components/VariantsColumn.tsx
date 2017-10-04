@@ -58,11 +58,13 @@ import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
 import { Colors, fontColor } from '../../colors/Colors';
 import CreateLine from '../../common/components/CreateLine';
+import Modal from '../../common/components/Modal';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
+import Dropdown from './../../common/components/Dropdown';
 import { notificationManager } from './../../common/components/InAppNotification';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -76,6 +78,7 @@ import StatusDropdown from './StatusDropdown';
 const VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
 type Variant = LibraryTypes.Variant;
+type Algorithm = LibraryTypes.Algorithm;
 
 export interface Props
 {
@@ -85,6 +88,7 @@ export interface Props
   variantsOrder: Immutable.List<ID>;
   groupId: ID;
   algorithmId: ID;
+  algorithms: Immutable.Map<ID, Algorithm>;
   multiselect?: boolean;
   params?: any;
   variantActions?: any;
@@ -101,6 +105,11 @@ class VariantsColumn extends TerrainComponent<Props>
     roles: RoleTypes.RoleMap,
     draggingItemIndex: number;
     draggingOverIndex: number;
+
+    duplicatingVariant: boolean;
+    duplicateVariantTextboxValue: string;
+    duplicateVariantAlgorithmIndex: number;
+    duplicateVariantId: ID;
   } = {
     rendered: false,
     lastMoved: null,
@@ -108,6 +117,11 @@ class VariantsColumn extends TerrainComponent<Props>
     roles: null,
     draggingItemIndex: -1,
     draggingOverIndex: -1,
+
+    duplicatingVariant: false,
+    duplicateVariantTextboxValue: '',
+    duplicateVariantAlgorithmIndex: 0,
+    duplicateVariantId: undefined,
   };
 
   public componentWillMount()
@@ -121,7 +135,7 @@ class VariantsColumn extends TerrainComponent<Props>
       {
         const numericId = parseInt(id, 10);
         this.props.variantActions.select(id);
-        this.props.analyticsActions.fetch(numericId, analytics.selectedMetric);
+        this.props.analyticsActions.fetch([numericId], analytics.selectedMetric);
       });
     }
 
@@ -169,12 +183,69 @@ class VariantsColumn extends TerrainComponent<Props>
     }
   }
 
-  public handleDuplicate(id: ID)
+  public handleDuplicateModalConfirm()
   {
+    const id = this.state.duplicateVariantId;
+    const sorted = this.getSortedAlgorithms();
+    const algorithmIds = [];
+    sorted.map((value) =>
+    {
+      algorithmIds.push(value.id);
+    });
     this.props.variantActions.duplicate(
       this.props.variants.get(id),
       this.props.variantsOrder.findIndex((iid) => iid === id),
+      this.state.duplicateVariantTextboxValue,
+      null,
+      algorithmIds[this.state.duplicateVariantAlgorithmIndex],
     );
+    this.setState({
+      duplicatingVariant: false,
+    });
+  }
+
+  public handleDuplicateModalClose()
+  {
+    this.setState({
+      duplicatingVariant: false,
+    });
+  }
+
+  public getSortedAlgorithms()
+  {
+    const filtered = this.props.algorithms.filter((value) => value.groupId === this.props.groupId);
+    const sorted = filtered.sortBy((algorithm) => algorithm.id);
+    return sorted;
+  }
+
+  public handleDuplicate(id: ID)
+  {
+    const sorted = this.getSortedAlgorithms();
+    const algorithmIds = [];
+    sorted.map((value) =>
+    {
+      algorithmIds.push(value.id);
+    });
+    this.setState({
+      duplicatingVariant: true,
+      duplicateVariantId: id,
+      duplicateVariantAlgorithmIndex: algorithmIds.indexOf(this.props.algorithmId),  // get index,
+      duplicateVariantTextboxValue: Util.duplicateNameFor(this.props.variants.get(id).name),
+    });
+  }
+
+  public handleVariantAlgorithmIndexChange(index)
+  {
+    this.setState({
+      duplicateVariantAlgorithmIndex: index,
+    });
+  }
+
+  public handleDuplicateTextboxChange(value)
+  {
+    this.setState({
+      duplicateVariantTextboxValue: value,
+    });
   }
 
   public handleArchive(id: ID)
@@ -306,7 +377,7 @@ class VariantsColumn extends TerrainComponent<Props>
       } else
       {
         this.props.variantActions.select(id.toString());
-        this.props.analyticsActions.fetch(id, analytics.selectedMetric);
+        this.props.analyticsActions.fetch([id], analytics.selectedMetric);
       }
     } else
     {
@@ -320,6 +391,47 @@ class VariantsColumn extends TerrainComponent<Props>
   public handleDoubleClick(id: ID)
   {
     browserHistory.push(`/builder/?o=${id}`);
+  }
+
+  public renderDuplicateDropdown()
+  {
+    const sorted = this.getSortedAlgorithms();
+    const algorithmNames = sorted.map((value) => value.name);
+    return (
+      <div className='new-algorithm-modal-child'>
+        <div className='database-dropdown-wrapper'>
+          <Dropdown
+            selectedIndex={this.state.duplicateVariantAlgorithmIndex}
+            options={algorithmNames.toList()}
+            onChange={this.handleVariantAlgorithmIndexChange}
+            canEdit={true}
+            directionBias={90}
+            className={'bic-db-dropdown'}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public renderDuplicateModal()
+  {
+    return (<Modal
+      open={this.state.duplicatingVariant}
+      showTextbox={true}
+      confirm={true}
+      onClose={this.handleDuplicateModalClose}
+      onConfirm={this.handleDuplicateModalConfirm}
+      onTextboxValueChange={this.handleDuplicateTextboxChange}
+      textboxValue={this.state.duplicateVariantTextboxValue}
+      title='Duplicate Variant'
+      confirmButtonText='Duplicate'
+      message='What would you like to name the duplicate variant?'
+      textboxPlaceholderValue='Varaint Name'
+      children={this.renderDuplicateDropdown()}
+      childrenMessage='Please select an algorithm for the duplicate variant.'
+      allowOverflow={true}
+      inputClassName='duplicate-algorithm-modal-input'
+    />);
   }
 
   public renderVariant(id: ID, fadeIndex: number)
@@ -359,7 +471,6 @@ class VariantsColumn extends TerrainComponent<Props>
     //     role = 'Builder';
     //   }
     // }
-
     return (
       <LibraryItem
         index={index}
@@ -374,6 +485,7 @@ class VariantsColumn extends TerrainComponent<Props>
         canArchive={canDrag && variant.status !== ItemStatus.Archive}
         canDuplicate={canEdit}
         canUnarchive={variant.status === ItemStatus.Archive}
+        canRename={variant.status !== ItemStatus.Live && variant.status !== ItemStatus.Default}
         key={variant.id}
         to={`/${basePath}/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'
@@ -504,6 +616,7 @@ class VariantsColumn extends TerrainComponent<Props>
         index={3}
         title='Variants'
       >
+        {this.renderDuplicateModal()}
         {
           this.props.variantsOrder ?
             (

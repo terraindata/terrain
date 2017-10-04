@@ -59,6 +59,7 @@ import Store from './../data/UserStore';
 import AccountEntry from './AccountEntry';
 import './Settings.less';
 type User = UserTypes.User;
+import { notificationManager } from './../../common/components/InAppNotification';
 import Modal from './../../common/components/Modal';
 import PasswordStrengthInput from './PasswordStrengthInput';
 
@@ -199,11 +200,7 @@ class Settings extends TerrainComponent<Props>
     Ajax.changePassword(+userId, currentPassword, newPassword, () =>
     {
       Actions.fetch();
-      this.setState({
-        modalMessage: 'Your password has been changed.',
-        errorModal: false,
-      });
-      this.toggleModal();
+      notificationManager.addNotification('Success', 'Updated password', 'info', 4);
     }, (error) =>
       {
         this.setState({

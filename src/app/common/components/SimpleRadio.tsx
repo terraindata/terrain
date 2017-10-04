@@ -43,69 +43,64 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:strict-boolean-expressions
-
-import * as Immutable from 'immutable';
+import * as classNames from 'classnames';
+import CheckBox from 'common/components/CheckBox';
 import * as Radium from 'radium';
 import * as React from 'react';
-import Dropdown from './../../common/components/Dropdown';
+import { backgroundColor, borderColor, Colors } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import Actions from './../data/FileImportActions';
-import * as FileImportTypes from './../FileImportTypes';
-import './TypeDropdown.less';
-const { List } = Immutable;
-
-type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
-const ELASTIC_TYPES = List(FileImportTypes.ELASTIC_TYPES);
+import './SimpleRadio.less';
 
 export interface Props
 {
-  columnId: number;
-  recursionDepth: number;
-  columnType: ColumnTypesTree;
-  tooltips?: List<any>;
+  on: boolean;
+  label: string;
+
+  small?: boolean;
+  large?: boolean;
+
+  color?: string;
 }
 
 @Radium
-class TypeDropdown extends TerrainComponent<Props>
+class SimpleRadio extends TerrainComponent<Props>
 {
-  public handleTypeChange(typeIndex: number)
-  {
-    const type = FileImportTypes.ELASTIC_TYPES[typeIndex];
-    Actions.setColumnType(this.props.columnId, this.props.recursionDepth, type);
-  }
-
   public render()
   {
+    let { color } = this.props;
+    if (color === undefined)
+    {
+      color = Colors().text1;
+    }
+
     return (
       <div
-        className='fi-type-dropdown-wrapper'
+        className={classNames({
+          'simple-radio': true,
+          'simple-radio-on': this.props.on,
+          'simple-radio-small': this.props.small,
+          'simple-radio-large': this.props.large,
+        })}
       >
         <div
-          className='fi-type-dropdown'
+          className='simple-radio-outline'
+          style={borderColor(color)}
         >
-          <Dropdown
-            selectedIndex={FileImportTypes.ELASTIC_TYPES.indexOf(this.props.columnType.type)}
-            options={ELASTIC_TYPES}
-            onChange={this.handleTypeChange}
-            canEdit={true}
-            className='fi-type-dropdown-dropdown'
-            tooltips={this.props.tooltips}
+          <div
+            className='simple-radio-fill'
+            style={backgroundColor(color)}
           />
         </div>
-        {
-          this.props.columnType.type === 'array' &&
-          <TypeDropdown
-            columnId={this.props.columnId}
-            recursionDepth={this.props.recursionDepth + 1}
-            columnType={this.props.columnType.innerType}
-            tooltips={this.props.tooltips}
-          />
-        }
+        <div
+          className='simple-radio-label'
+        >
+          {
+            this.props.label
+          }
+        </div>
       </div>
     );
   }
 }
 
-export default TypeDropdown;
+export default SimpleRadio;
