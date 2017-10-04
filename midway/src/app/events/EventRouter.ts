@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
@@ -55,23 +56,32 @@ import { EventConfig, Events } from './Events';
 export const events: Events = new Events();
 const Router = new KoaRouter();
 
+function logError(error: string)
+{
+  if (process.env.NODE_ENV === 'production')
+  {
+    return;
+  }
+  else
+  {
+    throw new Error(error);
+  }
+}
+
 async function storeEvent(request: any)
 {
-  const production = process.env.NODE_ENV === 'production';
-  if (!production &&
-    request.body !== undefined && Object.keys(request.body).length > 0 &&
+  if (request.body !== undefined && Object.keys(request.body).length > 0 &&
     request.query !== undefined && Object.keys(request.body).length > 0)
   {
-    throw new Error('Both request query and body cannot be set.');
+    logError('Both request query and body cannot be set.');
   }
 
-  if (!production &&
-    (request.body === undefined ||
-      request.body !== undefined && Object.keys(request.body).length === 0) &&
+  if ((request.body === undefined ||
+    request.body !== undefined && Object.keys(request.body).length === 0) &&
     (request.query === undefined ||
       request.query !== undefined && Object.keys(request.query).length === 0))
   {
-    throw new Error('Either request query or body parameters are required.');
+    logError('Either request query or body parameters are required.');
   }
 
   let req: object = request.body;
@@ -94,6 +104,11 @@ async function storeEvent(request: any)
     meta: req['meta'],
   };
 
+  if (_.difference(Object.keys(req), Object.keys(event).concat(['id', 'accessToken'])).length > 0)
+  {
+    return logError('Error storing analytics event: unexpected fields encountered');
+  }
+
   // const msg = await Encryption.decodeMessage(event);
   try
   {
@@ -101,14 +116,7 @@ async function storeEvent(request: any)
   }
   catch (e)
   {
-    if (process.env.NODE_ENV === 'production')
-    {
-      return;
-    }
-    else
-    {
-      throw new Error('Error storing analytics event:' + String(e));
-    }
+    return logError('Error storing analytics event:' + String(e));
   }
 }
 
