@@ -95,7 +95,7 @@ export interface Props
   transforms: List<Transform>;
   requireJSONHaveAllFields: boolean;
 
-  // import only 
+  // import only
   primaryKeys?: List<number>;
   primaryKeyDelimiter?: string;
   existingIndexAndType?: boolean;

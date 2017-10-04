@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor } from '../../common/Colors';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './TemplateList.less';
@@ -169,31 +169,39 @@ class TemplateList extends TerrainComponent<Props>
       >
         {
           this.props.items.map((item, index) =>
-            <div
-              className={classNames({
-                'clickable list-items-item': true,
-                'list-items-item-selected': index === this.state.selectedIndex,
-              })}
-              onClick={this._fn(this.handleSelectOption, index)}
-              style={[
-                fontColor(Colors().text1),
-                backgroundColor(Colors().bg3),
-              ]}
-              key={index}
-            >
+          {
+            const isSelected = index === this.state.selectedIndex;
+            return (
               <div
-                className='flex-container list-items-item-wrapper'
+                className={classNames({
+                  'clickable list-items-item': true,
+                  'list-items-item-selected': isSelected,
+                })}
+                onClick={this._fn(this.handleSelectOption, index)}
+                style={[
+                  fontColor(Colors().text1),
+                  backgroundColor(Colors().bg3),
+                  borderColor(
+                    isSelected ? Colors().active : Colors().highlight,
+                    isSelected ? Colors().active : Colors().inactiveHover,
+                  ),
+                ]}
+                key={index}
               >
-                {
-                  item
-                }
-                <TrashIcon
-                  onClick={this._fn(this.handleDelete, index)}
-                  className='delete-list-item'
-                />
+                <div
+                  className='flex-container list-items-item-wrapper'
+                >
+                  {
+                    item
+                  }
+                  <TrashIcon
+                    onClick={this._fn(this.handleDelete, index)}
+                    className='delete-list-item'
+                  />
+                </div>
               </div>
-            </div>,
-          )
+            );
+          })
         }
       </div>
     );
