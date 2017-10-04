@@ -226,7 +226,7 @@ export const TOOLTIP_THEMES: Themes = {
     fontColor: () => Colors().text2,
   },
   faded: {
-    backgroundColor: () => Colors().fadedOutBg,
+    backgroundColor: () => Colors().bg3,
     fontColor: () => Colors().text1,
   },
   alt: {

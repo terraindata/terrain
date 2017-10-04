@@ -575,7 +575,7 @@ const LIGHT: Theme =
 
     boxShadow: 'rgba(0, 0, 0, 0.05)',
 
-    fadedOutBg: '#fff', // bg to cover up things when they are faded out
+    fadedOutBg: 'rgba(255, 255, 255, 0.75)', // bg to cover up things when they are faded out
 
     inputBg: 'rgb(237, 239, 243)',
     inputBorder: '1px solid rgb(200, 202, 206)',
