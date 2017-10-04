@@ -224,7 +224,7 @@ class ResultsArea extends TerrainComponent<Props>
   public renderResults()
   {
     const { resultsState } = this.props;
-    const { results } = resultsState;
+    const { hits } = resultsState;
     const { resultsConfig } = this.props.query;
 
     let infoAreaContent: any = null;
@@ -254,7 +254,7 @@ class ResultsArea extends TerrainComponent<Props>
       />;
     }
 
-    if (!resultsState.results)
+    if (!hits)
     {
       if (resultsState.rawResult)
       {
@@ -281,7 +281,7 @@ class ResultsArea extends TerrainComponent<Props>
         />;
       }
     }
-    else if (!results.size)
+    else if (!hits.size)
     {
       resultsContent = <InfoArea
         large='There are no results for your query.'
@@ -298,7 +298,7 @@ class ResultsArea extends TerrainComponent<Props>
           })}
         >
           <ResultsTable
-            results={results}
+            results={hits}
             resultsConfig={resultsConfig}
             onExpand={this.handleExpand}
             resultsLoading={resultsState.loading}
@@ -318,7 +318,7 @@ class ResultsArea extends TerrainComponent<Props>
           onRequestMoreItems={this.handleRequestMoreResults}
         >
           {
-            results.map((result, index) =>
+            hits.map((result, index) =>
             {
               if (index > this.state.resultsPages * RESULTS_PAGE_SIZE)
               {
@@ -449,7 +449,7 @@ column if you have customized the results view.');
     {
       text = 'Error with query';
     }
-    else if (resultsState.results)
+    else if (resultsState.hits)
     {
       const { count } = resultsState;
       text = `${count || 'No'}${count === MAX_RESULTS ? '+' : ''} result${count === 1 ? '' : 's'}`;

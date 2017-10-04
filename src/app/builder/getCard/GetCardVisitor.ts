@@ -95,8 +95,8 @@ const KEY_INLINE_DISPLAYS = [
 
 // Clause types that have static keys
 const STATIC_KEY_CLAUSE_TYPES = [
-  ESClauseType.ESStructureClause,
-  ESClauseType.ESWildcardStructureClause,
+  // ESClauseType.ESStructureClause,
+  // ESClauseType.ESWildcardStructureClause,
 ];
 
 const KEY_DISPLAY: Display =

@@ -71,7 +71,8 @@ export type Results = List<Result>;
 
 class ResultsStateC extends BaseClass
 {
-  public results: Results = List([]);
+  public hits: Results = List([]);
+  public aggregations: any = {};
   public fields: List<string> = List([]);
   public count: number = 0;
   public rawResult: string = '';

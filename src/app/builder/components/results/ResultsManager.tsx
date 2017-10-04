@@ -197,7 +197,8 @@ export class ResultsManager extends TerrainComponent<Props>
       if (!this.props.query || nextProps.query.id !== this.props.query.id)
       {
         this.changeResults({
-          results: List([]),
+          hits: List([]),
+          aggregations: {},
         });
       }
     }
@@ -205,7 +206,8 @@ export class ResultsManager extends TerrainComponent<Props>
     if (this.props.variantPath !== undefined && (this.props.variantPath !== nextProps.variantPath))
     {
       this.changeResults({
-        results: List([]),
+        hits: List([]),
+        aggregations: {}
       });
     }
 
@@ -468,52 +470,52 @@ export class ResultsManager extends TerrainComponent<Props>
     }
   }
 
-  private updateResults(resultsData: any[], isAllFields: boolean)
+  private updateResults(resultsData: any, isAllFields: boolean)
   {
     const { resultsState } = this.props;
-
-    const resultsCount = resultsData.length;
-    if (resultsData.length > MAX_RESULTS)
+    const hitsData = resultsData.hits;
+    const resultsCount = hitsData.length;
+    if (hitsData.length > MAX_RESULTS)
     {
-      resultsData.splice(MAX_RESULTS, resultsData.length - MAX_RESULTS);
+      hitsData.splice(MAX_RESULTS, hitsData.length - MAX_RESULTS);
     }
-    let results: Results =
+    let hits: Results =
       (resultsState.hasLoadedResults || resultsState.hasLoadedAllFields)
-        ? resultsState.results : List([]);
-    resultsData.map(
-      (resultData, index) =>
+        ? resultsState.hits : List([]);
+    hitsData.map(
+      (hitData, index) =>
       {
-        let result: Result = results.get(index) || _Result();
-        result = result.set(
+        let hit: Result = hits.get(index) || _Result();
+        hit = hit.set(
           'fields',
-          result.fields.merge(resultData),
+          hit.fields.merge(hitData),
         );
 
-        result = result.set(
+        hit = hit.set(
           'primaryKey',
-          getPrimaryKeyFor(result, this.props.query.resultsConfig, index),
+          getPrimaryKeyFor(hit, this.props.query.resultsConfig, index),
         );
 
         if (!isAllFields)
         {
-          result = result.set('rawFields', Map(resultData));
+          hit = hit.set('rawFields', Map(hitData));
         }
 
-        results = results.set(index, result);
+        hits = hits.set(index, hit);
       },
     );
 
     let fields = List<string>([]);
-    if (results.get(0))
+    if (hits.get(0))
     {
-      fields = results.get(0).fields.keySeq().toList();
+      fields = hits.get(0).fields.keySeq().toList();
     }
 
     const loading = (isAllFields && !resultsState.hasLoadedResults) ||
       (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields);
 
     const changes: any = {
-      results,
+      hits,
       fields,
       hasError: false,
       loading,
@@ -521,18 +523,19 @@ export class ResultsManager extends TerrainComponent<Props>
       errorLine: null,
       mainErrorMessage: null,
       subErrorMessage: null,
+      aggregations: resultsData.aggregations,
     };
 
     if (!resultsState.hasLoadedCount)
     {
-      changes['count'] = results.size;
+      changes['count'] = hits.size;
     }
 
     const filteredFields = List(_.filter(fields.toArray(), (val) => !(val.charAt(0) === '_')));
     const exportChanges: any = {
       filetype: 'csv',
       originalNames: filteredFields,
-      preview: List(results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
+      preview: List(hits.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
         filteredFields.map((field, index) =>
         {
           const value = result.fields.get(String(field));
@@ -566,7 +569,8 @@ export class ResultsManager extends TerrainComponent<Props>
         _id: hit._id,
       });
     });
-    this.updateResults(resultsData, isAllFields);
+    const aggregations = resultsData.aggregations;
+    this.updateResults({hits, aggregations}, isAllFields);
   }
 
   private handleM2QueryResponse(response: MidwayQueryResponse, isAllFields: boolean)
@@ -596,7 +600,8 @@ export class ResultsManager extends TerrainComponent<Props>
         _id: hit._id,
       });
     });
-    this.updateResults(hits, isAllFields);
+    const aggregations = resultsData.aggregations;
+    this.updateResults({hits, aggregations}, isAllFields);
   }
 
   private handleM1Error(response: any, isAllFields?: boolean)
