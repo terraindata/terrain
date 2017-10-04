@@ -547,7 +547,7 @@ const LIGHT: Theme =
   {
     // Use these colors
 
-    bg1: 'rgb(215, 217, 221)',
+    bg1: 'rgb(220, 222, 226)',
     bg2: 'rgb(237, 239, 243)',
     bg3: '#fff',
 
