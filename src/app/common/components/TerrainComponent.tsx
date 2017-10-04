@@ -131,6 +131,8 @@ class TerrainComponent<T> extends React.Component<T, any>
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
 
+  // note that lodash does not memoize any arguments beyond the first
+  // so ...path (acts as keypath if val is an object) is not memoized.
   public setStateWrapper(key, ...path: string[]): (val) => void
   {
     return (val, ...args: any[]) =>
