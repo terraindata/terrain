@@ -389,10 +389,6 @@
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-2.3.3.tgz#1f20b96f954b4997a09c1c0a20264aaba6b00147"
 
-"@types/source-map@*":
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/@types/source-map/-/source-map-0.5.1.tgz#7e74db5d06ab373a712356eebfaea2fad0ea2367"
-
 "@types/sqlite3@^2.2.33":
   version "2.2.33"
   resolved "https://registry.yarnpkg.com/@types/sqlite3/-/sqlite3-2.2.33.tgz#8e7a9d60746670a422df62f78dc721a93676d9c9"
@@ -411,29 +407,11 @@
   dependencies:
     "@types/superagent" "*"
 
-"@types/tapable@*":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-0.2.3.tgz#0888b0f20cc7e58e1c22a1888b4e963eefaa810a"
-
 "@types/tape@^4.2.29":
   version "4.2.30"
   resolved "https://registry.yarnpkg.com/@types/tape/-/tape-4.2.30.tgz#3c1917c4dfd6f27271b9922772513515bc6c46b4"
   dependencies:
     "@types/node" "*"
-
-"@types/uglify-js@*":
-  version "2.6.29"
-  resolved "https://registry.yarnpkg.com/@types/uglify-js/-/uglify-js-2.6.29.tgz#521347f69e20201d218f5991ae66e10878afcf1a"
-  dependencies:
-    "@types/source-map" "*"
-
-"@types/webpack@^2.2.14":
-  version "2.2.16"
-  resolved "https://registry.yarnpkg.com/@types/webpack/-/webpack-2.2.16.tgz#9ca93f468ab3a8eb4b6f45f589acf58c8133aa9b"
-  dependencies:
-    "@types/node" "*"
-    "@types/tapable" "*"
-    "@types/uglify-js" "*"
 
 "@types/winston@>=2.3.1":
   version "2.3.4"

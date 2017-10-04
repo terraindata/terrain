@@ -191,7 +191,6 @@
     "@types/sqlite3": "^2.2.33",
     "@types/supertest": "^2.0.0",
     "@types/tape": "^4.2.29",
-    "@types/webpack": "^2.2.14",
     "@types/winston": ">=2.3.1",
     "babel-cli": "^6.26.0",
     "babel-loader": "^7.1.2",
