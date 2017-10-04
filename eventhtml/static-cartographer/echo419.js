@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 // eventId: HTML id assigned to button/input field/etc.
 
+let host = "http://localhost:3000";
+
 if (document.readyState !== 'loading')
 {
   initialLoad();
@@ -87,13 +89,17 @@ function getHTMLIDs(callback)
   url = url.split(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)/).splice(1);
   const route = '/' + url[1].split('/')[1];
   url = url[0] + url[1].split('/')[0] + '/' + 'events/ids';
+  url = host + "/events/";
+  console.log('url='+url);
 
   const xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function()
   {
     if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200)
     {
-      uploadCartography(JSON.parse(xhttp.response));
+      console.log('res = '+xhttp.response);
+      if(xhttp.response != undefined)
+          uploadCartography(JSON.parse(xhttp.response));
     }
   }
   xhttp.open("GET", url);
@@ -123,11 +129,14 @@ function uploadCartography(EventIdLst, callback)
   url = url.split(/^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)/).splice(1);
   const route = '/' + url[1].split('/')[1];
   url = url[0] + url[1].split('/')[0] + '/' + 'events/';
+  url = host + "/events/";
+  console.log('url = '+url);
   const xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function()
   {
     if (xhttp.readyState === XMLHttpRequest.DONE && xhttp.status === 200)
     {
+      console.log('res2 = '+xhttp.response);
       respArr = JSON.parse(xhttp.response);
       for (let ind = 0; ind < respArr.length; ++ind)
       {
