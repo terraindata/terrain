@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
+import * as winston from 'winston';
+
 import { Config } from './Config';
 
 export interface EventConfig
@@ -52,7 +54,6 @@ export interface EventConfig
   eventid: number | string;
   variantid: number | string;
   visitorid: number | string;
-  timestamp: Date | string;
   source: {
     ip: string;
     host: string;
@@ -62,14 +63,80 @@ export interface EventConfig
   meta?: any;
 }
 
-export async function putMapping(config: Config): Promise<boolean>
+export const indexName = 'terrain-analytics';
+export const typeName = 'events';
+
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
 {
-  // todo create event schema here
-  return false;
+  return (error: Error, response: T) =>
+  {
+    if (error !== null && error !== undefined)
+    {
+      reject(error);
+    }
+    else
+    {
+      resolve(response);
+    }
+  };
 }
 
-export async function storeEvent(event: EventConfig): Promise<EventConfig>
+export class Events
 {
-  // todo: store event here
-  return {} as EventConfig;
+  private client: Elastic.Client;
+
+  constructor(config: Config)
+  {
+    this.client = new Elastic.Client({
+      host: config.db,
+    });
+
+    this.client.ping({
+      requestTimeout: 100,
+    }, (err) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          throw new Error('creating ES client for host: ' + String(config.db) + ': ' + String(err));
+        }
+      });
+
+    this.client.indices.exists({
+      index: indexName,
+    }, (err, indexExists) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          throw new Error('creating index: ' + indexName + ': ' + String(err));
+        }
+
+        if (!indexExists)
+        {
+          winston.info('Index ' + indexName + ' does not exist. Creating it...');
+          this.client.indices.create({
+            index: indexName,
+            timeout: '5s',
+          }, (err2) =>
+            {
+              if (err2 !== null && err2 !== undefined)
+              {
+                throw new Error('creating index: ' + indexName + ': ' + String(err));
+              }
+            });
+        }
+      });
+  }
+
+  public async store(event: EventConfig): Promise<void>
+  {
+    return new Promise<void>((resolve, reject) =>
+    {
+      this.client.index({
+        index: indexName,
+        type: typeName,
+        body: event,
+      },
+        makePromiseCallback(resolve, reject));
+    });
+  }
 }

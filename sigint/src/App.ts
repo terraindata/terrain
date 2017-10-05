@@ -55,7 +55,7 @@ import * as Config from './Config';
 import * as Events from './Events';
 import './Logging';
 import Middleware from './Middleware';
-import Router from './Router';
+import { Router } from './Router';
 
 export let CFG: Config.Config;
 
@@ -103,13 +103,13 @@ class App
     this.app.use(Middleware.logger(winston));
     this.app.use(Middleware.responseTime());
 
-    this.app.use(Router.routes());
+    const router = new Router(config);
+    this.app.use(router.routes());
   }
 
   public async start(): Promise<http.Server>
   {
     await Config.handleConfig(this.config);
-    await Events.putMapping(this.config);
 
     winston.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
