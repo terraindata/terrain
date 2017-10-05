@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
+import { Config } from './Config';
 
 export interface EventConfig
 {
@@ -61,8 +62,14 @@ export interface EventConfig
   meta?: any;
 }
 
+export async function putMapping(config: Config): Promise<boolean>
+{
+  // todo create event schema here
+  return false;
+}
+
 export async function storeEvent(event: EventConfig): Promise<EventConfig>
 {
-    // todo: store event
-    return {} as EventConfig;
+  // todo: store event here
+  return {} as EventConfig;
 }

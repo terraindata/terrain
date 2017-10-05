@@ -52,6 +52,7 @@ import cors = require('kcors');
 
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
+import * as Events from './Events';
 import './Logging';
 import Middleware from './Middleware';
 import Router from './Router';
@@ -107,8 +108,8 @@ class App
 
   public async start(): Promise<http.Server>
   {
-    // process configuration options
     await Config.handleConfig(this.config);
+    await Events.putMapping(this.config);
 
     winston.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
