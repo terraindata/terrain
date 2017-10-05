@@ -60,7 +60,12 @@ const Router = new KoaRouter();
 // Get job by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.get(ctx.params.id);
+  let getArchived: boolean = false;
+  if (ctx.query['archived'] !== undefined && (ctx.query.archived === 'true' || ctx.query.archived === true))
+  {
+    getArchived = true;
+  }
+  ctx.body = await scheduler.get(ctx.params.id, getArchived);
 });
 
 // Post new scheduled job

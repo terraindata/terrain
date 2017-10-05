@@ -272,10 +272,14 @@ export class Scheduler
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
           await sftp.connect(sftpconfig);
           const checkIfDirectoryExists: object[] = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
-          let importFilename: string = '';
+          let importFilename: string = path;
           let matches: string[] = [];
           const CheckIfFileExists: object[] = checkIfDirectoryExists.filter((filename) =>
           {
+            if (filename['type'] !== '-')
+            {
+              return;
+            }
             const match = filename['name'].match(path.substring(path.lastIndexOf('/') + 1).replace(/\*/g, '.*'));
             if (match !== null && match.length > 0)
             {
@@ -284,36 +288,43 @@ export class Scheduler
             }
           });
           matches.sort(naturalSort);
-          if (matches.length === 0)
-          {
-            importFilename = path;
-          }
-          else
+          if (matches.length !== 0)
           {
             importFilename = sort.toLowerCase() === 'asc' ? path.substring(0, path.lastIndexOf('/') + 1) + matches[matches.length - 1]
               : path.substring(0, path.lastIndexOf('/') + 1) + matches[0];
           }
-
-          // TODO: add permissions checking
+          if (importFilename.indexOf('*') !== -1)
+          {
+            winston.info('Schedule ' + scheduleID.toString() + ': Detected wildcard(s) in filename, but could not find matching file.');
+          }
           if (checkIfDirectoryExists.length > 0 && CheckIfFileExists.length !== 0 && importFilename !== '')
           {
-            winston.info('Starting import with sftp');
-            const readStream: stream.Readable = await sftp.get(importFilename, false, encoding);
-            const result = await imprt.upsert(readStream, fields, true);
-            await this.setJobStatus(scheduleID, 0);
-            await sftp.end();
-            winston.info('Successfully completed scheduled import with sftp.');
-            return resolveJob('Success');
+            let readStream: stream.Readable;
+            try
+            {
+              readStream = await sftp.get(importFilename, false, encoding);
+              winston.info('Schedule ' + scheduleID.toString() + ': Starting import with sftp');
+              const result = await imprt.upsert(readStream, fields, true);
+              await this.setJobStatus(scheduleID, 0);
+              await sftp.end();
+              winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import with sftp.');
+            }
+            catch (e)
+            {
+              winston.info('Schedule ' + scheduleID.toString() + ': Error while trying to read file. Do you have read permission?');
+            }
+            return rejectJob('Failure to import.');
           }
           else
           {
-            winston.info('Failed to complete scheduled import with sftp.');
+            winston.info('Schedule ' + scheduleID.toString() + ': Failed to complete scheduled import with sftp.');
           }
-          return resolveJob('Failed to import.');
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob('Failed to import.');
         }
         catch (e)
         {
-          winston.info('Exception caught: ' + (e.toString() as string));
+          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
           await this.setJobStatus(scheduleID, 0);
           await sftp.end();
           return rejectJob(e.toString());
@@ -333,18 +344,39 @@ export class Scheduler
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
           await sftp.connect(sftpconfig);
           const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
-          if (checkIfDirectoryExists.length === 1) // TODO: add permissions checking
+          if (checkIfDirectoryExists.length !== 0)
           {
-            winston.info('Starting export with sftp');
-            const readStream: stream.Readable = await sftp.put(await imprt.export(fields as ExportConfig, true), path, false, encoding);
-            await sftp.end();
-            winston.info('Successfully completed scheduled export with sftp.');
-            return resolveJob('Success');
+            winston.info('Schedule ' + scheduleID.toString() + ': Starting export with sftp');
+            let writeStream: stream.Readable = new stream.Readable();
+            try
+            {
+              writeStream = await imprt.export(fields as ExportConfig, true) as stream.Readable;
+            }
+            catch (e)
+            {
+              winston.info('Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string));
+              await this.setJobStatus(scheduleID, 0);
+              return rejectJob('Failed to export.');
+            }
+            let readStream: stream.Readable;
+            try
+            {
+              readStream = await sftp.put(writeStream, path, false, encoding);
+              await sftp.end();
+              winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export with sftp.');
+            }
+            catch (e)
+            {
+              winston.info('Schedule ' + scheduleID.toString() +
+                ': Error while trying to write file. Do you have write permission?');
+            }
+            await this.setJobStatus(scheduleID, 0);
+            return rejectJob('Failed to export.');
           }
         }
         catch (e)
         {
-          winston.info('Exception caught: ' + (e.toString() as string));
+          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
           await this.setJobStatus(scheduleID, 0);
           await sftp.end();
           return rejectJob(e.toString());
