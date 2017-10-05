@@ -126,6 +126,7 @@ export class Router
         useragent: request.useragent,
         referer: request.header.referer,
       },
+      timestamp: new Date(),
       meta: req['meta'],
     };
 

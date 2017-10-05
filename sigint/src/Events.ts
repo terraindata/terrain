@@ -60,6 +60,7 @@ export interface EventConfig
     useragent: string;
     referer?: string;
   };
+  timestamp: Date;
   meta?: any;
 }
 
