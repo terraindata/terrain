@@ -43,59 +43,49 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
+import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
+import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import Ajax from 'util/Ajax';
-import ActionTypes from './AnalyticsActionTypes';
-import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
+import * as React from 'react';
+import configureStore from 'redux-mock-store';
 
-const AnalyticsReducer = {};
-
-AnalyticsReducer[ActionTypes.fetch] =
-  (state, action: Action<{ analytics: any }>) =>
-  {
-    const { analytics } = action.payload;
-    let nextState = state;
-
-    Object.keys(analytics).forEach((variantId) =>
-    {
-      const variantAnalytics = analytics[variantId];
-      nextState = nextState.setIn(['data', parseInt(variantId, 10)], variantAnalytics);
-    });
-
-    return nextState;
-  };
-
-AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metricId: ID }>) =>
-  {
-    const { metricId } = action.payload;
-    return state.set('selectedMetric', metricId);
-  };
-
-AnalyticsReducer[ActionTypes.selectInterval] =
-  (state, action: Action<{ intervalId: string }>) =>
-  {
-    const { intervalId } = action.payload;
-    return state.set('selectedInterval', intervalId);
-  };
-
-AnalyticsReducer[ActionTypes.selectDateRange] =
-  (state, action: Action<{ dateRangeId: string }>) =>
-  {
-    const { dateRangeId } = action.payload;
-    return state.set('selectedDateRange', dateRangeId);
-  };
-
-const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
+describe('AnalyticsSelector', () =>
 {
-  let nextState = state;
-  if (AnalyticsReducer[action.type])
+  const analytics: AnalyticsState = _AnalyticsState({
+    loaded: false,
+    data: Immutable.Map({}),
+    selectedMetric: 1,
+  });
+
+  let analyticsComponent = null;
+
+  const onMetricSelect = (value) => null;
+  const onIntervalSelect = (value) => null;
+  const onDateRangeSelect = (value) => null;
+
+  beforeEach(() =>
   {
-    nextState = AnalyticsReducer[action.type](state, action);
-  }
+    analyticsComponent = shallow(
+      <AnalyticsSelector
+        analytics={analytics}
+        onMetricSelect={onMetricSelect}
+        onIntervalSelect={onIntervalSelect}
+        onDateRangeSelect={onDateRangeSelect}
+      />,
+    );
+  });
 
-  return nextState;
-};
+  describe('#render', () =>
+  {
+    it('should have 3 MultiSwitch components', () =>
+    {
+      const multiswitchs = analyticsComponent.find('MultiSwitch');
 
-export default AnalyticsReducerWrapper;
+      expect(multiswitchs).toHaveLength(3);
+      expect(multiswitchs.nodes[0].props.onChange).toEqual(onMetricSelect);
+      expect(multiswitchs.nodes[1].props.onChange).toEqual(onIntervalSelect);
+      expect(multiswitchs.nodes[2].props.onChange).toEqual(onDateRangeSelect);
+    });
+  });
+});
