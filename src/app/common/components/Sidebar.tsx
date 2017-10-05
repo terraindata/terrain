@@ -86,12 +86,13 @@ export class Sidebar extends TerrainComponent<Props>
     ColorsActions.setStyle('.sidebar-expand:hover .sidebar-expand-icon', { fill: Colors().text1 });
   }
 
-  public handleLinkDisabled(link) {
-    return function(e)
+  public handleLinkDisabled(link)
+  {
+    return (e) =>
     {
       e.preventDefault();
       alert(`You have not set up ${link.text}`);
-    }
+    };
   }
 
   public render()

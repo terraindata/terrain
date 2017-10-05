@@ -86,6 +86,7 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // for error reporting
 
 // data that needs to be loaded
+import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
 import ColorsActions from './colors/data/ColorsActions';
@@ -98,7 +99,6 @@ import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
-import TerrainTools from 'util/TerrainTools';
 
 // Icons
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');

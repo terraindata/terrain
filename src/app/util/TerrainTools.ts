@@ -42,7 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+import AuthStore from 'auth/data/AuthStore';
 import * as _ from 'lodash';
+import UserStore from 'users/data/UserStore';
 // Log levels
 const LEVEL_TEXT = 'text';
 const LEVEL_DEBUG = 'debug';
@@ -62,14 +65,18 @@ const logStyles = {
 // Toggle-able features
 const FEATURE_KEY_PREFIX = 'toggle-feature-'; // prefix for the localStorage key.
 
-class TerrainTools {
+// tslint:disable:no-console
+class TerrainTools
+{
   public static ANALYTICS = 'analytics';
 
-  public static welcome() {
+  public static welcome()
+  {
     TerrainTools.log('TerrainTools test are loaded');
   }
 
-  public static help() {
+  public static help()
+  {
     TerrainTools.log(`
 API:
 TerrainTools.activate(<feature>)
@@ -79,28 +86,53 @@ Example:
 TerrainTools.activate(TerrainTools.ANALYITICS);
 
 Toggle-able Features:
-* TerrainTools.ANALYTICS`, LEVEL_TEXT)
+* TerrainTools.ANALYTICS`, LEVEL_TEXT);
   }
 
-  public static activate(feature) {
-    localStorage.setItem(TerrainTools.getFeatureKey(feature), '1');
-    TerrainTools.log(`${_.capitalize(feature)} has been enabled, refresh the page.`)
+  public static isAdmin()
+  {
+    const userId = AuthStore.getState().id;
+    const user = UserStore.getState().getIn(['users', userId]);
+    console.log(user);
+    return user && user.isSuperUser;
   }
 
-  public static deactivate(feature) {
-    localStorage.setItem(TerrainTools.getFeatureKey(feature), '0');
-    TerrainTools.log(`${_.capitalize(feature)} has been disabled, refresh the page.`)
+  public static activate(feature)
+  {
+    if (TerrainTools.isAdmin())
+    {
+      localStorage.setItem(TerrainTools.getFeatureKey(feature), '1');
+      TerrainTools.log(`${_.capitalize(feature)} has been enabled, refresh the page.`);
+    } else
+    {
+      TerrainTools.log('You need to Admin to enable/disabled features', LEVEL_ERROR);
+    }
   }
 
-  public static isFeatureEnabled(feature) {
+  public static deactivate(feature)
+  {
+    if (TerrainTools.isAdmin())
+    {
+      localStorage.setItem(TerrainTools.getFeatureKey(feature), '0');
+      TerrainTools.log(`${_.capitalize(feature)} has been disabled, refresh the page.`);
+    } else
+    {
+      TerrainTools.log('You need to Admin to enable/disabled features', LEVEL_ERROR);
+    }
+  }
+
+  public static isFeatureEnabled(feature)
+  {
     return localStorage.getItem(TerrainTools.getFeatureKey(feature)) === '1';
   }
 
-  public static getFeatureKey(feature) {
+  public static getFeatureKey(feature)
+  {
     return `${FEATURE_KEY_PREFIX}${feature}`;
   }
 
-  public static log(message, logLevel = LEVEL_INFO) {
+  public static log(message, logLevel = LEVEL_INFO)
+  {
     console.error(`%c ${message} `, logStyles[logLevel]);
   }
 }
