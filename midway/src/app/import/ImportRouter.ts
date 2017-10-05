@@ -103,10 +103,15 @@ Router.post('/export/headless', async (ctx, next) =>
   }
   Util.verifyParameters(exprtConf, ['templateId', 'variantId']);
 
-  // await perm.ImportPermissions.verifyExportRoute(ctx.state.user, ctx.request.body.body);
-
-  const exportReturn: stream.Readable | string = await imprt.export(exprtConf, true);
-  ctx.body = exportReturn;
+  if (exprtConf.templateId !== authStream['template']['id'])
+  {
+    ctx.body = 'Authenticating template ID does not match export template ID.';
+  }
+  else
+  {
+    const exportReturn: stream.Readable | string = await imprt.export(exprtConf, true);
+    ctx.body = exportReturn;
+  }
 });
 
 Router.post('/headless', async (ctx, next) =>
@@ -118,12 +123,9 @@ Router.post('/headless', async (ctx, next) =>
     ctx.status = 400;
     return;
   }
-
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
+
   // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
-
-  // await perm.ImportPermissions.verifyHeadlessRoute(authStream['user'] as UserConfig, authStream['fields']);
-
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
 });
 
