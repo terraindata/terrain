@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import MultiSwitch from 'common/components/MultiSwitch';
+import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
 import RadioButtons from 'common/components/RadioButtons';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -371,38 +371,11 @@ class Library extends TerrainComponent<any>
               marginLeft: '10px',
               overflowY: 'scroll',
             }}>
-              <p>Metric</p>
-              <MultiSwitch
-                options={Immutable.List([
-                  { value: '1', label: 'Impressions' },
-                  { value: '2', label: 'CTR' },
-                  { value: '3', label: 'Conversions' },
-                ])}
-                value={selectedMetric.toString()}
-                usesValues
-                onChange={this.handleMetricRadioButtonClick}
-              />
-              <p>Interval</p>
-              <MultiSwitch
-                options={Immutable.List([
-                  { value: 'day', label: 'Daily' },
-                  { value: 'week', label: 'Weekly' },
-                  { value: 'month', label: 'Monthly' },
-                ])}
-                value={selectedInterval}
-                usesValues
-                onChange={this.handleIntervalRadioButtonClick}
-              />
-              <p>Date Range</p>
-              <MultiSwitch
-                options={Immutable.List([
-                  { value: '1', label: 'Today' },
-                  { value: '2', label: 'Last 7 days' },
-                  { value: '3', label: 'Last Month' },
-                ])}
-                value={selectedDateRange.toString()}
-                usesValues
-                onChange={this.handleDateRangeRadioButtonClick}
+              <AnalyticsSelector
+                analytics={analytics}
+                onMetricSelect={this.handleMetricRadioButtonClick}
+                onIntervalSelect={this.handleIntervalRadioButtonClick}
+                onDateRangeSelect={this.handleDateRangeRadioButtonClick}
               />
             </div>
           </div> : null
