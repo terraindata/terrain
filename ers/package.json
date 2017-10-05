@@ -1,0 +1,56 @@
+{
+  "name": "terrain-ers",
+  "version": "1.0.0",
+  "description": "Terrain Event Registration Server (ERS).",
+  "main": "src/Main.ts",
+  "private": true,
+  "scripts": {
+    "start": "nodemon --exec ./node_modules/.bin/ts-node $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./src/Main.ts",
+    "lint": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
+    "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
+    "fix": "yarn run style && yarn run lint;"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://git.terrain.int/terrain/Search"
+  },
+  "authors": [
+    "Han Solo"
+  ],
+  "pre-commit": [
+    "lint",
+    "style"
+  ],
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "/test/.+Tests\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json"
+    ],
+    "mapCoverage": true,
+    "globals": {
+      "DEV": true
+    },
+    "testURL": "http://localhost"
+  },
+  "dependencies": {
+    "command-line-args": "^4.0.7",
+    "command-line-usage": "^4.0.1",
+    "date-format": "^1.1.0",
+    "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1",
+    "ts-loader": "^2.3.7",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2",
+    "typescript-formatter": "^6.0.0",
+    "webpack": "^3.5.6"
+  }
+}
