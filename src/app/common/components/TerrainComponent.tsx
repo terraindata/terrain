@@ -128,12 +128,31 @@ class TerrainComponent<T> extends React.Component<T, any>
     };
 
     this._setStateWrapper = _.memoize(this._setStateWrapper);
+    this._setStateWrapperPath = _.memoize(this._setStateWrapperPath, this._setStateWrapperPathResolver);
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
 
   // note that lodash does not memoize any arguments beyond the first
   // so ...path (acts as keypath if val is an object) is not memoized.
-  public _setStateWrapper(key, ...path: string[]): (val) => void
+  public _setStateWrapper(key: string): (val) => void
+  {
+    return (val, ...args: any[]) =>
+    {
+      this.setState({ [key]: val });
+    };
+  }
+
+  public _setStateWrapperPathResolver(key: string, ...path: string[]): string
+  {
+    let accumulator = key;
+    for (const k of path)
+    {
+      accumulator += '.' + k;
+    }
+    return accumulator;
+  }
+
+  public _setStateWrapperPath(key: string, ...path: string[]): (val) => void
   {
     return (val, ...args: any[]) =>
     {
