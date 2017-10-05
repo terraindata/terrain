@@ -43,90 +43,16 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import reducer from 'analytics/data/AnalyticsReducer';
-import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
-import * as Immutable from 'immutable';
 
-describe('AnalyticsReducer', () =>
-{
-  let analytics: AnalyticsState = _AnalyticsState({});
+import * as koaBodyParser from 'koa-bodyparser';
+import * as koaLogger from 'koa-logger-winston';
+import koaResponseTime = require('koa-response-time');
 
-  const analyticsResponse = {
-    1: [
-      {
-        key_as_string: '2015-06-02T00:00:00.000Z',
-        key: 1433203200000,
-        doc_count: 10320,
-      },
-      {
-        key_as_string: '2015-06-03T00:00:00.000Z',
-        key: 1433289600000,
-        doc_count: 12582,
-      },
-      {
-        key_as_string: '2015-06-04T00:00:00.000Z',
-        key: 1433376000000,
-        doc_count: 12279,
-      },
-      {
-        key_as_string: '2015-06-05T00:00:00.000Z',
-        key: 1433462400000,
-        doc_count: 6187,
-      },
-      {
-        key_as_string: '2015-06-06T00:00:00.000Z',
-        key: 1433548800000,
-        doc_count: 937,
-      },
-    ],
+const Middleware =
+  {
+    bodyParser: koaBodyParser,
+    logger: koaLogger,
+    responseTime: koaResponseTime,
   };
 
-  beforeEach(() =>
-  {
-    analytics = _AnalyticsState({});
-  });
-
-  it('should return the inital state', () =>
-  {
-    expect(reducer(undefined, {})).toEqual(analytics);
-  });
-
-  describe('#fetch', () =>
-  {
-    it('should handle analytics.fetch', () =>
-    {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.fetch,
-        payload: {
-          analytics: analyticsResponse,
-        },
-      });
-
-      expect(
-        nextState,
-      ).toEqual(
-        analytics.setIn(['data', 1], analyticsResponse[1]),
-      );
-    });
-  });
-
-  describe('#selectMetric', () =>
-  {
-    it('should handle analytics.selectMetric', () =>
-    {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.selectMetric,
-        payload: {
-          metricId: '100',
-        },
-      });
-
-      expect(
-        nextState.selectedMetric,
-      ).toEqual(
-        '100',
-      );
-    });
-  });
-});
+export default Middleware;

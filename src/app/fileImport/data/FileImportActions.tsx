@@ -138,13 +138,16 @@ const FileImportActions =
       $(ActionTypes.updatePreviewColumns, { transform }),
 
     saveTemplate:
-    (templateName: string, exporting: boolean, handleTemplateSaveSuccess) =>
+    (templateName: string, exporting: boolean, handleTemplateSaveSuccess, serverId?: number, dbName?: string, tableName?: string) =>
       $(ActionTypes.saveTemplate, {
         templateName,
         exporting,
         setErrorMsg: FileImportActions.setErrorMsg,
         fetchTemplates: FileImportActions.fetchTemplates,
         handleTemplateSaveSuccess,
+        serverId,
+        dbName,
+        tableName,
       }),
 
     updateTemplate:

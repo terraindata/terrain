@@ -43,90 +43,69 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import reducer from 'analytics/data/AnalyticsReducer';
-import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
-import * as Immutable from 'immutable';
 
-describe('AnalyticsReducer', () =>
-{
-  let analytics: AnalyticsState = _AnalyticsState({});
+import cmdLineArgs = require('command-line-args');
+import cmdLineUsage = require('command-line-usage');
+import { Config } from './Config';
 
-  const analyticsResponse = {
-    1: [
-      {
-        key_as_string: '2015-06-02T00:00:00.000Z',
-        key: 1433203200000,
-        doc_count: 10320,
-      },
-      {
-        key_as_string: '2015-06-03T00:00:00.000Z',
-        key: 1433289600000,
-        doc_count: 12582,
-      },
-      {
-        key_as_string: '2015-06-04T00:00:00.000Z',
-        key: 1433376000000,
-        doc_count: 12279,
-      },
-      {
-        key_as_string: '2015-06-05T00:00:00.000Z',
-        key: 1433462400000,
-        doc_count: 6187,
-      },
-      {
-        key_as_string: '2015-06-06T00:00:00.000Z',
-        key: 1433548800000,
-        doc_count: 937,
-      },
-    ],
-  };
-
-  beforeEach(() =>
+const optionList = [
   {
-    analytics = _AnalyticsState({});
+    alias: 'c',
+    defaultValue: 'config.json',
+    name: 'config',
+    type: String,
+    typeLabel: 'file',
+    description: 'Configuration file to use.',
+  },
+  {
+    alias: 'p',
+    defaultValue: 3001,
+    name: 'port',
+    type: Number,
+    typeLabel: 'number',
+    description: 'Port to listen on.',
+  },
+  {
+    name: 'debug',
+    type: Boolean,
+    description: 'Turn on debug mode.',
+  },
+  {
+    alias: 'h',
+    name: 'help',
+    type: Boolean,
+    description: 'Show help and usage information.',
+  },
+  {
+    alias: 'v',
+    name: 'verbose',
+    type: Boolean,
+    description: 'Print verbose information.',
+  },
+  {
+    alias: 'd',
+    name: 'db',
+    type: String,
+    defaultValue: 'http://127.0.0.1:9200',
+    description: 'Analytics datastore connection parameters',
+  },
+];
+
+const sections = [
+  {
+    header: 'sigint 1.0',
+    content: 'Terrain Analytics Server.',
+  },
+  {
+    header: 'Options',
+    optionList,
+  },
+];
+
+export let CmdLineArgs: Config = cmdLineArgs(optionList,
+  {
+    partial: true,
   });
 
-  it('should return the inital state', () =>
-  {
-    expect(reducer(undefined, {})).toEqual(analytics);
-  });
-
-  describe('#fetch', () =>
-  {
-    it('should handle analytics.fetch', () =>
-    {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.fetch,
-        payload: {
-          analytics: analyticsResponse,
-        },
-      });
-
-      expect(
-        nextState,
-      ).toEqual(
-        analytics.setIn(['data', 1], analyticsResponse[1]),
-      );
-    });
-  });
-
-  describe('#selectMetric', () =>
-  {
-    it('should handle analytics.selectMetric', () =>
-    {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.selectMetric,
-        payload: {
-          metricId: '100',
-        },
-      });
-
-      expect(
-        nextState.selectedMetric,
-      ).toEqual(
-        '100',
-      );
-    });
-  });
-});
+export const CmdLineUsage = cmdLineUsage(sections);
+export default CmdLineArgs;

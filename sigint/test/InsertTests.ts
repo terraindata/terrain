@@ -43,90 +43,83 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import reducer from 'analytics/data/AnalyticsReducer';
-import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
-import * as Immutable from 'immutable';
 
-describe('AnalyticsReducer', () =>
+import * as request from 'supertest';
+import * as winston from 'winston';
+
+import App from '../src/App';
+
+let server;
+
+/* tslint:disable:max-line-length */
+
+beforeAll(async (done) =>
 {
-  let analytics: AnalyticsState = _AnalyticsState({});
-
-  const analyticsResponse = {
-    1: [
-      {
-        key_as_string: '2015-06-02T00:00:00.000Z',
-        key: 1433203200000,
-        doc_count: 10320,
-      },
-      {
-        key_as_string: '2015-06-03T00:00:00.000Z',
-        key: 1433289600000,
-        doc_count: 12582,
-      },
-      {
-        key_as_string: '2015-06-04T00:00:00.000Z',
-        key: 1433376000000,
-        doc_count: 12279,
-      },
-      {
-        key_as_string: '2015-06-05T00:00:00.000Z',
-        key: 1433462400000,
-        doc_count: 6187,
-      },
-      {
-        key_as_string: '2015-06-06T00:00:00.000Z',
-        key: 1433548800000,
-        doc_count: 937,
-      },
-    ],
-  };
-
-  beforeEach(() =>
+  try
   {
-    analytics = _AnalyticsState({});
-  });
+    const options =
+      {
+        debug: true,
+        db: 'http://127.0.0.1:9200',
+        port: 43002,
+      };
 
-  it('should return the inital state', () =>
+    const app = new App(options);
+    server = await app.start();
+  }
+  catch (e)
   {
-    expect(reducer(undefined, {})).toEqual(analytics);
-  });
+    fail(e);
+  }
+  done();
+});
 
-  describe('#fetch', () =>
+describe('Event insertion tests', () =>
+{
+  test('GET /v1/', async () =>
   {
-    it('should handle analytics.fetch', () =>
-    {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.fetch,
-        payload: {
-          analytics: analyticsResponse,
-        },
+    await request(server)
+      .get('/v1/')
+      .query({
+        eventid: 111,
+        variantid: 111,
+        visitorid: 123456,
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe('');
       });
-
-      expect(
-        nextState,
-      ).toEqual(
-        analytics.setIn(['data', 1], analyticsResponse[1]),
-      );
-    });
   });
 
-  describe('#selectMetric', () =>
+  test('POST /v1/', async () =>
   {
-    it('should handle analytics.selectMetric', () =>
-    {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.selectMetric,
-        payload: {
-          metricId: '100',
-        },
+    await request(server)
+      .post('/v1/')
+      .send({
+        eventid: 222,
+        variantid: 111,
+        visitorid: 123456,
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe('');
       });
+  });
 
-      expect(
-        nextState.selectedMetric,
-      ).toEqual(
-        '100',
-      );
-    });
+  test('Invalid GET /v1/', async () =>
+  {
+    await request(server)
+      .get('/v1/')
+      .query({
+        eventid: 222,
+        visitorid: 123456,
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe('');
+      });
   });
 });

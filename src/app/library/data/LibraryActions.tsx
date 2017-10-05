@@ -78,9 +78,9 @@ const Actions =
       (
         group: LibraryTypes.Group = LibraryTypes._Group(),
         idCallBack?: (id: ID) => void,
-      ) => (dispatch) =>
+      ) => (dispatch, getState, api) =>
         {
-          Ajax.saveItem(
+          api.saveItem(
             group,
             (response) =>
             {
@@ -89,6 +89,7 @@ const Actions =
               dispatch($(ActionTypes.groups.create, {
                 group: group.set('id', id),
               }));
+
               idCallBack && idCallBack(id);
             },
           );

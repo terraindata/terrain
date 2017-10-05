@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "newLine": "LF",
-        "jsx": "react",
         "module": "commonjs",
         "sourceMap": false,
         "inlineSources": true,
@@ -9,8 +8,7 @@
         "strictNullChecks": true,
         "target": "es6",
         "typeRoots": [
-            "../src/typings",
-            "../node_modules/@types"
+            "./node_modules/@types"
         ],
         "baseUrl": ".",
         "experimentalDecorators": true,
@@ -18,9 +16,8 @@
         "outDir": "./build/"
     },
     "exclude": [
-        "../node_modules",
-        "../src",
+        "node_modules",
         "build",
-        "../coverage"
+        "coverage"
     ]
 }
