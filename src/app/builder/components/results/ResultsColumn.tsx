@@ -153,7 +153,7 @@ class ResultsColumn extends TerrainComponent<Props>
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
           />
-        );      
+        );
       case 2:
         return <pre className='results-column-raw-results'>
           {JSON.stringify(this.props.resultsState.rawResult, null, 5)}

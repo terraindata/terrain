@@ -64,6 +64,7 @@ import Modal from '../../../common/components/Modal';
 import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
 import Aggregation from '../results/Aggregation';
+import { ResultsState } from './ResultTypes';
 
 import Radium = require('radium');
 
@@ -82,26 +83,9 @@ export interface Props
   onNavigationException: () => void;
 }
 
-interface State
-{
-  resultFormat: string;
-  showingConfig?: boolean;
-
-  expanded?: boolean;
-  expandedResultIndex?: number;
-
-  resultsPages: number;
-  onResultsLoaded?: (unchanged?: boolean) => void;
-
-  showingExport?: boolean;
-}
-
 @Radium
 class AggregationsArea extends TerrainComponent<Props>
 {
-  public state: State = {
-
-  };
 
   public isQueryEmpty(): boolean
   {
@@ -117,48 +101,53 @@ class AggregationsArea extends TerrainComponent<Props>
   public renderResults()
   {
     const { resultsState } = this.props;
-    
-    //TODO: make this be aggregations from results 
-    var aggregations = Immutable.List([
-         {"price_ranges" : {
-           "buckets": [
-            {
-              "to": 50,
-              "doc_count": 2
-            },
-            {
-              "from": 50,
-              "to": 100,
-              "doc_count": 4
-            },
-            {
-              "from": 100,
-              "doc_count": 4
-            }
-          ]
-        }},
-        {"genres" : {
-            "doc_count_error_upper_bound": 0, 
-            "sum_other_doc_count": 0, 
-            "buckets" : [ 
-                {
-                    "key" : "jazz",
-                    "doc_count" : 10
-                },
-                {
-                    "key" : "rock",
-                    "doc_count" : 10
-                },
-                {
-                    "key" : "electronic",
-                    "doc_count" : 10
-                },
-            ]
-        }
-      }
-    ]);
+    const aggs = resultsState.aggregations;
+    let aggregations = Immutable.List([]);
+    _.keys(aggs).forEach((key) =>
+    {
+      aggregations = aggregations.push({ [key]: aggs[key] });
+    });
+    // TODO: make this be aggregations from results
+    // var aggregations = Immutable.List([
+    //      {"price_ranges" : {
+    //        "buckets": [
+    //         {
+    //           "to": 50,
+    //           "doc_count": 2
+    //         },
+    //         {
+    //           "from": 50,
+    //           "to": 100,
+    //           "doc_count": 4
+    //         },
+    //         {
+    //           "from": 100,
+    //           "doc_count": 4
+    //         }
+    //       ]
+    //     }},
+    //     {"genres" : {
+    //         "doc_count_error_upper_bound": 0,
+    //         "sum_other_doc_count": 0,
+    //         "buckets" : [
+    //             {
+    //                 "key" : "jazz",
+    //                 "doc_count" : 10
+    //             },
+    //             {
+    //                 "key" : "rock",
+    //                 "doc_count" : 10
+    //             },
+    //             {
+    //                 "key" : "electronic",
+    //                 "doc_count" : 10
+    //             },
+    //         ]
+    //     }
+    //   }
+    // ]);
 
-    console.log(aggregations);
+    // console.log(aggregations);
 
     let infoAreaContent: any = null;
     let resultsContent: any = null;
@@ -187,7 +176,7 @@ class AggregationsArea extends TerrainComponent<Props>
       />;
     }
 
-    if (aggregations)
+    else if (aggregations)
     {
       if (!aggregations.size)
       {
@@ -195,46 +184,41 @@ class AggregationsArea extends TerrainComponent<Props>
           large='There are no aggregations for your query.'
         />;
       }
-      else 
+      else
       {
         resultsContent = (
-        <InfiniteScroll
-          className='aggregations-area-aggs'
-          onRequestMoreItems={this.handleRequestMoreResults}
-        >
-          {
-            aggregations.map((agg, index) =>
+          <InfiniteScroll
+            className='aggregations-area-aggs'
+            onRequestMoreItems={this.handleRequestMoreResults}
+          >
             {
-              return (
-                <Aggregation
-                  aggregation={agg}
-                  index={index}
-                  key={index}
-                />
-              );
-            })
-          }
-        </InfiniteScroll>
-      );
-
-
+              aggregations.map((agg, index) =>
+              {
+                return (
+                  <Aggregation
+                    aggregation={agg}
+                    index={index}
+                    key={index}
+                  />
+                );
+              })
+            }
+          </InfiniteScroll>
+        );
 
       }
     }
     return (
       <div>
-      {
-        resultsContent
-      }
-      {
-        infoAreaContent
-      }
+        {
+          resultsContent
+        }
+        {
+          infoAreaContent
+        }
       </div>
     );
-    
   }
-
-
 
   public render()
   {

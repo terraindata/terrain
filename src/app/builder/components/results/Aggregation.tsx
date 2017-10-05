@@ -51,11 +51,11 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import './Aggregation.less';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 import ColorManager from '../../../util/ColorManager';
 import TerrainComponent from './../../../common/components/TerrainComponent';
+import './Aggregation.less';
 
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -67,16 +67,13 @@ export interface Props
 
 }
 
-
 @Radium
 class AggregationComponent extends TerrainComponent<Props> {
   public state: {
-    expanded: boolean;
-
+    expanded: boolean,
   } = {
-    expanded: false;
+    expanded: false,
   };
-
 
   public toggleExpanded()
   {
@@ -89,13 +86,13 @@ class AggregationComponent extends TerrainComponent<Props> {
   {
     const aggTitle = Object.keys(this.props.aggregation)[0];
     return (
-      <div 
+      <div
         className={classNames({
           'aggregation-title-bar': true,
           'aggregation-title-bar-open': !this.state.expanded,
-         })}
+        })}
       >
-        <ArrowIcon className ='arrow-icon' onClick={this.toggleExpanded}/>
+        <ArrowIcon className='arrow-icon' onClick={this.toggleExpanded} />
         {
           aggTitle
         }
@@ -104,18 +101,16 @@ class AggregationComponent extends TerrainComponent<Props> {
     );
   }
 
-
   public renderExpandedAgg()
   {
-    var values = Object.values(this.props.aggregation)[0];  
-    console.log(values);
+    const values = _.values(this.props.aggregation)[0];
     return (
-      <div className='aggregation-expanded-view'> 
+      <div className='aggregation-expanded-view'>
         {
-          this.state.expanded ? 
-            <div> 
-              { (values.buckets !== null) ? <pre> {JSON.stringify(values, undefined, 2) } </pre> : ''}
-            </div> 
+          this.state.expanded ?
+            <div>
+              {(values.buckets !== null) ? <pre> {JSON.stringify(values, undefined, 2)} </pre> : ''}
+            </div>
             :
             ''
         }
@@ -143,19 +138,15 @@ class AggregationComponent extends TerrainComponent<Props> {
   //   );
   // }
 
-
   public render()
   {
     return (
       <div className='aggregation'>
-       {this.renderAgg()}
-       {this.renderExpandedAgg()}
+        {this.renderAgg()}
+        {this.renderExpandedAgg()}
       </div>
-
-    ); 
-   
+    );
   }
 }
-
 
 export default AggregationComponent;
