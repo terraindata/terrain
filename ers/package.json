@@ -42,9 +42,18 @@
     "command-line-args": "^4.0.7",
     "command-line-usage": "^4.0.1",
     "date-format": "^1.1.0",
+    "elasticsearch": "^13.3.1",
+    "kcors": "^2.2.1",
+    "koa": "^2.3.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-logger-winston": "^0.0.2",
+    "koa-response-time": "^2.0.0",
+    "koa-router": "^7.2.1",
     "winston": "^2.4.0"
   },
   "devDependencies": {
+    "@types/koa": "^2.0.39",
+    "@types/node": "^8.0.32",
     "nodemon": "^1.12.1",
     "ts-loader": "^2.3.7",
     "ts-node": "^3.3.0",

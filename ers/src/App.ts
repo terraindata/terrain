@@ -49,8 +49,6 @@ import * as Koa from 'koa';
 import * as winston from 'winston';
 
 import cors = require('kcors');
-import srs = require('secure-random-string');
-import v8 = require('v8');
 
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
@@ -59,7 +57,6 @@ import Middleware from './Middleware';
 import Router from './Router';
 
 export let CFG: Config.Config;
-export let HA: number;
 
 class App
 {
@@ -93,7 +90,6 @@ class App
 
     this.app = new Koa();
     this.app.proxy = true;
-    this.app.keys = [srs({ length: 256 })];
     this.app.use(async (ctx, next) =>
     {
       // tslint:disable-next-line:no-empty
@@ -113,10 +109,6 @@ class App
   {
     // process configuration options
     await Config.handleConfig(this.config);
-
-    const heapStats: object = v8.getHeapStatistics();
-    this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));
-    HA = this.heapAvail;
 
     winston.info('Listening on port ' + String(this.config.port));
     return this.app.listen(this.config.port);
