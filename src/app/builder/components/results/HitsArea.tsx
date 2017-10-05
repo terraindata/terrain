@@ -423,10 +423,6 @@ column if you have customized the results view.');
 
   public toggleView()
   {
-    if (this.state.expanded || this.state.showingConfig)
-    {
-      return;
-    }
     this.setState({
       hitFormat: this.state.hitFormat === 'icon' ? 'table' : 'icon',
       expanded: false,

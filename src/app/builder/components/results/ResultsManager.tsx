@@ -524,6 +524,7 @@ export class ResultsManager extends TerrainComponent<Props>
       mainErrorMessage: null,
       subErrorMessage: null,
       aggregations: resultsData.aggregations,
+      rawResult: resultsData.rawResult,
     };
 
     if (!resultsState.hasLoadedCount)
@@ -570,7 +571,7 @@ export class ResultsManager extends TerrainComponent<Props>
       });
     });
     const aggregations = resultsData.aggregations;
-    this.updateResults({ hits, aggregations }, isAllFields);
+    this.updateResults({ hits, aggregations, rawResult: resultsData }, isAllFields);
   }
 
   private handleM2QueryResponse(response: MidwayQueryResponse, isAllFields: boolean)
@@ -601,7 +602,7 @@ export class ResultsManager extends TerrainComponent<Props>
       });
     });
     const aggregations = resultsData.aggregations;
-    this.updateResults({ hits, aggregations }, isAllFields);
+    this.updateResults({ hits, aggregations, rawResult: resultsData }, isAllFields);
   }
 
   private handleM1Error(response: any, isAllFields?: boolean)

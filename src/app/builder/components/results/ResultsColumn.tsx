@@ -146,7 +146,9 @@ class ResultsColumn extends TerrainComponent<Props>
       case 1:
         return <div>Aggregations</div>;
       case 2:
-        return <div>Raw results</div>;
+        return <pre className='results-column-raw-results'>
+          {JSON.stringify(this.props.resultsState.rawResult, null, 5)}
+        </pre>;
       default:
         return <div>No information</div>;
     }
@@ -162,7 +164,7 @@ class ResultsColumn extends TerrainComponent<Props>
   }
 }
 
-const ACTIVE_TAB_STYLE = _.extend({}, getStyle('border-bottom-color', Colors().active), backgroundColor(Colors().bg3));
-const INACTIVE_TAB_STYLE = _.extend({}, getStyle('border-bottom-color', Colors().bg3), backgroundColor(Colors().bg2));
+const ACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().active), backgroundColor(Colors().bg3));
+const INACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().bg3), backgroundColor(Colors().bg2));
 
 export default ResultsColumn;
