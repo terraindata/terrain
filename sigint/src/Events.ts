@@ -44,52 +44,100 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as _ from 'lodash';
+import * as Elastic from 'elasticsearch';
 import * as winston from 'winston';
 
-import * as Util from '../Util';
-import * as Encryption from './Encryption';
-import { Events } from './Events';
+import { Config } from './Config';
 
-export const events: Events = new Events();
-const Router = new KoaRouter();
-
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
-// * variantid: list of variantids
-// * start: start time of the interval
-// * end: end time of the interval
-// * agg: supported aggregation operations are:
-//     `select` - returns all events between the specified interval
-//     `histogram` - returns a histogram of events between the specified interval
-//     `rate` - returns a ratio of two events between the specified interval
-// * field (optional):
-//     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
-// * interval (optional; required if `agg` is `histogram` or `rate`):
-//     the resolution of interval for aggregation operations.
-//     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
-//     also supported are values such as `1.5h`, `90m` etc.
-//
-Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
+export interface EventConfig
 {
-  Util.verifyParameters(
-    JSON.parse(JSON.stringify(ctx.request.query)),
-    ['start', 'end', 'eventid', 'variantid', 'agg'],
-  );
-  winston.info('getting events for variant');
-  const response: object[] = await events.AggregationHandler(ctx.request.query);
-  ctx.body = response.reduce((acc, x) =>
-  {
-    for (const key in x)
-    {
-      if (x.hasOwnProperty(key) !== undefined)
-      {
-        acc[key] = x[key];
-        return acc;
-      }
-    }
-  }, {});
-});
+  eventid: number | string;
+  variantid: number | string;
+  visitorid: number | string;
+  source: {
+    ip: string;
+    host: string;
+    useragent: string;
+    referer?: string;
+  };
+  timestamp: Date;
+  meta?: any;
+}
 
-export default Router;
+export const indexName = 'terrain-analytics';
+export const typeName = 'events';
+
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+{
+  return (error: Error, response: T) =>
+  {
+    if (error !== null && error !== undefined)
+    {
+      reject(error);
+    }
+    else
+    {
+      resolve(response);
+    }
+  };
+}
+
+export class Events
+{
+  private client: Elastic.Client;
+
+  constructor(config: Config)
+  {
+    this.client = new Elastic.Client({
+      host: config.db,
+    });
+
+    this.client.ping({
+      requestTimeout: 100,
+    }, (err) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          throw new Error('creating ES client for host: ' + String(config.db) + ': ' + String(err));
+        }
+      });
+
+    this.client.indices.exists({
+      index: indexName,
+    }, (err, indexExists) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          throw new Error('creating index: ' + indexName + ': ' + String(err));
+        }
+
+        if (!indexExists)
+        {
+          winston.info('Index ' + indexName + ' does not exist. Creating it...');
+          this.client.indices.create({
+            index: indexName,
+            timeout: '5s',
+          }, (err2) =>
+            {
+              if (err2 !== null && err2 !== undefined)
+              {
+                throw new Error('creating index: ' + indexName + ': ' + String(err));
+              }
+            });
+        }
+      });
+  }
+
+  public async store(event: EventConfig): Promise<void>
+  {
+    return new Promise<void>((resolve, reject) =>
+    {
+      this.client.index({
+        index: indexName,
+        type: typeName,
+        body: event,
+      },
+        makePromiseCallback(resolve, reject));
+    });
+  }
+}

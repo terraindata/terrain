@@ -44,52 +44,68 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as _ from 'lodash';
-import * as winston from 'winston';
+import cmdLineArgs = require('command-line-args');
+import cmdLineUsage = require('command-line-usage');
+import { Config } from './Config';
 
-import * as Util from '../Util';
-import * as Encryption from './Encryption';
-import { Events } from './Events';
-
-export const events: Events = new Events();
-const Router = new KoaRouter();
-
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
-// * variantid: list of variantids
-// * start: start time of the interval
-// * end: end time of the interval
-// * agg: supported aggregation operations are:
-//     `select` - returns all events between the specified interval
-//     `histogram` - returns a histogram of events between the specified interval
-//     `rate` - returns a ratio of two events between the specified interval
-// * field (optional):
-//     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
-// * interval (optional; required if `agg` is `histogram` or `rate`):
-//     the resolution of interval for aggregation operations.
-//     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
-//     also supported are values such as `1.5h`, `90m` etc.
-//
-Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  Util.verifyParameters(
-    JSON.parse(JSON.stringify(ctx.request.query)),
-    ['start', 'end', 'eventid', 'variantid', 'agg'],
-  );
-  winston.info('getting events for variant');
-  const response: object[] = await events.AggregationHandler(ctx.request.query);
-  ctx.body = response.reduce((acc, x) =>
+const optionList = [
   {
-    for (const key in x)
-    {
-      if (x.hasOwnProperty(key) !== undefined)
-      {
-        acc[key] = x[key];
-        return acc;
-      }
-    }
-  }, {});
-});
+    alias: 'c',
+    defaultValue: 'config.json',
+    name: 'config',
+    type: String,
+    typeLabel: 'file',
+    description: 'Configuration file to use.',
+  },
+  {
+    alias: 'p',
+    defaultValue: 3001,
+    name: 'port',
+    type: Number,
+    typeLabel: 'number',
+    description: 'Port to listen on.',
+  },
+  {
+    name: 'debug',
+    type: Boolean,
+    description: 'Turn on debug mode.',
+  },
+  {
+    alias: 'h',
+    name: 'help',
+    type: Boolean,
+    description: 'Show help and usage information.',
+  },
+  {
+    alias: 'v',
+    name: 'verbose',
+    type: Boolean,
+    description: 'Print verbose information.',
+  },
+  {
+    alias: 'd',
+    name: 'db',
+    type: String,
+    defaultValue: 'http://127.0.0.1:9200',
+    description: 'Analytics datastore connection parameters',
+  },
+];
 
-export default Router;
+const sections = [
+  {
+    header: 'sigint 1.0',
+    content: 'Terrain Analytics Server.',
+  },
+  {
+    header: 'Options',
+    optionList,
+  },
+];
+
+export let CmdLineArgs: Config = cmdLineArgs(optionList,
+  {
+    partial: true,
+  });
+
+export const CmdLineUsage = cmdLineUsage(sections);
+export default CmdLineArgs;

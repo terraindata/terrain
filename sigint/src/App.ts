@@ -44,52 +44,81 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as _ from 'lodash';
+import * as http from 'http';
+import * as Koa from 'koa';
 import * as winston from 'winston';
 
-import * as Util from '../Util';
-import * as Encryption from './Encryption';
-import { Events } from './Events';
+import cors = require('kcors');
 
-export const events: Events = new Events();
-const Router = new KoaRouter();
+import { CmdLineArgs } from './CmdLineArgs';
+import * as Config from './Config';
+import * as Events from './Events';
+import './Logging';
+import Middleware from './Middleware';
+import { Router } from './Router';
 
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
-// * variantid: list of variantids
-// * start: start time of the interval
-// * end: end time of the interval
-// * agg: supported aggregation operations are:
-//     `select` - returns all events between the specified interval
-//     `histogram` - returns a histogram of events between the specified interval
-//     `rate` - returns a ratio of two events between the specified interval
-// * field (optional):
-//     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
-// * interval (optional; required if `agg` is `histogram` or `rate`):
-//     the resolution of interval for aggregation operations.
-//     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
-//     also supported are values such as `1.5h`, `90m` etc.
-//
-Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
+export let CFG: Config.Config;
+
+class App
 {
-  Util.verifyParameters(
-    JSON.parse(JSON.stringify(ctx.request.query)),
-    ['start', 'end', 'eventid', 'variantid', 'agg'],
-  );
-  winston.info('getting events for variant');
-  const response: object[] = await events.AggregationHandler(ctx.request.query);
-  ctx.body = response.reduce((acc, x) =>
+  private static uncaughtExceptionHandler(err: Error): void
   {
-    for (const key in x)
-    {
-      if (x.hasOwnProperty(key) !== undefined)
-      {
-        acc[key] = x[key];
-        return acc;
-      }
-    }
-  }, {});
-});
+    winston.error('Uncaught Exception: ' + err.toString());
+    // this is a good place to clean tangled resources
+    process.abort();
+  }
 
-export default Router;
+  private static unhandledRejectionHandler(err: Error): void
+  {
+    winston.error('Unhandled Promise Rejection: ' + err.toString());
+  }
+
+  private app: Koa;
+  private config: Config.Config;
+  private heapAvail: number;
+
+  constructor(config: Config.Config = CmdLineArgs)
+  {
+    process.on('uncaughtException', App.uncaughtExceptionHandler);
+    process.on('unhandledRejection', App.unhandledRejectionHandler);
+
+    // first, load config from a config file, if one is specified
+    config = Config.loadConfigFromFile(config);
+
+    winston.debug('Using configuration: ' + JSON.stringify(config));
+    this.config = config;
+    CFG = this.config;
+
+    this.app = new Koa();
+    this.app.proxy = true;
+    this.app.use(async (ctx, next) =>
+    {
+      // tslint:disable-next-line:no-empty
+      ctx.req.setTimeout(0, () => { });
+      await next();
+    });
+    this.app.use(cors());
+
+    this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
+    this.app.use(Middleware.logger(winston));
+    this.app.use(Middleware.responseTime());
+
+    const router = new Router(config);
+    this.app.use(router.routes());
+  }
+
+  public async start(): Promise<http.Server>
+  {
+    await Config.handleConfig(this.config);
+
+    winston.info('Listening on port ' + String(this.config.port));
+    return this.app.listen(this.config.port);
+  }
+
+  public getConfig(): Config.Config
+  {
+    return this.config;
+  }
+}
+
+export default App;
