@@ -65,6 +65,7 @@ import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
 import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
+import HitsTable from './HitsTable';
 import { ResultsState } from './ResultTypes';
 
 const RESULTS_PAGE_SIZE = 20;
