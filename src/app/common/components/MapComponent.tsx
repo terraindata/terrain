@@ -642,9 +642,11 @@ class MapComponent extends TerrainComponent<Props>
               <Circle
                 center={location}
                 radius={this.convertDistanceToMeters()}
-                stroke={false}
-                fillColor={'white'}
-                fillOpacity={0.6}
+                stroke={true}
+                color={Colors().builder.cards.categories.filter}
+                width={7}
+                fillColor={Colors().builder.cards.categories.filter}
+                fillOpacity={0.2}
               />
               :
               null
