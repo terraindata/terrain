@@ -116,7 +116,6 @@
     "memoize-one": "^3.0.1",
     "moment": "^2.13.0",
     "mysql": "^2.13.0",
-    "nock": "^9.0.14",
     "node-libs-browser": "0.6.0",
     "node-schedule": "^1.2.3",
     "object-assign": "^4.1.1",
