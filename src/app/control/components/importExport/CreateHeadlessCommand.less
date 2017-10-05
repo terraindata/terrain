@@ -30,8 +30,7 @@
   }
 
   .headless-entry-row {
-    margin: @spacing;
-    margin-bottom: @quarter-spacing;
+    margin: @half-spacing;
     display: flex;
     .big-text;
 
@@ -58,13 +57,18 @@
         width: @icon-size;
         height: @icon-size;
         fill: currentColor;
+
+        &.clipboard-icon-big {
+          width: 20px;
+          height: 20px;
+        }
       }
     }
   }
 
   .headless-command-title {
-    margin: @spacing;
-    margin-bottom: @half-spacing;
+    padding: @half-spacing;
+    padding-right: 0px;
   }
 
   .headless-command-content {

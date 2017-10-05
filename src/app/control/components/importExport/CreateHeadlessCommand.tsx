@@ -52,21 +52,23 @@ import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'common/Colors';
 import Dropdown from 'common/components/Dropdown';
+import { notificationManager } from 'common/components/InAppNotification';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import VariantSelector from 'library/components/VariantSelector';
 import { LibraryStore } from 'library/data/LibraryStore';
-// import * as LibraryTypes from 'library/LibraryTypes';
 
 import ControlActions from '../../data/ControlActions';
 
 import './CreateHeadlessCommand.less';
 
 const { List } = Immutable;
+const ClipboardIcon = require('images/icon_clipboard.svg');
 const ViewIcon = require('images/icon_search.svg');
 
 type Template = FileImportTypes.Template;
@@ -232,6 +234,11 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     {
       return `(${template.export ? 'Export' : 'Import'}) ${template.templateName}`;
     }).toList();
+  }
+
+  public handleTextCopied()
+  {
+    notificationManager.addNotification('Text Copied to Clipboard', '', 'info', 4);
   }
 
   public handleFilenameChange(event)
@@ -456,7 +463,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
       filename: this.state.filenameValue,
       exportKey: this.state.exportKeyValue,
     });
-
+    const formComplete = requests.length === 0 && errors.length === 0;
     return (
       <div className='headless-command-generator' style={backgroundColor(Colors().altBg2)}>
         <div className='headless-entry-row'>
@@ -474,7 +481,6 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
           </div>
           <div className='headless-entry-icon-wrapper'
             style={fontColor('#555')}
-            key='icon-wrapper'
           >
             {
               template !== undefined && tooltip(
@@ -493,7 +499,24 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
         {
           template !== undefined && template.export ? this.renderExportOptions(template) : this.renderImportOptions(template)
         }
-        <div className='headless-command-title'> Headless Command </div>
+        <div className='headless-entry-row'>
+          <div className='headless-command-title'> Headless Command </div>
+          {
+            formComplete &&
+            <CopyToClipboard text={command} onCopy={this.handleTextCopied}>
+              <div className='headless-entry-icon-wrapper'
+                style={fontColor('#555')}
+              >
+                {
+                  tooltip(
+                    <ClipboardIcon className='headless-entry-icon clipboard-icon-big' />,
+                    { title: 'Copy Command to Clipboard', distance: 15 }
+                  )
+                }
+              </div>
+            </CopyToClipboard>
+          }
+        </div>
         {this.renderCommandContent(command, requests, errors)}
       </div>
     );
