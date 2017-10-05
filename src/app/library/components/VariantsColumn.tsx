@@ -389,7 +389,12 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleDoubleClick(id: ID)
   {
-    browserHistory.push(`/builder/?o=${id}`);
+    const { multiselect } = this.props;
+
+    if (!multiselect)
+    {
+      browserHistory.push(`/builder/?o=${id}`);
+    }
   }
 
   public renderDuplicateDropdown()
