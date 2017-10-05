@@ -51,6 +51,8 @@ import * as request from 'request';
 import * as rimraf from 'rimraf';
 import * as sha1 from 'sha1';
 
+import { templates } from './import/ImportTemplateRouter';
+import { ImportTemplateConfig } from './import/ImportTemplates';
 import { users } from './users/UserRouter';
 
 export async function authenticateStream(req: http.IncomingMessage): Promise<object>
@@ -60,6 +62,35 @@ export async function authenticateStream(req: http.IncomingMessage): Promise<obj
     const { files, fields } = await asyncBusboy(req);
     const user = await users.loginWithAccessToken(Number(fields['id']), fields['accessToken']);
     resolve({ files, fields, user });
+  });
+}
+
+export async function authenticatePersistentAccessToken(req: object): Promise<object>
+{
+  return new Promise<object>(async (resolve, reject) =>
+  {
+    const template: ImportTemplateConfig[] =
+      await templates.loginWithPersistentAccessToken(Number(req['id']), req['persistentAccessToken']);
+    if (template.length === 0)
+    {
+      return resolve({ template: null });
+    }
+    resolve({ template: template[0] });
+  });
+}
+
+export async function authenticateStreamPersistentAccessToken(req: http.IncomingMessage): Promise<object>
+{
+  return new Promise<object>(async (resolve, reject) =>
+  {
+    const { files, fields } = await asyncBusboy(req);
+    const template: ImportTemplateConfig[] =
+      await templates.loginWithPersistentAccessToken(Number(fields['id']), fields['persistentAccessToken']);
+    if (template.length === 0)
+    {
+      return resolve({ files, fields, template: null });
+    }
+    resolve({ files, fields, template: template[0] });
   });
 }
 
