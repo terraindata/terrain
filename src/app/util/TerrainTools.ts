@@ -42,70 +42,67 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import AppRouter from './AppRouter';
-import BuilderStore from './builder/data/BuilderStore'; // for error reporting
-import ColorsStore from './colors/data/ColorsStore';
-import LibraryStore from './library/data/LibraryStore';
-import TerrainStore from './store/TerrainStore';
-import UserStore from './users/data/UserStore';
-import TerrainTools from 'util/TerrainTools';
+import * as _ from 'lodash';
+// Log levels
+const LEVEL_TEXT = 'text';
+const LEVEL_DEBUG = 'debug';
+const LEVEL_INFO = 'info';
+const LEVEL_WARN = 'warn';
+const LEVEL_ERROR = 'error';
 
-declare global {
-  interface Window {
-    TerrainTools: any;
+// Log message styles per level
+const logStyles = {
+  [LEVEL_TEXT]: 'color: darkgrey;',
+  [LEVEL_DEBUG]: 'color: white; background-color: darkgrey; display: block;',
+  [LEVEL_INFO]: 'color: white; background: blue; font-weight: bold; display: block;',
+  [LEVEL_WARN]: 'color: white; background-color: orange; display: block;',
+  [LEVEL_ERROR]: 'color: white; background-color: red; display: block;',
+};
+
+// Toggle-able features
+const FEATURE_KEY_PREFIX = 'toggle-feature-'; // prefix for the localStorage key.
+
+class TerrainTools {
+  public static ANALYTICS = 'analytics';
+
+  public static welcome() {
+    TerrainTools.log('TerrainTools test are loaded');
+  }
+
+  public static help() {
+    TerrainTools.log(`
+API:
+TerrainTools.activate(<feature>)
+TerrainTools.deactivate(<feature>)
+
+Example:
+TerrainTools.activate(TerrainTools.ANALYITICS);
+
+Toggle-able Features:
+* TerrainTools.ANALYTICS`, LEVEL_TEXT)
+  }
+
+  public static activate(feature) {
+    localStorage.setItem(TerrainTools.getFeatureKey(feature), '1');
+    TerrainTools.log(`${_.capitalize(feature)} has been enabled, refresh the page.`)
+  }
+
+  public static deactivate(feature) {
+    localStorage.setItem(TerrainTools.getFeatureKey(feature), '0');
+    TerrainTools.log(`${_.capitalize(feature)} has been disabled, refresh the page.`)
+  }
+
+  public static isFeatureEnabled(feature) {
+    return localStorage.getItem(TerrainTools.getFeatureKey(feature)) === '1';
+  }
+
+  public static getFeatureKey(feature) {
+    return `${FEATURE_KEY_PREFIX}${feature}`;
+  }
+
+  public static log(message, logLevel = LEVEL_INFO) {
+    console.error(`%c ${message} `, logStyles[logLevel]);
   }
 }
 
-if (!DEV)
-{
-  // report uncaught errors in production
-  window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
-  {
-
-    const user = UserStore.getState().get('currentUser');
-    const userId = user && user.id;
-    const libraryState = JSON.stringify(LibraryStore.getState().toJS());
-    const builderState = JSON.stringify(BuilderStore.getState().toJS());
-    const location = JSON.stringify(window.location);
-    const colorsState = JSON.stringify(ColorsStore.getState().toJS());
-
-    const msg = `${errorMsg} by ${userId}
-      Location:
-      ${location}
-
-      Library State:
-      ${libraryState}
-
-      Builder State:
-      ${builderState}
-
-      Colors State:
-      ${colorsState}
-
-      Error Stack:
-      ${(error != null && error.stack != null) ? error.stack : ''}
-    `;
-
-    $.post('http://lukeknepper.com/email.php', {
-      msg,
-      secret: '11235813',
-    });
-
-    return false;
-  };
-} else {
-  window.TerrainTools = TerrainTools;
-}
-
-ReactDOM.render(
-  <Provider store={TerrainStore}>
-    <AppRouter />
-  </Provider>,
-  document.getElementById('app'), () =>
-  {
-    // tests can go here
-  });
+export default TerrainTools;

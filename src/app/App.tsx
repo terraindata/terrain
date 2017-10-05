@@ -98,6 +98,7 @@ import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
+import TerrainTools from 'util/TerrainTools';
 
 // Icons
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
@@ -146,6 +147,7 @@ const links =
       icon: <ReportingIcon />,
       text: 'Analytics',
       route: '/analytics',
+      enabled: TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS),
     },
     // {
     //   icon: <ManualIcon />,
