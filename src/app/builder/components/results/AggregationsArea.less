@@ -1,0 +1,22 @@
+@import "../../../common/Common.less";
+
+@top-height: 24px;
+
+.aggregations-area {
+  padding-bottom: 2 * @standard-margin;
+  margin-left: -2 * @standard-margin;
+  margin-right: -2 * @standard-margin;
+  padding-right: @standard-margin / 2;
+  padding-left: 0px;
+  overflow: hidden;
+
+  .aggregations-area-aggs {
+    height: calc(~"100% - @{top-height}");
+    overflow-y: auto;
+    margin-right: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    margin-top: @top-height;
+  }
+}

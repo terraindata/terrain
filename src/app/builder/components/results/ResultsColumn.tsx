@@ -58,6 +58,7 @@ import Query from '../../../../items/types/Query';
 import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
 import ResultsArea from './ResultsArea';
+import AggregationsArea from './AggregationsArea';
 import Radium = require('radium');
 
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
@@ -138,7 +139,14 @@ class ResultsColumn extends TerrainComponent<Props>
           />
         );
       case 1:
-        return <div>Aggregations</div>
+        return (
+          <AggregationsArea
+            query={this.props.query}
+            db={this.props.db}
+            onNavigationException={this.props.onNavigationException}
+            resultsState={this.props.resultsState}
+          />
+        );
       case 2: 
         return <div>Raw results</div>
       default:

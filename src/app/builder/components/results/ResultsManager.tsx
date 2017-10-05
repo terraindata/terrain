@@ -590,6 +590,7 @@ export class ResultsManager extends TerrainComponent<Props>
       return;
     }
     const resultsData = response.getResultsData();
+    console.log(resultsData.aggregations);
     const hits = resultsData.hits.hits.map((hit) =>
     {
       const sort = hit.sort !== undefined ? { _sort: hit.sort[0] } : {};
