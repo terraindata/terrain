@@ -57,11 +57,13 @@ import Radium = require('radium');
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
+
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
+import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
 import { ResultsState } from './ResultTypes';
 
@@ -144,7 +146,14 @@ class ResultsColumn extends TerrainComponent<Props>
           />
         );
       case 1:
-        return <div>Aggregations</div>;
+        return (
+          <AggregationsArea
+            query={this.props.query}
+            db={this.props.db}
+            onNavigationException={this.props.onNavigationException}
+            resultsState={this.props.resultsState}
+          />
+        );      
       case 2:
         return <pre className='results-column-raw-results'>
           {JSON.stringify(this.props.resultsState.rawResult, null, 5)}
