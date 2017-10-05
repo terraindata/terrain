@@ -62,12 +62,12 @@ const Actions =
       metricId,
       callback?: (analyticsVariants: any) => void,
       errorCallback?: (response) => void,
-    ) => (dispatch) =>
+    ) => (dispatch, getState, api) =>
       {
         const start = new Date(2015, 5, 2);
         const end = new Date(2015, 5, 20);
 
-        return Ajax.getAnalytics(
+        return api.getAnalytics(
           variantIds,
           start,
           end,

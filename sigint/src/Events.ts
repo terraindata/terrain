@@ -43,90 +43,101 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import reducer from 'analytics/data/AnalyticsReducer';
-import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
-import * as Immutable from 'immutable';
 
-describe('AnalyticsReducer', () =>
+import * as Elastic from 'elasticsearch';
+import * as winston from 'winston';
+
+import { Config } from './Config';
+
+export interface EventConfig
 {
-  let analytics: AnalyticsState = _AnalyticsState({});
-
-  const analyticsResponse = {
-    1: [
-      {
-        key_as_string: '2015-06-02T00:00:00.000Z',
-        key: 1433203200000,
-        doc_count: 10320,
-      },
-      {
-        key_as_string: '2015-06-03T00:00:00.000Z',
-        key: 1433289600000,
-        doc_count: 12582,
-      },
-      {
-        key_as_string: '2015-06-04T00:00:00.000Z',
-        key: 1433376000000,
-        doc_count: 12279,
-      },
-      {
-        key_as_string: '2015-06-05T00:00:00.000Z',
-        key: 1433462400000,
-        doc_count: 6187,
-      },
-      {
-        key_as_string: '2015-06-06T00:00:00.000Z',
-        key: 1433548800000,
-        doc_count: 937,
-      },
-    ],
+  eventid: number | string;
+  variantid: number | string;
+  visitorid: number | string;
+  source: {
+    ip: string;
+    host: string;
+    useragent: string;
+    referer?: string;
   };
+  timestamp: Date;
+  meta?: any;
+}
 
-  beforeEach(() =>
-  {
-    analytics = _AnalyticsState({});
-  });
+export const indexName = 'terrain-analytics';
+export const typeName = 'events';
 
-  it('should return the inital state', () =>
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+{
+  return (error: Error, response: T) =>
   {
-    expect(reducer(undefined, {})).toEqual(analytics);
-  });
-
-  describe('#fetch', () =>
-  {
-    it('should handle analytics.fetch', () =>
+    if (error !== null && error !== undefined)
     {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.fetch,
-        payload: {
-          analytics: analyticsResponse,
-        },
+      reject(error);
+    }
+    else
+    {
+      resolve(response);
+    }
+  };
+}
+
+export class Events
+{
+  private client: Elastic.Client;
+
+  constructor(config: Config)
+  {
+    this.client = new Elastic.Client({
+      host: config.db,
+    });
+
+    this.client.ping({
+      requestTimeout: 100,
+    }, (err) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          throw new Error('creating ES client for host: ' + String(config.db) + ': ' + String(err));
+        }
       });
 
-      expect(
-        nextState,
-      ).toEqual(
-        analytics.setIn(['data', 1], analyticsResponse[1]),
-      );
-    });
-  });
+    this.client.indices.exists({
+      index: indexName,
+    }, (err, indexExists) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          throw new Error('creating index: ' + indexName + ': ' + String(err));
+        }
 
-  describe('#selectMetric', () =>
-  {
-    it('should handle analytics.selectMetric', () =>
-    {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.selectMetric,
-        payload: {
-          metricId: '100',
-        },
+        if (!indexExists)
+        {
+          winston.info('Index ' + indexName + ' does not exist. Creating it...');
+          this.client.indices.create({
+            index: indexName,
+            timeout: '5s',
+          }, (err2) =>
+            {
+              if (err2 !== null && err2 !== undefined)
+              {
+                throw new Error('creating index: ' + indexName + ': ' + String(err));
+              }
+            });
+        }
       });
+  }
 
-      expect(
-        nextState.selectedMetric,
-      ).toEqual(
-        '100',
-      );
+  public async store(event: EventConfig): Promise<void>
+  {
+    return new Promise<void>((resolve, reject) =>
+    {
+      this.client.index({
+        index: indexName,
+        type: typeName,
+        body: event,
+      },
+        makePromiseCallback(resolve, reject));
     });
-  });
-});
+  }
+}

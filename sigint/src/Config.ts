@@ -43,90 +43,74 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import reducer from 'analytics/data/AnalyticsReducer';
-import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
-import * as Immutable from 'immutable';
 
-describe('AnalyticsReducer', () =>
+import * as fs from 'fs';
+import * as winston from 'winston';
+
+import { CmdLineUsage } from './CmdLineArgs';
+
+export interface Config
 {
-  let analytics: AnalyticsState = _AnalyticsState({});
+  config?: string;
+  port?: number;
+  debug?: boolean;
+  help?: boolean;
+  verbose?: boolean;
+  db?: string;
+}
 
-  const analyticsResponse = {
-    1: [
-      {
-        key_as_string: '2015-06-02T00:00:00.000Z',
-        key: 1433203200000,
-        doc_count: 10320,
-      },
-      {
-        key_as_string: '2015-06-03T00:00:00.000Z',
-        key: 1433289600000,
-        doc_count: 12582,
-      },
-      {
-        key_as_string: '2015-06-04T00:00:00.000Z',
-        key: 1433376000000,
-        doc_count: 12279,
-      },
-      {
-        key_as_string: '2015-06-05T00:00:00.000Z',
-        key: 1433462400000,
-        doc_count: 6187,
-      },
-      {
-        key_as_string: '2015-06-06T00:00:00.000Z',
-        key: 1433548800000,
-        doc_count: 937,
-      },
-    ],
-  };
-
-  beforeEach(() =>
+function updateObject<T>(obj: T, newObj: T): T
+{
+  for (const key in newObj)
   {
-    analytics = _AnalyticsState({});
-  });
-
-  it('should return the inital state', () =>
-  {
-    expect(reducer(undefined, {})).toEqual(analytics);
-  });
-
-  describe('#fetch', () =>
-  {
-    it('should handle analytics.fetch', () =>
+    if (newObj.hasOwnProperty(key))
     {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.fetch,
-        payload: {
-          analytics: analyticsResponse,
-        },
-      });
+      obj[key] = newObj[key];
+    }
+  }
+  return obj;
+}
 
-      expect(
-        nextState,
-      ).toEqual(
-        analytics.setIn(['data', 1], analyticsResponse[1]),
-      );
-    });
-  });
-
-  describe('#selectMetric', () =>
+export function loadConfigFromFile(config: Config): Config
+{
+  // load options from a configuration file, if specified.
+  if (config.config !== undefined)
   {
-    it('should handle analytics.selectMetric', () =>
+    try
     {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.selectMetric,
-        payload: {
-          metricId: '100',
-        },
-      });
+      const settings = fs.readFileSync(config.config, 'utf8');
+      const cfgSettings = JSON.parse(settings);
+      config = updateObject(config, cfgSettings);
+    }
+    catch (e)
+    {
+      winston.error('Failed to read configuration settings from ' + String(config.config));
+    }
+  }
+  return config;
+}
 
-      expect(
-        nextState.selectedMetric,
-      ).toEqual(
-        '100',
-      );
-    });
-  });
-});
+export async function handleConfig(config: Config): Promise<void>
+{
+  winston.debug('Using configuration: ' + JSON.stringify(config));
+  if (config.help === true)
+  {
+    // tslint:disable-next-line
+    console.log(CmdLineUsage);
+    process.exit();
+  }
+
+  if (config.verbose === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'verbose';
+  }
+
+  if (config.debug === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'debug';
+  }
+}
+
+export default Config;

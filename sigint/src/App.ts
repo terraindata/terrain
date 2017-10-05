@@ -43,90 +43,82 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import reducer from 'analytics/data/AnalyticsReducer';
-import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
-import * as Immutable from 'immutable';
 
-describe('AnalyticsReducer', () =>
+import * as http from 'http';
+import * as Koa from 'koa';
+import * as winston from 'winston';
+
+import cors = require('kcors');
+
+import { CmdLineArgs } from './CmdLineArgs';
+import * as Config from './Config';
+import * as Events from './Events';
+import './Logging';
+import Middleware from './Middleware';
+import { Router } from './Router';
+
+export let CFG: Config.Config;
+
+class App
 {
-  let analytics: AnalyticsState = _AnalyticsState({});
-
-  const analyticsResponse = {
-    1: [
-      {
-        key_as_string: '2015-06-02T00:00:00.000Z',
-        key: 1433203200000,
-        doc_count: 10320,
-      },
-      {
-        key_as_string: '2015-06-03T00:00:00.000Z',
-        key: 1433289600000,
-        doc_count: 12582,
-      },
-      {
-        key_as_string: '2015-06-04T00:00:00.000Z',
-        key: 1433376000000,
-        doc_count: 12279,
-      },
-      {
-        key_as_string: '2015-06-05T00:00:00.000Z',
-        key: 1433462400000,
-        doc_count: 6187,
-      },
-      {
-        key_as_string: '2015-06-06T00:00:00.000Z',
-        key: 1433548800000,
-        doc_count: 937,
-      },
-    ],
-  };
-
-  beforeEach(() =>
+  private static uncaughtExceptionHandler(err: Error): void
   {
-    analytics = _AnalyticsState({});
-  });
+    winston.error('Uncaught Exception: ' + err.toString());
+    // this is a good place to clean tangled resources
+    process.abort();
+  }
 
-  it('should return the inital state', () =>
+  private static unhandledRejectionHandler(err: Error): void
   {
-    expect(reducer(undefined, {})).toEqual(analytics);
-  });
+    winston.error('Unhandled Promise Rejection: ' + err.toString());
+  }
 
-  describe('#fetch', () =>
+  private app: Koa;
+  private config: Config.Config;
+  private heapAvail: number;
+
+  constructor(config: Config.Config = CmdLineArgs)
   {
-    it('should handle analytics.fetch', () =>
+    process.on('uncaughtException', App.uncaughtExceptionHandler);
+    process.on('unhandledRejection', App.unhandledRejectionHandler);
+
+    // first, load config from a config file, if one is specified
+    config = Config.loadConfigFromFile(config);
+
+    winston.debug('Using configuration: ' + JSON.stringify(config));
+    this.config = config;
+    CFG = this.config;
+
+    this.app = new Koa();
+    this.app.proxy = true;
+    this.app.use(async (ctx, next) =>
     {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.fetch,
-        payload: {
-          analytics: analyticsResponse,
-        },
-      });
-
-      expect(
-        nextState,
-      ).toEqual(
-        analytics.setIn(['data', 1], analyticsResponse[1]),
-      );
+      // tslint:disable-next-line:no-empty
+      ctx.req.setTimeout(0, () => { });
+      await next();
     });
-  });
+    this.app.use(cors());
 
-  describe('#selectMetric', () =>
+    this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
+    this.app.use(Middleware.logger(winston));
+    this.app.use(Middleware.responseTime());
+
+    const router = new Router(config);
+    this.app.use(router.routes());
+  }
+
+  public async start(): Promise<http.Server>
   {
-    it('should handle analytics.selectMetric', () =>
-    {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.selectMetric,
-        payload: {
-          metricId: '100',
-        },
-      });
+    await Config.handleConfig(this.config);
 
-      expect(
-        nextState.selectedMetric,
-      ).toEqual(
-        '100',
-      );
-    });
-  });
-});
+    winston.info('Listening on port ' + String(this.config.port));
+    return this.app.listen(this.config.port);
+  }
+
+  public getConfig(): Config.Config
+  {
+    return this.config;
+  }
+}
+
+export default App;
