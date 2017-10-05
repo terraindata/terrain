@@ -1,13 +1,33 @@
 @import "../../../common/Common.less";
 @border-radius: 3px;
 @icon-size: 16px;
-@comand-content-height: 100px;
+@command-content-height: 100px;
 
 .headless-command-generator {
   margin: auto;
   display: flex;
   padding: @spacing;
   flex-direction: column;
+
+  .headless-form-block {
+    padding: @half-spacing;
+    display: flex;
+    vertical-align: top;
+    justify-content: space-between;
+
+    .headless-form-column {
+      padding: 0px @half-spacing;
+      position: relative;
+
+      .headless-form-label {
+        padding: @half-spacing 0px;
+      }
+
+      .headless-form-input {
+        position: relative;
+      }
+    }
+  }
 
   .headless-entry-row {
     margin: @spacing;
@@ -48,7 +68,7 @@
   }
 
   .headless-command-content {
-    height: @comand-content-height;
+    height: @command-content-height;
     overflow: hidden;
     margin: @spacing;
     margin-top: 0px;
@@ -61,7 +81,7 @@
       justify-content: center;
       align-items: center;
       width: 100%;
-      height: @comand-content-height;
+      height: @command-content-height;
       position: absolute;  
       z-index: 2;
     }
@@ -77,14 +97,14 @@
       font-family: monospace;
     }
 
-    .headless-command-requsts-spacer
+    .headless-command-requests-spacer
     {
       padding: @spacing;
     }
 
     .headless-command-errors-spacer
     {
-      height: @comand-content-height - @spacing;
+      height: @command-content-height - @spacing;
       padding: @half-spacing;
       overflow-y: auto;
     }
@@ -92,7 +112,8 @@
     .headless-command-command {
       overflow: auto;
       position: relative;
-      margin: @spacing;
+      padding: @half-spacing;
+      max-height: @command-content-height - @spacing;
       .normal-text;
       font-family: monospace;
       z-index: 0;
@@ -107,8 +128,6 @@
       z-index: 1;
     }
   }
-
-
 }
 
 .headless-generator-data {

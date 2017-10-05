@@ -70,6 +70,7 @@ export interface Props
   libraryState: LibraryState;
   ids: List<number>; // [group id, algorithm id, variant id]
   onChangeSelection: (ids: List<number>) => void;
+  dropdownWidth?: string;
 }
 
 type LibraryItem = Group | Variant | Algorithm;
@@ -171,7 +172,7 @@ class VariantSelector extends TerrainComponent<Props>
               canEdit={true}
               onChange={this.handleGroupChange}
               openDown={true}
-              width='220px'
+              width={this.props.dropdownWidth}
             />
           </div>
         </div>
@@ -186,7 +187,7 @@ class VariantSelector extends TerrainComponent<Props>
               canEdit={true}
               onChange={this.handleAlgorithmChange}
               openDown={true}
-              width='220px'
+              width={this.props.dropdownWidth}
             />
           </div>
         </div>
@@ -201,7 +202,7 @@ class VariantSelector extends TerrainComponent<Props>
               canEdit={true}
               onChange={this.handleVariantChange}
               openDown={true}
-              width='220px'
+              width={this.props.dropdownWidth}
             />
           </div>
         </div>

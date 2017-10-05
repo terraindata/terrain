@@ -66,14 +66,10 @@ import ControlActions from '../../data/ControlActions';
 
 import './CreateHeadlessCommand.less';
 
-const Color = require('color');
-const { List, Map } = Immutable;
+const { List } = Immutable;
 const ViewIcon = require('images/icon_search.svg');
 
 type Template = FileImportTypes.Template;
-// type Variant = LibraryTypes.Variant;
-// type Group = LibraryTypes.Group;
-// type Algorithm = LibraryTypes.Algorithm;
 
 export interface Props
 {
@@ -95,8 +91,10 @@ interface HeadlessCommandArgs
   midwayURL: string;
   variantId?: number; // for export
   filename?: string; // for import
+  exportKey?: string;
 }
 
+const inputElementWidth = '220px';
 const fileTypeOptions = List(FileImportTypes.FILE_TYPES) as List<string>;
 
 export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): HeadlessCommandData
@@ -147,17 +145,22 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
 
     if (template.export) // export
     {
-      const { variantId } = headlessArgs;
+      const { variantId, exportKey } = headlessArgs;
 
       if (variantId === -1)
       {
         requests.push('Please Select a Variant');
       }
 
+      if (fileType === fileTypeOptions.get(1) && (exportKey === undefined || exportKey === ''))
+      {
+        requests.push('Please Provide an Export Key');
+      }
+
       command = `curl -X POST  -H 'Content-Type: ${contentTypeText}' ` +
         `-H 'Accept: application/json' -d ` +
         `'{"id": ${template.templateId}, "persistentAccessToken": ${template.persistentAccessToken}, ` +
-        `"body": {"dbid": ${template.dbid}, "filetype": ${fileTypeText}, ` +
+        `"body": {"dbid": ${template.dbid}, "filetype": ${fileTypeText}, "exportKey": ${exportKey}, ` +
         `"templateId": ${template.templateId}, "variantId": ${variantId}}}' ` +
         `${midwayURL}/midway/v1/import/export/headless`;
     }
@@ -167,7 +170,7 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
 
       if (filename === '' || filename === undefined)
       {
-        requests.push('Please Enter Filename');
+        requests.push('Please Enter a Filename');
       }
 
       command = `curl -X POST ${midwayURL}/midway/v1/import/headless ` +
@@ -186,12 +189,16 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     index: number;
     fileTypeIndex: number;
     midwayURLValue: string;
+    exportKeyValue: string;
     selectedIds: List<number>;
+    filenameValue: string;
   } = {
     index: this.props.index,
     fileTypeIndex: 0,
     midwayURLValue: 'localhost:3000',
+    exportKeyValue: '',
     selectedIds: List([-1, -1, -1]),
+    filenameValue: '',
   };
 
   public constructor(props)
@@ -221,8 +228,34 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
   {
     return this.props.templates.map((template, index) =>
     {
-      return `${template.templateName}`;
+      return `(${template.export ? 'Export' : 'Import'}) ${template.templateName}`;
     }).toList();
+  }
+
+  public handleFilenameChange(event)
+  {
+    const filename = event.target.value;
+    this.setState({
+      filenameValue: filename,
+    });
+
+    if (filename === undefined || filename.length === 0)
+    {
+      return;
+    }
+
+    if (filename.match(/\.csv$/i) && (this.state.fileTypeIndex === 0 || this.state.fileTypeIndex === 1))
+    { // switch from json to csv
+      this.setState({
+        fileTypeIndex: 2,
+      });
+    }
+    else if (filename.match(/\.json$/i) && this.state.fileTypeIndex === 2)
+    { // switch from json to csv
+      this.setState({
+        fileTypeIndex: 0,
+      });
+    }
   }
 
   public renderInfoTable(template)
@@ -268,37 +301,61 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
 
   public renderExportOptions(template)
   {
-    const inputStyle = getStyle('borderRadius', '3px');
+    const inputStyle = getStyle('borderRadius', '1px');
+    const columnStyle = getStyle('width', inputElementWidth);
     return (
       <div>
-        <div className='headless-entry-row'>
-          <div className='headless-entry-label'>
-            Export File Type
+        <div className='headless-form-block'>
+          <div className='headless-form-column' style={columnStyle}>
+            <div className='headless-form-label'>
+              Midway URL
+            </div>
+            <div className='headless-form-input'>
+              <input
+                value={this.state.midwayURLValue}
+                onChange={this.setStateWrapper('midwayURLValue', 'target', 'value')}
+                style={inputStyle}
+              />
+            </div>
           </div>
-          <div className='headless-entry-input'>
-            <Dropdown
-              options={fileTypeOptions}
-              selectedIndex={this.state.fileTypeIndex}
-              canEdit={true}
-              onChange={this.setStateWrapper('fileTypeIndex')}
-              openDown={true}
-            />
+          <div className='headless-form-column' style={columnStyle}>
+            <div className='headless-form-label'>
+              Export File Type
+            </div>
+            <div className='headless-form-input'>
+              <Dropdown
+                options={fileTypeOptions}
+                selectedIndex={this.state.fileTypeIndex}
+                canEdit={true}
+                onChange={this.setStateWrapper('fileTypeIndex')}
+                openDown={true}
+              />
+            </div>
           </div>
-          <div className='headless-entry-label'>
-            Midway URL
-          </div>
-          <div className='headless-entry-input'>
-            <input
-              value={this.state.midwayURLValue}
-              onChange={this.setStateWrapper('midwayURLValue', 'target', 'value')}
-              style={inputStyle}
-            />
+          <div className='headless-form-column' style={columnStyle}>
+            {
+              this.state.fileTypeIndex === 1 &&
+              <div className='headless-form-label'>
+                Export Key
+              </div>
+            }
+            {
+              this.state.fileTypeIndex === 1 &&
+              <div className='headless-form-input'>
+                <input
+                  value={this.state.exportKeyValue}
+                  onChange={this.setStateWrapper('exportKeyValue', 'target', 'value')}
+                  style={inputStyle}
+                />
+              </div>
+            }
           </div>
         </div>
         <VariantSelector
           libraryState={LibraryStore.getState()}
           onChangeSelection={this.setStateWrapper('selectedIds')}
           ids={this.state.selectedIds}
+          dropdownWidth={inputElementWidth}
         />
       </div>
     );
@@ -306,7 +363,53 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
 
   public renderImportOptions(template)
   {
+    const inputStyle = getStyle('borderRadius', '1px');
+    const columnStyle = getStyle('width', inputElementWidth);
 
+    return (
+      <div>
+        <div className='headless-form-block'>
+          <div className='headless-form-column' style={columnStyle}>
+            <div className='headless-form-label'>
+              Midway URL
+            </div>
+            <div className='headless-form-input'>
+              <input
+                value={this.state.midwayURLValue}
+                onChange={this.setStateWrapper('midwayURLValue', 'target', 'value')}
+                style={inputStyle}
+              />
+            </div>
+          </div>
+          <div className='headless-form-column' style={columnStyle}>
+            <div className='headless-form-label'>
+              Import Filename
+            </div>
+            <div className='headless-form-input'>
+              <input
+                value={this.state.filenameValue}
+                onChange={this.handleFilenameChange}
+                style={inputStyle}
+              />
+            </div>
+          </div>
+          <div className='headless-form-column' style={columnStyle}>
+            <div className='headless-form-label'>
+              File Type
+            </div>
+            <div className='headless-form-input'>
+              <Dropdown
+                options={fileTypeOptions}
+                selectedIndex={this.state.fileTypeIndex}
+                canEdit={true}
+                onChange={this.setStateWrapper('fileTypeIndex')}
+                openDown={true}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   public renderCommandContent(command, requests, errors)
@@ -348,6 +451,8 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
       fileType: fileTypeOptions.get(this.state.fileTypeIndex),
       midwayURL: this.state.midwayURLValue,
       variantId: this.state.selectedIds.get(2),
+      filename: this.state.filenameValue,
+      exportKey: this.state.exportKeyValue,
     });
 
     return (
