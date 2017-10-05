@@ -128,8 +128,7 @@ Router.get('/', async (ctx, next) =>
   ctx.body = '';
 });
 
+const AppRouter = new KoaRouter();
+AppRouter.use('/v1', Router.routes(), Router.allowedMethods());
 
-const ERSRouter = new KoaRouter();
-ERSRouter.use('/v1', Router.routes(), Router.allowedMethods());
-
-export default ERSRouter;
+export default AppRouter;

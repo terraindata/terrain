@@ -93,8 +93,8 @@ const optionList = [
 
 const sections = [
   {
-    header: 'Terrain ERS 1.0',
-    content: 'Terrain Event Registration Server.',
+    header: 'sigint 1.0',
+    content: 'Terrain Analytics Server.',
   },
   {
     header: 'Options',

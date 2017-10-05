@@ -1,7 +1,7 @@
 {
-  "name": "terrain-ers",
+  "name": "sigint",
   "version": "1.0.0",
-  "description": "Terrain Event Registration Server (ERS).",
+  "description": "sigint: Terrain Analytics Server",
   "main": "src/Main.ts",
   "private": true,
   "scripts": {
