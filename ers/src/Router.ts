@@ -45,18 +45,89 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
+
+import * as Events from './Events';
 
 const Router = new KoaRouter();
 
-Router.get('/', async (ctx, next) =>
+function logError(error: string)
 {
-  ctx.body = 'Hello!';
-});
+  if (process.env.NODE_ENV === 'production')
+  {
+    return;
+  }
+  else
+  {
+    throw new Error(error);
+  }
+}
 
+async function storeEvent(request: any)
+{
+  if (request.body !== undefined && Object.keys(request.body).length > 0 &&
+    request.query !== undefined && Object.keys(request.body).length > 0)
+  {
+    logError('Both request query and body cannot be set.');
+  }
+
+  if ((request.body === undefined ||
+    request.body !== undefined && Object.keys(request.body).length === 0) &&
+    (request.query === undefined ||
+      request.query !== undefined && Object.keys(request.query).length === 0))
+  {
+    logError('Either request query or body parameters are required.');
+  }
+
+  let req: object = request.body;
+  if (req === undefined || (req !== undefined && Object.keys(req).length === 0))
+  {
+    req = request.query;
+  }
+
+  const event: Events.EventConfig = {
+    eventid: req['eventid'],
+    variantid: req['variantid'],
+    visitorid: req['visitorid'],
+    source: {
+      ip: request.ip,
+      host: request.host,
+      useragent: request.useragent,
+      referer: request.header.referer,
+    },
+    timestamp: new Date().toJSON(),
+    meta: req['meta'],
+  };
+
+  if (_.difference(Object.keys(req), Object.keys(event).concat(['id', 'accessToken'])).length > 0)
+  {
+    return logError('Error storing analytics event: unexpected fields encountered');
+  }
+
+  // const msg = await Encryption.decodeMessage(event);
+  try
+  {
+    await Events.storeEvent(event);
+  }
+  catch (e)
+  {
+    return logError('Error storing analytics event:' + String(e));
+  }
+}
+
+// Handle analytics event ingestion
 Router.post('/', async (ctx, next) =>
 {
-  ctx.body = 'Bye!';
+  await storeEvent(ctx.request);
+  ctx.body = '';
 });
+
+Router.get('/', async (ctx, next) =>
+{
+  await storeEvent(ctx.request);
+  ctx.body = '';
+});
+
 
 const ERSRouter = new KoaRouter();
 ERSRouter.use('/v1', Router.routes(), Router.allowedMethods());

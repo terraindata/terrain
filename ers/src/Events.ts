@@ -44,52 +44,25 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as _ from 'lodash';
-import * as winston from 'winston';
+import * as Elastic from 'elasticsearch';
 
-import * as Util from '../Util';
-import * as Encryption from './Encryption';
-import { Events } from './Events';
-
-export const events: Events = new Events();
-const Router = new KoaRouter();
-
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
-// * variantid: list of variantids
-// * start: start time of the interval
-// * end: end time of the interval
-// * agg: supported aggregation operations are:
-//     `select` - returns all events between the specified interval
-//     `histogram` - returns a histogram of events between the specified interval
-//     `rate` - returns a ratio of two events between the specified interval
-// * field (optional):
-//     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
-// * interval (optional; required if `agg` is `histogram` or `rate`):
-//     the resolution of interval for aggregation operations.
-//     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
-//     also supported are values such as `1.5h`, `90m` etc.
-//
-Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
+export interface EventConfig
 {
-  Util.verifyParameters(
-    JSON.parse(JSON.stringify(ctx.request.query)),
-    ['start', 'end', 'eventid', 'variantid', 'agg'],
-  );
-  winston.info('getting events for variant');
-  const response: object[] = await events.AggregationHandler(ctx.request.query);
-  ctx.body = response.reduce((acc, x) =>
-  {
-    for (const key in x)
-    {
-      if (x.hasOwnProperty(key) !== undefined)
-      {
-        acc[key] = x[key];
-        return acc;
-      }
-    }
-  }, {});
-});
+  eventid: number | string;
+  variantid: number | string;
+  visitorid: number | string;
+  timestamp: Date | string;
+  source: {
+    ip: string;
+    host: string;
+    useragent: string;
+    referer?: string;
+  };
+  meta?: any;
+}
 
-export default Router;
+export async function storeEvent(event: EventConfig): Promise<EventConfig>
+{
+    // todo: store event
+    return {} as EventConfig;
+}
