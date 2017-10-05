@@ -97,7 +97,7 @@ export class Router
   private async storeEvent(request: any)
   {
     if (request.body !== undefined && Object.keys(request.body).length > 0 &&
-      request.query !== undefined && Object.keys(request.body).length > 0)
+      request.query !== undefined && Object.keys(request.query).length > 0)
     {
       return this.logError('Both request query and body cannot be set.');
     }

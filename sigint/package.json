@@ -8,7 +8,8 @@
     "start": "nodemon --exec ./node_modules/.bin/ts-node $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./src/Main.ts",
     "lint": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
-    "fix": "yarn run style && yarn run lint;"
+    "fix": "yarn run style && yarn run lint;",
+    "test": "jest . --forceExit --coverage"
   },
   "repository": {
     "type": "git",
@@ -54,7 +55,9 @@
   "devDependencies": {
     "@types/koa": "^2.0.39",
     "@types/node": "^8.0.32",
+    "jest": "^21.2.1",
     "nodemon": "^1.12.1",
+    "ts-jest": "^21.1.0",
     "ts-loader": "^2.3.7",
     "ts-node": "^3.3.0",
     "tslint": "^5.7.0",
