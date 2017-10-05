@@ -141,6 +141,8 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
         contentTypeText = 'text/plain';
         fileTypeText = 'csv';
         break;
+      default:
+        break;
     }
 
     if (template.export) // export
