@@ -356,21 +356,15 @@ class Library extends TerrainComponent<any>
             /> : null}
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
-          <div className='library-bottom'>
-            <div style={{ width: '80%', height: '100%' }}>
+          <div className="library-bottom">
+            <div className="library-analytics-chart-wrapper">
               <MultipleAreaChart
                 datasets={datasets}
                 xDataKey={'key'}
                 yDataKey={'doc_count'}
               />
             </div>
-            <div style={{
-              width: '20%',
-              height: '100%',
-              backgroundColor: '#333',
-              marginLeft: '10px',
-              overflowY: 'scroll',
-            }}>
+            <div className="library-analytics-selector-wrapper">
               <AnalyticsSelector
                 analytics={analytics}
                 onMetricSelect={this.handleMetricRadioButtonClick}
