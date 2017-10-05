@@ -45,120 +45,80 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
-
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
-import ColorManager from '../../../util/ColorManager';
-import Histogram from './../../../charts/components/Histogram';
-import TerrainComponent from './../../../common/components/TerrainComponent';
-import './Aggregation.less';
-
-const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
+import
+{
+  createContainer,
+  VictoryArea,
+  VictoryAxis,
+  VictoryBar,
+  VictoryBrushContainer,
+  VictoryChart,
+  VictoryGroup,
+  VictoryLegend,
+  VictoryPortal,
+  VictoryScatter,
+  VictoryTheme,
+  VictoryTooltip,
+} from 'victory';
+import ColorManager from '../../util/ColorManager';
+import { backgroundColor, borderColor, Colors, fontColor } from './../../common/Colors';
+import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props
 {
-  aggregation: any;
-  index: number;
-  key: number;
+  data: any;
 
 }
 
 @Radium
-class AggregationComponent extends TerrainComponent<Props> {
-  public state: {
-    expanded: boolean,
-  } = {
-    expanded: false,
-  };
-
-  public toggleExpanded()
-  {
-    this.setState({
-      expanded: !this.state.expanded,
-    });
-  }
-
-  public renderAgg()
-  {
-    const aggTitle = Object.keys(this.props.aggregation)[0];
-    return (
-      <div
-        className={classNames({
-          'aggregation-title-bar': true,
-          'aggregation-title-bar-open': !this.state.expanded,
-        })}
-      >
-        <ArrowIcon className='arrow-icon' onClick={this.toggleExpanded} />
-        {
-          aggTitle
-        }
-      </div>
-
-    );
-  }
-
-  public renderExpandedAgg()
-  {
-    return (
-      <div className='aggregation-expanded-view'>
-        {
-          <div>
-            {this.renderAggregationContent()}
-          </div>
-        }
-      </div>
-    );
-  }
-
-  public renderAggregationContent()
-  {
-    if (this.canBeHistogram(this.props.aggregation))
-    {
-      return this.renderHistogram();
-    }
-    else
-    {
-      const values = _.values(this.props.aggregation)[0];
-      return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
-    }
-  }
-
-  // TODO Make this more comprehensive
-  public canBeHistogram(agg)
-  {
-    const values = _.values(this.props.aggregation)[0];
-    return values.buckets !== undefined;
-  }
-
-  public renderHistogram()
-  {
-    const buckets = _.values(this.props.aggregation)[0].buckets;
-    const data = buckets.map((bucket) =>
-    {
-      return { x: bucket.key, y: bucket.doc_count, width: 10 };
-    },
-    );
-    return (
-      <Histogram
-        data={data}
-      />
-    );
-  }
+class Histogram extends TerrainComponent<Props> {
 
   public render()
   {
     return (
-      <div className='aggregation'>
-        {this.renderAgg()}
-        {this.state.expanded && this.renderExpandedAgg()}
-      </div>
+      <VictoryChart
+        theme={VictoryTheme.material}
+        domainPadding={10}
+        domain={{ x: [0, 200], y: [0, 2000] }}
+        height={300}
+      >
+        <VictoryBar
+          style={{
+            parent: {
+              maxHeight: 350,
+            },
+            data: {
+              fill: '#c43a31', fillOpacity: 0.7, stroke: '#c43a31', strokeWidth: 3,
+            },
+          }}
+          data={this.props.data}
+          domainPadding={10}
+        />
+      </VictoryChart>
     );
+    // return (
+    //   <VictoryChart >
+    //   <VictoryBar
+    //     style={{
+    //       parent: {
+    //         maxHeight: 350,
+    //       },
+    //       data: {
+    //         fill: "#c43a31", fillOpacity: 0.7, stroke: "#c43a31", strokeWidth: 3
+    //       },
+    //     }}
+    //     data={this.props.data}
+    //     domainPadding={10}
+    //     domain={{x: [0,200]}}
+    //   />
+    //   </VictoryChart>
+    // );
   }
 }
 
-export default AggregationComponent;
+export default Histogram;

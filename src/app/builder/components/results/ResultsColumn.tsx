@@ -156,7 +156,7 @@ class ResultsColumn extends TerrainComponent<Props>
         );
       case 2:
         return <pre className='results-column-raw-results'>
-          {JSON.stringify(this.props.resultsState.rawResult, null, 5)}
+          {JSON.stringify(this.props.resultsState.rawResult, null, 2)}
         </pre>;
       default:
         return <div>No information</div>;
