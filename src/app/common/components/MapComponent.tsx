@@ -642,8 +642,9 @@ class MapComponent extends TerrainComponent<Props>
               <Circle
                 center={location}
                 radius={this.convertDistanceToMeters()}
-                color={'red'}
-                fillColor={'red'}
+                stroke={false}
+                fillColor={'white'}
+                fillOpacity={0.6}
               />
               :
               null
@@ -652,6 +653,8 @@ class MapComponent extends TerrainComponent<Props>
             secondLocation !== undefined && this.props.showDirectDistance ?
               <Polyline
                 positions={[location, secondLocation]}
+                color={'black'}
+                weight={2}
               />
               :
               null
