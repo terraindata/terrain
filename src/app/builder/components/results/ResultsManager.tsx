@@ -64,7 +64,7 @@ import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import { _Result, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
+import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
 
 export interface Props
 {
@@ -96,7 +96,7 @@ interface State
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
-let RESULTS_CACHE: { [primaryKey: string]: Result };
+let HITS_CACHE: { [primaryKey: string]: Hit };
 
 export class ResultsManager extends TerrainComponent<Props>
 {
@@ -207,11 +207,11 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       this.changeResults({
         hits: List([]),
-        aggregations: {}
+        aggregations: {},
       });
     }
 
-    if (nextProps.resultsState.results !== this.props.resultsState.results)
+    if (nextProps.resultsState.hits !== this.props.resultsState.hits)
     {
       // update spotlights
       let nextState = nextProps.resultsState;
@@ -220,16 +220,16 @@ export class ResultsManager extends TerrainComponent<Props>
       SpotlightStore.getState().spotlights.map(
         (spotlight, id) =>
         {
-          let resultIndex = nextState.results && nextState.results.findIndex(
-            (r) => getPrimaryKeyFor(r, resultsConfig) === id,
+          let hitIndex = nextState.hits && nextState.hits.findIndex(
+            (h) => getPrimaryKeyFor(h, resultsConfig) === id,
           );
-          if (resultIndex !== -1)
+          if (hitIndex !== -1)
           {
             spotlightAction(id, _.extend({
               color: spotlight.color,
               name: spotlight.name,
             },
-              nextState.results.get(resultIndex).toJS(),
+              nextState.hits.get(hitIndex).toJS(),
             ));
             // TODO something more like this
             // spotlightAction(id,
@@ -322,7 +322,7 @@ export class ResultsManager extends TerrainComponent<Props>
     const tql = AllBackendsMap[query.language].queryToCode(
       query,
       {
-        limit: MAX_RESULTS,
+        limit: MAX_HITS,
         replaceInputs: true,
       },
     );
@@ -364,7 +364,7 @@ export class ResultsManager extends TerrainComponent<Props>
           {
             allFields: true,
             transformAliases: true,
-            limit: MAX_RESULTS,
+            limit: MAX_HITS,
             replaceInputs: true,
           });
         this.setState({
@@ -475,17 +475,17 @@ export class ResultsManager extends TerrainComponent<Props>
     const { resultsState } = this.props;
     const hitsData = resultsData.hits;
     const resultsCount = hitsData.length;
-    if (hitsData.length > MAX_RESULTS)
+    if (hitsData.length > MAX_HITS)
     {
-      hitsData.splice(MAX_RESULTS, hitsData.length - MAX_RESULTS);
+      hitsData.splice(MAX_HITS, hitsData.length - MAX_HITS);
     }
-    let hits: Results =
+    let hits: Hits =
       (resultsState.hasLoadedResults || resultsState.hasLoadedAllFields)
         ? resultsState.hits : List([]);
     hitsData.map(
       (hitData, index) =>
       {
-        let hit: Result = hits.get(index) || _Result();
+        let hit: Hit = hits.get(index) || _Hit();
         hit = hit.set(
           'fields',
           hit.fields.merge(hitData),
@@ -535,10 +535,10 @@ export class ResultsManager extends TerrainComponent<Props>
     const exportChanges: any = {
       filetype: 'csv',
       originalNames: filteredFields,
-      preview: List(hits.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
+      preview: List(hits.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((hit) =>
         filteredFields.map((field, index) =>
         {
-          const value = result.fields.get(String(field));
+          const value = hit.fields.get(String(field));
           return Array.isArray(value) || typeof (value) === 'boolean' ? JSON.stringify(value) : value;
         }),
       )),
@@ -570,7 +570,7 @@ export class ResultsManager extends TerrainComponent<Props>
       });
     });
     const aggregations = resultsData.aggregations;
-    this.updateResults({hits, aggregations}, isAllFields);
+    this.updateResults({ hits, aggregations }, isAllFields);
   }
 
   private handleM2QueryResponse(response: MidwayQueryResponse, isAllFields: boolean)
@@ -601,7 +601,7 @@ export class ResultsManager extends TerrainComponent<Props>
       });
     });
     const aggregations = resultsData.aggregations;
-    this.updateResults({hits, aggregations}, isAllFields);
+    this.updateResults({ hits, aggregations }, isAllFields);
   }
 
   private handleM1Error(response: any, isAllFields?: boolean)
@@ -728,16 +728,16 @@ export class ResultsManager extends TerrainComponent<Props>
   }
 }
 
-function getPrimaryKeyFor(result: Result, config: ResultsConfig, index?: number): string
+function getPrimaryKeyFor(hit: Hit, config: ResultsConfig, index?: number): string
 {
   if (config && config.primaryKeys.size)
   {
     return config.primaryKeys.map(
-      (field) => result.fields.get(field),
+      (field) => hit.fields.get(field),
     ).join('-and-');
   }
 
-  return index + ': ' + JSON.stringify(result.fields.toJS()); // 'result-' + Math.floor(Math.random() * 100000000);
+  return index + ': ' + JSON.stringify(hit.fields.toJS()); // 'result-' + Math.floor(Math.random() * 100000000);
 }
 
 export default ResultsManager;

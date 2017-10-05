@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import './ResultsArea.less';
+import './HitsArea.less';
 const { Map, List } = Immutable;
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
@@ -65,9 +65,9 @@ import FileImportPreview from '../../../fileImport/components/FileImportPreview'
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
-import Result from '../results/Result';
+import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
-import ResultsTable from '../results/ResultsTable';
+import HitsTable from './HitsTable';
 
 import Radium = require('radium');
 
@@ -75,9 +75,9 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from 
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import { MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultTypes';
+import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
-const RESULTS_PAGE_SIZE = 20;
+const HITS_PAGE_SIZE = 20;
 
 export interface Props
 {
@@ -95,41 +95,41 @@ export interface Props
 
 interface State
 {
-  resultFormat: string;
+  hitFormat: string;
   showingConfig?: boolean;
 
   expanded?: boolean;
-  expandedResultIndex?: number;
+  expandedHitIndex?: number;
 
-  resultsPages: number;
-  onResultsLoaded?: (unchanged?: boolean) => void;
+  hitsPages: number;
+  onHitsLoaded?: (unchanged?: boolean) => void;
 
   showingExport?: boolean;
 }
 
 @Radium
-class ResultsArea extends TerrainComponent<Props>
+class HitsArea extends TerrainComponent<Props>
 {
   public state: State = {
     expanded: false,
-    expandedResultIndex: null,
+    expandedHitIndex: null,
     showingConfig: false,
     showingExport: false,
-    resultsPages: 1,
-    resultFormat: 'icon',
+    hitsPages: 1,
+    hitFormat: 'icon',
   };
 
-  public resultsFodderRange = _.range(0, 25);
+  public hitsFodderRange = _.range(0, 25);
 
   public componentWillReceiveProps(nextProps)
   {
     if (nextProps.query.cards !== this.props.query
       || nextProps.query.inputs !== this.props.query.inputs)
     {
-      if (this.state.onResultsLoaded)
+      if (this.state.onHitsLoaded)
       {
         // reset infinite scroll
-        this.state.onResultsLoaded(false);
+        this.state.onHitsLoaded(false);
       }
     }
   }
@@ -141,28 +141,28 @@ class ResultsArea extends TerrainComponent<Props>
     });
   }
 
-  public handleExpand(resultIndex: number)
+  public handleExpand(hitIndex: number)
   {
     this.setState({
       expanded: true,
-      expandedResultIndex: resultIndex,
+      expandedHitIndex: hitIndex,
     });
   }
 
-  public renderExpandedResult()
+  public renderExpandedHit()
   {
-    const { expandedResultIndex } = this.state;
-    const { results } = this.props.resultsState;
+    const { expandedHitIndex } = this.state;
+    const { hits } = this.props.resultsState;
     const { resultsConfig } = this.props.query;
 
-    let result: ResultClass;
+    let hit: HitClass;
 
-    if (results)
+    if (hits)
     {
-      result = results.get(expandedResultIndex);
+      hit = hits.get(expandedHitIndex);
     }
 
-    if (!result)
+    if (!hit)
     {
       return null;
     }
@@ -174,44 +174,44 @@ class ResultsArea extends TerrainComponent<Props>
         'result-expanded-config-open': this.state.showingConfig,
       })}>
         <div className='result-expanded-bg' onClick={this.handleCollapse}></div>
-        <Result
-          result={result}
+        <Hit
+          hit={hit}
           resultsConfig={resultsConfig}
           onExpand={this.handleCollapse}
           expanded={true}
           allowSpotlights={this.props.allowSpotlights}
           index={-1}
-          primaryKey={result.primaryKey}
+          primaryKey={hit.primaryKey}
         />
       </div>
     );
   }
 
-  public handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
+  public handleRequestMoreHits(onHitsLoaded: (unchanged?: boolean) => void)
   {
-    const { resultsPages } = this.state;
+    const { hitsPages } = this.state;
 
-    if (resultsPages * RESULTS_PAGE_SIZE < MAX_RESULTS)
+    if (hitsPages * HITS_PAGE_SIZE < MAX_HITS)
     {
       this.setState({
-        resultsPages: resultsPages + 1,
-        onResultsLoaded,
+        hitsPages: hitsPages + 1,
+        onHitsLoaded,
       });
     }
     else
     {
-      onResultsLoaded(true);
+      onHitsLoaded(true);
     }
   }
 
   public componentDidUpdate()
   {
-    if (this.state.onResultsLoaded)
+    if (this.state.onHitsLoaded)
     {
       this.setState({
-        onResultsLoaded: null,
+        onHitsLoaded: null,
       });
-      this.state.onResultsLoaded(false);
+      this.state.onHitsLoaded(false);
     }
   }
 
@@ -221,33 +221,33 @@ class ResultsArea extends TerrainComponent<Props>
     return !query || (!query.tql && !query.cards.size);
   }
 
-  public renderResults()
+  public renderHits()
   {
     const { resultsState } = this.props;
     const { hits } = resultsState;
     const { resultsConfig } = this.props.query;
 
     let infoAreaContent: any = null;
-    let resultsContent: any = null;
-    let resultsAreOutdated: boolean = false;
+    let hitsContent: any = null;
+    let hitsAreOutdated: boolean = false;
 
     if (this.isDatabaseEmpty())
     {
-      resultsAreOutdated = true;
+      hitsAreOutdated = true;
       infoAreaContent = <InfoArea
         large='The database is empty, please select the database.'
       />;
     }
     else if (this.isQueryEmpty())
     {
-      resultsAreOutdated = true;
+      hitsAreOutdated = true;
       infoAreaContent = <InfoArea
         large='Results will display here as you build your query.'
       />;
     }
     else if (resultsState.hasError)
     {
-      resultsAreOutdated = true;
+      hitsAreOutdated = true;
       infoAreaContent = <InfoArea
         large='There was an error with your query.'
         small={resultsState.errorMessage}
@@ -258,7 +258,7 @@ class ResultsArea extends TerrainComponent<Props>
     {
       if (resultsState.rawResult)
       {
-        resultsContent = (
+        hitsContent = (
           <div className='result-text'>
             {
               resultsState.rawResult
@@ -269,7 +269,7 @@ class ResultsArea extends TerrainComponent<Props>
 
       if (resultsState.loading)
       {
-        resultsAreOutdated = true;
+        hitsAreOutdated = true;
         infoAreaContent = <InfoArea
           large='Querying results...'
         />;
@@ -283,25 +283,25 @@ class ResultsArea extends TerrainComponent<Props>
     }
     else if (!hits.size)
     {
-      resultsContent = <InfoArea
+      hitsContent = <InfoArea
         large='There are no results for your query.'
         small='The query was successful, but there were no matches.'
       />;
     }
-    else if (this.state.resultFormat === 'table')
+    else if (this.state.hitFormat === 'table')
     {
-      resultsContent = (
+      hitsContent = (
         <div
           className={classNames({
             'results-table-wrapper': true,
-            'results-table-wrapper-outdated': resultsAreOutdated,
+            'results-table-wrapper-outdated': hitsAreOutdated,
           })}
         >
-          <ResultsTable
-            results={hits}
+          <HitsTable
+            hits={hits}
             resultsConfig={resultsConfig}
             onExpand={this.handleExpand}
-            resultsLoading={resultsState.loading}
+            hitsLoading={resultsState.loading}
             allowSpotlights={this.props.allowSpotlights}
           />
         </div>
@@ -309,37 +309,37 @@ class ResultsArea extends TerrainComponent<Props>
     }
     else
     {
-      resultsContent = (
+      hitsContent = (
         <InfiniteScroll
           className={classNames({
             'results-area-results': true,
-            'results-area-results-outdated': resultsAreOutdated,
+            'results-area-results-outdated': hitsAreOutdated,
           })}
-          onRequestMoreItems={this.handleRequestMoreResults}
+          onRequestMoreItems={this.handleRequestMoreHits}
         >
           {
-            hits.map((result, index) =>
+            hits.map((hit, index) =>
             {
-              if (index > this.state.resultsPages * RESULTS_PAGE_SIZE)
+              if (index > this.state.hitsPages * HITS_PAGE_SIZE)
               {
                 return null;
               }
 
               return (
-                <Result
-                  result={result}
+                <Hit
+                  hit={hit}
                   resultsConfig={resultsConfig}
                   onExpand={this.handleExpand}
                   index={index}
                   key={index}
-                  primaryKey={result.primaryKey}
+                  primaryKey={hit.primaryKey}
                   allowSpotlights={this.props.allowSpotlights}
                 />
               );
             })
           }
           {
-            this.resultsFodderRange.map(
+            this.hitsFodderRange.map(
               (i) =>
                 <div className='results-area-fodder' key={i} />,
             )
@@ -353,7 +353,7 @@ class ResultsArea extends TerrainComponent<Props>
         className='results-area-results-wrapper'
       >
         {
-          resultsContent
+          hitsContent
         }
         {
           infoAreaContent
@@ -423,8 +423,12 @@ column if you have customized the results view.');
 
   public toggleView()
   {
+    if (this.state.expanded || this.state.showingConfig)
+    {
+      return;
+    }
     this.setState({
-      resultFormat: this.state.resultFormat === 'icon' ? 'table' : 'icon',
+      hitFormat: this.state.hitFormat === 'icon' ? 'table' : 'icon',
       expanded: false,
     });
   }
@@ -452,7 +456,7 @@ column if you have customized the results view.');
     else if (resultsState.hits)
     {
       const { count } = resultsState;
-      text = `${count || 'No'}${count === MAX_RESULTS ? '+' : ''} result${count === 1 ? '' : 's'}`;
+      text = `${count || 'No'}${count === MAX_HITS ? '+' : ''} hit${count === 1 ? '' : 's'}`;
     }
     else
     {
@@ -493,7 +497,7 @@ column if you have customized the results view.');
           first='Icons'
           second='Table'
           onChange={this.toggleView}
-          selected={this.state.resultFormat === 'icon' ? 1 : 2}
+          selected={this.state.hitFormat === 'icon' ? 1 : 2}
           small={true}
         />
       </div>
@@ -598,12 +602,12 @@ column if you have customized the results view.');
         className={classNames({
           'results-area': true,
           'results-area-config-open': this.state.showingConfig,
-          'results-area-table altBg': this.state.resultFormat === 'table',
+          'results-area-table altBg': this.state.hitFormat === 'table',
         })}
       >
         {this.renderTopbar()}
-        {this.renderResults()}
-        {this.renderExpandedResult()}
+        {this.renderHits()}
+        {this.renderExpandedHit()}
         {this.props.showCustomizeView && this.renderConfig()}
         {this.props.showExport && this.renderExport()}
       </div>
@@ -616,4 +620,4 @@ column if you have customized the results view.');
   }
 }
 
-export default ResultsArea;
+export default HitsArea;

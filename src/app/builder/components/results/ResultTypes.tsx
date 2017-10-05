@@ -49,9 +49,9 @@ THE SOFTWARE.
 import { List, Map } from 'immutable';
 import { BaseClass, New } from '../../../Classes';
 
-export const MAX_RESULTS = 200;
+export const MAX_HITS = 200;
 
-class ResultClass extends BaseClass
+class HitClass extends BaseClass
 {
   // all available fields for display
   public fields: IMMap<string, string> = Map<string, string>({});
@@ -63,15 +63,15 @@ class ResultClass extends BaseClass
   public rawFields: IMMap<string, string> = Map<string, string>({});
   public transformFields: IMMap<string, string> = Map<string, string>({});
 }
-export type Result = ResultClass & IRecord<ResultClass>;
-export const _Result = (config: object = {}) =>
-  New<Result>(new ResultClass(config), config, true); // generates unique IDs
+export type Hit = HitClass & IRecord<HitClass>;
+export const _Hit = (config: object = {}) =>
+  New<Hit>(new HitClass(config), config, true); // generates unique IDs
 
-export type Results = List<Result>;
+export type Hits = List<Hit>;
 
 class ResultsStateC extends BaseClass
 {
-  public hits: Results = List([]);
+  public hits: Hits = List([]);
   public aggregations: any = {};
   public fields: List<string> = List([]);
   public count: number = 0;

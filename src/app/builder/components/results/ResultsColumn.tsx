@@ -47,21 +47,23 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import './ResultsArea.less';
+import './ResultsColumnStyle.less';
 const { Map, List } = Immutable;
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
 
+import Radium = require('radium');
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
-import Ajax from '../../../util/Ajax';
-import Actions from '../../data/BuilderActions';
-import ResultsArea from './ResultsArea';
-import Radium = require('radium');
-
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import TerrainComponent from '../../../common/components/TerrainComponent';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
+import Ajax from '../../../util/Ajax';
+import Actions from '../../data/BuilderActions';
+import HitsArea from './HitsArea';
+import { ResultsState } from './ResultTypes';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -100,31 +102,35 @@ class ResultsColumn extends TerrainComponent<Props>
 
   public renderTabBar()
   {
-    return ( <div className='results-column-tabs'>
-        { TAB_NAMES.map((name, index) => 
-          <div 
+    return (
+      <div
+        className='results-column-tabs'
+        style={backgroundColor(Colors().emptyBg)}
+      >
+        {TAB_NAMES.map((name, index) =>
+          <div
             className={classNames({
               'results-column-tab': true,
               'results-column-tab-selected': index === this.state.selectedTab,
             })}
             key={index}
-            onClick={()=>{this.setSelectedTab(index)}}
+            onClick={() => { this.setSelectedTab(index); }}
+            style={index === this.state.selectedTab ? ACTIVE_TAB_STYLE : INACTIVE_TAB_STYLE}
           >
-          {name}
-          </div>
-      )}
+            {name}
+          </div>,
+        )}
       </div>
     );
   }
-
 
   public renderContent()
   {
     switch (this.state.selectedTab)
     {
-      case 0: 
+      case 0:
         return (
-          <ResultsArea
+          <HitsArea
             query={this.props.query}
             canEdit={this.props.canEdit}
             db={this.props.db}
@@ -138,11 +144,11 @@ class ResultsColumn extends TerrainComponent<Props>
           />
         );
       case 1:
-        return <div>Aggregations</div>
-      case 2: 
-        return <div>Raw results</div>
+        return <div>Aggregations</div>;
+      case 2:
+        return <div>Raw results</div>;
       default:
-        return <div>No information</div>
+        return <div>No information</div>;
     }
   }
 
@@ -150,10 +156,13 @@ class ResultsColumn extends TerrainComponent<Props>
   {
     return (
       <div className='results-column-wrapper'>
-        { this.renderTabBar() }
-        { this.renderContent() }
-    </div>);
+        {this.renderTabBar()}
+        {this.renderContent()}
+      </div>);
   }
 }
+
+const ACTIVE_TAB_STYLE = _.extend({}, getStyle('border-bottom-color', Colors().active), backgroundColor(Colors().bg3));
+const INACTIVE_TAB_STYLE = _.extend({}, getStyle('border-bottom-color', Colors().bg3), backgroundColor(Colors().bg2));
 
 export default ResultsColumn;
