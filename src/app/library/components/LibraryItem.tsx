@@ -80,6 +80,7 @@ export interface Props
   canEdit: boolean;
   canDrag: boolean;
   canCreate: boolean;
+  canRename: boolean;
 
   onHover: (index: number, type: string, id: ID) => void;
   // ^ called on target
@@ -129,7 +130,17 @@ class LibraryItem extends TerrainComponent<Props>
     List([
       {
         text: 'Duplicate',
-        // icon: '',
+        onClick: this.handleDuplicate,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
+      },
+    ]),
+    duplicateRename:
+    List([
+      {
+        text: 'Duplicate',
         onClick: this.handleDuplicate,
       },
       {
@@ -138,6 +149,17 @@ class LibraryItem extends TerrainComponent<Props>
       },
     ]),
     archive:
+    List([
+      {
+        text: 'Archive',
+        onClick: this.handleArchive,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
+      },
+    ]),
+    archiveRename:
     List([
       {
         text: 'Rename',
@@ -149,6 +171,17 @@ class LibraryItem extends TerrainComponent<Props>
       },
     ]),
     unarchive:
+    List([
+      {
+        text: 'Unarchive',
+        onClick: this.handleUnarchive,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
+      },
+    ]),
+    unarchiveRename:
     List([
       {
         text: 'Rename',
@@ -163,7 +196,21 @@ class LibraryItem extends TerrainComponent<Props>
     List([
       {
         text: 'Duplicate',
-        // icon: '',
+        onClick: this.handleDuplicate,
+      },
+      {
+        text: 'Archive',
+        onClick: this.handleArchive,
+      },
+      {
+        text: 'Rename',
+        disabled: true,
+      },
+    ]),
+    duplicateRenameArchive:
+    List([
+      {
+        text: 'Duplicate',
         onClick: this.handleDuplicate,
       },
       {
@@ -292,15 +339,29 @@ class LibraryItem extends TerrainComponent<Props>
     const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging, isSelected } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
 
-    const { canArchive, canDuplicate, canUnarchive } = this.props;
+    const { canArchive, canDuplicate, canUnarchive, canRename } = this.props;
     const menuOptions =
-      (canArchive && canDuplicate) ? this.menuOptions.duplicateArchive :
+      (canArchive && canDuplicate && canRename) ? this.menuOptions.duplicateRenameArchive :
         (
-          canArchive ? this.menuOptions.archive :
+          (canArchive && canDuplicate) ? this.menuOptions.duplicateArchive :
             (
-              canUnarchive ? this.menuOptions.unarchive :
+              (canArchive && canRename) ? this.menuOptions.archiveRename :
                 (
-                  canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
+                  (canDuplicate && canRename) ? this.menuOptions.duplicateRename :
+                    (
+                      (canUnarchive && canRename) ? this.menuOptions.unarchiveRename :
+                        (
+                          (canUnarchive ? this.menuOptions.unarchive :
+                            (
+                              (canArchive ? this.menuOptions.archive :
+                                (
+                                  canDuplicate ? this.menuOptions.duplicate : this.menuOptions.none
+                                )
+                              )
+                            )
+                          )
+                        )
+                    )
                 )
             )
         );

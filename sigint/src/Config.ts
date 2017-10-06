@@ -43,64 +43,74 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { backgroundColor, Colors } from '../../common/Colors';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './FileImportPreviewRow.less';
 
-export interface Props
+import * as fs from 'fs';
+import * as winston from 'winston';
+
+import { CmdLineUsage } from './CmdLineArgs';
+
+export interface Config
 {
-  items: List<string>;
-  columnsToInclude?: List<boolean>;
+  config?: string;
+  port?: number;
+  debug?: boolean;
+  help?: boolean;
+  verbose?: boolean;
+  db?: string;
 }
 
-@Radium
-class FileImportPreviewRow extends TerrainComponent<Props>
+function updateObject<T>(obj: T, newObj: T): T
 {
-  public render()
+  for (const key in newObj)
   {
-    const { columnsToInclude } = this.props;
-    return (
-      <div
-        className='flex-container fi-preview-row'
-      >
-        {
-          this.props.items.map((value, key) =>
-            <div
-              key={key}
-              className='fi-preview-row-cell-wrapper'
-            >
-              <div
-                className={classNames({
-                  'fi-preview-row-cell': true,
-                  'fi-preview-row-cell-disabled': columnsToInclude !== undefined && !columnsToInclude.get(key),
-                })}
-                style={{
-                  background: Colors().bg2,
-                  color: Colors().text1,
-                }}
-              >
-                <div
-                  className='fi-preview-row-cell-text'
-                >
-                  {
-                    value
-                  }
-                </div>
-                <div
-                  className='fi-preview-row-disabled-veil'
-                  style={backgroundColor(Colors().bg3)}
-                >
-                </div>
-              </div>
-            </div>,
-          )
-        }
-      </div>
-    );
+    if (newObj.hasOwnProperty(key))
+    {
+      obj[key] = newObj[key];
+    }
+  }
+  return obj;
+}
+
+export function loadConfigFromFile(config: Config): Config
+{
+  // load options from a configuration file, if specified.
+  if (config.config !== undefined)
+  {
+    try
+    {
+      const settings = fs.readFileSync(config.config, 'utf8');
+      const cfgSettings = JSON.parse(settings);
+      config = updateObject(config, cfgSettings);
+    }
+    catch (e)
+    {
+      winston.error('Failed to read configuration settings from ' + String(config.config));
+    }
+  }
+  return config;
+}
+
+export async function handleConfig(config: Config): Promise<void>
+{
+  winston.debug('Using configuration: ' + JSON.stringify(config));
+  if (config.help === true)
+  {
+    // tslint:disable-next-line
+    console.log(CmdLineUsage);
+    process.exit();
+  }
+
+  if (config.verbose === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'verbose';
+  }
+
+  if (config.debug === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'debug';
   }
 }
 
-export default FileImportPreviewRow;
+export default Config;

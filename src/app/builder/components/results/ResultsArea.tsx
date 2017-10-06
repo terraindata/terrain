@@ -530,19 +530,19 @@ column if you have customized the results view.');
 
   public renderExport()
   {
-    const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
-      filetype, requireJSONHaveAllFields, exportRank, elasticUpdate } = this.props.exportState;
+    const { previewColumns, columnNames, columnsToInclude, columnTypes, templates, transforms,
+      filetype, requireJSONHaveAllFields, exportRank, elasticUpdate, objectKey } = this.props.exportState;
+    // const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
+    //   filetype, requireJSONHaveAllFields, exportRank, objectKey, elasticUpdate } = this.props.exportState;
 
     const content =
       <div
-        style={{
-          background: 'black',  // TODO: black from Colors?
-        }}
+        style={backgroundColor(Colors().bg1)}
       >
         <FileImportPreview
-          previewRows={previewRows}
-          primaryKeys={primaryKeys}
-          primaryKeyDelimiter={primaryKeyDelimiter}
+          exporting={true}
+          filetype={filetype}
+          previewColumns={previewColumns}
           columnNames={columnNames}
           columnsToInclude={columnsToInclude}
           columnTypes={columnTypes}
@@ -550,11 +550,10 @@ column if you have customized the results view.');
           transforms={transforms}
           columnOptions={List([])}
           uploadInProgress={false}
-          filetype={filetype}
           requireJSONHaveAllFields={requireJSONHaveAllFields}
+          objectKey={objectKey}
           exportRank={exportRank}
           elasticUpdate={elasticUpdate}
-          exporting={true}
           query={this.props.query}
           inputs={this.props.query.inputs}
           serverId={Number(this.props.db.id)}

@@ -78,9 +78,9 @@ const Actions =
       (
         group: LibraryTypes.Group = LibraryTypes._Group(),
         idCallBack?: (id: ID) => void,
-      ) => (dispatch) =>
+      ) => (dispatch, getState, api) =>
         {
-          Ajax.saveItem(
+          api.saveItem(
             group,
             (response) =>
             {
@@ -89,6 +89,7 @@ const Actions =
               dispatch($(ActionTypes.groups.create, {
                 group: group.set('id', id),
               }));
+
               idCallBack && idCallBack(id);
             },
           );
@@ -160,7 +161,7 @@ const Actions =
         $(ActionTypes.algorithms.move, { groupId, index, algorithm }),
 
       duplicate:
-      (algorithm: Algorithm, index: number, groupId?: ID) => (dispatch) =>
+      (algorithm: Algorithm, index: number, name: string, db: BackendInstance, groupId?: ID) => (dispatch) =>
       {
         const { variantsOrder } = algorithm;
 
@@ -169,7 +170,8 @@ const Actions =
           .set('parent', groupId)
           .set('groupId', groupId)
           .set('id', -1)
-          .set('name', Util.duplicateNameFor(algorithm.name))
+          .set('name', name)
+          .set('db', db)
           .set('variantsOrder', Immutable.List([]));
 
         dispatch(Actions.algorithms.create(
@@ -182,7 +184,7 @@ const Actions =
               (variantId, index) =>
               {
                 const variant = variants.get(variantId);
-                setTimeout(() => Actions.variants.duplicate(variant, 0, groupId, algorithmId), index * 200);
+                setTimeout(() => dispatch(Actions.variants.duplicate(variant, index, null, groupId, algorithmId, db)), index * 200);
               },
             );
           },
@@ -235,19 +237,21 @@ const Actions =
       },
 
       duplicate:
-      (variant: Variant, index: number, groupId?: ID, algorithmId?: ID) => (dispatch) =>
+      (variant: Variant, index: number, name?: string, groupId?: ID, algorithmId?: ID, db?: BackendInstance) => (dispatch) =>
       {
         groupId = groupId || variant.groupId;
         algorithmId = algorithmId || variant.algorithmId;
         const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
+        db = db || algorithm.db;
+        name = name || Util.duplicateNameFor(variant.name);
         let newVariant = variant
           .set('id', -1)
           .set('parent', algorithmId)
           .set('algorithmId', algorithmId)
           .set('groupId', groupId)
-          .set('name', Util.duplicateNameFor(variant.name))
+          .set('name', name)
           .set('status', ItemStatus.Build)
-          .set('db', algorithm.db)
+          .set('db', db)
           .set('language', algorithm.language);
         newVariant = LibraryTypes.touchVariant(newVariant);
 
