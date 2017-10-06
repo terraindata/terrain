@@ -122,7 +122,7 @@ export class Events
       'terrain-analytics',
     );
 
-    // predefined events
+    // tslint:disable-next-line:no-floating-promises
     this.elasticController.getTasty().upsert(this.eventMetadataTable,
     [
       {
@@ -130,21 +130,21 @@ export class Events
         name: 'view',
         description:
           `Page view or impression event. This event fires off when a page
-           serving a variant is loaded or viewed.`,
+          serving a variant is loaded or viewed.`,
       },
       {
         id: 2,
         name: 'click',
         description:
           `Item or page click event. This event is generated through an interaction
-           with the page or item served by a variant.`,
+          with the page or item served by a variant.`,
       },
       {
         id: 3,
         name: 'conversion',
         description:
           `An event denoting an item transaction or conversion. This event is generated
-           when an item served by a variant gets bought.`,
+          when an item served by a variant gets bought.`,
       },
       {
         id: 4,
