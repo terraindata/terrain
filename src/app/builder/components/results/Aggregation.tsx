@@ -60,7 +60,6 @@ import Menu, { MenuOption } from './../../../common/components/Menu';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './Aggregation.less';
 import AggsTable from './AggsTable';
-
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 export interface Props
