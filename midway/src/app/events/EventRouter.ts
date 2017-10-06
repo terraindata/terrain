@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import jsurl = require('jsurl');
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
@@ -80,6 +81,16 @@ async function storeEvent(request: any)
     req = request.query;
   }
 
+  let meta = req['meta'];
+  try
+  {
+    meta = jsurl.parse(req['meta']);
+  }
+  catch (e)
+  {
+    meta = req['meta'];
+  }
+
   const event: EventConfig = {
     eventid: req['eventid'],
     variantid: req['variantid'],
@@ -91,7 +102,7 @@ async function storeEvent(request: any)
       referer: request.header.referer,
     },
     timestamp: req['timestamp'],
-    meta: req['meta'],
+    meta,
   };
 
   // const msg = await Encryption.decodeMessage(event);
