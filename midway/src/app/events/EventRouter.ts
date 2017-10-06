@@ -55,6 +55,42 @@ import { EventMetadataConfig, Events } from './Events';
 export const events: Events = new Events();
 const Router = new KoaRouter();
 
+// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
+// * variantid: list of variantids
+// * start: start time of the interval
+// * end: end time of the interval
+// * agg: supported aggregation operations are:
+//     `select` - returns all events between the specified interval
+//     `histogram` - returns a histogram of events between the specified interval
+//     `rate` - returns a ratio of two events between the specified interval
+// * field (optional):
+//     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
+// * interval (optional; required if `agg` is `histogram` or `rate`):
+//     the resolution of interval for aggregation operations.
+//     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
+//     also supported are values such as `1.5h`, `90m` etc.
+//
+Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  Util.verifyParameters(
+    JSON.parse(JSON.stringify(ctx.request.query)),
+    ['start', 'end', 'eventid', 'variantid', 'agg'],
+  );
+  winston.info('getting events for variant');
+  const response: object[] = await events.AggregationHandler(ctx.request.query);
+  ctx.body = response.reduce((acc, x) =>
+  {
+    for (const key in x)
+    {
+      if (x.hasOwnProperty(key) !== undefined)
+      {
+        acc[key] = x[key];
+        return acc;
+      }
+    }
+  }, {});
+});
+
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all events');
@@ -99,42 +135,6 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
 
   winston.info('modify event' + String(event.id));
   ctx.body = await events.addEvent(event);
-});
-
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
-// * variantid: list of variantids
-// * start: start time of the interval
-// * end: end time of the interval
-// * agg: supported aggregation operations are:
-//     `select` - returns all events between the specified interval
-//     `histogram` - returns a histogram of events between the specified interval
-//     `rate` - returns a ratio of two events between the specified interval
-// * field (optional):
-//     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
-// * interval (optional; required if `agg` is `histogram` or `rate`):
-//     the resolution of interval for aggregation operations.
-//     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
-//     also supported are values such as `1.5h`, `90m` etc.
-//
-Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  Util.verifyParameters(
-    JSON.parse(JSON.stringify(ctx.request.query)),
-    ['start', 'end', 'eventid', 'variantid', 'agg'],
-  );
-  winston.info('getting events for variant');
-  const response: object[] = await events.AggregationHandler(ctx.request.query);
-  ctx.body = response.reduce((acc, x) =>
-  {
-    for (const key in x)
-    {
-      if (x.hasOwnProperty(key) !== undefined)
-      {
-        acc[key] = x[key];
-        return acc;
-      }
-    }
-  }, {});
 });
 
 export default Router;

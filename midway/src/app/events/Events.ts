@@ -152,7 +152,7 @@ export class Events
           description:
           `An event denoting that an item was added to the cart.`,
         },
-      ]);
+      ]).then().catch();
   }
 
   public async getMetadata(filter: object): Promise<string>
