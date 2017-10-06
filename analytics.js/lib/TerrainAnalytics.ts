@@ -48,7 +48,7 @@ import jsurl = require('jsurl');
 declare let ClientJS: any;
 import 'clientjs';
 
-const host = 'http://localhost:3000/midway/v1/events/';
+const host = 'http://localhost:3001/v1/';
 
 const TerrainAnalytics = {
     eventIDs: {
@@ -56,16 +56,19 @@ const TerrainAnalytics = {
         impression: 1,
         click: 2,
         transaction: 3,
-        conversion: 4,
+        conversion: 3,
     },
 
-    logEvent(eventNameOrID, meta) {
+    logEvent(eventNameOrID, variantOrSourceID, meta) {
         const client = new ClientJS();
 
         const eventID = typeof eventNameOrID === 'string' ? TerrainAnalytics.eventIDs[eventNameOrID] : eventNameOrID;
         const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] : client.getFingerprint();
 
-        let paramString = 'eventid=' + String(eventID) + '&visitorid=' + String(visitorID);
+        let paramString = 'eventid=' + String(eventID)
+                        + '&visitorid=' + String(visitorID)
+                        + '&variantid=' + String(variantOrSourceID);
+
         if (meta != null)
         {
           paramString += '&meta=' + String(jsurl.stringify(meta));
