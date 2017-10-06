@@ -40,6 +40,7 @@
         "**/*bundle*.js",
         "node_modules",
         "analytics.js",
+        "sigint",
         "midway",
         "build",
         "coverage"
