@@ -76,12 +76,24 @@ export default class AggsTable extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-
     const dataFields = _.values(this.props.tableData);
     this.setState({
       rows: _.values(dataFields[0]),
     });
   }
+
+    public componentWillReceiveProps(nextProps: Props)
+  {
+    if (nextProps.tableData !== this.props.tableData)
+    {
+      // force the table to update
+      const dataFields = _.values(nextProps.tableData);
+      this.setState({
+        rows: _.values(dataFields[0]),
+      });
+    }
+  }
+
 
   public getColumns(): List<any>
   {
@@ -110,6 +122,7 @@ export default class AggsTable extends TerrainComponent<Props>
         columns={this.getColumns().toJS()}
         rowGetter={this.getRow}
         rowsCount={this.state.rows.length}
+        minHeight={((this.state.rows.length + 1) * 35)} //add scroll bar size ~ 20
       />
     );
   }

@@ -60,7 +60,6 @@ import { MenuOption } from './../../../common/components/Menu';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './Aggregation.less';
 import AggsTable from './AggsTable';
-
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 export interface Props
@@ -185,26 +184,6 @@ class AggregationComponent extends TerrainComponent<Props> {
       />
     );
   }
-
-  // public renderBucketView(values)
-  // {
-  //   console.log(values);
-
-  //   return (
-  //      <div className='bucket-view'>
-  //      {
-  //        values. =>
-  //       {
-  //         return (
-  //           <div key={index}>
-  //             <pre>JSON.stringify(value, null, 2) </pre>
-  //           </div>
-  //         );
-  //       })
-  //      }
-  //      </div>
-  //   );
-  // }
 
   public render()
   {

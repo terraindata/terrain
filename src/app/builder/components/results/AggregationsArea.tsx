@@ -107,47 +107,6 @@ class AggregationsArea extends TerrainComponent<Props>
     {
       aggregations = aggregations.push({ [key]: aggs[key] });
     });
-    // TODO: make this be aggregations from results
-    // var aggregations = Immutable.List([
-    //      {"price_ranges" : {
-    //        "buckets": [
-    //         {
-    //           "to": 50,
-    //           "doc_count": 2
-    //         },
-    //         {
-    //           "from": 50,
-    //           "to": 100,
-    //           "doc_count": 4
-    //         },
-    //         {
-    //           "from": 100,
-    //           "doc_count": 4
-    //         }
-    //       ]
-    //     }},
-    //     {"genres" : {
-    //         "doc_count_error_upper_bound": 0,
-    //         "sum_other_doc_count": 0,
-    //         "buckets" : [
-    //             {
-    //                 "key" : "jazz",
-    //                 "doc_count" : 10
-    //             },
-    //             {
-    //                 "key" : "rock",
-    //                 "doc_count" : 10
-    //             },
-    //             {
-    //                 "key" : "electronic",
-    //                 "doc_count" : 10
-    //             },
-    //         ]
-    //     }
-    //   }
-    // ]);
-
-    // console.log(aggregations);
 
     let infoAreaContent: any = null;
     let resultsContent: any = null;
