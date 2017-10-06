@@ -1099,6 +1099,7 @@ export const Ajax =
       end: Date,
       metricId: number,
       intervalId: number,
+      aggregation: string,
       onLoad: (response: any) => void,
       onError?: (ev: Event) => void)
     {
@@ -1108,7 +1109,7 @@ export const Ajax =
         end: end.toISOString(),
         interval: intervalId,
         eventid: metricId.toString(),
-        agg: 'histogram',
+        agg: aggregation,
         field: '@timestamp',
       };
 
