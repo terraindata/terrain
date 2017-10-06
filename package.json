@@ -103,6 +103,7 @@
     "javascript-natural-sort": "^0.7.1",
     "jest": "^21.2.1",
     "jquery": "^3.2.1",
+    "jsurl": "^0.1.5",
     "kcors": "^2.2.1",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
