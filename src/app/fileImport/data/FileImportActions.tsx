@@ -133,18 +133,21 @@ const FileImportActions =
     (columnId: number, recursionDepth: number, type: string) =>
       $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
-    updatePreviewRows:
+    updatePreviewColumns:
     (transform: Transform) =>
-      $(ActionTypes.updatePreviewRows, { transform }),
+      $(ActionTypes.updatePreviewColumns, { transform }),
 
     saveTemplate:
-    (templateName: string, exporting: boolean, handleTemplateSaveSuccess) =>
+    (templateName: string, exporting: boolean, handleTemplateSaveSuccess, serverId?: number, dbName?: string, tableName?: string) =>
       $(ActionTypes.saveTemplate, {
         templateName,
         exporting,
         setErrorMsg: FileImportActions.setErrorMsg,
         fetchTemplates: FileImportActions.fetchTemplates,
         handleTemplateSaveSuccess,
+        serverId,
+        dbName,
+        tableName,
       }),
 
     updateTemplate:

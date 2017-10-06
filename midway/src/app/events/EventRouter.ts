@@ -46,83 +46,19 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
 import * as Encryption from './Encryption';
-import { EventConfig, Events } from './Events';
+import { Events } from './Events';
 
 export const events: Events = new Events();
 const Router = new KoaRouter();
 
-async function storeEvent(request: any)
+Router.get('/time', async (ctx, next) =>
 {
-  const production = process.env.NODE_ENV === 'production';
-  if (!production &&
-    request.body !== undefined && Object.keys(request.body).length > 0 &&
-    request.query !== undefined && Object.keys(request.body).length > 0)
-  {
-    throw new Error('Both request query and body cannot be set.');
-  }
-
-  if (!production &&
-    (request.body === undefined ||
-      request.body !== undefined && Object.keys(request.body).length === 0) &&
-    (request.query === undefined ||
-      request.query !== undefined && Object.keys(request.query).length === 0))
-  {
-    throw new Error('Either request query or body parameters are required.');
-  }
-
-  let req: object = request.body;
-  if (req === undefined || (req !== undefined && Object.keys(req).length === 0))
-  {
-    req = request.query;
-  }
-
-  const event: EventConfig = {
-    eventid: req['eventid'],
-    variantid: req['variantid'],
-    visitorid: req['visitorid'],
-    source: {
-      ip: request.ip,
-      host: request.host,
-      useragent: request.useragent,
-      referer: request.header.referer,
-    },
-    timestamp: req['timestamp'],
-    meta: req['meta'],
-  };
-
-  // const msg = await Encryption.decodeMessage(event);
-  try
-  {
-    await events.storeEvent(event);
-  }
-  catch (e)
-  {
-    if (process.env.NODE_ENV === 'production')
-    {
-      return;
-    }
-    else
-    {
-      throw new Error('Error storing analytics event:' + String(e));
-    }
-  }
-}
-
-// Handle analytics event ingestion
-Router.post('/', async (ctx, next) =>
-{
-  await storeEvent(ctx.request);
-  ctx.body = '';
-});
-
-Router.get('/', async (ctx, next) =>
-{
-  await storeEvent(ctx.request);
-  ctx.body = '';
+  ctx.body = new Date().toJSON();
 });
 
 // * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)

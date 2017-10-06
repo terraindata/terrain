@@ -111,10 +111,6 @@ export class Events
    */
   public async storeEvent(event: EventConfig): Promise<EventConfig>
   {
-    if (event.timestamp === undefined)
-    {
-      event.timestamp = new Date();
-    }
     return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 

@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, link } from '../../common/Colors';
+import { backgroundColor, Colors, fontColor, link } from '../../common/Colors';
 import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -64,6 +64,7 @@ type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 
 export interface Props
 {
+  items: List<string>;
   columnId: number;
   columnName: string;
   columnNames: List<string>; // TODO: move to parent component while preserving split/merge functionality
@@ -156,9 +157,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           />
           <span
             className='fi-preview-column-header-include-text clickable'
-            style={{
-              color: this.props.isIncluded ? Colors().active : Colors().border3,
-            }}
+            style={fontColor(this.props.isIncluded ? Colors().active : Colors().border3)}
           >
             Include
           </span>
@@ -172,9 +171,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
                 'fi-preview-column-header-key-selected': this.props.isPrimaryKey,
               })}
               onClick={this.handlePrimaryKeyChange}
-              style={{
-                background: this.props.isPrimaryKey ? Colors().active : Colors().bg2,
-              }}
+              style={backgroundColor(this.props.isPrimaryKey ? Colors().active : Colors().bg2)}
             >
               <KeyIcon />
             </div>,
@@ -256,47 +253,60 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
     );
   }
 
-  public renderColumn()
+  public render()
   {
     return (
       <div
         className={classNames({
           'fi-preview-column': true,
-          'fi-preview-column-disabled': !this.props.isIncluded,
+          'fi-preview-column-excluded': !this.props.isIncluded,
         })}
-        style={{
-          background: Colors().bg2,
-          text: Colors().text1,
-        }}
+        style={fontColor(Colors().text1)}
       >
-        {
-          this.renderHeader()
-        }
-        {
-          this.renderName()
-        }
         <div
-          className='flex-container-center'
+          style={backgroundColor(Colors().bg2)}
         >
           {
-            this.renderType()
+            this.renderHeader()
           }
           {
-            this.renderTransform()
+            this.renderName()
           }
+          <div
+            className='flex-container-center'
+          >
+            {
+              this.renderType()
+            }
+            {
+              this.renderTransform()
+            }
+          </div>
         </div>
-        <div
-          className='fi-preview-column-disabled-veil'
-          style={backgroundColor(Colors().bg3)}
-        >
-        </div>
+        {
+          this.props.items.map((item, key) =>
+            <div
+              key={key}
+              className={classNames({
+                'fi-preview-column-cell': true,
+              })}
+              style={[
+                fontColor(Colors().text1),
+                backgroundColor(Colors().bg2),
+              ]}
+            >
+              <div
+                className='fi-preview-column-cell-text'
+              >
+                {
+                  item
+                }
+              </div>
+            </div>,
+          )
+        }
       </div>
     );
-  }
-
-  public render()
-  {
-    return this.renderColumn();
   }
 }
 

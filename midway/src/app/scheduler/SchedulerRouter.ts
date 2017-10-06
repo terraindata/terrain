@@ -47,8 +47,11 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
+import { UserConfig, Users } from '../users/Users';
 import * as Util from '../Util';
 import { Scheduler, SchedulerConfig } from './Scheduler';
+
+const users = new Users();
 
 export const scheduler: Scheduler = new Scheduler();
 
@@ -57,21 +60,38 @@ const Router = new KoaRouter();
 // Get job by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.getSchedule(ctx.params.id);
+  let getArchived: boolean = false;
+  if (ctx.query['archived'] !== undefined && (ctx.query.archived === 'true' || ctx.query.archived === true))
+  {
+    getArchived = true;
+  }
+  ctx.body = await scheduler.get(ctx.params.id, getArchived);
 });
 
 // Post new scheduled job
 Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const schedule: SchedulerConfig = ctx.request.body.body;
-  Util.verifyParameters(schedule, ['jobId', 'schedule']);
-  ctx.body = await scheduler.createSchedule(schedule);
+  Util.verifyParameters(schedule, ['jobType', 'paramsJob', 'schedule', 'sort', 'transport']);
+  ctx.body = await scheduler.createCustomSchedule(ctx.state.user, schedule);
+});
+
+// update scheduled job's status: set active to 1
+Router.post('/active/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await scheduler.changeActiveStatus(ctx.state.user, ctx.params.id, 1);
+});
+
+// update scheduled job's status: set active to 0
+Router.post('/inactive/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await scheduler.changeActiveStatus(ctx.state.user, ctx.params.id, 0);
 });
 
 // Delete scheduled jobs by parameter
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.deleteSchedule(ctx.params.id);
+  ctx.body = await scheduler.archive(ctx.state.user, ctx.params.id);
 });
 
 // Update job
@@ -80,7 +100,7 @@ Router.post('/update/:id', passport.authenticate('access-token-local'), async (c
   const schedule: SchedulerConfig = ctx.request.body.body;
   schedule.id = ctx.params.id;
   Util.verifyParameters(schedule, ['id', 'jobId', 'schedule']);
-  ctx.body = await scheduler.updateSchedule(schedule);
+  ctx.body = await scheduler.upsert(ctx.state.user, schedule);
 });
 
 export default Router;

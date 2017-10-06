@@ -134,7 +134,11 @@ class VariantsColumn extends TerrainComponent<Props>
       {
         const numericId = parseInt(id, 10);
         this.props.variantActions.select(id);
-        this.props.analyticsActions.fetch([numericId], analytics.selectedMetric);
+        this.props.analyticsActions.fetch(
+          [numericId],
+          analytics.selectedMetric,
+          analytics.selectedInterval,
+        );
       });
     }
 
@@ -389,7 +393,12 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleDoubleClick(id: ID)
   {
-    browserHistory.push(`/builder/?o=${id}`);
+    const { multiselect } = this.props;
+
+    if (!multiselect)
+    {
+      browserHistory.push(`/builder/?o=${id}`);
+    }
   }
 
   public renderDuplicateDropdown()
