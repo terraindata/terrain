@@ -52,7 +52,7 @@ const { Map, List } = Immutable;
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
-
+const Dimensions = require('react-dimensions');
 import Radium = require('radium');
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
@@ -66,7 +66,7 @@ import Actions from '../../data/BuilderActions';
 import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
 import HitsTable from './HitsTable';
-import { ResultsState } from './ResultTypes';
+import { MAX_HITS, ResultsState } from './ResultTypes';
 
 const RESULTS_PAGE_SIZE = 20;
 
@@ -92,14 +92,33 @@ class ResultsColumn extends TerrainComponent<Props>
 
   public state: {
     selectedTab: number,
+    highlightedTabs: any,
   } = {
     selectedTab: 0,
+    highlightedTabs: Map({ hits: false, aggregations: false }),
   };
 
-  public setSelectedTab(index)
+  public componentWillReceiveProps(nextProps)
+  {
+    if (!this.props.resultsState.hits.equals(nextProps.resultsState.hits) && this.state.selectedTab !== 0)
+    {
+      this.setState({
+        highlightedTabs: this.state.highlightedTabs.set('hits', true),
+      });
+    }
+    if (!_.isEqual(this.props.resultsState.aggregations, nextProps.resultsState.aggregations) && this.state.selectedTab !== 1)
+    {
+      this.setState({
+        highlightedTabs: this.state.highlightedTabs.set('aggregations', true),
+      });
+    }
+  }
+
+  public setSelectedTab(name, index)
   {
     this.setState({
       selectedTab: index,
+      highlightedTabs: this.state.highlightedTabs.set(name.toLowerCase(), false),
     });
   }
 
@@ -117,14 +136,42 @@ class ResultsColumn extends TerrainComponent<Props>
               'results-column-tab-selected': index === this.state.selectedTab,
             })}
             key={index}
-            onClick={() => { this.setSelectedTab(index); }}
+            onClick={() => { this.setSelectedTab(name, index); }}
             style={index === this.state.selectedTab ? ACTIVE_TAB_STYLE : INACTIVE_TAB_STYLE}
           >
-            {name}
+            {name !== 'Raw' &&
+              <div
+                className='results-column-tab-number'
+                style={this.state.highlightedTabs.get(name.toLowerCase()) ? backgroundColor(Colors().active) : {}}
+              >
+                {this.getNumberOf(name)}
+              </div>
+            }
+            <div className='results-column-tab-name'>{name}</div>
           </div>,
         )}
       </div>
     );
+  }
+
+  public getNumberOf(name: string): string
+  {
+    switch (name)
+    {
+      case 'Hits':
+        const hits = this.props.resultsState.hits;
+        if (hits.size < MAX_HITS)
+        {
+          return String(hits.size);
+        }
+        return String(MAX_HITS) + '+';
+      case 'Aggregations':
+        const aggs = this.props.resultsState.aggregations;
+        return String(_.keys(aggs).length);
+      case 'Suggestions':
+      default:
+        return '0';
+    }
   }
 
   public renderContent()
@@ -177,4 +224,4 @@ class ResultsColumn extends TerrainComponent<Props>
 const ACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().active), backgroundColor(Colors().bg3));
 const INACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().bg3), backgroundColor(Colors().bg2));
 
-export default ResultsColumn;
+export default Dimensions()(ResultsColumn);

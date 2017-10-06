@@ -47,18 +47,18 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
 
 import * as classNames from 'classnames';
-import { List } from 'immutable';
 import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 import ColorManager from '../../../util/ColorManager';
-import Histogram from './../../../charts/components/Histogram';
 import Menu, { MenuOption } from './../../../common/components/Menu';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './Aggregation.less';
+import AggregationHistogram from './AggregationHistogram';
 import AggsTable from './AggsTable';
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -200,15 +200,24 @@ class AggregationComponent extends TerrainComponent<Props> {
     return values.buckets !== undefined;
   }
 
-  public renderHistogram()
+  public parseDataForHistogram(buckets)
   {
-    const buckets = _.values(this.props.aggregation)[0].buckets;
     let data;
+    let domainMin: number = Infinity;
+    let domainMax: number = -Infinity;
+    let rangeMax: number = -Infinity;
     let categories = [];
-    if (buckets[0] && (buckets[0].to || buckets[0].from)) // range query
+    // RANGE QUERIES
+    if (buckets[0] && (buckets[0].to || buckets[0].from))
     {
+      domainMin = 0;
+      domainMax = buckets.length;
       data = buckets.map((bucket, i) =>
       {
+        if (bucket.doc_count > rangeMax)
+        {
+          rangeMax = bucket.doc_count;
+        }
         return { x: i, y: bucket.doc_count };
       });
       categories = buckets.map((bucket) =>
@@ -218,28 +227,59 @@ class AggregationComponent extends TerrainComponent<Props> {
         return from + '-' + to;
       });
     }
+    // TERMS QUERIES
     else if (buckets[0] && buckets[0].key && typeof buckets[0].key === 'string')
     {
+      domainMin = 0;
+      domainMax = buckets.length;
       data = buckets.map((bucket, i) =>
       {
+        if (bucket.doc_count > rangeMax)
+        {
+          rangeMax = bucket.doc_count;
+        }
         return { x: i, y: bucket.doc_count };
       });
       categories = buckets.map((bucket) =>
       {
-        return bucket.index;
+        return bucket.key;
       });
     }
+    // HISTOGRAM QUERIES
     else
     {
       data = buckets.map((bucket) =>
       {
+        if (bucket.doc_count > rangeMax)
+        {
+          rangeMax = bucket.doc_count;
+        }
+        if (bucket.key > domainMax)
+        {
+          domainMax = bucket.key;
+        }
+        if (bucket.key < domainMin)
+        {
+          domainMin = bucket.key;
+        }
         return { x: bucket.key, y: bucket.doc_count };
       });
     }
+    return { data, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
+  }
+
+  // TODO CLEAN THIS
+  public renderHistogram()
+  {
+    const buckets = _.values(this.props.aggregation)[0].buckets;
+    const { data, categories, domain, range } = this.parseDataForHistogram(buckets);
     return (
-      <Histogram
-        data={data}
-        xCategories={categories}
+      <AggregationHistogram
+        barsData={data}
+        xLabels={List<string>(categories)}
+        colors={[Colors().active, Colors().activeHover]}
+        domain={domain}
+        range={range}
       />
     );
   }
