@@ -5,11 +5,43 @@
   margin: 24px;
 
   .aggregation-title-bar {
+    display: inline-block;
+    margin-bottom: 10px;
+    width: 100%;
 
     .arrow-icon {
       width: 10px;
 
     }
+
+    .aggregation-title-bar-title {
+      display: inline;
+      padding: 8px
+    }
+
+    .menu-wrapper {
+      display: inline-block;
+      position: relative;
+      float: right;
+      position: relative;
+      top: 5px;
+      right: 0px;
+      display: inline-block;
+      margin-left: 5px;
+      background: none;
+      &:hover {
+        background: rgba(0,0,0,0.25);
+      }
+      border: 2px solid #fff;
+      height: 18px !important;
+      width: 18px !important;
+      box-sizing: border-box;
+      .menu-icon {
+        left: 0px;
+        top: 0px;
+      }
+    }
+
 
     &.aggregation-title-bar-open {
       width: calc(~"100% - 1px");

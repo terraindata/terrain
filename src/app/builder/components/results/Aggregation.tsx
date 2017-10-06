@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
 
 import * as classNames from 'classnames';
+import { List } from 'immutable';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -55,8 +56,10 @@ import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
 import ColorManager from '../../../util/ColorManager';
 import Histogram from './../../../charts/components/Histogram';
+import Menu, { MenuOption } from './../../../common/components/Menu';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './Aggregation.less';
+import AggsTable from './AggsTable';
 
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -72,8 +75,10 @@ export interface Props
 class AggregationComponent extends TerrainComponent<Props> {
   public state: {
     expanded: boolean,
+    viewMode: string,
   } = {
     expanded: false,
+    viewMode: 'Table',
   };
 
   public toggleExpanded()
@@ -81,6 +86,47 @@ class AggregationComponent extends TerrainComponent<Props> {
     this.setState({
       expanded: !this.state.expanded,
     });
+  }
+
+  public changeModeToTable()
+  {
+    this.setState({
+      viewMode: 'Table',
+    });
+  }
+
+  public changeModeToGraph()
+  {
+    this.setState({
+      viewMode: 'Graph',
+    });
+  }
+
+  public changeModeToRaw()
+  {
+    this.setState({
+      viewMode: 'Raw',
+    });
+  }
+
+  public getMenuOptions(): List<MenuOption>
+  {
+    const options: List<MenuOption> =
+      List([
+        {
+          text: 'Table',
+          onClick: this.changeModeToTable,
+        },
+        {
+          text: 'Graph',
+          onClick: this.changeModeToGraph,
+        },
+        {
+          text: 'Raw',
+          onClick: this.changeModeToRaw,
+        },
+      ]);
+    return options;
   }
 
   public renderAgg()
@@ -94,8 +140,18 @@ class AggregationComponent extends TerrainComponent<Props> {
         })}
       >
         <ArrowIcon className='arrow-icon' onClick={this.toggleExpanded} />
+        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded}>
+          {
+            aggTitle
+          }
+        </div>
         {
-          aggTitle
+          this.state.expanded ?
+            <Menu
+              options={this.getMenuOptions()}
+            />
+            :
+            ''
         }
       </div>
 
@@ -104,28 +160,38 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public renderExpandedAgg()
   {
+    const values = _.values(this.props.aggregation)[0];
     return (
       <div className='aggregation-expanded-view'>
         {
-          <div>
-            {this.renderAggregationContent()}
-          </div>
+          this.state.expanded ?
+            <div>
+              {(this.state.viewMode === 'Table') ? this.renderTableView(values) : ''}
+              {(this.state.viewMode === 'Graph') ? this.renderAggregationHistogram() : ''}
+              {(this.state.viewMode === 'Raw') ? <pre> {JSON.stringify(values, undefined, 2)} </pre> : ''}
+            </div>
+            :
+            ''
         }
       </div>
     );
   }
 
-  public renderAggregationContent()
+  public renderAggregationHistogram()
   {
     if (this.canBeHistogram(this.props.aggregation))
     {
       return this.renderHistogram();
     }
-    else
-    {
-      const values = _.values(this.props.aggregation)[0];
-      return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
-    }
+  }
+
+  public renderTableView(tableData)
+  {
+    return (
+      <AggsTable
+        tableData={tableData}
+      />
+    );
   }
 
   // TODO Make this more comprehensive
