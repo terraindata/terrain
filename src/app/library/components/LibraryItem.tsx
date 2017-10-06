@@ -390,7 +390,6 @@ class LibraryItem extends TerrainComponent<Props>
           'library-item-dragging': this.props.isDragging,
           'library-item-dragging-hidden': this.props.isDragging && this.props.draggingOverIndex !== this.props.index,
         })}
-        id={'item' + this.props.id.toString()}
       >
         <Link
           to={this.props.to}
