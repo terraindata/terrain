@@ -71,53 +71,82 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props
 {
-  data: any;
+  data: BarData[];
+  height?: number;
+  width?: number;
+  showLabels?: boolean;
+  xCategories?: string[];
+  yCategories?: string[];
+  onBarClick?: () => void;
+  onBarHover?: () => void;
+  horizontal?: boolean;
+  parentStyle?: any;
+  barStyle?: any;
+  barWidth?: number;
+}
 
+interface BarData
+{
+  x: number;
+  y: number;
 }
 
 @Radium
 class Histogram extends TerrainComponent<Props> {
 
+  public state: {
+    xValues: number[],
+    yValues: number[],
+    barWidth: number,
+  } = {
+    xValues: [],
+    yValues: [],
+    barWidth: 0,
+  };
+
+  public getBarWidth()
+  {
+    if (this.props.barWidth !== undefined && this.props.barWidth > 0)
+    {
+      return this.props.barWidth;
+    }
+    const width = this.props.width !== undefined ? this.props.width : 300;
+    const numBars = this.props.data.length;
+    if (numBars > 0)
+    {
+      return width / numBars;
+    }
+    return 0;
+  }
+
+  public parseData()
+  {
+    const barWidth = this.getBarWidth();
+    return this.props.data.map((data) => _.extend({}, data, { width: barWidth }));
+  }
+
   public render()
   {
+    const data = this.parseData();
+    const { height, width, showLabels, xCategories, yCategories, onBarClick, onBarHover,
+      horizontal, parentStyle, barStyle } = this.props;
     return (
       <VictoryChart
         theme={VictoryTheme.material}
+        height={height !== undefined ? height : 300}
+        width={width !== undefined ? width : 300}
         domainPadding={10}
-        domain={{ x: [0, 200], y: [0, 2000] }}
-        height={300}
       >
         <VictoryBar
           style={{
-            parent: {
-              maxHeight: 350,
-            },
             data: {
-              fill: '#c43a31', fillOpacity: 0.7, stroke: '#c43a31', strokeWidth: 3,
+              fill: Colors().active,
             },
           }}
           data={this.props.data}
-          domainPadding={10}
         />
       </VictoryChart>
     );
-    // return (
-    //   <VictoryChart >
-    //   <VictoryBar
-    //     style={{
-    //       parent: {
-    //         maxHeight: 350,
-    //       },
-    //       data: {
-    //         fill: "#c43a31", fillOpacity: 0.7, stroke: "#c43a31", strokeWidth: 3
-    //       },
-    //     }}
-    //     data={this.props.data}
-    //     domainPadding={10}
-    //     domain={{x: [0,200]}}
-    //   />
-    //   </VictoryChart>
-    // );
   }
 }
 

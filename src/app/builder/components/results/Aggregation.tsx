@@ -138,14 +138,43 @@ class AggregationComponent extends TerrainComponent<Props> {
   public renderHistogram()
   {
     const buckets = _.values(this.props.aggregation)[0].buckets;
-    const data = buckets.map((bucket) =>
+    let data;
+    let categories = [];
+    if (buckets[0] && (buckets[0].to || buckets[0].from)) // range query
     {
-      return { x: bucket.key, y: bucket.doc_count, width: 10 };
-    },
-    );
+      data = buckets.map((bucket, i) =>
+      {
+        return { x: i, y: bucket.doc_count };
+      });
+      categories = buckets.map((bucket) =>
+      {
+        const to = bucket.to !== undefined ? String(bucket.to) : '';
+        const from = bucket.from !== undefined ? String(bucket.from) : '';
+        return from + '-' + to;
+      });
+    }
+    else if (buckets[0] && buckets[0].key && typeof buckets[0].key === 'string')
+    {
+      data = buckets.map((bucket, i) =>
+      {
+        return { x: i, y: bucket.doc_count };
+      });
+      categories = buckets.map((bucket) =>
+      {
+        return bucket.index;
+      });
+    }
+    else
+    {
+      data = buckets.map((bucket) =>
+      {
+        return { x: bucket.key, y: bucket.doc_count };
+      });
+    }
     return (
       <Histogram
         data={data}
+        xCategories={categories}
       />
     );
   }
