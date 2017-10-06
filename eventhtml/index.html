@@ -13,7 +13,7 @@
     <body>
         <h1>Terrain Analytics test page</h1>
         <p>Try this.</p>
-        <input type="text" id="some_input_field">&nbsp;<button id="nola" onclick="terrain_analytics.logEvent('click');">click here</button>
-        <script src='./static-cartographer/echo405.js'></script>
+        <input type="text" id="some_input_field">&nbsp;<button id="nola" onclick="TerrainAnalytics.logEvent('click',{'foo':'bar'});">click here</button>
+        <script src='./static-cartographer/bundle.js'></script>
     </body>
 </html>

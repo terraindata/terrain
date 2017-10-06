@@ -6,6 +6,7 @@
   "private": true,
   "scripts": {
     "build": "webpack --config webpack.config.js --output-filename ./build/bundle.js",
+    "deploy": "cp ./build/bundle.js ../eventhtml/static-cartographer/",
     "lint": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;"
@@ -38,7 +39,10 @@
     },
     "testURL": "http://localhost"
   },
-  "dependencies": {},
+  "dependencies": {
+    "clientjs": "^0.1.11",
+    "jsurl": "^0.1.5"
+  },
   "devDependencies": {
     "ts-loader": "^2.3.7",
     "tslint": "^5.7.0",

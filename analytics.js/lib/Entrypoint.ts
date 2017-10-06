@@ -42,25 +42,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-const host = "http://localhost:3000/midway/v1/events/";
+// Copyright 2017 Terrain Data, Inc.
 
-const terrain_analytics = {
-    eventIDs: {
-        "view": 1,
-        "impression": 1,
-        "click": 2,
-        "transaction": 3,
-        "conversion": 4,
-    },
+import * as TerrainAnalytics from './TerrainAnalytics';
 
-    logEvent: function(eventNameOrID, meta){
-        const eventID = typeof eventNameOrID == "string" ? this.eventIDs[eventNameOrID] : eventNameOrID;
-
-        let paramString = "eventid="+eventID; // TODO add JSURL lib and encode meta object
-        console.log(paramString);
-
-        let xhr = new XMLHttpRequest();
-        xhr.open("GET", host + "?" + paramString, true); // async = true
-        xhr.send();
-    },
-};
+// noinspection TypeScriptUnresolvedVariable
+window['TerrainAnalytics'] = TerrainAnalytics;
+module.exports = TerrainAnalytics;

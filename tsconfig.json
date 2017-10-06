@@ -39,6 +39,7 @@
     "exclude": [
         "**/*bundle*.js",
         "node_modules",
+        "analytics.js/node_modules",
         "midway",
         "build",
         "coverage"

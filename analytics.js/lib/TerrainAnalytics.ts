@@ -44,7 +44,37 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-function getCurrentTime()
-{
-  return new Date().toISOString();
-}
+import jsurl = require('jsurl');
+declare let ClientJS: any;
+import 'clientjs';
+
+const host = 'http://localhost:3000/midway/v1/events/';
+
+const TerrainAnalytics = {
+    eventIDs: {
+        view: 1,
+        impression: 1,
+        click: 2,
+        transaction: 3,
+        conversion: 4,
+    },
+
+    logEvent(eventNameOrID, meta) {
+        const client = new ClientJS();
+
+        const eventID = typeof eventNameOrID === 'string' ? TerrainAnalytics.eventIDs[eventNameOrID] : eventNameOrID;
+        const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] : client.getFingerprint();
+
+        let paramString = 'eventid=' + String(eventID) + '&visitorid=' + String(visitorID);
+        if (meta != null)
+        {
+          paramString += '&meta=' + String(jsurl.stringify(meta));
+        }
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', host + '?' + paramString, true);
+        xhr.send();
+    },
+};
+
+module.exports = TerrainAnalytics;
