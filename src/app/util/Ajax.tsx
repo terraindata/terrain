@@ -967,6 +967,26 @@ export const Ajax =
       );
     },
 
+    resetTemplateToken(templateId: number,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/updateAccessToken/',
+        { id: String(templateId) },
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1

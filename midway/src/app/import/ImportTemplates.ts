@@ -216,6 +216,10 @@ export class ImportTemplates
         {
           return reject('Invalid template id passed');
         }
+        if (!user.isSuperUser)
+        {
+          return reject('Insufficient Permissions');
+        }
         const template: ImportTemplateConfig = results[0] as ImportTemplateConfig;
         template['persistentAccessToken'] = srs({ length: 256 });
         const upserted: ImportTemplateConfigStringified =

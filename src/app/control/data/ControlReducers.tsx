@@ -110,6 +110,23 @@ ControlReducer[ActionTypes.importExport.deleteTemplate] =
     return state;
   };
 
+ControlReducer[ActionTypes.importExport.resetTemplateToken] =
+  (state, action) =>
+  {
+    Ajax.resetTemplateToken(action.payload.templateId,
+      () =>
+      {
+        action.payload.handleResetSuccess();
+        action.payload.fetchTemplates();
+      },
+      (err: string) =>
+      {
+        action.payload.handleResetError(err);
+      },
+    );
+    return state;
+  };
+
 const ControlReducerWrapper = (state: ControlState = _ControlState(), action) =>
 {
   let nextState = state;

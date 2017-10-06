@@ -51,11 +51,13 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 
 import { backgroundColor, borderColor, Colors, fontColor } from 'common/Colors';
+import { notificationManager } from 'common/components/InAppNotification';
 import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
+import { MidwayError } from 'shared/error/MidwayError';
 import Ajax from 'util/Ajax';
 import ControlActions from '../../data/ControlActions';
 
@@ -79,7 +81,11 @@ export interface Props
   templates: List<Template>;
 }
 
-type ConfirmActionType = 'DELETE' | 'RESET';
+enum ConfirmActionType
+{
+  DELETE,
+  RESET,
+}
 
 class AccessTokenControl extends TerrainComponent<Props>
 {
@@ -107,7 +113,7 @@ class AccessTokenControl extends TerrainComponent<Props>
     confirmModalMessage: '',
     confirmModalTitle: '',
     confirmModalIsError: false,
-    confirmModalType: 'DELETE',
+    confirmModalType: ConfirmActionType.DELETE,
     currentActiveTemplate: undefined,
     currentActiveIndex: -1,
     headlessModalOpen: false,
@@ -150,7 +156,7 @@ class AccessTokenControl extends TerrainComponent<Props>
       },
       {
         text: 'Reset Access Token',
-        onClick: () => undefined,
+        onClick: () => this.requestResetTemplateToken(template, index),
         icon: <AccessIcon className='template-menu-option-icon' />,
         iconColor: '#555',
       },
@@ -197,7 +203,7 @@ class AccessTokenControl extends TerrainComponent<Props>
 
   public confirmConfirmModal()
   {
-    if (this.state.confirmModalType === 'DELETE')
+    if (this.state.confirmModalType === ConfirmActionType.DELETE)
     {
       if (this.state.currentActiveTemplate === undefined)
       {
@@ -210,9 +216,17 @@ class AccessTokenControl extends TerrainComponent<Props>
         this.state.currentActiveTemplate.templateName,
       );
     }
-    else if (this.state.confirmModalType === 'RESET')
+    else if (this.state.confirmModalType === ConfirmActionType.RESET)
     {
-      // TODO: complete this
+      if (this.state.currentActiveTemplate === undefined)
+      {
+        return;
+      }
+      ControlActions.importExport.resetTemplateToken(
+        this.state.currentActiveTemplate.templateId,
+        this.handleResetTemplateTokenSuccess,
+        this.handleResetTemplateTokenError
+      );
     }
   }
 
@@ -225,26 +239,52 @@ class AccessTokenControl extends TerrainComponent<Props>
       confirmModalMessage: `Are you sure you want to delete template "${template.templateName}"?`,
       confirmModalTitle: 'Confirm Action',
       confirmModalIsError: false,
+      confirmModalType: ConfirmActionType.DELETE,
     });
   }
 
   public handleDeleteTemplateSuccess(templateName: string)
   {
-    this.setState({
-      responseModalOpen: true,
-      responseModalMessage: `Successfully deleted template "${templateName}"`,
-      responseModalTitle: 'Template Deleted',
-      responseModalIsError: false,
-    });
+    notificationManager.addNotification('Template Deleted', `Successfully deleted template "${templateName}"`, 'info', 4);
   }
 
   public handleDeleteTemplateError(error: string)
   {
+    const readable = MidwayError.fromJSON(error).getDetail();
     this.setState({
       responseModalOpen: true,
-      responseModalMessage: `Error deleting template: ${error}`,
+      responseModalMessage: `Error deleting template: ${readable}`,
       responseModalTitle: 'Error',
       responseModalIsError: true,
+    });
+  }
+
+  public handleResetTemplateTokenSuccess()
+  {
+    notificationManager.addNotification('Token Reset', 'Successfully Reset Access Token', 'info', 4);
+  }
+
+  public handleResetTemplateTokenError(error: string)
+  {
+    const readable = MidwayError.fromJSON(error).getDetail();
+    this.setState({
+      responseModalOpen: true,
+      responseModalMessage: `Error resetting access token: ${readable}`,
+      responseModalTitle: 'Error',
+      responseModalIsError: true,
+    });
+  }
+
+  public requestResetTemplateToken(template, index)
+  {
+    this.setState({
+      currentActiveTemplate: template,
+      currentActiveIndex: index,
+      confirmModalOpen: true,
+      confirmModalMessage: `Are you sure you want to reset the access token for "${template.templateName}"?`,
+      confirmModalTitle: 'Confirm Action',
+      confirmModalIsError: false,
+      confirmModalType: ConfirmActionType.RESET,
     });
   }
 

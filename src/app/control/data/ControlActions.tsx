@@ -75,6 +75,15 @@ const ControlActions =
           fetchTemplates: ControlActions.importExport.fetchTemplates,
           templateName,
         }),
+
+      resetTemplateToken:
+      (templateId: number, handleResetSuccess, handleResetError) =>
+        $(ActionTypes.importExport.resetTemplateToken, {
+          templateId,
+          handleResetSuccess,
+          handleResetError,
+          fetchTemplates: ControlActions.importExport.fetchTemplates,
+        }),
     },
 
   };

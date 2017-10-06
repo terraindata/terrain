@@ -129,13 +129,12 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
 Router.post('/updateAccessToken', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('update access token');
-  const template: ImportTemplateConfig = ctx.request.body.body;
-  Util.verifyParameters(template, ['id']);
-  if (template.id === undefined)
+  const templateObj: object = ctx.request.body.body;
+  if (templateObj['id'] === undefined)
   {
     throw new Error('Invalid parameter template ID');
   }
-  ctx.body = await templates.updateAccessToken(ctx.state.user, template.id);
+  ctx.body = await templates.updateAccessToken(ctx.state.user, templateObj['id']);
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>

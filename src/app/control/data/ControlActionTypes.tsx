@@ -52,6 +52,7 @@ const ControlActionTypes =
       setTemplates: '',
       fetchTemplates: '',
       deleteTemplate: '',
+      resetTemplateToken: '',
     },
   };
 
