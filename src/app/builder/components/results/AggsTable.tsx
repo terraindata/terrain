@@ -58,13 +58,12 @@ import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig
 import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import ColorManager from '../../../util/ColorManager';
-import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
-import { getResultName } from './Hit';
 
 export interface Props
 {
   tableData: any;
+  containerWidth?: number;
+  containerHeight?: number;
 }
 
 @Radium
@@ -84,7 +83,7 @@ export default class AggsTable extends TerrainComponent<Props>
     });
   }
 
-    public componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.tableData !== this.props.tableData)
     {
@@ -96,25 +95,76 @@ export default class AggsTable extends TerrainComponent<Props>
     }
   }
 
-
-  public getColumns(): List<any>
+  public getColumns(): List<TableColumn>
   {
-    const cols = [];
-    const dataFields = _.values(this.props.tableData);
-    const colNames = _.keys(dataFields[0][0]);
-    colNames.map(
-      (field) =>
-        cols.push({
-          key: field,
-          name: field,
-        }),
-    );
+    const cols: TableColumn[] = [];
+    cols.push({
+      key: 'key',
+      name: 'key',
+      resizable: true,
+      sortable: true,
+    });
+
+    cols.push({
+      key: 'doc_count',
+      name: 'doc_count',
+      resizable: true,
+      sortable: true,
+    });
+
     return List(cols);
+    // const cols = [];
+    // const dataFields = _.values(this.props.tableData);
+    // const colNames = _.keys(dataFields[0][0]);
+    // colNames.map(
+    //   (field) =>
+    //     cols.push({
+    //       key: field,
+    //       name: field,
+    //     }),
+    // );
+    // return List(cols);
   }
 
   public getRow(i: number): object
   {
     return this.state.rows[i];
+  }
+
+  public handleGridSort(sortColumn, sortDirection)
+  {
+    const comparer = (aa, bb) =>
+    {
+      const a = aa[sortColumn];
+      const b = bb[sortColumn];
+
+      if (sortDirection === 'ASC')
+      {
+        return (a > b) ? 1 : -1;
+      }
+      else if (sortDirection === 'DESC')
+      {
+        return (a < b) ? 1 : -1;
+      }
+      else
+      {
+        return 0;
+      }
+    };
+
+    let rows;
+    if (sortDirection === 'NONE')
+    {
+      rows = this.state.rows;
+    }
+    else
+    {
+      rows = this.state.rows.sort(comparer);
+    }
+
+    this.setState({
+      rows,
+    });
   }
 
   public render()
@@ -124,11 +174,9 @@ export default class AggsTable extends TerrainComponent<Props>
         columns={this.getColumns().toJS()}
         rowGetter={this.getRow}
         rowsCount={this.state.rows.length}
-        maxHeight= {200}// {((this.state.rows.length + 1) * 35)} //add scroll bar size ~ 20
-
+        maxHeight={200}// {((this.state.rows.length + 1) * 35)} //add scroll bar size ~ 20
+        onGridSort={this.handleGridSort}
       />
     );
   }
 }
-
-

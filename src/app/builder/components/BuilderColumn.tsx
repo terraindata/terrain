@@ -306,7 +306,7 @@ const BuilderColumn = createReactClass<any, any>(
       const options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map((index) => ({
         text: COLUMNS[index],
         onClick: this.switchView,
-        disabled: index === this.state.column,
+        selected: index === this.state.column,
         icon: menuIcons[index].icon,
         iconColor: menuIcons[index].color,
       })));
