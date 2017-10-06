@@ -112,20 +112,6 @@ export async function authenticateStreamPersistentAccessToken(req: http.Incoming
   });
 }
 
-export function buildDesiredHash(nameToType: object): string
-{
-  let strToHash: string = 'object';   // TODO: check
-  const nameToTypeArr: any[] = Object.keys(nameToType).sort();
-  for (const name in nameToTypeArr)
-  {
-    if (nameToType.hasOwnProperty(name))
-    {
-      strToHash += '|' + name + ':' + (nameToType[name] as string) + '|';
-    }
-  }
-  return sha1(strToHash);
-}
-
 export function getEmptyObject(payload: object): object
 {
   let emptyObj: any = {};
@@ -179,19 +165,6 @@ export function getRequest(url)
       }
     });
   });
-}
-
-export function isJSON(str: string): boolean
-{
-  try
-  {
-    JSON.parse(str);
-  }
-  catch (e)
-  {
-    return false;
-  }
-  return true;
 }
 
 export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
