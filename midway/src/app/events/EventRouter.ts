@@ -55,11 +55,6 @@ import { Events } from './Events';
 export const events: Events = new Events();
 const Router = new KoaRouter();
 
-Router.get('/time', async (ctx, next) =>
-{
-  ctx.body = new Date().toJSON();
-});
-
 // * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
 // * variantid: list of variantids
 // * start: start time of the interval
