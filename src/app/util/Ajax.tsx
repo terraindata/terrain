@@ -688,6 +688,26 @@ export const Ajax =
       );
     },
 
+    getStreamingProgress(onLoad: (resp: any) => void,
+      onError: (resp: any) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'import/progress/',
+        {},
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
     importFile(file: File,
       filetype: string,
       dbname: string,
@@ -1078,6 +1098,7 @@ export const Ajax =
       start: Date,
       end: Date,
       metricId: number,
+      intervalId: number,
       onLoad: (response: any) => void,
       onError?: (ev: Event) => void)
     {
@@ -1085,7 +1106,7 @@ export const Ajax =
         variantid: variantIds.join(','),
         start: start.toISOString(),
         end: end.toISOString(),
-        interval: 'day',
+        interval: intervalId,
         eventid: metricId.toString(),
         agg: 'histogram',
         field: '@timestamp',

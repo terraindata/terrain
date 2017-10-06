@@ -285,7 +285,7 @@ export function getPreview(card: Card): string
         {
           return getPreview(value);
         }
-        return value;
+        return value; // add key of card so key: value is preview
       }
       if (keys[1] === 'length' || keys[1] === 'size')
       {
@@ -299,7 +299,7 @@ export function getPreview(card: Card): string
   }
   else if (typeof preview === 'function')
   {
-    return preview(card);
+    return ': ' + preview(card);
   }
   return 'No preview';
 }
