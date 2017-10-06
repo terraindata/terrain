@@ -225,7 +225,7 @@ class AccessTokenControl extends TerrainComponent<Props>
       ControlActions.importExport.resetTemplateToken(
         this.state.currentActiveTemplate.templateId,
         this.handleResetTemplateTokenSuccess,
-        this.handleResetTemplateTokenError
+        this.handleResetTemplateTokenError,
       );
     }
   }

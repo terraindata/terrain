@@ -216,7 +216,7 @@ export class ImportTemplates
         {
           return reject('Invalid template id passed');
         }
-        if (!user.isSuperUser)
+        if (user.isSuperUser !== 1)
         {
           return reject('Insufficient Permissions');
         }

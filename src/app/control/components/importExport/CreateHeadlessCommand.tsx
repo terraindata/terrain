@@ -93,7 +93,7 @@ interface HeadlessCommandArgs
   midwayURL: string;
   variantId?: number; // for export
   filename?: string; // for import
-  exportKey?: string;
+  objectKey?: string;
 }
 
 const inputElementWidth = '220px';
@@ -131,17 +131,17 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
     }
 
     let contentTypeText; // for export
-    let fileTypeText;
+    let fileTypeTextImport; // TODO remove when import is able to handle type object
     switch (fileType)
     {
       case fileTypeOptions.get(0): // json
       case fileTypeOptions.get(1): // json [type object]
         contentTypeText = 'application/json';
-        fileTypeText = 'json';
+        fileTypeTextImport = 'json';
         break;
       case fileTypeOptions.get(2): // csv
         contentTypeText = 'text/plain';
-        fileTypeText = 'csv';
+        fileTypeTextImport  = 'csv';
         break;
       default:
         break;
@@ -149,22 +149,22 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
 
     if (template.export) // export
     {
-      const { variantId, exportKey } = headlessArgs;
+      const { variantId, objectKey } = headlessArgs;
 
       if (variantId === -1)
       {
         requests.push('Please Select a Variant');
       }
 
-      if (fileType === fileTypeOptions.get(1) && (exportKey === undefined || exportKey === ''))
+      if (fileType === fileTypeOptions.get(1) && (objectKey === undefined || objectKey === ''))
       {
         requests.push('Please Provide an Export Key');
       }
 
       command = `curl -X POST  -H 'Content-Type: ${contentTypeText}' ` +
         `-H 'Accept: application/json' -d ` +
-        `'{"id": ${template.templateId}, "persistentAccessToken": ${template.persistentAccessToken}, ` +
-        `"body": {"dbid": ${template.dbid}, "filetype": ${fileTypeText}, "exportKey": ${exportKey}, ` +
+        `'{"id": ${template.templateId}, "persistentAccessToken": "${template.persistentAccessToken}", ` +
+        `"body": {"dbid": ${template.dbid}, "filetype": "${fileType}", "objectKey": "${objectKey}", ` +
         `"templateId": ${template.templateId}, "variantId": ${variantId}}}' ` +
         `${midwayURL}/midway/v1/import/export/headless`;
     }
@@ -179,7 +179,7 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
 
       command = `curl -X POST ${midwayURL}/midway/v1/import/headless ` +
         `-F id=${template.templateId} -F persistentAccessToken=${template.persistentAccessToken} ` +
-        `-F filetype=${fileTypeText} -F templateId=${template.templateId} -F file=@${filename}`;
+        `-F filetype="${fileTypeTextImport}" -F templateId=${template.templateId} -F file="@${filename}"`;
     }
   }
 
@@ -193,14 +193,14 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     index: number;
     fileTypeIndex: number;
     midwayURLValue: string;
-    exportKeyValue: string;
+    objectKeyValue: string;
     selectedIds: List<number>;
     filenameValue: string;
   } = {
     index: this.props.index,
     fileTypeIndex: 0,
     midwayURLValue: 'localhost:3000',
-    exportKeyValue: '',
+    objectKeyValue: '',
     selectedIds: List([-1, -1, -1]),
     filenameValue: '',
   };
@@ -352,8 +352,8 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
               this.state.fileTypeIndex === 1 &&
               <div className='headless-form-input'>
                 <input
-                  value={this.state.exportKeyValue}
-                  onChange={this.setStateWrapper('exportKeyValue', 'target', 'value')}
+                  value={this.state.objectKeyValue}
+                  onChange={this.setStateWrapper('objectKeyValue', 'target', 'value')}
                   style={inputStyle}
                 />
               </div>
@@ -461,7 +461,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
       midwayURL: this.state.midwayURLValue,
       variantId: this.state.selectedIds.get(2),
       filename: this.state.filenameValue,
-      exportKey: this.state.exportKeyValue,
+      objectKey: this.state.objectKeyValue,
     });
     const formComplete = requests.length === 0 && errors.length === 0;
     return (
@@ -510,7 +510,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
                 {
                   tooltip(
                     <ClipboardIcon className='headless-entry-icon clipboard-icon-big' />,
-                    { title: 'Copy Command to Clipboard', distance: 15 }
+                    { title: 'Copy Command to Clipboard', distance: 15 },
                   )
                 }
               </div>
