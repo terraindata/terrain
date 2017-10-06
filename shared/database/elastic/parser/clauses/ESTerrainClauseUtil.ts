@@ -45,21 +45,36 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import ESInterpreter from 'shareddatabase/elastic/parser/ESInterpreter';
-/**
- * Settings passed to and stored in an ESClause
- */
-interface ESClauseSettings
-{
-  def?: string | { [key: string]: string | null };
-  name?: string;
-  path?: string[];
-  desc?: string;
-  url?: string;
-  multifield?: boolean;
-  template?: any;
-  required?: string[];
-  suggestions?: any[];
-  rewrite?: (ESInterpreter, ESValueInfo) => void;
-}
+import ESValueInfo from 'shareddatabase/elastic/parser/ESValueInfo';
 
-export default ESClauseSettings;
+import * as _ from 'lodash';
+
+export default class ESTerrainClauseUtil
+{
+  public static bool2filter(interpreter: ESInterpreter, valueInfo: ESValueInfo)
+  {
+    const isFilter =
+      _.reduce(valueInfo.value,
+        (memo, value: any) =>
+        {
+          let validFilter = typeof value === 'object';
+          if (Array.isArray(value))
+          {
+            validFilter = _.reduce(value,
+              (memo0, value0) => memo0 &&
+                (value0['range'] ||
+                  value0['term'] ||
+                  value0['match']),
+              true);
+          }
+          else
+          {
+            validFilter =
+              (value['range'] !== undefined) ||
+              (value['term'] !== undefined) ||
+              (value['match'] !== undefined);
+          }
+          return memo && validFilter;
+        }, true);
+  }
+}

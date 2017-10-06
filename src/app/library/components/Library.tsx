@@ -356,15 +356,15 @@ class Library extends TerrainComponent<any>
             /> : null}
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
-          <div className="library-bottom">
-            <div className="library-analytics-chart-wrapper">
+          <div className='library-bottom'>
+            <div className='library-analytics-chart-wrapper'>
               <MultipleAreaChart
                 datasets={datasets}
                 xDataKey={'key'}
                 yDataKey={'doc_count'}
               />
             </div>
-            <div className="library-analytics-selector-wrapper">
+            <div className='library-analytics-selector-wrapper'>
               <AnalyticsSelector
                 analytics={analytics}
                 onMetricSelect={this.handleMetricRadioButtonClick}
