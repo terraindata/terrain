@@ -327,7 +327,7 @@ const TransformChart = {
       .attr('opacity', 0.5);
 
     overlay.append('text')
-      .attr('x', 75)
+      .attr('x', 10)
       .attr('y', height / 2)
       .attr('text-anchor', 'start')
       .attr('fill', Colors().text1)
@@ -364,7 +364,7 @@ const TransformChart = {
       .attr('opacity', 0.5);
 
     overlay.append('text')
-      .attr('x', 60)
+      .attr('x', 10)
       .attr('y', height / 2)
       .attr('text-anchor', 'start')
       .attr('fill', Colors().text1)
@@ -1418,14 +1418,16 @@ const TransformChart = {
     d3.select(el).select('.inner-svg').select('.overlay').remove();
     this._drawBars(el, scales, barsData, colors);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
+    this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+    this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors);
     if (!pointsData.length)
     {
       this._drawNoPointsOverlay(el, scales);
-      return;
     }
-    d3.select(el).select('.inner-svg').select('.no-point-overlay').remove();
-    this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
-    this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors);
+    else
+    {
+      d3.select(el).select('.inner-svg').select('.no-point-overlay').remove();
+    }
     this._movePointEditMenu(el, height);
   },
 
