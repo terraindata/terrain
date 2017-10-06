@@ -48,18 +48,23 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import { List } from 'immutable';
+const { List } = Immutable;
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
 import ColorManager from '../../../util/ColorManager';
+import Modal from '../../../common/components/Modal';
+import Histogram from './../../../charts/components/Histogram';
 import Menu, { MenuOption } from './../../../common/components/Menu';
 import TerrainComponent from './../../../common/components/TerrainComponent';
+import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
 import AggregationHistogram from './AggregationHistogram';
 import AggsTable from './AggsTable';
+
+const ClipboardIcon = require('images/icon_clipboard.svg');
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 export interface Props
@@ -75,9 +80,11 @@ class AggregationComponent extends TerrainComponent<Props> {
   public state: {
     expanded: boolean,
     viewMode: string,
+    showingExport: boolean,
   } = {
     expanded: false,
     viewMode: 'Table',
+    showingExport: false,
   };
 
   public toggleExpanded()
@@ -94,10 +101,10 @@ class AggregationComponent extends TerrainComponent<Props> {
     });
   }
 
-  public changeModeToGraph()
+  public changeModeToHistogram()
   {
     this.setState({
-      viewMode: 'Graph',
+      viewMode: 'Histogram',
     });
   }
 
@@ -108,24 +115,62 @@ class AggregationComponent extends TerrainComponent<Props> {
     });
   }
 
-  public getMenuOptions(): List<MenuOption>
+  public showExport()
   {
-    const options: List<MenuOption> =
-      List([
-        {
-          text: 'Table',
-          onClick: this.changeModeToTable,
-        },
-        {
-          text: 'Graph',
-          onClick: this.changeModeToGraph,
-        },
-        {
-          text: 'Raw',
-          onClick: this.changeModeToRaw,
-        },
-      ]);
-    return options;
+    this.setState({
+      showingExport: true,
+    });
+  }
+
+  public hideExport()
+  {
+    this.setState({
+      showingExport: false,
+    });
+  }
+
+  public getMenuOptions(): Immutable.List<MenuOption>
+  {
+    const options = [{
+      text: 'Raw',
+      onClick: this.changeModeToRaw,
+      selected: this.state.viewMode === 'Raw',
+    }];
+
+    if (this.canBeHistogram())
+    {
+      options.push({
+        text: 'Histogram',
+        onClick: this.changeModeToHistogram,
+        selected: this.state.viewMode === 'Histogram',
+      });
+    }
+
+    if (this.canBeTable())
+    {
+      options.push({
+        text: 'Table',
+        onClick: this.changeModeToTable,
+        selected: this.state.viewMode === 'Table',
+      });
+    }
+
+    // const options: List<MenuOption> =
+    //   List([
+    //     {
+    //       text: 'Table',
+    //       onClick: this.changeModeToTable,
+    //     },
+    //     {
+    //       text: 'Graph',
+    //       onClick: this.changeModeToGraph,
+    //     },
+    //     {
+    //       text: 'Raw',
+    //       onClick: this.changeModeToRaw,
+    //     },
+    //   ]);
+    return List(options);
   }
 
   public renderAgg()
@@ -146,9 +191,24 @@ class AggregationComponent extends TerrainComponent<Props> {
         </div>
         {
           this.state.expanded ?
-            <Menu
-              options={this.getMenuOptions()}
-            />
+            (
+              <div className='aggregation-title-bar-options'>
+                <div
+                  className='aggregation-title-bar-export'
+                  onClick={this.showExport}
+                  key='results-area-export'
+                  style={link()}
+                >
+                  Export
+                </div>
+                <div className='clipboard-icon-wrapper'>
+                  {tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')}
+                </div>
+                <Menu
+                  options={this.getMenuOptions()}
+                />
+              </div>
+            )
             :
             ''
         }
@@ -166,7 +226,7 @@ class AggregationComponent extends TerrainComponent<Props> {
           this.state.expanded ?
             <div>
               {(this.state.viewMode === 'Table') ? this.renderTableView(values) : ''}
-              {(this.state.viewMode === 'Graph') ? this.renderAggregationHistogram() : ''}
+              {(this.state.viewMode === 'Histogram') ? this.renderAggregationHistogram() : ''}
               {(this.state.viewMode === 'Raw') ? <pre> {JSON.stringify(values, undefined, 2)} </pre> : ''}
             </div>
             :
@@ -178,23 +238,33 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public renderAggregationHistogram()
   {
-    if (this.canBeHistogram(this.props.aggregation))
+    if (this.canBeHistogram())
     {
       return this.renderHistogram();
     }
   }
 
+  public canBeTable()
+  {
+    const values = _.values(this.props.aggregation)[0];
+    return values.buckets !== undefined;
+  }
+
   public renderTableView(tableData)
   {
-    return (
-      <AggsTable
-        tableData={tableData}
-      />
-    );
+    if (this.canBeTable())
+    {
+
+      return (
+        <AggsTable
+          tableData={tableData}
+        />
+      );
+    }
   }
 
   // TODO Make this more comprehensive
-  public canBeHistogram(agg)
+  public canBeHistogram()
   {
     const values = _.values(this.props.aggregation)[0];
     return values.buckets !== undefined;
@@ -284,12 +354,35 @@ class AggregationComponent extends TerrainComponent<Props> {
     );
   }
 
+  public renderExport()
+  {
+
+    const content =
+      <div
+        style={backgroundColor(Colors().bg1)}
+      >
+        test
+      </div>;
+
+    return (
+      <Modal
+        open={this.state.showingExport}
+        onClose={this.hideExport}
+        title={'Export'}
+        children={content}
+        fill={true}
+        noFooterPadding={true}
+      />
+    );
+  }
+
   public render()
   {
     return (
       <div className='aggregation'>
         {this.renderAgg()}
         {this.state.expanded && this.renderExpandedAgg()}
+        {this.state.showingExport && this.renderExport()}
       </div>
     );
   }

@@ -2,7 +2,8 @@
 
 .aggregation {
   width: 100%;
-  margin: 24px;
+  margin: 20px;
+  margin-bottom: 0px;
 
   .aggregation-title-bar {
     display: inline-block;
@@ -11,34 +12,56 @@
 
     .arrow-icon {
       width: 10px;
-
+      cursor: pointer;
     }
 
     .aggregation-title-bar-title {
       display: inline;
-      padding: 8px
+      padding: 8px;
+      position: relative;
+      height: 40px;
+      cursor: pointer;
     }
 
-    .menu-wrapper {
-      display: inline-block;
+    .aggregation-title-bar-options {
+      float: right; 
       position: relative;
-      float: right;
-      position: relative;
-      top: 5px;
-      right: 0px;
-      display: inline-block;
-      margin-left: 5px;
-      background: none;
-      &:hover {
-        background: rgba(0,0,0,0.25);
+
+      .clipboard-icon-wrapper {
+        display: inline;
+        .clipboard-icon {
+          height: 20px;
+          width: 20px;
+          float: right;
+          margin-right: 24px;
+          fill: white;
+          cursor: pointer;
+        }
       }
-      border: 2px solid #fff;
-      height: 18px !important;
-      width: 18px !important;
-      box-sizing: border-box;
-      .menu-icon {
-        left: 0px;
-        top: 0px;
+
+      .aggregation-title-bar-export {
+        display: inline-block;
+        margin-right: 5px;
+        cursor: pointer;
+      }
+
+      .menu-wrapper {
+        display: inline-block;
+        right: 0px;
+        margin-left: 5px;
+        cursor: pointer; 
+        background: none;
+        &:hover {
+          background: rgba(0,0,0,0.25);
+        }
+        border: 2px solid #fff;
+        height: 18px !important;
+        width: 18px !important;
+        box-sizing: border-box;
+        .menu-icon {
+          left: 0px;
+          top: 0px;
+        }
       }
     }
 
