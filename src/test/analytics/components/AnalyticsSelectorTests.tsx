@@ -43,58 +43,49 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
+import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
+import { shallow } from 'enzyme';
+import * as Immutable from 'immutable';
+import * as React from 'react';
+import configureStore from 'redux-mock-store';
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as _ from 'lodash';
-import * as winston from 'winston';
-
-import * as Util from '../Util';
-import * as Encryption from './Encryption';
-import { Events } from './Events';
-
-export const events: Events = new Events();
-const Router = new KoaRouter();
-
-Router.get('/time', async (ctx, next) =>
+describe('AnalyticsSelector', () =>
 {
-  ctx.body = new Date().toJSON();
-});
+  const analytics: AnalyticsState = _AnalyticsState({
+    loaded: false,
+    data: Immutable.Map({}),
+    selectedMetric: 1,
+  });
 
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
-// * variantid: list of variantids
-// * start: start time of the interval
-// * end: end time of the interval
-// * agg: supported aggregation operations are:
-//     `select` - returns all events between the specified interval
-//     `histogram` - returns a histogram of events between the specified interval
-//     `rate` - returns a ratio of two events between the specified interval
-// * field (optional):
-//     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
-// * interval (optional; required if `agg` is `histogram` or `rate`):
-//     the resolution of interval for aggregation operations.
-//     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
-//     also supported are values such as `1.5h`, `90m` etc.
-//
-Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  Util.verifyParameters(
-    JSON.parse(JSON.stringify(ctx.request.query)),
-    ['start', 'end', 'eventid', 'variantid', 'agg'],
-  );
-  winston.info('getting events for variant');
-  const response: object[] = await events.AggregationHandler(ctx.request.query);
-  ctx.body = response.reduce((acc, x) =>
+  let analyticsComponent = null;
+
+  const onMetricSelect = (value) => null;
+  const onIntervalSelect = (value) => null;
+  const onDateRangeSelect = (value) => null;
+
+  beforeEach(() =>
   {
-    for (const key in x)
-    {
-      if (x.hasOwnProperty(key) !== undefined)
-      {
-        acc[key] = x[key];
-        return acc;
-      }
-    }
-  }, {});
-});
+    analyticsComponent = shallow(
+      <AnalyticsSelector
+        analytics={analytics}
+        onMetricSelect={onMetricSelect}
+        onIntervalSelect={onIntervalSelect}
+        onDateRangeSelect={onDateRangeSelect}
+      />,
+    );
+  });
 
-export default Router;
+  describe('#render', () =>
+  {
+    it('should have 3 MultiSwitch components', () =>
+    {
+      const multiswitchs = analyticsComponent.find('MultiSwitch');
+
+      expect(multiswitchs).toHaveLength(3);
+      expect(multiswitchs.nodes[0].props.onChange).toEqual(onMetricSelect);
+      expect(multiswitchs.nodes[1].props.onChange).toEqual(onIntervalSelect);
+      expect(multiswitchs.nodes[2].props.onChange).toEqual(onDateRangeSelect);
+    });
+  });
+});
