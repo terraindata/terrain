@@ -53,6 +53,7 @@ import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
 import RolesReducer from 'roles/data/RolesReducers';
 import UserReducer from 'users/data/UserReducers';
+import Ajax from 'util/Ajax';
 import ColorsReducer from '../colors/data/ColorsReducers';
 
 const reducers = {
@@ -67,7 +68,7 @@ const rootReducer = combineReducers(reducers);
 const initialState = Immutable.Map();
 
 const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk),
+  applyMiddleware(thunk.withExtraArgument(Ajax)),
   window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
 ));
 

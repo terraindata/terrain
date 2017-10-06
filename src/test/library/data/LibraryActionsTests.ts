@@ -48,14 +48,11 @@ import Actions from 'library/data/LibraryActions';
 import ActionTypes from 'library/data/LibraryActionTypes';
 import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
 import * as LibraryTypes from 'library/LibraryTypes';
-import * as nock from 'nock';
-import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import { Ajax, createMockStore } from '../../helpers';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
-const middlewares = [thunk];
-const mockStore = configureMockStore(middlewares);
+const mockStore = createMockStore();
 
 describe('LibraryActions', () =>
 {
@@ -71,39 +68,27 @@ describe('LibraryActions', () =>
     const groupName = 'Test Group';
     group.set('name', groupName);
 
-    afterEach(() =>
+    it('should create a groups.create action after the new group has been created', (done) =>
     {
-      nock.cleanAll();
-    });
-
-    it('should create a groups.create action after the new group has been created', () =>
-    {
-      nock(MIDWAY_BASE_URL)
-        .post(`/items/${groupId}`)
-        .reply(200, [
-          {
-            id: groupId,
-            meta: `{"db":{},"modelVersion":2,"lastEdited":"","lastUserId":"",
-"userIds":[],"algorithmsOrder":[],"defaultLanguage":"elastic"}`,
-            name: groupName,
-            parent: 0,
-            status: 'BUILD',
-            type: 'GROUP',
-          },
-        ]);
+      Ajax.saveItem = (
+        item: any,
+        onLoad?: (resp: any) => void,
+        onError?: (ev: Event) => void,
+      ) => onLoad({ id: groupId });
 
       const expectedActions = [
         {
           type: ActionTypes.groups.create,
-          payload: { group: group.set('id', groupId) },
+          payload: { group: group.set('id', groupId), versioning: true },
         },
       ];
 
       const store = mockStore({ library });
 
-      return store.dispatch(Actions.groups.create(group, (id) =>
+      store.dispatch(Actions.groups.create(group, (id) =>
       {
         expect(store.getActions()).toEqual(expectedActions);
+        done();
       }));
     });
   });

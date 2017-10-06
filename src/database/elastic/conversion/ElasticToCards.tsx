@@ -187,7 +187,6 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       },
     ));
   }
-
   return make(Blocks, clauseCardType, valueMap, true);
 };
 
