@@ -78,36 +78,36 @@ export default class AggsTable extends TerrainComponent<Props>
   {
     const dataFields = _.values(this.props.tableData);
     this.setState({
-      rows: _.values(dataFields[0]),
+      rows: _.values(this.props.tableData.buckets),
     });
   }
 
-    public componentWillReceiveProps(nextProps: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.tableData !== this.props.tableData)
     {
       // force the table to update
       const dataFields = _.values(nextProps.tableData);
       this.setState({
-        rows: _.values(dataFields[0]),
+        rows: _.values(this.props.tableData.buckets),
       });
     }
   }
 
-
   public getColumns(): List<any>
   {
-    const cols = [];
-    const dataFields = _.values(this.props.tableData);
-    const colNames = _.keys(dataFields[0][0]);
-    colNames.map(
-      (field) =>
-        cols.push({
-          key: field,
-          name: field,
-        }),
-    );
-    return List(cols);
+    return List([{ key: 'key', name: 'key' }, { key: 'doc_count', name: 'doc_count' }]);
+    // const cols = [];
+    // const dataFields = _.values(this.props.tableData);
+    // const colNames = _.keys(this.props.tableData.buckets[0]);
+    // colNames.map(
+    //   (field) =>
+    //     cols.push({
+    //       key: field,
+    //       name: field,
+    //     }),
+    // );
+    // return List(cols);
   }
 
   public getRow(i: number): object
@@ -122,7 +122,7 @@ export default class AggsTable extends TerrainComponent<Props>
         columns={this.getColumns().toJS()}
         rowGetter={this.getRow}
         rowsCount={this.state.rows.length}
-        minHeight={((this.state.rows.length + 1) * 35)} //add scroll bar size ~ 20
+        minHeight={((Number(this.state.rows.length) + 1) * 35)} // add scroll bar size ~ 20
       />
     );
   }
