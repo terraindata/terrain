@@ -54,7 +54,6 @@ import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
 import { items } from '../items/ItemRouter';
 import * as Util from '../Util';
-import * as Encryption from './Encryption';
 
 export interface AggregationRequest
 {

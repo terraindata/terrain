@@ -50,7 +50,6 @@ import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import * as Encryption from './Encryption';
 import { Events } from './Events';
 
 export const events: Events = new Events();
