@@ -80,7 +80,7 @@ export async function authenticatePersistentAccessToken(req: object): Promise<ob
   return new Promise<object>(async (resolve, reject) =>
   {
     const template: ImportTemplateConfig[] =
-      await templates.loginWithPersistentAccessToken(Number(req['id']), req['persistentAccessToken']);
+      await templates.loginWithPersistentAccessToken(Number(req['templateId']), req['persistentAccessToken']);
     if (template.length === 0)
     {
       return resolve({ template: null });
@@ -95,7 +95,7 @@ export async function authenticateStreamPersistentAccessToken(req: http.Incoming
   {
     const { files, fields } = await asyncBusboy(req);
     const template: ImportTemplateConfig[] =
-      await templates.loginWithPersistentAccessToken(Number(fields['id']), fields['persistentAccessToken']);
+      await templates.loginWithPersistentAccessToken(Number(fields['templateId']), fields['persistentAccessToken']);
     if (template.length === 0)
     {
       return resolve({ files, fields, template: null });

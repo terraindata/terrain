@@ -43,59 +43,71 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+import { AnalyticsState } from 'analytics/data/AnalyticsStore';
+import MultiSwitch from 'common/components/MultiSwitch';
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
-import Ajax from 'util/Ajax';
-import ActionTypes from './AnalyticsActionTypes';
-import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
+import * as React from 'react';
 
-const AnalyticsReducer = {};
-
-AnalyticsReducer[ActionTypes.fetch] =
-  (state, action: Action<{ analytics: any }>) =>
-  {
-    const { analytics } = action.payload;
-    let nextState = state;
-
-    Object.keys(analytics).forEach((variantId) =>
-    {
-      const variantAnalytics = analytics[variantId];
-      nextState = nextState.setIn(['data', parseInt(variantId, 10)], variantAnalytics);
-    });
-
-    return nextState;
-  };
-
-AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metricId: ID }>) =>
-  {
-    const { metricId } = action.payload;
-    return state.set('selectedMetric', metricId);
-  };
-
-AnalyticsReducer[ActionTypes.selectInterval] =
-  (state, action: Action<{ intervalId: string }>) =>
-  {
-    const { intervalId } = action.payload;
-    return state.set('selectedInterval', intervalId);
-  };
-
-AnalyticsReducer[ActionTypes.selectDateRange] =
-  (state, action: Action<{ dateRangeId: string }>) =>
-  {
-    const { dateRangeId } = action.payload;
-    return state.set('selectedDateRange', dateRangeId);
-  };
-
-const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
+interface Props
 {
-  let nextState = state;
-  if (AnalyticsReducer[action.type])
+  analytics: AnalyticsState;
+  onMetricSelect: (value: number | string) => void;
+  onIntervalSelect: (value: number | string) => void;
+  onDateRangeSelect: (value: number | string) => void;
+}
+
+const METRICS = Immutable.List([
+  { value: '1', label: 'Impressions' },
+  { value: '2', label: 'CTR' },
+  { value: '3', label: 'Conversions' },
+]);
+
+const INTERVALS = Immutable.List([
+  { value: 'day', label: 'Daily' },
+  { value: 'week', label: 'Weekly' },
+  { value: 'month', label: 'Monthly' },
+]);
+
+const DATE_RANGES = Immutable.List([
+  { value: '1', label: 'Today' },
+  { value: '2', label: 'Last 7 days' },
+  { value: '3', label: 'Last Month' },
+]);
+
+class AnalyticsSelector extends TerrainComponent<Props>
+{
+  public render()
   {
-    nextState = AnalyticsReducer[action.type](state, action);
+    const { analytics } = this.props;
+    const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
+
+    return (
+      <div>
+        <p>Metric</p>
+        <MultiSwitch
+          options={METRICS}
+          value={selectedMetric.toString()}
+          usesValues
+          onChange={this.props.onMetricSelect}
+        />
+        <p>Interval</p>
+        <MultiSwitch
+          options={INTERVALS}
+          value={selectedInterval}
+          usesValues
+          onChange={this.props.onIntervalSelect}
+        />
+        <p>Date Range</p>
+        <MultiSwitch
+          options={DATE_RANGES}
+          value={selectedDateRange.toString()}
+          usesValues
+          onChange={this.props.onDateRangeSelect}
+        />
+      </div>
+    );
   }
+}
 
-  return nextState;
-};
-
-export default AnalyticsReducerWrapper;
+export default AnalyticsSelector;
