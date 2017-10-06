@@ -93,7 +93,7 @@ Toggle-able Features:
   {
     const userId = AuthStore.getState().id;
     const user = UserStore.getState().getIn(['users', userId]);
-    console.log(user);
+
     return user && user.isSuperUser;
   }
 
