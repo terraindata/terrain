@@ -191,7 +191,6 @@ export default class HitsTable extends TerrainComponent<Props>
       stateKey: 'spotlightState',
     });
 
-    console.log(this.props.hits);
     this.setState({ rows: this.props.hits });
   }
 
@@ -358,8 +357,6 @@ export default class HitsTable extends TerrainComponent<Props>
       return <InfoArea large='Loading...' />;
     }
 
-    console.log('Cols', this.state.columns);
-    console.log('Rows', this.state.rows.toJS());
     return (
       <Table
         onGridSort={this.handleGridSort}

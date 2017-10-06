@@ -50,8 +50,10 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+
+import './AggsTable.less';
+
 import * as ReactDataGrid from 'react-data-grid';
-import { Toolbar } from 'react-data-grid-addons';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
@@ -122,8 +124,11 @@ export default class AggsTable extends TerrainComponent<Props>
         columns={this.getColumns().toJS()}
         rowGetter={this.getRow}
         rowsCount={this.state.rows.length}
-        minHeight={((this.state.rows.length + 1) * 35)} //add scroll bar size ~ 20
+        maxHeight= {200}// {((this.state.rows.length + 1) * 35)} //add scroll bar size ~ 20
+
       />
     );
   }
 }
+
+
