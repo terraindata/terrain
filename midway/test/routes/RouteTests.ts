@@ -899,6 +899,7 @@ describe('File import route tests', () =>
 
 describe('File import templates route tests', () =>
 {
+  let persistentAccessToken: string = '';
   test('Create template: POST /midway/v1/templates/create', async () =>
   {
     await request(server)
@@ -908,10 +909,10 @@ describe('File import templates route tests', () =>
         accessToken: 'ImAnAdmin',
         body: {
           name: 'my_template',
-
+          export: true,
           dbid: 1,
-          dbname: 'test_elastic_db',
-          tablename: 'fileImportTestTable',
+          dbname: 'movies',
+          tablename: 'data',
 
           originalNames: ['pkey', 'column1', 'column2'],
           columnTypes:
@@ -930,14 +931,15 @@ describe('File import templates route tests', () =>
         expect(response.text).not.toBe('Unauthorized');
         const respData = JSON.parse(response.text);
         expect(respData.length).toBeGreaterThan(0);
+        persistentAccessToken = respData[0]['persistentAccessToken'];
         expect(respData[0])
           .toMatchObject({
             id: 1,
             name: 'my_template',
-
+            export: true,
             dbid: 1,
-            dbname: 'test_elastic_db',
-            tablename: 'fileImportTestTable',
+            dbname: 'movies',
+            tablename: 'data',
 
             originalNames: ['pkey', 'column1', 'column2'],
             columnTypes:
@@ -948,6 +950,7 @@ describe('File import templates route tests', () =>
             },
             primaryKeys: ['pkey'],
             transformations: [],
+            persistentAccessToken,
           });
       })
       .catch((error) =>
@@ -975,8 +978,8 @@ describe('File import templates route tests', () =>
           name: 'my_template',
 
           dbid: 1,
-          dbname: 'test_elastic_db',
-          tablename: 'fileImportTestTable',
+          dbname: 'movies',
+          tablename: 'data',
 
           originalNames: ['pkey', 'column1', 'column2'],
           columnTypes:
@@ -987,6 +990,7 @@ describe('File import templates route tests', () =>
           },
           primaryKeys: ['pkey'],
           transformations: [],
+          persistentAccessToken,
         });
       })
       .catch((error) =>
@@ -1017,6 +1021,34 @@ describe('File import templates route tests', () =>
       .catch((error) =>
       {
         fail('POST /midway/v1/templates/ request returned an error: ' + String(error));
+      });
+  });
+
+  test('Post headless export: POST /midway/v1/import/export/headless', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/import/export/headless')
+      .send({
+        templateId: 1,
+        persistentAccessToken,
+        body: {
+          dbid: 1,
+          dbname: 'movies',
+          templateId: 1,
+          export: true,
+          filetype: 'csv',
+          query: ' {\"index\": \"movies\", \"type\": \"data\", \"from\": 0, \"size\": 10, \"body\": {\"query\": { }}}',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe(undefined);
+        expect(response.body).not.toBe(undefined);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/import/export/headless request returned an error: ' + String(error));
       });
   });
 });
