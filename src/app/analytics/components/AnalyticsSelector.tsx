@@ -43,58 +43,71 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { AnalyticsState } from 'analytics/data/AnalyticsStore';
+import MultiSwitch from 'common/components/MultiSwitch';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
+import * as React from 'react';
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as _ from 'lodash';
-import * as winston from 'winston';
-
-import * as Util from '../Util';
-import * as Encryption from './Encryption';
-import { Events } from './Events';
-
-export const events: Events = new Events();
-const Router = new KoaRouter();
-
-Router.get('/time', async (ctx, next) =>
+interface Props
 {
-  ctx.body = new Date().toJSON();
-});
+  analytics: AnalyticsState;
+  onMetricSelect: (value: number | string) => void;
+  onIntervalSelect: (value: number | string) => void;
+  onDateRangeSelect: (value: number | string) => void;
+}
 
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
-// * variantid: list of variantids
-// * start: start time of the interval
-// * end: end time of the interval
-// * agg: supported aggregation operations are:
-//     `select` - returns all events between the specified interval
-//     `histogram` - returns a histogram of events between the specified interval
-//     `rate` - returns a ratio of two events between the specified interval
-// * field (optional):
-//     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
-// * interval (optional; required if `agg` is `histogram` or `rate`):
-//     the resolution of interval for aggregation operations.
-//     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
-//     also supported are values such as `1.5h`, `90m` etc.
-//
-Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
+const METRICS = Immutable.List([
+  { value: '1', label: 'Impressions' },
+  { value: '2', label: 'CTR' },
+  { value: '3', label: 'Conversions' },
+]);
+
+const INTERVALS = Immutable.List([
+  { value: 'day', label: 'Daily' },
+  { value: 'week', label: 'Weekly' },
+  { value: 'month', label: 'Monthly' },
+]);
+
+const DATE_RANGES = Immutable.List([
+  { value: '1', label: 'Today' },
+  { value: '2', label: 'Last 7 days' },
+  { value: '3', label: 'Last Month' },
+]);
+
+class AnalyticsSelector extends TerrainComponent<Props>
 {
-  Util.verifyParameters(
-    JSON.parse(JSON.stringify(ctx.request.query)),
-    ['start', 'end', 'eventid', 'variantid', 'agg'],
-  );
-  winston.info('getting events for variant');
-  const response: object[] = await events.AggregationHandler(ctx.request.query);
-  ctx.body = response.reduce((acc, x) =>
+  public render()
   {
-    for (const key in x)
-    {
-      if (x.hasOwnProperty(key) !== undefined)
-      {
-        acc[key] = x[key];
-        return acc;
-      }
-    }
-  }, {});
-});
+    const { analytics } = this.props;
+    const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
 
-export default Router;
+    return (
+      <div>
+        <p>Metric</p>
+        <MultiSwitch
+          options={METRICS}
+          value={selectedMetric.toString()}
+          usesValues
+          onChange={this.props.onMetricSelect}
+        />
+        <p>Interval</p>
+        <MultiSwitch
+          options={INTERVALS}
+          value={selectedInterval}
+          usesValues
+          onChange={this.props.onIntervalSelect}
+        />
+        <p>Date Range</p>
+        <MultiSwitch
+          options={DATE_RANGES}
+          value={selectedDateRange.toString()}
+          usesValues
+          onChange={this.props.onDateRangeSelect}
+        />
+      </div>
+    );
+  }
+}
+
+export default AnalyticsSelector;

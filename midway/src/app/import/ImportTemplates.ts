@@ -189,9 +189,9 @@ export class ImportTemplates
     });
   }
 
-  public async loginWithPersistentAccessToken(id: number, persistentAccessToken: string): Promise<ImportTemplateConfig[]>
+  public async loginWithPersistentAccessToken(templateId: number, persistentAccessToken: string): Promise<ImportTemplateConfig[]>
   {
-    return this.select([], { id, persistentAccessToken });
+    return this.select([], { id: templateId, persistentAccessToken });
   }
 
   public async select(columns: string[], filter: object): Promise<ImportTemplateConfig[]>

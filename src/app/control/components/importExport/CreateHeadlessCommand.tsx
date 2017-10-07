@@ -141,7 +141,7 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
         break;
       case fileTypeOptions.get(2): // csv
         contentTypeText = 'text/plain';
-        fileTypeTextImport  = 'csv';
+        fileTypeTextImport = 'csv';
         break;
       default:
         break;
@@ -322,7 +322,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             <div className='headless-form-input'>
               <input
                 value={this.state.midwayURLValue}
-                onChange={this.setStateWrapper('midwayURLValue', 'target', 'value')}
+                onChange={this._setStateWrapperPath('midwayURLValue', 'target', 'value')}
                 style={inputStyle}
               />
             </div>
@@ -336,7 +336,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
                 options={fileTypeOptions}
                 selectedIndex={this.state.fileTypeIndex}
                 canEdit={true}
-                onChange={this.setStateWrapper('fileTypeIndex')}
+                onChange={this._setStateWrapper('fileTypeIndex')}
                 openDown={true}
               />
             </div>
@@ -353,7 +353,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
               <div className='headless-form-input'>
                 <input
                   value={this.state.objectKeyValue}
-                  onChange={this.setStateWrapper('objectKeyValue', 'target', 'value')}
+                  onChange={this._setStateWrapperPath('objectKeyValue', 'target', 'value')}
                   style={inputStyle}
                 />
               </div>
@@ -362,7 +362,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
         </div>
         <VariantSelector
           libraryState={LibraryStore.getState()}
-          onChangeSelection={this.setStateWrapper('selectedIds')}
+          onChangeSelection={this._setStateWrapper('selectedIds')}
           ids={this.state.selectedIds}
           dropdownWidth={inputElementWidth}
         />
@@ -385,7 +385,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             <div className='headless-form-input'>
               <input
                 value={this.state.midwayURLValue}
-                onChange={this.setStateWrapper('midwayURLValue', 'target', 'value')}
+                onChange={this._setStateWrapperPath('midwayURLValue', 'target', 'value')}
                 style={inputStyle}
               />
             </div>
@@ -411,7 +411,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
                 options={fileTypeOptions}
                 selectedIndex={this.state.fileTypeIndex}
                 canEdit={true}
-                onChange={this.setStateWrapper('fileTypeIndex')}
+                onChange={this._setStateWrapper('fileTypeIndex')}
                 openDown={true}
               />
             </div>
@@ -474,7 +474,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             <Dropdown
               options={templateTextList.size !== 0 ? templateTextList : undefined}
               selectedIndex={this.state.index}
-              onChange={this.setStateWrapper('index')}
+              onChange={this._setStateWrapper('index')}
               canEdit={true}
               directionBias={90}
             />
