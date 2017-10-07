@@ -89,6 +89,8 @@ export interface ParseCSVConfig
   error: (err: string) => void;
 }
 
+const newlineDelimeters = ['\r\n', '\r', '\n'];
+
 export function parseCSV(file, config: ParseCSVConfig)
 {
   const delim = config.delimiter || ',';
@@ -99,25 +101,25 @@ export function parseCSV(file, config: ParseCSVConfig)
   let preview = config.preview;
 
   // autodetect newLine
-  let newLine;
-  const rnIndex = file.indexOf('\r\n');
-  const nIndex = file.indexOf('\n');
-  if (rnIndex === -1 && nIndex === -1)
+  let newLine: string = '';
+  let newLineIndex: number;
+  newlineDelimeters.map((newLineDelim) =>
+  {
+    const index = file.indexOf(newLineDelim);
+    if (index !== -1)
+    {
+      if (newLineIndex === undefined || newLineIndex > index)
+      {
+        newLine = newLineDelim;
+        newLineIndex = index;
+      }
+    }
+  });
+
+  if (newLine === '')
   {
     config.error('Error: no line-breaks found in uploaded CSV file.');
     return undefined;
-  }
-  if (rnIndex === -1)
-  {
-    newLine = '\n';
-  }
-  else if (nIndex === -1)
-  {
-    newLine = '\r\n';
-  }
-  else
-  {
-    newLine = rnIndex < nIndex ? '\r\n' : '\n';
   }
 
   const newLineLength = newLine.length;
