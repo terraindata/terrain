@@ -77,6 +77,7 @@ export interface Props
 {
   templates: List<Template>;
   index: number;
+  getServerName: (dbid) => string;
 }
 
 export interface HeadlessCommandData
@@ -278,13 +279,16 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
           <table className='headless-generator-info-table'>
             <tbody>
               <tr>
-                <td style={labelStyle}> Template Type: </td><td> {typeText} </td>
+                <td style={labelStyle}> Template Type: </td>
+                <td style={labelStyle}> {typeText} </td>
               </tr>
               <tr>
-                <td style={labelStyle}> Template ID: </td><td> {template.templateId} </td>
+                <td style={labelStyle}> Template ID: </td>
+                <td style={labelStyle}> {template.templateId} </td>
               </tr>
               <tr>
-                <td style={labelStyle}> Access token: </td><td className='access-token-cell'> {template.persistentAccessToken} </td>
+                <td style={labelStyle}> Access token: </td>
+                <td className='access-token-cell' style={labelStyle}> {template.persistentAccessToken} </td>
               </tr>
             </tbody>
           </table>
@@ -293,13 +297,16 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
           <table className='headless-generator-info-table'>
             <tbody>
               <tr>
-                <td style={labelStyle}> Server ID: </td><td> {template.dbid} </td>
+                <td style={labelStyle}> Server Name: </td>
+                <td style={labelStyle}> {this.props.getServerName(template.dbid)} </td>
               </tr>
               <tr>
-                <td style={labelStyle}> Index: </td><td> {template.dbname} </td>
+                <td style={labelStyle}> Index: </td>
+                <td style={labelStyle}> {template.dbname} </td>
               </tr>
               <tr>
-                <td style={labelStyle}> Type: </td><td> {template.tablename} </td>
+                <td style={labelStyle}> Type: </td>
+                <td style={labelStyle}> {template.tablename} </td>
               </tr>
             </tbody>
           </table>

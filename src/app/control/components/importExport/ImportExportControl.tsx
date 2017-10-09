@@ -53,12 +53,14 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import TemplateControlList from './TemplateControlList';
 
+import { SchemaStore } from 'schema/data/SchemaStore';
+import { Server, ServerMap } from 'schema/SchemaTypes';
 import ControlActions from '../../data/ControlActions';
 import ControlStore from '../../data/ControlStore';
 
 import './ImportExportControl.less';
 
-const { List } = Immutable;
+const { List, Map } = Immutable;
 type Template = FileImportTypes.Template;
 
 export interface Props
@@ -66,12 +68,14 @@ export interface Props
   placeholder?: string;
 }
 
-class ControlPage extends TerrainComponent<Props>
+class ImportExportControl extends TerrainComponent<Props>
 {
   public state: {
+    servers: ServerMap;
     templates: List<Template>;
   } = {
     templates: List([]),
+    servers: Map<string, Server>(),
   };
 
   constructor(props)
@@ -80,6 +84,10 @@ class ControlPage extends TerrainComponent<Props>
     this._subscribe(ControlStore, {
       stateKey: 'templates',
       storeKeyPath: ['importExportTemplates'],
+    });
+    this._subscribe(SchemaStore, {
+      stateKey: 'servers',
+      storeKeyPath: ['servers'],
     });
   }
 
@@ -93,12 +101,15 @@ class ControlPage extends TerrainComponent<Props>
     return (
       <div className='import-export-token-control-page'>
         <div className='import-export-control-title'>
-          Manage Templates
+          Manage Import and Export Templates
         </div>
-        <TemplateControlList templates={this.state.templates} />
+        <TemplateControlList
+          templates={this.state.templates}
+          servers={this.state.servers}
+        />
       </div>
     );
   }
 }
 
-export default ControlPage;
+export default ImportExportControl;

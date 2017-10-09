@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 
 import { backgroundColor, borderColor, Colors, fontColor } from 'common/Colors';
@@ -57,6 +58,7 @@ import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
+import { ServerMap } from 'schema/SchemaTypes';
 import { MidwayError } from 'shared/error/MidwayError';
 import Ajax from 'util/Ajax';
 import ControlActions from '../../data/ControlActions';
@@ -79,6 +81,7 @@ type HeaderConfig = HeaderConfigItem[];
 export interface Props
 {
   templates: List<Template>;
+  servers: ServerMap;
 }
 
 enum ConfirmActionType
@@ -90,7 +93,6 @@ enum ConfirmActionType
 class AccessTokenControl extends TerrainComponent<Props>
 {
   public state: {
-    // templates: List<Template>;
     responseModalOpen: boolean;
     responseModalMessage: string;
     responseModalTitle: string;
@@ -104,7 +106,6 @@ class AccessTokenControl extends TerrainComponent<Props>
     currentActiveIndex: number;
     headlessModalOpen: boolean;
   } = {
-    // templates: List([]),
     responseModalOpen: false,
     responseModalMessage: '',
     responseModalTitle: '',
@@ -124,6 +125,7 @@ class AccessTokenControl extends TerrainComponent<Props>
   constructor(props)
   {
     super(props);
+    this.getServerName = _.memoize(this.getServerName);
   }
 
   public getOptions(template: Template, index: number)
@@ -169,16 +171,21 @@ class AccessTokenControl extends TerrainComponent<Props>
     ]);
   }
 
+  public getServerName(dbid): string
+  {
+    const server = this.props.servers.find((v, k) => v.connectionId === dbid);
+    return server === undefined ? '' : server.get('name');
+  }
+
   public getTemplateConfig(): HeaderConfig
   {
-    // const menuOptions = List([option1]);
     return [
       ['ID', (template, index) => template.templateId],
       ['Name', (template, index) => template.templateName],
       ['Template Type', (template, index) => template.export ? 'Export' : 'Import'],
-      ['Server ID', (template, index) => template.dbid],
-      ['Index', (template, index) => template.dbname],
-      ['Type', (template, index) => template.tablename],
+      ['Server Name', (template, index) => this.getServerName(template.dbid)],
+      ['ES Index', (template, index) => template.dbname],
+      ['ES Type', (template, index) => template.tablename],
       ['Access Token', (template, index) =>
         <div className='access-token-cell'>
           {template.persistentAccessToken}
@@ -355,7 +362,13 @@ class AccessTokenControl extends TerrainComponent<Props>
 
   public renderCreateHeadlessCommand()
   {
-    return <CreateHeadlessCommand templates={this.props.templates} index={this.state.currentActiveIndex} />;
+    return (
+      <CreateHeadlessCommand
+        templates={this.props.templates}
+        index={this.state.currentActiveIndex}
+        getServerName={this.getServerName}
+      />
+    );
   }
 
   public render()
