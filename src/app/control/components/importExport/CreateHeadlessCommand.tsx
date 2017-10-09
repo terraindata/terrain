@@ -69,7 +69,7 @@ import './CreateHeadlessCommand.less';
 
 const { List } = Immutable;
 const ClipboardIcon = require('images/icon_clipboard.svg');
-const ViewIcon = require('images/icon_search.svg');
+const ViewIcon = require('images/icon_info.svg');
 
 type Template = FileImportTypes.Template;
 
@@ -463,6 +463,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
       filename: this.state.filenameValue,
       objectKey: this.state.objectKeyValue,
     });
+    const iconWrapperStyle = fontColor(Colors().bg3);
     const formComplete = requests.length === 0 && errors.length === 0;
     return (
       <div className='headless-command-generator' style={backgroundColor(Colors().altBg2)}>
@@ -480,7 +481,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             />
           </div>
           <div className='headless-entry-icon-wrapper'
-            style={fontColor('#555')}
+            style={iconWrapperStyle}
           >
             {
               template !== undefined && tooltip(
@@ -505,7 +506,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             formComplete &&
             <CopyToClipboard text={command} onCopy={this.handleTextCopied}>
               <div className='headless-entry-icon-wrapper'
-                style={fontColor('#555')}
+                style={iconWrapperStyle)}
               >
                 {
                   tooltip(
