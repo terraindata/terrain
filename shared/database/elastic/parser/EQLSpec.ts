@@ -1652,7 +1652,6 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
         // template: { must: null, must_not: null, should: null, minimum_should_match: null },
         suggestions: ['must', 'must_not', 'filter', 'should', 'minimum_should_match'],
-        rewrite: ESTerrainClauseUtil.bool2filter,
       }),
     new ESVariantClause('must',
       {
