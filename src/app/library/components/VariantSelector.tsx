@@ -54,16 +54,12 @@ import * as React from 'react';
 import Dropdown from 'common/components/Dropdown';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { LibraryState } from 'library/data/LibraryStore';
-import * as LibraryTypes from 'library/LibraryTypes';
+import { LibraryItem } from 'library/LibraryTypes';
 
 import './VariantSelector.less';
 
 const Color = require('color');
 const { List } = Immutable;
-
-type Variant = LibraryTypes.Variant;
-type Group = LibraryTypes.Group;
-type Algorithm = LibraryTypes.Algorithm;
 
 export interface Props
 {
@@ -72,7 +68,6 @@ export interface Props
   onChangeSelection: (ids: List<number>) => void;
 }
 
-type LibraryItem = Group | Variant | Algorithm;
 type AvailableItemsType = [List<LibraryItem>, List<string>, number];
 
 class VariantSelector extends TerrainComponent<Props>
