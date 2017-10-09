@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESTerrainClauseUtil from 'shared/database/elastic/parser/clauses/ESTerrainClauseUtil';
 import ESAnyClause from './clauses/ESAnyClause';
 import ESArrayClause from './clauses/ESArrayClause';
 import ESBaseClause from './clauses/ESBaseClause';
