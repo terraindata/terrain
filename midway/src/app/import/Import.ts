@@ -892,7 +892,7 @@ export class Import
     switch (this.NUMERIC_TYPES.has(typeObj['type']) ? 'number' : typeObj['type'])
     {
       case 'number':
-        if (item[field] === '')
+        if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }
