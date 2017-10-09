@@ -278,19 +278,6 @@ class AggregationComponent extends TerrainComponent<Props> {
     );
   }
 
-  // <CopyToClipboard text={command} onCopy={this.handleTextCopied}>
-  //             <div className='headless-entry-icon-wrapper'
-  //               style={fontColor('#555')}
-  //             >
-  //               {
-  //                 tooltip(
-  //                   <ClipboardIcon className='headless-entry-icon clipboard-icon-big' />,
-  //                   { title: 'Copy Command to Clipboard', distance: 15 },
-  //                 )
-  //               }
-  //             </div>
-  //           </CopyToClipboard>
-
   public renderExpandedAgg()
   {
     const values = _.values(this.props.aggregation)[0];
@@ -298,11 +285,11 @@ class AggregationComponent extends TerrainComponent<Props> {
       case 'Table':
         return this.renderTableView(values);
       case 'Histogram':
-        return this.renderHistogram(values)
+        return this.renderHistogram(values);
       case 'Raw':
-        return <pre> {JSON.stringify(values, undefined, 2)} </pre>
+        return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
       default:
-        return <pre> {JSON.stringify(values, undefined, 2)} </pre>
+        return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
     }
   }
 
@@ -420,20 +407,16 @@ class AggregationComponent extends TerrainComponent<Props> {
   public renderExport()
   {
 
-    // const content =
-    //   <div
-    //     style={backgroundColor(Colors().bg1)}
-    //   >
-    //     test
-    //   </div>;
+    const content =
+      <div
+        style={backgroundColor(Colors().bg1)}
+      >
+        test
+      </div>;
 
       // const { previewColumns, columnNames, columnsToInclude, columnTypes, templates, transforms,
       // filetype, requireJSONHaveAllFields, exportRank, elasticUpdate, objectKey } = this.props.exportState;
 
-      const content =
-      <div
-        style={backgroundColor(Colors().bg1)}
-      >
 
     return (
       <Modal
