@@ -4,7 +4,6 @@
 @command-content-height: 100px;
 
 .headless-command-generator {
-  margin: auto;
   display: flex;
   padding: @spacing;
   flex-direction: column;
@@ -47,13 +46,13 @@
       padding: @quarter-spacing;
       position: relative;
       width: @icon-size + 2px;
+      display: flex;
+      align-items: center;
 
       .headless-entry-icon {
         cursor: pointer;
         position: relative;
-        top: 50%;
         padding: 1px;
-        transform: translateY(-50%);
         width: @icon-size;
         height: @icon-size;
         fill: currentColor;
@@ -125,10 +124,8 @@
 
     .headless-command-veil {
       position: absolute;
-      top: -5%;
-      left: -5%;
-      width: 110%;
-      height: 110%;
+      width: 100%;
+      height: 100%;
       z-index: 1;
     }
   }

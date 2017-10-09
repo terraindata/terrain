@@ -1,7 +1,7 @@
 @import "../../../common/Common.less";
 
 @border-style: 1px solid;
-@border-radius: 3px;
+@border-radius: 0px;
 @icon-ratio: 1.25;
 @icon-size: calc(1em*@icon-ratio);
 
@@ -9,29 +9,31 @@
   display: table;
   margin-top: @spacing;
   margin: auto;
-  border-collapse: separate;
-  border-spacing: 0px @spacing;
+  border-collapse: collapse;
 
   .template-info {
     display: table-row;
+    border-top: @border-style;
+    border-bottom: @border-style;
 
     .template-info-data {
       .common-cell-properties;
       padding: @quarter-spacing @spacing;
-      border-top: @border-style;
-      border-bottom: @border-style;
 
-      &:first-child {
-        border-left: @border-style;
-        border-bottom-left-radius: @border-radius;
-        border-top-left-radius: @border-radius;
-      }
+      // border-top: inherit;
+      // border-bottom: inherit;
 
-      &:last-child {
-        border-right: @border-style;
-        border-bottom-right-radius: @border-radius;
-        border-top-right-radius: @border-radius;
-      }
+      // &:first-child {
+      //   border-left: @border-style;
+      //   border-bottom-left-radius: @border-radius;
+      //   border-top-left-radius: @border-radius;
+      // }
+
+      // &:last-child {
+      //   border-right: @border-style;
+      //   border-bottom-right-radius: @border-radius;
+      //   border-top-right-radius: @border-radius;
+      // }
     }
 
     .access-token-cell {
@@ -47,7 +49,7 @@
 
     .template-info-data {
       .common-cell-properties;
-      padding: 0px @spacing;
+      padding: @half-spacing @spacing;
     }
   }
 

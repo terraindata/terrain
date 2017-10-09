@@ -167,28 +167,6 @@ export class ImportTemplates
     return this.select([], filter);
   }
 
-  public async getStringified(id?: number): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-
-      const filter: object = (id !== undefined) ? { id } : {};
-      const templates: ImportTemplateConfig[] = await this.select([], filter);
-      const templatesStringified: ImportTemplateConfigStringified[] = templates.map((template) =>
-      {
-        return this._stringifyConfig(template);
-      });
-
-      const allTemplates: object =
-        {
-          default: JSON.stringify(templates as object[]),
-          stringified: JSON.stringify(templatesStringified),
-        };
-      const stringifiedTemplates: string = JSON.stringify(allTemplates);
-      return resolve(stringifiedTemplates);
-    });
-  }
-
   public async loginWithPersistentAccessToken(templateId: number, persistentAccessToken: string): Promise<ImportTemplateConfig[]>
   {
     return this.select([], { id: templateId, persistentAccessToken });
