@@ -44,45 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-var webpack = require("webpack");
-var path = require("path");
+import * as TerrainAnalytics from './TerrainAnalytics';
 
-module.exports =
-{
-    entry: "./lib/Entrypoint.ts",
-    devtool: "cheap-module-source-map",
-
-    output:
-    {
-        path: __dirname,
-        publicPath: "/build/",
-        filename: "bundle.js",
-    },
-
-    resolve:
-    {
-        extensions: [ ".js", ".ts", ".json" ],
-    },
-
-    module:
-    {
-        rules:
-        [
-            {
-                test: /\.ts(x?)$/,
-                exclude: [/node_modules/],
-                loader:
-                    "ts-loader?happyPackMode=true"
-                    + JSON.stringify({
-                        compilerOptions: {
-                        },
-                    }),
-            },
-        ],
-    },
-
-    plugins:
-    [
-    ],
-
-};
+// noinspection TypeScriptUnresolvedVariable
+window['TerrainAnalytics'] = TerrainAnalytics;
+module.exports = TerrainAnalytics;
