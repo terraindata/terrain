@@ -200,7 +200,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
   } = {
     index: this.props.index,
     fileTypeIndex: 0,
-    midwayURLValue: 'localhost:3000',
+    midwayURLValue: this.getInitialURL(),
     objectKeyValue: '',
     selectedIds: List([-1, -1, -1]),
     filenameValue: '',
@@ -227,6 +227,11 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
         index: nextProps.index,
       });
     }
+  }
+
+  public getInitialURL()
+  {
+    return window.location.origin.match(/http:\/\/localhost:8080/) ? 'localhost:3000' : window.location.origin;
   }
 
   public getTemplateTextList(): List<string>

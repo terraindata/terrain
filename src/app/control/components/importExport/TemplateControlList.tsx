@@ -51,7 +51,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors, fontColor } from 'common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'common/Colors';
 import { notificationManager } from 'common/components/InAppNotification';
 import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
@@ -316,15 +316,31 @@ class AccessTokenControl extends TerrainComponent<Props>
     });
   }
 
+  public renderTemplateCellStyle(index, length)
+  {
+    if (index === 0)
+    {
+      return cellLeftStyle;
+    }
+    else if (index === length - 1)
+    {
+      return cellRightStyle;
+    }
+    else
+    {
+      return cellMiddleStyle;
+    }
+  }
+
   public renderTemplate(template: Template, index: number)
   {
     return (
-      <div className='template-info' key={index} style={backgroundColor(Colors().bg3)}>
+      <div className='template-info' key={index} style={tableRowStyle}>
         {
           this.getTemplateConfig().map((headerItem: HeaderConfigItem, i: number) =>
           {
             return (
-              <div className='template-info-data' key={i} style={borderColor(Colors().border3)}>
+              <div className='template-info-data' key={i} style={this.renderTemplateCellStyle(i, this.getTemplateConfig().length)}>
                 {headerItem[1](template, index)}
               </div>
             );
@@ -419,5 +435,27 @@ class AccessTokenControl extends TerrainComponent<Props>
     );
   }
 }
+
+const tableRowStyle = _.extend({},
+  getStyle('boxShadow', 'rgba(0, 0, 0, 0.39) 2px 2px 4px 1px'),
+  backgroundColor(Colors().bg3),
+);
+
+const cellMiddleStyle = _.extend({},
+  getStyle('borderTopColor', Colors().highlight),
+  getStyle('borderBottomColor', Colors().darkerHighlight),
+)
+
+const cellLeftStyle = _.extend({},
+  getStyle('borderLeftColor', Colors().border1),
+  getStyle('borderTopColor', Colors().highlight),
+  getStyle('borderBottomColor', Colors().darkerHighlight),
+);
+
+const cellRightStyle = _.extend({},
+  getStyle('borderRightColor', Colors().darkerHighlight),
+  getStyle('borderTopColor', Colors().highlight),
+  getStyle('borderBottomColor', Colors().darkerHighlight),
+);
 
 export default AccessTokenControl;
