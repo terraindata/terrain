@@ -128,7 +128,7 @@ class TerrainComponent<T> extends React.Component<T, any>
     };
 
     this._setStateWrapper = _.memoize(this._setStateWrapper);
-    this._setStateWrapperPath = _.memoize(this._setStateWrapperPath, this._setStateWrapperPathResolver);
+    this._setStateWrapperPath = _.memoize(this._setStateWrapperPath, this.__setStateWrapperPathResolver);
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
   }
 
@@ -141,14 +141,9 @@ class TerrainComponent<T> extends React.Component<T, any>
   }
 
   // avoid having periods in the key or the path, since they are used as delimiters for the cache key.
-  public _setStateWrapperPathResolver(key: string, ...path: string[]): string
+  public __setStateWrapperPathResolver(key: string, ...path: string[]): string
   {
-    let accumulator = key;
-    for (const k of path)
-    {
-      accumulator += '.' + k;
-    }
-    return accumulator;
+    return key + path.join('.');
   }
 
   public _setStateWrapperPath(key: string, ...path: string[]): (val) => void
