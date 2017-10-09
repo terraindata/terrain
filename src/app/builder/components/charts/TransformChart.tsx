@@ -91,7 +91,6 @@ const TransformChart = {
     svg.append('g')
       .attr('class', 'bottomAxis');
 
-
     const innerSvg = svg.append('svg')
       .attr('class', 'inner-svg')
       .attr('x', xMargin)

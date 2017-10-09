@@ -101,8 +101,8 @@ class ResultsColumn extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.setState({
-      selectedTab : TAB_NAMES.indexOf(this.props.query.resultsViewMode);
-    }); 
+      selectedTab: TAB_NAMES.indexOf(this.props.query.resultsViewMode),
+    });
   }
 
   public componentWillReceiveProps(nextProps)
@@ -119,11 +119,18 @@ class ResultsColumn extends TerrainComponent<Props>
         highlightedTabs: this.state.highlightedTabs.set('aggregations', true),
       });
     }
+    if (this.props.query.resultsViewMode !== nextProps.query.resultsViewMode)
+    {
+      this.setState({
+        selectedTab: TAB_NAMES.indexOf(nextProps.query.resultsViewMode),
+      });
+    }
   }
 
   public setSelectedTab(name, index)
   {
-    Actions.changeQuery(this.props.query.set('resultsViewMode', name));
+
+    Actions.change(List(this._keyPath('query', 'resultsViewMode')), name);
     this.setState({
       selectedTab: index,
       highlightedTabs: this.state.highlightedTabs.set(name.toLowerCase(), false),

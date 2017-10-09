@@ -54,7 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+// import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Modal from '../../../common/components/Modal';
 import ColorManager from '../../../util/ColorManager';
 import Histogram from './../../../charts/components/Histogram';
