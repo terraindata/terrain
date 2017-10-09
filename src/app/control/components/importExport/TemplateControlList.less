@@ -9,30 +9,31 @@
   display: table;
   margin-top: @spacing;
   margin: auto;
-  border-collapse: separate;
-  border-spacing: 0px @half-spacing;
+  border-collapse: collapse;
 
   .template-info {
     display: table-row;
-    border: @border-style;
+    border-top: @border-style;
+    border-bottom: @border-style;
 
     .template-info-data {
       .common-cell-properties;
       padding: @quarter-spacing @spacing;
-      border-top: inherit;
-      border-bottom: inherit;
 
-      &:first-child {
-        border-left: 3px solid;
-        border-bottom-left-radius: @border-radius;
-        border-top-left-radius: @border-radius;
-      }
+      // border-top: inherit;
+      // border-bottom: inherit;
 
-      &:last-child {
-        border-right: @border-style;
-        border-bottom-right-radius: @border-radius;
-        border-top-right-radius: @border-radius;
-      }
+      // &:first-child {
+      //   border-left: @border-style;
+      //   border-bottom-left-radius: @border-radius;
+      //   border-top-left-radius: @border-radius;
+      // }
+
+      // &:last-child {
+      //   border-right: @border-style;
+      //   border-bottom-right-radius: @border-radius;
+      //   border-top-right-radius: @border-radius;
+      // }
     }
 
     .access-token-cell {
@@ -48,7 +49,7 @@
 
     .template-info-data {
       .common-cell-properties;
-      padding: 0px @spacing;
+      padding: @half-spacing @spacing;
     }
   }
 
