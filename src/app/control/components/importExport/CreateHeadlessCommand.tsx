@@ -506,7 +506,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             formComplete &&
             <CopyToClipboard text={command} onCopy={this.handleTextCopied}>
               <div className='headless-entry-icon-wrapper'
-                style={iconWrapperStyle)}
+                style={iconWrapperStyle}
               >
                 {
                   tooltip(
