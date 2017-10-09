@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import jsurl = require('jsurl');
 import * as KoaRouter from 'koa-router';
 import * as _ from 'lodash';
 
@@ -116,6 +117,16 @@ export class Router
       req = request.query;
     }
 
+    let meta = req['meta'];
+    try
+    {
+      meta = jsurl.parse(req['meta']);
+    }
+    catch (e)
+    {
+      meta = req['meta'];
+    }
+
     const event: EventConfig = {
       eventid: req['eventid'],
       variantid: req['variantid'],
@@ -127,7 +138,7 @@ export class Router
         referer: request.header.referer,
       },
       timestamp: new Date(),
-      meta: req['meta'],
+      meta,
     };
 
     if (_.difference(Object.keys(req), Object.keys(event).concat(['id', 'accessToken'])).length > 0)

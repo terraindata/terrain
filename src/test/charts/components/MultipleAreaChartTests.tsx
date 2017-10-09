@@ -161,13 +161,13 @@ describe('MultipleAreaChart', () =>
 
   describe('#handleZoom', () =>
   {
-    it('should update state.selectedDomain (that handles the brush)', () =>
+    it('should update state.brushDomain (that handles the brush)', () =>
     {
-      expect(chartComponent.state().selectedDomain).toEqual({});
+      expect(chartComponent.state().brushDomain).toEqual({});
       const nextZoomDomain = { x: [0, 5], y: [10, 15] };
       chartComponent.instance().handleZoom(nextZoomDomain);
 
-      expect(chartComponent.state().selectedDomain).toEqual(nextZoomDomain);
+      expect(chartComponent.state().brushDomain).toEqual(nextZoomDomain);
     });
   });
 

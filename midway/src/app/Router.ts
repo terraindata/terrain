@@ -78,6 +78,11 @@ AppRouter.use('/import', ImportRouter.routes(), ImportRouter.allowedMethods());
 AppRouter.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.allowedMethods());
 // Add future routes here.
 
+AppRouter.get('/time', (ctx, next) =>
+{
+  ctx.body = new Date().toJSON();
+});
+
 // Prefix all routes with /midway
 //  This is so that we can allow the front-end to use all other routes.
 //  Any route not prefixed with /midway will just serve the front-end.

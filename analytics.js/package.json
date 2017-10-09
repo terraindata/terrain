@@ -38,11 +38,14 @@
     },
     "testURL": "http://localhost"
   },
-  "dependencies": {},
+  "dependencies": {
+    "clientjs": "^0.1.11",
+    "jsurl": "^0.1.5"
+  },
   "devDependencies": {
     "ts-loader": "^2.3.7",
     "tslint": "^5.7.0",
-    "typescript": "^2.5.2",
+    "typescript": "^2.5.3",
     "typescript-formatter": "^6.0.0",
     "webpack": "^3.5.6"
   }
