@@ -78,6 +78,7 @@ const RESULTS_PAGE_SIZE = 20;
 export interface Props
 {
   resultsState: ResultsState;
+  exportState?: FileImportState;
   db: BackendInstance;
   query: Query;
   onNavigationException: () => void;
@@ -113,15 +114,12 @@ class AggregationsArea extends TerrainComponent<Props>
       return Map({});
     }
     let aggsList = query.aggregationList !== undefined ? query.aggregationList : Map({});
-    console.log("ORIGINAL AGGS LIST", aggsList);
     _.keys(aggregations).forEach((name) => {
       if (aggsList.get(name) === undefined)
       {
-        console.log(name + ' is undefined: ' + aggsList.get(name));
         aggsList = aggsList.set(name, 'Raw');
       }
     });
-    console.log("NEW AGGS LIST", aggsList);
     return aggsList;
   }
 

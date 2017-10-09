@@ -1002,6 +1002,8 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderTable()
   {
+    console.log(this.props.columnNames);
+    console.log(this.props.previewColumns);
     const previewColumns = this.props.columnNames.map((value, key) =>
       <FileImportPreviewColumn
         key={key}

@@ -255,6 +255,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public render()
   {
+    console.log(this.props);
     return (
       <div
         className={classNames({
@@ -284,6 +285,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           </div>
         </div>
         {
+          this.props.items ? 
           this.props.items.map((item, key) =>
             <div
               key={key}
@@ -304,6 +306,8 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
               </div>
             </div>,
           )
+          : 
+          ''
         }
       </div>
     );

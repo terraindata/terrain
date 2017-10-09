@@ -214,6 +214,8 @@ class ResultsColumn extends TerrainComponent<Props>
             db={this.props.db}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
+            exportState={this.props.exportState}
+
           />
         );
       case 2:
