@@ -99,7 +99,7 @@ export default class AggsTable extends TerrainComponent<Props>
     else
     {
       rows = _.keys(tableData).map((key) => {
-        return {key, value: tableData[key]}
+        return {key, value: tableData[key]};
       });
     }
     console.log(rows);

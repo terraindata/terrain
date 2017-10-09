@@ -130,7 +130,6 @@ const Histogram = {
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height);
 
     const scales = this._scales(el, state.domain, state.barsData, state.width, state.height);
-    console.log(state);
     this._draw(el, scales, state.domain, state.barsData, state.width, state.height, state.colors, state.xLabels, state.yLabels);
   },
 
@@ -222,7 +221,6 @@ const Histogram = {
     {
       // TODO calculate correct width of bars here
       const chartWidth = d3.select(el).select('.inner-svg').attr('width');
-      console.log(chartWidth);
       let width = (chartWidth / barsData.length);
       if (width < 1)
       {
@@ -247,7 +245,6 @@ const Histogram = {
 
   _draw(el, scales, domain, barsData, width, height, colors, xLabels, yLabels)
   {
-    console.log(width);
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realBarY));

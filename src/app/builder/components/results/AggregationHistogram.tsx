@@ -64,12 +64,8 @@ import Histogram from './../../../charts/components/Histogram';
 
 export interface Props
 {
-  barsData: any;
-  xLabels?: List<string>;
-  yLabels?: List<string>;
+  data: any;
   colors: [string, string];
-  domain: List<number>;
-  range: List<number>;
   containerWidth?: number;
 }
 
@@ -88,20 +84,90 @@ class AggregationHistogram extends TerrainComponent<Props>
     Histogram.create(el, this.getChartState());
   }
 
+   public parseData(buckets)
+  {
+    let data;
+    let domainMin: number = Infinity;
+    let domainMax: number = -Infinity;
+    let rangeMax: number = -Infinity;
+    let categories = [];
+    // RANGE QUERIES
+    if (buckets[0] && (buckets[0].to || buckets[0].from))
+    {
+      domainMin = 0;
+      domainMax = buckets.length;
+      data = buckets.map((bucket, i) =>
+      {
+        if (bucket.doc_count > rangeMax)
+        {
+          rangeMax = bucket.doc_count;
+        }
+        return { x: i, y: bucket.doc_count };
+      });
+      categories = buckets.map((bucket) =>
+      {
+        const to = bucket.to !== undefined ? String(bucket.to) : '';
+        const from = bucket.from !== undefined ? String(bucket.from) : '';
+        return from + '-' + to;
+      });
+    }
+    // TERMS QUERIES
+    else if (buckets[0] && buckets[0].key && typeof buckets[0].key === 'string')
+    {
+      domainMin = 0;
+      domainMax = buckets.length;
+      data = buckets.map((bucket, i) =>
+      {
+        if (bucket.doc_count > rangeMax)
+        {
+          rangeMax = bucket.doc_count;
+        }
+        return { x: i, y: bucket.doc_count };
+      });
+      categories = buckets.map((bucket) =>
+      {
+        return bucket.key;
+      });
+    }
+    // HISTOGRAM QUERIES
+    else
+    {
+      data = buckets.map((bucket) =>
+      {
+        if (bucket.doc_count > rangeMax)
+        {
+          rangeMax = bucket.doc_count;
+        }
+        if (bucket.key > domainMax)
+        {
+          domainMax = bucket.key;
+        }
+        if (bucket.key < domainMin)
+        {
+          domainMin = bucket.key;
+        }
+        return { x: bucket.key, y: bucket.doc_count };
+      });
+    }
+    return { barsData: data, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
+  }
+
   public getChartState(overrideState?: any)
   {
     overrideState = overrideState || {};
+    const buckets = overrideState.data || this.props.data;
+    const { barsData, categories, domain, range } = this.parseData(buckets);
 
     const chartState = {
-      barsData: (overrideState.barsData || this.props.barsData),
+      barsData: (barsData),
       domain: {
-        x: (overrideState.domain && overrideState.domain.toJS()) || this.props.domain.toJS(),
-        y: this.props.range.toJS(),
+        x: domain.toJS(),
+        y: range.toJS(),
       },
       width: overrideState.containerWidth || this.props.containerWidth || 300,
       height: 300,
       colors: this.props.colors,
-      xLabels: (overrideState.xLabels && overrideState.xLabels.toJS()) || this.props.xLabels.toJS(),
+      xLabels: categories,
     };
 
     return chartState;

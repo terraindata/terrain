@@ -53,14 +53,14 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import Query from '../../../../items/types/Query';
 import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
-// import { CopyToClipboard } from 'react-copy-to-clipboard';
-import Actions from '../../data/BuilderActions';
 import Modal from '../../../common/components/Modal';
 import ColorManager from '../../../util/ColorManager';
+// import { CopyToClipboard } from 'react-copy-to-clipboard';
+import Actions from '../../data/BuilderActions';
 import Histogram from './../../../charts/components/Histogram';
 import Menu, { MenuOption } from './../../../common/components/Menu';
-import Query from '../../../../items/types/Query';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
@@ -297,11 +297,11 @@ class AggregationComponent extends TerrainComponent<Props> {
       case 'Table':
         return this.renderTableView(values);
       case 'Histogram':
-        return this.renderHistogram(values)
+        return this.renderHistogram(values);
       case 'Raw':
-        return <pre> {JSON.stringify(values, undefined, 2)} </pre>
+        return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
       default:
-        return <pre> {JSON.stringify(values, undefined, 2)} </pre>
+        return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
     }
   }
 
@@ -331,87 +331,15 @@ class AggregationComponent extends TerrainComponent<Props> {
     return values.buckets !== undefined;
   }
 
-  public parseDataForHistogram(buckets)
-  {
-    let data;
-    let domainMin: number = Infinity;
-    let domainMax: number = -Infinity;
-    let rangeMax: number = -Infinity;
-    let categories = [];
-    // RANGE QUERIES
-    if (buckets[0] && (buckets[0].to || buckets[0].from))
-    {
-      domainMin = 0;
-      domainMax = buckets.length;
-      data = buckets.map((bucket, i) =>
-      {
-        if (bucket.doc_count > rangeMax)
-        {
-          rangeMax = bucket.doc_count;
-        }
-        return { x: i, y: bucket.doc_count };
-      });
-      categories = buckets.map((bucket) =>
-      {
-        const to = bucket.to !== undefined ? String(bucket.to) : '';
-        const from = bucket.from !== undefined ? String(bucket.from) : '';
-        return from + '-' + to;
-      });
-    }
-    // TERMS QUERIES
-    else if (buckets[0] && buckets[0].key && typeof buckets[0].key === 'string')
-    {
-      domainMin = 0;
-      domainMax = buckets.length;
-      data = buckets.map((bucket, i) =>
-      {
-        if (bucket.doc_count > rangeMax)
-        {
-          rangeMax = bucket.doc_count;
-        }
-        return { x: i, y: bucket.doc_count };
-      });
-      categories = buckets.map((bucket) =>
-      {
-        return bucket.key;
-      });
-    }
-    // HISTOGRAM QUERIES
-    else
-    {
-      data = buckets.map((bucket) =>
-      {
-        if (bucket.doc_count > rangeMax)
-        {
-          rangeMax = bucket.doc_count;
-        }
-        if (bucket.key > domainMax)
-        {
-          domainMax = bucket.key;
-        }
-        if (bucket.key < domainMin)
-        {
-          domainMin = bucket.key;
-        }
-        return { x: bucket.key, y: bucket.doc_count };
-      });
-    }
-    return { data, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
-  }
-
   public renderHistogram(values)
   {
     if (this.canBeHistogram())
     {
       const buckets = _.values(this.props.aggregation)[0].buckets;
-      const { data, categories, domain, range } = this.parseDataForHistogram(buckets);
       return (
         <AggregationHistogram
-          barsData={data}
-          xLabels={List<string>(categories)}
+          data={buckets}
           colors={[Colors().active, Colors().activeHover]}
-          domain={domain}
-          range={range}
         />
       );
     }
