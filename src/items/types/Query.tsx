@@ -53,7 +53,6 @@ import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';
-import { Aggregation, Aggregations } from '../../builder/components/results/ResultTypes';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change

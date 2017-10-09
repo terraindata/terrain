@@ -119,7 +119,7 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public isSingleValue(aggregation)
   {
-    return _.values(aggregation).length === 1 && _.values(aggregation).value !== undefined;
+    return _.values(aggregation).length === 1 && _.values(aggregation)[0].value !== undefined;
   }
 
   public toggleExpanded()
@@ -241,15 +241,20 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public renderSingleAgg()
   {
-    const content = this.props.name + ' ' + String(this.props.aggregation.value);
+    const {name, aggregation} = this.props;
     return (
       <div
         className='aggregation-title-bar'
       >
-        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded}>
+        <div className='aggregation-title-bar-title'>
+          <span>
           {
-            content
+            name + ':  '
           }
+          </span>
+          <span className='aggregation-title-bar-value'>
+            {String(_.values(aggregation)[0].value)}
+          </span>
         </div>
         {
           (
@@ -302,17 +307,19 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public canBeTable()
   {
-    const values = _.values(this.props.aggregation)[0];
-    return values.buckets !== undefined;
+    return true;
+    // const values = _.values(this.props.aggregation)[0];
+    // return values.buckets !== undefined;
   }
 
-  public renderTableView(tableData)
+  public renderTableView(values)
   {
     if (this.canBeTable())
     {
       return (
         <AggsTable
-          tableData={tableData}
+          tableData={values}
+          useBuckets={values.buckets !== undefined}
         />
       );
     }
