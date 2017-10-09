@@ -54,6 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Modal from '../../../common/components/Modal';
 import ColorManager from '../../../util/ColorManager';
 import Histogram from './../../../charts/components/Histogram';
@@ -216,6 +217,19 @@ class AggregationComponent extends TerrainComponent<Props> {
 
     );
   }
+
+  // <CopyToClipboard text={command} onCopy={this.handleTextCopied}>
+  //             <div className='headless-entry-icon-wrapper'
+  //               style={fontColor('#555')}
+  //             >
+  //               {
+  //                 tooltip(
+  //                   <ClipboardIcon className='headless-entry-icon clipboard-icon-big' />,
+  //                   { title: 'Copy Command to Clipboard', distance: 15 },
+  //                 )
+  //               }
+  //             </div>
+  //           </CopyToClipboard>
 
   public renderExpandedAgg()
   {

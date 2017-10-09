@@ -83,6 +83,7 @@ class QueryC
   parseTree: ESInterpreter = null;
   lastMutation: number = 0;
   deckOpen: boolean = false; // TODO change back to TRUE once deck is complete
+  resultsViewMode: string = 'Hits';
 
   cardsAndCodeInSync: boolean = false;
 
@@ -110,6 +111,7 @@ export const _Query = (config?: object) =>
   config['resultsConfig'] = _ResultsConfig(config['resultsConfig']);
   config['meta'] = Map<string, any>(config['meta']);
   config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);
+  config['resultsViewMode'] = 'Hits';
   config['tuningOrder'] = List<string>(config['tuningOrder']);
   const query = new Query_Record(config) as any as Query;
 
@@ -122,6 +124,7 @@ export function queryForSave(query: Query): object
     .set('cards', BlockUtils.cardsForServer(query.cards))
     .set('parseTree', null)
     .set('resultsConfig', query.resultsConfig.toJS());
+
   return query.toJS();
 }
 

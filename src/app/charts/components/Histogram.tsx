@@ -83,7 +83,7 @@ const Histogram = {
       ;
 
     svg.append('rect')
-      .attr('class', 'bg');
+      .attr('class', 'bg')
 
     svg.append('g')
       .attr('class', 'yLeftAxis');

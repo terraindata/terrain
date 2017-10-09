@@ -98,6 +98,13 @@ class ResultsColumn extends TerrainComponent<Props>
     highlightedTabs: Map({ hits: false, aggregations: false }),
   };
 
+  public componentWillMount()
+  {
+    this.setState({
+      selectedTab : TAB_NAMES.indexOf(this.props.query.resultsViewMode);
+    }); 
+  }
+
   public componentWillReceiveProps(nextProps)
   {
     if (!this.props.resultsState.hits.equals(nextProps.resultsState.hits) && this.state.selectedTab !== 0)
@@ -116,6 +123,7 @@ class ResultsColumn extends TerrainComponent<Props>
 
   public setSelectedTab(name, index)
   {
+    Actions.changeQuery(this.props.query.set('resultsViewMode', name));
     this.setState({
       selectedTab: index,
       highlightedTabs: this.state.highlightedTabs.set(name.toLowerCase(), false),
