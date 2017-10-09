@@ -51,6 +51,7 @@ const { List, Map } = Immutable;
 import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
 import { _Query, Query, queryForSave } from '../../items/types/Query';
 
+export type LibraryItem = Group | Variant | Algorithm;
 // TODO MOD refactor
 
 class VariantC extends ItemC
