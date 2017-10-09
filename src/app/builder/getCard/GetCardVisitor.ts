@@ -155,6 +155,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         typeName?: string;
         accepts?: List<string>;
 
+        errors?: string[];
+
         getChildTerms?: (card: Card, schemaState) => List<string>;
         getNeighborTerms?: (card: Card, schemaState) => List<string>;
         getParentTerms?: (card: Card, schemaState) => List<string>;
@@ -173,7 +175,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: clause.name,
-      clause: clause,
+      clause,
+      errors: [],
       colors: getCardColors(clause.path[0], Colors().border2),
       language: 'elastic',
       description: clause.desc,
@@ -892,6 +895,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           },
         },
         tql: (stringBlock) => stringBlock['value'],
+        singleType: true,
+        typeName: 'boolean',
       },
     });
   }

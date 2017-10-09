@@ -104,43 +104,6 @@ export default class ESValueInfo
    */
   private _errors: ESParserError[];
 
-  public static fromValue(val): ESValueInfo | null
-  {
-    let valueInfo = null;
-    if (val === null)
-    {
-      valueInfo = new ESValueInfo();
-      valueInfo.jsonType = ESJSONType.null;
-      valueInfo.value = null;
-    }
-    switch (typeof val)
-    {
-      case 'string':
-      {
-        valueInfo = new ESValueInfo();
-        valueInfo.jsonType = ESJSONType.string;
-        valueInfo.value = val;
-        break;
-      }
-      case 'number':
-      {
-        valueInfo = new ESValueInfo();
-        valueInfo.jsonType = ESJSONType.number;
-        valueInfo.value = val;
-        break;
-      }
-      case 'boolean':
-      {
-        valueInfo = new ESValueInfo();
-        valueInfo.jsonType = ESJSONType.boolean;
-        valueInfo.value = val;
-        break;
-      }
-      default:
-    }
-    return valueInfo;
-  }
-
   public constructor()
   {
     this.jsonType = ESJSONType.unknown;
@@ -183,6 +146,11 @@ export default class ESValueInfo
   public get errors(): ESParserError[]
   {
     return this._errors;
+  }
+
+  public hasError(): boolean
+  {
+    return this._errors.length > 0;
   }
 
   public attachError(error: ESParserError): void

@@ -54,14 +54,13 @@ import Query from '../../../items/types/Query';
 import Options from '../../types/CardsToCodeOptions';
 
 import { isInput } from '../../../blocks/types/Input';
-import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
 import ESCardParser from './ESCardParser';
+import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
 
 class CardsToElastic
 {
   public static toElastic(query: Query, options: Options = {}): string
   {
-    const t = ESCardParser.parseQuery(query, options);
     const rootCard = query.cards.get(0);
     if (!rootCard)
     {

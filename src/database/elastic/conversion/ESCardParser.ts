@@ -44,108 +44,214 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import {Query} from '../../../items/types/Query';
-import Options from '../../types/CardsToCodeOptions';
+// tslint:disable:restrict-plus-operands strict-boolean-expressions
 
+import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
-
-import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
-import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
-import {Block} from '../../../blocks/types/Block';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
+import ESParserError from '../../../../shared/database/elastic/parser/ESParserError';
 import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
+import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+
+import { Block } from '../../../blocks/types/Block';
+
+import { BuilderStore } from 'builder/data/BuilderStore';
+
+import { toInputMap } from '../../../blocks/types/Input';
+
 export default class ESCardParser
 {
-  public static parseQuery(query: Query, options: Options = {}) : ESInterpreter
+  public static parseAndUpdateCards(cards: List<Block>): void
   {
-    const rootCard = query.cards.get(0);
+    if (cards.size === 0)
+    {
+      return;
+    }
+    const rootCard = cards.get(0);
+    // assert this is the root card
+    if (rootCard['key'] !== 'root')
+    {
+      return;
+    }
+    const parsedCard = new ESCardParser(rootCard);
+    const state = BuilderStore.getState();
+    let inputs = state.query && state.query.inputs;
+    if (inputs === null)
+    {
+      inputs = Immutable.List([]);
+    }
+    const params: { [name: string]: any; } = toInputMap(inputs);
+    const cardInterpreter = new ESInterpreter(parsedCard, params);
+    parsedCard.getValueInfo().recursivelyVisit((element: ESValueInfo) =>
+    {
+      const card: Block = element.card;
+      if (!card)
+      {
+        return true;
+      }
+      if (element.errors.length > 0)
+      {
+        for (const e of element.errors)
+        {
+          card.static.errors.push(e.message);
+        }
+      } else
+      {
+        // no error
+        if (card.static.errors.length > 0)
+        {
+          card.static.errors.length = 0;
+        }
+      }
+      return true;
+    });
+  }
+
+  // parsing errors
+  private errors: ESParserError[];
+  private value: any;
+  private valueInfo: ESValueInfo | null;
+
+  public constructor(rootCard: Block)
+  {
+    this.errors = [];
     if (!rootCard)
     {
-      return null;
+      // empty
+      this.accumulateErrorOnValueInfo(null, 'There is no cards.');
     }
 
     // root card is a ESStructural clause
-    const rootValueInfo = ESCardParser.parseCard(rootCard, options);
-    const theInterpreter = new ESInterpreter(rootValueInfo);
-    return theInterpreter;
+    try
+    {
+      this.valueInfo = this.parseCard(rootCard);
+      this.value = this.valueInfo.value;
+    } catch (e)
+    {
+      this.accumulateErrorOnValueInfo(null, 'Failed to parse cards, message: ' + String(e.message));
+    }
   }
 
-  public static parseCard(block: Block, options): ESValueInfo
+  public hasError(): boolean
+  {
+    return this.errors.length > 0;
+  }
+
+  /**
+   * @returns {any} the parsed root value
+   */
+  public getValue(): any
+  {
+    return this.value;
+  }
+
+  /**
+   * @returns {any} the parsed root value info
+   */
+  public getValueInfo(): ESValueInfo
+  {
+    return this.valueInfo as ESValueInfo;
+  }
+
+  public accumulateError(error: ESParserError): void
+  {
+    this.errors.push(error);
+  }
+
+  private accumulateErrorOnValueInfo(valueInfo: ESValueInfo, message: string, isWarning: boolean = false): void
+  {
+    this.errors.push(new ESParserError(
+      null, valueInfo, message, isWarning),
+    );
+  }
+
+  private accumulateErrorsOnParser(errors: ESParserError[]): void
+  {
+    for (const e of errors)
+    {
+      this.errors.push(e);
+    }
+  }
+  private parseCard(block: Block): ESValueInfo
   {
     if (block.static.toValueInfo !== undefined)
     {
-      return block.static.toValueInfo(block, options);
+      return block.static.toValueInfo(block);
     }
     if (block.static.clause === undefined)
     {
-      // this should not be happened
-      console.log('Card ' + block.stati.title + ' has undefined clause');
+      // must be a custom card, ignore it now
       return null;
     }
-    console.log('parseCard ' + block.static.title + ' clause ' + block.static.clause.type);
     switch (block.static.clause.clauseType)
     {
       case ESClauseType.ESAnyClause:
-        return ESCardParser.parseESAnyClause(block, options);
+        return this.parseESAnyClause(block);
       case ESClauseType.ESArrayClause:
-        return ESCardParser.parseESArrayClause(block, options);
+        return this.parseESArrayClause(block);
       case ESClauseType.ESBaseClause:
-        return ESCardParser.parserSingleValue(block, options);
+        return this.parseCardValue(block);
       case ESClauseType.ESBooleanClause:
-        return ESCardParser.parserSingleValue(block, options);
+        return this.parseCardValue(block);
       case ESClauseType.ESEnumClause:
-        return ESCardParser.parserSingleValue(block, options);
+        return this.parseCardValue(block);
       case ESClauseType.ESFieldClause:
-        return ESCardParser.parserSingleValue(block, options);
+        return this.parseCardValue(block);
       case ESClauseType.ESIndexClause:
-        return ESCardParser.parserSingleValue(block, options);
+        return this.parseCardValue(block);
       case ESClauseType.ESMapClause:
-        return ESCardParser.parseESStructureClause(block, options);
+        return this.parseESStructureClause(block);
       case ESClauseType.ESNullClause:
-        return ESCardParser.parserSingleValue(block, options);
+        return this.parseCardValue(block);
       case ESClauseType.ESNumberClause:
-        return ESCardParser.parserSingleValue(block, options);
+        return this.parseCardValue(block);
       case ESClauseType.ESObjectClause:
-        return ESCardParser.parseESStructureClause(block, options);
+        return this.parseESStructureClause(block);
       case ESClauseType.ESPropertyClause:
-        return ESCardParser.parserSingleValue(block, options);
+        return this.parseCardValue(block);
       case ESClauseType.ESReferenceClause:
-        return ESCardParser.parseESReferenceClause(block, options);
+        return this.parseESReferenceClause(block);
       case ESClauseType.ESStringClause:
-        return ESCardParser.parserSingleValue(block, options);
+        return this.parseCardValue(block);
       case ESClauseType.ESStructureClause:
-        return ESCardParser.parseESStructureClause(block, options);
+        return this.parseESStructureClause(block);
       case ESClauseType.ESTypeClause:
-        return ESCardParser.parserSingleValue(block, options);
+        return this.parseCardValue(block);
       case ESClauseType.ESScriptClause:
-        return ESCardParser.parseESStructureClause(block, options);
+        return this.parseESStructureClause(block);
       case ESClauseType.ESWildcardStructureClause:
-        return ESCardParser.parseESStructureClause(block, options);
+        return this.parseESStructureClause(block);
       default:
-        return ESCardParser.parseESClause(block, options);
+        return this.parseESClause(block);
     }
   }
 
-  public static parseESClause(block, options)
+  private parseESClause(block)
   {
-    console.log('Error: Unknown card ' + block.static.title + ' clause ' + block.static.clause.type);
-    return null;
+    const valueInfo = new ESValueInfo();
+    valueInfo.card = block;
+    this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESClause '));
+    return valueInfo;
   }
 
-  public static parseESReferenceClause(block, options)
+  private parseESReferenceClause(block)
   {
-    console.log('Error: Unknown card ' + block.static.title + ' clause ' + block.static.clause.type);
-    return null;
+    const valueInfo = new ESValueInfo();
+    valueInfo.card = block;
+    this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESReferenceClause '));
+    return valueInfo;
   }
 
-  public static parseESAnyClause(block, options)
+  private parseESAnyClause(block)
   {
-    console.log('Error: Unknown card ' + block.static.title + ' clause ' + block.static.clause.type);
-    return null;
+    const valueInfo = new ESValueInfo();
+    valueInfo.card = block;
+    this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESAnyClause '));
+    return valueInfo;
   }
 
-  public static parseESArrayClause(block, options)
+  private parseESArrayClause(block)
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
@@ -157,16 +263,14 @@ export default class ESCardParser
     block['cards'].map(
       (card) =>
       {
-        const elementValueInfo = ESCardParser.parseCard(card, options);
+        const elementValueInfo = this.parseCard(card);
         valueInfo.addArrayChild(elementValueInfo);
         theValue.push(elementValueInfo.value);
       });
-    console.log('Parse an array card ' + block.static.title + ' clause ' + block.static.clause.type);
-    console.log('Value: ' + JSON.stringify(valueInfo.value));
     return valueInfo;
   }
 
-  public static parseESStructureClause(block, options)
+  private parseESStructureClause(block)
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
@@ -180,71 +284,87 @@ export default class ESCardParser
       {
         const keyName = card['key'];
         const childName = new ESJSONParser(JSON.stringify(keyName)).getValueInfo();
-        const childValue = ESCardParser.parseCard(card, options);
-        const propertyInfo = new ESPropertyInfo(childName, childValue);
-        valueInfo.addObjectChild(keyName, propertyInfo);
-        theValue[keyName] = childValue.value;
-      }
+        const childValue = this.parseCard(card);
+        if (childValue !== null)
+        {
+          const propertyInfo = new ESPropertyInfo(childName, childValue);
+          valueInfo.addObjectChild(keyName, propertyInfo);
+          theValue[keyName] = childValue.value;
+        } else
+        {
+          // console.log('card ' + keyName + ' has value null');
+        }
+      },
     );
-    console.log('Parse a structure card ' + block.static.title + ' clause ' + block.static.clause.type);
-    console.log('Value: ' + JSON.stringify(valueInfo.value));
     return valueInfo;
   }
 
-  public static parserSingleValue(block, options)
+  private parseCardValue(block)
   {
     let value;
     const singleType = block.static.singleType;
     const typeName = block.static.typeName;
-    console.log('Card ' + block.static.title + ' singleType ' + singleType + ' typeName' + typeName);
     if (block['value'] === '')
     {
       // the input is empty
-      console.log('Card ' + block.static.title + ' input is empty');
       value = '""';
-    } else if (typeof  block['value'] === 'string' && block['value'][0] === '@')
+    } else if (typeof block['value'] === 'string' && block['value'][0] === '@')
     {
       // the input is a parameter
-      console.log('Card ' + block.static.title + ' input is a parameter');
       value = block['value'];
     } else if (singleType === false)
     {
-      console.log('Card ' + block.static.title + ' input type ' + typeof block['value']);
-      // the input is encoded as a string, but its value type can be other types
+      // the input is encoded as a string, but its value type can be other JSON types
       value = block['value'];
     } else
     {
-      console.log('Card ' + block.static.title + ' input type ' + typeof block['value']);
       // the input is encoded as its type
       if (typeName === 'string')
       {
         value = JSON.stringify(block['value']);
       } else
       {
+        // now, the card value is not guaranteed encoded as string, it may be encoded at its declared type.
         if (typeName === typeof block['value'])
         {
           value = JSON.stringify(block['value']);
-        } else if (typeof block['value'] == 'string')
+        } else if (typeof block['value'] === 'string')
         {
           value = block['value'];
         } else
         {
-          console.log('Error: asked type ' + typeName + ' value type ' + typeof block['value']);
+          // something goes wrong
           value = JSON.stringify(block['value']);
         }
       }
     }
     const parser = new ESJSONParser(value, true);
-    const valueInfo = parser.getValueInfo();
+    let valueInfo = parser.getValueInfo();
     if (valueInfo)
     {
       valueInfo.card = block;
-      console.log('Parse a value card ' + block.static.title + ' clause ' + block.static.clause.type);
-      console.log('Value: ' + JSON.stringify(valueInfo.value));
-      return valueInfo;
     } else
     {
-      return null;
+      valueInfo = new ESValueInfo();
+      valueInfo.card = block;
+      if (parser.hasError())
+      {
+        for (const e of parser.getErrors())
+        {
+          e.valueInfo = valueInfo;
+          valueInfo.attachError(e);
+        }
+      } else
+      {
+        this.accumulateErrorOnValueInfo(valueInfo, String('The card value ' + block.value + ' is not recognizable.'));
+      }
     }
+
+    if (valueInfo.hasError())
+    {
+      this.accumulateErrorsOnParser(valueInfo.errors);
+    }
+
+    return valueInfo;
   }
 }

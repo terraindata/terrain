@@ -50,6 +50,8 @@ import ESJSONParser from './ESJSONParser';
 import ESParserError from './ESParserError';
 import ESValueInfo from './ESValueInfo';
 
+import ESCardParser from '../../../../src/database/elastic/conversion/ESCardParser';
+
 export const ESInterpreterDefaultConfig = new EQLConfig();
 
 /**
@@ -60,7 +62,7 @@ export default class ESInterpreter
 {
   public config: EQLConfig; // query language description
   public params: { [name: string]: null | ESClause }; // input parameter clause types
-  public parser: ESJSONParser; // source parser
+  public parser: ESJSONParser | ESCardParser; // source parser
   public rootValueInfo: ESValueInfo;
   public errors: ESParserError[];
 
@@ -76,7 +78,7 @@ export default class ESInterpreter
    * @param config the spec config to use
    * @param params parameter map to use
    */
-  public constructor(query: string | ESJSONParser | ESValueInfo,
+  public constructor(query: string | ESJSONParser | ESCardParser,
     params: { [name: string]: any } = {},
     config: EQLConfig = ESInterpreterDefaultConfig)
   {
@@ -93,11 +95,7 @@ export default class ESInterpreter
         return;
       }
       this.rootValueInfo = this.parser.getValueInfo();
-    } else if (query instanceof ESValueInfo)
-    {
-      this.rootValueInfo = query;
-      this.parser = null;
-    } else if (query instanceof ESJSONParser)
+    } else if (query instanceof ESCardParser || query instanceof ESJSONParser)
     {
       this.parser = query;
       this.rootValueInfo = this.parser.getValueInfo();
@@ -141,7 +139,7 @@ export default class ESInterpreter
   public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
   {
     let token = null;
-    if (info !== null)
+    if (info !== null && info.tokens.length > 0)
     {
       token = info.tokens[0];
     }
