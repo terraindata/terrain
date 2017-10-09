@@ -55,10 +55,12 @@ import * as React from 'react';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
 // import { CopyToClipboard } from 'react-copy-to-clipboard';
+import Actions from '../../data/BuilderActions';
 import Modal from '../../../common/components/Modal';
 import ColorManager from '../../../util/ColorManager';
 import Histogram from './../../../charts/components/Histogram';
 import Menu, { MenuOption } from './../../../common/components/Menu';
+import Query from '../../../../items/types/Query';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
@@ -73,7 +75,8 @@ export interface Props
   aggregation: any;
   index: number;
   key: number;
-
+  name: string;
+  query: Query;
 }
 
 @Radium
@@ -82,11 +85,42 @@ class AggregationComponent extends TerrainComponent<Props> {
     expanded: boolean,
     viewMode: string,
     showingExport: boolean,
+    singleValue: boolean,
   } = {
     expanded: false,
     viewMode: 'Table',
     showingExport: false,
+    singleValue: false,
   };
+
+  public componentWillMount()
+  {
+    this.setState({
+      viewMode: this.props.query.aggregationList.get(this.props.name),
+      singleValue: this.isSingleValue(this.props.aggregation),
+    });
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.query.aggregationList[this.props.name] !== nextProps.query.aggregationList.get(nextProps.name))
+    {
+      this.setState({
+        viewMode: nextProps.query.aggregationList.get(nextProps.name),
+      });
+    }
+    if (this.props.aggregation !== nextProps.aggregation)
+    {
+      this.setState({
+        singleValue: this.isSingleValue(nextProps.aggregation),
+      });
+    }
+  }
+
+  public isSingleValue(aggregation)
+  {
+    return _.values(aggregation).length === 1 && _.values(aggregation).value !== undefined;
+  }
 
   public toggleExpanded()
   {
@@ -97,6 +131,7 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public changeModeToTable()
   {
+    Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), 'Table');
     this.setState({
       viewMode: 'Table',
     });
@@ -104,6 +139,7 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public changeModeToHistogram()
   {
+    Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), 'Histogram');
     this.setState({
       viewMode: 'Histogram',
     });
@@ -111,6 +147,7 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public changeModeToRaw()
   {
+    Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), 'Raw');
     this.setState({
       viewMode: 'Raw',
     });
@@ -155,28 +192,12 @@ class AggregationComponent extends TerrainComponent<Props> {
         selected: this.state.viewMode === 'Table',
       });
     }
-
-    // const options: List<MenuOption> =
-    //   List([
-    //     {
-    //       text: 'Table',
-    //       onClick: this.changeModeToTable,
-    //     },
-    //     {
-    //       text: 'Graph',
-    //       onClick: this.changeModeToGraph,
-    //     },
-    //     {
-    //       text: 'Raw',
-    //       onClick: this.changeModeToRaw,
-    //     },
-    //   ]);
     return List(options);
   }
 
   public renderAgg()
   {
-    const aggTitle = Object.keys(this.props.aggregation)[0];
+    const aggTitle = _.keys(this.props.aggregation)[0];
     return (
       <div
         className={classNames({
@@ -218,6 +239,39 @@ class AggregationComponent extends TerrainComponent<Props> {
     );
   }
 
+  public renderSingleAgg()
+  {
+    const content = this.props.name + ' ' + String(this.props.aggregation.value);
+    return (
+      <div
+        className='aggregation-title-bar'
+      >
+        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded}>
+          {
+            content
+          }
+        </div>
+        {
+          (
+            <div className='aggregation-title-bar-options'>
+              <div
+                className='aggregation-title-bar-export'
+                onClick={this.showExport}
+                key='results-area-export'
+                style={link()}
+              >
+                Export
+              </div>
+              <div className='clipboard-icon-wrapper'>
+                {tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')}
+              </div>
+            </div>
+          )
+        }
+      </div>
+    );
+  }
+
   // <CopyToClipboard text={command} onCopy={this.handleTextCopied}>
   //             <div className='headless-entry-icon-wrapper'
   //               style={fontColor('#555')}
@@ -234,27 +288,15 @@ class AggregationComponent extends TerrainComponent<Props> {
   public renderExpandedAgg()
   {
     const values = _.values(this.props.aggregation)[0];
-    return (
-      <div className='aggregation-expanded-view'>
-        {
-          this.state.expanded ?
-            <div>
-              {(this.state.viewMode === 'Table') ? this.renderTableView(values) : ''}
-              {(this.state.viewMode === 'Histogram') ? this.renderAggregationHistogram() : ''}
-              {(this.state.viewMode === 'Raw') ? <pre> {JSON.stringify(values, undefined, 2)} </pre> : ''}
-            </div>
-            :
-            ''
-        }
-      </div>
-    );
-  }
-
-  public renderAggregationHistogram()
-  {
-    if (this.canBeHistogram())
-    {
-      return this.renderHistogram();
+    switch (this.state.viewMode) {
+      case 'Table':
+        return this.renderTableView(values);
+      case 'Histogram':
+        return this.renderHistogram(values)
+      case 'Raw':
+        return <pre> {JSON.stringify(values, undefined, 2)} </pre>
+      default:
+        return <pre> {JSON.stringify(values, undefined, 2)} </pre>
     }
   }
 
@@ -268,7 +310,6 @@ class AggregationComponent extends TerrainComponent<Props> {
   {
     if (this.canBeTable())
     {
-
       return (
         <AggsTable
           tableData={tableData}
@@ -277,7 +318,6 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
   }
 
-  // TODO Make this more comprehensive
   public canBeHistogram()
   {
     const values = _.values(this.props.aggregation)[0];
@@ -352,20 +392,23 @@ class AggregationComponent extends TerrainComponent<Props> {
     return { data, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
   }
 
-  // TODO CLEAN THIS
-  public renderHistogram()
+  public renderHistogram(values)
   {
-    const buckets = _.values(this.props.aggregation)[0].buckets;
-    const { data, categories, domain, range } = this.parseDataForHistogram(buckets);
-    return (
-      <AggregationHistogram
-        barsData={data}
-        xLabels={List<string>(categories)}
-        colors={[Colors().active, Colors().activeHover]}
-        domain={domain}
-        range={range}
-      />
-    );
+    if (this.canBeHistogram())
+    {
+      const buckets = _.values(this.props.aggregation)[0].buckets;
+      const { data, categories, domain, range } = this.parseDataForHistogram(buckets);
+      return (
+        <AggregationHistogram
+          barsData={data}
+          xLabels={List<string>(categories)}
+          colors={[Colors().active, Colors().activeHover]}
+          domain={domain}
+          range={range}
+        />
+      );
+    }
+    return null;
   }
 
   public renderExport()
@@ -394,8 +437,8 @@ class AggregationComponent extends TerrainComponent<Props> {
   {
     return (
       <div className='aggregation'>
-        {this.renderAgg()}
-        {this.state.expanded && this.renderExpandedAgg()}
+        {this.state.singleValue ? this.renderSingleAgg() : this.renderAgg()}
+        {this.state.expanded && !this.state.singleValue && this.renderExpandedAgg()}
         {this.state.showingExport && this.renderExport()}
       </div>
     );

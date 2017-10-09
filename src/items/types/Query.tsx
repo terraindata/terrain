@@ -53,6 +53,7 @@ import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';
+import { Aggregation, Aggregations } from '../../builder/components/results/ResultTypes';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
@@ -83,8 +84,10 @@ class QueryC
   parseTree: ESInterpreter = null;
   lastMutation: number = 0;
   deckOpen: boolean = false; // TODO change back to TRUE once deck is complete
-  resultsViewMode: string = 'Hits';
   cardsAndCodeInSync: boolean = false;
+
+  resultsViewMode: string = 'Hits';
+  aggregationList: Map<string, string> = Map<string, string>({});
 
   meta: IMMap<string, any> = Map<string, any>({});
 
@@ -111,6 +114,7 @@ export const _Query = (config?: object) =>
   config['meta'] = Map<string, any>(config['meta']);
   config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);
   config['tuningOrder'] = List<string>(config['tuningOrder']);
+  config['aggregationList'] = Map<string, string>(config['aggregationList']);
   const query = new Query_Record(config) as any as Query;
 
   return query;

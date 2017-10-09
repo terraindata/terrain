@@ -93,12 +93,44 @@ class AggregationsArea extends TerrainComponent<Props>
     return !query || (!query.tql && !query.cards.size);
   }
 
-  public handleRequestMoreResults(onResultsLoaded: (unchanged?: boolean) => void)
+  public componentWillMount()
+  {
+    Actions.change(List(this._keyPath('query', 'aggregationList')), this.parseAggs(this.props.resultsState.aggregations, this.props.query));
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.resultsState.aggregations !== nextProps.resultsState.aggregations)
+    {
+     Actions.change(List(this._keyPath('query', 'aggregationList')), this.parseAggs(nextProps.resultsState.aggregations, nextProps.query));
+    }
+  }
+
+  public parseAggs(aggregations, query)
+  {
+    if (query === undefined)
+    {
+      return Map({});
+    }
+    let aggsList = query.aggregationList !== undefined ? query.aggregationList : Map({});
+    console.log("ORIGINAL AGGS LIST", aggsList);
+    _.keys(aggregations).forEach((name) => {
+      if (aggsList.get(name) === undefined)
+      {
+        console.log(name + ' is undefined: ' + aggsList.get(name));
+        aggsList = aggsList.set(name, 'Raw');
+      }
+    });
+    console.log("NEW AGGS LIST", aggsList);
+    return aggsList;
+  }
+
+  public handleRequestMoreAggregations(onResultsLoaded: (unchanged?: boolean) => void)
   {
     onResultsLoaded(true);
   }
 
-  public renderResults()
+  public renderAggregations()
   {
     const { resultsState } = this.props;
     const aggs = resultsState.aggregations;
@@ -148,7 +180,7 @@ class AggregationsArea extends TerrainComponent<Props>
         resultsContent = (
           <InfiniteScroll
             className='aggregations-area-aggs'
-            onRequestMoreItems={this.handleRequestMoreResults}
+            onRequestMoreItems={this.handleRequestMoreAggregations}
           >
             {
               aggregations.map((agg, index) =>
@@ -158,6 +190,8 @@ class AggregationsArea extends TerrainComponent<Props>
                     aggregation={agg}
                     index={index}
                     key={index}
+                    name={_.keys(agg)[0]}
+                    query={this.props.query}
                   />
                 );
               })
@@ -183,7 +217,7 @@ class AggregationsArea extends TerrainComponent<Props>
   {
     return (
       <div className='aggregations-area'>
-        {this.renderResults()}
+        {this.renderAggregations()}
       </div>
     );
   }
