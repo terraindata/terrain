@@ -48,11 +48,36 @@ import * as aesjs from 'aes-js';
 import * as srs from 'secure-random-string';
 import * as sha1 from 'sha1';
 
-import * as Util from '../Util';
-
 const timePeriods: number = 2; // number of past intervals to check, minimum 1
 const timeSalt: string = srs({ length: 256 }); // time salt
 const timeInterval: number = 5; // minutes before refreshing
+
+export function isJSON(str: string): boolean
+{
+  try
+  {
+    JSON.parse(str);
+  }
+  catch (e)
+  {
+    return false;
+  }
+  return true;
+}
+
+export function buildDesiredHash(nameToType: object): string
+{
+  let strToHash: string = 'object';   // TODO: check
+  const nameToTypeArr: any[] = Object.keys(nameToType).sort();
+  for (const name in nameToTypeArr)
+  {
+    if (nameToType.hasOwnProperty(name))
+    {
+      strToHash += '|' + name + ':' + (nameToType[name] as string) + '|';
+    }
+  }
+  return sha1(strToHash);
+}
 
 /*
  * Decrypt a message with the private key using AES128
@@ -114,13 +139,13 @@ export async function decodeMessage(event: any): Promise<any>
   {
     const checkTime = getClosestTime();
     const message = event['message'] as string;
-    const emptyPayloadHash: string = Util.buildDesiredHash(event.payload);
+    const emptyPayloadHash: string = buildDesiredHash(event.payload);
     for (let tp = 0; tp < timePeriods; ++tp)
     {
       const newTime: number = checkTime - tp * timeInterval * 60;
       const privateKey: string = await getUniqueId(event.ip as string, event.id, newTime);
       const decodedMsg: string = await decrypt(message, privateKey);
-      if (Util.isJSON(decodedMsg) && emptyPayloadHash === Util.buildDesiredHash(JSON.parse(decodedMsg)))
+      if (isJSON(decodedMsg) && emptyPayloadHash === buildDesiredHash(JSON.parse(decodedMsg)))
       {
         return resolve(event);
       }
