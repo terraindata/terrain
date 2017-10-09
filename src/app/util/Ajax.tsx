@@ -1107,8 +1107,8 @@ export const Ajax =
         variantid: variantIds.join(','),
         start: start.toISOString(),
         end: end.toISOString(),
-        interval: intervalId,
         eventid: metricId.toString(),
+        interval: intervalId,
         agg: aggregation,
         field: '@timestamp',
       };
