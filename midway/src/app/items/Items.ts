@@ -44,11 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import DeployVariant from '../../../../shared/deploy/DeployVariant';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
+
+export const DV: DeployVariant = new DeployVariant();
 
 // CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
 // parent integer, status text, type text);
@@ -100,6 +103,34 @@ export class Items
       return this.select([], { id });
     }
     return this.select([], {});
+  }
+
+  public async getLiveVariants(ids?: number[]): Promise<string[] | string>
+  {
+    return new Promise<string[] | string>(async (resolve, reject) =>
+    {
+      if (ids === undefined)
+      {
+        return reject('Must provide an array of item IDs.');
+      }
+      const liveItems: string[] = [];
+      for (const id of ids)
+      {
+        if (ids.hasOwnProperty(id))
+        {
+          const items: ItemConfig[] = await this.select([], { id, type: 'VARIANT', status: 'LIVE' } as object);
+          if (items.length !== 0)
+          {
+            liveItems.push(DV.getVariantDeployedName(items[0] as ItemConfig));
+          }
+          else
+          {
+            liveItems.push('');
+          }
+        }
+      }
+      return resolve(liveItems);
+    });
   }
 
   // both regular and superusers can create items

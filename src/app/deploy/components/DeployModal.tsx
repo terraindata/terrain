@@ -63,6 +63,9 @@ import DeployModalColumn from './DeployModalColumn';
 import EQLTemplateGenerator from '../../../../shared/database/elastic/parser/EQLTemplateGenerator';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+import DeployVariant from '../../../../shared/deploy/DeployVariant';
+
+const DV: DeployVariant = new DeployVariant();
 
 export interface Props
 {
@@ -122,7 +125,8 @@ class DeployModal extends TerrainComponent<Props>
     const state = LibraryStore.getState();
     const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
-    const id: string = group.name + '.' + algorithm.name + '.' + variant.name;
+    const id: string = DV.getVariantDeployedName(variant as object);
+
     const { changingStatusTo } = this.state;
 
     if ((changingStatusTo === ItemStatus.Live && variant.status !== 'LIVE')
