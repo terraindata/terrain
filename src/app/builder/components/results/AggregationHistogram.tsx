@@ -84,7 +84,7 @@ class AggregationHistogram extends TerrainComponent<Props>
     Histogram.create(el, this.getChartState());
   }
 
-   public parseData(buckets)
+  public parseData(buckets)
   {
     let data;
     let domainMin: number = Infinity;
@@ -96,20 +96,21 @@ class AggregationHistogram extends TerrainComponent<Props>
     {
       domainMin = 0;
       domainMax = buckets.length;
-      data = buckets.map((bucket, i) =>
-      {
-        if (bucket.doc_count > rangeMax)
-        {
-          rangeMax = bucket.doc_count;
-        }
-        return { x: i, y: bucket.doc_count };
-      });
       categories = buckets.map((bucket) =>
       {
         const to = bucket.to !== undefined ? String(bucket.to) : '';
         const from = bucket.from !== undefined ? String(bucket.from) : '';
         return from + '-' + to;
       });
+      data = buckets.map((bucket, i) =>
+      {
+        if (bucket.doc_count > rangeMax)
+        {
+          rangeMax = bucket.doc_count;
+        }
+        return { x: i, y: bucket.doc_count, label: categories[i] };
+      });
+
     }
     // TERMS QUERIES
     else if (buckets[0] && buckets[0].key && typeof buckets[0].key === 'string')
@@ -122,7 +123,7 @@ class AggregationHistogram extends TerrainComponent<Props>
         {
           rangeMax = bucket.doc_count;
         }
-        return { x: i, y: bucket.doc_count };
+        return { x: i, y: bucket.doc_count, label: bucket.key };
       });
       categories = buckets.map((bucket) =>
       {

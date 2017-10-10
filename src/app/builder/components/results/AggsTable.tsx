@@ -98,8 +98,9 @@ export default class AggsTable extends TerrainComponent<Props>
     }
     else
     {
-      rows = _.keys(tableData).map((key) => {
-        return {key, value: tableData[key]};
+      rows = _.keys(tableData).map((key) =>
+      {
+        return { key, value: tableData[key] };
       });
     }
     console.log(rows);
@@ -116,7 +117,7 @@ export default class AggsTable extends TerrainComponent<Props>
     }
     else
     {
-      return List([{key: 'key', name: 'key'}, {key: 'value', name: 'value'}]);
+      return List([{ key: 'key', name: 'key' }, { key: 'value', name: 'value' }]);
     }
   }
 

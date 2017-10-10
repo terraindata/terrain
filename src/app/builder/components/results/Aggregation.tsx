@@ -49,15 +49,17 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 const { List } = Immutable;
+import { notificationManager } from 'common/components/InAppNotification';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
 import Modal from '../../../common/components/Modal';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 import ColorManager from '../../../util/ColorManager';
-// import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Actions from '../../data/BuilderActions';
 import Histogram from './../../../charts/components/Histogram';
 import Menu, { MenuOption } from './../../../common/components/Menu';
@@ -72,6 +74,7 @@ const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 export interface Props
 {
+  exportState?: FileImportState;
   aggregation: any;
   index: number;
   key: number;
@@ -197,7 +200,7 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public renderAgg()
   {
-    const aggTitle = _.keys(this.props.aggregation)[0];
+    const values = _.values(this.props.aggregation)[0];
     return (
       <div
         className={classNames({
@@ -208,7 +211,7 @@ class AggregationComponent extends TerrainComponent<Props> {
         <ArrowIcon className='arrow-icon' onClick={this.toggleExpanded} />
         <div className='aggregation-title-bar-title' onClick={this.toggleExpanded}>
           {
-            aggTitle
+            this.props.name
           }
         </div>
         {
@@ -224,7 +227,9 @@ class AggregationComponent extends TerrainComponent<Props> {
                   Export
                 </div>
                 <div className='clipboard-icon-wrapper'>
-                  {tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')}
+                  {
+                    tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')
+                  }
                 </div>
                 <Menu
                   options={this.getMenuOptions()}
@@ -241,16 +246,16 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public renderSingleAgg()
   {
-    const {name, aggregation} = this.props;
+    const { name, aggregation } = this.props;
     return (
       <div
         className='aggregation-title-bar'
       >
         <div className='aggregation-title-bar-title'>
           <span>
-          {
-            name + ':  '
-          }
+            {
+              name + ':  '
+            }
           </span>
           <span className='aggregation-title-bar-value'>
             {String(_.values(aggregation)[0].value)}
@@ -293,7 +298,8 @@ class AggregationComponent extends TerrainComponent<Props> {
   public renderExpandedAgg()
   {
     const values = _.values(this.props.aggregation)[0];
-    switch (this.state.viewMode) {
+    switch (this.state.viewMode)
+    {
       case 'Table':
         return this.renderTableView(values);
       case 'Histogram':
@@ -349,23 +355,16 @@ class AggregationComponent extends TerrainComponent<Props> {
   public renderExport()
   {
 
-    const content =
-      <div
-        style={backgroundColor(Colors().bg1)}
-      >
-        test
-      </div>;
-
-    return (
-      <Modal
-        open={this.state.showingExport}
-        onClose={this.hideExport}
-        title={'Export'}
-        children={content}
-        fill={true}
-        noFooterPadding={true}
-      />
-    );
+    // return (
+    //   <Modal
+    //     open={this.state.showingExport}
+    //     onClose={this.hideExport}
+    //     title={'Export'}
+    //     children={content}
+    //     fill={true}
+    //     noFooterPadding={true}
+    //   />
+    // );
   }
 
   public render()

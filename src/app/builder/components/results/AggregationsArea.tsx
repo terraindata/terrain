@@ -56,17 +56,17 @@ import * as React from 'react';
 const moment = require('moment');
 const ReactModal = require('react-modal');
 
+import Radium = require('radium');
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
 import Aggregation from '../results/Aggregation';
 import { ResultsState } from './ResultTypes';
-
-import Radium = require('radium');
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
@@ -78,6 +78,7 @@ const RESULTS_PAGE_SIZE = 20;
 export interface Props
 {
   resultsState: ResultsState;
+  exportState?: FileImportState;
   db: BackendInstance;
   query: Query;
   onNavigationException: () => void;
@@ -102,7 +103,7 @@ class AggregationsArea extends TerrainComponent<Props>
   {
     if (this.props.resultsState.aggregations !== nextProps.resultsState.aggregations)
     {
-     Actions.change(List(this._keyPath('query', 'aggregationList')), this.parseAggs(nextProps.resultsState.aggregations, nextProps.query));
+      Actions.change(List(this._keyPath('query', 'aggregationList')), this.parseAggs(nextProps.resultsState.aggregations, nextProps.query));
     }
   }
 
@@ -113,7 +114,8 @@ class AggregationsArea extends TerrainComponent<Props>
       return Map({});
     }
     let aggsList = query.aggregationList !== undefined ? query.aggregationList : Map({});
-    _.keys(aggregations).forEach((name) => {
+    _.keys(aggregations).forEach((name) =>
+    {
       if (aggsList.get(name) === undefined)
       {
         aggsList = aggsList.set(name, 'Raw');

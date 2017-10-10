@@ -208,7 +208,70 @@ const Histogram = {
     }
   },
 
-  _drawBars(el, scales, barsData, colors)
+  _mouseoverFactory: (el, scales, colors, drawToolTip) => function(point)
+  {
+    drawToolTip(el, d3.mouse(this), scales, this, colors);
+    return false;
+  },
+
+  _mouseoutFactory: (el) => (point) =>
+  {
+    d3.select(el).select('.histogram-bar-tooltip').remove();
+  },
+
+  _drawToolTip(el, mouse, scales, bar, colors)
+  {
+    d3.select(el).selectAll('.histogram-bar-tooltip').remove();
+    const xVal = scales.realX.invert(bar.x.baseVal.value);
+    const yVal = scales.realBarY.invert(bar.y.baseVal.value);
+    const text_x = bar.id !== undefined && bar.id !== '' ?
+      bar.id : 'X: ' + Util.formatNumber(xVal);
+    const text_y = 'Y: ' + Util.formatNumber(yVal);
+    const h = 35;
+    const w = 75;
+    const containerWidth = parseInt(d3.select(el).select('.inner-svg').attr('width'));
+    const containerHeight = parseInt(d3.select(el).select('.inner-svg').attr('height'));
+    const x = (mouse[0] + w) > containerWidth ? mouse[0] - w - 5 : mouse[0] + 5;
+    const y = (mouse[1] + h) > containerHeight ? mouse[1] - h - 14 : mouse[1] + 14;
+
+    const tooltip = d3.select(el).select('.inner-svg').append('g')
+      .attr('class', 'histogram-bar-tooltip');
+
+    tooltip.append('rect')
+      .attr('x', x)
+      .attr('y', y)
+      .attr('rx', 5)
+      .attr('ry', 5)
+      .attr('height', h)
+      .attr('width', w)
+      .attr('fill', colors[0]);
+
+    tooltip.append('text')
+      .attr('x', x + 6)
+      .attr('y', y + 14)
+      .attr('text-anchor', 'start')
+      .attr('fill', Colors().altBg1)
+      .attr('clip-path', 'url(#clip)')
+      .text(text_x);
+
+    tooltip.append('text')
+      .attr('x', x + 6)
+      .attr('y', y + 14 * 2)
+      .attr('text-anchor', 'start')
+      .attr('fill', Colors().altBg1)
+      .attr('clip-path', 'url(#clip)')
+      .text(text_y);
+
+    const clipPath = tooltip.append('clipPath')
+      .attr('id', 'clip')
+      .append('rect')
+      .attr('x', x)
+      .attr('y', y)
+      .attr('height', h - 3)
+      .attr('width', w - 3);
+  },
+
+  _drawBars(el, scales, barsData, colors, xLabels)
   {
     const g = d3.select(el).selectAll('.bars');
 
@@ -219,9 +282,8 @@ const Histogram = {
 
     const barWidth = (d) =>
     {
-      // TODO calculate correct width of bars here
       const chartWidth = d3.select(el).select('.inner-svg').attr('width');
-      let width = (chartWidth / barsData.length);
+      let width = (chartWidth / barsData.length) - 1;
       if (width < 1)
       {
         width = 1;
@@ -231,14 +293,18 @@ const Histogram = {
 
     bar.enter()
       .append('rect')
-      .attr('class', 'bar')
-      .attr('fill', colors[0]);
+      .attr('fill', colors[0])
+      .attr('class', 'bar');
 
     bar
-      .attr('x', (d) => scales.realX(d['x']) + xPadding)
+      .attr('x', (d) => scales.realX(d['x']))
       .attr('width', barWidth)
       .attr('y', (d) => scales.realBarY(d['y']))
-      .attr('height', (d) => scaleMin(scales.realBarY) - scales.realBarY(d['y']));
+      .attr('height', (d) => scaleMin(scales.realBarY) - scales.realBarY(d['y']))
+      .attr('id', (d) => d['label']);
+
+    bar.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
+    bar.on('mouseout', this._mouseoutFactory(el));
 
     bar.exit().remove();
   },
@@ -251,7 +317,7 @@ const Histogram = {
 
     this._drawBg(el, scales);
     this._drawAxes(el, scales, width, height, xLabels, yLabels);
-    this._drawBars(el, scales, barsData, colors);
+    this._drawBars(el, scales, barsData, colors, xLabels);
   },
 
   _scales(el, domain, barsData, stateWidth, stateHeight)

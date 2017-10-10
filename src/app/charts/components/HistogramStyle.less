@@ -10,4 +10,24 @@
 	.domain {
 		display: none;
 	}
+
+	.histogram-bar-tooltip {
+		text {
+		    font-size: 11px;
+		    letter-spacing: 0.3px;
+		    text-anchor: start;
+		    text-overflow: ellipsis; 
+		    width: 75px;
+		    }
+	}
+
+	.bar {
+		opacity: 0.5;
+		cursor: pointer;
+		&:hover {
+			opacity: 0.8;
+			stroke-width: 1px;
+			// stroke: red;
+		}
+	}
 }
