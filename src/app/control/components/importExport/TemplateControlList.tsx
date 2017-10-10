@@ -62,10 +62,11 @@ import { ServerMap } from 'schema/SchemaTypes';
 import { MidwayError } from 'shared/error/MidwayError';
 import Ajax from 'util/Ajax';
 import ControlActions from '../../data/ControlActions';
+import { ControlList, HeaderConfig } from '../ControlList';
 
 import CreateHeadlessCommand from './CreateHeadlessCommand';
 import './TemplateControlList.less';
-// const CodeIcon = require('images/icon_tqlDropdown.svg');
+
 const DeleteIcon = require('images/icon_close.svg');
 const ImportIcon = require('images/icon_import.svg');
 const ScheduleIcon = require('images/icon_dateDropdown.svg');
@@ -75,8 +76,6 @@ const ViewIcon = require('images/icon_search.svg');
 const { List } = Immutable;
 
 type Template = FileImportTypes.Template;
-type HeaderConfigItem = [string, (rowElem, index) => any];
-type HeaderConfig = HeaderConfigItem[];
 
 export interface Props
 {
@@ -90,7 +89,7 @@ enum ConfirmActionType
   RESET,
 }
 
-class AccessTokenControl extends TerrainComponent<Props>
+class TemplateControlList extends TerrainComponent<Props>
 {
   public state: {
     responseModalOpen: boolean;
@@ -120,7 +119,20 @@ class AccessTokenControl extends TerrainComponent<Props>
     headlessModalOpen: false,
   };
 
-  public templateConfig: HeaderConfig;
+  public templateConfig: HeaderConfig =
+  [
+    ['ID', (template, index) => template.templateId],
+    ['Name', (template, index) => template.templateName],
+    ['Template Type', (template, index) => template.export ? 'Export' : 'Import'],
+    ['Server Name', (template, index) => this.getServerName(template.dbid)],
+    ['ES Index', (template, index) => template.dbname],
+    ['ES Type', (template, index) => template.tablename],
+    ['Access Token', (template, index) =>
+      <div className='access-token-cell'>
+        {template.persistentAccessToken}
+      </div>,
+    ],
+  ];
 
   constructor(props)
   {
@@ -136,7 +148,6 @@ class AccessTokenControl extends TerrainComponent<Props>
         text: 'Delete Template',
         onClick: () => this.requestDeleteTemplate(template, index),
         icon: <DeleteIcon className='template-menu-option-icon' />,
-        iconColor: '#555', // iconColor doesn't work right now
       },
       {
         text: `Headless ${typeText}`,
@@ -148,25 +159,21 @@ class AccessTokenControl extends TerrainComponent<Props>
             'template-icon-export': template.export,
           })}
         />,
-        iconColor: '#555',
       },
       {
         text: `Schedule ${typeText}`,
         onClick: () => undefined,
         icon: <ScheduleIcon className='template-menu-option-icon' />,
-        iconColor: '#555',
       },
       {
         text: 'Reset Access Token',
         onClick: () => this.requestResetTemplateToken(template, index),
         icon: <AccessIcon className='template-menu-option-icon' />,
-        iconColor: '#555',
       },
       {
         text: 'View Raw',
         onClick: () => undefined,
         icon: <ViewIcon className='template-menu-option-icon' />,
-        iconColor: '#555',
       },
     ]);
   }
@@ -175,28 +182,6 @@ class AccessTokenControl extends TerrainComponent<Props>
   {
     const server = this.props.servers.find((v, k) => v.connectionId === dbid);
     return server === undefined ? '' : server.get('name');
-  }
-
-  public getTemplateConfig(): HeaderConfig
-  {
-    return [
-      ['ID', (template, index) => template.templateId],
-      ['Name', (template, index) => template.templateName],
-      ['Template Type', (template, index) => template.export ? 'Export' : 'Import'],
-      ['Server Name', (template, index) => this.getServerName(template.dbid)],
-      ['ES Index', (template, index) => template.dbname],
-      ['ES Type', (template, index) => template.tablename],
-      ['Access Token', (template, index) =>
-        <div className='access-token-cell'>
-          {template.persistentAccessToken}
-        </div>,
-      ],
-      ['', (template, index) =>
-        <div className='template-menu-options-wrapper'>
-          <Menu options={this.getOptions(template, index)} />
-        </div>,
-      ],
-    ];
   }
 
   public requestCreateHeadless(template: Template, index: number)
@@ -316,50 +301,6 @@ class AccessTokenControl extends TerrainComponent<Props>
     });
   }
 
-  public renderTemplate(template: Template, index: number)
-  {
-    return (
-      <div className='template-info' key={index} style={tableRowStyle}>
-        {
-          this.getTemplateConfig().map((headerItem: HeaderConfigItem, i: number) =>
-          {
-            return (
-              <div className='template-info-data' key={i}>
-                {headerItem[1](template, index)}
-              </div>
-            );
-          })
-        }
-      </div>
-    );
-  }
-
-  public renderTable()
-  {
-    return (
-      <div className='import-export-token-control-table'>
-        <div
-          className={classNames({
-            'template-info-header': true,
-          })}
-          key='header'
-        >
-          {
-            this.getTemplateConfig().map((headerItem: HeaderConfigItem, i: number) =>
-            {
-              return (
-                <div className='template-info-data' key={i}>
-                  {headerItem[0]}
-                </div>
-              );
-            })
-          }
-        </div>
-        {this.props.templates.map(this.renderTemplate)}
-      </div>
-    );
-  }
-
   public renderCreateHeadlessCommand()
   {
     return (
@@ -378,7 +319,7 @@ class AccessTokenControl extends TerrainComponent<Props>
 
     return (
       <div>
-        {this.renderTable()}
+        {<ControlList items={this.props.templates} config={this.templateConfig} getMenuOptions={this.getOptions}/>}
         {
           this.state.responseModalOpen &&
           <Modal
@@ -420,26 +361,4 @@ class AccessTokenControl extends TerrainComponent<Props>
   }
 }
 
-const tableRowStyle = _.extend({},
-  backgroundColor(Colors().bg3),
-  borderColor(Colors().bg2),
-);
-
-// const cellMiddleStyle = _.extend({},
-//   getStyle('borderTopColor', Colors().highlight),
-//   getStyle('borderBottomColor', Colors().darkerHighlight),
-// )
-
-// const cellLeftStyle = _.extend({},
-//   getStyle('borderLeftColor', Colors().border1),
-//   getStyle('borderTopColor', Colors().highlight),
-//   getStyle('borderBottomColor', Colors().darkerHighlight),
-// );
-
-// const cellRightStyle = _.extend({},
-//   getStyle('borderRightColor', Colors().darkerHighlight),
-//   getStyle('borderTopColor', Colors().highlight),
-//   getStyle('borderBottomColor', Colors().darkerHighlight),
-// );
-
-export default AccessTokenControl;
+export default TemplateControlList;
