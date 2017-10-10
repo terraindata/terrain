@@ -77,6 +77,8 @@ export interface Props
   getServerName: (dbid) => string;
 }
 
+const temporarySFTPNames = List(['Sample SFTP 1', 'SFTP 2', 'SFTP 3']);
+
 const inputElementWidth = '220px';
 const fileTypeOptions = List(FileImportTypes.FILE_TYPES) as List<string>;
 
@@ -93,12 +95,14 @@ class TransportScheduler extends TerrainComponent<Props>
   public state: {
     index: number;
     fileTypeIndex: number;
+    sftpIndex: number;
     selectedIds: List<number>;
     objectKeyValue: string;
     filenameValue: string;
   } = {
     index: this.props.index,
     fileTypeIndex: 0,
+    sftpIndex: 0,
     selectedIds: List([-1, -1, -1]),
     objectKeyValue: '',
     filenameValue: '',
@@ -123,7 +127,29 @@ class TransportScheduler extends TerrainComponent<Props>
 
   public handleFilenameChange(event)
   {
-    
+    const filename = event.target.value;
+    const { fileTypeIndex } = this.state;
+    this.setState({
+      filenameValue: filename,
+    });
+
+    if (filename === undefined || filename.length === 0)
+    {
+      return;
+    }
+
+    if (filename.match(/\.csv$/i) && (fileTypeIndex === FileTypes.JSON || fileTypeIndex === FileTypes.JSON_TYPE_OBJECT))
+    { // switch from json to csv
+      this.setState({
+        fileTypeIndex: 2,
+      });
+    }
+    else if (filename.match(/\.json$/i) && fileTypeIndex === FileTypes.CSV)
+    { // switch from json to csv
+      this.setState({
+        fileTypeIndex: 0,
+      });
+    }
   }
 
   /*
@@ -131,7 +157,25 @@ class TransportScheduler extends TerrainComponent<Props>
    */
   public renderConnectionOptions(template: Template)
   {
-
+    const columnStyle = getStyle('width', inputElementWidth);
+    return (
+      <div className='headless-form-block'>
+        <div className='headless-form-column' style={columnStyle}>
+          <div className='headless-form-label'>
+            SFTP Name
+          </div>
+          <div className='headless-form-input'>
+            <Dropdown
+              options={temporarySFTPNames}
+              selectedIndex={this.state.sftpIndex}
+              canEdit={true}
+              onChange={this._setStateWrapper('sftpIndex')}
+              openDown={true}
+            />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   /*
@@ -139,7 +183,71 @@ class TransportScheduler extends TerrainComponent<Props>
    */
   public renderScheduleOptions(template: Template)
   {
-
+    const inputStyle = getStyle('borderRadius', '1px');
+    return (
+      <div className='headless-form-block'>
+        <div className='headless-form-column'>
+          <div className='headless-form-label'>
+            Minutes
+          </div>
+          <div className='headless-form-input'>
+              <input
+                value={this.state.filenameValue}
+                onChange={this.handleFilenameChange}
+                style={inputStyle}
+              />
+          </div>
+        </div>
+        <div className='headless-form-column'>
+          <div className='headless-form-label'>
+            Hours
+          </div>
+          <div className='headless-form-input'>
+              <input
+                value={this.state.filenameValue}
+                onChange={this.handleFilenameChange}
+                style={inputStyle}
+              />
+          </div>
+        </div>
+        <div className='headless-form-column'>
+          <div className='headless-form-label'>
+            Days of the Month
+          </div>
+          <div className='headless-form-input'>
+              <input
+                value={this.state.filenameValue}
+                onChange={this.handleFilenameChange}
+                style={inputStyle}
+              />
+          </div>
+        </div>
+        <div className='headless-form-column'>
+          <div className='headless-form-label'>
+            Months of the Year
+          </div>
+          <div className='headless-form-input'>
+              <input
+                value={this.state.filenameValue}
+                onChange={this.handleFilenameChange}
+                style={inputStyle}
+              />
+          </div>
+        </div>
+        <div className='headless-form-column'>
+          <div className='headless-form-label'>
+            Days of the Week
+          </div>
+          <div className='headless-form-input'>
+              <input
+                value={this.state.filenameValue}
+                onChange={this.handleFilenameChange}
+                style={inputStyle}
+              />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   /*
@@ -209,9 +317,6 @@ class TransportScheduler extends TerrainComponent<Props>
               </div>
             }
           </div>
-          <div className='headless-form-column' style={columnStyle}>
-            { /* this column is for spacing */ }
-          </div>
         </div>
       </div>
     );
@@ -228,12 +333,15 @@ class TransportScheduler extends TerrainComponent<Props>
           getServerName={this.props.getServerName}
           onChange={this._setStateWrapper('index')}
         />
-      {
-        template !== undefined && this.renderImportExportOptions(template)
-      }
-      {
-        this.renderScheduleOptions(template)
-      }
+        {
+          template !== undefined && this.renderImportExportOptions(template)
+        }
+        {
+          this.renderScheduleOptions(template)
+        }
+        {
+          this.renderConnectionOptions(template)
+        }
       </div>
     );
   }
