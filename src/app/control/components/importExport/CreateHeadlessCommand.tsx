@@ -100,6 +100,13 @@ interface HeadlessCommandArgs
 const inputElementWidth = '220px';
 const fileTypeOptions = List(FileImportTypes.FILE_TYPES) as List<string>;
 
+enum FileTypes // TODO make this more type robust to track FileImportTypes.FILE_TYPES
+{
+  JSON,
+  JSON_TYPE_OBJECT,
+  CSV,
+}
+
 export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): HeadlessCommandData
 {
   const { template, fileType, midwayURL } = headlessArgs;
@@ -250,6 +257,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
   public handleFilenameChange(event)
   {
     const filename = event.target.value;
+    const { fileTypeIndex } = this.state;
     this.setState({
       filenameValue: filename,
     });
@@ -259,13 +267,13 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
       return;
     }
 
-    if (filename.match(/\.csv$/i) && (this.state.fileTypeIndex === 0 || this.state.fileTypeIndex === 1))
+    if (filename.match(/\.csv$/i) && (fileTypeIndex === FileTypes.JSON || fileTypeIndex === FileTypes.JSON_TYPE_OBJECT))
     { // switch from json to csv
       this.setState({
         fileTypeIndex: 2,
       });
     }
-    else if (filename.match(/\.json$/i) && this.state.fileTypeIndex === 2)
+    else if (filename.match(/\.json$/i) && fileTypeIndex === FileTypes.CSV)
     { // switch from json to csv
       this.setState({
         fileTypeIndex: 0,
@@ -324,6 +332,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
   {
     const inputStyle = getStyle('borderRadius', '1px');
     const columnStyle = getStyle('width', inputElementWidth);
+    const { fileTypeIndex } = this.state;
     return (
       <div>
         <div className='headless-form-block'>
@@ -346,7 +355,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             <div className='headless-form-input'>
               <Dropdown
                 options={fileTypeOptions}
-                selectedIndex={this.state.fileTypeIndex}
+                selectedIndex={fileTypeIndex}
                 canEdit={true}
                 onChange={this._setStateWrapper('fileTypeIndex')}
                 openDown={true}
@@ -355,13 +364,13 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
           </div>
           <div className='headless-form-column' style={columnStyle}>
             {
-              this.state.fileTypeIndex === 1 &&
+              fileTypeIndex === FileTypes.JSON_TYPE_OBJECT &&
               <div className='headless-form-label'>
                 Export Key
               </div>
             }
             {
-              this.state.fileTypeIndex === 1 &&
+              fileTypeIndex === FileTypes.JSON_TYPE_OBJECT &&
               <div className='headless-form-input'>
                 <input
                   value={this.state.objectKeyValue}

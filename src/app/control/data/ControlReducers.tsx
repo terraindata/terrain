@@ -50,6 +50,7 @@ import Ajax from 'util/Ajax';
 import ActionTypes from './ControlActionTypes';
 
 import * as FileImportTypes from 'fileImport/FileImportTypes';
+import * as _ from 'lodash';
 import { _ControlState, ControlState } from './ControlStore';
 type Template = FileImportTypes.Template;
 
@@ -64,21 +65,12 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
       (templatesArr) =>
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
-        {
-          return FileImportTypes._Template({
+        { // TODO move this translation to _Template
+          return FileImportTypes._Template(_.extend({}, template, {
             templateId: template['id'],
             templateName: template['name'],
             originalNames: List<string>(template['originalNames']),
-            columnTypes: template['columnTypes'],
-            transformations: template['transformations'],
-            primaryKeys: template['primaryKeys'],
-            primaryKeyDelimiter: template['primaryKeyDelimiter'],
-            persistentAccessToken: template['persistentAccessToken'],
-            dbid: template['dbid'],
-            dbname: template['dbname'],
-            tablename: template['tablename'],
-            export: template['export'],
-          });
+          }));
         },
         ));
         action.payload.setTemplates(templates);

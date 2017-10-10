@@ -174,7 +174,7 @@ class AccessTokenControl extends TerrainComponent<Props>
   public getServerName(dbid): string
   {
     const server = this.props.servers.find((v, k) => v.connectionId === dbid);
-    return server === undefined ? '' : server.get('name');
+    return server === undefined ? 'Server Not Found' : server.get('name');
   }
 
   public getTemplateConfig(): HeaderConfig
