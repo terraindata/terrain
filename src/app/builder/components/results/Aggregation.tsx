@@ -207,15 +207,15 @@ class AggregationComponent extends TerrainComponent<Props> {
           'aggregation-title-bar': true,
           'aggregation-title-bar-closed': !this.state.expanded,
         })}
-        onClick={this.toggleExpanded}
       >
         <ArrowIcon
           className={classNames({
             'arrow-icon': true,
-            'arrow-icon-open': this.state.expanded,
+            'arrow-icon-closed': !this.state.expanded,
           })}
+          onClick={this.toggleExpanded}
         />
-        <div className='aggregation-title-bar-title'>
+        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded}>
           {
             this.props.name
           }
