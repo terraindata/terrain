@@ -95,11 +95,13 @@ class TransportScheduler extends TerrainComponent<Props>
     fileTypeIndex: number;
     selectedIds: List<number>;
     objectKeyValue: string;
+    filenameValue: string;
   } = {
     index: this.props.index,
     fileTypeIndex: 0,
     selectedIds: List([-1, -1, -1]),
     objectKeyValue: '',
+    filenameValue: '',
   };
 
   public componentDidMount()
@@ -119,23 +121,65 @@ class TransportScheduler extends TerrainComponent<Props>
     }
   }
 
-  public renderExportOptions(template: Template)
+  public handleFilenameChange(event)
+  {
+    
+  }
+
+  /*
+   *  SFTP info
+   */
+  public renderConnectionOptions(template: Template)
+  {
+
+  }
+
+  /*
+   *  Date and Time for the CRON job
+   */
+  public renderScheduleOptions(template: Template)
+  {
+
+  }
+
+  /*
+   *  Filename and filetype, Variant Selection (if export)
+   */
+  public renderImportExportOptions(template: Template)
   {
     const inputStyle = getStyle('borderRadius', '1px');
     const columnStyle = getStyle('width', inputElementWidth);
     const { fileTypeIndex } = this.state;
+    const typeText = template.export ? 'Export' : 'Import';
+    const showObjectKeyField = fileTypeIndex === FileTypes.JSON_TYPE_OBJECT && !template.export;
+    // TODO: show import object key when import supports object key
     return (
       <div>
-        <VariantSelector
-          libraryState={LibraryStore.getState()}
-          onChangeSelection={this._setStateWrapperPath('selectedIds')}
-          ids={this.state.selectedIds}
-          dropdownWidth={inputElementWidth}
-        />
+        {
+          !!template.export &&
+          <VariantSelector
+            libraryState={LibraryStore.getState()}
+            onChangeSelection={this._setStateWrapperPath('selectedIds')}
+            ids={this.state.selectedIds}
+            dropdownWidth={inputElementWidth}
+          />
+        }
         <div className='headless-form-block'>
           <div className='headless-form-column' style={columnStyle}>
             <div className='headless-form-label'>
-              Export File Type
+              Import Filename
+            </div>
+            <div className='headless-form-input'>
+              <input
+                value={this.state.filenameValue}
+                onChange={this.handleFilenameChange}
+                style={inputStyle}
+              />
+            </div>
+          </div>
+          <div className='headless-form-column' style={columnStyle}>
+            <div className='headless-form-label'>
+              {typeText} File Type
             </div>
             <div className='headless-form-input'>
               <Dropdown
@@ -149,13 +193,13 @@ class TransportScheduler extends TerrainComponent<Props>
           </div>
           <div className='headless-form-column' style={columnStyle}>
             {
-              fileTypeIndex === FileTypes.JSON_TYPE_OBJECT &&
+              showObjectKeyField &&
               <div className='headless-form-label'>
                 Export Key
               </div>
             }
             {
-              fileTypeIndex === FileTypes.JSON_TYPE_OBJECT &&
+              showObjectKeyField &&
               <div className='headless-form-input'>
                 <input
                   value={this.state.objectKeyValue}
@@ -173,40 +217,11 @@ class TransportScheduler extends TerrainComponent<Props>
     );
   }
 
-  public renderImportOptions(template: Template)
-  {
-    const columnStyle = getStyle('width', inputElementWidth);
-    const { fileTypeIndex } = this.state;
-    return (
-      <div className='headless-form-block'>
-        <div className='headless-form-column' style={columnStyle}>
-          <div className='headless-form-label'>
-            Import File Type
-          </div>
-          <div className='headless-form-input'>
-            <Dropdown
-              options={fileTypeOptions}
-              selectedIndex={fileTypeIndex}
-              canEdit={true}
-              onChange={this._setStateWrapper('fileTypeIndex')}
-              openDown={true}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  public renderScheduleOptions(template: Template)
-  {
-    
-  }
-
   public render()
   {
     const template: Template = this.state.index !== -1 ? this.props.templates.get(this.state.index) : undefined;
     return (
-      <div className='transport-scheduler' style={backgroundColor(Colors().altBg2)}> 
+      <div className='transport-scheduler' style={backgroundColor(Colors().altBg2)}>
         <TemplateSelector
           index={this.state.index}
           templates={this.props.templates}
@@ -214,7 +229,7 @@ class TransportScheduler extends TerrainComponent<Props>
           onChange={this._setStateWrapper('index')}
         />
       {
-        template !== undefined && template.export ? this.renderExportOptions(template) : this.renderImportOptions(template)
+        template !== undefined && this.renderImportExportOptions(template)
       }
       {
         this.renderScheduleOptions(template)

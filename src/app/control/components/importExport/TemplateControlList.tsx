@@ -66,6 +66,7 @@ import { ControlList, HeaderConfig } from '../ControlList';
 
 import CreateHeadlessCommand from './CreateHeadlessCommand';
 import TransportScheduler from './TransportScheduler';
+
 import './TemplateControlList.less';
 
 const DeleteIcon = require('images/icon_close.svg');
