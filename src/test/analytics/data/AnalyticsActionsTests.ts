@@ -102,6 +102,8 @@ describe('AnalyticsActions', () =>
         startParam: Date,
         endParam: Date,
         metricIdParam: number,
+        intervalIdParam: string,
+        agg: string,
         onLoad: (response: any) => void,
         onError?: (ev: Event) => void,
       ) => onLoad(analyticsResponse);
@@ -116,7 +118,7 @@ describe('AnalyticsActions', () =>
       const store = mockStore({ analytics });
 
       store.dispatch(
-        Actions.fetch([variantId], metricId, intervalId, (analyticsResponseParam) =>
+        Actions.fetch([variantId], metricId, intervalId, dateRangeId, (analyticsResponseParam) =>
         {
           expect(store.getActions()).toEqual(expectedActions);
           done();
