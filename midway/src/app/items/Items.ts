@@ -45,6 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import DeployVariant from '../../../../shared/deploy/DeployVariant';
+import DatabaseController from '../../database/DatabaseController';
+import ElasticClient from '../../database/elastic/client/ElasticClient';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { UserConfig } from '../users/Users';
@@ -130,6 +133,41 @@ export class Items
         }
       }
       return resolve(liveItems);
+    });
+  }
+
+  public async checkStatusVariants(dbid: number): Promise<string[] | string>
+  {
+    return new Promise<string[] | string>(async (resolve, reject) =>
+    {
+      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+      if (database === undefined)
+      {
+        return reject('Database "' + dbid.toString() + '" not found.');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return reject('Status metadata currently is only supported for Elastic databases.');
+      }
+      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+      elasticClient.cluster.state({}, function getState(err, resp)
+      {
+        let storedScriptNames: string[] = [];
+        // console.log(resp);
+        if (resp['metadata'] !== undefined && resp['metadata']['stored_scripts'] !== undefined)
+        {
+          const storedScripts = resp['metadata']['stored_scripts'] as object;
+          storedScriptNames = Object.keys(storedScripts);
+          storedScriptNames = storedScriptNames.map((storedScriptName) =>
+          {
+            return storedScriptName.startsWith('mustache#') ? storedScriptName.substring(9) : '';
+          }).filter((storedScriptName) =>
+          {
+            return storedScriptName.length > 0;
+          });
+        }
+        return resolve(storedScriptNames);
+      });
     });
   }
 

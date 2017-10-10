@@ -80,6 +80,12 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
   ctx.body = await items.get(ctx.params.id);
 });
 
+Router.get('/status/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting status from DB ID ' + String(ctx.params.id));
+  ctx.body = await items.checkStatusVariants(parseInt(ctx.params.id, 10));
+});
+
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('create items');
