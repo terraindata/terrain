@@ -96,14 +96,16 @@ class AggregationsArea extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    Actions.change(List(this._keyPath('query', 'aggregationList')), this.parseAggs(this.props.resultsState.aggregations, this.props.query));
+    Actions.change(List(this._keyPath('query', 'aggregationList')),
+      this.parseAggs(this.props.resultsState.aggregations, this.props.query), true);
   }
 
   public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.resultsState.aggregations !== nextProps.resultsState.aggregations)
     {
-      Actions.change(List(this._keyPath('query', 'aggregationList')), this.parseAggs(nextProps.resultsState.aggregations, nextProps.query));
+      Actions.change(List(this._keyPath('query', 'aggregationList')),
+        this.parseAggs(nextProps.resultsState.aggregations, nextProps.query), true);
     }
   }
 

@@ -205,11 +205,17 @@ class AggregationComponent extends TerrainComponent<Props> {
       <div
         className={classNames({
           'aggregation-title-bar': true,
-          'aggregation-title-bar-open': !this.state.expanded,
+          'aggregation-title-bar-closed': !this.state.expanded,
         })}
+        onClick={this.toggleExpanded}
       >
-        <ArrowIcon className='arrow-icon' onClick={this.toggleExpanded} />
-        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded}>
+        <ArrowIcon
+          className={classNames({
+            'arrow-icon': true,
+            'arrow-icon-open': this.state.expanded,
+          })}
+        />
+        <div className='aggregation-title-bar-title'>
           {
             this.props.name
           }
@@ -261,23 +267,6 @@ class AggregationComponent extends TerrainComponent<Props> {
             {String(_.values(aggregation)[0].value)}
           </span>
         </div>
-        {
-          (
-            <div className='aggregation-title-bar-options'>
-              <div
-                className='aggregation-title-bar-export'
-                onClick={this.showExport}
-                key='results-area-export'
-                style={link()}
-              >
-                Export
-              </div>
-              <div className='clipboard-icon-wrapper'>
-                {tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')}
-              </div>
-            </div>
-          )
-        }
       </div>
     );
   }
@@ -370,9 +359,12 @@ class AggregationComponent extends TerrainComponent<Props> {
   public render()
   {
     return (
-      <div className='aggregation'>
+      <div
+        className='aggregation'
+        style={borderColor(Colors().bg3)}
+      >
         {this.state.singleValue ? this.renderSingleAgg() : this.renderAgg()}
-        {this.state.expanded && !this.state.singleValue && this.renderExpandedAgg()}
+        <div className='aggregation-expanded'> {this.state.expanded && !this.state.singleValue && this.renderExpandedAgg()} </div>
         {this.state.showingExport && this.renderExport()}
       </div>
     );
