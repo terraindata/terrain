@@ -97,11 +97,11 @@ export async function authenticateStreamPersistentAccessToken(req: http.Incoming
 {
   return new Promise<object>(async (resolve, reject) =>
   {
-    if (req['templateId'] === undefined || req['persistentAccessToken'] === undefined)
-    {
-      return reject('Missing one or more auth fields.');
-    }
     const { files, fields } = await asyncBusboy(req);
+    if (fields['templateId'] === undefined || fields['persistentAccessToken'] === undefined)
+    {
+      return reject('Missing one or more auth fields. ' + fields['templateId'] + ' , ' + fields['persistentAccessToken']);
+    }
     const template: ImportTemplateConfig[] =
       await templates.loginWithPersistentAccessToken(Number(fields['templateId']), fields['persistentAccessToken']);
     if (template.length === 0)
