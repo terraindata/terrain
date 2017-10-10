@@ -164,14 +164,14 @@ export class AggsTableComponent extends TerrainComponent<Props>
 
   public render()
   {
+    const actualHeight = ((Number(this.state.rows.length) + 1) * 35 + 20)
     return (
       <ReactDataGrid
         columns={this.getColumns().toJS()}
         rowGetter={this.getRow}
         rowsCount={this.state.rows.length}
-        // minHeight={((Number(this.state.rows.length) + 1) * 35)} // add scroll bar size ~ 20
+        minHeight={(actualHeight < 400) ? actualHeight : 400} // add scroll bar size ~ 20
         onGridSort={this.handleGridSort}
-        maxHeight={200}
         minWidth={this.props.containerWidth}
       />
     );
@@ -181,7 +181,8 @@ export class AggsTableComponent extends TerrainComponent<Props>
 export const AggsTable = Dimensions({
   elementResize: true,
   containerStyle: {
-    height: '100%',
+    height: 'auto',
+
   },
 })(AggsTableComponent);
 
