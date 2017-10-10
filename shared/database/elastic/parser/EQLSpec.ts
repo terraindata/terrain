@@ -368,7 +368,7 @@ const EQLSpec: ESClause[] =
         date_histogram: 'bucket_date_histogram',
         range: 'bucket_range',
         date_range: 'bucket_date_range',
-        ip_ranges: 'bucket_ip_range',
+        ip_range: 'bucket_ip_range',
         geo_distance: 'bucket_geo_distance',
         geohash_grid: 'bucket_geohash_grid',
         sampler: 'bucket_sampler',
@@ -615,6 +615,7 @@ const EQLSpec: ESClause[] =
       }),
     new ESStructureClause('bucket_significant_terms',
       {
+        field: 'field',
         shard_size: 'number',
         min_doc_count: 'number',
         shard_min_doc_count: 'number',

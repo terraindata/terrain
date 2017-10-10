@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import { List, Map } from 'immutable';
+import { List, Map, Set } from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -96,7 +96,6 @@ export class AggsTableComponent extends TerrainComponent<Props>
     if (useBuckets)
     {
       rows = _.values(tableData.buckets);
-      console.log(rows);
     }
     else
     {
@@ -111,46 +110,67 @@ export class AggsTableComponent extends TerrainComponent<Props>
     });
   }
 
-  public flatten(data) {
-    let result = {};
-    const recurse = (current, property) => {
+  public flatten(data)
+  {
+    const result = {};
+    const recurse = (current, property: string) =>
+    {
       // non-object/array
-      if (Object(current) !== current) {
+      if (Object(current) !== current)
+      {
         result[property] = current;
       }
       // array
       else if (Array.isArray(current))
       {
-        current.map((value, i) => {
-          recurse(value, property + '[' + i + ']');
+        current.map((value, i) =>
+        {
+          recurse(value, property + '[' + String(i) + ']');
         });
       }
       // object
       else
       {
-        _.keys(current).map((key) => {
+        _.keys(current).map((key: string) =>
+        {
           if (property === 'values')
           {
             property = '';
           }
-          recurse(current[key], property ? property + '.' + key : key);
+          recurse(current[key], (property !== '' && property !== undefined) ? property + '.' + key : key);
         });
       }
-    }
+    };
     recurse(data, '');
     return result;
-}
+  }
 
   public getColumns(): List<any>
   {
     if (this.props.useBuckets)
     {
-      const data = _.values(this.props.tableData.buckets)
-      const keys = _.keys(data[0]);
-      const cols =  List(keys.map((key) => {
-          return {key, name: key, resizable: true};
+      const data = _.values(this.props.tableData.buckets);
+      let keys = Set([]);
+      data.map((d) =>
+      {
+        _.keys(d).map((key) =>
+        {
+          keys = keys.add(key);
+        });
+      });
+      // Order columns so that score, bg_count, and doc_count are at the end...
+      keys = keys.sortBy((key) =>
+      {
+        if (key === 'doc_count' || key === 'bg_count' || key === 'score')
+        {
+          return 2;
+        }
+        return 1;
+      }).toSet();
+      const cols = List(keys.map((key) =>
+      {
+        return { key, name: key, resizable: true };
       }));
-      // if to or from, or to_as_string or from_as_string is a key, make sure the other one is there
       return cols;
       // return List([{ key: 'key', name: 'key', resizable: true }, { key: 'doc_count', name: 'doc_count', resizable: true }]);
     }
@@ -203,14 +223,14 @@ export class AggsTableComponent extends TerrainComponent<Props>
 
   public render()
   {
+    const actualHeight = ((Number(this.state.rows.length) + 1) * 35 + 20);
     return (
       <ReactDataGrid
         columns={this.getColumns().toJS()}
         rowGetter={this.getRow}
         rowsCount={this.state.rows.length}
-        // minHeight={((Number(this.state.rows.length) + 1) * 35)} // add scroll bar size ~ 20
+        minHeight={(actualHeight < 385) ? actualHeight : 385} // add scroll bar size ~ 20
         onGridSort={this.handleGridSort}
-        maxHeight={200}
         minWidth={this.props.containerWidth}
       />
     );
@@ -220,7 +240,8 @@ export class AggsTableComponent extends TerrainComponent<Props>
 export const AggsTable = Dimensions({
   elementResize: true,
   containerStyle: {
-    height: '100%',
+    height: 'auto',
+
   },
 })(AggsTableComponent);
 

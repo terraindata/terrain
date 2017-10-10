@@ -85,18 +85,22 @@ class AggregationComponent extends TerrainComponent<Props> {
   public state: {
     expanded: boolean,
     viewMode: string,
-    singleValue: boolean,
+    isSingleValue: boolean,
+    singleValue: string,
   } = {
     expanded: false,
     viewMode: 'Table',
-    singleValue: false,
+    isSingleValue: false,
+    singleValue: '',
   };
 
   public componentWillMount()
   {
+    const { isSingle, value } = this.isSingleValue(this.props.aggregation);
     this.setState({
       viewMode: this.props.query.aggregationList.get(this.props.name),
-      singleValue: this.isSingleValue(this.props.aggregation),
+      isSingleValue: isSingle,
+      singleValue: value,
     });
   }
 
@@ -110,15 +114,23 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
     if (this.props.aggregation !== nextProps.aggregation)
     {
+      const { isSingle, value } = this.isSingleValue(nextProps.aggregation);
       this.setState({
-        singleValue: this.isSingleValue(nextProps.aggregation),
+        isSingleValue: isSingle,
+        singleValue: value,
       });
     }
   }
 
   public isSingleValue(aggregation)
   {
-    return _.values(aggregation).length === 1 && _.values(aggregation)[0].value !== undefined;
+    const values = _.values(aggregation);
+    const length = _.keys(values[0]).length;
+    const isSingle = length === 1 &&
+      (values[0].value !== undefined || values[0].doc_count !== undefined);
+    const value = values[0].value !== undefined ? values[0].value : values[0].doc_count;
+    return { isSingle, value };
+
   }
 
   public toggleExpanded()
@@ -258,7 +270,7 @@ class AggregationComponent extends TerrainComponent<Props> {
             }
           </span>
           <span className='aggregation-title-bar-value'>
-            {String(_.values(aggregation)[0].value)}
+            {this.state.singleValue}
           </span>
         </div>
       </div>
@@ -359,8 +371,8 @@ class AggregationComponent extends TerrainComponent<Props> {
         className='aggregation'
         style={borderColor(Colors().bg3)}
       >
-        {this.state.singleValue ? this.renderSingleAgg() : this.renderAgg()}
-        <div className='aggregation-expanded'> {this.state.expanded && !this.state.singleValue && this.renderExpandedAgg()} </div>
+        {this.state.isSingleValue ? this.renderSingleAgg() : this.renderAgg()}
+        <div className='aggregation-expanded'> {this.state.expanded && !this.state.isSingleValue && this.renderExpandedAgg()} </div>
       </div>
     );
   }

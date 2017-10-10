@@ -114,8 +114,8 @@ class AggregationHistogram extends TerrainComponent<Props>
 
     }
     // TERMS / DATE QUERIES
-    else if ((buckets[0] && buckets[0].key && typeof buckets[0].key === 'string') || 
-            (buckets[0] && buckets[0].key_as_string))
+    else if ((buckets[0] && buckets[0].key && typeof buckets[0].key === 'string') ||
+      (buckets[0] && buckets[0].key_as_string))
     {
       domainMin = 0;
       domainMax = buckets.length;
@@ -157,19 +157,20 @@ class AggregationHistogram extends TerrainComponent<Props>
 
   public parseValueData(data)
   {
-    let categories = [];
+    const categories = [];
     let domainMin = Infinity;
     let domainMax = -Infinity;
     let rangeMax = -Infinity;
-    const barsData = _.keys(data).map((key, i) => {
+    const barsData = _.keys(data).map((key, i) =>
+    {
       let xVal = parseFloat(key);
-      let yVal = parseFloat(data[key]);
+      const yVal = parseFloat(data[key]);
       if (isNaN(xVal))
       {
         xVal = i;
         categories.push(key);
       }
-     if (xVal < domainMin)
+      if (xVal < domainMin)
       {
         domainMin = xVal;
       }
@@ -181,21 +182,16 @@ class AggregationHistogram extends TerrainComponent<Props>
       {
         rangeMax = yVal;
       }
-      return {x: xVal, y: yVal};
+      return { x: xVal, y: yVal };
     });
-    console.log(data);
-    return {barsData, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
+    return { barsData, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
   }
 
   public getChartState(overrideState?: any)
   {
     overrideState = overrideState || {};
     const data = overrideState.data || this.props.data;
-    const {barsData, categories, domain, range } = this.props.useBuckets ? this.parseBucketData(data) : this.parseValueData(data);
-    console.log(barsData);
-    console.log(categories);
-    console.log(domain);
-    console.log(range);
+    const { barsData, categories, domain, range } = this.props.useBuckets ? this.parseBucketData(data) : this.parseValueData(data);
     const chartState = {
       barsData: (barsData),
       domain: {
