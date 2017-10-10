@@ -51,8 +51,6 @@ import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
 
-export const DV: DeployVariant = new DeployVariant();
-
 // CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
 // parent integer, status text, type text);
 
@@ -105,31 +103,28 @@ export class Items
     return this.select([], {});
   }
 
-  public async getLiveVariants(ids?: number[]): Promise<string[] | string>
+  public async getLiveVariants(ids: number[]): Promise<string[] | object[]>
   {
-    return new Promise<string[] | string>(async (resolve, reject) =>
+    return new Promise<string[] | object[]>(async (resolve, reject) =>
     {
-      if (ids === undefined)
+      if (ids.length === 0)
       {
-        return reject('Must provide an array of item IDs.');
+        const items: ItemConfig[] = await this.select([], { type: 'VARIANT', status: 'LIVE' } as object);
+        const liveItems: object[] = items.map((item) =>
+        {
+          return { id: item.id, name: DeployVariant.getVariantDeployedName(item as ItemConfig) };
+        });
+        return resolve(liveItems);
       }
-      const liveItems: string[] = [];
-      for (const id of ids)
+      else
       {
-        if (ids.hasOwnProperty(id))
+        const liveItems: string[] = await Promise.all(ids.map(async (id) =>
         {
           const items: ItemConfig[] = await this.select([], { id, type: 'VARIANT', status: 'LIVE' } as object);
-          if (items.length !== 0)
-          {
-            liveItems.push(DV.getVariantDeployedName(items[0] as ItemConfig));
-          }
-          else
-          {
-            liveItems.push('');
-          }
-        }
+          return items.length !== 0 ? DeployVariant.getVariantDeployedName(items[0] as ItemConfig) as string : '' as string;
+        }));
+        return resolve(liveItems);
       }
-      return resolve(liveItems);
     });
   }
 

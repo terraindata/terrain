@@ -49,7 +49,7 @@ class DeployVariant
   /**
    * @returns {string} the variant's live deployed name in ES
    */
-  public getVariantDeployedName(variant: object): string
+  public static getVariantDeployedName(variant: object): string
   {
     return 'terrain_' + (variant['id'] as string);
   }
