@@ -96,12 +96,14 @@ export class AggsTableComponent extends TerrainComponent<Props>
     if (useBuckets)
     {
       rows = _.values(tableData.buckets);
+      console.log(rows);
     }
     else
     {
-      rows = _.keys(tableData).map((key) =>
+      const flatJson = this.flatten(tableData);
+      rows = _.keys(flatJson).map((key) =>
       {
-        return { key, value: tableData[key] };
+        return { key, value: flatJson[key] };
       });
     }
     this.setState({
@@ -109,11 +111,48 @@ export class AggsTableComponent extends TerrainComponent<Props>
     });
   }
 
+  public flatten(data) {
+    let result = {};
+    const recurse = (current, property) => {
+      // non-object/array
+      if (Object(current) !== current) {
+        result[property] = current;
+      }
+      // array
+      else if (Array.isArray(current))
+      {
+        current.map((value, i) => {
+          recurse(value, property + '[' + i + ']');
+        });
+      }
+      // object
+      else
+      {
+        _.keys(current).map((key) => {
+          if (property === 'values')
+          {
+            property = '';
+          }
+          recurse(current[key], property ? property + '.' + key : key);
+        });
+      }
+    }
+    recurse(data, '');
+    return result;
+}
+
   public getColumns(): List<any>
   {
     if (this.props.useBuckets)
     {
-      return List([{ key: 'key', name: 'key', resizable: true }, { key: 'doc_count', name: 'doc_count', resizable: true }]);
+      const data = _.values(this.props.tableData.buckets)
+      const keys = _.keys(data[0]);
+      const cols =  List(keys.map((key) => {
+          return {key, name: key, resizable: true};
+      }));
+      // if to or from, or to_as_string or from_as_string is a key, make sure the other one is there
+      return cols;
+      // return List([{ key: 'key', name: 'key', resizable: true }, { key: 'doc_count', name: 'doc_count', resizable: true }]);
     }
     else
     {

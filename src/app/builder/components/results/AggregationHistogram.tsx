@@ -67,6 +67,7 @@ export interface Props
   data: any;
   colors: [string, string];
   containerWidth?: number;
+  useBuckets: boolean;
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
@@ -84,7 +85,7 @@ class AggregationHistogram extends TerrainComponent<Props>
     Histogram.create(el, this.getChartState());
   }
 
-  public parseData(buckets)
+  public parseBucketData(buckets)
   {
     let data;
     let domainMin: number = Infinity;
@@ -112,8 +113,9 @@ class AggregationHistogram extends TerrainComponent<Props>
       });
 
     }
-    // TERMS QUERIES
-    else if (buckets[0] && buckets[0].key && typeof buckets[0].key === 'string')
+    // TERMS / DATE QUERIES
+    else if ((buckets[0] && buckets[0].key && typeof buckets[0].key === 'string') || 
+            (buckets[0] && buckets[0].key_as_string))
     {
       domainMin = 0;
       domainMax = buckets.length;
@@ -127,7 +129,7 @@ class AggregationHistogram extends TerrainComponent<Props>
       });
       categories = buckets.map((bucket) =>
       {
-        return bucket.key;
+        return bucket.key_as_string || bucket.key;
       });
     }
     // HISTOGRAM QUERIES
@@ -153,12 +155,47 @@ class AggregationHistogram extends TerrainComponent<Props>
     return { barsData: data, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
   }
 
+  public parseValueData(data)
+  {
+    let categories = [];
+    let domainMin = Infinity;
+    let domainMax = -Infinity;
+    let rangeMax = -Infinity;
+    const barsData = _.keys(data).map((key, i) => {
+      let xVal = parseFloat(key);
+      let yVal = parseFloat(data[key]);
+      if (isNaN(xVal))
+      {
+        xVal = i;
+        categories.push(key);
+      }
+     if (xVal < domainMin)
+      {
+        domainMin = xVal;
+      }
+      if (xVal > domainMax)
+      {
+        domainMax = xVal;
+      }
+      if (yVal > rangeMax)
+      {
+        rangeMax = yVal;
+      }
+      return {x: xVal, y: yVal};
+    });
+    console.log(data);
+    return {barsData, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
+  }
+
   public getChartState(overrideState?: any)
   {
     overrideState = overrideState || {};
-    const buckets = overrideState.data || this.props.data;
-    const { barsData, categories, domain, range } = this.parseData(buckets);
-
+    const data = overrideState.data || this.props.data;
+    const {barsData, categories, domain, range } = this.props.useBuckets ? this.parseBucketData(data) : this.parseValueData(data);
+    console.log(barsData);
+    console.log(categories);
+    console.log(domain);
+    console.log(range);
     const chartState = {
       barsData: (barsData),
       domain: {

@@ -351,7 +351,7 @@ const EQLSpec: ESClause[] =
         cardinality: 'metric_cardinality',
         extended_stats: 'metric_extend_stats',
         geo_bounds: 'metric_geo_bounds',
-        centroid: 'metric_centroid',
+        geo_centroid: 'metric_centroid',
         percentiles: 'metric_percentiles',
         percentile_ranks: 'metric_percentiles',
         stats: 'metric_stats',
@@ -893,7 +893,7 @@ const EQLSpec: ESClause[] =
         value_type: 'string',
         script: 'script',
         format: 'string',
-        percents: 'number[]', // double array
+        values: 'number[]', // double array
         keyed: 'boolean',
         tdigest: 'percentiles_tdigest',
         hdr: 'percentiles_hdr',

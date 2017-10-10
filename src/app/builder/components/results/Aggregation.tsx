@@ -306,19 +306,21 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public canBeHistogram()
   {
+    // Check that values.values values are numbers
     const values = _.values(this.props.aggregation)[0];
-    return values.buckets !== undefined;
+    return values.buckets !== undefined || values.values !== undefined;
   }
 
   public renderHistogram(values)
   {
     if (this.canBeHistogram())
     {
-      const buckets = _.values(this.props.aggregation)[0].buckets;
+      const data = values.buckets !== undefined ? values.buckets : values.values;
       return (
         <AggregationHistogram
-          data={buckets}
+          data={data}
           colors={[Colors().active, Colors().activeHover]}
+          useBuckets={values.buckets !== undefined}
         />
       );
     }
