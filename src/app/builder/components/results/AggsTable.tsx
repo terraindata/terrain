@@ -64,6 +64,8 @@ export interface Props
 {
   tableData: any;
   containerWidth?: number;
+  containerHeight?: number;
+  useBuckets?: boolean;
 }
 
 @Radium
@@ -77,27 +79,47 @@ export class AggsTableComponent extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    const dataFields = _.values(this.props.tableData);
-    this.setState({
-      rows: _.values(this.props.tableData.buckets),
-    });
+    this.populateRows(this.props.tableData, this.props.useBuckets);
   }
 
   public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.tableData !== this.props.tableData)
     {
-      // force the table to update
-      const dataFields = _.values(nextProps.tableData);
-      this.setState({
-        rows: _.values(this.props.tableData.buckets),
+      this.populateRows(nextProps.tableData, nextProps.useBuckets);
+    }
+  }
+
+  public populateRows(tableData, useBuckets)
+  {
+    let rows = [];
+    if (useBuckets)
+    {
+      rows = _.values(tableData.buckets);
+    }
+    else
+    {
+      rows = _.keys(tableData).map((key) =>
+      {
+        return { key, value: tableData[key] };
       });
     }
+    console.log(rows);
+    this.setState({
+      rows,
+    });
   }
 
   public getColumns(): List<any>
   {
-    return List([{ key: 'key', name: 'key', resizable: true }, { key: 'doc_count', name: 'doc_count', resizable: true }]);
+    if (this.props.useBuckets)
+    {
+      return List([{ key: 'key', name: 'key', resizable: true }, { key: 'doc_count', name: 'doc_count', resizable: true }]);
+    }
+    else
+    {
+      return List([{ key: 'key', name: 'key', resizable: true }, { key: 'value', name: 'value', resizable: true }]);
+    }
   }
 
   public getRow(i: number): object

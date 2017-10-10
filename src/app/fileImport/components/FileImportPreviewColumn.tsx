@@ -255,7 +255,6 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public render()
   {
-    console.log(this.props);
     return (
       <div
         className={classNames({
@@ -285,8 +284,17 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           </div>
         </div>
         {
-          this.props.items ?
-            this.props.items.map((item, key) =>
+          this.props.items.map((item, key) =>
+            <div
+              key={key}
+              className={classNames({
+                'fi-preview-column-cell': true,
+              })}
+              style={[
+                fontColor(Colors().text1),
+                backgroundColor(Colors().bg2),
+              ]}
+            >
               <div
                 key={key}
                 className={classNames({
@@ -297,17 +305,12 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
                   backgroundColor(Colors().bg2),
                 ]}
               >
-                <div
-                  className='fi-preview-column-cell-text'
-                >
-                  {
-                    item
-                  }
-                </div>
-              </div>,
-            )
-            :
-            ''
+                {
+                  item
+                }
+              </div>
+            </div>,
+          )
         }
       </div>
     );

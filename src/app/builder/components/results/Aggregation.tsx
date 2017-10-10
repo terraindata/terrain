@@ -49,21 +49,30 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 const { List } = Immutable;
+<<<<<<< HEAD
 import Util from '../../../util/Util';
+=======
+import { notificationManager } from 'common/components/InAppNotification';
+>>>>>>> 9860cc5151040672bc500c99c98ce6a812db7004
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import Query from '../../../../items/types/Query';
 import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
+<<<<<<< HEAD
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Actions from '../../data/BuilderActions';
+=======
+>>>>>>> 9860cc5151040672bc500c99c98ce6a812db7004
 import Modal from '../../../common/components/Modal';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 import ColorManager from '../../../util/ColorManager';
+import Actions from '../../data/BuilderActions';
 import Histogram from './../../../charts/components/Histogram';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Menu, { MenuOption } from './../../../common/components/Menu';
-import { notificationManager } from 'common/components/InAppNotification';
-import Query from '../../../../items/types/Query';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
@@ -121,7 +130,7 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public isSingleValue(aggregation)
   {
-    return _.values(aggregation).length === 1 && _.values(aggregation).value !== undefined;
+    return _.values(aggregation).length === 1 && _.values(aggregation)[0].value !== undefined;
   }
 
   public toggleExpanded()
@@ -196,11 +205,17 @@ class AggregationComponent extends TerrainComponent<Props> {
       <div
         className={classNames({
           'aggregation-title-bar': true,
-          'aggregation-title-bar-open': !this.state.expanded,
+          'aggregation-title-bar-closed': !this.state.expanded,
         })}
+        onClick={this.toggleExpanded}
       >
-        <ArrowIcon className='arrow-icon' onClick={this.toggleExpanded} />
-        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded}>
+        <ArrowIcon
+          className={classNames({
+            'arrow-icon': true,
+            'arrow-icon-open': this.state.expanded,
+          })}
+        />
+        <div className='aggregation-title-bar-title'>
           {
             this.props.name
           }
@@ -209,6 +224,7 @@ class AggregationComponent extends TerrainComponent<Props> {
           this.state.expanded ?
             (
               <div className='aggregation-title-bar-options'>
+<<<<<<< HEAD
                 {
                   this.canBeTable() ?
                     <div
@@ -229,6 +245,21 @@ class AggregationComponent extends TerrainComponent<Props> {
                     }
                   </div>
                 </CopyToClipboard>
+=======
+                <div
+                  className='aggregation-title-bar-export'
+                  onClick={this.showExport}
+                  key='results-area-export'
+                  style={link()}
+                >
+                  Export
+                </div>
+                <div className='clipboard-icon-wrapper'>
+                  {
+                    tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')
+                  }
+                </div>
+>>>>>>> 9860cc5151040672bc500c99c98ce6a812db7004
                 <Menu
                   options={this.getMenuOptions()}
                 />
@@ -244,16 +275,22 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public renderSingleAgg()
   {
-    const content = this.props.name + ' ' + String(this.props.aggregation.value);
+    const { name, aggregation } = this.props;
     return (
       <div
         className='aggregation-title-bar'
       >
-        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded}>
-          {
-            content
-          }
+        <div className='aggregation-title-bar-title'>
+          <span>
+            {
+              name + ':  '
+            }
+          </span>
+          <span className='aggregation-title-bar-value'>
+            {String(_.values(aggregation)[0].value)}
+          </span>
         </div>
+<<<<<<< HEAD
         {
           (
             <div className='aggregation-title-bar-options'>
@@ -277,6 +314,8 @@ class AggregationComponent extends TerrainComponent<Props> {
             </div>
           )
         }
+=======
+>>>>>>> 9860cc5151040672bc500c99c98ce6a812db7004
       </div>
     );
   }
@@ -299,20 +338,28 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public canBeTable()
   {
-    const values = _.values(this.props.aggregation)[0];
-    return values.buckets !== undefined;
+    return true;
+    // const values = _.values(this.props.aggregation)[0];
+    // return values.buckets !== undefined;
   }
 
-  public renderTableView(tableData)
+  public renderTableView(values)
   {
     if (this.canBeTable())
     {
       return (
+<<<<<<< HEAD
         <div className='aggregation-table'>
           <AggsTable
             tableData={tableData}
           />
         </div>
+=======
+        <AggsTable
+          tableData={values}
+          useBuckets={values.buckets !== undefined}
+        />
+>>>>>>> 9860cc5151040672bc500c99c98ce6a812db7004
       );
     }
   }
@@ -323,87 +370,15 @@ class AggregationComponent extends TerrainComponent<Props> {
     return values.buckets !== undefined;
   }
 
-  public parseDataForHistogram(buckets)
-  {
-    let data;
-    let domainMin: number = Infinity;
-    let domainMax: number = -Infinity;
-    let rangeMax: number = -Infinity;
-    let categories = [];
-    // RANGE QUERIES
-    if (buckets[0] && (buckets[0].to || buckets[0].from))
-    {
-      domainMin = 0;
-      domainMax = buckets.length;
-      data = buckets.map((bucket, i) =>
-      {
-        if (bucket.doc_count > rangeMax)
-        {
-          rangeMax = bucket.doc_count;
-        }
-        return { x: i, y: bucket.doc_count };
-      });
-      categories = buckets.map((bucket) =>
-      {
-        const to = bucket.to !== undefined ? String(bucket.to) : '';
-        const from = bucket.from !== undefined ? String(bucket.from) : '';
-        return from + '-' + to;
-      });
-    }
-    // TERMS QUERIES
-    else if (buckets[0] && buckets[0].key && typeof buckets[0].key === 'string')
-    {
-      domainMin = 0;
-      domainMax = buckets.length;
-      data = buckets.map((bucket, i) =>
-      {
-        if (bucket.doc_count > rangeMax)
-        {
-          rangeMax = bucket.doc_count;
-        }
-        return { x: i, y: bucket.doc_count };
-      });
-      categories = buckets.map((bucket) =>
-      {
-        return bucket.key;
-      });
-    }
-    // HISTOGRAM QUERIES
-    else
-    {
-      data = buckets.map((bucket) =>
-      {
-        if (bucket.doc_count > rangeMax)
-        {
-          rangeMax = bucket.doc_count;
-        }
-        if (bucket.key > domainMax)
-        {
-          domainMax = bucket.key;
-        }
-        if (bucket.key < domainMin)
-        {
-          domainMin = bucket.key;
-        }
-        return { x: bucket.key, y: bucket.doc_count };
-      });
-    }
-    return { data, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
-  }
-
   public renderHistogram(values)
   {
     if (this.canBeHistogram())
     {
       const buckets = _.values(this.props.aggregation)[0].buckets;
-      const { data, categories, domain, range } = this.parseDataForHistogram(buckets);
       return (
         <AggregationHistogram
-          barsData={data}
-          xLabels={List<string>(categories)}
+          data={buckets}
           colors={[Colors().active, Colors().activeHover]}
-          domain={domain}
-          range={range}
         />
       );
     }
@@ -419,14 +394,19 @@ class AggregationComponent extends TerrainComponent<Props> {
       exportArray[i + 1] = [object.key, object.doc_count];
       );
     Util.exportToCSV(exportArray, this.props.name);
+
   }
 
   public render()
   {
     return (
-      <div className='aggregation'>
+      <div
+        className='aggregation'
+        style={borderColor(Colors().bg3)}
+      >
         {this.state.singleValue ? this.renderSingleAgg() : this.renderAgg()}
-        {this.state.expanded && !this.state.singleValue && this.renderExpandedAgg()}
+        <div className='aggregation-expanded'> {this.state.expanded && !this.state.singleValue && this.renderExpandedAgg()} </div>
+        {this.state.showingExport && this.renderExport()}
       </div>
     );
   }

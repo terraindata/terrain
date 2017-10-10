@@ -56,11 +56,13 @@ import * as React from 'react';
 const moment = require('moment');
 const ReactModal = require('react-modal');
 
+import Radium = require('radium');
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
 import Aggregation from '../results/Aggregation';
@@ -96,14 +98,16 @@ class AggregationsArea extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    Actions.change(List(this._keyPath('query', 'aggregationList')), this.parseAggs(this.props.resultsState.aggregations, this.props.query));
+    Actions.change(List(this._keyPath('query', 'aggregationList')),
+      this.parseAggs(this.props.resultsState.aggregations, this.props.query), true);
   }
 
   public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.resultsState.aggregations !== nextProps.resultsState.aggregations)
     {
-      Actions.change(List(this._keyPath('query', 'aggregationList')), this.parseAggs(nextProps.resultsState.aggregations, nextProps.query));
+      Actions.change(List(this._keyPath('query', 'aggregationList')),
+        this.parseAggs(nextProps.resultsState.aggregations, nextProps.query), true);
     }
   }
 
