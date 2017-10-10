@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+// tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as Immutable from 'immutable';
 import './AggregationsArea.less';
@@ -62,14 +62,11 @@ import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
-import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
 import Aggregation from '../results/Aggregation';
 import { ResultsState } from './ResultTypes';
 
-import Radium = require('radium');
-import { FileImportState } from '../../../fileImport/FileImportTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
@@ -80,7 +77,6 @@ const RESULTS_PAGE_SIZE = 20;
 export interface Props
 {
   resultsState: ResultsState;
-  exportState?: FileImportState;
   db: BackendInstance;
   query: Query;
   onNavigationException: () => void;
@@ -172,7 +168,7 @@ class AggregationsArea extends TerrainComponent<Props>
 
     else if (aggregations)
     {
-      if (!aggregations.size)
+      if (aggregations.size === 0)
       {
         resultsContent = <InfoArea
           large='There are no aggregations for your query.'

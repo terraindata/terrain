@@ -44,16 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
+// tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 const { List } = Immutable;
-<<<<<<< HEAD
-import Util from '../../../util/Util';
-=======
 import { notificationManager } from 'common/components/InAppNotification';
->>>>>>> 9860cc5151040672bc500c99c98ce6a812db7004
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -61,17 +57,10 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
-<<<<<<< HEAD
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import Actions from '../../data/BuilderActions';
-=======
->>>>>>> 9860cc5151040672bc500c99c98ce6a812db7004
-import Modal from '../../../common/components/Modal';
-import { FileImportState } from '../../../fileImport/FileImportTypes';
 import ColorManager from '../../../util/ColorManager';
+import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import Histogram from './../../../charts/components/Histogram';
-import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Menu, { MenuOption } from './../../../common/components/Menu';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
@@ -84,7 +73,6 @@ const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 export interface Props
 {
-  exportState?: FileImportState;
   aggregation: any;
   index: number;
   key: number;
@@ -197,7 +185,6 @@ class AggregationComponent extends TerrainComponent<Props> {
     notificationManager.addNotification('Text Copied to Clipboard', '', 'info', 4);
   }
 
-
   public renderAgg()
   {
     const values = _.values(this.props.aggregation)[0];
@@ -228,7 +215,7 @@ class AggregationComponent extends TerrainComponent<Props> {
                   this.canBeTable() ?
                     <div
                       className='aggregation-title-bar-export'
-                      onClick={this.renderExport}
+                      onClick={this.exportData}
                       key='results-area-export'
                       style={link()}
                     >
@@ -308,7 +295,7 @@ class AggregationComponent extends TerrainComponent<Props> {
       return (
         <div className='aggregation-table'>
           <AggsTable
-            tableData={tableData}
+            tableData={values}
             useBuckets={values.buckets !== undefined}
 
           />
@@ -338,16 +325,29 @@ class AggregationComponent extends TerrainComponent<Props> {
     return null;
   }
 
-  public renderExport()
+  public exportData()
   {
     const values = _.values(this.props.aggregation)[0];
-    const exportArray = [values.buckets.size];
-    exportArray[0] = ['key', 'doc_count'];
-    values.buckets.map((object, i) =>
-      exportArray[i + 1] = [object.key, object.doc_count];
-      );
+    let exportArray;
+    if (values.buckets !== undefined)
+    {
+      exportArray = [values.buckets.size];
+      exportArray[0] = ['key', 'doc_count'];
+      values.buckets.map((object, i: number) =>
+      {
+        return exportArray[i + 1] = [object.key, object.doc_count];
+      });
+    }
+    else
+    {
+      exportArray = [values.size];
+      exportArray[0] = ['key', 'value'];
+      _.keys(values).map((key, i: number) =>
+      {
+        return exportArray[i + 1] = [key, values[key]];
+      });
+    }
     Util.exportToCSV(exportArray, this.props.name);
-
   }
 
   public render()
@@ -359,7 +359,6 @@ class AggregationComponent extends TerrainComponent<Props> {
       >
         {this.state.singleValue ? this.renderSingleAgg() : this.renderAgg()}
         <div className='aggregation-expanded'> {this.state.expanded && !this.state.singleValue && this.renderExpandedAgg()} </div>
-        {this.state.showingExport && this.renderExport()}
       </div>
     );
   }

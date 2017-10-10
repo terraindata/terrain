@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions no-console
+// tslint:disable:no-var-requires
 
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
@@ -104,7 +104,6 @@ export class AggsTableComponent extends TerrainComponent<Props>
         return { key, value: tableData[key] };
       });
     }
-    console.log(rows);
     this.setState({
       rows,
     });
@@ -170,7 +169,7 @@ export class AggsTableComponent extends TerrainComponent<Props>
         columns={this.getColumns().toJS()}
         rowGetter={this.getRow}
         rowsCount={this.state.rows.length}
-        //minHeight={((Number(this.state.rows.length) + 1) * 35)} // add scroll bar size ~ 20
+        // minHeight={((Number(this.state.rows.length) + 1) * 35)} // add scroll bar size ~ 20
         onGridSort={this.handleGridSort}
         maxHeight={200}
         minWidth={this.props.containerWidth}
