@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 const { List } = Immutable;
+import Util from '../../../util/Util';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -59,6 +60,8 @@ import Actions from '../../data/BuilderActions';
 import Modal from '../../../common/components/Modal';
 import ColorManager from '../../../util/ColorManager';
 import Histogram from './../../../charts/components/Histogram';
+import FileImportPreview from '../../../fileImport/components/FileImportPreview';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Menu, { MenuOption } from './../../../common/components/Menu';
 import { notificationManager } from 'common/components/InAppNotification';
 import Query from '../../../../items/types/Query';
@@ -70,6 +73,8 @@ import AggsTable from './AggsTable';
 
 const ClipboardIcon = require('images/icon_clipboard.svg');
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
+type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
+
 
 export interface Props
 {
@@ -86,12 +91,10 @@ class AggregationComponent extends TerrainComponent<Props> {
   public state: {
     expanded: boolean,
     viewMode: string,
-    showingExport: boolean,
     singleValue: boolean,
   } = {
     expanded: false,
     viewMode: 'Table',
-    showingExport: false,
     singleValue: false,
   };
 
@@ -155,20 +158,6 @@ class AggregationComponent extends TerrainComponent<Props> {
     });
   }
 
-  public showExport()
-  {
-    this.setState({
-      showingExport: true,
-    });
-  }
-
-  public hideExport()
-  {
-    this.setState({
-      showingExport: false,
-    });
-  }
-
   public getMenuOptions(): Immutable.List<MenuOption>
   {
     const options = [{
@@ -197,6 +186,12 @@ class AggregationComponent extends TerrainComponent<Props> {
     return List(options);
   }
 
+   public handleTextCopied()
+  {
+    notificationManager.addNotification('Text Copied to Clipboard', '', 'info', 4);
+  }
+
+
   public renderAgg()
   {
     const values = _.values(this.props.aggregation)[0];
@@ -216,15 +211,20 @@ class AggregationComponent extends TerrainComponent<Props> {
         {
           this.state.expanded ?
             (
-              <div className='aggregation-title-bar-options'>
-                <div
-                  className='aggregation-title-bar-export'
-                  onClick={this.showExport}
-                  key='results-area-export'
-                  style={link()}
-                >
-                  Export
-                </div>
+              <div className='aggregation-title-bar-options'>  
+                {
+                  this.canBeTable() ? 
+                    <div
+                      className='aggregation-title-bar-export'
+                      onClick={this.renderExport}
+                      key='results-area-export'
+                      style={link()}
+                    >
+                      Export
+                  </div>
+                  :
+                  ''
+                }
                 <CopyToClipboard text={JSON.stringify(values, undefined, 2)} onCopy={this.handleTextCopied}>
                   <div className='clipboard-icon-wrapper'>
                     {
@@ -304,9 +304,11 @@ class AggregationComponent extends TerrainComponent<Props> {
     if (this.canBeTable())
     {
       return (
-        <AggsTable
-          tableData={tableData}
-        />
+        <div className='aggregation-table'>
+          <AggsTable
+            tableData={tableData}
+          />
+        </div>
       );
     }
   }
@@ -406,28 +408,13 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public renderExport()
   {
-
-    const content =
-      <div
-        style={backgroundColor(Colors().bg1)}
-      >
-        test
-      </div>;
-
-      // const { previewColumns, columnNames, columnsToInclude, columnTypes, templates, transforms,
-      // filetype, requireJSONHaveAllFields, exportRank, elasticUpdate, objectKey } = this.props.exportState;
-
-
-    return (
-      <Modal
-        open={this.state.showingExport}
-        onClose={this.hideExport}
-        title={'Export'}
-        children={content}
-        fill={true}
-        noFooterPadding={true}
-      />
-    );
+    const values = _.values(this.props.aggregation)[0];
+    const exportArray = [values.buckets.size];
+    exportArray[0] = ['key', 'doc_count'];
+    values.buckets.map((object, i) =>
+        exportArray[i + 1] = [object.key, object.doc_count];
+      );
+    Util.exportToCSV(exportArray, this.props.name);
   }
 
   public render()
@@ -436,7 +423,6 @@ class AggregationComponent extends TerrainComponent<Props> {
       <div className='aggregation'>
         {this.state.singleValue ? this.renderSingleAgg() : this.renderAgg()}
         {this.state.expanded && !this.state.singleValue && this.renderExpandedAgg()}
-        {this.state.showingExport && this.renderExport()}
       </div>
     );
   }

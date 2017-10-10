@@ -58,16 +58,16 @@ import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig
 import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
+const Dimensions = require('react-dimensions');
 
 export interface Props
 {
   tableData: any;
   containerWidth?: number;
-  containerHeight?: number;
 }
 
 @Radium
-export default class AggsTable extends TerrainComponent<Props>
+export default class AggsTableComponent extends TerrainComponent<Props>
 {
   public state: {
     rows: any;
@@ -97,7 +97,7 @@ export default class AggsTable extends TerrainComponent<Props>
 
   public getColumns(): List<any>
   {
-    return List([{ key: 'key', name: 'key' }, { key: 'doc_count', name: 'doc_count' }]);
+    return List([{ key: 'key', name: 'key', resizable: true }, { key: 'doc_count', name: 'doc_count', resizable: true }]);
   }
 
   public getRow(i: number): object
@@ -148,10 +148,20 @@ export default class AggsTable extends TerrainComponent<Props>
         columns={this.getColumns().toJS()}
         rowGetter={this.getRow}
         rowsCount={this.state.rows.length}
-        minHeight={((Number(this.state.rows.length) + 1) * 35)} // add scroll bar size ~ 20
-        maxHeight={200}// {((this.state.rows.length + 1) * 35)} //add scroll bar size ~ 20
+        //minHeight={((Number(this.state.rows.length) + 1) * 35)} // add scroll bar size ~ 20
         onGridSort={this.handleGridSort}
+        maxHeight={200}
+        minWidth={this.props.containerWidth}
       />
     );
   }
 }
+
+export const AggsTable = Dimensions({
+  elementResize: true,
+  containerStyle: {
+    height: '100%',
+  },
+})(AggsTableComponent);
+
+export default AggsTable;
