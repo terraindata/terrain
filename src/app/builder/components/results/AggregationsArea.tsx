@@ -67,7 +67,7 @@ import Aggregation from '../results/Aggregation';
 import { ResultsState } from './ResultTypes';
 
 import Radium = require('radium');
-
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
@@ -103,7 +103,7 @@ class AggregationsArea extends TerrainComponent<Props>
   {
     if (this.props.resultsState.aggregations !== nextProps.resultsState.aggregations)
     {
-     Actions.change(List(this._keyPath('query', 'aggregationList')), this.parseAggs(nextProps.resultsState.aggregations, nextProps.query));
+      Actions.change(List(this._keyPath('query', 'aggregationList')), this.parseAggs(nextProps.resultsState.aggregations, nextProps.query));
     }
   }
 
@@ -114,7 +114,8 @@ class AggregationsArea extends TerrainComponent<Props>
       return Map({});
     }
     let aggsList = query.aggregationList !== undefined ? query.aggregationList : Map({});
-    _.keys(aggregations).forEach((name) => {
+    _.keys(aggregations).forEach((name) =>
+    {
       if (aggsList.get(name) === undefined)
       {
         aggsList = aggsList.set(name, 'Raw');

@@ -67,7 +67,7 @@ export interface Props
 }
 
 @Radium
-export default class AggsTableComponent extends TerrainComponent<Props>
+export class AggsTableComponent extends TerrainComponent<Props>
 {
   public state: {
     rows: any;

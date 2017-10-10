@@ -55,12 +55,11 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
- import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Actions from '../../data/BuilderActions';
 import Modal from '../../../common/components/Modal';
 import ColorManager from '../../../util/ColorManager';
 import Histogram from './../../../charts/components/Histogram';
-import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Menu, { MenuOption } from './../../../common/components/Menu';
 import { notificationManager } from 'common/components/InAppNotification';
@@ -73,8 +72,6 @@ import AggsTable from './AggsTable';
 
 const ClipboardIcon = require('images/icon_clipboard.svg');
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
-type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
-
 
 export interface Props
 {
@@ -186,7 +183,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     return List(options);
   }
 
-   public handleTextCopied()
+  public handleTextCopied()
   {
     notificationManager.addNotification('Text Copied to Clipboard', '', 'info', 4);
   }
@@ -211,9 +208,9 @@ class AggregationComponent extends TerrainComponent<Props> {
         {
           this.state.expanded ?
             (
-              <div className='aggregation-title-bar-options'>  
+              <div className='aggregation-title-bar-options'>
                 {
-                  this.canBeTable() ? 
+                  this.canBeTable() ?
                     <div
                       className='aggregation-title-bar-export'
                       onClick={this.renderExport}
@@ -222,8 +219,8 @@ class AggregationComponent extends TerrainComponent<Props> {
                     >
                       Export
                   </div>
-                  :
-                  ''
+                    :
+                    ''
                 }
                 <CopyToClipboard text={JSON.stringify(values, undefined, 2)} onCopy={this.handleTextCopied}>
                   <div className='clipboard-icon-wrapper'>
@@ -260,14 +257,20 @@ class AggregationComponent extends TerrainComponent<Props> {
         {
           (
             <div className='aggregation-title-bar-options'>
-              <div
-                className='aggregation-title-bar-export'
-                onClick={this.showExport}
-                key='results-area-export'
-                style={link()}
-              >
-                Export
-              </div>
+
+              {
+                this.canBeTable() ?
+                  <div
+                    className='aggregation-title-bar-export'
+                    onClick={this.renderExport}
+                    key='results-area-export'
+                    style={link()}
+                  >
+                    Export
+                </div>
+                  :
+                  ''
+              }
               <div className='clipboard-icon-wrapper'>
                 {tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')}
               </div>
@@ -281,7 +284,8 @@ class AggregationComponent extends TerrainComponent<Props> {
   public renderExpandedAgg()
   {
     const values = _.values(this.props.aggregation)[0];
-    switch (this.state.viewMode) {
+    switch (this.state.viewMode)
+    {
       case 'Table':
         return this.renderTableView(values);
       case 'Histogram':
@@ -412,7 +416,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     const exportArray = [values.buckets.size];
     exportArray[0] = ['key', 'doc_count'];
     values.buckets.map((object, i) =>
-        exportArray[i + 1] = [object.key, object.doc_count];
+      exportArray[i + 1] = [object.key, object.doc_count];
       );
     Util.exportToCSV(exportArray, this.props.name);
   }
