@@ -170,7 +170,7 @@ export class AggsTableComponent extends TerrainComponent<Props>
         columns={this.getColumns().toJS()}
         rowGetter={this.getRow}
         rowsCount={this.state.rows.length}
-        minHeight={(actualHeight < 400) ? actualHeight : 400} // add scroll bar size ~ 20
+        minHeight={(actualHeight < 385) ? actualHeight : 385} // add scroll bar size ~ 20
         onGridSort={this.handleGridSort}
         minWidth={this.props.containerWidth}
       />
