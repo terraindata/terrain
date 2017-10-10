@@ -65,6 +65,7 @@ import ControlActions from '../../data/ControlActions';
 import { ControlList, HeaderConfig } from '../ControlList';
 
 import CreateHeadlessCommand from './CreateHeadlessCommand';
+import TransportScheduler from './TransportScheduler';
 import './TemplateControlList.less';
 
 const DeleteIcon = require('images/icon_close.svg');
@@ -104,6 +105,7 @@ class TemplateControlList extends TerrainComponent<Props>
     currentActiveTemplate: Template;
     currentActiveIndex: number;
     headlessModalOpen: boolean;
+    schedulerModalOpen: boolean;
   } = {
     responseModalOpen: false,
     responseModalMessage: '',
@@ -117,6 +119,7 @@ class TemplateControlList extends TerrainComponent<Props>
     currentActiveTemplate: undefined,
     currentActiveIndex: -1,
     headlessModalOpen: false,
+    schedulerModalOpen: false,
   };
 
   public templateConfig: HeaderConfig =
@@ -162,7 +165,7 @@ class TemplateControlList extends TerrainComponent<Props>
       },
       {
         text: `Schedule ${typeText}`,
-        onClick: () => undefined,
+        onClick: () => this.requestTransportScheduler(template, index),
         icon: <ScheduleIcon className='template-menu-option-icon' />,
       },
       {
@@ -188,6 +191,15 @@ class TemplateControlList extends TerrainComponent<Props>
   {
     this.setState({
       headlessModalOpen: true,
+      currentActiveTemplate: template,
+      currentActiveIndex: index,
+    });
+  }
+
+  public requestTransportScheduler(template: Template, index: number)
+  {
+    this.setState({
+      schedulerModalOpen: true,
       currentActiveTemplate: template,
       currentActiveIndex: index,
     });
@@ -301,10 +313,28 @@ class TemplateControlList extends TerrainComponent<Props>
     });
   }
 
+  public schedulerCloseModal()
+  {
+    this.setState({
+      schedulerModalOpen: false,
+    });
+  }
+
   public renderCreateHeadlessCommand()
   {
     return (
       <CreateHeadlessCommand
+        templates={this.props.templates}
+        index={this.state.currentActiveIndex}
+        getServerName={this.getServerName}
+      />
+    );
+  }
+
+  public renderTransportScheduler()
+  {
+    return (
+      <TransportScheduler
         templates={this.props.templates}
         index={this.state.currentActiveIndex}
         getServerName={this.getServerName}
@@ -351,6 +381,18 @@ class TemplateControlList extends TerrainComponent<Props>
             title={`Compose Headless Command`}
             onClose={this.headlessCloseModal}
             children={this.renderCreateHeadlessCommand()}
+            allowOverflow={true}
+            wide={true}
+            noFooterPadding={true}
+          />
+        }
+        {
+          this.state.schedulerModalOpen &&
+          <Modal
+            open={this.state.schedulerModalOpen}
+            title={`Schedule an Import or Export`}
+            onClose={this.schedulerCloseModal}
+            children={this.renderTransportScheduler()}
             allowOverflow={true}
             wide={true}
             noFooterPadding={true}

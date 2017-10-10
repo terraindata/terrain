@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as React from 'react';
 
+import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 
 import { Colors, fontColor, getStyle } from 'common/Colors';
@@ -78,7 +79,7 @@ class TemplateSelector extends TerrainComponent<Props>
   public renderInfoTable(template)
   {
     const typeText = template !== undefined ? (template.export ? 'Export' : 'Import') : '';
-    const labelStyle = [fontColor(Colors().altText3), getStyle('fontSize', '12px')];
+    const labelStyle = _.extend({}, fontColor(Colors().altText3), getStyle('fontSize', '12px'));
 
     return (
       <div className='template-selector-data'>

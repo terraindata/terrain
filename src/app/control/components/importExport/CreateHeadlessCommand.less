@@ -3,30 +3,30 @@
 @icon-size: 20px;
 @command-content-height: 100px;
 
+.headless-form-block {
+  padding: @half-spacing;
+  display: flex;
+  vertical-align: top;
+  justify-content: space-between;
+
+  .headless-form-column {
+    padding: 0px @half-spacing;
+    position: relative;
+
+    .headless-form-label {
+      padding: @half-spacing 0px;
+    }
+
+    .headless-form-input {
+      position: relative;
+    }
+  }
+}
+
 .headless-command-generator {
   display: flex;
   padding: @spacing;
   flex-direction: column;
-
-  .headless-form-block {
-    padding: @half-spacing;
-    display: flex;
-    vertical-align: top;
-    justify-content: space-between;
-
-    .headless-form-column {
-      padding: 0px @half-spacing;
-      position: relative;
-
-      .headless-form-label {
-        padding: @half-spacing 0px;
-      }
-
-      .headless-form-input {
-        position: relative;
-      }
-    }
-  }
 
   .headless-entry-row {
     margin: 0px @half-spacing;

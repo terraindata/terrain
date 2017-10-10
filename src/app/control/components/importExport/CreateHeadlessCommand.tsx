@@ -64,7 +64,6 @@ import * as FileImportTypes from 'fileImport/FileImportTypes';
 import VariantSelector from 'library/components/VariantSelector';
 import { LibraryStore } from 'library/data/LibraryStore';
 
-import ControlActions from '../../data/ControlActions';
 import TemplateSelector from './TemplateSelector';
 
 import './CreateHeadlessCommand.less';
@@ -275,6 +274,12 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     const { fileTypeIndex } = this.state;
     return (
       <div>
+        <VariantSelector
+          libraryState={LibraryStore.getState()}
+          onChangeSelection={this._setStateWrapper('selectedIds')}
+          ids={this.state.selectedIds}
+          dropdownWidth={inputElementWidth}
+        />
         <div className='headless-form-block'>
           <div className='headless-form-column' style={columnStyle}>
             <div className='headless-form-label'>
@@ -321,12 +326,6 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             }
           </div>
         </div>
-        <VariantSelector
-          libraryState={LibraryStore.getState()}
-          onChangeSelection={this._setStateWrapper('selectedIds')}
-          ids={this.state.selectedIds}
-          dropdownWidth={inputElementWidth}
-        />
       </div>
     );
   }
