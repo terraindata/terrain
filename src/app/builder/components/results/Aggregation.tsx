@@ -224,7 +224,6 @@ class AggregationComponent extends TerrainComponent<Props> {
           this.state.expanded ?
             (
               <div className='aggregation-title-bar-options'>
-<<<<<<< HEAD
                 {
                   this.canBeTable() ?
                     <div
@@ -245,21 +244,6 @@ class AggregationComponent extends TerrainComponent<Props> {
                     }
                   </div>
                 </CopyToClipboard>
-=======
-                <div
-                  className='aggregation-title-bar-export'
-                  onClick={this.showExport}
-                  key='results-area-export'
-                  style={link()}
-                >
-                  Export
-                </div>
-                <div className='clipboard-icon-wrapper'>
-                  {
-                    tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')
-                  }
-                </div>
->>>>>>> 9860cc5151040672bc500c99c98ce6a812db7004
                 <Menu
                   options={this.getMenuOptions()}
                 />
@@ -290,32 +274,6 @@ class AggregationComponent extends TerrainComponent<Props> {
             {String(_.values(aggregation)[0].value)}
           </span>
         </div>
-<<<<<<< HEAD
-        {
-          (
-            <div className='aggregation-title-bar-options'>
-
-              {
-                this.canBeTable() ?
-                  <div
-                    className='aggregation-title-bar-export'
-                    onClick={this.renderExport}
-                    key='results-area-export'
-                    style={link()}
-                  >
-                    Export
-                </div>
-                  :
-                  ''
-              }
-              <div className='clipboard-icon-wrapper'>
-                {tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')}
-              </div>
-            </div>
-          )
-        }
-=======
->>>>>>> 9860cc5151040672bc500c99c98ce6a812db7004
       </div>
     );
   }
@@ -348,18 +306,13 @@ class AggregationComponent extends TerrainComponent<Props> {
     if (this.canBeTable())
     {
       return (
-<<<<<<< HEAD
         <div className='aggregation-table'>
           <AggsTable
             tableData={tableData}
+            useBuckets={values.buckets !== undefined}
+
           />
         </div>
-=======
-        <AggsTable
-          tableData={values}
-          useBuckets={values.buckets !== undefined}
-        />
->>>>>>> 9860cc5151040672bc500c99c98ce6a812db7004
       );
     }
   }
