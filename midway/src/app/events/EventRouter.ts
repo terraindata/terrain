@@ -50,16 +50,10 @@ import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import * as Encryption from './Encryption';
-import { Events } from './Events';
+import { EventMetadataConfig, Events } from './Events';
 
 export const events: Events = new Events();
 const Router = new KoaRouter();
-
-Router.get('/time', async (ctx, next) =>
-{
-  ctx.body = new Date().toJSON();
-});
 
 // * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
 // * variantid: list of variantids
@@ -95,6 +89,52 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
       }
     }
   }, {});
+});
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting all events');
+  ctx.body = await events.getMetadata({});
+});
+
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const id = ctx.params.id;
+  winston.info('getting event ID ' + String(id));
+  ctx.body = await events.getMetadata({ id });
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add event');
+  const event: EventMetadataConfig = ctx.request.body.body;
+  Util.verifyParameters(event, ['name']);
+  if (event.id !== undefined)
+  {
+    throw new Error('Invalid parameter event ID');
+  }
+
+  ctx.body = await events.addEvent(events);
+});
+
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const event: EventMetadataConfig = ctx.request.body.body;
+  Util.verifyParameters(event, ['name']);
+  if (event.id === undefined)
+  {
+    event.id = Number(ctx.params.id);
+  }
+  else
+  {
+    if (event.id !== Number(ctx.params.id))
+    {
+      throw new Error('Event ID does not match the supplied id in the URL');
+    }
+  }
+
+  winston.info('modify event' + String(event.id));
+  ctx.body = await events.addEvent(event);
 });
 
 export default Router;

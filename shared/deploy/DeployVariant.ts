@@ -44,45 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-var webpack = require("webpack");
-var path = require("path");
-
-module.exports =
+class DeployVariant
 {
-    entry: "./lib/Entrypoint.ts",
-    devtool: "cheap-module-source-map",
+  /**
+   * @returns {string} the variant's live deployed name in ES
+   */
+  public static getVariantDeployedName(variant: object): string
+  {
+    return 'terrain_' + (variant['id'] as string);
+  }
+}
 
-    output:
-    {
-        path: __dirname,
-        publicPath: "/build/",
-        filename: "bundle.js",
-    },
-
-    resolve:
-    {
-        extensions: [ ".js", ".ts", ".json" ],
-    },
-
-    module:
-    {
-        rules:
-        [
-            {
-                test: /\.ts(x?)$/,
-                exclude: [/node_modules/],
-                loader:
-                    "ts-loader?happyPackMode=true"
-                    + JSON.stringify({
-                        compilerOptions: {
-                        },
-                    }),
-            },
-        ],
-    },
-
-    plugins:
-    [
-    ],
-
-};
+export default DeployVariant;

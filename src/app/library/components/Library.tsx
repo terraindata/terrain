@@ -179,7 +179,15 @@ class Library extends TerrainComponent<any>
     const { analytics } = this.props;
     const { selectedVariants } = this.props.library;
     const selectedVariantIds = selectedVariants.toJS();
-    const numericOptionValue = parseInt(optionValue, 10);
+
+    let numericOptionValue = null;
+    if (optionValue.indexOf(',') > -1)
+    {
+      numericOptionValue = optionValue.split(',').map((o) => parseInt(o, 10));
+    } else
+    {
+      numericOptionValue = parseInt(optionValue, 10);
+    }
 
     this.props.analyticsActions.selectMetric(optionValue);
     this.props.analyticsActions.fetch(

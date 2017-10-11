@@ -101,6 +101,14 @@ const Actions =
         const dateRange = calculateDateRange(numericDateRangeId);
         const start = dateRange.start;
         const end = dateRange.end;
+        let aggregation = '';
+        if (metricId.length === 2)
+        {
+          aggregation = 'rate';
+        } else
+        {
+          aggregation = 'histogram';
+        }
 
         return api.getAnalytics(
           variantIds,
@@ -108,6 +116,7 @@ const Actions =
           end,
           metricId,
           intervalId,
+          aggregation,
           (variantAnalytics) =>
           {
             dispatch({
