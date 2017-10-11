@@ -61,6 +61,8 @@ const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 
+import ESCardParser from '../../../../database/elastic/conversion/ESCardParser';
+
 export interface Props
 {
   cards: Cards;
@@ -169,6 +171,8 @@ class CardsArea extends TerrainComponent<Props>
 
     const { isDraggingCardOver, draggingCardItem, draggingOverIndex } = this.state;
     const { keyPath } = this.props;
+
+    ESCardParser.parseAndUpdateCards(cards);
 
     return (
       <div>
