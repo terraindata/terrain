@@ -97,7 +97,6 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public componentDidMount()
   {
-    console.log('Aggregation did mount ', this.props.query.aggregationList);
     const currentAgg = this.props.query.aggregationList.get(this.props.name);
     this.updateInitialDisplay(this.props.aggregation, currentAgg, this.props.name);
     const { isSingle, value } = this.isSingleValue(this.props.aggregation);
@@ -109,7 +108,7 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (!_.isEqual(this.props.query.aggregationList.get(this.props.name), 
+    if (!_.isEqual(this.props.query.aggregationList.get(this.props.name),
       nextProps.query.aggregationList.get(nextProps.name)))
     {
       const currentAgg = nextProps.query.aggregationList.get(nextProps.name);
@@ -149,12 +148,8 @@ class AggregationComponent extends TerrainComponent<Props> {
     {
       return;
     }
-    console.log('Updating intitial dispaly for ', name);
-    console.log('displayType: ', currentAgg.displayType);
-    console.log('Expanded: ' currentAgg.expanded);
     const displayType = currentAgg.displayType !== 'None'
-     ? currentAgg.displayType : this.getBestDisplayType(aggregation);
-     console.log('Setting display type to: ', displayType);
+      ? currentAgg.displayType : this.getBestDisplayType(aggregation);
     this.setState({
       displayType,
       expanded: currentAgg.expanded,
@@ -380,7 +375,8 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
   }
 
-  public findKey(obj, k) {
+  public findKey(obj, k)
+  {
     const keys = _.keys(obj);
     for (let i = 0; i < keys.length; i++)
     {
