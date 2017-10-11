@@ -49,6 +49,7 @@ THE SOFTWARE.
 
 import aesjs = require('aes-js');
 import srs = require('secure-random-string');
+import sha1 = require('sha1');
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
@@ -88,11 +89,11 @@ export class Credentials
         'type',
       ],
     );
-    this.privateKey = `0VAtqVlzusw8nqA8TMoSfGHR3ik3dB-c9t4-gKUjD5iRbsWQWRzeL
+    this.privateKey = sha1(`0VAtqVlzusw8nqA8TMoSfGHR3ik3dB-c9t4-gKUjD5iRbsWQWRzeL
                        -6mBtRGWV4M2A7ZZryVT7-NZjTvzuY7qhjrZdJTv4iGPmcbta-3iL
                        kgfEzY3QufFvm14dqtzfsCXhboiOC23idadrMNGlQwyJ783XlGwLB
                        xDeGI01olmhg0oiNCeoGc_4zDrHq3wcgcwQ_mpZYAj9mJsv_OI_yD
-                       iN83Y_gDQCTzA9u3NdmmxquD2jSrR2fSKRokspxqBjb5`;
+                       iN83Y_gDQCTzA9u3NdmmxquD2jSrR2fSKRokspxqBjb5`).substring(0, 16);
     this.key = aesjs.utils.utf8.toBytes(this.privateKey);
   }
 
@@ -137,10 +138,14 @@ export class Credentials
       {
         return reject('Cannot create/update credentials as non-super user.');
       }
-
       // if modifying existing credential, check for existence
       if (cred.id !== undefined)
       {
+        if (cred.createdBy !== user.id)
+        {
+          return reject('Only user who created this credential can modify it.');
+        }
+        cred.permissions = cred.permissions === undefined ? 0 : cred.permissions;
         const creds: CredentialConfig[] = await this.get(cred.id);
         if (creds.length === 0)
         {
@@ -154,13 +159,25 @@ export class Credentials
           return reject('Credential does not have an id');
         }
 
-        // insert a version to save the past state of this item
+        // insert a version to save the past state of this credential
         await versions.create(user, 'credentials', id, creds[0]);
 
+        if (cred.meta !== undefined)
+        {
+          cred.meta = await this._encrypt(cred.meta);
+        }
         cred = Util.updateObject(creds[0], cred);
       }
+      else
+      {
+        cred.meta = await this._encrypt(cred.meta);
+      }
+      let newCredObj: object = await App.DB.upsert(this.credentialTable, cred) as object;
 
-      resolve(await App.DB.upsert(this.credentialTable, cred) as CredentialConfig);
+      const newCred: CredentialConfig[] = newCredObj as CredentialConfig[];
+      newCred[0].meta = ''; // sanitize credentials
+      newCredObj = newCred as object;
+      return resolve(newCredObj as CredentialConfig);
     });
   }
 
