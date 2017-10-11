@@ -44,22 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as CredentialP from './CredentialPermissions';
-import * as ImportP from './ImportPermissions';
+// NB: This router only exists for testing purposes.
+// If using a proxy, be sure to set app.proxy = true
 
-export let CredentialPermissions: CredentialP.CredentialPermissions = new CredentialP.CredentialPermissions();
-export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-export class Permissions
+import { CredentialConfig, Credentials } from '../credentials/Credentials';
+import * as Util from '../Util';
+
+const Router = new KoaRouter();
+export const credentials: Credentials = new Credentials();
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  public ImportPermissions: ImportP.ImportPermissions;
-  public CredentialPermissions: CredentialP.CredentialPermissions;
-
-  constructor()
+  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
   {
-    this.ImportPermissions = ImportPermissions;
-    this.CredentialPermissions = CredentialPermissions;
+    ctx.body = 'Unauthorized';
   }
-}
+  else
+  {
+    ctx.body = await credentials.get();
+  }
+});
 
-export default Permissions;
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
+  {
+    ctx.body = 'Unauthorized';
+  }
+  else
+  {
+    const cred: CredentialConfig = ctx.request.body.body;
+    Util.verifyParameters(cred, ['name', 'type', 'meta']);
+    ctx.body = await credentials.upsert(ctx.state.user, cred);
+  }
+});
+
+export default Router;

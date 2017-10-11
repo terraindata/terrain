@@ -74,12 +74,6 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   ctx.body = getItems;
 });
 
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting item ID ' + String(ctx.params.id));
-  ctx.body = await items.get(ctx.params.id);
-});
-
 Router.get('/live', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   let typeArr: number[] = [];
@@ -96,6 +90,12 @@ Router.get('/live', passport.authenticate('access-token-local'), async (ctx, nex
     });
   }
   ctx.body = await items.getLiveVariants(typeArr);
+});
+
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting item ID ' + String(ctx.params.id));
+  ctx.body = await items.get(ctx.params.id);
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
