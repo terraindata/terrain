@@ -108,7 +108,8 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (!_.isEqual(this.props.query.aggregationList.get(this.props.name), nextProps.query.aggregationList.get(nextProps.name)))
+    if (!_.isEqual(this.props.query.aggregationList.get(this.props.name), 
+      nextProps.query.aggregationList.get(nextProps.name)))
     {
       const currentAgg = nextProps.query.aggregationList.get(nextProps.name);
       this.updateInitialDisplay(nextProps.aggregation, currentAgg, nextProps.name);
@@ -128,7 +129,7 @@ class AggregationComponent extends TerrainComponent<Props> {
         return;
       }
       if ((currentAgg.displayType === 'Table' && !this.canBeTable(nextProps.aggregation)) ||
-        (currentAgg.displayType === 'Histogram' && !this.canBeHistogram(nextProps.aggregation))
+        (currentAgg.displayType === 'Histogram' && this.canBeHistogram(nextProps.aggregation) === undefined)
       )
       {
         const displayType = this.getBestDisplayType(nextProps.aggregation);
@@ -159,7 +160,7 @@ class AggregationComponent extends TerrainComponent<Props> {
   public getBestDisplayType(aggregation?)
   {
     let displayType = 'Raw';
-    if (this.canBeHistogram(aggregation))
+    if (this.canBeHistogram(aggregation) !== undefined)
     {
       displayType = 'Histogram';
     }
@@ -223,7 +224,7 @@ class AggregationComponent extends TerrainComponent<Props> {
       selected: this.state.displayType === 'Raw',
     }];
 
-    if (this.canBeHistogram())
+    if (this.canBeHistogram() !== undefined)
     {
       options.push({
         text: 'Histogram',
@@ -372,24 +373,39 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
   }
 
+  public findKey(obj, k) {
+    const keys = _.keys(obj);
+    for (let i = 0; i < keys.length; i++)
+    {
+      const key = keys[i];
+      const value = obj[key];
+      if (key === k)
+      {
+        return value;
+      }
+      else if (_.isObject(value))
+      {
+        return this.findKey(value, k);
+      }
+    }
+  }
+
   public canBeHistogram(overrideAggregation?)
   {
     const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
     const values = _.values(aggregation)[0];
-    let canBeHistogram = values.buckets !== undefined && values.buckets.length !== 0;
-    _.keys(values).map((key) => {
-      console.log(key);
-    })
-    return canBeHistogram;
+    const value = this.findKey(values, 'buckets');
+    return value;
   }
 
   public renderHistogram(values)
   {
-    if (this.canBeHistogram())
+    const value = this.canBeHistogram();
+    if (value !== undefined)
     {
       return (
         <AggregationHistogram
-          data={values.buckets}
+          data={value}
           colors={[Colors().active, Colors().activeHover]}
         />
       );
