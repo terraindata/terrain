@@ -44,67 +44,50 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions
+import ESParserError from 'shared/database/elastic/parser/ESParserError';
+import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
 
-import * as _ from 'lodash';
-import * as React from 'react';
-
-import * as Color from 'color';
-
-import { backgroundColor, Colors, fontColor, getStyle } from 'common/Colors';
-import TerrainComponent from 'common/components/TerrainComponent';
-import './CardHelpTooltip.less';
-
-export interface Props
+abstract class ESParser
 {
-  staticInfo: any;
-}
+  protected errors: ESParserError[];
+  protected value: any;
+  protected valueInfo: ESValueInfo | null;
 
-export default class CardHelpTooltip extends TerrainComponent<Props>
-{
-  public render()
+  public constructor()
   {
-    const cardColor = (this.props.staticInfo.colors && this.props.staticInfo.colors[0]) || Colors().altText1;
-    const titleStyle = _.extend({},
-      backgroundColor(Colors().bg3),
-      fontColor(cardColor),
-      getStyle('borderLeftColor', cardColor),
-      getStyle('borderTopColor', Colors().highlight),
-      getStyle('borderRightColor', Colors().highlight),
-      getStyle('borderBottomColor', Colors().highlight),
-    );
-    let errorMessage = '';
-    if (this.props.staticInfo.errors.length > 0)
-    {
-      for (const e of this.props.staticInfo.errors)
-      {
-        errorMessage += e;
-      }
-    }
-    return (
-      <div className='card-help-tooltip'>
-        {
-          this.props.staticInfo.title &&
-          <div className='card-help-title' style={titleStyle}>
-            {this.props.staticInfo.title}
-          </div>
-        }
-        <div className='card-description'>
-          {this.props.staticInfo.description}
-        </div>
-        {
-          errorMessage &&
-          <div className='card-errorMessage'>
-            {errorMessage}
-          </div>
-        }
-        {
-          this.props.staticInfo.errors.length > 0 &&
-          <div className='card-help-link'>
-            <a target='_blank' href={this.props.staticInfo.url}> Learn More </a>
-          </div>
-        }
-      </div>
-    );
+    this.errors = [];
+  }
+
+  public hasError(): boolean
+  {
+    return this.errors.length > 0;
+  }
+
+  public getErrors(): ESParserError[]
+  {
+    return this.errors;
+  }
+
+  /**
+   * @returns {any} the parsed root value
+   */
+  public getValue(): any
+  {
+    return this.value;
+  }
+
+  /**
+   * @returns {any} the parsed root value info
+   */
+  public getValueInfo(): ESValueInfo
+  {
+    return this.valueInfo as ESValueInfo;
+  }
+
+  public accumulateError(error: ESParserError): void
+  {
+    this.errors.push(error);
   }
 }
+
+export default ESParser;

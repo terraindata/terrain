@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESInterpreter from 'shareddatabase/elastic/parser/ESInterpreter';
 /**
  * Settings passed to and stored in an ESClause
  */
@@ -58,6 +59,7 @@ interface ESClauseSettings
   template?: any;
   required?: string[];
   suggestions?: any[];
+  rewrite?: (ESInterpreter, ESValueInfo) => void;
 }
 
 export default ESClauseSettings;
