@@ -377,7 +377,7 @@ class Library extends TerrainComponent<any>
                   width={150}
                   height={150}
                   loading={true}
-                  loaded={true}
+                  loaded={false}
                 />
               }
             </div>
