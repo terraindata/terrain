@@ -1105,13 +1105,14 @@ export const Ajax =
     {
       const args = {
         variantid: variantIds.join(','),
-        start: start.toISOString(),
-        end: end.toISOString(),
+        start: start,
+        end: end,
         eventid: metricId.toString(),
         interval: intervalId,
         agg: aggregation,
         field: '@timestamp',
       };
+
 
       return Ajax.req(
         'get',
@@ -1129,6 +1130,28 @@ export const Ajax =
           }
         },
         { onError, urlArgs: args });
+    },
+
+    getServerTime(
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void
+    ) {
+      return Ajax.req(
+        'get',
+        'events/time',
+        {},
+        (response: any) =>
+        {
+          try
+          {
+            onLoad(response);
+          }
+          catch (e)
+          {
+            onError && onError(response as any);
+          }
+        },
+        { onError });
     },
   };
 

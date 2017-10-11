@@ -48,6 +48,7 @@ import MultiSwitch from 'common/components/MultiSwitch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import Ajax from 'util/Ajax';
 
 interface Props
 {

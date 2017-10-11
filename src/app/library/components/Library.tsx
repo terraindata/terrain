@@ -60,6 +60,7 @@ import GroupsColumn from './GroupsColumn';
 import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
+import Loading from 'common/components/Loading';
 
 export interface Props
 {
@@ -366,11 +367,20 @@ class Library extends TerrainComponent<any>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
             <div className='library-analytics-chart-wrapper'>
-              <MultipleAreaChart
-                datasets={datasets}
-                xDataKey={'key'}
-                yDataKey={'doc_count'}
-              />
+              {analytics.loaded ?
+                <MultipleAreaChart
+                  datasets={datasets}
+                  xDataKey={'key'}
+                  yDataKey={'doc_count'}
+                /> :
+                <Loading
+                  width={150}
+                  height={150}
+                  loading={true}
+                  loaded={true}
+                  onLoadedEnd={() => {}}
+                />
+              }
             </div>
             <div className='library-analytics-selector-wrapper'>
               <AnalyticsSelector
