@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
+import Loading from 'common/components/Loading';
 import RadioButtons from 'common/components/RadioButtons';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -60,7 +61,6 @@ import GroupsColumn from './GroupsColumn';
 import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
-import Loading from 'common/components/Loading';
 
 export interface Props
 {
@@ -378,7 +378,6 @@ class Library extends TerrainComponent<any>
                   height={150}
                   loading={true}
                   loaded={true}
-                  onLoadedEnd={() => {}}
                 />
               }
             </div>

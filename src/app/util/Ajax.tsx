@@ -1105,14 +1105,13 @@ export const Ajax =
     {
       const args = {
         variantid: variantIds.join(','),
-        start: start,
-        end: end,
+        start,
+        end,
         eventid: metricId.toString(),
         interval: intervalId,
         agg: aggregation,
         field: '@timestamp',
       };
-
 
       return Ajax.req(
         'get',
@@ -1134,8 +1133,9 @@ export const Ajax =
 
     getServerTime(
       onLoad: (response: any) => void,
-      onError?: (ev: Event) => void
-    ) {
+      onError?: (ev: Event) => void,
+    )
+    {
       return Ajax.req(
         'get',
         'events/time',

@@ -74,7 +74,7 @@ function calculateDateRange(dateRangeId: number, callback)
           start = new Date(Date.UTC(
             serverTimeDate.getUTCFullYear(),
             serverTimeDate.getUTCMonth(),
-            serverTimeDate.getUTCDate()))
+            serverTimeDate.getUTCDate()));
           start = start.toISOString(); // Today at 0:00 UTC
           break;
         case 2:
@@ -101,7 +101,7 @@ function calculateDateRange(dateRangeId: number, callback)
       }
 
       callback({ start, end });
-    }
+    },
   );
 }
 
@@ -121,7 +121,8 @@ const Actions =
         const numericDateRangeId = parseInt(dateRangeId, 10);
         calculateDateRange(
           numericDateRangeId,
-          (dateRange) => {
+          (dateRange) =>
+          {
             const start = dateRange.start;
             const end = dateRange.end;
 
@@ -152,7 +153,7 @@ const Actions =
                 callback && callback(variantAnalytics);
               },
             );
-          }
+          },
         );
       },
 
