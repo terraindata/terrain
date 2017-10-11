@@ -100,8 +100,8 @@ Router.get('/live', passport.authenticate('access-token-local'), async (ctx, nex
 
 Router.get('/live/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-    const status: string = await items.checkVariantInES(ctx.params.id, parseInt(ctx.query.dbid as string, 10));
-    ctx.body = status;
+  const status: string = await items.checkVariantInES(ctx.params.id, parseInt(ctx.query.dbid as string, 10));
+  ctx.body = status;
 });
 
 Router.get('/status/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
