@@ -87,7 +87,7 @@ export interface HeadlessCommandData
   requests: string[];
 }
 
-interface HeadlessCommandArgs
+export interface HeadlessCommandArgs
 {
   template: Template;
   fileType: string;
@@ -142,12 +142,12 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
     let fileTypeTextImport; // TODO remove when import is able to handle type object
     switch (fileType)
     {
-      case fileTypeOptions.get(0): // json
-      case fileTypeOptions.get(1): // json [type object]
+      case fileTypeOptions.get(FileTypes.JSON): // json
+      case fileTypeOptions.get(FileTypes.JSON_TYPE_OBJECT): // json [type object]
         contentTypeText = 'application/json';
         fileTypeTextImport = 'json';
         break;
-      case fileTypeOptions.get(2): // csv
+      case fileTypeOptions.get(FileTypes.CSV): // csv
         contentTypeText = 'text/plain';
         fileTypeTextImport = 'csv';
         break;
@@ -164,9 +164,9 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
         requests.push('Please Select a Variant');
       }
 
-      if (fileType === fileTypeOptions.get(1) && (objectKey === undefined || objectKey === ''))
+      if (fileType === fileTypeOptions.get(FileTypes.JSON_TYPE_OBJECT) && (objectKey === undefined || objectKey === ''))
       {
-        requests.push('Please Provide an Export Key');
+        requests.push('Please Provide an Export Object Key');
       }
 
       command = `curl -X POST  -H 'Content-Type: ${contentTypeText}' ` +
@@ -256,13 +256,13 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     if (filename.match(/\.csv$/i) && (fileTypeIndex === FileTypes.JSON || fileTypeIndex === FileTypes.JSON_TYPE_OBJECT))
     { // switch from json to csv
       this.setState({
-        fileTypeIndex: 2,
+        fileTypeIndex: FileTypes.CSV,
       });
     }
     else if (filename.match(/\.json$/i) && fileTypeIndex === FileTypes.CSV)
     { // switch from json to csv
       this.setState({
-        fileTypeIndex: 0,
+        fileTypeIndex: FileTypes.JSON,
       });
     }
   }
@@ -311,7 +311,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             {
               fileTypeIndex === FileTypes.JSON_TYPE_OBJECT &&
               <div className='headless-form-label'>
-                Export Key
+                Export Object Key
               </div>
             }
             {

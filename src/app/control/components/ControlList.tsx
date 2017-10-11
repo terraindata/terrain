@@ -115,7 +115,7 @@ export class ControlList extends TerrainComponent<Props>
               );
             })
           }
-          {this.props.getMenuOptions !== undefined && <div className='row-info-data' key='context-menu'/>}
+          {this.props.getMenuOptions !== undefined && <div className='row-info-data' key='context-menu' />}
         </div>
         {this.props.items.map(this.renderRow)}
       </div>

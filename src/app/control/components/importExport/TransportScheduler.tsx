@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import cronstrue from 'cronstrue';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
@@ -57,6 +58,7 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'commo
 
 import Dropdown from 'common/components/Dropdown';
 import { notificationManager } from 'common/components/InAppNotification';
+import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
@@ -68,6 +70,7 @@ import TemplateSelector from './TemplateSelector';
 import './TransportScheduler.less';
 
 const { List } = Immutable;
+const HelpIcon = require('images/icon_help-1.svg');
 type Template = FileImportTypes.Template;
 
 export interface Props
@@ -75,11 +78,29 @@ export interface Props
   templates: List<Template>;
   index: number;
   getServerName: (dbid) => string;
+  modalOpen: boolean;
+  onClose: () => void;
 }
 
-const temporarySFTPNames = List(['Sample SFTP 1', 'SFTP 2', 'SFTP 3']);
+export interface ScheduleValidationData
+{
+  valid: boolean; // whether or not the args are valid (not to be fully relied on)
+  readable: string; // human readable summary of command
+  errors: string[];
+  requests: string[];
+}
 
-const inputElementWidth = '220px';
+export interface ScheduleArgs
+{
+  template: Template;
+  fileType: string;
+  filename: string;
+  objectKey?: string;
+  variantId?: number;
+  sftpId: number;
+  cronArgs: string[];
+}
+
 const fileTypeOptions = List(FileImportTypes.FILE_TYPES) as List<string>;
 
 enum FileTypes // TODO make this more type robust to track FileImportTypes.FILE_TYPES
@@ -87,6 +108,88 @@ enum FileTypes // TODO make this more type robust to track FileImportTypes.FILE_
   JSON,
   JSON_TYPE_OBJECT,
   CSV,
+}
+
+export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidationData
+{
+  const { cronArgs, filename, fileType, objectKey, sftpId, template, variantId } = args;
+
+  const errors = [];
+  const requests = [];
+
+  let cronReadable = '';
+
+  if (template === undefined)
+  {
+    requests.push('Please Select a Template');
+  }
+  else
+  {
+    if (template.templateId === -1 || template.templateId === undefined)
+    {
+      errors.push('Template has no ID');
+    }
+  }
+
+  if (template.export)
+  {
+    if (variantId === -1 || variantId === undefined)
+    {
+      requests.push('Please Select a Variant');
+    }
+    if (fileType === fileTypeOptions.get(FileTypes.JSON_TYPE_OBJECT) && (objectKey === undefined || objectKey === ''))
+    {
+      requests.push('Please Provide an Export Object Key');
+    }
+  }
+  else
+  {
+    if (fileType === fileTypeOptions.get(FileTypes.JSON_TYPE_OBJECT))
+    {
+      errors.push('Import with object keys is not supported');
+    }
+  }
+
+  if (filename === '' || filename === undefined)
+  {
+    requests.push('Please Enter a Filename');
+  }
+
+  if (sftpId === undefined || sftpId === -1)
+  {
+    requests.push('Please Select an SFTP Connection');
+  }
+
+  if (cronArgs.length !== 5)
+  {
+    errors.push('Invalid number of Cron parameters');
+  }
+  else
+  {
+    const cronStr = `${cronArgs[0]} ${cronArgs[1]} ${cronArgs[2]} ${cronArgs[3]} ${cronArgs[4]}`;
+    try
+    {
+      cronReadable = cronstrue.toString(cronStr); // TODO: cronstrue doesn't catch all errors
+    }
+    catch (err)
+    {
+      errors.push('Bad schedule parameters: ' + String(err));
+    }
+  }
+
+  const typeText = template.export ? 'Export' : 'Import';
+  const preposition = template.export ? 'to' : 'from';
+  const readable = `${typeText} ${preposition} ${filename !== undefined && filename !== '' ?
+    filename : '<please enter filename>'} ${cronReadable}`;
+  const valid = errors.length === 0 && requests.length === 0;
+
+  return {
+    valid,
+    readable,
+    requests,
+    errors
+  };
+
 }
 
 @Radium
@@ -99,6 +202,11 @@ class TransportScheduler extends TerrainComponent<Props>
     selectedIds: List<number>;
     objectKeyValue: string;
     filenameValue: string;
+    cronParam0: string;
+    cronParam1: string;
+    cronParam2: string;
+    cronParam3: string;
+    cronParam4: string;
   } = {
     index: this.props.index,
     fileTypeIndex: 0,
@@ -106,6 +214,11 @@ class TransportScheduler extends TerrainComponent<Props>
     selectedIds: List([-1, -1, -1]),
     objectKeyValue: '',
     filenameValue: '',
+    cronParam0: defaultCRONparams[0],
+    cronParam1: defaultCRONparams[1],
+    cronParam2: defaultCRONparams[2],
+    cronParam3: defaultCRONparams[3],
+    cronParam4: defaultCRONparams[4],
   };
 
   public componentDidMount()
@@ -152,6 +265,11 @@ class TransportScheduler extends TerrainComponent<Props>
     }
   }
 
+  public handleConfirm()
+  {
+    // TODO:
+  }
+
   /*
    *  SFTP info
    */
@@ -191,11 +309,11 @@ class TransportScheduler extends TerrainComponent<Props>
             Minutes
           </div>
           <div className='headless-form-input'>
-              <input
-                value={this.state.filenameValue}
-                onChange={this.handleFilenameChange}
-                style={inputStyle}
-              />
+            <input
+              value={this.state.cronParam0}
+              onChange={this._setStateWrapperPath('cronParam0', 'target', 'value')}
+              style={inputStyle}
+            />
           </div>
         </div>
         <div className='headless-form-column'>
@@ -203,47 +321,65 @@ class TransportScheduler extends TerrainComponent<Props>
             Hours
           </div>
           <div className='headless-form-input'>
-              <input
-                value={this.state.filenameValue}
-                onChange={this.handleFilenameChange}
-                style={inputStyle}
-              />
+            <input
+              value={this.state.cronParam1}
+              onChange={this._setStateWrapperPath('cronParam1', 'target', 'value')}
+              style={inputStyle}
+            />
           </div>
         </div>
         <div className='headless-form-column'>
           <div className='headless-form-label'>
-            Days of the Month
+            Day(s) of Month
           </div>
           <div className='headless-form-input'>
-              <input
-                value={this.state.filenameValue}
-                onChange={this.handleFilenameChange}
-                style={inputStyle}
-              />
+            <input
+              value={this.state.cronParam2}
+              onChange={this._setStateWrapperPath('cronParam2', 'target', 'value')}
+              style={inputStyle}
+            />
           </div>
         </div>
         <div className='headless-form-column'>
           <div className='headless-form-label'>
-            Months of the Year
+            Month(s) of Year
           </div>
           <div className='headless-form-input'>
-              <input
-                value={this.state.filenameValue}
-                onChange={this.handleFilenameChange}
-                style={inputStyle}
-              />
+            <input
+              value={this.state.cronParam3}
+              onChange={this._setStateWrapperPath('cronParam3', 'target', 'value')}
+              style={inputStyle}
+            />
           </div>
         </div>
         <div className='headless-form-column'>
           <div className='headless-form-label'>
-            Days of the Week
+            Day(s) of Week
           </div>
           <div className='headless-form-input'>
-              <input
-                value={this.state.filenameValue}
-                onChange={this.handleFilenameChange}
-                style={inputStyle}
-              />
+            <input
+              value={this.state.cronParam4}
+              onChange={this._setStateWrapperPath('cronParam4', 'target', 'value')}
+              style={inputStyle}
+            />
+          </div>
+        </div>
+        <div className='headless-form-column'>
+          <div className='headless-form-label'>
+            <div className='scheduler-help-spacer' />
+          </div>
+          <div className='headless-form-input scheduler-help-wrapper'>
+            {
+              tooltip(
+                <HelpIcon className='scheduler-help-icon' />,
+                {
+                  html: helpTooltipElement,
+                  position: 'right',
+                  interactive: true,
+                  trigger: 'click',
+                }
+              )
+            }
           </div>
         </div>
       </div>
@@ -259,7 +395,7 @@ class TransportScheduler extends TerrainComponent<Props>
     const columnStyle = getStyle('width', inputElementWidth);
     const { fileTypeIndex } = this.state;
     const typeText = template.export ? 'Export' : 'Import';
-    const showObjectKeyField = fileTypeIndex === FileTypes.JSON_TYPE_OBJECT && !template.export;
+    const showObjectKeyField = fileTypeIndex === FileTypes.JSON_TYPE_OBJECT && template.export;
     // TODO: show import object key when import supports object key
     return (
       <div>
@@ -275,7 +411,7 @@ class TransportScheduler extends TerrainComponent<Props>
         <div className='headless-form-block'>
           <div className='headless-form-column' style={columnStyle}>
             <div className='headless-form-label'>
-              Import Filename
+              {typeText} Filename
             </div>
             <div className='headless-form-input'>
               <input
@@ -303,7 +439,7 @@ class TransportScheduler extends TerrainComponent<Props>
             {
               showObjectKeyField &&
               <div className='headless-form-label'>
-                Export Key
+                Export Object Key
               </div>
             }
             {
@@ -322,29 +458,93 @@ class TransportScheduler extends TerrainComponent<Props>
     );
   }
 
+  public renderRequests(requests: string[])
+  {
+    return <span> Missing Fields: {requests.join(', ')} </span>
+  }
+
+  public renderErrors(errors: string[])
+  {
+    return <span style={fontColor(Colors().error)}> {errors.join(', ')} </span>;
+  }
+
+  public renderConfirmSection(template: Template)
+  {
+    const { valid, readable, errors, requests } =
+      validateScheduleSettings(
+        {
+          template,
+          fileType: fileTypeOptions.get(this.state.fileTypeIndex),
+          filename: this.state.filenameValue,
+          objectKey: this.state.objectKeyValue,
+          variantId: this.state.selectedIds.get(2),
+          sftpId: this.state.sftpIndex, // TODO: fix this once Jason's connection object route gets added
+          cronArgs: [this.state.cronParam0, this.state.cronParam1, this.state.cronParam2, this.state.cronParam3, this.state.cronParam4]
+        });
+
+    return (
+      <div className='scheduler-form-confirmation-row'>
+        {valid ? readable : (errors.length !== 0 ? this.renderErrors(errors) : this.renderRequests(requests))}
+      </div>
+    );
+  }
+
   public render()
   {
     const template: Template = this.state.index !== -1 ? this.props.templates.get(this.state.index) : undefined;
     return (
-      <div className='transport-scheduler' style={backgroundColor(Colors().altBg2)}>
-        <TemplateSelector
-          index={this.state.index}
-          templates={this.props.templates}
-          getServerName={this.props.getServerName}
-          onChange={this._setStateWrapper('index')}
-        />
-        {
-          template !== undefined && this.renderImportExportOptions(template)
-        }
-        {
-          this.renderScheduleOptions(template)
-        }
-        {
-          this.renderConnectionOptions(template)
-        }
-      </div>
+      <Modal
+        open={this.props.modalOpen}
+        title={`Schedule an Import or Export`}
+        onClose={this.props.onClose}
+        allowOverflow={true}
+        wide={true}
+        noFooterPadding={true}
+        confirm={true}
+        onConfirm={this.handleConfirm}
+        closeOnConfirm={false}
+        confirmButtonText={'Schedule'}
+      >
+        <div className='transport-scheduler' style={backgroundColor(Colors().altBg2)}>
+          <TemplateSelector
+            index={this.state.index}
+            templates={this.props.templates}
+            getServerName={this.props.getServerName}
+            onChange={this._setStateWrapper('index')}
+          />
+          {
+            template !== undefined && this.renderImportExportOptions(template)
+          }
+          {
+            template !== undefined && this.renderScheduleOptions(template)
+          }
+          {
+            template !== undefined && this.renderConnectionOptions(template)
+          }
+          {
+            this.renderConfirmSection(template)
+          }
+        </div>
+      </Modal>
     );
   }
 }
+
+const temporarySFTPNames = List(['Sample SFTP 1', 'SFTP 2', 'SFTP 3']);
+const inputElementWidth = '220px';
+const scheduleHelpText =
+  `Schedule parameters should follow CRON expression rules. Some common ones:
+ - '*' matches all possible times.
+ - '0' matches only the value 0.
+ - '1,3,5' matches anything whose value is 1,3,5.
+ - '2-6' matches anything between 2 and 6 inclusive.
+ - Days/months can be like 'FRI' or 'JAN'.
+
+Examples:
+ - "* * * * *" runs the job every minute.
+ - "30 18 * * SUN" runs the job at 6:30pm every Sunday.
+`;
+const helpTooltipElement = <div className='scheduler-help-text'> {scheduleHelpText} </div>
+const defaultCRONparams = ['0', '0', '*', '*', 'SUN'];
 
 export default TransportScheduler;

@@ -332,17 +332,6 @@ class TemplateControlList extends TerrainComponent<Props>
     );
   }
 
-  public renderTransportScheduler()
-  {
-    return (
-      <TransportScheduler
-        templates={this.props.templates}
-        index={this.state.currentActiveIndex}
-        getServerName={this.getServerName}
-      />
-    );
-  }
-
   public render()
   {
     const typeText = (this.state.currentActiveTemplate !== undefined &&
@@ -350,7 +339,7 @@ class TemplateControlList extends TerrainComponent<Props>
 
     return (
       <div>
-        {<ControlList items={this.props.templates} config={this.templateConfig} getMenuOptions={this.getOptions}/>}
+        {<ControlList items={this.props.templates} config={this.templateConfig} getMenuOptions={this.getOptions} />}
         {
           this.state.responseModalOpen &&
           <Modal
@@ -389,14 +378,12 @@ class TemplateControlList extends TerrainComponent<Props>
         }
         {
           this.state.schedulerModalOpen &&
-          <Modal
-            open={this.state.schedulerModalOpen}
-            title={`Schedule an Import or Export`}
+          <TransportScheduler
+            templates={this.props.templates}
+            index={this.state.currentActiveIndex}
+            getServerName={this.getServerName}
+            modalOpen={this.state.schedulerModalOpen}
             onClose={this.schedulerCloseModal}
-            children={this.renderTransportScheduler()}
-            allowOverflow={true}
-            wide={true}
-            noFooterPadding={true}
           />
         }
       </div>
