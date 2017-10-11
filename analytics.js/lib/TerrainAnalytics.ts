@@ -80,7 +80,7 @@ const TerrainAnalytics = {
     }
 
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', (server || '/') + '?' + paramString, true);
+    xhr.open('GET', (server || '') + '?' + paramString, true);
     xhr.send();
   },
 };
