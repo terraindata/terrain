@@ -325,6 +325,7 @@ export class Scheduler
               await this.setJobStatus(scheduleID, 0);
               await sftp.end();
               winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import with sftp.');
+              return resolveJob('Successfully completed scheduled import with sftp.');
             }
             catch (e)
             {
@@ -396,6 +397,7 @@ export class Scheduler
               readStream = await sftp.put(writeStream, path, false, encoding);
               await sftp.end();
               winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export with sftp.');
+              return resolveJob('Successfully completed scheduled export with sftp.');
             }
             catch (e)
             {

@@ -104,11 +104,7 @@ export class Credentials
   {
     return new Promise<CredentialConfig[]>(async (resolve, reject) =>
     {
-      const creds: CredentialConfig[] = id !== undefined ? (type !== undefined ?
-        await App.DB.select(this.credentialTable, [], { id, type }) as CredentialConfig[] :
-        await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[]) :
-        (type !== undefined ? await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[] :
-          await App.DB.select(this.credentialTable, [], {}) as CredentialConfig[]);
+      const creds: CredentialConfig[] = await App.DB.select(this.credentialTable, [], { id, type }) as CredentialConfig[];
       return resolve(await Promise.all(creds.map(async (cred) =>
       {
         cred.meta = await this._decrypt(cred.meta);
@@ -122,12 +118,29 @@ export class Credentials
   {
     return new Promise<string[]>(async (resolve, reject) =>
     {
-      const creds: CredentialConfig[] = type !== undefined ?
-        await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[] :
-        await App.DB.select(this.credentialTable, [], {}) as CredentialConfig[];
+      const creds: CredentialConfig[] = await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[];
       return resolve(await Promise.all(creds.map(async (cred) =>
       {
         return await this._decrypt(cred.meta);
+      })));
+    });
+  }
+
+  // returns a string of names and ids that match given type
+  public async getNames(type?: string): Promise<object[]>
+  {
+    return new Promise<object[]>(async (resolve, reject) =>
+    {
+      const creds: CredentialConfig[] = await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[];
+      return resolve(await Promise.all(creds.map(async (cred) =>
+      {
+        return {
+          createdBy: cred.createdBy,
+          id: cred['id'],
+          name: cred.name,
+          permissions: cred['permissions'],
+          type: cred.type,
+        };
       })));
     });
   }
