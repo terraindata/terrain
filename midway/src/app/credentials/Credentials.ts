@@ -54,6 +54,8 @@ import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
 
+export const DV: DeployVariant = new DeployVariant();
+
 // CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
 // parent integer, status text, type text);
 
@@ -106,28 +108,31 @@ export class Items
     return this.select([], {});
   }
 
-  public async getLiveVariants(ids: number[]): Promise<string[] | object[]>
+  public async getLiveVariants(ids?: number[]): Promise<string[] | string>
   {
-    return new Promise<string[] | object[]>(async (resolve, reject) =>
+    return new Promise<string[] | string>(async (resolve, reject) =>
     {
-      if (ids.length === 0)
+      if (ids === undefined)
       {
-        const items: ItemConfig[] = await this.select([], { type: 'VARIANT', status: 'LIVE' } as object);
-        const liveItems: object[] = items.map((item) =>
-        {
-          return { id: item.id, name: DeployVariant.getVariantDeployedName(item as ItemConfig) };
-        });
-        return resolve(liveItems);
+        return reject('Must provide an array of item IDs.');
       }
-      else
+      const liveItems: string[] = [];
+      for (const id of ids)
       {
-        const liveItems: string[] = await Promise.all(ids.map(async (id) =>
+        if (ids.hasOwnProperty(id))
         {
           const items: ItemConfig[] = await this.select([], { id, type: 'VARIANT', status: 'LIVE' } as object);
-          return items.length !== 0 ? DeployVariant.getVariantDeployedName(items[0] as ItemConfig) as string : '' as string;
-        }));
-        return resolve(liveItems);
+          if (items.length !== 0)
+          {
+            liveItems.push(DV.getVariantDeployedName(items[0] as ItemConfig));
+          }
+          else
+          {
+            liveItems.push('');
+          }
+        }
       }
+      return resolve(liveItems);
     });
   }
 
@@ -135,46 +140,34 @@ export class Items
   {
     return new Promise<string[] | string>(async (resolve, reject) =>
     {
-      const result: string[] | string = await this._checkStatusVariantsHelper(dbid);
-      if (!Array.isArray(result))
+      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+      if (database === undefined)
       {
-        return reject(result as string);
+        return reject('Database "' + dbid.toString() + '" not found.');
       }
-      return resolve(result);
-    });
-  }
-
-  public async checkVariantInES(variantId?: number, dbid?: number): Promise<string>
-  {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      if (variantId === undefined || isNaN(variantId))
+      if (database.getType() !== 'ElasticController')
       {
-        return reject('Must provide variant id.');
+        return reject('Status metadata currently is only supported for Elastic databases.');
       }
-      if (dbid === undefined || isNaN(dbid))
+      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+      elasticClient.cluster.state({}, function getState(err, resp)
       {
-        return reject('Must provide database id.');
-      }
-      const liveScripts: string[] | string = await this._checkStatusVariantsHelper(dbid);
-      if (!Array.isArray(liveScripts))
-      {
-        return reject(liveScripts as string);
-      }
-      const variants: ItemConfig[] = await this.get(variantId);
-      if (variants.length === 0)
-      {
-        return reject('Variant not found.');
-      }
-      if (liveScripts.length === 0)
-      {
-        return reject('No stored scripts found in ES instance.');
-      }
-      const variantDeployedName: string = DeployVariant.getVariantDeployedName(variants[0] as ItemConfig) as string;
-
-      return liveScripts.indexOf(variantDeployedName) < 0 ? (variants[0].status !== 'LIVE' ? resolve('Variant not deployed.')
-        : resolve('Error, LIVE variant not found in ES instance.')) : (variants[0].status !== 'LIVE' ?
-          resolve('Variant found in ES instance but not LIVE.') : resolve('Variant is LIVE as ' + (variantDeployedName as string)));
+        let storedScriptNames: string[] = [];
+        // console.log(resp);
+        if (resp['metadata'] !== undefined && resp['metadata']['stored_scripts'] !== undefined)
+        {
+          const storedScripts = resp['metadata']['stored_scripts'] as object;
+          storedScriptNames = Object.keys(storedScripts);
+          storedScriptNames = storedScriptNames.map((storedScriptName) =>
+          {
+            return storedScriptName.startsWith('mustache#') ? storedScriptName.substring(9) : '';
+          }).filter((storedScriptName) =>
+          {
+            return storedScriptName.length > 0;
+          });
+        }
+        return resolve(storedScriptNames);
+      });
     });
   }
 
@@ -221,40 +214,6 @@ export class Items
       }
 
       resolve(await App.DB.upsert(this.itemTable, item) as ItemConfig);
-    });
-  }
-
-  private async _checkStatusVariantsHelper(dbid: number): Promise<string[] | string>
-  {
-    return new Promise<string[] | string>(async (resolve, reject) =>
-    {
-      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
-      if (database === undefined)
-      {
-        return resolve('Database "' + dbid.toString() + '" not found.');
-      }
-      if (database.getType() !== 'ElasticController')
-      {
-        return resolve('Status metadata currently is only supported for Elastic databases.');
-      }
-      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-      elasticClient.cluster.state({}, function getState(err, resp)
-      {
-        let storedScriptNames: string[] = [];
-        if (resp['metadata'] !== undefined && resp['metadata']['stored_scripts'] !== undefined)
-        {
-          const storedScripts = resp['metadata']['stored_scripts'] as object;
-          storedScriptNames = Object.keys(storedScripts);
-          storedScriptNames = storedScriptNames.map((storedScriptName) =>
-          {
-            return storedScriptName.startsWith('mustache#') ? storedScriptName.substring(9) : '';
-          }).filter((storedScriptName) =>
-          {
-            return storedScriptName.length > 0;
-          });
-        }
-        return resolve(storedScriptNames);
-      });
     });
   }
 }

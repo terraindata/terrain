@@ -80,6 +80,30 @@ Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next
   ctx.body = await items.get(ctx.params.id);
 });
 
+Router.get('/live', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  let typeArr: number[] = [];
+  if (ctx.query.ids !== undefined)
+  {
+    typeArr = ctx.query.ids.split(',').map((val) =>
+    {
+      const parsed: number = parseInt(val as string, 10);
+      if (isNaN(parsed))
+      {
+        throw new Error('Invalid input format for ids');
+      }
+      return parsed;
+    });
+  }
+  ctx.body = await items.getLiveVariants(typeArr);
+});
+
+Router.get('/live/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+    const status: string = await items.checkVariantInES(ctx.params.id, parseInt(ctx.query.dbid as string, 10));
+    ctx.body = status;
+});
+
 Router.get('/status/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting status from DB ID ' + String(ctx.params.id));
