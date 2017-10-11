@@ -80,7 +80,7 @@ AppRouter.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.
 
 AppRouter.get('/time', (ctx, next) =>
 {
-  ctx.body = new Date().toJSON();
+  ctx.body = { serverTime: new Date().toJSON() };
 });
 
 // Prefix all routes with /midway
