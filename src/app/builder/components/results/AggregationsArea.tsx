@@ -113,7 +113,7 @@ class AggregationsArea extends TerrainComponent<Props>
     {
       return Map({});
     }
-    let aggsList = Map({});
+    let aggsList =  Map({});
     _.keys(aggregations).forEach((name) =>
     {
       if (query.aggregationList.get(name) === undefined)
@@ -126,7 +126,7 @@ class AggregationsArea extends TerrainComponent<Props>
         aggsList = aggsList.set(name, query.aggregationList.get(name))
       }
     });
-    console.log(aggsList);
+    console.log('AggsList', aggsList.toJS());
     return aggsList;
   }
 

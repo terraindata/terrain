@@ -95,8 +95,9 @@ class AggregationComponent extends TerrainComponent<Props> {
     singleValue: '',
   };
 
-  public componentWillMount()
+  public componentDidMount()
   {
+    console.log('Aggregation did mount ', this.props.query.aggregationList);
     const currentAgg = this.props.query.aggregationList.get(this.props.name);
     this.updateInitialDisplay(this.props.aggregation, currentAgg, this.props.name);
     const { isSingle, value } = this.isSingleValue(this.props.aggregation);
@@ -148,7 +149,12 @@ class AggregationComponent extends TerrainComponent<Props> {
     {
       return;
     }
-    const displayType = currentAgg.displayType !== 'None' ? currentAgg.displayType : this.getBestDisplayType(aggregation);
+    console.log('Updating intitial dispaly for ', name);
+    console.log('displayType: ', currentAgg.displayType);
+    console.log('Expanded: ' currentAgg.expanded);
+    const displayType = currentAgg.displayType !== 'None'
+     ? currentAgg.displayType : this.getBestDisplayType(aggregation);
+     console.log('Setting display type to: ', displayType);
     this.setState({
       displayType,
       expanded: currentAgg.expanded,
@@ -359,13 +365,14 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public renderTableView(values)
   {
+    const buckets = this.findKey(values, 'buckets');
     if (this.canBeTable())
     {
       return (
         <div className='aggregation-table'>
           <AggsTable
-            tableData={values}
-            useBuckets={values.buckets !== undefined}
+            tableData={buckets !== undefined ? buckets : values}
+            useBuckets={buckets !== undefined}
 
           />
         </div>
