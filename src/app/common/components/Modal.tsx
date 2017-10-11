@@ -64,6 +64,7 @@ export interface Props
   title?: string;
   error?: boolean;
   fill?: boolean;
+  wide?: boolean;
   confirm?: boolean;
   confirmButtonText?: string;
   onConfirm?: () => void;
@@ -138,6 +139,7 @@ class Modal extends TerrainComponent<Props>
             }
             className={classNames({
               'modal-content': true,
+              'modal-content-wide': this.props.wide,
               'modal-content-fill': this.props.fill,
               'modal-content-allow-overflow': this.props.allowOverflow,
               [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),

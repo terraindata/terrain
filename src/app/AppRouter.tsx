@@ -52,6 +52,7 @@ import Logout from './common/components/Logout';
 import Placeholder from './common/components/Placeholder';
 import Redirect from './common/components/Redirect';
 import TerrainComponent from './common/components/TerrainComponent';
+import ControlPage from './control/components/ControlPage';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';
 import LibraryActions from './library/data/LibraryActions';
@@ -131,6 +132,8 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/browser/:a/:b/:c' component={Redirect} />
 
           <Route path='/schema' component={SchemaPage} />
+
+          <Route path='/control' component={ControlPage} />
 
           <Route path='/import' component={FileImport} />
           <Route path='/analytics' onEnter={this.libraryOnEnter}>
