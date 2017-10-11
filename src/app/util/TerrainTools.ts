@@ -105,7 +105,7 @@ Toggle-able Features:
       TerrainTools.log(`${_.capitalize(feature)} has been enabled, refresh the page.`);
     } else
     {
-      TerrainTools.log('You need to Admin to enable/disabled features', LEVEL_ERROR);
+      TerrainTools.log('You need to be Admin to enable/disabled features', LEVEL_ERROR);
     }
   }
 
@@ -117,7 +117,7 @@ Toggle-able Features:
       TerrainTools.log(`${_.capitalize(feature)} has been disabled, refresh the page.`);
     } else
     {
-      TerrainTools.log('You need to Admin to enable/disabled features', LEVEL_ERROR);
+      TerrainTools.log('You need to be Admin to enable/disabled features', LEVEL_ERROR);
     }
   }
 
