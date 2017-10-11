@@ -86,6 +86,7 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // for error reporting
 
 // data that needs to be loaded
+import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
 import ColorsActions from './colors/data/ColorsActions';
@@ -147,6 +148,7 @@ const links =
       icon: <ReportingIcon />,
       text: 'Analytics',
       route: '/analytics',
+      enabled: TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS),
     },
     {
       icon: <ControlIcon />,

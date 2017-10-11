@@ -52,19 +52,21 @@ import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import { CredentialConfig, Credentials } from '../credentials/Credentials';
 import { ExportConfig, Import } from '../import/Import';
 import { UserConfig } from '../users/Users';
 import { versions } from '../versions/VersionRouter';
 
 export const imprt: Import = new Import();
+export const credentials: Credentials = new Credentials();
 
-const sftpconfig: object =
-  {
-    host: '10.1.1.103',
-    port: 22,
-    username: 'testuser',
-    password: 'Terrain123!',
-  };
+// const sftpconfig: object =
+//   {
+//     host: '10.1.1.103',
+//     port: 22,
+//     username: 'testuser',
+//     password: 'Terrain123!',
+//   };
 
 export interface SchedulerConfig
 {
@@ -192,12 +194,12 @@ export class Scheduler
       if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'sftp')
       {
         jobId = 0;
-        packedParamsSchedule = [req['paramsJob'], (req['transport'] as any)['filename'], req['sort'], 'utf8'];
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
       else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'sftp')
       {
         jobId = 1;
-        packedParamsSchedule = [req['paramsJob'], (req['transport'] as any)['filename'], req['sort'], 'utf8'];
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
       req.active = 1;
       req.archived = 0;
@@ -261,14 +263,29 @@ export class Scheduler
     // 0: import via sftp
     // 1: export via sftp
     await this.createJob(async (scheduleID: number, fields: object,
-      path: string, sort: string, encoding?: string | null): Promise<any> => // import with sftp
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
         const sftp = new Client();
+        let sftpconfig: object = {};
         try
         {
           await this.setJobStatus(scheduleID, 1);
+          const path: string = transport['filename'];
+          const creds: CredentialConfig[] = await credentials.get(transport['id'], transport['type']);
+          if (creds.length === 0)
+          {
+            return rejectJob('No SFTP credentials matched parameters.');
+          }
+          try
+          {
+            sftpconfig = JSON.parse(creds[0].meta);
+          }
+          catch (e)
+          {
+            return rejectJob(e.message);
+          }
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
           await sftp.connect(sftpconfig);
           const checkIfDirectoryExists: object[] = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
@@ -308,6 +325,7 @@ export class Scheduler
               await this.setJobStatus(scheduleID, 0);
               await sftp.end();
               winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import with sftp.');
+              return resolveJob('Successfully completed scheduled import with sftp.');
             }
             catch (e)
             {
@@ -332,15 +350,30 @@ export class Scheduler
       });
     });
 
-    await this.createJob(async (scheduleID: number, fields: object, path: string,
+    await this.createJob(async (scheduleID: number, fields: object, transport: object,
       sort: string, encoding?: string | null) => // export with sftp
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
         const sftp = new Client();
+        let sftpconfig: object = {};
         try
         {
           await this.setJobStatus(scheduleID, 1);
+          const path: string = transport['filename'];
+          const creds: CredentialConfig[] = await credentials.get(transport['id'], transport['type']);
+          if (creds.length === 0)
+          {
+            return rejectJob('No SFTP credentials matched parameters.');
+          }
+          try
+          {
+            sftpconfig = JSON.parse(creds[0].meta);
+          }
+          catch (e)
+          {
+            return rejectJob(e.message);
+          }
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
           await sftp.connect(sftpconfig);
           const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
@@ -364,6 +397,7 @@ export class Scheduler
               readStream = await sftp.put(writeStream, path, false, encoding);
               await sftp.end();
               winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export with sftp.');
+              return resolveJob('Successfully completed scheduled export with sftp.');
             }
             catch (e)
             {

@@ -44,22 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as CredentialP from './CredentialPermissions';
-import * as ImportP from './ImportPermissions';
+import { UserConfig } from '../users/Users';
 
-export let CredentialPermissions: CredentialP.CredentialPermissions = new CredentialP.CredentialPermissions();
-export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
-
-export class Permissions
+export class CredentialPermissions
 {
-  public ImportPermissions: ImportP.ImportPermissions;
-  public CredentialPermissions: CredentialP.CredentialPermissions;
-
-  constructor()
+  public async verifyPermission(user: UserConfig, params: object): Promise<string>
   {
-    this.ImportPermissions = ImportPermissions;
-    this.CredentialPermissions = CredentialPermissions;
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      if (user.isSuperUser === 0)
+      {
+        return reject('User must be a super user.');
+      }
+      return resolve();
+    });
   }
 }
 
-export default Permissions;
+export default CredentialPermissions;
