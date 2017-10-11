@@ -44,8 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// NB: this file should never be exposed directly via API routes!
-// It must only be called from inside midway and exposed via those routes
+// NB: this file should never be exposed directly via API routes except to localhost!
+// It must only be called from inside midway and exposed via those routes, or exposed
+// via /credentials to localhost for testing purposes
 
 import aesjs = require('aes-js');
 import srs = require('secure-random-string');
@@ -89,6 +90,8 @@ export class Credentials
         'type',
       ],
     );
+
+    // AES 128 requires a key that is 16, 24, or 32 bytes
     this.privateKey = sha1(`0VAtqVlzusw8nqA8TMoSfGHR3ik3dB-c9t4-gKUjD5iRbsWQWRzeL
                        -6mBtRGWV4M2A7ZZryVT7-NZjTvzuY7qhjrZdJTv4iGPmcbta-3iL
                        kgfEzY3QufFvm14dqtzfsCXhboiOC23idadrMNGlQwyJ783XlGwLB
@@ -181,6 +184,7 @@ export class Credentials
     });
   }
 
+  // use standard AES 128 decryption
   private async _decrypt(msg: string, privateKey?: string): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
@@ -192,6 +196,7 @@ export class Credentials
     });
   }
 
+  // use standard AES 128 rencryption
   private async _encrypt(msg: string, privateKey?: string): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>

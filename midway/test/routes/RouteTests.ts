@@ -1053,6 +1053,72 @@ describe('File import templates route tests', () =>
   });
 });
 
+describe('Credentials tests', () =>
+{
+  test('POST /midway/v1/credentials', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/credentials')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          createdBy: 1,
+          meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
+          name: 'SFTP Test 1',
+          type: 'sftp',
+          permissions: 1,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        const result: object = JSON.parse(response.text);
+        expect(Array.isArray(result)).toBe(true);
+        const resultAsArray: object[] = result as object[];
+        expect(resultAsArray[0]).toMatchObject({
+          createdBy: 1,
+          id: 1,
+          meta: '',
+          name: 'SFTP Test 1',
+          type: 'sftp',
+          permissions: 1,
+        });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/credentials request returned an error: ' + String(error));
+      });
+  });
+
+  test('GET /midway/v1/credentials', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/credentials')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        const result = JSON.parse(response.text);
+        expect(result).toMatchObject([{
+          createdBy: 1,
+          id: 1,
+          meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
+          name: 'SFTP Test 1',
+          permissions: 1,
+          type: 'sftp',
+        }]);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/credentials request returned an error: ' + String(error));
+      });
+  });
+});
+
 describe('Analytics aggregation route tests', () =>
 {
   test('GET /midway/v1/events/ (select)', async () =>

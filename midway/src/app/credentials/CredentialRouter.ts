@@ -44,6 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// NB: This router only exists for testing purposes.
+// If using a proxy, be sure to set app.proxy = true
+
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
@@ -56,14 +59,28 @@ export const credentials: Credentials = new Credentials();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await credentials.get();
+  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
+  {
+    ctx.body = 'Unauthorized';
+  }
+  else
+  {
+    ctx.body = await credentials.get();
+  }
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const cred: CredentialConfig = ctx.request.body.body;
-  Util.verifyParameters(cred, ['name', 'type', 'meta']);
-  ctx.body = await credentials.upsert(ctx.state.user, cred);
+  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
+  {
+    ctx.body = 'Unauthorized';
+  }
+  else
+  {
+    const cred: CredentialConfig = ctx.request.body.body;
+    Util.verifyParameters(cred, ['name', 'type', 'meta']);
+    ctx.body = await credentials.upsert(ctx.state.user, cred);
+  }
 });
 
 export default Router;
