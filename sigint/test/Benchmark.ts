@@ -75,7 +75,8 @@ export async function startServer()
 
 export const flow = {
   main: [
-    { post: host + '/v1', json: {
+    {
+      post: host + '/v1', json: {
         eventid: '#{INDEX}',
         variantid: '#{INDEX}',
         visitorid: '#{INDEX}',
@@ -91,11 +92,13 @@ const runOptions = {
   iterations: 1000,
 };
 
+// tslint:disable-next-line:no-floating-promises
 startServer();
 benchrest(flow, runOptions)
   .on('error', (err, ctx) => winston.error('Failed in %s with err: ', ctx, err))
   .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
-  .on('end', (stats, errorCount) => {
+  .on('end', (stats, errorCount) =>
+  {
     winston.info('error count: ', errorCount);
     winston.info('stats', stats);
     // TODO: teardown server here
