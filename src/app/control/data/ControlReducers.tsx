@@ -44,91 +44,89 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import * as Immutable from 'immutable';
 
-import * as Util from '../Util';
-import { ItemConfig, Items } from './Items';
-export * from './Items';
+import Ajax from 'util/Ajax';
+import ActionTypes from './ControlActionTypes';
 
-const Router = new KoaRouter();
-export const items: Items = new Items();
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import * as _ from 'lodash';
+import { _ControlState, ControlState } from './ControlStore';
+type Template = FileImportTypes.Template;
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  let getItems: ItemConfig[] = [];
-  if (ctx.query.type !== undefined)
+const { List, Map } = Immutable;
+
+const ControlReducer = {};
+
+ControlReducer[ActionTypes.importExport.fetchTemplates] =
+  (state, action) =>
   {
-    const typeArr: string[] = ctx.query.type.split(',');
-    for (const type of typeArr)
-    {
-      getItems = getItems.concat(await items.select([], { type }));
-    }
-  }
-  else
-  {
-    winston.info('getting all items');
-    getItems = await items.get();
-  }
-  ctx.body = getItems;
-});
-
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting item ID ' + String(ctx.params.id));
-  ctx.body = await items.get(ctx.params.id);
-});
-
-Router.get('/live', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  let typeArr: number[] = [];
-  if (ctx.query.ids !== undefined)
-  {
-    typeArr = ctx.query.ids.split(',').map((val) =>
-    {
-      const parsed: number = parseInt(val as string, 10);
-      if (isNaN(parsed))
+    Ajax.getAllTemplates(
+      (templatesArr) =>
       {
-        throw new Error('Invalid input format for ids');
-      }
-      return parsed;
-    });
-  }
-  ctx.body = await items.getLiveVariants(typeArr);
-});
+        const templates: List<Template> = List<Template>(templatesArr.map((template) =>
+        { // TODO move this translation to _Template
+          return FileImportTypes._Template(_.extend({}, template, {
+            templateId: template['id'],
+            templateName: template['name'],
+            originalNames: List<string>(template['originalNames']),
+          }));
+        },
+        ));
+        action.payload.setTemplates(templates);
+      },
+    );
+    return state;
+  };
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+ControlReducer[ActionTypes.importExport.setTemplates] =
+  (state, action) =>
+  {
+    return state.set('importExportTemplates', action.payload.templates);
+  };
+
+ControlReducer[ActionTypes.importExport.deleteTemplate] =
+  (state, action) =>
+  {
+    Ajax.deleteTemplate(action.payload.templateId,
+      () =>
+      {
+        action.payload.handleDeleteTemplateSuccess(action.payload.templateName);
+        action.payload.fetchTemplates();
+      },
+      (err: string) =>
+      {
+        action.payload.handleDeleteTemplateError(err);
+      },
+    );
+    return state;
+  };
+
+ControlReducer[ActionTypes.importExport.resetTemplateToken] =
+  (state, action) =>
+  {
+    Ajax.resetTemplateToken(action.payload.templateId,
+      () =>
+      {
+        action.payload.handleResetSuccess();
+        action.payload.fetchTemplates();
+      },
+      (err: string) =>
+      {
+        action.payload.handleResetError(err);
+      },
+    );
+    return state;
+  };
+
+const ControlReducerWrapper = (state: ControlState = _ControlState(), action) =>
 {
-  winston.info('create items');
-  const item: ItemConfig = ctx.request.body.body;
-  Util.verifyParameters(item, ['name']);
-  if (item.id !== undefined)
+  let nextState = state;
+  if (ControlReducer[action.type])
   {
-    throw new Error('Invalid parameter item ID');
+    nextState = ControlReducer[action.type](state, action);
   }
+  return nextState;
+};
 
-  ctx.body = await items.upsert(ctx.state.user, item);
-});
-
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('modify items');
-  const item: ItemConfig = ctx.request.body.body;
-  Util.verifyParameters(item, ['name']);
-  if (item.id === undefined)
-  {
-    item.id = Number(ctx.params.id);
-  }
-  else
-  {
-    if (item.id !== Number(ctx.params.id))
-    {
-      throw new Error('Item ID does not match the supplied id in the URL');
-    }
-  }
-
-  ctx.body = await items.upsert(ctx.state.user, item);
-});
-
-export default Router;
+export default ControlReducerWrapper;

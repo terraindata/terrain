@@ -44,60 +44,40 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as util from 'util';
-import * as winston from 'winston';
-import ESInterpreter from '../../../database/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
-import ESParserError from '../../../database/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../Utils';
+// tslint:disable:no-var-requires strict-boolean-expressions variable-name
 
-function getExpectedFile(): string
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import * as Redux from 'redux';
+import * as ReduxActions from 'redux-actions';
+import thunk from 'redux-thunk';
+
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import Util from 'util/Util';
+import ControlReducers from './ControlReducers';
+
+type Template = FileImportTypes.Template;
+
+const { List } = Immutable;
+
+class ControlStateC
 {
-  return __filename.split('.')[0] + '.expected';
+  public importExportTemplates: List<Template> = List([]);
 }
 
-let expected;
-
-beforeAll(async (done) =>
+const ControlState_Record = Immutable.Record(new ControlStateC());
+export interface ControlState extends ControlStateC, IRecord<ControlState> { }
+export const _ControlState = (config?: any) =>
 {
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
+  return new ControlState_Record(Util.extendId(config || {})) as any as ControlState;
+};
 
-  const expectedString: any = await new Promise((resolve, reject) =>
-  {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
+const DefaultState = _ControlState();
 
-  expected = JSON.parse(expectedString);
-  done();
-});
+export const ControlStore = Redux.createStore(
+  ControlReducers,
+  DefaultState,
+  Redux.applyMiddleware(thunk),
+);
 
-function testParse(testName: string,
-  testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing "' + testName + '": "' + testString + '"');
-  const interpreter: ESInterpreter = new ESInterpreter(testString);
-  const parser: ESJSONParser = interpreter.parser as ESJSONParser;
-
-  if (parser.getErrors().length > 0)
-  {
-    winston.info(util.inspect(parser.getErrors(), false, 16));
-    winston.info(util.inspect(parser.getValueInfo(), false, 16));
-  }
-
-  expect(parser.getValue()).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
-}
-
-test('parse valid json objects', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
-    {
-      const testValue: any = expected[testName];
-      testParse(testName, JSON.stringify(testValue), testValue);
-    });
-});
+export default ControlStore;

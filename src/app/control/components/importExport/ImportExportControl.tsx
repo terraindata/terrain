@@ -44,91 +44,70 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import * as Immutable from 'immutable';
+import * as React from 'react';
 
-import * as Util from '../Util';
-import { ItemConfig, Items } from './Items';
-export * from './Items';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import TemplateControlList from './TemplateControlList';
 
-const Router = new KoaRouter();
-export const items: Items = new Items();
+import { SchemaStore } from 'schema/data/SchemaStore';
+import { Server, ServerMap } from 'schema/SchemaTypes';
+import ControlActions from '../../data/ControlActions';
+import ControlStore from '../../data/ControlStore';
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+import './ImportExportControl.less';
+
+const { List, Map } = Immutable;
+type Template = FileImportTypes.Template;
+
+export interface Props
 {
-  let getItems: ItemConfig[] = [];
-  if (ctx.query.type !== undefined)
-  {
-    const typeArr: string[] = ctx.query.type.split(',');
-    for (const type of typeArr)
-    {
-      getItems = getItems.concat(await items.select([], { type }));
-    }
-  }
-  else
-  {
-    winston.info('getting all items');
-    getItems = await items.get();
-  }
-  ctx.body = getItems;
-});
+  placeholder?: string;
+}
 
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+class ImportExportControl extends TerrainComponent<Props>
 {
-  winston.info('getting item ID ' + String(ctx.params.id));
-  ctx.body = await items.get(ctx.params.id);
-});
+  public state: {
+    servers: ServerMap;
+    templates: List<Template>;
+  } = {
+    templates: List([]),
+    servers: Map<string, Server>(),
+  };
 
-Router.get('/live', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  let typeArr: number[] = [];
-  if (ctx.query.ids !== undefined)
+  constructor(props)
   {
-    typeArr = ctx.query.ids.split(',').map((val) =>
-    {
-      const parsed: number = parseInt(val as string, 10);
-      if (isNaN(parsed))
-      {
-        throw new Error('Invalid input format for ids');
-      }
-      return parsed;
+    super(props);
+    this._subscribe(ControlStore, {
+      stateKey: 'templates',
+      storeKeyPath: ['importExportTemplates'],
+    });
+    this._subscribe(SchemaStore, {
+      stateKey: 'servers',
+      storeKeyPath: ['servers'],
     });
   }
-  ctx.body = await items.getLiveVariants(typeArr);
-});
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('create items');
-  const item: ItemConfig = ctx.request.body.body;
-  Util.verifyParameters(item, ['name']);
-  if (item.id !== undefined)
+  public componentDidMount()
   {
-    throw new Error('Invalid parameter item ID');
+    ControlActions.importExport.fetchTemplates();
   }
 
-  ctx.body = await items.upsert(ctx.state.user, item);
-});
-
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('modify items');
-  const item: ItemConfig = ctx.request.body.body;
-  Util.verifyParameters(item, ['name']);
-  if (item.id === undefined)
+  public render()
   {
-    item.id = Number(ctx.params.id);
+    return (
+      <div className='import-export-token-control-page'>
+        <div className='import-export-control-title'>
+          Manage Import and Export Templates
+        </div>
+        <TemplateControlList
+          templates={this.state.templates}
+          servers={this.state.servers}
+        />
+      </div>
+    );
   }
-  else
-  {
-    if (item.id !== Number(ctx.params.id))
-    {
-      throw new Error('Item ID does not match the supplied id in the URL');
-    }
-  }
+}
 
-  ctx.body = await items.upsert(ctx.state.user, item);
-});
-
-export default Router;
+export default ImportExportControl;

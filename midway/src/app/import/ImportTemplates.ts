@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as srs from 'secure-random-string';
-
+import * as winston from 'winston';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 
@@ -171,6 +171,7 @@ export class ImportTemplates
   {
     return this.select([], { id: templateId, persistentAccessToken });
   }
+
   public async select(columns: string[], filter: object): Promise<ImportTemplateConfig[]>
   {
     return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
@@ -192,6 +193,10 @@ export class ImportTemplates
         if (results.length === 0)
         {
           return reject('Invalid template id passed');
+        }
+        if (user.isSuperUser !== 1)
+        {
+          return reject('Insufficient Permissions');
         }
         const template: ImportTemplateConfig = results[0] as ImportTemplateConfig;
         template['persistentAccessToken'] = srs({ length: 256 });

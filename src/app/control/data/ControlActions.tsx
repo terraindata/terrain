@@ -44,60 +44,48 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as util from 'util';
-import * as winston from 'winston';
-import ESInterpreter from '../../../database/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
-import ESParserError from '../../../database/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../Utils';
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import ActionTypes from './ControlActionTypes';
+import { ControlStore } from './ControlStore';
 
-function getExpectedFile(): string
-{
-  return __filename.split('.')[0] + '.expected';
-}
+type Template = FileImportTypes.Template;
 
-let expected;
+const $ = (type: string, payload: any) => ControlStore.dispatch({ type, payload });
 
-beforeAll(async (done) =>
-{
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-
-  const expectedString: any = await new Promise((resolve, reject) =>
+const ControlActions =
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
-
-  expected = JSON.parse(expectedString);
-  done();
-});
-
-function testParse(testName: string,
-  testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing "' + testName + '": "' + testString + '"');
-  const interpreter: ESInterpreter = new ESInterpreter(testString);
-  const parser: ESJSONParser = interpreter.parser as ESJSONParser;
-
-  if (parser.getErrors().length > 0)
-  {
-    winston.info(util.inspect(parser.getErrors(), false, 16));
-    winston.info(util.inspect(parser.getValueInfo(), false, 16));
-  }
-
-  expect(parser.getValue()).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
-}
-
-test('parse valid json objects', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
+    importExport:
     {
-      const testValue: any = expected[testName];
-      testParse(testName, JSON.stringify(testValue), testValue);
-    });
-});
+      setTemplates:
+      (templates: List<Template>) =>
+        $(ActionTypes.importExport.setTemplates, { templates }),
+
+      fetchTemplates:
+      () =>
+        $(ActionTypes.importExport.fetchTemplates, {
+          setTemplates: ControlActions.importExport.setTemplates,
+        }),
+
+      deleteTemplate:
+      (templateId: number, handleDeleteTemplateSuccess, handleDeleteTemplateError, templateName: string) =>
+        $(ActionTypes.importExport.deleteTemplate, {
+          templateId,
+          handleDeleteTemplateSuccess,
+          handleDeleteTemplateError,
+          fetchTemplates: ControlActions.importExport.fetchTemplates,
+          templateName,
+        }),
+
+      resetTemplateToken:
+      (templateId: number, handleResetSuccess, handleResetError) =>
+        $(ActionTypes.importExport.resetTemplateToken, {
+          templateId,
+          handleResetSuccess,
+          handleResetError,
+          fetchTemplates: ControlActions.importExport.fetchTemplates,
+        }),
+    },
+
+  };
+
+export default ControlActions;
