@@ -87,6 +87,7 @@ export const flow = {
 
 const runOptions = {
   limit: 20,
+  prealloc: 1000,
   iterations: 1000,
 };
 
