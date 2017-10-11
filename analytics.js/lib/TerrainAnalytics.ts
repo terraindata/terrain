@@ -51,33 +51,33 @@ import 'clientjs';
 const host = 'http://localhost:3001/v1/';
 
 const TerrainAnalytics = {
-    eventIDs: {
-        view: 1,
-        impression: 1,
-        click: 2,
-        transaction: 3,
-        conversion: 3,
-    },
+  eventIDs: {
+    view: 1,
+    impression: 1,
+    click: 2,
+    transaction: 3,
+    conversion: 3,
+  },
 
-    logEvent(eventNameOrID, variantOrSourceID, meta) {
-        const client = new ClientJS();
+  logEvent(eventNameOrID, variantOrSourceID, meta)
+  {
+    const client = new ClientJS();
+    const eventID = typeof eventNameOrID === 'string' ? TerrainAnalytics.eventIDs[eventNameOrID] : eventNameOrID;
+    const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] : client.getFingerprint();
 
-        const eventID = typeof eventNameOrID === 'string' ? TerrainAnalytics.eventIDs[eventNameOrID] : eventNameOrID;
-        const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] : client.getFingerprint();
+    let paramString = 'eventid=' + String(eventID)
+      + '&visitorid=' + String(visitorID)
+      + '&variantid=' + String(variantOrSourceID);
 
-        let paramString = 'eventid=' + String(eventID)
-                        + '&visitorid=' + String(visitorID)
-                        + '&variantid=' + String(variantOrSourceID);
+    if (meta != null)
+    {
+      paramString += '&meta=' + String(jsurl.stringify(meta));
+    }
 
-        if (meta != null)
-        {
-          paramString += '&meta=' + String(jsurl.stringify(meta));
-        }
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', host + '?' + paramString, true);
-        xhr.send();
-    },
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', host + '?' + paramString, true);
+    xhr.send();
+  },
 };
 
-module.exports = TerrainAnalytics;
+export = TerrainAnalytics;

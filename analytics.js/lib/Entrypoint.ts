@@ -48,4 +48,4 @@ import * as TerrainAnalytics from './TerrainAnalytics';
 
 // noinspection TypeScriptUnresolvedVariable
 window['TerrainAnalytics'] = TerrainAnalytics;
-module.exports = TerrainAnalytics;
+export = TerrainAnalytics;
