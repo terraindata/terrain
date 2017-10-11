@@ -67,7 +67,6 @@ export interface Props
   data: any;
   colors: [string, string];
   containerWidth?: number;
-  useBuckets: boolean;
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
@@ -152,46 +151,14 @@ class AggregationHistogram extends TerrainComponent<Props>
         return { x: bucket.key, y: bucket.doc_count };
       });
     }
-    return { barsData: data, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
-  }
-
-  public parseValueData(data)
-  {
-    const categories = [];
-    let domainMin = Infinity;
-    let domainMax = -Infinity;
-    let rangeMax = -Infinity;
-    const barsData = _.keys(data).map((key, i) =>
-    {
-      let xVal = parseFloat(key);
-      const yVal = parseFloat(data[key]);
-      if (isNaN(xVal))
-      {
-        xVal = i;
-        categories.push(key);
-      }
-      if (xVal < domainMin)
-      {
-        domainMin = xVal;
-      }
-      if (xVal > domainMax)
-      {
-        domainMax = xVal;
-      }
-      if (yVal > rangeMax)
-      {
-        rangeMax = yVal;
-      }
-      return { x: xVal, y: yVal };
-    });
-    return { barsData, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax]) };
+    return { barsData: data, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax + 0.05 * rangeMax]) };
   }
 
   public getChartState(overrideState?: any)
   {
     overrideState = overrideState || {};
     const data = overrideState.data || this.props.data;
-    const { barsData, categories, domain, range } = this.props.useBuckets ? this.parseBucketData(data) : this.parseValueData(data);
+    const { barsData, categories, domain, range } = this.parseBucketData(data);
     const chartState = {
       barsData: (barsData),
       domain: {

@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-const { List } = Immutable;
+const { List, Map } = Immutable;
 import { notificationManager } from 'common/components/InAppNotification';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -67,6 +67,7 @@ import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
 import AggregationHistogram from './AggregationHistogram';
 import AggsTable from './AggsTable';
+import { Aggregation as AggregationClass } from './ResultTypes';
 
 const ClipboardIcon = require('images/icon_clipboard.svg');
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
@@ -84,21 +85,22 @@ export interface Props
 class AggregationComponent extends TerrainComponent<Props> {
   public state: {
     expanded: boolean,
-    viewMode: string,
+    displayType: string,
     isSingleValue: boolean,
     singleValue: string,
   } = {
     expanded: false,
-    viewMode: 'Table',
+    displayType: 'Table',
     isSingleValue: false,
     singleValue: '',
   };
 
   public componentWillMount()
   {
+    const currentAgg = this.props.query.aggregationList.get(this.props.name);
+    this.updateInitialDisplay(this.props.aggregation, currentAgg, this.props.name);
     const { isSingle, value } = this.isSingleValue(this.props.aggregation);
     this.setState({
-      viewMode: this.props.query.aggregationList.get(this.props.name),
       isSingleValue: isSingle,
       singleValue: value,
     });
@@ -106,11 +108,10 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (this.props.query.aggregationList[this.props.name] !== nextProps.query.aggregationList.get(nextProps.name))
+    if (!_.isEqual(this.props.query.aggregationList.get(this.props.name), nextProps.query.aggregationList.get(nextProps.name)))
     {
-      this.setState({
-        viewMode: nextProps.query.aggregationList.get(nextProps.name),
-      });
+      const currentAgg = nextProps.query.aggregationList.get(nextProps.name);
+      this.updateInitialDisplay(nextProps.aggregation, currentAgg, nextProps.name);
     }
     if (this.props.aggregation !== nextProps.aggregation)
     {
@@ -122,6 +123,31 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
   }
 
+  public updateInitialDisplay(aggregation, currentAgg, name)
+  {
+    const displayType = currentAgg.displayType !== 'None' ? currentAgg.displayType : this.getBestDisplayType(aggregation);
+    this.setState({
+      displayType,
+      expanded: currentAgg !== undefined ? currentAgg.expanded : true,
+    });
+    currentAgg.displayType = displayType;
+    Actions.change(List(this._keyPath('query', 'aggregationList', name)), currentAgg, true);
+  }
+
+  public getBestDisplayType(aggregation?)
+  {
+    let displayType = 'Raw';
+    if (this.canBeHistogram(aggregation))
+    {
+      displayType = 'Histogram';
+    }
+    else if (this.canBeTable(aggregation))
+    {
+      displayType = 'Table';
+    }
+    return displayType;
+  }
+
   public isSingleValue(aggregation)
   {
     const values = _.values(aggregation);
@@ -130,54 +156,57 @@ class AggregationComponent extends TerrainComponent<Props> {
       (values[0].value !== undefined || values[0].doc_count !== undefined);
     const value = values[0].value !== undefined ? values[0].value : values[0].doc_count;
     return { isSingle, value };
-
   }
 
   public toggleExpanded()
   {
+    const currAgg = this.props.query.aggregationList.get(this.props.name);
+    currAgg.expanded = !this.state.expanded;
+    Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), currAgg);
     this.setState({
       expanded: !this.state.expanded,
     });
   }
 
-  public changeModeToTable()
+  public changeDisplayType(type: string)
   {
-    Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), 'Table');
+    const currAgg = this.props.query.aggregationList.get(this.props.name);
+    currAgg.displayType = type;
+    Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), currAgg);
     this.setState({
-      viewMode: 'Table',
+      displayType: type,
     });
   }
 
-  public changeModeToHistogram()
+  public changeDisplaytoTable()
   {
-    Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), 'Histogram');
-    this.setState({
-      viewMode: 'Histogram',
-    });
+    this.changeDisplayType('Table');
   }
 
-  public changeModeToRaw()
+  public changeDisplayToHistogram()
   {
-    Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), 'Raw');
-    this.setState({
-      viewMode: 'Raw',
-    });
+    this.changeDisplayType('Histogram');
+  }
+
+  public changeDisplayToRaw()
+  {
+    this.changeDisplayType('Raw');
   }
 
   public getMenuOptions(): Immutable.List<MenuOption>
   {
     const options = [{
       text: 'Raw',
-      onClick: this.changeModeToRaw,
-      selected: this.state.viewMode === 'Raw',
+      onClick: this.changeDisplayToRaw,
+      selected: this.state.displayType === 'Raw',
     }];
 
     if (this.canBeHistogram())
     {
       options.push({
         text: 'Histogram',
-        onClick: this.changeModeToHistogram,
-        selected: this.state.viewMode === 'Histogram',
+        onClick: this.changeDisplayToHistogram,
+        selected: this.state.displayType === 'Histogram',
       });
     }
 
@@ -185,8 +214,8 @@ class AggregationComponent extends TerrainComponent<Props> {
     {
       options.push({
         text: 'Table',
-        onClick: this.changeModeToTable,
-        selected: this.state.viewMode === 'Table',
+        onClick: this.changeDisplaytoTable,
+        selected: this.state.displayType === 'Table',
       });
     }
     return List(options);
@@ -280,7 +309,8 @@ class AggregationComponent extends TerrainComponent<Props> {
   public renderExpandedAgg()
   {
     const values = _.values(this.props.aggregation)[0];
-    switch (this.state.viewMode)
+
+    switch (this.state.displayType)
     {
       case 'Table':
         return this.renderTableView(values);
@@ -293,11 +323,15 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
   }
 
-  public canBeTable()
+  public canBeTable(overrideAggregation?)
   {
+    const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
+    const values = _.values(aggregation)[0];
+    if (values.buckets !== undefined)
+    {
+      return values.buckets.length > 0;
+    }
     return true;
-    // const values = _.values(this.props.aggregation)[0];
-    // return values.buckets !== undefined;
   }
 
   public renderTableView(values)
@@ -316,23 +350,21 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
   }
 
-  public canBeHistogram()
+  public canBeHistogram(overrideAggregation?)
   {
-    // Check that values.values values are numbers
-    const values = _.values(this.props.aggregation)[0];
-    return values.buckets !== undefined || values.values !== undefined;
+    const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
+    const values = _.values(aggregation)[0];
+    return values.buckets !== undefined && values.buckets.length !== 0;
   }
 
   public renderHistogram(values)
   {
     if (this.canBeHistogram())
     {
-      const data = values.buckets !== undefined ? values.buckets : values.values;
       return (
         <AggregationHistogram
-          data={data}
+          data={values.buckets}
           colors={[Colors().active, Colors().activeHover]}
-          useBuckets={values.buckets !== undefined}
         />
       );
     }

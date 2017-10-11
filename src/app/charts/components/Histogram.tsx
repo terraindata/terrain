@@ -60,6 +60,7 @@ import Util from '../../util/Util';
 
 const xMargin = 45;
 const yMargin = 10;
+const labelSpacing = 26;
 
 const scaleMin = (scale) => scale.range()[0];
 const scaleMax = (scale) => scale.range()[scale.range().length - 1];
@@ -163,12 +164,12 @@ const Histogram = {
       .style('color', '#fff')
       .call(yLeftAxis);
 
-    // var bottomAxisTickFn: any = (tick, index: number): string => index == 0 || index == 10 ? "" : tick;
     const bottomAxis = d3.svg.axis();
     if (xLabels !== undefined && xLabels.length > 0)
     {
+      const numLabels = Math.min(1, (width / xLabels.length) / labelSpacing) * xLabels.length;
       bottomAxis.scale(scales.x)
-        .ticks(xLabels.length)
+        .ticks(Math.floor(numLabels))
         .tickFormat(function(d) { return xLabels[d]; })
         .orient('bottom');
     }
@@ -198,6 +199,7 @@ const Histogram = {
         return 'middle';
       });
 
+    // rotate axis labels if they are text (for legibility)
     if (xLabels !== undefined && xLabels.length > 0)
     {
       d3.select(el).select('.bottomAxis').selectAll('text')
@@ -205,6 +207,10 @@ const Histogram = {
         .attr('dx', '-.8em')
         .attr('dy', '.15em')
         .attr('transform', 'rotate(-65)');
+      const bottomAxis = d3.select(el).select('.bottomAxis');
+      const bottomAxisHeight = bottomAxis.node().getBBox().height;
+      d3.select(el).select('.histogram-chart')
+        .attr('style', `padding-bottom: ${bottomAxisHeight - 20}px`);
     }
   },
 

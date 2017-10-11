@@ -71,12 +71,12 @@ export type Hits = List<Hit>;
 
 class AggregationClass extends BaseClass
 {
-  public name: string;
   public displayType: string;
+  public expanded: boolean;
 }
 export type Aggregation = AggregationClass & IRecord<AggregationClass>;
 export const _Aggregation = (config: object = {}) =>
-  New<Aggregation>(new AggregationClass(config), config, true); // generates unique IDs
+  New<Aggregation>(new AggregationClass(config), config, true);
 
 export type Aggregations = List<Aggregation>;
 

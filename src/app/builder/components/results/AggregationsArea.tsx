@@ -118,7 +118,8 @@ class AggregationsArea extends TerrainComponent<Props>
     {
       if (aggsList.get(name) === undefined)
       {
-        aggsList = aggsList.set(name, 'Raw');
+        const aggInfo = { displayType: 'None', expanded: true };
+        aggsList = aggsList.set(name, aggInfo);
       }
     });
     return aggsList;

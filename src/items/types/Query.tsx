@@ -50,10 +50,10 @@ import { List, Map, Record } from 'immutable';
 
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import { Aggregation } from '../../app/builder/components/results/ResultTypes';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';
-
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
 class QueryC
@@ -86,7 +86,7 @@ class QueryC
   cardsAndCodeInSync: boolean = false;
 
   resultsViewMode: string = 'Hits';
-  aggregationList: Map<string, string> = Map<string, string>({});
+  aggregationList: Map<string, Aggregation> = Map<string, Aggregation>({});
 
   meta: IMMap<string, any> = Map<string, any>({});
 
@@ -113,7 +113,7 @@ export const _Query = (config?: object) =>
   config['meta'] = Map<string, any>(config['meta']);
   config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);
   config['tuningOrder'] = List<string>(config['tuningOrder']);
-  config['aggregationList'] = Map<string, string>(config['aggregationList']);
+  config['aggregationList'] = Map<string, Aggregation>(config['aggregationList']);
   const query = new Query_Record(config) as any as Query;
 
   return query;
