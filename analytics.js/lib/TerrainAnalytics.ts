@@ -80,4 +80,7 @@ const TerrainAnalytics = {
   },
 };
 
+// noinspection TypeScriptUnresolvedVariable
+window['TerrainAnalytics'] = TerrainAnalytics;
+
 export = TerrainAnalytics;

@@ -46,6 +46,4 @@ THE SOFTWARE.
 
 import * as TerrainAnalytics from './TerrainAnalytics';
 
-// noinspection TypeScriptUnresolvedVariable
-window['TerrainAnalytics'] = TerrainAnalytics;
 export = TerrainAnalytics;
