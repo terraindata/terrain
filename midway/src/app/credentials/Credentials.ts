@@ -1,0 +1,190 @@
+/*
+University of Illinois/NCSA Open Source License 
+
+Copyright (c) 2018 Terrain Data, Inc. and the authors. All rights reserved.
+
+Developed by: Terrain Data, Inc. and
+              the individuals who committed the code in this file.
+              https://github.com/terraindata/terrain
+                  
+Permission is hereby granted, free of charge, to any person 
+obtaining a copy of this software and associated documentation files 
+(the "Software"), to deal with the Software without restriction, 
+including without limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of the Software, 
+and to permit persons to whom the Software is furnished to do so, 
+subject to the following conditions:
+
+* Redistributions of source code must retain the above copyright notice, 
+  this list of conditions and the following disclaimers.
+
+* Redistributions in binary form must reproduce the above copyright 
+  notice, this list of conditions and the following disclaimers in the 
+  documentation and/or other materials provided with the distribution.
+
+* Neither the names of Terrain Data, Inc., Terrain, nor the names of its 
+  contributors may be used to endorse or promote products derived from
+  this Software without specific prior written permission.
+
+This license supersedes any copyright notice, license, or related statement
+following this comment block.  All files in this repository are provided
+under the same license, regardless of whether a corresponding comment block
+appears in them.  This license also applies retroactively to any previous
+state of the repository, including different branches and commits, which
+were made public on or after December 8th, 2018.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
+THE SOFTWARE.
+*/
+
+// Copyright 2017 Terrain Data, Inc.
+
+// NB: this file should never be exposed directly via API routes!
+// It must only be called from inside midway and exposed via those routes
+
+import aesjs = require('aes-js');
+import srs = require('secure-random-string');
+
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import { UserConfig } from '../users/Users';
+import * as Util from '../Util';
+import { versions } from '../versions/VersionRouter';
+
+// CREATE TABLE credentials (id integer PRIMARY KEY, createdBy integer NOT NULL, \
+// meta text NOT NULL, name text NOT NULL, permission integer, type text NOT NULL);
+
+export interface CredentialConfig
+{
+  id?: number;
+  createdBy: number;
+  meta: string;
+  name: string;
+  permissions?: number;
+  type: string;
+}
+
+export class Credentials
+{
+  private credentialTable: Tasty.Table;
+  private key: any;
+  private privateKey: string;
+
+  constructor()
+  {
+    this.credentialTable = new Tasty.Table(
+      'credentials',
+      ['id'],
+      [
+        'createdBy',
+        'meta',
+        'name',
+        'permissions',
+        'type',
+      ],
+    );
+    this.privateKey = `0VAtqVlzusw8nqA8TMoSfGHR3ik3dB-c9t4-gKUjD5iRbsWQWRzeL
+                       -6mBtRGWV4M2A7ZZryVT7-NZjTvzuY7qhjrZdJTv4iGPmcbta-3iL
+                       kgfEzY3QufFvm14dqtzfsCXhboiOC23idadrMNGlQwyJ783XlGwLB
+                       xDeGI01olmhg0oiNCeoGc_4zDrHq3wcgcwQ_mpZYAj9mJsv_OI_yD
+                       iN83Y_gDQCTzA9u3NdmmxquD2jSrR2fSKRokspxqBjb5`;
+    this.key = aesjs.utils.utf8.toBytes(this.privateKey);
+  }
+
+  public async get(id?: number, type?: string): Promise<CredentialConfig[]>
+  {
+    return new Promise<CredentialConfig[]>(async (resolve, reject) =>
+    {
+      const creds: CredentialConfig[] = id !== undefined ? (type !== undefined ?
+        await App.DB.select(this.credentialTable, [], { id, type }) as CredentialConfig[] :
+        await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[]) :
+        (type !== undefined ? await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[] :
+          await App.DB.select(this.credentialTable, [], {}) as CredentialConfig[]);
+      return resolve(await Promise.all(creds.map(async (cred) =>
+      {
+        cred.meta = await this._decrypt(cred.meta);
+        return cred;
+      })));
+    });
+  }
+
+  // returns a string of credentials that match given type
+  public async getByType(type?: string): Promise<string[]>
+  {
+    return new Promise<string[]>(async (resolve, reject) =>
+    {
+      const creds: CredentialConfig[] = type !== undefined ?
+        await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[] :
+        await App.DB.select(this.credentialTable, [], {}) as CredentialConfig[];
+      return resolve(await Promise.all(creds.map(async (cred) =>
+      {
+        return await this._decrypt(cred.meta);
+      })));
+    });
+  }
+
+  public async upsert(user: UserConfig, cred: CredentialConfig): Promise<CredentialConfig>
+  {
+    return new Promise<CredentialConfig>(async (resolve, reject) =>
+    {
+      // check privileges
+      if (user.isSuperUser === 0)
+      {
+        return reject('Cannot create/update credentials as non-super user.');
+      }
+
+      // if modifying existing credential, check for existence
+      if (cred.id !== undefined)
+      {
+        const creds: CredentialConfig[] = await this.get(cred.id);
+        if (creds.length === 0)
+        {
+          // cred id specified but cred not found
+          return reject('Invalid credential id passed');
+        }
+
+        const id = creds[0].id;
+        if (id === undefined)
+        {
+          return reject('Credential does not have an id');
+        }
+
+        // insert a version to save the past state of this item
+        await versions.create(user, 'credentials', id, creds[0]);
+
+        cred = Util.updateObject(creds[0], cred);
+      }
+
+      resolve(await App.DB.upsert(this.credentialTable, cred) as CredentialConfig);
+    });
+  }
+
+  private async _decrypt(msg: string, privateKey?: string): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      const key: any = privateKey !== undefined ? aesjs.utils.utf8.toBytes(privateKey) : this.key;
+      const msgBytes: any = aesjs.utils.hex.toBytes(msg);
+      const aesCtr: any = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+      return resolve(aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes)));
+    });
+  }
+
+  private async _encrypt(msg: string, privateKey?: string): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      const key: any = privateKey !== undefined ? aesjs.utils.utf8.toBytes(privateKey) : this.key;
+      const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
+      const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+      return resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
+    });
+  }
+}
+
+export default Credentials;
