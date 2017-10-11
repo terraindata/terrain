@@ -268,7 +268,7 @@ class AggregationComponent extends TerrainComponent<Props> {
                 <CopyToClipboard text={JSON.stringify(values, undefined, 2)} onCopy={this.handleTextCopied}>
                   <div className='clipboard-icon-wrapper'>
                     {
-                      tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')
+                      tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy JSON to Clipboard')
                     }
                   </div>
                 </CopyToClipboard>
