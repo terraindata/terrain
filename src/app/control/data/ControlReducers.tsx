@@ -49,6 +49,7 @@ import * as Immutable from 'immutable';
 import Ajax from 'util/Ajax';
 import ActionTypes from './ControlActionTypes';
 
+import { _SchedulerConfig, SchedulerConfig } from 'database/types/SchedulerConfig';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import * as _ from 'lodash';
 import { _ControlState, ControlState } from './ControlStore';
@@ -117,6 +118,29 @@ ControlReducer[ActionTypes.importExport.resetTemplateToken] =
       },
     );
     return state;
+  };
+
+ControlReducer[ActionTypes.importExport.fetchSchedules] =
+  (state, action) =>
+  {
+    Ajax.getAllScheduledJobs(
+      (schedulesArr) =>
+      {
+        const schedules: List<SchedulerConfig> = List<SchedulerConfig>(schedulesArr.map((schedule) =>
+        {
+          return _SchedulerConfig(_.extend({}, schedule));
+        },
+        ));
+        action.payload.setSchedules(schedules);
+      },
+    );
+    return state;
+  };
+
+ControlReducer[ActionTypes.importExport.setSchedules] =
+  (state, action) =>
+  {
+    return state.set('importExportScheduledJobs', action.payload.schedules);
   };
 
 const ControlReducerWrapper = (state: ControlState = _ControlState(), action) =>

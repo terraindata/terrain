@@ -53,6 +53,8 @@ const ControlActionTypes =
       fetchTemplates: '',
       deleteTemplate: '',
       resetTemplateToken: '',
+      fetchSchedules: '',
+      setSchedules: '',
     },
   };
 

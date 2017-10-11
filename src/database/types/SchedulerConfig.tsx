@@ -44,78 +44,45 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:variable-name no-shadowed-variable
+
 import * as Immutable from 'immutable';
-import * as React from 'react';
+const { List } = Immutable;
 
-import TerrainComponent from 'common/components/TerrainComponent';
-import { SchedulerConfig } from 'database/types/SchedulerConfig';
-import * as FileImportTypes from 'fileImport/FileImportTypes';
-import TemplateControlList from './TemplateControlList';
-
-import { SchemaStore } from 'schema/data/SchemaStore';
-import { Server, ServerMap } from 'schema/SchemaTypes';
-import ControlActions from '../../data/ControlActions';
-import ControlStore from '../../data/ControlStore';
-
-import './ImportExportControl.less';
-
-const { List, Map } = Immutable;
-type Template = FileImportTypes.Template;
-
-export interface Props
+// identical to the SchedulerConfigC defined in Scheduler.ts (id is declared by IRecord)
+class SchedulerConfigC
 {
-  placeholder?: string;
+  public active?: number;                   // whether the schedule is running (different from currentlyRunning)
+  public archived?: number;                 // whether the schedule has been archived (deleted) or not
+  public currentlyRunning?: number;         // whether the job is currently running
+  public jobId?: number;                    // corresponds to job ID
+  public jobType?: string;                  // import or export etc.
+  public paramsJob?: object;                // parameters passed for the job, excluding info like filename
+  public paramsScheduleArr?: any[];         // parameters passed for the schedule
+  public paramsScheduleStr?: string;        // JSON stringified representation of paramsScheduleArr
+  public schedule: string;                  // cronjob format for when the schedule should run
+  public sort?: string;                     // for regex expression file matching, which end of the list should be used
+  public transport?: object;                // sftp and relevant parameters, https, local filesystem, etc.
+  public transportStr?: string;             // JSON stringified representation of transport
 }
 
-class ImportExportControl extends TerrainComponent<Props>
-{
-  public state: {
-    servers: ServerMap;
-    templates: List<Template>;
-    schedules: List<SchedulerConfig>;
-  } = {
-    servers: Map<string, Server>(),
-    templates: List([]),
-    schedules: List([]),
+const SchedulerConfig_Record = Immutable.Record(new SchedulerConfigC());
+export interface SchedulerConfig extends SchedulerConfigC, IRecord<SchedulerConfig> { }
+export const _SchedulerConfig =
+  (config: {
+    active?: number;
+    archived?: number;
+    currentlyRunning?: number;
+    jobId?: number;
+    jobType?: string;
+    paramsJob?: object;
+    paramsScheduleArr?: any[];
+    paramsScheduleStr?: string;
+    schedule: string;
+    sort?: string;
+    transport?: object;
+    transportStr?: string;
+  }) =>
+  {
+    return new SchedulerConfig_Record(config) as any as SchedulerConfig;
   };
-
-  constructor(props)
-  {
-    super(props);
-    this._subscribe(ControlStore, {
-      stateKey: 'templates',
-      storeKeyPath: ['importExportTemplates'],
-    });
-    this._subscribe(ControlStore, {
-      stateKey: 'schedules',
-      storeKeyPath: ['importExportScheduledJobs'],
-    });
-    this._subscribe(SchemaStore, {
-      stateKey: 'servers',
-      storeKeyPath: ['servers'],
-    });
-  }
-
-  public componentDidMount()
-  {
-    ControlActions.importExport.fetchTemplates();
-    ControlActions.importExport.fetchSchedules();
-  }
-
-  public render()
-  {
-    return (
-      <div className='import-export-token-control-page'>
-        <div className='import-export-control-title'>
-          Manage Import and Export Templates
-        </div>
-        <TemplateControlList
-          templates={this.state.templates}
-          servers={this.state.servers}
-        />
-      </div>
-    );
-  }
-}
-
-export default ImportExportControl;

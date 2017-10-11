@@ -987,6 +987,24 @@ export const Ajax =
       );
       return;
     },
+
+    getAllScheduledJobs(
+      onLoad: (schedules: object[]) => void,
+    )
+    {
+      const payload: object = {};
+
+      Ajax.req(
+        'get',
+        'scheduler/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+      );
+    },
+
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1

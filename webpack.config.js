@@ -69,6 +69,7 @@ module.exports =
             builder: path.resolve(__dirname, 'src/app/builder'),
             charts: path.resolve(__dirname, 'src/app/charts'),
             common: path.resolve(__dirname, 'src/app/common'),
+            database: path.resolve(__dirname, 'src/database'),
             deploy: path.resolve(__dirname, 'src/app/deploy'),
             fileImport: path.resolve(__dirname, 'src/app/fileImport'),
             images: path.resolve(__dirname, 'src/images'),

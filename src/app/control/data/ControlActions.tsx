@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { SchedulerConfig } from 'database/types/SchedulerConfig';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import ActionTypes from './ControlActionTypes';
 import { ControlStore } from './ControlStore';
@@ -83,6 +84,16 @@ const ControlActions =
           handleResetSuccess,
           handleResetError,
           fetchTemplates: ControlActions.importExport.fetchTemplates,
+        }),
+
+      setSchedules:
+      (schedules: List<SchedulerConfig>) =>
+        $(ActionTypes.importExport.setSchedules, { schedules }),
+
+      fetchSchedules:
+      () =>
+        $(ActionTypes.importExport.fetchSchedules, {
+          setSchedules: ControlActions.importExport.setSchedules,
         }),
     },
 

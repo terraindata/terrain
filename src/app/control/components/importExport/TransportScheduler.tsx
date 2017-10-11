@@ -179,8 +179,8 @@ export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidation
 
   const typeText = template.export ? 'Export' : 'Import';
   const preposition = template.export ? 'to' : 'from';
-  const readable = `${typeText} ${preposition} ${filename !== undefined && filename !== '' ?
-    filename : '<please enter filename>'} ${cronReadable}`;
+  const readable = `${typeText} ${preposition} "${filename !== undefined && filename !== '' ?
+    filename : '<please enter filename>'}" ${cronReadable}`;
   const valid = errors.length === 0 && requests.length === 0;
 
   return {
@@ -267,7 +267,7 @@ class TransportScheduler extends TerrainComponent<Props>
 
   public handleConfirm()
   {
-    // TODO:
+    
   }
 
   /*
@@ -395,7 +395,7 @@ class TransportScheduler extends TerrainComponent<Props>
     const columnStyle = getStyle('width', inputElementWidth);
     const { fileTypeIndex } = this.state;
     const typeText = template.export ? 'Export' : 'Import';
-    const showObjectKeyField = fileTypeIndex === FileTypes.JSON_TYPE_OBJECT && template.export;
+    const showObjectKeyField = Boolean(template.export && fileTypeIndex === FileTypes.JSON_TYPE_OBJECT);
     // TODO: show import object key when import supports object key
     return (
       <div>
@@ -468,19 +468,9 @@ class TransportScheduler extends TerrainComponent<Props>
     return <span style={fontColor(Colors().error)}> {errors.join(', ')} </span>;
   }
 
-  public renderConfirmSection(template: Template)
+  public renderConfirmSection(validationData: ScheduleValidationData)
   {
-    const { valid, readable, errors, requests } =
-      validateScheduleSettings(
-        {
-          template,
-          fileType: fileTypeOptions.get(this.state.fileTypeIndex),
-          filename: this.state.filenameValue,
-          objectKey: this.state.objectKeyValue,
-          variantId: this.state.selectedIds.get(2),
-          sftpId: this.state.sftpIndex, // TODO: fix this once Jason's connection object route gets added
-          cronArgs: [this.state.cronParam0, this.state.cronParam1, this.state.cronParam2, this.state.cronParam3, this.state.cronParam4]
-        });
+    const { valid, readable, errors, requests } = validationData;
 
     return (
       <div className='scheduler-form-confirmation-row'>
@@ -492,6 +482,16 @@ class TransportScheduler extends TerrainComponent<Props>
   public render()
   {
     const template: Template = this.state.index !== -1 ? this.props.templates.get(this.state.index) : undefined;
+    const validationData = validateScheduleSettings({
+      template,
+      fileType: fileTypeOptions.get(this.state.fileTypeIndex),
+      filename: this.state.filenameValue,
+      objectKey: this.state.objectKeyValue,
+      variantId: this.state.selectedIds.get(2),
+      sftpId: this.state.sftpIndex, // TODO: fix this once Jason's connection object route gets added
+      cronArgs: [this.state.cronParam0, this.state.cronParam1, this.state.cronParam2, this.state.cronParam3, this.state.cronParam4]
+    });
+
     return (
       <Modal
         open={this.props.modalOpen}
@@ -504,6 +504,7 @@ class TransportScheduler extends TerrainComponent<Props>
         onConfirm={this.handleConfirm}
         closeOnConfirm={false}
         confirmButtonText={'Schedule'}
+        confirmDisabled={!validationData.valid}
       >
         <div className='transport-scheduler' style={backgroundColor(Colors().altBg2)}>
           <TemplateSelector
@@ -522,7 +523,7 @@ class TransportScheduler extends TerrainComponent<Props>
             template !== undefined && this.renderConnectionOptions(template)
           }
           {
-            this.renderConfirmSection(template)
+            this.renderConfirmSection(validationData)
           }
         </div>
       </Modal>
