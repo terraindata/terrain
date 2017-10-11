@@ -781,11 +781,7 @@ export const Themes: { [name: string]: Theme } =
     DARK, LIGHT,
   };
 
-export const ThemesInt =
-  {
-    DARK: 0,
-    LIGHT: 1,
-  };
+export const ThemesArray = ['DARK', 'LIGHT'];
 
 const curTheme = 'DARK';
 
