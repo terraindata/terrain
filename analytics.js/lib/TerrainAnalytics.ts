@@ -48,7 +48,12 @@ import jsurl = require('jsurl');
 declare let ClientJS: any;
 import 'clientjs';
 
-const host = 'http://localhost:3001/v1/';
+// Use the 'data-server' attribute to specify the backend server
+// <script src='...' data-server='http://<terrain-analytics-domain>/sigint/v1/'>
+
+const scripts = document.getElementsByTagName('script');
+const currentScript = scripts[scripts.length - 1];
+const server = currentScript.getAttribute('data-server');
 
 const TerrainAnalytics = {
   eventIDs: {
@@ -75,7 +80,7 @@ const TerrainAnalytics = {
     }
 
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', host + '?' + paramString, true);
+    xhr.open('GET', (server || '/') + '?' + paramString, true);
     xhr.send();
   },
 };
