@@ -100,7 +100,7 @@ class AggregationsArea extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (this.props.resultsState.aggregations !== nextProps.resultsState.aggregations)
+    if (!_.isEqual(this.props.resultsState.aggregations, nextProps.resultsState.aggregations))
     {
       Actions.change(List(this._keyPath('query', 'aggregationList')),
         this.parseAggs(nextProps.resultsState.aggregations, nextProps.query), true);
@@ -113,15 +113,20 @@ class AggregationsArea extends TerrainComponent<Props>
     {
       return Map({});
     }
-    let aggsList = query.aggregationList !== undefined ? query.aggregationList : Map({});
+    let aggsList = Map({});
     _.keys(aggregations).forEach((name) =>
     {
-      if (aggsList.get(name) === undefined)
+      if (query.aggregationList.get(name) === undefined)
       {
         const aggInfo = { displayType: 'None', expanded: true };
         aggsList = aggsList.set(name, aggInfo);
       }
+      else
+      {
+        aggsList = aggsList.set(name, query.aggregationList.get(name))
+      }
     });
+    console.log(aggsList);
     return aggsList;
   }
 
@@ -143,7 +148,6 @@ class AggregationsArea extends TerrainComponent<Props>
     let infoAreaContent: any = null;
     let resultsContent: any = null;
     let resultsAreOutdated: boolean = false;
-
     if (this.isDatabaseEmpty())
     {
       resultsAreOutdated = true;
