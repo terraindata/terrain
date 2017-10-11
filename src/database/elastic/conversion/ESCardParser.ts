@@ -88,7 +88,7 @@ export default class ESCardParser extends ESParser
     // reset cards' errors
     forAllCards(rootCard, (card: Block) =>
     {
-      if (card.static.errors.length > 0)
+      if (card.static.errors && card.static.errors.length > 0)
       {
         card.static.errors.length = 0;
       }
