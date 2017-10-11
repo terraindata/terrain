@@ -77,8 +77,8 @@ export default function ElasticToCards(
     try
     {
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'root');
-      const cards = BlockUtils.reconcileCards(query.cards, List([rootCard]));
+      const rootCard = parseCardFromValueInfo(rootValueInfo) as Block;
+      const cards = BlockUtils.reconcileCards(query.cards, rootCard.cards);
       return query
         .set('cards', cards)
         .set('cardsAndCodeInSync', true);

@@ -72,7 +72,7 @@ export default class ESCardParser extends ESParser
     }
     const rootCard = cards.get(0);
     // assert this is the root card
-    if (rootCard['key'] !== 'root')
+    if (rootCard['type'] !== 'eqlbody')
     {
       return;
     }
@@ -208,6 +208,7 @@ export default class ESCardParser extends ESParser
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
     this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESClause '));
     return valueInfo;
   }
@@ -216,6 +217,7 @@ export default class ESCardParser extends ESParser
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
     this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESReferenceClause '));
     return valueInfo;
   }
@@ -224,6 +226,7 @@ export default class ESCardParser extends ESParser
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
     this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESAnyClause '));
     return valueInfo;
   }
@@ -232,6 +235,7 @@ export default class ESCardParser extends ESParser
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
     const theValue = [];
     valueInfo.card = block;
     valueInfo.jsonType = ESJSONType.array;
@@ -251,8 +255,8 @@ export default class ESCardParser extends ESParser
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
     const theValue = {};
-    valueInfo.card = block;
     valueInfo.jsonType = ESJSONType.object;
     valueInfo.value = theValue;
     block.static.valueInfo = valueInfo;
@@ -321,10 +325,12 @@ export default class ESCardParser extends ESParser
     if (valueInfo)
     {
       valueInfo.card = block;
+      valueInfo.clause = block.static.clause;
     } else
     {
       valueInfo = new ESValueInfo();
       valueInfo.card = block;
+      valueInfo.clause = block.static.clause;
       if (parser.hasError())
       {
         for (const e of parser.getErrors())
