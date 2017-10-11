@@ -100,7 +100,7 @@ export async function authenticateStreamPersistentAccessToken(req: http.Incoming
     const { files, fields } = await asyncBusboy(req);
     if (fields['templateId'] === undefined || fields['persistentAccessToken'] === undefined)
     {
-      return reject('Missing one or more auth fields. ' + fields['templateId'] + ' , ' + fields['persistentAccessToken']);
+      return reject(`Missing one or more auth fields. ${fields['templateId']} , ${fields['persistentAccessToken']}`);
     }
     const template: ImportTemplateConfig[] =
       await templates.loginWithPersistentAccessToken(Number(fields['templateId']), fields['persistentAccessToken']);
