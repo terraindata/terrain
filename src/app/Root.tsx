@@ -46,12 +46,21 @@ THE SOFTWARE.
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import TerrainTools from 'util/TerrainTools';
 import AppRouter from './AppRouter';
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
 import ColorsStore from './colors/data/ColorsStore';
 import LibraryStore from './library/data/LibraryStore';
 import TerrainStore from './store/TerrainStore';
 import UserStore from './users/data/UserStore';
+
+declare global
+{
+  interface Window
+  {
+    TerrainTools: any;
+  }
+}
 
 if (!DEV)
 {
@@ -90,6 +99,10 @@ if (!DEV)
 
     return false;
   };
+} else
+{
+  window.TerrainTools = TerrainTools;
+  TerrainTools.welcome();
 }
 
 ReactDOM.render(
