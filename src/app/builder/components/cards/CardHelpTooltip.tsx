@@ -74,8 +74,10 @@ export default class CardHelpTooltip extends TerrainComponent<Props>
       getStyle('borderBottomColor', Colors().highlight),
     );
     let errorMessage = '';
-    if (this.props.staticInfo.errors.length > 0)
+    let cardHasError = false;
+    if (this.props.staticInfo.errors && this.props.staticInfo.errors.length > 0)
     {
+      cardHasError = true;
       for (const e of this.props.staticInfo.errors)
       {
         errorMessage += e;
@@ -93,13 +95,12 @@ export default class CardHelpTooltip extends TerrainComponent<Props>
           {this.props.staticInfo.description}
         </div>
         {
-          errorMessage &&
+          cardHasError &&
           <div className='card-errorMessage'>
             {errorMessage}
           </div>
         }
         {
-          this.props.staticInfo.errors.length > 0 &&
           <div className='card-help-link'>
             <a target='_blank' href={this.props.staticInfo.url}> Learn More </a>
           </div>
