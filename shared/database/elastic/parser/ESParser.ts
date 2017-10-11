@@ -44,91 +44,50 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import ESParserError from 'shared/database/elastic/parser/ESParserError';
+import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
 
-import * as Util from '../Util';
-import { ItemConfig, Items } from './Items';
-export * from './Items';
-
-const Router = new KoaRouter();
-export const items: Items = new Items();
-
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+abstract class ESParser
 {
-  let getItems: ItemConfig[] = [];
-  if (ctx.query.type !== undefined)
-  {
-    const typeArr: string[] = ctx.query.type.split(',');
-    for (const type of typeArr)
-    {
-      getItems = getItems.concat(await items.select([], { type }));
-    }
-  }
-  else
-  {
-    winston.info('getting all items');
-    getItems = await items.get();
-  }
-  ctx.body = getItems;
-});
+  protected errors: ESParserError[];
+  protected value: any;
+  protected valueInfo: ESValueInfo | null;
 
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting item ID ' + String(ctx.params.id));
-  ctx.body = await items.get(ctx.params.id);
-});
-
-Router.get('/live', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  let typeArr: number[] = [];
-  if (ctx.query.ids !== undefined)
+  public constructor()
   {
-    typeArr = ctx.query.ids.split(',').map((val) =>
-    {
-      const parsed: number = parseInt(val as string, 10);
-      if (isNaN(parsed))
-      {
-        throw new Error('Invalid input format for ids');
-      }
-      return parsed;
-    });
-  }
-  ctx.body = await items.getLiveVariants(typeArr);
-});
-
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('create items');
-  const item: ItemConfig = ctx.request.body.body;
-  Util.verifyParameters(item, ['name']);
-  if (item.id !== undefined)
-  {
-    throw new Error('Invalid parameter item ID');
+    this.errors = [];
   }
 
-  ctx.body = await items.upsert(ctx.state.user, item);
-});
-
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('modify items');
-  const item: ItemConfig = ctx.request.body.body;
-  Util.verifyParameters(item, ['name']);
-  if (item.id === undefined)
+  public hasError(): boolean
   {
-    item.id = Number(ctx.params.id);
-  }
-  else
-  {
-    if (item.id !== Number(ctx.params.id))
-    {
-      throw new Error('Item ID does not match the supplied id in the URL');
-    }
+    return this.errors.length > 0;
   }
 
-  ctx.body = await items.upsert(ctx.state.user, item);
-});
+  public getErrors(): ESParserError[]
+  {
+    return this.errors;
+  }
 
-export default Router;
+  /**
+   * @returns {any} the parsed root value
+   */
+  public getValue(): any
+  {
+    return this.value;
+  }
+
+  /**
+   * @returns {any} the parsed root value info
+   */
+  public getValueInfo(): ESValueInfo
+  {
+    return this.valueInfo as ESValueInfo;
+  }
+
+  public accumulateError(error: ESParserError): void
+  {
+    this.errors.push(error);
+  }
+}
+
+export default ESParser;

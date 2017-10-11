@@ -44,60 +44,15 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as util from 'util';
-import * as winston from 'winston';
-import ESInterpreter from '../../../database/elastic/parser/ESInterpreter';
-import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
-import ESParserError from '../../../database/elastic/parser/ESParserError';
-import { makePromiseCallback } from '../../Utils';
-
-function getExpectedFile(): string
+class DeployVariant
 {
-  return __filename.split('.')[0] + '.expected';
-}
-
-let expected;
-
-beforeAll(async (done) =>
-{
-  // TODO: get rid of this monstrosity once @types/winston is updated.
-  (winston as any).level = 'debug';
-
-  const expectedString: any = await new Promise((resolve, reject) =>
+  /**
+   * @returns {string} the variant's live deployed name in ES
+   */
+  public static getVariantDeployedName(variant: object): string
   {
-    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
-  });
-
-  expected = JSON.parse(expectedString);
-  done();
-});
-
-function testParse(testName: string,
-  testString: string,
-  expectedValue: any,
-  expectedErrors: ESParserError[] = [])
-{
-  winston.info('testing "' + testName + '": "' + testString + '"');
-  const interpreter: ESInterpreter = new ESInterpreter(testString);
-  const parser: ESJSONParser = interpreter.parser as ESJSONParser;
-
-  if (parser.getErrors().length > 0)
-  {
-    winston.info(util.inspect(parser.getErrors(), false, 16));
-    winston.info(util.inspect(parser.getValueInfo(), false, 16));
+    return 'terrain_' + (variant['id'] as string);
   }
-
-  expect(parser.getValue()).toEqual(expectedValue);
-  expect(parser.getErrors()).toEqual(expectedErrors);
 }
 
-test('parse valid json objects', () =>
-{
-  Object.getOwnPropertyNames(expected).forEach(
-    (testName: string) =>
-    {
-      const testValue: any = expected[testName];
-      testParse(testName, JSON.stringify(testValue), testValue);
-    });
-});
+export default DeployVariant;

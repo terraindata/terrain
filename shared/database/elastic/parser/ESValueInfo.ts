@@ -70,6 +70,8 @@ export default class ESValueInfo
    */
   public tokens: ESParserToken[];
 
+  public card: any;
+
   /**
    * When this value is the result of substituting in a parameter,
    * this is set to the name of that parameter.
@@ -144,6 +146,11 @@ export default class ESValueInfo
   public get errors(): ESParserError[]
   {
     return this._errors;
+  }
+
+  public hasError(): boolean
+  {
+    return this._errors.length > 0;
   }
 
   public attachError(error: ESParserError): void
