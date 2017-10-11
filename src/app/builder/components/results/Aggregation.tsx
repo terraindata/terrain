@@ -123,6 +123,10 @@ class AggregationComponent extends TerrainComponent<Props> {
       // If the type of the aggregation changed, update the display type accordingly (because supported
       // agg types might be different)
       const currentAgg = nextProps.query.aggregationList.get(nextProps.name);
+      if (currentAgg === undefined)
+      {
+        return;
+      }
       if ((currentAgg.displayType === 'Table' && !this.canBeTable(nextProps.aggregation)) ||
         (currentAgg.displayType === 'Histogram' && !this.canBeHistogram(nextProps.aggregation))
       )
@@ -139,10 +143,14 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public updateInitialDisplay(aggregation, currentAgg, name)
   {
+    if (currentAgg === undefined)
+    {
+      return;
+    }
     const displayType = currentAgg.displayType !== 'None' ? currentAgg.displayType : this.getBestDisplayType(aggregation);
     this.setState({
       displayType,
-      expanded: currentAgg !== undefined ? currentAgg.expanded : true,
+      expanded: currentAgg.expanded,
     });
     currentAgg.displayType = displayType;
     Actions.change(List(this._keyPath('query', 'aggregationList', name)), currentAgg, true);
@@ -368,7 +376,11 @@ class AggregationComponent extends TerrainComponent<Props> {
   {
     const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
     const values = _.values(aggregation)[0];
-    return values.buckets !== undefined && values.buckets.length !== 0;
+    let canBeHistogram = values.buckets !== undefined && values.buckets.length !== 0;
+    _.keys(values).map((key) => {
+      console.log(key);
+    })
+    return canBeHistogram;
   }
 
   public renderHistogram(values)
