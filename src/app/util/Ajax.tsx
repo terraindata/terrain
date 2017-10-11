@@ -1138,7 +1138,7 @@ export const Ajax =
     {
       return Ajax.req(
         'get',
-        'events/time',
+        'time',
         {},
         (response: any) =>
         {
