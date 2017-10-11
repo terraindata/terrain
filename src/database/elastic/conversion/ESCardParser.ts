@@ -50,17 +50,19 @@ import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseTyp
 import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESJSONType from '../../../../shared/database/elastic/parser/ESJSONType';
+import ESParser from '../../../../shared/database/elastic/parser/ESParser';
 import ESParserError from '../../../../shared/database/elastic/parser/ESParserError';
 import ESPropertyInfo from '../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 
+import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 
 import { BuilderStore } from 'builder/data/BuilderStore';
 
 import { toInputMap } from '../../../blocks/types/Input';
 
-export default class ESCardParser
+export default class ESCardParser extends ESParser
 {
   public static parseAndUpdateCards(cards: List<Block>): void
   {
@@ -83,6 +85,14 @@ export default class ESCardParser
     }
     const params: { [name: string]: any; } = toInputMap(inputs);
     const cardInterpreter = new ESInterpreter(parsedCard, params);
+    // reset cards' errors
+    forAllCards(rootCard, (card: Block) =>
+    {
+      if (card.static.errors.length > 0)
+      {
+        card.static.errors.length = 0;
+      }
+    });
     parsedCard.getValueInfo().recursivelyVisit((element: ESValueInfo) =>
     {
       const card: Block = element.card;
@@ -96,26 +106,14 @@ export default class ESCardParser
         {
           card.static.errors.push(e.message);
         }
-      } else
-      {
-        // no error
-        if (card.static.errors.length > 0)
-        {
-          card.static.errors.length = 0;
-        }
       }
       return true;
     });
   }
 
-  // parsing errors
-  private errors: ESParserError[];
-  private value: any;
-  private valueInfo: ESValueInfo | null;
-
   public constructor(rootCard: Block)
   {
-    this.errors = [];
+    super();
     if (!rootCard)
     {
       // empty
@@ -131,27 +129,6 @@ export default class ESCardParser
     {
       this.accumulateErrorOnValueInfo(null, 'Failed to parse cards, message: ' + String(e.message));
     }
-  }
-
-  public hasError(): boolean
-  {
-    return this.errors.length > 0;
-  }
-
-  /**
-   * @returns {any} the parsed root value
-   */
-  public getValue(): any
-  {
-    return this.value;
-  }
-
-  /**
-   * @returns {any} the parsed root value info
-   */
-  public getValueInfo(): ESValueInfo
-  {
-    return this.valueInfo as ESValueInfo;
   }
 
   public accumulateError(error: ESParserError): void
@@ -284,6 +261,7 @@ export default class ESCardParser
       {
         const keyName = card['key'];
         const childName = new ESJSONParser(JSON.stringify(keyName)).getValueInfo();
+        childName.card = card;
         const childValue = this.parseCard(card);
         if (childValue !== null)
         {

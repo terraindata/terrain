@@ -245,9 +245,7 @@ const EQLSpec: ESClause[] =
           {
             'query:query':
             {
-              'bool:elasticFilter': null,
             },
-            'sort:elasticScore': null,
           },
         },
         suggestions: ['body', 'index', 'type', 'from', 'size'],

@@ -44,13 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESParser from 'shared/database/elastic/parser/ESParser';
 import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
 import ESParserError from './ESParserError';
 import ESValueInfo from './ESValueInfo';
-
-import ESCardParser from '../../../../src/database/elastic/conversion/ESCardParser';
 
 export const ESInterpreterDefaultConfig = new EQLConfig();
 
@@ -62,7 +61,7 @@ export default class ESInterpreter
 {
   public config: EQLConfig; // query language description
   public params: { [name: string]: null | ESClause }; // input parameter clause types
-  public parser: ESJSONParser | ESCardParser; // source parser
+  public parser: ESParser; // source parser
   public rootValueInfo: ESValueInfo;
   public errors: ESParserError[];
 
@@ -78,7 +77,7 @@ export default class ESInterpreter
    * @param config the spec config to use
    * @param params parameter map to use
    */
-  public constructor(query: string | ESJSONParser | ESCardParser,
+  public constructor(query: string | ESParser,
     params: { [name: string]: any } = {},
     config: EQLConfig = ESInterpreterDefaultConfig)
   {
@@ -88,19 +87,20 @@ export default class ESInterpreter
 
     if (typeof query === 'string')
     {
-      this.parser = new ESJSONParser(query);
+      this.parser = new ESJSONParser(query) as ESParser;
       if (this.parser.hasError())
       {
         this.accumulateError(null, 'Failed to parse the query ' + query);
         return;
       }
       this.rootValueInfo = this.parser.getValueInfo();
-    } else if (query instanceof ESCardParser || query instanceof ESJSONParser)
+    } else if (query instanceof ESParser)
     {
       this.parser = query;
       this.rootValueInfo = this.parser.getValueInfo();
     } else
     {
+      this.parser = null;
       this.accumulateError(null, 'The input must be a query, an ESJSONParser object, or an ESValueInfo');
       return;
     }
