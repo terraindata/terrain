@@ -120,6 +120,20 @@ class AggregationComponent extends TerrainComponent<Props> {
         isSingleValue: isSingle,
         singleValue: value,
       });
+      // If the type of the aggregation changed, update the display type accordingly (because supported
+      // agg types might be different)
+      const currentAgg = nextProps.query.aggregationList.get(nextProps.name);
+      if ((currentAgg.displayType === 'Table' && !this.canBeTable(nextProps.aggregation)) ||
+        (currentAgg.displayType === 'Histogram' && !this.canBeHistogram(nextProps.aggregation))
+      )
+      {
+        const displayType = this.getBestDisplayType(nextProps.aggregation);
+        this.setState({
+          displayType,
+        });
+        currentAgg.displayType = displayType;
+        Actions.change(List(this._keyPath('query', 'aggregationList', name)), currentAgg, true);
+      }
     }
   }
 

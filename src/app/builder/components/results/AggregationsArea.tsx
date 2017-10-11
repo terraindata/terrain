@@ -100,7 +100,7 @@ class AggregationsArea extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (this.props.resultsState.aggregations !== nextProps.resultsState.aggregations)
+    if (!_.isEqual(this.props.resultsState.aggregations, nextProps.resultsState.aggregations))
     {
       Actions.change(List(this._keyPath('query', 'aggregationList')),
         this.parseAggs(nextProps.resultsState.aggregations, nextProps.query), true);
@@ -143,7 +143,6 @@ class AggregationsArea extends TerrainComponent<Props>
     let infoAreaContent: any = null;
     let resultsContent: any = null;
     let resultsAreOutdated: boolean = false;
-
     if (this.isDatabaseEmpty())
     {
       resultsAreOutdated = true;
