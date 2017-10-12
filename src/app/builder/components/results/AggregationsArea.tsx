@@ -123,10 +123,9 @@ class AggregationsArea extends TerrainComponent<Props>
       }
       else
       {
-        aggsList = aggsList.set(name, query.aggregationList.get(name))
+        aggsList = aggsList.set(name, query.aggregationList.get(name));
       }
     });
-    console.log(aggsList);
     return aggsList;
   }
 

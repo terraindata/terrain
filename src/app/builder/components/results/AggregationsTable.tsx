@@ -51,7 +51,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import './AggsTable.less';
+import './AggregationsTable.less';
 
 import * as ReactDataGrid from 'react-data-grid';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
@@ -69,7 +69,7 @@ export interface Props
 }
 
 @Radium
-export class AggsTableComponent extends TerrainComponent<Props>
+export class AggregationsTableComponent extends TerrainComponent<Props>
 {
   public state: {
     rows: any;
@@ -237,12 +237,12 @@ export class AggsTableComponent extends TerrainComponent<Props>
   }
 }
 
-export const AggsTable = Dimensions({
+export const AggregationsTable = Dimensions({
   elementResize: true,
   containerStyle: {
     height: 'auto',
 
   },
-})(AggsTableComponent);
+})(AggregationsTableComponent);
 
-export default AggsTable;
+export default AggregationsTable;

@@ -61,16 +61,18 @@ import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import Histogram from './../../../charts/components/Histogram';
+import Dropdown from './../../../common/components/Dropdown';
 import Menu, { MenuOption } from './../../../common/components/Menu';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
 import AggregationHistogram from './AggregationHistogram';
-import AggsTable from './AggsTable';
+import AggregationsTable from './AggregationsTable';
 import { Aggregation as AggregationClass } from './ResultTypes';
 
 const ClipboardIcon = require('images/icon_clipboard.svg');
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
+const ExportIcon = require('images/icon_import.svg');
 
 export interface Props
 {
@@ -108,7 +110,7 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (!_.isEqual(this.props.query.aggregationList.get(this.props.name), 
+    if (!_.isEqual(this.props.query.aggregationList.get(this.props.name),
       nextProps.query.aggregationList.get(nextProps.name)))
     {
       const currentAgg = nextProps.query.aggregationList.get(nextProps.name);
@@ -201,47 +203,27 @@ class AggregationComponent extends TerrainComponent<Props> {
     });
   }
 
-  public changeDisplaytoTable()
+  public handleDisplayTypeChange(index: number)
   {
-    this.changeDisplayType('Table');
+    const displayTypeOptions = this.getDropdownOptions();
+    this.changeDisplayType(displayTypeOptions[index]);
   }
 
-  public changeDisplayToHistogram()
+  public getDropdownOptions()
   {
-    this.changeDisplayType('Histogram');
-  }
-
-  public changeDisplayToRaw()
-  {
-    this.changeDisplayType('Raw');
-  }
-
-  public getMenuOptions(): Immutable.List<MenuOption>
-  {
-    const options = [{
-      text: 'Raw',
-      onClick: this.changeDisplayToRaw,
-      selected: this.state.displayType === 'Raw',
-    }];
+    const options = ['Raw'];
 
     if (this.canBeHistogram() !== undefined)
     {
-      options.push({
-        text: 'Histogram',
-        onClick: this.changeDisplayToHistogram,
-        selected: this.state.displayType === 'Histogram',
-      });
+      options.push('Histogram');
     }
 
     if (this.canBeTable())
     {
-      options.push({
-        text: 'Table',
-        onClick: this.changeDisplaytoTable,
-        selected: this.state.displayType === 'Table',
-      });
+      options.push('Table');
     }
-    return List(options);
+
+    return options;
   }
 
   public handleTextCopied()
@@ -252,6 +234,7 @@ class AggregationComponent extends TerrainComponent<Props> {
   public renderAgg()
   {
     const values = _.values(this.props.aggregation)[0];
+    const displayTypeOptions = this.getDropdownOptions();
     return (
       <div
         className={classNames({
@@ -274,30 +257,34 @@ class AggregationComponent extends TerrainComponent<Props> {
         {
           this.state.expanded ?
             (
-              <div className='aggregation-title-bar-options'>
+              <div className='aggregation-title-bar-options' key={this.props.name}>
                 {
                   this.canBeTable() ?
-                    <div
+                    tooltip(<ExportIcon
                       className='aggregation-title-bar-export'
                       onClick={this.exportData}
                       key='results-area-export'
-                      style={link()}
-                    >
-                      Export
-                  </div>
+                    />, 'Export CSV')
+
                     :
                     ''
                 }
-                <CopyToClipboard text={JSON.stringify(values, undefined, 2)} onCopy={this.handleTextCopied}>
-                  <div className='clipboard-icon-wrapper'>
-                    {
-                      tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy JSON to Clipboard')
-                    }
-                  </div>
-                </CopyToClipboard>
-                <Menu
-                  options={this.getMenuOptions()}
-                />
+                <div>
+                  <CopyToClipboard text={JSON.stringify(values, undefined, 2)} onCopy={this.handleTextCopied}>
+                    <div className='clipboard-icon-wrapper'>
+                      {
+                        tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy JSON to Clipboard')
+                      }
+                    </div>
+                  </CopyToClipboard>
+                  <Dropdown
+                    options={List(displayTypeOptions)}
+                    selectedIndex={displayTypeOptions.indexOf(this.state.displayType)}
+                    canEdit={true}
+                    onChange={this.handleDisplayTypeChange}
+                    className='aggregation-display-type-dropdown'
+                  />
+                </div>
               </div>
             )
             :
@@ -363,7 +350,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     {
       return (
         <div className='aggregation-table'>
-          <AggsTable
+          <AggregationsTable
             tableData={values}
             useBuckets={values.buckets !== undefined}
 
@@ -373,7 +360,8 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
   }
 
-  public findKey(obj, k) {
+  public findKey(obj, k)
+  {
     const keys = _.keys(obj);
     for (let i = 0; i < keys.length; i++)
     {
