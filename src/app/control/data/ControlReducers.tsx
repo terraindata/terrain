@@ -174,7 +174,7 @@ ControlReducer[ActionTypes.importExport.setCredentials] =
 ControlReducer[ActionTypes.importExport.createSchedule] =
   (state, action) =>
   {
-    const params = _.pick(action.payload, ['jobType', 'paramsJob', 'schedule', 'sort', 'transport']);
+    const params = _.pick(action.payload, ['name', 'jobType', 'paramsJob', 'schedule', 'sort', 'transport']);
     Ajax.createSchedule(params,
       (resp: object[]) =>
       {

@@ -96,6 +96,7 @@ export interface ScheduleValidationData
 
 export interface ScheduleArgs
 {
+  scheduleName: string;
   template: Template;
   fileType: string;
   filename: string;
@@ -116,7 +117,7 @@ enum FileTypes // TODO make this more type robust to track FileImportTypes.FILE_
 
 export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidationData
 {
-  const { cronArgs, filename, fileType, objectKey, credentialId, template, variantId } = args;
+  const { scheduleName, cronArgs, filename, fileType, objectKey, credentialId, template, variantId } = args;
 
   const errors = [];
   const requests = [];
@@ -156,6 +157,11 @@ export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidation
     {
       errors.push('Import with object keys is not supported');
     }
+  }
+
+  if (scheduleName === '' || scheduleName === undefined)
+  {
+    requests.push('Please Provide a Name for this Schedule');
   }
 
   if (filename === '' || filename === undefined)
@@ -210,6 +216,7 @@ class TransportScheduler extends TerrainComponent<Props>
     selectedIds: List<number>;
     objectKeyValue: string;
     filenameValue: string;
+    scheduleNameValue: string;
     cronParam0: string;
     cronParam1: string;
     cronParam2: string;
@@ -222,6 +229,7 @@ class TransportScheduler extends TerrainComponent<Props>
     selectedIds: List([-1, -1, -1]),
     objectKeyValue: '',
     filenameValue: '',
+    scheduleNameValue: 'schedule 1',
     cronParam0: defaultCRONparams[0],
     cronParam1: defaultCRONparams[1],
     cronParam2: defaultCRONparams[2],
@@ -285,6 +293,7 @@ class TransportScheduler extends TerrainComponent<Props>
     const credential: CredentialConfig = this.props.credentials.get(this.state.credentialIndex);
     const args = {
       template,
+      scheduleName: this.state.scheduleNameValue,
       fileType: fileTypeOptions.get(this.state.fileTypeIndex),
       filename: this.state.filenameValue,
       objectKey: this.state.objectKeyValue,
@@ -299,7 +308,7 @@ class TransportScheduler extends TerrainComponent<Props>
 
       const paramsJob = {
         dbid: template.dbid,
-        fileType: args.fileType,
+        filetype: args.fileType,
         templateId: template.templateId,
       };
       if (template.export)
@@ -314,6 +323,7 @@ class TransportScheduler extends TerrainComponent<Props>
         filename: this.state.filenameValue,
       };
       ControlActions.importExport.createSchedule(
+        this.state.scheduleNameValue,
         jobType,
         paramsJob,
         cronStr,
@@ -370,83 +380,101 @@ class TransportScheduler extends TerrainComponent<Props>
   {
     const inputStyle = getStyle('borderRadius', '1px');
     return (
-      <div className='headless-form-block'>
-        <div className='headless-form-column'>
-          <div className='headless-form-label'>
-            Minutes
+      <div>
+        <div className='headless-form-block'>
+          <div className='headless-form-column'>
+            <div className='headless-form-label'>
+              Scheduled Job Name
+            </div>
+            <div className='headless-form-input'>
+              <input
+                value={this.state.scheduleNameValue}
+                onChange={this._setStateWrapperPath('scheduleNameValue', 'target', 'value')}
+                style={inputStyle}
+              />
+            </div>
           </div>
-          <div className='headless-form-input'>
-            <input
-              value={this.state.cronParam0}
-              onChange={this._setStateWrapperPath('cronParam0', 'target', 'value')}
-              style={inputStyle}
-            />
-          </div>
+          <div className='headless-form-column'/>
+          <div className='headless-form-column'/>
         </div>
-        <div className='headless-form-column'>
-          <div className='headless-form-label'>
-            Hours
+        <div className='headless-form-block'>
+          <div className='headless-form-column'>
+            <div className='headless-form-label'>
+              Minutes
+            </div>
+            <div className='headless-form-input'>
+              <input
+                value={this.state.cronParam0}
+                onChange={this._setStateWrapperPath('cronParam0', 'target', 'value')}
+                style={inputStyle}
+              />
+            </div>
           </div>
-          <div className='headless-form-input'>
-            <input
-              value={this.state.cronParam1}
-              onChange={this._setStateWrapperPath('cronParam1', 'target', 'value')}
-              style={inputStyle}
-            />
+          <div className='headless-form-column'>
+            <div className='headless-form-label'>
+              Hours
+            </div>
+            <div className='headless-form-input'>
+              <input
+                value={this.state.cronParam1}
+                onChange={this._setStateWrapperPath('cronParam1', 'target', 'value')}
+                style={inputStyle}
+              />
+            </div>
           </div>
-        </div>
-        <div className='headless-form-column'>
-          <div className='headless-form-label'>
-            Day(s) of Month
+          <div className='headless-form-column'>
+            <div className='headless-form-label'>
+              Day(s) of Month
+            </div>
+            <div className='headless-form-input'>
+              <input
+                value={this.state.cronParam2}
+                onChange={this._setStateWrapperPath('cronParam2', 'target', 'value')}
+                style={inputStyle}
+              />
+            </div>
           </div>
-          <div className='headless-form-input'>
-            <input
-              value={this.state.cronParam2}
-              onChange={this._setStateWrapperPath('cronParam2', 'target', 'value')}
-              style={inputStyle}
-            />
+          <div className='headless-form-column'>
+            <div className='headless-form-label'>
+              Month(s) of Year
+            </div>
+            <div className='headless-form-input'>
+              <input
+                value={this.state.cronParam3}
+                onChange={this._setStateWrapperPath('cronParam3', 'target', 'value')}
+                style={inputStyle}
+              />
+            </div>
           </div>
-        </div>
-        <div className='headless-form-column'>
-          <div className='headless-form-label'>
-            Month(s) of Year
+          <div className='headless-form-column'>
+            <div className='headless-form-label'>
+              Day(s) of Week
+            </div>
+            <div className='headless-form-input'>
+              <input
+                value={this.state.cronParam4}
+                onChange={this._setStateWrapperPath('cronParam4', 'target', 'value')}
+                style={inputStyle}
+              />
+            </div>
           </div>
-          <div className='headless-form-input'>
-            <input
-              value={this.state.cronParam3}
-              onChange={this._setStateWrapperPath('cronParam3', 'target', 'value')}
-              style={inputStyle}
-            />
-          </div>
-        </div>
-        <div className='headless-form-column'>
-          <div className='headless-form-label'>
-            Day(s) of Week
-          </div>
-          <div className='headless-form-input'>
-            <input
-              value={this.state.cronParam4}
-              onChange={this._setStateWrapperPath('cronParam4', 'target', 'value')}
-              style={inputStyle}
-            />
-          </div>
-        </div>
-        <div className='headless-form-column'>
-          <div className='headless-form-label'>
-            <div className='scheduler-help-spacer' />
-          </div>
-          <div className='headless-form-input scheduler-help-wrapper'>
-            {
-              tooltip(
-                <HelpIcon className='scheduler-help-icon' />,
-                {
-                  html: helpTooltipElement,
-                  position: 'right',
-                  interactive: true,
-                  trigger: 'click',
-                },
-              )
-            }
+          <div className='headless-form-column'>
+            <div className='headless-form-label'>
+              <div className='scheduler-help-spacer' />
+            </div>
+            <div className='headless-form-input scheduler-help-wrapper'>
+              {
+                tooltip(
+                  <HelpIcon className='scheduler-help-icon' />,
+                  {
+                    html: helpTooltipElement,
+                    position: 'right',
+                    interactive: true,
+                    trigger: 'click',
+                  },
+                )
+              }
+            </div>
           </div>
         </div>
       </div>
@@ -552,6 +580,7 @@ class TransportScheduler extends TerrainComponent<Props>
     const credential = this.props.credentials.get(this.state.credentialIndex);
     const validationData = validateScheduleSettings({
       template,
+      scheduleName: this.state.scheduleNameValue,
       fileType: fileTypeOptions.get(this.state.fileTypeIndex),
       filename: this.state.filenameValue,
       objectKey: this.state.objectKeyValue,

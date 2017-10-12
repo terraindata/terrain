@@ -1027,6 +1027,7 @@ export const Ajax =
 
     createSchedule(
       params: {
+        name: string,
         jobType: string,
         paramsJob: object,
         schedule: string,

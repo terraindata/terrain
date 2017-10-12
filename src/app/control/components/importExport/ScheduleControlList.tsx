@@ -122,7 +122,8 @@ class ScheduleControlList extends TerrainComponent<Props>
   [
     ['ID', (schedule, index) => schedule.id],
     ['Job Type', (schedule, index) => schedule.jobType],
-    ['Schedule', (schedule, index) => cronstrue.toString(schedule.schedule)],
+    ['Scheduled Job Name', (schedule, index) => schedule.name],
+    ['Schedule Settings', (schedule, index) => cronstrue.toString(schedule.schedule)],
     ['Transfer Type', (schedule, index) => schedule.transport.type],
     ['Transfer Connection ID', (schedule, index) => schedule.transport.id],
     ['Transfer Filename', (schedule, index) => schedule.transport.filename],

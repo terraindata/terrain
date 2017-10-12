@@ -108,8 +108,9 @@ const ControlActions =
         }),
 
       createSchedule:
-      (jobType: string, paramsJob: object, schedule: string, sort: string, transport: object, onLoad, onError) =>
+      (scheduleName: string, jobType: string, paramsJob: object, schedule: string, sort: string, transport: object, onLoad, onError) =>
         $(ActionTypes.importExport.createSchedule, {
+          name: scheduleName,
           jobType,
           paramsJob,
           schedule,

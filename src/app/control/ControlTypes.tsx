@@ -53,6 +53,7 @@ const { List } = Immutable;
 class SchedulerConfigC
 {
   public id: ID = -1;
+  public name: string = '';                      // name of the schedule
   public active?: number = 0;                   // whether the schedule is running (different from currentlyRunning)
   public archived?: number = 0;                 // whether the schedule has been archived (deleted) or not
   public currentlyRunning?: number = 0;         // whether the job is currently running
@@ -71,6 +72,7 @@ const SchedulerConfig_Record = Immutable.Record(new SchedulerConfigC());
 export interface SchedulerConfig extends SchedulerConfigC, IRecord<SchedulerConfig> { }
 export const _SchedulerConfig =
   (config: {
+    name: string;
     active?: number;
     archived?: number;
     currentlyRunning?: number;
