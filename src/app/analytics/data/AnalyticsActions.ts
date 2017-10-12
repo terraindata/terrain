@@ -55,35 +55,54 @@ import { ItemStatus } from '../../../items/types/Item';
 
 import Ajax from './../../util/Ajax';
 
-function calculateDateRange(dateRangeId: number)
+function calculateDateRange(dateRangeId: number, callback)
 {
-  const currentDate = new Date();
-  const timestamp = currentDate.getTime();
-
   let start = null;
   let end = null;
 
-  switch (dateRangeId)
-  {
-    case 1: // Today
-      start = new Date(2015, 5, 2);
-      end = new Date(2015, 5, 2, 23, 59, 59);
-      break;
-    case 2:
-      start = new Date(2015, 5, 2);
-      end = new Date(2015, 5, 9);
-      break;
-    case 3:
-      start = new Date(2015, 5, 1);
-      end = new Date(2015, 5, 31);
-      break;
-    default:
-      start = new Date(2015, 5, 2);
-      end = new Date(2015, 5, 20);
-      break;
-  }
+  Ajax.getServerTime(
+    (serverTimeResponse) =>
+    {
+      const { serverTime } = serverTimeResponse;
+      const serverTimeDate = new Date(serverTime);
+      const serverTimeTimestamp = serverTimeDate.getTime();
 
-  return { start, end };
+      end = serverTimeDate.toISOString(); // Today at current time
+      switch (dateRangeId)
+      {
+        case 1: // Today
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()));
+          start = start.toISOString(); // Today at 0:00 UTC
+          break;
+        case 2:
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()) - (7 * 86400000))
+            .toISOString(); // 7 days since today
+          break;
+        case 3:
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()) - (30 * 86400000))
+            .toISOString(); // 7 days since today
+          break;
+        default:
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()))
+            .toISOString(); // Fetch today's analytics by default
+          break;
+      }
+
+      callback({ start, end });
+    },
+  );
 }
 
 const Actions =
@@ -97,35 +116,43 @@ const Actions =
       errorCallback?: (response) => void,
     ) => (dispatch, getState, api) =>
       {
-        const numericDateRangeId = parseInt(dateRangeId, 10);
-        const dateRange = calculateDateRange(numericDateRangeId);
-        const start = dateRange.start;
-        const end = dateRange.end;
-        let aggregation = '';
-        if (metricId.length === 2)
-        {
-          aggregation = 'rate';
-        } else
-        {
-          aggregation = 'histogram';
-        }
+        dispatch({ type: ActionTypes.fetchStart });
 
-        return api.getAnalytics(
-          variantIds,
-          start,
-          end,
-          metricId,
-          intervalId,
-          aggregation,
-          (variantAnalytics) =>
+        const numericDateRangeId = parseInt(dateRangeId, 10);
+        calculateDateRange(
+          numericDateRangeId,
+          (dateRange) =>
           {
-            dispatch({
-              type: ActionTypes.fetch,
-              payload: {
-                analytics: variantAnalytics,
+            const start = dateRange.start;
+            const end = dateRange.end;
+
+            let aggregation = '';
+            if (metricId.length === 2)
+            {
+              aggregation = 'rate';
+            } else
+            {
+              aggregation = 'histogram';
+            }
+
+            return api.getAnalytics(
+              variantIds,
+              start,
+              end,
+              metricId,
+              intervalId,
+              aggregation,
+              (variantAnalytics) =>
+              {
+                dispatch({
+                  type: ActionTypes.fetch,
+                  payload: {
+                    analytics: variantAnalytics,
+                  },
+                });
+                callback && callback(variantAnalytics);
               },
-            });
-            callback && callback(variantAnalytics);
+            );
           },
         );
       },

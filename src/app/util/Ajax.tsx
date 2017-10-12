@@ -1228,8 +1228,8 @@ export const Ajax =
     {
       const args = {
         variantid: variantIds.join(','),
-        start: start.toISOString(),
-        end: end.toISOString(),
+        start,
+        end,
         eventid: metricId.toString(),
         interval: intervalId,
         agg: aggregation,
@@ -1252,6 +1252,29 @@ export const Ajax =
           }
         },
         { onError, urlArgs: args });
+    },
+
+    getServerTime(
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void,
+    )
+    {
+      return Ajax.req(
+        'get',
+        'time',
+        {},
+        (response: any) =>
+        {
+          try
+          {
+            onLoad(response);
+          }
+          catch (e)
+          {
+            onError && onError(response as any);
+          }
+        },
+        { onError });
     },
   };
 
