@@ -57,10 +57,10 @@ import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import { ServerMap } from 'schema/SchemaTypes';
 import { MidwayError } from 'shared/error/MidwayError';
-import Ajax from 'util/Ajax';
 import ControlActions from '../../data/ControlActions';
 import { ControlList, HeaderConfig } from '../ControlList';
 
@@ -83,6 +83,7 @@ export interface Props
 {
   templates: List<Template>;
   servers: ServerMap;
+  credentials: List<CredentialConfig>;
 }
 
 enum ConfirmActionType
@@ -174,11 +175,6 @@ class TemplateControlList extends TerrainComponent<Props>
         onClick: () => this.requestResetTemplateToken(template, index),
         icon: <AccessIcon className='template-menu-option-icon' />,
       },
-      {
-        text: 'View Raw',
-        onClick: () => undefined,
-        icon: <ViewIcon className='template-menu-option-icon' />,
-      },
     ]);
   }
 
@@ -259,6 +255,22 @@ class TemplateControlList extends TerrainComponent<Props>
     this.setState({
       responseModalOpen: true,
       responseModalMessage: `Error deleting template: ${readable}`,
+      responseModalTitle: 'Error',
+      responseModalIsError: true,
+    });
+  }
+
+  public handleScheduleSuccess()
+  {
+    notificationManager.addNotification('Success', 'Successfully Added Scheduled Job', 'info', 4);
+  }
+
+  public handleScheduleError(error: string)
+  {
+    const readable = MidwayError.fromJSON(error).getDetail();
+    this.setState({
+      responseModalOpen: true,
+      responseModalMessage: `Error creating schedule: ${readable}`,
       responseModalTitle: 'Error',
       responseModalIsError: true,
     });
@@ -380,10 +392,13 @@ class TemplateControlList extends TerrainComponent<Props>
           this.state.schedulerModalOpen &&
           <TransportScheduler
             templates={this.props.templates}
+            credentials={this.props.credentials}
             index={this.state.currentActiveIndex}
             getServerName={this.getServerName}
             modalOpen={this.state.schedulerModalOpen}
             onClose={this.schedulerCloseModal}
+            handleScheduleSuccess={this.handleScheduleSuccess}
+            handleScheduleError={this.handleScheduleError}
           />
         }
       </div>

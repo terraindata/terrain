@@ -48,8 +48,9 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import { SchedulerConfig } from 'database/types/SchedulerConfig';
+import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
+import ScheduleControlList from './ScheduleControlList';
 import TemplateControlList from './TemplateControlList';
 
 import { SchemaStore } from 'schema/data/SchemaStore';
@@ -73,10 +74,12 @@ class ImportExportControl extends TerrainComponent<Props>
     servers: ServerMap;
     templates: List<Template>;
     schedules: List<SchedulerConfig>;
+    credentials: List<CredentialConfig>;
   } = {
     servers: Map<string, Server>(),
     templates: List([]),
     schedules: List([]),
+    credentials: List([]),
   };
 
   constructor(props)
@@ -90,6 +93,10 @@ class ImportExportControl extends TerrainComponent<Props>
       stateKey: 'schedules',
       storeKeyPath: ['importExportScheduledJobs'],
     });
+    this._subscribe(ControlStore, {
+      stateKey: 'credentials',
+      storeKeyPath: ['importExportCredentials'],
+    });
     this._subscribe(SchemaStore, {
       stateKey: 'servers',
       storeKeyPath: ['servers'],
@@ -100,6 +107,7 @@ class ImportExportControl extends TerrainComponent<Props>
   {
     ControlActions.importExport.fetchTemplates();
     ControlActions.importExport.fetchSchedules();
+    ControlActions.importExport.fetchCredentials();
   }
 
   public render()
@@ -112,6 +120,15 @@ class ImportExportControl extends TerrainComponent<Props>
         <TemplateControlList
           templates={this.state.templates}
           servers={this.state.servers}
+          credentials={this.state.credentials}
+        />
+        <div className='import-export-control-title'>
+          Manage Schedules
+        </div>
+        <ScheduleControlList
+          scheduledJobs={this.state.schedules}
+          servers={this.state.servers}
+          credentials={this.state.credentials}
         />
       </div>
     );

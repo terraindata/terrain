@@ -44,26 +44,27 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:variable-name no-shadowed-variable
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import * as Immutable from 'immutable';
 const { List } = Immutable;
 
-// identical to the SchedulerConfigC defined in Scheduler.ts (id is declared by IRecord)
+// duplicate of SchedulerConfig defined in Scheduler.ts
 class SchedulerConfigC
 {
-  public active?: number;                   // whether the schedule is running (different from currentlyRunning)
-  public archived?: number;                 // whether the schedule has been archived (deleted) or not
-  public currentlyRunning?: number;         // whether the job is currently running
-  public jobId?: number;                    // corresponds to job ID
-  public jobType?: string;                  // import or export etc.
-  public paramsJob?: object;                // parameters passed for the job, excluding info like filename
-  public paramsScheduleArr?: any[];         // parameters passed for the schedule
-  public paramsScheduleStr?: string;        // JSON stringified representation of paramsScheduleArr
-  public schedule: string;                  // cronjob format for when the schedule should run
-  public sort?: string;                     // for regex expression file matching, which end of the list should be used
-  public transport?: object;                // sftp and relevant parameters, https, local filesystem, etc.
-  public transportStr?: string;             // JSON stringified representation of transport
+  public id: ID = -1;
+  public active?: number = 0;                   // whether the schedule is running (different from currentlyRunning)
+  public archived?: number = 0;                 // whether the schedule has been archived (deleted) or not
+  public currentlyRunning?: number = 0;         // whether the job is currently running
+  public jobId?: number = -1;                    // corresponds to job ID
+  public jobType?: string = '';                  // import or export etc.
+  public paramsJob?: object = {};                // parameters passed for the job, excluding info like filename
+  public paramsScheduleArr?: any[] = [];         // parameters passed for the schedule
+  public paramsScheduleStr?: string = '';        // JSON stringified representation of paramsScheduleArr
+  public schedule: string = '';                  // cronjob format for when the schedule should run
+  public sort?: string = 'asc';                     // for regex expression file matching, which end of the list should be used
+  public transport?: object = {};                // sftp and relevant parameters, https, local filesystem, etc.
+  public transportStr?: string = '';             // JSON stringified representation of transport
 }
 
 const SchedulerConfig_Record = Immutable.Record(new SchedulerConfigC());
@@ -85,4 +86,28 @@ export const _SchedulerConfig =
   }) =>
   {
     return new SchedulerConfig_Record(config) as any as SchedulerConfig;
+  };
+
+class CredentialConfigC
+{
+  public id: ID = -1;
+  public createdBy: number = 0;
+  public meta: string = '';
+  public name: string = '';
+  public permissions?: number = 0;
+  public type: string = '';
+}
+
+const CredentialConfig_Record = Immutable.Record(new CredentialConfigC());
+export interface CredentialConfig extends CredentialConfigC, IRecord<CredentialConfig> { }
+export const _CredentialConfig =
+  (config: {
+    createdBy: number;
+    meta: string;
+    name: string;
+    permissions?: number;
+    type: string;
+  }) =>
+  {
+    return new CredentialConfig_Record(config) as any as CredentialConfig;
   };

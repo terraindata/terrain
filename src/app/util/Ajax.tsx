@@ -976,7 +976,7 @@ export const Ajax =
       {
         onLoad(resp);
       };
-      Ajax.req(
+      return Ajax.req(
         'post',
         'templates/updateAccessToken/',
         { id: String(templateId) },
@@ -985,7 +985,6 @@ export const Ajax =
           onError,
         },
       );
-      return;
     },
 
     getAllScheduledJobs(
@@ -1001,6 +1000,75 @@ export const Ajax =
         (response: object[]) =>
         {
           onLoad(response);
+        },
+      );
+    },
+
+    getCredentialConfigs(
+      type: string,
+      onLoad: (credentials: object[]) => void,
+    )
+    {
+      const payload = {};
+
+      Ajax.req(
+        'get',
+        'scheduler/connections/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+        {
+          urlArgs: { type },
+        },
+      );
+    },
+
+    createSchedule(
+      params: {
+        jobType: string,
+        paramsJob: object,
+        schedule: string,
+        sort: string,
+        transport: object,
+      },
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      return Ajax.req(
+        'post',
+        'scheduler/create/',
+        params,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+        {
+          onError,
+        },
+      );
+    },
+
+    deleteSchedule(
+      id: ID,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const payload = {};
+
+      return Ajax.req(
+        'post',
+        'scheduler/delete/' + String(id),
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+        {
+          onError,
         },
       );
     },

@@ -55,6 +55,10 @@ const ControlActionTypes =
       resetTemplateToken: '',
       fetchSchedules: '',
       setSchedules: '',
+      fetchCredentials: '',
+      setCredentials: '',
+      createSchedule: '',
+      deleteSchedule: '',
     },
   };
 

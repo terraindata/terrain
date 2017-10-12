@@ -128,7 +128,7 @@ class Modal extends TerrainComponent<Props>
         fontColor(Colors().activeText),
         backgroundColor(Colors().activeHover),
         borderColor(Colors().altBg2),
-        getStyle('cursor', 'default')
+        getStyle('cursor', 'default'),
       ]
       :
       [

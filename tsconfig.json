@@ -19,6 +19,7 @@
             "builder*": ["src/app/builder/*"],
             "charts*": ["src/app/charts/*"],
             "common*": ["src/app/common/*"],
+            "control*": ["src/app/control/*"],
             "database*": ["src/database/*"],
             "deploy*": ["src/app/deploy/*"],
             "fileImport*": ["src/app/fileImport/*"],

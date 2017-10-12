@@ -52,7 +52,7 @@ import * as Redux from 'redux';
 import * as ReduxActions from 'redux-actions';
 import thunk from 'redux-thunk';
 
-import { SchedulerConfig } from 'database/types/SchedulerConfig';
+import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import Util from 'util/Util';
 import ControlReducers from './ControlReducers';
@@ -65,6 +65,7 @@ class ControlStateC
 {
   public importExportTemplates: List<Template> = List([]);
   public importExportScheduledJobs: List<SchedulerConfig> = List([]);
+  public importExportCredentials: List<CredentialConfig> = List([]);
 }
 
 const ControlState_Record = Immutable.Record(new ControlStateC());

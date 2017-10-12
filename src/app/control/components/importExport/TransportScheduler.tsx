@@ -61,6 +61,7 @@ import { notificationManager } from 'common/components/InAppNotification';
 import Modal from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import VariantSelector from 'library/components/VariantSelector';
 import { LibraryStore } from 'library/data/LibraryStore';
@@ -76,10 +77,13 @@ type Template = FileImportTypes.Template;
 export interface Props
 {
   templates: List<Template>;
+  credentials: List<CredentialConfig>;
   index: number;
   getServerName: (dbid) => string;
   modalOpen: boolean;
   onClose: () => void;
+  handleScheduleSuccess: (resp: object[]) => void;
+  handleScheduleError: (err: string) => void;
 }
 
 export interface ScheduleValidationData
@@ -96,8 +100,8 @@ export interface ScheduleArgs
   fileType: string;
   filename: string;
   objectKey?: string;
-  variantId?: number;
-  sftpId: number;
+  variantId?: ID;
+  credentialId: ID;
   cronArgs: string[];
 }
 
@@ -112,7 +116,7 @@ enum FileTypes // TODO make this more type robust to track FileImportTypes.FILE_
 
 export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidationData
 {
-  const { cronArgs, filename, fileType, objectKey, sftpId, template, variantId } = args;
+  const { cronArgs, filename, fileType, objectKey, credentialId, template, variantId } = args;
 
   const errors = [];
   const requests = [];
@@ -128,6 +132,10 @@ export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidation
     if (template.templateId === -1 || template.templateId === undefined)
     {
       errors.push('Template has no ID');
+    }
+    if (template.dbid === -1 || template.dbid === undefined)
+    {
+      errors.push('Template has an invalid database');
     }
   }
 
@@ -155,9 +163,9 @@ export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidation
     requests.push('Please Enter a Filename');
   }
 
-  if (sftpId === undefined || sftpId === -1)
+  if (credentialId === undefined || credentialId === -1)
   {
-    requests.push('Please Select an SFTP Connection');
+    requests.push('Please Select a Transfer Connection');
   }
 
   if (cronArgs.length !== 5)
@@ -187,7 +195,7 @@ export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidation
     valid,
     readable,
     requests,
-    errors
+    errors,
   };
 
 }
@@ -198,7 +206,7 @@ class TransportScheduler extends TerrainComponent<Props>
   public state: {
     index: number;
     fileTypeIndex: number;
-    sftpIndex: number;
+    credentialIndex: number;
     selectedIds: List<number>;
     objectKeyValue: string;
     filenameValue: string;
@@ -210,7 +218,7 @@ class TransportScheduler extends TerrainComponent<Props>
   } = {
     index: this.props.index,
     fileTypeIndex: 0,
-    sftpIndex: 0,
+    credentialIndex: 0,
     selectedIds: List([-1, -1, -1]),
     objectKeyValue: '',
     filenameValue: '',
@@ -220,6 +228,12 @@ class TransportScheduler extends TerrainComponent<Props>
     cronParam3: defaultCRONparams[3],
     cronParam4: defaultCRONparams[4],
   };
+
+  constructor(props)
+  {
+    super(props);
+    this.computeCredentialNames = memoizeOne(this.computeCredentialNames);
+  }
 
   public componentDidMount()
   {
@@ -267,27 +281,80 @@ class TransportScheduler extends TerrainComponent<Props>
 
   public handleConfirm()
   {
-    
+    const template: Template = this.state.index !== -1 ? this.props.templates.get(this.state.index) : undefined;
+    const credential: CredentialConfig = this.props.credentials.get(this.state.credentialIndex);
+    const args = {
+      template,
+      fileType: fileTypeOptions.get(this.state.fileTypeIndex),
+      filename: this.state.filenameValue,
+      objectKey: this.state.objectKeyValue,
+      variantId: this.state.selectedIds.get(2),
+      credentialId: credential && credential.id,
+      cronArgs: [this.state.cronParam0, this.state.cronParam1, this.state.cronParam2, this.state.cronParam3, this.state.cronParam4],
+    };
+    const validationData = validateScheduleSettings(args);
+    if (validationData.valid)
+    {
+      const jobType = template.export ? 'export' : 'import';
+
+      const paramsJob = {
+        dbid: template.dbid,
+        fileType: args.fileType,
+        templateId: template.templateId,
+      };
+      if (template.export)
+      {
+        paramsJob['variantId'] = args.variantId;
+      }
+
+      const cronStr = `${args.cronArgs[0]} ${args.cronArgs[1]} ${args.cronArgs[2]} ${args.cronArgs[3]} ${args.cronArgs[4]}`;
+      const transport = {
+        type: credential.type,
+        id: credential.id,
+        filename: this.state.filenameValue,
+      };
+      ControlActions.importExport.createSchedule(
+        jobType,
+        paramsJob,
+        cronStr,
+        'asc',
+        transport,
+        this.props.handleScheduleSuccess,
+        this.props.handleScheduleError,
+      );
+    }
+    this.props.onClose();
+  }
+
+  // is memoized
+  public computeCredentialNames(credentials)
+  {
+    return this.props.credentials.map((item) =>
+    {
+      return `(${item.type}) ${item.id}: ${item.name}`;
+    }).toList();
   }
 
   /*
-   *  SFTP info
+   *  Connections (SFTP, email, etc)
    */
   public renderConnectionOptions(template: Template)
   {
+    const credentials = this.computeCredentialNames(this.props.credentials);
+
     const columnStyle = getStyle('width', inputElementWidth);
     return (
       <div className='headless-form-block'>
         <div className='headless-form-column' style={columnStyle}>
           <div className='headless-form-label'>
-            SFTP Name
+            Transfer Connection
           </div>
           <div className='headless-form-input'>
             <Dropdown
-              options={temporarySFTPNames}
-              selectedIndex={this.state.sftpIndex}
+              options={credentials}
+              selectedIndex={this.state.credentialIndex}
               canEdit={true}
-              onChange={this._setStateWrapper('sftpIndex')}
+              onChange={this._setStateWrapper('credentialIndex')}
               openDown={true}
             />
           </div>
@@ -377,7 +444,7 @@ class TransportScheduler extends TerrainComponent<Props>
                   position: 'right',
                   interactive: true,
                   trigger: 'click',
-                }
+                },
               )
             }
           </div>
@@ -460,7 +527,7 @@ class TransportScheduler extends TerrainComponent<Props>
 
   public renderRequests(requests: string[])
   {
-    return <span> Missing Fields: {requests.join(', ')} </span>
+    return <span> Missing Fields: {requests.join(', ')} </span>;
   }
 
   public renderErrors(errors: string[])
@@ -482,14 +549,15 @@ class TransportScheduler extends TerrainComponent<Props>
   public render()
   {
     const template: Template = this.state.index !== -1 ? this.props.templates.get(this.state.index) : undefined;
+    const credential = this.props.credentials.get(this.state.credentialIndex);
     const validationData = validateScheduleSettings({
       template,
       fileType: fileTypeOptions.get(this.state.fileTypeIndex),
       filename: this.state.filenameValue,
       objectKey: this.state.objectKeyValue,
       variantId: this.state.selectedIds.get(2),
-      sftpId: this.state.sftpIndex, // TODO: fix this once Jason's connection object route gets added
-      cronArgs: [this.state.cronParam0, this.state.cronParam1, this.state.cronParam2, this.state.cronParam3, this.state.cronParam4]
+      credentialId: credential && credential.id,
+      cronArgs: [this.state.cronParam0, this.state.cronParam1, this.state.cronParam2, this.state.cronParam3, this.state.cronParam4],
     });
 
     return (
@@ -531,7 +599,6 @@ class TransportScheduler extends TerrainComponent<Props>
   }
 }
 
-const temporarySFTPNames = List(['Sample SFTP 1', 'SFTP 2', 'SFTP 3']);
 const inputElementWidth = '220px';
 const scheduleHelpText =
   `Schedule parameters should follow CRON expression rules. Some common ones:
@@ -545,7 +612,7 @@ Examples:
  - "* * * * *" runs the job every minute.
  - "30 18 * * SUN" runs the job at 6:30pm every Sunday.
 `;
-const helpTooltipElement = <div className='scheduler-help-text'> {scheduleHelpText} </div>
+const helpTooltipElement = <div className='scheduler-help-text'> {scheduleHelpText} </div>;
 const defaultCRONparams = ['0', '0', '*', '*', 'SUN'];
 
 export default TransportScheduler;
