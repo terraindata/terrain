@@ -58,18 +58,19 @@ import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 
+import { notificationManager } from 'common/components/InAppNotification';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import TQLEditor from 'tql/components/TQLEditor';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
+import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
 import HitsTable from './HitsTable';
 import { MAX_HITS, ResultsState } from './ResultTypes';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { notificationManager } from 'common/components/InAppNotification';
-import { tooltip } from './../../../common/components/tooltip/Tooltips';
 
 const RESULTS_PAGE_SIZE = 20;
 const ClipboardIcon = require('images/icon_clipboard.svg');
@@ -197,23 +198,15 @@ class ResultsColumn extends TerrainComponent<Props>
     notificationManager.addNotification('Result Copied to Clipboard', '', 'info', 4);
   }
 
-  // <CopyToClipboard text={formatted} onCopy={this.handleTextCopied}>
-  //         <div className='clipboard-icon-wrapper'>
-  //           {
-  //             tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')
-  //           }
-  //         </div>
-  //       </CopyToClipboard>
-
   public renderRawResult()
   {
-    // Add loading message
     const formatted = JSON.stringify(this.props.resultsState.rawResult, null, 2);
     return (
-      <div>
-        <pre className='results-column-raw-results'>
-          {formatted}
-        </pre>
+      <div className='results-column-raw-results'>
+        <TQLEditor
+          tql={formatted}
+          canEdit={false}
+        />
       </div>
     );
   }

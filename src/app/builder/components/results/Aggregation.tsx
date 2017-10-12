@@ -49,7 +49,9 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import FadeInOut from 'common/components/FadeInOut';
 import { notificationManager } from 'common/components/InAppNotification';
+import StyleTag from 'common/components/StyleTag';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -69,8 +71,6 @@ import './Aggregation.less';
 import AggregationHistogram from './AggregationHistogram';
 import AggregationsTable from './AggregationsTable';
 import { Aggregation as AggregationClass } from './ResultTypes';
-import FadeInOut from 'common/components/FadeInOut';
-import StyleTag from 'common/components/StyleTag';
 
 const ClipboardIcon = require('images/icon_clipboard.svg');
 const ExportIcon = require('images/icon_import.svg');
@@ -452,7 +452,5 @@ class AggregationComponent extends TerrainComponent<Props> {
       </div>
     );
   }
-}
-
 }
 export default AggregationComponent;

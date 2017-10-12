@@ -109,7 +109,7 @@ class AggregationsArea extends TerrainComponent<Props>
 
   public parseAggs(aggregations, query)
   {
-    if (query === undefined)
+    if (query === undefined || aggregations === undefined)
     {
       return Map({});
     }
