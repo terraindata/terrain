@@ -136,11 +136,15 @@ export class Scheduler
     });
   }
 
-  public async cancelJob(jobID: number): Promise<boolean>
+  public async cancelJob(jobId?: number): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
-      const schedules: any[] = await App.DB.select(this.schedulerTable, [], { jobId: jobID }) as any[];
+      if (jobId === undefined)
+      {
+        return resolve(false);
+      }
+      const schedules: any[] = await App.DB.select(this.schedulerTable, [], { jobId }) as any[];
       if (schedules.length === 0)
       {
         return resolve(false);
@@ -149,7 +153,7 @@ export class Scheduler
       {
         if (schedules.hasOwnProperty(schedule))
         {
-          this.scheduleMap[schedule['id']].cancelNext();
+          this.scheduleMap[schedule['id']].cancel();
         }
       }
       return resolve(true);
@@ -538,7 +542,7 @@ export class Scheduler
             {
               return reject('Cannot upsert on an archived schedule.');
             }
-            this.scheduleMap[(scheduleObj['id'] as number)].cancelNext();
+            this.scheduleMap[(scheduleObj['id'] as number)].cancel();
             if (scheduleObj.active === 1)
             {
               const resultJobId: string = schedule.id !== undefined ? (schedule['id'] as number).toString() : '-1';
@@ -552,7 +556,7 @@ export class Scheduler
             }
           }
           // insert a version to save the past state of this schedule
-          await versions.create(user, 'schedules', schedule.id, schedule);
+          await versions.create(user, 'schedules', schedules[0].id as number, schedules[0]);
         }
       }
       else
