@@ -378,11 +378,12 @@ class TransportScheduler extends TerrainComponent<Props>
    */
   public renderScheduleOptions(template: Template)
   {
+    const columnNonCronStyle = getStyle('width', inputElementWidth);
     const inputStyle = getStyle('borderRadius', '1px');
     return (
       <div>
         <div className='headless-form-block'>
-          <div className='headless-form-column'>
+          <div className='headless-form-column' style={columnNonCronStyle}>
             <div className='headless-form-label'>
               Scheduled Job Name
             </div>
@@ -394,8 +395,8 @@ class TransportScheduler extends TerrainComponent<Props>
               />
             </div>
           </div>
-          <div className='headless-form-column'/>
-          <div className='headless-form-column'/>
+          <div className='headless-form-column' style={columnNonCronStyle}/>
+          <div className='headless-form-column' style={columnNonCronStyle}/>
         </div>
         <div className='headless-form-block'>
           <div className='headless-form-column'>
