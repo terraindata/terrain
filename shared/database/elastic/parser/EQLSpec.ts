@@ -353,7 +353,7 @@ const EQLSpec: ESClause[] =
         geo_bounds: 'metric_geo_bounds',
         geo_centroid: 'metric_centroid',
         percentiles: 'metric_percentiles',
-        percentile_ranks: 'metric_percentiles',
+        percentile_ranks: 'metric_percentile_ranks',
         stats: 'metric_stats',
         sum: 'metric_sum',
         top_hits: 'inner_hits',
@@ -887,7 +887,7 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-min-aggregation.html',
       }),
 
-    new ESStructureClause('metric_percentiles',
+    new ESStructureClause('metric_percentile_ranks',
       {
         field: 'field', // numerical field
         missing: 'number',
@@ -895,6 +895,24 @@ const EQLSpec: ESClause[] =
         script: 'script',
         format: 'string',
         values: 'number[]', // double array
+        keyed: 'boolean',
+        tdigest: 'percentiles_tdigest',
+        hdr: 'percentiles_hdr',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A multi-value metrics aggregation that calculates one or more percentile ranks over numeric values extracted from the aggregated documents. ',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-percentile-rank-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_percentiles',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+        percents: 'number[]', // double array
         keyed: 'boolean',
         tdigest: 'percentiles_tdigest',
         hdr: 'percentiles_hdr',

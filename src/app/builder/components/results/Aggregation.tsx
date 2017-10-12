@@ -56,7 +56,7 @@ import * as React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import Query from '../../../../items/types/Query';
-import { backgroundColor, borderColor, Colors, fontColor, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
@@ -69,10 +69,12 @@ import './Aggregation.less';
 import AggregationHistogram from './AggregationHistogram';
 import AggregationsTable from './AggregationsTable';
 import { Aggregation as AggregationClass } from './ResultTypes';
+import FadeInOut from 'common/components/FadeInOut';
+import StyleTag from 'common/components/StyleTag';
 
 const ClipboardIcon = require('images/icon_clipboard.svg');
-const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 const ExportIcon = require('images/icon_import.svg');
+const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
 export interface Props
 {
@@ -97,7 +99,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     singleValue: '',
   };
 
-  public componentWillMount()
+  public componentDidMount()
   {
     const currentAgg = this.props.query.aggregationList.get(this.props.name);
     this.updateInitialDisplay(this.props.aggregation, currentAgg, this.props.name);
@@ -150,7 +152,8 @@ class AggregationComponent extends TerrainComponent<Props> {
     {
       return;
     }
-    const displayType = currentAgg.displayType !== 'None' ? currentAgg.displayType : this.getBestDisplayType(aggregation);
+    const displayType = currentAgg.displayType !== 'None'
+      ? currentAgg.displayType : this.getBestDisplayType(aggregation);
     this.setState({
       displayType,
       expanded: currentAgg.expanded,
@@ -247,6 +250,8 @@ class AggregationComponent extends TerrainComponent<Props> {
             'arrow-icon': true,
             'arrow-icon-closed': !this.state.expanded,
           })}
+          style={this.state.expanded ? getStyle('fill', Colors().active) :
+            getStyle('fill', Colors().altBg1)}
           onClick={this.toggleExpanded}
         />
         <div className='aggregation-title-bar-title' onClick={this.toggleExpanded}>
@@ -346,14 +351,14 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public renderTableView(values)
   {
+    const buckets = this.findKey(values, 'buckets');
     if (this.canBeTable())
     {
       return (
         <div className='aggregation-table'>
           <AggregationsTable
-            tableData={values}
-            useBuckets={values.buckets !== undefined}
-
+            tableData={buckets !== undefined ? buckets : values}
+            useBuckets={buckets !== undefined}
           />
         </div>
       );
@@ -434,10 +439,20 @@ class AggregationComponent extends TerrainComponent<Props> {
         style={borderColor(Colors().bg3)}
       >
         {this.state.isSingleValue ? this.renderSingleAgg() : this.renderAgg()}
-        <div className='aggregation-expanded'> {this.state.expanded && !this.state.isSingleValue && this.renderExpandedAgg()} </div>
+        <FadeInOut
+          open={this.state.expanded && !this.state.isSingleValue}
+        >
+          <div
+            className='aggregation-expanded'
+            style={borderColor(Colors().active)}
+          >
+            {this.renderExpandedAgg()}
+          </div>
+        </FadeInOut>
       </div>
     );
   }
 }
 
+}
 export default AggregationComponent;

@@ -95,7 +95,7 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
     let rows = [];
     if (useBuckets)
     {
-      rows = _.values(tableData.buckets);
+      rows = _.values(tableData);
     }
     else
     {
@@ -149,7 +149,7 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
   {
     if (this.props.useBuckets)
     {
-      const data = _.values(this.props.tableData.buckets);
+      const data = _.values(this.props.tableData);
       let keys = Set([]);
       data.map((d) =>
       {

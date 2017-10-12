@@ -67,8 +67,12 @@ import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
 import HitsTable from './HitsTable';
 import { MAX_HITS, ResultsState } from './ResultTypes';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { notificationManager } from 'common/components/InAppNotification';
+import { tooltip } from './../../../common/components/tooltip/Tooltips';
 
 const RESULTS_PAGE_SIZE = 20;
+const ClipboardIcon = require('images/icon_clipboard.svg');
 
 export interface Props
 {
@@ -188,6 +192,31 @@ class ResultsColumn extends TerrainComponent<Props>
     }
   }
 
+  public handleTextCopied()
+  {
+    notificationManager.addNotification('Result Copied to Clipboard', '', 'info', 4);
+  }
+
+  public renderRawResult()
+  {
+    // Add loading message
+    const formatted = JSON.stringify(this.props.resultsState.rawResult, null, 2);
+    return (
+      <div>
+        <CopyToClipboard text={formatted} onCopy={this.handleTextCopied}>
+          <div className='clipboard-icon-wrapper'>
+            {
+              tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')
+            }
+          </div>
+        </CopyToClipboard>
+        <pre className='results-column-raw-results'>
+          {formatted}
+        </pre>
+      </div>
+    );
+  }
+
   public renderContent()
   {
     switch (this.state.selectedTab)
@@ -217,9 +246,7 @@ class ResultsColumn extends TerrainComponent<Props>
           />
         );
       case 2:
-        return <pre className='results-column-raw-results'>
-          {JSON.stringify(this.props.resultsState.rawResult, null, 2)}
-        </pre>;
+        return this.renderRawResult();
       default:
         return <div>No information</div>;
     }

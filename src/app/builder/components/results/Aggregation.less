@@ -18,8 +18,9 @@
       top: -2px;
       left: 3px;
       .transition;
+      .rotate(180deg);
       &.arrow-icon-closed {
-        .rotate(-90deg);
+        .rotate(90deg);
       }
     }
 
@@ -41,7 +42,6 @@
     .aggregation-title-bar-options {
       float: right; 
       position: relative;
-      right: 44px;
 
       .clipboard-icon-wrapper {
         display: inline;
@@ -102,7 +102,13 @@
 
 
   .aggregation-expanded {
-    padding-bottom: 20px;
+    padding-bottom: 24px;
+    border-left: 1px solid;
+    margin-left: 8px;
+    display: block;
+    margin-top: -16px;
+    padding-top: 16px;
+    padding-left: 12px;
   }
 }
 

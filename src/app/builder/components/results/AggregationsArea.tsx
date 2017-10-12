@@ -113,17 +113,20 @@ class AggregationsArea extends TerrainComponent<Props>
     {
       return Map({});
     }
-    let aggsList = Map({});
+    let aggsList = query.aggregationList !== undefined ? query.aggregationList : Map({});
     _.keys(aggregations).forEach((name) =>
     {
-      if (query.aggregationList.get(name) === undefined)
+      if (aggsList.get(name) === undefined)
       {
         const aggInfo = { displayType: 'None', expanded: true };
         aggsList = aggsList.set(name, aggInfo);
       }
-      else
+    });
+    _.keys(aggsList).forEach((name) =>
+    {
+      if (aggregations.name === undefined)
       {
-        aggsList = aggsList.set(name, query.aggregationList.get(name));
+        aggsList = aggsList.delete(name);
       }
     });
     return aggsList;
