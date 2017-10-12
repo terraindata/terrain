@@ -106,7 +106,9 @@ describe('AnalyticsReducer', () =>
       expect(
         nextState,
       ).toEqual(
-        analytics.setIn(['data', 1], analyticsResponse[1]),
+        analytics
+          .set('loaded', true)
+          .setIn(['data', 1], analyticsResponse[1]),
       );
     });
   });
