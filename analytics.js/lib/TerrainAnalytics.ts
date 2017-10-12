@@ -64,7 +64,7 @@ const TerrainAnalytics = {
     conversion: 3,
   },
 
-  logEvent(eventNameOrID, variantOrSourceID, meta)
+  logEvent(eventNameOrID: string | any, variantOrSourceID: string | any, meta?: any)
   {
     const client = new ClientJS();
     const eventID = typeof eventNameOrID === 'string' ? TerrainAnalytics.eventIDs[eventNameOrID] : eventNameOrID;
@@ -74,7 +74,7 @@ const TerrainAnalytics = {
       + '&visitorid=' + String(visitorID)
       + '&variantid=' + String(variantOrSourceID);
 
-    if (meta != null)
+    if (meta !== null && meta !== undefined)
     {
       paramString += '&meta=' + String(jsurl.stringify(meta));
     }
@@ -87,5 +87,4 @@ const TerrainAnalytics = {
 
 // noinspection TypeScriptUnresolvedVariable
 window['TerrainAnalytics'] = TerrainAnalytics;
-
 export = TerrainAnalytics;
