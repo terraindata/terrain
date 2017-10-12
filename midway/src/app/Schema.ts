@@ -98,6 +98,7 @@ const appSchemaSQL: string[] = [
      active bool NOT NULL,
      archived bool NOT NULL,
      currentlyRunning bool NOT NULL,
+     name text NOT NULL,
      jobId integer NOT NULL,
      jobType text NOT NULL,
      paramsScheduleStr text,

@@ -73,6 +73,7 @@ export interface SchedulerConfig
   active?: number;                   // whether the schedule is running (different from currentlyRunning)
   archived?: number;                 // whether the schedule has been archived (deleted) or not
   currentlyRunning?: number;         // whether the job is currently running
+  name: string;                      // name of the schedule
   id?: number;                       // schedule ID
   jobId?: number;                    // corresponds to job ID
   jobType?: string;                  // import or export etc.
@@ -103,6 +104,7 @@ export class Scheduler
         'active',
         'archived',
         'currentlyRunning',
+        'name',
         'jobId',
         'jobType',
         'paramsScheduleStr',
@@ -117,7 +119,6 @@ export class Scheduler
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      // TODO: cancel job if it's currently running
       if (id !== undefined)
       {
         const schedules: SchedulerConfig[] = await this.get(id) as SchedulerConfig[];
@@ -126,6 +127,7 @@ export class Scheduler
           for (const schedule of schedules)
           {
             schedule.archived = 1;
+            await this.cancelJob(schedule.jobId);
             return resolve(await App.DB.upsert(this.schedulerTable, schedule as object) as SchedulerConfig[]);
           }
         }
@@ -134,11 +136,15 @@ export class Scheduler
     });
   }
 
-  public async cancelJob(jobID: number): Promise<boolean>
+  public async cancelJob(jobId?: number): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
-      const schedules: any[] = await App.DB.select(this.schedulerTable, [], { jobId: jobID }) as any[];
+      if (jobId === undefined)
+      {
+        return resolve(false);
+      }
+      const schedules: any[] = await App.DB.select(this.schedulerTable, [], { jobId }) as any[];
       if (schedules.length === 0)
       {
         return resolve(false);
@@ -147,7 +153,7 @@ export class Scheduler
       {
         if (schedules.hasOwnProperty(schedule))
         {
-          this.scheduleMap[schedule['id']].cancelNext();
+          this.scheduleMap[schedule['id']].cancel();
         }
       }
       return resolve(true);
@@ -158,7 +164,6 @@ export class Scheduler
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      // TODO: cancel job if it's currently running
       if (id !== undefined)
       {
         const schedules: SchedulerConfig[] = await this.get(id) as SchedulerConfig[];
@@ -167,6 +172,10 @@ export class Scheduler
           for (const schedule of schedules)
           {
             schedule.active = status;
+            if (status === 0)
+            {
+              await this.cancelJob(schedule.jobId);
+            }
             return resolve(await App.DB.upsert(this.schedulerTable, schedule as object) as SchedulerConfig[]);
           }
         }
@@ -516,6 +525,7 @@ export class Scheduler
         return reject('Cannot upsert without a JobID.');
       }
       schedule.jobType = schedule.jobType === undefined ? '' : schedule.jobType;
+      schedule.name = schedule.name === undefined ? '' : schedule.name;
       schedule.sort = schedule.sort === undefined ? '' : schedule.sort;
       if (schedule.schedule === undefined)
       {
@@ -532,24 +542,21 @@ export class Scheduler
             {
               return reject('Cannot upsert on an archived schedule.');
             }
-            if (scheduleObj.currentlyRunning !== undefined && scheduleObj.currentlyRunning === 1)
+            this.scheduleMap[(scheduleObj['id'] as number)].cancel();
+            if (scheduleObj.active === 1)
             {
-              this.scheduleMap[(scheduleObj['id'] as number)].cancelNext();
-              if (scheduleObj.active === 1)
-              {
-                const resultJobId: string = schedule.id !== undefined ? (schedule['id'] as number).toString() : '-1';
-                const appendedParamsArr: any[] = [schedule.paramsScheduleArr];
-                const job: any = nodeScheduler.scheduleJob(schedule.schedule,
-                  function callJob(unwrappedParams)
-                  {
-                    this.jobMap[(schedule['jobId'] as number)](...unwrappedParams);
-                  }.bind(this, appendedParamsArr));
-                this.scheduleMap[resultJobId] = job;
-              }
+              const resultJobId: string = schedule.id !== undefined ? (schedule['id'] as number).toString() : '-1';
+              const appendedParamsArr: any[] = [schedule.paramsScheduleArr];
+              const job: any = nodeScheduler.scheduleJob(schedule.schedule,
+                function callJob(unwrappedParams)
+                {
+                  this.jobMap[(schedule['jobId'] as number)](...unwrappedParams);
+                }.bind(this, appendedParamsArr));
+              this.scheduleMap[resultJobId] = job;
             }
           }
           // insert a version to save the past state of this schedule
-          await versions.create(user, 'schedules', schedule.id, schedule);
+          await versions.create(user, 'schedules', schedules[0].id as number, schedules[0]);
         }
       }
       else

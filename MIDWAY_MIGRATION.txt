@@ -33,4 +33,23 @@ CREATE TABLE IF NOT EXISTS schedules
      transportStr text);
 END TRANSACTION;
 ----------------------------------------------------------
+3.
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS schedulesCopy
+    (id integer PRIMARY KEY,
+     active bool NOT NULL,
+     archived bool NOT NULL,
+     currentlyRunning bool NOT NULL,
+     name text NOT NULL,
+     jobId integer NOT NULL,
+     jobType text NOT NULL,
+     paramsScheduleStr text,
+     schedule text NOT NULL,
+     sort text NOT NULL,
+     transportStr text);
+INSERT INTO schedulesCopy (id, active, archived, currentlyRunning, name, jobId, jobType, paramsScheduleStr, schedule, sort, transportStr) SELECT schedules.id, schedules.active, schedules.archived, schedules.currentlyRunning, '', schedules.jobId, schedules.jobType, schedules.paramsScheduleStr, schedules.schedule, schedules.sort, schedules.transportStr FROM schedules;
+DROP TABLE schedules;
+ALTER TABLE schedulesCopy RENAME TO schedules;
+END TRANSACTION;
+----------------------------------------------------------
 
