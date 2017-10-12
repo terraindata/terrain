@@ -73,6 +73,7 @@ export interface SchedulerConfig
   active?: number;                   // whether the schedule is running (different from currentlyRunning)
   archived?: number;                 // whether the schedule has been archived (deleted) or not
   currentlyRunning?: number;         // whether the job is currently running
+  name: string;                      // name of the schedule
   id?: number;                       // schedule ID
   jobId?: number;                    // corresponds to job ID
   jobType?: string;                  // import or export etc.
@@ -103,6 +104,7 @@ export class Scheduler
         'active',
         'archived',
         'currentlyRunning',
+        'name',
         'jobId',
         'jobType',
         'paramsScheduleStr',
@@ -516,6 +518,7 @@ export class Scheduler
         return reject('Cannot upsert without a JobID.');
       }
       schedule.jobType = schedule.jobType === undefined ? '' : schedule.jobType;
+      schedule.name = schedule.name === undefined ? '' : schedule.name;
       schedule.sort = schedule.sort === undefined ? '' : schedule.sort;
       if (schedule.schedule === undefined)
       {

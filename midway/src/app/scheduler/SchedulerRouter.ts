@@ -96,7 +96,7 @@ Router.post('/active/:id', passport.authenticate('access-token-local'), async (c
 Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const schedule: SchedulerConfig = ctx.request.body.body;
-  Util.verifyParameters(schedule, ['jobType', 'paramsJob', 'schedule', 'sort', 'transport']);
+  Util.verifyParameters(schedule, ['jobType', 'name', 'paramsJob', 'schedule', 'sort', 'transport']);
   ctx.body = await scheduler.createCustomSchedule(ctx.state.user, schedule);
 });
 
