@@ -197,19 +197,20 @@ class ResultsColumn extends TerrainComponent<Props>
     notificationManager.addNotification('Result Copied to Clipboard', '', 'info', 4);
   }
 
+  // <CopyToClipboard text={formatted} onCopy={this.handleTextCopied}>
+  //         <div className='clipboard-icon-wrapper'>
+  //           {
+  //             tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')
+  //           }
+  //         </div>
+  //       </CopyToClipboard>
+
   public renderRawResult()
   {
     // Add loading message
     const formatted = JSON.stringify(this.props.resultsState.rawResult, null, 2);
     return (
       <div>
-        <CopyToClipboard text={formatted} onCopy={this.handleTextCopied}>
-          <div className='clipboard-icon-wrapper'>
-            {
-              tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy to Clipboard')
-            }
-          </div>
-        </CopyToClipboard>
         <pre className='results-column-raw-results'>
           {formatted}
         </pre>
