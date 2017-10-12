@@ -132,7 +132,7 @@ ControlReducer[ActionTypes.importExport.fetchSchedules] =
         {
           return _SchedulerConfig(_.extend({},
             schedule,
-            { transport: JSON.parse(schedule.transportStr) }
+            { transport: JSON.parse(schedule.transportStr), paramsScheduleArr: JSON.parse(schedule.paramsScheduleStr) },
           ));
         },
         ));

@@ -79,6 +79,7 @@ type Template = FileImportTypes.Template;
 export interface Props
 {
   scheduledJobs: List<SchedulerConfig>;
+  templates: List<Template>;
   servers: ServerMap;
   credentials: List<CredentialConfig>;
 }
@@ -124,16 +125,12 @@ class ScheduleControlList extends TerrainComponent<Props>
     ['Job Type', (schedule, index) => schedule.jobType],
     ['Scheduled Job Name', (schedule, index) => schedule.name],
     ['Schedule Settings', (schedule, index) => cronstrue.toString(schedule.schedule)],
+    ['Template Id', (schedule, index) => schedule.paramsScheduleArr[0].templateId],
+    ['Template Name', (schedule, index) => this.getTemplateName(schedule.paramsScheduleArr[0].templateId)],
     ['Transfer Type', (schedule, index) => schedule.transport.type],
-    ['Transfer Connection ID', (schedule, index) => schedule.transport.id],
+    ['Transfer Connection', (schedule, index) => this.getConnectionName(schedule.transport.id)],
     ['Transfer Filename', (schedule, index) => schedule.transport.filename],
   ];
-
-  constructor(props)
-  {
-    super(props);
-    this.getServerName = _.memoize(this.getServerName);
-  }
 
   public getOptions(schedule: SchedulerConfig, index: number)
   {
@@ -144,6 +141,18 @@ class ScheduleControlList extends TerrainComponent<Props>
         icon: <DeleteIcon className='schedule-menu-option-icon' />,
       },
     ]);
+  }
+
+  public getConnectionName(transferId)
+  {
+    const credential = this.props.credentials.find((v, k) => v.id === transferId);
+    return credential && credential.name;
+  }
+
+  public getTemplateName(templateId)
+  {
+    const template = this.props.templates.find((v, k) => v.templateId === templateId);
+    return template && template.templateName;
   }
 
   public getServerName(dbid): string // is this needed?
@@ -215,7 +224,16 @@ class ScheduleControlList extends TerrainComponent<Props>
   {
     return (
       <div>
-        {<ControlList items={this.props.scheduledJobs} config={this.displayConfig} getMenuOptions={this.getOptions} />}
+        {
+          <ControlList
+            items={this.props.scheduledJobs}
+            config={this.displayConfig}
+            getMenuOptions={this.getOptions}
+            _templates={this.props.templates}
+            _servers={this.props.servers}
+            _credentials={this.props.credentials}
+          />
+        }
         {
           this.state.responseModalOpen &&
           <Modal

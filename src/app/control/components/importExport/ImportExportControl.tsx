@@ -126,6 +126,7 @@ class ImportExportControl extends TerrainComponent<Props>
           Manage Schedules
         </div>
         <ScheduleControlList
+          templates={this.state.templates}
           scheduledJobs={this.state.schedules}
           servers={this.state.servers}
           credentials={this.state.credentials}

@@ -65,6 +65,7 @@ export interface Props
   items: List<any>;
   config: HeaderConfig;
   getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
+  [_dependents: string]: any; // for if the config has functions that depend on values outside of items
 }
 
 export class ControlList extends TerrainComponent<Props>

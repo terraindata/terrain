@@ -72,6 +72,7 @@ const SchedulerConfig_Record = Immutable.Record(new SchedulerConfigC());
 export interface SchedulerConfig extends SchedulerConfigC, IRecord<SchedulerConfig> { }
 export const _SchedulerConfig =
   (config: {
+    id: ID;
     name: string;
     active?: number;
     archived?: number;
@@ -104,6 +105,7 @@ const CredentialConfig_Record = Immutable.Record(new CredentialConfigC());
 export interface CredentialConfig extends CredentialConfigC, IRecord<CredentialConfig> { }
 export const _CredentialConfig =
   (config: {
+    id: ID;
     createdBy: number;
     meta: string;
     name: string;

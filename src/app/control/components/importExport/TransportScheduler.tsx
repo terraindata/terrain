@@ -395,8 +395,8 @@ class TransportScheduler extends TerrainComponent<Props>
               />
             </div>
           </div>
-          <div className='headless-form-column' style={columnNonCronStyle}/>
-          <div className='headless-form-column' style={columnNonCronStyle}/>
+          <div className='headless-form-column' style={columnNonCronStyle} />
+          <div className='headless-form-column' style={columnNonCronStyle} />
         </div>
         <div className='headless-form-block'>
           <div className='headless-form-column'>

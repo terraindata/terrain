@@ -139,12 +139,6 @@ class TemplateControlList extends TerrainComponent<Props>
     ],
   ];
 
-  constructor(props)
-  {
-    super(props);
-    this.getServerName = _.memoize(this.getServerName);
-  }
-
   public getOptions(template: Template, index: number)
   {
     const typeText = template.export ? 'Export' : 'Import';
@@ -351,7 +345,14 @@ class TemplateControlList extends TerrainComponent<Props>
 
     return (
       <div>
-        {<ControlList items={this.props.templates} config={this.templateConfig} getMenuOptions={this.getOptions} />}
+        {
+          <ControlList
+            items={this.props.templates}
+            config={this.templateConfig}
+            getMenuOptions={this.getOptions}
+            _servers={this.props.servers}
+          />
+        }
         {
           this.state.responseModalOpen &&
           <Modal
