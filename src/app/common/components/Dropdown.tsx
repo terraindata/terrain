@@ -370,7 +370,7 @@ class Dropdown extends TerrainComponent<Props>
           this.state.up && this.state.open
           && optionsEl
         }
-        { tooltip(
+        {tooltip(
           <div
             className='dropdown-value'
             ref='value'

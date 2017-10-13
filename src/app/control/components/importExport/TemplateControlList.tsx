@@ -51,7 +51,6 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import { notificationManager } from 'common/components/InAppNotification';
 import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
@@ -61,6 +60,7 @@ import * as FileImportTypes from 'fileImport/FileImportTypes';
 import { ServerMap } from 'schema/SchemaTypes';
 import { MidwayError } from 'shared/error/MidwayError';
 import Ajax from 'util/Ajax';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import ControlActions from '../../data/ControlActions';
 
 import CreateHeadlessCommand from './CreateHeadlessCommand';
