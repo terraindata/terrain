@@ -64,6 +64,8 @@ import Ajax from '../../util/Ajax';
 import UserActions from '../data/UserActions';
 import UserStore from '../data/UserStore';
 import * as UserTypes from '../UserTypes';
+import Switch from 'common/components/Switch';
+import FadeInOut from 'common/components/FadeInOut';
 
 const CloseIcon = require('../../../images/icon_close_8x8.svg');
 
@@ -93,6 +95,7 @@ class Connections extends TerrainComponent<Props>
     addingConnection: boolean,
     errorModalOpen: boolean,
     errorModalMessage: string,
+    analyticsEnabled: number,
   } = {
     typeIndex: 0,
     loading: true,
@@ -101,6 +104,7 @@ class Connections extends TerrainComponent<Props>
     addingConnection: false,
     errorModalOpen: false,
     errorModalMessage: '',
+    analyticsEnabled: 0,
   };
 
   public xhr: XMLHttpRequest = null;
@@ -351,6 +355,7 @@ class Connections extends TerrainComponent<Props>
                 </div>
               </div>
             </div>
+            {this.renderAnalyticsConnection()}
             <div className='button' onClick={this.createConnection}>
               Create
             </div>
@@ -371,10 +376,60 @@ class Connections extends TerrainComponent<Props>
     return null;
   }
 
+  public renderAnalyticsConnection()
+  {
+    const { analyticsEnabled } = this.state;
+
+    return (
+      <div className="connections-analytics flex-container">
+        <div className="left-column flex-grow">
+          <h4>Set Analytics Index and Type</h4>
+          <Switch
+            medium={true}
+            first="On"
+            second="Off"
+            selected={analyticsEnabled}
+            onChange={this.handleAnalyticsSwitch}
+          />
+        </div>
+        <div className="right-column flex-grow">
+          <FadeInOut open={analyticsEnabled === 1}>
+            <div className="flex-grow">
+              <b>Index</b>
+              <div>
+                <input
+                  ref="analytics-index"
+                  placeholder="Index"
+                />
+              </div>
+            </div>
+            <div className="flex-grow">
+              <b>Type</b>
+              <div>
+                <input
+                  ref="analytics-type"
+                  placeholder="Type"
+                />
+              </div>
+            </div>
+          </FadeInOut>
+        </div>
+      </div>
+    );
+  }
+
   public toggleErrorModal()
   {
     this.setState({
       errorModalOpen: !this.state.errorModalOpen,
+    });
+  }
+
+  public handleAnalyticsSwitch(selected)
+  {
+    this.setState((state) =>
+    {
+      return { analyticsEnabled: selected };
     });
   }
 
@@ -386,7 +441,7 @@ class Connections extends TerrainComponent<Props>
         <div className='connections'>
           <div className='connections-page-title'>
             Database Connections
-        </div>
+          </div>
           {
             loading &&
             <InfoArea large='Loading...' />
