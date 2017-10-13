@@ -44,66 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-import Ajax from 'util/Ajax';
-import ActionTypes from './AnalyticsActionTypes';
-import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
+// NB: This router only exists for testing purposes.
+// If using a proxy, be sure to set app.proxy = true
 
-const AnalyticsReducer = {};
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-AnalyticsReducer[ActionTypes.fetchStart] =
-  (state, action: Action<{}>) =>
-  {
-    return state.set('loaded', false);
-  };
+import { CredentialConfig, Credentials } from '../credentials/Credentials';
+import * as Util from '../Util';
 
-AnalyticsReducer[ActionTypes.fetch] =
-  (state, action: Action<{ analytics: any }>) =>
-  {
-    const { analytics } = action.payload;
-    let nextState = state;
+const Router = new KoaRouter();
+export const credentials: Credentials = new Credentials();
 
-    Object.keys(analytics).forEach((variantId) =>
-    {
-      const variantAnalytics = analytics[variantId];
-      nextState = nextState
-        .set('loaded', true)
-        .setIn(['data', parseInt(variantId, 10)], variantAnalytics);
-    });
-
-    return nextState;
-  };
-
-AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metricId: ID }>) =>
-  {
-    const { metricId } = action.payload;
-    return state.set('selectedMetric', metricId);
-  };
-
-AnalyticsReducer[ActionTypes.selectInterval] =
-  (state, action: Action<{ intervalId: string }>) =>
-  {
-    const { intervalId } = action.payload;
-    return state.set('selectedInterval', intervalId);
-  };
-
-AnalyticsReducer[ActionTypes.selectDateRange] =
-  (state, action: Action<{ dateRangeId: string }>) =>
-  {
-    const { dateRangeId } = action.payload;
-    return state.set('selectedDateRange', dateRangeId);
-  };
-
-const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  let nextState = state;
-  if (AnalyticsReducer[action.type])
+  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
   {
-    nextState = AnalyticsReducer[action.type](state, action);
+    ctx.body = 'Unauthorized';
   }
+  else
+  {
+    ctx.body = await credentials.get();
+  }
+});
 
-  return nextState;
-};
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
+  {
+    ctx.body = 'Unauthorized';
+  }
+  else
+  {
+    const cred: CredentialConfig = ctx.request.body.body;
+    Util.verifyParameters(cred, ['name', 'type', 'meta']);
+    ctx.body = await credentials.upsert(ctx.state.user, cred);
+  }
+});
 
-export default AnalyticsReducerWrapper;
+export default Router;

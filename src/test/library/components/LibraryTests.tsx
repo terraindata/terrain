@@ -129,7 +129,6 @@ describe('Library', () =>
         expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
         expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
-        expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
         expect(libraryComponent.find('AnalyticsSelector')).toHaveLength(1);
       });
     });

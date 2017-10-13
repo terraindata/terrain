@@ -950,6 +950,43 @@ export const Ajax =
       );
     },
 
+    getAllTemplates(
+      onLoad: (templates: object[]) => void,
+    )
+    {
+      const payload: object = {};
+
+      Ajax.req(
+        'post',
+        'templates/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+      );
+    },
+
+    resetTemplateToken(templateId: number,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'templates/updateAccessToken/',
+        { id: String(templateId) },
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1
@@ -1105,8 +1142,8 @@ export const Ajax =
     {
       const args = {
         variantid: variantIds.join(','),
-        start: start.toISOString(),
-        end: end.toISOString(),
+        start,
+        end,
         eventid: metricId.toString(),
         interval: intervalId,
         agg: aggregation,
@@ -1129,6 +1166,29 @@ export const Ajax =
           }
         },
         { onError, urlArgs: args });
+    },
+
+    getServerTime(
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void,
+    )
+    {
+      return Ajax.req(
+        'get',
+        'time',
+        {},
+        (response: any) =>
+        {
+          try
+          {
+            onLoad(response);
+          }
+          catch (e)
+          {
+            onError && onError(response as any);
+          }
+        },
+        { onError });
     },
   };
 

@@ -43,67 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import Util from 'util/Util';
 
-import * as Immutable from 'immutable';
-import Ajax from 'util/Ajax';
-import ActionTypes from './AnalyticsActionTypes';
-import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
-
-const AnalyticsReducer = {};
-
-AnalyticsReducer[ActionTypes.fetchStart] =
-  (state, action: Action<{}>) =>
+const ControlActionTypes =
   {
-    return state.set('loaded', false);
-  };
-
-AnalyticsReducer[ActionTypes.fetch] =
-  (state, action: Action<{ analytics: any }>) =>
-  {
-    const { analytics } = action.payload;
-    let nextState = state;
-
-    Object.keys(analytics).forEach((variantId) =>
+    importExport:
     {
-      const variantAnalytics = analytics[variantId];
-      nextState = nextState
-        .set('loaded', true)
-        .setIn(['data', parseInt(variantId, 10)], variantAnalytics);
-    });
-
-    return nextState;
+      setTemplates: '',
+      fetchTemplates: '',
+      deleteTemplate: '',
+      resetTemplateToken: '',
+    },
   };
 
-AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metricId: ID }>) =>
-  {
-    const { metricId } = action.payload;
-    return state.set('selectedMetric', metricId);
-  };
+Util.setValuesToKeys(ControlActionTypes, '');
 
-AnalyticsReducer[ActionTypes.selectInterval] =
-  (state, action: Action<{ intervalId: string }>) =>
-  {
-    const { intervalId } = action.payload;
-    return state.set('selectedInterval', intervalId);
-  };
-
-AnalyticsReducer[ActionTypes.selectDateRange] =
-  (state, action: Action<{ dateRangeId: string }>) =>
-  {
-    const { dateRangeId } = action.payload;
-    return state.set('selectedDateRange', dateRangeId);
-  };
-
-const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
-{
-  let nextState = state;
-  if (AnalyticsReducer[action.type])
-  {
-    nextState = AnalyticsReducer[action.type](state, action);
-  }
-
-  return nextState;
-};
-
-export default AnalyticsReducerWrapper;
+export default ControlActionTypes;

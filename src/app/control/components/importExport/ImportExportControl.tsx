@@ -45,65 +45,69 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
-import Ajax from 'util/Ajax';
-import ActionTypes from './AnalyticsActionTypes';
-import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
+import * as React from 'react';
 
-const AnalyticsReducer = {};
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import TemplateControlList from './TemplateControlList';
 
-AnalyticsReducer[ActionTypes.fetchStart] =
-  (state, action: Action<{}>) =>
-  {
-    return state.set('loaded', false);
-  };
+import { SchemaStore } from 'schema/data/SchemaStore';
+import { Server, ServerMap } from 'schema/SchemaTypes';
+import ControlActions from '../../data/ControlActions';
+import ControlStore from '../../data/ControlStore';
 
-AnalyticsReducer[ActionTypes.fetch] =
-  (state, action: Action<{ analytics: any }>) =>
-  {
-    const { analytics } = action.payload;
-    let nextState = state;
+import './ImportExportControl.less';
 
-    Object.keys(analytics).forEach((variantId) =>
-    {
-      const variantAnalytics = analytics[variantId];
-      nextState = nextState
-        .set('loaded', true)
-        .setIn(['data', parseInt(variantId, 10)], variantAnalytics);
-    });
+const { List, Map } = Immutable;
+type Template = FileImportTypes.Template;
 
-    return nextState;
-  };
-
-AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metricId: ID }>) =>
-  {
-    const { metricId } = action.payload;
-    return state.set('selectedMetric', metricId);
-  };
-
-AnalyticsReducer[ActionTypes.selectInterval] =
-  (state, action: Action<{ intervalId: string }>) =>
-  {
-    const { intervalId } = action.payload;
-    return state.set('selectedInterval', intervalId);
-  };
-
-AnalyticsReducer[ActionTypes.selectDateRange] =
-  (state, action: Action<{ dateRangeId: string }>) =>
-  {
-    const { dateRangeId } = action.payload;
-    return state.set('selectedDateRange', dateRangeId);
-  };
-
-const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
+export interface Props
 {
-  let nextState = state;
-  if (AnalyticsReducer[action.type])
+  placeholder?: string;
+}
+
+class ImportExportControl extends TerrainComponent<Props>
+{
+  public state: {
+    servers: ServerMap;
+    templates: List<Template>;
+  } = {
+    templates: List([]),
+    servers: Map<string, Server>(),
+  };
+
+  constructor(props)
   {
-    nextState = AnalyticsReducer[action.type](state, action);
+    super(props);
+    this._subscribe(ControlStore, {
+      stateKey: 'templates',
+      storeKeyPath: ['importExportTemplates'],
+    });
+    this._subscribe(SchemaStore, {
+      stateKey: 'servers',
+      storeKeyPath: ['servers'],
+    });
   }
 
-  return nextState;
-};
+  public componentDidMount()
+  {
+    ControlActions.importExport.fetchTemplates();
+  }
 
-export default AnalyticsReducerWrapper;
+  public render()
+  {
+    return (
+      <div className='import-export-token-control-page'>
+        <div className='import-export-control-title'>
+          Manage Import and Export Templates
+        </div>
+        <TemplateControlList
+          templates={this.state.templates}
+          servers={this.state.servers}
+        />
+      </div>
+    );
+  }
+}
+
+export default ImportExportControl;

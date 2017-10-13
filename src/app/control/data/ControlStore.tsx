@@ -44,66 +44,40 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires strict-boolean-expressions variable-name
+
 import * as Immutable from 'immutable';
-import Ajax from 'util/Ajax';
-import ActionTypes from './AnalyticsActionTypes';
-import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
+import * as _ from 'lodash';
+import * as Redux from 'redux';
+import * as ReduxActions from 'redux-actions';
+import thunk from 'redux-thunk';
 
-const AnalyticsReducer = {};
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import Util from 'util/Util';
+import ControlReducers from './ControlReducers';
 
-AnalyticsReducer[ActionTypes.fetchStart] =
-  (state, action: Action<{}>) =>
-  {
-    return state.set('loaded', false);
-  };
+type Template = FileImportTypes.Template;
 
-AnalyticsReducer[ActionTypes.fetch] =
-  (state, action: Action<{ analytics: any }>) =>
-  {
-    const { analytics } = action.payload;
-    let nextState = state;
+const { List } = Immutable;
 
-    Object.keys(analytics).forEach((variantId) =>
-    {
-      const variantAnalytics = analytics[variantId];
-      nextState = nextState
-        .set('loaded', true)
-        .setIn(['data', parseInt(variantId, 10)], variantAnalytics);
-    });
-
-    return nextState;
-  };
-
-AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metricId: ID }>) =>
-  {
-    const { metricId } = action.payload;
-    return state.set('selectedMetric', metricId);
-  };
-
-AnalyticsReducer[ActionTypes.selectInterval] =
-  (state, action: Action<{ intervalId: string }>) =>
-  {
-    const { intervalId } = action.payload;
-    return state.set('selectedInterval', intervalId);
-  };
-
-AnalyticsReducer[ActionTypes.selectDateRange] =
-  (state, action: Action<{ dateRangeId: string }>) =>
-  {
-    const { dateRangeId } = action.payload;
-    return state.set('selectedDateRange', dateRangeId);
-  };
-
-const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
+class ControlStateC
 {
-  let nextState = state;
-  if (AnalyticsReducer[action.type])
-  {
-    nextState = AnalyticsReducer[action.type](state, action);
-  }
+  public importExportTemplates: List<Template> = List([]);
+}
 
-  return nextState;
+const ControlState_Record = Immutable.Record(new ControlStateC());
+export interface ControlState extends ControlStateC, IRecord<ControlState> { }
+export const _ControlState = (config?: any) =>
+{
+  return new ControlState_Record(Util.extendId(config || {})) as any as ControlState;
 };
 
-export default AnalyticsReducerWrapper;
+const DefaultState = _ControlState();
+
+export const ControlStore = Redux.createStore(
+  ControlReducers,
+  DefaultState,
+  Redux.applyMiddleware(thunk),
+);
+
+export default ControlStore;

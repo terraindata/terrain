@@ -44,66 +44,29 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-import Ajax from 'util/Ajax';
-import ActionTypes from './AnalyticsActionTypes';
-import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
+import * as React from 'react';
 
-const AnalyticsReducer = {};
+import TerrainComponent from 'common/components/TerrainComponent';
+import ImportExportControl from './importExport/ImportExportControl';
 
-AnalyticsReducer[ActionTypes.fetchStart] =
-  (state, action: Action<{}>) =>
-  {
-    return state.set('loaded', false);
-  };
+import './ControlPage.less';
 
-AnalyticsReducer[ActionTypes.fetch] =
-  (state, action: Action<{ analytics: any }>) =>
-  {
-    const { analytics } = action.payload;
-    let nextState = state;
-
-    Object.keys(analytics).forEach((variantId) =>
-    {
-      const variantAnalytics = analytics[variantId];
-      nextState = nextState
-        .set('loaded', true)
-        .setIn(['data', parseInt(variantId, 10)], variantAnalytics);
-    });
-
-    return nextState;
-  };
-
-AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metricId: ID }>) =>
-  {
-    const { metricId } = action.payload;
-    return state.set('selectedMetric', metricId);
-  };
-
-AnalyticsReducer[ActionTypes.selectInterval] =
-  (state, action: Action<{ intervalId: string }>) =>
-  {
-    const { intervalId } = action.payload;
-    return state.set('selectedInterval', intervalId);
-  };
-
-AnalyticsReducer[ActionTypes.selectDateRange] =
-  (state, action: Action<{ dateRangeId: string }>) =>
-  {
-    const { dateRangeId } = action.payload;
-    return state.set('selectedDateRange', dateRangeId);
-  };
-
-const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
+export interface Props
 {
-  let nextState = state;
-  if (AnalyticsReducer[action.type])
+  params?: any;
+  location?: any;
+}
+
+class ControlPage extends TerrainComponent<Props>
+{
+  public render()
   {
-    nextState = AnalyticsReducer[action.type](state, action);
+    return (
+      <div className='control-body'>
+        <ImportExportControl />
+      </div>
+    );
   }
+}
 
-  return nextState;
-};
-
-export default AnalyticsReducerWrapper;
+export default ControlPage;

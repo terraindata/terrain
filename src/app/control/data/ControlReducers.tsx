@@ -45,65 +45,88 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
+
 import Ajax from 'util/Ajax';
-import ActionTypes from './AnalyticsActionTypes';
-import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
+import ActionTypes from './ControlActionTypes';
 
-const AnalyticsReducer = {};
+import * as FileImportTypes from 'fileImport/FileImportTypes';
+import * as _ from 'lodash';
+import { _ControlState, ControlState } from './ControlStore';
+type Template = FileImportTypes.Template;
 
-AnalyticsReducer[ActionTypes.fetchStart] =
-  (state, action: Action<{}>) =>
+const { List, Map } = Immutable;
+
+const ControlReducer = {};
+
+ControlReducer[ActionTypes.importExport.fetchTemplates] =
+  (state, action) =>
   {
-    return state.set('loaded', false);
+    Ajax.getAllTemplates(
+      (templatesArr) =>
+      {
+        const templates: List<Template> = List<Template>(templatesArr.map((template) =>
+        { // TODO move this translation to _Template
+          return FileImportTypes._Template(_.extend({}, template, {
+            templateId: template['id'],
+            templateName: template['name'],
+            originalNames: List<string>(template['originalNames']),
+          }));
+        },
+        ));
+        action.payload.setTemplates(templates);
+      },
+    );
+    return state;
   };
 
-AnalyticsReducer[ActionTypes.fetch] =
-  (state, action: Action<{ analytics: any }>) =>
+ControlReducer[ActionTypes.importExport.setTemplates] =
+  (state, action) =>
   {
-    const { analytics } = action.payload;
-    let nextState = state;
-
-    Object.keys(analytics).forEach((variantId) =>
-    {
-      const variantAnalytics = analytics[variantId];
-      nextState = nextState
-        .set('loaded', true)
-        .setIn(['data', parseInt(variantId, 10)], variantAnalytics);
-    });
-
-    return nextState;
+    return state.set('importExportTemplates', action.payload.templates);
   };
 
-AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metricId: ID }>) =>
+ControlReducer[ActionTypes.importExport.deleteTemplate] =
+  (state, action) =>
   {
-    const { metricId } = action.payload;
-    return state.set('selectedMetric', metricId);
+    Ajax.deleteTemplate(action.payload.templateId,
+      () =>
+      {
+        action.payload.handleDeleteTemplateSuccess(action.payload.templateName);
+        action.payload.fetchTemplates();
+      },
+      (err: string) =>
+      {
+        action.payload.handleDeleteTemplateError(err);
+      },
+    );
+    return state;
   };
 
-AnalyticsReducer[ActionTypes.selectInterval] =
-  (state, action: Action<{ intervalId: string }>) =>
+ControlReducer[ActionTypes.importExport.resetTemplateToken] =
+  (state, action) =>
   {
-    const { intervalId } = action.payload;
-    return state.set('selectedInterval', intervalId);
+    Ajax.resetTemplateToken(action.payload.templateId,
+      () =>
+      {
+        action.payload.handleResetSuccess();
+        action.payload.fetchTemplates();
+      },
+      (err: string) =>
+      {
+        action.payload.handleResetError(err);
+      },
+    );
+    return state;
   };
 
-AnalyticsReducer[ActionTypes.selectDateRange] =
-  (state, action: Action<{ dateRangeId: string }>) =>
-  {
-    const { dateRangeId } = action.payload;
-    return state.set('selectedDateRange', dateRangeId);
-  };
-
-const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
+const ControlReducerWrapper = (state: ControlState = _ControlState(), action) =>
 {
   let nextState = state;
-  if (AnalyticsReducer[action.type])
+  if (ControlReducer[action.type])
   {
-    nextState = AnalyticsReducer[action.type](state, action);
+    nextState = ControlReducer[action.type](state, action);
   }
-
   return nextState;
 };
 
-export default AnalyticsReducerWrapper;
+export default ControlReducerWrapper;

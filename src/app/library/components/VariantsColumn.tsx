@@ -138,6 +138,7 @@ class VariantsColumn extends TerrainComponent<Props>
           [numericId],
           analytics.selectedMetric,
           analytics.selectedInterval,
+          analytics.selectedDateRange,
         );
       });
     }
@@ -380,7 +381,12 @@ class VariantsColumn extends TerrainComponent<Props>
       } else
       {
         this.props.variantActions.select(id.toString());
-        this.props.analyticsActions.fetch([id], analytics.selectedMetric);
+        this.props.analyticsActions.fetch(
+          [id],
+          analytics.selectedMetric,
+          analytics.selectedInterval,
+          analytics.selectedDateRange,
+        );
       }
     } else
     {
