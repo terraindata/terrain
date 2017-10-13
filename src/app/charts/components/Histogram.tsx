@@ -45,7 +45,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-invalid-this restrict-plus-operands radix strict-boolean-expressions no-var-requires only-arrow-functions no-console variable-name max-line-length no-unused-expression no-shadowed-variable
+// tslint:disable:no-invalid-this restrict-plus-operands radix strict-boolean-expressions no-var-requires only-arrow-functions variable-name max-line-length no-unused-expression no-shadowed-variable
 
 import './HistogramStyle.less';
 
@@ -315,6 +315,14 @@ const Histogram = {
     bar.exit().remove();
   },
 
+  _extendChart(el, xLabels)
+  {
+    const bottomAxis = d3.select(el).select('.bottomAxis');
+    const bottomAxisHeight = bottomAxis.node().getBBox().height;
+    d3.select(el).select('.histogram-chart')
+      .attr('style', `padding-bottom: ${bottomAxisHeight - 20}px`);
+  },
+
   _draw(el, scales, domain, barsData, width, height, colors, xLabels, yLabels)
   {
     d3.select(el).select('.inner-svg')
@@ -324,6 +332,7 @@ const Histogram = {
     this._drawBg(el, scales);
     this._drawAxes(el, scales, width, height, xLabels, yLabels);
     this._drawBars(el, scales, barsData, colors, xLabels);
+    this._extendChart(el, xLabels);
   },
 
   _scales(el, domain, barsData, stateWidth, stateHeight)

@@ -61,7 +61,6 @@ import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from 
 import { notificationManager } from 'common/components/InAppNotification';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import TQLEditor from 'tql/components/TQLEditor';
-import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
@@ -158,15 +157,15 @@ class ResultsColumn extends TerrainComponent<Props>
             onClick={() => { this.setSelectedTab(name, index); }}
             style={index === this.state.selectedTab ? ACTIVE_TAB_STYLE : INACTIVE_TAB_STYLE}
           >
+            <div className='results-column-tab-name'>{name}</div>
             {name !== 'Raw' &&
               <div
                 className='results-column-tab-number'
                 style={this.state.highlightedTabs.get(name.toLowerCase()) ? backgroundColor(Colors().active) : {}}
               >
-                {this.getNumberOf(name)}
+                {this.state.highlightedTabs.get(name.toLowerCase()) ? this.getNumberOf(name) : ''}
               </div>
             }
-            <div className='results-column-tab-name'>{name}</div>
           </div>,
         )}
       </div>

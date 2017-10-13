@@ -254,7 +254,7 @@ class AggregationComponent extends TerrainComponent<Props> {
             getStyle('fill', Colors().altBg1)}
           onClick={this.toggleExpanded}
         />
-        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded}>
+        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded} style={fontColor(Colors().active)}>
           {
             this.props.name
           }
@@ -269,7 +269,7 @@ class AggregationComponent extends TerrainComponent<Props> {
                       className='aggregation-title-bar-export'
                       onClick={this.exportData}
                       key='results-area-export'
-                    />, 'Export CSV')
+                    />, 'Export to CSV')
 
                     :
                     ''
@@ -453,4 +453,5 @@ class AggregationComponent extends TerrainComponent<Props> {
     );
   }
 }
+
 export default AggregationComponent;

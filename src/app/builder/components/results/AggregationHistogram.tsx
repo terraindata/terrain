@@ -58,8 +58,6 @@ import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 
-const ZOOM_FACTOR = 2.0;
-
 import Histogram from './../../../charts/components/Histogram';
 
 export interface Props
