@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import { extend } from 'lodash';
-import UserStore from '../users/data/UserStore';
 
 const Color = require('color');
 
