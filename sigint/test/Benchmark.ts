@@ -44,45 +44,63 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-var webpack = require("webpack");
-var path = require("path");
+import benchrest = require('bench-rest');
+import winston = require('winston');
 
-module.exports =
+import App from '../src/App';
+
+const db = 'http://127.0.0.1:9200';
+const host = 'http://127.0.0.1:43002';
+let server;
+
+export async function startServer()
 {
-    entry: "./lib/TerrainAnalytics.ts",
-    devtool: "cheap-module-source-map",
+  try
+  {
+    const options =
+      {
+        debug: true,
+        db,
+        port: 43002,
+      };
 
-    output:
+    const app = new App(options);
+    server = await app.start();
+  }
+  catch (e)
+  {
+    throw new Error('starting event server sigint: ' + String(e));
+  }
+}
+
+export const flow = {
+  main: [
     {
-        path: __dirname,
-        publicPath: "/build/",
-        filename: "bundle.js",
+      post: host + '/v1', json: {
+        eventid: '#{INDEX}',
+        variantid: '#{INDEX}',
+        visitorid: '#{INDEX}',
+      },
     },
-
-    resolve:
-    {
-        extensions: [ ".js", ".ts", ".json" ],
-    },
-
-    module:
-    {
-        rules:
-        [
-            {
-                test: /\.ts(x?)$/,
-                exclude: [/node_modules/],
-                loader:
-                    "ts-loader?happyPackMode=true"
-                    + JSON.stringify({
-                        compilerOptions: {
-                        },
-                    }),
-            },
-        ],
-    },
-
-    plugins:
-    [
-    ],
-
+    { get: host + '/v1?eventid=#{INDEX}&variantid=#{INDEX}&visitorid=#{INDEX}' },
+  ],
 };
+
+const runOptions = {
+  limit: 20,
+  prealloc: 1000,
+  iterations: 1000,
+};
+
+// tslint:disable-next-line:no-floating-promises
+startServer();
+benchrest(flow, runOptions)
+  .on('error', (err, ctx) => winston.error('Failed in %s with err: ', ctx, err))
+  .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
+  .on('end', (stats, errorCount) =>
+  {
+    winston.info('error count: ', errorCount);
+    winston.info('stats', stats);
+    // TODO: teardown server here
+    process.exit();
+  });
