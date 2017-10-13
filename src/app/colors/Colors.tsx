@@ -576,7 +576,7 @@ const LIGHT: Theme =
 
     fadedOutBg: 'rgba(255, 255, 255, 0.75)', // bg to cover up things when they are faded out
 
-    inputBg: 'rgb(255,255,255,0.15)', //237, 239, 243)',
+    inputBg: 'rgba(255,255,255,0.15)', //237, 239, 243)',
     inputBorder: '1px solid rgb(200, 202, 206)',
 
     active: darkActive,
