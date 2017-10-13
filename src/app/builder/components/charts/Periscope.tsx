@@ -105,6 +105,9 @@ const Periscope = {
     .periscope .tick text {
       fill: ${Colors().text2} !important;
     }
+    .periscope .handle {
+      stroke: rgba(210,215,219,0.75) !important;
+    }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
   },

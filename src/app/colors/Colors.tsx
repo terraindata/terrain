@@ -848,6 +848,8 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
   {
     const borderHover = Color(strongColor).alpha(0.5);
     const backgroundHover = Color(bgColor).mix(Color(strongColor), Colors().builder.cards.cardBgOpacity);
+    const sideBorderColorLight = (localStorage.getItem('theme') === 'DARK') ? Colors().darkerHighlight : 'rgba(0,0,0,0.20)';
+    const sideBorderColorDark = (localStorage.getItem('theme') === 'DARK') ? Colors().darkerHighlight : 'rgba(0,0,0,0.30)';
 
     CACHE[key] = {
       background: hovered ? backgroundHover : bgColor,
@@ -861,9 +863,9 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
       borderLeftWidth: '3px',
       borderLeftColor: strongColor,
 
-      borderTopColor: hovered ? borderHover : Colors().highlight,
-      borderRightColor: hovered ? borderHover : Colors().darkerHighlight,
-      borderBottomColor: hovered ? borderHover : Colors().darkerHighlight,
+      borderTopColor: hovered ? borderHover : sideBorderColorLight,
+      borderRightColor: hovered ? borderHover : sideBorderColorDark,
+      borderBottomColor: hovered ? borderHover : sideBorderColorDark,
       transition: 'background 0.15s',
       [hoverBg && ':hover']: {
         background: hoverBg,
