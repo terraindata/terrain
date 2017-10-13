@@ -48,6 +48,8 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 
+import * as Immutable from 'immutable';
+
 export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object | number | boolean);
 export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object | number | boolean);
 export type TQLStringFn = string | ((block: Block) => string);
