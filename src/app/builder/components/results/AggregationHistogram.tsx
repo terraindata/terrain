@@ -133,7 +133,7 @@ class AggregationHistogram extends TerrainComponent<Props>
     else
     {
       let barDifference = Infinity;
-      let tempData = {};
+      const tempData = {};
       buckets.forEach((bucket, i) =>
       {
         if (bucket.doc_count > rangeMax)
