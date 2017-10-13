@@ -563,7 +563,7 @@ class TransformModal extends TerrainComponent<Props>
         confirm={true}
         confirmButtonText={'Apply Transformation'}
         onConfirm={this.handleTransform}
-        closeOnConfirm={false}
+        closeOnConfirm={true}
       />
     );
   }

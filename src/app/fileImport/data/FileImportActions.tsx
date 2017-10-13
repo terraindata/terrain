@@ -137,14 +137,17 @@ const FileImportActions =
     (transform: Transform) =>
       $(ActionTypes.updatePreviewColumns, { transform }),
 
-    saveTemplate:
-    (templateName: string, exporting: boolean, handleTemplateSaveSuccess) =>
+    saveTemplate: // if the database, server, and table haven't been selected in the file import process, they need to be given here
+    (templateName: string, exporting: boolean, handleTemplateSaveSuccess, serverId?: number, dbName?: string, tableName?: string) =>
       $(ActionTypes.saveTemplate, {
         templateName,
         exporting,
         setErrorMsg: FileImportActions.setErrorMsg,
         fetchTemplates: FileImportActions.fetchTemplates,
         handleTemplateSaveSuccess,
+        serverId,
+        dbName,
+        tableName,
       }),
 
     updateTemplate:

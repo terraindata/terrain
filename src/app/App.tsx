@@ -86,6 +86,7 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // for error reporting
 
 // data that needs to be loaded
+import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
 import ColorsActions from './colors/data/ColorsActions';
@@ -107,6 +108,7 @@ const BuilderIcon = require('./../images/icon_bldr-3.svg');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
 const SchemaIcon = require('./../images/icon_schema.svg?name=SchemaIcon');
 const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
+const ControlIcon = require('./../images/icon_gear.svg');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
 
@@ -146,6 +148,12 @@ const links =
       icon: <ReportingIcon />,
       text: 'Analytics',
       route: '/analytics',
+      enabled: TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS),
+    },
+    {
+      icon: <ControlIcon />,
+      text: 'Control',
+      route: '/control',
     },
     // {
     //   icon: <ManualIcon />,

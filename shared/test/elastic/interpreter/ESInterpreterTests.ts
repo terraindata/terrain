@@ -80,7 +80,7 @@ function testParse(testName: string,
 {
   winston.info('testing "' + testName + '": "' + testString + '"');
   const interpreter: ESInterpreter = new ESInterpreter(testString);
-  const parser: ESJSONParser = interpreter.parser;
+  const parser: ESJSONParser = interpreter.parser as ESJSONParser;
 
   if (parser.getErrors().length > 0)
   {

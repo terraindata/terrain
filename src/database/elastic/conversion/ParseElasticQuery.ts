@@ -158,5 +158,5 @@ export function ParseElasticQuery(query: Query)
 
 export function ElasticParseTreeToQuery(query: Query, options: Options): string
 {
-  return ESParseTreeToCode(query.parseTree.parser, options, query.inputs);
+  return ESParseTreeToCode(query.parseTree.parser as ESJSONParser, options, query.inputs);
 }

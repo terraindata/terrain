@@ -74,6 +74,24 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   ctx.body = getItems;
 });
 
+Router.get('/live', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  let typeArr: number[] = [];
+  if (ctx.query.ids !== undefined)
+  {
+    typeArr = ctx.query.ids.split(',').map((val) =>
+    {
+      const parsed: number = parseInt(val as string, 10);
+      if (isNaN(parsed))
+      {
+        throw new Error('Invalid input format for ids');
+      }
+      return parsed;
+    });
+  }
+  ctx.body = await items.getLiveVariants(typeArr);
+});
+
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting item ID ' + String(ctx.params.id));

@@ -1,0 +1,76 @@
+@import "../../../common/Common.less";
+
+@border-style: 1px solid;
+@border-radius: 0px;
+@icon-ratio: 1.25;
+@icon-size: calc(1em*@icon-ratio);
+
+.import-export-token-control-table {
+  display: table;
+  margin-top: @spacing;
+  margin: auto;
+  border-collapse: collapse;
+
+  .template-info {
+    display: table-row;
+    border-top: @border-style;
+    border-bottom: @border-style;
+
+    .template-info-data {
+      .common-cell-properties;
+      padding: @quarter-spacing @spacing;
+
+      // border-top: inherit;
+      // border-bottom: inherit;
+
+      // &:first-child {
+      //   border-left: @border-style;
+      //   border-bottom-left-radius: @border-radius;
+      //   border-top-left-radius: @border-radius;
+      // }
+
+      // &:last-child {
+      //   border-right: @border-style;
+      //   border-bottom-right-radius: @border-radius;
+      //   border-top-right-radius: @border-radius;
+      // }
+    }
+
+    .access-token-cell {
+      max-width: 100px;
+      text-overflow: ellipsis;
+      overflow-x: hidden;
+      white-space: nowrap;
+    }
+  }
+
+  .template-info-header {
+    display: table-row;
+
+    .template-info-data {
+      .common-cell-properties;
+      padding: @half-spacing @spacing;
+    }
+  }
+
+  .common-cell-properties {
+    display: table-cell;
+    .big-text;
+    vertical-align: middle;
+  }
+  
+  .template-menu-options-wrapper {
+    position: relative;
+    padding: @half-spacing;
+    width: @icon-size;
+    height: @icon-size;
+    margin: auto;
+
+    .template-menu-option-icon {
+      fill: currentColor;
+      &.template-icon-export {
+        .rotate180;
+      }
+    }
+  }
+}

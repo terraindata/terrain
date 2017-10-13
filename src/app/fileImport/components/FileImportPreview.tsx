@@ -72,6 +72,8 @@ import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import TransformModal from './TransformModal';
 
+import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
+
 const { List } = Immutable;
 
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -382,7 +384,20 @@ class FileImportPreview extends TerrainComponent<Props>
       this.showUpdateTemplate();
       return;
     }
-    Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess);
+    if (this.props.exporting)
+    {
+      const stringQuery: string =
+        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      const parsedQuery = JSON.parse(stringQuery);
+      const dbName = parsedQuery['index'];
+      const tableName = parsedQuery['type'];
+      Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess,
+        this.props.serverId, dbName, tableName);
+    }
+    else
+    {
+      Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess);
+    }
     this.setState({
       showingSaveTemplate: false,
       appliedTemplateName: saveTemplateName,
@@ -614,7 +629,8 @@ class FileImportPreview extends TerrainComponent<Props>
     this.confirmedLeave = true;
     if (this.props.exporting)
     {
-      const stringQuery: string = ESParseTreeToCode(this.props.query.parseTree.parser, { replaceInputs: true }, this.props.inputs);
+      const stringQuery: string =
+        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
       const parsedQuery = JSON.parse(stringQuery);
       const dbName = parsedQuery['index'];
 

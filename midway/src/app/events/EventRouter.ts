@@ -50,88 +50,10 @@ import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import * as Encryption from './Encryption';
-import { EventConfig, Events } from './Events';
+import { EventMetadataConfig, Events } from './Events';
 
 export const events: Events = new Events();
 const Router = new KoaRouter();
-
-function logError(error: string)
-{
-  if (process.env.NODE_ENV === 'production')
-  {
-    return;
-  }
-  else
-  {
-    throw new Error(error);
-  }
-}
-
-async function storeEvent(request: any)
-{
-  if (request.body !== undefined && Object.keys(request.body).length > 0 &&
-    request.query !== undefined && Object.keys(request.body).length > 0)
-  {
-    logError('Both request query and body cannot be set.');
-  }
-
-  if ((request.body === undefined ||
-    request.body !== undefined && Object.keys(request.body).length === 0) &&
-    (request.query === undefined ||
-      request.query !== undefined && Object.keys(request.query).length === 0))
-  {
-    logError('Either request query or body parameters are required.');
-  }
-
-  let req: object = request.body;
-  if (req === undefined || (req !== undefined && Object.keys(req).length === 0))
-  {
-    req = request.query;
-  }
-
-  const event: EventConfig = {
-    eventid: req['eventid'],
-    variantid: req['variantid'],
-    visitorid: req['visitorid'],
-    source: {
-      ip: request.ip,
-      host: request.host,
-      useragent: request.useragent,
-      referer: request.header.referer,
-    },
-    timestamp: req['timestamp'],
-    meta: req['meta'],
-  };
-
-  if (_.difference(Object.keys(req), Object.keys(event).concat(['id', 'accessToken'])).length > 0)
-  {
-    return logError('Error storing analytics event: unexpected fields encountered');
-  }
-
-  // const msg = await Encryption.decodeMessage(event);
-  try
-  {
-    await events.storeEvent(event);
-  }
-  catch (e)
-  {
-    return logError('Error storing analytics event:' + String(e));
-  }
-}
-
-// Handle analytics event ingestion
-Router.post('/', async (ctx, next) =>
-{
-  await storeEvent(ctx.request);
-  ctx.body = '';
-});
-
-Router.get('/', async (ctx, next) =>
-{
-  await storeEvent(ctx.request);
-  ctx.body = '';
-});
 
 // * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
 // * variantid: list of variantids
@@ -167,6 +89,52 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
       }
     }
   }, {});
+});
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting all events');
+  ctx.body = await events.getMetadata({});
+});
+
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const id = ctx.params.id;
+  winston.info('getting event ID ' + String(id));
+  ctx.body = await events.getMetadata({ id });
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add event');
+  const event: EventMetadataConfig = ctx.request.body.body;
+  Util.verifyParameters(event, ['name']);
+  if (event.id !== undefined)
+  {
+    throw new Error('Invalid parameter event ID');
+  }
+
+  ctx.body = await events.addEvent(events);
+});
+
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const event: EventMetadataConfig = ctx.request.body.body;
+  Util.verifyParameters(event, ['name']);
+  if (event.id === undefined)
+  {
+    event.id = Number(ctx.params.id);
+  }
+  else
+  {
+    if (event.id !== Number(ctx.params.id))
+    {
+      throw new Error('Event ID does not match the supplied id in the URL');
+    }
+  }
+
+  winston.info('modify event' + String(event.id));
+  ctx.body = await events.addEvent(event);
 });
 
 export default Router;

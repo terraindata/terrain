@@ -52,6 +52,8 @@ class AnalyticsStateC
   public loaded = false;
   public data: IMMap<ID, any> = Immutable.Map({});
   public selectedMetric: ID = 1;
+  public selectedInterval: string = 'day';
+  public selectedDateRange: ID = 1;
 }
 
 const AnalyticsState_Record = Immutable.Record(new AnalyticsStateC());
