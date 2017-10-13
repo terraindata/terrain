@@ -570,14 +570,14 @@ const LIGHT: Theme =
 
     altHighlight: 'rgba(255,255,255,0.15)',
 
-    highlight: 'rgba(210,215,219,0.75)', // for slight emphasis
-    darkerHighlight: 'rgb(235, 235, 238)', // to make a depth effect with highlight
+    highlight: 'rgba(210,215,219,0.25)', // for slight emphasis
+    darkerHighlight: 'rgb(210,215,219,0.5)', // to make a depth effect with highlight
 
     boxShadow: 'rgba(130,130,130,0.4)',
 
     fadedOutBg: 'rgba(255, 255, 255, 0.75)', // bg to cover up things when they are faded out
 
-    inputBg: 'rgb(237, 239, 243)',
+    inputBg: 'rgb(255,255,255,0.15)', //237, 239, 243)',
     inputBorder: '1px solid rgb(200, 202, 206)',
 
     active: darkActive,

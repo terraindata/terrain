@@ -177,24 +177,20 @@ class StatusDropdown extends TerrainComponent<Props>
         tooltipText = "This Variant is Live and you aren't<br />an Admin in this Group, so you<br />can't edit its status.";
       }
     }
+    else
+    {
+      tooltipText = 'Click to change the Variant\'s status, e.g. to Deploy or Archive';
+    }
 
     return (
-      <div> {
-        tooltip(
-          <Dropdown
-            options={this.getOptions()}
-            selectedIndex={this.getSelectedIndex()}
-            onChange={this.handleChange}
-            canEdit={this.canEdit()}
-            tooltips={this.props.tooltips}
-          />,
-          {
-            title: this.canEdit() ? 'Click to change the Variant\'s status, e.g. to Deploy or Archive' :
-              tooltipText,
-            position: 'right',
-          },
-        )}
-      </div>
+      <Dropdown
+        options={this.getOptions()}
+        selectedIndex={this.getSelectedIndex()}
+        onChange={this.handleChange}
+        canEdit={this.canEdit()}
+        tooltips={this.props.tooltips}
+        wrapperTooltip={tooltipText}
+      />
     );
     // <div className='status-dropdown-wrapper'>
     //   <div

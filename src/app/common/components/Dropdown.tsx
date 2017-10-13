@@ -77,6 +77,7 @@ export interface Props
   unmountOnChange?: boolean;
   openDown?: boolean;
   tooltips?: List<any>;
+  wrapperTooltip?: string;
 }
 
 @Radium
@@ -369,34 +370,40 @@ class Dropdown extends TerrainComponent<Props>
           this.state.up && this.state.open
           && optionsEl
         }
-        <div
-          className='dropdown-value'
-          ref='value'
-          style={[
-            { width: this.props.width },
-            ...dropdownValueStyle,
-          ]}
-          key='dropdown-value'
-        >
+        { tooltip(
+          <div
+            className='dropdown-value'
+            ref='value'
+            style={[
+              { width: this.props.width },
+              ...dropdownValueStyle,
+            ]}
+            key='dropdown-value'
+          >
+            {
+              // map through all of the options so that the dropdown takes the width of the longest one
+              //  CSS hides all but the selected option
+              options && options.map((option, index) =>
+                <div
+                  key={index}
+                  className={classNames({
+                    'dropdown-option-inner': true,
+                    'dropdown-option-value-selected': index === selectedIndex,
+                  })}
+                  style={fontColor(Colors().text1)}
+                >
+                  {
+                    this.getOptionName(option, index)
+                  }
+                </div>,
+              )
+            }
+          </div>,
           {
-            // map through all of the options so that the dropdown takes the width of the longest one
-            //  CSS hides all but the selected option
-            options && options.map((option, index) =>
-              <div
-                key={index}
-                className={classNames({
-                  'dropdown-option-inner': true,
-                  'dropdown-option-value-selected': index === selectedIndex,
-                })}
-                style={fontColor(Colors().text1)}
-              >
-                {
-                  this.getOptionName(option, index)
-                }
-              </div>,
-            )
-          }
-        </div>
+            title: this.props.wrapperTooltip,
+            position: 'right',
+          },
+        )}
         {
           !this.state.up && this.state.open
           && optionsEl
