@@ -1,6 +1,6 @@
 variables:
   GIT_SSL_NO_VERIFY: "true"
-  GIT_STRATEGY: "fetch"
+  GIT_STRATEGY: "clone"
   GET_SOURCES_ATTEMPTS: "3"
 
 # This folder is cached between builds

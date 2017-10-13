@@ -82,6 +82,7 @@ export interface ExportConfig extends ImportConfig, ExportTemplateConfig
 {
   filetype: string;
   rank?: boolean;
+  objectKey?: string;
 }
 
 export class Import
@@ -132,9 +133,13 @@ export class Import
 
       const dbSchema: Tasty.Schema = await database.getTasty().schema();
 
-      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json')
+      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json' && exprt.filetype !== 'json [type object]')
       {
         return reject('Filetype must be either CSV or JSON.');
+      }
+      if (exprt.filetype === 'json [type object]' && exprt.objectKey === undefined)
+      {
+        return reject('Must provide an object key if exporting in json [type object] format.');
       }
       if (headless)
       {
@@ -211,15 +216,21 @@ export class Import
       {
         writer = csvWriter();
       }
-      else if (exprt.filetype === 'json')
+      else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
       {
         writer = new stream.PassThrough();
       }
       const pass = new stream.PassThrough();
       writer.pipe(pass);
 
-      if (exprt.filetype === 'json')
+      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
       {
+        if (exprt.filetype === 'json [type object]')
+        {
+          writer.write('{ \"');
+          writer.write(exprt.objectKey);
+          writer.write('\":');
+        }
         writer.write('[');
       }
 
@@ -310,7 +321,7 @@ export class Import
           {
             writer.write(returnDoc);
           }
-          else if (exprt.filetype === 'json')
+          else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
           {
             isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
             writer.write(JSON.stringify(returnDoc));
@@ -325,9 +336,13 @@ export class Import
         }
         else
         {
-          if (exprt.filetype === 'json')
+          if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
           {
             writer.write(']');
+            if (exprt.filetype === 'json [type object]')
+            {
+              writer.write('}');
+            }
           }
           writer.end();
           resolve(pass);
@@ -337,7 +352,7 @@ export class Import
     });
   }
 
-  public async upsert(files: stream.Readable[], fields: object, headless: boolean): Promise<ImportConfig>
+  public async upsert(files: stream.Readable[] | stream.Readable, fields: object, headless: boolean): Promise<ImportConfig>
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
@@ -360,12 +375,19 @@ export class Import
       }
 
       let file: stream.Readable | null = null;
-      for (const f of files)
+      if (Array.isArray(files))
       {
-        if (f['fieldname'] === 'file')
+        for (const f of files)
         {
-          file = f;
+          if (f['fieldname'] === 'file')
+          {
+            file = f;
+          }
         }
+      }
+      else
+      {
+        file = files;
       }
       if (file === null)
       {
@@ -870,7 +892,7 @@ export class Import
     switch (this.NUMERIC_TYPES.has(typeObj['type']) ? 'number' : typeObj['type'])
     {
       case 'number':
-        if (item[field] === '')
+        if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }

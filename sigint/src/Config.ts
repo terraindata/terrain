@@ -44,32 +44,73 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as aesjs from 'aes-js';
+import * as fs from 'fs';
+import * as winston from 'winston';
 
-/*
-* Decrypt a message with the private key using AES128
-*/
-export async function decrypt(msg: string, privateKey: string): Promise<string>
+import { CmdLineUsage } from './CmdLineArgs';
+
+export interface Config
 {
-  return new Promise<string>((resolve, reject) =>
-  {
-    const key = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
-    const msgBytes = aesjs.utils.hex.toBytes(msg);
-    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    resolve(aesjs.utils.utf8.fromBytes(aesCtr.decrypt(msgBytes)));
-  });
+  config?: string;
+  port?: number;
+  debug?: boolean;
+  help?: boolean;
+  verbose?: boolean;
+  db?: string;
 }
 
-/*
-* Encrypt a message with the private key using AES128
-*/
-export async function encrypt(msg: string, privateKey: string): Promise<string>
+function updateObject<T>(obj: T, newObj: T): T
 {
-  return new Promise<string>((resolve, reject) =>
+  for (const key in newObj)
   {
-    const key: any = aesjs.utils.utf8.toBytes(privateKey); // type UInt8Array
-    const msgBytes: any = aesjs.utils.utf8.toBytes(msg);
-    const aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
-    resolve(aesjs.utils.hex.fromBytes(aesCtr.encrypt(msgBytes)));
-  });
+    if (newObj.hasOwnProperty(key))
+    {
+      obj[key] = newObj[key];
+    }
+  }
+  return obj;
 }
+
+export function loadConfigFromFile(config: Config): Config
+{
+  // load options from a configuration file, if specified.
+  if (config.config !== undefined)
+  {
+    try
+    {
+      const settings = fs.readFileSync(config.config, 'utf8');
+      const cfgSettings = JSON.parse(settings);
+      config = updateObject(config, cfgSettings);
+    }
+    catch (e)
+    {
+      winston.error('Failed to read configuration settings from ' + String(config.config));
+    }
+  }
+  return config;
+}
+
+export async function handleConfig(config: Config): Promise<void>
+{
+  winston.debug('Using configuration: ' + JSON.stringify(config));
+  if (config.help === true)
+  {
+    // tslint:disable-next-line
+    console.log(CmdLineUsage);
+    process.exit();
+  }
+
+  if (config.verbose === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'verbose';
+  }
+
+  if (config.debug === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'debug';
+  }
+}
+
+export default Config;

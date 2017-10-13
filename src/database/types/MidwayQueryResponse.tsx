@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-console
+import * as _ from 'lodash';
 
 import ElasticQueryResult from '../../../shared/database/elastic/ElasticQueryResponse';
 import MidwayErrorItem from '../../../shared/error/MidwayErrorItem';
@@ -64,26 +65,9 @@ export default class MidwayQueryResponse extends QueryResponse
     return new MidwayQueryResponse(obj.result, obj.errors, obj.request);
   }
 
-  public static formatElasticResult(result: QueryResult): any[]
+  public static formatElasticResult(result: QueryResult): any
   {
-    let ret = [];
-    const r = result as ElasticQueryResult;
-    const hits = r.hits.hits;
-    const results = hits.map((hit) =>
-    {
-      const source = hit._source;
-      source._index = hit._index;
-      source._type = hit._type;
-      source._id = hit._id;
-      source._score = hit._score;
-      if (hit.sort !== undefined)
-      {
-        source._sort = hit.sort[0];
-      }
-      return source;
-    });
-    ret = results;
-    return ret;
+    return result;
   }
 
   public constructor(result: QueryResult, errors: MidwayErrorItem[] = [], request: QueryRequest)
@@ -91,7 +75,7 @@ export default class MidwayQueryResponse extends QueryResponse
     super(result, errors, request);
   }
 
-  public getResultsData(): any[]
+  public getResultsData(): any
   {
     let result;
     switch (this.request.databasetype)

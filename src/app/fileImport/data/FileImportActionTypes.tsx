@@ -63,7 +63,7 @@ const FileImportActionTypes =
     setColumnToInclude: '',
     setColumnName: '',
     setColumnType: '',
-    updatePreviewRows: '',
+    updatePreviewColumns: '',
     saveTemplate: '',
     fetchTemplates: '',
     setTemplates: '',
@@ -77,6 +77,7 @@ const FileImportActionTypes =
     togglePreviewColumn: '',
     setExportFiletype: '',
     toggleExportRank: '',
+    setTypeObjectKey: '',
     setErrorMsg: '',
   };
 

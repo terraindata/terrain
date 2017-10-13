@@ -64,6 +64,7 @@ export interface Props
   title?: string;
   error?: boolean;
   fill?: boolean;
+  wide?: boolean;
   confirm?: boolean;
   confirmButtonText?: string;
   onConfirm?: () => void;
@@ -82,6 +83,7 @@ export interface Props
   closeOnConfirm?: boolean;
   className?: string;
   noFooterPadding?: boolean; // TODO: find better way
+  inputClassName?: string;
 }
 
 @Radium
@@ -137,6 +139,7 @@ class Modal extends TerrainComponent<Props>
             }
             className={classNames({
               'modal-content': true,
+              'modal-content-wide': this.props.wide,
               'modal-content-fill': this.props.fill,
               'modal-content-allow-overflow': this.props.allowOverflow,
               [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
@@ -207,7 +210,10 @@ class Modal extends TerrainComponent<Props>
                     backgroundColor(Colors().altBg1),
                   ]}
                   type='text'
-                  className='standard-input'
+                  className={classNames({
+                    'standard-input': true,
+                    [this.props.inputClassName]: this.props.inputClassName !== undefined && this.props.inputClassName !== '',
+                  })}
                   placeholder={this.props.textboxPlaceholderValue}
                   defaultValue={this.props.initialTextboxValue}
                   value={this.props.textboxValue}

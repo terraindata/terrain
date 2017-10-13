@@ -61,9 +61,10 @@ import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, Colors, fontColor } from '../../../common/Colors';
+import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
 
 import { Cards } from '../../../../blocks/types/Card';
+import { ElasticBlocks } from '../../../../database/elastic/blocks/ElasticBlocks';
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
@@ -80,16 +81,15 @@ export interface Props
 
   containerWidth?: number;
   containerHeight?: number;
+
 }
 
 class CardsColumn extends TerrainComponent<Props>
 {
   public state: {
     keyPath: KeyPath;
-    learningMode: boolean;
   } = {
     keyPath: this.computeKeyPath(this.props),
-    learningMode: false,
   };
 
   public innerHeight: number = -1;
@@ -130,28 +130,23 @@ class CardsColumn extends TerrainComponent<Props>
     //   });
   }
 
-  public toggleLearningMode()
-  {
-    this.setState({
-      learningMode: !this.state.learningMode,
-    });
-  }
-
-  public renderTopbar()
-  {
-    return (
-      <div className='cards-area-top-bar'>
-        <div className='cards-area-white-space' />
-        <Switch
-          first='Standard'
-          second='Learning'
-          onChange={this.toggleLearningMode}
-          selected={this.state.learningMode ? 2 : 1}
-          small={true}
-        />
-      </div>
-    );
-  }
+  // public renderTopbar()
+  // {
+  //   return (
+  //     <div
+  //       className='cards-area-top-bar'
+  //       style={backgroundColor(Colors().bg2)}
+  //     >
+  //       <div className='cards-area-white-space' />
+  //       <Switch
+  //         first='Standard'
+  //         second='Tuning'
+  //         onChange={this._toggle('tuningMode')}
+  //         small={true}
+  //       />
+  //     </div>
+  //   );
+  // }
 
   public toggleDeck()
   {
@@ -184,23 +179,14 @@ class CardsColumn extends TerrainComponent<Props>
     }
   }
 
-  public handleCardDrop(type: string)
+  public handleCardDrop(cardType: string)
   {
-    switch (type)
+    const theCard = ElasticBlocks[cardType];
+    if (theCard !== undefined)
     {
-      case 'eqlfrom':
-        return { key: 'from' };
-      case 'eqltype':
-        return { key: 'type' };
-      case 'eqlindex':
-        return { key: 'index' };
-      case 'eqlsize':
-        return { key: 'size' };
-      case 'eqlbody':
-        return { key: 'body' };
-      default:
-        return { key: '' };
+      return theCard['key'];
     }
+    return '';
   }
 
   public render()
@@ -209,7 +195,6 @@ class CardsColumn extends TerrainComponent<Props>
     const { cards, canEdit } = props;
     const { keyPath } = this.state;
     const canHaveDeck = canEdit;
-
     return (
       <div
         className={classNames({

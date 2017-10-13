@@ -228,6 +228,11 @@ const Util = {
 
   roundNumber(num, decimalPoints)
   {
+    if (decimalPoints <= 0)
+    {
+      return parseInt(num, 10);
+    }
+
     return Math.round(num * Math.pow(10, decimalPoints)) / Math.pow(10, decimalPoints);
   },
 
@@ -455,6 +460,11 @@ const Util = {
   siblings(reactNode): NodeList
   {
     return Util.parentNode(reactNode).childNodes;
+  },
+
+  children(reactNode): NodeList
+  {
+    return ReactDOM.findDOMNode(reactNode).childNodes;
   },
 
   selectText(field, start, end)

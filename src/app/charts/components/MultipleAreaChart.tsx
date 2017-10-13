@@ -44,9 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
+import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import ContainerDimensions from 'react-container-dimensions';
+import Util from 'util/Util';
 import
 {
   createContainer,
@@ -61,8 +64,6 @@ import
   VictoryTheme,
   VictoryTooltip,
 } from 'victory';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import * as LibraryTypes from './../../library/LibraryTypes';
 
 const styles = {
   wrapper: {
@@ -78,13 +79,25 @@ const styles = {
     height: '20%',
   },
   topChart: {
-    padding: { top: 10, bottom: 25, left: 40, right: 0 },
+    padding: { top: 50, bottom: 25, left: 50, right: 0 },
     areas: { data: { strokeWidth: 2, fillOpacity: 0.4 } },
+    scatters: { data: { strokeWidth: 1, stroke: 'white', fillOpacity: 0 } },
     tooltip: { fill: 'white' },
   },
   bottomChart: {
-    padding: { top: 10, bottom: 25, left: 40, right: 0 },
+    padding: { top: 10, bottom: 25, left: 50, right: 0 },
     areas: { data: { fill: '#c43a31' } },
+  },
+  legend: {
+    border: {
+      stroke: 'yellow',
+      fill: 'white',
+      padding: '5',
+    },
+    borderPadding: {
+      left: 10,
+      right: 10,
+    },
   },
 };
 
@@ -119,7 +132,7 @@ interface Props
 
 interface State
 {
-  selectedDomain: any;
+  brushDomain: any;
   zoomDomain: any;
   visibleDatasets: List<ID>;
   highlightDataset: ID;
@@ -136,7 +149,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
   };
 
   public state: State = {
-    selectedDomain: {},
+    brushDomain: {},
     zoomDomain: {},
     visibleDatasets: null,
     highlightDataset: null,
@@ -173,13 +186,15 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
       this.setState({
         visibleDatasets: visibleDatasets.toList(),
         datasetColors: this.mapDatasetColors(nextProps.datasets),
+        brushDomain: {},
+        zoomDomain: {},
       });
     }
   }
 
   public handleZoom(domain)
   {
-    this.setState({ selectedDomain: domain });
+    this.setState({ brushDomain: domain });
   }
 
   public handleBrush(domain)
@@ -217,6 +232,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
           scatters.push(
             <VictoryScatter
               key={key}
+              style={styles.topChart.scatters}
               data={ds.data}
               size={(datum, active) => active ? 5 : 0}
               x={xDataKey}
@@ -278,25 +294,32 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     const data = datasets
       .map((ds, key) =>
       {
-        let labelsStyle = {};
+        let labelsStyle = { fill: this.getDatasetColor(ds.id) };
+        const dataStyle = { fill: this.getDatasetColor(ds.id) };
 
         if (visibleDatasets.includes(key))
         {
-          labelsStyle = { textDecoration: 'underline' };
+          labelsStyle = Object.assign({}, labelsStyle, { textDecoration: 'underline' });
         }
 
         return {
           id: ds.id,
           name: ds.label,
           labels: labelsStyle,
+          symbol: dataStyle,
         };
       });
 
     return (
       <VictoryLegend
+        x={40}
+        y={9}
         name='legend'
+        gutter={20}
         data={data.toArray()}
         orientation={config.legend.orientation}
+        style={{ border: styles.legend.border }}
+        borderPadding={styles.legend.borderPadding}
       />
     );
   }
@@ -347,8 +370,6 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         // we want to paint the whole area
         mutation: (areaProps) =>
         {
-          // Store a reference to the active dataset, to bring it to the front
-          this.setState({ highlightDataset: props.datum.id });
           return {
             // Change the corresponding area style.
             style: Object.assign(
@@ -375,7 +396,6 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         eventKey: 'all',
         mutation: () =>
         {
-          this.setState({ highlightDataset: null });
           // Returning null resets all mutations, reverts the component back to
           // its original state.
           return null;
@@ -405,7 +425,9 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
   public formatDate(timestamp)
   {
     const date = new Date(timestamp);
-    return date.toISOString();
+    const dateString = date.toISOString();
+
+    return Util.formatDate(dateString);
   }
 
   public render()
@@ -414,6 +436,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     const data = this.renderData();
     const legend = this.renderLegend();
 
+    const { visibleDatasets } = this.state;
+
     const VictoryZoomVoronoiContainer = createContainer('zoom', 'voronoi');
 
     return (
@@ -421,18 +445,25 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         <div style={styles.topChartWrapper}>
           <ContainerDimensions>
             <VictoryChart
+              domainPadding={{ y: [0, 30] }}
               scale={config.topChart.scale}
               theme={VictoryTheme.material}
               padding={styles.topChart.padding}
               containerComponent={
                 <VictoryZoomVoronoiContainer
                   responsive={false}
-                  dimension='x'
+                  zoomDimension='x'
+                  voronoiDimension='x'
                   zoomDomain={this.state.zoomDomain}
-                  onDomainChange={this.handleZoom}
+                  cachedZoomDomain={this.state.zoomDomain}
+                  onZoomDomainChange={this.handleZoom}
                   labels={(d) => d.l ? `${this.formatDate(d.x)} => ${d.y}` : null}
                   labelComponent={
-                    <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
+                    <VictoryTooltip
+                      cornerRadius={0}
+                      flyoutStyle={styles.topChart.tooltip}
+                      dx={25}
+                    />
                   }
                 />
               }
@@ -467,9 +498,9 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               theme={VictoryTheme.material}
               containerComponent={
                 <VictoryBrushContainer responsive={false}
-                  dimension='x'
-                  selectedDomain={this.state.selectedDomain}
-                  onDomainChange={this.handleBrush}
+                  brushDimension='x'
+                  brushDomain={this.state.brushDomain}
+                  onBrushDomainChange={this.handleBrush}
                 />
               }
             >
