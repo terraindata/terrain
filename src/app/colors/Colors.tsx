@@ -844,7 +844,7 @@ export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolea
     const backgroundHover = Color(bgColor).mix(Color(strongColor), Colors().builder.cards.cardBgOpacity);
     const sideBorderColorLight = (localStorage.getItem('theme') === 'DARK') ? Colors().darkerHighlight : 'rgba(0,0,0,0.20)';
     const sideBorderColorDark = (localStorage.getItem('theme') === 'DARK') ? Colors().darkerHighlight : 'rgba(0,0,0,0.30)';
-    
+
     CACHE[key] = {
       background: hovered ? backgroundHover : bgColor,
       color: strongColor,
