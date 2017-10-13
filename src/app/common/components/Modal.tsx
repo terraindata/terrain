@@ -218,6 +218,7 @@ class Modal extends TerrainComponent<Props>
                   defaultValue={this.props.initialTextboxValue}
                   value={this.props.textboxValue}
                   onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
+                  autoFocus
                 />
               }
               {
