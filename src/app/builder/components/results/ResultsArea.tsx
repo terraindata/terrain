@@ -460,7 +460,10 @@ column if you have customized the results view.');
     }
 
     return (
-      <div className='results-top'>
+      <div
+        className='results-top'
+        style={getStyle('boxShadow', '0px 3px 12px ' + Colors().boxShadow)}
+      >
         <div className='results-top-summary'>
           {
             text

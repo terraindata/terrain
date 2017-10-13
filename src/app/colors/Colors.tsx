@@ -86,12 +86,14 @@ interface Theme
 
   highlight: string; // for slight emphasis
   darkerHighlight: string; // for depth effect with highlight
+  stroke: string; // should stand out against any background
 
   boxShadow: string; // shadow color
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
   inputBg: string;
+  inputFocusBg: string;
   inputBorder: string;
 
   scrollbarBG: string;
@@ -338,13 +340,15 @@ const DARK: Theme =
 
     highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
     darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
-
+    stroke: 'rgba(255,255,255,0.15)', // stands out against any background
+    
     boxShadow: 'rgba(0, 0, 0, 0.39)',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
     inputBg: 'rgba(0,0,0,0.25)',
-    inputBorder: 'none',
+    inputBorder: 'rgba(0,0,0,0.25)',
+    inputFocusBg: 'rgba(0,0,0,0.5)',
 
     active: darkActive,
     activeText: '#fff',
@@ -433,7 +437,7 @@ const DARK: Theme =
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
 
-        cardBgOpacity: 0.45,
+        cardBgOpacity: 0.15,
 
         cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
 
@@ -550,7 +554,7 @@ const LIGHT: Theme =
     bg2: 'rgb(237, 239, 243)',
     bg3: '#fff',
 
-    emptyBg: 'rgb(249, 251, 255)',
+    emptyBg: '#c7cacf', // 'rgb(249, 251, 255)',
 
     border1: 'rgb(200, 202, 206)',
     border2: 'rgb(100,105,107)',
@@ -571,13 +575,15 @@ const LIGHT: Theme =
 
     highlight: 'rgba(210,215,219,0.25)', // for slight emphasis
     darkerHighlight: 'rgb(210,215,219,0.5)', // to make a depth effect with highlight
+    stroke: '#aaa', // stands out against any background
 
-    boxShadow: 'rgba(130,130,130,0.4)',
+    boxShadow: 'rgba(130,130,130,0.3)',
 
     fadedOutBg: 'rgba(255, 255, 255, 0.75)', // bg to cover up things when they are faded out
 
-    inputBg: 'rgba(255,255,255,0.15)', //237, 239, 243)',
-    inputBorder: '1px solid rgb(200, 202, 206)',
+    inputBg: 'rgba(255,255,255,1)', //237, 239, 243)',
+    inputBorder: 'rgb(200, 202, 206)',
+    inputFocusBg: '#fff',
 
     active: darkActive,
     activeText: '#fff',
@@ -592,7 +598,7 @@ const LIGHT: Theme =
 
     error: '#d14f42',
 
-    import: 'rgba(30, 180, 250, 0.75)',
+    import: '#1efab4',
 
     resultLine: 'rgba(0,0,0,0.25)',
 

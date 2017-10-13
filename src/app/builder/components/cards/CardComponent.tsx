@@ -73,7 +73,7 @@ import CardHelpTooltip from './CardHelpTooltip';
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { borderColor, cardStyle, Colors, getStyle } from '../../../colors/Colors';
+import { borderColor, cardStyle, Colors, getStyle, fontColor } from '../../../colors/Colors';
 import ColorsActions from '../../../colors/data/ColorsActions';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
@@ -770,10 +770,7 @@ class _CardComponent extends TerrainComponent<Props>
       columnIndex={this.props.columnIndex}
       keyPath={keyPath}
       language={this.props.card.static.language}
-      textStyle={{
-        color: this.props.card.static.colors[0],
-        backgroundColor: this.state.hovering ? Colors().bg1 : undefined,
-      }}
+      textStyle={fontColor(this.props.card.static.colors[0])}
       handleCardDrop={this.props.handleCardDrop}
       tuningMode={this.props.tuningMode}
     />;

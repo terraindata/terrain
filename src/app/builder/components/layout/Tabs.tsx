@@ -281,6 +281,7 @@ export class Tabs extends TerrainComponent<TabsProps> {
               })}
               key={index}
               onClick={action.onClick}
+              style={action.enabled ? backgroundColor(Colors().bg3) : undefined}
             >
               {
                 action.icon &&

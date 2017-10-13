@@ -1074,6 +1074,7 @@ class FileImportPreview extends TerrainComponent<Props>
         style={{
           color: Colors().import,
           border: 'solid 1px ' + Colors().import,
+          background: Colors().bg3,
         }}
       >
         {this.props.exporting ? 'Export' : 'Import'}
@@ -1266,7 +1267,7 @@ class FileImportPreview extends TerrainComponent<Props>
           'fi-preview': true,
           'fi-preview-export': this.props.exporting,
         })}
-        style={backgroundColor(Colors().emptyBg)}
+        style={backgroundColor(Colors().bg3)}
       >
         {
           this.props.exporting && !this.props.query ?

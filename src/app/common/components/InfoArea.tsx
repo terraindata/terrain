@@ -131,7 +131,7 @@ class InfoArea extends TerrainComponent<Props>
           'info-area': true,
           'info-area-inline': this.props.inline,
         })}
-        style={backgroundColor(Colors().emptyBg)}
+        style={backgroundColor(Colors().bg3)}
       >
         {this.renderThing('large')}
         {this.renderThing('small')}

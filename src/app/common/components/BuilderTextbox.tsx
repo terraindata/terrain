@@ -406,6 +406,7 @@ class BuilderTextbox extends TerrainComponent<Props>
       {
         textStyle.color = getCardColors('parameter', Colors().builder.cards.inputParameter);
       }
+      console.log(textStyle);
 
       let value;
       if (typeof (this.state.boxValue) === 'number')

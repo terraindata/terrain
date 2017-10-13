@@ -64,7 +64,7 @@ import Query from '../../../items/types/Query';
 import ColorsActions from '../../colors/data/ColorsActions';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
+import { backgroundColor, Colors, fontColor, borderColor } from '../../colors/Colors';
 import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
@@ -345,13 +345,25 @@ const BuilderColumn = createReactClass<any, any>(
         >
           <div
             className='builder-title-bar'
-            style={{ 'box-shadow': '0px 3px 9px ' + Colors().boxShadow }}
+            style={{
+              'box-shadow': '0px 3px 9px ' + Colors().boxShadow,
+              borderColor: Colors().stroke,
+            }}
           >
             {
               this.props.index === 0 ? null : (
-                <div className='builder-resize-handle' ref='resize-handle'>
-                  <div className='builder-resize-handle-line'></div>
-                  <div className='builder-resize-handle-line'></div>
+                <div
+                  className='builder-resize-handle'
+                  ref='resize-handle'
+                >
+                  <div
+                    className='builder-resize-handle-line'
+                    style={borderColor(Colors().stroke)}
+                  ></div>
+                  <div
+                    className='builder-resize-handle-line'
+                    style={borderColor(Colors().stroke)}
+                  ></div>
                 </div>
               )
             }
