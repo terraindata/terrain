@@ -68,6 +68,10 @@ const FileImportActions =
     (tableName: string) =>
       $(ActionTypes.changeTableName, { tableName }),
 
+    setServerDbTable:
+    (serverId: number, name: string, dbName: string, tableName: string) =>
+      $(ActionTypes.setServerDbTable, {serverId, name, dbName, tableName}),
+
     changeHasCsvHeader:
     (hasCsvHeader: boolean) =>
       $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),

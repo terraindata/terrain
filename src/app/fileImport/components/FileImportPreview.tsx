@@ -181,6 +181,15 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public componentDidMount()
   {
+    if (this.props.exporting)
+    {
+      const stringQuery: string =
+        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      const parsedQuery = JSON.parse(stringQuery);
+      const dbName = parsedQuery['index'];
+      const tableName = parsedQuery['type'];
+      Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
+    }
     Actions.fetchTemplates(this.props.exporting);
     this.setState({
       templateOptions: this.props.templates.map((template, i) => template.templateName),
