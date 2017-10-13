@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { Display } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
@@ -64,6 +65,7 @@ export interface Card extends IRecord<Card>
   tuning?: boolean; // whether the card is in the tuning section
   // whether a card in tuning column is collapsed (needs to be sep. from closed)
   tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
+  errors: List<string>;
 
   // the following fields are excluded from the server save
   static: {
@@ -154,6 +156,7 @@ export const _card = (config: CardConfig) =>
 
   config = _.extend(config, {
     id: '',
+    errors: Immutable.List([]),
     _isCard: true,
     _isBlock: true,
     closed: false,

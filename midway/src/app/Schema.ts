@@ -98,12 +98,20 @@ const appSchemaSQL: string[] = [
      active bool NOT NULL,
      archived bool NOT NULL,
      currentlyRunning bool NOT NULL,
+     name text NOT NULL,
      jobId integer NOT NULL,
      jobType text NOT NULL,
      paramsScheduleStr text,
      schedule text NOT NULL,
      sort text NOT NULL,
      transportStr text);`,
+  `CREATE TABLE IF NOT EXISTS credentials
+    (id integer PRIMARY KEY,
+     createdBy integer NOT NULL,
+     meta text NOT NULL,
+     name text NOT NULL,
+     permissions integer,
+     type text NOT NULL); `,
 ];
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)

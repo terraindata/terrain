@@ -51,6 +51,12 @@ import { _AnalyticsState, AnalyticsState } from './AnalyticsStore';
 
 const AnalyticsReducer = {};
 
+AnalyticsReducer[ActionTypes.fetchStart] =
+  (state, action: Action<{}>) =>
+  {
+    return state.set('loaded', false);
+  };
+
 AnalyticsReducer[ActionTypes.fetch] =
   (state, action: Action<{ analytics: any }>) =>
   {
@@ -60,7 +66,9 @@ AnalyticsReducer[ActionTypes.fetch] =
     Object.keys(analytics).forEach((variantId) =>
     {
       const variantAnalytics = analytics[variantId];
-      nextState = nextState.setIn(['data', parseInt(variantId, 10)], variantAnalytics);
+      nextState = nextState
+        .set('loaded', true)
+        .setIn(['data', parseInt(variantId, 10)], variantAnalytics);
     });
 
     return nextState;

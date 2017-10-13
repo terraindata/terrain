@@ -52,25 +52,28 @@ import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import { CredentialConfig, Credentials } from '../credentials/Credentials';
 import { ExportConfig, Import } from '../import/Import';
 import { UserConfig } from '../users/Users';
 import { versions } from '../versions/VersionRouter';
 
 export const imprt: Import = new Import();
+export const credentials: Credentials = new Credentials();
 
-const sftpconfig: object =
-  {
-    host: '10.1.1.103',
-    port: 22,
-    username: 'testuser',
-    password: 'Terrain123!',
-  };
+// const sftpconfig: object =
+//   {
+//     host: '10.1.1.103',
+//     port: 22,
+//     username: 'testuser',
+//     password: 'Terrain123!',
+//   };
 
 export interface SchedulerConfig
 {
   active?: number;                   // whether the schedule is running (different from currentlyRunning)
   archived?: number;                 // whether the schedule has been archived (deleted) or not
   currentlyRunning?: number;         // whether the job is currently running
+  name: string;                      // name of the schedule
   id?: number;                       // schedule ID
   jobId?: number;                    // corresponds to job ID
   jobType?: string;                  // import or export etc.
@@ -101,6 +104,7 @@ export class Scheduler
         'active',
         'archived',
         'currentlyRunning',
+        'name',
         'jobId',
         'jobType',
         'paramsScheduleStr',
@@ -115,7 +119,6 @@ export class Scheduler
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      // TODO: cancel job if it's currently running
       if (id !== undefined)
       {
         const schedules: SchedulerConfig[] = await this.get(id) as SchedulerConfig[];
@@ -124,6 +127,7 @@ export class Scheduler
           for (const schedule of schedules)
           {
             schedule.archived = 1;
+            await this.cancelJob(schedule.jobId);
             return resolve(await App.DB.upsert(this.schedulerTable, schedule as object) as SchedulerConfig[]);
           }
         }
@@ -132,11 +136,15 @@ export class Scheduler
     });
   }
 
-  public async cancelJob(jobID: number): Promise<boolean>
+  public async cancelJob(jobId?: number): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
-      const schedules: any[] = await App.DB.select(this.schedulerTable, [], { jobId: jobID }) as any[];
+      if (jobId === undefined)
+      {
+        return resolve(false);
+      }
+      const schedules: any[] = await App.DB.select(this.schedulerTable, [], { jobId }) as any[];
       if (schedules.length === 0)
       {
         return resolve(false);
@@ -145,7 +153,7 @@ export class Scheduler
       {
         if (schedules.hasOwnProperty(schedule))
         {
-          this.scheduleMap[schedule['id']].cancelNext();
+          this.scheduleMap[schedule['id']].cancel();
         }
       }
       return resolve(true);
@@ -156,7 +164,6 @@ export class Scheduler
   {
     return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      // TODO: cancel job if it's currently running
       if (id !== undefined)
       {
         const schedules: SchedulerConfig[] = await this.get(id) as SchedulerConfig[];
@@ -165,6 +172,10 @@ export class Scheduler
           for (const schedule of schedules)
           {
             schedule.active = status;
+            if (status === 0)
+            {
+              await this.cancelJob(schedule.jobId);
+            }
             return resolve(await App.DB.upsert(this.schedulerTable, schedule as object) as SchedulerConfig[]);
           }
         }
@@ -192,12 +203,12 @@ export class Scheduler
       if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'sftp')
       {
         jobId = 0;
-        packedParamsSchedule = [req['paramsJob'], (req['transport'] as any)['filename'], req['sort'], 'utf8'];
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
       else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'sftp')
       {
         jobId = 1;
-        packedParamsSchedule = [req['paramsJob'], (req['transport'] as any)['filename'], req['sort'], 'utf8'];
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
       req.active = 1;
       req.archived = 0;
@@ -261,14 +272,29 @@ export class Scheduler
     // 0: import via sftp
     // 1: export via sftp
     await this.createJob(async (scheduleID: number, fields: object,
-      path: string, sort: string, encoding?: string | null): Promise<any> => // import with sftp
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
         const sftp = new Client();
+        let sftpconfig: object = {};
         try
         {
           await this.setJobStatus(scheduleID, 1);
+          const path: string = transport['filename'];
+          const creds: CredentialConfig[] = await credentials.get(transport['id'], transport['type']);
+          if (creds.length === 0)
+          {
+            return rejectJob('No SFTP credentials matched parameters.');
+          }
+          try
+          {
+            sftpconfig = JSON.parse(creds[0].meta);
+          }
+          catch (e)
+          {
+            return rejectJob(e.message);
+          }
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
           await sftp.connect(sftpconfig);
           const checkIfDirectoryExists: object[] = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
@@ -308,6 +334,7 @@ export class Scheduler
               await this.setJobStatus(scheduleID, 0);
               await sftp.end();
               winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import with sftp.');
+              return resolveJob('Successfully completed scheduled import with sftp.');
             }
             catch (e)
             {
@@ -332,15 +359,30 @@ export class Scheduler
       });
     });
 
-    await this.createJob(async (scheduleID: number, fields: object, path: string,
+    await this.createJob(async (scheduleID: number, fields: object, transport: object,
       sort: string, encoding?: string | null) => // export with sftp
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
         const sftp = new Client();
+        let sftpconfig: object = {};
         try
         {
           await this.setJobStatus(scheduleID, 1);
+          const path: string = transport['filename'];
+          const creds: CredentialConfig[] = await credentials.get(transport['id'], transport['type']);
+          if (creds.length === 0)
+          {
+            return rejectJob('No SFTP credentials matched parameters.');
+          }
+          try
+          {
+            sftpconfig = JSON.parse(creds[0].meta);
+          }
+          catch (e)
+          {
+            return rejectJob(e.message);
+          }
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
           await sftp.connect(sftpconfig);
           const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
@@ -364,6 +406,7 @@ export class Scheduler
               readStream = await sftp.put(writeStream, path, false, encoding);
               await sftp.end();
               winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export with sftp.');
+              return resolveJob('Successfully completed scheduled export with sftp.');
             }
             catch (e)
             {
@@ -482,6 +525,7 @@ export class Scheduler
         return reject('Cannot upsert without a JobID.');
       }
       schedule.jobType = schedule.jobType === undefined ? '' : schedule.jobType;
+      schedule.name = schedule.name === undefined ? '' : schedule.name;
       schedule.sort = schedule.sort === undefined ? '' : schedule.sort;
       if (schedule.schedule === undefined)
       {
@@ -498,24 +542,21 @@ export class Scheduler
             {
               return reject('Cannot upsert on an archived schedule.');
             }
-            if (scheduleObj.currentlyRunning !== undefined && scheduleObj.currentlyRunning === 1)
+            this.scheduleMap[(scheduleObj['id'] as number)].cancel();
+            if (scheduleObj.active === 1)
             {
-              this.scheduleMap[(scheduleObj['id'] as number)].cancelNext();
-              if (scheduleObj.active === 1)
-              {
-                const resultJobId: string = schedule.id !== undefined ? (schedule['id'] as number).toString() : '-1';
-                const appendedParamsArr: any[] = [schedule.paramsScheduleArr];
-                const job: any = nodeScheduler.scheduleJob(schedule.schedule,
-                  function callJob(unwrappedParams)
-                  {
-                    this.jobMap[(schedule['jobId'] as number)](...unwrappedParams);
-                  }.bind(this, appendedParamsArr));
-                this.scheduleMap[resultJobId] = job;
-              }
+              const resultJobId: string = schedule.id !== undefined ? (schedule['id'] as number).toString() : '-1';
+              const appendedParamsArr: any[] = [schedule.paramsScheduleArr];
+              const job: any = nodeScheduler.scheduleJob(schedule.schedule,
+                function callJob(unwrappedParams)
+                {
+                  this.jobMap[(schedule['jobId'] as number)](...unwrappedParams);
+                }.bind(this, appendedParamsArr));
+              this.scheduleMap[resultJobId] = job;
             }
           }
           // insert a version to save the past state of this schedule
-          await versions.create(user, 'schedules', schedule.id, schedule);
+          await versions.create(user, 'schedules', schedules[0].id as number, schedules[0]);
         }
       }
       else

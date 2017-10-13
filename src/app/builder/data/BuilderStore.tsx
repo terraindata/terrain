@@ -106,6 +106,8 @@ const DefaultState = _BuilderState();
 
 import BuilderReducers from './BuilderReducers';
 
+import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
+
 export const BuilderStore: IStore<BuilderState> = Redux.createStore(
   (
     state: BuilderState = DefaultState,
@@ -151,6 +153,11 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
     {
       // a card changed and we need to re-translate the tql
       //  needs to be after the card change has affected the state
+      const newCards = ESCardParser.parseAndUpdateCards(state.query.cards);
+      if (newCards !== state.query.cards)
+      {
+        state = state.setIn(['query', 'cards'], newCards);
+      }
       state = state
         .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));
       state = state
