@@ -65,6 +65,9 @@ export interface DatabaseConfig
   dsn: string;
   host: string;
   status?: string;
+  isAnalytics: boolean;
+  analyticsIndex: string;
+  analyticsType: string;
 }
 
 export class Databases
@@ -82,6 +85,9 @@ export class Databases
         'dsn',
         'host',
         'status',
+        'isAnalytics',
+        'analyticsIndex',
+        'analyticsType',
       ],
     );
   }
