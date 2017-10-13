@@ -58,18 +58,18 @@ import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
 
+import { notificationManager } from 'common/components/InAppNotification';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
+import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
 import HitsTable from './HitsTable';
 import { MAX_HITS, ResultsState } from './ResultTypes';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { notificationManager } from 'common/components/InAppNotification';
-import { tooltip } from './../../../common/components/tooltip/Tooltips';
 
 const RESULTS_PAGE_SIZE = 20;
 const ClipboardIcon = require('images/icon_clipboard.svg');
@@ -157,15 +157,15 @@ class ResultsColumn extends TerrainComponent<Props>
             onClick={() => { this.setSelectedTab(name, index); }}
             style={index === this.state.selectedTab ? ACTIVE_TAB_STYLE : INACTIVE_TAB_STYLE}
           >
+            <div className='results-column-tab-name'>{name}</div>
             {name !== 'Raw' &&
               <div
                 className='results-column-tab-number'
                 style={this.state.highlightedTabs.get(name.toLowerCase()) ? backgroundColor(Colors().active) : {}}
               >
-                {this.getNumberOf(name)}
+                {this.state.highlightedTabs.get(name.toLowerCase()) ? this.getNumberOf(name) : ''}
               </div>
             }
-            <div className='results-column-tab-name'>{name}</div>
           </div>,
         )}
       </div>
