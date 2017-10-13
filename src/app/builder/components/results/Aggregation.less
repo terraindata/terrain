@@ -1,7 +1,6 @@
 @import "../../../common/Common.less";
 
 .aggregation {
-  width: 100%;
   margin: 40px;
   margin-bottom: 0px;
   border-bottom: 1px solid;
@@ -43,8 +42,7 @@
     .aggregation-title-bar-options {
       float: right; 
       position: relative;
-      padding-bottom: 22px;
-      margin-bottom: 12px;
+      top: -3px;
 
       .clipboard-icon-wrapper {
         display: inline;
@@ -68,15 +66,18 @@
         right: 0px;
       }
 
+
       .aggregation-title-bar-export {
         .rotate180;
         display: inline-block;
         cursor: pointer;
         position: absolute;
         right: 50px;
-        height: 18px;
-        fill: white;
         top: 6px;
+        .aggregation-title-bar-export-icon {
+          height: 18px;
+          fill: white;
+        }
       }
 
       .menu-wrapper {
@@ -117,7 +118,7 @@
     margin-left: 8px;
     display: block;
     margin-top: -16px;
-    padding-top: 16px;
+    padding-top: 32px;
     padding-left: 12px;
   }
 }

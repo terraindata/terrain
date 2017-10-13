@@ -265,7 +265,10 @@ class TQLEditor extends TerrainComponent<Props>
 
   private executeChange: any = () =>
   {
-    this.props.onChange(this.state.codeMirrorInstance.getValue());
+    if (this.props.onChange !== undefined)
+    {
+      this.props.onChange(this.state.codeMirrorInstance.getValue());
+    }
   }
 
   private handleHighlighting(cmInstance, change)
