@@ -54,7 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import Dropdown from 'common/components/Dropdown';
 import { notificationManager } from 'common/components/InAppNotification';
 import TerrainComponent from 'common/components/TerrainComponent';

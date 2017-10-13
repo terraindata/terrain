@@ -51,7 +51,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import { notificationManager } from 'common/components/InAppNotification';
 import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
