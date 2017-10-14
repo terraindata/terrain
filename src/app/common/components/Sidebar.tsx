@@ -51,8 +51,8 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
+import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
 import ColorsActions from '../../colors/data/ColorsActions';
-import { backgroundColor, Colors } from '../../common/Colors';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
@@ -84,6 +84,8 @@ export class Sidebar extends TerrainComponent<Props>
   {
     ColorsActions.setStyle('.sidebar-expand-icon', { fill: Colors().text2 });
     ColorsActions.setStyle('.sidebar-expand:hover .sidebar-expand-icon', { fill: Colors().text1 });
+    ColorsActions.setStyle('.sidebar-link svg', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.sidebar-link-inner-selected svg', { fill: '#fff !important' });
   }
 
   public handleLinkDisabled(link)
@@ -122,7 +124,7 @@ export class Sidebar extends TerrainComponent<Props>
               <div
                 className={Util.objToClassname({
                   'sidebar-link': true,
-                  'sidebar-link-selected': index === this.props.selectedIndex,
+                  'xr': index === this.props.selectedIndex,
                 })}
                 key={'sidebar-link-' + index}
                 style={{
@@ -133,13 +135,18 @@ export class Sidebar extends TerrainComponent<Props>
               >
 
                 {tooltip(<div
-                  className='sidebar-link-inner'
+                  className={classNames({
+                    'sidebar-link-inner': true,
+                    'sidebar-link-inner-selected': index === this.props.selectedIndex,
+                  })}
+
                 >
                   {
                     link.icon
                   }
                   <div
                     className='sidebar-link-text'
+                    style={fontColor(Colors().text1)}
                   >
                     {
                       link.text
