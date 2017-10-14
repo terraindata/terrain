@@ -109,6 +109,13 @@
   }
 
   &.builder-tb-cards {
+    cursor: pointer;
+    
+    &:hover {
+      .builder-tb-cards-toggle {
+        opacity: 1;
+      }
+    }
   }
 
   @card-chip-width: 20px;
@@ -253,11 +260,5 @@
     fill: #fff;
   }
 
-  opacity: 0;
-  &:hover {
-    opacity: 0.9;
-  }
-  &:active {
-    opacity: 1.0;
-  }
+  opacity: 0.5;
 }

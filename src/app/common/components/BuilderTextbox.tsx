@@ -493,6 +493,7 @@ class BuilderTextbox extends TerrainComponent<Props>
           'builder-tb-cards-closed': this.props.tuningMode ? card.tuningClosed : card.closed,
         })}
         ref='cards'
+        onClick={this.toggleClosed}
       >
         <div className='builder-tb-cards-input'>
           <div
@@ -501,7 +502,6 @@ class BuilderTextbox extends TerrainComponent<Props>
           >
             <div
               className='builder-tb-cards-toggle'
-              onClick={this.toggleClosed}
             >
               <ArrowIcon />
             </div>
