@@ -341,7 +341,7 @@ const DARK: Theme =
     highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
     darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
     stroke: 'rgba(255,255,255,0.15)', // stands out against any background
-    
+
     boxShadow: 'rgba(0, 0, 0, 0.39)',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
