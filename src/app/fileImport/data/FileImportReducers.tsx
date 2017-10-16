@@ -182,10 +182,10 @@ FileImportReducers[ActionTypes.changeTableName] =
 FileImportReducers[ActionTypes.setServerDbTable] =
   (state, action) =>
     state
-    .set('serverId', action.payload.serverId)
-    .set('serverName', action.payload.name)
-    .set('dbName', action.payload.dbName)
-    .set('tableName', action.payload.tableName);
+      .set('serverId', action.payload.serverId)
+      .set('serverName', action.payload.name)
+      .set('dbName', action.payload.dbName)
+      .set('tableName', action.payload.tableName);
 
 FileImportReducers[ActionTypes.changeHasCsvHeader] =
   (state, action) =>

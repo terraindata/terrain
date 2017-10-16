@@ -189,7 +189,8 @@ class FileImportPreview extends TerrainComponent<Props>
       const dbName = parsedQuery['index'];
       const tableName = parsedQuery['type'];
       Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
-    }
+    } // Parse the TQL and set the filters so that when we fetch we get the right templates.
+
     Actions.fetchTemplates(this.props.exporting);
     this.setState({
       templateOptions: this.props.templates.map((template, i) => template.templateName),
