@@ -54,6 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
 import Dropdown from 'common/components/Dropdown';
 import { notificationManager } from 'common/components/InAppNotification';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -61,15 +62,13 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import VariantSelector from 'library/components/VariantSelector';
 import { LibraryStore } from 'library/data/LibraryStore';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 
-import ControlActions from '../../data/ControlActions';
+import TemplateSelector from './TemplateSelector';
 
 import './CreateHeadlessCommand.less';
 
 const { List } = Immutable;
 const ClipboardIcon = require('images/icon_clipboard.svg');
-const ViewIcon = require('images/icon_info.svg');
 
 type Template = FileImportTypes.Template;
 
@@ -87,7 +86,7 @@ export interface HeadlessCommandData
   requests: string[];
 }
 
-interface HeadlessCommandArgs
+export interface HeadlessCommandArgs
 {
   template: Template;
   fileType: string;
@@ -142,12 +141,12 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
     let fileTypeTextImport; // TODO remove when import is able to handle type object
     switch (fileType)
     {
-      case fileTypeOptions.get(0): // json
-      case fileTypeOptions.get(1): // json [type object]
+      case fileTypeOptions.get(FileTypes.JSON): // json
+      case fileTypeOptions.get(FileTypes.JSON_TYPE_OBJECT): // json [type object]
         contentTypeText = 'application/json';
         fileTypeTextImport = 'json';
         break;
-      case fileTypeOptions.get(2): // csv
+      case fileTypeOptions.get(FileTypes.CSV): // csv
         contentTypeText = 'text/plain';
         fileTypeTextImport = 'csv';
         break;
@@ -164,9 +163,9 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
         requests.push('Please Select a Variant');
       }
 
-      if (fileType === fileTypeOptions.get(1) && (objectKey === undefined || objectKey === ''))
+      if (fileType === fileTypeOptions.get(FileTypes.JSON_TYPE_OBJECT) && (objectKey === undefined || objectKey === ''))
       {
-        requests.push('Please Provide an Export Key');
+        requests.push('Please Provide an Export Object Key');
       }
 
       command = `curl -X POST  -H 'Content-Type: ${contentTypeText}' ` +
@@ -213,12 +212,6 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     filenameValue: '',
   };
 
-  public constructor(props)
-  {
-    super(props);
-    this.getTemplateTextList = memoizeOne(this.getTemplateTextList);
-  }
-
   public componentDidMount()
   {
     this.setState({
@@ -239,14 +232,6 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
   public getInitialURL()
   {
     return window.location.origin.match(/http:\/\/localhost:8080/) ? 'localhost:3000' : window.location.origin;
-  }
-
-  public getTemplateTextList(): List<string>
-  {
-    return this.props.templates.map((template, index) =>
-    {
-      return `(${template.export ? 'Export' : 'Import'}) ${template.templateName}`;
-    }).toList();
   }
 
   public handleTextCopied()
@@ -270,62 +255,15 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     if (filename.match(/\.csv$/i) && (fileTypeIndex === FileTypes.JSON || fileTypeIndex === FileTypes.JSON_TYPE_OBJECT))
     { // switch from json to csv
       this.setState({
-        fileTypeIndex: 2,
+        fileTypeIndex: FileTypes.CSV,
       });
     }
     else if (filename.match(/\.json$/i) && fileTypeIndex === FileTypes.CSV)
     { // switch from json to csv
       this.setState({
-        fileTypeIndex: 0,
+        fileTypeIndex: FileTypes.JSON,
       });
     }
-  }
-
-  public renderInfoTable(template)
-  {
-    const typeText = template !== undefined ? (template.export ? 'Export' : 'Import') : '';
-    const labelStyle = [fontColor(Colors().altText3), getStyle('fontSize', '12px')];
-
-    return (
-      <div className='headless-generator-data'>
-        <div className='headless-generator-column'>
-          <table className='headless-generator-info-table'>
-            <tbody>
-              <tr>
-                <td style={labelStyle}> Template Type: </td>
-                <td style={labelStyle}> {typeText} </td>
-              </tr>
-              <tr>
-                <td style={labelStyle}> Template ID: </td>
-                <td style={labelStyle}> {template.templateId} </td>
-              </tr>
-              <tr>
-                <td style={labelStyle}> Access token: </td>
-                <td className='access-token-cell' style={labelStyle}> {template.persistentAccessToken} </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className='headless-generator-column'>
-          <table className='headless-generator-info-table'>
-            <tbody>
-              <tr>
-                <td style={labelStyle}> Server Name: </td>
-                <td style={labelStyle}> {this.props.getServerName(template.dbid)} </td>
-              </tr>
-              <tr>
-                <td style={labelStyle}> Index: </td>
-                <td style={labelStyle}> {template.dbname} </td>
-              </tr>
-              <tr>
-                <td style={labelStyle}> Type: </td>
-                <td style={labelStyle}> {template.tablename} </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
   }
 
   public renderExportOptions(template)
@@ -335,6 +273,12 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     const { fileTypeIndex } = this.state;
     return (
       <div>
+        <VariantSelector
+          libraryState={LibraryStore.getState()}
+          onChangeSelection={this._setStateWrapper('selectedIds')}
+          ids={this.state.selectedIds}
+          dropdownWidth={inputElementWidth}
+        />
         <div className='headless-form-block'>
           <div className='headless-form-column' style={columnStyle}>
             <div className='headless-form-label'>
@@ -366,7 +310,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             {
               fileTypeIndex === FileTypes.JSON_TYPE_OBJECT &&
               <div className='headless-form-label'>
-                Export Key
+                Export Object Key
               </div>
             }
             {
@@ -381,12 +325,6 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
             }
           </div>
         </div>
-        <VariantSelector
-          libraryState={LibraryStore.getState()}
-          onChangeSelection={this._setStateWrapper('selectedIds')}
-          ids={this.state.selectedIds}
-          dropdownWidth={inputElementWidth}
-        />
       </div>
     );
   }
@@ -475,7 +413,6 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
   {
     const template: Template = this.state.index !== -1 ? this.props.templates.get(this.state.index) : undefined;
     const typeText = template !== undefined ? (template.export ? 'Export' : 'Import') : '';
-    const templateTextList = this.getTemplateTextList();
     const { command, requests, errors } = computeHeadlessCommand({
       template,
       fileType: fileTypeOptions.get(this.state.fileTypeIndex),
@@ -488,36 +425,12 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     const formComplete = requests.length === 0 && errors.length === 0;
     return (
       <div className='headless-command-generator' style={backgroundColor(Colors().altBg2)}>
-        <div className='headless-entry-row'>
-          <div className='headless-entry-label'>
-            Template
-          </div>
-          <div className='headless-entry-input'>
-            <Dropdown
-              options={templateTextList.size !== 0 ? templateTextList : undefined}
-              selectedIndex={this.state.index}
-              onChange={this._setStateWrapper('index')}
-              canEdit={true}
-              directionBias={90}
-            />
-          </div>
-          <div className='headless-entry-icon-wrapper'
-            style={iconWrapperStyle}
-          >
-            {
-              template !== undefined && tooltip(
-                <ViewIcon className='headless-entry-icon' />,
-                {
-                  html: this.renderInfoTable(template),
-                  trigger: 'click',
-                  position: 'right',
-                  style: { display: 'inline' },
-                  interactive: true,
-                },
-              )
-            }
-          </div>
-        </div>
+        <TemplateSelector
+          index={this.state.index}
+          templates={this.props.templates}
+          getServerName={this.props.getServerName}
+          onChange={this._setStateWrapper('index')}
+        />
         {
           template !== undefined && template.export ? this.renderExportOptions(template) : this.renderImportOptions(template)
         }
@@ -531,7 +444,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
               >
                 {
                   tooltip(
-                    <ClipboardIcon className='headless-entry-icon clipboard-icon-big' />,
+                    <ClipboardIcon className='headless-entry-icon' />,
                     { title: 'Copy Command to Clipboard', distance: 15 },
                   )
                 }

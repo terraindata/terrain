@@ -67,6 +67,7 @@ export interface Props
   wide?: boolean;
   confirm?: boolean;
   confirmButtonText?: string;
+  confirmDisabled?: boolean; // if true, confirm button is disabled
   onConfirm?: () => void;
   onClose: () => void;
   children?: any;
@@ -108,6 +109,11 @@ class Modal extends TerrainComponent<Props>
     }
   }
 
+  public handleFocus(e)
+  {
+    e.target.select(); // text input field value will show selected
+  }
+
   public render()
   {
     const defaultTitle = this.props.error ? 'Error' : 'Please Confirm';
@@ -124,6 +130,20 @@ class Modal extends TerrainComponent<Props>
       backgroundColor('#fff'),
       borderColor('#EDEFF3'),
     ];
+
+    const confirmButtonStyle = this.props.confirmDisabled ?
+      [
+        fontColor(Colors().activeText),
+        backgroundColor(Colors().activeHover),
+        borderColor(Colors().altBg2),
+        getStyle('cursor', 'default'),
+      ]
+      :
+      [
+        backgroundColor(Colors().active, Colors().activeHover),
+        borderColor(Colors().active, Colors().activeHover),
+        fontColor(Colors().activeText),
+      ];
 
     return (
       <FadeInOut
@@ -219,6 +239,8 @@ class Modal extends TerrainComponent<Props>
                   defaultValue={this.props.initialTextboxValue}
                   value={this.props.textboxValue}
                   onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
+                  autoFocus
+                  onFocus={this.handleFocus}
                 />
               }
               {
@@ -262,13 +284,12 @@ class Modal extends TerrainComponent<Props>
                   {
                     this.props.confirm ?
                       <div
-                        className='button modal-confirm-button'
+                        className={classNames({
+                          'button': true,
+                          'modal-confirm-button': true,
+                        })}
                         onClick={this.closeModalSuccess}
-                        style={[
-                          backgroundColor(Colors().active, Colors().activeHover),
-                          borderColor(Colors().active, Colors().activeHover),
-                          fontColor(Colors().activeText),
-                        ]}
+                        style={confirmButtonStyle}
                         key='modal-confirm-button'
                       >
                         {

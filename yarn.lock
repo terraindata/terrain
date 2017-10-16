@@ -2342,6 +2342,10 @@ cron-parser@^2.4.0:
     is-nan "^1.2.1"
     moment-timezone "^0.5.0"
 
+cronstrue@^0.10.10:
+  version "0.10.10"
+  resolved "https://registry.yarnpkg.com/cronstrue/-/cronstrue-0.10.10.tgz#16b177079822fcbda8282654792a3d8a2735c484"
+
 cross-spawn@^4.0.0:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-4.0.2.tgz#7b9247621c23adfdd3856004a823cbe397424d41"
