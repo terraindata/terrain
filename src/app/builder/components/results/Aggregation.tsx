@@ -69,6 +69,7 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
 import AggregationHistogram from './AggregationHistogram';
+import AggregationScatterPlot from './AggregationScatterPlot';
 import AggregationsTable from './AggregationsTable';
 import { Aggregation as AggregationClass } from './ResultTypes';
 
@@ -85,16 +86,31 @@ export interface Props
   query: Query;
 }
 
+export enum DISPLAY_TYPES
+{
+  Histogram,
+  ScatterPlot,
+  Table,
+  Raw,
+}
+
+const DISPLAY_TYPE_NAMES = {
+  [DISPLAY_TYPES.Histogram]: 'Histogram',
+  [DISPLAY_TYPES.ScatterPlot]: 'ScatterPlot',
+  [DISPLAY_TYPES.Table]: 'Table',
+  [DISPLAY_TYPES.Raw]: 'Raw',
+};
+
 @Radium
 class AggregationComponent extends TerrainComponent<Props> {
   public state: {
     expanded: boolean,
-    displayType: string,
+    displayType: DISPLAY_TYPES,
     isSingleValue: boolean,
     singleValue: string,
   } = {
     expanded: false,
-    displayType: 'Table',
+    displayType: DISPLAY_TYPES.Raw,
     isSingleValue: false,
     singleValue: '',
   };
@@ -132,8 +148,9 @@ class AggregationComponent extends TerrainComponent<Props> {
       {
         return;
       }
-      if ((currentAgg.displayType === 'Table' && !this.canBeTable(nextProps.aggregation)) ||
-        (currentAgg.displayType === 'Histogram' && this.canBeHistogram(nextProps.aggregation) === undefined)
+      if ((currentAgg.displayType === DISPLAY_TYPES.Table && !this.canBeTable(nextProps.aggregation)) ||
+        (currentAgg.displayType === DISPLAY_TYPES.Histogram && this.canBeHistogram(nextProps.aggregation) === undefined) ||
+        (currentAgg.displayType === DISPLAY_TYPES.ScatterPlot && !this.canBeScatterPlot(nextProps.aggregation))
       )
       {
         const displayType = this.getBestDisplayType(nextProps.aggregation);
@@ -164,14 +181,18 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public getBestDisplayType(aggregation?)
   {
-    let displayType = 'Raw';
+    let displayType = DISPLAY_TYPES.Raw;
     if (this.canBeHistogram(aggregation) !== undefined)
     {
-      displayType = 'Histogram';
+      displayType = DISPLAY_TYPES.Histogram;
+    }
+    else if (this.canBeScatterPlot(aggregation))
+    {
+      displayType = DISPLAY_TYPES.ScatterPlot;
     }
     else if (this.canBeTable(aggregation))
     {
-      displayType = 'Table';
+      displayType = DISPLAY_TYPES.Table;
     }
     return displayType;
   }
@@ -196,7 +217,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     });
   }
 
-  public changeDisplayType(type: string)
+  public changeDisplayType(type)
   {
     const currAgg = this.props.query.aggregationList.get(this.props.name);
     currAgg.displayType = type;
@@ -208,24 +229,26 @@ class AggregationComponent extends TerrainComponent<Props> {
 
   public handleDisplayTypeChange(index: number)
   {
-    const displayTypeOptions = this.getDropdownOptions();
-    this.changeDisplayType(displayTypeOptions[index]);
+    const options = this.getDropdownOptions();
+    this.changeDisplayType(parseFloat(options[index]));
   }
 
   public getDropdownOptions()
   {
-    const options = ['Raw'];
-
+    const options = [String(DISPLAY_TYPES.Raw)];
     if (this.canBeHistogram() !== undefined)
     {
-      options.push('Histogram');
+      options.push(String(DISPLAY_TYPES.Histogram));
+    }
+    if (this.canBeScatterPlot())
+    {
+      options.push(String(DISPLAY_TYPES.ScatterPlot));
     }
 
     if (this.canBeTable())
     {
-      options.push('Table');
+      options.push(String(DISPLAY_TYPES.Table));
     }
-
     return options;
   }
 
@@ -237,7 +260,7 @@ class AggregationComponent extends TerrainComponent<Props> {
   public renderAgg()
   {
     const values = _.values(this.props.aggregation)[0];
-    const displayTypeOptions = this.getDropdownOptions();
+    const options = this.getDropdownOptions();
     return (
       <div
         className={classNames({
@@ -285,8 +308,9 @@ class AggregationComponent extends TerrainComponent<Props> {
                   </div>
                 </CopyToClipboard>
                 <Dropdown
-                  options={List(displayTypeOptions)}
-                  selectedIndex={displayTypeOptions.indexOf(this.state.displayType)}
+                  options={List(options)}
+                  optionsDisplayName={Map(DISPLAY_TYPE_NAMES)}
+                  selectedIndex={options.indexOf(String(this.state.displayType))}
                   canEdit={true}
                   onChange={this.handleDisplayTypeChange}
                   className='aggregation-display-type-dropdown'
@@ -328,11 +352,13 @@ class AggregationComponent extends TerrainComponent<Props> {
 
     switch (this.state.displayType)
     {
-      case 'Table':
+      case DISPLAY_TYPES.Table:
         return this.renderTableView(values);
-      case 'Histogram':
+      case DISPLAY_TYPES.Histogram:
         return this.renderHistogram(values);
-      case 'Raw':
+      case DISPLAY_TYPES.ScatterPlot:
+        return this.renderScatterPlot(values);
+      case DISPLAY_TYPES.Raw:
         return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
       default:
         return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
@@ -382,6 +408,23 @@ class AggregationComponent extends TerrainComponent<Props> {
         return this.findKey(value, k);
       }
     }
+  }
+
+  public renderScatterPlot(values)
+  {
+    return (
+      <AggregationScatterPlot
+        data={values.values}
+        colors={[Colors().active, Colors().activeHover]}
+      />
+    );
+  }
+
+  public canBeScatterPlot(overrideAggration?)
+  {
+    const aggregation = overrideAggration !== undefined ? overrideAggration : this.props.aggregation;
+    const values = _.values(aggregation)[0];
+    return values.values !== undefined;
   }
 
   public canBeHistogram(overrideAggregation?)

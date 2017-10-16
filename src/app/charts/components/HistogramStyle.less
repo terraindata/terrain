@@ -1,33 +1,36 @@
-.histogram-chart {
-	overflow: visible;
-	.tick {
-		stroke-width: 1px;
-		text-anchor: end;
-	    font-weight: lighter;
-	    font-size: 12px;
-	    letter-spacing: 1;
-	}
-	.domain {
-		display: none;
-	}
-
-	.histogram-bar-tooltip {
-		text {
-		    font-size: 11px;
-		    letter-spacing: 0.3px;
-		    text-anchor: start;
-		    text-overflow: ellipsis; 
-		    width: 75px;
-		    }
-	}
-
-	.bar {
-		opacity: 0.5;
-		cursor: pointer;
-		&:hover {
-			opacity: 0.8;
+.histogram-chart-wrapper {
+	position: relative;
+	.histogram-chart {
+		overflow: visible;
+		.tick {
 			stroke-width: 1px;
-			// stroke: red;
+			text-anchor: end;
+		    font-weight: lighter;
+		    font-size: 12px;
+		    letter-spacing: 1;
+		}
+		.domain {
+			display: none;
+		}
+
+		.histogram-bar-tooltip {
+			text {
+			    font-size: 11px;
+			    letter-spacing: 0.3px;
+			    text-anchor: start;
+			    text-overflow: ellipsis; 
+			    width: 75px;
+			    }
+		}
+
+		.bar {
+			opacity: 0.5;
+			cursor: pointer;
+			&:hover {
+				opacity: 0.8;
+				stroke-width: 1px;
+				// stroke: red;
+			}
 		}
 	}
 }

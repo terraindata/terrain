@@ -47,13 +47,12 @@ THE SOFTWARE.
 
 // tslint:disable:no-invalid-this restrict-plus-operands radix strict-boolean-expressions no-var-requires only-arrow-functions variable-name max-line-length no-unused-expression no-shadowed-variable
 
-import './HistogramStyle.less';
+import './ScatterPlotStyle.less';
 
 import { Colors } from '../../common/Colors';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');
-// import * as d3 from 'd3';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import Util from '../../util/Util';
@@ -67,16 +66,16 @@ const scaleMax = (scale) => scale.range()[scale.range().length - 1];
 const scaleDomainMin = (scale) => scale.domain()[0];
 const scaleDomainMax = (scale) => scale.domain()[scale.domain().length - 1];
 
-const Histogram = {
+const ScatterPlot = {
 
   create(el, state)
   {
-    d3.select(el).attr('class', 'histogram-chart-wrapper');
+    d3.select(el).attr('class', 'scatter-plot-wrapper');
 
     const svg = d3
       .select(el)
       .append('svg')
-      .attr('class', 'histogram-chart')
+      .attr('class', 'scatter-plot')
       .attr('width', state.width)
       .attr('height', state.height)
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
@@ -96,26 +95,18 @@ const Histogram = {
       .attr('x', xMargin)
       .attr('y', yMargin);
 
-    // need a transparent filling background so that the touchmove events on inner-svg register as expected
-    innerSvg.append('rect')
-      .attr('x', 0)
-      .attr('y', 0)
-      .attr('width', '100%')
-      .attr('height', '100%')
-      .attr('opacity', 0);
-
     innerSvg.append('g')
-      .attr('class', 'bars');
+      .attr('class', 'points');
 
     this.update(el, state);
 
     // apply CSS styles
 
     const styleCSS = `
-    .histogram-chart .tick {
+    .scatter-plot .tick {
       stroke: ${Colors().altHighlight};
     }
-    .histogram-chart .tick text {
+    .scatter-plot .tick text {
       fill: ${Colors().altBg2} !important;
     }
     `;
@@ -125,13 +116,13 @@ const Histogram = {
   update(el, state)
   {
     d3.select(el)
-      .select('.histogram-chart')
+      .select('.scatter-plot')
       .attr('width', state.width)
       .attr('height', state.height)
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height);
 
-    const scales = this._scales(el, state.domain, state.barsData, state.width, state.height);
-    this._draw(el, scales, state.domain, state.barsData, state.width, state.height, state.colors, state.xLabels, state.yLabels);
+    const scales = this._scales(el, state.domain, state.pointsData, state.width, state.height);
+    this._draw(el, scales, state.domain, state.pointsData, state.width, state.height, state.colors);
   },
 
   destroy(el)
@@ -150,7 +141,7 @@ const Histogram = {
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY));
   },
 
-  _drawAxes(el, scales, width, height, xLabels, yLabels)
+  _drawAxes(el, scales, width, height)
   {
     // TODO: add support for ylabels
     const yLeftAxis = d3.svg.axis()
@@ -165,22 +156,11 @@ const Histogram = {
       .call(yLeftAxis);
 
     const bottomAxis = d3.svg.axis();
-    if (xLabels !== undefined && xLabels.length > 0)
-    {
-      const numLabels = Math.min(1, (width / xLabels.length) / labelSpacing) * xLabels.length;
-      bottomAxis.scale(scales.x)
-        .ticks(Math.floor(numLabels))
-        .tickFormat(function(d) { return xLabels[d]; })
-        .orient('bottom');
-    }
-    else
-    {
-      bottomAxis.scale(scales.x)
-        .ticks(width > 500 ? 6 : 4)
-        .tickSize(-1 * scaleMin(scales.pointY) + scaleMax(scales.pointY), -1 * scaleMin(scales.pointY) + scaleMax(scales.pointY))
-        .tickFormat(Util.formatNumber)
-        .orient('bottom');
-    }
+    bottomAxis.scale(scales.x)
+      .ticks(width > 500 ? 6 : 4)
+      .tickSize(-1 * scaleMin(scales.pointY) + scaleMax(scales.pointY), -1 * scaleMin(scales.pointY) + scaleMax(scales.pointY))
+      .tickFormat(Util.formatNumber)
+      .orient('bottom');
 
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
@@ -198,21 +178,6 @@ const Histogram = {
         }
         return 'middle';
       });
-
-    // rotate axis labels if they are text (for legibility)
-    if (xLabels !== undefined && xLabels.length > 0)
-    {
-      d3.select(el).select('.bottomAxis').selectAll('text')
-        .style('text-anchor', 'end')
-        .attr('dx', '-.8em')
-        .attr('dy', '.15em')
-        .attr('transform', 'rotate(-65)');
-      const bottomAxis = d3.select(el).select('.bottomAxis');
-      const bottomAxisHeight = bottomAxis.node().getBBox().height;
-      d3.select(el).select('.histogram-chart')
-        .attr('style', `padding-bottom: ${bottomAxisHeight - 20}px`);
-
-    }
   },
 
   _mouseoverFactory: (el, scales, colors, drawToolTip) => function(point)
@@ -223,16 +188,40 @@ const Histogram = {
 
   _mouseoutFactory: (el) => (point) =>
   {
-    d3.select(el).select('.histogram-bar-tooltip').remove();
+    d3.select(el).select('.scatter-point-tooltip').remove();
   },
 
-  _drawToolTip(el, mouse, scales, bar, colors)
+  _drawPoints(el, scales, pointsData, colors)
   {
-    d3.select(el).selectAll('.histogram-bar-tooltip').remove();
-    const xVal = scales.realX.invert(bar.x.baseVal.value);
-    const yVal = scales.realBarY.invert(bar.y.baseVal.value);
-    const text_x = bar.id !== undefined && bar.id !== '' ?
-      bar.id : 'X: ' + Util.formatNumber(xVal);
+    const g = d3.select(el).selectAll('.points');
+
+    const point = g.selectAll('circle')
+      .data(pointsData, (d) => d['x']);
+
+    point.enter()
+      .append('circle')
+      .attr('cx', (d) => scales.realX(d['x']))
+      .attr('cy', (d) => scales.realPointY(d['y']))
+      .attr('fill', Colors().altBg1)
+      .attr('stroke', colors[0])
+      .attr('class', 'point')
+      .attr('r', 10);
+
+    point
+      .attr('_id', (d) => d['x']);
+
+    point.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
+    point.on('mouseout', this._mouseoutFactory(el));
+
+    point.exit().remove();
+  },
+
+  _drawToolTip(el, mouse, scales, point, colors)
+  {
+    d3.select(el).selectAll('.scatter-point-tooltip').remove();
+    const xVal = scales.realX.invert(point.cx.baseVal.value);
+    const yVal = scales.realPointY.invert(point.cy.baseVal.value);
+    const text_x = 'X: ' + Util.formatNumber(xVal);
     const text_y = 'Y: ' + Util.formatNumber(yVal);
     const h = 35;
     const w = 75;
@@ -242,7 +231,7 @@ const Histogram = {
     const y = (mouse[1] + h) > containerHeight ? mouse[1] - h - 14 : mouse[1] + 14;
 
     const tooltip = d3.select(el).select('.inner-svg').append('g')
-      .attr('class', 'histogram-bar-tooltip');
+      .attr('class', 'scatter-point-tooltip');
 
     tooltip.append('rect')
       .attr('x', x)
@@ -278,64 +267,18 @@ const Histogram = {
       .attr('width', w - 3);
   },
 
-  _drawBars(el, scales, barsData, colors, xLabels)
-  {
-    const g = d3.select(el).selectAll('.bars');
-
-    const bar = g.selectAll('.bar')
-      .data(barsData, (d) => d['x']);
-
-    const xPadding = 5;
-
-    const chartWidth = d3.select(el).select('.inner-svg').attr('width');
-    let barWidth = (chartWidth / barsData.length) - 1;
-    if (barWidth < 1)
-    {
-      barWidth = 1;
-    }
-
-    bar.enter()
-      .append('rect')
-      .attr('fill', colors[0])
-      .attr('class', 'bar');
-
-    bar
-      .attr('x', (d) => scales.realX(d['x']))
-      .attr('width', barWidth)
-      .attr('y', (d) => scales.realBarY(d['y']))
-      .attr('height', (d) => scaleMin(scales.realBarY) - scales.realBarY(d['y']))
-      .attr('id', (d) => d['label']);
-
-    bar.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
-    bar.on('mouseout', this._mouseoutFactory(el));
-
-    bar.exit().remove();
-  },
-
-  _extendChart(el, xLabels)
-  {
-    if (xLabels !== undefined && xLabels.length > 0)
-    {
-      const bottomAxis = d3.select(el).select('.bottomAxis');
-      const bottomAxisHeight = bottomAxis.node().getBBox().height;
-      d3.select(el).select('.histogram-chart')
-        .attr('style', `padding-bottom: ${bottomAxisHeight - 20}px`);
-    }
-  },
-
-  _draw(el, scales, domain, barsData, width, height, colors, xLabels, yLabels)
+  _draw(el, scales, domain, pointsData, width, height, colors)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
-      .attr('height', scaleMin(scales.realBarY));
+      .attr('height', scaleMin(scales.realPointY));
 
     this._drawBg(el, scales);
-    this._drawAxes(el, scales, width, height, xLabels, yLabels);
-    this._drawBars(el, scales, barsData, colors, xLabels);
-    this._extendChart(el, xLabels);
+    this._drawAxes(el, scales, width, height);
+    this._drawPoints(el, scales, pointsData, colors);
   },
 
-  _scales(el, domain, barsData, stateWidth, stateHeight)
+  _scales(el, domain, pointsData, stateWidth, stateHeight)
   {
     if (!domain)
     {
@@ -360,145 +303,14 @@ const Histogram = {
       .range([height - yMargin, 0])
       .domain(domain.y);
 
-    // TODO CALCULATE THIS CORRECTLY
-    let barsMax = domain['y'][1];
-    barsMax = barsMax * 1.1;
-
-    const barY = d3.scale.linear()
-      .range([height, yMargin])
-      .domain([0, barsMax]);
-
-    const realBarY = d3.scale.linear()
-      .range([height - yMargin, 0])
-      .domain([0, barsMax]);
-
     return {
       x,
       pointY,
-      barY,
       realX,
       realPointY,
-      realBarY,
     };
   },
 
 };
 
-export default Histogram;
-
-// USING VICTORY CHART:
-
-// // Copyright 2017 Terrain Data, Inc.
-
-// // tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
-// import * as classNames from 'classnames';
-// import * as Immutable from 'immutable';
-// import * as _ from 'lodash';
-// import * as Radium from 'radium';
-// import * as React from 'react';
-// import
-// {
-//   createContainer,
-//   VictoryArea,
-//   VictoryAxis,
-//   VictoryBar,
-//   VictoryBrushContainer,
-//   VictoryChart,
-//   VictoryGroup,
-//   VictoryLegend,
-//   VictoryPortal,
-//   VictoryScatter,
-//   VictoryTheme,
-//   VictoryTooltip,
-// } from 'victory';
-// import ColorManager from '../../util/ColorManager';
-// import { backgroundColor, borderColor, Colors, fontColor } from './../../common/Colors';
-// import TerrainComponent from './../../common/components/TerrainComponent';
-
-// export interface Props
-// {
-//   data: BarData[];
-//   height?: number;
-//   width?: number;
-//   showLabels?: boolean;
-//   xCategories?: string[];
-//   yCategories?: string[];
-//   onBarClick?: () => void;
-//   onBarHover?: () => void;
-//   horizontal?: boolean;
-//   parentStyle?: any;
-//   barStyle?: any;
-//   barWidth?: number;
-// }
-
-// interface BarData
-// {
-//   x: number;
-//   y: number;
-// }
-
-// @Radium
-// class Histogram extends TerrainComponent<Props> {
-
-//   public state: {
-//     xValues: number[],
-//     yValues: number[],
-//     barWidth: number,
-//   } = {
-//     xValues: [],
-//     yValues: [],
-//     barWidth: 0,
-//   };
-
-//   public getBarWidth()
-//   {
-//     if (this.props.barWidth !== undefined && this.props.barWidth > 0)
-//     {
-//       return this.props.barWidth;
-//     }
-//     const width = this.props.width !== undefined ? this.props.width : 300;
-//     const numBars = this.props.data.length;
-//     if (numBars > 0)
-//     {
-//       return width / numBars;
-//     }
-//     return 0;
-//   }
-
-//   public parseData()
-//   {
-//     const barWidth = this.getBarWidth();
-//     return this.props.data.map((data) => _.extend({}, data, { width: barWidth }));
-//   }
-
-//   public render()
-//   {
-
-//   }
-
-//   public render()
-//   {
-//     const data = this.parseData();
-//     const { height, width, showLabels, xCategories, yCategories, onBarClick, onBarHover,
-//       horizontal, parentStyle, barStyle } = this.props;
-//     return (
-//       <VictoryChart
-//         theme={VictoryTheme.material}
-//         height={height !== undefined ? height : 300}
-//         width={width !== undefined ? width : 300}
-//         domainPadding={10}
-//       >
-//         <VictoryBar
-//           style={{
-//             data: {
-//               fill: Colors().active,
-//             },
-//           }}
-//           data={this.props.data}
-//         />
-//       </VictoryChart>
-//     );
-//   }
-// }
-
-// export default Histogram;
+export default ScatterPlot;

@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import { List, Map } from 'immutable';
 import { BaseClass, New } from '../../../Classes';
+import { DISPLAY_TYPES } from './Aggregation';
 
 export const MAX_HITS = 200;
 
@@ -71,7 +72,7 @@ export type Hits = List<Hit>;
 
 class AggregationClass extends BaseClass
 {
-  public displayType: string;
+  public displayType: DISPLAY_TYPES;
   public expanded: boolean;
 }
 export type Aggregation = AggregationClass & IRecord<AggregationClass>;
