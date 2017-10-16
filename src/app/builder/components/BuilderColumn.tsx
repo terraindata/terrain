@@ -61,9 +61,10 @@ import UserStore from '../../users/data/UserStore';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
+import ColorsActions from '../../colors/data/ColorsActions';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
@@ -180,6 +181,11 @@ const BuilderColumn = createReactClass<any, any>(
       const rejigger = () => this.setState({ rand: Math.random() });
       this.unsubUser = UserStore.subscribe(rejigger);
       this.unsubRoles = RolesStore.subscribe(rejigger);
+
+      ColorsActions.setStyle('.builder-column .builder-title-bar-options .bc-options-svg .cls-1 ', { fill: Colors().altBg1 });
+      ColorsActions.setStyle('.builder-column .builder-title-bar-options .menu-wrapper ', { 'border-color': Colors().altBg1 });
+      ColorsActions.setStyle('.builder-column .builder-title-bar .builder-title-bar-title svg .cls-1', { fill: Colors().altBg1 });
+
     },
 
     componentWillUnmount()
@@ -339,12 +345,25 @@ const BuilderColumn = createReactClass<any, any>(
         >
           <div
             className='builder-title-bar'
+            style={{
+              'box-shadow': '0px 3px 9px ' + Colors().boxShadow,
+              'borderColor': Colors().stroke,
+            }}
           >
             {
               this.props.index === 0 ? null : (
-                <div className='builder-resize-handle' ref='resize-handle'>
-                  <div className='builder-resize-handle-line'></div>
-                  <div className='builder-resize-handle-line'></div>
+                <div
+                  className='builder-resize-handle'
+                  ref='resize-handle'
+                >
+                  <div
+                    className='builder-resize-handle-line'
+                    style={borderColor(Colors().stroke)}
+                  ></div>
+                  <div
+                    className='builder-resize-handle-line'
+                    style={borderColor(Colors().stroke)}
+                  ></div>
                 </div>
               )
             }

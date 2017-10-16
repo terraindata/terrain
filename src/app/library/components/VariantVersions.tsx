@@ -50,7 +50,7 @@ import * as Radium from 'radium';
 import './VariantVersions.less';
 const classNames = require('classnames');
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import UserStore from './../../users/data/UserStore';

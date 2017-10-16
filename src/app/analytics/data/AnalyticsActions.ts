@@ -55,12 +55,12 @@ import { ItemStatus } from '../../../items/types/Item';
 
 import Ajax from './../../util/Ajax';
 
-function calculateDateRange(dateRangeId: number, callback)
+function calculateDateRange(api, dateRangeId: number, callback)
 {
   let start = null;
   let end = null;
 
-  Ajax.getServerTime(
+  api.getServerTime(
     (serverTimeResponse) =>
     {
       const { serverTime } = serverTimeResponse;
@@ -120,6 +120,7 @@ const Actions =
 
         const numericDateRangeId = parseInt(dateRangeId, 10);
         calculateDateRange(
+          api,
           numericDateRangeId,
           (dateRange) =>
           {

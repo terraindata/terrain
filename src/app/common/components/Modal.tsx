@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import FadeInOut from './FadeInOut';
 import './Modal.less';
@@ -115,12 +115,15 @@ class Modal extends TerrainComponent<Props>
 
     const msgTag = this.props.pre ? <pre /> : <div />;
 
-    const messageStyle = fontColor(Colors().altText2);
-    const buttonTextColor = Color(Colors().altText2);
+    const messageStyle = [
+      fontColor('#242424'),
+      backgroundColor('#fff'),
+    ];
+    const buttonTextColor = Color('#242424');
     const buttonStyle = [
-      fontColor(Colors().altText3, buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
-      backgroundColor(Colors().altBg1),
-      borderColor(Colors().altBg2),
+      fontColor('#424242', buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
+      backgroundColor('#fff'),
+      borderColor('#EDEFF3'),
     ];
 
     const confirmButtonStyle = this.props.confirmDisabled ?
@@ -168,7 +171,7 @@ class Modal extends TerrainComponent<Props>
               })}
               style={[
                 fontColor(Colors().altText1),
-                backgroundColor(Colors().altBg1),
+                backgroundColor('#fff'),
               ]}
             >
               <div
@@ -178,7 +181,9 @@ class Modal extends TerrainComponent<Props>
                 })}
                 style={[
                   fontColor(Colors().text1),
-                  this.props.error ? backgroundColor(Colors().error) : backgroundColor(Colors().bg3),
+                  this.props.error ? backgroundColor(Colors().error) :
+                    (localStorage.getItem('theme') === 'DARK') ? backgroundColor(Colors().bg3) : backgroundColor(Colors().bg2),
+
                 ]}
               >
                 {
@@ -220,10 +225,6 @@ class Modal extends TerrainComponent<Props>
               {
                 this.props.showTextbox &&
                 <input
-                  style={[
-                    fontColor(Colors().altText2),
-                    backgroundColor(Colors().altBg1),
-                  ]}
                   type='text'
                   className={classNames({
                     'standard-input': true,

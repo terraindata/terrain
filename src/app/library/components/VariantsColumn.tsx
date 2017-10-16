@@ -56,6 +56,7 @@ import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
+import { Colors, fontColor } from '../../colors/Colors';
 import CreateLine from '../../common/components/CreateLine';
 import Modal from '../../common/components/Modal';
 import RolesStore from '../../roles/data/RolesStore';
@@ -534,6 +535,7 @@ class VariantsColumn extends TerrainComponent<Props>
             />
             <div
               className='library-item-line'
+              style={fontColor(Colors().text1)}
             >
               {
                 'Changed ' + Util.formatDate(variant.lastEdited)

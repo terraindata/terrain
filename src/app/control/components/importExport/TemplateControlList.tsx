@@ -51,7 +51,6 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'common/Colors';
 import { notificationManager } from 'common/components/InAppNotification';
 import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
@@ -61,6 +60,7 @@ import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import { ServerMap } from 'schema/SchemaTypes';
 import { MidwayError } from 'shared/error/MidwayError';
+
 import ControlActions from '../../data/ControlActions';
 import { ControlList, HeaderConfig } from '../ControlList';
 

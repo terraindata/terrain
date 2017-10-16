@@ -79,6 +79,8 @@ const analyticsResponse = [
   },
 ];
 
+const serverTimeResponse = { serverTime: '2015-06-06T00:00:00.000Z' };
+
 const mockStore = createMockStore();
 
 describe('AnalyticsActions', () =>
@@ -108,7 +110,15 @@ describe('AnalyticsActions', () =>
         onError?: (ev: Event) => void,
       ) => onLoad(analyticsResponse);
 
+      Ajax.getServerTime = (
+        onLoad: (response: any) => void,
+        onError?: (ev: Event) => void,
+      ) => onLoad(serverTimeResponse);
+
       const expectedActions = [
+        {
+          type: ActionTypes.fetchStart,
+        },
         {
           type: ActionTypes.fetch,
           payload: { analytics: analyticsResponse },

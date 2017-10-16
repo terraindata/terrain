@@ -50,6 +50,7 @@
     "moduleNameMapper": {
       "^auth/(.*)$": "<rootDir>/src/app/auth/$1",
       "^analytics/(.*)$": "<rootDir>/src/app/analytics/$1",
+      "^app/(.*)$": "<rootDir>/src/app/$1",
       "^builder/(.*)$": "<rootDir>/src/app/builder/$1",
       "^charts/(.*)$": "<rootDir>/src/app/charts/$1",
       "^common/(.*)$": "<rootDir>/src/app/common/$1",

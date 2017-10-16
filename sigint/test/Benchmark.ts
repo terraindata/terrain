@@ -43,84 +43,64 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { backgroundColor, Colors } from '../../colors/Colors';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './Switch.less';
 
-export interface Props
-{
-  first: string;
-  second: string;
-  selected: number;
-  onChange: (selected: number) => void;
-  small?: boolean;
-  medium?: boolean;
-}
+import benchrest = require('bench-rest');
+import winston = require('winston');
 
-@Radium
-class Switch extends TerrainComponent<Props>
+import App from '../src/App';
+
+const db = 'http://127.0.0.1:9200';
+const host = 'http://127.0.0.1:43002';
+let server;
+
+export async function startServer()
 {
-  public handleSwitch()
+  try
   {
-    this.props.onChange((this.props.selected + 1) % 2);
+    const options =
+      {
+        debug: true,
+        db,
+        port: 43002,
+      };
+
+    const app = new App(options);
+    server = await app.start();
   }
-
-  public render()
+  catch (e)
   {
-    const classes = classNames({
-      'switch': true,
-      'switch-on-first': this.props.selected === 1,
-      'switch-on-second': this.props.selected !== 1,
-      'switch-small': this.props.small,
-      'switch-medium': this.props.medium,
-      'noselect': true,
-    });
-
-    return (
-      <div
-        className={classes}
-        onClick={this.handleSwitch}
-        style={SWITCH_STYLE}
-      >
-        <div
-          className='switch-on'
-          style={backgroundColor(Colors().active)}
-        />
-        <div
-          className='switch-first'
-          style={this.props.selected === 1 ? ACTIVE_SECTION_STYLE : undefined}
-        >
-          {
-            this.props.first
-          }
-        </div>
-        <div
-          className='switch-second'
-          style={this.props.selected !== 1 ? ACTIVE_SECTION_STYLE : undefined}
-        >
-          {
-            this.props.second
-          }
-        </div>
-      </div>
-    );
+    throw new Error('starting event server sigint: ' + String(e));
   }
 }
 
-const SWITCH_STYLE = {
-  'backgroundColor': Colors().bg3,
-  'color': Colors().text2,
-
-  ':hover': {
-    color: Colors().text1,
-  },
+export const flow = {
+  main: [
+    {
+      post: host + '/v1', json: {
+        eventid: '#{INDEX}',
+        variantid: '#{INDEX}',
+        visitorid: '#{INDEX}',
+      },
+    },
+    { get: host + '/v1?eventid=#{INDEX}&variantid=#{INDEX}&visitorid=#{INDEX}' },
+  ],
 };
 
-const ACTIVE_SECTION_STYLE = {
-  color: '#fff',
+const runOptions = {
+  limit: 20,
+  prealloc: 1000,
+  iterations: 1000,
 };
 
-export default Switch;
+// tslint:disable-next-line:no-floating-promises
+startServer();
+benchrest(flow, runOptions)
+  .on('error', (err, ctx) => winston.error('Failed in %s with err: ', ctx, err))
+  .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
+  .on('end', (stats, errorCount) =>
+  {
+    winston.info('error count: ', errorCount);
+    winston.info('stats', stats);
+    // TODO: teardown server here
+    process.exit();
+  });

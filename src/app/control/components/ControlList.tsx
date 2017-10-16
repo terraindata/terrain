@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import { backgroundColor, borderColor, Colors } from 'common/Colors';
+import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
 import { Menu, MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
 

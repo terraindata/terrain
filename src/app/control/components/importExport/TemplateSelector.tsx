@@ -51,7 +51,7 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 
-import { Colors, fontColor, getStyle } from 'common/Colors';
+import { Colors, fontColor, getStyle } from 'app/colors/Colors';
 import Dropdown from 'common/components/Dropdown';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';

@@ -16,6 +16,7 @@
             "library*": ["src/app/library/*"],
             "auth*": ["src/app/auth/*"],
             "analytics*": ["src/app/analytics/*"],
+            "app*": ["src/app/*"],
             "builder*": ["src/app/builder/*"],
             "charts*": ["src/app/charts/*"],
             "common*": ["src/app/common/*"],
