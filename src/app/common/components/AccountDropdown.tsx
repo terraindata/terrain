@@ -49,6 +49,8 @@ THE SOFTWARE.
 import * as $ from 'jquery';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
+import { Colors } from '../../colors/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';
@@ -65,6 +67,7 @@ const EditIcon = require('./../../../images/icon_edit.svg');
 const HomeIcon = require('./../../../images/icon_profile_16x16.svg?name=HomeIcon');
 const ConnectionsIcon = require('./../../../images/icon_gear.svg?name=ConnectionsIcon');
 const InfoIcon = require('../../../images/icon_info.svg?name=InfoIcon');
+const CreditsIcon = require('../../../images/icon_group.svg?name=CreditsIcon');
 
 export interface Props
 {
@@ -76,6 +79,7 @@ class AccountDropdown extends TerrainComponent<Props>
     open?: boolean,
     user?: UserTypes.User,
     commitLogOpen?: boolean,
+    showingCredits?: boolean,
   } = {
   };
 
@@ -91,6 +95,11 @@ class AccountDropdown extends TerrainComponent<Props>
         stateKey: 'user',
       },
     );
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.account-arrow-icon .st0', { fill: Colors().altBg1 });
   }
 
   public componentWillUnmount()
@@ -185,6 +194,14 @@ class AccountDropdown extends TerrainComponent<Props>
               </div>
           </div>
         }
+        <div className='account-dropdown-row' onMouseDown={this._toggle('showingCredits')}>
+          <div className='account-dropdown-icon account-dropdown-icon-green'>
+            <CreditsIcon />
+          </div>
+          <div className='account-dropdown-link'>
+            Credits
+          </div>
+        </div>
         <div className='account-dropdown-row' onMouseDown={this.handleLogout}>
           <div className='account-dropdown-icon account-dropdown-icon-blue'>
             <LogoutIcon />
@@ -232,8 +249,44 @@ class AccountDropdown extends TerrainComponent<Props>
           onClose={this._toggle('commitLogOpen')}
           pre={true}
         />
+
+        <Modal
+          message={CREDITS}
+          open={this.state.showingCredits}
+          title={'Credits'}
+          onClose={this._toggle('showingCredits')}
+          pre={true}
+        />
       </div>
     );
   }
 }
+
+const CREDITS = `
+Terrain Version 2.0 Created By:
+- Abhishek Kulkarni
+- Alex Liu
+- Ben Grossman-Ponemon
+- Ben Smith
+- Charles Tripp
+- David Hyde
+- Dennis Guo
+- Jason Lee
+- Jonas Lamis
+- Juan-Pablo Mansor
+- Justin Kirk
+- Laura Brouckman
+- Leslie Kurt
+- Luke Knepper
+- Mike Agnich
+- Nate Smith
+- Phil Tripp
+- Sam Pullara
+- Victoria Xia
+- Xi Yang
+
+Terrain Version 1.0 Created By:
+- The Pine Marten
+`;
+
 export default AccountDropdown;

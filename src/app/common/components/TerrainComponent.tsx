@@ -127,7 +127,35 @@ class TerrainComponent<T> extends React.Component<T, any>
       unmountFn && unmountFn();
     };
 
+    this._setStateWrapper = _.memoize(this._setStateWrapper);
+    this._setStateWrapperPath = _.memoize(this._setStateWrapperPath, this.__setStateWrapperPathResolver);
     Util.bind(this, '_keyPath', '_subscribe', 'componentWillUnmount');
+  }
+
+  public _setStateWrapper(key: string): (val) => void
+  {
+    return (val) =>
+    {
+      this.setState({ [key]: val });
+    };
+  }
+
+  // avoid having periods in the key or the path, since they are used as delimiters for the cache key.
+  public __setStateWrapperPathResolver(key: string, ...path: string[]): string
+  {
+    return key + path.join('.');
+  }
+
+  public _setStateWrapperPath(key: string, ...path: string[]): (val) => void
+  {
+    return (val) =>
+    {
+      for (const property of path)
+      {
+        val = val[property];
+      }
+      this.setState({ [key]: val });
+    };
   }
 
   public shouldComponentUpdate(nextProps: T, nextState: any)

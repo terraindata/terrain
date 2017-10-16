@@ -44,7 +44,29 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-function getCurrentTime()
+import * as React from 'react';
+
+import TerrainComponent from 'common/components/TerrainComponent';
+import ImportExportControl from './importExport/ImportExportControl';
+
+import './ControlPage.less';
+
+export interface Props
 {
-  return new Date().toISOString();
+  params?: any;
+  location?: any;
 }
+
+class ControlPage extends TerrainComponent<Props>
+{
+  public render()
+  {
+    return (
+      <div className='control-body'>
+        <ImportExportControl />
+      </div>
+    );
+  }
+}
+
+export default ControlPage;

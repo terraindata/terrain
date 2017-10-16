@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { Colors, getCardColors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
@@ -147,20 +147,11 @@ export const elasticTransform = _card(
         };
       },
 
-      init: (blocksConfig) => (
-        {
-          scorePoints: List([
-            BlockUtils.make(blocksConfig, 'scorePoint', {
-              value: 2,
-              score: 0.2,
-            }),
-            BlockUtils.make(blocksConfig, 'scorePoint', {
-              value: 15,
-              score: 0.5,
-            }),
-          ]),
-        }
-      ),
+      // init: (blocksConfig) => (
+      //   {
+      //     scorePoints: List([]),
+      //   }
+      // ),
 
       metaFields: ['domain', 'hasCustomDomain'],
     },

@@ -44,15 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import TerrainComponent from '../../common/components/TerrainComponent';
 
 export interface Props
 {
-  style: {
-    [selector: string]: React.CSSProperties,
-  };
+  style: IMMap<string, React.CSSProperties>;
 }
 
 export class StyleTag extends TerrainComponent<Props>
@@ -60,8 +59,7 @@ export class StyleTag extends TerrainComponent<Props>
   public render()
   {
     let str = '';
-
-    _.mapValues(this.props.style, (styles: object, selector: string) =>
+    _.mapValues(this.props.style.toJS(), (styles: object, selector: string) =>
     {
       let innerStr = '';
       _.mapValues(styles, (value: string, styleName: string) =>

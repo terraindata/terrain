@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 
-import { Colors, getCardColors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
@@ -246,7 +246,7 @@ export const elasticFilter = _card({
               displayType: DisplayType.DROPDOWN,
               key: 'filterOp',
               options: List(
-                _.keys(esFilterOperatorsMap),
+                _.keys(esFilterOperatorsMap) as string[],
                 // can consider using this, but it includes 'boost', and uses raw text values
                 // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
               ),

@@ -68,6 +68,10 @@ const FileImportActions =
     (tableName: string) =>
       $(ActionTypes.changeTableName, { tableName }),
 
+    setServerDbTable:
+    (serverId: number, name: string, dbName: string, tableName: string) =>
+      $(ActionTypes.setServerDbTable, { serverId, name, dbName, tableName }),
+
     changeHasCsvHeader:
     (hasCsvHeader: boolean) =>
       $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),
@@ -104,13 +108,14 @@ const FileImportActions =
       }),
 
     exportFile:
-    (query: string, serverId: number, dbName: string, rank: boolean, downloadFilename: string,
+    (query: string, serverId: number, dbName: string, rank: boolean, objectKey: string, downloadFilename: string,
       handleFileExportSuccess, handleFileExportError) =>
       $(ActionTypes.exportFile, {
         query,
         serverId,
         dbName,
         rank,
+        objectKey,
         downloadFilename,
         handleFileExportSuccess,
         handleFileExportError,
@@ -132,18 +137,21 @@ const FileImportActions =
     (columnId: number, recursionDepth: number, type: string) =>
       $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
-    updatePreviewRows:
+    updatePreviewColumns:
     (transform: Transform) =>
-      $(ActionTypes.updatePreviewRows, { transform }),
+      $(ActionTypes.updatePreviewColumns, { transform }),
 
-    saveTemplate:
-    (templateName: string, exporting: boolean, handleTemplateSaveSuccess) =>
+    saveTemplate: // if the database, server, and table haven't been selected in the file import process, they need to be given here
+    (templateName: string, exporting: boolean, handleTemplateSaveSuccess, serverId?: number, dbName?: string, tableName?: string) =>
       $(ActionTypes.saveTemplate, {
         templateName,
         exporting,
         setErrorMsg: FileImportActions.setErrorMsg,
         fetchTemplates: FileImportActions.fetchTemplates,
         handleTemplateSaveSuccess,
+        serverId,
+        dbName,
+        tableName,
       }),
 
     updateTemplate:
@@ -219,6 +227,10 @@ const FileImportActions =
     toggleExportRank:
     (exportRank: boolean) =>
       $(ActionTypes.toggleExportRank, { exportRank }),
+
+    setTypeObjectKey:
+    (typeObjectKey: string) =>
+      $(ActionTypes.setTypeObjectKey, { typeObjectKey }),
   };
 
 export default FileImportActions;

@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import FadeInOut from './FadeInOut';
 import './Modal.less';
@@ -64,6 +64,7 @@ export interface Props
   title?: string;
   error?: boolean;
   fill?: boolean;
+  wide?: boolean;
   confirm?: boolean;
   confirmButtonText?: string;
   onConfirm?: () => void;
@@ -82,6 +83,7 @@ export interface Props
   closeOnConfirm?: boolean;
   className?: string;
   noFooterPadding?: boolean; // TODO: find better way
+  inputClassName?: string;
 }
 
 @Radium
@@ -112,12 +114,15 @@ class Modal extends TerrainComponent<Props>
 
     const msgTag = this.props.pre ? <pre /> : <div />;
 
-    const messageStyle = fontColor(Colors().altText2);
-    const buttonTextColor = Color(Colors().altText2);
+    const messageStyle = [
+      fontColor('#242424'),
+      backgroundColor('#fff'),
+    ];
+    const buttonTextColor = Color('#242424');
     const buttonStyle = [
-      fontColor(Colors().altText3, buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
-      backgroundColor(Colors().altBg1),
-      borderColor(Colors().altBg2),
+      fontColor('#424242', buttonTextColor.alpha(buttonTextColor.alpha() * 0.5)),
+      backgroundColor('#fff'),
+      borderColor('#EDEFF3'),
     ];
 
     return (
@@ -137,6 +142,7 @@ class Modal extends TerrainComponent<Props>
             }
             className={classNames({
               'modal-content': true,
+              'modal-content-wide': this.props.wide,
               'modal-content-fill': this.props.fill,
               'modal-content-allow-overflow': this.props.allowOverflow,
               [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
@@ -150,7 +156,7 @@ class Modal extends TerrainComponent<Props>
               })}
               style={[
                 fontColor(Colors().altText1),
-                backgroundColor(Colors().altBg1),
+                backgroundColor('#fff'),
               ]}
             >
               <div
@@ -160,7 +166,9 @@ class Modal extends TerrainComponent<Props>
                 })}
                 style={[
                   fontColor(Colors().text1),
-                  this.props.error ? backgroundColor(Colors().error) : backgroundColor(Colors().bg3),
+                  this.props.error ? backgroundColor(Colors().error) :
+                    (localStorage.getItem('theme') === 'DARK') ? backgroundColor(Colors().bg3) : backgroundColor(Colors().bg2),
+
                 ]}
               >
                 {
@@ -202,12 +210,11 @@ class Modal extends TerrainComponent<Props>
               {
                 this.props.showTextbox &&
                 <input
-                  style={[
-                    fontColor(Colors().altText2),
-                    backgroundColor(Colors().altBg1),
-                  ]}
                   type='text'
-                  className='standard-input'
+                  className={classNames({
+                    'standard-input': true,
+                    [this.props.inputClassName]: this.props.inputClassName !== undefined && this.props.inputClassName !== '',
+                  })}
                   placeholder={this.props.textboxPlaceholderValue}
                   defaultValue={this.props.initialTextboxValue}
                   value={this.props.textboxValue}

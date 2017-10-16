@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { Display } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
@@ -61,6 +62,10 @@ export interface Card extends IRecord<Card>
   _isCard: boolean;
   _isBlock: boolean;
   closed: boolean;
+  tuning?: boolean; // whether the card is in the tuning section
+  // whether a card in tuning column is collapsed (needs to be sep. from closed)
+  tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
+  errors: List<string>;
 
   // the following fields are excluded from the server save
   static: {
@@ -68,7 +73,6 @@ export interface Card extends IRecord<Card>
     colors: string[];
     title: string;
     display: Display | Display[];
-
     isAggregate: boolean;
 
     // the format string used for generating tql
@@ -143,7 +147,7 @@ export interface CardConfig
   };
 }
 
-export const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
+export const allCardsMetaFields = allBlocksMetaFields.concat(['closed', 'tuning', 'tuningClosed']);
 
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
@@ -152,9 +156,12 @@ export const _card = (config: CardConfig) =>
 
   config = _.extend(config, {
     id: '',
+    errors: Immutable.List([]),
     _isCard: true,
     _isBlock: true,
     closed: false,
+    tuning: false,
+    tuningClosed: false,
   });
 
   if (config.static.metaFields)

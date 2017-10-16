@@ -43,64 +43,69 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { backgroundColor, Colors } from '../../common/Colors';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './FileImportPreviewRow.less';
 
-export interface Props
-{
-  items: List<string>;
-  columnsToInclude?: List<boolean>;
-}
+import cmdLineArgs = require('command-line-args');
+import cmdLineUsage = require('command-line-usage');
+import { Config } from './Config';
 
-@Radium
-class FileImportPreviewRow extends TerrainComponent<Props>
-{
-  public render()
+const optionList = [
   {
-    const { columnsToInclude } = this.props;
-    return (
-      <div
-        className='flex-container fi-preview-row'
-      >
-        {
-          this.props.items.map((value, key) =>
-            <div
-              key={key}
-              className='fi-preview-row-cell-wrapper'
-            >
-              <div
-                className={classNames({
-                  'fi-preview-row-cell': true,
-                  'fi-preview-row-cell-disabled': columnsToInclude !== undefined && !columnsToInclude.get(key),
-                })}
-                style={{
-                  background: Colors().bg2,
-                  color: Colors().text1,
-                }}
-              >
-                <div
-                  className='fi-preview-row-cell-text'
-                >
-                  {
-                    value
-                  }
-                </div>
-                <div
-                  className='fi-preview-row-disabled-veil'
-                  style={backgroundColor(Colors().bg3)}
-                >
-                </div>
-              </div>
-            </div>,
-          )
-        }
-      </div>
-    );
-  }
-}
+    alias: 'c',
+    defaultValue: 'config.json',
+    name: 'config',
+    type: String,
+    typeLabel: 'file',
+    description: 'Configuration file to use.',
+  },
+  {
+    alias: 'p',
+    defaultValue: 3001,
+    name: 'port',
+    type: Number,
+    typeLabel: 'number',
+    description: 'Port to listen on.',
+  },
+  {
+    name: 'debug',
+    type: Boolean,
+    description: 'Turn on debug mode.',
+  },
+  {
+    alias: 'h',
+    name: 'help',
+    type: Boolean,
+    description: 'Show help and usage information.',
+  },
+  {
+    alias: 'v',
+    name: 'verbose',
+    type: Boolean,
+    description: 'Print verbose information.',
+  },
+  {
+    alias: 'd',
+    name: 'db',
+    type: String,
+    defaultValue: 'http://127.0.0.1:9200',
+    description: 'Analytics datastore connection parameters',
+  },
+];
 
-export default FileImportPreviewRow;
+const sections = [
+  {
+    header: 'sigint 1.0',
+    content: 'Terrain Analytics Server.',
+  },
+  {
+    header: 'Options',
+    optionList,
+  },
+];
+
+export let CmdLineArgs: Config = cmdLineArgs(optionList,
+  {
+    partial: true,
+  });
+
+export const CmdLineUsage = cmdLineUsage(sections);
+export default CmdLineArgs;

@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as srs from 'secure-random-string';
+import * as winston from 'winston';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 
@@ -59,6 +61,7 @@ export interface ImportTemplateBase
   dbname: string;         // for elastic, index name
   export?: boolean;       // export type template
   originalNames: string[];    // array of strings (oldName)
+  persistentAccessToken?: string;    // persistent access token
   primaryKeyDelimiter?: string;
   primaryKeys: string[];  // newName of primary key(s)
   tablename: string;      // for elastic, type name
@@ -80,6 +83,7 @@ interface ImportTemplateConfigStringified
   id?: number;
   name: string;
   originalNames: string;
+  persistentAccessToken?: string;
   primaryKeyDelimiter: string;
   primaryKeys: string;
   tablename: string;
@@ -111,6 +115,7 @@ export class ImportTemplates
         'export',
         'name',
         'originalNames',
+        'persistentAccessToken',
         'primaryKeyDelimiter',
         'primaryKeys',
         'tablename',
@@ -162,6 +167,11 @@ export class ImportTemplates
     return this.select([], filter);
   }
 
+  public async loginWithPersistentAccessToken(templateId: number, persistentAccessToken: string): Promise<ImportTemplateConfig[]>
+  {
+    return this.select([], { id: templateId, persistentAccessToken });
+  }
+
   public async select(columns: string[], filter: object): Promise<ImportTemplateConfig[]>
   {
     return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
@@ -169,6 +179,31 @@ export class ImportTemplates
       const templates: ImportTemplateConfigStringified[] =
         await App.DB.select(this.templateTable, columns, filter) as ImportTemplateConfigStringified[];
       resolve(this._parseConfig(templates) as ImportTemplateConfig[]);
+    });
+  }
+
+  public async updateAccessToken(user: UserConfig, templateID: number): Promise<ImportTemplateConfig>
+  {
+    return new Promise<ImportTemplateConfig>(async (resolve, reject) =>
+    {
+      if (templateID !== undefined)
+      {
+        const results: ImportTemplateConfig[] = await this.get(templateID);
+        // template id specified but template not found
+        if (results.length === 0)
+        {
+          return reject('Invalid template id passed');
+        }
+        if (user.isSuperUser !== 1)
+        {
+          return reject('Insufficient Permissions');
+        }
+        const template: ImportTemplateConfig = results[0] as ImportTemplateConfig;
+        template['persistentAccessToken'] = srs({ length: 256 });
+        const upserted: ImportTemplateConfigStringified =
+          await App.DB.upsert(this.templateTable, this._stringifyConfig(template)) as ImportTemplateConfigStringified;
+        resolve(this._parseConfig(upserted) as ImportTemplateConfig);
+      }
     });
   }
 
@@ -186,6 +221,15 @@ export class ImportTemplates
         }
 
         template = Util.updateObject(results[0], template);
+      }
+      if (template['persistentAccessToken'] === undefined || template['persistentAccessToken'] === '')
+      {
+        const persistentAccessToken = srs(
+          {
+            length: 256,
+          },
+        );
+        template['persistentAccessToken'] = persistentAccessToken;
       }
       const upserted: ImportTemplateConfigStringified =
         await App.DB.upsert(this.templateTable, this._stringifyConfig(template)) as ImportTemplateConfigStringified;
@@ -206,6 +250,7 @@ export class ImportTemplates
   {
     const template: ImportTemplateConfig =
       {
+        persistentAccessToken: stringified['persistentAccessToken'],
         columnTypes: JSON.parse(stringified['columnTypes']),
         dbid: stringified['dbid'],
         dbname: stringified['dbname'],
@@ -225,6 +270,7 @@ export class ImportTemplates
   {
     const stringified: ImportTemplateConfigStringified =
       {
+        persistentAccessToken: template['persistentAccessToken'],
         columnTypes: JSON.stringify(template['columnTypes']),
         dbid: template['dbid'],
         dbname: template['dbname'],

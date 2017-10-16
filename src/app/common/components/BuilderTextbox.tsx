@@ -49,7 +49,7 @@ THE SOFTWARE.
 import './BuilderTextbox.less';
 
 import * as classNames from 'classnames';
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -63,7 +63,9 @@ import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
-import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../common/Colors';
+import Store from '../../builder/data/BuilderStore';
+import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../colors/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import SchemaStore from '../../schema/data/SchemaStore';
 import Autocomplete from './Autocomplete';
@@ -113,6 +115,8 @@ export interface Props
   onBlur?: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) => void;
 
   textStyle?: React.CSSProperties;
+
+  tuningMode?: boolean;
 }
 
 interface State
@@ -155,6 +159,13 @@ class BuilderTextbox extends TerrainComponent<Props>
       boxValue: props.value,
       boxValueBuffer: null,
     };
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.builder-tb input &::placeholder ', { color: Colors().text3 + '!important' });
+    ColorsActions.setStyle('.builder-tb input ', { color: Colors().text1 });
+
   }
 
   public getCreatingType(): string
@@ -334,7 +345,18 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public toggleClosed()
   {
-    Actions.change(this.props.keyPath.push('closed'), !this.props.value['closed']);
+    const card: Card = this.props.value as Card;
+    const key = this.props.tuningMode ? 'tuningClosed' : 'closed';
+    let keyPath = this.props.keyPath;
+    if (this.props.tuningMode)
+    {
+      const keyPaths = Map(Store.getState().query.cardKeyPaths);
+      if (keyPaths.get(card.id) !== undefined)
+      {
+        keyPath = List(keyPaths.get(card.id));
+      }
+    }
+    Actions.change(keyPath.push(key), !this.props.value[key]);
   }
 
   public computeOptions()
@@ -467,20 +489,19 @@ class BuilderTextbox extends TerrainComponent<Props>
     //   var color = "#aaa";
     //   var title = "Add a Card";
     // }
-
     const chipStyle = cardStyle(color, Colors().bg3, null, true);
     const arrowLineStyle = borderColor(color);
     const arrowHeadStyle = getStyle('borderTopColor', color);
-
     return (
       <div
         className={classNames({
           'builder-tb': true,
           'builder-tb-cards': true,
           'builder-tb-cards-top': this.props.top,
-          'builder-tb-cards-closed': card.closed,
+          'builder-tb-cards-closed': this.props.tuningMode ? card.tuningClosed : card.closed,
         })}
         ref='cards'
+        onClick={this.toggleClosed}
       >
         <div className='builder-tb-cards-input'>
           <div
@@ -489,7 +510,6 @@ class BuilderTextbox extends TerrainComponent<Props>
           >
             <div
               className='builder-tb-cards-toggle'
-              onClick={this.toggleClosed}
             >
               <ArrowIcon />
             </div>

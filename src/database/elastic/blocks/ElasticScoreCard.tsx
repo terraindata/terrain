@@ -51,7 +51,7 @@ import * as _ from 'lodash';
 
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import ScoreBar from '../../../app/builder/components/charts/ScoreBar';
-import { Colors, getCardColors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
@@ -194,7 +194,7 @@ export const elasticScore = _card(
                 {
                   displayType: DisplayType.DROPDOWN,
                   key: 'sortOrder',
-                  options: List(ESInterpreterDefaultConfig.getClause('sort_order')['values']),
+                  options: List(ESInterpreterDefaultConfig.getClause('sort_order')['values'] as string[]),
                   autoDisabled: true,
                   dropdownUsesRawValues: true,
                   centerDropdown: true,
@@ -213,7 +213,7 @@ export const elasticScore = _card(
                 {
                   displayType: DisplayType.DROPDOWN,
                   key: 'sortMode',
-                  options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values'].concat(['auto'])),
+                  options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values'].concat(['auto']) as string[]),
                   dropdownUsesRawValues: true,
                   autoDisabled: true,
                   centerDropdown: true,
@@ -232,7 +232,7 @@ export const elasticScore = _card(
                 {
                   displayType: DisplayType.DROPDOWN,
                   key: 'sortType',
-                  options: List(ESInterpreterDefaultConfig.getClause('field_type')['values']),
+                  options: List(ESInterpreterDefaultConfig.getClause('field_type')['values'] as string[]),
                   dropdownUsesRawValues: true,
                   autoDisabled: true,
                   centerDropdown: true,

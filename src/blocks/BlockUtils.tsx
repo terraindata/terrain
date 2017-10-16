@@ -144,7 +144,6 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
   blockType: string, extraConfig?: { [key: string]: any }, skipTemplate?: boolean) =>
 {
   let block = blocksConfig[blockType];
-
   if (!block)
   {
     console.log(blocksConfig, blockType, extraConfig);
@@ -286,7 +285,7 @@ export function getPreview(card: Card): string
         {
           return getPreview(value);
         }
-        return value;
+        return value; // add key of card so key: value is preview
       }
       if (keys[1] === 'length' || keys[1] === 'size')
       {

@@ -49,8 +49,8 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { Colors, getStyle } from '../../common/Colors';
-import StyleTag from '../../common/components/StyleTag';
+import { Colors, getStyle } from '../../colors/Colors';
+import ColorsActions from './../../colors/data/ColorsActions';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './DragHandleStyle.less';
 
@@ -68,7 +68,16 @@ export interface Props
 @Radium
 class DragHandle extends TerrainComponent<Props>
 {
-  public renderHandle(dragHandleStyle)
+  public componentWillMount()
+  {
+    const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
+    ColorsActions.setStyle('.drag-icon ', { fill: this.props.useAltColor ? Colors().altText2 : Colors().text2 });
+    ColorsActions.setStyle('.drag-icon:hover ', { fill: Colors().inactiveHover });
+    ColorsActions.setStyle('.drag-icon:active ', { fill: Colors().active });
+    ColorsActions.setStyle('.' + hoveringClassName, { opacity: '0.85 !important' as any });
+  }
+
+  public renderHandle()
   {
     return (
       <div
@@ -81,36 +90,17 @@ class DragHandle extends TerrainComponent<Props>
         }}
       >
         <Handle className='drag-icon' />
-        <StyleTag style={dragHandleStyle} />
       </div>
     );
   }
 
   public render()
   {
-    const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
-
-    // TODO: Find a way to only generate these styles once for the whole app
-    const dragHandleStyle = {
-      '.drag-icon': {
-        fill: this.props.useAltColor ? Colors().altText2 : Colors().text2,
-      },
-      '.drag-icon:hover': {
-        fill: Colors().inactiveHover,
-      },
-      '.drag-icon:active': {
-        fill: Colors().active,
-      },
-      ['.' + hoveringClassName]: {
-        opacity: '0.85 !important' as any,
-      },
-    };
-
     return (
       (
         this.props.connectDragSource !== undefined ?
-          this.props.connectDragSource(this.renderHandle(dragHandleStyle)) :
-          this.renderHandle(dragHandleStyle)
+          this.props.connectDragSource(this.renderHandle()) :
+          this.renderHandle()
       )
     );
   }

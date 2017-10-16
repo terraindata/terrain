@@ -59,6 +59,9 @@ import * as BlockUtils from 'src/blocks/BlockUtils';
 import { AllBackendsMap } from 'src/database/AllBackends';
 import Util from 'util/Util';
 
+import { CardConfig } from '../../../../blocks/types/Card';
+import { backgroundColor, Colors } from '../../../colors/Colors';
+
 import CardDropArea from './CardDropArea';
 import CardSelector from './CardSelector';
 import './CreateCardTool.less';
@@ -90,7 +93,7 @@ export interface Props
   }>; // can override the options displayed
   overrideClick?: (index: number) => void; // override the click handler
 
-  handleCardDrop?: (tyoe: string) => any;
+  handleCardDrop?: (cardType: string) => any;
 }
 
 @Radium

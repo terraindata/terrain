@@ -54,10 +54,10 @@ import * as React from 'react';
 import './Result.less';
 const { List } = Immutable;
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
-import { spotlightAction } from '../../data/SpotlightStore';
+import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { Result } from './ResultTypes';
 
@@ -114,11 +114,24 @@ class ResultComponent extends TerrainComponent<Props> {
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
+    const prevSpotlights = SpotlightStore.getState().spotlights;
     for (const key in nextProps)
     {
       if (key !== 'result' && this.props[key] !== nextProps[key])
       {
-        this.unspotlight();
+        if (prevSpotlights.get(nextProps.primaryKey))
+        {
+          this.setState({
+            isSpotlit: true,
+            spotlightColor: prevSpotlights.get(nextProps.primaryKey).color,
+          });
+        }
+        else
+        {
+          this.setState({
+            isSpotlit: false,
+          });
+        }
         return true;
       }
     }
@@ -149,14 +162,14 @@ class ResultComponent extends TerrainComponent<Props> {
       return null;
     }
 
-    const value = getResultValue(this.props.result, field, this.props.resultsConfig, overrideFormat);
+    const value = getResultValue(this.props.result, field, this.props.resultsConfig, false, overrideFormat);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
       <div
         className='result-field'
         key={field}
-        style={borderColor(Colors().builder.results.lines)}
+        style={borderColor(Colors().resultLine)}
       >
         {
           showField &&
@@ -184,10 +197,10 @@ class ResultComponent extends TerrainComponent<Props> {
     );
   }
 
-  public spotlight()
+  public spotlight(overrideId?, overrideColor?)
   {
-    const id = this.props.primaryKey;
-    const spotlightColor = ColorManager.altColorForKey(id);
+    const id = overrideId || this.props.primaryKey;
+    const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
     this.setState({
       isSpotlit: true,
       spotlightColor,
@@ -296,8 +309,8 @@ class ResultComponent extends TerrainComponent<Props> {
         <div
           className='result-inner'
           style={[
-            borderColor(Colors().builder.results.lines),
-            backgroundColor(Colors().builder.results.background),
+            borderColor(Colors().resultLine),
+            backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
           ]}
         >
           <div className='result-name'>
@@ -353,7 +366,7 @@ class ResultComponent extends TerrainComponent<Props> {
     ));
   }
 }
-export function getResultValue(result: Result, field: string, config: ResultsConfig, overrideFormat?: any): string
+export function getResultValue(result: Result, field: string, config: ResultsConfig, isTitle: boolean, overrideFormat?: any): string
 {
   let value: any;
   if (result)
@@ -364,7 +377,7 @@ export function getResultValue(result: Result, field: string, config: ResultsCon
       value = JSON.stringify(value);
     }
   }
-  return ResultFormatValue(field, value, config, overrideFormat);
+  return ResultFormatValue(field, value, config, isTitle, overrideFormat);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -401,10 +414,10 @@ export function getResultName(result: Result, config: ResultsConfig)
     nameField = _.first(getResultFields(result, config));
   }
 
-  return getResultValue(result, nameField, config);
+  return getResultValue(result, nameField, config, true);
 }
 
-export function ResultFormatValue(field: string, value: string | number, config: ResultsConfig, overrideFormat?: any): any
+export function ResultFormatValue(field: string, value: string | number, config: ResultsConfig, isTitle: boolean, overrideFormat?: any): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const { showRaw } = overrideFormat || format || { showRaw: false };
@@ -430,7 +443,7 @@ export function ResultFormatValue(field: string, value: string | number, config:
     italics = true;
   }
 
-  if (format)
+  if (format && !isTitle)
   {
     switch (format.type)
     {

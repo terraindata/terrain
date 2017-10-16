@@ -176,11 +176,14 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public updatePoints(points: ScorePoints, isConcrete?: boolean)
   {
+    const domainRange = this.props.domain.get(1) - this.props.domain.get(0);
+    const valueDecimalPoints = 4 - Math.floor(Math.log10(domainRange));
+
     points = points.map(
       (scorePoint) =>
         scorePoint
           .set('score', Util.roundNumber(scorePoint.score, 4))
-          .set('value', Util.roundNumber(scorePoint.value, 4)),
+          .set('value', Util.roundNumber(scorePoint.value, valueDecimalPoints)),
     ).toList();
     this.setState({
       pointsCache: points,
@@ -233,12 +236,16 @@ class TransformCardChart extends TerrainComponent<Props>
           }
           else
           {
+            const domainMin = this.props.domain.get(0);
+            const domainMax = this.props.domain.get(1);
+            const domainRange = domainMax - domainMin;
+
             min = (index - 1) >= 0 ?
-              Math.max(this.props.domain.get(0), pointValues[index - 1] + .01)
-              : this.props.domain.get(0);
+              Math.max(this.props.domain.get(0), pointValues[index - 1] + domainRange / 1000)
+              : domainMin;
             max = (index + 1) < pointValues.length ?
-              Math.min(this.props.domain.get(1), pointValues[index + 1] - .01)
-              : this.props.domain.get(1);
+              Math.min(this.props.domain.get(1), pointValues[index + 1] - domainRange / 1000)
+              : domainMax;
           }
           scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
         }
@@ -294,6 +301,10 @@ class TransformCardChart extends TerrainComponent<Props>
 
   public onCreate(value, score)
   {
+    if (score < 0)
+    {
+      score = 0;
+    }
     const { points } = this.props;
     let index = 0;
     while (points.get(index) && points.get(index).value < value)

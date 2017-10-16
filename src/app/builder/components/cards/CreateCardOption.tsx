@@ -53,7 +53,7 @@ import * as React from 'react';
 import * as Highlight from 'react-highlighter';
 
 import { CardConfig } from '../../../../blocks/types/Card';
-import { backgroundColor, borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../common/Colors';
+import { backgroundColor, borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CreateCardOption.less';
 

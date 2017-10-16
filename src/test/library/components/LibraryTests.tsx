@@ -43,13 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
+import Library from 'library/components/Library';
+import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
-import Library from '../../../app/library/components/Library';
-import { _LibraryState, LibraryState } from '../../../app/library/data/LibraryStore';
-import * as LibraryTypes from '../../../app/library/LibraryTypes';
 import { ItemType } from '../../../items/types/Item';
 
 describe('Library', () =>
@@ -76,6 +77,12 @@ describe('Library', () =>
     name: 'Variant 1',
   })));
 
+  const analytics: AnalyticsState = _AnalyticsState({
+    loaded: false,
+    data: Immutable.Map({}),
+    selectedMetric: 1,
+  });
+
   let libraryComponent = null;
 
   beforeEach(() =>
@@ -83,6 +90,7 @@ describe('Library', () =>
     libraryComponent = shallow(
       <Library
         library={library}
+        analytics={analytics}
         router={{ params: { groupId: '1' } }}
       />,
     );
@@ -121,7 +129,7 @@ describe('Library', () =>
         expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
         expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
-        expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
+        expect(libraryComponent.find('AnalyticsSelector')).toHaveLength(1);
       });
     });
   });

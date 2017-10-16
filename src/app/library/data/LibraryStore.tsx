@@ -113,8 +113,12 @@ const DefaultState = _LibraryState();
 
 import LibraryReducers from './LibraryReducers';
 
+// Because LibraryReducers.tsx imports LibraryState and _LibraryState
+// from this file, and this file imports LibraryReducers from LibraryReducers.tsx
+// it will cause circularity problems in environments that don't go trough webpack
+// like Jest. That's why we check that if the reducer is not defined, use a dummy reducer.
 export const LibraryStore = Redux.createStore(
-  LibraryReducers,
+  LibraryReducers !== undefined ? LibraryReducers : (state, action) => state,
   DefaultState,
   Redux.applyMiddleware(thunk),
 );

@@ -44,17 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions no-var-requires class-name no-empty max-line-length no-unused-expression
+// tslint:disable:strict-boolean-expressions no-var-requires class-name no-empty max-line-length no-unused-expression prefer-const
 
 import './CardStyle.less';
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { DragSource } from 'react-dnd';
-
 const { createDragPreview } = require('react-dnd-text-dragpreview');
 import { Display } from '../../../../blocks/displays/Display';
 import { Card } from '../../../../blocks/types/Card';
@@ -67,14 +67,14 @@ import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScro
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 
-import StyleTag from 'common/components/StyleTag';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import CardHelpTooltip from './CardHelpTooltip';
 
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { cardStyle, Colors } from '../../../common/Colors';
+import { borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import ColorsActions from '../../../colors/data/ColorsActions';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
@@ -82,6 +82,7 @@ import CreateCardTool from './CreateCardTool';
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('images/icon_more_12x3.svg?name=MoreIcon');
 const HelpIcon = require('images/icon_help-1.svg?name=HelpIcon');
+const TuningIcon = require('images/icon_tuning.svg?name=TuningIcon');
 
 const CARD_OVERSCAN = 200;
 const CARD_HEIGHT_MAP: { [id: string]: number } = {};
@@ -111,6 +112,11 @@ export interface Props
   display?: Display;
 
   handleCardDrop?: (type: string) => any;
+
+  // Tuning column
+  allowTuningDragAndDrop?: boolean;
+  tuningMode?: boolean;
+  handleCardReorder?: (card, index) => void;
 }
 
 @Radium
@@ -124,6 +130,21 @@ class _CardComponent extends TerrainComponent<Props>
     menuOptions: List<MenuOption>;
 
     scrollState: BuilderScrollState;
+    keyPath: KeyPath;
+
+    // for tuning DnD
+    originalMouseY: number
+    midpoints: number[];
+    originalElTop: number;
+    originalElBottom: number;
+    moving: boolean;
+    elHeight: number;
+    siblingHeights: number[];
+    minDY: number;
+    maxDY: number;
+    dY: number;
+    index: number;
+    cardTransition: boolean;
   };
 
   public refs: {
@@ -147,6 +168,20 @@ class _CardComponent extends TerrainComponent<Props>
       hovering: false,
       closing: false,
       opening: false,
+      // For tuning column DnD
+      moving: false,
+      originalMouseY: 0,
+      originalElTop: 0,
+      originalElBottom: 0,
+      elHeight: 0,
+      midpoints: [],
+      siblingHeights: [],
+      minDY: 0,
+      maxDY: 0,
+      dY: 0,
+      index: 0,
+      cardTransition: true,
+
       menuOptions:
       Immutable.List([
         // {
@@ -164,12 +199,17 @@ class _CardComponent extends TerrainComponent<Props>
       ]),
 
       scrollState: BuilderScrollStore.getState(),
+      keyPath: props.keyPath,
     };
-
   }
 
   public componentWillMount()
   {
+    ColorsActions.setStyle('.card-drag-handle svg', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-minimize-icon .st0', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-help-icon', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-tuning-icon', { stroke: Colors().altBg1 });
     // TODO
     // this._subscribe(Store, {
     //   stateKey: 'selected',
@@ -199,6 +239,11 @@ class _CardComponent extends TerrainComponent<Props>
       stateKey: 'scrollState',
       isMounted: true,
     });
+
+    this.setState({
+      keyPath: this.getKeyPath(),
+    });
+
   }
 
   public getCardTerms(card: Card): List<string>
@@ -220,7 +265,20 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (nextProps.card.closed !== this.props.card.closed)
+    if (this.props.keyPath !== nextProps.keyPath || this.props.index !== nextProps.index)
+    {
+      if (!nextProps.tuningMode)
+      {
+        const newKeyPath = nextProps.singleCard ? nextProps.keyPath
+          : this._ikeyPath(nextProps.keyPath, nextProps.index);
+        this.setState({
+          keyPath: newKeyPath,
+        });
+        Actions.updateKeyPath(nextProps.card.id, newKeyPath);
+      }
+    }
+    if ((nextProps.card.closed !== this.props.card.closed && !nextProps.tuningMode) ||
+      (nextProps.card.tuningClosed !== this.props.card.tuningClosed && nextProps.tuningMode))
     {
       if (this.state.closing || this.state.opening)
       {
@@ -236,6 +294,9 @@ class _CardComponent extends TerrainComponent<Props>
         this.toggleClose(null);
       }
     }
+    this.setState({
+      cardTransition: true,
+    });
   }
 
   public componentDidMount()
@@ -269,8 +330,19 @@ class _CardComponent extends TerrainComponent<Props>
     {
       return; // I just don't want to deal
     }
+    const key = this.props.tuningMode ? 'tuningClosed' : 'closed';
+    const closed = this.props.tuningMode ? this.props.card.tuningClosed : this.props.card.closed;
+    let keyPath = this.getKeyPath();
+    if (this.props.tuningMode)
+    {
+      const keyPaths = Immutable.Map(Store.getState().query.cardKeyPaths);
+      if (keyPaths.get(this.props.card.id) !== undefined)
+      {
+        keyPath = Immutable.List(keyPaths.get(this.props.card.id));
+      }
+    }
 
-    if (!this.props.card.closed)
+    if (!closed)
     {
       this.setState({
         closing: true,
@@ -279,12 +351,11 @@ class _CardComponent extends TerrainComponent<Props>
       // animate just the body for normal cards,
       //  the entire card for cards inside textboxes
       const ref = this.props.singleCard ? this.refs.card : this.refs.cardBody;
-
       Util.animateToHeight(ref, 0, () =>
       {
         // do this after the animation so the rest of the app picks up on it
         Actions.change(
-          this.getKeyPath().push('closed'),
+          keyPath.push(key),
           true,
         );
       });
@@ -304,7 +375,7 @@ class _CardComponent extends TerrainComponent<Props>
         {
           // do this after the animation so the rest of the app picks up on it
           Actions.change(
-            this.getKeyPath().push('closed'),
+            keyPath.push(key),
             false,
           );
         }),
@@ -389,11 +460,172 @@ class _CardComponent extends TerrainComponent<Props>
     }
   }
 
+  public handleCardDrag(event)
+  {
+    this.setState({
+      dY: this.shiftSiblings(event, true).dY,
+    });
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  public shiftSiblings(evt, shiftSiblings: boolean): ({ dY: number, index: number })
+  {
+    const dY = Util.valueMinMax(evt.pageY - this.state.originalMouseY, this.state.minDY, this.state.maxDY);
+
+    let index: number;
+
+    if (dY < 0)
+    {
+      // if dragged up, search from top down
+      for (
+        index = 0;
+        this.state.midpoints[index] < this.state.originalElTop + dY;
+        index++
+      )
+      {
+
+      }
+    }
+    else
+    {
+      for (
+        index = this.state.midpoints.length - 1;
+        this.state.midpoints[index] > this.state.originalElBottom + dY;
+        index--
+      )
+      {
+
+      }
+    }
+    if (shiftSiblings)
+    {
+      const sibs = this.getSiblings();
+      sibs.forEach((sib, i) =>
+      {
+        if (i === this.state.index)
+        {
+          return;
+        }
+        let shift = 0;
+        if (index < this.state.index)
+        {
+          if (i >= index && i < this.state.index)
+          {
+            shift = 1;
+          }
+        }
+        else
+        {
+          if (i > this.state.index && i <= index)
+          {
+            shift = -1;
+          }
+        }
+        sib['style'].top = shift * this.state.elHeight;
+      });
+    }
+    return {
+      dY,
+      index,
+    };
+  }
+
+  public getSiblings()
+  {
+    if (!this.refs['card'])
+    {
+      return [];
+    }
+    const children = Util.siblings(Util.parentNode(this.refs['card']));
+    let cards = [];
+    for (let i = 0; i < children.length; ++i)
+    {
+      if (children[i].childNodes.length > 1)
+      {
+        cards.push(children[i].childNodes[1]);
+      }
+    }
+    return cards;
+  }
+
+  public handleMouseDown(event)
+  {
+    if (!this.props.tuningMode)
+    {
+      return;
+    }
+    // for tuning mode, dragging and dropping cards will just reorder them (in tuner)
+    // but have no effect on the actual layout of cards in builder
+    $('body').on('mouseup', this.handleMouseUp);
+    $('body').on('mouseleave', this.handleMouseUp);
+    $('body').on('mousemove', this.handleCardDrag);
+    const el = this.refs['card'];
+    const cr = el['getBoundingClientRect']();
+    const parent = Util.parentNode(Util.parentNode(Util.parentNode((this.refs['card']))));
+    const parentCr = parent['getBoundingClientRect']();
+    const minDY = parentCr.top - cr.top;
+    const maxDY = parentCr.bottom - cr.bottom;
+
+    const cards = this.getSiblings();
+    let midpoints = [];
+    let siblingHeights = [];
+    cards.forEach((card) =>
+    {
+      const c = card['getBoundingClientRect']();
+      midpoints.push(((c.top as number) + (c.bottom as number)) / 2);
+      siblingHeights.push((c.bottom as number) - (c.top as number));
+    });
+    this.setState({
+      originalMouseY: event.pageY,
+      midpoints,
+      originalElTop: cr.top,
+      originalElBottom: cr.bottom,
+      elHeight: cr.height,
+      siblingHeights,
+      minDY,
+      maxDY,
+      dY: 0,
+      index: cards.indexOf(el),
+      moving: true,
+    });
+    event.preventDefault();
+  }
+
+  public handleMouseUp(event)
+  {
+    if (!this.props.tuningMode)
+    {
+      return;
+    }
+    $('body').off('mouseup', this.handleMouseUp);
+    $('body').off('mouseleave', this.handleMouseUp);
+    $('body').off('mousemove', this.handleCardDrag);
+    if (this.props.handleCardReorder)
+    {
+      const { index } = this.shiftSiblings(event, false);
+      $('.card-transition').removeClass('card-transition');
+      const sibs = this.getSiblings();
+      _.range(0, sibs.length).map((i) =>
+        sibs[i]['style'].top = 0,
+      );
+      this.props.handleCardReorder(this.props.card, index);
+      this.setState({
+        moving: false,
+      });
+    }
+  }
+
   public getKeyPath()
   {
-    return this.props.singleCard
+    const newKeyPath = this.props.singleCard
       ? this.props.keyPath
       : this._ikeyPath(this.props.keyPath, this.props.index);
+    if (!this.props.tuningMode)
+    {
+      Actions.updateKeyPath(this.props.card.id, newKeyPath);
+    }
+    return newKeyPath;
   }
 
   public handleCardToolClose()
@@ -413,10 +645,27 @@ class _CardComponent extends TerrainComponent<Props>
     this.renderTimeout && clearTimeout(this.renderTimeout);
   }
 
+  public toggleTuning()
+  {
+    if (this.props.tuningMode)
+    {
+      const keyPaths = Immutable.Map(Store.getState().query.cardKeyPaths);
+      if (keyPaths.get(this.props.card.id) !== undefined)
+      {
+        const keyPath = Immutable.List(keyPaths.get(this.props.card.id));
+        Actions.change(keyPath.push('tuning'), false);
+      }
+    }
+    else
+    {
+      Actions.change(this.getKeyPath().push('tuning'), !this.props.card.tuning);
+    }
+  }
+
   public render()
   {
     const { id } = this.props.card;
-    this.cardEl = document.getElementById(this.props.card.id); // memoize?
+    this.cardEl = $('cards-column-cards-area #' + this.props.card.id) as any; // memoize?
     if (this.cardEl)
     {
       const { columnTop, columnHeight, columnScroll } = this.state.scrollState;
@@ -440,14 +689,14 @@ class _CardComponent extends TerrainComponent<Props>
 
         CARD_HEIGHT_MAP[id] = cardHeight;
 
-        if (cardEnd < visibleStart || cardStart > visibleEnd)
+        if ((cardEnd < visibleStart || cardStart > visibleEnd) && !this.props.tuningMode)
         {
           // TODO fix bug here where you have the CreateCardTool open
           //  and scroll to the bottom of the column and it expands
           //  cardHeight ad infinitum
           return (
             <div
-              className='card card-placeholder'
+              className='card card-placeholder card-transition'
               id={id}
               style={{
                 height: cardHeight,
@@ -457,7 +706,7 @@ class _CardComponent extends TerrainComponent<Props>
         }
       }
     }
-    else
+    else if (!this.props.tuningMode)
     {
       this.renderTimeout = setTimeout(() =>
       {
@@ -466,7 +715,7 @@ class _CardComponent extends TerrainComponent<Props>
 
       return (
         <div
-          className='card card-placeholder'
+          className='card card-placeholder card-transition'
           id={id}
           style={{
             minHeight: CARD_HEIGHT_MAP[id] || 50,
@@ -496,31 +745,56 @@ class _CardComponent extends TerrainComponent<Props>
       );
     }
 
+    let keyPath = this.state.keyPath;
+    if (this.props.tuningMode)
+    {
+      const keyPaths = Immutable.Map(Store.getState().query.cardKeyPaths);
+      if (keyPaths.get(this.props.card.id) !== undefined)
+      {
+        keyPath = Immutable.List(keyPaths.get(this.props.card.id));
+      }
+    }
+    let style = null;
+    if (this.state.moving)
+    {
+      style = _.extend({}, CARD_COMPONENT_MOVING_STYLE, {
+        top: this.state.dY,
+        zIndex: 999999,
+      });
+    }
     const content = <BuilderComponent
       canEdit={this.props.canEdit}
       data={this.props.card}
       helpOn={this.props.helpOn}
       addColumn={this.props.addColumn}
       columnIndex={this.props.columnIndex}
-      keyPath={this.getKeyPath()}
+      keyPath={keyPath}
       language={this.props.card.static.language}
-      textStyle={{
-        color: this.props.card.static.colors[0],
-        backgroundColor: this.state.hovering ? Colors().bg1 : undefined,
-      }}
+      textStyle={fontColor(this.props.card.static.colors[0])}
       handleCardDrop={this.props.handleCardDrop}
+      tuningMode={this.props.tuningMode}
     />;
 
     const { card } = this.props;
     const { title } = card.static;
     const { isDragging, connectDragSource } = this.props;
 
+    let canMove = false;
+    if (this.props.tuningMode && this.props.allowTuningDragAndDrop)
+    {
+      canMove = true;
+    }
+    if (!this.props.tuningMode && this.props.canEdit && !card['cannotBeMoved'])
+    {
+      canMove = true;
+    }
+    const closed = this.props.tuningMode ? this.props.card.tuningClosed : this.props.card.closed;
     return (
       <div
         className={classNames({
           'card': true,
           'card-dragging': isDragging,
-          'card-closed': this.props.card.closed,
+          'card-closed': closed,
           'single-card': this.props.singleCard,
           'card-selected': this.state.selected,
           'card-hovering': this.state.hovering,
@@ -528,21 +802,26 @@ class _CardComponent extends TerrainComponent<Props>
           'card-opening': this.state.opening,
           'card-no-title': card['noTitle'],
           [card.type + '-card']: true,
+          'card-moving': this.state.moving,
+          'card-transition': this.state.cardTransition,
         })}
         ref='card'
         id={id}
         onMouseMove={this.handleMouseMove}
+        style={style}
       >
-        <CDA
-          half={true}
-          keyPath={this.props.keyPath}
-          index={this.props.index}
-          accepts={this.props.accepts}
-          wrapType={this.props.card.type}
-          singleChild={this.props.singleChild || this.props.singleCard}
-          language={card.static.language}
-          handleCardDrop={this.props.handleCardDrop}
-        />
+        {!this.props.tuningMode &&
+          <CDA
+            half={true}
+            keyPath={this.props.keyPath}
+            index={this.props.index}
+            accepts={this.props.accepts}
+            wrapType={this.props.card.type}
+            singleChild={this.props.singleChild || this.props.singleCard}
+            language={card.static.language}
+            handleCardDrop={this.props.handleCardDrop}
+          />
+        }
         <div
           className={classNames({
             'card-inner': true,
@@ -563,7 +842,7 @@ class _CardComponent extends TerrainComponent<Props>
             <div
               className={classNames({
                 'card-title': true,
-                'card-title-closed': (this.props.card.closed && !this.state.opening) || this.state.closing,
+                'card-title-closed': ((closed && !this.state.opening) || this.state.closing),
                 'card-title-card-hovering': this.state.hovering,
               })}
               style={{
@@ -574,9 +853,11 @@ class _CardComponent extends TerrainComponent<Props>
               onClick={this.handleTitleClick}
             >
               {
-                this.props.canEdit &&
-                !card['cannotBeMoved'] &&
-                <div className='card-drag-handle'>
+                canMove &&
+                <div
+                  className='card-drag-handle'
+                  onMouseDown={this.handleMouseDown}
+                >
                   <DragHandle
                     hiddenByDefault={!this.state.hovering}
                     connectDragSource={connectDragSource}
@@ -590,6 +871,7 @@ class _CardComponent extends TerrainComponent<Props>
               }
               {
                 this.props.canEdit &&
+                !this.props.tuningMode &&
                 !card['cannotBeMoved'] &&
                 <Menu
                   options={this.state.menuOptions}
@@ -597,7 +879,7 @@ class _CardComponent extends TerrainComponent<Props>
                 />
               }
               {
-                !(this.props.card && this.props.card['noTitle']) &&
+                !(this.props.card && this.props.card['noTitle']) && !closed &&
                 <div
                   className='card-title-inner'
                   style={{
@@ -611,15 +893,39 @@ class _CardComponent extends TerrainComponent<Props>
               }
 
               {
-                !this.props.card.closed ? null :
+                (closed) ?
                   <div className={classNames({
                     'card-preview': true,
                     'card-preview-hidden': this.state.opening,
                   })}>
-                    {BlockUtils.getPreview(card)}
+                    {this.props.card.static.title + ' (' + BlockUtils.getPreview(this.props.card) + ')'}
                   </div>
+                  :
+                  null
               }
             </div>
+            {
+              <div
+                className='card-tuning-wrapper'
+                onClick={this.toggleTuning}
+              >
+                {
+                  tooltip(
+                    <TuningIcon
+                      className={classNames({
+                        'card-tuning-icon': true,
+                        'card-tuning-icon-on': card.tuning,
+                        'card-tuning-icon-off': this.props.tuningMode && !card.tuning,
+                      })}
+                      style={card.tuning ? getStyle('stroke', Colors().active, Colors().activeHover) : {}}
+                    />,
+                    card.tuning || this.props.tuningMode ? 'Remove this card from the tuning column'
+                      : 'Add this card to the tuning column',
+                  )
+                }
+              </div>
+            }
+
             {
               this.props.canEdit &&
               !card['cannotBeMoved'] &&
@@ -629,7 +935,7 @@ class _CardComponent extends TerrainComponent<Props>
                   tooltip(
                     <HelpIcon className='card-help-icon' />,
                     {
-                      html: <CardHelpTooltip staticInfo={card.static} />,
+                      html: <CardHelpTooltip staticInfo={card.static} errors={card.errors} />,
                       trigger: 'click',
                       position: 'top-end',
                       interactive: true,
@@ -642,8 +948,11 @@ class _CardComponent extends TerrainComponent<Props>
             }
           </div>
           {
-            (!this.props.card.closed || this.state.opening) &&
-            <div className='card-body-wrapper' ref='cardBody'>
+            (!closed || this.state.opening) &&
+            <div
+              className='card-body-wrapper'
+              ref='cardBody'
+            >
               <div
                 className='card-body'
                 style={{
@@ -658,21 +967,27 @@ class _CardComponent extends TerrainComponent<Props>
             </div>
           }
         </div>
-        <CDA
-          half={true}
-          lower={true}
-          keyPath={this.props.keyPath}
-          index={this.props.index}
-          accepts={this.props.accepts}
-          wrapType={this.props.card.type}
-          singleChild={this.props.singleChild || this.props.singleCard}
-          language={card.static.language}
-          handleCardDrop={this.props.handleCardDrop}
-        />
+        {!this.props.tuningMode &&
+          <CDA
+            half={true}
+            lower={true}
+            keyPath={this.props.keyPath}
+            index={this.props.index}
+            accepts={this.props.accepts}
+            wrapType={this.props.card.type}
+            singleChild={this.props.singleChild || this.props.singleCard}
+            language={card.static.language}
+            handleCardDrop={this.props.handleCardDrop}
+          />
+        }
       </div>
     );
   }
 }
+
+const CARD_COMPONENT_MOVING_STYLE = _.extend({},
+  borderColor(Colors().active),
+);
 
 // Drag and Drop (the bass)
 

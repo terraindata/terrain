@@ -52,8 +52,9 @@ import * as _ from 'lodash';
 const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
-import { Colors } from '../../common/Colors';
-import StyleTag from '../../common/components/StyleTag';
+import { BuilderStore } from '../../builder/data/BuilderStore';
+import { Colors } from '../../colors/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 // syntax highlighters
@@ -99,7 +100,6 @@ export interface Props
   language?: string;
   canEdit: boolean;
 
-  theme?: string;
   highlightedLine?: number;
 
   isDiff?: boolean;
@@ -134,6 +134,27 @@ class TQLEditor extends TerrainComponent<Props>
     super(props);
     this.executeChange = _.debounce(this.executeChange, 300);
   }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('span.cm-atom', { color: Colors().builder.cards.booleanClause + '!important' });
+    ColorsActions.setStyle('span.cm-property ', { color: Colors().builder.cards.structureClause + '!important' });
+    ColorsActions.setStyle('span.cm-attribute', { color: '#f00' /* what is an attribute? */ + '!important' });
+    ColorsActions.setStyle('span.cm-keyword', { color: Colors().builder.cards.mapClause + '!important' });
+    ColorsActions.setStyle('span.cm-builtin', { color: Colors().builder.cards.baseClause + '!important' });
+    ColorsActions.setStyle('span.cm-string', { color: Colors().builder.cards.stringClause + '!important' });
+    ColorsActions.setStyle('span.cm-variable', { color: Colors().builder.cards.fieldClause + '!important' });
+    ColorsActions.setStyle('span.cm-variable-2', { color: Colors().builder.cards.inputParameter + '!important' });
+    ColorsActions.setStyle('span.cm-variable-3', { color: Colors().builder.cards.fieldClause + '!important' });
+    ColorsActions.setStyle('span.es-null', { color: Colors().builder.cards.nullClause + '!important' });
+    ColorsActions.setStyle('span.es-number', { color: Colors().builder.cards.numberClause + '!important' });
+    ColorsActions.setStyle('span.es-boolean', { color: Colors().builder.cards.booleanClause + '!important' });
+    ColorsActions.setStyle('span.es-parameter', { color: Colors().builder.cards.inputParameter + '!important' });
+    ColorsActions.setStyle('span.es-strin', { color: Colors().builder.cards.stringClause + '!important' });
+    ColorsActions.setStyle('.CodeMirror-scroll', { background: Colors().bg3 + '!important' });
+    ColorsActions.setStyle('.CodeMirror-gutters', { background: Colors().bg3 + '!important' });
+  }
+
   public componentWillUnmount()
   {
     this.executeChange.flush();
@@ -153,7 +174,7 @@ class TQLEditor extends TerrainComponent<Props>
           'Ctrl-Enter': this.issueQuery,
         },
         lineWrapping: true,
-        theme: this.props.theme || localStorage.getItem('theme') || 'default',
+        theme: Colors().tqlEditor,
         matchBrackets: true,
         autoCloseBrackets: true,
         foldGutter: true,
@@ -211,15 +232,11 @@ class TQLEditor extends TerrainComponent<Props>
           this.props.placeholder : 'Write your query here'}
       />
     );
-
     return (
       <div>
         {
           CM
         }
-        <StyleTag
-          style={CODE_HIGHLIGHTING_STYLE}
-        />
       </div>
     );
   }
@@ -403,25 +420,5 @@ class TQLEditor extends TerrainComponent<Props>
   }
 
 }
-
-const CODE_HIGHLIGHTING_STYLE = {
-  '.cm-s-monokai span.cm-atom': { color: Colors().builder.cards.booleanClause },
-
-  '.cm-s-monokai span.cm-property': { color: Colors().builder.cards.structureClause },
-  '.cm-s-monokai span.cm-attribute': { color: '#f00' /* what is an attribute? */ },
-  '.cm-s-monokai span.cm-keyword': { color: Colors().builder.cards.mapClause },
-  '.cm-s-monokai span.cm-builtin': { color: Colors().builder.cards.baseClause },
-  '.cm-s-monokai span.cm-string': { color: Colors().builder.cards.stringClause },
-
-  '.cm-s-monokai span.cm-variable': { color: Colors().builder.cards.fieldClause },
-  '.cm-s-monokai span.cm-variable-2': { color: Colors().builder.cards.inputParameter },
-  '.cm-s-monokai span.cm-variable-3': { color: Colors().builder.cards.fieldClause },
-
-  '.cm-s-monokai span.es-null': { color: Colors().builder.cards.nullClause },
-  '.cm-s-monokai span.es-number': { color: Colors().builder.cards.numberClause },
-  '.cm-s-monokai span.es-boolean': { color: Colors().builder.cards.booleanClause },
-  '.cm-s-monokai span.es-parameter': { color: Colors().builder.cards.inputParameter },
-  '.cm-s-monokai span.es-string': { color: Colors().builder.cards.stringClause },
-};
 
 export default TQLEditor;

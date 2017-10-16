@@ -9,7 +9,7 @@
   margin-left: -13px;
   
   .cards-deck,
-  .cards-column-cards-area {
+  .cards-column-cards-area, .tuning-column-cards-area {
     position: absolute;
     top: 0px;
     height: 100%;
@@ -28,11 +28,11 @@
   }
   
   .cards-deck {
-    background: #4e4f4d;
+    // background: #4e4f4d;
     width: 0px;
   }
   
-  .cards-column-cards-area {
+  .cards-column-cards-area, .tuning-column-cards-area {
     padding: 6px;
     padding-right: 3px;
     left: 0px;
@@ -45,7 +45,7 @@
     .cards-deck {
       width: @deck-width;
     }
-    .cards-column-cards-area {
+    .cards-column-cards-area, .tuning-column-cards-area {
       width: calc(~"100% - @{deck-width}");
       left: @deck-width;
     }
@@ -55,7 +55,7 @@
   }
   
   &:not(.cards-column-deck-open) {
-    .cards-column-cards-area {
+    .cards-column-cards-area, .tuning-column-cards-area {
       @knob-width: 24px;
       width: calc(~"100% - @{knob-width}");
       left: @knob-width;
