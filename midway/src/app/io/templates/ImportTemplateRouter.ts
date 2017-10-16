@@ -48,27 +48,27 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import * as Util from '../Util';
+import * as Util from '../../Util';
 import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 
 const Router = new KoaRouter();
-export const templates = new ImportTemplates();
+export const importTemplates = new ImportTemplates();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting all templates');
-  ctx.body = await templates.get();
+  winston.info('getting all importTemplates');
+  ctx.body = await importTemplates.get();
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting template ID ' + String(ctx.params.id));
-  ctx.body = await templates.get(Number(ctx.params.id));
+  ctx.body = await importTemplates.get(Number(ctx.params.id));
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting filtered templates');
+  winston.info('getting filtered importTemplates');
   const request: object = ctx.request.body.body;
   const filter: object = {};
   if (request !== undefined)
@@ -98,7 +98,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
       throw new Error('At most one of "importOnly" and "exportOnly" may be set to true.');
     }
   }
-  ctx.body = await templates.select([], filter);
+  ctx.body = await importTemplates.select([], filter);
 });
 
 Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -111,7 +111,7 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
   {
     throw new Error('Invalid parameter template ID');
   }
-  ctx.body = await templates.upsert(ctx.state.user, template);
+  ctx.body = await importTemplates.upsert(ctx.state.user, template);
 });
 
 Router.post('/updateAccessToken', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -122,7 +122,7 @@ Router.post('/updateAccessToken', passport.authenticate('access-token-local'), a
   {
     throw new Error('Invalid parameter template ID');
   }
-  ctx.body = await templates.updateAccessToken(ctx.state.user, templateObj['id']);
+  ctx.body = await importTemplates.updateAccessToken(ctx.state.user, templateObj['id']);
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -141,13 +141,13 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
     }
   }
 
-  ctx.body = await templates.upsert(ctx.state.user, template);
+  ctx.body = await importTemplates.upsert(ctx.state.user, template);
 });
 
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('deleting template');
-  ctx.body = await templates.delete(ctx.state.user, ctx.params.id);
+  ctx.body = await importTemplates.delete(ctx.state.user, ctx.params.id);
 });
 
 export default Router;

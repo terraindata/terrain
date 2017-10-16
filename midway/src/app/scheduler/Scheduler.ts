@@ -53,10 +53,12 @@ import * as winston from 'winston';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { CredentialConfig, Credentials } from '../credentials/Credentials';
-import { ExportConfig, Import } from '../import/Import';
+import { Export, ExportConfig } from '../io/Export';
+import { Import } from '../io/Import';
 import { UserConfig } from '../users/Users';
 import { versions } from '../versions/VersionRouter';
 
+export const exprt: Export = new Export();
 export const imprt: Import = new Import();
 export const credentials: Credentials = new Credentials();
 
@@ -392,7 +394,7 @@ export class Scheduler
             let writeStream: stream.Readable = new stream.Readable();
             try
             {
-              writeStream = await imprt.export(fields as ExportConfig, true) as stream.Readable;
+              writeStream = await exprt.export(fields as ExportConfig, true) as stream.Readable;
             }
             catch (e)
             {
