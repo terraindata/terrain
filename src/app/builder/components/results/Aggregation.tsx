@@ -105,12 +105,12 @@ const DISPLAY_TYPE_NAMES = {
 class AggregationComponent extends TerrainComponent<Props> {
   public state: {
     expanded: boolean,
-    displayType: string,
+    displayType: DISPLAY_TYPES,
     isSingleValue: boolean,
     singleValue: string,
   } = {
     expanded: false,
-    displayType: 'Table',
+    displayType: DISPLAY_TYPES.Raw,
     isSingleValue: false,
     singleValue: '',
   };
