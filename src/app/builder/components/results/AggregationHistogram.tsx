@@ -84,7 +84,7 @@ class AggregationHistogram extends TerrainComponent<Props>
 
   public parseBucketData(buckets)
   {
-    let data;
+    let data = [];
     let domainMin: number = Infinity;
     let domainMax: number = -Infinity;
     let rangeMax: number = -Infinity;
@@ -132,7 +132,9 @@ class AggregationHistogram extends TerrainComponent<Props>
     // HISTOGRAM QUERIES
     else
     {
-      data = buckets.map((bucket) =>
+      let barDifference = Infinity;
+      const tempData = {};
+      buckets.forEach((bucket, i) =>
       {
         if (bucket.doc_count > rangeMax)
         {
@@ -146,8 +148,24 @@ class AggregationHistogram extends TerrainComponent<Props>
         {
           domainMin = bucket.key;
         }
-        return { x: bucket.key, y: bucket.doc_count };
+        if (i > 0 && bucket.key - buckets[i - 1].key < barDifference)
+        {
+          barDifference = bucket.key - buckets[i - 1].key;
+        }
+        tempData[bucket.key] = bucket.doc_count;
       });
+      // This is done so that any missing bars are added as having 0 value
+      for (let i = domainMin; i <= domainMax; i += barDifference)
+      {
+        if (tempData[i] !== undefined)
+        {
+          data.push({ x: i, y: tempData[i] });
+        }
+        else
+        {
+          data.push({ x: i, y: 0 });
+        }
+      }
     }
     return { barsData: data, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax + 0.05 * rangeMax]) };
   }

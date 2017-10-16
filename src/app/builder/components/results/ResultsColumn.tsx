@@ -163,14 +163,12 @@ class ResultsColumn extends TerrainComponent<Props>
             style={index === this.state.selectedTab ? ACTIVE_TAB_STYLE : INACTIVE_TAB_STYLE}
           >
             <div className='results-column-tab-name'>{name}</div>
-            {name !== 'Raw' &&
-              <div
-                className='results-column-tab-number'
-                style={this.state.highlightedTabs.get(name.toLowerCase()) ? backgroundColor(Colors().active) : {}}
-              >
-                {this.state.highlightedTabs.get(name.toLowerCase()) ? this.getNumberOf(name) : ''}
-              </div>
-            }
+            <div
+              className='results-column-tab-number'
+              style={this.state.highlightedTabs.get(name.toLowerCase()) ? backgroundColor(Colors().active) : {}}
+            >
+              {this.state.highlightedTabs.get(name.toLowerCase()) ? this.getNumberOf(name) : ''}
+            </div>
           </div>,
         )}
       </div>
@@ -193,7 +191,7 @@ class ResultsColumn extends TerrainComponent<Props>
         return String(_.keys(aggs).length);
       case 'Suggestions':
       default:
-        return '0';
+        return '';
     }
   }
 

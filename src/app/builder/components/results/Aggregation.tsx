@@ -265,31 +265,32 @@ class AggregationComponent extends TerrainComponent<Props> {
               <div className='aggregation-title-bar-options' key={this.props.name}>
                 {
                   this.canBeTable() ?
-                    tooltip(<ExportIcon
-                      className='aggregation-title-bar-export'
-                      onClick={this.exportData}
-                      key='results-area-export'
-                    />, 'Export to CSV')
-
+                    <div className='aggregation-title-bar-export'>
+                      {
+                        tooltip(<ExportIcon
+                          className='aggregation-title-bar-export-icon'
+                          onClick={this.exportData}
+                          key='results-area-export'
+                        />, 'Export to CSV')
+                      }
+                    </div>
                     :
                     ''
                 }
-                <div>
-                  <CopyToClipboard text={JSON.stringify(values, undefined, 2)} onCopy={this.handleTextCopied}>
-                    <div className='clipboard-icon-wrapper'>
-                      {
-                        tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy JSON to Clipboard')
-                      }
-                    </div>
-                  </CopyToClipboard>
-                  <Dropdown
-                    options={List(displayTypeOptions)}
-                    selectedIndex={displayTypeOptions.indexOf(this.state.displayType)}
-                    canEdit={true}
-                    onChange={this.handleDisplayTypeChange}
-                    className='aggregation-display-type-dropdown'
-                  />
-                </div>
+                <CopyToClipboard text={JSON.stringify(values, undefined, 2)} onCopy={this.handleTextCopied}>
+                  <div className='clipboard-icon-wrapper'>
+                    {
+                      tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy JSON to Clipboard')
+                    }
+                  </div>
+                </CopyToClipboard>
+                <Dropdown
+                  options={List(displayTypeOptions)}
+                  selectedIndex={displayTypeOptions.indexOf(this.state.displayType)}
+                  canEdit={true}
+                  onChange={this.handleDisplayTypeChange}
+                  className='aggregation-display-type-dropdown'
+                />
               </div>
             )
             :

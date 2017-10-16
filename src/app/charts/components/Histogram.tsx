@@ -211,6 +211,7 @@ const Histogram = {
       const bottomAxisHeight = bottomAxis.node().getBBox().height;
       d3.select(el).select('.histogram-chart')
         .attr('style', `padding-bottom: ${bottomAxisHeight - 20}px`);
+
     }
   },
 
@@ -286,16 +287,12 @@ const Histogram = {
 
     const xPadding = 5;
 
-    const barWidth = (d) =>
+    const chartWidth = d3.select(el).select('.inner-svg').attr('width');
+    let barWidth = (chartWidth / barsData.length) - 1;
+    if (barWidth < 1)
     {
-      const chartWidth = d3.select(el).select('.inner-svg').attr('width');
-      let width = (chartWidth / barsData.length) - 1;
-      if (width < 1)
-      {
-        width = 1;
-      }
-      return width;
-    };
+      barWidth = 1;
+    }
 
     bar.enter()
       .append('rect')
