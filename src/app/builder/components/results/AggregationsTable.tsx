@@ -169,14 +169,14 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
       }).toSet();
       const cols = List(keys.map((key) =>
       {
-        return { key, name: key, resizable: true, draggable: true };
+        return { key, name: key, resizable: true};
       }));
       return cols;
       // return List([{ key: 'key', name: 'key', resizable: true }, { key: 'doc_count', name: 'doc_count', resizable: true }]);
     }
     else
     {
-      return List([{ key: 'key', name: 'key', resizable: true, draggable: true }, { key: 'value', name: 'value', resizable: true, draggable: true }]);
+      return List([{ key: 'key', name: 'key', resizable: true}, { key: 'value', name: 'value', resizable: true}]);
     }
   }
 
