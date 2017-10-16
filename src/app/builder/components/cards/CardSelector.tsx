@@ -211,15 +211,15 @@ class CardSelector extends TerrainComponent<Props>
         <div className='inset-shadow-veil' style={getStyle('boxShadow', `inset 2px 2px 8px 1px ${Colors().boxShadow}`)} />
 
         <div className='selectors-row'>
-          { // TODO once card categories are ready to go
-            // <div className='card-category-selector' style={borderColor(Colors().border1)}>
-            //   <div className='card-category-title' style={fontColor(Colors().text1)}>
-            //     Categories
-            //   </div>
-            //   {
-            //     this.renderCategoryOptions()
-            //   }
-            // </div>
+          {
+            <div className='card-category-selector' style={borderColor(Colors().border1)}>
+              <div className='card-category-title' style={fontColor(Colors().text1)}>
+                Categories
+              </div>
+              {
+                this.renderCategoryOptions()
+              }
+            </div>
           }
           <div
             className='create-card-selector-inner'
@@ -234,13 +234,10 @@ class CardSelector extends TerrainComponent<Props>
               isEmpty &&
               <div className='create-card-empty'>
                 There are no remaining cards that can be created here.
-                    </div>
+              </div>
             }
             {
               this.props.cardTypeList.map(this.renderCardOption)
-            }
-            {
-              _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
             }
           </div>
         </div>

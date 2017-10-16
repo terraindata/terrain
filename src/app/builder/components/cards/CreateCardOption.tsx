@@ -129,13 +129,16 @@ class CreateCardOption extends TerrainComponent<Props>
     const text = capitalize(this.props.overrideTitle || card.static.title);
     const description = card.static.description || 'Create a ' + card.static.title + ' card.';
     const searchResult = this.searchForText(text, description, this.props.searchText);
-    const minimalCardStyle = _.extend({},
-      cardStyle(card.static.colors[0], Colors().bg3, null, true),
-      {
-        borderTopWidth: 0,
-        borderRightWidth: 0,
-        borderBottomWidth: 0,
-      },
+    // const minimalCardStyle = _.extend({},
+    //   cardStyle(card.static.colors[0], Colors().bg3, null, true),
+    //   {
+    //     borderTopWidth: 0,
+    //     borderRightWidth: 0,
+    //     borderBottomWidth: 0,
+    //   },
+    // );
+    const titleStyle = _.extend({},
+      fontColor(card.static.colors[0])
     );
     return (
       !searchResult ? null :
@@ -153,9 +156,9 @@ class CreateCardOption extends TerrainComponent<Props>
           key='create-option'
         >
           <div
-            className='create-card-option-button'
-            style={minimalCardStyle}
-            key='create-button'
+            className='create-card-option-title'
+            key='create-title'
+            style={titleStyle}
           >
             {
               searchResult[0]

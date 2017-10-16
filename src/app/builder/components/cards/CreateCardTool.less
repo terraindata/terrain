@@ -1,6 +1,7 @@
 @import "../../../common/Common.less";
 
 @focus-color: @bright-green;
+@item-row-height: 300px;
 
 .create-card-wrapper {
   
@@ -59,17 +60,15 @@
     }
 
     .create-card-selector-inner {
-
       flex: 1;
-      max-height: 250px;
+      max-height: @item-row-height;
       overflow: auto;
-      // padding: @half-spacing;
     }
 
     .card-category-selector {
       width: 160px;
       border-right: 1px solid;
-      
+      max-height: @item-row-height;
       .card-category-title {
         margin-top: @spacing;
         margin-bottom: @spacing;
