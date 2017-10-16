@@ -108,6 +108,11 @@ class Modal extends TerrainComponent<Props>
     }
   }
 
+  public handleFocus(e)
+  {
+    e.target.select(); // text input field value will show selected
+  }
+
   public render()
   {
     const defaultTitle = this.props.error ? 'Error' : 'Please Confirm';
@@ -219,6 +224,8 @@ class Modal extends TerrainComponent<Props>
                   defaultValue={this.props.initialTextboxValue}
                   value={this.props.textboxValue}
                   onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
+                  autoFocus
+                  onFocus={this.handleFocus}
                 />
               }
               {
