@@ -314,10 +314,13 @@ const Histogram = {
 
   _extendChart(el, xLabels)
   {
-    const bottomAxis = d3.select(el).select('.bottomAxis');
-    const bottomAxisHeight = bottomAxis.node().getBBox().height;
-    d3.select(el).select('.histogram-chart')
-      .attr('style', `padding-bottom: ${bottomAxisHeight - 20}px`);
+    if (xLabels !== undefined && xLabels.length > 0 )
+    {
+      const bottomAxis = d3.select(el).select('.bottomAxis');
+      const bottomAxisHeight = bottomAxis.node().getBBox().height;
+      d3.select(el).select('.histogram-chart')
+        .attr('style', `padding-bottom: ${bottomAxisHeight - 20}px`); 
+    }
   },
 
   _draw(el, scales, domain, barsData, width, height, colors, xLabels, yLabels)
