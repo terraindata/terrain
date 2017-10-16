@@ -127,7 +127,7 @@ export class Scheduler
           for (const schedule of schedules)
           {
             schedule.archived = 1;
-            await this.cancelJob(schedule.jobId);
+            await this.cancelJob(schedule.id);
             return resolve(await App.DB.upsert(this.schedulerTable, schedule as object) as SchedulerConfig[]);
           }
         }
@@ -136,26 +136,23 @@ export class Scheduler
     });
   }
 
-  public async cancelJob(jobId?: number): Promise<boolean>
+  public async cancelJob(id?: number): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
-      if (jobId === undefined)
+      if (id === undefined)
       {
         return resolve(false);
       }
-      const schedules: any[] = await App.DB.select(this.schedulerTable, [], { jobId }) as any[];
+      const schedules: any[] = await App.DB.select(this.schedulerTable, [], { id }) as any[];
       if (schedules.length === 0)
       {
         return resolve(false);
       }
-      for (const schedule of schedules)
+      schedules.map((schedule) =>
       {
-        if (schedules.hasOwnProperty(schedule))
-        {
-          this.scheduleMap[schedule['id']].cancel();
-        }
-      }
+        this.scheduleMap[schedule['id']].cancel();
+      });
       return resolve(true);
     });
   }
@@ -174,7 +171,7 @@ export class Scheduler
             schedule.active = status;
             if (status === 0)
             {
-              await this.cancelJob(schedule.jobId);
+              await this.cancelJob(schedule.id);
             }
             return resolve(await App.DB.upsert(this.schedulerTable, schedule as object) as SchedulerConfig[]);
           }
@@ -338,7 +335,7 @@ export class Scheduler
             }
             catch (e)
             {
-              winston.info('Schedule ' + scheduleID.toString() + ': Error while trying to read file. Do you have read permission?');
+              winston.info('Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string));
             }
             return rejectJob('Failure to import.');
           }
