@@ -58,6 +58,7 @@ import './CardHelpTooltip.less';
 export interface Props
 {
   staticInfo: any;
+  errors: List<string>;
 }
 
 export default class CardHelpTooltip extends TerrainComponent<Props>
@@ -73,15 +74,16 @@ export default class CardHelpTooltip extends TerrainComponent<Props>
       getStyle('borderRightColor', Colors().highlight),
       getStyle('borderBottomColor', Colors().highlight),
     );
-    let errorMessage = '';
+    let errorMessage = 'Error: ';
     let cardHasError = false;
-    if (this.props.staticInfo.errors && this.props.staticInfo.errors.length > 0)
+    if (this.props.errors && this.props.errors.size > 0)
     {
       cardHasError = true;
-      for (const e of this.props.staticInfo.errors)
-      {
-        errorMessage += e;
-      }
+      this.props.errors.map(
+        (msg, key) =>
+        {
+          errorMessage += msg;
+        });
     }
     return (
       <div className='card-help-tooltip'>

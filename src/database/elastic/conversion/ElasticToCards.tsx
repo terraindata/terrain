@@ -59,6 +59,7 @@ import Blocks from '../blocks/ElasticBlocks';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+import ESCardParser from './ESCardParser';
 
 const { make } = BlockUtils;
 
@@ -78,7 +79,8 @@ export default function ElasticToCards(
     {
       const rootValueInfo = query.parseTree.parser.getValueInfo();
       const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'root');
-      const cards = BlockUtils.reconcileCards(query.cards, List([rootCard]));
+      let cards = BlockUtils.reconcileCards(query.cards, List([rootCard]));
+      cards = ESCardParser.parseAndUpdateCards(cards);
       return query
         .set('cards', cards)
         .set('cardsAndCodeInSync', true);
