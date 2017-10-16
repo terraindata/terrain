@@ -69,6 +69,7 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
 import AggregationHistogram from './AggregationHistogram';
+import AggregationScatterPlot from './AggregationScatterPlot';
 import AggregationsTable from './AggregationsTable';
 import { Aggregation as AggregationClass } from './ResultTypes';
 
@@ -133,7 +134,8 @@ class AggregationComponent extends TerrainComponent<Props> {
         return;
       }
       if ((currentAgg.displayType === 'Table' && !this.canBeTable(nextProps.aggregation)) ||
-        (currentAgg.displayType === 'Histogram' && this.canBeHistogram(nextProps.aggregation) === undefined)
+        (currentAgg.displayType === 'Histogram' && this.canBeHistogram(nextProps.aggregation) === undefined) ||
+        (currentAgg.displayType === 'ScatterPlot' && !this.canBeScatterPlot(nextProps.aggregation))
       )
       {
         const displayType = this.getBestDisplayType(nextProps.aggregation);
@@ -168,6 +170,10 @@ class AggregationComponent extends TerrainComponent<Props> {
     if (this.canBeHistogram(aggregation) !== undefined)
     {
       displayType = 'Histogram';
+    }
+    else if (this.canBeScatterPlot(aggregation))
+    {
+      displayType = 'ScatterPlot';
     }
     else if (this.canBeTable(aggregation))
     {
@@ -219,6 +225,10 @@ class AggregationComponent extends TerrainComponent<Props> {
     if (this.canBeHistogram() !== undefined)
     {
       options.push('Histogram');
+    }
+    if (this.canBeScatterPlot())
+    {
+      options.push('ScatterPlot');
     }
 
     if (this.canBeTable())
@@ -332,6 +342,8 @@ class AggregationComponent extends TerrainComponent<Props> {
         return this.renderTableView(values);
       case 'Histogram':
         return this.renderHistogram(values);
+      case 'ScatterPlot':
+        return this.renderScatterPlot(values);
       case 'Raw':
         return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
       default:
@@ -382,6 +394,23 @@ class AggregationComponent extends TerrainComponent<Props> {
         return this.findKey(value, k);
       }
     }
+  }
+
+  public renderScatterPlot(values)
+  {
+    return (
+      <AggregationScatterPlot
+        data={values.values}
+        colors={[Colors().active, Colors().activeHover]}
+      />
+    );
+  }
+
+  public canBeScatterPlot(overrideAggration?)
+  {
+    const aggregation = overrideAggration !== undefined ? overrideAggration : this.props.aggregation;
+    const values = _.values(aggregation)[0];
+    return values.values !== undefined;
   }
 
   public canBeHistogram(overrideAggregation?)
