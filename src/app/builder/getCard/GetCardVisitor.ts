@@ -174,7 +174,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     obj['static'] = _.extend({
       clause,
       title: clause.name,
-      clause,
       colors: getCardColors(clause.path[0], Colors().border2),
       category: clause.path[0],
       language: 'elastic',

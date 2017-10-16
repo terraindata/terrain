@@ -139,36 +139,36 @@ class CreateCardOption extends TerrainComponent<Props>
     );
     return (
       !searchResult ? null :
-      <div
-        className={classNames({
-          'create-card-option': true,
-          'create-card-option-focused': this.props.isFocused,
-        })}
-        onClick={this.handleClick}
-        style={[
-          borderColor(Colors().highlight),
-          backgroundColor('rgba(0,0,0,0)', Colors().darkerHighlight),
-          fontColor(Colors().text2, Colors().text1),
-        ]}
-        key='create-option'
-      >
         <div
-          className='create-card-option-button'
-          style={minimalCardStyle}
-          key='create-button'
+          className={classNames({
+            'create-card-option': true,
+            'create-card-option-focused': this.props.isFocused,
+          })}
+          onClick={this.handleClick}
+          style={[
+            borderColor(Colors().highlight),
+            backgroundColor('rgba(0,0,0,0)', Colors().darkerHighlight),
+            fontColor(Colors().text2, Colors().text1),
+          ]}
+          key='create-option'
         >
-          {
-            searchResult[0]
-          }
+          <div
+            className='create-card-option-button'
+            style={minimalCardStyle}
+            key='create-button'
+          >
+            {
+              searchResult[0]
+            }
+          </div>
+          <div
+            className='create-card-option-description'
+          >
+            {
+              searchResult[1]
+            }
+          </div>
         </div>
-        <div
-          className='create-card-option-description'
-        >
-          {
-            searchResult[1]
-          }
-        </div>
-      </div>
     );
   }
 }
