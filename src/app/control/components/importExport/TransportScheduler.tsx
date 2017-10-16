@@ -315,6 +315,10 @@ class TransportScheduler extends TerrainComponent<Props>
       {
         paramsJob['variantId'] = args.variantId;
       }
+      if (args.fileType === fileTypeOptions.get(FileTypes.JSON_TYPE_OBJECT))
+      {
+        paramsJob['objectKey'] = args.objectKey;
+      }
 
       const cronStr = `${args.cronArgs[0]} ${args.cronArgs[1]} ${args.cronArgs[2]} ${args.cronArgs[3]} ${args.cronArgs[4]}`;
       const transport = {
