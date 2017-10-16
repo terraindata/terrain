@@ -44,96 +44,97 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 
+import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
+import { Menu, MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
-import * as FileImportTypes from 'fileImport/FileImportTypes';
-import ScheduleControlList from './ScheduleControlList';
-import TemplateControlList from './TemplateControlList';
 
-import { SchemaStore } from 'schema/data/SchemaStore';
-import { Server, ServerMap } from 'schema/SchemaTypes';
-import ControlActions from '../../data/ControlActions';
-import ControlStore from '../../data/ControlStore';
+import './ControlList.less';
 
-import './ImportExportControl.less';
+const { List } = Immutable;
 
-const { List, Map } = Immutable;
-type Template = FileImportTypes.Template;
+export type HeaderConfigItem = [string, (rowElem, index) => any];
+export type HeaderConfig = HeaderConfigItem[];
 
 export interface Props
 {
-  placeholder?: string;
+  items: List<any>;
+  config: HeaderConfig;
+  getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
+  [_dependents: string]: any; // for if the config has functions that depend on values outside of items
 }
 
-class ImportExportControl extends TerrainComponent<Props>
+export class ControlList extends TerrainComponent<Props>
 {
-  public state: {
-    servers: ServerMap;
-    templates: List<Template>;
-    schedules: List<SchedulerConfig>;
-    credentials: List<CredentialConfig>;
-  } = {
-    servers: Map<string, Server>(),
-    templates: List([]),
-    schedules: List([]),
-    credentials: List([]),
-  };
-
-  constructor(props)
+  public renderRow(item, index: number)
   {
-    super(props);
-    this._subscribe(ControlStore, {
-      stateKey: 'templates',
-      storeKeyPath: ['importExportTemplates'],
-    });
-    this._subscribe(ControlStore, {
-      stateKey: 'schedules',
-      storeKeyPath: ['importExportScheduledJobs'],
-    });
-    this._subscribe(ControlStore, {
-      stateKey: 'credentials',
-      storeKeyPath: ['importExportCredentials'],
-    });
-    this._subscribe(SchemaStore, {
-      stateKey: 'servers',
-      storeKeyPath: ['servers'],
-    });
-  }
-
-  public componentDidMount()
-  {
-    ControlActions.importExport.fetchTemplates();
-    ControlActions.importExport.fetchSchedules();
-    ControlActions.importExport.fetchCredentials();
+    return (
+      <div className='row-info' key={index} style={tableRowStyle}>
+        {
+          this.props.config.map((headerItem: HeaderConfigItem, i: number) =>
+          {
+            return (
+              <div className='row-info-data' key={i}>
+                {headerItem[1](item, index)}
+              </div>
+            );
+          })
+        }
+        {
+          this.props.getMenuOptions !== undefined ?
+            <div className='row-info-data' key='context-menu'>
+              <div className='control-list-menu-options-wrapper'>
+                <Menu options={this.props.getMenuOptions(item, index)} />
+              </div>
+            </div>
+            : undefined
+        }
+      </div>
+    );
   }
 
   public render()
   {
     return (
-      <div className='import-export-token-control-page'>
-        <div className='import-export-control-title'>
-          Manage Import and Export Templates
+      this.props.items.size > 0 ?
+        <div className='control-list-table'>
+          <div
+            className={classNames({
+              'row-info-header': true,
+            })}
+            key='header'
+          >
+            {
+              this.props.config.map((headerItem: HeaderConfigItem, i: number) =>
+              {
+                return (
+                  <div className='row-info-data' key={i}>
+                    {headerItem[0]}
+                  </div>
+                );
+              })
+            }
+            {
+              this.props.getMenuOptions !== undefined ?
+                <div className='row-info-data' key='context-menu' />
+                : undefined
+            }
+          </div>
+          {
+            this.props.items.map(this.renderRow)
+          }
         </div>
-        <TemplateControlList
-          templates={this.state.templates}
-          servers={this.state.servers}
-          credentials={this.state.credentials}
-        />
-        <div className='import-export-control-title'>
-          Manage Schedules
-        </div>
-        <ScheduleControlList
-          templates={this.state.templates}
-          scheduledJobs={this.state.schedules}
-          servers={this.state.servers}
-          credentials={this.state.credentials}
-        />
-      </div>
+        :
+        <div> List Has No Items </div>
     );
   }
 }
 
-export default ImportExportControl;
+const tableRowStyle = _.extend({},
+  backgroundColor(Colors().bg3),
+  borderColor(Colors().bg2),
+);

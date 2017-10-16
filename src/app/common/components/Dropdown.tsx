@@ -325,7 +325,7 @@ class Dropdown extends TerrainComponent<Props>
           className='dropdown-options-wrapper'
         >
           {
-            this.props.options ?
+            (this.props.options && this.props.options.size > 0) ?
               this.props.options.map(this.renderOption)
               :
               'No options available'
