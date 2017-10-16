@@ -51,7 +51,7 @@ import './LibraryColumn.less';
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 export interface Props
@@ -63,6 +63,11 @@ export interface Props
 const COLUMN_STYLE = _.extend({},
   backgroundColor(Colors().bg1),
   borderColor(Colors().bg3),
+);
+
+const TITLE_STYLE = _.extend({},
+  backgroundColor(Colors().bg3),
+  fontColor(Colors().text1),
 );
 
 class LibraryColumn extends TerrainComponent<Props>
@@ -77,7 +82,7 @@ class LibraryColumn extends TerrainComponent<Props>
           this.props.title &&
           <div
             className='library-column-title'
-            style={backgroundColor(Colors().bg3)}
+            style={TITLE_STYLE}
           >
             {
               this.props.title

@@ -49,7 +49,7 @@ var path = require("path");
 
 module.exports =
 {
-    entry: "./lib/Entrypoint.ts",
+    entry: "./lib/TerrainAnalytics.ts",
     devtool: "cheap-module-source-map",
 
     output:

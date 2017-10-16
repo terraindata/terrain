@@ -57,10 +57,11 @@ import { browserHistory } from 'react-router';
 import LibraryActions from '../../../library/data/LibraryActions';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
+import ColorsActions from './../../../colors/data/ColorsActions';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryStore } from './../../../library/data/LibraryStore';
 
-import { backgroundColor, Colors } from '../../../common/Colors';
+import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
 
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -199,6 +200,12 @@ export class Tabs extends TerrainComponent<TabsProps> {
     this.computeTabs(this.props.config);
   }
 
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action svg', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action', { 'border-color': Colors().altBg1 });
+  }
+
   public componentWillUnmount()
   {
     this.cancel && this.cancel();
@@ -274,6 +281,7 @@ export class Tabs extends TerrainComponent<TabsProps> {
               })}
               key={index}
               onClick={action.onClick}
+              style={action.enabled ? backgroundColor(Colors().bg3) : undefined}
             >
               {
                 action.icon &&
@@ -283,7 +291,10 @@ export class Tabs extends TerrainComponent<TabsProps> {
                   }
                 </div>
               }
-              <div className='tabs-action-piece'>
+              <div
+                className='tabs-action-piece'
+                style={fontColor(Colors().text1)}
+              >
                 {
                   action.text
                 }
@@ -388,4 +399,5 @@ export class Tabs extends TerrainComponent<TabsProps> {
     );
   }
 }
+
 export default Tabs;

@@ -71,6 +71,7 @@ export default class ESValueInfo
   public tokens: ESParserToken[];
 
   public card: any;
+  public cardPath: any;
 
   /**
    * When this value is the result of substituting in a parameter,

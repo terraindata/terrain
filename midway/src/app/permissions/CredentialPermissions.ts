@@ -44,96 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions max-line-length
+import { UserConfig } from '../users/Users';
 
-import * as _ from 'lodash';
-
-import * as Immutable from 'immutable';
-
-export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object | number | boolean);
-export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object | number | boolean);
-export type TQLStringFn = string | ((block: Block) => string);
-export type TQLFn = TQLStringFn | TQLRecursiveObjectFn;
-
-// A Block is a card or a distinct piece / group of card pieces
-export interface Block extends IRecord<Block>
+export class CredentialPermissions
 {
-  id: string;
-  type: string;
-  _isBlock: boolean;
-
-  // fields not saved on server
-  static: {
-    language: string;
-    tql: TQLFn;
-    tqlGlue?: string;
-    topTql?: string;
-    accepts?: List<string>;
-
-    // remove this block if it contains a card and the card is removed
-    //  will not remove field if it is the last in its parents' list
-    removeOnCardRemove?: boolean;
-
-    metaFields: string[];
-
-    [field: string]: any;
-  };
-
-  [field: string]: any;
-}
-
-export interface BlockConfig
-{
-  static: {
-    language: string;
-    tql: TQLFn;
-    tqlGlue?: string;
-    accepts?: List<string>;
-    removeOnCardRemove?: boolean;
-    metaFields?: string[];
-    [field: string]: any;
-  };
-
-  [field: string]: any;
-}
-
-export const allBlocksMetaFields = ['id'];
-
-const RESERVED_WORDS = ['type', 'size', 'length', 'set', 'setIn', 'get', 'getIn', 'map'];
-export const verifyBlockConfigKeys = (config: object) =>
-{
-  RESERVED_WORDS.map(
-    (word) =>
+  public async verifyPermission(user: UserConfig, params: object): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
     {
-      if (config[word])
+      if (user.isSuperUser === 0)
       {
-        throw new Error('Creating card: ' + word + ' is a reserved word. ' + JSON.stringify(config));
+        return reject('User must be a super user.');
       }
-    },
-  );
-};
-
-// helper function to populate common fields for an Block
-export const _block = (config: BlockConfig): Block =>
-{
-  verifyBlockConfigKeys(config);
-
-  const blockConfig: Block = _.extend({
-    id: '',
-    type: '',
-    _isBlock: true,
-  }, config);
-
-  if (blockConfig.static.metaFields)
-  {
-    blockConfig.static.metaFields = blockConfig.static.metaFields.concat(allBlocksMetaFields);
+      return resolve();
+    });
   }
-  else
-  {
-    blockConfig.static.metaFields = allBlocksMetaFields;
-  }
+}
 
-  return blockConfig;
-};
-
-export default Block;
+export default CredentialPermissions;

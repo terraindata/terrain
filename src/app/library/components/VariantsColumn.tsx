@@ -56,6 +56,7 @@ import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
+import { Colors, fontColor } from '../../colors/Colors';
 import CreateLine from '../../common/components/CreateLine';
 import Modal from '../../common/components/Modal';
 import RolesStore from '../../roles/data/RolesStore';
@@ -138,6 +139,7 @@ class VariantsColumn extends TerrainComponent<Props>
           [numericId],
           analytics.selectedMetric,
           analytics.selectedInterval,
+          analytics.selectedDateRange,
         );
       });
     }
@@ -380,7 +382,12 @@ class VariantsColumn extends TerrainComponent<Props>
       } else
       {
         this.props.variantActions.select(id.toString());
-        this.props.analyticsActions.fetch([id], analytics.selectedMetric);
+        this.props.analyticsActions.fetch(
+          [id],
+          analytics.selectedMetric,
+          analytics.selectedInterval,
+          analytics.selectedDateRange,
+        );
       }
     } else
     {
@@ -528,6 +535,7 @@ class VariantsColumn extends TerrainComponent<Props>
             />
             <div
               className='library-item-line'
+              style={fontColor(Colors().text1)}
             >
               {
                 'Changed ' + Util.formatDate(variant.lastEdited)

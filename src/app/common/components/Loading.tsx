@@ -61,7 +61,7 @@ export interface Props
 {
   loading: boolean;
   loaded: boolean;
-  onLoadedEnd: () => void;
+  onLoadedEnd?: () => void;
   width: number;
   height: number;
 
@@ -166,7 +166,10 @@ class Loading extends TerrainComponent<Props>
 
   public handleEnd()
   {
-    this.props.onLoadedEnd();
+    if (typeof this.props.onLoadedEnd === 'function')
+    {
+      this.props.onLoadedEnd();
+    }
   }
 
   public render()

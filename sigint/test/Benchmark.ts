@@ -44,96 +44,63 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions max-line-length
+import benchrest = require('bench-rest');
+import winston = require('winston');
 
-import * as _ from 'lodash';
+import App from '../src/App';
 
-import * as Immutable from 'immutable';
+const db = 'http://127.0.0.1:9200';
+const host = 'http://127.0.0.1:43002';
+let server;
 
-export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object | number | boolean);
-export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object | number | boolean);
-export type TQLStringFn = string | ((block: Block) => string);
-export type TQLFn = TQLStringFn | TQLRecursiveObjectFn;
-
-// A Block is a card or a distinct piece / group of card pieces
-export interface Block extends IRecord<Block>
+export async function startServer()
 {
-  id: string;
-  type: string;
-  _isBlock: boolean;
-
-  // fields not saved on server
-  static: {
-    language: string;
-    tql: TQLFn;
-    tqlGlue?: string;
-    topTql?: string;
-    accepts?: List<string>;
-
-    // remove this block if it contains a card and the card is removed
-    //  will not remove field if it is the last in its parents' list
-    removeOnCardRemove?: boolean;
-
-    metaFields: string[];
-
-    [field: string]: any;
-  };
-
-  [field: string]: any;
-}
-
-export interface BlockConfig
-{
-  static: {
-    language: string;
-    tql: TQLFn;
-    tqlGlue?: string;
-    accepts?: List<string>;
-    removeOnCardRemove?: boolean;
-    metaFields?: string[];
-    [field: string]: any;
-  };
-
-  [field: string]: any;
-}
-
-export const allBlocksMetaFields = ['id'];
-
-const RESERVED_WORDS = ['type', 'size', 'length', 'set', 'setIn', 'get', 'getIn', 'map'];
-export const verifyBlockConfigKeys = (config: object) =>
-{
-  RESERVED_WORDS.map(
-    (word) =>
-    {
-      if (config[word])
+  try
+  {
+    const options =
       {
-        throw new Error('Creating card: ' + word + ' is a reserved word. ' + JSON.stringify(config));
-      }
+        debug: true,
+        db,
+        port: 43002,
+      };
+
+    const app = new App(options);
+    server = await app.start();
+  }
+  catch (e)
+  {
+    throw new Error('starting event server sigint: ' + String(e));
+  }
+}
+
+export const flow = {
+  main: [
+    {
+      post: host + '/v1', json: {
+        eventid: '#{INDEX}',
+        variantid: '#{INDEX}',
+        visitorid: '#{INDEX}',
+      },
     },
-  );
+    { get: host + '/v1?eventid=#{INDEX}&variantid=#{INDEX}&visitorid=#{INDEX}' },
+  ],
 };
 
-// helper function to populate common fields for an Block
-export const _block = (config: BlockConfig): Block =>
-{
-  verifyBlockConfigKeys(config);
-
-  const blockConfig: Block = _.extend({
-    id: '',
-    type: '',
-    _isBlock: true,
-  }, config);
-
-  if (blockConfig.static.metaFields)
-  {
-    blockConfig.static.metaFields = blockConfig.static.metaFields.concat(allBlocksMetaFields);
-  }
-  else
-  {
-    blockConfig.static.metaFields = allBlocksMetaFields;
-  }
-
-  return blockConfig;
+const runOptions = {
+  limit: 20,
+  prealloc: 1000,
+  iterations: 1000,
 };
 
-export default Block;
+// tslint:disable-next-line:no-floating-promises
+startServer();
+benchrest(flow, runOptions)
+  .on('error', (err, ctx) => winston.error('Failed in %s with err: ', ctx, err))
+  .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
+  .on('end', (stats, errorCount) =>
+  {
+    winston.info('error count: ', errorCount);
+    winston.info('stats', stats);
+    // TODO: teardown server here
+    process.exit();
+  });

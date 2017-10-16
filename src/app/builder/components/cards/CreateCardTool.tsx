@@ -53,7 +53,7 @@ import * as React from 'react';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { CardConfig } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { backgroundColor, Colors } from '../../../common/Colors';
+import { backgroundColor, Colors } from '../../../colors/Colors';
 import CreateLine from '../../../common/components/CreateLine';
 import KeyboardFocus from '../../../common/components/KeyboardFocus';
 import TerrainComponent from '../../../common/components/TerrainComponent';

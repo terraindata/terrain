@@ -44,96 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions max-line-length
+// NB: This router only exists for testing purposes.
+// If using a proxy, be sure to set app.proxy = true
 
-import * as _ from 'lodash';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-import * as Immutable from 'immutable';
+import { CredentialConfig, Credentials } from '../credentials/Credentials';
+import * as Util from '../Util';
 
-export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object | number | boolean);
-export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object | number | boolean);
-export type TQLStringFn = string | ((block: Block) => string);
-export type TQLFn = TQLStringFn | TQLRecursiveObjectFn;
+const Router = new KoaRouter();
+export const credentials: Credentials = new Credentials();
 
-// A Block is a card or a distinct piece / group of card pieces
-export interface Block extends IRecord<Block>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  id: string;
-  type: string;
-  _isBlock: boolean;
-
-  // fields not saved on server
-  static: {
-    language: string;
-    tql: TQLFn;
-    tqlGlue?: string;
-    topTql?: string;
-    accepts?: List<string>;
-
-    // remove this block if it contains a card and the card is removed
-    //  will not remove field if it is the last in its parents' list
-    removeOnCardRemove?: boolean;
-
-    metaFields: string[];
-
-    [field: string]: any;
-  };
-
-  [field: string]: any;
-}
-
-export interface BlockConfig
-{
-  static: {
-    language: string;
-    tql: TQLFn;
-    tqlGlue?: string;
-    accepts?: List<string>;
-    removeOnCardRemove?: boolean;
-    metaFields?: string[];
-    [field: string]: any;
-  };
-
-  [field: string]: any;
-}
-
-export const allBlocksMetaFields = ['id'];
-
-const RESERVED_WORDS = ['type', 'size', 'length', 'set', 'setIn', 'get', 'getIn', 'map'];
-export const verifyBlockConfigKeys = (config: object) =>
-{
-  RESERVED_WORDS.map(
-    (word) =>
-    {
-      if (config[word])
-      {
-        throw new Error('Creating card: ' + word + ' is a reserved word. ' + JSON.stringify(config));
-      }
-    },
-  );
-};
-
-// helper function to populate common fields for an Block
-export const _block = (config: BlockConfig): Block =>
-{
-  verifyBlockConfigKeys(config);
-
-  const blockConfig: Block = _.extend({
-    id: '',
-    type: '',
-    _isBlock: true,
-  }, config);
-
-  if (blockConfig.static.metaFields)
+  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
   {
-    blockConfig.static.metaFields = blockConfig.static.metaFields.concat(allBlocksMetaFields);
+    ctx.body = 'Unauthorized';
   }
   else
   {
-    blockConfig.static.metaFields = allBlocksMetaFields;
+    ctx.body = await credentials.get();
   }
+});
 
-  return blockConfig;
-};
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  if (ctx.request.ip !== '::1' && ctx.request.ip !== '::ffff:127.0.0.1')
+  {
+    ctx.body = 'Unauthorized';
+  }
+  else
+  {
+    const cred: CredentialConfig = ctx.request.body.body;
+    Util.verifyParameters(cred, ['name', 'type', 'meta']);
+    ctx.body = await credentials.upsert(ctx.state.user, cred);
+  }
+});
 
-export default Block;
+export default Router;
