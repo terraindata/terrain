@@ -110,7 +110,7 @@ class AggregationScatterPlot extends TerrainComponent<Props>
         {
           minDomain = d.key;
         }
-        return { x: d.key, y: d.value };
+        return { x: d.key, y: d.value, id: i };
       });
     }
     else
@@ -136,7 +136,7 @@ class AggregationScatterPlot extends TerrainComponent<Props>
         {
           minDomain = x;
         }
-        return { x, y };
+        return { x, y, id: i };
       });
     }
     const range = maxRange - minRange;

@@ -49,7 +49,7 @@ THE SOFTWARE.
 
 import './ScatterPlotStyle.less';
 
-import { Colors } from '../../colors/colors';
+import { Colors } from '../../colors/Colors';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');
@@ -193,6 +193,7 @@ const ScatterPlot = {
 
   _drawPoints(el, scales, pointsData, colors)
   {
+    d3.select(el).selectAll('.point').remove();
     const g = d3.select(el).selectAll('.points');
 
     const point = g.selectAll('circle')
@@ -208,7 +209,7 @@ const ScatterPlot = {
       .attr('r', 10);
 
     point
-      .attr('_id', (d) => d['x']);
+      .attr('_id', (d) => d['id']);
 
     point.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
     point.on('mouseout', this._mouseoutFactory(el));

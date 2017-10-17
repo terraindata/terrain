@@ -49,7 +49,7 @@ THE SOFTWARE.
 
 import './HistogramStyle.less';
 
-import { Colors } from '../../colors/colors';
+import { Colors } from '../../colors/Colors';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');
@@ -412,7 +412,7 @@ export default Histogram;
 //   VictoryTooltip,
 // } from 'victory';
 // import ColorManager from '../../util/ColorManager';
-// import { backgroundColor, borderColor, Colors, fontColor } from './../../colors/colors';
+// import { backgroundColor, borderColor, Colors, fontColor } from './../../colors/Colors';
 // import TerrainComponent from './../../common/components/TerrainComponent';
 
 // export interface Props
