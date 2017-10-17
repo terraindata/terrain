@@ -135,7 +135,7 @@ export class Items
   {
     return new Promise<string[] | string>(async (resolve, reject) =>
     {
-      const result: string[] | string = await this._checkStatusVariantsHelper(dbid);
+      const result: string[] | string = await this._getAllVariantsInCluster(dbid);
       if (!Array.isArray(result))
       {
         return reject(result as string);
@@ -156,25 +156,8 @@ export class Items
       {
         return reject('Must provide database id.');
       }
-      const liveScripts: string[] | string = await this._checkStatusVariantsHelper(dbid);
-      if (!Array.isArray(liveScripts))
-      {
-        return reject(liveScripts as string);
-      }
-      const variants: ItemConfig[] = await this.get(variantId);
-      if (variants.length === 0)
-      {
-        return reject('Variant not found.');
-      }
-      if (liveScripts.length === 0)
-      {
-        return reject('No stored scripts found in ES instance.');
-      }
-      const variantDeployedName: string = DeployVariant.getVariantDeployedName(variants[0] as ItemConfig) as string;
-
-      return liveScripts.indexOf(variantDeployedName) < 0 ? (variants[0].status !== 'LIVE' ? resolve('Variant not deployed.')
-        : resolve('Error, LIVE variant not found in ES instance.')) : (variants[0].status !== 'LIVE' ?
-          resolve('Variant found in ES instance but not LIVE.') : resolve('Variant is LIVE as ' + (variantDeployedName as string)));
+      const liveScripts: string = await this._checkVariantInESHelper(variantId, dbid);
+      return resolve(liveScripts);
     });
   }
 
@@ -224,7 +207,55 @@ export class Items
     });
   }
 
-  private async _checkStatusVariantsHelper(dbid: number): Promise<string[] | string>
+  private async _checkVariantInESHelper(variantId: number, dbid: number): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+      if (database === undefined)
+      {
+        return resolve('Database "' + dbid.toString() + '" not found.');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return resolve('Status metadata currently is only supported for Elastic databases.');
+      }
+      const items: ItemConfig[] = await this.select([], { id: variantId } as object);
+      if (items.length === 0)
+      {
+        return resolve('Variant not found.');
+      }
+      const variantDeployedName: string = DeployVariant.getVariantDeployedName(items[0] as object);
+
+      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+      elasticClient.getScript({ id: variantDeployedName, lang: 'mustache' }, async function getState(err, resp)
+      {
+        if (items[0].type !== 'VARIANT')
+        {
+          return resolve('Item is not a variant.');
+        }
+        if (resp['_id'] === variantDeployedName && resp['found'] === true && items[0].status === 'LIVE'
+          && await this._verifyVariantScript(variantId, resp['_script']))
+        {
+          return resolve('Variant is LIVE as ' + (variantDeployedName as string));
+        }
+        else if (resp['_id'] === variantDeployedName && resp['found'] === true && items[0].status !== 'LIVE')
+        {
+          return resolve('Variant found in ES instance but not LIVE.');
+        }
+        else if (resp['_id'] === variantDeployedName && resp['found'] === false && items[0].status === 'LIVE')
+        {
+          return resolve('Error, LIVE variant not found in ES instance.');
+        }
+        else
+        {
+          return resolve('Variant is not LIVE.');
+        }
+      }.bind(this));
+    });
+  }
+
+  private async _getAllVariantsInCluster(dbid: number): Promise<string[] | string>
   {
     return new Promise<string[] | string>(async (resolve, reject) =>
     {
@@ -255,6 +286,14 @@ export class Items
         }
         return resolve(storedScriptNames);
       });
+    });
+  }
+
+  private async _verifyVariantScript(variantId: number, storedScript: string): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      return resolve(true);
     });
   }
 }
