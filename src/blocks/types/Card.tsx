@@ -51,6 +51,9 @@ import * as _ from 'lodash';
 import { Display } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
 
+import ESClause from '../../../shared/database/elastic/parser/clauses/ESClause';
+import ESValueInfo from '../../../shared/database/elastic/parser/ESValueInfo';
+
 export type InitFn = (blockSpec: { [type: string]: BlockConfig }, extraConfig?: { [key: string]: any }, skipTemplate?: boolean) => {
   [k: string]: any;
 };
@@ -83,6 +86,9 @@ export interface Card extends IRecord<Card>
     //    e.g. "$DIRECTION" will look up "DirectionTQL" in CommonSQL and pass the value into it
     // - topTql is the tql to use if this card is at the top level of a query
     tql: TQLFn;
+    toValueInfo?: (block: Block, blockPath: KeyPath) => ESValueInfo;
+    updateCards?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
+    updateView?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
     tqlGlue?: string;
     topTql?: string;
 
@@ -130,6 +136,10 @@ export interface CardConfig
     isAggregate?: boolean;
     // manualEntry: IManualEntry;
     tql: TQLFn;
+    clause?: ESClause;
+    toValueInfo?: (block: Block, blockPath: KeyPath) => ESValueInfo;
+    updateCards?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
+    updateView?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
     tqlGlue?: string;
     topTql?: string | ((block: Block) => string);
     accepts?: List<string>;

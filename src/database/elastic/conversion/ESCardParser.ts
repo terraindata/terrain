@@ -79,7 +79,12 @@ export default class ESCardParser extends ESParser
     {
       return cards;
     }
+
+    // update the cards
+    const updatedRootCard = ESCardParser.updateCardBeforeParsing(rootCard);
+    // parsing
     const parsedCard = new ESCardParser(rootCard);
+    // interpreting
     const state = BuilderStore.getState();
     let inputs = state.query && state.query.inputs;
     if (inputs === null)
@@ -88,7 +93,8 @@ export default class ESCardParser extends ESParser
     }
     const params: { [name: string]: any; } = toInputMap(inputs);
     const cardInterpreter = new ESInterpreter(parsedCard, params);
-    const newRootCard = ESCardParser.updateCardErrors(rootCard, parsedCard);
+    // update filter card
+    const newRootCard = ESCardParser.updateCardErrors(updatedRootCard, parsedCard);
     if (newRootCard === rootCard)
     {
       return cards;
@@ -98,16 +104,25 @@ export default class ESCardParser extends ESParser
     }
   }
 
-  private static updateCardErrors(rootCard, parsedCard: ESCardParser)
+  private static updateCardBeforeParsing(rootCard)
   {
-    // handle errors
     forAllCards(rootCard, (card: Block, keyPath) =>
     {
+      // clear the errors
       if (card.errors && card.errors.size > 0)
       {
         rootCard = rootCard.setIn(keyPath.push('errors'), Immutable.List([]));
       }
+      if (card.static.updateCards)
+      {
+        rootCard = rootCard.setIn(keyPath, card.static.updateCards(rootCard, card, keyPath));
+      }
     });
+    return rootCard;
+  }
+
+  private static updateCardErrors(rootCard, parsedCard: ESCardParser)
+  {
     parsedCard.getValueInfo().recursivelyVisit((element: ESValueInfo) =>
     {
       const card: Block = element.card;
