@@ -172,7 +172,6 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
         return { key, name: key, resizable: true};
       }));
       return cols;
-      // return List([{ key: 'key', name: 'key', resizable: true }, { key: 'doc_count', name: 'doc_count', resizable: true }]);
     }
     else
     {

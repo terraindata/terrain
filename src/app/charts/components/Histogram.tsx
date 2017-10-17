@@ -165,8 +165,10 @@ const Histogram = {
       .call(yLeftAxis);
 
     const bottomAxis = d3.svg.axis();
+    console.log(xLabels);
     if (xLabels !== undefined && xLabels.length > 0)
     {
+      console.log("here");
       const numLabels = Math.min(1, (width / xLabels.length) / labelSpacing) * xLabels.length;
       bottomAxis.scale(scales.x)
         .ticks(Math.floor(numLabels))
