@@ -150,7 +150,7 @@ class ResultsColumn extends TerrainComponent<Props>
     return (
       <div
         className='results-column-tabs'
-        style={backgroundColor(Colors().emptyBg)}
+        style={[backgroundColor(Colors().emptyBg)]}
       >
         {TAB_NAMES.map((name, index) =>
           <div
@@ -162,7 +162,7 @@ class ResultsColumn extends TerrainComponent<Props>
             onClick={() => { this.setSelectedTab(name, index); }}
             style={index === this.state.selectedTab ? ACTIVE_TAB_STYLE : INACTIVE_TAB_STYLE}
           >
-            <div className='results-column-tab-name'>{name}</div>
+            <div className='results-column-tab-name' style={fontColor(Colors().text1)}>{name}</div>
             <div
               className='results-column-tab-number'
               style={this.state.highlightedTabs.get(name.toLowerCase()) ? backgroundColor(Colors().active) : {}}

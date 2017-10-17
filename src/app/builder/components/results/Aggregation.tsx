@@ -362,7 +362,10 @@ class AggregationComponent extends TerrainComponent<Props> {
     const { name, aggregation } = this.props;
     return (
       <div
-        className='aggregation-title-bar'
+        className={classNames({
+          'aggregation-title-bar': true,
+          'aggregation-title-bar-closed': true,
+        })}
       >
         <div
           className='aggregation-title-bar-title'
@@ -534,7 +537,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     return (
       <div
         className='aggregation'
-        style={borderColor(Colors().bg3)}
+        style={[borderColor(Colors().altBg1), fontColor(Colors().text1)]}
       >
         {this.state.isSingleValue ? this.renderSingleAgg() : this.renderAgg()}
         <FadeInOut

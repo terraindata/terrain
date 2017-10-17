@@ -116,7 +116,7 @@ const Histogram = {
       stroke: #e8e8e8;
     }
     .histogram-chart .tick text {
-      fill: ${Colors().text3} !important;
+      fill: ${Colors().text1} !important;
     }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
