@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 
 import * as Immutable from 'immutable';
+import ESValueInfo from '../../../shared/database/elastic/parser/ESValueInfo';
 
 export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object | number | boolean);
 export type TQLRecursiveObjectFn = ((block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) => string | object | number | boolean);
@@ -68,6 +69,9 @@ export interface Block extends IRecord<Block>
     tql: TQLFn;
     tqlGlue?: string;
     topTql?: string;
+    toValueInfo?: (block: Block, blockPath: KeyPath) => ESValueInfo;
+    updateCards?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
+    updateView?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
     accepts?: List<string>;
 
     // remove this block if it contains a card and the card is removed
@@ -87,6 +91,9 @@ export interface BlockConfig
   static: {
     language: string;
     tql: TQLFn;
+    toValueInfo?: (block: Block, blockPath: KeyPath) => ESValueInfo;
+    updateCards?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
+    updateView?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
     tqlGlue?: string;
     accepts?: List<string>;
     removeOnCardRemove?: boolean;
