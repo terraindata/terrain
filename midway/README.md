@@ -45,7 +45,7 @@ Contains unit tests for Midway. test's directory structure mirrors that of midwa
 
 #### Import
 
-Imports a csv/json into Midway. Headless cURL request:
+Imports a csv/json file into Midway. Headless cURL request:
 ```
 curl -X POST <midway address>/midway/v1/import/headless -F templateId=<template id> -F persistentAccessToken=<persistent template access token> -F filetype="<csv or json or json [type object]>" -F file="@<filename>"
 ```
@@ -71,6 +71,11 @@ Stores credentials such as SFTP, SSH, email, etc. for the scheduler. Create a ne
 curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"id":<user id>,"accessToken":"<access token>","body":{"name":"<name>","type":"<sftp/ssh/email/etc.>","permissions":1,"meta":"{\"host\":\"<SFTP IP>\",\"port\":<SFTP port, usually 22>,\"username\":\"<username>\",\"password\":\"<password>\"}"}}' 'localhost:3000/midway/v1/credentials'
 ``` 
 
+Get a list of credentials from localhost using a cURL request:
+```
+curl -X GET 'localhost:3000/midway/v1/credentials/?id=<user id>&accessToken=<access token>'
+```
+
 ### Scheduler
 
 Allows users to schedule persistent jobs within Midway. Headless cURL request:
@@ -84,7 +89,7 @@ curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -
 
 Included in the `midway/test` folder.
 
-Run the `yarn run jest-test` command to run the back-end tests.
+Run the `yarn run test-back` command to run the back-end tests.
 
 #### API Tests in Back-end test files
 
