@@ -51,13 +51,14 @@ import * as React from 'react';
 
 import * as Color from 'color';
 
-import { backgroundColor, Colors, fontColor, getStyle } from 'common/Colors';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { backgroundColor, Colors, fontColor, getStyle } from './../../../colors/Colors';
 import './CardHelpTooltip.less';
 
 export interface Props
 {
   staticInfo: any;
+  errors: List<string>;
 }
 
 export default class CardHelpTooltip extends TerrainComponent<Props>
@@ -73,13 +74,16 @@ export default class CardHelpTooltip extends TerrainComponent<Props>
       getStyle('borderRightColor', Colors().highlight),
       getStyle('borderBottomColor', Colors().highlight),
     );
-    let errorMessage = '';
-    if (this.props.staticInfo.errors.length > 0)
+    let errorMessage = 'Error: ';
+    let cardHasError = false;
+    if (this.props.errors && this.props.errors.size > 0)
     {
-      for (const e of this.props.staticInfo.errors)
-      {
-        errorMessage += e;
-      }
+      cardHasError = true;
+      this.props.errors.map(
+        (msg, key) =>
+        {
+          errorMessage += msg;
+        });
     }
     return (
       <div className='card-help-tooltip'>
@@ -93,13 +97,12 @@ export default class CardHelpTooltip extends TerrainComponent<Props>
           {this.props.staticInfo.description}
         </div>
         {
-          errorMessage &&
+          cardHasError &&
           <div className='card-errorMessage'>
             {errorMessage}
           </div>
         }
         {
-          this.props.staticInfo.errors.length > 0 &&
           <div className='card-help-link'>
             <a target='_blank' href={this.props.staticInfo.url}> Learn More </a>
           </div>

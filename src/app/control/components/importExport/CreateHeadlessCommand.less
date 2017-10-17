@@ -1,0 +1,122 @@
+@import "../../../common/Common.less";
+@border-radius: 3px;
+@icon-size: 20px;
+@command-content-height: 100px;
+
+.headless-form-block {
+  padding: @half-spacing;
+  display: flex;
+  vertical-align: top;
+  justify-content: space-between;
+
+  .headless-form-column {
+    padding: 0px @half-spacing;
+    position: relative;
+
+    .headless-form-label {
+      padding-bottom: @half-spacing;
+    }
+
+    .headless-form-input {
+      position: relative;
+    }
+  }
+}
+
+.headless-form-title {
+  padding: @half-spacing @spacing 0px @spacing;
+}
+
+.headless-command-generator {
+  display: flex;
+  padding: @spacing;
+  flex-direction: column;
+
+  .headless-entry-row {
+    margin: 0px @half-spacing;
+    display: flex;
+    .big-text;
+
+    .headless-entry-icon-wrapper {
+      padding: @quarter-spacing;
+      position: relative;
+      width: @icon-size + 2px;
+      display: flex;
+      align-items: center;
+
+      .headless-entry-icon {
+        cursor: pointer;
+        position: relative;
+        padding: 1px;
+        width: @icon-size;
+        height: @icon-size;
+        fill: currentColor;
+      }
+    }
+  }
+
+  .headless-command-title {
+    padding: @half-spacing;
+    padding-right: 0px;
+  }
+
+  .headless-command-content {
+    height: @command-content-height;
+    overflow: hidden;
+    margin: @spacing;
+    margin-top: 0px;
+    border-radius: @border-radius;
+    word-break: break-all;
+    position: relative;
+    
+    .headless-content-floating {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: @command-content-height;
+      position: absolute;  
+      z-index: 2;
+    }
+
+    .headless-command-requests {
+      .headless-content-floating;
+      font-size: 125%;
+    }
+
+    .headless-command-errors {
+      .headless-content-floating;
+      .normal-text;
+      font-family: monospace;
+    }
+
+    .headless-command-requests-spacer
+    {
+      padding: @spacing;
+    }
+
+    .headless-command-errors-spacer
+    {
+      height: @command-content-height - @spacing;
+      padding: @half-spacing;
+      overflow-y: auto;
+    }
+
+    .headless-command-command {
+      overflow: auto;
+      position: relative;
+      padding: @half-spacing;
+      max-height: @command-content-height - @spacing;
+      .normal-text;
+      font-family: monospace;
+      z-index: 0;
+    }
+
+    .headless-command-veil {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+  }
+}

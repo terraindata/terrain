@@ -47,15 +47,33 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
+import { CredentialConfig, Credentials } from '../credentials/Credentials';
+import { Permissions } from '../permissions/Permissions';
 import { UserConfig, Users } from '../users/Users';
 import * as Util from '../Util';
 import { Scheduler, SchedulerConfig } from './Scheduler';
 
+const Router = new KoaRouter();
+const perm: Permissions = new Permissions();
 const users = new Users();
 
+export const credentials: Credentials = new Credentials();
 export const scheduler: Scheduler = new Scheduler();
 
-const Router = new KoaRouter();
+const allowedTypes: string[] = ['sftp'];
+
+Router.get('/connections', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  await perm.CredentialPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
+  if (ctx.query.type === undefined || allowedTypes.indexOf(ctx.query.type) < 0)
+  {
+    ctx.body = await Promise.reject('Must provide a type of this format: ' + JSON.stringify(allowedTypes) as string);
+  }
+  else
+  {
+    ctx.body = await credentials.getNames(ctx.query.type);
+  }
+});
 
 // Get job by search parameter, or all if none provided
 Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -68,30 +86,30 @@ Router.get('/:id?', passport.authenticate('access-token-local'), async (ctx, nex
   ctx.body = await scheduler.get(ctx.params.id, getArchived);
 });
 
-// Post new scheduled job
-Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const schedule: SchedulerConfig = ctx.request.body.body;
-  Util.verifyParameters(schedule, ['jobType', 'paramsJob', 'schedule', 'sort', 'transport']);
-  ctx.body = await scheduler.createCustomSchedule(ctx.state.user, schedule);
-});
-
 // update scheduled job's status: set active to 1
 Router.post('/active/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   ctx.body = await scheduler.changeActiveStatus(ctx.state.user, ctx.params.id, 1);
 });
 
-// update scheduled job's status: set active to 0
-Router.post('/inactive/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+// Post new scheduled job
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  ctx.body = await scheduler.changeActiveStatus(ctx.state.user, ctx.params.id, 0);
+  const schedule: SchedulerConfig = ctx.request.body.body;
+  Util.verifyParameters(schedule, ['jobType', 'name', 'paramsJob', 'schedule', 'sort', 'transport']);
+  ctx.body = await scheduler.createCustomSchedule(ctx.state.user, schedule);
 });
 
 // Delete scheduled jobs by parameter
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   ctx.body = await scheduler.archive(ctx.state.user, ctx.params.id);
+});
+
+// update scheduled job's status: set active to 0
+Router.post('/inactive/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await scheduler.changeActiveStatus(ctx.state.user, ctx.params.id, 0);
 });
 
 // Update job

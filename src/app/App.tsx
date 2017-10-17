@@ -74,7 +74,7 @@ import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
 
-import { backgroundColor, Colors, fontColor } from './common/Colors';
+import { backgroundColor, Colors, fontColor } from './colors/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
 import StyleTag from './common/components/StyleTag';
 import DeployModal from './deploy/components/DeployModal';
@@ -86,6 +86,8 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // for error reporting
 
 // data that needs to be loaded
+import SchemaActions from 'schema/data/SchemaActions';
+import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
 import ColorsActions from './colors/data/ColorsActions';
@@ -94,7 +96,6 @@ import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
-import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
@@ -107,6 +108,7 @@ const BuilderIcon = require('./../images/icon_bldr-3.svg');
 const ReportingIcon = require('./../images/icon_builder_18x18.svg?name=ReportingIcon');
 const SchemaIcon = require('./../images/icon_schema.svg?name=SchemaIcon');
 const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
+const ControlIcon = require('./../images/icon_gear.svg');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
 
@@ -146,6 +148,12 @@ const links =
       icon: <ReportingIcon />,
       text: 'Analytics',
       route: '/analytics',
+      enabled: TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS),
+    },
+    {
+      icon: <ControlIcon />,
+      text: 'Control',
+      route: '/control',
     },
     // {
     //   icon: <ManualIcon />,
@@ -160,6 +168,7 @@ interface Props
     pathname: string,
   };
   children: any;
+  schemaActions: any;
 }
 
 const APP_STYLE = _.extend({},
@@ -182,7 +191,7 @@ class App extends TerrainComponent<Props>
 
     noLocalStorage: false,
 
-    stylesTag: Immutable.Map(),
+    stylesTag: Immutable.Map<string, React.CSSProperties>(),
   };
 
   constructor(props: Props)
@@ -244,11 +253,6 @@ class App extends TerrainComponent<Props>
     //   storeKeyPath: ['loaded'],
     // });
 
-    this._subscribe(SchemaStore, {
-      stateKey: 'schemaLoaded',
-      storeKeyPath: ['loaded'],
-    });
-
     this._subscribe(ColorsStore, {
       stateKey: 'stylesTag',
       storeKeyPath: ['styles'],
@@ -265,10 +269,19 @@ class App extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('input', { background: Colors().inputBg, color: Colors().text1 });
+    ColorsActions.setStyle('input', { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder });
+    ColorsActions.setStyle('input:hover', { 'background': Colors().inputFocusBg + ' !important', 'border-color': Colors().inputBorder + ' !important' });
+    ColorsActions.setStyle('input:focus', { 'background': Colors().inputFocusBg + ' !important', 'border-color': Colors().inputBorder + ' !important' });
     ColorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
     ColorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
     ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
+    ColorsActions.setStyle('.altBg', { color: Colors().altText1 });
+    ColorsActions.setStyle('.card-muted-input input:hover', { 'background': Colors().inputBg + ' !important', 'border-color': Colors().inputBorder });
+    ColorsActions.setStyle('.close svg', { fill: Colors().text2 });
+    ColorsActions.setStyle('.close:hover svg', { fill: Colors().activeText });
+    ColorsActions.setStyle('.dropdown-value', { 'border-color': Colors().inputBorder });
+    ColorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().text3 });
+    ColorsActions.setStyle('.button', { backgroundColor: Colors().active, color: Colors().activeText });
 
     const tooltipStyles = generateThemeStyles();
     _.map(tooltipStyles, (value, key) =>
@@ -282,7 +295,7 @@ class App extends TerrainComponent<Props>
     UserActions.fetch();
     TerrainStore.dispatch(LibraryActions.fetch());
     LibraryStore.dispatch(LibraryActions.fetch());
-    SchemaActions.fetch();
+    this.props.schemaActions.fetch();
     // RolesActions.fetch();
   }
 
@@ -402,7 +415,7 @@ class App extends TerrainComponent<Props>
 
         <DeployModal />
         <StyleTag
-          style={this.state.stylesTag.toJS()}
+          style={this.state.stylesTag}
         />
 
         <InAppNotification />
@@ -413,4 +426,8 @@ class App extends TerrainComponent<Props>
   }
 }
 
-export default App;
+export default Util.createContainer(
+  App,
+  [],
+  { schemaActions: SchemaActions },
+);

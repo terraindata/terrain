@@ -62,21 +62,29 @@ import { BuilderStore } from 'builder/data/BuilderStore';
 
 import { toInputMap } from '../../../blocks/types/Input';
 
+import * as Immutable from 'immutable';
+import { Card } from '../../../blocks/types/Card';
+
 export default class ESCardParser extends ESParser
 {
-  public static parseAndUpdateCards(cards: List<Block>): void
+  public static parseAndUpdateCards(cards: List<Card>): List<Card>
   {
     if (cards.size === 0)
     {
-      return;
+      return cards;
     }
     const rootCard = cards.get(0);
     // assert this is the root card
-    if (rootCard['key'] !== 'root')
+    if (rootCard['type'] !== 'eqlbody')
     {
-      return;
+      return cards;
     }
+
+    // update the cards
+    const updatedRootCard = ESCardParser.updateCardBeforeParsing(rootCard);
+    // parsing
     const parsedCard = new ESCardParser(rootCard);
+    // interpreting
     const state = BuilderStore.getState();
     let inputs = state.query && state.query.inputs;
     if (inputs === null)
@@ -85,14 +93,36 @@ export default class ESCardParser extends ESParser
     }
     const params: { [name: string]: any; } = toInputMap(inputs);
     const cardInterpreter = new ESInterpreter(parsedCard, params);
-    // reset cards' errors
-    forAllCards(rootCard, (card: Block) =>
+    // update filter card
+    const newRootCard = ESCardParser.updateCardErrors(updatedRootCard, parsedCard);
+    if (newRootCard === rootCard)
     {
-      if (card.static.errors.length > 0)
+      return cards;
+    } else
+    {
+      return Immutable.List([newRootCard]);
+    }
+  }
+
+  private static updateCardBeforeParsing(rootCard)
+  {
+    forAllCards(rootCard, (card: Block, keyPath) =>
+    {
+      // clear the errors
+      if (card.errors && card.errors.size > 0)
       {
-        card.static.errors.length = 0;
+        rootCard = rootCard.setIn(keyPath.push('errors'), Immutable.List([]));
+      }
+      if (card.static.updateCards)
+      {
+        rootCard = rootCard.setIn(keyPath, card.static.updateCards(rootCard, card, keyPath));
       }
     });
+    return rootCard;
+  }
+
+  private static updateCardErrors(rootCard, parsedCard: ESCardParser)
+  {
     parsedCard.getValueInfo().recursivelyVisit((element: ESValueInfo) =>
     {
       const card: Block = element.card;
@@ -102,16 +132,20 @@ export default class ESCardParser extends ESParser
       }
       if (element.errors.length > 0)
       {
+        const errorsKeyPath = element.cardPath.push('errors');
+        let cardErrors = rootCard.getIn(errorsKeyPath);
         for (const e of element.errors)
         {
-          card.static.errors.push(e.message);
+          cardErrors = cardErrors.push(e.message);
         }
+        rootCard = rootCard.setIn(errorsKeyPath, cardErrors);
       }
       return true;
     });
+    return rootCard;
   }
 
-  public constructor(rootCard: Block)
+  public constructor(rootCard: Block, cardPath: KeyPath = Immutable.List([]))
   {
     super();
     if (!rootCard)
@@ -123,7 +157,7 @@ export default class ESCardParser extends ESParser
     // root card is a ESStructural clause
     try
     {
-      this.valueInfo = this.parseCard(rootCard);
+      this.valueInfo = this.parseCard(rootCard, cardPath);
       this.value = this.valueInfo.value;
     } catch (e)
     {
@@ -150,11 +184,11 @@ export default class ESCardParser extends ESParser
       this.errors.push(e);
     }
   }
-  private parseCard(block: Block): ESValueInfo
+  private parseCard(block: Block, blockPath: KeyPath): ESValueInfo
   {
     if (block.static.toValueInfo !== undefined)
     {
-      return block.static.toValueInfo(block);
+      return block.static.toValueInfo(block, blockPath);
     }
     if (block.static.clause === undefined)
     {
@@ -164,105 +198,117 @@ export default class ESCardParser extends ESParser
     switch (block.static.clause.clauseType)
     {
       case ESClauseType.ESAnyClause:
-        return this.parseESAnyClause(block);
+        return this.parseESAnyClause(block, blockPath);
       case ESClauseType.ESArrayClause:
-        return this.parseESArrayClause(block);
+        return this.parseESArrayClause(block, blockPath);
       case ESClauseType.ESBaseClause:
-        return this.parseCardValue(block);
+        return this.parseCardValue(block, blockPath);
       case ESClauseType.ESBooleanClause:
-        return this.parseCardValue(block);
+        return this.parseCardValue(block, blockPath);
       case ESClauseType.ESEnumClause:
-        return this.parseCardValue(block);
+        return this.parseCardValue(block, blockPath);
       case ESClauseType.ESFieldClause:
-        return this.parseCardValue(block);
+        return this.parseCardValue(block, blockPath);
       case ESClauseType.ESIndexClause:
-        return this.parseCardValue(block);
+        return this.parseCardValue(block, blockPath);
       case ESClauseType.ESMapClause:
-        return this.parseESStructureClause(block);
+        return this.parseESStructureClause(block, blockPath);
       case ESClauseType.ESNullClause:
-        return this.parseCardValue(block);
+        return this.parseCardValue(block, blockPath);
       case ESClauseType.ESNumberClause:
-        return this.parseCardValue(block);
+        return this.parseCardValue(block, blockPath);
       case ESClauseType.ESObjectClause:
-        return this.parseESStructureClause(block);
+        return this.parseESStructureClause(block, blockPath);
       case ESClauseType.ESPropertyClause:
-        return this.parseCardValue(block);
+        return this.parseCardValue(block, blockPath);
       case ESClauseType.ESReferenceClause:
-        return this.parseESReferenceClause(block);
+        return this.parseESReferenceClause(block, blockPath);
       case ESClauseType.ESStringClause:
-        return this.parseCardValue(block);
+        return this.parseCardValue(block, blockPath);
       case ESClauseType.ESStructureClause:
-        return this.parseESStructureClause(block);
+        return this.parseESStructureClause(block, blockPath);
       case ESClauseType.ESTypeClause:
-        return this.parseCardValue(block);
+        return this.parseCardValue(block, blockPath);
       case ESClauseType.ESScriptClause:
-        return this.parseESStructureClause(block);
+        return this.parseESStructureClause(block, blockPath);
       case ESClauseType.ESWildcardStructureClause:
-        return this.parseESStructureClause(block);
+        return this.parseESStructureClause(block, blockPath);
       default:
-        return this.parseESClause(block);
+        return this.parseESClause(block, blockPath);
     }
   }
 
-  private parseESClause(block)
+  private parseESClause(block, blockPath)
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
+    valueInfo.cardPath = blockPath;
     this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESClause '));
     return valueInfo;
   }
 
-  private parseESReferenceClause(block)
+  private parseESReferenceClause(block, blockPath)
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
+    valueInfo.cardPath = blockPath;
     this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESReferenceClause '));
     return valueInfo;
   }
 
-  private parseESAnyClause(block)
+  private parseESAnyClause(block, blockPath)
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
+    valueInfo.cardPath = blockPath;
     this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESAnyClause '));
     return valueInfo;
   }
 
-  private parseESArrayClause(block)
+  private parseESArrayClause(block, blockPath)
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
+    valueInfo.cardPath = blockPath;
     const theValue = [];
     valueInfo.card = block;
     valueInfo.jsonType = ESJSONType.array;
     valueInfo.value = theValue;
     block.static.valueInfo = valueInfo;
+    const childrenCard = blockPath.push('cards');
     block['cards'].map(
-      (card) =>
+      (card, key) =>
       {
-        const elementValueInfo = this.parseCard(card);
+        const elementValueInfo = this.parseCard(card, childrenCard.push(key));
         valueInfo.addArrayChild(elementValueInfo);
         theValue.push(elementValueInfo.value);
       });
     return valueInfo;
   }
 
-  private parseESStructureClause(block)
+  private parseESStructureClause(block, blockPath)
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
+    valueInfo.cardPath = blockPath;
     const theValue = {};
-    valueInfo.card = block;
     valueInfo.jsonType = ESJSONType.object;
     valueInfo.value = theValue;
     block.static.valueInfo = valueInfo;
+    const childrenCard = blockPath.push('cards');
     block['cards'].map(
-      (card) =>
+      (card, key) =>
       {
         const keyName = card['key'];
         const childName = new ESJSONParser(JSON.stringify(keyName)).getValueInfo();
         childName.card = card;
-        const childValue = this.parseCard(card);
+        childName.cardPath = childrenCard.push(key);
+        const childValue = this.parseCard(card, childrenCard.push(key));
         if (childValue !== null)
         {
           const propertyInfo = new ESPropertyInfo(childName, childValue);
@@ -277,7 +323,7 @@ export default class ESCardParser extends ESParser
     return valueInfo;
   }
 
-  private parseCardValue(block)
+  private parseCardValue(block, blockPath)
   {
     let value;
     const singleType = block.static.singleType;
@@ -321,10 +367,14 @@ export default class ESCardParser extends ESParser
     if (valueInfo)
     {
       valueInfo.card = block;
+      valueInfo.clause = block.static.clause;
+      valueInfo.cardPath = blockPath;
     } else
     {
       valueInfo = new ESValueInfo();
       valueInfo.card = block;
+      valueInfo.clause = block.static.clause;
+      valueInfo.cardPath = blockPath;
       if (parser.hasError())
       {
         for (const e of parser.getErrors())

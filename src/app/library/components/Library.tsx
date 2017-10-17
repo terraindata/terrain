@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
+import Loading from 'common/components/Loading';
 import RadioButtons from 'common/components/RadioButtons';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
@@ -329,7 +330,7 @@ class Library extends TerrainComponent<any>
               basePath,
               algorithmActions: this.props.libraryAlgorithmActions,
             }}
-            isFocused={variantIds !== null && variantIds.length === 0}
+            isFocused={variantIds === null}
           />
           <VariantsColumn
             {...{
@@ -366,11 +367,19 @@ class Library extends TerrainComponent<any>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
             <div className='library-analytics-chart-wrapper'>
-              <MultipleAreaChart
-                datasets={datasets}
-                xDataKey={'key'}
-                yDataKey={'doc_count'}
-              />
+              {analytics.loaded ?
+                <MultipleAreaChart
+                  datasets={datasets}
+                  xDataKey={'key'}
+                  yDataKey={'doc_count'}
+                /> :
+                <Loading
+                  width={150}
+                  height={150}
+                  loading={true}
+                  loaded={false}
+                />
+              }
             </div>
             <div className='library-analytics-selector-wrapper'>
               <AnalyticsSelector

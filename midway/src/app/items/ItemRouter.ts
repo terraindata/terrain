@@ -74,12 +74,6 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
   ctx.body = getItems;
 });
 
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting item ID ' + String(ctx.params.id));
-  ctx.body = await items.get(ctx.params.id);
-});
-
 Router.get('/live', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   let typeArr: number[] = [];
@@ -108,6 +102,12 @@ Router.get('/status/:id', passport.authenticate('access-token-local'), async (ct
 {
   winston.info('getting status from DB ID ' + String(ctx.params.id));
   ctx.body = await items.checkStatusVariants(parseInt(ctx.params.id, 10));
+});
+
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting item ID ' + String(ctx.params.id));
+  ctx.body = await items.get(ctx.params.id);
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>

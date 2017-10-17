@@ -177,16 +177,15 @@
 }
 
 .card-help-icon {
-  fill: rgba(255,255,255,0.5);
   width: 20px;
   height: 20px;
   position: relative;
   cursor: pointer;
   .transition;
-  opacity: 0;
+  opacity: 0.5;
 
   &:hover {
-    fill: #fff;
+    opacity: 1.0
   }
 }
 
@@ -213,7 +212,7 @@
   .transition;
   opacity: 0;
   &:hover {
-    stroke: #fff;
+    //stroke: #fff;
   }
 }
 
@@ -272,16 +271,17 @@
 
   .card-minimize-icon {
     display: inline-block;
-    fill: rgba(255,255,255,0.5);
+    // fill: rgba(255,255,255,0.5);
     width: 10px;
     position: absolute;
     top: 11px;
     left: 38px;
     .transition;
-    opacity: 0;
+     opacity: 0;
+
 
     &:hover {
-      fill: #fff;
+      // fill: #fff;
     }
   }
 
@@ -598,16 +598,16 @@
 
 .card-muted-input input {
   background: rgba(0,0,0,0) !important;
+  border: 0px;
   color: #fff;
   .transition;
 
-  &:hover:not(.ac-input-disabled), &[value=""] {
-    background: rgba(0,0,0,0.25) !important;
+  &:hover .ac-input-disabled {
+    background: none !important;
   }
 
   &:focus {
-    background: rgba(0,0,0,0.5) !important;
-    color: #242424;
+    // color: #242424;
   }
 
   &::placeholder {

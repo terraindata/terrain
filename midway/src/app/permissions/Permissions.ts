@@ -44,17 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as CredentialP from './CredentialPermissions';
 import * as ImportP from './ImportPermissions';
 
+export let CredentialPermissions: CredentialP.CredentialPermissions = new CredentialP.CredentialPermissions();
 export let ImportPermissions: ImportP.ImportPermissions = new ImportP.ImportPermissions();
 
 export class Permissions
 {
   public ImportPermissions: ImportP.ImportPermissions;
+  public CredentialPermissions: CredentialP.CredentialPermissions;
 
   constructor()
   {
     this.ImportPermissions = ImportPermissions;
+    this.CredentialPermissions = CredentialPermissions;
   }
 }
 

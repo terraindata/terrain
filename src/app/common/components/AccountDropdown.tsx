@@ -49,6 +49,8 @@ THE SOFTWARE.
 import * as $ from 'jquery';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
+import { Colors } from '../../colors/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';
@@ -93,6 +95,11 @@ class AccountDropdown extends TerrainComponent<Props>
         stateKey: 'user',
       },
     );
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.account-arrow-icon .st0', { fill: Colors().text3 });
   }
 
   public componentWillUnmount()

@@ -44,18 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands
+// tslint:disable:restrict-plus-operands  strict-boolean-expressions no-console
 
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 
-import { Colors, getCardColors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
+
+import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
+import { ElasticBlocks } from './ElasticBlocks';
 
 const esFilterOperatorsMap = {
   '>': 'gt',
@@ -78,119 +81,343 @@ const esFilterOperatorsTooltips = {
 export const elasticFilterBlock = _block(
   {
     field: '',
-    value: undefined,
+    value: '',
+    cards: Immutable.List([]),
+    key: 'term',
     boolQuery: 'must',
     filterOp: '=',
 
     static: {
       language: 'elastic',
-      tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+      // the shape of elasticFilterBlock is similar with the eqlquery card.
+      clause: ESInterpreterDefaultConfig.getClause('query'),
+      // this tql is same as tql of other clause cards.
+      tql: (block, tqlTranslationFn, tqlConfig) =>
       {
-        let value: any;
-        try
-        {
-          value = JSON.parse(block['value']);
-        }
-        catch (e)
-        {
-          value = block['value'];
-        }
-
-        // term query
-        if (block['filterOp'] === '=')
-        {
-          return {
-            [block['boolQuery']]: {
-              term: {
-                [block['field']]: value,
-              },
-            },
-          };
-        }
-        else if (block['filterOp'] === '≈')
-        {
-          return {
-            [block['boolQuery']]: {
-              match: {
-                [block['field']]: value,
-              },
-            },
-          };
-        }
-        else
-        {
-          // range query
-          const rangeOp = esFilterOperatorsMap[block['filterOp']];
-          if (rangeOp === undefined)
+        const json: object = {};
+        block['cards'].map(
+          (card) =>
           {
-            throw new Error('Unspecified range operation for: ' + block['filterOp']);
-          }
-
-          return {
-            [block['boolQuery']]: {
-              range: {
-                [block['field']]: {
-                  [rangeOp]: value,
-                },
-              },
-            },
-          };
-        }
-
+            _.extend(json, {
+              [card['key']]: tqlTranslationFn(card, tqlConfig),
+            });
+          },
+        );
+        return json;
       },
       removeOnCardRemove: true,
+      // this is called before parsing/interpreting cards, so we have to update the cards fields.
+      updateCards: (rootBlock: Block, block: Block, blockPath?: KeyPath) =>
+      {
+        let queryCard;
+        const templateField = String(block['field']) + ':string';
+
+        if (block['filterOp'] === '=')
+        {
+          queryCard = BlockUtils.make(ElasticBlocks,
+            'eqlquery',
+            {
+              template: {
+                'term:term_query': {
+                  [templateField]: block['value'],
+                },
+              },
+            });
+        } else if (block['filterOp'] === '≈')
+        {
+          // match
+          queryCard = BlockUtils.make(ElasticBlocks,
+            'eqlquery',
+            {
+              template: {
+                'match:match': {
+                  [templateField]: block['value'],
+                },
+              },
+            });
+        } else
+        {
+          // range
+          // match
+          const rangeField = String(block['field']) + ':range_value';
+          const rangeOp = String(esFilterOperatorsMap[block['filterOp']]) + ':base';
+          queryCard = BlockUtils.make(ElasticBlocks,
+            'eqlquery',
+            {
+              template: {
+                'range:range_query': {
+                  [rangeField]: {
+                    [rangeOp]: block['value'],
+                  },
+                },
+              },
+            });
+        }
+        return block.set('cards', queryCard.cards);
+      },
+
+      init: (blocksConfig, extraConfig?, skipTemplate?) =>
+      {
+        const config = {};
+        config['field'] = (extraConfig && extraConfig.field) || '';
+        config['value'] = (extraConfig && extraConfig.value) || '';
+        config['boolQuery'] = (extraConfig && extraConfig.boolQuery) || 'must';
+        config['filterOp'] = (extraConfig && extraConfig.filterOp) || '=';
+        return config;
+      },
     },
   });
 
 export const elasticFilter = _card({
+  // a short-path for searching the index.
+  currentIndex: '',
+  // a short-path for searching the type.
+  currentType: '',
+  indexFilters: List(),
+  typeFilters: List(),
+  otherFilters: List(),
   filters: List(),
+  cards: Immutable.List([]),
+
   key: 'bool',
 
   static: {
+    // this makes the shape of elasticFilterBlock similar with the bool_query clause card.
+    clause: ESInterpreterDefaultConfig.getClause('bool_query'),
     language: 'elastic',
     title: 'Filter',
     description: 'Terrain\'s custom card for filtering results in a human-readable way.',
     colors: getCardColors('filter', Colors().builder.cards.structureClause),
     preview: '[filters.length] Filters',
-
-    tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
+    // this tql is same as tql of other clause cards.
+    tql: (block, tqlTranslationFn, tqlConfig) =>
     {
-      const filterObj = {};
-
-      const filters = block['filters'].map(
-        (filterBlock) =>
+      const json: object = {};
+      block['cards'].map(
+        (card) =>
         {
-          const f = tqlTranslationFn(filterBlock, tqlConfig);
-          _.map(f as any, (v, k) =>
-          {
-            if (filterObj[k] === undefined)
-            {
-              filterObj[k] = [v];
-            }
-            else
-            {
-              filterObj[k].push(v);
-            }
+          _.extend(json, {
+            [card['key']]: tqlTranslationFn(card, tqlConfig),
           });
-        });
-      return filterObj;
+        },
+      );
+      return json;
     },
-
-    init: (blocksConfig) =>
+    // this is called before parsing/interpreting cards, so we have to update the cards fields.
+    updateCards: (rootBlock: Block, block: Block, blockPath: KeyPath) =>
     {
+      const indexFilters = [];
+      const typeFilters = [];
+      const otherFilters = [];
+      const filterCards = [];
+      const mustCards = [];
+      const shouldCards = [];
+      const mustNotCards = [];
+      const allFilters = block['indexFilters'].concat(block['typeFilters']).concat(block['otherFilters']);
+      allFilters.map((filterBlock) =>
+      {
+        const updatedBlock = filterBlock.static.updateCards(rootBlock, filterBlock);
+        switch (updatedBlock.field)
+        {
+          case '_index':
+
+            indexFilters.push(updatedBlock);
+            break;
+          case '_type':
+            typeFilters.push(updatedBlock);
+            break;
+          default:
+            otherFilters.push(updatedBlock);
+        }
+        switch (updatedBlock.boolQuery)
+        {
+          case 'must':
+            mustCards.push(updatedBlock);
+            break;
+          case 'must_not':
+            mustNotCards.push(updatedBlock);
+            break;
+          case 'should':
+            shouldCards.push(updatedBlock);
+            break;
+          case 'filter':
+            filterCards.push(updatedBlock);
+            break;
+          default:
+            console.log('Unknown block when updating ElasticFilter cards' + String(block.boolQuery));
+        }
+      });
+      block = block.setIn(['cards', 0, 'cards'], Immutable.List(filterCards));
+      block = block.setIn(['cards', 1, 'cards'], Immutable.List(mustCards));
+      block = block.setIn(['cards', 2, 'cards'], Immutable.List(mustNotCards));
+      block = block.setIn(['cards', 3, 'cards'], Immutable.List(shouldCards));
+      block = block.set('indexFilters', List(indexFilters));
+      if (indexFilters.length === 0)
+      {
+        block = block.set('currentIndex', '');
+      } else
+      {
+        block = block.set('currentIndex', indexFilters[0].value);
+      }
+      block = block.set('typeFilters', List(typeFilters));
+
+      if (typeFilters.length === 0)
+      {
+        block = block.set('currentType', '');
+      } else
+      {
+        block = block.set('currentType', typeFilters[0].value);
+      }
+      block = block.set('otherFilters', List(otherFilters));
+      return block;
+    },
+    // to init the card with a special set of filters, please pass the filters
+    // with extraConfig.filters (see ElasticFilterCard.tsx::parseCardFromValueInfo)
+    init: (blocksConfig, extraConfig?, skiTemplate?) =>
+    {
+      const indexFilters = [];
+      const typeFilters = [];
+      const otherFilters = [];
+      const boolCard = BlockUtils.make(blocksConfig,
+        'eqlbool_query',
+        {
+          key: 'bool',
+          template: {
+            'filter:query[]': null,
+            'must:query[]': null,
+            'must_not:query[]': null,
+            'should:query[]': null,
+          },
+        });
+
+      const filters = extraConfig.filters;
+      if (filters)
+      {
+        filters.map((block) =>
+        {
+          switch (block.field)
+          {
+            case '_index':
+              indexFilters.push(block);
+              break;
+            case '_type':
+              typeFilters.push(block);
+              break;
+            default:
+              otherFilters.push(block);
+          }
+        });
+      } else
+      {
+        const indexBlock = BlockUtils.make(blocksConfig,
+          'elasticFilterBlock',
+          {
+            field: '_index',
+            value: '',
+            boolQuery: 'filter',
+          });
+
+        const typeBlock = BlockUtils.make(blocksConfig,
+          'elasticFilterBlock',
+          {
+            field: '_type',
+            value: '',
+            boolQuery: 'filter',
+          });
+
+        indexFilters.push(indexBlock);
+        typeFilters.push(typeBlock);
+      }
+
       return {
-        filters: List([
-          BlockUtils.make(blocksConfig, 'elasticFilterBlock'),
-        ]),
+        indexFilters: List(indexFilters),
+        typeFilters: List(typeFilters),
+        otherFilters: List(otherFilters),
+        cards: boolCard.cards,
       };
     },
 
     display:
     [
+      // display _index filters first, so that 1) index filters are always at the beginning
+      // 2) we can auto-complete the value with index schema options.
       {
         displayType: DisplayType.ROWS,
-        key: 'filters',
+        key: 'indexFilters',
+        english: 'Index',
+        factoryType: 'elasticFilterBlock',
+        row:
+        {
+          inner:
+          [
+            {
+              displayType: DisplayType.TEXT,
+              key: 'field',
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'boolQuery',
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'filterOp',
+              style: {
+                maxWidth: 75,
+              },
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'value',
+              getAutoTerms: (schemaState) =>
+              {
+                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Index);
+              },
+            },
+          ],
+        },
+      },
+      // display _type filters second, so that 1) type filters are always following the index filters.
+      // 2) we can auto-complete the value with type schema options.
+      {
+        displayType: DisplayType.ROWS,
+        key: 'typeFilters',
         english: 'Filter',
+        factoryType: 'elasticFilterBlock',
+        row:
+        {
+          inner:
+          [
+            {
+              displayType: DisplayType.TEXT,
+              key: 'field',
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'boolQuery',
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'filterOp',
+              style: {
+                maxWidth: 75,
+              },
+            },
+            {
+              displayType: DisplayType.TEXT,
+              key: 'value',
+              getAutoTerms: (schemaState) =>
+              {
+                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Type);
+              },
+            },
+          ],
+        },
+      },
+      // finally display all other filters.
+      {
+        displayType: DisplayType.ROWS,
+        key: 'otherFilters',
+        english: 'Index',
         factoryType: 'elasticFilterBlock',
         row:
         {
