@@ -3,44 +3,39 @@
 @icon-size: 20px;
 @command-content-height: 100px;
 
+.headless-form-block {
+  padding: @half-spacing;
+  display: flex;
+  vertical-align: top;
+  justify-content: space-between;
+
+  .headless-form-column {
+    padding: 0px @half-spacing;
+    position: relative;
+
+    .headless-form-label {
+      padding-bottom: @half-spacing;
+    }
+
+    .headless-form-input {
+      position: relative;
+    }
+  }
+}
+
+.headless-form-title {
+  padding: @half-spacing @spacing 0px @spacing;
+}
+
 .headless-command-generator {
   display: flex;
   padding: @spacing;
   flex-direction: column;
 
-  .headless-form-block {
-    padding: @half-spacing;
-    display: flex;
-    vertical-align: top;
-    justify-content: space-between;
-
-    .headless-form-column {
-      padding: 0px @half-spacing;
-      position: relative;
-
-      .headless-form-label {
-        padding: @half-spacing 0px;
-      }
-
-      .headless-form-input {
-        position: relative;
-      }
-    }
-  }
-
   .headless-entry-row {
-    margin: @half-spacing;
+    margin: 0px @half-spacing;
     display: flex;
     .big-text;
-
-    .headless-entry-label {
-      margin: @half-spacing 0px;
-      padding: @half-spacing 0px;
-    }
-
-    .headless-entry-input {
-      margin: @half-spacing @spacing;
-    }
 
     .headless-entry-icon-wrapper {
       padding: @quarter-spacing;
@@ -56,11 +51,6 @@
         width: @icon-size;
         height: @icon-size;
         fill: currentColor;
-
-        &.clipboard-icon-big {
-          width: 20px;
-          height: 20px;
-        }
       }
     }
   }
@@ -127,37 +117,6 @@
       width: 100%;
       height: 100%;
       z-index: 1;
-    }
-  }
-}
-
-.headless-generator-data {
-  display: flex;
-
-  .headless-generator-column {
-    &:first-child {
-      margin-right: @double-spacing;
-    }
-  }
-
-  .headless-generator-info-table {
-    width: 200px;
-    margin-left: @half-spacing;
-    tr {
-      td {
-        &:first-child {
-          padding-right: @half-spacing;
-        }
-
-        padding: @quarter-spacing 0px;
-      }
-    }
-
-    .access-token-cell {
-      max-width: 60px;
-      text-overflow: ellipsis;
-      overflow-x: hidden;
-      white-space: nowrap;
     }
   }
 }

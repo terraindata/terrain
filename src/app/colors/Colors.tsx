@@ -86,12 +86,15 @@ interface Theme
 
   highlight: string; // for slight emphasis
   darkerHighlight: string; // for depth effect with highlight
+  stroke: string; // should stand out against any background
 
   boxShadow: string; // shadow color
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
   inputBg: string;
+  inputFocusBg: string;
+  inputBorder: string;
 
   scrollbarBG: string;
   scrollbarPiece: string;
@@ -100,6 +103,8 @@ interface Theme
   error: string;
 
   import: string;
+
+  resultLine: string;
 
   tqlEditor: string;
 
@@ -258,11 +263,6 @@ interface Theme
       background: string,
     },
 
-    results: {
-      background: string,
-      lines: string,
-    },
-
     inputs: {
       background: string,
     },
@@ -297,7 +297,7 @@ const code =
     arrayClause: '#b161bc',
 
     enumClause: 'rgb(255, 189, 86)',
-    fieldClause: '#fad14b', // pastel purple: 'rgb(144, 118, 170)',
+    fieldClause: '#f99c49', // pastel purple: 'rgb(144, 118, 170)',
 
     structureClause: '#4fc0ba',
     mapClause: '#4fc0ba',
@@ -340,12 +340,15 @@ const DARK: Theme =
 
     highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
     darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
+    stroke: 'rgba(255,255,255,0.15)', // stands out against any background
 
     boxShadow: 'rgba(0, 0, 0, 0.39)',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
     inputBg: 'rgba(0,0,0,0.25)',
+    inputBorder: 'rgba(0,0,0,0.25)',
+    inputFocusBg: 'rgba(0,0,0,0.5)',
 
     active: darkActive,
     activeText: '#fff',
@@ -361,6 +364,8 @@ const DARK: Theme =
     error: '#d14f42',
 
     import: '#1efab4',
+
+    resultLine: 'rgba(255,255,255,0.25)',
 
     tqlEditor: 'monokai',
 
@@ -521,10 +526,239 @@ const DARK: Theme =
         background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
       },
 
-      results:
+      inputs:
       {
+        background: '#626262',
+      },
+    },
+
+    // File import -----------------------------
+
+    fileimport: {
+      preview: {
+        column: {
+          base: '#00a0f4',
+          typeDropdown: '#005d69',
+          transform: '#a2af93',
+        },
+        cell: '#f1d7d7',
+      },
+    },
+  };
+
+const LIGHT: Theme =
+  {
+    // Use these colors
+
+    bg1: 'rgb(220, 222, 226)',
+    bg2: 'rgb(237, 239, 243)',
+    bg3: '#fff',
+
+    emptyBg: '#c7cacf', // 'rgb(249, 251, 255)',
+
+    border1: 'rgb(200, 202, 206)',
+    border2: 'rgb(100,105,107)',
+    border3: 'rgb(125,130,139)',
+
+    text1: '#161616',
+    text2: '#242424',
+    text3: '#424242',
+
+    altBg1: 'rgba(0,0,0,0.40)', //'rgb(39, 39, 39)',
+    altBg2: '#EDEFF3',
+
+    altText1: '#fff',
+    altText2: '#fff',
+    altText3: 'rgba(255,255,255,0.5)',
+
+    altHighlight: 'rgba(255,255,255,0.15)',
+
+    highlight: 'rgba(210,215,219,0.25)', // for slight emphasis
+    darkerHighlight: 'rgb(210,215,219,0.5)', // to make a depth effect with highlight
+    stroke: '#aaa', // stands out against any background
+
+    boxShadow: 'rgba(130,130,130,0.3)',
+
+    fadedOutBg: 'rgba(255, 255, 255, 0.75)', // bg to cover up things when they are faded out
+
+    inputBg: 'rgba(255,255,255,1)', //237, 239, 243)',
+    inputBorder: 'rgb(200, 202, 206)',
+    inputFocusBg: '#fff',
+
+    active: darkActive,
+    activeText: '#fff',
+    inactiveHover: Color(darkActive).fade(0.25).string(),
+    inactiveHoverText: '#fff',
+    activeHover: Color(darkActive).fade(0.75).string(),
+
+    scrollbarBG: '#fff',
+    scrollbarPiece: 'rgb(180, 182, 186)',
+
+    altScrollbarPiece: 'rgba(0, 0, 0, 0.25)',
+
+    error: '#d14f42',
+
+    import: '#1efab4',
+
+    resultLine: 'rgba(0,0,0,0.25)',
+
+    tqlEditor: 'default',
+
+    // DO NOT USE these below colors anymore -- these need to be cleaned up
+
+    // text
+    text:
+    {
+      baseDark: '#000000',
+      secondaryDark: 'rgba(0,0,0,0.50)',
+      baseLight: 'rgba(0, 0, 0, 0.6)',
+      secondaryLight: 'rgba(0, 0, 0, 0.8)',
+      thirdLight: 'rgba(0, 0, 0, 1)',
+
+      link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
+      linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
+    },
+
+    button:
+    {
+      text: '#FFFFFF',
+      background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
+      backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
+    },
+
+    // Library ------
+
+    library:
+    {
+      // item
+      item: {
+        title: '#424242',
+        body: '#4B4B4B',
+        activeBody: '#4C7C9C',
+      },
+
+      // info graph selection btn
+      infoGraphBtn: {
+        btnBase: '#696666',
+        btnRoll: '#6E6B6B',
+        btnSelected: '#828080',
+        btnRadioBase: 'rgba(0,0,0,0.50)',
+        btnRadioSelected: '#80CCFF',
+      },
+
+      //text box
+      textbox: {
+        base: '#FFFFFF',
+      },
+    },
+
+    // Builder -----------------------------
+
+    builder: {
+      // tab area
+      tabs: {
         background: '#151515',
-        lines: 'rgba(255,255,255,0.25)',
+        tabActive: '#272727',
+        tabTopRibbon: '#4C7C9C',
+        tabInactive: 'rgba(39,39,39,50)',
+        tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
+      },
+
+      // deck
+      deck: {
+        background: 'rgb(256, 256, 260)',
+      },
+
+      // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
+      cards: {
+
+        cardBgOpacity: 0.15,
+
+        cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
+
+        // card theme colors
+
+        //by category
+        categories: {
+          primary: '#4fc0ba',
+          control: '#f99c49',
+          sort: '#1eb4fa',
+          filter: '#38fa1e',
+          match: '#b161bc',
+          score: '#1eb4fa',
+          script: '#4fc0ba',
+          compound: '#f99c49',
+          join: '#f99c49',
+          geo: '#0ee06b',
+          suggest: '#bbfa1e',
+          parameter: code.inputParameter,
+        },
+
+        //by clause type
+        anyClause: code.anyClause,
+        arrayClause: code.arrayClause,
+        baseClause: code.baseClause,
+        booleanClause: code.booleanClause,
+        enumClause: code.enumClause,
+        fieldClause: code.fieldClause,
+        indexClause: code.indexClause,
+        mapClause: code.mapClause,
+        nullClause: code.nullClause,
+        numberClause: code.numberClause,
+        objectClause: code.objectClause,
+        stringClause: code.stringClause,
+        structureClause: code.structureClause,
+        typeClause: code.typeClause,
+        inputParameter: code.inputParameter,
+
+        card1: '#559DCE',
+        card2: '#397DD0',
+        card3: '#D14F42',
+        card4: '#D55A44',
+        card5: '#DA6846',
+        card6: '#DD7547',
+        card7: '#DD8846',
+        card8: '#DAA043',
+        card9: '#D9B540',
+        card10: '#86A760',
+        card11: '#659F72',
+        card12: '#4B977F',
+        card13: '#39908B',
+        card14: '#2E8C9A',
+        card15: '#2589AA',
+        card16: '#466AA3',
+        card17: '#824BA0',
+        card18: '#B161BC',
+        card19: '#319AA9',
+        card20: '#4A979A',
+        card21: '#3A91A5',
+
+        card1BG: Color('#559DCE').alpha(.2).string(),
+        card2BG: Color('#397DD0').alpha(0.2).string(),
+        card3BG: Color('#D14F42').alpha(0.2).string(),
+        card4BG: Color('#D55A44').alpha(0.2).string(),
+        card5BG: Color('#DA6846').alpha(0.2).string(),
+        card6BG: Color('#DD7547').alpha(0.2).string(),
+        card7BG: Color('#DD8846').alpha(0.2).string(),
+        card8BG: Color('#DAA043').alpha(0.2).string(),
+        card9BG: Color('#D9B540').alpha(0.2).string(),
+        card10BG: Color('#86A760').alpha(0.2).string(),
+        card11BG: Color('#659F72').alpha(0.2).string(),
+        card12BG: Color('#4B977F').alpha(0.2).string(),
+        card13BG: Color('#39908B').alpha(0.2).string(),
+        card14BG: Color('#2E8C9A').alpha(0.2).string(),
+        card15BG: Color('#2589AA').alpha(0.2).string(),
+        card16BG: Color('#466AA3').alpha(0.2).string(),
+        card17BG: Color('#824BA0').alpha(0.2).string(),
+        card18BG: Color('#B161BC').alpha(0.2).string(),
+        card19BG: Color('#319AA9').alpha(0.2).string(),
+        card20BG: Color('#4A979A').alpha(0.2).string(),
+        card21BG: Color('#3A91A5').alpha(0.2).string(),
+      },
+
+      //builder column
+      builderColumn: {
+        background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
       },
 
       inputs:
@@ -547,17 +781,22 @@ const DARK: Theme =
     },
   };
 
-const Themes: { [name: string]: Theme } =
+export const Themes: { [name: string]: Theme } =
   {
-    DARK,
+    DARK, LIGHT,
   };
+
+export const ThemesArray = ['DARK', 'LIGHT'];
 
 const curTheme = 'DARK';
 
 export function Colors()
 {
-  // in the future, you will switch out the theme here.
-  return Themes[curTheme];
+  if (localStorage.getItem('theme') === null)
+  {
+    localStorage.setItem('theme', 'DARK');
+  }
+  return Themes[localStorage.getItem('theme')];
 }
 
 const dynamicMap: any = {
@@ -602,26 +841,31 @@ export function altStyle()
 export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean, hovered?: boolean)
 {
   const key = 'card-' + strongColor + bgColor + hoverBg + small + hovered;
+  const smallWeight = (localStorage.getItem('theme') === 'DARK') ? ' 2px 2px 4px 1px' : ' 1px 1px 2px 1px';
+  const largeWeight = (localStorage.getItem('theme') === 'DARK') ? ' 3px 3px 5px 2px ' : ' 2px 2px 3px 1px';
 
   if (!CACHE[key])
   {
     const borderHover = Color(strongColor).alpha(0.5);
     const backgroundHover = Color(bgColor).mix(Color(strongColor), Colors().builder.cards.cardBgOpacity);
+    const sideBorderColorLight = (localStorage.getItem('theme') === 'DARK') ? Colors().darkerHighlight : 'rgba(0,0,0,0.20)';
+    const sideBorderColorDark = (localStorage.getItem('theme') === 'DARK') ? Colors().darkerHighlight : 'rgba(0,0,0,0.30)';
 
     CACHE[key] = {
       background: hovered ? backgroundHover : bgColor,
       color: strongColor,
 
-      boxShadow: small ? 'rgba(0, 0, 0, 0.39) 2px 2px 4px 1px' :
-        '3px 3px 5px 2px rgba(0,0,0,.39)',
+      boxShadow: small ? Colors().boxShadow + smallWeight :
+        Colors().boxShadow + largeWeight,
+
       borderWidth: 1,
       borderStyle: 'solid',
       borderLeftWidth: '3px',
       borderLeftColor: strongColor,
 
-      borderTopColor: hovered ? borderHover : Colors().highlight,
-      borderRightColor: hovered ? borderHover : Colors().darkerHighlight,
-      borderBottomColor: hovered ? borderHover : Colors().darkerHighlight,
+      borderTopColor: hovered ? borderHover : sideBorderColorLight,
+      borderRightColor: hovered ? borderHover : sideBorderColorDark,
+      borderBottomColor: hovered ? borderHover : sideBorderColorDark,
       transition: 'background 0.15s',
       [hoverBg && ':hover']: {
         background: hoverBg,

@@ -63,7 +63,7 @@ const Dimensions = require('react-dimensions');
 import { forAllCards } from '../../../../blocks/BlockUtils';
 import { Cards } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
+import { altStyle, backgroundColor, Colors, fontColor } from '../../../colors/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import Util from '../../../util/Util';

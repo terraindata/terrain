@@ -74,7 +74,7 @@ import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
 
-import { backgroundColor, Colors, fontColor } from './common/Colors';
+import { backgroundColor, Colors, fontColor } from './colors/Colors';
 import { InAppNotification } from './common/components/InAppNotification';
 import StyleTag from './common/components/StyleTag';
 import DeployModal from './deploy/components/DeployModal';
@@ -190,7 +190,7 @@ class App extends TerrainComponent<Props>
 
     noLocalStorage: false,
 
-    stylesTag: Immutable.Map(),
+    stylesTag: Immutable.Map<string, React.CSSProperties>(),
   };
 
   constructor(props: Props)
@@ -273,10 +273,17 @@ class App extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('input', { background: Colors().inputBg, color: Colors().text1 });
+    ColorsActions.setStyle('input', { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder });
+    ColorsActions.setStyle('input:hover', { 'background': Colors().inputFocusBg + ' !important', 'border-color': Colors().inputBorder + ' !important' });
+    ColorsActions.setStyle('input:focus', { 'background': Colors().inputFocusBg + ' !important', 'border-color': Colors().inputBorder + ' !important' });
     ColorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
     ColorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
     ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
+    ColorsActions.setStyle('.card-muted-input input:hover', { 'background': Colors().inputBg + ' !important', 'border-color': Colors().inputBorder });
+    ColorsActions.setStyle('.close', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.dropdown-value', { 'border-color': Colors().inputBorder });
+    ColorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().altBg1 });
+    ColorsActions.setStyle('.button', { backgroundColor: Colors().active, color: Colors().activeText });
 
     const tooltipStyles = generateThemeStyles();
     _.map(tooltipStyles, (value, key) =>
@@ -410,7 +417,7 @@ class App extends TerrainComponent<Props>
 
         <DeployModal />
         <StyleTag
-          style={this.state.stylesTag.toJS()}
+          style={this.state.stylesTag}
         />
 
         <InAppNotification />

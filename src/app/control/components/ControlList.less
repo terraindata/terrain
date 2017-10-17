@@ -1,0 +1,48 @@
+@import "../../common/Common.less";
+
+@border-style: 1px solid;
+@border-radius: 0px;
+@icon-ratio: 1.25;
+@icon-size: calc(1em*@icon-ratio);
+
+.control-list-table {
+  display: table;
+  margin-top: @spacing;
+  margin: auto;
+  border-collapse: collapse;
+
+  .row-info {
+    display: table-row;
+    border-top: @border-style;
+    border-bottom: @border-style;
+
+    .row-info-data {
+      .common-cell-properties;
+      padding: @half-spacing @spacing;
+    }
+  }
+
+  .row-info-header {
+    display: table-row;
+
+    .row-info-data {
+      .common-cell-properties;
+      padding: @half-spacing @spacing;
+    }
+  }
+
+  .common-cell-properties {
+    display: table-cell;
+    .big-text;
+    vertical-align: middle;
+  }
+
+  .control-list-menu-options-wrapper {
+    position: relative;
+    padding: @half-spacing;
+    width: @icon-size;
+    height: @icon-size;
+    margin: auto;
+  }
+}
+

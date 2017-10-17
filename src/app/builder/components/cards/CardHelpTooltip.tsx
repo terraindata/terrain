@@ -51,8 +51,8 @@ import * as React from 'react';
 
 import * as Color from 'color';
 
-import { backgroundColor, Colors, fontColor, getStyle } from 'common/Colors';
 import TerrainComponent from 'common/components/TerrainComponent';
+import { backgroundColor, Colors, fontColor, getStyle } from './../../../colors/Colors';
 import './CardHelpTooltip.less';
 
 export interface Props

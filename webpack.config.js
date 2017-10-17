@@ -66,9 +66,12 @@ module.exports =
         alias: {
             auth: path.resolve(__dirname, 'src/app/auth'),
             analytics: path.resolve(__dirname, 'src/app/analytics'),
+            app: path.resolve(__dirname, 'src/app'),
             builder: path.resolve(__dirname, 'src/app/builder'),
             charts: path.resolve(__dirname, 'src/app/charts'),
             common: path.resolve(__dirname, 'src/app/common'),
+            control: path.resolve(__dirname, 'src/app/control'),
+            database: path.resolve(__dirname, 'src/database'),
             deploy: path.resolve(__dirname, 'src/app/deploy'),
             fileImport: path.resolve(__dirname, 'src/app/fileImport'),
             images: path.resolve(__dirname, 'src/images'),
