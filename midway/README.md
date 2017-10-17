@@ -45,22 +45,28 @@ Contains unit tests for Midway. test's directory structure mirrors that of midwa
 
 #### Import
 
-Imports a csv/json into Midway.
+Imports a csv/json into Midway. Headless cURL request:
+```curl -X POST <midway address>/midway/v1/import/headless -F templateId=<template id> -F persistentAccessToken=<persistent template access token> -F filetype="<csv or json or json [type object]>" -F file="@<filename>"```
 
 #### Export
 
-Export results from Terraformer as a csv/json/json [type object] file. Headless cURL request:
-```curl  -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"templateId":<template id>,"persistentAccessToken":"<persistent template access token>","body":{"dbid":<database id>,"templateId":<template id>, "variantId":<variant id>,"filetype":"<csv or json or json [type object]>"}}' 'http://localhost:3000/midway/v1/import/export/headless'```
+Exports results from Terraformer as a csv/json/json [type object] file. Headless cURL request:
+```curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"templateId":<template id>,"persistentAccessToken":"<persistent template access token>","body":{"dbid":<database id>,"templateId":<template id>, "variantId":<variant id>,"filetype":"<csv or json or json [type object]>"}}' '<midway address>/midway/v1/export/headless'```
 
+#### Template Creation
+
+Create a template for import/export. Headless cURL request:
+```curl -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' -d '{"id":<user id>,"accessToken":"<access token>","body":{"name":"<template name>","dbid":<database id>,"objectKey":"<export only, string value for json [type object]>","rank":<export only, bool>,"dbname":"<ES index>","tablename":"<ES type>","csvHeaderMissing":<bool>,"originalNames":<array of column names i.e. ["pkey","column1","column2"]>,"columnTypes":<column type object i.e. {"pkey":{"type":"long"},"column1":{"type":"array","innerType":{"type":"text"}},"col2":{"type":"date"}}>,"primaryKeys":"<primary keys>","transformations":<array of transformations i.e. [{"name":"renames","colName":"column2","args":{"newName":"col2"}}]>}}' "<midway address>/midway/v1/<import or export>/templates/create"```
 
 ### Credentials
 
 Stores credentials such as SFTP, SSH, email, etc. for the scheduler. Create a new credential from localhost using a cURL request:
-```curl -XPOST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"id":<user id>,"accessToken":"<access token>","body":{"name":"<name>","type":"<sftp/ssh/email/etc.>","permissions":1,"meta":"{\"host\":\"<SFTP IP>\",\"port\":<SFTP port, usually 22>,\"username\":\"<username>\",\"password\":\"<password>\"}"}}' 'localhost:3000/midway/v1/credentials'``` 
+```curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"id":<user id>,"accessToken":"<access token>","body":{"name":"<name>","type":"<sftp/ssh/email/etc.>","permissions":1,"meta":"{\"host\":\"<SFTP IP>\",\"port\":<SFTP port, usually 22>,\"username\":\"<username>\",\"password\":\"<password>\"}"}}' 'localhost:3000/midway/v1/credentials'``` 
 
 ### Scheduler
 
-Allows users to schedule persistent jobs within Midway. 
+Allows users to schedule persistent jobs within Midway. Headless cURL request:
+```curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"templateId":<template id>,"persistentAccessToken":"<persistent template access token>","body":{"jobType":"<import or export>","schedule":"<cron format>","sort":"<asc or desc>","transport":{"type":"<sftp/ssh/email/etc.","id":<credentials id>,"filename":"<full path to file in SFTP server>"}, "paramsJob": {<params for headless import or export i.e. "dbid":<database id>,"templateId":<template id>, "variantId":<variant id>,"filetype":"<csv or json or json [type object]>">}}}' '<midway url>/midway/v1/scheduler/create'```
 
 ## Testing
 
