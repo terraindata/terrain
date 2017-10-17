@@ -179,19 +179,19 @@ class AggregationsArea extends TerrainComponent<Props>
       }
       else
       {
-        resultsContent = (
-          aggregationsList.map((agg, index) =>
+        resultsContent = ( <div className='aggregations-area-aggs'>
+          {aggregationsList.map((agg, index) =>
           {
             return (
               <Aggregation
                 aggregation={agg}
-                key={index}
                 name={_.keys(agg)[0]}
                 query={this.props.query}
+                key={index}
               />
             );
-          })
-        );
+          })}
+        </div>);
 
       }
     }
