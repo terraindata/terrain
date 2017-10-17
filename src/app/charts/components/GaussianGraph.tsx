@@ -401,7 +401,7 @@ const GaussianGraph = {
       .attr('text-anchor', 'start')
       .attr('fill', Colors().altBg1)
       .attr('clip-path', 'url(#clip2)')
-      .text('Sigma = ' + numDeviations);
+      .text('Sigma = ' + Util.formatNumber(numDeviations));
 
     tooltip.append('text')
       .attr('x', x + 6)
@@ -428,15 +428,12 @@ const GaussianGraph = {
       .attr('width', w - 3);
   },
 
-  _drawStdDeviationBgs(el, scales, height, average, stdDev, stdDevLower, stdDevUpper, colors)
+  _drawStdDeviationBgs(el, scales, height, average, stdDev, stdDevLower, stdDevUpper, rectHeight, colors)
   {
     d3.select(el).select('.lower-section-bg').remove();
     d3.select(el).select('.upper-section-bg').remove();
 
-    const rectHeight = Math.max(this._gaussian(stdDevLower, average, stdDev),
-      this._gaussian(stdDevUpper, average, stdDev));
-
-    const numDeviations = Math.round(Math.abs(stdDevUpper - average) / stdDev);
+    const numDeviations = Math.abs(stdDevUpper - average) / stdDev;
 
     const lowerSection = d3.select(el).select('.bgs')
       .append('g')
@@ -510,7 +507,17 @@ const GaussianGraph = {
       return { x, y: this._gaussian(x, average, stdDev), id: key };
     });
     this._drawPoints(el, scales, pointsData, colors);
-    this._drawStdDeviationBgs(el, scales, height, average, stdDev, stdDevLower, stdDevUpper, colors);
+    this._drawStdDeviationBgs(
+      el,
+      scales,
+      height,
+      average,
+      stdDev,
+      stdDevLower,
+      stdDevUpper,
+      Math.max(this._gaussian(min, average, stdDev), this._gaussian(max, average, stdDev)),
+      colors,
+    );
   },
 
   _scales(el, domain, stateWidth, stateHeight)
