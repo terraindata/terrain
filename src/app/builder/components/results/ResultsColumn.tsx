@@ -47,28 +47,23 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import './ResultsColumnStyle.less';
 const { Map, List } = Immutable;
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
-const Dimensions = require('react-dimensions');
 import Radium = require('radium');
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 
-import { notificationManager } from 'common/components/InAppNotification';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
+import './ResultsColumnStyle.less';
+
 import TQLEditor from 'tql/components/TQLEditor';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
-import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
-import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
-import HitsTable from './HitsTable';
 import { MAX_HITS, ResultsState } from './ResultTypes';
 
 const RESULTS_PAGE_SIZE = 20;
@@ -111,7 +106,6 @@ class ResultsColumn extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-
     if (!this.props.resultsState.hits.equals(nextProps.resultsState.hits) && this.state.selectedTab !== 0)
     {
       this.setState({
@@ -196,11 +190,6 @@ class ResultsColumn extends TerrainComponent<Props>
     }
   }
 
-  public handleTextCopied()
-  {
-    notificationManager.addNotification('Result Copied to Clipboard', '', 'info', 4);
-  }
-
   public renderRawResult()
   {
     const formatted = JSON.stringify(this.props.resultsState.rawResult, null, 2);
@@ -262,4 +251,4 @@ class ResultsColumn extends TerrainComponent<Props>
 const ACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().active), backgroundColor(Colors().bg3));
 const INACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().bg3), backgroundColor(Colors().bg2));
 
-export default Dimensions()(ResultsColumn);
+export default ResultsColumn;

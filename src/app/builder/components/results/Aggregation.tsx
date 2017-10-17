@@ -64,7 +64,6 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import Histogram from './../../../charts/components/Histogram';
 import Dropdown from './../../../common/components/Dropdown';
-import Menu, { MenuOption } from './../../../common/components/Menu';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
@@ -81,7 +80,6 @@ const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 export interface Props
 {
   aggregation: any;
-  index: number;
   key: number;
   name: string;
   query: Query;
@@ -98,7 +96,7 @@ export enum DISPLAY_TYPES
 
 const DISPLAY_TYPE_NAMES = {
   [DISPLAY_TYPES.Histogram]: 'Histogram',
-  [DISPLAY_TYPES.ScatterPlot]: 'ScatterPlot',
+  [DISPLAY_TYPES.ScatterPlot]: 'Scatter Plot',
   [DISPLAY_TYPES.Table]: 'Table',
   [DISPLAY_TYPES.Raw]: 'Raw',
   [DISPLAY_TYPES.Gaussian]: 'Graph',
@@ -158,11 +156,12 @@ class AggregationComponent extends TerrainComponent<Props> {
           displayType,
         });
         currentAgg.displayType = displayType;
-        Actions.change(List(this._keyPath('query', 'aggregationList', name)), currentAgg, true);
+        Actions.change(List(this._keyPath('query', 'aggregationList', nextProps.name)), currentAgg, true);
       }
     }
   }
 
+  // Returns whether the stored display type is valid for the aggregation
   public validDisplayType(displayType, aggregation)
   {
     switch (displayType)
@@ -180,6 +179,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
   }
 
+  // Select display type based on stored display (in current agg) or choosing best if none is stored
   public updateInitialDisplay(aggregation, currentAgg, name)
   {
     if (currentAgg === undefined)
@@ -192,11 +192,15 @@ class AggregationComponent extends TerrainComponent<Props> {
       displayType,
       expanded: currentAgg.expanded,
     });
-    currentAgg.displayType = displayType;
-    Actions.change(List(this._keyPath('query', 'aggregationList', name)), currentAgg, true);
+    if (displayType !== currentAgg.displayType)
+    {
+      currentAgg.displayType = displayType;
+      Actions.change(List(this._keyPath('query', 'aggregationList', name)), currentAgg, true);
+    }
   }
 
-  public getBestDisplayType(aggregation?)
+  // Returns a visual display type if possible, otherwise table, then raw
+  public getBestDisplayType(aggregation)
   {
     let displayType = DISPLAY_TYPES.Raw;
     if (this.canBeHistogram(aggregation) !== undefined)
@@ -218,6 +222,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     return displayType;
   }
 
+  // extracts single value from metrics aggregation (sum, avg, ...)
   public isSingleValue(aggregation)
   {
     const values = _.values(aggregation);
@@ -450,6 +455,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
   }
 
+  // Has to be an extended stats aggregation
   public canBeGaussian(overrideAggregation?)
   {
     const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
@@ -477,6 +483,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     );
   }
 
+  // For percentile/percentile_rank aggregations
   public canBeScatterPlot(overrideAggregation?)
   {
     const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
@@ -484,6 +491,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     return values.values !== undefined;
   }
 
+  // Most buckets aggregations
   public canBeHistogram(overrideAggregation?)
   {
     const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
@@ -538,6 +546,7 @@ class AggregationComponent extends TerrainComponent<Props> {
       <div
         className='aggregation'
         style={[borderColor(Colors().altBg1), fontColor(Colors().text1)]}
+        key={'agg_' + String(this.props.key)}
       >
         {this.state.isSingleValue ? this.renderSingleAgg() : this.renderAgg()}
         <FadeInOut

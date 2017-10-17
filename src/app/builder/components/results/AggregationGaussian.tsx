@@ -46,18 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions no-var-requires
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 const Dimensions = require('react-dimensions');
-const { List, Map } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
-
 import GaussianGraph from './../../../charts/components/GaussianGraph';
 
 export interface Props
@@ -68,7 +60,6 @@ export interface Props
 }
 
 const GAUSSIAN_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
-// http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
 
 class AggregationGaussian extends TerrainComponent<Props>
 {
@@ -93,12 +84,14 @@ class AggregationGaussian extends TerrainComponent<Props>
   {
     overrideState = overrideState || {};
     const data = overrideState.data || this.props.data;
+    // If the data is null (when the field is invalid/empty)
     if (data.min === null)
     {
       return undefined;
     }
     const stdDev = data.std_deviation;
     const maxY = this.gaussian(data.avg, data.avg, stdDev);
+    // Sometimes lower bounds is less than min, upper bounds is greater than max
     const domainMin = Math.min(data.min, data.std_deviation_bounds.lower);
     const domainMax = Math.max(data.max, data.std_deviation_bounds.upper);
     const chartState = {

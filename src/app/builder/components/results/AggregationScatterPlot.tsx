@@ -46,18 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions no-var-requires
 
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const Dimensions = require('react-dimensions');
-const { List, Map } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
-
 import ScatterPlot from './../../../charts/components/ScatterPlot';
 
 export interface Props
@@ -90,33 +83,36 @@ class AggregationScatterPlot extends TerrainComponent<Props>
     let maxDomain = -Infinity;
     let minDomain = Infinity;
 
+    // Keyed data: [{key: x, value: y}]
     if (Array.isArray(data))
     {
-      pointsData = data.map((d, i) =>
+      pointsData = data.map((d, id) =>
       {
-        if (d.value > maxRange)
+        const x = d.key;
+        const y = d.value;
+        if (y > maxRange)
         {
-          maxRange = d.value;
+          maxRange = y;
         }
-        if (d.value < minRange)
+        if (y < minRange)
         {
-          minRange = d.value;
+          minRange = y;
         }
-        if (d.key > maxDomain)
+        if (x > maxDomain)
         {
-          maxDomain = d.key;
+          maxDomain = x;
         }
-        if (d.key < minDomain)
+        if (x < minDomain)
         {
-          minDomain = d.key;
+          minDomain = x;
         }
-        return { x: d.key, y: d.value, id: i };
+        return { x, y, id};
       });
     }
+    // Unkeyed data: {key: value, key: value}
     else
     {
-      // If data is not keyed
-      pointsData = (_.keys(data)).map((key, i) =>
+      pointsData = (_.keys(data)).map((key, id) =>
       {
         const x = parseFloat(key);
         const y = data[key];
@@ -136,11 +132,11 @@ class AggregationScatterPlot extends TerrainComponent<Props>
         {
           minDomain = x;
         }
-        return { x, y, id: i };
+        return { x, y, id };
       });
     }
-    const range = maxRange - minRange;
-    const domain = maxDomain - minDomain;
+    const range = (maxRange - minRange) !== 0 ? (maxRange - minRange) : 1;
+    const domain = (maxDomain - minDomain) !== 0 ? (maxDomain - minDomain) : 1;
     return {
       pointsData,
       domain: [minDomain - 0.05 * domain, maxDomain + 0.05 * domain],

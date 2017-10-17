@@ -194,7 +194,6 @@ class AggregationsArea extends TerrainComponent<Props>
                 return (
                   <Aggregation
                     aggregation={agg}
-                    index={index}
                     key={index}
                     name={_.keys(agg)[0]}
                     query={this.props.query}
