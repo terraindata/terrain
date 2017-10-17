@@ -220,32 +220,6 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
     });
   }
 
-  public onHeaderDrop(source, target) {
-    const stateCopy = Object.assign({}, this.state);
-    const columnSourceIndex = this.state.columns.findIndex(
-      i => i.key === source
-    );
-    const columnTargetIndex = this.state.columns.findIndex(
-      i => i.key === target
-    );
-
-    stateCopy.columns.splice(
-      columnTargetIndex,
-      0,
-      stateCopy.columns.splice(columnSourceIndex, 1)[0]
-    );
-
-    const emptyColumns = Object.assign({},this.state, { columns: [] });
-    this.setState(
-      emptyColumns
-    );
-
-    const reorderedColumns = Object.assign({},this.state, { columns: stateCopy.columns });
-    this.setState(
-      reorderedColumns
-    );
-  }
-
   public render()
   {
     const actualHeight = ((Number(this.state.rows.length) + 1) * 35 + 20);
