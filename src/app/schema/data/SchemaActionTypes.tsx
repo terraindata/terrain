@@ -57,6 +57,6 @@ export let SchemaActionTypes =
     selectId: '',
   };
 
-Util.setValuesToKeys(SchemaActionTypes, '');
+Util.setValuesToKeys(SchemaActionTypes, 'schema');
 
 export default SchemaActionTypes;

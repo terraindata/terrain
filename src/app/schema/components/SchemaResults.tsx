@@ -49,11 +49,11 @@ THE SOFTWARE.
 import Radium = require('radium');
 import * as React from 'react';
 import BackendInstance from '../../../database/types/BackendInstance';
-import SchemaStore from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 import * as PropTypes from 'prop-types';
+import Util from 'util/Util';
 import { _ResultsConfig } from '../../../../shared/results/types/ResultsConfig';
 import { _Query, Query } from '../../../items/types/Query';
 import HitsArea from '../../builder/components/results/HitsArea';
@@ -66,6 +66,7 @@ import { AllBackendsMap } from '../../../database/AllBackends';
 export interface Props
 {
   servers: SchemaTypes.ServerMap;
+  schema: SchemaTypes.SchemaState;
 }
 
 @Radium
@@ -86,110 +87,105 @@ class SchemaResults extends TerrainComponent<Props>
     resultsState: _ResultsState(),
   };
 
-  constructor(props: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
-    super(props);
+    const { schema: storeState } = nextProps;
 
-    this._subscribe(SchemaStore, {
-      updater: (storeState: SchemaTypes.SchemaState) =>
+    if (!this.state.initialized)
+    {
+      this.setState({
+        initialized: true,
+      });
+      return;
+    }
+    const { selectedId } = storeState;
+    // TODO change if store changes
+    const selectedItem =
+      storeState.getIn(['servers', selectedId]) ||
+      storeState.getIn(['databases', selectedId]) ||
+      storeState.getIn(['tables', selectedId]) ||
+      storeState.getIn(['columns', selectedId]) ||
+      storeState.getIn(['fieldProperties', selectedId]);
+
+    if (selectedItem !== this.state.selectedItem)
+    {
+      this.setState({
+        selectedId,
+        selectedItem,
+      });
+
+      if (this.showsResults(selectedItem))
       {
-        if (!this.state.initialized)
+        const resultsServer: SchemaTypes.Server =
+          selectedItem['type'] === 'server' ? selectedItem :
+            this.props.servers
+            && this.props.servers.get(selectedItem['serverId']);
+
+        let queryString: string = '';
+        switch (selectedItem.type)
         {
-          this.setState({
-            initialized: true,
-          });
+          case 'server':
+            queryString = '{ "index": "", "type": "", "from": 0, "size": 1000 }';
+            break;
+          case 'database':
+            queryString = '{ "index": "' + selectedItem['name'] + '", "type": "", "from": 0, "size": 1000 }';
+            break;
+          case 'table':
+            queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
+              + '", "type": "' + selectedItem['name'] + '", "from": 0, "size": 1000 }';
+            break;
+          case 'column':
+            queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
+              + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '",'
+              + '"from": 0, "size": 1000 }';
+            break;
+          case 'fieldProperty':
+            queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
+              + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '",'
+              + '"from": 0, "size": 1000 }';
+            break;
+        }
+
+        if (resultsServer === this.state.resultsServer && queryString === this.state.resultsQueryString)
+        {
           return;
         }
-        const { selectedId } = storeState;
-        // TODO change if store changes
-        const selectedItem =
-          storeState.getIn(['servers', selectedId]) ||
-          storeState.getIn(['databases', selectedId]) ||
-          storeState.getIn(['tables', selectedId]) ||
-          storeState.getIn(['columns', selectedId]) ||
-          storeState.getIn(['fieldProperties', selectedId]);
 
-        if (selectedItem !== this.state.selectedItem)
+        let resultsQuery: Query;
+        if (!this.state.resultsQuery)
         {
-          this.setState({
-            selectedId,
-            selectedItem,
-          });
-
-          if (this.showsResults(selectedItem))
-          {
-            const resultsServer: SchemaTypes.Server =
-              selectedItem['type'] === 'server' ? selectedItem :
-                this.props.servers
-                && this.props.servers.get(selectedItem['serverId']);
-
-            let queryString: string = '';
-            switch (selectedItem.type)
-            {
-              case 'server':
-                queryString = '{ "index": "", "type": "", "from": 0, "size": 1000 }';
-                break;
-              case 'database':
-                queryString = '{ "index": "' + selectedItem['name'] + '", "type": "", "from": 0, "size": 1000 }';
-                break;
-              case 'table':
-                queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
-                  + '", "type": "' + selectedItem['name'] + '", "from": 0, "size": 1000 }';
-                break;
-              case 'column':
-                queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
-                  + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '",'
-                  + '"from": 0, "size": 1000 }';
-                break;
-              case 'fieldProperty':
-                queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
-                  + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '",'
-                  + '"from": 0, "size": 1000 }';
-                break;
-            }
-
-            if (resultsServer === this.state.resultsServer && queryString === this.state.resultsQueryString)
-            {
-              return;
-            }
-
-            let resultsQuery: Query;
-            if (!this.state.resultsQuery)
-            {
-              resultsQuery = _Query({});
-              resultsQuery = resultsQuery.set('resultsConfig', _ResultsConfig());
-            }
-            else
-            {
-              resultsQuery = this.state.resultsQuery;
-              resultsQuery = resultsQuery.set('lastMutation', resultsQuery.lastMutation + 1);
-            }
-            resultsQuery = resultsQuery.set('db', {
-              id: resultsServer.connectionId,
-              name: resultsServer.name,
-              source: 'm2',
-              type: 'elastic',
-            });
-            resultsQuery = resultsQuery.set('tql', queryString);
-            resultsQuery = resultsQuery.set('parseTree', AllBackendsMap['elastic'].parseQuery(resultsQuery));
-
-            const resultsErrorMessage = null;
-
-            this.setState({
-              resultsQuery,
-              resultsQueryString: queryString,
-              resultsServer: resultsQuery.db as BackendInstance,
-              resultsState: _ResultsState(),
-              resultsErrorMessage,
-            });
-          }
-          else
-          {
-            this.handleResultsStateChange(_ResultsState());
-          }
+          resultsQuery = _Query({});
+          resultsQuery = resultsQuery.set('resultsConfig', _ResultsConfig());
         }
-      },
-    });
+        else
+        {
+          resultsQuery = this.state.resultsQuery;
+          resultsQuery = resultsQuery.set('lastMutation', resultsQuery.lastMutation + 1);
+        }
+        resultsQuery = resultsQuery.set('db', {
+          id: resultsServer.connectionId,
+          name: resultsServer.name,
+          source: 'm2',
+          type: 'elastic',
+        });
+        resultsQuery = resultsQuery.set('tql', queryString);
+        resultsQuery = resultsQuery.set('parseTree', AllBackendsMap['elastic'].parseQuery(resultsQuery));
+
+        const resultsErrorMessage = null;
+
+        this.setState({
+          resultsQuery,
+          resultsQueryString: queryString,
+          resultsServer: resultsQuery.db as BackendInstance,
+          resultsState: _ResultsState(),
+          resultsErrorMessage,
+        });
+      }
+      else
+      {
+        this.handleResultsStateChange(_ResultsState());
+      }
+    }
   }
 
   public showsResults(selectedItem: SchemaBaseClass): boolean
@@ -253,4 +249,8 @@ class SchemaResults extends TerrainComponent<Props>
   }
 }
 
-export default SchemaResults;
+export default Util.createContainer(
+  SchemaResults,
+  ['schema'],
+  {},
+);

@@ -69,7 +69,7 @@ const ROW_STYLE = {
   // }
 };
 
-const LINE_STYLE = borderColor(Colors().highlight);
+const LINE_STYLE = borderColor(Colors().stroke);
 
 const PLUS_STYLE = {};
 

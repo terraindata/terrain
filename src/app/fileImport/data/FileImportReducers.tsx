@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import TerrainStore from 'store/TerrainStore';
 import Ajax from './../../util/Ajax';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
@@ -356,7 +357,7 @@ FileImportReducers[ActionTypes.importFile] =
       {
         action.payload.handleFileImportSuccess();
         action.payload.changeUploadInProgress(false);
-        action.payload.fetchSchema();
+        TerrainStore.dispatch(action.payload.fetchSchema());
       },
       (err: string) =>
       {

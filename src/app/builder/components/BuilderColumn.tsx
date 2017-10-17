@@ -182,9 +182,9 @@ const BuilderColumn = createReactClass<any, any>(
       this.unsubUser = UserStore.subscribe(rejigger);
       this.unsubRoles = RolesStore.subscribe(rejigger);
 
-      ColorsActions.setStyle('.builder-column .builder-title-bar-options .bc-options-svg .cls-1 ', { fill: Colors().altBg1 });
-      ColorsActions.setStyle('.builder-column .builder-title-bar-options .menu-wrapper ', { 'border-color': Colors().altBg1 });
-      ColorsActions.setStyle('.builder-column .builder-title-bar .builder-title-bar-title svg .cls-1', { fill: Colors().altBg1 });
+      ColorsActions.setStyle('.builder-column .builder-title-bar-options .bc-options-svg .cls-1 ', { fill: Colors().text3 });
+      ColorsActions.setStyle('.builder-column .builder-title-bar-options .menu-wrapper ', { 'border-color': Colors().text3 });
+      ColorsActions.setStyle('.builder-column .builder-title-bar .builder-title-bar-title svg .cls-1', { fill: Colors().text3 });
 
     },
 
@@ -341,13 +341,14 @@ const BuilderColumn = createReactClass<any, any>(
       return this.renderPanel((
         <div
           className={'builder-column builder-column-' + this.props.index}
-          style={backgroundColor(Colors().bg2)}
+          style={backgroundColor(Colors().bg1)}
         >
           <div
             className='builder-title-bar'
             style={{
               'box-shadow': '0px 3px 9px ' + Colors().boxShadow,
               'borderColor': Colors().stroke,
+              'backgroundColor': Colors().bg2,
             }}
           >
             {
@@ -421,7 +422,9 @@ const BuilderColumn = createReactClass<any, any>(
               this.state.column === COLUMNS.Cards ||
               this.state.column === COLUMNS.Inputs,
             })}
-            style={backgroundColor(Colors().bg1)}
+            style={
+              borderColor(Colors().stroke)
+            }
           >
             {
               this.renderContent(canEdit)

@@ -52,9 +52,11 @@ import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import Util from 'util/Util';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { SchemaState } from 'schema/SchemaTypes';
 import { Display } from '../../../blocks/displays/Display';
 import { Card, CardString } from '../../../blocks/types/Card';
 import { isInput } from '../../../blocks/types/Input';
@@ -67,7 +69,6 @@ import Store from '../../builder/data/BuilderStore';
 import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../colors/Colors';
 import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import SchemaStore from '../../schema/data/SchemaStore';
 import Autocomplete from './Autocomplete';
 
 const shallowCompare = require('react-addons-shallow-compare');
@@ -82,6 +83,7 @@ export interface Props
   keyPath: KeyPath; // keypath of value
   onChange?: (value: string | number) => void;
   language: string;
+  schema: SchemaState;
 
   id?: string; // TODO remove
 
@@ -143,6 +145,7 @@ class BuilderTextbox extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
+
     this.debouncedChange = _.debounce(this.debouncedChange, 300);
 
     this.state = {
@@ -361,7 +364,9 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public computeOptions()
   {
-    if (this.props.autoDisabled)
+    const { schema, autoDisabled } = this.props;
+
+    if (autoDisabled)
     {
       return;
     }
@@ -370,11 +375,11 @@ class BuilderTextbox extends TerrainComponent<Props>
 
     if (this.props.getAutoTerms)
     {
-      options = this.props.getAutoTerms(SchemaStore.getState());
+      options = this.props.getAutoTerms(schema);
     }
     else
     {
-      options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
+      options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath, schema);
     }
 
     if (options && !options.equals(this.state.options))
@@ -565,4 +570,8 @@ class BuilderTextbox extends TerrainComponent<Props>
 //       && props.display.accepts.indexOf(monitor.getItem().type) !== -1;
 //   },
 
-export default BuilderTextbox;
+export default Util.createContainer(
+  BuilderTextbox,
+  ['schema'],
+  {},
+);
