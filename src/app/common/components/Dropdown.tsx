@@ -335,7 +335,7 @@ class Dropdown extends TerrainComponent<Props>
 
     const { selectedIndex, textColor, options } = this.props;
     const customColor = this.colorForOption(selectedIndex);
-    
+
     const dropdownValueStyle = [
       this.props.canEdit ?
         backgroundColor(

@@ -74,6 +74,7 @@ export interface Props
 class ImportExportControl extends TerrainComponent<Props>
 {
   public state: {
+    servers: ServerMap;
     templates: List<Template>;
     schedules: List<SchedulerConfig>;
     credentials: List<CredentialConfig>;

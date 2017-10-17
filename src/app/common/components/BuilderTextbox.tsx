@@ -66,7 +66,7 @@ import CardDropArea from '../../builder/components/cards/CardDropArea';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
 import Store from '../../builder/data/BuilderStore';
-import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../common/Colors';
+import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../colors/Colors';
 import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Autocomplete from './Autocomplete';
