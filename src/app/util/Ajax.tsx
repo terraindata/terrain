@@ -848,9 +848,10 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/create',
+        routeType + '/templates/create',
         payload,
         onLoadHandler,
         {
@@ -883,9 +884,10 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/' + String(templateId),
+        routeType + '/templates/' + String(templateId),
         payload,
         onLoadHandler,
         {
@@ -895,7 +897,9 @@ export const Ajax =
       return;
     },
 
-    deleteTemplate(templateId: number,
+    deleteTemplate(
+      templateId: number,
+      exporting: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -904,9 +908,10 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/delete/' + String(templateId),
+        routeType + '/templates/delete/' + String(templateId),
         {},
         onLoadHandler,
         {
@@ -938,10 +943,10 @@ export const Ajax =
       {
         payload['importOnly'] = true;
       }
-
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/',
+        routeType + '/templates/',
         payload,
         (response: object[]) =>
         {
@@ -951,14 +956,15 @@ export const Ajax =
     },
 
     getAllTemplates(
+      exporting: boolean,
       onLoad: (templates: object[]) => void,
     )
     {
       const payload: object = {};
-
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/',
+        routeType + '/templates/',
         payload,
         (response: object[]) =>
         {
@@ -967,7 +973,9 @@ export const Ajax =
       );
     },
 
-    resetTemplateToken(templateId: number,
+    resetTemplateToken(
+      templateId: number,
+      exporting: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -976,9 +984,10 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       return Ajax.req(
         'post',
-        'templates/updateAccessToken/',
+        routeType + '/templates/updateAccessToken/',
         { id: String(templateId) },
         onLoadHandler,
         {

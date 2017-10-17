@@ -461,7 +461,9 @@ FileImportReducers[ActionTypes.updateTemplate] =
 FileImportReducers[ActionTypes.deleteTemplate] =
   (state, action) =>
   {
-    Ajax.deleteTemplate(action.payload.templateId,
+    Ajax.deleteTemplate(
+      action.payload.templateId,
+      action.payload.exporting,
       () =>
       {
         action.payload.handleDeleteTemplateSuccess(action.payload.templateName);
