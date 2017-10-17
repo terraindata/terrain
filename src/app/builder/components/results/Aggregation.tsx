@@ -535,7 +535,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     return (
       <div
         className='aggregation'
-        style={[borderColor(Colors().altBg1), fontColor(Colors().text1)]}
+        style={[borderColor(Colors().resultLine), fontColor(Colors().text1)]}
       >
         {this.state.isSingleValue ? this.renderSingleAgg() : this.renderAgg()}
         <FadeInOut
