@@ -80,7 +80,7 @@ const Histogram = {
       .attr('width', state.width)
       .attr('height', state.height)
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       ;
 
     svg.append('rect')
@@ -113,10 +113,10 @@ const Histogram = {
 
     const styleCSS = `
     .histogram-chart .tick {
-      stroke: ${Colors().altHighlight};
+      stroke: #e8e8e8;
     }
     .histogram-chart .tick text {
-      fill: ${Colors().altBg2} !important;
+      fill: ${Colors().text3} !important;
     }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
@@ -257,7 +257,7 @@ const Histogram = {
       .attr('x', x + 6)
       .attr('y', y + 14)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip)')
       .text(text_x);
 
@@ -265,7 +265,7 @@ const Histogram = {
       .attr('x', x + 6)
       .attr('y', y + 14 * 2)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip)')
       .text(text_y);
 

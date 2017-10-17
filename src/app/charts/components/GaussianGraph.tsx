@@ -78,7 +78,7 @@ const GaussianGraph = {
       .attr('width', state.width)
       .attr('height', state.height)
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       ;
 
     svg.append('rect')
@@ -117,10 +117,10 @@ const GaussianGraph = {
 
     const styleCSS = `
     .gaussian-graph .tick {
-      stroke: ${Colors().altHighlight};
+      stroke: #e8e8e8;
     }
     .gaussian-graph .tick text {
-      fill: ${Colors().text2} !important;
+      fill: ${Colors().text3} !important;
     }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
@@ -207,13 +207,13 @@ const GaussianGraph = {
         return scales.realPointY(d.p);
       });
 
-    d3.select('.lines').append('path')
+    d3.select(el).select('.lines').append('path')
       .datum(data)
       .attr('class', 'line')
       .attr('d', line)
       .attr('stroke', colors[0]);
 
-    d3.select('.lines').append('clipPath')
+    d3.select(el).select('.lines').append('clipPath')
       .attr('id', 'gaussian')
       .append('path')
       .datum(data)
@@ -255,7 +255,7 @@ const GaussianGraph = {
     point
       .attr('cx', (d) => scales.realX(d['x']))
       .attr('cy', (d) => scales.realPointY(d['y']))
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('stroke', colors[0])
       .attr('class', 'point')
       .attr('r', 10);
@@ -289,7 +289,7 @@ const GaussianGraph = {
       .datum(data)
       .attr('class', className)
       .attr('d', line)
-      .attr('stroke', Colors().bg3);
+      .attr('stroke', 'rgb(60, 63, 65)');
   },
 
   _mouseoverFactory: (el, scales, colors, drawToolTip) => function(point)
@@ -333,7 +333,7 @@ const GaussianGraph = {
       .attr('x', x + 6)
       .attr('y', y + 14)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip)')
       .text(point.id);
 
@@ -341,7 +341,7 @@ const GaussianGraph = {
       .attr('x', x + 6)
       .attr('y', y + 14 * 2)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip)')
       .text(text_x);
 
@@ -349,7 +349,7 @@ const GaussianGraph = {
       .attr('x', x + 6)
       .attr('y', y + 14 * 3)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip)')
       .text(text_y);
 
@@ -399,7 +399,7 @@ const GaussianGraph = {
       .attr('x', x + 6)
       .attr('y', y + 14)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip2)')
       .text('Sigma = ' + Util.formatNumber(numDeviations));
 
@@ -407,7 +407,7 @@ const GaussianGraph = {
       .attr('x', x + 6)
       .attr('y', y + 35)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip2)')
       .text('Std deviation = ');
 
@@ -415,7 +415,7 @@ const GaussianGraph = {
       .attr('x', x + 6)
       .attr('y', y + 50)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip2)')
       .text(Util.formatNumber(stdDev));
 

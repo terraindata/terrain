@@ -79,7 +79,7 @@ const ScatterPlot = {
       .attr('width', state.width)
       .attr('height', state.height)
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       ;
 
     svg.append('rect')
@@ -104,10 +104,10 @@ const ScatterPlot = {
 
     const styleCSS = `
     .scatter-plot .tick {
-      stroke: ${Colors().altHighlight};
+      stroke: #e8e8e8;
     }
     .scatter-plot .tick text {
-      fill: ${Colors().altBg2} !important;
+      fill: ${Colors().text3} !important;
     }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
@@ -203,7 +203,7 @@ const ScatterPlot = {
       .append('circle')
       .attr('cx', (d) => scales.realX(d['x']))
       .attr('cy', (d) => scales.realPointY(d['y']))
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('stroke', colors[0])
       .attr('class', 'point')
       .attr('r', 10);
@@ -247,7 +247,7 @@ const ScatterPlot = {
       .attr('x', x + 6)
       .attr('y', y + 14)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip)')
       .text(text_x);
 
@@ -255,7 +255,7 @@ const ScatterPlot = {
       .attr('x', x + 6)
       .attr('y', y + 14 * 2)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip)')
       .text(text_y);
 

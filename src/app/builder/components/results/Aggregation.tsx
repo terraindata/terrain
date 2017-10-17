@@ -298,10 +298,14 @@ class AggregationComponent extends TerrainComponent<Props> {
             'arrow-icon-closed': !this.state.expanded,
           })}
           style={this.state.expanded ? getStyle('fill', Colors().active) :
-            getStyle('fill', Colors().altBg1)}
+            getStyle('fill', Colors().text1)}
           onClick={this.toggleExpanded}
         />
-        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded} style={fontColor(Colors().active)}>
+        <div
+          className='aggregation-title-bar-title'
+          onClick={this.toggleExpanded}
+          style={this.state.expanded ? fontColor(Colors().active) : fontColor(Colors().text1)}
+        >
           {
             this.props.name
           }
@@ -318,6 +322,7 @@ class AggregationComponent extends TerrainComponent<Props> {
                           className='aggregation-title-bar-export-icon'
                           onClick={this.exportData}
                           key='results-area-export'
+                          style={getStyle('fill', Colors().text1)}
                         />, 'Export to CSV')
                       }
                     </div>
@@ -327,7 +332,10 @@ class AggregationComponent extends TerrainComponent<Props> {
                 <CopyToClipboard text={JSON.stringify(values, undefined, 2)} onCopy={this.handleTextCopied}>
                   <div className='clipboard-icon-wrapper'>
                     {
-                      tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy JSON to Clipboard')
+                      tooltip(<ClipboardIcon
+                        className='clipboard-icon'
+                        style={getStyle('fill', Colors().text1)}
+                      />, 'Copy JSON to Clipboard')
                     }
                   </div>
                 </CopyToClipboard>
@@ -356,7 +364,10 @@ class AggregationComponent extends TerrainComponent<Props> {
       <div
         className='aggregation-title-bar'
       >
-        <div className='aggregation-title-bar-title'>
+        <div
+          className='aggregation-title-bar-title'
+          style={fontColor(Colors().text1)}
+        >
           <span>
             {
               name + ':  '
