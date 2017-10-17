@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import './GaussianGraph.less';
 
-import { Colors } from '../../common/Colors';
+import { Colors } from '../../colors/colors';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');

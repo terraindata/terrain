@@ -58,7 +58,7 @@ import * as React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import Query from '../../../../items/types/Query';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/colors';
 import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
