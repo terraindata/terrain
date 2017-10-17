@@ -52,33 +52,35 @@ describe('AnalyticsReducer', () =>
 {
   let analytics: AnalyticsState = _AnalyticsState({});
 
-  const analyticsResponse = [
-    {
-      key_as_string: '2015-06-02T00:00:00.000Z',
-      key: 1433203200000,
-      doc_count: 10320,
-    },
-    {
-      key_as_string: '2015-06-03T00:00:00.000Z',
-      key: 1433289600000,
-      doc_count: 12582,
-    },
-    {
-      key_as_string: '2015-06-04T00:00:00.000Z',
-      key: 1433376000000,
-      doc_count: 12279,
-    },
-    {
-      key_as_string: '2015-06-05T00:00:00.000Z',
-      key: 1433462400000,
-      doc_count: 6187,
-    },
-    {
-      key_as_string: '2015-06-06T00:00:00.000Z',
-      key: 1433548800000,
-      doc_count: 937,
-    },
-  ];
+  const analyticsResponse = {
+    1: [
+      {
+        key_as_string: '2015-06-02T00:00:00.000Z',
+        key: 1433203200000,
+        doc_count: 10320,
+      },
+      {
+        key_as_string: '2015-06-03T00:00:00.000Z',
+        key: 1433289600000,
+        doc_count: 12582,
+      },
+      {
+        key_as_string: '2015-06-04T00:00:00.000Z',
+        key: 1433376000000,
+        doc_count: 12279,
+      },
+      {
+        key_as_string: '2015-06-05T00:00:00.000Z',
+        key: 1433462400000,
+        doc_count: 6187,
+      },
+      {
+        key_as_string: '2015-06-06T00:00:00.000Z',
+        key: 1433548800000,
+        doc_count: 937,
+      },
+    ],
+  };
 
   beforeEach(() =>
   {
@@ -97,7 +99,6 @@ describe('AnalyticsReducer', () =>
       const nextState = reducer(analytics, {
         type: ActionTypes.fetch,
         payload: {
-          variantId: 1,
           analytics: analyticsResponse,
         },
       });
@@ -105,7 +106,9 @@ describe('AnalyticsReducer', () =>
       expect(
         nextState,
       ).toEqual(
-        analytics.setIn(['data', 1], analyticsResponse),
+        analytics
+          .set('loaded', true)
+          .setIn(['data', 1], analyticsResponse[1]),
       );
     });
   });
@@ -125,6 +128,44 @@ describe('AnalyticsReducer', () =>
         nextState.selectedMetric,
       ).toEqual(
         '100',
+      );
+    });
+  });
+
+  describe('#selectInterval', () =>
+  {
+    it('should handle analytics.selectInterval', () =>
+    {
+      const nextState = reducer(analytics, {
+        type: ActionTypes.selectInterval,
+        payload: {
+          intervalId: 'day',
+        },
+      });
+
+      expect(
+        nextState.selectedInterval,
+      ).toEqual(
+        'day',
+      );
+    });
+  });
+
+  describe('#selectDateRange', () =>
+  {
+    it('should handle analytics.selectDateRange', () =>
+    {
+      const nextState = reducer(analytics, {
+        type: ActionTypes.selectDateRange,
+        payload: {
+          dateRangeId: '2',
+        },
+      });
+
+      expect(
+        nextState.selectedDateRange,
+      ).toEqual(
+        '2',
       );
     });
   });

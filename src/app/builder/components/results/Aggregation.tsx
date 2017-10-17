@@ -58,7 +58,7 @@ import * as React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import Query from '../../../../items/types/Query';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
@@ -68,6 +68,7 @@ import Menu, { MenuOption } from './../../../common/components/Menu';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
+import AggregationGaussian from './AggregationGaussian';
 import AggregationHistogram from './AggregationHistogram';
 import AggregationScatterPlot from './AggregationScatterPlot';
 import AggregationsTable from './AggregationsTable';
@@ -92,6 +93,7 @@ export enum DISPLAY_TYPES
   ScatterPlot,
   Table,
   Raw,
+  Gaussian,
 }
 
 const DISPLAY_TYPE_NAMES = {
@@ -99,6 +101,7 @@ const DISPLAY_TYPE_NAMES = {
   [DISPLAY_TYPES.ScatterPlot]: 'ScatterPlot',
   [DISPLAY_TYPES.Table]: 'Table',
   [DISPLAY_TYPES.Raw]: 'Raw',
+  [DISPLAY_TYPES.Gaussian]: 'Graph',
 };
 
 @Radium
@@ -148,10 +151,7 @@ class AggregationComponent extends TerrainComponent<Props> {
       {
         return;
       }
-      if ((currentAgg.displayType === DISPLAY_TYPES.Table && !this.canBeTable(nextProps.aggregation)) ||
-        (currentAgg.displayType === DISPLAY_TYPES.Histogram && this.canBeHistogram(nextProps.aggregation) === undefined) ||
-        (currentAgg.displayType === DISPLAY_TYPES.ScatterPlot && !this.canBeScatterPlot(nextProps.aggregation))
-      )
+      if (!this.validDisplayType(currentAgg.displayType, nextProps.aggregation))
       {
         const displayType = this.getBestDisplayType(nextProps.aggregation);
         this.setState({
@@ -160,6 +160,23 @@ class AggregationComponent extends TerrainComponent<Props> {
         currentAgg.displayType = displayType;
         Actions.change(List(this._keyPath('query', 'aggregationList', name)), currentAgg, true);
       }
+    }
+  }
+
+  public validDisplayType(displayType, aggregation)
+  {
+    switch (displayType)
+    {
+      case DISPLAY_TYPES.Table:
+        return this.canBeTable(aggregation);
+      case DISPLAY_TYPES.Histogram:
+        return this.canBeHistogram(aggregation) !== undefined;
+      case DISPLAY_TYPES.ScatterPlot:
+        return this.canBeScatterPlot(aggregation);
+      case DISPLAY_TYPES.Gaussian:
+        return this.canBeGaussian(aggregation);
+      default:
+        return true;
     }
   }
 
@@ -189,6 +206,10 @@ class AggregationComponent extends TerrainComponent<Props> {
     else if (this.canBeScatterPlot(aggregation))
     {
       displayType = DISPLAY_TYPES.ScatterPlot;
+    }
+    else if (this.canBeGaussian(aggregation))
+    {
+      displayType = DISPLAY_TYPES.Gaussian;
     }
     else if (this.canBeTable(aggregation))
     {
@@ -244,7 +265,10 @@ class AggregationComponent extends TerrainComponent<Props> {
     {
       options.push(String(DISPLAY_TYPES.ScatterPlot));
     }
-
+    if (this.canBeGaussian())
+    {
+      options.push(String(DISPLAY_TYPES.Gaussian));
+    }
     if (this.canBeTable())
     {
       options.push(String(DISPLAY_TYPES.Table));
@@ -274,10 +298,14 @@ class AggregationComponent extends TerrainComponent<Props> {
             'arrow-icon-closed': !this.state.expanded,
           })}
           style={this.state.expanded ? getStyle('fill', Colors().active) :
-            getStyle('fill', Colors().altBg1)}
+            getStyle('fill', Colors().text1)}
           onClick={this.toggleExpanded}
         />
-        <div className='aggregation-title-bar-title' onClick={this.toggleExpanded} style={fontColor(Colors().active)}>
+        <div
+          className='aggregation-title-bar-title'
+          onClick={this.toggleExpanded}
+          style={this.state.expanded ? fontColor(Colors().active) : fontColor(Colors().text1)}
+        >
           {
             this.props.name
           }
@@ -294,6 +322,7 @@ class AggregationComponent extends TerrainComponent<Props> {
                           className='aggregation-title-bar-export-icon'
                           onClick={this.exportData}
                           key='results-area-export'
+                          style={getStyle('fill', Colors().text1)}
                         />, 'Export to CSV')
                       }
                     </div>
@@ -303,7 +332,10 @@ class AggregationComponent extends TerrainComponent<Props> {
                 <CopyToClipboard text={JSON.stringify(values, undefined, 2)} onCopy={this.handleTextCopied}>
                   <div className='clipboard-icon-wrapper'>
                     {
-                      tooltip(<ClipboardIcon className='clipboard-icon' />, 'Copy JSON to Clipboard')
+                      tooltip(<ClipboardIcon
+                        className='clipboard-icon'
+                        style={getStyle('fill', Colors().text1)}
+                      />, 'Copy JSON to Clipboard')
                     }
                   </div>
                 </CopyToClipboard>
@@ -332,7 +364,10 @@ class AggregationComponent extends TerrainComponent<Props> {
       <div
         className='aggregation-title-bar'
       >
-        <div className='aggregation-title-bar-title'>
+        <div
+          className='aggregation-title-bar-title'
+          style={fontColor(Colors().text1)}
+        >
           <span>
             {
               name + ':  '
@@ -358,6 +393,8 @@ class AggregationComponent extends TerrainComponent<Props> {
         return this.renderHistogram(values);
       case DISPLAY_TYPES.ScatterPlot:
         return this.renderScatterPlot(values);
+      case DISPLAY_TYPES.Gaussian:
+        return this.renderGaussian(values);
       case DISPLAY_TYPES.Raw:
         return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
       default:
@@ -410,6 +447,23 @@ class AggregationComponent extends TerrainComponent<Props> {
     }
   }
 
+  public canBeGaussian(overrideAggregation?)
+  {
+    const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
+    const values = _.values(aggregation)[0];
+    return values.std_deviation !== undefined;
+  }
+
+  public renderGaussian(values)
+  {
+    return (
+      <AggregationGaussian
+        data={values}
+        colors={[Colors().active, Colors().activeHover]}
+      />
+    );
+  }
+
   public renderScatterPlot(values)
   {
     return (
@@ -420,9 +474,9 @@ class AggregationComponent extends TerrainComponent<Props> {
     );
   }
 
-  public canBeScatterPlot(overrideAggration?)
+  public canBeScatterPlot(overrideAggregation?)
   {
-    const aggregation = overrideAggration !== undefined ? overrideAggration : this.props.aggregation;
+    const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
     const values = _.values(aggregation)[0];
     return values.values !== undefined;
   }

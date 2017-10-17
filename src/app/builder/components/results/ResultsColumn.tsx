@@ -56,7 +56,7 @@ const Dimensions = require('react-dimensions');
 import Radium = require('radium');
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 
 import { notificationManager } from 'common/components/InAppNotification';
 import { CopyToClipboard } from 'react-copy-to-clipboard';

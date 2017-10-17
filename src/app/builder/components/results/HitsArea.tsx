@@ -71,7 +71,7 @@ import HitsTable from './HitsTable';
 
 import Radium = require('radium');
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -460,7 +460,10 @@ column if you have customized the results view.');
     }
 
     return (
-      <div className='results-top'>
+      <div
+        className='results-top'
+        style={getStyle('boxShadow', '0px 3px 12px ' + Colors().boxShadow)}
+      >
         <div className='results-top-summary'>
           {
             text

@@ -67,7 +67,7 @@ import Actions from '../../data/BuilderActions';
 import Aggregation from '../results/Aggregation';
 import { ResultsState } from './ResultTypes';
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';

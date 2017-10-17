@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import DeployVariant from '../../../../shared/deploy/DeployVariant';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { UserConfig } from '../users/Users';
@@ -100,6 +101,31 @@ export class Items
       return this.select([], { id });
     }
     return this.select([], {});
+  }
+
+  public async getLiveVariants(ids: number[]): Promise<string[] | object[]>
+  {
+    return new Promise<string[] | object[]>(async (resolve, reject) =>
+    {
+      if (ids.length === 0)
+      {
+        const items: ItemConfig[] = await this.select([], { type: 'VARIANT', status: 'LIVE' } as object);
+        const liveItems: object[] = items.map((item) =>
+        {
+          return { id: item.id, name: DeployVariant.getVariantDeployedName(item as ItemConfig) };
+        });
+        return resolve(liveItems);
+      }
+      else
+      {
+        const liveItems: string[] = await Promise.all(ids.map(async (id) =>
+        {
+          const items: ItemConfig[] = await this.select([], { id, type: 'VARIANT', status: 'LIVE' } as object);
+          return items.length !== 0 ? DeployVariant.getVariantDeployedName(items[0] as ItemConfig) as string : '' as string;
+        }));
+        return resolve(liveItems);
+      }
+    });
   }
 
   // both regular and superusers can create items

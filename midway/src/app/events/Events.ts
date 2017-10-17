@@ -54,7 +54,6 @@ import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
 import { items } from '../items/ItemRouter';
 import * as Util from '../Util';
-import * as Encryption from './Encryption';
 
 export interface AggregationRequest
 {
@@ -82,9 +81,17 @@ export interface EventConfig
   meta?: any;
 }
 
+export interface EventMetadataConfig
+{
+  id: number | string;
+  name: string;
+  description?: string;
+}
+
 export class Events
 {
   private eventTable: Tasty.Table;
+  private eventMetadataTable: Tasty.Table;
   private elasticController: ElasticController;
 
   constructor()
@@ -104,6 +111,58 @@ export class Events
       ],
       'terrain-analytics',
     );
+
+    this.eventMetadataTable = new Tasty.Table(
+      'eventMetadata',
+      [],
+      [
+        'id',
+        'name',
+      ],
+      'terrain-analytics',
+    );
+
+    // tslint:disable-next-line:no-floating-promises
+    this.elasticController.getTasty().upsert(this.eventMetadataTable,
+      [
+        {
+          id: 1,
+          name: 'view',
+          description:
+          `Page view or impression event. This event fires off when a page
+          serving a variant is loaded or viewed.`,
+        },
+        {
+          id: 2,
+          name: 'click',
+          description:
+          `Item or page click event. This event is generated through an interaction
+          with the page or item served by a variant.`,
+        },
+        {
+          id: 3,
+          name: 'conversion',
+          description:
+          `An event denoting an item transaction or conversion. This event is generated
+          when an item served by a variant gets bought.`,
+        },
+        {
+          id: 4,
+          name: 'addtocart',
+          description:
+          `An event denoting that an item was added to the cart.`,
+        },
+      ]).then().catch();
+  }
+
+  public async getMetadata(filter: object): Promise<string>
+  {
+    return JSON.stringify(this.elasticController.getTasty().select(this.eventMetadataTable, [], filter));
+  }
+
+  public async addEvent(event: object): Promise<EventMetadataConfig>
+  {
+    return this.elasticController.getTasty().upsert(this.eventMetadataTable, event) as Promise<EventMetadataConfig>;
   }
 
   /*
@@ -111,10 +170,6 @@ export class Events
    */
   public async storeEvent(event: EventConfig): Promise<EventConfig>
   {
-    if (event.timestamp === undefined)
-    {
-      event.timestamp = new Date();
-    }
     return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 

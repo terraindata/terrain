@@ -67,14 +67,14 @@ import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScro
 import Store from './../../data/BuilderStore';
 import CardDropArea from './CardDropArea';
 
-import StyleTag from 'common/components/StyleTag';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import CardHelpTooltip from './CardHelpTooltip';
 
 const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import { borderColor, cardStyle, Colors, getStyle } from '../../../common/Colors';
+import { borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import ColorsActions from '../../../colors/data/ColorsActions';
 import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
@@ -205,6 +205,11 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillMount()
   {
+    ColorsActions.setStyle('.card-drag-handle svg', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-minimize-icon .st0', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-help-icon', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.card-tuning-icon', { stroke: Colors().altBg1 });
     // TODO
     // this._subscribe(Store, {
     //   stateKey: 'selected',
@@ -234,9 +239,11 @@ class _CardComponent extends TerrainComponent<Props>
       stateKey: 'scrollState',
       isMounted: true,
     });
+
     this.setState({
       keyPath: this.getKeyPath(),
     });
+
   }
 
   public getCardTerms(card: Card): List<string>
@@ -763,10 +770,7 @@ class _CardComponent extends TerrainComponent<Props>
       columnIndex={this.props.columnIndex}
       keyPath={keyPath}
       language={this.props.card.static.language}
-      textStyle={{
-        color: this.props.card.static.colors[0],
-        backgroundColor: this.state.hovering ? Colors().bg1 : undefined,
-      }}
+      textStyle={fontColor(this.props.card.static.colors[0])}
       handleCardDrop={this.props.handleCardDrop}
       tuningMode={this.props.tuningMode}
     />;
@@ -931,7 +935,7 @@ class _CardComponent extends TerrainComponent<Props>
                   tooltip(
                     <HelpIcon className='card-help-icon' />,
                     {
-                      html: <CardHelpTooltip staticInfo={card.static} />,
+                      html: <CardHelpTooltip staticInfo={card.static} errors={card.errors} />,
                       trigger: 'click',
                       position: 'top-end',
                       interactive: true,

@@ -19,6 +19,7 @@ midway/**/*.jsx
 .idea
 .vscode
 midway.db
+midwaytest.db
 moviesdb.db
 *.swp
 build/

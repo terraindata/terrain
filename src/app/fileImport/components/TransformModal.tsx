@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -563,7 +563,7 @@ class TransformModal extends TerrainComponent<Props>
         confirm={true}
         confirmButtonText={'Apply Transformation'}
         onConfirm={this.handleTransform}
-        closeOnConfirm={false}
+        closeOnConfirm={true}
       />
     );
   }

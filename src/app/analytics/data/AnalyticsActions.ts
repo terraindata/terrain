@@ -55,32 +55,105 @@ import { ItemStatus } from '../../../items/types/Item';
 
 import Ajax from './../../util/Ajax';
 
+function calculateDateRange(api, dateRangeId: number, callback)
+{
+  let start = null;
+  let end = null;
+
+  api.getServerTime(
+    (serverTimeResponse) =>
+    {
+      const { serverTime } = serverTimeResponse;
+      const serverTimeDate = new Date(serverTime);
+      const serverTimeTimestamp = serverTimeDate.getTime();
+
+      end = serverTimeDate.toISOString(); // Today at current time
+      switch (dateRangeId)
+      {
+        case 1: // Today
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()));
+          start = start.toISOString(); // Today at 0:00 UTC
+          break;
+        case 2:
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()) - (7 * 86400000))
+            .toISOString(); // 7 days since today
+          break;
+        case 3:
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()) - (30 * 86400000))
+            .toISOString(); // 7 days since today
+          break;
+        default:
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()))
+            .toISOString(); // Fetch today's analytics by default
+          break;
+      }
+
+      callback({ start, end });
+    },
+  );
+}
+
 const Actions =
   {
     fetch: (
       variantIds: ID[],
       metricId,
+      intervalId,
+      dateRangeId,
       callback?: (analyticsVariants: any) => void,
       errorCallback?: (response) => void,
-    ) => (dispatch) =>
+    ) => (dispatch, getState, api) =>
       {
-        const start = new Date(2015, 5, 2);
-        const end = new Date(2015, 5, 20);
+        dispatch({ type: ActionTypes.fetchStart });
 
-        return Ajax.getAnalytics(
-          variantIds,
-          start,
-          end,
-          metricId,
-          (variantAnalytics) =>
+        const numericDateRangeId = parseInt(dateRangeId, 10);
+        calculateDateRange(
+          api,
+          numericDateRangeId,
+          (dateRange) =>
           {
-            dispatch({
-              type: ActionTypes.fetch,
-              payload: {
-                analytics: variantAnalytics,
+            const start = dateRange.start;
+            const end = dateRange.end;
+
+            let aggregation = '';
+            if (metricId.length === 2)
+            {
+              aggregation = 'rate';
+            } else
+            {
+              aggregation = 'histogram';
+            }
+
+            return api.getAnalytics(
+              variantIds,
+              start,
+              end,
+              metricId,
+              intervalId,
+              aggregation,
+              (variantAnalytics) =>
+              {
+                dispatch({
+                  type: ActionTypes.fetch,
+                  payload: {
+                    analytics: variantAnalytics,
+                  },
+                });
+                callback && callback(variantAnalytics);
               },
-            });
-            callback && callback(variantAnalytics);
+            );
           },
         );
       },
@@ -90,6 +163,22 @@ const Actions =
       return {
         type: ActionTypes.selectMetric,
         payload: { metricId },
+      };
+    },
+
+    selectInterval: (intervalId) =>
+    {
+      return {
+        type: ActionTypes.selectInterval,
+        payload: { intervalId },
+      };
+    },
+
+    selectDateRange: (dateRangeId) =>
+    {
+      return {
+        type: ActionTypes.selectDateRange,
+        payload: { dateRangeId },
       };
     },
   };

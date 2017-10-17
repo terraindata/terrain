@@ -49,7 +49,7 @@ THE SOFTWARE.
 
 import './ScatterPlotStyle.less';
 
-import { Colors } from '../../common/Colors';
+import { Colors } from '../../colors/Colors';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');
@@ -79,7 +79,7 @@ const ScatterPlot = {
       .attr('width', state.width)
       .attr('height', state.height)
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       ;
 
     svg.append('rect')
@@ -104,10 +104,10 @@ const ScatterPlot = {
 
     const styleCSS = `
     .scatter-plot .tick {
-      stroke: ${Colors().altHighlight};
+      stroke: #e8e8e8;
     }
     .scatter-plot .tick text {
-      fill: ${Colors().altBg2} !important;
+      fill: ${Colors().text3} !important;
     }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
@@ -193,6 +193,7 @@ const ScatterPlot = {
 
   _drawPoints(el, scales, pointsData, colors)
   {
+    d3.select(el).selectAll('.point').remove();
     const g = d3.select(el).selectAll('.points');
 
     const point = g.selectAll('circle')
@@ -202,13 +203,13 @@ const ScatterPlot = {
       .append('circle')
       .attr('cx', (d) => scales.realX(d['x']))
       .attr('cy', (d) => scales.realPointY(d['y']))
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('stroke', colors[0])
       .attr('class', 'point')
       .attr('r', 10);
 
     point
-      .attr('_id', (d) => d['x']);
+      .attr('_id', (d) => d['id']);
 
     point.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
     point.on('mouseout', this._mouseoutFactory(el));
@@ -246,7 +247,7 @@ const ScatterPlot = {
       .attr('x', x + 6)
       .attr('y', y + 14)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip)')
       .text(text_x);
 
@@ -254,7 +255,7 @@ const ScatterPlot = {
       .attr('x', x + 6)
       .attr('y', y + 14 * 2)
       .attr('text-anchor', 'start')
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('clip-path', 'url(#clip)')
       .text(text_y);
 

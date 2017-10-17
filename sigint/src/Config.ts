@@ -44,7 +44,73 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-function getCurrentTime()
+import * as fs from 'fs';
+import * as winston from 'winston';
+
+import { CmdLineUsage } from './CmdLineArgs';
+
+export interface Config
 {
-  return new Date().toISOString();
+  config?: string;
+  port?: number;
+  debug?: boolean;
+  help?: boolean;
+  verbose?: boolean;
+  db?: string;
 }
+
+function updateObject<T>(obj: T, newObj: T): T
+{
+  for (const key in newObj)
+  {
+    if (newObj.hasOwnProperty(key))
+    {
+      obj[key] = newObj[key];
+    }
+  }
+  return obj;
+}
+
+export function loadConfigFromFile(config: Config): Config
+{
+  // load options from a configuration file, if specified.
+  if (config.config !== undefined)
+  {
+    try
+    {
+      const settings = fs.readFileSync(config.config, 'utf8');
+      const cfgSettings = JSON.parse(settings);
+      config = updateObject(config, cfgSettings);
+    }
+    catch (e)
+    {
+      winston.error('Failed to read configuration settings from ' + String(config.config));
+    }
+  }
+  return config;
+}
+
+export async function handleConfig(config: Config): Promise<void>
+{
+  winston.debug('Using configuration: ' + JSON.stringify(config));
+  if (config.help === true)
+  {
+    // tslint:disable-next-line
+    console.log(CmdLineUsage);
+    process.exit();
+  }
+
+  if (config.verbose === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'verbose';
+  }
+
+  if (config.debug === true)
+  {
+    // TODO: get rid of this monstrosity once @types/winston is updated.
+    (winston as any).level = 'debug';
+  }
+}
+
+export default Config;

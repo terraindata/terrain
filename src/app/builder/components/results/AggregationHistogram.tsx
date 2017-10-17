@@ -155,16 +155,30 @@ class AggregationHistogram extends TerrainComponent<Props>
         tempData[bucket.key] = bucket.doc_count;
       });
       // This is done so that any missing bars are added as having 0 value
-      for (let i = domainMin; i <= domainMax; i += barDifference)
+      if (barDifference > (domainMax - domainMin) * 0.001) // Limit the number of bars
+
       {
-        if (tempData[i] !== undefined)
+        for (let i = domainMin; i <= domainMax; i += barDifference)
         {
-          data.push({ x: i, y: tempData[i] });
+          if (tempData[i] !== undefined)
+          {
+            data.push({ x: i, y: tempData[i] });
+          }
+          else
+          {
+            data.push({ x: i, y: 0 });
+          }
         }
-        else
+      }
+      else // If there are too many bars, use labels instead
+      {
+        _.keys(tempData).map((key, i) =>
         {
-          data.push({ x: i, y: 0 });
-        }
+          data.push({ x: i, y: tempData[key], label: String(key) });
+          categories.push(String(key));
+        });
+        domainMax = _.keys(tempData).length;
+        domainMin = 0;
       }
     }
     return { barsData: data, categories, domain: List([domainMin, domainMax]), range: List([0, rangeMax + 0.05 * rangeMax]) };
