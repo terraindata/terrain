@@ -1,20 +1,17 @@
-
 @import "../../../common/Common.less";
-
-@top-height: 0px;
 
 .aggregations-area {
   padding-bottom: 2 * @standard-margin;
   margin-left: -2 * @standard-margin;
-  margin-right: -2 * @standard-margin;
   padding-right: @standard-margin / 2;
   padding-left: 0px;
+  overflow-y: auto;
+  height: 100%;
 
   .aggregations-area-aggs {
     height: calc(~"100% - 50px");
     padding-bottom: 50px;
     overflow-y: auto;
     margin-right: 6px;
-    margin-top: @top-height;
   }
 }

@@ -46,18 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions no-var-requires
 
+// http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
+
 import * as Immutable from 'immutable';
+const { List } = Immutable;
 import * as _ from 'lodash';
 const Dimensions = require('react-dimensions');
-const { List, Map } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
-
 import Histogram from './../../../charts/components/Histogram';
 
 export interface Props
@@ -66,8 +63,6 @@ export interface Props
   colors: [string, string];
   containerWidth?: number;
 }
-
-// http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
 
 class AggregationHistogram extends TerrainComponent<Props>
 {
@@ -89,6 +84,7 @@ class AggregationHistogram extends TerrainComponent<Props>
     let domainMax: number = -Infinity;
     let rangeMax: number = -Infinity;
     let categories = [];
+
     // RANGE QUERIES
     if (buckets[0] && (buckets[0].to || buckets[0].from))
     {
@@ -154,7 +150,7 @@ class AggregationHistogram extends TerrainComponent<Props>
         }
         tempData[bucket.key] = bucket.doc_count;
       });
-      // This is done so that any missing bars are added as having 0 value
+      // Missing bars are added as having 0 value
       if (barDifference > (domainMax - domainMin) * 0.001) // Limit the number of bars
 
       {
@@ -200,7 +196,6 @@ class AggregationHistogram extends TerrainComponent<Props>
       colors: this.props.colors,
       xLabels: categories,
     };
-
     return chartState;
   }
 

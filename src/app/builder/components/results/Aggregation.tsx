@@ -51,14 +51,13 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import FadeInOut from 'common/components/FadeInOut';
 import { notificationManager } from 'common/components/InAppNotification';
-import StyleTag from 'common/components/StyleTag';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import Query from '../../../../items/types/Query';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
@@ -545,7 +544,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     return (
       <div
         className='aggregation'
-        style={[borderColor(Colors().altBg1), fontColor(Colors().text1)]}
+        style={[borderColor(Colors().resultLine), fontColor(Colors().text1)]}
         key={'agg_' + String(this.props.key)}
       >
         {this.state.isSingleValue ? this.renderSingleAgg() : this.renderAgg()}

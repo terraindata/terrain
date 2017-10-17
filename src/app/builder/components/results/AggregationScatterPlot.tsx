@@ -106,7 +106,7 @@ class AggregationScatterPlot extends TerrainComponent<Props>
         {
           minDomain = x;
         }
-        return { x, y, id};
+        return { x, y, id };
       });
     }
     // Unkeyed data: {key: value, key: value}
