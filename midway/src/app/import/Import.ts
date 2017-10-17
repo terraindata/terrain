@@ -352,7 +352,7 @@ export class Import
     });
   }
 
-  public async upsert(files: stream.Readable[], fields: object, headless: boolean): Promise<ImportConfig>
+  public async upsert(files: stream.Readable[] | stream.Readable, fields: object, headless: boolean): Promise<ImportConfig>
   {
     return new Promise<ImportConfig>(async (resolve, reject) =>
     {
@@ -375,12 +375,19 @@ export class Import
       }
 
       let file: stream.Readable | null = null;
-      for (const f of files)
+      if (Array.isArray(files))
       {
-        if (f['fieldname'] === 'file')
+        for (const f of files)
         {
-          file = f;
+          if (f['fieldname'] === 'file')
+          {
+            file = f;
+          }
         }
+      }
+      else
+      {
+        file = files;
       }
       if (file === null)
       {
@@ -885,7 +892,7 @@ export class Import
     switch (this.NUMERIC_TYPES.has(typeObj['type']) ? 'number' : typeObj['type'])
     {
       case 'number':
-        if (item[field] === '')
+        if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;
         }

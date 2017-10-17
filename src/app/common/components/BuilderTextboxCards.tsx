@@ -49,6 +49,7 @@ THE SOFTWARE.
 import { Card, CardString } from '../../../blocks/types/Card';
 
 import * as classNames from 'classnames';
+import FadeInOut from 'common/components/FadeInOut';
 import * as React from 'react';
 import { Display } from '../../../blocks/displays/Display';
 import { AllBackendsMap } from '../../../database/AllBackends';
@@ -88,27 +89,32 @@ class BuilderTextboxCards extends React.Component<Props, any>
 
   public render()
   {
-    const key = this.props.tuningMode ? 'tuningClosed' : 'closed';
-    if (this.isText() || this.isCreating() || this.props.value[key])
+    if (this.isText() || this.isCreating())
     {
       return null;
     }
 
+    const closedKey = this.props.tuningMode ? 'tuningClosed' : 'closed';
+
     // We're in card mode
     return (
-      <div className={classNames({
-        'builder-tb-cards-area': true,
-        [this.props.className]: !!this.props.className,
-      })} ref='tb'>
-        <CardComponent
-          {...this.props}
-          singleCard={true}
-          card={this.props.value as Card}
-          index={null}
-          display={this.props.display}
-        // tuningMode={this.props.tuningMode}
-        />
-      </div>
+      <FadeInOut
+        open={!this.props.value[closedKey]}
+      >
+        <div className={classNames({
+          'builder-tb-cards-area': true,
+          [this.props.className]: !!this.props.className,
+        })} ref='tb'>
+          <CardComponent
+            {...this.props}
+            singleCard={true}
+            card={this.props.value as Card}
+            index={null}
+            display={this.props.display}
+          // tuningMode={this.props.tuningMode}
+          />
+        </div>
+      </FadeInOut>
     );
   }
 }

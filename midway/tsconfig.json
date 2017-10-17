@@ -13,24 +13,6 @@
             "../node_modules/@types"
         ],
         "baseUrl": ".",
-        "paths": {
-            "library*": ["../src/app/library/*"],
-            "auth*": ["../src/app/auth/*"],
-            "analytics*": ["../src/app/analytics/*"],
-            "builder*": ["../src/app/builder/*"],
-            "charts*": ["../src/app/charts/*"],
-            "common*": ["../src/app/common/*"],
-            "deploy*": ["../src/app/deploy/*"],
-            "fileimport*": ["../src/app/fileimport/*"],
-            "manual*": ["../src/app/manual/*"],
-            "roles*": ["../src/app/roles/*"],
-            "schema*": ["../src/app/schema/*"],
-            "store*": ["../src/app/store/*"],
-            "tql*": ["../src/app/tql/*"],
-            "users*": ["../src/app/users/*"],
-            "util*": ["../src/app/util/*"],
-            "x*": ["../src/app/x/*"]
-        },
         "experimentalDecorators": true,
         "declaration": false,
         "outDir": "./build/"

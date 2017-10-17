@@ -54,7 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
-import { backgroundColor, buttonColors, Colors, disabledButtonColors, fontColor } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors, disabledButtonColors, fontColor } from '../../colors/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
 import { CSVTypeParser, parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from './../../../../shared/Util';
@@ -821,7 +821,10 @@ class FileImport extends TerrainComponent<any>
           <div
             className='fi-next-button button'
             onClick={nextEnabled ? this.incrementStep : this._fn(this.setError, errorMsg)}
-            style={nextEnabled ? buttonColors() : disabledButtonColors()}
+            style={[
+              nextEnabled ? buttonColors() : disabledButtonColors(),
+              fontColor(Colors().text1),
+            ]}
             ref='fi-next-button'
           >
             Next

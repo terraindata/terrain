@@ -54,6 +54,7 @@ import Query from '../../../items/types/Query';
 import Options from '../../types/CardsToCodeOptions';
 
 import { isInput } from '../../../blocks/types/Input';
+import ESCardParser from './ESCardParser';
 import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
 
 class CardsToElastic

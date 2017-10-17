@@ -47,10 +47,10 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as React from 'react';
 import { Link } from 'react-router';
-
-import { tooltip } from 'common/components/tooltip/Tooltips';
+import { Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserStore from './../data/UserStore';
 import * as UserTypes from './../UserTypes';
@@ -158,7 +158,10 @@ class UserThumbnail extends TerrainComponent<Props>
         />
         {
           text &&
-          <div className='user-thumbnail-text'>
+          <div
+            className='user-thumbnail-text'
+            style={fontColor(Colors().text1)}
+          >
             {
               text
             }

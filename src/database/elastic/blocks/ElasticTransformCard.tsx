@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 
-import { Colors, getCardColors } from '../../../app/common/Colors';
+import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';

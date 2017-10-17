@@ -65,6 +65,7 @@ import './Logging';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
+import { scheduler } from './scheduler/SchedulerRouter';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
 import Users from './users/Users';
@@ -161,6 +162,10 @@ class App
         await databases.connect({} as any, db.id);
       }
     }
+
+    // setup stored users
+    await scheduler.initializeJobs();
+    await scheduler.initializeSchedules();
 
     const heapStats: object = v8.getHeapStatistics();
     this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));

@@ -45,6 +45,8 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-console
+// tslint:enable:allow-null-union
+// tslint:enable:allow-undefined-union
 
 import { List } from 'immutable';
 import * as _ from 'lodash';
@@ -56,7 +58,7 @@ import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 import { Backend } from '../../../database/types/Backend';
-import { Colors, getCardColors } from '../../common/Colors';
+import { Colors, getCardColors } from '../../colors/Colors';
 
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
@@ -149,6 +151,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         preview: string | ((c: Card) => string);
         display: Display | Display[];
         tql: TQLFn;
+        singleType?: boolean;
+        typeName?: string;
         accepts?: List<string>;
 
         getChildTerms?: (card: Card, schemaState) => List<string>;
@@ -169,6 +173,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
       title: clause.name,
+      clause,
       colors: getCardColors(clause.path[0], Colors().border2),
       language: 'elastic',
       description: clause.desc,
@@ -220,6 +225,16 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     }
 
     return _card(obj as any);
+  }
+
+  protected static initCardValueFromTemplate(blocksConfig, extraConfig?, skipTemplate?)
+  {
+    const config = {};
+    if (skipTemplate !== true && extraConfig && extraConfig.template)
+    {
+      config['value'] = String(extraConfig.template);
+    }
+    return config;
   }
 
   // map the card type name ('eql' + clausename) to the card
@@ -331,11 +346,36 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         },
 
         init: (blocksConfig, extraConfig?, skipTemplate?) =>
-          ({
-            cards: List([
-              // BlockUtils.make(blocksConfig, 'eql' + clause.elementID, extraConfig, skipTemplate),
-            ]),
-          }),
+        {
+          const config = {};
+          let template;
+          if (extraConfig !== undefined && extraConfig.template)
+          {
+            template = extraConfig.template;
+          } else if (clause.template)
+          {
+            template = clause.template;
+          }
+
+          // template : [ card1, card2, ...]
+          const cards = _.compact(
+            _.map(
+              template,
+              (templateValue, templateIndex) =>
+              {
+                //                console.log("Array ->" + templateIndex + " : " + templateValue);
+                const cardTypeName = GetCardVisitor.getCardType(clause.elementID);
+                return BlockUtils.make(
+                  blocksConfig, cardTypeName,
+                  {
+                    key: String(templateIndex),
+                    template: templateValue,
+                  },
+                );
+              }));
+          config['cards'] = List(cards);
+          return config;
+        },
 
         tql: (block, tqlFn, tqlConfig) =>
         {
@@ -348,9 +388,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESBaseClause(clause: ESBaseClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template === undefined ? '' : clause.template,
+      value: clause.template === undefined ? '' : String(clause.template),
       colors: getCardColors(clause.path[0], Colors().builder.cards.baseClause),
       static: {
+        init: GetCardVisitor.initCardValueFromTemplate,
         colors: getCardColors(clause.path[0], Colors().builder.cards.baseClause),
         preview: '[value]',
         display: {
@@ -358,6 +399,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
         },
         tql: (block) => CommonElastic.parseESValue(block['value']),
+        singleType: false,
       },
     });
   }
@@ -365,9 +407,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESBooleanClause(clause: ESBooleanClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template === undefined ? true : clause.template,
+      key: clause.name,
+      value: clause.template === undefined ? 'true' : String(clause.template),
 
       static: {
+        init: GetCardVisitor.initCardValueFromTemplate,
         colors: getCardColors(clause.path[0], Colors().builder.cards.booleanClause),
         preview: '[value]',
         display: {
@@ -379,6 +423,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           ]),
         },
         tql: (boolBlock) => !!boolBlock['value'],
+        singleType: true,
+        typeName: 'boolean',
       },
     });
   }
@@ -386,9 +432,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESEnumClause(clause: ESEnumClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template === undefined ? clause.values[0] : clause.template,
+      key: clause.name,
+      value: clause.template === undefined ? String(clause.values[0]) : String(clause.template),
       colors: getCardColors(clause.path[0], Colors().builder.cards.enumClause),
       static: {
+        init: GetCardVisitor.initCardValueFromTemplate,
         colors: getCardColors(clause.path[0], Colors().builder.cards.enumClause),
         preview: '[value]',
         display: {
@@ -398,6 +446,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           dropdownUsesRawValues: true,
         },
         tql: (block) => block['value'],
+        singleType: true,
+        typeName: typeof clause.values[0],
       },
     });
   }
@@ -405,8 +455,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESFieldClause(clause: ESFieldClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template === undefined ? '' : clause.template,
+      value: clause.template === undefined ? '' : String(clause.template),
       static: {
+        init: GetCardVisitor.initCardValueFromTemplate,
         colors: getCardColors(clause.path[0], Colors().builder.cards.fieldClause),
         preview: '[value]',
         display: {
@@ -418,6 +469,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           },
         },
         tql: (stringBlock) => stringBlock['value'],
+        singleType: true,
+        typeName: 'string',
       },
     });
   }
@@ -425,9 +478,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESIndexClause(clause: ESIndexClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template === undefined ? '' : clause.template,
       key: 'index',
+      value: clause.template === undefined ? '' : String(clause.template),
       static: {
+        init: GetCardVisitor.initCardValueFromTemplate,
         colors: getCardColors(clause.path[0], Colors().builder.cards.indexClause),
         preview: '[value]',
         display: {
@@ -439,6 +493,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           },
         },
         tql: (stringBlock) => stringBlock['value'],
+        singleType: true,
+        typeName: 'string',
       },
     });
   }
@@ -464,7 +520,56 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           accepts,
         },
         accepts,
+        init: (blocksConfig, extraConfig?, skipTemplate?) =>
+        {
+          let template;
+          if (extraConfig !== undefined && extraConfig.template !== undefined)
+          {
+            template = extraConfig.template;
+          } else if (clause.template)
+          {
+            template = clause.template;
+          }
 
+          if (template && skipTemplate !== true)
+          {
+            // create the card list from the template
+            const cards = _.compact(
+              _.map(
+                template,
+                (templateValue, templateKey) =>
+                {
+                  //              console.log(templateKey + ":" + templateValue);
+                  const cardKeyType = templateKey.split(':');
+                  let cardTypeName = cardKeyType[1];
+                  if (!cardTypeName.startsWith('elastic'))
+                  {
+                    cardTypeName = GetCardVisitor.getCardType(cardKeyType[1]);
+                  }
+                  if (blocksConfig[cardTypeName] !== undefined)
+                  {
+                    return BlockUtils.make(
+                      blocksConfig, cardTypeName,
+                      {
+                        key: cardKeyType[0],
+                        template: templateValue,
+                        // value: templateValue === null ? undefined : templateValue,
+                        // all base cards have a 'value' key
+                      },
+                    );
+                  }
+                  else
+                  {
+                    console.log('No block for ' + String(templateKey), cardTypeName, templateValue);
+                  }
+                },
+              ),
+            );
+
+            return { cards: List(cards) };
+          }
+          return {};
+        },
         tql: (block, tqlFn, tqlConfig) =>
         {
           const json = {};
@@ -489,6 +594,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         preview: '',
         display: [],
         tql: () => null,
+        singleType: true,
+        typeName: 'null',
       },
     });
   }
@@ -497,8 +604,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   {
     return GetCardVisitor.seedCard(clause, {
       value: clause.template == null || clause.template === undefined
-        ? 0 : clause.template,
+        ? '0' : String(clause.template),
       static: {
+        init: GetCardVisitor.initCardValueFromTemplate,
         preview: '[value]',
         colors: getCardColors(clause.path[0], Colors().builder.cards.numberClause),
         display: {
@@ -507,6 +615,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           // TODO autocomplete?
         },
         tql: (numBlock) => +numBlock['value'],
+        singleType: true,
+        typeName: 'number',
       },
     });
   }
@@ -567,8 +677,9 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESStringClause(clause: ESStringClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: clause.template === undefined ? '' : clause.template,
+      value: clause.template === undefined ? '' : String(clause.template),
       static: {
+        init: GetCardVisitor.initCardValueFromTemplate,
         colors: getCardColors(clause.path[0], Colors().builder.cards.stringClause),
         preview: '[value]',
         display: {
@@ -577,6 +688,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           // TODO autocomplete
         },
         tql: (stringBlock) => stringBlock['value'],
+        singleType: true,
+        typeName: 'string',
       },
     });
   }
@@ -610,23 +723,37 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         },
       };
 
-      if (clause.template && skipTemplate !== true)
+      let template;
+      if (extraConfig && extraConfig.template)
+      {
+        template = extraConfig.template;
+      } else if (clause.template)
+      {
+        template = clause.template;
+      }
+
+      if (template && skipTemplate !== true)
       {
         // create the card list from the template
         const cards = _.compact(
           _.map(
-            clause.template,
+            template,
             (templateValue, templateKey) =>
             {
-              const cardTypeName = GetCardVisitor.getCardType(
-                String(templateValue === null ? clause.structure[templateKey] : templateValue));
+              //              console.log(templateKey + ":" + templateValue);
+              const cardKeyType = templateKey.split(':');
+              let cardTypeName = cardKeyType[1];
+              if (!cardTypeName.startsWith('elastic'))
+              {
+                cardTypeName = GetCardVisitor.getCardType(cardKeyType[1]);
+              }
               if (blocksConfig[cardTypeName])
               {
-                // console.log(clauseType, templateKey);
                 return BlockUtils.make(
                   blocksConfig, cardTypeName,
                   {
-                    key: templateKey,
+                    key: cardKeyType[0],
+                    template: templateValue,
                     // value: templateValue === null ? undefined : templateValue,
                     // all base cards have a 'value' key
                   },
@@ -698,7 +825,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
           clause.suggestions.forEach(handler);
           clause.required.forEach(handler);
-          Object.keys(clause.template).forEach(handler);
           Object.keys(clause.structure).forEach(handler);
 
           return List(result);
@@ -751,9 +877,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESTypeClause(clause: ESTypeClause): any
   {
     return GetCardVisitor.seedCard(clause, {
-      value: typeof clause.template === 'string' ? clause.template : '',
       key: 'type',
+      value: clause.template === undefined ? '' : String(clause.template),
       static: {
+        init: GetCardVisitor.initCardValueFromTemplate,
         colors: getCardColors(clause.path[0], Colors().builder.cards.typeClause),
         preview: '[value]',
         display: {
@@ -765,6 +892,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           },
         },
         tql: (stringBlock) => stringBlock['value'],
+        singleType: true,
+        typeName: 'boolean',
       },
     });
   }
