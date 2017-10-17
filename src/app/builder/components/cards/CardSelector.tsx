@@ -53,6 +53,7 @@ import * as React from 'react';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+const Color = require('color');
 
 import TerrainComponent from 'common/components/TerrainComponent';
 import { CardConfig } from 'src/blocks/types/Card';
@@ -158,10 +159,12 @@ class CardSelector extends TerrainComponent<Props>
     return (
       <div
         className='card-category-list-item'
-        style={[
-          cardStyle(color, Colors().bg3, cardHoverBackground(color, Colors().bg3), true),
-          getStyle('boxShadow', '1px 2px 14px ' + Colors().boxShadow),
-        ]}
+        style={_.extend({},
+          // cardStyle(color, Colors().bg3, cardHoverBackground(color, Colors().bg3), true),
+          fontColor(color),
+          backgroundColor(Colors().bg3, cardHoverBackground(color, Colors().bg3)),
+          borderColor(Colors().border2),
+        )}
         key={key}
       >
         {key}
@@ -197,7 +200,15 @@ class CardSelector extends TerrainComponent<Props>
   public render()
   {
     const isEmpty = this.props.cardTypeList.size === 0;
-
+    const inputStyle = _.extend({},
+      {
+        borderColor: 'rgba(0,0,0,0)',
+      },
+    );
+    const searchLineStyle = _.extend({},
+      borderColor(Color(Colors().border1).alpha(0.25).toString()),
+      backgroundColor(Colors().darkerHighlight)
+    );
     return (
       <div
         className={classNames({
@@ -208,45 +219,44 @@ class CardSelector extends TerrainComponent<Props>
         ref='selector'
         style={backgroundColor(Colors().bg1)}
       >
-        <div className='inset-shadow-veil' style={getStyle('boxShadow', `inset 2px 2px 8px 1px ${Colors().boxShadow}`)} />
+        <div className='inset-shadow-veil' style={getStyle('boxShadow', `inset 2px 2px 4px 1px ${Colors().boxShadow}`)} />
 
         <div className='selectors-row'>
-          {
-            <div className='card-category-selector' style={borderColor(Colors().border1)}>
-              <div className='card-category-title' style={fontColor(Colors().text1)}>
-                Categories
-              </div>
+          <div className='card-category-selector'>
+            <div className='card-category-title' style={fontColor(Colors().text1)}>
+              Types
+            </div>
+            {
+              this.renderCategoryOptions()
+            }
+          </div>
+          <div className='create-card-selector-column' style={borderColor(Colors().border1)}>
+            <div className='card-category-selector-title'>
+              Cards
+            </div>
+            <div
+              className='create-card-selector-inner'
+              ref={this.registerCardSelector}
+              style={this.state.computedHeight === -1 ?
+                {} :
+                {
+                  height: this.state.computedHeight,
+                }}
+            >
               {
-                this.renderCategoryOptions()
+                isEmpty &&
+                <div className='create-card-empty'>
+                  There are no remaining cards that can be created here.
+                </div>
+              }
+              {
+                this.props.cardTypeList.map(this.renderCardOption)
               }
             </div>
-          }
-          <div
-            className='create-card-selector-inner'
-            ref={this.registerCardSelector}
-            style={this.state.computedHeight === -1 ?
-              {} :
-              {
-                height: this.state.computedHeight,
-              }}
-          >
-            {
-              isEmpty &&
-              <div className='create-card-empty'>
-                There are no remaining cards that can be created here.
-              </div>
-            }
-            {
-              this.props.cardTypeList.map(this.renderCardOption)
-            }
           </div>
         </div>
         <div className='card-search-line'
-          style={[
-            borderColor(Colors().border2),
-            backgroundColor(Colors().darkerHighlight),
-            // getStyle('boxShadow', `${Colors().border3} 0px 0px 1px`)
-          ]}
+          style={searchLineStyle}
         >
           <input
             className='card-search-input'
@@ -254,7 +264,7 @@ class CardSelector extends TerrainComponent<Props>
             value={this.state.searchValue}
             ref={this.registerInputElement}
             onChange={this.handleSearchTextboxChange}
-            style={backgroundColor('rgba(0,0,0,0)')}
+            style={inputStyle}
           />
         </div>
 

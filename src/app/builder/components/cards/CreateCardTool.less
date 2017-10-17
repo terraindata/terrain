@@ -26,8 +26,6 @@
   &.create-card-opening .create-card-selector {
     height: 0px;
   }
-  
-
 
   .inset-shadow-veil {
     z-index: 10;
@@ -59,112 +57,63 @@
       display: flex;
     }
 
-    .create-card-selector-inner {
+    .create-card-selector-column {
       flex: 1;
-      max-height: @item-row-height;
-      overflow: auto;
+      border-left: 1px solid;
+      .card-category-selector-title {
+        height: 1em;
+        margin-top: @half-spacing;
+        margin-bottom: @half-spacing;
+        text-align: center;
+      }
+
+      .create-card-selector-inner {
+        max-height: @item-row-height;
+        overflow: auto;
+      }
     }
 
     .card-category-selector {
       width: 160px;
-      border-right: 1px solid;
-      max-height: @item-row-height;
       .card-category-title {
-        margin-top: @spacing;
-        margin-bottom: @spacing;
+        height: 1em;
+        margin-top: @half-spacing;
+        margin-bottom: @half-spacing;
         text-align: center;
       }
 
       .card-category-list {
-        padding: 0px @double-spacing;
+        padding: 0px @spacing;
 
         .card-category-list-item {
           cursor: pointer;
-          margin: @quarter-spacing 0px;
+          margin: 0px;
           text-align: center;
           padding: 3px;
           text-transform: capitalize;
-          
-          .transition;
-        }
+          border-top: 1px solid;
 
+          .big-text;
+          .transition;
+          &:last-child {
+            border-bottom: 1px solid;
+          }
+        }
       }
     }
 
     .card-search-line {
       position: relative;
       z-index: 1;
-      padding: @quarter-spacing;
-      height: 30px;
       border-top: 1px solid;
       .card-search-input {
-        border-radius: 3px;
+        padding: @half-spacing;
+        border-radius: 0px;
+        background-color: none;
       }
     }
   }
-  
-  
-  
-  // .create-card-placeholder {
-  //   @h: 18px;
-  //   height: @h;
-  //   width: calc(~"100% - 24px");
-  //   display: inline-block;
-  //   position: relative;
-  //   border-radius: 3px;
-  //   // margin-top: 6px;
-  //   margin-bottom: 6px;
-  //   margin-left: 12px;
-  //   margin-right: 12px;
-  //   box-sizing: border-box;
-  //   text-align: center;
-  //   cursor: pointer;
-    
-  //   // border: 1px solid #fff;
-    
-  //   opacity: 0.2;
-    
-  //   svg {
-  //     @sh: @h * 2 / 3;
-  //     height: @sh;
-  //     margin-top: (@h - @sh)/2;
-  //     fill: #fff;
-  //   }
-    
-  //   &:hover {
-  //     background: #47a7ff;
-  //     opacity: 1;
-  //     svg {
-  //       fill: #fff;
-  //     }
-  //   }
-    
-  //   .transition;
-  // }
-  
-  &.create-card-open {
-    // .create-card-placeholder {
-    //   // margin-bottom: 0px;
-            
-    //   // svg {
-    //   //   fill: #f00;
-    //   // }
-      
-    //   // &:hover {
-    //   //   background: #f00;
-    //   //   svg {
-    //   //     fill: #fff;
-    //   //   }
-    //   // }
-    // }
-  }
-  
-  // .create-card-close {
-  //   position: absolute;
-  //   right: 8px;
-  //   top: 8px;
-  //   background: rgba(255,0,0,0.25);
-  // }
+
 }
 
 
@@ -175,34 +124,5 @@
   .card .create-line-row {
     opacity: 0.2;
   }
-  // .create-card-wrapper.create-card-closed {
-  //   .create-card-placeholder {
-  //     opacity: 1;
-  //     background: rgba(255,255,255,0.15);
-  //   }
-  // }
-  // .card {
-  //   .create-card-wrapper.create-card-closed {
-  //     .create-card-placeholder {
-  //       opacity: 0.2;
-  //       background: none;
-  //     }
-  //   } 
-  // }
+
 }
-
-// a little experiment to make the placeholders only appear on card hover
-// .create-card-wrapper {
-//   height: 0px;
-//   overflow: hidden;
-// }
-
-// .card-hovering {
-//   .create-card-wrapper {
-//     height: auto;
-//   }
-  
-//   .card .create-card-wrapper {
-//     height: 0px;
-//   }
-// }
