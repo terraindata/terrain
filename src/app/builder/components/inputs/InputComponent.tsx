@@ -250,7 +250,7 @@ class InputComponent extends TerrainComponent<Props>
               canEdit={true}
               textColor={colorForInputType}
             />
-            <div className='input-close' onClick={this.closeInput}>
+            <div className='input-close close' onClick={this.closeInput}>
               <CloseIcon />
             </div>
           </div>

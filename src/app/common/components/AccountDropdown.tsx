@@ -99,7 +99,7 @@ class AccountDropdown extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.account-arrow-icon .st0', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.account-arrow-icon .st0', { fill: Colors().text3 });
   }
 
   public componentWillUnmount()

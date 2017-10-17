@@ -102,9 +102,9 @@ class CardsColumn extends TerrainComponent<Props>
   public componentWillMount()
   {
     ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon ',
-      { fill: Colors().altBg1, background: Colors().bg3 });
+      { fill: Colors().text3, background: Colors().bg3 });
     ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon &:hover ',
-      { 'fill': Colors().bg3, 'background-color': Colors().altBg1 });
+      { 'fill': Colors().bg3, 'background-color': Colors().text3 });
   }
 
   public computeKeyPath(props: Props): KeyPath

@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { SchemaActions } from '../../schema/data/SchemaStore';
+import SchemaActions from 'schema/data/SchemaActions';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
