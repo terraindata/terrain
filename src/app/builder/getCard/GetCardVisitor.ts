@@ -58,7 +58,7 @@ import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 import { Backend } from '../../../database/types/Backend';
-import { Colors, getCardColors } from '../../common/Colors';
+import { Colors, getCardColors } from '../../colors/Colors';
 
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';
@@ -155,8 +155,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         typeName?: string;
         accepts?: List<string>;
 
-        errors?: string[];
-
         getChildTerms?: (card: Card, schemaState) => List<string>;
         getNeighborTerms?: (card: Card, schemaState) => List<string>;
         getParentTerms?: (card: Card, schemaState) => List<string>;
@@ -176,7 +174,6 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
     obj['static'] = _.extend({
       title: clause.name,
       clause,
-      errors: [],
       colors: getCardColors(clause.path[0], Colors().border2),
       language: 'elastic',
       description: clause.desc,

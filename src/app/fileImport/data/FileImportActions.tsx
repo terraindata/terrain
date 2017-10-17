@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { SchemaActions } from '../../schema/data/SchemaStore';
+import SchemaActions from 'schema/data/SchemaActions';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
@@ -67,6 +67,10 @@ const FileImportActions =
     changeTableName:
     (tableName: string) =>
       $(ActionTypes.changeTableName, { tableName }),
+
+    setServerDbTable:
+    (serverId: number, name: string, dbName: string, tableName: string) =>
+      $(ActionTypes.setServerDbTable, { serverId, name, dbName, tableName }),
 
     changeHasCsvHeader:
     (hasCsvHeader: boolean) =>

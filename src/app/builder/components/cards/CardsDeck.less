@@ -96,10 +96,8 @@
   font-size: 14px;
   
   .cards-deck-knob-icon {
-    border: 1px solid @knob-bg;
+    border: 1px solid;
     
-    fill: @knob-color;
-    background: @knob-bg;
     width: 10px;
     padding: 6px;
     border-radius: 3px;
@@ -110,8 +108,8 @@
     top: 6px;
     
     &:hover {
-      background: #fff; //fade(#fff, 90%);
-      fill: @knob-bg;
+       background: #fff; //fade(#fff, 90%);
+       fill: @knob-bg;
     }
   }
   
@@ -121,15 +119,15 @@
   }
 }
 
-.cards-column-deck-open {
+ .cards-column-deck-open {
   .cards-deck-knob {
     .cards-deck-knob-icon {
-      background-color: fade(#fff, 25%);
+    //  background-color: fade(#fff, 25%);
       .rotate180;
       &:hover {
-        background: fade(#fff, 90%);
-        fill: @knob-bg;
+     //   background: fade(#fff, 90%);
+       // fill: @knob-bg;
       }
     }
   }
-}
+ }

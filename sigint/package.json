@@ -9,7 +9,8 @@
     "lint": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;",
-    "test": "jest . --forceExit --coverage"
+    "test": "jest . --forceExit --coverage",
+    "bench": "ts-node test/Benchmark.ts"
   },
   "repository": {
     "type": "git",
@@ -54,8 +55,10 @@
     "winston": "^2.4.0"
   },
   "devDependencies": {
+    "@types/jest": "^21.1.2",
     "@types/koa": "^2.0.39",
     "@types/node": "^8.0.32",
+    "bench-rest": "^1.2.4",
     "jest": "^21.2.1",
     "nodemon": "^1.12.1",
     "ts-jest": "^21.1.0",

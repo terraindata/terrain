@@ -60,11 +60,11 @@ import CardsArea from './CardsArea';
 import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
-import { AllBackendsMap } from '../../../../database/AllBackends';
-import { altStyle, backgroundColor, Colors, fontColor } from '../../../common/Colors';
-
 import { Cards } from '../../../../blocks/types/Card';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 import { ElasticBlocks } from '../../../../database/elastic/blocks/ElasticBlocks';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
+import ColorsActions from './../../../colors/data/ColorsActions';
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
@@ -97,6 +97,14 @@ class CardsColumn extends TerrainComponent<Props>
   public componentDidMount()
   {
     this.handleScroll();
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon ',
+      { fill: Colors().text3, background: Colors().bg3 });
+    ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon &:hover ',
+      { 'fill': Colors().bg3, 'background-color': Colors().text3 });
   }
 
   public computeKeyPath(props: Props): KeyPath
@@ -262,6 +270,7 @@ class CardsColumn extends TerrainComponent<Props>
           >
             <ExpandIcon
               className='cards-deck-knob-icon'
+              style={borderColor(Colors().border1)}
             />
             <div
               className='cards-deck-knob-text'
@@ -269,6 +278,7 @@ class CardsColumn extends TerrainComponent<Props>
             >
               Card Deck
             </div>
+
           </div>
         }
 

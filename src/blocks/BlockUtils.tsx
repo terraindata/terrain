@@ -299,7 +299,7 @@ export function getPreview(card: Card): string
   }
   else if (typeof preview === 'function')
   {
-    return ': ' + preview(card);
+    return preview(card);
   }
   return 'No preview';
 }

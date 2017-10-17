@@ -52,7 +52,7 @@ import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { Card } from '../../../../blocks/types/Card';
-import { backgroundColor, cardStyle, Colors } from '../../../common/Colors';
+import { backgroundColor, cardStyle, Colors } from '../../../colors/Colors';
 import Actions from '../../data/BuilderActions';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './CardsDeck.less';

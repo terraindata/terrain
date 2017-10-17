@@ -48,11 +48,14 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
+import ScheduleControlList from './ScheduleControlList';
 import TemplateControlList from './TemplateControlList';
 
-import { SchemaStore } from 'schema/data/SchemaStore';
 import { Server, ServerMap } from 'schema/SchemaTypes';
+import { SchemaState } from 'schema/SchemaTypes';
+import Util from 'util/Util';
 import ControlActions from '../../data/ControlActions';
 import ControlStore from '../../data/ControlStore';
 
@@ -64,6 +67,8 @@ type Template = FileImportTypes.Template;
 export interface Props
 {
   placeholder?: string;
+  servers: ServerMap;
+  schema: SchemaState;
 }
 
 class ImportExportControl extends TerrainComponent<Props>
@@ -71,9 +76,13 @@ class ImportExportControl extends TerrainComponent<Props>
   public state: {
     servers: ServerMap;
     templates: List<Template>;
+    schedules: List<SchedulerConfig>;
+    credentials: List<CredentialConfig>;
   } = {
-    templates: List([]),
     servers: Map<string, Server>(),
+    templates: List([]),
+    schedules: List([]),
+    credentials: List([]),
   };
 
   constructor(props)
@@ -83,19 +92,27 @@ class ImportExportControl extends TerrainComponent<Props>
       stateKey: 'templates',
       storeKeyPath: ['importExportTemplates'],
     });
-    this._subscribe(SchemaStore, {
-      stateKey: 'servers',
-      storeKeyPath: ['servers'],
+    this._subscribe(ControlStore, {
+      stateKey: 'schedules',
+      storeKeyPath: ['importExportScheduledJobs'],
+    });
+    this._subscribe(ControlStore, {
+      stateKey: 'credentials',
+      storeKeyPath: ['importExportCredentials'],
     });
   }
 
   public componentDidMount()
   {
     ControlActions.importExport.fetchTemplates();
+    ControlActions.importExport.fetchSchedules();
+    ControlActions.importExport.fetchCredentials();
   }
 
   public render()
   {
+    const { schema } = this.props;
+
     return (
       <div className='import-export-token-control-page'>
         <div className='import-export-control-title'>
@@ -103,11 +120,25 @@ class ImportExportControl extends TerrainComponent<Props>
         </div>
         <TemplateControlList
           templates={this.state.templates}
-          servers={this.state.servers}
+          servers={schema.servers}
+          credentials={this.state.credentials}
+        />
+        <div className='import-export-control-title'>
+          Manage Schedules
+        </div>
+        <ScheduleControlList
+          templates={this.state.templates}
+          scheduledJobs={this.state.schedules}
+          servers={schema.servers}
+          credentials={this.state.credentials}
         />
       </div>
     );
   }
 }
 
-export default ImportExportControl;
+export default Util.createContainer(
+  ImportExportControl,
+  ['schema'],
+  {},
+);

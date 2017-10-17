@@ -54,7 +54,7 @@ import * as React from 'react';
 import './Result.less';
 const { List } = Immutable;
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
@@ -169,7 +169,7 @@ class ResultComponent extends TerrainComponent<Props> {
       <div
         className='result-field'
         key={field}
-        style={borderColor(Colors().builder.results.lines)}
+        style={borderColor(Colors().resultLine)}
       >
         {
           showField &&
@@ -309,8 +309,8 @@ class ResultComponent extends TerrainComponent<Props> {
         <div
           className='result-inner'
           style={[
-            borderColor(Colors().builder.results.lines),
-            backgroundColor(Colors().builder.results.background),
+            borderColor(Colors().resultLine),
+            backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
           ]}
         >
           <div className='result-name'>

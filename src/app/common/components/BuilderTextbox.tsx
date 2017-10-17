@@ -52,9 +52,11 @@ import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
+import Util from 'util/Util';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { SchemaState } from 'schema/SchemaTypes';
 import { Display } from '../../../blocks/displays/Display';
 import { Card, CardString } from '../../../blocks/types/Card';
 import { isInput } from '../../../blocks/types/Input';
@@ -64,9 +66,9 @@ import CardDropArea from '../../builder/components/cards/CardDropArea';
 import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
 import Store from '../../builder/data/BuilderStore';
-import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../common/Colors';
+import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../colors/Colors';
+import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import SchemaStore from '../../schema/data/SchemaStore';
 import Autocomplete from './Autocomplete';
 
 const shallowCompare = require('react-addons-shallow-compare');
@@ -81,6 +83,7 @@ export interface Props
   keyPath: KeyPath; // keypath of value
   onChange?: (value: string | number) => void;
   language: string;
+  schema: SchemaState;
 
   id?: string; // TODO remove
 
@@ -142,6 +145,7 @@ class BuilderTextbox extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
+
     this.debouncedChange = _.debounce(this.debouncedChange, 300);
 
     this.state = {
@@ -158,6 +162,13 @@ class BuilderTextbox extends TerrainComponent<Props>
       boxValue: props.value,
       boxValueBuffer: null,
     };
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.builder-tb input &::placeholder ', { color: Colors().text3 + '!important' });
+    ColorsActions.setStyle('.builder-tb input ', { color: Colors().text1 });
+
   }
 
   public getCreatingType(): string
@@ -353,7 +364,9 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public computeOptions()
   {
-    if (this.props.autoDisabled)
+    const { schema, autoDisabled } = this.props;
+
+    if (autoDisabled)
     {
       return;
     }
@@ -362,11 +375,11 @@ class BuilderTextbox extends TerrainComponent<Props>
 
     if (this.props.getAutoTerms)
     {
-      options = this.props.getAutoTerms(SchemaStore.getState());
+      options = this.props.getAutoTerms(schema);
     }
     else
     {
-      options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath);
+      options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath, schema);
     }
 
     if (options && !options.equals(this.state.options))
@@ -493,6 +506,7 @@ class BuilderTextbox extends TerrainComponent<Props>
           'builder-tb-cards-closed': this.props.tuningMode ? card.tuningClosed : card.closed,
         })}
         ref='cards'
+        onClick={this.toggleClosed}
       >
         <div className='builder-tb-cards-input'>
           <div
@@ -501,7 +515,6 @@ class BuilderTextbox extends TerrainComponent<Props>
           >
             <div
               className='builder-tb-cards-toggle'
-              onClick={this.toggleClosed}
             >
               <ArrowIcon />
             </div>
@@ -557,4 +570,8 @@ class BuilderTextbox extends TerrainComponent<Props>
 //       && props.display.accepts.indexOf(monitor.getItem().type) !== -1;
 //   },
 
-export default BuilderTextbox;
+export default Util.createContainer(
+  BuilderTextbox,
+  ['schema'],
+  {},
+);

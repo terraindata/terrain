@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
+import Ajax from 'util/Ajax';
 import ActionTypes from './ControlActionTypes';
 import { ControlStore } from './ControlStore';
 
@@ -83,6 +85,49 @@ const ControlActions =
           handleResetSuccess,
           handleResetError,
           fetchTemplates: ControlActions.importExport.fetchTemplates,
+        }),
+
+      setSchedules:
+      (schedules: List<SchedulerConfig>) =>
+        $(ActionTypes.importExport.setSchedules, { schedules }),
+
+      fetchSchedules:
+      () =>
+        $(ActionTypes.importExport.fetchSchedules, {
+          setSchedules: ControlActions.importExport.setSchedules,
+        }),
+
+      setCredentials:
+      (credentials: List<SchedulerConfig>) =>
+        $(ActionTypes.importExport.setCredentials, { credentials }),
+
+      fetchCredentials:
+      () =>
+        $(ActionTypes.importExport.fetchCredentials, {
+          setCredentials: ControlActions.importExport.setCredentials,
+        }),
+
+      createSchedule:
+      (scheduleName: string, jobType: string, paramsJob: object, schedule: string, sort: string, transport: object, onLoad, onError) =>
+        $(ActionTypes.importExport.createSchedule, {
+          name: scheduleName,
+          jobType,
+          paramsJob,
+          schedule,
+          sort,
+          transport,
+          onLoad,
+          onError,
+          fetchSchedules: ControlActions.importExport.fetchSchedules,
+        }),
+
+      deleteSchedule:
+      (id: ID, onLoad, onError) =>
+        $(ActionTypes.importExport.deleteSchedule, {
+          id,
+          onLoad,
+          onError,
+          fetchSchedules: ControlActions.importExport.fetchSchedules,
         }),
     },
 
