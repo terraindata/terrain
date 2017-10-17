@@ -51,6 +51,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import GaussianGraph from './../../../charts/components/GaussianGraph';
+import * as _ from 'lodash';
 
 export interface Props
 {
@@ -66,6 +67,12 @@ class AggregationGaussian extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
+  }
+
+  public state: {
+    chartState: any,
+  } = {
+    chartState: {},
   }
 
   public componentDidMount()
@@ -109,7 +116,9 @@ class AggregationGaussian extends TerrainComponent<Props>
       stdDevLower: data.std_deviation_bounds.lower,
       average: data.avg,
     };
-
+    this.setState({
+      chartState,
+    });
     return chartState;
   }
 
@@ -122,7 +131,16 @@ class AggregationGaussian extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps)
   {
     const el = ReactDOM.findDOMNode(this);
-    GaussianGraph.update(el, this.getChartState(nextProps));
+    if (!_.isEqual(this.props.data, nextProps.data))
+    {
+      GaussianGraph.update(el, this.getChartState(nextProps));
+    }
+    if (this.props.containerWidth !== nextProps.containerWidth)
+    {
+      const chartState = this.state.chartState;
+      chartState.width = nextProps.containerWidth;
+      GaussianGraph.update(el, chartState);
+    }
   }
 
   public render()

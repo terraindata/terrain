@@ -71,6 +71,12 @@ class AggregationHistogram extends TerrainComponent<Props>
     super(props);
   }
 
+  public state: {
+    chartState: any,
+  } = {
+    chartState: {},
+  }
+
   public componentDidMount()
   {
     const el = ReactDOM.findDOMNode(this);
@@ -196,6 +202,9 @@ class AggregationHistogram extends TerrainComponent<Props>
       colors: this.props.colors,
       xLabels: categories,
     };
+    this.setState({
+      chartState,
+    })
     return chartState;
   }
 
@@ -206,9 +215,18 @@ class AggregationHistogram extends TerrainComponent<Props>
   }
 
   public componentWillReceiveProps(nextProps)
-  {
+  {      
     const el = ReactDOM.findDOMNode(this);
-    Histogram.update(el, this.getChartState(nextProps));
+    if (!_.isEqual(nextProps.data, this.props.data))
+    {
+      Histogram.update(el, this.getChartState(nextProps));
+    }
+    if (this.props.containerWidth !== nextProps.containerWidth)
+    {
+      const chartState = this.state.chartState;
+      chartState.width = nextProps.containerWidth;
+      Histogram.update(el, chartState);
+    }
   }
 
   public render()

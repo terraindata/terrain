@@ -69,6 +69,13 @@ class AggregationScatterPlot extends TerrainComponent<Props>
     super(props);
   }
 
+  public state: {
+    chartState: any,
+  } =
+  {
+    chartState: {},
+  }
+
   public componentDidMount()
   {
     const el = ReactDOM.findDOMNode(this);
@@ -146,6 +153,7 @@ class AggregationScatterPlot extends TerrainComponent<Props>
 
   public getChartState(overrideState?: any)
   {
+    console.log('GET CHART STATE');
     overrideState = overrideState || {};
     const data = overrideState.data || this.props.data;
     const { pointsData, domain, range } = this.parseData(data);
@@ -159,7 +167,9 @@ class AggregationScatterPlot extends TerrainComponent<Props>
       height: 300,
       colors: this.props.colors,
     };
-
+    this.setState({
+      chartState,
+    });
     return chartState;
   }
 
@@ -170,9 +180,18 @@ class AggregationScatterPlot extends TerrainComponent<Props>
   }
 
   public componentWillReceiveProps(nextProps)
-  {
+  {      
     const el = ReactDOM.findDOMNode(this);
-    ScatterPlot.update(el, this.getChartState(nextProps));
+    if (!_.isEqual(nextProps.data, this.props.data))
+    {
+      ScatterPlot.update(el, this.getChartState(nextProps));
+    }
+    if (this.props.containerWidth !== nextProps.containerWidth)
+    {
+      const chartState = this.state.chartState;
+      chartState.width = nextProps.containerWidth;
+      ScatterPlot.update(el, chartState);
+    }
   }
 
   public render()
