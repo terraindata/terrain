@@ -51,6 +51,8 @@ import { List, Map } from 'immutable';
 import * as React from 'react';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { SchemaState } from 'schema/SchemaTypes';
+import Util from 'util/Util';
 import BackendInstance from '../../../database/types/BackendInstance';
 import AuthStore from '../../auth/data/AuthStore';
 import CreateItem from '../../common/components/CreateItem';
@@ -58,7 +60,6 @@ import Dropdown from '../../common/components/Dropdown';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import { SchemaStore } from '../../schema/data/SchemaStore';
 import Ajax from '../../util/Ajax';
 import UserActions from '../data/UserActions';
 import UserStore from '../data/UserStore';
@@ -79,6 +80,7 @@ export interface Props
   params?: any;
   history?: any;
   children?: any;
+  schema: SchemaState;
 }
 
 class Connections extends TerrainComponent<Props>
@@ -95,7 +97,7 @@ class Connections extends TerrainComponent<Props>
     typeIndex: 0,
     loading: true,
     servers: null,
-    expanded: Map(),
+    expanded: Map<number, boolean>(),
     addingConnection: false,
     errorModalOpen: false,
     errorModalMessage: '',
@@ -150,7 +152,7 @@ class Connections extends TerrainComponent<Props>
 
   public updateState()
   {
-    const state = SchemaStore.getState();
+    const { schema: state } = this.props;
     this.setState({
       servers: state.servers,
       loading: state.loading,
@@ -403,4 +405,8 @@ class Connections extends TerrainComponent<Props>
   }
 }
 
-export default Connections;
+export default Util.createContainer(
+  Connections,
+  ['schema'],
+  {},
+);

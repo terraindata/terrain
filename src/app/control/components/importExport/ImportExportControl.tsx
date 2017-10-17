@@ -53,8 +53,9 @@ import * as FileImportTypes from 'fileImport/FileImportTypes';
 import ScheduleControlList from './ScheduleControlList';
 import TemplateControlList from './TemplateControlList';
 
-import { SchemaStore } from 'schema/data/SchemaStore';
 import { Server, ServerMap } from 'schema/SchemaTypes';
+import { SchemaState } from 'schema/SchemaTypes';
+import Util from 'util/Util';
 import ControlActions from '../../data/ControlActions';
 import ControlStore from '../../data/ControlStore';
 
@@ -66,6 +67,8 @@ type Template = FileImportTypes.Template;
 export interface Props
 {
   placeholder?: string;
+  servers: ServerMap;
+  schema: SchemaState;
 }
 
 class ImportExportControl extends TerrainComponent<Props>
@@ -97,10 +100,6 @@ class ImportExportControl extends TerrainComponent<Props>
       stateKey: 'credentials',
       storeKeyPath: ['importExportCredentials'],
     });
-    this._subscribe(SchemaStore, {
-      stateKey: 'servers',
-      storeKeyPath: ['servers'],
-    });
   }
 
   public componentDidMount()
@@ -112,6 +111,8 @@ class ImportExportControl extends TerrainComponent<Props>
 
   public render()
   {
+    const { schema } = this.props;
+
     return (
       <div className='import-export-token-control-page'>
         <div className='import-export-control-title'>
@@ -119,7 +120,7 @@ class ImportExportControl extends TerrainComponent<Props>
         </div>
         <TemplateControlList
           templates={this.state.templates}
-          servers={this.state.servers}
+          servers={schema.servers}
           credentials={this.state.credentials}
         />
         <div className='import-export-control-title'>
@@ -128,7 +129,7 @@ class ImportExportControl extends TerrainComponent<Props>
         <ScheduleControlList
           templates={this.state.templates}
           scheduledJobs={this.state.schedules}
-          servers={this.state.servers}
+          servers={schema.servers}
           credentials={this.state.credentials}
         />
       </div>
@@ -136,4 +137,8 @@ class ImportExportControl extends TerrainComponent<Props>
   }
 }
 
-export default ImportExportControl;
+export default Util.createContainer(
+  ImportExportControl,
+  ['schema'],
+  {},
+);
