@@ -121,7 +121,7 @@ class ResultsColumn extends TerrainComponent<Props>
     if (!_.isEqual(this.props.resultsState.aggregations, nextProps.resultsState.aggregations) && this.state.selectedTab !== 1)
     {
       const aggs = this.props.resultsState.aggregations;
-      
+
       if (_.keys(aggs).length !== 0)
       {
         this.setState({

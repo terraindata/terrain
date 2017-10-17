@@ -169,13 +169,13 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
       }).toSet();
       const cols = List(keys.map((key) =>
       {
-        return { key, name: key, resizable: true};
+        return { key, name: key, resizable: true };
       }));
       return cols;
     }
     else
     {
-      return List([{ key: 'key', name: 'key', resizable: true}, { key: 'value', name: 'value', resizable: true}]);
+      return List([{ key: 'key', name: 'key', resizable: true }, { key: 'value', name: 'value', resizable: true }]);
     }
   }
 
@@ -224,14 +224,14 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
   {
     const actualHeight = ((Number(this.state.rows.length) + 1) * 35 + 20);
     return (
-        <ReactDataGrid
-          columns={this.getColumns().toJS()}
-          rowGetter={this.getRow}
-          rowsCount={this.state.rows.length}
-          minHeight={(actualHeight < 385) ? actualHeight : 385} // add scroll bar size ~ 20
-          onGridSort={this.handleGridSort}
-          minWidth={this.props.containerWidth}
-        />
+      <ReactDataGrid
+        columns={this.getColumns().toJS()}
+        rowGetter={this.getRow}
+        rowsCount={this.state.rows.length}
+        minHeight={(actualHeight < 385) ? actualHeight : 385} // add scroll bar size ~ 20
+        onGridSort={this.handleGridSort}
+        minWidth={this.props.containerWidth}
+      />
     );
   }
 }

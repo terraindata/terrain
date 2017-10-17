@@ -151,8 +151,10 @@ class TQLEditor extends TerrainComponent<Props>
     ColorsActions.setStyle('span.es-boolean', { color: Colors().builder.cards.booleanClause + '!important' });
     ColorsActions.setStyle('span.es-parameter', { color: Colors().builder.cards.inputParameter + '!important' });
     ColorsActions.setStyle('span.es-strin', { color: Colors().builder.cards.stringClause + '!important' });
-    ColorsActions.setStyle('.CodeMirror-scroll', { background: (localStorage.getItem('theme') === 'DARK') ? Colors().bg1 + ' !important' : Colors().bg3 + ' !important' });
-    ColorsActions.setStyle('.CodeMirror-gutters', { background: (localStorage.getItem('theme') === 'DARK') ? Colors().bg1 + ' !important' : Colors().bg3 + ' !important' });
+    ColorsActions.setStyle('.CodeMirror-scroll',
+      { background: (localStorage.getItem('theme') === 'DARK') ? Colors().bg1 + ' !important' : Colors().bg3 + ' !important' });
+    ColorsActions.setStyle('.CodeMirror-gutters',
+      { background: (localStorage.getItem('theme') === 'DARK') ? Colors().bg1 + ' !important' : Colors().bg3 + ' !important' });
   }
 
   public componentWillUnmount()
