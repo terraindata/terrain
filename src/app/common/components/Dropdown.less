@@ -1,7 +1,7 @@
 @import "../../common/Common.less";
 
 @option-height: 26px;
-@dropdown-height: @option-height + 5px;
+@dropdown-height: @option-height + 7px;
 @border-radius: 3px;
 
 .dropdown-wrapper {
@@ -32,7 +32,6 @@
 
  .dropdown-options-wrapper {
   display: none;
-  // color: black;
   background-color: #fff;
   border: 1px solid lightgrey;
  }
@@ -81,7 +80,6 @@
     margin: 0px 6px;
     transition: all 0.05s;
     border-radius: @border-radius;
-    color: #000000;
   }
   
   .dropdown-value {
@@ -92,13 +90,14 @@
     padding-right: 28px; // apply padding that exists in options menu
     padding-top: 2px;
     
+    border: 1px solid;
+    
     .dropdown-option-inner {
       // we keep even the unselected ones around so that the width of
       //  the dropdown can take the width of the widest one
       padding: 0px;
       margin: 0px;
       opacity: 0;
-      color: #000000;
 
       &.dropdown-option-value-selected {
         display: block;

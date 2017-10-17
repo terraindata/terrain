@@ -142,7 +142,7 @@ export class Menu extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.menu-wrapper .menu-icon .st0 ', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.menu-wrapper .menu-icon .st0 ', { fill: Colors().text3 });
   }
 
   public componentWillUnmount()

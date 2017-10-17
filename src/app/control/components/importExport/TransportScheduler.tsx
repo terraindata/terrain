@@ -608,7 +608,7 @@ class TransportScheduler extends TerrainComponent<Props>
         confirmButtonText={'Schedule'}
         confirmDisabled={!validationData.valid}
       >
-        <div className='transport-scheduler' style={backgroundColor(Colors().altBg2)}>
+        <div className='transport-scheduler altBg' style={backgroundColor(Colors().altBg2)}>
           <TemplateSelector
             index={this.state.index}
             templates={this.props.templates}
