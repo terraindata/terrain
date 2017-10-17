@@ -66,15 +66,16 @@ export interface Props
 
 class AggregationHistogram extends TerrainComponent<Props>
 {
-  constructor(props: Props)
-  {
-    super(props);
-  }
 
   public state: {
     chartState: any,
   } = {
     chartState: {},
+  };
+
+  constructor(props: Props)
+  {
+    super(props);
   }
 
   public componentDidMount()
@@ -204,7 +205,7 @@ class AggregationHistogram extends TerrainComponent<Props>
     };
     this.setState({
       chartState,
-    })
+    });
     return chartState;
   }
 
@@ -215,7 +216,7 @@ class AggregationHistogram extends TerrainComponent<Props>
   }
 
   public componentWillReceiveProps(nextProps)
-  {      
+  {
     const el = ReactDOM.findDOMNode(this);
     if (!_.isEqual(nextProps.data, this.props.data))
     {

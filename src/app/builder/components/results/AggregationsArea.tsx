@@ -179,7 +179,7 @@ class AggregationsArea extends TerrainComponent<Props>
       }
       else
       {
-        resultsContent = ( <div className='aggregations-area-aggs'>
+        resultsContent = (<div className='aggregations-area-aggs'>
           {aggregationsList.map((agg, index) =>
           {
             return (

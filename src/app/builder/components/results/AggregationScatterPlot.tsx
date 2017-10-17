@@ -60,20 +60,22 @@ export interface Props
   containerWidth?: number;
 }
 
+const THRESHOLD = 0.000001;
+
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
 
 class AggregationScatterPlot extends TerrainComponent<Props>
 {
-  constructor(props: Props)
-  {
-    super(props);
-  }
-
   public state: {
     chartState: any,
   } =
   {
     chartState: {},
+  };
+
+  constructor(props: Props)
+  {
+    super(props);
   }
 
   public componentDidMount()
@@ -153,7 +155,6 @@ class AggregationScatterPlot extends TerrainComponent<Props>
 
   public getChartState(overrideState?: any)
   {
-    console.log('GET CHART STATE');
     overrideState = overrideState || {};
     const data = overrideState.data || this.props.data;
     const { pointsData, domain, range } = this.parseData(data);
@@ -179,10 +180,47 @@ class AggregationScatterPlot extends TerrainComponent<Props>
     ScatterPlot.destroy(el);
   }
 
+  // TODO: Support for keyed version
+  public isClose(data, newData)
+  {
+    if (typeof data !== typeof newData)
+    {
+      return false;
+    }
+    if (Array.isArray(data))
+    {
+      data.forEach((d, i) =>
+      {
+        if (newData[i].key !== d.key)
+        {
+          return false;
+        }
+        if (Math.abs(newData[i].value - d.value) > THRESHOLD)
+        {
+          return false;
+        }
+      });
+      return true;
+    }
+    const allKeys = (_.keys(data)).concat(_.keys(newData));
+    allKeys.forEach((key) =>
+    {
+      if (newData[key] === undefined || data[key] === undefined)
+      {
+        return false;
+      }
+      if (Math.abs(newData[key] - data[key]) > THRESHOLD)
+      {
+        return false;
+      }
+    });
+    return true;
+  }
+
   public componentWillReceiveProps(nextProps)
-  {      
+  {
     const el = ReactDOM.findDOMNode(this);
-    if (!_.isEqual(nextProps.data, this.props.data))
+    if (!this.isClose(nextProps.data, this.props.data))
     {
       ScatterPlot.update(el, this.getChartState(nextProps));
     }

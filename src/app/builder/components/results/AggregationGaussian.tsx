@@ -47,11 +47,11 @@ THE SOFTWARE.
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions no-var-requires
 
 const Dimensions = require('react-dimensions');
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import GaussianGraph from './../../../charts/components/GaussianGraph';
-import * as _ from 'lodash';
 
 export interface Props
 {
@@ -64,15 +64,16 @@ const GAUSSIAN_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
 
 class AggregationGaussian extends TerrainComponent<Props>
 {
-  constructor(props: Props)
-  {
-    super(props);
-  }
 
   public state: {
     chartState: any,
   } = {
     chartState: {},
+  };
+
+  constructor(props: Props)
+  {
+    super(props);
   }
 
   public componentDidMount()
