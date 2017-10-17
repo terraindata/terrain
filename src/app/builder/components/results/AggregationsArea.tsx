@@ -47,13 +47,11 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as Immutable from 'immutable';
-import './AggregationsArea.less';
 const { Map, List } = Immutable;
+import './AggregationsArea.less';
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
-// import * as moment from 'moment';
-const moment = require('moment');
 const ReactModal = require('react-modal');
 
 import Radium = require('radium');
@@ -66,8 +64,6 @@ import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
 import Aggregation from '../results/Aggregation';
 import { ResultsState } from './ResultTypes';
-
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -140,11 +136,11 @@ class AggregationsArea extends TerrainComponent<Props>
   public renderAggregations()
   {
     const { resultsState } = this.props;
-    const aggs = resultsState.aggregations;
-    let aggregations = Immutable.List([]);
-    _.keys(aggs).forEach((key) =>
+    const previousAggs = resultsState.aggregations;
+    let aggregationsList = List([]);
+    _.keys(previousAggs).forEach((key) =>
     {
-      aggregations = aggregations.push({ [key]: aggs[key] });
+      aggregationsList = aggregationsList.push({ [key]: previousAggs[key] });
     });
 
     let infoAreaContent: any = null;
@@ -161,7 +157,7 @@ class AggregationsArea extends TerrainComponent<Props>
     {
       resultsAreOutdated = true;
       infoAreaContent = <InfoArea
-        large='Results will display here as you build your query.'
+        large='Aggregations will display here as you build your query.'
       />;
     }
     else if (resultsState.hasError)
@@ -173,9 +169,9 @@ class AggregationsArea extends TerrainComponent<Props>
       />;
     }
 
-    else if (aggregations)
+    else if (aggregationsList)
     {
-      if (aggregations.size === 0)
+      if (aggregationsList.size === 0)
       {
         resultsContent = <InfoArea
           large='There are no aggregations for your query.'
@@ -184,25 +180,18 @@ class AggregationsArea extends TerrainComponent<Props>
       else
       {
         resultsContent = (
-          <InfiniteScroll
-            className='aggregations-area-aggs'
-            onRequestMoreItems={this.handleRequestMoreAggregations}
-          >
-            {
-              aggregations.map((agg, index) =>
-              {
-                return (
-                  <Aggregation
-                    aggregation={agg}
-                    index={index}
-                    key={index}
-                    name={_.keys(agg)[0]}
-                    query={this.props.query}
-                  />
-                );
-              })
-            }
-          </InfiniteScroll>
+          aggregationsList.map((agg, index) =>
+          {
+            return (
+              <Aggregation
+                aggregation={agg}
+                index={index}
+                key={index}
+                name={_.keys(agg)[0]}
+                query={this.props.query}
+              />
+            );
+          })   
         );
 
       }
