@@ -128,6 +128,10 @@ const GaussianGraph = {
 
   update(el, state)
   {
+    if (state === undefined)
+    {
+      return;
+    }
     d3.select(el)
       .select('.gaussian-graph')
       .attr('width', state.width)
@@ -192,11 +196,11 @@ const GaussianGraph = {
       });
   },
 
-  _drawGaussianLine(el, scales, average, stdDev, min, max, colors)
+  _drawGaussianLine(el, scales, average, stdDev, min, max, stdDevLower, stdDevUpper, colors)
   {
     d3.select(el).select('.line').remove();
     d3.select(el).select('#gaussian').remove();
-    const data = this._getData(average, stdDev, min, max);
+    const data = this._getData(average, stdDev, Math.min(min, stdDevLower), Math.max(max, stdDevUpper));
     const line = d3.svg.line()
       .x((d) =>
       {
@@ -439,17 +443,22 @@ const GaussianGraph = {
       .append('g')
       .attr('class', 'lower-section-bg');
 
+    const sectionWidth = Math.abs(scales.realX(average) - scales.realX(stdDevLower));
+    const sectionHeight = Math.abs(height - scales.realPointY(rectHeight));
+    const avgHeight = this._gaussian(average, average, stdDev);
+    const maxHeight = Math.abs(height - scales.realPointY(avgHeight));
+
     lowerSection.append('rect')
-      .attr('height', height)
-      .attr('width', scales.realX(average) - scales.realX(stdDevLower))
+      .attr('height', maxHeight)
+      .attr('width', sectionWidth)
       .attr('x', scales.realX(stdDevLower))
-      .attr('y', 0)
+      .attr('y', scales.realPointY(avgHeight))
       .attr('fill', colors[0])
       .attr('clip-path', 'url(#gaussian)');
 
     lowerSection.append('rect')
-      .attr('height', scales.realPointY(rectHeight))
-      .attr('width', scales.realX(average) - scales.realX(stdDevLower))
+      .attr('height', sectionHeight)
+      .attr('width', sectionWidth)
       .attr('x', scales.realX(stdDevLower))
       .attr('y', scales.realPointY(rectHeight))
       .attr('fill', colors[0]);
@@ -459,16 +468,16 @@ const GaussianGraph = {
       .attr('class', 'upper-section-bg');
 
     upperSection.append('rect')
-      .attr('height', height)
-      .attr('width', scales.realX(stdDevUpper) - scales.realX(average))
+      .attr('height', maxHeight)
+      .attr('width', sectionWidth)
       .attr('x', scales.realX(average))
-      .attr('y', 0)
+      .attr('y', scales.realPointY(avgHeight))
       .attr('fill', colors[0])
       .attr('clip-path', 'url(#gaussian)');
 
     upperSection.append('rect')
-      .attr('height', scales.realPointY(rectHeight))
-      .attr('width', scales.realX(stdDevUpper) - scales.realX(average))
+      .attr('height', sectionHeight)
+      .attr('width', sectionWidth)
       .attr('x', scales.realX(average))
       .attr('y', scales.realPointY(rectHeight))
       .attr('fill', colors[0]);
@@ -490,7 +499,7 @@ const GaussianGraph = {
 
     this._drawBg(el, scales);
     this._drawAxes(el, scales, width, height);
-    this._drawGaussianLine(el, scales, average, stdDev, min, max, colors);
+    this._drawGaussianLine(el, scales, average, stdDev, min, max, stdDevLower, stdDevUpper, colors);
     this._drawVerticalLine(el, scales, average, this._gaussian(average, average, stdDev), 'average-line');
     this._drawVerticalLine(el, scales, stdDevUpper, this._gaussian(stdDevUpper, average, stdDev), 'upper-line');
     this._drawVerticalLine(el, scales, stdDevLower, this._gaussian(stdDevLower, average, stdDev), 'lower-line');
@@ -515,7 +524,7 @@ const GaussianGraph = {
       stdDev,
       stdDevLower,
       stdDevUpper,
-      Math.max(this._gaussian(min, average, stdDev), this._gaussian(max, average, stdDev)),
+      this._gaussian(stdDevUpper, average, stdDev),
       colors,
     );
   },

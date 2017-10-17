@@ -83,16 +83,28 @@ class AggregationGaussian extends TerrainComponent<Props>
     GaussianGraph.create(el, this.getChartState());
   }
 
+  public gaussian(x, average, stdDev)
+  {
+    x = (x - average) / stdDev;
+    return GAUSSIAN_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
+  }
+
   public getChartState(overrideState?: any)
   {
     overrideState = overrideState || {};
     const data = overrideState.data || this.props.data;
+    if (data.min === null)
+    {
+      return undefined;
+    }
     const stdDev = data.std_deviation;
-    const maxY = GAUSSIAN_CONSTANT * Math.exp(-1 / (2 * stdDev * stdDev)) / stdDev;
+    const maxY = this.gaussian(data.avg, data.avg, stdDev);
+    const domainMin = Math.min(data.min, data.std_deviation_bounds.lower);
+    const domainMax = Math.max(data.max, data.std_deviation_bounds.upper);
     const chartState = {
       domain: {
-        x: [data.min, data.max],
-        y: [0, maxY + 0.1],
+        x: [domainMin, domainMax],
+        y: [0, maxY + 0.1 * maxY],
       },
       width: overrideState.containerWidth || this.props.containerWidth || 300,
       height: 300,

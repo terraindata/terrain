@@ -111,6 +111,7 @@ class ResultsColumn extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
+
     if (!this.props.resultsState.hits.equals(nextProps.resultsState.hits) && this.state.selectedTab !== 0)
     {
       this.setState({

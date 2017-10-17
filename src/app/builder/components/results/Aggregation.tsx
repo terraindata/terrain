@@ -322,7 +322,7 @@ class AggregationComponent extends TerrainComponent<Props> {
                           className='aggregation-title-bar-export-icon'
                           onClick={this.exportData}
                           key='results-area-export'
-                          style={getStyle('fill', Colors().text1)}
+                          style={getStyle('fill', Colors().altBg1)}
                         />, 'Export to CSV')
                       }
                     </div>
