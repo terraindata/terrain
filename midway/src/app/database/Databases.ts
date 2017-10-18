@@ -135,6 +135,11 @@ export class Databases
       db = Util.updateObject(results[0], db);
     }
 
+    if (db.isAnalytics === undefined)
+    {
+      db.isAnalytics = false;
+    }
+
     return App.DB.upsert(this.databaseTable, db) as Promise<DatabaseConfig>;
   }
 
