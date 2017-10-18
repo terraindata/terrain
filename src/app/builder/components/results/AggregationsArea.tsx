@@ -195,7 +195,6 @@ class AggregationsArea extends TerrainComponent<Props>
             );
           })}
         </div>);
-
       }
     }
     return (
