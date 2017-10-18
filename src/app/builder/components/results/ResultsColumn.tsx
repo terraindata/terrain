@@ -114,6 +114,11 @@ class ResultsColumn extends TerrainComponent<Props>
     }
     if (!_.isEqual(this.props.resultsState.aggregations, nextProps.resultsState.aggregations) && this.state.selectedTab !== 1)
     {
+<<<<<<< HEAD
+      this.setState({
+        highlightedTabs: this.state.highlightedTabs.set('aggregations', true),
+      });
+=======
       const aggs = this.props.resultsState.aggregations;
 
       if (_.keys(aggs).length !== 0)
@@ -122,6 +127,7 @@ class ResultsColumn extends TerrainComponent<Props>
           highlightedTabs: this.state.highlightedTabs.set('aggregations', true),
         });
       }
+>>>>>>> 65d9da6eb6bd90a310a92280be85204071dd106b
     }
     if (this.props.query.resultsViewMode !== nextProps.query.resultsViewMode)
     {

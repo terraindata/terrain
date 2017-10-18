@@ -327,7 +327,10 @@ class AggregationComponent extends TerrainComponent<Props> {
                           onClick={this.exportData}
                           key='results-area-export'
                           style={getStyle('fill', Colors().iconColor)}
-                        />, 'Export to CSV')
+                        />, {
+                            title: 'Export to CSV',
+                            distance: 5,
+                          })
                       }
                     </div>
                     :
@@ -339,7 +342,10 @@ class AggregationComponent extends TerrainComponent<Props> {
                       tooltip(<ClipboardIcon
                         className='clipboard-icon'
                         style={getStyle('fill', Colors().iconColor)}
-                      />, 'Copy JSON to Clipboard')
+                      />, {
+                          title: 'Copy JSON to Clipboard',
+                          distance: 20,
+                        })
                     }
                   </div>
                 </CopyToClipboard>
