@@ -157,7 +157,7 @@ export class Databases
       throw new Error('Database does not have an ID');
     }
 
-    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
+    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn, db.analyticsIndex, db.analyticsType);
     DatabaseRegistry.set(db.id, controller);
 
     // try to provision built-in scripts to the connected database

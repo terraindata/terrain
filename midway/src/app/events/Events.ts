@@ -48,6 +48,7 @@ import bodybuilder = require('bodybuilder');
 import * as Elastic from 'elasticsearch';
 import * as winston from 'winston';
 
+import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
@@ -94,10 +95,10 @@ export class Events
   private eventTable: Tasty.Table;
   private eventMetadataTable: Tasty.Table;
 
-  constructor()
+  public async initializeEventMetadata(tasty: Tasty.Tasty, index: string, type: string): Promise<void>
   {
     this.eventTable = new Tasty.Table(
-      'events',
+      type,
       [],
       [
         'eventid',
@@ -106,22 +107,19 @@ export class Events
         'source',
         'timestamp',
       ],
-      'terrain-analytics',
+      index,
     );
 
     this.eventMetadataTable = new Tasty.Table(
-      'eventMetadata',
+      type + '-metadata',
       [],
       [
         'id',
         'name',
       ],
-      'terrain-analytics',
+      index,
     );
-  }
 
-  public async initializeMetadata(tasty: Tasty.Tasty): Promise<void>
-  {
     tasty.upsert(this.eventMetadataTable,
       [
         {
@@ -154,25 +152,25 @@ export class Events
       ]).then().catch();
   }
 
-  public async getMetadata(tasty: Tasty.Tasty, filter: object): Promise<string>
+  public async getMetadata(controller: DatabaseController, filter: object): Promise<string>
   {
-    return JSON.stringify(tasty.select(this.eventMetadataTable, [], filter));
+    return JSON.stringify(controller.getTasty().select(this.eventMetadataTable, [], filter));
   }
 
-  public async addEventMetadata(tasty: Tasty.Tasty, event: object): Promise<EventMetadataConfig>
+  public async addEventMetadata(controller: DatabaseController, event: object): Promise<EventMetadataConfig>
   {
-    return tasty.upsert(this.eventMetadataTable, event) as Promise<EventMetadataConfig>;
+    return controller.getTasty().upsert(this.eventMetadataTable, event) as Promise<EventMetadataConfig>;
   }
 
   /*
    * Store an analytics event in ES
    */
-  public async storeEvent(tasty: Tasty.Tasty, event: EventConfig): Promise<EventConfig>
+  public async storeEvent(controller: DatabaseController, event: EventConfig): Promise<EventConfig>
   {
-    return tasty.upsert(this.eventTable, event) as Promise<EventConfig>;
+    return controller.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 
-  public generateHistogramQuery(variantid: string, request: AggregationRequest): Elastic.SearchParams
+  public generateHistogramQuery(controller: DatabaseController, variantid: string, request: AggregationRequest): Elastic.SearchParams
   {
     const body = bodybuilder()
       .size(0)
@@ -190,15 +188,15 @@ export class Events
         interval: request.interval,
       },
     );
-    return this.buildQuery(body.build());
+    return this.buildQuery(controller, body.build());
   }
 
-  public async getHistogram(client: ElasticClient, variantid: string, request: AggregationRequest): Promise<object>
+  public async getHistogram(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
-      const query = this.generateHistogramQuery(variantid, request);
-      this.runQuery(client, query, (response) =>
+      const query = this.generateHistogramQuery(controller, variantid, request);
+      this.runQuery(controller, query, (response) =>
       {
         resolve({
           [variantid]: response['aggregations'][request.agg].buckets,
@@ -207,7 +205,7 @@ export class Events
     });
   }
 
-  public generateRateQuery(variantid: string, request: AggregationRequest): Elastic.SearchParams
+  public generateRateQuery(controller: DatabaseController, variantid: string, request: AggregationRequest): Elastic.SearchParams
   {
     const eventids: string[] = request.eventid.split(',');
     const numerator = request.agg + '_' + eventids[0];
@@ -274,10 +272,10 @@ export class Events
         }),
     );
 
-    return this.buildQuery(body.build());
+    return this.buildQuery(controller, body.build());
   }
 
-  public async getRate(client: ElasticClient, variantid: string, request: AggregationRequest): Promise<object>
+  public async getRate(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
@@ -286,8 +284,8 @@ export class Events
       const denominator = request.agg + '_' + eventids[1];
       const rate = request.agg + '_' + eventids[0] + '_' + eventids[1];
 
-      const query = this.generateRateQuery(variantid, request);
-      this.runQuery(client, query, (response) =>
+      const query = this.generateRateQuery(controller, variantid, request);
+      this.runQuery(controller, query, (response) =>
       {
         resolve({
           [variantid]: response['aggregations'].histogram.buckets.map(
@@ -307,7 +305,7 @@ export class Events
     });
   }
 
-  public generateSelectQuery(variantid: string, request: AggregationRequest): Elastic.SearchParams
+  public generateSelectQuery(controller: DatabaseController, variantid: string, request: AggregationRequest): Elastic.SearchParams
   {
     let body = bodybuilder()
       .filter('term', 'variantid', variantid)
@@ -329,15 +327,15 @@ export class Events
         winston.info('Ignoring malformed field value');
       }
     }
-    return this.buildQuery(body.build());
+    return this.buildQuery(controller, body.build());
   }
 
-  public async getAllEvents(client: ElasticClient, variantid: string, request: AggregationRequest): Promise<object>
+  public async getAllEvents(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>((resolve, reject) =>
     {
-      const query = this.generateSelectQuery(variantid, request);
-      this.runQuery(client, query, (response) =>
+      const query = this.generateSelectQuery(controller, variantid, request);
+      this.runQuery(controller, query, (response) =>
       {
         resolve({
           [variantid]: response['hits'].hits.map((e) => e['_source']),
@@ -346,7 +344,7 @@ export class Events
     });
   }
 
-  public async AggregationHandler(client: ElasticClient, request: AggregationRequest): Promise<object[]>
+  public async AggregationHandler(controller: DatabaseController, request: AggregationRequest): Promise<object[]>
   {
     const variantids = request['variantid'].split(',');
     const promises: Array<Promise<any>> = [];
@@ -359,7 +357,7 @@ export class Events
 
       for (const variantid of variantids)
       {
-        promises.push(this.getHistogram(client, variantid, request));
+        promises.push(this.getHistogram(controller as ElasticController, variantid, request));
       }
     }
     else if (request['agg'] === 'rate')
@@ -377,31 +375,34 @@ export class Events
 
       for (const variantid of variantids)
       {
-        promises.push(this.getRate(client, variantid, request));
+        promises.push(this.getRate(controller as ElasticController, variantid, request));
       }
     }
     else if (request['agg'] === 'select')
     {
       for (const variantid of variantids)
       {
-        promises.push(this.getAllEvents(client, variantid, request));
+        promises.push(this.getAllEvents(controller as ElasticController, variantid, request));
       }
     }
     return Promise.all(promises);
   }
 
-  private buildQuery(body: object): Elastic.SearchParams
+  private buildQuery(controller: DatabaseController, body: object): Elastic.SearchParams
   {
-    return {
-      index: 'terrain-analytics',
-      type: 'events',
-      body,
-    };
+    const query = controller.getAnalyticsDB();
+    if (query['index'] === undefined || query['type'] === undefined)
+    {
+      throw new Error('Required analytics query parameters \"index\" or \"type\" is missing');
+    }
+
+    query['body'] = body;
+    return query;
   }
 
-  private runQuery(client: ElasticClient, query: Elastic.SearchParams, resolve: (T) => void, reject: (Error) => void): void
+  private runQuery(controller: ElasticController, query: Elastic.SearchParams, resolve: (T) => void, reject: (Error) => void): void
   {
-    client.search(query, Util.makePromiseCallback(resolve, reject));
+    controller.getClient().search(query, Util.makePromiseCallback(resolve, reject));
   }
 }
 

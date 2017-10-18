@@ -87,7 +87,7 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
     throw new Error('Database "' + String(ctx.request.query.database) + '" not found.');
   }
 
-  const response: object[] = await events.AggregationHandler(database.getClient() as any, ctx.request.query);
+  const response: object[] = await events.AggregationHandler(database, ctx.request.query);
   ctx.body = response.reduce((acc, x) =>
   {
     for (const key in x)
@@ -110,7 +110,7 @@ Router.get('/:databaseid', passport.authenticate('access-token-local'), async (c
   {
     throw new Error('Database "' + String(databaseid) + '" not found.');
   }
-  ctx.body = await events.getMetadata(database.getTasty(), ctx.request.query);
+  ctx.body = await events.getMetadata(database, ctx.request.query);
 });
 
 Router.get('/:databaseid/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -125,7 +125,7 @@ Router.get('/:databaseid/:id', passport.authenticate('access-token-local'), asyn
     throw new Error('Database "' + String(databaseid) + '" not found.');
   }
 
-  ctx.body = await events.getMetadata(database.getTasty(), { id });
+  ctx.body = await events.getMetadata(database, { id });
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -145,7 +145,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
     throw new Error('Database "' + String(databaseid) + '" not found.');
   }
 
-  ctx.body = await events.addEventMetadata(database.getTasty(), events);
+  ctx.body = await events.addEventMetadata(database, events);
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -173,7 +173,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   }
 
   winston.info('modify event' + String(event.id));
-  ctx.body = await events.addEventMetadata(database.getTasty(), event);
+  ctx.body = await events.addEventMetadata(database, event);
 });
 
 export default Router;
