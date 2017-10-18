@@ -204,17 +204,17 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleAlgorithmDuplicateConfirm()
   {
+    const groupId = _.keys(this.props.groups.toJS()).sort()[this.state.duplicateAlgorithmGroupIndex];
     const id = this.state.duplicateAlgorithmId;
     const index = this.props.algorithmsOrder.findIndex((iid) => iid === id);
     const dbs = this.getSortedDatabases(this.props.dbs);
     const dbIndex = this.getNewAlgorithmIndex();
-    const sorted = this.props.groups.sortBy((group) => group.id);
     this.props.algorithmActions.duplicate(
       this.props.algorithms.get(id),
-      this.props.algorithmsOrder.findIndex((iid) => iid === id),
+      index,
       this.state.duplicateAlgorithmTextboxValue,
       dbs.get(dbIndex),
-      sorted[this.state.duplicateAlgorithmGroupIndex].id,
+      this.props.groups.get(parseFloat(groupId)).id,
     );
     this.setState({
       duplicatingAlgorithm: false,
@@ -629,14 +629,22 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderGroupDropdown()
   {
-    const groupNames = this.getSortedGroupNames();
+    const values = _.keys(this.props.groups.toJS())
+      .map((key) => parseFloat(key))
+      .sort();
+    let groupNames = Immutable.Map<number, string>({});
+    _.keys(this.props.groups.toJS()).forEach((key) =>
+    {
+      groupNames = groupNames.set(parseFloat(key), this.props.groups.get(parseFloat(key)).name);
+    });
     return (
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
           <div className='duplicate-algorithm-child-message'>Please select a group for the duplicate algorithm.</div>
           <Dropdown
             selectedIndex={this.state.duplicateAlgorithmGroupIndex}
-            options={Immutable.List(groupNames)}
+            options={Immutable.List(values)}
+            optionsDisplayName={groupNames}
             onChange={this.handleDuplicateAlgorithmGroupChange}
             canEdit={true}
             directionBias={90}
