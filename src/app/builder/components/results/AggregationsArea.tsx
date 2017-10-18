@@ -52,18 +52,11 @@ import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
 import './AggregationsArea.less';
-const ReactModal = require('react-modal');
-
 import Radium = require('radium');
-import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
-import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import InfoArea from '../../../common/components/InfoArea';
-import Modal from '../../../common/components/Modal';
-import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Ajax from '../../../util/Ajax';
 import Actions from '../../data/BuilderActions';
 import Aggregation from '../results/Aggregation';
 import { ResultsState } from './ResultTypes';

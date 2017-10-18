@@ -50,13 +50,10 @@ import { List, Map, Set } from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-
 import './AggregationsTable.less';
-
 import * as ReactDataGrid from 'react-data-grid';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
-import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 const Dimensions = require('react-dimensions');
 
@@ -93,7 +90,6 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
   public populateRows(tableData, useBuckets)
   {
     let rows = [];
-    const rows2 = [];
     if (useBuckets)
     {
       rows = _.values(tableData);
