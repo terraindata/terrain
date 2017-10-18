@@ -108,14 +108,12 @@ class ResultsColumn extends TerrainComponent<Props>
   {
     if (!this.props.resultsState.hits.equals(nextProps.resultsState.hits) && this.state.selectedTab !== 0)
     {
-      console.log("New hit");
       this.setState({
         highlightedTabs: this.state.highlightedTabs.set('hits', true),
       });
     }
     if (!_.isEqual(this.props.resultsState.aggregations, nextProps.resultsState.aggregations) && this.state.selectedTab !== 1)
     {
-      console.log("New agg");
       const aggs = this.props.resultsState.aggregations;
 
       if (_.keys(aggs).length !== 0)

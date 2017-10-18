@@ -93,6 +93,7 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
   public populateRows(tableData, useBuckets)
   {
     let rows = [];
+    const columns = this.getColumns();
     if (useBuckets)
     {
       rows = _.values(tableData);
@@ -184,42 +185,6 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
     return this.state.rows[i];
   }
 
-  public handleGridSort(sortColumn, sortDirection)
-  {
-    const comparer = (aa, bb) =>
-    {
-      const a = aa[sortColumn];
-      const b = bb[sortColumn];
-
-      if (sortDirection === 'ASC')
-      {
-        return (a > b) ? 1 : -1;
-      }
-      else if (sortDirection === 'DESC')
-      {
-        return (a < b) ? 1 : -1;
-      }
-      else
-      {
-        return 0;
-      }
-    };
-
-    let rows;
-    if (sortDirection === 'NONE')
-    {
-      rows = this.state.rows;
-    }
-    else
-    {
-      rows = this.state.rows.sort(comparer);
-    }
-
-    this.setState({
-      rows,
-    });
-  }
-
   public render()
   {
     const actualHeight = ((Number(this.state.rows.length) + 1) * 35 + 20);
@@ -229,7 +194,6 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
         rowGetter={this.getRow}
         rowsCount={this.state.rows.length}
         minHeight={(actualHeight < 385) ? actualHeight : 385} // add scroll bar size ~ 20
-        onGridSort={this.handleGridSort}
         minWidth={this.props.containerWidth}
       />
     );
