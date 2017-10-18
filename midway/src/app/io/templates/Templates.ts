@@ -44,44 +44,51 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions variable-name
+import * as srs from 'secure-random-string';
+import * as winston from 'winston';
+import * as Tasty from '../../../tasty/Tasty';
+import * as App from '../../App';
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as Redux from 'redux';
-import * as ReduxActions from 'redux-actions';
-import thunk from 'redux-thunk';
+import { UserConfig } from '../../users/UserRouter';
+import * as Util from '../../Util';
 
-import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
-import * as FileImportTypes from 'fileImport/FileImportTypes';
-import Util from 'util/Util';
-import ControlReducers from './ControlReducers';
-
-type Template = FileImportTypes.Template;
-
-const { List } = Immutable;
-
-class ControlStateC
+export interface TemplateBase
 {
-  public importTemplates: List<Template> = List([]);
-  public exportTemplates: List<Template> = List([]);
-  public importExportScheduledJobs: List<SchedulerConfig> = List([]);
-  public importExportCredentials: List<CredentialConfig> = List([]);
+  // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
+  // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
+  columnTypes: object;
+  dbid: number;           // instance id
+  dbname: string;         // for elastic, index name
+  id?: number;
+  name: string;
+  originalNames: string[];    // array of strings (oldName)
+  persistentAccessToken?: string;    // persistent access token
+  primaryKeyDelimiter?: string;
+  primaryKeys: string[];  // newName of primary key(s)
+  tablename: string;      // for elastic, type name
+  transformations: object[];  // list of in-order data transformations
 }
 
-const ControlState_Record = Immutable.Record(new ControlStateC());
-export interface ControlState extends ControlStateC, IRecord<ControlState> { }
-export const _ControlState = (config?: any) =>
+export interface TemplateBaseStringified
 {
-  return new ControlState_Record(Util.extendId(config || {})) as any as ControlState;
-};
+  columnTypes: string;
+  dbid: number;
+  dbname: string;
+  id?: number;
+  name: string;
+  originalNames: string;
+  persistentAccessToken?: string;
+  primaryKeyDelimiter: string;
+  primaryKeys: string;
+  tablename: string;
+  transformations: string;
+}
 
-const DefaultState = _ControlState();
+export type ImportTemplateConfig = TemplateBase;
 
-export const ControlStore = Redux.createStore(
-  ControlReducers,
-  DefaultState,
-  Redux.applyMiddleware(thunk),
-);
+class Templates
+{
 
-export default ControlStore;
+}
+
+export default Templates;

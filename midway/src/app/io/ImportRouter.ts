@@ -44,44 +44,55 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires strict-boolean-expressions variable-name
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as stream from 'stream';
+import * as winston from 'winston';
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as Redux from 'redux';
-import * as ReduxActions from 'redux-actions';
-import thunk from 'redux-thunk';
+import { HA } from '../App';
+import { Permissions } from '../permissions/Permissions';
+import { UserConfig } from '../users/Users';
+import * as Util from '../Util';
+import { Import } from './Import';
+import ImportTemplateRouter from './templates/ImportTemplateRouter';
 
-import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
-import * as FileImportTypes from 'fileImport/FileImportTypes';
-import Util from 'util/Util';
-import ControlReducers from './ControlReducers';
+const Router = new KoaRouter();
+export const imprt: Import = new Import();
+const perm: Permissions = new Permissions();
 
-type Template = FileImportTypes.Template;
+Router.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.allowedMethods());
 
-const { List } = Immutable;
-
-class ControlStateC
+Router.post('/', async (ctx, next) =>
 {
-  public importTemplates: List<Template> = List([]);
-  public exportTemplates: List<Template> = List([]);
-  public importExportScheduledJobs: List<SchedulerConfig> = List([]);
-  public importExportCredentials: List<CredentialConfig> = List([]);
-}
+  winston.info('importing to database');
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  if (authStream['user'] === null)
+  {
+    ctx.status = 400;
+    return;
+  }
+  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
+  Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
+  // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
 
-const ControlState_Record = Immutable.Record(new ControlStateC());
-export interface ControlState extends ControlStateC, IRecord<ControlState> { }
-export const _ControlState = (config?: any) =>
+  await perm.ImportPermissions.verifyDefaultRoute(authStream['user'] as UserConfig, authStream['fields']);
+
+  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
+});
+
+Router.post('/headless', async (ctx, next) =>
 {
-  return new ControlState_Record(Util.extendId(config || {})) as any as ControlState;
-};
+  winston.info('importing to database, from file and template id');
+  const authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
+  if (authStream['template'] === null)
+  {
+    ctx.status = 400;
+    return;
+  }
+  Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
 
-const DefaultState = _ControlState();
+  // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
+  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
+});
 
-export const ControlStore = Redux.createStore(
-  ControlReducers,
-  DefaultState,
-  Redux.applyMiddleware(thunk),
-);
-
-export default ControlStore;
+export default Router;
