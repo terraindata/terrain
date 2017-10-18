@@ -99,9 +99,7 @@ class AggregationHistogram extends TerrainComponent<Props>
       domainMax = buckets.length;
       categories = buckets.map((bucket) =>
       {
-        const to = bucket.to !== undefined ? String(bucket.to) : '';
-        const from = bucket.from !== undefined ? String(bucket.from) : '';
-        return from + '-' + to;
+        return bucket.key;
       });
       data = buckets.map((bucket, i) =>
       {
