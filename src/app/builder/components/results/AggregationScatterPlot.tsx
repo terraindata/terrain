@@ -60,7 +60,7 @@ export interface Props
   containerWidth?: number;
 }
 
-const THRESHOLD = 0.000001;
+const THRESHOLD = 0.1;
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
 
@@ -98,7 +98,7 @@ class AggregationScatterPlot extends TerrainComponent<Props>
       pointsData = data.map((d, id) =>
       {
         const x = d.key;
-        const y = d.value;
+        const y = !isNaN(d.value) ? d.value : 0;
         if (y > maxRange)
         {
           maxRange = y;
@@ -124,7 +124,7 @@ class AggregationScatterPlot extends TerrainComponent<Props>
       pointsData = (_.keys(data)).map((key, id) =>
       {
         const x = parseFloat(key);
-        const y = data[key];
+        const y = !isNaN(data[key]) ? data[key] : 0;
         if (y > maxRange)
         {
           maxRange = y;
@@ -189,23 +189,26 @@ class AggregationScatterPlot extends TerrainComponent<Props>
     }
     if (Array.isArray(data))
     {
-      data.forEach((d, i) =>
+      for (let i = 0; i < data.length; i++)
       {
-        if (newData[i].key !== d.key)
+        const newValue = newData[i].value;
+        const value = data[i].value;
+        if (isNaN(newValue) || isNaN(value) || newData[i].key !== data[i].key)
         {
           return false;
         }
-        if (Math.abs(newData[i].value - d.value) > THRESHOLD)
+        if (Math.abs(newValue - value) > THRESHOLD)
         {
           return false;
         }
-      });
+      }
       return true;
     }
     const allKeys = (_.keys(data)).concat(_.keys(newData));
-    allKeys.forEach((key) =>
+    for (let i = 0; i < allKeys.length; i++)
     {
-      if (newData[key] === undefined || data[key] === undefined)
+      const key = allKeys[i];
+      if (isNaN(newData[key]) || isNaN(data[key]) || newData[key] === undefined || data[key] === undefined)
       {
         return false;
       }
@@ -213,7 +216,7 @@ class AggregationScatterPlot extends TerrainComponent<Props>
       {
         return false;
       }
-    });
+    }
     return true;
   }
 

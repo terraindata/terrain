@@ -235,6 +235,7 @@ class AggregationComponent extends TerrainComponent<Props> {
   {
     const currAgg = this.props.query.aggregationList.get(this.props.name);
     currAgg.expanded = !this.state.expanded;
+
     Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), currAgg);
     this.setState({
       expanded: !this.state.expanded,
@@ -406,6 +407,11 @@ class AggregationComponent extends TerrainComponent<Props> {
       default:
         return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
     }
+  }
+
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    return (!(_.isEqual(this.props, nextProps) && _.isEqual(this.state, nextState)));
   }
 
   public canBeTable(overrideAggregation?)

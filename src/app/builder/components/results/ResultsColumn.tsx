@@ -227,7 +227,6 @@ class ResultsColumn extends TerrainComponent<Props>
           <AggregationsArea
             query={this.props.query}
             db={this.props.db}
-            onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
           />
         );
