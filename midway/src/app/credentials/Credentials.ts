@@ -157,10 +157,6 @@ export class Credentials
       // if modifying existing credential, check for existence
       if (cred.id !== undefined)
       {
-        if (cred.createdBy !== user.id)
-        {
-          return reject('Only user who created this credential can modify it.');
-        }
         cred.permissions = cred.permissions === undefined ? 0 : cred.permissions;
         const creds: CredentialConfig[] = await this.get(cred.id);
         if (creds.length === 0)
@@ -169,6 +165,10 @@ export class Credentials
           return reject('Invalid credential id passed');
         }
 
+        if (creds[0].createdBy !== user.id)
+        {
+          return reject('Only the user who created this credential can modify it.');
+        }
         const id = creds[0].id;
         if (id === undefined)
         {
@@ -186,6 +186,7 @@ export class Credentials
       }
       else
       {
+        cred.createdBy = user.id !== undefined ? user.id : -1;
         cred.meta = await this._encrypt(cred.meta);
       }
       let newCredObj: object = await App.DB.upsert(this.credentialTable, cred) as object;

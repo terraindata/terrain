@@ -126,11 +126,11 @@ class ColorManager
   private static ALT_COLORS =
   [
     '#00A7F7',
-    '#009788',
     '#8AC541',
     '#FFEC18',
     '#FF9900',
-    '#00BCD6',
+    '#F123F9',
+    '#23F9E2',
     '#48B14B',
     '#CCDD1F',
     '#FFC200',
