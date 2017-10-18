@@ -84,7 +84,7 @@ class TemplateList extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.list-items-item-wrapper .st1', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.list-items-item-wrapper .st1', { fill: Colors().text3 });
 
   }
 

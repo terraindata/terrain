@@ -227,7 +227,7 @@ class LibraryItem extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.library-item .library-item-title-bar .library-item-icon svg, .cls-1 ', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.library-item .library-item-title-bar .library-item-icon svg, .cls-1 ', { fill: Colors().text3 });
   }
 
   public componentDidMount()

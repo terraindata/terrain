@@ -562,14 +562,14 @@ const LIGHT: Theme =
 
     text1: '#161616',
     text2: '#242424',
-    text3: '#424242',
+    text3: 'rgba(0,0,0,0.40)',
 
-    altBg1: 'rgba(0,0,0,0.40)', //'rgb(39, 39, 39)',
+    altBg1: '#fff',
     altBg2: '#EDEFF3',
 
-    altText1: '#fff',
-    altText2: '#fff',
-    altText3: 'rgba(255,255,255,0.5)',
+    altText1: '#000',
+    altText2: '#242424',
+    altText3: '#424242',
 
     altHighlight: 'rgba(255,255,255,0.15)',
 

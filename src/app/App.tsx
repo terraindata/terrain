@@ -86,6 +86,7 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // for error reporting
 
 // data that needs to be loaded
+import SchemaActions from 'schema/data/SchemaActions';
 import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
@@ -95,7 +96,6 @@ import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
-import { SchemaActions, SchemaStore } from './schema/data/SchemaStore';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
@@ -168,6 +168,7 @@ interface Props
     pathname: string,
   };
   children: any;
+  schemaActions: any;
 }
 
 const APP_STYLE = _.extend({},
@@ -252,11 +253,6 @@ class App extends TerrainComponent<Props>
     //   storeKeyPath: ['loaded'],
     // });
 
-    this._subscribe(SchemaStore, {
-      stateKey: 'schemaLoaded',
-      storeKeyPath: ['loaded'],
-    });
-
     this._subscribe(ColorsStore, {
       stateKey: 'stylesTag',
       storeKeyPath: ['styles'],
@@ -279,10 +275,12 @@ class App extends TerrainComponent<Props>
     ColorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
     ColorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
     ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
+    ColorsActions.setStyle('.altBg', { color: Colors().altText1 });
     ColorsActions.setStyle('.card-muted-input input:hover', { 'background': Colors().inputBg + ' !important', 'border-color': Colors().inputBorder });
-    ColorsActions.setStyle('.close', { fill: Colors().altBg1 });
+    ColorsActions.setStyle('.close svg', { fill: Colors().text2 });
+    ColorsActions.setStyle('.close:hover svg', { fill: Colors().activeText });
     ColorsActions.setStyle('.dropdown-value', { 'border-color': Colors().inputBorder });
-    ColorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().altBg1 });
+    ColorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().text3 });
     ColorsActions.setStyle('.button', { backgroundColor: Colors().active, color: Colors().activeText });
 
     const tooltipStyles = generateThemeStyles();
@@ -297,7 +295,7 @@ class App extends TerrainComponent<Props>
     UserActions.fetch();
     TerrainStore.dispatch(LibraryActions.fetch());
     LibraryStore.dispatch(LibraryActions.fetch());
-    SchemaActions.fetch();
+    this.props.schemaActions.fetch();
     // RolesActions.fetch();
   }
 
@@ -428,4 +426,8 @@ class App extends TerrainComponent<Props>
   }
 }
 
-export default App;
+export default Util.createContainer(
+  App,
+  [],
+  { schemaActions: SchemaActions },
+);

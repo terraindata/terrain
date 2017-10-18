@@ -202,8 +202,8 @@ export class Tabs extends TerrainComponent<TabsProps> {
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action svg', { fill: Colors().altBg1 });
-    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action', { 'border-color': Colors().altBg1 });
+    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action svg', { fill: Colors().text3 });
+    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action', { 'border-color': Colors().text3 });
   }
 
   public componentWillUnmount()
