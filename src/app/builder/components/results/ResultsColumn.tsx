@@ -260,6 +260,6 @@ class ResultsColumn extends TerrainComponent<Props>
 const ACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().active), backgroundColor(Colors().bg3));
 const INACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().bg3), backgroundColor(Colors().bg2));
 const ACTIVE_TAB_NUMBER_STYLE = _.extend({}, fontColor(Colors().text1), backgroundColor(Colors().active));
-const INACTIVE_TAB_NUMBER_STYLE = _.extend({}, fontColor(Colors().altText1), backgroundColor(Colors().altBg1));
+const INACTIVE_TAB_NUMBER_STYLE = _.extend({}, fontColor(Colors().altText1), backgroundColor((localStorage.getItem('theme') === 'DARK' ) ? Colors().altBg1 : Colors().bg1));
 
 export default ResultsColumn;

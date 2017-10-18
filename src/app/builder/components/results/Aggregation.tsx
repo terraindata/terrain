@@ -325,7 +325,7 @@ class AggregationComponent extends TerrainComponent<Props> {
                           className='aggregation-title-bar-export-icon'
                           onClick={this.exportData}
                           key='results-area-export'
-                          style={getStyle('fill', Colors().altBg1)}
+                          style={getStyle('fill', Colors().iconColor)}
                         />, 'Export to CSV')
                       }
                     </div>
@@ -337,7 +337,7 @@ class AggregationComponent extends TerrainComponent<Props> {
                     {
                       tooltip(<ClipboardIcon
                         className='clipboard-icon'
-                        style={getStyle('fill', Colors().text1)}
+                        style={getStyle('fill', Colors().iconColor)}
                       />, 'Copy JSON to Clipboard')
                     }
                   </div>
