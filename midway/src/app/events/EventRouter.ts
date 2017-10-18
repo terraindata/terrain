@@ -49,6 +49,8 @@ import * as KoaRouter from 'koa-router';
 import * as _ from 'lodash';
 import * as winston from 'winston';
 
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../Util';
 import { EventMetadataConfig, Events } from './Events';
 
@@ -57,6 +59,7 @@ const Router = new KoaRouter();
 
 // * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
 // * variantid: list of variantids
+// * database: database (connection) id
 // * start: start time of the interval
 // * end: end time of the interval
 // * agg: supported aggregation operations are:
@@ -74,10 +77,17 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
 {
   Util.verifyParameters(
     JSON.parse(JSON.stringify(ctx.request.query)),
-    ['start', 'end', 'eventid', 'variantid', 'agg'],
+    ['database', 'start', 'end', 'eventid', 'variantid', 'agg'],
   );
   winston.info('getting events for variant');
-  const response: object[] = await events.AggregationHandler(ctx.request.query);
+
+  const database: DatabaseController | undefined = DatabaseRegistry.get(ctx.request.query.database);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + String(ctx.request.query.database) + '" not found.');
+  }
+
+  const response: object[] = await events.AggregationHandler(database.getClient() as any, ctx.request.query);
   ctx.body = response.reduce((acc, x) =>
   {
     for (const key in x)
@@ -91,36 +101,58 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
   }, {});
 });
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/:databaseid', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all events');
-  ctx.body = await events.getMetadata({});
+  const databaseid = ctx.params.databaseid;
+  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + String(databaseid) + '" not found.');
+  }
+  ctx.body = await events.getMetadata(database.getTasty(), ctx.request.query);
 });
 
-Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/:databaseid/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  const databaseid = ctx.params.databaseid;
   const id = ctx.params.id;
   winston.info('getting event ID ' + String(id));
-  ctx.body = await events.getMetadata({ id });
+
+  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + String(databaseid) + '" not found.');
+  }
+
+  ctx.body = await events.getMetadata(database.getTasty(), { id });
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('add event');
   const event: EventMetadataConfig = ctx.request.body.body;
-  Util.verifyParameters(event, ['name']);
+  Util.verifyParameters(event, ['database', 'name']);
   if (event.id !== undefined)
   {
     throw new Error('Invalid parameter event ID');
   }
 
-  ctx.body = await events.addEvent(events);
+  const databaseid = ctx.request.body.body.database;
+  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + String(databaseid) + '" not found.');
+  }
+
+  ctx.body = await events.addEventMetadata(database.getTasty(), events);
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  winston.info('update event');
   const event: EventMetadataConfig = ctx.request.body.body;
-  Util.verifyParameters(event, ['name']);
+  Util.verifyParameters(event, ['database', 'name']);
   if (event.id === undefined)
   {
     event.id = Number(ctx.params.id);
@@ -133,8 +165,15 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
     }
   }
 
+  const databaseid = ctx.request.body.body.database;
+  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + String(databaseid) + '" not found.');
+  }
+
   winston.info('modify event' + String(event.id));
-  ctx.body = await events.addEvent(event);
+  ctx.body = await events.addEventMetadata(database.getTasty(), event);
 });
 
 export default Router;

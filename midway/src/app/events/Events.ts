@@ -48,6 +48,7 @@ import bodybuilder = require('bodybuilder');
 import * as Elastic from 'elasticsearch';
 import * as winston from 'winston';
 
+import ElasticClient from '../../database/elastic/client/ElasticClient';
 import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
 import * as DBUtil from '../../database/Util';
@@ -92,13 +93,9 @@ export class Events
 {
   private eventTable: Tasty.Table;
   private eventMetadataTable: Tasty.Table;
-  private elasticController: ElasticController;
 
   constructor()
   {
-    const elasticConfig: ElasticConfig = DBUtil.DSNToConfig('elastic', 'http://127.0.0.1:9200') as ElasticConfig;
-    this.elasticController = new ElasticController(elasticConfig, 0, 'Analytics');
-
     this.eventTable = new Tasty.Table(
       'events',
       [],
@@ -121,9 +118,11 @@ export class Events
       ],
       'terrain-analytics',
     );
+  }
 
-    // tslint:disable-next-line:no-floating-promises
-    this.elasticController.getTasty().upsert(this.eventMetadataTable,
+  public async initializeMetadata(tasty: Tasty.Tasty): Promise<void>
+  {
+    tasty.upsert(this.eventMetadataTable,
       [
         {
           id: 1,
@@ -155,22 +154,22 @@ export class Events
       ]).then().catch();
   }
 
-  public async getMetadata(filter: object): Promise<string>
+  public async getMetadata(tasty: Tasty.Tasty, filter: object): Promise<string>
   {
-    return JSON.stringify(this.elasticController.getTasty().select(this.eventMetadataTable, [], filter));
+    return JSON.stringify(tasty.select(this.eventMetadataTable, [], filter));
   }
 
-  public async addEvent(event: object): Promise<EventMetadataConfig>
+  public async addEventMetadata(tasty: Tasty.Tasty, event: object): Promise<EventMetadataConfig>
   {
-    return this.elasticController.getTasty().upsert(this.eventMetadataTable, event) as Promise<EventMetadataConfig>;
+    return tasty.upsert(this.eventMetadataTable, event) as Promise<EventMetadataConfig>;
   }
 
   /*
    * Store an analytics event in ES
    */
-  public async storeEvent(event: EventConfig): Promise<EventConfig>
+  public async storeEvent(tasty: Tasty.Tasty, event: EventConfig): Promise<EventConfig>
   {
-    return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
+    return tasty.upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 
   public generateHistogramQuery(variantid: string, request: AggregationRequest): Elastic.SearchParams
@@ -194,12 +193,12 @@ export class Events
     return this.buildQuery(body.build());
   }
 
-  public async getHistogram(variantid: string, request: AggregationRequest): Promise<object>
+  public async getHistogram(client: ElasticClient, variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
       const query = this.generateHistogramQuery(variantid, request);
-      this.runQuery(query, (response) =>
+      this.runQuery(client, query, (response) =>
       {
         resolve({
           [variantid]: response['aggregations'][request.agg].buckets,
@@ -278,7 +277,7 @@ export class Events
     return this.buildQuery(body.build());
   }
 
-  public async getRate(variantid: string, request: AggregationRequest): Promise<object>
+  public async getRate(client: ElasticClient, variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
@@ -288,7 +287,7 @@ export class Events
       const rate = request.agg + '_' + eventids[0] + '_' + eventids[1];
 
       const query = this.generateRateQuery(variantid, request);
-      this.runQuery(query, (response) =>
+      this.runQuery(client, query, (response) =>
       {
         resolve({
           [variantid]: response['aggregations'].histogram.buckets.map(
@@ -333,12 +332,12 @@ export class Events
     return this.buildQuery(body.build());
   }
 
-  public async getAllEvents(variantid: string, request: AggregationRequest): Promise<object>
+  public async getAllEvents(client: ElasticClient, variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>((resolve, reject) =>
     {
       const query = this.generateSelectQuery(variantid, request);
-      this.runQuery(query, (response) =>
+      this.runQuery(client, query, (response) =>
       {
         resolve({
           [variantid]: response['hits'].hits.map((e) => e['_source']),
@@ -347,7 +346,7 @@ export class Events
     });
   }
 
-  public async AggregationHandler(request: AggregationRequest): Promise<object[]>
+  public async AggregationHandler(client: ElasticClient, request: AggregationRequest): Promise<object[]>
   {
     const variantids = request['variantid'].split(',');
     const promises: Array<Promise<any>> = [];
@@ -360,7 +359,7 @@ export class Events
 
       for (const variantid of variantids)
       {
-        promises.push(this.getHistogram(variantid, request));
+        promises.push(this.getHistogram(client, variantid, request));
       }
     }
     else if (request['agg'] === 'rate')
@@ -378,14 +377,14 @@ export class Events
 
       for (const variantid of variantids)
       {
-        promises.push(this.getRate(variantid, request));
+        promises.push(this.getRate(client, variantid, request));
       }
     }
     else if (request['agg'] === 'select')
     {
       for (const variantid of variantids)
       {
-        promises.push(this.getAllEvents(variantid, request));
+        promises.push(this.getAllEvents(client, variantid, request));
       }
     }
     return Promise.all(promises);
@@ -400,12 +399,9 @@ export class Events
     };
   }
 
-  private runQuery(query: Elastic.SearchParams, resolve: (T) => void, reject: (Error) => void): void
+  private runQuery(client: ElasticClient, query: Elastic.SearchParams, resolve: (T) => void, reject: (Error) => void): void
   {
-    this.elasticController.getClient().search(
-      query,
-      Util.makePromiseCallback(resolve, reject),
-    );
+    client.search(query, Util.makePromiseCallback(resolve, reject));
   }
 }
 
