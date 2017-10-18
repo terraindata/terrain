@@ -163,6 +163,10 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
       {
         if (key === 'doc_count' || key === 'bg_count' || key === 'score')
         {
+          return 3;
+        }
+        if (key === 'to' || key === 'to_as_string')
+        {
           return 2;
         }
         return 1;
