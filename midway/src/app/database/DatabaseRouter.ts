@@ -57,7 +57,7 @@ export const databases = new Databases();
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all databases');
-  ctx.body = await databases.select(['id', 'name', 'type', 'host', 'status', 'analyticsIndex', 'analyticsType'], ctx.request.query);
+  ctx.body = await databases.select(['id', 'name', 'type', 'host', 'status', 'isAnalytics', 'analyticsIndex', 'analyticsType']);
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>

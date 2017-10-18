@@ -81,10 +81,10 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
   );
   winston.info('getting events for variant');
 
-  const database: DatabaseController | undefined = DatabaseRegistry.get(ctx.request.query.database);
+  const database: DatabaseController | undefined = DatabaseRegistry.get(Number(ctx.request.query.database));
   if (database === undefined)
   {
-    throw new Error('Database "' + String(ctx.request.query.database) + '" not found.');
+    throw new Error('Database "' + String(ctx.request.query.database) + '" does not exist or does not have analytics enabled.');
   }
 
   const response: object[] = await events.AggregationHandler(database, ctx.request.query);
@@ -108,9 +108,9 @@ Router.get('/:databaseid', passport.authenticate('access-token-local'), async (c
   const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
   if (database === undefined)
   {
-    throw new Error('Database "' + String(databaseid) + '" not found.');
+    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
-  ctx.body = await events.getMetadata(database, ctx.request.query);
+  ctx.body = await events.getMetadata(database);
 });
 
 Router.get('/:databaseid/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -122,7 +122,7 @@ Router.get('/:databaseid/:id', passport.authenticate('access-token-local'), asyn
   const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
   if (database === undefined)
   {
-    throw new Error('Database "' + String(databaseid) + '" not found.');
+    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
 
   ctx.body = await events.getMetadata(database, { id });
@@ -142,7 +142,7 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
   if (database === undefined)
   {
-    throw new Error('Database "' + String(databaseid) + '" not found.');
+    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
 
   ctx.body = await events.addEventMetadata(database, events);
@@ -169,7 +169,7 @@ Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, nex
   const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
   if (database === undefined)
   {
-    throw new Error('Database "' + String(databaseid) + '" not found.');
+    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
 
   winston.info('modify event' + String(event.id));

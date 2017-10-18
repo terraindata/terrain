@@ -86,6 +86,8 @@ export class Databases
         'host',
         'status',
         'isAnalytics',
+        'analyticsIndex',
+        'analyticsType',
       ],
     );
   }
@@ -99,7 +101,7 @@ export class Databases
     return App.DB.delete(this.databaseTable, { id } as DatabaseConfig);
   }
 
-  public async select(columns: string[], filter: object): Promise<DatabaseConfig[]>
+  public async select(columns: string[], filter?: object): Promise<DatabaseConfig[]>
   {
     return App.DB.select(this.databaseTable, columns, filter) as Promise<DatabaseConfig[]>;
   }

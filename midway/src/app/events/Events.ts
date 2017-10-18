@@ -152,7 +152,7 @@ export class Events
       ]).then().catch();
   }
 
-  public async getMetadata(controller: DatabaseController, filter: object): Promise<string>
+  public async getMetadata(controller: DatabaseController, filter?: object): Promise<string>
   {
     return JSON.stringify(controller.getTasty().select(this.eventMetadataTable, [], filter));
   }
