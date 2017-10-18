@@ -53,6 +53,7 @@ import * as React from 'react';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import ColorsActions from '../../../colors/data/ColorsActions';
 import DragHandle from '../../../common/components/DragHandle';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ManualInfo from '../../../manual/components/ManualInfo';
@@ -277,6 +278,12 @@ class CardField extends TerrainComponent<Props>
     }
 
     $('.card-field-wrapper-moving').removeClass('card-field-wrapper-moving');
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.card-field-add .st0', { fill: Colors().iconColor });
+
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -516,7 +523,7 @@ const REMOVE_TOOL_STYLE = _.extend({},
 const ADD_TOOL_STYLE = _.extend({},
   getStyle('fill', Colors().text1),
   backgroundColor('transparent', Colors().inactiveHover),
-  borderColor(Colors().text1),
+  borderColor(Colors().iconColor),
 );
 
 const CARD_FIELD_MOVING_STYLE = _.extend({},

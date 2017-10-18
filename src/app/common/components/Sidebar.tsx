@@ -84,7 +84,7 @@ export class Sidebar extends TerrainComponent<Props>
   {
     ColorsActions.setStyle('.sidebar-expand-icon', { fill: Colors().text2 });
     ColorsActions.setStyle('.sidebar-expand:hover .sidebar-expand-icon', { fill: Colors().text1 });
-    ColorsActions.setStyle('.sidebar-link svg', { fill: Colors().text1 });
+    ColorsActions.setStyle('.sidebar-link svg', { fill: Colors().iconColor });
     ColorsActions.setStyle('.sidebar-link .sidebar-link-inner-selected svg', { fill: Colors().activeText });
   }
 

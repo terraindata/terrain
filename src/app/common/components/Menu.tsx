@@ -144,7 +144,7 @@ export class Menu extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    // ColorsActions.setStyle('.menu-wrapper .menu-icon .st0 ', { fill: Colors().text3 });
+    ColorsActions.setStyle('.menu-wrapper .menu-icon:hover .st0 ', { fill: 'red' });
   }
 
   public componentWillUnmount()
@@ -197,14 +197,14 @@ export class Menu extends TerrainComponent<Props>
           'menu-wrapper-right': this.props.openRight,
         })}
         style={[
-          borderColor(this.state.open ? Colors().active : Colors().text1),
+          borderColor(this.state.open ? Colors().active : Colors().iconColor),
           this.props.style ? this.props.style : null,
         ]}
       >
         <div
           className='menu-icon-wrapper'
           onClick={this.toggleOpen}
-          style={fontColor(this.state.open ? Colors().active : Colors().text1, Colors().active)}
+          style={fontColor(this.state.open ? Colors().active : Colors().iconColor, Colors().active)}
         >
           <MoreIcon className='menu-icon' />
         </div>
