@@ -93,7 +93,7 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
   public populateRows(tableData, useBuckets)
   {
     let rows = [];
-    const columns = this.getColumns();
+    const rows2 = [];
     if (useBuckets)
     {
       rows = _.values(tableData);
@@ -103,6 +103,10 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
       const flatJson = this.flatten(tableData);
       rows = _.keys(flatJson).map((key) =>
       {
+        if (flatJson[key] === null)
+        {
+          flatJson[key] = 0;
+        }
         return { key, value: flatJson[key] };
       });
     }

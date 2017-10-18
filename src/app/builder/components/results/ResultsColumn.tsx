@@ -160,16 +160,16 @@ class ResultsColumn extends TerrainComponent<Props>
             <div className='results-column-tab-name' style={fontColor(Colors().text1)}>{name}</div>
             {
               (name.toLowerCase() !== 'raw') ?
-              <div
-                className='results-column-tab-number'
-                style={ this.state.highlightedTabs.get(name.toLowerCase()) ? ACTIVE_TAB_NUMBER_STYLE : INACTIVE_TAB_NUMBER_STYLE }
-              >
-                { this.getNumberOf(name) }
-              </div>
-              :
-              <div
-                className='results-column-tab-number'
-              />
+                <div
+                  className='results-column-tab-number'
+                  style={this.state.highlightedTabs.get(name.toLowerCase()) ? ACTIVE_TAB_NUMBER_STYLE : INACTIVE_TAB_NUMBER_STYLE}
+                >
+                  {this.getNumberOf(name)}
+                </div>
+                :
+                <div
+                  className='results-column-tab-number'
+                />
             }
           </div>,
         )}
@@ -256,7 +256,8 @@ class ResultsColumn extends TerrainComponent<Props>
 
 const ACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().active), backgroundColor(Colors().bg3));
 const INACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().bg3), backgroundColor(Colors().bg2));
-const ACTIVE_TAB_NUMBER_STYLE = _.extend({}, fontColor(Colors().text1), backgroundColor(Colors().active));
-const INACTIVE_TAB_NUMBER_STYLE = _.extend({}, fontColor(Colors().altText1), backgroundColor((localStorage.getItem('theme') === 'DARK' ) ? Colors().altBg1 : Colors().bg1));
+const ACTIVE_TAB_NUMBER_STYLE = _.extend({}, fontColor('#fff'), backgroundColor(Colors().active));
+const INACTIVE_TAB_NUMBER_STYLE = _.extend({},
+  fontColor(Colors().altText1), backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().altBg1 : Colors().bg1));
 
 export default ResultsColumn;

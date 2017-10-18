@@ -403,9 +403,9 @@ class AggregationComponent extends TerrainComponent<Props> {
       case DISPLAY_TYPES.Gaussian:
         return this.renderGaussian(values);
       case DISPLAY_TYPES.Raw:
-        return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
+        return <pre className='aggregation-raw'> {JSON.stringify(values, undefined, 2)} </pre>;
       default:
-        return <pre> {JSON.stringify(values, undefined, 2)} </pre>;
+        return <pre className='aggregation-raw'> {JSON.stringify(values, undefined, 2)} </pre>;
     }
   }
 
@@ -464,7 +464,7 @@ class AggregationComponent extends TerrainComponent<Props> {
   {
     const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
     const values = _.values(aggregation)[0];
-    return values.std_deviation !== undefined;
+    return values.std_deviation !== undefined && values.std_deviation !== null;
   }
 
   public renderGaussian(values)
@@ -492,7 +492,7 @@ class AggregationComponent extends TerrainComponent<Props> {
   {
     const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
     const values = _.values(aggregation)[0];
-    return values.values !== undefined;
+    return values.values !== undefined && values.values !== null;
   }
 
   // Most buckets aggregations
