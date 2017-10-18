@@ -53,31 +53,16 @@ import { HA } from '../App';
 import { Permissions } from '../permissions/Permissions';
 import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
-import { ExportConfig, Import } from './Import';
+import { Export, ExportConfig } from './Export';
+import ExportTemplateRouter from './templates/ExportTemplateRouter';
 
 const Router = new KoaRouter();
-export const imprt: Import = new Import();
+export const exprt: Export = new Export();
 const perm: Permissions = new Permissions();
 
-Router.post('/', async (ctx, next) =>
-{
-  winston.info('importing to database');
-  const authStream: object = await Util.authenticateStream(ctx.req);
-  if (authStream['user'] === null)
-  {
-    ctx.status = 400;
-    return;
-  }
-  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
-  Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
-  // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
+Router.use('/templates', ExportTemplateRouter.routes(), ExportTemplateRouter.allowedMethods());
 
-  await perm.ImportPermissions.verifyDefaultRoute(authStream['user'] as UserConfig, authStream['fields']);
-
-  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
-});
-
-Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const requestObj: object = JSON.parse(ctx.request.body.data).body;
   Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'dbname', 'filetype', 'query', 'rank', 'transformations']);
@@ -85,14 +70,14 @@ Router.post('/export', passport.authenticate('access-token-local'), async (ctx, 
 
   await perm.ImportPermissions.verifyExportRoute(ctx.state.user, requestObj);
 
-  const exportReturn: stream.Readable | string = await imprt.export(exprtConf, false);
+  const exportReturn: stream.Readable | string = await exprt.export(exprtConf, false);
 
   ctx.type = 'text/plain';
   ctx.attachment(ctx.request.body.filename);
   ctx.body = exportReturn;
 });
 
-Router.post('/export/headless', async (ctx, next) =>
+Router.post('/headless', async (ctx, next) =>
 {
   const exprtConf: ExportConfig = ctx.request.body.body;
   const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.body);
@@ -109,24 +94,9 @@ Router.post('/export/headless', async (ctx, next) =>
   }
   else
   {
-    const exportReturn: stream.Readable | string = await imprt.export(exprtConf, true);
+    const exportReturn: stream.Readable | string = await exprt.export(exprtConf, true);
     ctx.body = exportReturn;
   }
-});
-
-Router.post('/headless', async (ctx, next) =>
-{
-  winston.info('importing to database, from file and template id');
-  const authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
-  if (authStream['template'] === null)
-  {
-    ctx.status = 400;
-    return;
-  }
-  Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
-
-  // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
-  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
 });
 
 export default Router;

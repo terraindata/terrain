@@ -245,6 +245,8 @@ class TransportScheduler extends TerrainComponent<Props>
 
   public componentDidMount()
   {
+    const template: Template = this.state.index !== -1 ? this.props.templates.get(this.state.index) : undefined;
+
     this.setState({
       index: this.props.index,
     });
@@ -296,7 +298,7 @@ class TransportScheduler extends TerrainComponent<Props>
       scheduleName: this.state.scheduleNameValue,
       fileType: fileTypeOptions.get(this.state.fileTypeIndex),
       filename: this.state.filenameValue,
-      objectKey: this.state.objectKeyValue,
+      objectKey: template.objectKey ? template.objectKey : this.state.objectKeyValue,
       variantId: this.state.selectedIds.get(2),
       credentialId: credential && credential.id,
       cronArgs: [this.state.cronParam0, this.state.cronParam1, this.state.cronParam2, this.state.cronParam3, this.state.cronParam4],
@@ -545,11 +547,22 @@ class TransportScheduler extends TerrainComponent<Props>
             {
               showObjectKeyField &&
               <div className='headless-form-input'>
-                <input
-                  value={this.state.objectKeyValue}
-                  onChange={this._setStateWrapperPath('objectKeyValue', 'target', 'value')}
-                  style={inputStyle}
-                />
+                {
+                  template.objectKey !== '' ?
+                    <input
+                      value={template.objectKey}
+                      onChange={this._setStateWrapperPath('objectKeyValue', 'target', 'value')}
+                      style={_.extend({}, inputStyle, backgroundColor(Colors().altHighlight))}
+                      disabled={true}
+                    />
+                    :
+                    <input
+                      value={this.state.objectKeyValue}
+                      onChange={this._setStateWrapperPath('objectKeyValue', 'target', 'value')}
+                      style={inputStyle}
+                    />
+                }
+
               </div>
             }
           </div>
@@ -588,7 +601,7 @@ class TransportScheduler extends TerrainComponent<Props>
       scheduleName: this.state.scheduleNameValue,
       fileType: fileTypeOptions.get(this.state.fileTypeIndex),
       filename: this.state.filenameValue,
-      objectKey: this.state.objectKeyValue,
+      objectKey: template.objectKey ? template.objectKey : this.state.objectKeyValue,
       variantId: this.state.selectedIds.get(2),
       credentialId: credential && credential.id,
       cronArgs: [this.state.cronParam0, this.state.cronParam1, this.state.cronParam2, this.state.cronParam3, this.state.cronParam4],
