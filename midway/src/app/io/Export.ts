@@ -72,6 +72,46 @@ export interface ExportConfig extends TemplateBase, ExportTemplateConfig
   update: boolean;      // false means replace (instead of update) ; default should be true
 }
 
+function temporaryFindIndexAndType(queryObj)
+{
+  let index = '';
+  let type = '';
+  try
+  {
+    const filters = queryObj['body']['query']['bool']['filter'];
+    for (const filter of filters)
+    {
+      try
+      {
+        if (filter['term']['_index'] !== undefined)
+        {
+          index = filter['term']['_index'];
+        }
+      }
+      catch (e)
+      {
+        // do nothing
+      }
+      try
+      {
+        if (filter['term']['_type'] !== undefined)
+        {
+          type = filter['term']['_index'];
+        }
+      }
+      catch (e)
+      {
+        // do nothing
+      }
+    }
+  }
+  catch (e)
+  {
+    return [];
+  }
+  return [index, type];
+}
+
 export class Export
 {
   private BATCH_SIZE: number = 5000;
@@ -99,10 +139,13 @@ export class Export
       {
         return reject('Filetype must be either CSV or JSON.');
       }
-      if (exprt.filetype === 'json [type object]' && exprt.objectKey === undefined)
+
+      let objectKeyValue: string | undefined;
+      if (exprt.filetype === 'json [type object]' && exprt.objectKey !== undefined)
       {
-        return reject('Must provide an object key if exporting in json [type object] format.');
+        objectKeyValue = exprt.objectKey;
       }
+
       if (headless)
       {
         // get a template given the template ID
@@ -120,6 +163,11 @@ export class Export
         {
           exprt[templateKey] = template[templateKey];
         }
+      }
+
+      if (exprt.filetype === 'json [type object]' && objectKeyValue !== undefined)
+      {
+        exprt.objectKey = objectKeyValue;
       }
 
       let qry: string = '';
@@ -162,16 +210,16 @@ export class Export
       {
         return reject(e);
       }
-
-      if (qryObj['index'] === '')
+      const [queryIndex, queryType] = temporaryFindIndexAndType(qryObj);
+      if (queryIndex === '')
       {
         return reject('Must provide an index.');
       }
-      if (qryObj['index'] !== exprt['dbname'])
+      if (queryIndex !== exprt['dbname'])
       {
         return reject('Query index name does not match supplied index name.');
       }
-      const tableName: string = qryObj['type'] !== '' ? qryObj['type'] : undefined;
+      const tableName: string | undefined = queryType !== '' ? queryType : undefined;
       let rankCounter: number = 1;
       let writer: any;
       if (exprt.filetype === 'csv')

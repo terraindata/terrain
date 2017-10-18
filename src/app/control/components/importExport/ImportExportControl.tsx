@@ -111,14 +111,14 @@ class ImportExportControl extends TerrainComponent<Props>
     this.getExportSchedules = memoizeOne(this.getExportSchedules);
   }
 
-  public getImportSchedules(schedules: List<SchedulerConfig>)
+  public getImportSchedules(schedules: List<SchedulerConfig>): List<SchedulerConfig>
   {
-    return schedules.filter((v: SchedulerConfig) => v.jobType === 'import');
+    return schedules.filter((v: SchedulerConfig) => v.jobType === 'import').toList();
   }
 
-  public getExportSchedules(schedules: List<SchedulerConfig>)
+  public getExportSchedules(schedules: List<SchedulerConfig>): List<SchedulerConfig>
   {
-    return schedules.filter((v: SchedulerConfig) => v.jobType === 'export');
+    return schedules.filter((v: SchedulerConfig) => v.jobType === 'export').toList();
   }
 
   public componentDidMount()
@@ -147,7 +147,7 @@ class ImportExportControl extends TerrainComponent<Props>
         </div>
         <ScheduleControlList
           templates={this.state.importTemplates}
-          scheduledJobs={this.state.schedules}
+          scheduledJobs={this.getImportSchedules(this.state.schedules)}
           servers={schema.servers}
           credentials={this.state.credentials}
         />
@@ -164,7 +164,7 @@ class ImportExportControl extends TerrainComponent<Props>
         </div>
         <ScheduleControlList
           templates={this.state.exportTemplates}
-          scheduledJobs={this.state.schedules}
+          scheduledJobs={this.getExportSchedules(this.state.schedules)}
           servers={schema.servers}
           credentials={this.state.credentials}
         />

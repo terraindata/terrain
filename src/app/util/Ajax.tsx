@@ -806,7 +806,7 @@ export const Ajax =
       };
       Ajax.req(
         'post',
-        'import/export/',
+        'export/',
         payload,
         onLoadHandler,
         {
@@ -828,6 +828,7 @@ export const Ajax =
       name: string,
       exporting: boolean,
       primaryKeyDelimiter: string,
+      objectKey: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -843,6 +844,7 @@ export const Ajax =
         name,
         export: exporting,
         primaryKeyDelimiter,
+        objectKey,
       };
       const onLoadHandler = (resp) =>
       {

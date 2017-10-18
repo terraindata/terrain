@@ -68,11 +68,16 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
         { // TODO move this translation to _Template
-          return FileImportTypes._Template(_.extend({}, template, {
-            templateId: template['id'],
-            templateName: template['name'],
-            originalNames: List<string>(template['originalNames']),
-          }));
+          return FileImportTypes._Template(_.extend({},
+            template,
+            {
+              export: action.payload.exporting,
+              templateId: template['id'],
+              templateName: template['name'],
+              originalNames: List<string>(template['originalNames']),
+            },
+            action.payload.exporting ? { objectKey: template['objectKey'] } : {},
+          ));
         },
         ));
         action.payload.setTemplates(templates, action.payload.exporting);

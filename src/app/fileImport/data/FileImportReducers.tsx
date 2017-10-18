@@ -236,7 +236,7 @@ FileImportReducers[ActionTypes.setTypeObjectKey] =
   (state, action) =>
     state
       .set('isDirty', true)
-      .set('objectKey', action.payload.setTypeObjectKey)
+      .set('objectKey', action.payload.typeObjectKey)
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
@@ -404,7 +404,8 @@ FileImportReducers[ActionTypes.setTemplates] =
 FileImportReducers[ActionTypes.saveTemplate] =
   (state, action) =>
   {
-    const { serverId, dbName, tableName } = action.payload;
+    const { serverId, dbName, tableName, objectKey } = action.payload;
+
     Ajax.saveTemplate(
       dbName !== undefined ? dbName : state.dbName,
       tableName !== undefined ? tableName : state.tableName,
@@ -419,6 +420,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       action.payload.templateName,
       action.payload.exporting,
       state.primaryKeyDelimiter,
+      state.objectKey,
       () =>
       {
         action.payload.handleTemplateSaveSuccess();
@@ -489,7 +491,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
           FileImportTypes._Template({
-            export: template['export'],
+            export: action.payload.exporting,
             templateId: template['id'],
             templateName: template['name'],
             originalNames: List<string>(template['originalNames']),
