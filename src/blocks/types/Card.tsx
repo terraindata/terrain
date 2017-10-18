@@ -46,9 +46,13 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { Display } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
+
+import ESClause from '../../../shared/database/elastic/parser/clauses/ESClause';
+import ESValueInfo from '../../../shared/database/elastic/parser/ESValueInfo';
 
 export type InitFn = (blockSpec: { [type: string]: BlockConfig }, extraConfig?: { [key: string]: any }, skipTemplate?: boolean) => {
   [k: string]: any;
@@ -64,6 +68,7 @@ export interface Card extends IRecord<Card>
   tuning?: boolean; // whether the card is in the tuning section
   // whether a card in tuning column is collapsed (needs to be sep. from closed)
   tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
+  errors: List<string>;
 
   // the following fields are excluded from the server save
   static: {
@@ -81,6 +86,9 @@ export interface Card extends IRecord<Card>
     //    e.g. "$DIRECTION" will look up "DirectionTQL" in CommonSQL and pass the value into it
     // - topTql is the tql to use if this card is at the top level of a query
     tql: TQLFn;
+    toValueInfo?: (block: Block, blockPath: KeyPath) => ESValueInfo;
+    updateCards?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
+    updateView?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
     tqlGlue?: string;
     topTql?: string;
 
@@ -128,6 +136,10 @@ export interface CardConfig
     isAggregate?: boolean;
     // manualEntry: IManualEntry;
     tql: TQLFn;
+    clause?: ESClause;
+    toValueInfo?: (block: Block, blockPath: KeyPath) => ESValueInfo;
+    updateCards?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
+    updateView?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
     tqlGlue?: string;
     topTql?: string | ((block: Block) => string);
     accepts?: List<string>;
@@ -154,6 +166,7 @@ export const _card = (config: CardConfig) =>
 
   config = _.extend(config, {
     id: '',
+    errors: Immutable.List([]),
     _isCard: true,
     _isBlock: true,
     closed: false,

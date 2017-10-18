@@ -53,6 +53,7 @@ import * as React from 'react';
 import { browserHistory } from 'react-router';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
+import { Colors, fontColor } from '../../colors/Colors';
 import CreateLine from '../../common/components/CreateLine';
 import Modal from '../../common/components/Modal';
 import RolesStore from '../../roles/data/RolesStore';
@@ -549,6 +550,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
             </div>
             <div
               className='library-item-line'
+              style={fontColor(Colors().text1)}
             >
               {
                 date === undefined ? 'There are no variants' :

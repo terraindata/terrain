@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import TerrainStore from 'store/TerrainStore';
 import Ajax from './../../util/Ajax';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
@@ -177,6 +178,14 @@ FileImportReducers[ActionTypes.changeDbName] =
 FileImportReducers[ActionTypes.changeTableName] =
   (state, action) =>
     state
+      .set('tableName', action.payload.tableName);
+
+FileImportReducers[ActionTypes.setServerDbTable] =
+  (state, action) =>
+    state
+      .set('serverId', action.payload.serverId)
+      .set('serverName', action.payload.name)
+      .set('dbName', action.payload.dbName)
       .set('tableName', action.payload.tableName);
 
 FileImportReducers[ActionTypes.changeHasCsvHeader] =
@@ -348,7 +357,7 @@ FileImportReducers[ActionTypes.importFile] =
       {
         action.payload.handleFileImportSuccess();
         action.payload.changeUploadInProgress(false);
-        action.payload.fetchSchema();
+        TerrainStore.dispatch(action.payload.fetchSchema());
       },
       (err: string) =>
       {

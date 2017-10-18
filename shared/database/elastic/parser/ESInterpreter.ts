@@ -108,7 +108,10 @@ export default class ESInterpreter
     try
     {
       const root: ESValueInfo = this.rootValueInfo;
-      root.clause = this.config.getClause('root');
+      if (root.clause === undefined)
+      {
+        root.clause = this.config.getClause('root');
+      }
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
         {

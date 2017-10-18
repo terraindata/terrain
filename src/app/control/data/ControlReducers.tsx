@@ -49,6 +49,7 @@ import * as Immutable from 'immutable';
 import Ajax from 'util/Ajax';
 import ActionTypes from './ControlActionTypes';
 
+import { _CredentialConfig, _SchedulerConfig, CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import * as _ from 'lodash';
 import { _ControlState, ControlState } from './ControlStore';
@@ -97,6 +98,7 @@ ControlReducer[ActionTypes.importExport.deleteTemplate] =
       (err: string) =>
       {
         action.payload.handleDeleteTemplateError(err);
+        action.payload.fetchTemplates();
       },
     );
     return state;
@@ -114,6 +116,93 @@ ControlReducer[ActionTypes.importExport.resetTemplateToken] =
       (err: string) =>
       {
         action.payload.handleResetError(err);
+        action.payload.fetchTemplates();
+      },
+    );
+    return state;
+  };
+
+ControlReducer[ActionTypes.importExport.fetchSchedules] =
+  (state, action) =>
+  {
+    Ajax.getAllScheduledJobs(
+      (schedulesArr) =>
+      {
+        const schedules: List<SchedulerConfig> = List<SchedulerConfig>(schedulesArr.map((schedule: SchedulerConfig) =>
+        {
+          return _SchedulerConfig(_.extend({},
+            schedule,
+            { transport: JSON.parse(schedule.transportStr), paramsScheduleArr: JSON.parse(schedule.paramsScheduleStr) },
+          ));
+        },
+        ));
+        action.payload.setSchedules(schedules);
+      },
+    );
+    return state;
+  };
+
+ControlReducer[ActionTypes.importExport.setSchedules] =
+  (state, action) =>
+  {
+    return state.set('importExportScheduledJobs', action.payload.schedules);
+  };
+
+ControlReducer[ActionTypes.importExport.fetchCredentials] =
+  (state, action) =>
+  {
+    Ajax.getCredentialConfigs('sftp',
+      (credentialsArr) =>
+      {
+        const credentials: List<CredentialConfig> = List<CredentialConfig>(credentialsArr.map((credential) =>
+        {
+          return _CredentialConfig(_.extend({}, credential));
+        },
+        ));
+        action.payload.setCredentials(credentials);
+      },
+    );
+    return state;
+  };
+
+ControlReducer[ActionTypes.importExport.setCredentials] =
+  (state, action) =>
+  {
+    return state.set('importExportCredentials', action.payload.credentials);
+  };
+
+ControlReducer[ActionTypes.importExport.createSchedule] =
+  (state, action) =>
+  {
+    const params = _.pick(action.payload, ['name', 'jobType', 'paramsJob', 'schedule', 'sort', 'transport']);
+    Ajax.createSchedule(params,
+      (resp: object[]) =>
+      {
+        action.payload.onLoad(resp);
+        action.payload.fetchSchedules();
+      },
+      (err: string) =>
+      {
+        action.payload.onError(err);
+        action.payload.fetchSchedules();
+      },
+    );
+    return state;
+  };
+
+ControlReducer[ActionTypes.importExport.deleteSchedule] =
+  (state, action) =>
+  {
+    Ajax.deleteSchedule(action.payload.id,
+      (resp: object[]) =>
+      {
+        action.payload.onLoad(resp);
+        action.payload.fetchSchedules();
+      },
+      (err: string) =>
+      {
+        action.payload.onError(err);
+        action.payload.fetchSchedules();
       },
     );
     return state;

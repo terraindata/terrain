@@ -50,6 +50,7 @@ const FileImportActionTypes =
     changeServer: '',
     changeDbName: '',
     changeTableName: '',
+    setServerDbTable: '',
     changeDbText: '',
     changeTableText: '',
     changeHasCsvHeader: '',

@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands
 
 import * as React from 'react';
+import { backgroundColor, borderColor, Colors } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './ScoreBar.less';
 
@@ -103,7 +104,10 @@ class ScoreBar extends TerrainComponent<{
     }
 
     return (
-      <div className='weight-graph'>
+      <div
+        className='weight-graph'
+        style={borderColor(Colors().stroke)}
+      >
         <div className='weight-graph-inner'>
           <div className='weight-graph-bar' style={style} />
         </div>
