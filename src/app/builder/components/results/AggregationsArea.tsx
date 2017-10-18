@@ -75,7 +75,6 @@ export interface Props
   resultsState: ResultsState;
   db: BackendInstance;
   query: Query;
-  onNavigationException: () => void;
 }
 
 @Radium
@@ -94,12 +93,23 @@ class AggregationsArea extends TerrainComponent<Props>
       this.parseAggs(this.props.resultsState.aggregations, this.props.query), true);
   }
 
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    return (!_.isEqual(nextProps.resultsState.aggregations, this.props.resultsState.aggregations) ||
+      !_.isEqual(nextProps.query.aggregationList, this.props.query.aggregationList ||
+        !_.isEqual(nextProps.db, this.props.db)));
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
     if (!_.isEqual(this.props.resultsState.aggregations, nextProps.resultsState.aggregations))
     {
-      Actions.change(List(this._keyPath('query', 'aggregationList')),
-        this.parseAggs(nextProps.resultsState.aggregations, nextProps.query), true);
+      const newAggInfo = this.parseAggs(nextProps.resultsState.aggregations, nextProps.query);
+      if (newAggInfo !== this.props.query.aggregationList)
+      {
+        Actions.change(List(this._keyPath('query', 'aggregationList')),
+          newAggInfo, true);
+      }
     }
   }
 
