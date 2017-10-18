@@ -90,7 +90,6 @@ Router.post('/headless', async (ctx, next) =>
     return;
   }
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
-
   // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
 });
