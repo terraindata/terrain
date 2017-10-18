@@ -235,19 +235,6 @@ const EQLSpec: ESClause[] =
         path: ['primary'],
         desc: 'The outermost clause object that contains an entire search query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template:
-        {
-          'index:index': null,
-          'type:type': null,
-          'from:from': null,
-          'size:size': 1000,
-          'body:body':
-          {
-            'query:query':
-            {
-            },
-          },
-        },
         suggestions: ['body', 'index', 'type', 'from', 'size'],
       }),
     new ESIndexClause('index',
@@ -323,7 +310,14 @@ const EQLSpec: ESClause[] =
         path: ['primary'],
         desc: 'The object containing the filtering, sorting, matching, and aggregation logic for a query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template: { 'query:query': null },
+        template: {
+          'query:query': {
+            'bool:elasticFilter': null,
+          },
+          'sort:elasticScore': null,
+          'from:from': 0,
+          'size:size': 1000,
+        },
         suggestions: ['query', 'sort', 'from', 'size'],
       }),
     new ESStructureClause('slice',

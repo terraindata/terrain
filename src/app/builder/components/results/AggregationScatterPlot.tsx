@@ -60,10 +60,19 @@ export interface Props
   containerWidth?: number;
 }
 
+const THRESHOLD = 0.000001;
+
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
 
 class AggregationScatterPlot extends TerrainComponent<Props>
 {
+  public state: {
+    chartState: any,
+  } =
+  {
+    chartState: {},
+  };
+
   constructor(props: Props)
   {
     super(props);
@@ -159,7 +168,9 @@ class AggregationScatterPlot extends TerrainComponent<Props>
       height: 300,
       colors: this.props.colors,
     };
-
+    this.setState({
+      chartState,
+    });
     return chartState;
   }
 
@@ -169,10 +180,56 @@ class AggregationScatterPlot extends TerrainComponent<Props>
     ScatterPlot.destroy(el);
   }
 
+  // TODO: Support for keyed version
+  public isClose(data, newData)
+  {
+    if (typeof data !== typeof newData)
+    {
+      return false;
+    }
+    if (Array.isArray(data))
+    {
+      data.forEach((d, i) =>
+      {
+        if (newData[i].key !== d.key)
+        {
+          return false;
+        }
+        if (Math.abs(newData[i].value - d.value) > THRESHOLD)
+        {
+          return false;
+        }
+      });
+      return true;
+    }
+    const allKeys = (_.keys(data)).concat(_.keys(newData));
+    allKeys.forEach((key) =>
+    {
+      if (newData[key] === undefined || data[key] === undefined)
+      {
+        return false;
+      }
+      if (Math.abs(newData[key] - data[key]) > THRESHOLD)
+      {
+        return false;
+      }
+    });
+    return true;
+  }
+
   public componentWillReceiveProps(nextProps)
   {
     const el = ReactDOM.findDOMNode(this);
-    ScatterPlot.update(el, this.getChartState(nextProps));
+    if (!this.isClose(nextProps.data, this.props.data))
+    {
+      ScatterPlot.update(el, this.getChartState(nextProps));
+    }
+    if (this.props.containerWidth !== nextProps.containerWidth)
+    {
+      const chartState = this.state.chartState;
+      chartState.width = nextProps.containerWidth;
+      ScatterPlot.update(el, chartState);
+    }
   }
 
   public render()

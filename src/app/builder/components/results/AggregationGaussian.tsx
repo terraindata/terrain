@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions no-var-requires
 
 const Dimensions = require('react-dimensions');
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -63,6 +64,13 @@ const GAUSSIAN_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
 
 class AggregationGaussian extends TerrainComponent<Props>
 {
+
+  public state: {
+    chartState: any,
+  } = {
+    chartState: {},
+  };
+
   constructor(props: Props)
   {
     super(props);
@@ -109,7 +117,9 @@ class AggregationGaussian extends TerrainComponent<Props>
       stdDevLower: data.std_deviation_bounds.lower,
       average: data.avg,
     };
-
+    this.setState({
+      chartState,
+    });
     return chartState;
   }
 
@@ -122,7 +132,16 @@ class AggregationGaussian extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps)
   {
     const el = ReactDOM.findDOMNode(this);
-    GaussianGraph.update(el, this.getChartState(nextProps));
+    if (!_.isEqual(this.props.data, nextProps.data))
+    {
+      GaussianGraph.update(el, this.getChartState(nextProps));
+    }
+    if (this.props.containerWidth !== nextProps.containerWidth)
+    {
+      const chartState = this.state.chartState;
+      chartState.width = nextProps.containerWidth;
+      GaussianGraph.update(el, chartState);
+    }
   }
 
   public render()

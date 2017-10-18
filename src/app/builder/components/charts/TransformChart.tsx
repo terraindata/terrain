@@ -1333,7 +1333,7 @@ const TransformChart = {
     for (const menuText of Object.keys(menuOptions))
     {
       const item = menu.append('div');
-      item.attr('style', `display: block; color: ${Colors().altBg1}`)
+      item.attr('style', `display: block; color: ${Colors().activeText}`)
         .attr('class', 'chart-context-menu-item')
         .text(menuText);
       item.on('mousedown', () => { menuOptions[menuText](d3.select(el), d3.mouse(this)); });

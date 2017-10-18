@@ -75,7 +75,6 @@ import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import ColorsActions from '../../../colors/data/ColorsActions';
-import SchemaStore from '../../../schema/data/SchemaStore';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
 
@@ -205,11 +204,11 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.card-drag-handle svg', { fill: Colors().altBg1 });
-    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', { fill: Colors().altBg1 });
-    ColorsActions.setStyle('.card-minimize-icon .st0', { fill: Colors().altBg1 });
-    ColorsActions.setStyle('.card-help-icon', { fill: Colors().altBg1 });
-    ColorsActions.setStyle('.card-tuning-icon', { stroke: Colors().altBg1 });
+    ColorsActions.setStyle('.card-drag-handle svg', { fill: Colors().text3 });
+    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', { fill: Colors().text3 });
+    ColorsActions.setStyle('.card-minimize-icon .st0', { fill: Colors().text3 });
+    ColorsActions.setStyle('.card-help-icon', { fill: Colors().text3 });
+    ColorsActions.setStyle('.card-tuning-icon', { stroke: Colors().text3 });
     // TODO
     // this._subscribe(Store, {
     //   stateKey: 'selected',
@@ -244,23 +243,6 @@ class _CardComponent extends TerrainComponent<Props>
       keyPath: this.getKeyPath(),
     });
 
-  }
-
-  public getCardTerms(card: Card): List<string>
-  {
-    let terms: List<string> = Immutable.List([]);
-
-    if (card.static.getChildTerms)
-    {
-      terms = card.static.getChildTerms(card, SchemaStore.getState());
-    }
-
-    if (card.static.getNeighborTerms)
-    {
-      terms = terms.concat(card.static.getNeighborTerms(card, SchemaStore.getState())).toList();
-    }
-
-    return terms;
   }
 
   public componentWillReceiveProps(nextProps: Props)

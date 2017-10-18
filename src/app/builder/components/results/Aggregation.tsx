@@ -79,7 +79,6 @@ const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 export interface Props
 {
   aggregation: any;
-  key: number;
   name: string;
   query: Query;
 }
@@ -545,7 +544,6 @@ class AggregationComponent extends TerrainComponent<Props> {
       <div
         className='aggregation'
         style={[borderColor(Colors().resultLine), fontColor(Colors().text1)]}
-        key={'agg_' + String(this.props.key)}
       >
         {this.state.isSingleValue ? this.renderSingleAgg() : this.renderAgg()}
         <FadeInOut
