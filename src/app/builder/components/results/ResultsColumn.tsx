@@ -108,12 +108,14 @@ class ResultsColumn extends TerrainComponent<Props>
   {
     if (!this.props.resultsState.hits.equals(nextProps.resultsState.hits) && this.state.selectedTab !== 0)
     {
+      console.log("New hit");
       this.setState({
         highlightedTabs: this.state.highlightedTabs.set('hits', true),
       });
     }
     if (!_.isEqual(this.props.resultsState.aggregations, nextProps.resultsState.aggregations) && this.state.selectedTab !== 1)
     {
+      console.log("New agg");
       const aggs = this.props.resultsState.aggregations;
 
       if (_.keys(aggs).length !== 0)
@@ -159,7 +161,7 @@ class ResultsColumn extends TerrainComponent<Props>
           >
             <div className='results-column-tab-name' style={fontColor(Colors().text1)}>{name}</div>
             {
-              (name.toLowerCase() !== 'raw') ? 
+              (name.toLowerCase() !== 'raw') ?
               <div
                 className='results-column-tab-number'
                 style={ this.state.highlightedTabs.get(name.toLowerCase()) ? ACTIVE_TAB_NUMBER_STYLE : INACTIVE_TAB_NUMBER_STYLE }
