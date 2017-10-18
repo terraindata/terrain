@@ -114,9 +114,20 @@ class ResultsColumn extends TerrainComponent<Props>
     }
     if (!_.isEqual(this.props.resultsState.aggregations, nextProps.resultsState.aggregations) && this.state.selectedTab !== 1)
     {
+<<<<<<< HEAD
       this.setState({
         highlightedTabs: this.state.highlightedTabs.set('aggregations', true),
       });
+=======
+      const aggs = this.props.resultsState.aggregations;
+
+      if (_.keys(aggs).length !== 0)
+      {
+        this.setState({
+          highlightedTabs: this.state.highlightedTabs.set('aggregations', true),
+        });
+      }
+>>>>>>> 65d9da6eb6bd90a310a92280be85204071dd106b
     }
     if (this.props.query.resultsViewMode !== nextProps.query.resultsViewMode)
     {
@@ -251,7 +262,8 @@ class ResultsColumn extends TerrainComponent<Props>
 
 const ACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().active), backgroundColor(Colors().bg3));
 const INACTIVE_TAB_STYLE = _.extend({}, getStyle('borderBottomColor', Colors().bg3), backgroundColor(Colors().bg2));
-const ACTIVE_TAB_NUMBER_STYLE = _.extend({}, fontColor(Colors().text1), backgroundColor(Colors().active));
-const INACTIVE_TAB_NUMBER_STYLE = _.extend({}, fontColor(Colors().altText1), backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().altBg1 : Colors().bg1));
+const ACTIVE_TAB_NUMBER_STYLE = _.extend({}, fontColor('#fff'), backgroundColor(Colors().active));
+const INACTIVE_TAB_NUMBER_STYLE = _.extend({},
+  fontColor(Colors().altText1), backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().altBg1 : Colors().bg1));
 
 export default ResultsColumn;

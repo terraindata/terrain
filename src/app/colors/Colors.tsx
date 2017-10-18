@@ -608,7 +608,7 @@ const LIGHT: Theme =
 
     tqlEditor: 'default',
 
-    iconColor: 'rgba(0, 0, 0, 0.4';
+    iconColor: 'rgba(0, 0, 0, 0.4)',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
