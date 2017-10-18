@@ -55,7 +55,7 @@ import { UserConfig } from '../users/UserRouter';
 import * as Util from '../Util';
 
 // CREATE TABLE databases (id integer PRIMARY KEY, name text NOT NULL, type text NOT NULL, \
-// dsn text NOT NULL, status text);
+// dsn text NOT NULL, status text, isAnalytics bool NOT NULL, analyticsIndex text, analyticsType text);
 
 export interface DatabaseConfig
 {
@@ -66,8 +66,8 @@ export interface DatabaseConfig
   host: string;
   status?: string;
   isAnalytics: boolean;
-  analyticsIndex: string;
-  analyticsType: string;
+  analyticsIndex?: string;
+  analyticsType?: string;
 }
 
 export class Databases
@@ -86,8 +86,6 @@ export class Databases
         'host',
         'status',
         'isAnalytics',
-        'analyticsIndex',
-        'analyticsType',
       ],
     );
   }
