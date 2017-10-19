@@ -46,83 +46,89 @@ THE SOFTWARE.
 
 // tslint:disable
 
-import { PropTypes } from 'react';
-import { MapComponent, MapLayer } from 'react-leaflet';
-import 'leaflet-routing-machine';
-import { isEqual } from 'lodash';
-import TerrainComponent from './TerrainComponent';
+/* Used with MapComponent to route between two locations
+Include RoutingMachine into route component and add 
+<RoutingMachine with props for to and from locations, a function that 
+returns a ref to the Leaflet Map, a markerIcon and a function that accepts the 
+route distance and time */
 
-export interface Props
-{
-  to: [number, number] | number[];
-  from: [number, number] | number[];
-  getMapRef: () => any; // returns a reference to a leaflet map component
-  markerIcon: any;
-  setTrafficData: (distance: number, time: number) => void;
-}
+// import { PropTypes } from 'react';
+// import { MapComponent, MapLayer } from 'react-leaflet';
+// import 'leaflet-routing-machine';
+// import { isEqual } from 'lodash';
+// import TerrainComponent from './TerrainComponent';
 
-export default class RoutingMachine extends MapComponent
-{
-  // The linter fails without these properties...
-  public props: Props;
-  public setState;
-  public forceUpdate;
-  public state = {};
-  public context;
-  public refs;
+// export interface Props
+// {
+//   to: [number, number] | number[];
+//   from: [number, number] | number[];
+//   getMapRef: () => any; // returns a reference to a leaflet map component
+//   markerIcon: any;
+//   setTrafficData: (distance: number, time: number) => void;
+// }
 
-  public componentWillMount()
-  {
-    super.componentWillMount();
-    const { to, from, getMapRef, markerIcon, setTrafficData } = (this as any).props;
-    const map = getMapRef();
-    const waypoints = [
-      (window as any).L.latLng(from[0], from[1]),
-      (window as any).L.latLng(to[0], to[1]),
-    ];
+// export default class RoutingMachine extends MapComponent
+// {
+//   // The linter fails without these properties...
+//   public props: Props;
+//   public setState;
+//   public forceUpdate;
+//   public state = {};
+//   public context;
+//   public refs;
 
-    (this as any).leafletElement = (window as any).L.Routing.control({
-      plan: (window as any).L.Routing.plan(waypoints, {
-        createMarker: function(i, wp)
-        {
-          return (window as any).L.marker(wp.latLng, {
-            draggable: false,
-            icon: markerIcon,
-            addWaypoints: false,
-          });
-        },
-      }),
-      router: (window as any).L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
-      show: false,
-      collapsible: false,
-      lineOptions: {
-        styles: [{ color: 'blue', opacity: 1, weight: 5, }]
-      },
-    }).addTo(map);
+//   public componentWillMount()
+//   {
+//     super.componentWillMount();
+//     const { to, from, getMapRef, markerIcon, setTrafficData } = (this as any).props;
+//     const map = getMapRef();
+//     const waypoints = [
+//       (window as any).L.latLng(from[0], from[1]),
+//       (window as any).L.latLng(to[0], to[1]),
+//     ];
 
-    (this as any).leafletElement.on('routesfound', function(e)
-    {
-      var routes = e.routes;
-      setTrafficData(routes[0].summary.totalDistance, routes[0].summary.totalTime);
-    });
-  }
+//     (this as any).leafletElement = (window as any).L.Routing.control({
+//       plan: (window as any).L.Routing.plan(waypoints, {
+//         createMarker: function(i, wp)
+//         {
+//           return (window as any).L.marker(wp.latLng, {
+//             draggable: false,
+//             icon: markerIcon,
+//             addWaypoints: false,
+//           });
+//         },
+//       }),
+//       router: (window as any).L.Routing.mapbox('pk.eyJ1IjoibGJyb3Vja21hbiIsImEiOiJjajc5ZXJlMDMwMWljMnFwbHQ4Z3cxdWxxIn0.WHg8thw4YmlCQe-I5vUKjg'),
+//       show: false,
+//       collapsible: false,
+//       lineOptions: {
+//         styles: [{ color: 'blue', opacity: 1, weight: 5, }]
+//       },
+//     }).addTo(map);
 
-  public createLeafletElement(props) { }
+//     (this as any).leafletElement.on('routesfound', function(e)
+//     {
+//       var routes = e.routes;
+//       setTrafficData(routes[0].summary.totalDistance, routes[0].summary.totalTime);
+//     });
+//   }
 
-  public componentWillReceiveProps(newProps)
-  {
-    const { to, from } = newProps;
-    if (!isEqual(from, (this as any).props.from) || !isEqual(to, (this as any).props.to))
-    {
-      (this as any).leafletElement.getPlan().setWaypoints([
-        (window as any).L.latLng(from[0], from[1]),
-        (window as any).L.latLng(to[0], to[1]),
-      ]);
-    }
-  }
+//   public createLeafletElement(props) { }
 
-  public render()
-  {
-    return null;
-  }
-}
+//   public componentWillReceiveProps(newProps)
+//   {
+//     const { to, from } = newProps;
+//     if (!isEqual(from, (this as any).props.from) || !isEqual(to, (this as any).props.to))
+//     {
+//       (this as any).leafletElement.getPlan().setWaypoints([
+//         (window as any).L.latLng(from[0], from[1]),
+//         (window as any).L.latLng(to[0], to[1]),
+//       ]);
+//     }
+//   }
+
+//   public render()
+//   {
+//     return null;
+//   }
+// }

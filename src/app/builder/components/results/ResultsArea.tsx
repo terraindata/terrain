@@ -361,7 +361,6 @@ class ResultsArea extends TerrainComponent<Props>
     else
     {
       // Extract the geo_distance fields and values from the query
-      // Maybe only do this is there is a map field in the config ?
       const geoDistances = this.props.query.tql.match(/"geo_distance": \{[^\}]*\}/g);
       let locations = {};
       if (geoDistances !== undefined && geoDistances !== null)

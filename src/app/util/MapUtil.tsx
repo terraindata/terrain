@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-//  tslint:disable:no-bitwise
+//  tslint:disable:no-bitwise no-console
 
 'use strict';
 
@@ -293,9 +293,9 @@ const MapUtil = {
       if (geopoint.split(',').length > 1)
       {
         const coords = geopoint.split(',');
-        // have some sort of check to make sure this is ok ?
         lat = parseFloat(coords[0].replace(/ /g, ''));
         lon = parseFloat(coords[1].replace(/ /g, ''));
+        console.assert(!isNaN(lat) && !isNaN(lon));
       }
       else
       {

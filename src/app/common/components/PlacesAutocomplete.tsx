@@ -494,9 +494,9 @@ class PlacesAutocomplete extends TerrainComponent<Props>
                   return (
                     <div
                       key={p.placeId}
-                      onMouseOver={() => this.setActiveItemAtIndex(p.index)}
-                      onMouseDown={() => this.selectAndSetAddress(p.suggestion, p.placeId)}
-                      onClick={() => this.selectAndSetAddress(p.suggesetion, p.placeId)}
+                      onMouseOver={this._fn(this.setActiveItemAtIndex, p.index)}
+                      onMouseDown={this._fn(this.selectAndSetAddress, p.suggestion, p.placeId)}
+                      onClick={this._fn(this.selectAndSetAddress, p.suggestion, p.placeId)}
                       style={p.active ? this.getStyleFor('autocompleteItemActive') : this.getStyleFor('autocompleteItem')}
                     >
                       {this.autocompleteItem(p.suggestion)}
