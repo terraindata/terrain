@@ -48,11 +48,12 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
 import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+const { List, Map, Set } = Immutable;
 const Color = require('color');
 
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -63,11 +64,52 @@ import { backgroundColor, borderColor, cardHoverBackground, cardStyle, Colors, f
 import CreateCardOption from './CreateCardOption';
 import './CreateCardTool.less';
 
+function getCardCategory(card: CardConfig): string
+{
+  if (card === undefined || card.static === undefined || card.static.clause === undefined)
+  {
+    return '';
+  }
+  else
+  {
+    return card.static.clause.path[0];
+  }
+}
+
+// if suggestion: if parent card.static.clause.suggestions contains overrideText[index][key]
+interface CardCategory
+{
+  name: string;
+  color: string;
+}
+
+const categories: List<CardCategory> = List(
+[
+  {name: 'suggested', color: Colors().text2}, // special category
+  {name: 'all', color: Colors().text2}, // special category
+  {name: 'filter', color: Colors().builder.cards.categories.filter},
+  {name: 'sort', color: Colors().builder.cards.categories.sort},
+  {name: 'match', color: Colors().builder.cards.categories.match},
+  {name: 'aggregation', color: Colors().builder.cards.structureClause},
+  {name: 'geo', color: Colors().builder.cards.categories.geo},
+  {name: 'primary', color: Colors().builder.cards.categories.primary},
+  {name: 'control', color: Colors().builder.cards.categories.control},
+  {name: 'score', color: Colors().builder.cards.categories.score},
+  {name: 'script', color: Colors().builder.cards.categories.script},
+  {name: 'compound', color: Colors().builder.cards.categories.compound},
+  {name: 'join', color: Colors().builder.cards.categories.join},
+  {name: 'parameter', color: Colors().builder.cards.categories.parameter},
+  {name: 'other', color: Colors().text2}, // special category
+]);
+
+const categoryCounter = Map(categories.map((v, i) => [v.name, 0]));
+// starting point for immutable map mapping category names to how many cards there are in each category
+
 export interface Props
 {
   cardTypeList: List<string>;
   open: boolean;
-  card: Card; // the card that is doing the creating
+  card: CardConfig; // the card that is doing the creating
   language: string;
   handleCardClick: (block, index) => void;
   overrideText?: List<{
@@ -75,35 +117,6 @@ export interface Props
     type: string;
   }>; // can override the options displayed
 }
-
-function getCardCategory(card: Card): string
-{
-  if (card === undefined)
-  {
-    return '';
-  }
-  else if (card.static.clause === undefined)
-  {
-    return card.key;
-  }
-  else
-  {
-    return card === undefined ? '' : card.static.clause.path[0];
-  }
-}
-
-// if suggestion: if parent card.static.clause.suggestions contains overrideText[index][key]
-
-const cardCategoryColors = Colors().builder.cards.categories;
-
-const categories =
-[
-  {name: 'suggested', color: Colors().text2},
-  {name: 'filter', color: Colors().builder.cards.categories.filter},
-  {name: 'sort', color: Colors().builder.cards.categories.sort},
-  {name: 'other', color: Colors().text3},
-  {name: 'all', color: Colors().text3},
-];
 
 @Radium
 class CardSelector extends TerrainComponent<Props>
@@ -114,19 +127,54 @@ class CardSelector extends TerrainComponent<Props>
     inputElement: any;
     cardSelectorElement: any;
     computedHeight: number;
-    possibleCategories: List<string>;
+    currentCategory: string;
   } = {
     searchValue: '',
     focusedIndex: -1,
     inputElement: undefined,
     cardSelectorElement: undefined,
     computedHeight: -1,
-    possibleCategories: List([]),
+    currentCategory: 'all',
   };
 
-  public computeAvailableCategories(cardTypeList: List<string>, overideText?: List<any>)
+  constructor(props)
   {
-    return [];
+    super(props);
+    this.computeAvailableCategories = memoizeOne(this.computeAvailableCategories);
+    this.getCardSuggestionSet = memoizeOne(this.getCardSuggestionSet);
+    this.state.currentCategory =
+      this.computeAvailableCategories(this.props.cardTypeList, this.props.card)[0].name;
+    // even if there are no cards, 'all' will always be there.
+  }
+
+  public getCardSuggestionSet(creatingCard: CardConfig)
+  {
+    return Set(creatingCard.static.clause.suggestions);
+  }
+
+  // return only categories where there exist cards that fall under that category. Category 'all' always shows
+  public computeAvailableCategories(cardTypeList: List<string>, creatingCard: CardConfig)
+  {
+    const counts = categoryCounter.toJS();
+    const suggestionSet = this.getCardSuggestionSet(creatingCard);
+    cardTypeList.forEach((v, i) => {
+      const card = AllBackendsMap[this.props.language].blocks[v] as CardConfig
+      const category = getCardCategory(card);
+      if (counts[category] !== undefined)
+      {
+        counts[category] += 1;
+      }
+      else
+      {
+        counts['other'] += 1;
+      }
+      if (suggestionSet.has(category))
+      {
+        counts['suggested'] += 1;
+      }
+      counts['all'] += 1;
+    });
+    return categories.filter((v, i) => counts[v.name] > 0 || v.name === 'all');
   }
 
   public handleSearchTextboxChange(ev: any)
@@ -231,7 +279,7 @@ class CardSelector extends TerrainComponent<Props>
   {
     return (
       <div className='card-category-list'>
-        {categories.map(this.renderCategory)}
+        {this.computeAvailableCategories(this.props.cardTypeList, this.props.card).map(this.renderCategory)}
       </div>
     );
   }

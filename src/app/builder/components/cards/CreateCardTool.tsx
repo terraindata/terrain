@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
@@ -81,7 +82,7 @@ export interface Props
   dy?: number;
   className?: string;
   accepts: List<string>;
-  data: Card;
+  data: any;
   onToggle?: () => void;
   onClose?: () => void; // like toggle, but only called when explicitly closed
   onMinimize?: () => void; // TODO see if these should be consolidated
@@ -105,6 +106,12 @@ class CreateCardTool extends TerrainComponent<Props>
   } = {
     focusedIndex: -1,
   };
+
+  constructor(props)
+  {
+    super(props);
+    this.extractTypeFromOverride = memoizeOne(this.extractTypeFromOverride);
+  }
 
   public handleCardClick(block, index)
   {
@@ -141,13 +148,17 @@ class CreateCardTool extends TerrainComponent<Props>
     this.props.onToggle && this.props.onToggle();
   }
 
+  public extractTypeFromOverride(overrideText)
+  {
+    return overrideText.map((t) => t.type).toList();
+  }
+
   public getCardTypeList(): List<string>
   {
 
     if (this.props.overrideText)
     {
-      // TODO consider memoizing this.
-      return this.props.overrideText.map((t) => t.type).toList();
+      return this.extractTypeFromOverride(this.props.overrideText);
     }
 
     return this.props.accepts || AllBackendsMap[this.props.language].cardsList;
@@ -265,7 +276,7 @@ class CreateCardTool extends TerrainComponent<Props>
         <CardSelector
           cardTypeList={this.getCardTypeList()}
           open={this.props.open}
-          card={this.props.data}
+          card={this.props.data as CardConfig}
           language={this.props.language}
           handleCardClick={this.handleCardClick}
           overrideText={this.props.overrideText}

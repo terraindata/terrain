@@ -74,7 +74,7 @@ export interface Props
   connectDropTarget?: (el: JSX.Element) => JSX.Element;
   helpOn?: boolean;
   accepts?: List<string>;
-  card?: Card;
+  card?: any;
   noCardTool?: boolean;
   singleChild?: boolean;
   hideCreateCardTool?: boolean;
