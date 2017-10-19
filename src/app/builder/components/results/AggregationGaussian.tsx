@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions no-var-requires
 
-const Dimensions = require('react-dimensions');
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -58,6 +57,7 @@ export interface Props
   data: any;
   colors: [string, string];
   containerWidth?: number;
+  name: string;
 }
 
 const GAUSSIAN_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
@@ -92,20 +92,16 @@ class AggregationGaussian extends TerrainComponent<Props>
   {
     overrideState = overrideState || {};
     const data = overrideState.data || this.props.data;
-    // If the data is null (when the field is invalid/empty)
-    if (data.min === null)
-    {
-      return undefined;
-    }
     const stdDev = data.std_deviation;
     const maxY = this.gaussian(data.avg, data.avg, stdDev);
     // Sometimes lower bounds is less than min, upper bounds is greater than max
     const domainMin = Math.min(data.min, data.std_deviation_bounds.lower);
     const domainMax = Math.max(data.max, data.std_deviation_bounds.upper);
+    const domain = domainMax - domainMin;
     const chartState = {
       domain: {
-        x: [domainMin, domainMax],
-        y: [0, maxY + 0.1 * maxY],
+        x: [domainMin - 0.1 * domain, domainMax + 0.1 * domain],
+        y: [0, maxY + 0.15 * maxY],
       },
       width: overrideState.containerWidth || this.props.containerWidth || 300,
       height: 300,
@@ -116,6 +112,7 @@ class AggregationGaussian extends TerrainComponent<Props>
       stdDevUpper: data.std_deviation_bounds.upper,
       stdDevLower: data.std_deviation_bounds.lower,
       average: data.avg,
+      addAnnotations: true,
     };
     this.setState({
       chartState,
@@ -132,6 +129,12 @@ class AggregationGaussian extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps)
   {
     const el = ReactDOM.findDOMNode(this);
+    if (this.props.name !== nextProps.name)
+    {
+      GaussianGraph.destroy(el);
+      GaussianGraph.create(el, this.getChartState(nextProps));
+    }
+
     if (!_.isEqual(this.props.data, nextProps.data))
     {
       GaussianGraph.update(el, this.getChartState(nextProps));
@@ -152,9 +155,4 @@ class AggregationGaussian extends TerrainComponent<Props>
   }
 }
 
-export default Dimensions({
-  elementResize: true,
-  containerStyle: {
-    height: 'auto',
-  },
-})(AggregationGaussian);
+export default AggregationGaussian;

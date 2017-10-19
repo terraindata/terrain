@@ -98,6 +98,12 @@ const ScatterPlot = {
     innerSvg.append('g')
       .attr('class', 'points');
 
+    if (state.addAnnotations)
+    {
+      innerSvg.append('g')
+        .attr('class', 'annotations');
+    }
+
     this.update(el, state);
 
     // apply CSS styles
@@ -122,7 +128,7 @@ const ScatterPlot = {
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height);
 
     const scales = this._scales(el, state.domain, state.pointsData, state.width, state.height);
-    this._draw(el, scales, state.domain, state.pointsData, state.width, state.height, state.colors);
+    this._draw(el, scales, state.domain, state.pointsData, state.width, state.height, state.colors, state.addAnnotations);
   },
 
   destroy(el)
@@ -217,6 +223,54 @@ const ScatterPlot = {
     point.exit().remove();
   },
 
+  _drawPointAnnotations(el, scales, pointsData, domain)
+  {
+    d3.select(el).selectAll('.annotation').remove();
+    const g = d3.select(el).selectAll('.annotations');
+
+    const annotation = g.selectAll('rect')
+      .data(pointsData, (d) => d['id'] + '_annotation');
+
+    annotation
+      .attr('_id', (d) => d['id']);
+
+    const annotationYUpper = (d) =>
+    {
+      if (Math.abs(scales.realPointY(d['y']) - scales.realPointY(domain.y[1])) < 40)
+      {
+        return scales.realPointY(d['y']) + 20;
+      }
+      return scales.realPointY(d['y']) - 25;
+    };
+
+    const annotationYLower = (d) =>
+    {
+      if (Math.abs(scales.realPointY(d['y']) - scales.realPointY(domain.y[1])) < 40)
+      {
+        return scales.realPointY(d['y']) + 30;
+      }
+      return scales.realPointY(d['y']) - 15;
+    };
+
+    annotation.enter().append('text')
+      .attr('fill', 'black')
+      .attr('class', 'annotation')
+      .attr('x', (d) => scales.realX(d['x']) - 12)
+      .attr('y', annotationYUpper)
+      .attr('text-anchor', 'start')
+      .text((d) => 'X: ' + Util.formatNumber(d['x']));
+
+    annotation.enter().append('text')
+      .attr('fill', 'black')
+      .attr('class', 'annotation')
+      .attr('x', (d) => scales.realX(d['x']) - 12)
+      .attr('y', annotationYLower)
+      .attr('text-anchor', 'start')
+      .text((d) => 'Y: ' + Util.formatNumber(d['y']));
+
+    annotation.exit().remove();
+  },
+
   _drawToolTip(el, mouse, scales, point, colors)
   {
     d3.select(el).selectAll('.scatter-point-tooltip').remove();
@@ -268,7 +322,7 @@ const ScatterPlot = {
       .attr('width', w - 3);
   },
 
-  _draw(el, scales, domain, pointsData, width, height, colors)
+  _draw(el, scales, domain, pointsData, width, height, colors, addAnnotations)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -277,6 +331,25 @@ const ScatterPlot = {
     this._drawBg(el, scales);
     this._drawAxes(el, scales, width, height);
     this._drawPoints(el, scales, pointsData, colors);
+    if (addAnnotations)
+    {
+      let annotatedPointsData = [];
+      if (pointsData.length <= 5)
+      {
+        annotatedPointsData = pointsData;
+      }
+      else
+      {
+        annotatedPointsData = pointsData.map((d, i) =>
+        {
+          if (i % 2 === 0)
+          {
+            return d;
+          }
+        }).filter((d) => d !== undefined);
+      }
+      this._drawPointAnnotations(el, scales, annotatedPointsData, domain);
+    }
   },
 
   _scales(el, domain, pointsData, stateWidth, stateHeight)

@@ -47,7 +47,6 @@ THE SOFTWARE.
 // tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions no-var-requires
 
 import * as _ from 'lodash';
-const Dimensions = require('react-dimensions');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -58,6 +57,7 @@ export interface Props
   data: any;
   colors: [string, string];
   containerWidth?: number;
+  name: string;
 }
 
 const THRESHOLD = 0.1;
@@ -167,6 +167,7 @@ class AggregationScatterPlot extends TerrainComponent<Props>
       width: overrideState.containerWidth || this.props.containerWidth || 300,
       height: 300,
       colors: this.props.colors,
+      addAnnotations: true,
     };
     this.setState({
       chartState,
@@ -180,7 +181,8 @@ class AggregationScatterPlot extends TerrainComponent<Props>
     ScatterPlot.destroy(el);
   }
 
-  // TODO: Support for keyed version
+  // Percentile data tends to fluctuate (on the same data)
+  // This prevents unnecessary re-renders of the chart
   public isClose(data, newData)
   {
     if (typeof data !== typeof newData)
@@ -223,6 +225,11 @@ class AggregationScatterPlot extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps)
   {
     const el = ReactDOM.findDOMNode(this);
+    if (this.props.name !== nextProps.name)
+    {
+      ScatterPlot.destroy(el);
+      ScatterPlot.create(el, this.getChartState());
+    }
     if (!this.isClose(nextProps.data, this.props.data))
     {
       ScatterPlot.update(el, this.getChartState(nextProps));
@@ -242,9 +249,4 @@ class AggregationScatterPlot extends TerrainComponent<Props>
     );
   }
 }
-export default Dimensions({
-  elementResize: true,
-  containerStyle: {
-    height: 'auto',
-  },
-})(AggregationScatterPlot);
+export default AggregationScatterPlot;

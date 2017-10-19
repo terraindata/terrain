@@ -51,7 +51,6 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { List } = Immutable;
 import * as _ from 'lodash';
-const Dimensions = require('react-dimensions');
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -62,6 +61,7 @@ export interface Props
   data: any;
   colors: [string, string];
   containerWidth?: number;
+  name: string;
 }
 
 class AggregationHistogram extends TerrainComponent<Props>
@@ -216,6 +216,11 @@ class AggregationHistogram extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps)
   {
     const el = ReactDOM.findDOMNode(this);
+    if (this.props.name !== nextProps.name)
+    {
+      Histogram.destroy(el);
+      Histogram.create(el, this.getChartState(nextProps));
+    }
     if (!_.isEqual(nextProps.data, this.props.data))
     {
       Histogram.update(el, this.getChartState(nextProps));
@@ -235,9 +240,4 @@ class AggregationHistogram extends TerrainComponent<Props>
     );
   }
 }
-export default Dimensions({
-  elementResize: true,
-  containerStyle: {
-    height: 'auto',
-  },
-})(AggregationHistogram);
+export default AggregationHistogram;
