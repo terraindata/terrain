@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import DatabaseController from '../database/DatabaseController';
 
-/** kkjfjfj
+/**
  * This is where we store connections to databaseRegistry being managed.
  */
 class DatabaseMap

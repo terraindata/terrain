@@ -83,6 +83,9 @@ beforeAll(async (done) =>
             type: 'elastic',
             dsn: 'http://127.0.0.1:9200',
             host: 'http://127.0.0.1:9200',
+            isAnalytics: true,
+            analyticsIndex: 'terrain-analytics',
+            analyticsType: 'events',
           },
         ],
       };
@@ -1125,6 +1128,7 @@ describe('Analytics aggregation route tests', () =>
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',
+        database: 1,
         start: new Date(2015, 5, 2, 1, 27, 4),
         end: new Date(2015, 5, 2, 1, 27, 14),
         eventid: 1,
@@ -1151,6 +1155,7 @@ describe('Analytics aggregation route tests', () =>
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',
+        database: 1,
         start: new Date(2015, 5, 2, 1, 27, 4),
         end: new Date(2015, 5, 2, 1, 27, 14),
         eventid: 1,
@@ -1178,6 +1183,7 @@ describe('Analytics aggregation route tests', () =>
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',
+        database: 1,
         start: new Date(2015, 5, 2, 1, 27, 4),
         end: new Date(2015, 5, 2, 3, 27, 4),
         eventid: '2,1',

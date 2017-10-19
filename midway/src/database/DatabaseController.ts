@@ -98,6 +98,8 @@ abstract class DatabaseController
   public abstract getTasty(): Tasty.Tasty;
 
   public abstract getQueryHandler(): QueryHandler;
+
+  public abstract getAnalyticsDB(): object;
 }
 
 export default DatabaseController;
