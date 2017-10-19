@@ -170,9 +170,6 @@ export class Import
           return reject('Invalid template ID provided: ' + String(fields['templateId']));
         }
         const template: ImportTemplateConfig = templates[0];
-        winston.info('AAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHH');
-        winston.info(JSON.stringify(template as object));
-        winston.info('AHUI$EHFIUSYDHFJKSDFSJKLDFSJLKDFJKDSF');
         imprtConf = {
           columnTypes: template['columnTypes'],
           dbid: template['dbid'],
