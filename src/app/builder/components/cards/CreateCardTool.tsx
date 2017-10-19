@@ -51,16 +51,16 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import { backgroundColor, Colors } from 'app/colors/Colors';
 import Actions from 'builder/data/BuilderActions';
 import CreateLine from 'common/components/CreateLine';
 import KeyboardFocus from 'common/components/KeyboardFocus';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as BlockUtils from 'src/blocks/BlockUtils';
+import { Card, CardConfig } from 'src/blocks/types/Card';
 import { AllBackendsMap } from 'src/database/AllBackends';
-import Util from 'util/Util';
 
-import { CardConfig } from '../../../../blocks/types/Card';
-import { backgroundColor, Colors } from '../../../colors/Colors';
+import Util from 'util/Util';
 
 import CardDropArea from './CardDropArea';
 import CardSelector from './CardSelector';
@@ -81,6 +81,7 @@ export interface Props
   dy?: number;
   className?: string;
   accepts: List<string>;
+  data: Card;
   onToggle?: () => void;
   onClose?: () => void; // like toggle, but only called when explicitly closed
   onMinimize?: () => void; // TODO see if these should be consolidated
@@ -142,11 +143,13 @@ class CreateCardTool extends TerrainComponent<Props>
 
   public getCardTypeList(): List<string>
   {
+
     if (this.props.overrideText)
     {
       // TODO consider memoizing this.
       return this.props.overrideText.map((t) => t.type).toList();
     }
+
     return this.props.accepts || AllBackendsMap[this.props.language].cardsList;
   }
 
@@ -262,6 +265,7 @@ class CreateCardTool extends TerrainComponent<Props>
         <CardSelector
           cardTypeList={this.getCardTypeList()}
           open={this.props.open}
+          card={this.props.data}
           language={this.props.language}
           handleCardClick={this.handleCardClick}
           overrideText={this.props.overrideText}

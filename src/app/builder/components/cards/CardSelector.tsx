@@ -56,7 +56,7 @@ const { List, Map } = Immutable;
 const Color = require('color');
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import { CardConfig } from 'src/blocks/types/Card';
+import { Card, CardConfig } from 'src/blocks/types/Card';
 import { AllBackendsMap } from 'src/database/AllBackends';
 import { backgroundColor, borderColor, cardHoverBackground, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
 
@@ -67,6 +67,7 @@ export interface Props
 {
   cardTypeList: List<string>;
   open: boolean;
+  card: Card; // the card that is doing the creating
   language: string;
   handleCardClick: (block, index) => void;
   overrideText?: List<{
@@ -75,7 +76,34 @@ export interface Props
   }>; // can override the options displayed
 }
 
+function getCardCategory(card: Card): string
+{
+  if (card === undefined)
+  {
+    return '';
+  }
+  else if (card.static.clause === undefined)
+  {
+    return card.key;
+  }
+  else
+  {
+    return card === undefined ? '' : card.static.clause.path[0];
+  }
+}
+
+// if suggestion: if parent card.static.clause.suggestions contains overrideText[index][key]
+
 const cardCategoryColors = Colors().builder.cards.categories;
+
+const categories =
+[
+  {name: 'suggested', color: Colors().text2},
+  {name: 'filter', color: Colors().builder.cards.categories.filter},
+  {name: 'sort', color: Colors().builder.cards.categories.sort},
+  {name: 'other', color: Colors().text3},
+  {name: 'all', color: Colors().text3},
+];
 
 @Radium
 class CardSelector extends TerrainComponent<Props>
@@ -85,16 +113,21 @@ class CardSelector extends TerrainComponent<Props>
     focusedIndex: number;
     inputElement: any;
     cardSelectorElement: any;
-    filteredList: List<number>; // list of indices of cardTypeList to show
     computedHeight: number;
+    possibleCategories: List<string>;
   } = {
     searchValue: '',
     focusedIndex: -1,
     inputElement: undefined,
     cardSelectorElement: undefined,
-    filteredList: List([]),
     computedHeight: -1,
+    possibleCategories: List([]),
   };
+
+  public computeAvailableCategories(cardTypeList: List<string>, overideText?: List<any>)
+  {
+    return [];
+  }
 
   public handleSearchTextboxChange(ev: any)
   {
@@ -148,26 +181,48 @@ class CardSelector extends TerrainComponent<Props>
     );
   }
 
-  // TODO: put this back in once categories are ready to go
-  public renderCategory(color: string, key: string)
+  public renderCardOptions()
   {
-    if (key === 'parameter' || key === 'compound' || key === 'suggest')
-    {
-      return undefined;
-    }
+    return this.props.cardTypeList.map(this.renderCardOption);
+  }
 
+  // public renderCategory(color: string, key: string)
+  // {
+  //   if (key === 'parameter' || key === 'compound' || key === 'suggest')
+  //   {
+  //     return undefined;
+  //   }
+
+  //   return (
+  //     <div
+  //       className='card-category-list-item'
+  //       style={_.extend({},
+  //         fontColor(color),
+  //         backgroundColor(Colors().bg2, cardHoverBackground(color, Colors().bg3)),
+  //         borderColor(Colors().border1),
+  //         getStyle('borderLeftColor', color),
+  //       )}
+  //       key={key}
+  //     >
+  //       {key}
+  //     </div>
+  //   );
+  // }
+
+  public renderCategory(item, index)
+  {
     return (
       <div
         className='card-category-list-item'
         style={_.extend({},
-          // cardStyle(color, Colors().bg3, cardHoverBackground(color, Colors().bg3), true),
-          fontColor(color),
-          backgroundColor(Colors().bg3, cardHoverBackground(color, Colors().bg3)),
-          borderColor(Colors().border2),
+          fontColor(item.color),
+          backgroundColor(Colors().bg2, cardHoverBackground(item.color, Colors().bg3)),
+          borderColor(Colors().border1),
+          getStyle('borderLeftColor', item.color),
         )}
-        key={key}
+        key={item.name}
       >
-        {key}
+        {item.name}
       </div>
     );
   }
@@ -176,7 +231,7 @@ class CardSelector extends TerrainComponent<Props>
   {
     return (
       <div className='card-category-list'>
-        {_.map(cardCategoryColors, this.renderCategory)}
+        {categories.map(this.renderCategory)}
       </div>
     );
   }
@@ -207,8 +262,12 @@ class CardSelector extends TerrainComponent<Props>
     );
     const searchLineStyle = _.extend({},
       borderColor(Color(Colors().border1).alpha(0.25).toString()),
-      backgroundColor(Colors().darkerHighlight)
     );
+    const columnTitleStyle = _.extend({},
+      fontColor(Colors().text1),
+      backgroundColor(Colors().inputBg),
+    );
+
     return (
       <div
         className={classNames({
@@ -219,11 +278,11 @@ class CardSelector extends TerrainComponent<Props>
         ref='selector'
         style={backgroundColor(Colors().bg1)}
       >
-        <div className='inset-shadow-veil' style={getStyle('boxShadow', `inset 2px 2px 4px 1px ${Colors().boxShadow}`)} />
+        <div className='inset-shadow-veil' />
 
         <div className='selectors-row'>
           <div className='card-category-selector'>
-            <div className='card-category-title' style={fontColor(Colors().text1)}>
+            <div className='create-card-column-title' style={columnTitleStyle}>
               Types
             </div>
             {
@@ -231,17 +290,18 @@ class CardSelector extends TerrainComponent<Props>
             }
           </div>
           <div className='create-card-selector-column' style={borderColor(Colors().border1)}>
-            <div className='card-category-selector-title'>
+            <div className='create-card-column-title' style ={columnTitleStyle}>
               Cards
             </div>
             <div
               className='create-card-selector-inner'
               ref={this.registerCardSelector}
-              style={this.state.computedHeight === -1 ?
+              style={_.extend({},
+                borderColor(Colors().border1), this.state.computedHeight === -1 ?
                 {} :
                 {
                   height: this.state.computedHeight,
-                }}
+                })}
             >
               {
                 isEmpty &&
@@ -250,7 +310,7 @@ class CardSelector extends TerrainComponent<Props>
                 </div>
               }
               {
-                this.props.cardTypeList.map(this.renderCardOption)
+                this.renderCardOptions()
               }
             </div>
           </div>

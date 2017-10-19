@@ -57,15 +57,15 @@
       display: flex;
     }
 
+    .create-card-column-title {
+      height: 1em;
+      padding: @half-spacing 0px;
+      text-align: center;
+    }
+
     .create-card-selector-column {
       flex: 1;
       border-left: 1px solid;
-      .card-category-selector-title {
-        height: 1em;
-        margin-top: @half-spacing;
-        margin-bottom: @half-spacing;
-        text-align: center;
-      }
 
       .create-card-selector-inner {
         max-height: @item-row-height;
@@ -75,24 +75,23 @@
 
     .card-category-selector {
       width: 160px;
-      .card-category-title {
-        height: 1em;
-        margin-top: @half-spacing;
-        margin-bottom: @half-spacing;
-        text-align: center;
-      }
 
       .card-category-list {
-        padding: 0px @spacing;
-
+        padding: 0px;
+        display: block;
         .card-category-list-item {
+          height: 24px;
+          width: 140px;
           cursor: pointer;
           margin: 0px;
-          text-align: center;
+          justify-content: center;
           padding: 3px;
+          display: flex;
+          align-items: center;
           text-transform: capitalize;
           border-top: 1px solid;
-
+          border-left: 3px solid;
+          border-right: 1px solid;
           .big-text;
           .transition;
           &:last-child {

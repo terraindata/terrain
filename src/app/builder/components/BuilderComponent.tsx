@@ -202,6 +202,7 @@ class BuilderComponent extends TerrainComponent<Props>
           addColumn={this.props.addColumn}
           columnIndex={this.props.columnIndex}
           accepts={st && st.accepts}
+          card={data}
           singleChild={d.singleChild}
           language={this.props.language}
           hideCreateCardTool={d.hideCreateCardTool}

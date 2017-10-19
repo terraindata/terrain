@@ -74,6 +74,7 @@ export interface Props
   connectDropTarget?: (el: JSX.Element) => JSX.Element;
   helpOn?: boolean;
   accepts?: List<string>;
+  card?: Card;
   noCardTool?: boolean;
   singleChild?: boolean;
   hideCreateCardTool?: boolean;
@@ -244,6 +245,7 @@ class CardsArea extends TerrainComponent<Props>
               open={this.state.cardToolOpen}
               className='nested-create-card-tool-wrapper'
               accepts={this.props.accepts}
+              data={this.props.card}
               onToggle={this._toggle('cardToolOpen')}
               hidePlaceholder={this.props.singleChild}
               cannotClose={cards.size === 0}
