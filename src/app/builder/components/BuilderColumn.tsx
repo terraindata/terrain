@@ -312,7 +312,7 @@ const BuilderColumn = createReactClass<any, any>(
       const options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map((index) => ({
         text: COLUMNS[index],
         onClick: this.switchView,
-        disabled: index === this.state.column,
+        selected: index === this.state.column,
         icon: menuIcons[index].icon,
         iconColor: menuIcons[index].color,
       })));
@@ -346,7 +346,7 @@ const BuilderColumn = createReactClass<any, any>(
           <div
             className='builder-title-bar'
             style={{
-              'box-shadow': '0px 3px 9px ' + Colors().boxShadow,
+              'boxShadow': '0px 3px 9px ' + Colors().boxShadow,
               'borderColor': Colors().stroke,
               'backgroundColor': Colors().bg2,
             }}

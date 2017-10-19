@@ -64,6 +64,7 @@ export interface MenuOption
   onClick: (index: number, id: string) => void;
   disabled?: boolean;
   icon?: any;
+  selected?: boolean;
   iconColor?: string;
 }
 
@@ -94,7 +95,7 @@ export class Menu extends TerrainComponent<Props>
 
     let onClick: any = _.noop;
 
-    if (!option.disabled)
+    if (!option.disabled || !option.selected)
     {
       // TODO
       onClick = (event) =>
@@ -107,7 +108,12 @@ export class Menu extends TerrainComponent<Props>
 
     return (
       <div
-        className={'menu-option' + (option.disabled ? ' menu-option-disabled' : '')}
+        
+       className={classNames({
+                      'menu-option': true,
+                      'menu-option-disabled': option.disabled,
+                      'menu-option-selected': option.selected,
+                    })}
         key={index}
         onClick={onClick}
       >

@@ -438,7 +438,7 @@ class LibraryItem extends TerrainComponent<Props>
                     })}
                     style={
                       isSelected ? backgroundColor(Colors().active) :
-                        backgroundColor(Colors().bg2, Colors().inactiveHover)
+                        backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().bg3 : Colors().bg2, Colors().inactiveHover)
                     }
                   >
                     <div
