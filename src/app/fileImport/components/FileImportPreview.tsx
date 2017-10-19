@@ -149,6 +149,7 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalTitle: string,
     responseModalError: boolean,
     previewErrorMsg: string,
+    analyzers: List<string>,
   } = {
     templateOptions: List([]),
     appliedTemplateName: '',
@@ -177,9 +178,19 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalTitle: '',
     responseModalError: false,
     previewErrorMsg: '',
+    analyzers: List([]),
   };
 
   public confirmedLeave: boolean = false;
+
+  constructor(props)
+  {
+    super(props);
+    this._subscribe(FileImportStore, {
+      stateKey: 'analyzers',
+      storeKeyPath: ['columnAnalyzers'],
+    });
+  }
 
   public componentDidMount()
   {
@@ -189,6 +200,8 @@ class FileImportPreview extends TerrainComponent<Props>
       const tableName = getType('');
       Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
     } // Parse the TQL and set the filters so that when we fetch we get the right templates.
+
+    Actions.fetchColumnAnalyzers();
 
     Actions.fetchTemplates(this.props.exporting);
     this.setState({
@@ -1032,6 +1045,7 @@ class FileImportPreview extends TerrainComponent<Props>
         columnNames={this.props.columnNames}
         isIncluded={this.props.columnsToInclude.get(key)}
         columnType={this.props.columnTypes.get(key)}
+        analyzers={this.state.analyzers}
         isPrimaryKey={this.props.exporting ? null : this.props.primaryKeys.includes(key)}
         columnOptions={this.props.columnOptions}
         exporting={this.props.exporting}
