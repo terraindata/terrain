@@ -204,7 +204,10 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleAlgorithmDuplicateConfirm()
   {
-    const groupId = _.keys(this.props.groups.toJS()).sort()[this.state.duplicateAlgorithmGroupIndex];
+    const groupKeys = _.keys(this.props.groups.toJS());
+    const groupId = groupKeys
+      .map((key) => parseFloat(key))
+      .sort()[this.state.duplicateAlgorithmGroupIndex];
     const id = this.state.duplicateAlgorithmId;
     const index = this.props.algorithmsOrder.findIndex((iid) => iid === id);
     const dbs = this.getSortedDatabases(this.props.dbs);
@@ -629,11 +632,10 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderGroupDropdown()
   {
-    const values = _.keys(this.props.groups.toJS())
-      .map((key) => parseFloat(key))
-      .sort();
+    const groupKeys = _.keys(this.props.groups.toJS());
+    const values = groupKeys.map((key) => parseFloat(key)).sort();
     let groupNames = Immutable.Map<number, string>({});
-    _.keys(this.props.groups.toJS()).forEach((key) =>
+    groupKeys.forEach((key) =>
     {
       groupNames = groupNames.set(parseFloat(key), this.props.groups.get(parseFloat(key)).name);
     });
