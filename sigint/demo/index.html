@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+          type="text/css">
+    <link rel="stylesheet" href="theme.css" type="text/css">
+</head>
+<body>
+<div class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <ul class="nav nav-pills" style="background-color: #CCEEFF; padding: 10px; border-radius: 5px;">
+                    <li class="nav-item">
+                        <a href="#" class="active nav-link"> <i class="fa fa-home fa-home"></i>&nbsp;Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"
+                           onclick="TerrainAnalytics.logEvent('click', 1, {pageNameSource: 'Home', pageTypeSource: 'site', pageNameDest: 'Item 1', pageTypeDest: 'site'});">Item
+                            1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link"
+                           onclick="TerrainAnalytics.logEvent('click', 1, {pageNameSource: 'Home', pageTypeSource: 'site', pageNameDest: 'Item 2', pageTypeDest: 'site'});">Item
+                            2</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div class="jumbotron">
+                    <h1>Terrain Analytics Demo</h1>
+                    <p>Please browse and purchase our movies from the list below!
+                </div>
+            </div>
+
+            <div class="col-md-2"></div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-4"><img
+                                        src="http://image.tmdb.org/t/p/w185/nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg"
+                                        style="width:100%;"></div>
+                                <div class="col-md-4"
+                                     style="text-align: center; valign: middle; margin-top: auto; margin-bottom: auto;">
+                                    <h4><a href="#" data-toggle="modal" data-target="#modal1"
+                                           onclick="TerrainAnalytics.logEvent('click', 1, {pageNameSource: 'Home', pageTypeSource: 'site', pageNameDest: 'Interstellar', pageTypeDest: 'movie'});">Interstellar</a>
+                                    </h4></div>
+                                <div class="col-md-4"
+                                     style="text-align: acenter; valign: middle; margin-top: auto; margin-bottom: auto;">
+                                    <a href="#"
+                                       onclick="TerrainAnalytics.logEvent('conversion', 1, {pageName: 'Home', pageType: 'site', itemsPurchased: [{type: 'movie', name: 'Interstellar', cost: '$9.99'}]}); window.alert('Thank you for your purchase!');">
+                                        <button class="btn btn-large btn-success">Buy Now</button>
+                                    </a></div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-4"><img
+                                        src="http://image.tmdb.org/t/p/w185/lZpWprJqbIFpEV5uoHfoK0KCnTW.jpg"
+                                        style="width:100%;"></div>
+                                <div class="col-md-4"
+                                     style="text-align: center; valign: middle; margin-top: auto; margin-bottom: auto;">
+                                    <h4><a href="#" data-toggle="modal" data-target="#modal2"
+                                           onclick="TerrainAnalytics.logEvent('click', 1, {pageNameSource: 'Home', pageTypeSource: 'site', pageNameDest: 'The Matrix', pageTypeDest: 'movie'});">The
+                                        Matrix</a></h4></div>
+                                <div class="col-md-4"
+                                     style="text-align: acenter; valign: middle; margin-top: auto; margin-bottom: auto;">
+                                    <a href="#"
+                                       onclick="TerrainAnalytics.logEvent('conversion', 1, {pageName: 'Home', pageType: 'site', itemsPurchased: [{type: 'movie', name: 'The Matrix', cost: '$9.99'}]}); window.alert('Thank you for your purchase!');">
+                                        <button class="btn btn-large btn-success">Buy Now</button>
+                                    </a></div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-4"><img
+                                        src="http://image.tmdb.org/t/p/w185/5WJnxuw41sddupf8cwOxYftuvJG.jpg"
+                                        style="width:100%;"></div>
+                                <div class="col-md-4"
+                                     style="text-align: center; valign: middle; margin-top: auto; margin-bottom: auto;">
+                                    <h4><a href="#" data-toggle="modal" data-target="#modal3"
+                                           onclick="TerrainAnalytics.logEvent('click', 1, {pageNameSource: 'Home', pageTypeSource: 'site', pageNameDest: 'Django Unchained', pageTypeDest: 'movie'});">Django
+                                        Unchained</a></h4></div>
+                                <div class="col-md-4"
+                                     style="text-align: acenter; valign: middle; margin-top: auto; margin-bottom: auto;">
+                                    <a href="#"
+                                       onclick="TerrainAnalytics.logEvent('conversion', 1, {pageName: 'Home', pageType: 'site', itemsPurchased: [{type: 'movie', name: 'Django Unchained', cost: '$9.99'}]}); window.alert('Thank you for your purchase!');">
+                                        <button class="btn btn-large btn-success">Buy Now</button>
+                                    </a></div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-4"><img
+                                        src="http://image.tmdb.org/t/p/w185/9cJETuLMc6R0bTWRA5i7ctY9bxk.jpg"
+                                        style="width:100%;"></div>
+                                <div class="col-md-4"
+                                     style="text-align: center; valign: middle; margin-top: auto; margin-bottom: auto;">
+                                    <h4><a href="#" data-toggle="modal" data-target="#modal4"
+                                           onclick="TerrainAnalytics.logEvent('click', 1, {pageNameSource: 'Home', pageTypeSource: 'site', pageNameDest: 'WALL-E', pageTypeDest: 'movie'});">WALL-E</a>
+                                    </h4></div>
+                                <div class="col-md-4"
+                                     style="text-align: acenter; valign: middle; margin-top: auto; margin-bottom: auto;">
+                                    <a href="#"
+                                       onclick="TerrainAnalytics.logEvent('conversion', 1, {pageName: 'Home', pageType: 'site', itemsPurchased: [{type: 'movie', name: 'WALL-E', cost: '$9.99'}]}); window.alert('Thank you for your purchase!');">
+                                        <button class="btn btn-large btn-success">Buy Now</button>
+                                    </a></div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-4"><img
+                                        src="http://image.tmdb.org/t/p/w185/bYR8O1H1ZlME7Dm9ysfTYZnRDpw.jpg"
+                                        style="width:100%;"></div>
+                                <div class="col-md-4"
+                                     style="text-align: center; valign: middle; margin-top: auto; margin-bottom: auto;">
+                                    <h4><a href="#" data-toggle="modal" data-target="#modal5"
+                                           onclick="TerrainAnalytics.logEvent('click', 1, {pageNameSource: 'Home', pageTypeSource: 'site', pageNameDest: '300', pageTypeDest: 'movie'});">300</a>
+                                    </h4></div>
+                                <div class="col-md-4"
+                                     style="text-align: acenter; valign: middle; margin-top: auto; margin-bottom: auto;">
+                                    <a href="#"
+                                       onclick="TerrainAnalytics.logEvent('conversion', 1, {pageName: 'Home', pageType: 'site', itemsPurchased: [{type: 'movie', name: '300', cost: '$9.99'}]}); window.alert('Thank you for your purchase!');">
+                                        <button class="btn btn-large btn-success">Buy Now</button>
+                                    </a></div>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+</div>
+
+<div id="modal1" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Interstellar</h4>
+            </div>
+            <div class="modal-body">
+                Interstellar chronicles the adventures of a group of explorers who make use of a newly discovered
+                wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an
+                interstellar voyage.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal2" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">The Matrix</h4>
+            </div>
+            <div class="modal-body">
+                Set in the 22nd century, The Matrix tells the story of a computer hacker who joins a group of
+                underground insurgents fighting the vast and powerful computers who now rule the earth.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal3" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Django Unchained</h4>
+            </div>
+            <div class="modal-body">
+                With the help of a German bounty hunter, a freed slave sets out to rescue his wife from a brutal
+                Mississippi plantation owner.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal4" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">WALL-E</h4>
+            </div>
+            <div class="modal-body">
+                WALL·E is the last robot left on an Earth that has been overrun with garbage and all humans have fled to
+                outer space. For 700 years he has continued to try and clean up the mess, but has developed some rather
+                interesting human-like qualities. When a ship arrives with a sleek new type of robot, WALL·E thinks he's
+                finally found a friend and stows away on the ship when it leaves.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal5" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">300</h4>
+            </div>
+            <div class="modal-body">
+                Based on Frank Miller's graphic novel, "300" is very loosely based the 480 B.C. Battle of Thermopylae,
+                where the King of Sparta led his army against the advancing Persians; the battle is said to have
+                inspired all of Greece to band together against the Persians, and helped usher in the world's first
+                democracy.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+        integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"
+        integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1"
+        crossorigin="anonymous"></script>
+
+<script src='../build/bundle.js'></script>
+<script>
+    $(document).ready(function () {
+        TerrainAnalytics.logEvent('view', 1, {pageName: 'Home', pageType: 'site'});
+    });
+</script>
+</body>
+</html>
