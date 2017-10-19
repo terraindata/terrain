@@ -68,7 +68,10 @@ const appSchemaSQL: string[] = [
      type text NOT NULL,
      dsn text NOT NULL,
      host text NOT NULL,
-     status text);`,
+     status text,
+     isAnalytics bool DEFAULT 0,
+     analyticsIndex text,
+     analyticsType text);`,
   `CREATE TABLE IF NOT EXISTS users
     (id integer PRIMARY KEY,
      accessToken text NOT NULL,

@@ -1,4 +1,4 @@
-1.
+-- 1.
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS importTemplatesCopy
     (id integer PRIMARY KEY,
@@ -18,7 +18,7 @@ DROP TABLE importTemplates;
 ALTER TABLE importTemplatesCopy RENAME TO importTemplates;
 END TRANSACTION;
 ----------------------------------------------------------
-2.
+-- 2.
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS schedules
     (id integer PRIMARY KEY,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS schedules
      transportStr text);
 END TRANSACTION;
 ----------------------------------------------------------
-3.
+-- 3.
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS schedulesCopy
     (id integer PRIMARY KEY,
@@ -52,7 +52,7 @@ DROP TABLE schedules;
 ALTER TABLE schedulesCopy RENAME TO schedules;
 END TRANSACTION;
 ----------------------------------------------------------
-4.
+-- 4.
 BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS exportTemplates
      (id integer PRIMARY KEY,
@@ -89,4 +89,21 @@ DROP TABLE importTemplates;
 ALTER TABLE importTemplatesCopy RENAME TO importTemplates;
 END TRANSACTION;
 ----------------------------------------------------------
+-- 5.
 
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS databasesCopy
+    (id integer PRIMARY KEY,
+     name text NOT NULL,
+     type text NOT NULL,
+     dsn text NOT NULL,
+     host text NOT NULL,
+     status text,
+     isAnalytics bool DEFAULT 0,
+     analyticsIndex text,
+     analyticsType text);
+INSERT INTO databasesCopy (id, name, type, dsn, host, status, isAnalytics) SELECT databases.id, databases.name, databases.type, databases.dsn, databases.host, databases.status, 0 FROM databases;
+DROP TABLE databases;
+ALTER TABLE databasesCopy RENAME TO databases;
+END TRANSACTION;
+----------------------------------------------------------
