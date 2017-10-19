@@ -111,6 +111,12 @@ const GaussianGraph = {
     innerSvg.append('g')
       .attr('class', 'points');
 
+    if (state.addAnnotations)
+    {
+      innerSvg.append('g')
+        .attr('class', 'annotations');
+    }
+
     this.update(el, state);
 
     // apply CSS styles
@@ -140,7 +146,7 @@ const GaussianGraph = {
 
     const scales = this._scales(el, state.domain, state.width, state.height);
     this._draw(el, scales, state.height, state.width, state.average, state.min, state.max, state.stdDev,
-      state.stdDevUpper, state.stdDevLower, state.colors, state.domain);
+      state.stdDevUpper, state.stdDevLower, state.colors, state.domain, state.addAnnotations);
   },
 
   destroy(el)
@@ -228,7 +234,8 @@ const GaussianGraph = {
   {
     const data = [];
     const stepSize = (max - min) * 0.001;
-    for (let i = min; i < max; i += stepSize)
+    const padding = (max - min) * 0.1;
+    for (let i = (min - padding); i < (max + padding); i += stepSize)
     {
       const p = this._gaussian(i, average, stdDev); // calc prob of rand draw
       data.push({ p, q: i });
@@ -272,6 +279,96 @@ const GaussianGraph = {
     point.on('mouseout', this._mouseoutFactory(el));
 
     point.exit().remove();
+  },
+
+  _drawPointAnnotations(el, scales, pointsData, colors, sigma)
+  {
+    d3.select(el).selectAll('.gaussian-annotation-text').remove();
+
+    const g = d3.select(el).selectAll('.annotations');
+    const annotation = g.selectAll('rect')
+      .data(pointsData, (d) => d['id'] + '_annotation');
+
+    const annotationX = (d) =>
+    {
+      switch (d['id'])
+      {
+        case 'Average':
+          return scales.realX(d['x']) - 10;
+        case 'Std Dev Upper':
+          return scales.realX(d['x']) + 12;
+        case 'Std Dev Lower':
+          return scales.realX(d['x']) - 40;
+        default:
+          return scales.realX(d['x']);
+      }
+    };
+
+    const annotationY = (d) =>
+    {
+      switch (d['id'])
+      {
+        case 'Average':
+          return scales.realPointY(d['y']) - 25;
+        case 'Std Dev Upper':
+          return scales.realPointY(d['y']) - 5;
+        case 'Std Dev Lower':
+          return scales.realPointY(d['y']) - 5;
+        default:
+          return scales.realPointY(d['y']);
+      }
+    };
+    const annotationYLower = (d) =>
+    {
+      switch (d['id'])
+      {
+        case 'Average':
+          return scales.realPointY(d['y']) - 15;
+        case 'Std Dev Upper':
+          return scales.realPointY(d['y']) + 5;
+        case 'Std Dev Lower':
+          return scales.realPointY(d['y']) + 5;
+        default:
+          return scales.realPointY(d['y']);
+      }
+    };
+
+    const text = (d) =>
+    {
+      switch (d['id'])
+      {
+        case 'Average':
+          return 'Avg:';
+        case 'Std Dev Upper':
+          return '+' + sigma + ' dev:';
+        case 'Std Dev Lower':
+          return '-' + sigma + ' dev:';
+        default:
+          return '';
+      }
+    };
+
+    annotation.enter().append('text')
+      .attr('fill', 'black')
+      .attr('class', 'gaussian-annotation-text')
+      .attr('x', annotationX)
+      .attr('y', annotationY)
+      .attr('text-anchor', 'start')
+      .text(text);
+
+    annotation.enter().append('text')
+      .attr('fill', 'black')
+      .attr('class', 'gaussian-annotation-text')
+      .attr('x', annotationX)
+      .attr('y', annotationYLower)
+      .attr('text-anchor', 'start')
+      .text((d) => Util.formatNumber(d['x']));
+
+    annotation
+      .attr('id', (d) => d['id'] + '_annotation')
+      .attr('_id', (d) => d['id'] + '_annotation');
+
+    annotation.exit().remove();
   },
 
   _drawVerticalLine(el, scales, xValue, maxY, className)
@@ -491,7 +588,7 @@ const GaussianGraph = {
     upperSection.on('mouseout', this._sectionMouseoutFactory(el));
   },
 
-  _draw(el, scales, height, width, average, min, max, stdDev, stdDevUpper, stdDevLower, colors, domain)
+  _draw(el, scales, height, width, average, min, max, stdDev, stdDevUpper, stdDevLower, colors, domain, addAnnotations)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -516,6 +613,17 @@ const GaussianGraph = {
       return { x, y: this._gaussian(x, average, stdDev), id: key };
     });
     this._drawPoints(el, scales, pointsData, colors);
+
+    if (addAnnotations)
+    {
+      const annotatedPointsData = pointsData.filter((d) =>
+      {
+        return d.id === 'Std Dev Upper' || d.id === 'Std Dev Lower' || d.id === 'Average';
+      });
+      const sigma = Math.round(Math.abs(average - stdDevUpper) / stdDev);
+      this._drawPointAnnotations(el, scales, annotatedPointsData, colors, sigma);
+    }
+
     this._drawStdDeviationBgs(
       el,
       scales,

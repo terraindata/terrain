@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires strict-boolean-expressions
-
+const Dimensions = require('react-dimensions');
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
@@ -81,6 +81,7 @@ export interface Props
   aggregation: any;
   name: string;
   query: Query;
+  containerWidth?: number;
 }
 
 export enum DISPLAY_TYPES
@@ -479,6 +480,8 @@ class AggregationComponent extends TerrainComponent<Props> {
       <AggregationGaussian
         data={values}
         colors={[Colors().active, Colors().activeHover]}
+        name={this.props.name}
+        containerWidth={this.props.containerWidth - 100}
       />
     );
   }
@@ -489,6 +492,8 @@ class AggregationComponent extends TerrainComponent<Props> {
       <AggregationScatterPlot
         data={values.values}
         colors={[Colors().active, Colors().activeHover]}
+        name={this.props.name}
+        containerWidth={this.props.containerWidth - 100}
       />
     );
   }
@@ -519,6 +524,8 @@ class AggregationComponent extends TerrainComponent<Props> {
         <AggregationHistogram
           data={value}
           colors={[Colors().active, Colors().activeHover]}
+          name={this.props.name}
+          containerWidth={this.props.containerWidth - 100}
         />
       );
     }
@@ -573,4 +580,9 @@ class AggregationComponent extends TerrainComponent<Props> {
   }
 }
 
-export default AggregationComponent;
+export default Dimensions({
+  elementResize: true,
+  containerStyle: {
+    height: 'auto',
+  },
+})(AggregationComponent);

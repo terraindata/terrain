@@ -121,6 +121,7 @@ class ResultsColumn extends TerrainComponent<Props>
           highlightedTabs: this.state.highlightedTabs.set('aggregations', true),
         });
       }
+
     }
     if (this.props.query.resultsViewMode !== nextProps.query.resultsViewMode)
     {
