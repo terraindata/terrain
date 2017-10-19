@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
+import './ResultsColumnStyle.less';
+
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 import * as classNames from 'classnames';
@@ -55,9 +57,6 @@ import * as React from 'react';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
-
-import './ResultsColumnStyle.less';
-
 import TQLEditor from 'tql/components/TQLEditor';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
@@ -114,11 +113,6 @@ class ResultsColumn extends TerrainComponent<Props>
     }
     if (!_.isEqual(this.props.resultsState.aggregations, nextProps.resultsState.aggregations) && this.state.selectedTab !== 1)
     {
-<<<<<<< HEAD
-      this.setState({
-        highlightedTabs: this.state.highlightedTabs.set('aggregations', true),
-      });
-=======
       const aggs = this.props.resultsState.aggregations;
 
       if (_.keys(aggs).length !== 0)
@@ -127,7 +121,6 @@ class ResultsColumn extends TerrainComponent<Props>
           highlightedTabs: this.state.highlightedTabs.set('aggregations', true),
         });
       }
->>>>>>> 65d9da6eb6bd90a310a92280be85204071dd106b
     }
     if (this.props.query.resultsViewMode !== nextProps.query.resultsViewMode)
     {
