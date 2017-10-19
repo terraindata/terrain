@@ -63,18 +63,24 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
   (state, action) =>
   {
     Ajax.getAllTemplates(
+      action.payload.exporting,
       (templatesArr) =>
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
         { // TODO move this translation to _Template
-          return FileImportTypes._Template(_.extend({}, template, {
-            templateId: template['id'],
-            templateName: template['name'],
-            originalNames: List<string>(template['originalNames']),
-          }));
+          return FileImportTypes._Template(_.extend({},
+            template,
+            {
+              export: action.payload.exporting,
+              templateId: template['id'],
+              templateName: template['name'],
+              originalNames: List<string>(template['originalNames']),
+            },
+            action.payload.exporting ? { objectKey: template['objectKey'] } : {},
+          ));
         },
         ));
-        action.payload.setTemplates(templates);
+        action.payload.setTemplates(templates, action.payload.exporting);
       },
     );
     return state;
@@ -83,22 +89,25 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
 ControlReducer[ActionTypes.importExport.setTemplates] =
   (state, action) =>
   {
-    return state.set('importExportTemplates', action.payload.templates);
+    const stateVar = action.payload.exporting ? 'exportTemplates' : 'importTemplates';
+    return state.set(stateVar, action.payload.templates);
   };
 
 ControlReducer[ActionTypes.importExport.deleteTemplate] =
   (state, action) =>
   {
-    Ajax.deleteTemplate(action.payload.templateId,
+    Ajax.deleteTemplate(
+      action.payload.templateId,
+      action.payload.exporting,
       () =>
       {
         action.payload.handleDeleteTemplateSuccess(action.payload.templateName);
-        action.payload.fetchTemplates();
+        action.payload.fetchTemplates(action.payload.exporting);
       },
       (err: string) =>
       {
         action.payload.handleDeleteTemplateError(err);
-        action.payload.fetchTemplates();
+        action.payload.fetchTemplates(action.payload.exporting);
       },
     );
     return state;
@@ -107,16 +116,18 @@ ControlReducer[ActionTypes.importExport.deleteTemplate] =
 ControlReducer[ActionTypes.importExport.resetTemplateToken] =
   (state, action) =>
   {
-    Ajax.resetTemplateToken(action.payload.templateId,
+    Ajax.resetTemplateToken(
+      action.payload.templateId,
+      action.payload.exporting,
       () =>
       {
         action.payload.handleResetSuccess();
-        action.payload.fetchTemplates();
+        action.payload.fetchTemplates(action.payload.exporting);
       },
       (err: string) =>
       {
         action.payload.handleResetError(err);
-        action.payload.fetchTemplates();
+        action.payload.fetchTemplates(action.payload.exporting);
       },
     );
     return state;

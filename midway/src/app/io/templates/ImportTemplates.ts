@@ -46,73 +46,38 @@ THE SOFTWARE.
 
 import * as srs from 'secure-random-string';
 import * as winston from 'winston';
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
 
-import { UserConfig } from '../users/UserRouter';
-import * as Util from '../Util';
+import * as Tasty from '../../../tasty/Tasty';
+import * as App from '../../App';
+import { UserConfig } from '../../users/UserRouter';
+import * as Util from '../../Util';
+import { TemplateBase, TemplateBaseStringified } from './Templates';
 
-export interface ImportTemplateBase
+export interface ImportTemplateConfig extends TemplateBase
 {
-  // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
-  // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
-  columnTypes: object;
-  dbid: number;           // instance id
-  dbname: string;         // for elastic, index name
-  export?: boolean;       // export type template
-  originalNames: string[];    // array of strings (oldName)
-  persistentAccessToken?: string;    // persistent access token
-  primaryKeyDelimiter?: string;
-  primaryKeys: string[];  // newName of primary key(s)
-  tablename: string;      // for elastic, type name
-  transformations: object[];  // list of in-order data transformations
-}
-
-export interface ImportTemplateConfig extends ImportTemplateBase
-{
-  id?: number;
   name: string;
 }
 
-interface ImportTemplateConfigStringified
+export interface ImportTemplateBaseStringified extends TemplateBaseStringified
 {
-  columnTypes: string;
-  dbid: number;
-  dbname: string;
-  export: boolean;
-  id?: number;
   name: string;
-  originalNames: string;
-  persistentAccessToken?: string;
-  primaryKeyDelimiter: string;
-  primaryKeys: string;
-  tablename: string;
-  transformations: string;
-}
-
-export interface ExportTemplateConfig extends ImportTemplateBase
-{
-  id?: number;
-  name: string;
-  query?: string;
-  templateId?: number;
-  variantId?: number;
 }
 
 export class ImportTemplates
 {
-  private templateTable: Tasty.Table;
+  private exportTemplateTable: Tasty.Table;
+  private importTemplateTable: Tasty.Table;
 
   constructor()
   {
-    this.templateTable = new Tasty.Table(
+
+    this.importTemplateTable = new Tasty.Table(
       'importTemplates',
       ['id'],
       [
         'columnTypes',
         'dbid',
         'dbname',
-        'export',
         'name',
         'originalNames',
         'persistentAccessToken',
@@ -135,8 +100,8 @@ export class ImportTemplates
         return reject('Invalid template id passed');
       }
 
-      const deleted: ImportTemplateConfigStringified[] =
-        await App.DB.delete(this.templateTable, { id }) as ImportTemplateConfigStringified[];
+      const deleted: ImportTemplateBaseStringified[] =
+        await App.DB.delete(this.importTemplateTable, { id }) as ImportTemplateBaseStringified[];
       resolve(this._parseConfig(deleted) as ImportTemplateConfig[]);
     });
   }
@@ -176,8 +141,8 @@ export class ImportTemplates
   {
     return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
     {
-      const templates: ImportTemplateConfigStringified[] =
-        await App.DB.select(this.templateTable, columns, filter) as ImportTemplateConfigStringified[];
+      const templates: ImportTemplateBaseStringified[] =
+        await App.DB.select(this.importTemplateTable, columns, filter) as ImportTemplateBaseStringified[];
       resolve(this._parseConfig(templates) as ImportTemplateConfig[]);
     });
   }
@@ -200,8 +165,8 @@ export class ImportTemplates
         }
         const template: ImportTemplateConfig = results[0] as ImportTemplateConfig;
         template['persistentAccessToken'] = srs({ length: 256 });
-        const upserted: ImportTemplateConfigStringified =
-          await App.DB.upsert(this.templateTable, this._stringifyConfig(template)) as ImportTemplateConfigStringified;
+        const upserted: ImportTemplateBaseStringified =
+          await App.DB.upsert(this.importTemplateTable, this._stringifyConfig(template)) as ImportTemplateBaseStringified;
         resolve(this._parseConfig(upserted) as ImportTemplateConfig);
       }
     });
@@ -231,13 +196,13 @@ export class ImportTemplates
         );
         template['persistentAccessToken'] = persistentAccessToken;
       }
-      const upserted: ImportTemplateConfigStringified =
-        await App.DB.upsert(this.templateTable, this._stringifyConfig(template)) as ImportTemplateConfigStringified;
+      const upserted: ImportTemplateBaseStringified =
+        await App.DB.upsert(this.importTemplateTable, this._stringifyConfig(template)) as ImportTemplateBaseStringified;
       resolve(this._parseConfig(upserted) as ImportTemplateConfig);
     });
   }
 
-  private _parseConfig(stringified: ImportTemplateConfigStringified | ImportTemplateConfigStringified[]):
+  private _parseConfig(stringified: ImportTemplateBaseStringified | ImportTemplateBaseStringified[]):
     ImportTemplateConfig | ImportTemplateConfig[]
   {
     if (Array.isArray(stringified))
@@ -246,7 +211,7 @@ export class ImportTemplates
     }
     return this._parseConfigHelper(stringified);
   }
-  private _parseConfigHelper(stringified: ImportTemplateConfigStringified): ImportTemplateConfig
+  private _parseConfigHelper(stringified: ImportTemplateBaseStringified): ImportTemplateConfig
   {
     const template: ImportTemplateConfig =
       {
@@ -254,7 +219,6 @@ export class ImportTemplates
         columnTypes: JSON.parse(stringified['columnTypes']),
         dbid: stringified['dbid'],
         dbname: stringified['dbname'],
-        export: stringified['export'],
         id: stringified['id'],
         name: stringified['name'],
         originalNames: JSON.parse(stringified['originalNames']),
@@ -266,15 +230,14 @@ export class ImportTemplates
     return template;
   }
 
-  private _stringifyConfig(template: ImportTemplateConfig): ImportTemplateConfigStringified
+  private _stringifyConfig(template: ImportTemplateConfig): ImportTemplateBaseStringified
   {
-    const stringified: ImportTemplateConfigStringified =
+    const stringified: ImportTemplateBaseStringified =
       {
         persistentAccessToken: template['persistentAccessToken'],
         columnTypes: JSON.stringify(template['columnTypes']),
         dbid: template['dbid'],
         dbname: template['dbname'],
-        export: template['export'] === true ? true : false,
         id: template['id'],
         name: template['name'],
         originalNames: JSON.stringify(template['originalNames']),

@@ -171,9 +171,9 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
       command = `curl -X POST  -H 'Content-Type: ${contentTypeText}' ` +
         `-H 'Accept: application/json' -d ` +
         `'{"id": ${template.templateId}, "persistentAccessToken": "${template.persistentAccessToken}", ` +
-        `"body": {"dbid": ${template.dbid}, "filetype": "${fileType}", "objectKey": "${objectKey}", ` +
+        `"body": {"dbid": ${template.dbid}, "filetype": "${fileType}", ` +
         `"templateId": ${template.templateId}, "variantId": ${variantId}}}' ` +
-        `${midwayURL}/midway/v1/import/export/headless`;
+        `${midwayURL}/midway/v1/export/headless`;
     }
     else // import
     {
@@ -200,7 +200,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     index: number;
     fileTypeIndex: number;
     midwayURLValue: string;
-    objectKeyValue: string;
+    objectKeyValue: string; // this does nothing until we add ability to override the template's object key
     selectedIds: List<number>;
     filenameValue: string;
   } = {
@@ -317,9 +317,10 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
               fileTypeIndex === FileTypes.JSON_TYPE_OBJECT &&
               <div className='headless-form-input'>
                 <input
-                  value={this.state.objectKeyValue}
+                  value={template.objectKey}
                   onChange={this._setStateWrapperPath('objectKeyValue', 'target', 'value')}
-                  style={inputStyle}
+                  style={_.extend({}, inputStyle, backgroundColor(Colors().altHighlight))}
+                  disabled={true}
                 />
               </div>
             }
@@ -419,7 +420,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
       midwayURL: this.state.midwayURLValue,
       variantId: this.state.selectedIds.get(2),
       filename: this.state.filenameValue,
-      objectKey: this.state.objectKeyValue,
+      objectKey: template.objectKey ? template.objectKey : this.state.objectKeyValue,
     });
     const iconWrapperStyle = fontColor(Colors().bg3);
     const formComplete = requests.length === 0 && errors.length === 0;

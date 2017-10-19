@@ -83,6 +83,11 @@ class MySQLController extends DatabaseController
   {
     throw new Error('No QueryHandler is currently implemented for MySQL.');
   }
+
+  public getAnalyticsDB(): object
+  {
+    throw new Error('Analytics backend is currently not implemented for MySQL.');
+  }
 }
 
 export default MySQLController;
