@@ -67,11 +67,9 @@ class ElasticBackend implements Backend
 
   topLevelCards =
   List([
-    'eqlindex',
     'eqltype',
     'eqlfrom',
     'eqlsize',
-    'eqlbody',
   ]);
 
   // Ordering of the cards deck
@@ -92,7 +90,7 @@ class ElasticBackend implements Backend
   {
     // The Elastic cards always start from the root card.
     return List([
-      make(ElasticBlocks, 'eqlroot', { key: 'root' }),
+      make(ElasticBlocks, 'eqlbody', { key: 'body' }),
     ]);
   }
 

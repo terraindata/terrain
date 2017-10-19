@@ -47,7 +47,7 @@ import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Switch.less';
 
@@ -126,7 +126,7 @@ const SWITCH_DARKER_STYLE = _.extend({}, SWITCH_STYLE, {
 });
 
 const ACTIVE_SECTION_STYLE = {
-  color: Colors().text1,
+  color: '#fff',
 };
 
 export default Switch;

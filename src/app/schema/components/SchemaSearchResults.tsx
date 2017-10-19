@@ -50,9 +50,10 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const Radium = require('radium');
 import * as React from 'react';
+import { SchemaState } from 'schema/SchemaTypes';
+import Util from 'util/Util';
 import FadeInOut from '../../common/components/FadeInOut';
 import Styles from '../../Styles';
-import SchemaStore from '../data/SchemaStore';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import SchemaTreeItem from './SchemaTreeItem';
@@ -62,6 +63,7 @@ type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 export interface Props
 {
   search: string;
+  schema: SchemaState;
 }
 
 let INIT_SHOWING_COUNT: IMMap<string, number> = Immutable.Map<string, number>({});
@@ -97,35 +99,27 @@ class SchemaSearchResults extends TerrainComponent<Props>
     prevItems: INIT_PREV_ITEMS,
   };
 
-  constructor(props: Props)
-  {
-    super(props);
-
-    this._subscribe(SchemaStore, {
-      updater: (storeState: SchemaTypes.SchemaState) =>
-      {
-        let { items, prevItems } = this.state;
-        items.map((v, storeKey) =>
-        {
-          const storeValue = storeState.get(storeKey);
-          if (prevItems.get(storeKey) !== storeValue)
-          {
-            // reference changed
-            items = items.set(storeKey, storeValue.valueSeq().toList());
-            prevItems = prevItems.set(storeKey, storeValue);
-          }
-        });
-
-        this.setState({
-          items,
-          prevItems,
-        });
-      },
-    });
-  }
-
   public componentWillReceiveProps(nextProps: Props)
   {
+    const { schema: storeState } = nextProps;
+
+    let { items, prevItems } = this.state;
+    items.map((v, storeKey) =>
+    {
+      const storeValue = storeState.get(storeKey);
+      if (prevItems.get(storeKey) !== storeValue)
+      {
+        // reference changed
+        items = items.set(storeKey, storeValue.valueSeq().toList());
+        prevItems = prevItems.set(storeKey, storeValue);
+      }
+    });
+
+    this.setState({
+      items,
+      prevItems,
+    });
+
     if (nextProps.search !== this.props.search)
     {
       this.setState({
@@ -294,4 +288,8 @@ class SchemaSearchResults extends TerrainComponent<Props>
   }
 }
 
-export default SchemaSearchResults;
+export default Util.createContainer(
+  SchemaSearchResults,
+  ['schema'],
+  {},
+);

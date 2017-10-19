@@ -46,11 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
+import { List } from 'immutable';
 import * as React from 'react';
 import { MidwayError } from 'shared/error/MidwayError';
 import * as UserTypes from '../UserTypes';
 import AuthStore from './../../auth/data/AuthStore';
+import { Colors, Themes, ThemesArray } from './../../colors/Colors';
 import CheckBox from './../../common/components/CheckBox';
+import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
@@ -58,6 +61,7 @@ import Store from './../data/UserStore';
 import AccountEntry from './AccountEntry';
 import './Settings.less';
 type User = UserTypes.User;
+import { notificationManager } from './../../common/components/InAppNotification';
 import Modal from './../../common/components/Modal';
 import PasswordStrengthInput from './PasswordStrengthInput';
 
@@ -70,7 +74,6 @@ export interface Props
   params?: any;
   history?: any;
   children?: any;
-
 }
 
 class Settings extends TerrainComponent<Props>
@@ -107,6 +110,22 @@ class Settings extends TerrainComponent<Props>
   {
     Actions.fetch();
   }
+
+  // public componentDidMount()
+  // {
+  //   if (localStorage.getItem('theme') === 'Dark')
+  //   {
+  //     this.setState({
+  //       theme: 0
+  //     });
+  //   }
+  //   else
+  //   {
+  //     this.setState({
+  //       theme: 1
+  //     });
+  //   }
+  // }
 
   public componentWillUnmount()
   {
@@ -183,11 +202,7 @@ class Settings extends TerrainComponent<Props>
     Ajax.changePassword(+userId, currentPassword, newPassword, () =>
     {
       Actions.fetch();
-      this.setState({
-        modalMessage: 'Your password has been changed.',
-        errorModal: false,
-      });
-      this.toggleModal();
+      notificationManager.addNotification('Success', 'Updated password', 'info', 4);
     }, (error) =>
       {
         this.setState({
@@ -433,6 +448,45 @@ class Settings extends TerrainComponent<Props>
     );
   }
 
+  public changeTheme(val)
+  {
+    const theme = ThemesArray[val];
+    if (localStorage.getItem('theme') !== theme)
+    {
+      localStorage.setItem('theme', theme);
+      location.reload();
+    }
+  }
+
+  public renderTerrainSettingsContent()
+  {
+    return (
+      <div>
+        <div className='settings-field-title'>
+          Color Theme:
+        </div>
+        <div className='settings-row'>
+          <Dropdown
+            options={List(ThemesArray)}
+            selectedIndex={ThemesArray.indexOf(localStorage.getItem('theme'))}
+            onChange={this.changeTheme}
+            canEdit={true}
+            className='settings-theme-dropdown'
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // <Select
+  //    clearable={false}
+  //    value={ThemesInt[localStorage.getItem('theme')]}
+  //    options={themesList}
+  //    onChange={this.changeTheme}
+  //    className='settings-timezone-dropdown'
+  //    searchable={false}
+  //  />
+
   public renderSignOutDescription()
   {
     return (
@@ -544,6 +598,10 @@ class Settings extends TerrainComponent<Props>
           title='Time Zone'
           description={this.renderTimeZoneDescription()}
           content={this.renderTimeZoneContent()}
+        />
+        <AccountEntry
+          title='Terrain App Settings'
+          content={this.renderTerrainSettingsContent()}
         />
         <Modal
           message={this.state.modalMessage}

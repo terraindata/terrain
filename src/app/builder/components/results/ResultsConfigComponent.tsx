@@ -54,7 +54,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { _Format, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -280,7 +280,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
               Drag fields to/from the sample result below to customize
               how this algorithm's results look in the Builder.
             </div>
-            <div className='results-config-config' style={[backgroundColor(Colors().bg2), shadowStyle]}>
+            <div className='results-config-config' style={[backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3), shadowStyle]}>
               <CRTarget
                 className='results-config-name'
                 type='name'

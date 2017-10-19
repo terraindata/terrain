@@ -48,6 +48,7 @@ import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
+import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 
 export const enum AutocompleteMatchType
@@ -75,6 +76,12 @@ export const ElasticBlockHelpers = {
         (db) => db.name,
       ).toList();
     }
+
+    const metaFields = ['_index', '_type', '_uid', '_id',
+      '_source', '_size',
+      '_all', '_field_names',
+      '_parent', '_routing',
+      '_meta'];
 
     if (index !== null)
     {
@@ -106,52 +113,57 @@ export const ElasticBlockHelpers = {
             column.tableId === String(typeId),
         ).map(
           (column) => column.name,
-        ).toList().push('_all');
+        ).toList().concat(List(metaFields));
       }
     }
 
-    return List();
+    return List(metaFields);
   },
 };
 
-export function findCardTypeInRoot(name: string): Block | null
+export function findCardType(name: string): Block | null
 {
   const state = BuilderStore.getState();
-  const rootCard = state.query.cards.get(0);
-  if (rootCard === undefined)
+  let theCard = null;
+  forAllCards(state.query.cards, (card) =>
   {
-    return null;
-  }
-  const isTheCard = (card) => card['type'] === name;
-  const theCard = rootCard['cards'].find(isTheCard);
-  if (theCard === undefined)
-  {
-    return null;
-  }
+    if (card.type === name)
+    {
+      theCard = card;
+    }
+  });
   return theCard;
 }
 
 export function getIndex(notSetIndex: string = null): string | null
 {
-  const c = findCardTypeInRoot('eqlindex');
+  const c = findCardType('elasticFilter');
   if (c === null)
   {
     return notSetIndex;
   } else
   {
-    return c['value'];
+    if (c['currentIndex'] === '')
+    {
+      return notSetIndex;
+    }
+    return c['currentIndex'];
   }
 }
 
 export function getType(notSetType: string = null): string | null
 {
-  const c = findCardTypeInRoot('eqltype');
+  const c = findCardType('elasticFilter');
   if (c === null)
   {
     return notSetType;
   } else
   {
-    return c['value'];
+    if (c['currentType'] === '')
+    {
+      return notSetType;
+    }
+    return c['currentType'];
   }
 }
 

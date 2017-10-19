@@ -80,7 +80,7 @@ export default class ESStructureClause extends ESClause
 
     this.checkValidAndUniqueProperties(this.required, 'required');
     this.checkValidAndUniqueProperties(this.suggestions, 'suggestions');
-    this.checkValidAndUniqueProperties(Object.keys(this.template), 'template');
+    // this.checkValidAndUniqueProperties(Object.keys(this.template), 'template');
   }
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
@@ -123,6 +123,7 @@ export default class ESStructureClause extends ESClause
           viTuple.propertyValue.clause = valueClause;
         }
       });
+    super.mark(interpreter, valueInfo);
   }
 
   protected unknownPropertyName(interpreter: ESInterpreter, children: { [name: string]: ESPropertyInfo }, viTuple: ESPropertyInfo)

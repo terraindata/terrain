@@ -102,27 +102,29 @@ class BuilderMapComponent extends TerrainComponent<Props>
   {
     const { distance, distanceUnit, geopoint, map_text, field } = this.props.data;
     return (
-      <MapComponent
-        keyPath={this.props.keyPath}
-        location={geopoint.toJS !== undefined ? geopoint.toJS() : geopoint}
-        address={map_text !== undefined ? map_text : ''}
-        markLocation={true}
-        showDistanceCircle={true}
-        showSearchBar={true}
-        zoomControl={true}
-        distance={parseFloat(distance)}
-        distanceUnit={distanceUnit}
-        geocoder='photon'
-        hideSearchSettings={true}
-        inputs={this.state.inputs}
-        textKeyPath={this._ikeyPath(this.props.parentKeyPath, 'map_text')}
-        spotlights={this.state.spotlights}
-        field={field}
-        keepAddressInSync={true}
-        canEdit={this.props.canEdit}
-        colorMarker={true}
-        className={'builder-map-component-wrapper'}
-      />
+      <div className='cards-builder-map-component'>
+        <MapComponent
+          keyPath={this.props.keyPath}
+          location={geopoint.toJS !== undefined ? geopoint.toJS() : geopoint}
+          address={map_text !== undefined ? map_text : ''}
+          markLocation={true}
+          showDistanceCircle={true}
+          showSearchBar={true}
+          zoomControl={true}
+          distance={parseFloat(distance)}
+          distanceUnit={distanceUnit}
+          geocoder='photon'
+          hideSearchSettings={true}
+          inputs={this.state.inputs}
+          textKeyPath={this._ikeyPath(this.props.parentKeyPath, 'map_text')}
+          spotlights={this.state.spotlights}
+          field={field}
+          keepAddressInSync={true}
+          canEdit={this.props.canEdit}
+          colorMarker={true}
+          className={'builder-map-component-wrapper'}
+        />
+      </div>
     );
   }
 }

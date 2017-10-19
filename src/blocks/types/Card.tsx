@@ -46,9 +46,13 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { Display } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
+
+import ESClause from '../../../shared/database/elastic/parser/clauses/ESClause';
+import ESValueInfo from '../../../shared/database/elastic/parser/ESValueInfo';
 
 export type InitFn = (blockSpec: { [type: string]: BlockConfig }, extraConfig?: { [key: string]: any }, skipTemplate?: boolean) => {
   [k: string]: any;
@@ -61,6 +65,10 @@ export interface Card extends IRecord<Card>
   _isCard: boolean;
   _isBlock: boolean;
   closed: boolean;
+  tuning?: boolean; // whether the card is in the tuning section
+  // whether a card in tuning column is collapsed (needs to be sep. from closed)
+  tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
+  errors: List<string>;
 
   // the following fields are excluded from the server save
   static: {
@@ -68,7 +76,6 @@ export interface Card extends IRecord<Card>
     colors: string[];
     title: string;
     display: Display | Display[];
-
     isAggregate: boolean;
 
     // the format string used for generating tql
@@ -79,8 +86,14 @@ export interface Card extends IRecord<Card>
     //    e.g. "$DIRECTION" will look up "DirectionTQL" in CommonSQL and pass the value into it
     // - topTql is the tql to use if this card is at the top level of a query
     tql: TQLFn;
+    toValueInfo?: (block: Block, blockPath: KeyPath) => ESValueInfo;
+    updateCards?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
+    updateView?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
     tqlGlue?: string;
     topTql?: string;
+
+    // This is used for the distance card, it will be overwritten by parser on load unless saved as metadata
+    map_text?: string;
 
     anythingAccepts?: boolean;
 
@@ -126,6 +139,10 @@ export interface CardConfig
     isAggregate?: boolean;
     // manualEntry: IManualEntry;
     tql: TQLFn;
+    clause?: ESClause;
+    toValueInfo?: (block: Block, blockPath: KeyPath) => ESValueInfo;
+    updateCards?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
+    updateView?: (rootBlock: Block, block: Block, blockPath: KeyPath) => Block;
     tqlGlue?: string;
     topTql?: string | ((block: Block) => string);
     accepts?: List<string>;
@@ -143,7 +160,7 @@ export interface CardConfig
   };
 }
 
-export const allCardsMetaFields = allBlocksMetaFields.concat(['closed']);
+export const allCardsMetaFields = allBlocksMetaFields.concat(['closed', 'tuning', 'tuningClosed', 'map_text']);
 
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
@@ -152,9 +169,13 @@ export const _card = (config: CardConfig) =>
 
   config = _.extend(config, {
     id: '',
+    errors: Immutable.List([]),
     _isCard: true,
     _isBlock: true,
     closed: false,
+    tuning: false,
+    tuningClosed: false,
+    map_text: '',
   });
 
   if (config.static.metaFields)

@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, buttonColors, Colors } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import { tooltip } from '../../common/components/tooltip/Tooltips';
 import Autocomplete from './../../common/components/Autocomplete';
 import CheckBox from './../../common/components/CheckBox';
@@ -73,6 +73,7 @@ export interface Props
   columnNames: List<string>;
   datatype: string;
   onClose: () => void;
+  setErrorMsg: (errMsg: string) => void;
 }
 
 @Radium
@@ -295,14 +296,12 @@ class TransformModal extends TerrainComponent<Props>
     const msg: string = this.transformErrorCheck(transformName);
     if (msg)
     {
-      Actions.setErrorMsg(msg);
+      this.props.setErrorMsg(msg);
       return;
     }
-
     const transform: Transform = this.getTransform(transformName);
-    Actions.updatePreviewRows(transform);
+    Actions.updatePreviewColumns(transform);
     Actions.addTransform(transform);
-    this.props.onClose();
   }
 
   public renderText(transformType: string)
@@ -460,9 +459,7 @@ class TransformModal extends TerrainComponent<Props>
     return (
       <div
         className='fi-transform-components'
-        style={{
-          color: Colors().text1,
-        }}
+        style={fontColor(Colors().text1)}
       >
         {
           components
@@ -514,9 +511,7 @@ class TransformModal extends TerrainComponent<Props>
           TRANSFORM_TYPES[datatypeId].map((type, index) =>
             <div
               className='flex-container fi-transform-option'
-              style={{
-                color: Colors().text1,
-              }}
+              style={fontColor(Colors().text1)}
               key={index}
             >
               <CheckBox
@@ -568,6 +563,7 @@ class TransformModal extends TerrainComponent<Props>
         confirm={true}
         confirmButtonText={'Apply Transformation'}
         onConfirm={this.handleTransform}
+        closeOnConfirm={true}
       />
     );
   }

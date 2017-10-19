@@ -82,6 +82,8 @@ export interface Props
   textStyle?: React.CSSProperties;
 
   handleCardDrop?: (type: string) => any;
+
+  tuningMode?: boolean;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
 }
@@ -132,6 +134,7 @@ class BuilderComponent extends TerrainComponent<Props>
           columnIndex={this.props.columnIndex}
           language={this.props.language}
           textStyle={this.props.textStyle}
+          tuningMode={this.props.tuningMode}
         />,
       ) as El[];
       // return displayArg.map(di => this.renderDisplay(di, parentKeyPath, data)) as El[];
@@ -204,6 +207,7 @@ class BuilderComponent extends TerrainComponent<Props>
           language={this.props.language}
           hideCreateCardTool={d.hideCreateCardTool}
           handleCardDrop={d.handleCardDrop ? d.handleCardDrop : this.props.handleCardDrop}
+          tuningMode={this.props.tuningMode}
         />;
         break;
       case DisplayType.CARDTEXT:
@@ -222,6 +226,7 @@ class BuilderComponent extends TerrainComponent<Props>
           columnIndex={this.props.columnIndex}
           display={d}
           language={this.props.language}
+          tuningMode={this.props.tuningMode}
         />;
         break;
       case DisplayType.DROPDOWN:
@@ -266,6 +271,7 @@ class BuilderComponent extends TerrainComponent<Props>
                 parentData={this.props.parentData}
                 language={this.props.language}
                 textStyle={this.props.textStyle}
+                tuningMode={this.props.tuningMode}
               />
             </div>
             <FadeInOut
@@ -279,6 +285,7 @@ class BuilderComponent extends TerrainComponent<Props>
                 parentData={this.props.parentData}
                 language={this.props.language}
                 textStyle={this.props.textStyle}
+                tuningMode={this.props.tuningMode}
               />
             </FadeInOut>
           </div>
@@ -298,6 +305,7 @@ class BuilderComponent extends TerrainComponent<Props>
                 parentData={this.props.parentData}
                 language={this.props.language}
                 textStyle={this.props.textStyle}
+                tuningMode={this.props.tuningMode}
               />
             }
             <div
@@ -314,6 +322,7 @@ class BuilderComponent extends TerrainComponent<Props>
                 columnIndex={this.props.columnIndex}
                 language={this.props.language}
                 textStyle={this.props.textStyle}
+                tuningMode={this.props.tuningMode}
               />
             </div>
             {!d.below ? null :
@@ -331,6 +340,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   columnIndex={this.props.columnIndex}
                   language={this.props.language}
                   textStyle={this.props.textStyle}
+                  tuningMode={this.props.tuningMode}
                 />
               </div>
             }
@@ -365,6 +375,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   isFirstRow={i === 0}
                   isOnlyRow={value.size === 1}
                   handleCardDrop={d.handleCardDrop}
+                  tuningMode={this.props.tuningMode}
                 />
               ))
             }
@@ -457,6 +468,7 @@ class BuilderComponent extends TerrainComponent<Props>
             autoDisabled={d.autoDisabled}
             getAutoTerms={d.getAutoTerms}
             language={this.props.language}
+            tuningMode={this.props.tuningMode}
             {...{
               keyPath,
               value,

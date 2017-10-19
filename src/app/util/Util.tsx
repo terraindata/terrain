@@ -45,8 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:restrict-plus-operands radix strict-boolean-expressions no-var-requires no-unused-expression forin no-shadowed-variable max-line-length
-
 import * as $ from 'jquery';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as Immutable from 'immutable';
@@ -462,6 +463,11 @@ const Util = {
     return Util.parentNode(reactNode).childNodes;
   },
 
+  children(reactNode): NodeList
+  {
+    return ReactDOM.findDOMNode(reactNode).childNodes;
+  },
+
   selectText(field, start, end)
   {
     if (field.createTextRange)
@@ -651,6 +657,35 @@ const Util = {
     });
   },
 
+  createContainer(component, stateToPropsKeys, dispatchToPropsMap)
+  {
+    const mapStateToProps = (state) =>
+    {
+      const stateToProps = {};
+      stateToPropsKeys.forEach((key) =>
+      {
+        stateToProps[key] = state.get(key);
+      });
+      return stateToProps;
+    };
+
+    const mapDispatchToProps = (dispatch) =>
+    {
+      const dispatchToProps = {};
+      Object.keys(dispatchToPropsMap).forEach((key) =>
+      {
+        const actions = dispatchToPropsMap[key];
+        dispatchToProps[key] = bindActionCreators(actions, dispatch);
+      });
+
+      return dispatchToProps;
+    };
+
+    return connect(
+      mapStateToProps,
+      mapDispatchToProps,
+    )(component);
+  },
 };
 
 export default Util;

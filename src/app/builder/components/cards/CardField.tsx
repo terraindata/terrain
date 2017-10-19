@@ -52,7 +52,7 @@ import * as React from 'react';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import DragHandle from '../../../common/components/DragHandle';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ManualInfo from '../../../manual/components/ManualInfo';
@@ -94,6 +94,7 @@ export interface Props
   addColumn?: (number, string?) => void;
   columnIndex?: number;
   handleCardDrop?: (type: string) => any;
+  tuningMode?: boolean;
 }
 
 interface IMoveState
@@ -359,6 +360,7 @@ class CardField extends TerrainComponent<Props>
             addColumn={this.props.addColumn}
             columnIndex={this.props.columnIndex}
             language={this.props.language}
+            tuningMode={this.props.tuningMode}
           />
         }
         <div
@@ -372,7 +374,7 @@ class CardField extends TerrainComponent<Props>
           ref='cardField'
         >
           {
-            !renderTools && this.props.canEdit && this.props.isFirstRow &&
+            !renderTools && this.props.canEdit && this.props.isFirstRow && !this.props.tuningMode &&
             tooltip(
               <div
                 className='card-field-top-add card-field-add'
@@ -430,6 +432,7 @@ class CardField extends TerrainComponent<Props>
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
               language={this.props.language}
+              tuningMode={this.props.tuningMode}
             />
           </div>
           {
@@ -496,6 +499,7 @@ class CardField extends TerrainComponent<Props>
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
               language={this.props.language}
+              tuningMode={this.props.tuningMode}
             />
           </div>
         }

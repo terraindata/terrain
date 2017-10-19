@@ -60,6 +60,7 @@ import Blocks from '../blocks/ElasticBlocks';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+import ESCardParser from './ESCardParser';
 
 const { make } = BlockUtils;
 
@@ -101,8 +102,9 @@ export default function ElasticToCards(
     try
     {
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'root');
-      const cards = BlockUtils.reconcileCards(query.cards, List([rootCard]));
+      const rootCard = parseCardFromValueInfo(rootValueInfo);
+      let cards = BlockUtils.reconcileCards(query.cards, rootCard['cards']);
+      cards = ESCardParser.parseAndUpdateCards(cards);
       return query
         .set('cards', cards)
         .set('cardsAndCodeInSync', true);
@@ -218,6 +220,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         distanceUnit,
         field,
         geopoint: coords,
+        map_text: '',
       },
       true);
   }
@@ -249,7 +252,6 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       },
     ));
   }
-
   return make(Blocks, clauseCardType, valueMap, true);
 };
 

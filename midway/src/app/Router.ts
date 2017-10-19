@@ -49,6 +49,7 @@ import * as KoaRouter from 'koa-router';
 import * as send from 'koa-send';
 
 import AuthRouter from './auth/AuthRouter';
+import CredentialRouter from './credentials/CredentialRouter';
 import DatabaseRouter from './database/DatabaseRouter';
 import EventRouter from './events/EventRouter';
 import ImportRouter from './import/ImportRouter';
@@ -65,6 +66,7 @@ import VersionRouter from './versions/VersionRouter';
 const AppRouter = new KoaRouter();
 
 AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
+AppRouter.use('/credentials', CredentialRouter.routes(), CredentialRouter.allowedMethods());
 AppRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
 AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
 AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
@@ -77,6 +79,11 @@ AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 AppRouter.use('/import', ImportRouter.routes(), ImportRouter.allowedMethods());
 AppRouter.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.allowedMethods());
 // Add future routes here.
+
+AppRouter.get('/time', (ctx, next) =>
+{
+  ctx.body = { serverTime: new Date().toJSON() };
+});
 
 // Prefix all routes with /midway
 //  This is so that we can allow the front-end to use all other routes.

@@ -46,42 +46,19 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import * as Encryption from './Encryption';
-import { Events } from './Events';
+import { EventMetadataConfig, Events } from './Events';
 
 export const events: Events = new Events();
-
 const Router = new KoaRouter();
 
-// Get an event tracker.
-Router.post('/', async (ctx, next) =>
-{
-  ctx.body = await events.registerEventHandler(ctx.request.ip, ctx.request.body.body);
-});
-
-// Handle client response for event tracker
-Router.post('/update/', async (ctx, next) =>
-{
-  const event: any = {
-    id: ctx.request.body['id'],
-    ip: ctx.request.ip,
-    message: ctx.request.body['message'],
-    payload: ctx.request.body['payload'],
-    type: ctx.request.body['type'],
-    url: ctx.request.body['url'],
-  };
-  const msg = await Encryption.decodeMessage(event);
-  await events.storeEvent(msg);
-  ctx.body = '';
-});
-
+// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
 // * variantid: list of variantids
 // * start: start time of the interval
 // * end: end time of the interval
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
 // * agg: supported aggregation operations are:
 //     `select` - returns all events between the specified interval
 //     `histogram` - returns a histogram of events between the specified interval
@@ -93,14 +70,14 @@ Router.post('/update/', async (ctx, next) =>
 //     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
 //     also supported are values such as `1.5h`, `90m` etc.
 //
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   Util.verifyParameters(
     JSON.parse(JSON.stringify(ctx.request.query)),
     ['start', 'end', 'eventid', 'variantid', 'agg'],
   );
   winston.info('getting events for variant');
-  const response: object[] = await events.EventHandler(ctx.request.query);
+  const response: object[] = await events.AggregationHandler(ctx.request.query);
   ctx.body = response.reduce((acc, x) =>
   {
     for (const key in x)
@@ -112,6 +89,52 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
       }
     }
   }, {});
+});
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting all events');
+  ctx.body = await events.getMetadata({});
+});
+
+Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const id = ctx.params.id;
+  winston.info('getting event ID ' + String(id));
+  ctx.body = await events.getMetadata({ id });
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add event');
+  const event: EventMetadataConfig = ctx.request.body.body;
+  Util.verifyParameters(event, ['name']);
+  if (event.id !== undefined)
+  {
+    throw new Error('Invalid parameter event ID');
+  }
+
+  ctx.body = await events.addEvent(events);
+});
+
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const event: EventMetadataConfig = ctx.request.body.body;
+  Util.verifyParameters(event, ['name']);
+  if (event.id === undefined)
+  {
+    event.id = Number(ctx.params.id);
+  }
+  else
+  {
+    if (event.id !== Number(ctx.params.id))
+    {
+      throw new Error('Event ID does not match the supplied id in the URL');
+    }
+  }
+
+  winston.info('modify event' + String(event.id));
+  ctx.body = await events.addEvent(event);
 });
 
 export default Router;

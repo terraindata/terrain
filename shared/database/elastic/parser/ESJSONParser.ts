@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESParser from 'shared/database/elastic/parser/ESParser';
 import ESJSONType from './ESJSONType';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
@@ -67,7 +68,7 @@ import ESValueInfo from './ESValueInfo';
  * myModeWithTokens(tokenizeWholeFile(cm.getValue())), starting a new highlight."
  *
  */
-export default class ESJSONParser
+export default class ESJSONParser extends ESParser
 {
   private queryString: string; // string being parsed
   private allowParameters: boolean; // if @parameters are allowed (non-compliant)
@@ -78,12 +79,8 @@ export default class ESJSONParser
   private lastRowChar: number; // position of last newline
   private lastRowNumber: number; // row number of last newline
 
-  private value: any; // parsed value
-  private valueInfo: ESValueInfo | null; // parsed root value info (or null on failure)
-
   private tokens: ESParserToken[]; // accumulated tokens, in order
   private valueInfos: ESValueInfo[]; // accumulated value info's, in order
-  private errors: ESParserError[]; // accumulated errors, in order
 
   /**
    * Runs the parser on the given query string. Read needed data by calling the
@@ -93,6 +90,8 @@ export default class ESJSONParser
    */
   public constructor(queryString: string, allowParameters: boolean = true)
   {
+    super();
+
     this.queryString = queryString;
     this.charNumber = 0;
     this.lastCheckedRowChar = -1;
@@ -104,7 +103,6 @@ export default class ESJSONParser
 
     this.tokens = [];
     this.valueInfos = [];
-    this.errors = [];
 
     this.valueInfo = this.readValue();
     if (this.valueInfo !== null)
@@ -121,22 +119,6 @@ export default class ESJSONParser
   }
 
   /**
-   * @returns {any} the parsed root value
-   */
-  public getValue(): any
-  {
-    return this.value;
-  }
-
-  /**
-   * @returns {any} the parsed root value info
-   */
-  public getValueInfo(): ESValueInfo
-  {
-    return this.valueInfo as ESValueInfo;
-  }
-
-  /**
    * @returns {ESParserToken[]} the tokens encountered, in order
    */
   public getTokens(): ESParserToken[]
@@ -150,24 +132,6 @@ export default class ESJSONParser
   public getValueInfos(): ESValueInfo[]
   {
     return this.valueInfos;
-  }
-
-  /**
-   * @returns {ESParserError[]} errors encountered, in order
-   */
-  public getErrors(): ESParserError[]
-  {
-    return this.errors;
-  }
-
-  public hasError(): boolean
-  {
-    return this.errors.length > 0;
-  }
-
-  public accumulateError(error: ESParserError): void
-  {
-    this.errors.push(error);
   }
 
   public accumulateErrorOnValueInfo(info: ESValueInfo, message: string, isWarning: boolean = false): void

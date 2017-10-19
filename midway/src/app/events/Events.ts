@@ -54,7 +54,6 @@ import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
 import { items } from '../items/ItemRouter';
 import * as Util from '../Util';
-import * as Encryption from './Encryption';
 
 export interface AggregationRequest
 {
@@ -67,28 +66,32 @@ export interface AggregationRequest
   interval?: string;
 }
 
-export interface EventTemplateConfig
+export interface EventConfig
 {
-  id: string;
-  ip: string;
-  url?: string;
-  variantId?: string;
+  eventid: number | string;
+  variantid: number | string;
+  visitorid: number | string;
+  timestamp: Date | string;
+  source: {
+    ip: string;
+    host: string;
+    useragent: string;
+    referer?: string;
+  };
+  meta?: any;
 }
 
-export interface EventConfig extends EventTemplateConfig
+export interface EventMetadataConfig
 {
-  eventType?: string;
-  date?: string;
-  message?: string;
-  name?: string;
-  payload?: any;
-  type: string;
+  id: number | string;
+  name: string;
+  description?: string;
 }
 
 export class Events
 {
   private eventTable: Tasty.Table;
-  private eventInfoTable: Tasty.Table;
+  private eventMetadataTable: Tasty.Table;
   private elasticController: ElasticController;
 
   constructor()
@@ -98,208 +101,253 @@ export class Events
 
     this.eventTable = new Tasty.Table(
       'events',
-      ['id'],
+      [],
       [
-        'date',
-        'ip',
-        'payload',
-        'type',
+        'eventid',
+        'variantid',
+        'visitorid',
+        'source',
+        'timestamp',
       ],
       'terrain-analytics',
     );
+
+    this.eventMetadataTable = new Tasty.Table(
+      'eventMetadata',
+      [],
+      [
+        'id',
+        'name',
+      ],
+      'terrain-analytics',
+    );
+
+    // tslint:disable-next-line:no-floating-promises
+    this.elasticController.getTasty().upsert(this.eventMetadataTable,
+      [
+        {
+          id: 1,
+          name: 'view',
+          description:
+          `Page view or impression event. This event fires off when a page
+          serving a variant is loaded or viewed.`,
+        },
+        {
+          id: 2,
+          name: 'click',
+          description:
+          `Item or page click event. This event is generated through an interaction
+          with the page or item served by a variant.`,
+        },
+        {
+          id: 3,
+          name: 'conversion',
+          description:
+          `An event denoting an item transaction or conversion. This event is generated
+          when an item served by a variant gets bought.`,
+        },
+        {
+          id: 4,
+          name: 'addtocart',
+          description:
+          `An event denoting that an item was added to the cart.`,
+        },
+      ]).then().catch();
+  }
+
+  public async getMetadata(filter: object): Promise<string>
+  {
+    return JSON.stringify(this.elasticController.getTasty().select(this.eventMetadataTable, [], filter));
+  }
+
+  public async addEvent(event: object): Promise<EventMetadataConfig>
+  {
+    return this.elasticController.getTasty().upsert(this.eventMetadataTable, event) as Promise<EventMetadataConfig>;
   }
 
   /*
-   * Parse incoming event request event
-   *
+   * Store an analytics event in ES
    */
-  public async registerEventHandler(ip: string, reqs: object[]): Promise<string>
+  public async storeEvent(event: EventConfig): Promise<EventConfig>
   {
-    return new Promise<string>(async (resolve, reject) =>
-    {
-      if (reqs === undefined || (Object.keys(reqs).length === 0 && reqs.constructor === Object) || reqs.length === 0)
-      {
-        return resolve('');
-      }
-      const encodedEvents: EventTemplateConfig[] = [];
-      for (const req of reqs)
-      {
-        if (req['ip'] === undefined)
-        {
-          req['ip'] = ip;
-        }
-        encodedEvents.push(await Encryption.encodeMessage(req));
-      }
-      if (encodedEvents.length === 0)
-      {
-        return resolve('');
-      }
+    return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
+  }
 
-      return resolve(JSON.stringify(encodedEvents));
-    });
+  public generateHistogramQuery(variantid: string, request: AggregationRequest): Elastic.SearchParams
+  {
+    const body = bodybuilder()
+      .size(0)
+      .filter('term', 'variantid', variantid)
+      .filter('term', 'eventid', request.eventid)
+      .filter('range', '@timestamp', {
+        gte: request.start,
+        lte: request.end,
+      })
+      .aggregation(
+      'date_histogram',
+      '@timestamp',
+      request.agg,
+      {
+        interval: request.interval,
+      },
+    );
+    return this.buildQuery(body.build());
   }
 
   public async getHistogram(variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
-      const client = this.elasticController.getClient();
-      const body = bodybuilder()
-        .size(0)
-        .filter('term', 'variantid', variantid)
-        .filter('term', 'eventid', request.eventid)
-        .filter('range', '@timestamp', {
-          gte: request.start,
-          lte: request.end,
-        })
-        .aggregation(
-        'date_histogram',
-        '@timestamp',
-        request.agg,
-        {
-          interval: request.interval,
-        },
-      );
-
-      const response = await new Promise((resolveI, rejectI) =>
+      const query = this.generateHistogramQuery(variantid, request);
+      this.runQuery(query, (response) =>
       {
-        const query = this.buildAnalyticsQuery(body.build());
-        client.search(query, Util.makePromiseCallback(resolveI, rejectI));
-      });
-      return resolve({
-        [variantid]: response['aggregations'][request.agg].buckets,
-      });
+        resolve({
+          [variantid]: response['aggregations'][request.agg].buckets,
+        });
+      }, reject);
     });
+  }
+
+  public generateRateQuery(variantid: string, request: AggregationRequest): Elastic.SearchParams
+  {
+    const eventids: string[] = request.eventid.split(',');
+    const numerator = request.agg + '_' + eventids[0];
+    const denominator = request.agg + '_' + eventids[1];
+    const rate = request.agg + '_' + eventids[0] + '_' + eventids[1];
+
+    const body = bodybuilder()
+      .size(0)
+      // .orFilter('term', 'eventid', eventids[0])
+      // .orFilter('term', 'eventid', eventids[1])
+      .filter('term', 'variantid', variantid)
+      .filter('range', '@timestamp', {
+        gte: request.start,
+        lte: request.end,
+      })
+
+      .aggregation(
+      'date_histogram',
+      '@timestamp',
+      'histogram',
+      {
+        interval: request.interval,
+      },
+      (agg) => agg.aggregation(
+        'filter',
+        undefined,
+        numerator,
+        {
+          term: {
+            eventid: eventids[0],
+          },
+        },
+        (agg1) => agg1.aggregation(
+          'value_count',
+          'eventid',
+          'count',
+        ),
+      )
+        .aggregation(
+        'filter',
+        undefined,
+        denominator,
+        {
+          term: {
+            eventid: eventids[1],
+          },
+        },
+        (agg1) => agg1.aggregation(
+          'value_count',
+          'eventid',
+          'count',
+        ),
+      )
+        .aggregation(
+        'bucket_script',
+        undefined,
+        rate,
+        {
+          buckets_path: {
+            [numerator]: numerator + '>count',
+            [denominator]: denominator + '>count',
+          },
+          script: 'params.' + numerator + ' / params.' + denominator,
+        }),
+    );
+
+    return this.buildQuery(body.build());
   }
 
   public async getRate(variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
-      const client = this.elasticController.getClient();
       const eventids: string[] = request.eventid.split(',');
       const numerator = request.agg + '_' + eventids[0];
       const denominator = request.agg + '_' + eventids[1];
       const rate = request.agg + '_' + eventids[0] + '_' + eventids[1];
 
-      const body = bodybuilder()
-        .size(0)
-        // .orFilter('term', 'eventid', eventids[0])
-        // .orFilter('term', 'eventid', eventids[1])
-        .filter('term', 'variantid', variantid)
-        .filter('range', '@timestamp', {
-          gte: request.start,
-          lte: request.end,
-        })
-
-        .aggregation(
-        'date_histogram',
-        '@timestamp',
-        'histogram',
-        {
-          interval: request.interval,
-        },
-        (agg) => agg.aggregation(
-          'filter',
-          undefined,
-          numerator,
-          {
-            term: {
-              eventid: eventids[0],
-            },
-          },
-          (agg1) => agg1.aggregation(
-            'value_count',
-            'eventid',
-            'count',
-          ),
-        )
-          .aggregation(
-          'filter',
-          undefined,
-          denominator,
-          {
-            term: {
-              eventid: eventids[1],
-            },
-          },
-          (agg1) => agg1.aggregation(
-            'value_count',
-            'eventid',
-            'count',
-          ),
-        )
-          .aggregation(
-          'bucket_script',
-          undefined,
-          rate,
-          {
-            buckets_path: {
-              [numerator]: numerator + '>count',
-              [denominator]: denominator + '>count',
-            },
-            script: 'params.' + numerator + ' / params.' + denominator,
-          }),
-      );
-
-      const response = await new Promise((resolveI, rejectI) =>
+      const query = this.generateRateQuery(variantid, request);
+      this.runQuery(query, (response) =>
       {
-        const query = this.buildAnalyticsQuery(body.build());
-        client.search(query, Util.makePromiseCallback(resolveI, rejectI));
-      });
-      return resolve({
-        [variantid]: response['aggregations'].histogram.buckets.map(
-          (obj) =>
-          {
-            delete obj[numerator];
-            delete obj[denominator];
-            obj.doc_count = obj[rate].value;
-            delete obj[rate];
-            return obj;
-          }),
-      });
+        resolve({
+          [variantid]: response['aggregations'].histogram.buckets.map(
+            (obj) =>
+            {
+              delete obj[numerator];
+              delete obj[denominator];
+              if (obj[rate] !== undefined)
+              {
+                obj.doc_count = obj[rate].value;
+                delete obj[rate];
+              }
+              return obj;
+            }),
+        });
+      }, reject);
     });
+  }
+
+  public generateSelectQuery(variantid: string, request: AggregationRequest): Elastic.SearchParams
+  {
+    let body = bodybuilder()
+      .filter('term', 'variantid', variantid)
+      .filter('term', 'eventid', request.eventid)
+      .filter('range', '@timestamp', {
+        gte: request.start,
+        lte: request.end,
+      });
+
+    if (request.field !== undefined)
+    {
+      try
+      {
+        const fields = request.field.split(',');
+        body = body.rawOption('_source', request.field);
+      }
+      catch (e)
+      {
+        winston.info('Ignoring malformed field value');
+      }
+    }
+    return this.buildQuery(body.build());
   }
 
   public async getAllEvents(variantid: string, request: AggregationRequest): Promise<object>
   {
-    return new Promise<object>(async (resolve, reject) =>
+    return new Promise<object>((resolve, reject) =>
     {
-      const client = this.elasticController.getClient();
-      let body = bodybuilder()
-        .filter('term', 'variantid', variantid)
-        .filter('term', 'eventid', request.eventid)
-        .filter('range', '@timestamp', {
-          gte: request.start,
-          lte: request.end,
+      const query = this.generateSelectQuery(variantid, request);
+      this.runQuery(query, (response) =>
+      {
+        resolve({
+          [variantid]: response['hits'].hits.map((e) => e['_source']),
         });
-
-      if (request.field !== undefined)
-      {
-        try
-        {
-          const fields = request.field.split(',');
-          body = body.rawOption('_source', request.field);
-        }
-        catch (e)
-        {
-          winston.info('Ignoring malformed field value');
-        }
-      }
-
-      const response = await new Promise((resolveI, rejectI) =>
-      {
-        const query = this.buildAnalyticsQuery(body.build());
-        client.search(query, Util.makePromiseCallback(resolveI, rejectI));
-      });
-
-      return resolve({
-        [variantid]: response['hits'].hits.map((e) => e['_source']),
-      });
+      }, reject);
     });
   }
 
-  public async EventHandler(request: AggregationRequest): Promise<object[]>
+  public async AggregationHandler(request: AggregationRequest): Promise<object[]>
   {
     const variantids = request['variantid'].split(',');
     const promises: Array<Promise<any>> = [];
@@ -343,23 +391,21 @@ export class Events
     return Promise.all(promises);
   }
 
-  /*
-   * Store the validated event in the datastore
-   *
-   */
-  public async storeEvent(event: EventConfig): Promise<EventConfig>
-  {
-    event.payload = JSON.stringify(event.payload);
-    return this.elasticController.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
-  }
-
-  private buildAnalyticsQuery(body: object): Elastic.SearchParams
+  private buildQuery(body: object): Elastic.SearchParams
   {
     return {
       index: 'terrain-analytics',
       type: 'events',
       body,
     };
+  }
+
+  private runQuery(query: Elastic.SearchParams, resolve: (T) => void, reject: (Error) => void): void
+  {
+    this.elasticController.getClient().search(
+      query,
+      Util.makePromiseCallback(resolve, reject),
+    );
   }
 }
 

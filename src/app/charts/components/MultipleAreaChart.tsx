@@ -79,12 +79,13 @@ const styles = {
     height: '20%',
   },
   topChart: {
-    padding: { top: 10, bottom: 25, left: 40, right: 0 },
+    padding: { top: 50, bottom: 25, left: 50, right: 0 },
     areas: { data: { strokeWidth: 2, fillOpacity: 0.4 } },
+    scatters: { data: { strokeWidth: 1, stroke: 'white', fillOpacity: 0 } },
     tooltip: { fill: 'white' },
   },
   bottomChart: {
-    padding: { top: 10, bottom: 25, left: 40, right: 0 },
+    padding: { top: 10, bottom: 25, left: 50, right: 0 },
     areas: { data: { fill: '#c43a31' } },
   },
   legend: {
@@ -131,7 +132,7 @@ interface Props
 
 interface State
 {
-  selectedDomain: any;
+  brushDomain: any;
   zoomDomain: any;
   visibleDatasets: List<ID>;
   highlightDataset: ID;
@@ -148,7 +149,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
   };
 
   public state: State = {
-    selectedDomain: {},
+    brushDomain: {},
     zoomDomain: {},
     visibleDatasets: null,
     highlightDataset: null,
@@ -185,7 +186,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
       this.setState({
         visibleDatasets: visibleDatasets.toList(),
         datasetColors: this.mapDatasetColors(nextProps.datasets),
-        selectedDomain: {},
+        brushDomain: {},
         zoomDomain: {},
       });
     }
@@ -193,7 +194,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
   public handleZoom(domain)
   {
-    this.setState({ selectedDomain: domain });
+    this.setState({ brushDomain: domain });
   }
 
   public handleBrush(domain)
@@ -231,6 +232,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
           scatters.push(
             <VictoryScatter
               key={key}
+              style={styles.topChart.scatters}
               data={ds.data}
               size={(datum, active) => active ? 5 : 0}
               x={xDataKey}
@@ -309,18 +311,16 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
       });
 
     return (
-      <VictoryPortal>
-        <VictoryLegend
-          x={40}
-          y={9}
-          name='legend'
-          gutter={20}
-          data={data.toArray()}
-          orientation={config.legend.orientation}
-          style={{ border: styles.legend.border }}
-          borderPadding={styles.legend.borderPadding}
-        />
-      </VictoryPortal>
+      <VictoryLegend
+        x={40}
+        y={9}
+        name='legend'
+        gutter={20}
+        data={data.toArray()}
+        orientation={config.legend.orientation}
+        style={{ border: styles.legend.border }}
+        borderPadding={styles.legend.borderPadding}
+      />
     );
   }
 
@@ -452,14 +452,19 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               containerComponent={
                 <VictoryZoomVoronoiContainer
                   responsive={false}
-                  dimension='x'
+                  zoomDimension='x'
+                  voronoiDimension='x'
                   zoomDomain={this.state.zoomDomain}
-                  onDomainChange={this.handleZoom}
+                  cachedZoomDomain={this.state.zoomDomain}
+                  onZoomDomainChange={this.handleZoom}
                   labels={(d) => d.l ? `${this.formatDate(d.x)} => ${d.y}` : null}
                   labelComponent={
-                    <VictoryTooltip cornerRadius={0} flyoutStyle={styles.topChart.tooltip} />
+                    <VictoryTooltip
+                      cornerRadius={0}
+                      flyoutStyle={styles.topChart.tooltip}
+                      dx={25}
+                    />
                   }
-                  style={{ overflow: 'visible' }}
                 />
               }
               events={[{
@@ -493,9 +498,9 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               theme={VictoryTheme.material}
               containerComponent={
                 <VictoryBrushContainer responsive={false}
-                  dimension='x'
-                  selectedDomain={this.state.selectedDomain}
-                  onDomainChange={this.handleBrush}
+                  brushDimension='x'
+                  brushDomain={this.state.brushDomain}
+                  onBrushDomainChange={this.handleBrush}
                 />
               }
             >

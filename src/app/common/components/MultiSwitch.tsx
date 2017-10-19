@@ -47,14 +47,20 @@ import * as classNames from 'classnames';
 import CheckBox from 'common/components/CheckBox';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors } from '../../common/Colors';
+import { backgroundColor, Colors } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './MultiSwitch.less';
 import SimpleRadio from './SimpleRadio';
 
+interface Option
+{
+  value: string;
+  label: string;
+}
+
 export interface Props
 {
-  options: List<string>;
+  options: List<string | Option>;
 
   // can pass the value in as an index, a string value, or an array of either
   //  (in the case of multiple selections)
@@ -71,10 +77,35 @@ export interface Props
 @Radium
 class MultiSwitch extends TerrainComponent<Props>
 {
+  public constructor(props)
+  {
+    super(props);
+
+    const { options } = this.props;
+
+    const normalizedOptions = options.map((option) =>
+    {
+      if (typeof option === 'object')
+      {
+        return option;
+      }
+      else
+      {
+        return { value: option, label: option };
+      }
+    });
+
+    this.state = {
+      options: normalizedOptions,
+    };
+  }
+
   public optionIsOn(index: number): boolean
   {
-    const { allowsMultiple, usesValues, value, options } = this.props;
-    const rawValue = usesValues ? options.get(index) : index;
+    const { allowsMultiple, usesValues, value } = this.props;
+    const { options } = this.state;
+
+    const rawValue = usesValues ? options.get(index).value : index;
 
     if (allowsMultiple)
     {
@@ -88,9 +119,11 @@ class MultiSwitch extends TerrainComponent<Props>
 
   public handleSelect(index: number)
   {
-    const { allowsMultiple, usesValues, onChange, options } = this.props;
+    const { allowsMultiple, usesValues, onChange } = this.props;
+    const { options } = this.state;
     let { value } = this.props;
-    const rawValue = usesValues ? options.get(index) : index;
+
+    const rawValue = usesValues ? options.get(index).value : index;
 
     if (allowsMultiple)
     {
@@ -126,13 +159,13 @@ class MultiSwitch extends TerrainComponent<Props>
         style={SWITCH_STYLE}
       >
         {
-          this.props.options.map(this.renderOption)
+          this.state.options.map(this.renderOption)
         }
       </div>
     );
   }
 
-  private renderOption(option: string, index: number)
+  private renderOption(option: Option, index: number)
   {
     const isOn = this.optionIsOn(index);
     return (
@@ -151,14 +184,14 @@ class MultiSwitch extends TerrainComponent<Props>
               checked={isOn}
               onChange={this._fn(this.handleSelect, index)}
               color={Colors().text1}
-              label={option}
+              label={option.label}
             />
             :
             <SimpleRadio
               on={isOn}
               large={this.props.large}
               small={this.props.small}
-              label={option}
+              label={option.label}
             />
         }
       </div>

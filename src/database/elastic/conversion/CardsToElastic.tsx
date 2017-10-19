@@ -54,20 +54,22 @@ import Query from '../../../items/types/Query';
 import Options from '../../types/CardsToCodeOptions';
 
 import { isInput } from '../../../blocks/types/Input';
+import ESCardParser from './ESCardParser';
 import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
 
 class CardsToElastic
 {
   public static toElastic(query: Query, options: Options = {}): string
   {
+    const body = {};
     const rootCard = query.cards.get(0);
-    if (!rootCard)
-    {
-      const emptyCardEQL = ESQueryToCode({}, options, query.inputs);
-      return emptyCardEQL;
-    }
+
     const rootCardValue = CardsToElastic.blockToElastic(rootCard, options);
-    const eql = ESQueryToCode(rootCardValue as ESQueryObject, options, query.inputs);
+    if (rootCardValue !== null)
+    {
+      body['body'] = rootCardValue;
+    }
+    const eql = ESQueryToCode(body as ESQueryObject, options, query.inputs);
     return eql;
   }
 
@@ -89,7 +91,7 @@ class CardsToElastic
       }
       return value;
     }
-    return { notYet: 'not yet done' };
+    return null;
   }
 }
 

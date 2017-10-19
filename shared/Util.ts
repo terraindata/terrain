@@ -89,6 +89,8 @@ export interface ParseCSVConfig
   error: (err: string) => void;
 }
 
+const newlineDelimeters = ['\r\n', '\r', '\n'];
+
 export function parseCSV(file, config: ParseCSVConfig)
 {
   const delim = config.delimiter || ',';
@@ -99,25 +101,25 @@ export function parseCSV(file, config: ParseCSVConfig)
   let preview = config.preview;
 
   // autodetect newLine
-  let newLine;
-  const rnIndex = file.indexOf('\r\n');
-  const nIndex = file.indexOf('\n');
-  if (rnIndex === -1 && nIndex === -1)
+  let newLine: string = '';
+  let newLineIndex: number;
+  newlineDelimeters.map((newLineDelim) =>
+  {
+    const index = file.indexOf(newLineDelim);
+    if (index !== -1)
+    {
+      if (newLineIndex === undefined || newLineIndex > index)
+      {
+        newLine = newLineDelim;
+        newLineIndex = index;
+      }
+    }
+  });
+
+  if (newLine === '')
   {
     config.error('Error: no line-breaks found in uploaded CSV file.');
     return undefined;
-  }
-  if (rnIndex === -1)
-  {
-    newLine = '\n';
-  }
-  else if (nIndex === -1)
-  {
-    newLine = '\r\n';
-  }
-  else
-  {
-    newLine = rnIndex < nIndex ? '\r\n' : '\n';
   }
 
   const newLineLength = newLine.length;
@@ -237,6 +239,7 @@ export function parseCSV(file, config: ParseCSVConfig)
     arr[row][col] = '';
   }
 
+  // remove blank lines
   arr = arr.filter((arrRow) =>
     arrRow.length > 1 || arrRow[0].length > newLineLength,
   );
@@ -256,7 +259,7 @@ export function parseCSV(file, config: ParseCSVConfig)
   return arr;
 }
 
-export function parseJSONSubset(file: string, numLines: number): object[]
+export function parseObjectListJSONSubset(file: string, numLines: number): object[]
 {
   let lineCount = 0;
   let openBracketCount = 0;
@@ -295,7 +298,7 @@ export function parseJSONSubset(file: string, numLines: number): object[]
   return JSON.parse(file.substring(0, c) + ']');
 }
 
-export function parseNewlineJSON(file: string, numLines: number): object[] | string
+export function parseNewlineJSONSubset(file: string, numLines: number): object[] | string
 {
   const items: object[] = [];
   let ind: number = 0;

@@ -53,8 +53,8 @@ import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 're
 
 import Switch from 'common/components/Switch';
 import Actions from '../../builder/data/BuilderActions';
+import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
-import { backgroundColor, Colors } from '../Colors';
 import Autocomplete from './Autocomplete';
 import CheckBox from './CheckBox';
 import './MapComponentStyle.less';

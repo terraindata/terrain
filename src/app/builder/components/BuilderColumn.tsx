@@ -61,13 +61,15 @@ import UserStore from '../../users/data/UserStore';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
+import ColorsActions from '../../colors/data/ColorsActions';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { backgroundColor, Colors, fontColor } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import CardsColumn from './cards/CardsColumn';
+import TuningColumn from './cards/TuningColumn';
 import InputsArea from './inputs/InputsArea';
 import ResultsArea from './results/ResultsArea';
 
@@ -80,6 +82,7 @@ const ResultsIcon = require('./../../../images/icon_resultsDropdown.svg');
 const TQLIcon = require('./../../../images/icon_tql.svg');
 const InputsIcon = require('./../../../images/icon_input.svg');
 const ManualIcon = require('./../../../images/icon_info.svg');
+const TuningIcon = require('./../../../images/icon_tuning.svg');
 
 enum COLUMNS
 {
@@ -88,9 +91,10 @@ enum COLUMNS
   Editor,
   Inputs,
   Schema,
+  Tuning,
 }
 // Manual,
-const NUM_COLUMNS = 5;
+const NUM_COLUMNS = 6;
 
 const menuIcons = [
   { icon: <BuilderIcon />, color: '#76a2c1' },
@@ -98,6 +102,7 @@ const menuIcons = [
   { icon: <TQLIcon />, color: '#d47884' },
   { icon: <InputsIcon />, color: '#c2b694' },
   { icon: <ManualIcon />, color: '#a98abf' },
+  { icon: <TuningIcon />, color: 'black' },
 ]; // TODO add schema icon above
 
 // interface Props
@@ -176,6 +181,11 @@ const BuilderColumn = createReactClass<any, any>(
       const rejigger = () => this.setState({ rand: Math.random() });
       this.unsubUser = UserStore.subscribe(rejigger);
       this.unsubRoles = RolesStore.subscribe(rejigger);
+
+      ColorsActions.setStyle('.builder-column .builder-title-bar-options .bc-options-svg .cls-1 ', { fill: Colors().text3 });
+      ColorsActions.setStyle('.builder-column .builder-title-bar-options .menu-wrapper ', { 'border-color': Colors().text3 });
+      ColorsActions.setStyle('.builder-column .builder-title-bar .builder-title-bar-title svg .cls-1', { fill: Colors().text3 });
+
     },
 
     componentWillUnmount()
@@ -260,6 +270,14 @@ const BuilderColumn = createReactClass<any, any>(
             showSearch={true}
             showResults={false}
           />;
+        case COLUMNS.Tuning:
+          return <TuningColumn
+            canEdit={canEdit}
+            addColumn={this.props.onAddManualColumn}
+            columnIndex={this.props.index}
+            cardsAndCodeInSync={query.cardsAndCodeInSync}
+            language={query.language}
+          />;
         // case COLUMNS.Manual:
         //   return <Manual
         //     selectedKey={this.props.selectedCardName}
@@ -323,16 +341,30 @@ const BuilderColumn = createReactClass<any, any>(
       return this.renderPanel((
         <div
           className={'builder-column builder-column-' + this.props.index}
-          style={backgroundColor(Colors().bg2)}
+          style={backgroundColor(Colors().bg1)}
         >
           <div
             className='builder-title-bar'
+            style={{
+              'box-shadow': '0px 3px 9px ' + Colors().boxShadow,
+              'borderColor': Colors().stroke,
+              'backgroundColor': Colors().bg2,
+            }}
           >
             {
               this.props.index === 0 ? null : (
-                <div className='builder-resize-handle' ref='resize-handle'>
-                  <div className='builder-resize-handle-line'></div>
-                  <div className='builder-resize-handle-line'></div>
+                <div
+                  className='builder-resize-handle'
+                  ref='resize-handle'
+                >
+                  <div
+                    className='builder-resize-handle-line'
+                    style={borderColor(Colors().stroke)}
+                  ></div>
+                  <div
+                    className='builder-resize-handle-line'
+                    style={borderColor(Colors().stroke)}
+                  ></div>
                 </div>
               )
             }
@@ -390,7 +422,9 @@ const BuilderColumn = createReactClass<any, any>(
               this.state.column === COLUMNS.Cards ||
               this.state.column === COLUMNS.Inputs,
             })}
-            style={backgroundColor(Colors().bg1)}
+            style={
+              borderColor(Colors().stroke)
+            }
           >
             {
               this.renderContent(canEdit)

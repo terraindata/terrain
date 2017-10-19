@@ -49,9 +49,8 @@ import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
+import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
-import { backgroundColor, Colors } from '../Colors';
-import Autocomplete from './Autocomplete';
 import TerrainComponent from './TerrainComponent';
 
 export interface Props

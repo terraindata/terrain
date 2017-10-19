@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions restrict-plus-operands
 
 import * as React from 'react';
-import { SchemaActions, SchemaStore } from '../data/SchemaStore';
+import SchemaActions from 'schema/data/SchemaActions';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { columnChildrenConfig, ColumnTreeInfo } from './items/ColumnTreeInfo';
@@ -58,6 +58,7 @@ import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
 const Radium = require('radium');
 import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
+import Util from 'util/Util';
 import FadeInOut from '../../common/components/FadeInOut';
 import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
 import SchemaTreeList from './SchemaTreeList';
@@ -69,12 +70,13 @@ export interface Props
   search: string;
 
   inSearchResults?: boolean;
+  schema: SchemaTypes.SchemaState;
+  schemaActions: any;
 }
 
 class State
 {
   public open: boolean = false;
-  public item: SchemaTypes.SchemaBaseClass = null;
   public childCount: number = -1;
   public isSelected = false;
   public isHighlighted = false;
@@ -137,53 +139,44 @@ class SchemaTreeItem extends TerrainComponent<Props>
   public lastHeaderClickTime: number = 0;
   public lastArrowClickTime: number = 0;
 
-  constructor(props: Props)
+  public componentWillReceiveProps(nextProps: Props)
   {
-    super(props);
+    const { schema: state } = nextProps;
+    if (this.state.childCount === -1) // assumes that schema data does not change
+    {
+      const item = state.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
 
-    this._subscribe(SchemaStore, {
-      stateKey: 'item',
-      storeKeyPath:
-      [SchemaTypes.typeToStoreKey[this.props.type], this.props.id],
-
-      updater: (state: SchemaTypes.SchemaState) =>
+      if (item)
       {
-        if (this.state.childCount === -1) // assumes that schema data does not change
-        {
-          const item = state.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
+        let childCount = 0;
+        typeToRendering[item['type']].childConfig.map(
+          (section) =>
+            childCount += item[section.type + 'Ids'].size,
+        );
 
-          if (item)
-          {
-            let childCount = 0;
-            typeToRendering[item['type']].childConfig.map(
-              (section) =>
-                childCount += item[section.type + 'Ids'].size,
-            );
+        this.setState({
+          childCount,
+        });
+      }
+    }
 
-            this.setState({
-              childCount,
-            });
-          }
-        }
+    const isHighlighted = this.props.id === state.highlightedId
+      && !!this.props.inSearchResults === state.highlightedInSearchResults;
+    const isSelected = this.props.id === state.selectedId;
 
-        const isHighlighted = this.props.id === state.highlightedId
-          && !!this.props.inSearchResults === state.highlightedInSearchResults;
-        const isSelected = this.props.id === state.selectedId;
-
-        if (isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected)
-        {
-          this.setState({
-            isHighlighted,
-            isSelected,
-          });
-        }
-      },
-    });
+    if (isHighlighted !== this.state.isHighlighted || isSelected !== this.state.isSelected)
+    {
+      this.setState({
+        isHighlighted,
+        isSelected,
+      });
+    }
   }
 
   public renderItemInfo()
   {
-    const { item } = this.state;
+    const { schema, type, id } = this.props;
+    const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
 
     if (!item)
     {
@@ -205,7 +198,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
   public renderItemChildren()
   {
-    const { item } = this.state;
+    const { schema, type, id } = this.props;
+    const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
 
     if (!this.state.open)
     {
@@ -250,21 +244,23 @@ class SchemaTreeItem extends TerrainComponent<Props>
     if (time - this.lastHeaderClickTime > 1000)
     {
       this.lastHeaderClickTime = time;
-      const { item, isSelected } = this.state;
+      const { schema, type, id } = this.props;
+      const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
+      const { isSelected } = this.state;
       if (!isSelected)
       {
         this.setState({
           isSelected: true,
           // open: !this.state.open, // need to decide whether or not to keep this in
         });
-        SchemaActions.selectId(this.props.id);
+        this.props.schemaActions.selectId(this.props.id);
       }
       else
       {
         this.setState({
           isSelected: false,
         });
-        SchemaActions.selectId(null);
+        this.props.schemaActions.selectId(null);
       }
     }
 
@@ -309,7 +305,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
   public renderName()
   {
-    const { item } = this.state;
+    const { schema, type, id } = this.props;
+    const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
 
     let nameText: string | El = <span className='loading-text' />;
 
@@ -325,13 +322,13 @@ class SchemaTreeItem extends TerrainComponent<Props>
           <div>
             {
               ['server', 'database', 'table', 'column'].map(
-                (type) =>
+                (itemType) =>
                 {
-                  const id = item[type + 'Id'];
+                  const itemId = item[itemType + 'Id'];
 
-                  if (id)
+                  if (itemId)
                   {
-                    const parentItem = SchemaStore.getState().getIn([type + 's', id]);
+                    const parentItem = schema.getIn([itemType + 's', itemId]);
                     return parentItem && parentItem.name + ' > ';
                   }
                 },
@@ -374,7 +371,9 @@ class SchemaTreeItem extends TerrainComponent<Props>
 
   public render()
   {
-    const { item, isSelected, isHighlighted } = this.state;
+    const { schema, type, id } = this.props;
+    const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
+    const { isSelected, isHighlighted } = this.state;
 
     const hasChildren = this.state.childCount > 0;
 
@@ -453,4 +452,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
   }
 }
 
-export default SchemaTreeItem;
+export default Util.createContainer(
+  SchemaTreeItem,
+  ['schema'],
+  { schemaActions: SchemaActions },
+);
