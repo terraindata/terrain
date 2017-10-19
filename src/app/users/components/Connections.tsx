@@ -75,6 +75,9 @@ interface Server extends BackendInstance
 {
   host: string;
   status: string;
+  isAnalytics: boolean;
+  analyticsIndex: string;
+  analyticsType: string;
 }
 
 export interface Props
@@ -108,6 +111,8 @@ class Connections extends TerrainComponent<Props>
   };
 
   public xhr: XMLHttpRequest = null;
+  public analyticsIndex: any = null;
+  public analyticsType: any = null;
 
   public ConnectionTypes = List(
     [
@@ -133,6 +138,7 @@ class Connections extends TerrainComponent<Props>
         {
           this.setState({
             servers,
+            loading: false,
           });
         }
       });
@@ -205,6 +211,26 @@ class Connections extends TerrainComponent<Props>
               }
             </div>
           </div>
+          { server.isAnalytics ?
+              (<div>
+                <div className='connections-item-info-row'>
+                  Analytics Index:
+                  <div className='connections-item-info-value'>
+                    {
+                      server.analyticsIndex
+                    }
+                  </div>
+                </div>
+                <div className='connections-item-info-row'>
+                  Analytics Type:
+                  <div className='connections-item-info-value'>
+                    {
+                      server.analyticsType
+                    }
+                  </div>
+                </div>
+              </div>) : null
+          }
         </div>
       );
     }
@@ -266,6 +292,12 @@ class Connections extends TerrainComponent<Props>
     const name: string = this.refs['name']['value'];
     const address: string = this.refs['address']['value'];
     const type = this.ConnectionTypes.get(this.state.typeIndex);
+    const { analyticsEnabled } = this.state;
+    const isAnalytics = analyticsEnabled === 1;
+    const analyticsIndex = this.analyticsIndex !== undefined ?
+      this.analyticsIndex.value : null;
+    const analyticsType = this.analyticsType !== undefined ?
+      this.analyticsType.value : null;
 
     if (!name.length)
     {
@@ -291,7 +323,15 @@ class Connections extends TerrainComponent<Props>
       addingConnection: false,
     });
 
-    Ajax.createDb(name, address, type, this.fetchConnections, (error) =>
+    Ajax.createDb(
+      name,
+      address,
+      type,
+      isAnalytics,
+      analyticsIndex,
+      analyticsType,
+      this.fetchConnections,
+      (error) =>
     {
       this.setState({
         errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
@@ -398,7 +438,7 @@ class Connections extends TerrainComponent<Props>
               <b>Index</b>
               <div>
                 <input
-                  ref="analytics-index"
+                  ref={(input) => this.analyticsIndex = input}
                   placeholder="Index"
                 />
               </div>
@@ -407,7 +447,7 @@ class Connections extends TerrainComponent<Props>
               <b>Type</b>
               <div>
                 <input
-                  ref="analytics-type"
+                  ref={(input) => this.analyticsType = input}
                   placeholder="Type"
                 />
               </div>
@@ -436,6 +476,7 @@ class Connections extends TerrainComponent<Props>
   public render()
   {
     const { servers, loading } = this.state;
+
     return (
       <div>
         <div className='connections'>
