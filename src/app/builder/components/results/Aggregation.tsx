@@ -82,6 +82,7 @@ export interface Props
   name: string;
   query: Query;
   containerWidth?: number;
+  index: number;
 }
 
 export enum DISPLAY_TYPES
@@ -427,14 +428,18 @@ class AggregationComponent extends TerrainComponent<Props> {
     const values = _.values(aggregation)[0];
     if (values.buckets !== undefined)
     {
-      return values.buckets.length > 0;
+      return _.keys(values.buckets).length > 0;
     }
     return true;
   }
 
   public renderTableView(values)
   {
-    const buckets = this.findKey(values, 'buckets');
+    let buckets = this.findKey(values, 'buckets');
+    if (buckets !== undefined && !Array.isArray(buckets))
+    {
+      buckets = _.keys(buckets).map((key) => _.extend({}, buckets[key], { key }));
+    }
     if (this.canBeTable())
     {
       return (
@@ -480,7 +485,7 @@ class AggregationComponent extends TerrainComponent<Props> {
       <AggregationGaussian
         data={values}
         colors={[Colors().active, Colors().activeHover]}
-        name={this.props.name}
+        index={this.props.index}
         containerWidth={this.props.containerWidth - 100}
       />
     );
@@ -492,7 +497,7 @@ class AggregationComponent extends TerrainComponent<Props> {
       <AggregationScatterPlot
         data={values.values}
         colors={[Colors().active, Colors().activeHover]}
-        name={this.props.name}
+        index={this.props.index}
         containerWidth={this.props.containerWidth - 100}
       />
     );
@@ -524,7 +529,7 @@ class AggregationComponent extends TerrainComponent<Props> {
         <AggregationHistogram
           data={value}
           colors={[Colors().active, Colors().activeHover]}
-          name={this.props.name}
+          index={this.props.index}
           containerWidth={this.props.containerWidth - 100}
         />
       );

@@ -92,7 +92,10 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
     let rows = [];
     if (useBuckets)
     {
-      rows = _.values(tableData);
+      rows = tableData.map((bucket) =>
+      {
+        return this.flatten(bucket);
+      });
     }
     else
     {
@@ -154,6 +157,7 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
       let keys = Set([]);
       data.map((d) =>
       {
+        d = this.flatten(d);
         _.keys(d).map((key) =>
         {
           keys = keys.add(key);

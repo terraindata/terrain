@@ -61,7 +61,7 @@ export interface Props
   data: any;
   colors: [string, string];
   containerWidth?: number;
-  name: string;
+  index: number;
 }
 
 class AggregationHistogram extends TerrainComponent<Props>
@@ -93,7 +93,8 @@ class AggregationHistogram extends TerrainComponent<Props>
     let categories = [];
 
     // RANGE QUERIES
-    if (buckets[0] && (buckets[0].to || buckets[0].from))
+    if (buckets[0] !== undefined &&
+      (buckets[0].to !== undefined || buckets[0].from !== undefined))
     {
       domainMin = 0;
       domainMax = buckets.length;
@@ -112,8 +113,10 @@ class AggregationHistogram extends TerrainComponent<Props>
 
     }
     // TERMS / DATE QUERIES
-    else if ((buckets[0] && buckets[0].key && typeof buckets[0].key === 'string') ||
-      (buckets[0] && buckets[0].key_as_string))
+    else if ((buckets[0] !== undefined
+      && buckets[0].key !== undefined
+      && typeof buckets[0].key === 'string')
+      || (buckets[0] !== undefined && buckets[0].key_as_string))
     {
       domainMin = 0;
       domainMax = buckets.length;
@@ -123,7 +126,7 @@ class AggregationHistogram extends TerrainComponent<Props>
         {
           rangeMax = bucket.doc_count;
         }
-        return { x: i, y: bucket.doc_count, label: bucket.key };
+        return { x: i, y: bucket.doc_count, label: bucket.key_as_string || bucket.key };
       });
       categories = buckets.map((bucket) =>
       {
@@ -157,7 +160,6 @@ class AggregationHistogram extends TerrainComponent<Props>
       });
       // Missing bars are added as having 0 value
       if (barDifference > (domainMax - domainMin) * 0.001) // Limit the number of bars
-
       {
         for (let i = domainMin; i <= domainMax; i += barDifference)
         {
@@ -176,7 +178,6 @@ class AggregationHistogram extends TerrainComponent<Props>
         _.keys(tempData).map((key, i) =>
         {
           data.push({ x: i, y: tempData[key], label: String(key) });
-          categories.push(String(key));
         });
         domainMax = _.keys(tempData).length;
         domainMin = 0;
@@ -188,7 +189,12 @@ class AggregationHistogram extends TerrainComponent<Props>
   public getChartState(overrideState?: any)
   {
     overrideState = overrideState || {};
-    const data = overrideState.data || this.props.data;
+    let data = overrideState.data || this.props.data;
+    // data might not be array --> convert to one
+    if (!Array.isArray(data))
+    {
+      data = _.keys(data).map((key) => _.extend({}, { key }, data[key]));
+    }
     const { barsData, categories, domain, range } = this.parseBucketData(data);
     const chartState = {
       barsData: (barsData),
@@ -216,7 +222,7 @@ class AggregationHistogram extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps)
   {
     const el = ReactDOM.findDOMNode(this);
-    if (this.props.name !== nextProps.name)
+    if (this.props.index !== nextProps.index)
     {
       Histogram.destroy(el);
       Histogram.create(el, this.getChartState(nextProps));

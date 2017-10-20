@@ -191,6 +191,7 @@ class AggregationsArea extends TerrainComponent<Props>
                 name={_.keys(agg)[0]}
                 query={this.props.query}
                 key={index}
+                index={index}
               />
             );
           })}

@@ -57,7 +57,7 @@ export interface Props
   data: any;
   colors: [string, string];
   containerWidth?: number;
-  name: string;
+  index: number;
 }
 
 const GAUSSIAN_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
@@ -129,7 +129,7 @@ class AggregationGaussian extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps)
   {
     const el = ReactDOM.findDOMNode(this);
-    if (this.props.name !== nextProps.name)
+    if (this.props.index !== nextProps.index)
     {
       GaussianGraph.destroy(el);
       GaussianGraph.create(el, this.getChartState(nextProps));

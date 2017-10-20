@@ -57,7 +57,7 @@ export interface Props
   data: any;
   colors: [string, string];
   containerWidth?: number;
-  name: string;
+  index: number;
 }
 
 const THRESHOLD = 0.1;
@@ -225,7 +225,7 @@ class AggregationScatterPlot extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps)
   {
     const el = ReactDOM.findDOMNode(this);
-    if (this.props.name !== nextProps.name)
+    if (this.props.index !== nextProps.index)
     {
       ScatterPlot.destroy(el);
       ScatterPlot.create(el, this.getChartState());

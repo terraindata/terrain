@@ -164,13 +164,22 @@ const Histogram = {
       .style('color', '#fff')
       .call(yLeftAxis);
 
+    const truncatedLabel = (d) =>
+    {
+      if (xLabels[d] !== undefined && xLabels[d].length > 25)
+      {
+        return xLabels[d].substring(0, 25) + '...';
+      }
+      return xLabels[d];
+    };
+
     const bottomAxis = d3.svg.axis();
     if (xLabels !== undefined && xLabels.length > 0)
     {
       const numLabels = Math.min(1, (width / xLabels.length) / labelSpacing) * xLabels.length;
       bottomAxis.scale(scales.x)
         .ticks(Math.floor(numLabels))
-        .tickFormat(function(d) { return xLabels[d]; })
+        .tickFormat(truncatedLabel)
         .orient('bottom');
     }
     else
@@ -278,7 +287,7 @@ const Histogram = {
       .attr('width', w - 3);
   },
 
-  _drawBars(el, scales, barsData, colors, xLabels)
+  _drawBars(el, scales, barsData, colors)
   {
     const g = d3.select(el).selectAll('.bars');
 
@@ -331,7 +340,7 @@ const Histogram = {
 
     this._drawBg(el, scales);
     this._drawAxes(el, scales, width, height, xLabels, yLabels);
-    this._drawBars(el, scales, barsData, colors, xLabels);
+    this._drawBars(el, scales, barsData, colors);
     this._extendChart(el, xLabels);
   },
 
@@ -385,120 +394,3 @@ const Histogram = {
 };
 
 export default Histogram;
-
-// USING VICTORY CHART:
-
-// // Copyright 2017 Terrain Data, Inc.
-
-// // tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
-// import * as classNames from 'classnames';
-// import * as Immutable from 'immutable';
-// import * as _ from 'lodash';
-// import * as Radium from 'radium';
-// import * as React from 'react';
-// import
-// {
-//   createContainer,
-//   VictoryArea,
-//   VictoryAxis,
-//   VictoryBar,
-//   VictoryBrushContainer,
-//   VictoryChart,
-//   VictoryGroup,
-//   VictoryLegend,
-//   VictoryPortal,
-//   VictoryScatter,
-//   VictoryTheme,
-//   VictoryTooltip,
-// } from 'victory';
-// import ColorManager from '../../util/ColorManager';
-// import { backgroundColor, borderColor, Colors, fontColor } from './../../colors/Colors';
-// import TerrainComponent from './../../common/components/TerrainComponent';
-
-// export interface Props
-// {
-//   data: BarData[];
-//   height?: number;
-//   width?: number;
-//   showLabels?: boolean;
-//   xCategories?: string[];
-//   yCategories?: string[];
-//   onBarClick?: () => void;
-//   onBarHover?: () => void;
-//   horizontal?: boolean;
-//   parentStyle?: any;
-//   barStyle?: any;
-//   barWidth?: number;
-// }
-
-// interface BarData
-// {
-//   x: number;
-//   y: number;
-// }
-
-// @Radium
-// class Histogram extends TerrainComponent<Props> {
-
-//   public state: {
-//     xValues: number[],
-//     yValues: number[],
-//     barWidth: number,
-//   } = {
-//     xValues: [],
-//     yValues: [],
-//     barWidth: 0,
-//   };
-
-//   public getBarWidth()
-//   {
-//     if (this.props.barWidth !== undefined && this.props.barWidth > 0)
-//     {
-//       return this.props.barWidth;
-//     }
-//     const width = this.props.width !== undefined ? this.props.width : 300;
-//     const numBars = this.props.data.length;
-//     if (numBars > 0)
-//     {
-//       return width / numBars;
-//     }
-//     return 0;
-//   }
-
-//   public parseData()
-//   {
-//     const barWidth = this.getBarWidth();
-//     return this.props.data.map((data) => _.extend({}, data, { width: barWidth }));
-//   }
-
-//   public render()
-//   {
-
-//   }
-
-//   public render()
-//   {
-//     const data = this.parseData();
-//     const { height, width, showLabels, xCategories, yCategories, onBarClick, onBarHover,
-//       horizontal, parentStyle, barStyle } = this.props;
-//     return (
-//       <VictoryChart
-//         theme={VictoryTheme.material}
-//         height={height !== undefined ? height : 300}
-//         width={width !== undefined ? width : 300}
-//         domainPadding={10}
-//       >
-//         <VictoryBar
-//           style={{
-//             data: {
-//               fill: Colors().active,
-//             },
-//           }}
-//           data={this.props.data}
-//         />
-//       </VictoryChart>
-//     );
-//   }
-// }
-
-// export default Histogram;
