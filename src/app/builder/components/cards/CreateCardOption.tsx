@@ -143,7 +143,7 @@ class CreateCardOption extends TerrainComponent<Props>
           onClick={this.handleClick}
           style={[
             borderColor(Colors().highlight),
-            backgroundColor('rgba(0,0,0,0)', Colors().darkerHighlight),
+            backgroundColor(Colors().bg1, Colors().darkerHighlight),
             fontColor(Colors().text2, Colors().text1),
           ]}
           key='create-option'

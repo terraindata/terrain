@@ -40,7 +40,7 @@
     overflow: hidden;
     max-height: 0px;
     &.create-card-selector-open {
-      max-height: 560px;
+      max-height: 600px;
     }
     
     border-radius: @create-card-border-radius;
@@ -65,10 +65,9 @@
 
     .create-card-selector-column {
       flex: 1;
-      border-left: 1px solid;
 
       .create-card-selector-inner {
-        max-height: @item-row-height;
+        margin: @spacing;
         overflow: auto;
       }
     }
@@ -77,11 +76,10 @@
       width: 160px;
 
       .card-category-list {
-        padding: 0px;
+        margin: @spacing;
         display: block;
         .card-category-list-item {
           height: 24px;
-          width: 140px;
           cursor: pointer;
           margin: 0px;
           justify-content: center;
