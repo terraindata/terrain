@@ -346,9 +346,9 @@ const BuilderColumn = createReactClass<any, any>(
           <div
             className='builder-title-bar'
             style={{
-              'boxShadow': '0px 3px 9px ' + Colors().boxShadow,
-              'borderColor': Colors().stroke,
-              'backgroundColor': Colors().bg2,
+              boxShadow: '0px 3px 9px ' + Colors().boxShadow,
+              borderColor: Colors().stroke,
+              backgroundColor: Colors().bg2,
             }}
           >
             {

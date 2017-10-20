@@ -437,7 +437,7 @@ class LibraryItem extends TerrainComponent<Props>
                       'library-item-title-bar-editing': this.state.nameEditing,
                     })}
                     style={
-                      isSelected ? backgroundColor(Colors().active) : 
+                      isSelected ? backgroundColor(Colors().active) :
                         backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().bg3 : Colors().bg2, Colors().inactiveHover)
                     }
                   >
