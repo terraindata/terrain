@@ -53,7 +53,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 
 import * as Immutable from 'immutable';
-const { List, Map, Set} = Immutable;
+const { List, Map, Set } = Immutable;
 type Set<T> = Immutable.Set<T>;
 
 const Color = require('color');
@@ -89,23 +89,23 @@ interface CardCategory
 }
 
 const categories: List<CardCategory> = List(
-[
-  {name: 'suggested', color: Colors().text2}, // special category
-  {name: 'all', color: Colors().text2}, // special category
-  {name: 'filter', color: Colors().builder.cards.categories.filter},
-  {name: 'sort', color: Colors().builder.cards.categories.sort},
-  {name: 'match', color: Colors().builder.cards.categories.match},
-  {name: 'aggregation', color: Colors().builder.cards.structureClause},
-  {name: 'geo', color: Colors().builder.cards.categories.geo},
-  {name: 'primary', color: Colors().builder.cards.categories.primary},
-  {name: 'control', color: Colors().builder.cards.categories.control},
-  {name: 'score', color: Colors().builder.cards.categories.score},
-  {name: 'script', color: Colors().builder.cards.categories.script},
-  {name: 'compound', color: Colors().builder.cards.categories.compound},
-  {name: 'join', color: Colors().builder.cards.categories.join},
-  {name: 'parameter', color: Colors().builder.cards.categories.parameter},
-  {name: 'other', color: Colors().text2}, // special category
-]);
+  [
+    { name: 'suggested', color: Colors().text2 }, // special category
+    { name: 'all', color: Colors().text2 }, // special category
+    { name: 'filter', color: Colors().builder.cards.categories.filter },
+    { name: 'sort', color: Colors().builder.cards.categories.sort },
+    { name: 'match', color: Colors().builder.cards.categories.match },
+    { name: 'aggregation', color: Colors().builder.cards.structureClause },
+    { name: 'geo', color: Colors().builder.cards.categories.geo },
+    { name: 'primary', color: Colors().builder.cards.categories.primary },
+    { name: 'control', color: Colors().builder.cards.categories.control },
+    { name: 'score', color: Colors().builder.cards.categories.score },
+    { name: 'script', color: Colors().builder.cards.categories.script },
+    { name: 'compound', color: Colors().builder.cards.categories.compound },
+    { name: 'join', color: Colors().builder.cards.categories.join },
+    { name: 'parameter', color: Colors().builder.cards.categories.parameter },
+    { name: 'other', color: Colors().text2 }, // special category
+  ]);
 
 const categoryCounter: IMMap<string, number> = Map(categories.map((v, i) => [v.name, 0]));
 // Convenient starting point for optimization.
@@ -150,7 +150,7 @@ class CardSelector extends TerrainComponent<Props>
     this.getCardSuggestionSet = memoizeOne(this.getCardSuggestionSet);
     this.calculateOptionCategories = memoizeOne(this.calculateOptionCategories);
     this.categoryClickedWrapper = _.memoize(this.categoryClickedWrapper, (item: CardCategory) => item.name);
-    const available = this.computeAvailableCategories(this.props.cardTypeList, this.props.card)
+    const available = this.computeAvailableCategories(this.props.cardTypeList, this.props.card);
     this.state.currentCategory = available.get(0);
     // even if there are no cards, 'all' will always be there.
   }
@@ -168,8 +168,9 @@ class CardSelector extends TerrainComponent<Props>
   {
     const counts = categoryCounter.toJS();
     const suggestionSet = this.getCardSuggestionSet(creatingCard);
-    cardTypeList.forEach((v, i) => {
-      const card = AllBackendsMap[this.props.language].blocks[v] as CardConfig
+    cardTypeList.forEach((v, i) =>
+    {
+      const card = AllBackendsMap[this.props.language].blocks[v] as CardConfig;
       const category = getCardCategory(card);
       if (counts[category] !== undefined)
       {
@@ -192,7 +193,8 @@ class CardSelector extends TerrainComponent<Props>
   public calculateOptionCategories(cardTypeList: List<string>, creatingCard: CardConfig): List<Set<string>>
   {
     const suggestionSet = this.getCardSuggestionSet(creatingCard);
-    return cardTypeList.map((v, i) => {
+    return cardTypeList.map((v, i) =>
+    {
       const card = AllBackendsMap[this.props.language].blocks[v] as CardConfig;
       const category = getCardCategory(card);
       const cardCategories = ['all'];
@@ -226,10 +228,10 @@ class CardSelector extends TerrainComponent<Props>
     this.setState({
       inputElement,
     });
-    if (this.props.open && inputElement !== null && inputElement !== undefined)
-    {
-      inputElement.focus();
-    }
+    // if (this.props.open && inputElement !== null && inputElement !== undefined)
+    // {
+    //   inputElement.focus();
+    // }
   }
 
   public registerCategoryList(categorySelectorList)
@@ -315,7 +317,7 @@ class CardSelector extends TerrainComponent<Props>
       this.setState({
         currentCategory: item,
       });
-    }
+    };
   }
 
   public renderCategoryOptions()
@@ -329,14 +331,21 @@ class CardSelector extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (this.props.cardTypeList !== nextProps.cardTypeList || !nextProps.open)
+    if (this.props.open !== nextProps.open)
     {
       this.setState({
-        // computedHeight: -1,
         currentCategory: this.computeAvailableCategories(this.props.cardTypeList, this.props.card).get(0),
         searchValue: '',
       });
     }
+    // if (this.props.cardTypeList !== nextProps.cardTypeList || !nextProps.open)
+    // {
+    //   this.setState({
+    //     // computedHeight: -1,
+    //     currentCategory: this.computeAvailableCategories(this.props.cardTypeList, this.props.card).get(0),
+    //     searchValue: '',
+    //   });
+    // }
     if (!this.props.open && nextProps.open &&
       this.state.inputElement !== null && this.state.inputElement !== undefined)
     {
@@ -360,10 +369,10 @@ class CardSelector extends TerrainComponent<Props>
       backgroundColor(Colors().inputBg),
     );
 
-    const innerBg = cardHoverBackground(this.state.currentCategory.color, Colors().bg3)
+    const innerBg = cardHoverBackground(this.state.currentCategory.color, Colors().bg3);
     const selectorInnerStyle = _.extend({},
       borderColor(Colors().border1),
-      getStyle('height', this.computeMaxHeight(this.props.cardTypeList.size))
+      getStyle('height', this.computeMaxHeight(this.props.cardTypeList.size)),
     );
 
     return (
@@ -388,7 +397,7 @@ class CardSelector extends TerrainComponent<Props>
             }
           </div>
           <div className='create-card-selector-column'>
-            <div className='create-card-column-title' style ={columnTitleStyle}>
+            <div className='create-card-column-title' style={columnTitleStyle}>
               Cards
             </div>
             <div

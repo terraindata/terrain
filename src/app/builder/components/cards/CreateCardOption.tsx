@@ -131,7 +131,7 @@ class CreateCardOption extends TerrainComponent<Props>
     const searchResult = this.searchForText(text, description, this.props.searchText);
 
     const titleStyle = _.extend({},
-      fontColor(card.static.colors[0])
+      fontColor(card.static.colors[0]),
     );
     return (
       !searchResult ? null :
