@@ -96,7 +96,8 @@ class AnalyticsSelector extends TerrainComponent<Props>
     const { analytics, servers, analyticsConnection } = this.props;
     const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
 
-    const options = servers.keySeq().toList();
+    const serversWithAnalytics = servers.filter((s) => s.isAnalytics);
+    const options = serversWithAnalytics.keySeq().toList();
 
     return (
       <div>
