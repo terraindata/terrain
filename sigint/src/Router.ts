@@ -48,6 +48,7 @@ import * as fs from 'fs';
 import jsurl = require('jsurl');
 import * as KoaRouter from 'koa-router';
 import * as _ from 'lodash';
+import * as winston from 'winston';
 
 import { Config } from './Config';
 import { EventConfig, Events } from './Events';
@@ -79,9 +80,9 @@ export class Router
     this.appRouter.get('/bundle.js', async (ctx, next) =>
     {
       ctx.type = 'js';
-      if (fs.existsSync('/build/bundle.js'))
+      if (fs.existsSync('./build/bundle.js'))
       {
-        ctx.body = fs.createReadStream('/build/bundle.js');
+        ctx.body = fs.createReadStream('./build/bundle.js');
       }
       else
       {
@@ -91,9 +92,9 @@ export class Router
     this.appRouter.get('/bundle.js.map', async (ctx, next) =>
     {
       ctx.type = 'js';
-      if (fs.existsSync('/build/bundle.js.map'))
+      if (fs.existsSync('./build/bundle.js.map'))
       {
-        ctx.body = fs.createReadStream('/build/bundle.js.map');
+        ctx.body = fs.createReadStream('./build/bundle.js.map');
       }
       else
       {

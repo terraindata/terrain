@@ -71,6 +71,11 @@ const optionList = [
     description: 'Turn on debug mode.',
   },
   {
+    name: 'demo',
+    type: Boolean,
+    description: 'Serve Terrain demo website.',
+  },
+  {
     alias: 'h',
     name: 'help',
     type: Boolean,
