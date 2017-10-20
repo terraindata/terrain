@@ -75,8 +75,6 @@ export interface Props
 export interface State
 {
   libraryState: LibraryState;
-  selectedDomain: any;
-  zoomDomain: any;
 }
 
 class Library extends TerrainComponent<any>
@@ -93,8 +91,6 @@ class Library extends TerrainComponent<any>
 
   public state: State = {
     libraryState: null,
-    selectedDomain: {},
-    zoomDomain: {},
   };
 
   public componentWillMount()
@@ -178,61 +174,93 @@ class Library extends TerrainComponent<any>
   public handleMetricRadioButtonClick(optionValue)
   {
     const { analytics } = this.props;
-    const { selectedVariants } = this.props.library;
-    const selectedVariantIds = selectedVariants.toJS();
 
-    let numericOptionValue = null;
-    if (optionValue.indexOf(',') > -1)
+    if (analytics.selectedAnalyticsConnection !== null)
     {
-      numericOptionValue = optionValue.split(',').map((o) => parseInt(o, 10));
-    } else
-    {
-      numericOptionValue = parseInt(optionValue, 10);
+      const { selectedVariants } = this.props.library;
+      const selectedVariantIds = selectedVariants.toJS();
+
+      let numericOptionValue = null;
+      if (optionValue.indexOf(',') > -1)
+      {
+        numericOptionValue = optionValue.split(',').map((o) => parseInt(o, 10));
+      } else
+      {
+        numericOptionValue = parseInt(optionValue, 10);
+      }
+
+      this.props.analyticsActions.selectMetric(optionValue);
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        selectedVariantIds,
+        numericOptionValue,
+        analytics.selectedInterval,
+        analytics.selectedDateRange,
+      );
     }
-
-    this.props.analyticsActions.selectMetric(optionValue);
-    this.props.analyticsActions.fetch(
-      selectedVariantIds,
-      numericOptionValue,
-      analytics.selectedInterval,
-      analytics.selectedDateRange,
-    );
   }
 
   public handleIntervalRadioButtonClick(optionValue)
   {
     const { analytics } = this.props;
-    const { selectedVariants } = this.props.library;
-    const selectedVariantIds = selectedVariants.toJS();
 
-    this.props.analyticsActions.selectInterval(optionValue);
-    this.props.analyticsActions.fetch(
-      selectedVariantIds,
-      analytics.selectedMetric,
-      optionValue,
-      analytics.selectedDateRange,
-    );
+    if (analytics.selectedAnalyticsConnection !== null)
+    {
+      const { selectedVariants } = this.props.library;
+      const selectedVariantIds = selectedVariants.toJS();
+
+      this.props.analyticsActions.selectInterval(optionValue);
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        selectedVariantIds,
+        analytics.selectedMetric,
+        optionValue,
+        analytics.selectedDateRange,
+      );
+    }
   }
 
   public handleDateRangeRadioButtonClick(optionValue)
   {
     const { analytics } = this.props;
+
+    if (analytics.selectedAnalyticsConnection !== null)
+    {
+      const { selectedVariants } = this.props.library;
+      const selectedVariantIds = selectedVariants.toJS();
+      const numericOptionValue = parseInt(optionValue, 10);
+
+      this.props.analyticsActions.selectDateRange(optionValue);
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        selectedVariantIds,
+        analytics.selectedMetric,
+        analytics.selectedInterval,
+        numericOptionValue,
+      );
+    }
+  }
+
+  public handleConnectionChange(connectionName)
+  {
+    const { analytics, schema } = this.props;
     const { selectedVariants } = this.props.library;
     const selectedVariantIds = selectedVariants.toJS();
-    const numericOptionValue = parseInt(optionValue, 10);
 
-    this.props.analyticsActions.selectDateRange(optionValue);
     this.props.analyticsActions.fetch(
+      connectionName,
       selectedVariantIds,
       analytics.selectedMetric,
       analytics.selectedInterval,
-      numericOptionValue,
+      analytics.selectedDateRange,
     );
+
+    this.props.analyticsActions.selectAnalyticsConnection(connectionName);
   }
 
   public render()
   {
-    const { library: libraryState, analytics } = this.props;
+    const { library: libraryState, analytics, schema } = this.props;
     const {
       dbs,
       groups,
@@ -390,9 +418,12 @@ class Library extends TerrainComponent<any>
             <div className='library-analytics-selector-wrapper'>
               <AnalyticsSelector
                 analytics={analytics}
+                servers={schema.servers}
+                analyticsConnection={analytics.selectedAnalyticsConnection}
                 onMetricSelect={this.handleMetricRadioButtonClick}
                 onIntervalSelect={this.handleIntervalRadioButtonClick}
                 onDateRangeSelect={this.handleDateRangeRadioButtonClick}
+                onConnectionChange={this.handleConnectionChange}
               />
             </div>
           </div> : null

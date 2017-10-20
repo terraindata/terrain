@@ -47,6 +47,7 @@ import Actions from 'analytics/data/AnalyticsActions';
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import * as Immutable from 'immutable';
+import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import { Ajax, createMockStore } from '../../helpers';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
@@ -147,9 +148,24 @@ const mockStore = createMockStore();
 describe('AnalyticsActions', () =>
 {
   const analytics: AnalyticsState = _AnalyticsState({});
+  const schema: SchemaState = _SchemaState({
+    servers: Immutable.Map({
+      'My ElasticSearch Instance': {
+        id: 'My ElasticSearch Instance',
+        type: 'server',
+        name: 'My ElasticSearch Instance',
+        connectionId: 1,
+        isAnalytics: true,
+        analyticsIndex: 'terrain-analytics',
+        analyticsType: 'events',
+      },
+    }),
+  });
+
   const metricId = 1;
   const intervalId = 'day';
   const dateRangeId = 1;
+  const connectionName = 'My ElasticSearch Instance';
 
   describe('#fetch', () =>
   {
@@ -191,11 +207,18 @@ describe('AnalyticsActions', () =>
         const store = mockStore({ analytics });
 
         store.dispatch(
-          Actions.fetch([variantId], metricId, intervalId, dateRangeId, (analyticsResponseParam) =>
-          {
-            expect(store.getActions()).toEqual(expectedActions);
-            done();
-          }),
+          Actions.fetch(
+            connectionName,
+            [variantId],
+            metricId,
+            intervalId,
+            dateRangeId,
+            (analyticsResponseParam) =>
+            {
+              expect(store.getActions()).toEqual(expectedActions);
+              done();
+            },
+          ),
         );
       });
     });
@@ -226,10 +249,16 @@ describe('AnalyticsActions', () =>
           },
         ];
 
-        const store = mockStore({ analytics });
+        const store = mockStore(Immutable.Map({ analytics, schema }));
 
         store.dispatch(
-          Actions.fetch([variantId], metricId, intervalId, dateRangeId, () => { return; },
+          Actions.fetch(
+            connectionName,
+            [variantId],
+            metricId,
+            intervalId,
+            dateRangeId,
+            () => { return; },
             (error) =>
             {
               expect(store.getActions()).toEqual(expectedActions);

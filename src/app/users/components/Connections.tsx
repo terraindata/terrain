@@ -50,6 +50,8 @@ import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 
+import FadeInOut from 'common/components/FadeInOut';
+import Switch from 'common/components/Switch';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
@@ -64,8 +66,6 @@ import Ajax from '../../util/Ajax';
 import UserActions from '../data/UserActions';
 import UserStore from '../data/UserStore';
 import * as UserTypes from '../UserTypes';
-import Switch from 'common/components/Switch';
-import FadeInOut from 'common/components/FadeInOut';
 
 const CloseIcon = require('../../../images/icon_close_8x8.svg');
 
@@ -211,25 +211,25 @@ class Connections extends TerrainComponent<Props>
               }
             </div>
           </div>
-          { server.isAnalytics ?
-              (<div>
-                <div className='connections-item-info-row'>
-                  Analytics Index:
+          {server.isAnalytics ?
+            (<div>
+              <div className='connections-item-info-row'>
+                Analytics Index:
                   <div className='connections-item-info-value'>
-                    {
-                      server.analyticsIndex
-                    }
-                  </div>
+                  {
+                    server.analyticsIndex
+                  }
                 </div>
-                <div className='connections-item-info-row'>
-                  Analytics Type:
+              </div>
+              <div className='connections-item-info-row'>
+                Analytics Type:
                   <div className='connections-item-info-value'>
-                    {
-                      server.analyticsType
-                    }
-                  </div>
+                  {
+                    server.analyticsType
+                  }
                 </div>
-              </div>) : null
+              </div>
+            </div>) : null
           }
         </div>
       );
@@ -332,12 +332,12 @@ class Connections extends TerrainComponent<Props>
       analyticsType,
       this.fetchConnections,
       (error) =>
-    {
-      this.setState({
-        errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
-        errorModalOpen: true,
-      });
-    },
+      {
+        this.setState({
+          errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
+          errorModalOpen: true,
+        });
+      },
     );
   }
 
@@ -421,34 +421,34 @@ class Connections extends TerrainComponent<Props>
     const { analyticsEnabled } = this.state;
 
     return (
-      <div className="connections-analytics flex-container">
-        <div className="left-column flex-grow">
+      <div className='connections-analytics flex-container'>
+        <div className='left-column flex-grow'>
           <h4>Set Analytics Index and Type</h4>
           <Switch
             medium={true}
-            first="On"
-            second="Off"
+            first='On'
+            second='Off'
             selected={analyticsEnabled}
             onChange={this.handleAnalyticsSwitch}
           />
         </div>
-        <div className="right-column flex-grow">
+        <div className='right-column flex-grow'>
           <FadeInOut open={analyticsEnabled === 1}>
-            <div className="flex-grow">
+            <div className='flex-grow'>
               <b>Index</b>
               <div>
                 <input
                   ref={(input) => this.analyticsIndex = input}
-                  placeholder="Index"
+                  placeholder='Index'
                 />
               </div>
             </div>
-            <div className="flex-grow">
+            <div className='flex-grow'>
               <b>Type</b>
               <div>
                 <input
                   ref={(input) => this.analyticsType = input}
-                  placeholder="Type"
+                  placeholder='Type'
                 />
               </div>
             </div>

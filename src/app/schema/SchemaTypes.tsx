@@ -97,6 +97,9 @@ class ServerC extends SchemaBaseClass
   public type = 'server';
   public name = '';
   public connectionId: number = -1;
+  public isAnalytics: boolean = false;
+  public analyticsIndex: string = null;
+  public analyticsType: string = null;
 
   public databaseIds: List<string> = List();
 }
@@ -105,6 +108,9 @@ export const _Server =
   (config: {
     name: string,
     connectionId: number,
+    isAnalytics?: boolean,
+    analyticsIndex?: string,
+    analyticsType?: string,
     id?: string,
   }) =>
   {

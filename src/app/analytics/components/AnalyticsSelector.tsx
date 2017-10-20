@@ -44,18 +44,24 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import { AnalyticsState } from 'analytics/data/AnalyticsStore';
+import Autocomplete from 'common/components/Autocomplete';
 import MultiSwitch from 'common/components/MultiSwitch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import { Server } from 'schema/SchemaTypes';
 import Ajax from 'util/Ajax';
 
 interface Props
 {
   analytics: AnalyticsState;
+  servers: Immutable.Map<string, Server>;
+  analyticsConnection?: string;
+
   onMetricSelect: (value: number | string) => void;
   onIntervalSelect: (value: number | string) => void;
   onDateRangeSelect: (value: number | string) => void;
+  onConnectionChange: (value: string) => void;
 }
 
 const METRICS = Immutable.List([
@@ -80,13 +86,26 @@ const DATE_RANGES = Immutable.List([
 
 class AnalyticsSelector extends TerrainComponent<Props>
 {
+  public handleConnectionChange(value)
+  {
+    this.props.onConnectionChange(value);
+  }
+
   public render()
   {
-    const { analytics } = this.props;
+    const { analytics, servers, analyticsConnection } = this.props;
     const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
+
+    const options = servers.keySeq().toList();
 
     return (
       <div>
+        <Autocomplete
+          value={analyticsConnection}
+          placeholder='Select Analytics Server'
+          onChange={this.handleConnectionChange}
+          options={options}
+        />
         <p>Metric</p>
         <MultiSwitch
           options={METRICS}

@@ -1296,6 +1296,7 @@ export const Ajax =
     },
 
     getAnalytics(
+      connectionId: number,
       variantIds: ID[],
       start: Date,
       end: Date,
@@ -1313,8 +1314,9 @@ export const Ajax =
         interval: intervalId,
         agg: aggregation,
         field: '@timestamp',
+        database: connectionId,
       };
-
+      console.error({ connectionId });
       return Ajax.req(
         'get',
         `events/agg`,
