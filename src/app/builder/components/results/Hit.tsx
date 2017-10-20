@@ -57,7 +57,9 @@ import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
+import MapUtil from '../../../util/MapUtil';
 import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
+import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { Hit } from './ResultTypes';
 
@@ -83,6 +85,8 @@ export interface Props
   connectDragSource?: (a: any) => any;
   connectDropTarget?: (a: any) => any;
   connectDragPreview?: (a: any) => void;
+
+  locations?: { [field: string]: any };
 }
 
 @Radium
@@ -161,8 +165,8 @@ class HitComponent extends TerrainComponent<Props> {
     {
       return null;
     }
-
-    const value = getResultValue(this.props.hit, field, this.props.resultsConfig, false, overrideFormat);
+    const color = this.state.isSpotlit ? this.state.spotlightColor : 'black';
+    const value = getResultValue(this.props.hit, field, this.props.resultsConfig, false, overrideFormat, this.props.locations, color);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
@@ -187,6 +191,7 @@ class HitComponent extends TerrainComponent<Props> {
             'result-field-value': true,
             'result-field-value-short': (field + value).length < 0,
             'result-field-value-number': typeof value === 'number',
+            'result-field-value-show-overflow': format && format.type === 'map',
           })}
         >
           {
@@ -207,7 +212,7 @@ class HitComponent extends TerrainComponent<Props> {
     }, function()
       {
         const spotlightData = this.props.hit.toJS();
-        spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig);
+        spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig, this.props.locations, spotlightColor);
         spotlightData['color'] = spotlightColor;
         spotlightData['id'] = id;
         spotlightAction(id, spotlightData);
@@ -267,8 +272,8 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
       );
     }
-
-    const name = getResultName(hit, resultsConfig);
+    const color = this.state.isSpotlit ? this.state.spotlightColor : 'black';
+    const name = getResultName(hit, resultsConfig, this.props.locations, color);
     const fields = getResultFields(hit, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
 
@@ -366,7 +371,8 @@ class HitComponent extends TerrainComponent<Props> {
     ));
   }
 }
-export function getResultValue(hit: Hit, field: string, config: ResultsConfig, isTitle: boolean, overrideFormat?: any): string
+export function getResultValue(hit: Hit, field: string, config: ResultsConfig, isTitle: boolean,
+  overrideFormat?: any, locations?: { [field: string]: any }, color?: string)
 {
   let value: any;
   if (hit)
@@ -377,7 +383,7 @@ export function getResultValue(hit: Hit, field: string, config: ResultsConfig, i
       value = JSON.stringify(value);
     }
   }
-  return ResultFormatValue(field, value, config, isTitle, overrideFormat);
+  return ResultFormatValue(field, value, config, isTitle, overrideFormat, locations, color);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -401,7 +407,7 @@ export function getResultFields(hit: Hit, config: ResultsConfig): string[]
   return fields;
 }
 
-export function getResultName(hit: Hit, config: ResultsConfig)
+export function getResultName(hit: Hit, config: ResultsConfig, locations?: { [field: string]: any }, color?: string)
 {
   let nameField: string;
 
@@ -414,10 +420,11 @@ export function getResultName(hit: Hit, config: ResultsConfig)
     nameField = _.first(getResultFields(hit, config));
   }
 
-  return getResultValue(hit, nameField, config, true);
+  return getResultValue(hit, nameField, config, true, null, locations, color);
 }
 
-export function ResultFormatValue(field: string, value: string | number, config: ResultsConfig, isTitle: boolean, overrideFormat?: any): any
+export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean,
+  overrideFormat?: any, locations?: { [field: string]: any }, color?: string): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const { showRaw } = overrideFormat || format || { showRaw: false };
@@ -441,6 +448,13 @@ export function ResultFormatValue(field: string, value: string | number, config:
   {
     value = 'null';
     italics = true;
+  }
+  if (format && format.type !== 'map')
+  {
+    if (List.isList(value))
+    {
+      value = JSON.stringify(value);
+    }
   }
 
   if (format && !isTitle)
@@ -468,6 +482,32 @@ export function ResultFormatValue(field: string, value: string | number, config:
                 showRaw ? value : null
               }
             </div>
+          </div>
+        );
+
+      case 'map':
+        const resultLocation = MapUtil.getCoordinatesFromGeopoint(value);
+        let targetLocation: [number, number];
+        if (locations !== undefined && locations[field] !== undefined)
+        {
+          targetLocation = MapUtil.getCoordinatesFromGeopoint(locations[field]) as [number, number];
+        }
+
+        return (
+          <div className='result-field-value-map-wrapper'>
+            <MapComponent
+              address={''}
+              location={targetLocation}
+              markLocation={true}
+              showDirectDistance={targetLocation !== undefined}
+              showSearchBar={false}
+              zoomControl={false}
+              secondLocation={resultLocation}
+              keepAddressInSync={false}
+              geocoder='photon'
+              secondaryMarkerColor={color}
+              colorMarker={true}
+            />
           </div>
         );
 

@@ -96,6 +96,7 @@ export class Import
     double: new Set(['text', 'double']),
     boolean: new Set(['text', 'boolean']),
     date: new Set(['text', 'date']),
+    geo_point: new Set(['array', 'geo_point']),
     // object: new Set(['object', 'nested']),
     // nested: new Set(['nested']),
   };
@@ -733,6 +734,32 @@ export class Import
           }
         }
         break;
+      case 'geo_point':
+        if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          try
+          {
+            if (typeof item[field] === 'string')
+            {
+              item[field] = JSON.parse(item[field]);
+            }
+          } catch (e)
+          {
+            return false;
+          }
+          if (Array.isArray(item[field]))
+          {
+            if (item[field].length !== 2 || typeof item[field][0] !== 'number' || typeof item[field][1] !== 'number')
+            {
+              return false;
+            }
+          }
+        }
+        break;
       default:  // "text" case, leave as string
     }
     return true;
@@ -1149,9 +1176,16 @@ export class Import
             counter++;
             if (counter === this.chunkCount)
             {
-              await this._deleteStreamingTempFolder();
-              winston.info('File Import: deleted streaming temp folder.');
-              resolve();
+              try
+              {
+                await this._deleteStreamingTempFolder();
+                winston.info('File Import: deleted streaming temp folder.');
+                resolve();
+              }
+              catch (e)
+              {
+                reject(e);
+              }
             }
             thisResolve();
           }));

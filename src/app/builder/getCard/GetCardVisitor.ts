@@ -250,8 +250,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private variantClauseMapping: { [clauseType: string]: string[] } = {};
 
   private customCardTypesMap: { [elasticClauseType: string]: string[] } = {
-    body: ['elasticScore'],
-    query: ['elasticFilter'],
+    sort_clause: ['elasticScore'],
+    query: ['elasticFilter', 'elasticDistance'],
   };
 
   public constructor(config: EQLConfig)

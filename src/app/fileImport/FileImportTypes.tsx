@@ -210,6 +210,7 @@ export const ELASTIC_TYPES =
     'integer',
     'half_float',
     'float',
+    'geo_point',
   ];
 
 // contains set of transforms applicable to each elastic type
@@ -232,6 +233,7 @@ export const TRANSFORM_TYPES =
     ['duplicate'],    // integer
     ['duplicate'],    // half_float
     ['duplicate'],    // float
+    ['duplicate'],    // geopoint
   ];
 
 export const STEP_NAMES =
