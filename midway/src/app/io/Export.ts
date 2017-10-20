@@ -117,6 +117,7 @@ export class Export
   private BATCH_SIZE: number = 5000;
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
   private SCROLL_TIMEOUT: string = '60s';
+  private MAX_ROW_THRESHOLD: number = 2000;
 
   public async export(exprt: ExportConfig, headless: boolean): Promise<stream.Readable | string>
   {
@@ -132,8 +133,6 @@ export class Export
         return reject('File export currently is only supported for Elastic databases.');
       }
       const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-
-      const dbSchema: Tasty.Schema = await database.getTasty().schema();
 
       if (exprt.filetype !== 'csv' && exprt.filetype !== 'json' && exprt.filetype !== 'json [type object]')
       {
@@ -164,13 +163,27 @@ export class Export
           exprt[templateKey] = template[templateKey];
         }
       }
-
+      if (exprt.columnTypes === undefined)
+      {
+        return reject('Must provide export template column types.');
+      }
       if (exprt.filetype === 'json [type object]' && objectKeyValue !== undefined)
       {
         exprt.objectKey = objectKeyValue;
       }
 
       let qry: string = '';
+
+      // if (this.props.exporting)
+      // {
+      //   const stringQuery: string =
+      //     ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      //   const parsedQuery = JSON.parse(stringQuery);
+      //   const dbName = parsedQuery['index'];
+      //   const tableName = parsedQuery['type'];
+      //   Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
+      // } // Parse the TQL and set the filters so that when we fetch we get the right templates.
+
       // get query data from variantId or query
       if (exprt.variantId !== undefined && exprt.query === undefined)
       {
@@ -202,6 +215,7 @@ export class Export
       }
 
       let qryObj: object;
+      const mapping: object = exprt.columnTypes;
       try
       {
         qryObj = JSON.parse(qry);
@@ -210,16 +224,12 @@ export class Export
       {
         return reject(e);
       }
-      const [queryIndex, queryType] = temporaryFindIndexAndType(qryObj);
-      if (queryIndex === '')
+
+      if (typeof mapping === 'string')
       {
-        return reject('Must provide an index.');
+         return reject(mapping);
       }
-      if (queryIndex !== exprt['dbname'])
-      {
-        return reject('Query index name does not match supplied index name.');
-      }
-      const tableName: string | undefined = queryType !== '' ? queryType : undefined;
+
       let rankCounter: number = 1;
       let writer: any;
       if (exprt.filetype === 'csv')
@@ -267,7 +277,7 @@ export class Export
         for (const doc of newDocs)
         {
           // verify schema mapping with documents and fix documents accordingly
-          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname, tableName);
+          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], mapping);
           if (typeof newDoc === 'string')
           {
             writer.end();
@@ -360,6 +370,147 @@ export class Export
       }.bind(this),
       );
     });
+  }
+
+  private async _getAllFieldsAndTypesFromQuery(elasticClient: ElasticClient, qryObj: object, maxSize?: number): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      const fieldObj: object = {};
+      let fieldsAndTypes: object = {};
+      let rankCounter = 1;
+      let qrySize: number = 0;
+      if (maxSize === undefined)
+      {
+        maxSize = this.MAX_ROW_THRESHOLD;
+      }
+      if (qryObj['body'] === undefined || (qryObj['body'] !== undefined && qryObj['body']['size'] === undefined))
+      {
+        qrySize = maxSize;
+      }
+      else
+      {
+        qrySize = qryObj['body']['size'];
+      }
+      elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
+      {
+        if (resp.hits === undefined || (resp.hits !== undefined && resp.hits.hits === undefined))
+        {
+          return resolve(fieldObj);
+        }
+        const newDocs: object[] = resp.hits.hits as object[];
+        if (newDocs.length === 0)
+        {
+          return resolve(fieldObj);
+        }
+        fieldsAndTypes = this._getFieldsAndTypesFromDocument(newDocs, fieldsAndTypes);
+        rankCounter += newDocs.length;
+        if (Math.min(Math.min(resp.hits.total, qrySize), maxSize))
+        {
+          elasticClient.scroll({
+            scrollId: resp._scroll_id,
+            scroll: this.SCROLL_TIMEOUT,
+          }, getMoreUntilDone);
+        }
+      }.bind(this),
+      );
+      for (const field of Object.keys(fieldsAndTypes))
+      {
+        fieldObj[field] = this._getPriorityType(fieldsAndTypes[field] as string[]);
+      }
+
+      return resolve(fieldObj);
+    });
+  }
+
+  // boolean, long, double, string, array, object ({...})
+  // returns an object with keys as the fields and values as arrays of the detected types
+  private async _getFieldsAndTypesFromDocuments(docs: object[], fieldObj?: object): Promise<object>
+  {
+    if (fieldObj === undefined)
+    {
+      fieldObj = {};
+    }
+    return new Promise<object>(async (resolve, reject) =>
+    {
+      for (const doc of docs)
+      {
+        const fields: string[] = Object.keys(doc);
+        for (const field of fields)
+        {
+          switch (typeof doc[field])
+          {
+            case 'number':
+              if (!fieldObj.hasOwnProperty(field))
+              {
+                fieldObj[field] = doc[field] % 1 === 0 ? ['long'] : ['double'];
+              }
+              else
+              {
+                const type = doc[field] % 1 === 0 ? 'long' : 'double';
+                if (fieldObj[field].indexOf(type) < 0)
+                {
+                  fieldObj[field].concat([type]);
+                }
+              }
+              break;
+            case 'boolean':
+              if (!fieldObj.hasOwnProperty(field))
+              {
+                fieldObj[field] = ['boolean'];
+              }
+              else
+              {
+                if (fieldObj[field].indexOf('boolean') < 0)
+                {
+                  fieldObj[field].concat(['boolean']);
+                }
+              }
+              break;
+            case 'object':
+              if (!fieldObj.hasOwnProperty(field))
+              {
+                fieldObj[field] = Array.isArray(doc[field]) === true ? 'array' : 'object';
+              }
+              else
+              {
+                const type = Array.isArray(doc[field]) === true ? 'array' : 'object';
+                if (fieldObj[field].indexOf(type) < 0)
+                {
+                  fieldObj[field].concat([type]);
+                }
+              }
+              break;
+            default:
+              fieldObj[field] = 'string';
+          }
+        }
+      }
+      return resolve(fieldObj);
+    });
+  }
+
+  private _getPriorityType(types: string[]): string
+  {
+    const topPriorityTypes: string[] = ['array', 'object', 'string'];
+    if (types.length === 1)
+    {
+      return types[0];
+    }
+
+    for (const type of topPriorityTypes)
+    {
+      if (types.indexOf(type) >= 0)
+      {
+        return type;
+      }
+    }
+
+    if (types === ['long', 'double'] || types === ['double', 'long'])
+    {
+      return 'double';
+    }
+    return 'string';
   }
 
   private _applyTransforms(obj: object, transforms: object[]): object
@@ -499,43 +650,25 @@ export class Export
     return typeObj['type'];
   }
 
-  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema,
-    database: string, tableName: string): Promise<object | string>
+  private async _checkDocumentAgainstMapping(document: object, mapping: object): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
       const newDocument: object = document;
-      if (schema.tableNames(database).length === 0)
+      const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(mapping), Object.keys(document));
+      for (const field of fieldsInMappingNotInDocument)
       {
-        return resolve('Schema not found for database ' + database);
+        newDocument[field] = null;
+        // TODO: Case 740
+        // if (fields[field]['type'] === 'text')
+        // {
+        //   newDocument[field] = '';
+        // }
       }
-      let tableNameArr: string[] = [];
-      if (tableName !== undefined)
+      const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(mapping));
+      for (const field of fieldsInDocumentNotMapping)
       {
-        tableNameArr = [tableName];
-      }
-      else
-      {
-        tableNameArr = schema.tableNames(database);
-      }
-      for (const table of tableNameArr)
-      {
-        const fields: object = schema.fields(database, table);
-        const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(fields), Object.keys(document));
-        for (const field of fieldsInMappingNotInDocument)
-        {
-          newDocument[field] = null;
-          // TODO: Case 740
-          // if (fields[field]['type'] === 'text')
-          // {
-          //   newDocument[field] = '';
-          // }
-        }
-        const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(fields));
-        for (const field of fieldsInDocumentNotMapping)
-        {
-          delete newDocument[field];
-        }
+        delete newDocument[field];
       }
       resolve(newDocument);
     });

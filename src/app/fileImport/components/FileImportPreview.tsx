@@ -923,6 +923,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderTransformModal()
   {
+    console.log(this.state.transformColumnId);
     return (
       <TransformModal
         open={this.state.showingTransformModal}
