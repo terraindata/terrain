@@ -298,6 +298,45 @@ FileImportReducers[ActionTypes.setColumnType] =
       .setIn(keyPath, action.payload.type);
   };
 
+FileImportReducers[ActionTypes.setColumnTypeIndex] =
+  (state, action) =>
+  {
+    const keyPath = ['columnTypes', action.payload.columnId];
+    keyPath.push('index');
+    return state
+      .set('isDirty', true)
+      .setIn(keyPath, action.payload.index);
+  };
+
+FileImportReducers[ActionTypes.setColumnTypeAnalyzer] =
+  (state, action) =>
+  {
+    const keyPath = ['columnTypes', action.payload.columnId];
+    keyPath.push('analyzer');
+    return state
+      .set('isDirty', true)
+      .setIn(keyPath, action.payload.analyzer);
+  };
+
+FileImportReducers[ActionTypes.fetchColumnAnalyzers] =
+  (state, action) =>
+  {
+    Ajax.getAnalyzers(
+      state.dbName,
+      (analyzerArr) =>
+      {
+        const analyzers: List<string> = List<string>(analyzerArr);
+        action.payload.setAnalyzers(analyzers);
+      },
+    );
+    return state;
+  };
+
+FileImportReducers[ActionTypes.setAnalyzers] =
+  (state, action) =>
+    state.set('columnAnalyzers', action.payload.analyzers)
+  ;
+
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
     state
