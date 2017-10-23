@@ -68,6 +68,15 @@ abstract class ESParser
     return this.errors;
   }
 
+  public getErrorMessages(): string[]
+  {
+    const ret = [];
+    for (const e of this.errors)
+    {
+      ret.push(e.message);
+    }
+    return ret;
+  }
   /**
    * @returns {any} the parsed root value
    */
