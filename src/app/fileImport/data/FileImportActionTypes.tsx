@@ -63,7 +63,9 @@ const FileImportActionTypes =
     addTransform: '',
     setColumnToInclude: '',
     setColumnName: '',
+    setColumnNames: '',
     setColumnType: '',
+    setColumnTypes: '',
     updatePreviewColumns: '',
     saveTemplate: '',
     fetchTemplates: '',
@@ -80,6 +82,7 @@ const FileImportActionTypes =
     toggleExportRank: '',
     setTypeObjectKey: '',
     setErrorMsg: '',
+    getNamesAndTypesFromQuery: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

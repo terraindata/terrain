@@ -372,6 +372,80 @@ export class Export
     });
   }
 
+  public async getNamesAndTypesFromQuery(dbid: number, qry: object | string): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      if (typeof qry === 'string')
+      {
+        try
+        {
+          qry = JSON.parse(qry);
+        }
+        catch (e)
+        {
+          return reject(e.message as string);
+        }
+      }
+      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+      if (database === undefined)
+      {
+        return reject('Database "' + dbid.toString() + '" not found.');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return reject('File export currently is only supported for Elastic databases.');
+      }
+      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+      return resolve(await this._getAllFieldsAndTypesFromQuery(elasticClient, qry as object));
+    });
+  }
+
+  public async getNamesAndTypesFromVariant(dbid: number, variantId: number): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+      if (database === undefined)
+      {
+        return reject('Database "' + dbid.toString() + '" not found.');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return reject('File export currently is only supported for Elastic databases.');
+      }
+      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+      const variants: ItemConfig[] = await TastyItems.get(variantId);
+      if (variants.length === 0)
+      {
+        return reject('Variant not found.');
+      }
+      const qry: object | string = await this._getQueryFromVariant(variants[0]);
+      if (typeof qry === 'string')
+      {
+        return reject(qry);
+      }
+      return resolve(await this._getAllFieldsAndTypesFromQuery(elasticClient, qry));
+    });
+  }
+
+  private async _getQueryFromVariant(variant: ItemConfig): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      let qry: object = {};
+      try
+      {
+        qry = JSON.parse(variant.meta)['query']['tql'];
+      }
+      catch (e)
+      {
+        return resolve('Malformed variant');
+      }
+      return resolve(qry);
+    });
+  }
+
   private async _getAllFieldsAndTypesFromQuery(elasticClient: ElasticClient, qryObj: object, maxSize?: number): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
@@ -403,23 +477,25 @@ export class Export
         {
           return resolve(fieldObj);
         }
-        fieldsAndTypes = this._getFieldsAndTypesFromDocument(newDocs, fieldsAndTypes);
+        fieldsAndTypes = await this._getFieldsAndTypesFromDocuments(newDocs, fieldsAndTypes);
         rankCounter += newDocs.length;
-        if (Math.min(Math.min(resp.hits.total, qrySize), maxSize))
+        if (Math.min(Math.min(resp.hits.total, qrySize), maxSize) > rankCounter - 1)
         {
           elasticClient.scroll({
             scrollId: resp._scroll_id,
             scroll: this.SCROLL_TIMEOUT,
           }, getMoreUntilDone);
         }
+        else
+        {
+          for (const field of Object.keys(fieldsAndTypes))
+          {
+            fieldObj[field] = this._getPriorityType(fieldsAndTypes[field] as string[]);
+          }
+          return resolve(fieldObj);
+        }
       }.bind(this),
       );
-      for (const field of Object.keys(fieldsAndTypes))
-      {
-        fieldObj[field] = this._getPriorityType(fieldsAndTypes[field] as string[]);
-      }
-
-      return resolve(fieldObj);
     });
   }
 
@@ -435,19 +511,19 @@ export class Export
     {
       for (const doc of docs)
       {
-        const fields: string[] = Object.keys(doc);
+        const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {
-          switch (typeof doc[field])
+          switch (typeof doc['_source'][field])
           {
             case 'number':
               if (!fieldObj.hasOwnProperty(field))
               {
-                fieldObj[field] = doc[field] % 1 === 0 ? ['long'] : ['double'];
+                fieldObj[field] = doc['_source'][field] % 1 === 0 ? ['long'] : ['double'];
               }
               else
               {
-                const type = doc[field] % 1 === 0 ? 'long' : 'double';
+                const type = doc['_source'][field] % 1 === 0 ? 'long' : 'double';
                 if (fieldObj[field].indexOf(type) < 0)
                 {
                   fieldObj[field].concat([type]);
@@ -470,11 +546,11 @@ export class Export
             case 'object':
               if (!fieldObj.hasOwnProperty(field))
               {
-                fieldObj[field] = Array.isArray(doc[field]) === true ? 'array' : 'object';
+                fieldObj[field] = Array.isArray(doc['_source'][field]) === true ? ['array'] : ['object'];
               }
               else
               {
-                const type = Array.isArray(doc[field]) === true ? 'array' : 'object';
+                const type = Array.isArray(doc['_source'][field]) === true ? 'array' : 'object';
                 if (fieldObj[field].indexOf(type) < 0)
                 {
                   fieldObj[field].concat([type]);
@@ -482,7 +558,14 @@ export class Export
               }
               break;
             default:
-              fieldObj[field] = 'string';
+              if (!fieldObj.hasOwnProperty(field))
+              {
+                fieldObj[field] = ['string'];
+              }
+              else
+              {
+                fieldObj[field].concat(['string']);
+              }
           }
         }
       }

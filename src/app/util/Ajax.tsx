@@ -998,6 +998,27 @@ export const Ajax =
       );
     },
 
+    getNamesAndTypesFromQuery(
+      connectionId: number,
+      query: object,
+      onLoad: (templates: object) => void,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        query,
+      };
+      Ajax.req(
+        'post',
+        'export/types',
+        payload,
+        (response: object) =>
+        {
+          onLoad(response);
+        },
+      );
+    },
+
     getAllScheduledJobs(
       onLoad: (schedules: object[]) => void,
     )

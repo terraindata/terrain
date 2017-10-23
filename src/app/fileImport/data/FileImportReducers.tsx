@@ -274,6 +274,13 @@ FileImportReducers[ActionTypes.setColumnName] =
       .setIn(['columnNames', action.payload.columnId], action.payload.newName)
   ;
 
+FileImportReducers[ActionTypes.setColumnNames] =
+  (state, action) =>
+    state
+      .set('isDirty', true)
+      .setIn(['columnNames'], action.payload.names)
+  ;
+
 FileImportReducers[ActionTypes.setColumnType] =
   (state, action) =>
   {
@@ -297,6 +304,27 @@ FileImportReducers[ActionTypes.setColumnType] =
       .set('isDirty', true)
       .setIn(keyPath, action.payload.type);
   };
+
+FileImportReducers[ActionTypes.setColumnTypes] =
+  (state, action) =>
+  {
+    for (let c = 0; c < action.payload.types.length; c++)
+    {
+      action.payload.setColumnType(c, action.payload.types[c]['recursionDepth'], action.payload.types[c]['type']);
+    }
+  };
+
+FileImportReducers[ActionTypes.getNamesAndTypesFromQuery] =
+  (state, action) =>
+  {
+    Ajax.getNamesAndTypesFromQuery(
+      state.serverId,
+      action.payload.query,
+    (namesAndTypes) =>
+    {
+      action.payload.setNamesAndTypes(namesAndTypes);
+    });
+  }
 
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>

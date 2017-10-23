@@ -77,6 +77,14 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   ctx.body = exportReturn;
 });
 
+Router.post('/types', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const typeObj: object = ctx.request.body.body;
+  Util.verifyParameters(typeObj, ['dbid', 'query']);
+  console.log(typeObj);
+  ctx.body = await exprt.getNamesAndTypesFromQuery(typeObj['dbid'], typeObj['query']);
+});
+
 Router.post('/headless', async (ctx, next) =>
 {
   const exprtConf: ExportConfig = ctx.request.body.body;

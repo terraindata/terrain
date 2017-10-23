@@ -188,6 +188,11 @@ class FileImportPreview extends TerrainComponent<Props>
       const dbName = getIndex('');
       const tableName = getType('');
       Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
+      const stringQuery: string =
+        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      const parsedQuery = JSON.parse(stringQuery);
+      console.log(parsedQuery);
+      Actions.getNamesAndTypesFromQuery(this.props.serverId, parsedQuery, this.setNamesAndTypes);
     } // Parse the TQL and set the filters so that when we fetch we get the right templates.
 
     Actions.fetchTemplates(this.props.exporting);
@@ -570,6 +575,8 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public onTransform(transformColumnId: number)
   {
+    console.log('asdfa\n');
+    console.log(transformColumnId);
     this.showTransformModal();
     this.setState({
       transformColumnId,
@@ -693,6 +700,20 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       exportFiletype: type,
     });
+  }
+
+  public setNamesAndTypes(namesAndTypes: object)
+  {
+    const names: string[] = Object.keys(namesAndTypes).sort();
+    const namesList: List<string> = List(names);
+    console.log(names);
+    Actions.setColumnNames(namesList);
+    const types: object[] = names.map((name) =>
+    {
+      return namesAndTypes[name];
+    });
+    console.log(types);
+    Actions.setColumnTypes(types);
   }
 
   public renderApplyTemplate()
@@ -923,7 +944,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderTransformModal()
   {
-    console.log(this.state.transformColumnId);
     return (
       <TransformModal
         open={this.state.showingTransformModal}

@@ -72,6 +72,10 @@ const FileImportActions =
     (serverId: number, name: string, dbName: string, tableName: string) =>
       $(ActionTypes.setServerDbTable, { serverId, name, dbName, tableName }),
 
+    getNamesAndTypesFromQuery:
+    (serverId: number, query: object, setNamesAndTypes) =>
+      $(ActionTypes.getNamesAndTypesFromQuery, { serverId, query, setNamesAndTypes }),
+
     changeHasCsvHeader:
     (hasCsvHeader: boolean) =>
       $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),
@@ -133,9 +137,17 @@ const FileImportActions =
     (columnId: number, newName: string) =>
       $(ActionTypes.setColumnName, { columnId, newName }),
 
+    setColumnNames:
+    (names: List<string>) =>
+      $(ActionTypes.setColumnNames, { names }),
+
     setColumnType:
     (columnId: number, recursionDepth: number, type: string) =>
       $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
+
+    setColumnTypes:
+    (types: object[]) =>
+      $(ActionTypes.setColumnTypes, { types }),
 
     updatePreviewColumns:
     (transform: Transform) =>
