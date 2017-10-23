@@ -1316,7 +1316,7 @@ export const Ajax =
         field: '@timestamp',
         database: connectionId,
       };
-      console.error({ connectionId });
+
       return Ajax.req(
         'get',
         `events/agg`,

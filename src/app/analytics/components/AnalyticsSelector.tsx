@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import { AnalyticsState } from 'analytics/data/AnalyticsStore';
-import Autocomplete from 'common/components/Autocomplete';
+import Dropdown from 'common/components/Dropdown';
 import MultiSwitch from 'common/components/MultiSwitch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
@@ -86,9 +86,20 @@ const DATE_RANGES = Immutable.List([
 
 class AnalyticsSelector extends TerrainComponent<Props>
 {
-  public handleConnectionChange(value)
+  public handleConnectionChange(optionIndex)
   {
-    this.props.onConnectionChange(value);
+    const options = this.getConnectionOptions();
+
+    this.props.onConnectionChange(options.get(optionIndex));
+  }
+
+  public getConnectionOptions()
+  {
+    const { servers } = this.props;
+
+    const serversWithAnalytics = servers.filter((s) => s.isAnalytics);
+
+    return serversWithAnalytics.keySeq().toList();
   }
 
   public render()
@@ -97,15 +108,17 @@ class AnalyticsSelector extends TerrainComponent<Props>
     const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
 
     const serversWithAnalytics = servers.filter((s) => s.isAnalytics);
-    const options = serversWithAnalytics.keySeq().toList();
+    const options = this.getConnectionOptions();
 
     return (
       <div>
-        <Autocomplete
-          value={analyticsConnection}
-          placeholder='Select Analytics Server'
+        <Dropdown
           onChange={this.handleConnectionChange}
           options={options}
+          canEdit={true}
+          className='bic-db-dropdown'
+          directionBias={90}
+          selectedIndex={options.indexOf(analyticsConnection)}
         />
         <p>Metric</p>
         <MultiSwitch
