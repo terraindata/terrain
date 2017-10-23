@@ -85,8 +85,8 @@ class AggregationMap extends TerrainComponent<Props>
     // Geo_bounds TODO: possibly recursively search for geo_bounds (could be multiple ?)
     if (data.bounds !== undefined)
     {
-      return {        
-boundingRectangles: [{
+      return {
+        boundingRectangles: [{
           bottomRight: data.bounds.bottom_right,
           topLeft: data.bounds.top_left,
         }],
@@ -125,7 +125,7 @@ boundingRectangles: [{
             latitudes.push(bounds.top_left.lat);
             longitudes.push(bounds.bottom_right.lon);
             longitudes.push(bounds.top_left.lon);
-            const name = bucket.key + ': ' + bucket.doc_count;
+            const name = String(bucket.key) + ': ' + String(bucket.doc_count);
             return {
               bottomRight: bounds.bottom_right,
               topLeft: bounds.top_left,
@@ -149,7 +149,7 @@ boundingRectangles: [{
             const location = this.findKey(bucket, 'location');
             latitudes.push(location.lat);
             longitudes.push(location.lon);
-            const name = bucket.key + ': ' + bucket.doc_count;
+            const name = String(bucket.key) + ': ' + String(bucket.doc_count);
             return {
               location,
               index: -1,

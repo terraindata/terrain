@@ -10,6 +10,18 @@
   padding-left: 0px;
   overflow: hidden;
 
+  .results-area-map {
+    max-height: 300px;
+    min-height: 25px;
+    width: 100%;
+    position: absolute;
+    bottom: 0px;
+    .results-area-map-topbar {
+      height: 25;
+      background: red;
+    }
+  }
+
   .results-area-results {
     height: calc(~"100% - @{top-height}");
     overflow-y: auto;

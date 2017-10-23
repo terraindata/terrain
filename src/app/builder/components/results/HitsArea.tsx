@@ -44,13 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions prefer-const
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions prefer-const no-empty
 
 import * as Immutable from 'immutable';
 import './HitsArea.less';
 const { Map, List } = Immutable;
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
+import * as $ from 'jquery';
 import * as React from 'react';
 // import * as moment from 'moment';
 const moment = require('moment');
@@ -107,6 +108,8 @@ interface State
   onHitsLoaded?: (unchanged?: boolean) => void;
 
   showingExport?: boolean;
+  mapHeight?: number;
+  mouseStartY?: number;
 }
 
 @Radium
@@ -119,9 +122,12 @@ class HitsArea extends TerrainComponent<Props>
     showingExport: false,
     hitsPages: 1,
     hitFormat: 'icon',
+    mapHeight: 25,
+    mouseStartY: 0,
   };
 
   public hitsFodderRange = _.range(0, 25);
+  public locations = {};
 
   public componentWillReceiveProps(nextProps)
   {
@@ -223,46 +229,20 @@ class HitsArea extends TerrainComponent<Props>
     return !query || (!query.tql && !query.cards.size);
   }
 
-  /*
-  The code below is code to build an aggregation map that shows the target location and
-  all the numbered locations of the reuslts.
-  To use this method and render a map(s):
-  // locations is created in renderResults() and is a map of fieldName: locationValue from the query
-  // results is from this.props.query.results
-  const mapData = this.buildAggregationMap(locations, results);
-  if (mapData !== undefined && mapData.length > 0)
-    {
-      return (
-        mapData.map((data, index) =>
-          <MapComponent
-            location={data.target}
-            multiLocations={data.multiLocations}
-            markLocation={true}
-            showSearchBar={false}
-            showDistanceCircle={false}
-            hideSearchSettings={true}
-            zoomControl={true}
-            colorMarker={true}
-            key={index}
-          />
-        )
-      );
-    }
-  */
-  public buildAggregationMap(locations, results)
+  public buildAggregationMap(locations, hits)
   {
     const allMapsData = [];
     _.keys(locations).forEach((field) =>
     {
       let multiLocations = [];
       const target = MapUtil.getCoordinatesFromGeopoint(locations[field]);
-      results.forEach((result, i) =>
+      hits.forEach((hit, i) =>
       {
         const { resultsConfig } = this.props.query;
         const name = resultsConfig.enabled && resultsConfig.name !== undefined ?
-          result.fields.get(resultsConfig.name) : result.fields.get('_id');
+          hit.fields.get(resultsConfig.name) : hit.fields.get('_id');
         multiLocations.push({
-          location: result.fields.get(field),
+          location: hit.fields.get(field),
           name,
           index: i + 1,
         });
@@ -270,6 +250,78 @@ class HitsArea extends TerrainComponent<Props>
       allMapsData.push({ target, multiLocations });
     });
     return allMapsData;
+  }
+
+  public handleMapMouseDown(event)
+  {
+    $('body').on('mouseup', this.handleMapMouseUp);
+    $('body').on('mouseleave', this.handleMapMouseUp);
+    $('body').on('mousemove', this.handleMapMouseMove);
+    const el = this.refs['map'];
+    const cr = el['getBoundingClientRect']();
+    this.setState({
+      mapHeight: cr.height,
+      mouseStartY: event.pageY,
+    });
+  }
+
+  public handleMapMouseUp(event)
+  {
+    $('body').off('mouseup', this.handleMapMouseUp);
+    $('body').off('mouseleave', this.handleMapMouseUp);
+    $('body').off('mousemove', this.handleMapMouseMove);
+  }
+
+  public handleMapMouseMove(event)
+  {
+    const dY = Math.min(300, this.state.mouseStartY - event.pageY);
+    console.log(event.pageY);
+    console.log(this.state.mouseStartY);
+    console.log(dY);
+    event.preventDefault();
+    event.stopPropagation();
+    this.setState({
+      mapHeight: dY,
+    });
+  }
+
+  public renderHitsMap()
+  {
+    if (_.keys(this.locations).length === 0)
+    {
+      return null;
+    }
+    const mapData = this.buildAggregationMap(this.locations, this.props.resultsState.hits);
+    if (mapData !== undefined && mapData.length > 0)
+    {
+      return (
+        <div
+          className='results-area-map' style={{height: this.state.mapHeight}}
+          ref='map'
+        >
+            <div
+              className='results-area-map-topbar'
+              onMouseDown={this.handleMapMouseDown}
+            />
+            {
+             mapData.map((data, index) =>
+            <MapComponent
+              location={data.target}
+              multiLocations={data.multiLocations}
+              markLocation={true}
+              showSearchBar={false}
+              showDistanceCircle={false}
+              hideSearchSettings={true}
+              zoomControl={true}
+              colorMarker={true}
+              key={index}
+            />
+          )}
+        </div>
+        )
+      );
+    }
+    return null;
   }
 
   public renderHits()
@@ -362,7 +414,7 @@ class HitsArea extends TerrainComponent<Props>
     {
       // Extract the geo_distance fields and values from the query
       const geoDistances = this.props.query.tql.match(/"geo_distance": \{[^\}]*\}/g);
-      let locations = {};
+      this.locations = {};
       if (geoDistances !== undefined && geoDistances !== null)
       {
         geoDistances.forEach((geoDist) =>
@@ -376,7 +428,7 @@ class HitsArea extends TerrainComponent<Props>
             {
               if (key !== 'distance' && key !== 'distance_type')
               {
-                locations[key] = obj.geo_distance[key];
+                this.locations[key] = obj.geo_distance[key];
               }
             });
           }
@@ -409,7 +461,7 @@ class HitsArea extends TerrainComponent<Props>
                   key={index}
                   primaryKey={hit.primaryKey}
                   allowSpotlights={this.props.allowSpotlights}
-                  locations={locations}
+                  locations={this.locations}
                 />
               );
             })
@@ -682,6 +734,7 @@ column if you have customized the results view.');
       >
         {this.renderTopbar()}
         {this.renderHits()}
+        {this.renderHitsMap()}
         {this.renderExpandedHit()}
         {this.props.showCustomizeView && this.renderConfig()}
         {this.props.showExport && this.renderExport()}
