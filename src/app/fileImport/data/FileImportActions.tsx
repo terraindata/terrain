@@ -146,8 +146,24 @@ const FileImportActions =
       $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
     setColumnTypes:
-    (types: object[]) =>
-      $(ActionTypes.setColumnTypes, { types }),
+    (columnNames: string[], columnTypes: object[]) =>
+      $(ActionTypes.setColumnTypes, { columnNames, columnTypes }),
+
+    setColumnTypeIndex:
+    (columnId: number, index: string) =>
+      $(ActionTypes.setColumnTypeIndex, { columnId, index }),
+
+    setColumnTypeAnalyzer:
+    (columnId: number, analyzer: string) =>
+      $(ActionTypes.setColumnTypeAnalyzer, { columnId, analyzer }),
+
+    fetchColumnAnalyzers:
+    () =>
+      $(ActionTypes.fetchColumnAnalyzers, { setAnalyzers: FileImportActions.setAnalyzers }),
+
+    setAnalyzers:
+    (analyzers) =>
+      $(ActionTypes.setAnalyzers, { analyzers }),
 
     updatePreviewColumns:
     (transform: Transform) =>

@@ -277,8 +277,7 @@ FileImportReducers[ActionTypes.setColumnName] =
 FileImportReducers[ActionTypes.setColumnNames] =
   (state, action) =>
     state
-      .set('isDirty', true)
-      .setIn(['columnNames'], action.payload.names)
+      .set('columnNames', action.payload.names)
   ;
 
 FileImportReducers[ActionTypes.setColumnType] =
@@ -308,10 +307,12 @@ FileImportReducers[ActionTypes.setColumnType] =
 FileImportReducers[ActionTypes.setColumnTypes] =
   (state, action) =>
   {
-    for (let c = 0; c < action.payload.types.length; c++)
-    {
-      action.payload.setColumnType(c, action.payload.types[c]['recursionDepth'], action.payload.types[c]['type']);
-    }
+    return state
+      .set('columnTypes', List(action.payload.columnNames.map((colName) =>
+        action.payload.columnTypes[colName] ?
+          FileImportTypes._ColumnTypesTree(action.payload.columnTypes[colName])
+          :
+          FileImportTypes._ColumnTypesTree())));
   };
 
 FileImportReducers[ActionTypes.getNamesAndTypesFromQuery] =
@@ -325,6 +326,45 @@ FileImportReducers[ActionTypes.getNamesAndTypesFromQuery] =
       action.payload.setNamesAndTypes(namesAndTypes);
     });
   }
+
+FileImportReducers[ActionTypes.setColumnTypeIndex] =
+  (state, action) =>
+  {
+    const keyPath = ['columnTypes', action.payload.columnId];
+    keyPath.push('index');
+    return state
+      .set('isDirty', true)
+      .setIn(keyPath, action.payload.index);
+  };
+
+FileImportReducers[ActionTypes.setColumnTypeAnalyzer] =
+  (state, action) =>
+  {
+    const keyPath = ['columnTypes', action.payload.columnId];
+    keyPath.push('analyzer');
+    return state
+      .set('isDirty', true)
+      .setIn(keyPath, action.payload.analyzer);
+  };
+
+FileImportReducers[ActionTypes.fetchColumnAnalyzers] =
+  (state, action) =>
+  {
+    Ajax.getAnalyzers(
+      state.dbName,
+      (analyzerArr) =>
+      {
+        const analyzers: List<string> = List<string>(analyzerArr);
+        action.payload.setAnalyzers(analyzers);
+      },
+    );
+    return state;
+  };
+
+FileImportReducers[ActionTypes.setAnalyzers] =
+  (state, action) =>
+    state.set('columnAnalyzers', action.payload.analyzers)
+  ;
 
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>

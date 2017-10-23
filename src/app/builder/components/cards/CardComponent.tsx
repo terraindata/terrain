@@ -204,11 +204,11 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.card-drag-handle svg', { fill: Colors().text3 });
-    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', { fill: Colors().text3 });
-    ColorsActions.setStyle('.card-minimize-icon .st0', { fill: Colors().text3 });
-    ColorsActions.setStyle('.card-help-icon', { fill: Colors().text3 });
-    ColorsActions.setStyle('.card-tuning-icon', { stroke: Colors().text3 });
+    ColorsActions.setStyle('.card-drag-handle svg', { fill: Colors().iconColor });
+    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', { fill: Colors().iconColor });
+    ColorsActions.setStyle('.card-minimize-icon .st0', { fill: Colors().iconColor });
+    ColorsActions.setStyle('.card-help-icon', { fill: Colors().iconColor });
+    ColorsActions.setStyle('.card-tuning-icon', { stroke: Colors().iconColor });
     // TODO
     // this._subscribe(Store, {
     //   stateKey: 'selected',

@@ -149,6 +149,7 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalTitle: string,
     responseModalError: boolean,
     previewErrorMsg: string,
+    analyzers: List<string>,
   } = {
     templateOptions: List([]),
     appliedTemplateName: '',
@@ -177,9 +178,19 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalTitle: '',
     responseModalError: false,
     previewErrorMsg: '',
+    analyzers: List([]),
   };
 
   public confirmedLeave: boolean = false;
+
+  constructor(props)
+  {
+    super(props);
+    this._subscribe(FileImportStore, {
+      stateKey: 'analyzers',
+      storeKeyPath: ['columnAnalyzers'],
+    });
+  }
 
   public componentDidMount()
   {
@@ -194,6 +205,8 @@ class FileImportPreview extends TerrainComponent<Props>
       console.log(parsedQuery);
       Actions.getNamesAndTypesFromQuery(this.props.serverId, parsedQuery, this.setNamesAndTypes);
     } // Parse the TQL and set the filters so that when we fetch we get the right templates.
+
+    Actions.fetchColumnAnalyzers();
 
     Actions.fetchTemplates(this.props.exporting);
     this.setState({
@@ -703,19 +716,19 @@ class FileImportPreview extends TerrainComponent<Props>
   public setNamesAndTypes(namesAndTypes: object)
   {
     const names: string[] = Object.keys(namesAndTypes).sort();
-    const namesList: List<string> = List(names);
+    const namesList: List<string> = List<string>(names);
     console.log('names: ');
     console.log(names);
     console.log('-----end names-----');
-    Actions.setColumnNames(namesList);
     const types: object[] = names.map((name) =>
     {
       return namesAndTypes[name];
     });
     console.log('types: ');
-    console.log(types);
+    console.log(namesAndTypes);
     console.log('-----end types-------');
-    Actions.setColumnTypes(types);
+    // Actions.setColumnTypes(namesList, namesAndTypes);
+    // Actions.setColumnNames(namesList);
   }
 
   public renderApplyTemplate()
@@ -1055,6 +1068,7 @@ class FileImportPreview extends TerrainComponent<Props>
         columnNames={this.props.columnNames}
         isIncluded={this.props.columnsToInclude.get(key)}
         columnType={this.props.columnTypes.get(key)}
+        analyzers={this.state.analyzers}
         isPrimaryKey={this.props.exporting ? null : this.props.primaryKeys.includes(key)}
         columnOptions={this.props.columnOptions}
         exporting={this.props.exporting}

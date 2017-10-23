@@ -112,26 +112,6 @@ export class ImportTemplates
     return this.select([], filter);
   }
 
-  public async getExport(id?: number): Promise<ImportTemplateConfig[]>
-  {
-    const filter: object = { export: true };
-    if (id !== undefined)
-    {
-      filter['id'] = id;
-    }
-    return this.select([], filter);
-  }
-
-  public async getImport(id?: number): Promise<ImportTemplateConfig[]>
-  {
-    const filter: object = { export: false };
-    if (id !== undefined)
-    {
-      filter['id'] = id;
-    }
-    return this.select([], filter);
-  }
-
   public async loginWithPersistentAccessToken(templateId: number, persistentAccessToken: string): Promise<ImportTemplateConfig[]>
   {
     return this.select([], { id: templateId, persistentAccessToken });

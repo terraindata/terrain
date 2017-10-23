@@ -81,7 +81,6 @@ Router.post('/types', passport.authenticate('access-token-local'), async (ctx, n
 {
   const typeObj: object = ctx.request.body.body;
   Util.verifyParameters(typeObj, ['dbid', 'query']);
-  console.log(typeObj);
   ctx.body = await exprt.getNamesAndTypesFromQuery(typeObj['dbid'], typeObj['query']);
 });
 
