@@ -575,8 +575,6 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public onTransform(transformColumnId: number)
   {
-    console.log('asdfa\n');
-    console.log(transformColumnId);
     this.showTransformModal();
     this.setState({
       transformColumnId,
@@ -706,13 +704,17 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     const names: string[] = Object.keys(namesAndTypes).sort();
     const namesList: List<string> = List(names);
+    console.log('names: ');
     console.log(names);
+    console.log('-----end names-----');
     Actions.setColumnNames(namesList);
     const types: object[] = names.map((name) =>
     {
       return namesAndTypes[name];
     });
+    console.log('types: ');
     console.log(types);
+    console.log('-----end types-------');
     Actions.setColumnTypes(types);
   }
 

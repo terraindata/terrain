@@ -98,6 +98,7 @@
     "cronstrue": "^0.10.10",
     "d3": "^3.5.14",
     "date-format": "^1.1.0",
+    "deep-equal": "^1.0.1",
     "diff-match-patch": "^1.0.0",
     "elasticsearch": "^13.3.1",
     "elasticsearch-scroll-stream": "^1.1.1",

@@ -47,6 +47,7 @@ THE SOFTWARE.
 import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
+import * as equal from 'deep-equal';
 import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
@@ -514,57 +515,77 @@ export class Export
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {
+          let fullTypeObj = {};
+          fullTypeObj = { type: 'string', index: 'not_analyzed', analyzer: null};
           switch (typeof doc['_source'][field])
           {
             case 'number':
+              fullTypeObj['type'] = doc['_source'][field] % 1 === 0 ? 'long' : 'double';
               if (!fieldObj.hasOwnProperty(field))
               {
-                fieldObj[field] = doc['_source'][field] % 1 === 0 ? ['long'] : ['double'];
+                fieldObj[field] = [fullTypeObj];
               }
               else
               {
-                const type = doc['_source'][field] % 1 === 0 ? 'long' : 'double';
-                if (fieldObj[field].indexOf(type) < 0)
+                if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
+                  .indexOf(true) > -1)
                 {
-                  fieldObj[field].concat([type]);
+                  fieldObj[field].concat(fullTypeObj);
                 }
               }
               break;
             case 'boolean':
+              fullTypeObj['type'] = 'boolean';
               if (!fieldObj.hasOwnProperty(field))
               {
-                fieldObj[field] = ['boolean'];
+                fieldObj[field] = [fullTypeObj];
               }
               else
               {
-                if (fieldObj[field].indexOf('boolean') < 0)
+                if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
+                  .indexOf(true) < 0)
                 {
-                  fieldObj[field].concat(['boolean']);
+                  fieldObj[field].concat(fullTypeObj);
                 }
               }
               break;
             case 'object':
+              fullTypeObj['type'] = Array.isArray(doc['_source'][field]) === true ? 'array' : 'object';
               if (!fieldObj.hasOwnProperty(field))
               {
-                fieldObj[field] = Array.isArray(doc['_source'][field]) === true ? ['array'] : ['object'];
+                fieldObj[field] = [fullTypeObj['type'] === 'array' ?
+                  this._recursiveArrayTypeHelper(doc['_source'][field]) : fullTypeObj];
               }
               else
               {
-                const type = Array.isArray(doc['_source'][field]) === true ? 'array' : 'object';
-                if (fieldObj[field].indexOf(type) < 0)
+                if (fullTypeObj['type'] === 'array')
                 {
-                  fieldObj[field].concat([type]);
+                  const fullArrayObj: object = this._recursiveArrayTypeHelper(doc['_source'][field]);
+                  if (fieldObj[field].indexOf(fullArrayObj) < 0)
+                  {
+                    fieldObj[field].concat(fullArrayObj);
+                  }
+                }
+                else
+                {
+                  if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
+                  .indexOf(true) < 0)
+                  {
+                    fieldObj[field].concat(fullTypeObj);
+                  }
                 }
               }
               break;
             default:
+              fullTypeObj['index'] = 'analyzed';
+              fullTypeObj['analyzer'] = 'standard';
               if (!fieldObj.hasOwnProperty(field))
               {
-                fieldObj[field] = ['string'];
+                fieldObj[field] = [fullTypeObj];
               }
               else
               {
-                fieldObj[field].concat(['string']);
+                fieldObj[field].concat(fullTypeObj);
               }
           }
         }
@@ -573,9 +594,40 @@ export class Export
     });
   }
 
-  private _getPriorityType(types: string[]): string
+  private _recursiveArrayTypeHelper(fieldValue: any): object
   {
-    const topPriorityTypes: string[] = ['array', 'object', 'string'];
+    if (Array.isArray(fieldValue))
+    {
+      return { type: 'array', innerType: this._recursiveArrayTypeHelper(fieldValue[0]) };
+    }
+    else
+    {
+      switch (typeof fieldValue)
+      {
+        case 'number':
+          return { type: fieldValue % 1 === 0 ? 'long' : 'double', innerType: null, index: 'not_analyzed', analyzer: null };
+        case 'boolean':
+          return { type: 'boolean', innerType: null, index: 'not_analyzed', analyzer: null };
+        case 'object':
+          return { type: 'object', innerType: null, index: 'not_analyzed', analyzer: null };
+        default:
+          return { type: 'string', innerType: null, index: 'analyzed', analyzer: 'standard' };
+      }
+    }
+  }
+
+  private _getInnermostType(arrayType: object): string
+  {
+    while (arrayType['type'] === 'array' && arrayType['innerType'] !== undefined && typeof arrayType['innerType'] === 'object')
+    {
+      arrayType = arrayType['innerType'];
+    }
+    return arrayType['type'];
+  }
+
+  private _getPriorityType(types: object[]): object
+  {
+    const topPriorityTypes: string[] = ['array', 'object']; // string is default case
     if (types.length === 1)
     {
       return types[0];
@@ -583,17 +635,34 @@ export class Export
 
     for (const type of topPriorityTypes)
     {
-      if (types.indexOf(type) >= 0)
+      if (types.map((typesObj) => typesObj['type']).indexOf('array') >= 0)
       {
-        return type;
+        const arrayTypes: object[] = types.filter((typeObj) => typeObj['type'] === 'array');
+        const innermostTypes: string[] = arrayTypes.map((arrayType) =>
+          {
+            return this._getInnermostType(arrayType);
+          });
+        if (types.length === 1)
+        {
+          return arrayTypes[0];
+        }
+        if (equal(innermostTypes.sort(), ['double', 'long']))
+        {
+          return { type: 'double', index: 'not_analyzed', analyzer: null };
+        }
+        return { type: 'string', index: 'analyzed', analyzer: 'standard' };
+      }
+      else if (types.map((typesObj) => typesObj['type']).indexOf('object') >= 0)
+      {
+        return { type: 'object', index: 'not_analyzed', analyzer: null };
       }
     }
 
-    if (types === ['long', 'double'] || types === ['double', 'long'])
+    if (equal(types.map((typeObj) => typeObj['type']).sort(), ['double', 'long']))
     {
-      return 'double';
+      return { type: 'double', index: 'not_analyzed', analyzer: null };
     }
-    return 'string';
+    return { type: 'string', index: 'analyzed', analyzer: 'standard' };
   }
 
   private _applyTransforms(obj: object, transforms: object[]): object
