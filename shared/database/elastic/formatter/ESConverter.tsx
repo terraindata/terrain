@@ -56,7 +56,7 @@ class ESConverter
 
   public static formatES(query: ESJSONParser, previousQuery?: ESJSONParser): string
   {
-    const formatter = new ESFormatter(ESConverter.defaultIndentSize);
+    const formatter = new ESFormatter(ESConverter.defaultIndentSize, true);
     return formatter.formatQuery(query);
   }
 }
