@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { borderColor, Colors, getStyle } from '../Colors';
+import { borderColor, Colors, getStyle } from './../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './CheckBox.less';
 

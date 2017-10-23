@@ -58,7 +58,7 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
-import { cardStyle, Colors, fontColor, getCardColors } from '../../../common/Colors';
+import { cardStyle, Colors, fontColor, getCardColors } from '../../../colors/Colors';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -250,7 +250,7 @@ class InputComponent extends TerrainComponent<Props>
               canEdit={true}
               textColor={colorForInputType}
             />
-            <div className='input-close' onClick={this.closeInput}>
+            <div className='input-close close' onClick={this.closeInput}>
               <CloseIcon />
             </div>
           </div>

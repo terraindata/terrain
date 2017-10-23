@@ -58,7 +58,7 @@ import { TQLFn } from '../../../blocks/types/Block';
 import { _card, Card, InitFn } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 import { Backend } from '../../../database/types/Backend';
-import { Colors, getCardColors } from '../../common/Colors';
+import { Colors, getCardColors } from '../../colors/Colors';
 
 import ElasticKeyBuilderTextbox from '../../common/components/ElasticKeyBuilderTextbox';
 import SpecializedCreateCardTool from '../components/cards/SpecializedCreateCardTool';

@@ -1,0 +1,67 @@
+@import "../../../common/Common.less";
+
+@border-radius: 3px;
+@icon-size: 20px;
+
+.template-selector-row {
+  margin: 0px @half-spacing;
+  display: flex;
+  .big-text;
+
+  .template-selector-label {
+    margin: @half-spacing 0px;
+    padding: @half-spacing;
+  }
+
+  .template-selector-input {
+    margin: @half-spacing @spacing;
+  }
+
+  .template-selector-icon-wrapper {
+    padding: @quarter-spacing;
+    position: relative;
+    width: @icon-size + 2px;
+    display: flex;
+    align-items: center;
+
+    .template-selector-icon {
+      cursor: pointer;
+      position: relative;
+      padding: 1px;
+      width: @icon-size;
+      height: @icon-size;
+      fill: currentColor;
+    }
+  }
+}
+
+.template-selector-data {
+  display: flex;
+
+  .template-selector-column {
+    &:first-child {
+      margin-right: @double-spacing;
+    }
+  }
+
+  .template-selector-info-table {
+    width: 200px;
+    margin-left: @half-spacing;
+    tr {
+      td {
+        &:first-child {
+          padding-right: @half-spacing;
+        }
+
+        padding: @quarter-spacing 0px;
+      }
+    }
+
+    .access-token-cell {
+      max-width: 60px;
+      text-overflow: ellipsis;
+      overflow-x: hidden;
+      white-space: nowrap;
+    }
+  }
+}

@@ -54,14 +54,13 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
-import { backgroundColor, buttonColors, Colors, disabledButtonColors, fontColor } from '../../common/Colors';
+import { backgroundColor, buttonColors, Colors, disabledButtonColors, fontColor } from '../../colors/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
 import { CSVTypeParser, parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import SchemaStore from './../../schema/data/SchemaStore';
 import { databaseId, tableId } from './../../schema/SchemaTypes';
 import * as SchemaTypes from './../../schema/SchemaTypes';
 import has = Reflect.has;
@@ -81,56 +80,67 @@ const PREVIEW_CHUNK_SIZE = FileImportTypes.PREVIEW_CHUNK_SIZE;
 
 export interface Props
 {
+  schema: SchemaTypes.SchemaState;
   params?: any;
   location?: any;
   router?: any;
   route?: any;
 }
 
+interface State
+{
+  fileImportState: FileImportTypes.FileImportState;
+  columnOptionNames: List<string>;
+  stepId: number;
+  servers?: SchemaTypes.ServerMap;
+  serverNames: List<string>;
+  serverIndex: number;
+  dbs?: SchemaTypes.DatabaseMap;
+  dbNames: List<string>;
+  tables?: SchemaTypes.TableMap;
+  tableNames: List<string>;
+  fileSelected: boolean;
+}
+
 @Radium
 class FileImport extends TerrainComponent<any>
 {
-  public state: {
-    fileImportState: FileImportTypes.FileImportState;
-    columnOptionNames: List<string>;
-    stepId: number;
-    servers?: SchemaTypes.ServerMap;
-    serverNames: List<string>;
-    serverIndex: number;
-    dbs?: SchemaTypes.DatabaseMap;
-    dbNames: List<string>;
-    tables?: SchemaTypes.TableMap;
-    tableNames: List<string>;
-    fileSelected: boolean;
-  } = {
-    fileImportState: FileImportStore.getState(),
-    columnOptionNames: List([]),
-    stepId: 0,
-    serverIndex: -1,
-    serverNames: List([]),
-    dbNames: List([]),
-    tableNames: List([]),
-    fileSelected: false,
-  };
+  public state: State;
 
   constructor(props)
   {
     super(props);
 
+    const { schema } = props;
+
+    this.state = {
+      fileImportState: FileImportStore.getState(),
+      columnOptionNames: List([]),
+      stepId: 0,
+      serverIndex: -1,
+      dbNames: List([]),
+      tableNames: List([]),
+      fileSelected: false,
+      servers: schema.servers,
+      dbs: schema.databases,
+      tables: schema.tables,
+      serverNames: schema.servers.keySeq().toList(),
+    };
+
     this._subscribe(FileImportStore, {
       stateKey: 'fileImportState',
     });
+  }
 
-    this._subscribe(SchemaStore, {
-      updater: (schemaState: SchemaTypes.SchemaState) =>
-      {
-        this.setState({
-          servers: schemaState.servers,
-          dbs: schemaState.databases,
-          tables: schemaState.tables,
-          serverNames: schemaState.servers.keySeq().toList(),
-        });
-      },
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    const { schema } = nextProps;
+
+    this.setState({
+      servers: schema.servers,
+      dbs: schema.databases,
+      tables: schema.tables,
+      serverNames: schema.servers.keySeq().toList(),
     });
   }
 
@@ -821,7 +831,10 @@ class FileImport extends TerrainComponent<any>
           <div
             className='fi-next-button button'
             onClick={nextEnabled ? this.incrementStep : this._fn(this.setError, errorMsg)}
-            style={nextEnabled ? buttonColors() : disabledButtonColors()}
+            style={[
+              nextEnabled ? buttonColors() : disabledButtonColors(),
+              fontColor(Colors().text1),
+            ]}
             ref='fi-next-button'
           >
             Next
@@ -871,6 +884,7 @@ class FileImport extends TerrainComponent<any>
 }
 
 // ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const ExportFileImport = DragDropContext(HTML5Backend)(FileImport) as any;
+const FileImportContainer = Util.createContainer(FileImport, ['schema'], {});
+const ExportFileImport = DragDropContext(HTML5Backend)(FileImportContainer) as any;
 
 export default ExportFileImport;

@@ -61,6 +61,7 @@ import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import { databases } from './database/DatabaseRouter';
+import { events } from './events/EventRouter';
 import './Logging';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
@@ -142,8 +143,6 @@ class App
 
   public async start(): Promise<http.Server>
   {
-    // tslint:disable-next-line:no-floating-promises
-
     // create application schema
     await Schema.createAppSchema(this.config.db as string, this.DB);
 
@@ -160,6 +159,11 @@ class App
       if (db.id !== undefined)
       {
         await databases.connect({} as any, db.id);
+      }
+
+      if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
+      {
+        await events.initializeEventMetadata(DB, db.analyticsIndex, db.analyticsType);
       }
     }
 

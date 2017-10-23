@@ -57,7 +57,7 @@ export const databases = new Databases();
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all databases');
-  ctx.body = await databases.get(undefined, ['id', 'name', 'type', 'host', 'status']);
+  ctx.body = await databases.select(['id', 'name', 'type', 'host', 'status', 'isAnalytics', 'analyticsIndex', 'analyticsType']);
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -70,10 +70,18 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
 {
   winston.info('add new database');
   const db: DatabaseConfig = ctx.request.body.body;
-  Util.verifyParameters(db, ['name', 'dsn', 'host']);
+  Util.verifyParameters(db, ['name', 'dsn', 'host', 'isAnalytics']);
   if (db.id !== undefined)
   {
-    throw Error('Invalid parameter database ID');
+    throw new Error('Invalid parameter database ID');
+  }
+
+  if (db.isAnalytics)
+  {
+    if (db.analyticsIndex === undefined || db.analyticsType === undefined)
+    {
+      throw new Error('Missing analytics index or type parameter');
+    }
   }
 
   db.status = 'DISCONNECTED';

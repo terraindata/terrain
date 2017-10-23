@@ -330,7 +330,7 @@ class Library extends TerrainComponent<any>
               basePath,
               algorithmActions: this.props.libraryAlgorithmActions,
             }}
-            isFocused={variantIds !== null && variantIds.length === 0}
+            isFocused={variantIds === null}
           />
           <VariantsColumn
             {...{

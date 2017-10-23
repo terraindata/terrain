@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import TerrainStore from 'store/TerrainStore';
 import Ajax from './../../util/Ajax';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
@@ -179,6 +180,14 @@ FileImportReducers[ActionTypes.changeTableName] =
     state
       .set('tableName', action.payload.tableName);
 
+FileImportReducers[ActionTypes.setServerDbTable] =
+  (state, action) =>
+    state
+      .set('serverId', action.payload.serverId)
+      .set('serverName', action.payload.name)
+      .set('dbName', action.payload.dbName)
+      .set('tableName', action.payload.tableName);
+
 FileImportReducers[ActionTypes.changeHasCsvHeader] =
   (state, action) =>
     state
@@ -227,7 +236,7 @@ FileImportReducers[ActionTypes.setTypeObjectKey] =
   (state, action) =>
     state
       .set('isDirty', true)
-      .set('objectKey', action.payload.setTypeObjectKey)
+      .set('objectKey', action.payload.typeObjectKey)
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
@@ -348,7 +357,7 @@ FileImportReducers[ActionTypes.importFile] =
       {
         action.payload.handleFileImportSuccess();
         action.payload.changeUploadInProgress(false);
-        action.payload.fetchSchema();
+        TerrainStore.dispatch(action.payload.fetchSchema());
       },
       (err: string) =>
       {
@@ -395,7 +404,8 @@ FileImportReducers[ActionTypes.setTemplates] =
 FileImportReducers[ActionTypes.saveTemplate] =
   (state, action) =>
   {
-    const { serverId, dbName, tableName } = action.payload;
+    const { serverId, dbName, tableName, objectKey } = action.payload;
+
     Ajax.saveTemplate(
       dbName !== undefined ? dbName : state.dbName,
       tableName !== undefined ? tableName : state.tableName,
@@ -410,6 +420,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       action.payload.templateName,
       action.payload.exporting,
       state.primaryKeyDelimiter,
+      state.objectKey,
       () =>
       {
         action.payload.handleTemplateSaveSuccess();
@@ -452,7 +463,9 @@ FileImportReducers[ActionTypes.updateTemplate] =
 FileImportReducers[ActionTypes.deleteTemplate] =
   (state, action) =>
   {
-    Ajax.deleteTemplate(action.payload.templateId,
+    Ajax.deleteTemplate(
+      action.payload.templateId,
+      action.payload.exporting,
       () =>
       {
         action.payload.handleDeleteTemplateSuccess(action.payload.templateName);
@@ -478,7 +491,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
           FileImportTypes._Template({
-            export: template['export'],
+            export: action.payload.exporting,
             templateId: template['id'],
             templateName: template['name'],
             originalNames: List<string>(template['originalNames']),

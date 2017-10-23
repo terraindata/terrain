@@ -75,11 +75,16 @@ export default class ESCardParser extends ESParser
     }
     const rootCard = cards.get(0);
     // assert this is the root card
-    if (rootCard['key'] !== 'root')
+    if (rootCard['type'] !== 'eqlbody')
     {
       return cards;
     }
+
+    // update the cards
+    const updatedRootCard = ESCardParser.updateCardBeforeParsing(rootCard);
+    // parsing
     const parsedCard = new ESCardParser(rootCard);
+    // interpreting
     const state = BuilderStore.getState();
     let inputs = state.query && state.query.inputs;
     if (inputs === null)
@@ -88,7 +93,8 @@ export default class ESCardParser extends ESParser
     }
     const params: { [name: string]: any; } = toInputMap(inputs);
     const cardInterpreter = new ESInterpreter(parsedCard, params);
-    const newRootCard = ESCardParser.updateCardErrors(rootCard, parsedCard);
+    // update filter card
+    const newRootCard = ESCardParser.updateCardErrors(updatedRootCard, parsedCard);
     if (newRootCard === rootCard)
     {
       return cards;
@@ -98,16 +104,25 @@ export default class ESCardParser extends ESParser
     }
   }
 
-  private static updateCardErrors(rootCard, parsedCard: ESCardParser)
+  private static updateCardBeforeParsing(rootCard)
   {
-    // handle errors
     forAllCards(rootCard, (card: Block, keyPath) =>
     {
+      // clear the errors
       if (card.errors && card.errors.size > 0)
       {
         rootCard = rootCard.setIn(keyPath.push('errors'), Immutable.List([]));
       }
+      if (card.static.updateCards)
+      {
+        rootCard = rootCard.setIn(keyPath, card.static.updateCards(rootCard, card, keyPath));
+      }
     });
+    return rootCard;
+  }
+
+  private static updateCardErrors(rootCard, parsedCard: ESCardParser)
+  {
     parsedCard.getValueInfo().recursivelyVisit((element: ESValueInfo) =>
     {
       const card: Block = element.card;
@@ -227,6 +242,7 @@ export default class ESCardParser extends ESParser
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
     valueInfo.cardPath = blockPath;
     this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESClause '));
     return valueInfo;
@@ -236,6 +252,7 @@ export default class ESCardParser extends ESParser
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
     valueInfo.cardPath = blockPath;
     this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESReferenceClause '));
     return valueInfo;
@@ -245,6 +262,7 @@ export default class ESCardParser extends ESParser
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
     valueInfo.cardPath = blockPath;
     this.accumulateErrorOnValueInfo(valueInfo, String('The card ' + String(block.static.title) + ' has ESAnyClause '));
     return valueInfo;
@@ -254,6 +272,7 @@ export default class ESCardParser extends ESParser
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
     valueInfo.cardPath = blockPath;
     const theValue = [];
     valueInfo.card = block;
@@ -275,9 +294,9 @@ export default class ESCardParser extends ESParser
   {
     const valueInfo = new ESValueInfo();
     valueInfo.card = block;
+    valueInfo.clause = block.static.clause;
     valueInfo.cardPath = blockPath;
     const theValue = {};
-    valueInfo.card = block;
     valueInfo.jsonType = ESJSONType.object;
     valueInfo.value = theValue;
     block.static.valueInfo = valueInfo;
@@ -348,11 +367,13 @@ export default class ESCardParser extends ESParser
     if (valueInfo)
     {
       valueInfo.card = block;
+      valueInfo.clause = block.static.clause;
       valueInfo.cardPath = blockPath;
     } else
     {
       valueInfo = new ESValueInfo();
       valueInfo.card = block;
+      valueInfo.clause = block.static.clause;
       valueInfo.cardPath = blockPath;
       if (parser.hasError())
       {

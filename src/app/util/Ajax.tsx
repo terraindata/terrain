@@ -806,7 +806,7 @@ export const Ajax =
       };
       Ajax.req(
         'post',
-        'import/export/',
+        'export/',
         payload,
         onLoadHandler,
         {
@@ -828,6 +828,7 @@ export const Ajax =
       name: string,
       exporting: boolean,
       primaryKeyDelimiter: string,
+      objectKey: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -843,14 +844,16 @@ export const Ajax =
         name,
         export: exporting,
         primaryKeyDelimiter,
+        objectKey,
       };
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/create',
+        routeType + '/templates/create',
         payload,
         onLoadHandler,
         {
@@ -883,9 +886,10 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/' + String(templateId),
+        routeType + '/templates/' + String(templateId),
         payload,
         onLoadHandler,
         {
@@ -895,7 +899,9 @@ export const Ajax =
       return;
     },
 
-    deleteTemplate(templateId: number,
+    deleteTemplate(
+      templateId: number,
+      exporting: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -904,9 +910,10 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/delete/' + String(templateId),
+        routeType + '/templates/delete/' + String(templateId),
         {},
         onLoadHandler,
         {
@@ -938,10 +945,10 @@ export const Ajax =
       {
         payload['importOnly'] = true;
       }
-
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/',
+        routeType + '/templates/',
         payload,
         (response: object[]) =>
         {
@@ -951,14 +958,15 @@ export const Ajax =
     },
 
     getAllTemplates(
+      exporting: boolean,
       onLoad: (templates: object[]) => void,
     )
     {
       const payload: object = {};
-
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/',
+        routeType + '/templates/',
         payload,
         (response: object[]) =>
         {
@@ -967,7 +975,9 @@ export const Ajax =
       );
     },
 
-    resetTemplateToken(templateId: number,
+    resetTemplateToken(
+      templateId: number,
+      exporting: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -976,17 +986,105 @@ export const Ajax =
       {
         onLoad(resp);
       };
-      Ajax.req(
+      const routeType = exporting ? 'export' : 'import';
+      return Ajax.req(
         'post',
-        'templates/updateAccessToken/',
+        routeType + '/templates/updateAccessToken/',
         { id: String(templateId) },
         onLoadHandler,
         {
           onError,
         },
       );
-      return;
     },
+
+    getAllScheduledJobs(
+      onLoad: (schedules: object[]) => void,
+    )
+    {
+      const payload: object = {};
+
+      Ajax.req(
+        'get',
+        'scheduler/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+      );
+    },
+
+    getCredentialConfigs(
+      type: string,
+      onLoad: (credentials: object[]) => void,
+    )
+    {
+      const payload = {};
+
+      Ajax.req(
+        'get',
+        'scheduler/connections/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+        {
+          urlArgs: { type },
+        },
+      );
+    },
+
+    createSchedule(
+      params: {
+        name: string,
+        jobType: string,
+        paramsJob: object,
+        schedule: string,
+        sort: string,
+        transport: object,
+      },
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      return Ajax.req(
+        'post',
+        'scheduler/create/',
+        params,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+        {
+          onError,
+        },
+      );
+    },
+
+    deleteSchedule(
+      id: ID,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const payload = {};
+
+      return Ajax.req(
+        'post',
+        'scheduler/delete/' + String(id),
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+        {
+          onError,
+        },
+      );
+    },
+
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1

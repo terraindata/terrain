@@ -83,6 +83,9 @@ beforeAll(async (done) =>
             type: 'elastic',
             dsn: 'http://127.0.0.1:9200',
             host: 'http://127.0.0.1:9200',
+            isAnalytics: true,
+            analyticsIndex: 'terrain-analytics',
+            analyticsType: 'events',
           },
         ],
       };
@@ -897,23 +900,21 @@ describe('File import route tests', () =>
   });
 });
 
-describe('File import templates route tests', () =>
+describe('File export templates route tests', () =>
 {
   let persistentAccessToken: string = '';
-  test('Create template: POST /midway/v1/templates/create', async () =>
+  test('Create template: POST /midway/v1/export/templates/create', async () =>
   {
     await request(server)
-      .post('/midway/v1/templates/create')
+      .post('/midway/v1/export/templates/create')
       .send({
         id: 1,
         accessToken: 'ImAnAdmin',
         body: {
           name: 'my_template',
-          export: true,
           dbid: 1,
           dbname: 'movies',
           tablename: 'data',
-
           originalNames: ['pkey', 'column1', 'column2'],
           columnTypes:
           {
@@ -936,7 +937,6 @@ describe('File import templates route tests', () =>
           .toMatchObject({
             id: 1,
             name: 'my_template',
-            export: true,
             dbid: 1,
             dbname: 'movies',
             tablename: 'data',
@@ -955,14 +955,14 @@ describe('File import templates route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/templates/create request returned an error: ' + String(error));
+        fail('POST /midway/v1/export/templates/create request returned an error: ' + String(error));
       });
   });
 
-  test('Get all templates: GET /midway/v1/templates/', async () =>
+  test('Get all import templates: GET /midway/v1/export/templates/', async () =>
   {
     await request(server)
-      .get('/midway/v1/templates/')
+      .get('/midway/v1/export/templates/')
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',
@@ -995,14 +995,14 @@ describe('File import templates route tests', () =>
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/templates/ request returned an error: ' + String(error));
+        fail('GET /midway/v1/export/templates/ request returned an error: ' + String(error));
       });
   });
 
-  test('Get filtered templates: POST /midway/v1/templates/', async () =>
+  test('Get filtered templates: POST /midway/v1/export/templates/', async () =>
   {
     await request(server)
-      .post('/midway/v1/templates/')
+      .post('/midway/v1/export/templates/')
       .send({
         id: 1,
         accessToken: 'ImAnAdmin',
@@ -1020,14 +1020,14 @@ describe('File import templates route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/templates/ request returned an error: ' + String(error));
+        fail('POST /midway/v1/export/templates/ request returned an error: ' + String(error));
       });
   });
 
-  test('Post headless export: POST /midway/v1/import/export/headless', async () =>
+  test('Post headless export: POST /midway/v1/export/headless', async () =>
   {
     await request(server)
-      .post('/midway/v1/import/export/headless')
+      .post('/midway/v1/export/headless')
       .send({
         templateId: 1,
         persistentAccessToken,
@@ -1035,9 +1035,9 @@ describe('File import templates route tests', () =>
           dbid: 1,
           dbname: 'movies',
           templateId: 1,
-          export: true,
           filetype: 'csv',
-          query: ' {\"index\": \"movies\", \"type\": \"data\", \"from\": 0, \"size\": 10, \"body\": {\"query\": { }}}',
+          query: '{\"body\":{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+          + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}}',
         },
       })
       .expect(200)
@@ -1048,7 +1048,7 @@ describe('File import templates route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/import/export/headless request returned an error: ' + String(error));
+        fail('POST /midway/v1/export/headless request returned an error: ' + String(error));
       });
   });
 });
@@ -1128,6 +1128,7 @@ describe('Analytics aggregation route tests', () =>
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',
+        database: 1,
         start: new Date(2015, 5, 2, 1, 27, 4),
         end: new Date(2015, 5, 2, 1, 27, 14),
         eventid: 1,
@@ -1154,6 +1155,7 @@ describe('Analytics aggregation route tests', () =>
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',
+        database: 1,
         start: new Date(2015, 5, 2, 1, 27, 4),
         end: new Date(2015, 5, 2, 1, 27, 14),
         eventid: 1,
@@ -1181,6 +1183,7 @@ describe('Analytics aggregation route tests', () =>
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',
+        database: 1,
         start: new Date(2015, 5, 2, 1, 27, 4),
         end: new Date(2015, 5, 2, 3, 27, 4),
         eventid: '2,1',

@@ -269,7 +269,7 @@ available, and `import [ClassName] = require('[package_name]');` if not. e.g.
 
 Included in the `midway/test` folder.
 
-Run the `yarn run jest-test` command to run the back-end tests.
+Run the `yarn run test-back` command to run the back-end tests.
 
 #### API Tests in Back-end test files
 

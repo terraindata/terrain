@@ -52,7 +52,9 @@ import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
-import { backgroundColor, buttonColors, Colors, fontColor } from '../../common/Colors';
+
+import { getIndex, getType } from 'database/elastic/blocks/ElasticBlockHelpers';
+import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
 import { ESParseTreeToCode } from './../../../database/elastic/conversion/ParseElasticQuery';
@@ -181,6 +183,13 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public componentDidMount()
   {
+    if (this.props.exporting)
+    {
+      const dbName = getIndex('');
+      const tableName = getType('');
+      Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
+    } // Parse the TQL and set the filters so that when we fetch we get the right templates.
+
     Actions.fetchTemplates(this.props.exporting);
     this.setState({
       templateOptions: this.props.templates.map((template, i) => template.templateName),
@@ -386,11 +395,8 @@ class FileImportPreview extends TerrainComponent<Props>
     }
     if (this.props.exporting)
     {
-      const stringQuery: string =
-        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      const parsedQuery = JSON.parse(stringQuery);
-      const dbName = parsedQuery['index'];
-      const tableName = parsedQuery['type'];
+      const dbName = getIndex('');
+      const tableName = getType('');
       Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess,
         this.props.serverId, dbName, tableName);
     }
@@ -631,8 +637,7 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      const parsedQuery = JSON.parse(stringQuery);
-      const dbName = parsedQuery['index'];
+      const dbName = getIndex('');
 
       if (dbName === undefined || dbName === '')
       {
@@ -1074,6 +1079,7 @@ class FileImportPreview extends TerrainComponent<Props>
         style={{
           color: Colors().import,
           border: 'solid 1px ' + Colors().import,
+          background: Colors().bg3,
         }}
       >
         {this.props.exporting ? 'Export' : 'Import'}
@@ -1266,6 +1272,7 @@ class FileImportPreview extends TerrainComponent<Props>
           'fi-preview': true,
           'fi-preview-export': this.props.exporting,
         })}
+        style={backgroundColor(Colors().bg3)}
       >
         {
           this.props.exporting && !this.props.query ?

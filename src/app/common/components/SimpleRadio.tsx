@@ -47,7 +47,7 @@ import * as classNames from 'classnames';
 import CheckBox from 'common/components/CheckBox';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors } from '../../common/Colors';
+import { backgroundColor, borderColor, Colors } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './SimpleRadio.less';
 

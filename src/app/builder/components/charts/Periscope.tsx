@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import './Periscope.less';
 
-import { Colors } from '../../../common/Colors';
+import { Colors } from '../../../colors/Colors';
 
 // consider upgrading d3 to v4, which has available types
 // import * as d3 from 'd3';
@@ -105,6 +105,9 @@ const Periscope = {
     .periscope .tick text {
       fill: ${Colors().text2} !important;
     }
+    .periscope .handle {
+      stroke: rgba(210,215,219,0.75) !important;
+    }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
   },
@@ -137,7 +140,7 @@ const Periscope = {
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
-      .attr('fill', Colors().altBg1);
+      .attr('fill', '#fff');
   },
 
   _drawAxes(el, scales)
@@ -150,7 +153,7 @@ const Periscope = {
       .orient('bottom');
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
-      .attr('style', 'stroke: ' + Colors().altHighlight)
+      .attr('style', 'stroke: ' + '#fff')
       .call(bottomAxis);
   },
 
@@ -243,12 +246,12 @@ const Periscope = {
       .append('circle')
       .attr('class', 'handle')
       .attr('style', 'stroke: ' + Colors().altHighlight)
-      .attr('fill', Colors().altBg1);
+      .attr('fill', '#fff');
 
     handle
       .attr('cx', (d) => scales.x(d))
       .attr('cy', scaleMin(scales.barY))
-      .attr('fill', Colors().altBg1)
+      .attr('fill', '#fff')
       .attr('style', 'stroke: ' + Colors().altHighlight)
       .attr('stroke-width', '3px')
       .attr('r', 10);

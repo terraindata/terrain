@@ -82,7 +82,7 @@ class InputsArea extends TerrainComponent<Props>
   {
     return (
       <InfoArea
-        large={this.props.canEdit ? '' : 'No inputs have been created, yet.'}
+        large={this.props.canEdit ? 'No inputs have been created, yet.' : ''}
         button={this.props.canEdit ? 'Add an Input' : null}
         onClick={this.handleCreateInput}
       />
