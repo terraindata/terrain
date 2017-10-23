@@ -206,6 +206,7 @@ class TemplateControlList extends TerrainComponent<Props>
       }
       ControlActions.importExport.deleteTemplate(
         this.state.currentActiveTemplate.templateId,
+        this.state.currentActiveTemplate.export,
         this.handleDeleteTemplateSuccess,
         this.handleDeleteTemplateError,
         this.state.currentActiveTemplate.templateName,
@@ -219,6 +220,7 @@ class TemplateControlList extends TerrainComponent<Props>
       }
       ControlActions.importExport.resetTemplateToken(
         this.state.currentActiveTemplate.templateId,
+        this.state.currentActiveTemplate.export,
         this.handleResetTemplateTokenSuccess,
         this.handleResetTemplateTokenError,
       );

@@ -60,11 +60,12 @@ class ElasticController extends DatabaseController
   private client: ElasticClient;
   private tasty: Tasty.Tasty;
   private queryHandler: ElasticQueryHandler;
+  private analyticsIndex: string;
+  private analyticsType: string;
 
-  constructor(config: ElasticConfig, id: number, name: string)
+  constructor(config: ElasticConfig, id: number, name: string, analyticsIndex?: string, analyticsType?: string)
   {
     super('ElasticController', id, name);
-
     this.client = new ElasticClient(this, config);
 
     this.tasty = new Tasty.Tasty(
@@ -72,6 +73,16 @@ class ElasticController extends DatabaseController
       new ElasticDB(this.client));
 
     this.queryHandler = new ElasticQueryHandler(this);
+
+    if (analyticsIndex !== undefined)
+    {
+      this.analyticsIndex = analyticsIndex;
+    }
+
+    if (analyticsType !== undefined)
+    {
+      this.analyticsType = analyticsType;
+    }
   }
 
   public getClient(): ElasticClient
@@ -87,6 +98,14 @@ class ElasticController extends DatabaseController
   public getQueryHandler(): ElasticQueryHandler
   {
     return this.queryHandler;
+  }
+
+  public getAnalyticsDB(): object
+  {
+    return {
+      index: this.analyticsIndex,
+      type: this.analyticsType,
+    };
   }
 }
 

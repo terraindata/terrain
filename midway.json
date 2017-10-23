@@ -5,7 +5,10 @@
             "name": "My ElasticSearch Instance",
             "type": "elastic",
             "dsn": "127.0.0.1:9200",
-            "host": "127.0.0.1:9200"
+            "host": "127.0.0.1:9200",
+            "isAnalytics": true,
+            "analyticsIndex": "terrain-analytics",
+            "analyticsType": "events"
         },
         {
             "name": "My MySQL Instance",

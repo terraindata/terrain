@@ -44,62 +44,51 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as srs from 'secure-random-string';
 import * as winston from 'winston';
-import QueryHandler from '../app/query/QueryHandler';
-import * as Tasty from '../tasty/Tasty';
+import * as Tasty from '../../../tasty/Tasty';
+import * as App from '../../App';
 
-/**
- * An client which acts as a selective isomorphic wrapper around
- * the sqlite3 API
- */
-abstract class DatabaseController
+import { UserConfig } from '../../users/UserRouter';
+import * as Util from '../../Util';
+
+export interface TemplateBase
 {
-  private id: number; // unique id
-  private lsn: number; // log sequence number
-  private type: string; // connection type
-  private name: string; // connection name
-  private header: string; // log entry header
-
-  constructor(type: string, id: number, name: string)
-  {
-    this.id = id;
-    this.lsn = -1;
-    this.type = type;
-    this.name = name;
-    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
-  }
-
-  public log(methodName: string, info?: any, moreInfo?: any)
-  {
-    const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.info(header);
-    if (info !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
-    }
-    if (moreInfo !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
-    }
-  }
-
-  public getType(): string
-  {
-    return this.type;
-  }
-
-  public getName(): string
-  {
-    return this.name;
-  }
-
-  public abstract getClient(): object;
-
-  public abstract getTasty(): Tasty.Tasty;
-
-  public abstract getQueryHandler(): QueryHandler;
-
-  public abstract getAnalyticsDB(): object;
+  // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
+  // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
+  columnTypes: object;
+  dbid: number;           // instance id
+  dbname: string;         // for elastic, index name
+  id?: number;
+  name: string;
+  originalNames: string[];    // array of strings (oldName)
+  persistentAccessToken?: string;    // persistent access token
+  primaryKeyDelimiter?: string;
+  primaryKeys: string[];  // newName of primary key(s)
+  tablename: string;      // for elastic, type name
+  transformations: object[];  // list of in-order data transformations
 }
 
-export default DatabaseController;
+export interface TemplateBaseStringified
+{
+  columnTypes: string;
+  dbid: number;
+  dbname: string;
+  id?: number;
+  name: string;
+  originalNames: string;
+  persistentAccessToken?: string;
+  primaryKeyDelimiter: string;
+  primaryKeys: string;
+  tablename: string;
+  transformations: string;
+}
+
+export type ImportTemplateConfig = TemplateBase;
+
+class Templates
+{
+
+}
+
+export default Templates;
