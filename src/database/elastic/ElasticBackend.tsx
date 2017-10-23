@@ -59,7 +59,7 @@ import ESValueInfo from '../../../shared/database/elastic/parser/ESValueInfo';
 import { Query } from '../../items/types/Query';
 import { AllBackendsMap } from '../AllBackends';
 import { QueryRequest } from '../types/QueryRequest';
-import {ElasticBlocks} from './blocks/ElasticBlocks';
+import { ElasticBlocks } from './blocks/ElasticBlocks';
 import ElasticCardsDeck from './blocks/ElasticCardsDeck';
 import CardsToElastic from './conversion/CardsToElastic';
 import ElasticToCards from './conversion/ElasticToCards';
