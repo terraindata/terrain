@@ -470,7 +470,6 @@ class CardField extends TerrainComponent<Props>
                       : null
                   }
                   {
-                    !this.props.isOnlyRow &&
                     tooltip(
                       <div
                         className='card-field-remove'

@@ -328,7 +328,10 @@ export default class ESCardParser extends ESParser
     let value;
     const singleType = block.static.singleType;
     const typeName = block.static.typeName;
-    if (block['value'] === '')
+    if (block['value'] === null)
+    {
+      value = 'null';
+    } else if (block['value'] === '')
     {
       // the input is empty
       value = '""';
