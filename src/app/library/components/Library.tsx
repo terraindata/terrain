@@ -95,7 +95,20 @@ class Library extends TerrainComponent<any>
 
   public componentWillMount()
   {
-    const { basePath } = this.props;
+    const { basePath, analytics, schema } = this.props;
+
+    if (analytics.selectedAnalyticsConnection === '')
+    {
+      const firstServerWithAnalytics = schema.servers.find(
+        (value, key) => value.isAnalytics,
+      );
+      if (firstServerWithAnalytics !== undefined)
+      {
+        this.props.analyticsActions.selectAnalyticsConnection(
+          firstServerWithAnalytics.name,
+        );
+      }
+    }
 
     if ((!this.props.params || !this.props.params.groupId))
     {
