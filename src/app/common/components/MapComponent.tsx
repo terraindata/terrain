@@ -627,7 +627,7 @@ class MapComponent extends TerrainComponent<Props>
             this.props.markLocation ?
               this.renderMarker(address, location, secondLocation !== undefined, -1,
                 primaryMarkerColor,
-                secondLocation === undefined
+                secondLocation === undefined,
               )
               :
               null
