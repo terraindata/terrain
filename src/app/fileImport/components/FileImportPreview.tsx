@@ -205,7 +205,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
     Actions.fetchTemplates(this.props.exporting);
     this.setState({
-      templateOptions: this.props.templates.map((template, i) => template.templateName),
+      templateOptions: this.props.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
     });
 
     if (!this.props.exporting && this.props.router !== undefined)
