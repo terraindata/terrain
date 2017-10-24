@@ -117,6 +117,7 @@ export interface Props
   open: boolean;
   card: CardConfig; // the card that is doing the creating
   language: string;
+  overrideWidth?: any; // overrides the width of the create card selector
   handleCardClick: (block, index) => void;
   overrideText?: List<{
     text: string;
@@ -228,10 +229,10 @@ class CardSelector extends TerrainComponent<Props>
     this.setState({
       inputElement,
     });
-    // if (this.props.open && inputElement !== null && inputElement !== undefined)
-    // {
-    //   inputElement.focus();
-    // }
+    if (this.props.open && inputElement !== null && inputElement !== undefined)
+    {
+      inputElement.focus();
+    }
   }
 
   public registerCategoryList(categorySelectorList)
@@ -338,14 +339,6 @@ class CardSelector extends TerrainComponent<Props>
         searchValue: '',
       });
     }
-    // if (this.props.cardTypeList !== nextProps.cardTypeList || !nextProps.open)
-    // {
-    //   this.setState({
-    //     // computedHeight: -1,
-    //     currentCategory: this.computeAvailableCategories(this.props.cardTypeList, this.props.card).get(0),
-    //     searchValue: '',
-    //   });
-    // }
     if (!this.props.open && nextProps.open &&
       this.state.inputElement !== null && this.state.inputElement !== undefined)
     {
@@ -356,6 +349,11 @@ class CardSelector extends TerrainComponent<Props>
   public render()
   {
     const isEmpty = this.props.cardTypeList.size === 0;
+
+    const rootStyle = _.extend({},
+      backgroundColor(Colors().bg1),
+      this.props.overrideWidth ? getStyle('width', this.props.overrideWidth) : {},
+    );
     const inputStyle = _.extend({},
       {
         borderColor: 'rgba(0,0,0,0)',
@@ -383,7 +381,7 @@ class CardSelector extends TerrainComponent<Props>
           'create-card-selector-focused': this.state.focusedIndex !== -1,
         })}
         ref='selector'
-        style={backgroundColor(Colors().bg1)}
+        style={rootStyle}
       >
         <div className='inset-shadow-veil' />
 
