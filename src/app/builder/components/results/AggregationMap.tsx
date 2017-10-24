@@ -97,12 +97,8 @@ class AggregationMap extends TerrainComponent<Props>
     else if (data.location !== undefined)
     {
       return {
-        multiLocations: [{
-          location: data.location,
-          index: -1,
-          name: '',
-        }],
         location: MapUtil.getCoordinatesFromGeopoint(data.location),
+        markLocation: true,
       };
     }
     else if (data.buckets !== undefined)

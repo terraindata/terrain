@@ -656,7 +656,7 @@ class MapComponent extends TerrainComponent<Props>
       return null;
     }
 
-    let center;
+    const center = location;
     let bounds;
     if (this.props.bounds !== undefined)
     {
@@ -683,10 +683,6 @@ class MapComponent extends TerrainComponent<Props>
         locations.push(List([location[1], location[0]]));
       }
       bounds = MapUtil.getBounds(locations);
-    }
-    else
-    {
-      center = location;
     }
     const mapProps = bounds !== undefined ? { bounds } : { center };
     return (
