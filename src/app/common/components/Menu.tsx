@@ -66,7 +66,6 @@ export interface MenuOption
   disabled?: boolean;
   selected?: boolean;
   icon?: any;
-  selected?: boolean;
   iconColor?: string;
 }
 
