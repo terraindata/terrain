@@ -107,11 +107,11 @@ class Autocomplete extends TerrainComponent<Props>
       };
   }
 
-  public componentWillReceiveProps(nextProps)
+  public componentWillMount()
   {
-    this.value = nextProps.value;
+    this.value = this.props.value;
     this.setState({
-      value: nextProps.value,
+      value: this.props.value,
     });
   }
 
