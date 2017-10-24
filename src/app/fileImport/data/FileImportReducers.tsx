@@ -274,12 +274,6 @@ FileImportReducers[ActionTypes.setColumnName] =
       .setIn(['columnNames', action.payload.columnId], action.payload.newName)
   ;
 
-FileImportReducers[ActionTypes.setColumnNames] =
-  (state, action) =>
-    state
-      .set('columnNames', action.payload.names)
-  ;
-
 FileImportReducers[ActionTypes.setColumnType] =
   (state, action) =>
   {
@@ -307,25 +301,27 @@ FileImportReducers[ActionTypes.setColumnType] =
 FileImportReducers[ActionTypes.setColumnTypes] =
   (state, action) =>
   {
+    const { previewColumns, columnNames } = state;
     return state
-      .set('columnTypes', List(action.payload.columnNames.map((colName) =>
-        action.payload.columnTypes[colName] ?
-          FileImportTypes._ColumnTypesTree(action.payload.columnTypes[colName])
+      .set('columnTypes', List(columnNames.map((colName) =>
+        action.payload.newColumnTypes[colName] ?
+          FileImportTypes._ColumnTypesTree(action.payload.newColumnTypes[colName])
           :
           FileImportTypes._ColumnTypesTree())));
   };
 
-FileImportReducers[ActionTypes.getNamesAndTypesFromQuery] =
+FileImportReducers[ActionTypes.fetchTypesFromQuery] =
   (state, action) =>
   {
-    Ajax.getNamesAndTypesFromQuery(
+    Ajax.getTypesFromQuery(
       state.serverId,
       action.payload.query,
-    (namesAndTypes) =>
-    {
-      action.payload.setNamesAndTypes(namesAndTypes);
-    });
-  }
+      (namesAndTypes) =>
+      {
+        action.payload.setColumnTypes(namesAndTypes);
+      });
+    return state;
+  };
 
 FileImportReducers[ActionTypes.setColumnTypeIndex] =
   (state, action) =>

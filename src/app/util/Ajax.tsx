@@ -1034,7 +1034,7 @@ export const Ajax =
       );
     },
 
-    getNamesAndTypesFromQuery(
+    getTypesFromQuery(
       connectionId: number,
       query: object,
       onLoad: (templates: object) => void,

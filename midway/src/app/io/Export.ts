@@ -228,7 +228,7 @@ export class Export
 
       if (typeof mapping === 'string')
       {
-         return reject(mapping);
+        return reject(mapping);
       }
 
       let rankCounter: number = 1;
@@ -437,7 +437,10 @@ export class Export
       let qry: object = {};
       try
       {
-        qry = JSON.parse(variant.meta)['query']['tql'];
+        if (variant.meta !== undefined)
+        {
+          qry = JSON.parse(variant.meta)['query']['tql'];
+        }
       }
       catch (e)
       {
@@ -474,13 +477,17 @@ export class Export
           return resolve(fieldObj);
         }
         const newDocs: object[] = resp.hits.hits as object[];
+        if (newDocs.length === undefined)
+        {
+          return resolve('Something was wrong with the query.');
+        }
         if (newDocs.length === 0)
         {
           return resolve(fieldObj);
         }
         fieldsAndTypes = await this._getFieldsAndTypesFromDocuments(newDocs, fieldsAndTypes);
         rankCounter += newDocs.length;
-        if (Math.min(Math.min(resp.hits.total, qrySize), maxSize) > rankCounter - 1)
+        if (Math.min(Math.min(resp.hits.total, qrySize), maxSize as number) > rankCounter - 1)
         {
           elasticClient.scroll({
             scrollId: resp._scroll_id,
@@ -502,7 +509,7 @@ export class Export
 
   // boolean, long, double, string, array, object ({...})
   // returns an object with keys as the fields and values as arrays of the detected types
-  private async _getFieldsAndTypesFromDocuments(docs: object[], fieldObj?: object): Promise<object>
+  private async _getFieldsAndTypesFromDocuments(docs: object[], fieldObj: object): Promise<object>
   {
     if (fieldObj === undefined)
     {
@@ -516,7 +523,7 @@ export class Export
         for (const field of fields)
         {
           let fullTypeObj = {};
-          fullTypeObj = { type: 'string', index: 'not_analyzed', analyzer: null};
+          fullTypeObj = { type: 'text', index: 'not_analyzed', analyzer: null };
           switch (typeof doc['_source'][field])
           {
             case 'number':
@@ -569,7 +576,7 @@ export class Export
                 else
                 {
                   if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
-                  .indexOf(true) < 0)
+                    .indexOf(true) < 0)
                   {
                     fieldObj[field].concat(fullTypeObj);
                   }
@@ -611,7 +618,7 @@ export class Export
         case 'object':
           return { type: 'object', innerType: null, index: 'not_analyzed', analyzer: null };
         default:
-          return { type: 'string', innerType: null, index: 'analyzed', analyzer: 'standard' };
+          return { type: 'text', innerType: null, index: 'analyzed', analyzer: 'standard' };
       }
     }
   }
@@ -639,9 +646,9 @@ export class Export
       {
         const arrayTypes: object[] = types.filter((typeObj) => typeObj['type'] === 'array');
         const innermostTypes: string[] = arrayTypes.map((arrayType) =>
-          {
-            return this._getInnermostType(arrayType);
-          });
+        {
+          return this._getInnermostType(arrayType);
+        });
         if (types.length === 1)
         {
           return arrayTypes[0];
@@ -650,7 +657,7 @@ export class Export
         {
           return { type: 'double', index: 'not_analyzed', analyzer: null };
         }
-        return { type: 'string', index: 'analyzed', analyzer: 'standard' };
+        return { type: 'text', index: 'analyzed', analyzer: 'standard' };
       }
       else if (types.map((typesObj) => typesObj['type']).indexOf('object') >= 0)
       {
@@ -662,7 +669,7 @@ export class Export
     {
       return { type: 'double', index: 'not_analyzed', analyzer: null };
     }
-    return { type: 'string', index: 'analyzed', analyzer: 'standard' };
+    return { type: 'text', index: 'analyzed', analyzer: 'standard' };
   }
 
   private _applyTransforms(obj: object, transforms: object[]): object

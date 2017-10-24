@@ -150,6 +150,8 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalError: boolean,
     previewErrorMsg: string,
     analyzers: List<string>,
+    exportColumnNames: List<string>,
+    exportColumnTypes: List<object>,
   } = {
     templateOptions: List([]),
     appliedTemplateName: '',
@@ -179,6 +181,8 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalError: false,
     previewErrorMsg: '',
     analyzers: List([]),
+    exportColumnNames: List([]),
+    exportColumnTypes: List([]),
   };
 
   public confirmedLeave: boolean = false;
@@ -189,6 +193,14 @@ class FileImportPreview extends TerrainComponent<Props>
     this._subscribe(FileImportStore, {
       stateKey: 'analyzers',
       storeKeyPath: ['columnAnalyzers'],
+    });
+    this._subscribe(FileImportStore, {
+      stateKey: 'exportColumnNames',
+      storeKeyPath: ['columnNames'],
+    });
+    this._subscribe(FileImportStore, {
+      stateKey: 'exportColumnTypes',
+      storeKeyPath: ['columnTypes'],
     });
   }
 
@@ -202,8 +214,7 @@ class FileImportPreview extends TerrainComponent<Props>
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
       const parsedQuery = JSON.parse(stringQuery);
-      console.log(parsedQuery);
-      Actions.getNamesAndTypesFromQuery(this.props.serverId, parsedQuery, this.setNamesAndTypes);
+      Actions.fetchTypesFromQuery(this.props.serverId, parsedQuery);
     } // Parse the TQL and set the filters so that when we fetch we get the right templates.
 
     Actions.fetchColumnAnalyzers();
@@ -711,24 +722,6 @@ class FileImportPreview extends TerrainComponent<Props>
     this.setState({
       exportFiletype: type,
     });
-  }
-
-  public setNamesAndTypes(namesAndTypes: object)
-  {
-    const names: string[] = Object.keys(namesAndTypes).sort();
-    const namesList: List<string> = List<string>(names);
-    console.log('names: ');
-    console.log(names);
-    console.log('-----end names-----');
-    const types: object[] = names.map((name) =>
-    {
-      return namesAndTypes[name];
-    });
-    console.log('types: ');
-    console.log(namesAndTypes);
-    console.log('-----end types-------');
-    // Actions.setColumnTypes(namesList, namesAndTypes);
-    // Actions.setColumnNames(namesList);
   }
 
   public renderApplyTemplate()
