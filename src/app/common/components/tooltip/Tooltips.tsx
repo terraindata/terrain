@@ -316,7 +316,7 @@ export function tooltip(innerComponent: any, options: TooltipProps | string)
   else if (typeof options === 'string')
   {
     const props: TooltipProps = { ...defaultProps };
-    props.html = <span style={tooltipTitleStyle}> options </span>;
+    props.html = <span style={tooltipTitleStyle}> {options} </span>;
     return <Tooltip children={innerComponent} {...props} />;
   }
   else if ((options.title === '' || options.title === undefined || options.title === null)
