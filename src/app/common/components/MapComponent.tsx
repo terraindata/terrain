@@ -304,10 +304,12 @@ class MapComponent extends TerrainComponent<Props>
     }
   }
 
-  public reverseGeocode()
+  public reverseGeocode(overrideAddress?)
   {
-    const lat = parseFloat(this.state.latitude);
-    const lng = parseFloat(this.state.longitude);
+    const lat = overrideAddress !== undefined ? overrideAddress[0]
+      : parseFloat(this.state.latitude);
+    const lng = overrideAddress !== undefined ? overrideAddress[1]
+      : parseFloat(this.state.longitude);
 
     if (this.reverseGeoCache[String([lat, lng])] !== undefined)
     {
@@ -320,6 +322,7 @@ class MapComponent extends TerrainComponent<Props>
       MapUtil.geocodeByLatLng('photon', { lat, lng }, (result) =>
       {
         this.handleLocationChange(result.location, result.address);
+        return result.address;
       });
     }
     else
@@ -518,7 +521,15 @@ class MapComponent extends TerrainComponent<Props>
     });
   }
 
-  public renderMarker(address, location, small, index, color, key?)
+  public handleDragEnd(e)
+  {
+    const marker = e.target;
+    const newPosition = marker.getLatLng();
+    this.reverseGeocode([newPosition.lat, newPosition.lng]);
+    marker.setLatLng([newPosition.lat, newPosition.lng]);
+  }
+
+  public renderMarker(address, location, small, index, color, draggable, key?)
   {
     const style = 'fill: ' + String(color) + ' !important;';
     const icon = this.markerIconWithStyle(style, small, index);
@@ -527,7 +538,9 @@ class MapComponent extends TerrainComponent<Props>
         position={location}
         icon={icon}
         key={key}
-        title={address}
+        draggable={draggable}
+        riseOnHover={true}
+        onDragEnd={draggable ? this.handleDragEnd : null}
       >
         {
           address !== '' && address !== undefined ?
@@ -552,7 +565,7 @@ class MapComponent extends TerrainComponent<Props>
     {
       const location = MapUtil.getCoordinatesFromGeopoint(spotlight.fields[this.props.field]);
       const address = spotlight.name;
-      return this.renderMarker(address, location, false, -1, spotlight.color, String(address) + '_' + String(index));
+      return this.renderMarker(address, location, false, -1, spotlight.color, false, String(address) + '_' + String(index));
     }
     return null;
   }
@@ -564,7 +577,7 @@ class MapComponent extends TerrainComponent<Props>
       const location = MapUtil.getCoordinatesFromGeopoint(locationData.location);
       const name = locationData.name;
       const color = locationData.color !== undefined ? locationData.color : 'black';
-      return this.renderMarker(name, location, false, locationData.index, color, String(name) + '_' + String(index));
+      return this.renderMarker(name, location, false, locationData.index, color, false, String(name) + '_' + String(index));
     }
     return null;
   }
@@ -614,6 +627,7 @@ class MapComponent extends TerrainComponent<Props>
             this.props.markLocation ?
               this.renderMarker(address, location, secondLocation !== undefined, -1,
                 primaryMarkerColor,
+                secondLocation === undefined
               )
               :
               null
@@ -621,7 +635,8 @@ class MapComponent extends TerrainComponent<Props>
           {
             this.props.secondLocation !== undefined && this.props.showDirectDistance ?
               this.renderMarker(this.props.secondAddress, secondLocation, secondLocation !== undefined, -1,
-                this.props.secondaryMarkerColor !== undefined ? this.props.secondaryMarkerColor : 'black')
+                this.props.secondaryMarkerColor !== undefined ? this.props.secondaryMarkerColor : 'black',
+                false)
               :
               null
           }
