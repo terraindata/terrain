@@ -589,10 +589,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESNullClause(clause: ESNullClause): any
   {
     return GetCardVisitor.seedCard(clause, {
+      value: 'null',
       noTitle: false,
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.nullClause),
-        preview: '',
+        preview: '[value]',
         display: [],
         tql: () => null,
         singleType: true,

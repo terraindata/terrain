@@ -91,7 +91,8 @@ class QueryC
   dbFields = ['id', 'parent', 'name', 'status', 'type'];
   excludeFields = ['dbFields', 'excludeFields'];
 
-  modelVersion = 2; // 2 is for the first version of Node midway
+  //modelVersion = CurrentQueryModelVersion; // 2 is for the first version of Node midway
+  modelVersion = 2;
 
   //what order the cards are in the tuning column
   tuningOrder: List<string> = List([]);
