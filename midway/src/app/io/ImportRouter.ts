@@ -80,6 +80,22 @@ Router.post('/', async (ctx, next) =>
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
 });
 
+Router.get('/analyzers', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  let allAnalyzers: string[] = ['standard', 'simple', 'whitespace', 'stop', 'keyword', 'pattern', 'english', 'fingerprint'];
+  if (ctx.query.index !== undefined)
+  {
+    const newAnalyzers: string[] = [];
+    allAnalyzers = allAnalyzers.concat(newAnalyzers);
+  }
+  ctx.body = allAnalyzers;
+});
+
+Router.post('/analyzers', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = '';
+});
+
 Router.post('/headless', async (ctx, next) =>
 {
   winston.info('importing to database, from file and template id');
@@ -90,7 +106,6 @@ Router.post('/headless', async (ctx, next) =>
     return;
   }
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
-
   // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
 });

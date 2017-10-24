@@ -43,32 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { merge } from 'lodash';
+import { VictoryTheme } from 'victory';
 
-import * as AuthTypes from '../AuthTypes';
-import Ajax from './../../util/Ajax';
-import ActionTypes from './AuthActionTypes';
+const strokeDasharray = '10, 0';
 
-const AuthReducer = {};
+const theme = {
+  axis: {
+    style: {
+      grid: {
+        strokeDasharray,
+      },
+    },
+  },
+};
 
-AuthReducer[ActionTypes.login] =
-  (state: AuthTypes.AuthState, action: Action<{ accessToken: string, id: number }>) =>
-  {
-    const { accessToken, id } = action.payload;
-    // store these values in localStorage so that the user is auto-logged in next time they visit
-    localStorage['accessToken'] = accessToken;
-    localStorage['id'] = id;
-    return state.set('accessToken', accessToken).set('id', +id);
-  };
-
-AuthReducer[ActionTypes.logout] =
-  (state: AuthTypes.AuthState, action) =>
-  {
-    Ajax.logout((success) =>
-    {
-      delete localStorage['accessToken'];
-      delete localStorage['id'];
-    });
-    return state.set('accessToken', null).set('id', null);
-  };
-
-export default AuthReducer;
+export default merge({}, VictoryTheme.material, theme);

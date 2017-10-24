@@ -91,6 +91,33 @@ const MapUtil = {
     }
   },
 
+  buildAddress(properties)
+  {
+    const { housenumber, street, city, state, country } = properties;
+    let address: string = '';
+    if (housenumber !== undefined)
+    {
+      address += String(housenumber) + ' ';
+    }
+    if (street !== undefined)
+    {
+      address += String(street) + ', ';
+    }
+    if (city !== undefined)
+    {
+      address += String(city) + ', ';
+    }
+    if (state !== undefined)
+    {
+      address += String(state) + ', ';
+    }
+    if (country !== undefined)
+    {
+      address += String(country);
+    }
+    return address;
+  },
+
   ajax(callback, params, url: string, reverse: boolean)
   {
     const xhr = new XMLHttpRequest();
@@ -107,10 +134,8 @@ const MapUtil = {
           let value;
           if (reverse)
           {
-            const { housenumber, street, city, state, country } = raw.features[0].properties;
-            const { lat, lon } = raw.features[0].geometry.coordinates;
-            const address = String(housenumber) + ' ' + String(street) + ', ' +
-              String(city) + ', ' + String(state) + ', ' + String(country);
+            const { lat, lon } = params;
+            const address = MapUtil.buildAddress(raw.features[0].properties);
             value = { address, location: [lat, lon] };
           }
           else

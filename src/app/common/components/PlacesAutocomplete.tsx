@@ -143,28 +143,8 @@ class PlacesAutocomplete extends TerrainComponent<Props>
     this.setState({
       autocompleteItems: predictions.features.map((p, idx) =>
       {
-        const { housenumber, street, city, state, country, osm_id } = p.properties;
-        let address: string = '';
-        if (housenumber !== undefined)
-        {
-          address += String(housenumber) + ' ';
-        }
-        if (street !== undefined)
-        {
-          address += String(street) + ', ';
-        }
-        if (city !== undefined)
-        {
-          address += String(city) + ', ';
-        }
-        if (state !== undefined)
-        {
-          address += String(state) + ', ';
-        }
-        if (country !== undefined)
-        {
-          address += String(country);
-        }
+        const address = MapUtil.buildAddress(p.properties);
+        const { osm_id } = p.properties;
         return {
           suggestion: address,
           placeId: String(osm_id) + '_' + String(idx),

@@ -49,11 +49,12 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import * as Radium from 'radium';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Menu.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
-import { Colors } from '../../colors/Colors';
+import { borderColor, Colors, fontColor } from '../../colors/Colors';
 import ColorsActions from '../../colors/data/ColorsActions';
 
 const optionHeight = 30; // coordinate with Menu.less
@@ -78,6 +79,7 @@ export interface Props
   openRight?: boolean; // menu will open to the right
 }
 
+@Radium
 export class Menu extends TerrainComponent<Props>
 {
   public state: {
@@ -95,7 +97,7 @@ export class Menu extends TerrainComponent<Props>
 
     let onClick: any = _.noop;
 
-    if (!option.disabled)
+    if (!option.disabled || !option.selected)
     {
       // TODO
       onClick = (event) =>
@@ -110,10 +112,9 @@ export class Menu extends TerrainComponent<Props>
       <div
         className={classNames({
           'menu-option': true,
-          'menu-option menu-option-disabled': option.disabled,
-          'menu-option menu-option-selected': option.selected,
+          'menu-option-disabled': option.disabled,
+          'menu-option-selected': option.selected,
         })}
-
         key={index}
         onClick={onClick}
       >
@@ -144,11 +145,6 @@ export class Menu extends TerrainComponent<Props>
       open: false,
     });
     $(document).off('click', this.close);
-  }
-
-  public componentWillMount()
-  {
-    ColorsActions.setStyle('.menu-wrapper .menu-icon .st0 ', { fill: Colors().text3 });
   }
 
   public componentWillUnmount()
@@ -200,11 +196,15 @@ export class Menu extends TerrainComponent<Props>
           'menu-vertical': this.props.vertical,
           'menu-wrapper-right': this.props.openRight,
         })}
-        style={this.props.style ? this.props.style : null}
+        style={[
+          borderColor(this.state.open ? Colors().active : Colors().iconColor),
+          this.props.style ? this.props.style : null,
+        ]}
       >
         <div
           className='menu-icon-wrapper'
           onClick={this.toggleOpen}
+          style={fontColor(this.state.open ? Colors().active : Colors().iconColor, Colors().active)}
         >
           <MoreIcon className='menu-icon' />
         </div>
