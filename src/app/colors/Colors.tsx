@@ -108,6 +108,8 @@ interface Theme
 
   tqlEditor: string;
 
+  iconColor: string;
+
   // DO NOT USE these below colors anymore -- these need to be cleaned up
 
   // text
@@ -369,6 +371,8 @@ const DARK: Theme =
 
     tqlEditor: 'monokai',
 
+    iconColor: '#fff',
+
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
     // text
@@ -603,6 +607,8 @@ const LIGHT: Theme =
     resultLine: 'rgba(0,0,0,0.25)',
 
     tqlEditor: 'default',
+
+    iconColor: 'rgba(0, 0, 0, 0.4)',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 

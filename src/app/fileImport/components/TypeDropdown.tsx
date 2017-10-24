@@ -58,12 +58,14 @@ const { List } = Immutable;
 
 type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 const ELASTIC_TYPES = List(FileImportTypes.ELASTIC_TYPES);
+const ELASTIC_TYPE_INDEXES = List(FileImportTypes.ELASTIC_TYPE_INDEXES);
 
 export interface Props
 {
   columnId: number;
   recursionDepth: number;
   columnType: ColumnTypesTree;
+  columnTypeAnalyzer: List<string>;
   tooltips?: List<any>;
 }
 
@@ -74,6 +76,18 @@ class TypeDropdown extends TerrainComponent<Props>
   {
     const type = FileImportTypes.ELASTIC_TYPES[typeIndex];
     Actions.setColumnType(this.props.columnId, this.props.recursionDepth, type);
+  }
+
+  public handleTypeIndexChange(typeIndexIndex: number)
+  {
+    const index = FileImportTypes.ELASTIC_TYPE_INDEXES[typeIndexIndex];
+    Actions.setColumnTypeIndex(this.props.columnId, index);
+  }
+
+  public handleTypeAnalyzerChange(typeAnalyzerIndex: number)
+  {
+    const analyzer = this.props.columnTypeAnalyzer.get(typeAnalyzerIndex);
+    Actions.setColumnTypeAnalyzer(this.props.columnId, analyzer);
   }
 
   public render()
@@ -100,8 +114,41 @@ class TypeDropdown extends TerrainComponent<Props>
             columnId={this.props.columnId}
             recursionDepth={this.props.recursionDepth + 1}
             columnType={this.props.columnType.innerType}
+            columnTypeAnalyzer={this.props.columnTypeAnalyzer}
             tooltips={this.props.tooltips}
           />
+        }
+        {
+          this.props.columnType.type === 'text' &&
+          <span>
+            <div
+              className='fi-type-dropdown'
+            >
+              <Dropdown
+                selectedIndex={FileImportTypes.ELASTIC_TYPE_INDEXES.indexOf(this.props.columnType.index)}
+                options={ELASTIC_TYPE_INDEXES}
+                onChange={this.handleTypeIndexChange}
+                canEdit={true}
+                className='fi-type-dropdown-dropdown'
+                tooltips={this.props.tooltips}
+              />
+            </div>
+            <div
+              className='fi-type-dropdown'
+            >
+              {
+                this.props.columnType.index === 'analyzed' &&
+                <Dropdown
+                  selectedIndex={this.props.columnTypeAnalyzer.indexOf(this.props.columnType.analyzer)}
+                  options={this.props.columnTypeAnalyzer}
+                  onChange={this.handleTypeAnalyzerChange}
+                  canEdit={true}
+                  className='fi-type-dropdown-dropdown'
+                  tooltips={this.props.tooltips}
+                />
+              }
+            </div>
+          </span>
         }
       </div>
     );
