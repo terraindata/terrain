@@ -62,6 +62,7 @@ export const scheduler: Scheduler = new Scheduler();
 
 const allowedTypes: string[] = ['sftp'];
 
+// Get connections from credentials table, requires type=<one of allowedTypes>
 Router.get('/connections', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.CredentialPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);

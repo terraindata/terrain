@@ -355,7 +355,6 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
       }, true),
     );
   });
-  console.log(filterBlocks);
   return filterBlocks;
 }
 

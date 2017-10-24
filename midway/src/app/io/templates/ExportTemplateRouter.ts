@@ -48,89 +48,106 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
-import * as Util from '../Util';
-import { DatabaseConfig, Databases } from './Databases';
+import * as Util from '../../Util';
+import { ExportTemplateConfig, ExportTemplates } from './ExportTemplates';
 
-export const Router = new KoaRouter();
-export const databases = new Databases();
+const Router = new KoaRouter();
+export const exportTemplates = new ExportTemplates();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting all databases');
-  ctx.body = await databases.select(['id', 'name', 'type', 'host', 'status', 'isAnalytics', 'analyticsIndex', 'analyticsType']);
+  winston.info('getting all exportTemplates');
+  ctx.body = await exportTemplates.get();
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('getting database ID ' + String(ctx.params.id));
-  ctx.body = await databases.get(Number(ctx.params.id), ['id', 'name', 'type', 'host', 'status']);
+  winston.info('getting template ID ' + String(ctx.params.id));
+  ctx.body = await exportTemplates.get(Number(ctx.params.id));
 });
 
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('add new database');
-  const db: DatabaseConfig = ctx.request.body.body;
-  Util.verifyParameters(db, ['name', 'dsn', 'host', 'isAnalytics']);
-  if (db.id !== undefined)
+  winston.info('getting filtered exportTemplates');
+  const request: object = ctx.request.body.body;
+  const filter: object = {};
+  if (request !== undefined)
   {
-    throw new Error('Invalid parameter database ID');
-  }
-
-  if (db.isAnalytics)
-  {
-    if (db.analyticsIndex === undefined || db.analyticsType === undefined)
+    if (request['dbid'] !== undefined)
     {
-      throw new Error('Missing analytics index or type parameter');
+      filter['dbid'] = request['dbid'];
+    }
+    if (request['dbname'] !== undefined)
+    {
+      filter['dbname'] = request['dbname'];
+    }
+    if (request['tablename'] !== undefined)
+    {
+      filter['tablename'] = request['tablename'];
+    }
+    if (request['exportOnly'] === true)
+    {
+      filter['export'] = true;
+    }
+    if (request['importOnly'] === true)
+    {
+      throw new Error('Only export is allowed.');
+    }
+    if (request['importOnly'] === true && request['exportOnly'] === true)
+    {
+      throw new Error('Only export is allowed.');
     }
   }
+  ctx.body = await exportTemplates.select([], filter);
+});
 
-  db.status = 'DISCONNECTED';
-  ctx.body = await databases.upsert(ctx.state.user, db);
-  const id = Number(ctx.body[0].id);
-  await databases.connect(ctx.state.user, id);
+Router.post('/create', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add new template');
+  const template: ExportTemplateConfig = ctx.request.body.body;
+  Util.verifyParameters(template, ['dbid', 'dbname', 'name', 'tablename']);
+  Util.verifyParameters(template, ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
+  if (template.id !== undefined)
+  {
+    throw new Error('Invalid parameter template ID');
+  }
+  ctx.body = await exportTemplates.upsert(ctx.state.user, template);
+});
+
+Router.post('/updateAccessToken', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('update access token');
+  const templateObj: object = ctx.request.body.body;
+  if (templateObj['id'] === undefined)
+  {
+    throw new Error('Invalid parameter template ID');
+  }
+  ctx.body = await exportTemplates.updateAccessToken(ctx.state.user, templateObj['id']);
 });
 
 Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('update existing database');
-  const db: DatabaseConfig = ctx.request.body.body;
-  if (db.id === undefined)
+  winston.info('editing existing template');
+  const template: ExportTemplateConfig = ctx.request.body.body;
+  if (template['id'] === undefined)
   {
-    db.id = Number(ctx.params.id);
+    template['id'] = Number(ctx.params.id);
   }
   else
   {
-    if (db.id !== Number(ctx.params.id))
+    if (template['id'] !== Number(ctx.params.id))
     {
-      throw Error('Database ID does not match the supplied id in the URL');
+      throw new Error('Template ID does not match the supplied id in the URL.');
     }
   }
 
-  ctx.body = await databases.upsert(ctx.state.user, db);
+  ctx.body = await exportTemplates.upsert(ctx.state.user, template);
 });
 
-Router.post('/:id/connect', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('connect to database');
-  ctx.body = await databases.connect(ctx.state.user, Number(ctx.params.id));
-});
-
-Router.post('/:id/disconnect', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('disconnect from database');
-  ctx.body = await databases.disconnect(ctx.state.user, Number(ctx.params.id));
-});
-
-Router.post('/:id/delete', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('delete a database entry');
-  ctx.body = await databases.delete(ctx.state.user, Number(ctx.params.id));
-});
-
-Router.get('/:id/schema', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('get database schema');
-  ctx.body = await databases.schema(Number(ctx.params.id));
+  winston.info('deleting template');
+  ctx.body = await exportTemplates.delete(ctx.state.user, ctx.params.id);
 });
 
 export default Router;

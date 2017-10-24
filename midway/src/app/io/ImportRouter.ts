@@ -44,62 +44,55 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as stream from 'stream';
 import * as winston from 'winston';
-import QueryHandler from '../app/query/QueryHandler';
-import * as Tasty from '../tasty/Tasty';
 
-/**
- * An client which acts as a selective isomorphic wrapper around
- * the sqlite3 API
- */
-abstract class DatabaseController
+import { HA } from '../App';
+import { Permissions } from '../permissions/Permissions';
+import { UserConfig } from '../users/Users';
+import * as Util from '../Util';
+import { Import } from './Import';
+import ImportTemplateRouter from './templates/ImportTemplateRouter';
+
+const Router = new KoaRouter();
+export const imprt: Import = new Import();
+const perm: Permissions = new Permissions();
+
+Router.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.allowedMethods());
+
+Router.post('/', async (ctx, next) =>
 {
-  private id: number; // unique id
-  private lsn: number; // log sequence number
-  private type: string; // connection type
-  private name: string; // connection name
-  private header: string; // log entry header
-
-  constructor(type: string, id: number, name: string)
+  winston.info('importing to database');
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  if (authStream['user'] === null)
   {
-    this.id = id;
-    this.lsn = -1;
-    this.type = type;
-    this.name = name;
-    this.header = 'DB:' + this.id.toString() + ':' + this.name + ':' + this.type + ':';
+    ctx.status = 400;
+    return;
   }
+  Util.verifyParameters(authStream['fields'], ['dbid', 'dbname', 'filetype', 'tablename']);
+  Util.verifyParameters(authStream['fields'], ['columnTypes', 'originalNames', 'primaryKeys', 'transformations']);
+  // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
 
-  public log(methodName: string, info?: any, moreInfo?: any)
+  await perm.ImportPermissions.verifyDefaultRoute(authStream['user'] as UserConfig, authStream['fields']);
+
+  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
+});
+
+Router.post('/headless', async (ctx, next) =>
+{
+  winston.info('importing to database, from file and template id');
+  const authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
+  if (authStream['template'] === null)
   {
-    const header = this.header + (++this.lsn).toString() + ':' + methodName;
-    winston.info(header);
-    if (info !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(info, null, 1));
-    }
-    if (moreInfo !== undefined)
-    {
-      winston.debug(header + ': ' + JSON.stringify(moreInfo, null, 1));
-    }
+    ctx.status = 400;
+    return;
   }
+  Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
 
-  public getType(): string
-  {
-    return this.type;
-  }
+  // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
+  ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
+});
 
-  public getName(): string
-  {
-    return this.name;
-  }
-
-  public abstract getClient(): object;
-
-  public abstract getTasty(): Tasty.Tasty;
-
-  public abstract getQueryHandler(): QueryHandler;
-
-  public abstract getAnalyticsDB(): object;
-}
-
-export default DatabaseController;
+export default Router;

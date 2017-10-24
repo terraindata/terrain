@@ -63,26 +63,21 @@ import * as Tasty from '../../tasty/Tasty';
 import { ItemConfig, Items } from '../items/Items';
 import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
-import { ExportTemplateConfig, ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
+import { ImportTemplateConfig, ImportTemplates } from './templates/ImportTemplates';
+import { TemplateBase } from './templates/Templates';
+
 const importTemplates = new ImportTemplates();
 
 const TastyItems: Items = new Items();
 const typeParser: SharedUtil.CSVTypeParser = new SharedUtil.CSVTypeParser();
 
-export interface ImportConfig extends ImportTemplateBase
+export interface ImportConfig extends TemplateBase
 {
   file: stream.Readable;
-  filetype: string;     // either 'json' or 'csv'
+  filetype: string;
   isNewlineSeparatedJSON?: boolean;      // defaults to false
   requireJSONHaveAllFields?: boolean;    // defaults to true
   update: boolean;      // false means replace (instead of update) ; default should be true
-}
-
-export interface ExportConfig extends ImportConfig, ExportTemplateConfig
-{
-  filetype: string;
-  rank?: boolean;
-  objectKey?: string;
 }
 
 export class Import
@@ -116,242 +111,6 @@ export class Import
   private chunkCount: number;
   private chunkQueue: object[];
   private nextChunk: string;
-
-  public async export(exprt: ExportConfig, headless: boolean): Promise<stream.Readable | string>
-  {
-    return new Promise<stream.Readable | string>(async (resolve, reject) =>
-    {
-      const database: DatabaseController | undefined = DatabaseRegistry.get(exprt.dbid);
-      if (database === undefined)
-      {
-        return reject('Database "' + exprt.dbid.toString() + '" not found.');
-      }
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File export currently is only supported for Elastic databases.');
-      }
-      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-
-      const dbSchema: Tasty.Schema = await database.getTasty().schema();
-
-      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json' && exprt.filetype !== 'json [type object]')
-      {
-        return reject('Filetype must be either CSV or JSON.');
-      }
-      if (exprt.filetype === 'json [type object]' && exprt.objectKey === undefined)
-      {
-        return reject('Must provide an object key if exporting in json [type object] format.');
-      }
-      if (headless)
-      {
-        // get a template given the template ID
-        const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateId);
-        if (templates.length === 0)
-        {
-          return reject('Template not found. Did you supply an export template ID?');
-        }
-        const template = templates[0] as object;
-        if (exprt.dbid !== template['dbid'])
-        {
-          return reject('Template database ID does not match supplied database ID.');
-        }
-        for (const templateKey of Object.keys(template))
-        {
-          exprt[templateKey] = template[templateKey];
-        }
-      }
-
-      let qry: string = '';
-      // get query data from variantId or query
-      if (exprt.variantId !== undefined && exprt.query === undefined)
-      {
-        const variants: ItemConfig[] = await TastyItems.get(exprt.variantId);
-        if (variants.length === 0)
-        {
-          return reject('Variant not found.');
-        }
-        if (variants[0]['meta'] !== undefined)
-        {
-          const variantMeta: object = JSON.parse(variants[0]['meta'] as string);
-          if (variantMeta['query'] !== undefined && variantMeta['query']['tql'] !== undefined)
-          {
-            qry = variantMeta['query']['tql'];
-          }
-        }
-      }
-      else if (exprt.variantId === undefined && exprt.query !== undefined)
-      {
-        qry = exprt.query;
-      }
-      else
-      {
-        return reject('Must provide either variant ID or query, not both or neither.');
-      }
-      if (qry === '')
-      {
-        return reject('Empty query provided.');
-      }
-
-      let qryObj: object;
-      try
-      {
-        qryObj = JSON.parse(qry);
-      }
-      catch (e)
-      {
-        return reject(e);
-      }
-
-      if (qryObj['index'] === '')
-      {
-        return reject('Must provide an index.');
-      }
-      if (qryObj['index'] !== exprt['dbname'])
-      {
-        return reject('Query index name does not match supplied index name.');
-      }
-      const tableName: string = qryObj['type'] !== '' ? qryObj['type'] : undefined;
-      let rankCounter: number = 1;
-      let writer: any;
-      if (exprt.filetype === 'csv')
-      {
-        writer = csvWriter();
-      }
-      else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-      {
-        writer = new stream.PassThrough();
-      }
-      const pass = new stream.PassThrough();
-      writer.pipe(pass);
-
-      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-      {
-        if (exprt.filetype === 'json [type object]')
-        {
-          writer.write('{ \"');
-          writer.write(exprt.objectKey);
-          writer.write('\":');
-        }
-        writer.write('[');
-      }
-
-      qryObj['scroll'] = this.SCROLL_TIMEOUT;
-      let errMsg: string = '';
-      let isFirstJSONObj: boolean = true;
-      elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
-      {
-        if (resp.hits === undefined || resp.hits.total === 0)
-        {
-          writer.end();
-          errMsg = 'Nothing to export.';
-          return reject(errMsg);
-        }
-        const newDocs: object[] = resp.hits.hits as object[];
-        if (newDocs.length === 0)
-        {
-          writer.end();
-          return resolve(pass);
-        }
-        let returnDocs: object[] = [];
-
-        const fieldArrayDepths: object = {};
-        for (const doc of newDocs)
-        {
-          // verify schema mapping with documents and fix documents accordingly
-          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname, tableName);
-          if (typeof newDoc === 'string')
-          {
-            writer.end();
-            errMsg = newDoc;
-            return reject(errMsg);
-          }
-          for (const field of Object.keys(newDoc))
-          {
-            if (newDoc[field] !== null && newDoc[field] !== undefined)
-            {
-              if (fieldArrayDepths[field] === undefined)
-              {
-                fieldArrayDepths[field] = new Set<number>();
-              }
-              fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
-            }
-            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
-            {
-              newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
-            }
-          }
-          returnDocs.push(newDoc as object);
-        }
-        for (const field of Object.keys(fieldArrayDepths))
-        {
-          if (fieldArrayDepths[field].size > 1)
-          {
-            errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
-            return reject(errMsg);
-          }
-        }
-
-        // transform documents with template
-        try
-        {
-          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true));
-          for (const doc of returnDocs)
-          {
-            if (exprt.rank === true)
-            {
-              if (doc['terrainRank'] !== undefined)
-              {
-                errMsg = 'Conflicting field: terrainRank.';
-                return reject(errMsg);
-              }
-              doc['terrainRank'] = rankCounter;
-            }
-            rankCounter++;
-          }
-        } catch (e)
-        {
-          writer.end();
-          errMsg = e;
-          return reject(errMsg);
-        }
-
-        // export to csv
-        for (const returnDoc of returnDocs)
-        {
-          if (exprt.filetype === 'csv')
-          {
-            writer.write(returnDoc);
-          }
-          else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-          {
-            isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-            writer.write(JSON.stringify(returnDoc));
-          }
-        }
-        if (Math.min(resp.hits.total, qryObj['size']) > rankCounter - 1)
-        {
-          elasticClient.scroll({
-            scrollId: resp._scroll_id,
-            scroll: this.SCROLL_TIMEOUT,
-          }, getMoreUntilDone);
-        }
-        else
-        {
-          if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-          {
-            writer.write(']');
-            if (exprt.filetype === 'json [type object]')
-            {
-              writer.write('}');
-            }
-          }
-          writer.end();
-          resolve(pass);
-        }
-      }.bind(this),
-      );
-    });
-  }
 
   public async upsert(files: stream.Readable[] | stream.Readable, fields: object, headless: boolean): Promise<ImportConfig>
   {
@@ -420,6 +179,7 @@ export class Import
           file,
           filetype: fields['filetype'],
           isNewlineSeparatedJSON,
+          name: template['name'],
           originalNames: template['originalNames'],
           primaryKeyDelimiter: template['primaryKeyDelimiter'],
           primaryKeys: template['primaryKeys'],
@@ -445,6 +205,7 @@ export class Import
             file,
             filetype: fields['filetype'],
             isNewlineSeparatedJSON,
+            name: fields['name'],
             originalNames,
             primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
             primaryKeys,
@@ -1433,7 +1194,7 @@ export class Import
   }
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
-  private async _transformAndCheck(allItems: object[], imprt: ImportConfig | ExportConfig,
+  private async _transformAndCheck(allItems: object[], imprt: ImportConfig,
     dontCheck?: boolean): Promise<object[][]>
   {
     const promises: Array<Promise<object[]>> = [];

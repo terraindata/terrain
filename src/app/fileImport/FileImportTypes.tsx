@@ -139,6 +139,7 @@ class TemplateC
   public transformations: List<Transform> = List([]);
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
+  public objectKey?: string = '';
   public persistentAccessToken?: string = '';
   public dbid?: number = -1;
   public dbname?: string = '';
@@ -157,6 +158,7 @@ export const _Template =
     transformations: List<object>;
     primaryKeys: List<number>;
     primaryKeyDelimiter: string;
+    objectKey?: string;
     persistentAccessToken?: string;
     dbid?: number;
     dbname?: string;

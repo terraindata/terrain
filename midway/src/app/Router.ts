@@ -52,8 +52,8 @@ import AuthRouter from './auth/AuthRouter';
 import CredentialRouter from './credentials/CredentialRouter';
 import DatabaseRouter from './database/DatabaseRouter';
 import EventRouter from './events/EventRouter';
-import ImportRouter from './import/ImportRouter';
-import ImportTemplateRouter from './import/ImportTemplateRouter';
+import ExportRouter from './io/ExportRouter';
+import ImportRouter from './io/ImportRouter';
 import ItemRouter from './items/ItemRouter';
 import QueryRouter from './query/QueryRouter';
 import SchedulerRouter from './scheduler/SchedulerRouter';
@@ -66,7 +66,6 @@ import VersionRouter from './versions/VersionRouter';
 const AppRouter = new KoaRouter();
 
 AppRouter.use('/auth', AuthRouter.routes(), AuthRouter.allowedMethods());
-AppRouter.use('/credentials', CredentialRouter.routes(), CredentialRouter.allowedMethods());
 AppRouter.use('/events', EventRouter.routes(), EventRouter.allowedMethods());
 AppRouter.use('/users', UserRouter.routes(), UserRouter.allowedMethods());
 AppRouter.use('/items', ItemRouter.routes(), ItemRouter.allowedMethods());
@@ -77,7 +76,8 @@ AppRouter.use('/schema', SchemaRouter.routes(), SchemaRouter.allowedMethods());
 AppRouter.use('/status', StatusRouter.routes(), StatusRouter.allowedMethods());
 AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 AppRouter.use('/import', ImportRouter.routes(), ImportRouter.allowedMethods());
-AppRouter.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.allowedMethods());
+AppRouter.use('/export', ExportRouter.routes(), ExportRouter.allowedMethods());
+AppRouter.use('/credentials', CredentialRouter.routes(), CredentialRouter.allowedMethods());
 // Add future routes here.
 
 AppRouter.get('/time', (ctx, next) =>
