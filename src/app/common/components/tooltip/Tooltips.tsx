@@ -60,7 +60,7 @@ import { backgroundColor, borderColor, Colors, fontColor } from './../../../colo
 
 import './Tooltips.less';
 
-const tooltipTitleStyle = {maxWidth: '400px', display: 'inline-block'}
+const tooltipTitleStyle = { maxWidth: '400px', display: 'inline-block' };
 // tooltipMaxWidth makes text-only tooltips have a consistent size
 // tippy-popper's max-width is 400 by default but we override it so that large html tooltips work.
 
