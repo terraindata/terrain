@@ -79,6 +79,9 @@ export interface Props
   onBlur?: (event: React.FocusEvent<any>, value: string) => void;
   onEnter?: (value: string) => void;
   onSelectOption?: (value: string) => void;
+
+  autoFocus?: boolean;
+  moveCursorToEnd?: boolean;
 }
 
 @Radium
@@ -137,6 +140,12 @@ class Autocomplete extends TerrainComponent<Props>
       open: true,
       selectedIndex: -1,
     });
+
+    // On initial focus, make sure that the cursor is at the end of the text box (for map component text inputs)
+    if (this.props.moveCursorToEnd)
+    {
+      (event.target as any).selectionStart = (event.target as any).selectionEnd = (event.target as any).selectionStart + 1;
+    }
 
     this.props.onFocus && this.props.onFocus(event);
   }

@@ -215,6 +215,7 @@ export const ELASTIC_TYPES =
     'integer',
     'half_float',
     'float',
+    'geo_point',
   ];
 
 export const ELASTIC_TYPE_INDEXES =
@@ -248,6 +249,7 @@ export const TRANSFORM_TYPES =
     ['duplicate'],    // integer
     ['duplicate'],    // half_float
     ['duplicate'],    // float
+    ['duplicate'],    // geopoint
   ];
 
 export const STEP_NAMES =
