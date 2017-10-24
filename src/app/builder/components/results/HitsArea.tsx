@@ -282,11 +282,8 @@ class HitsArea extends TerrainComponent<Props>
 
   public handleMapMouseMove(event)
   {
-    // console.log("START", this.state.mouseStartY);
-    // console.log("MOVED TO", event.pageY);
     const dY = this.state.mouseStartY - event.pageY;
     const newHeight = dY + this.state.mapHeight;
-    // console.log("NEW HEIGHT", newHeight);
     event.preventDefault();
     event.stopPropagation();
     this.setState({
@@ -301,6 +298,24 @@ class HitsArea extends TerrainComponent<Props>
     this.setState({
       mapHeight: 300,
     });
+  }
+
+  public toggleMapOpen(event)
+  {
+    const el = this.refs['map'];
+    const cr = el['getBoundingClientRect']();
+    if (cr.height <= 25)
+    {
+      this.setState({
+        mapHeight: 300,
+      });
+    }
+    else
+    {
+      this.setState({
+        mapHeight: 25,
+      });
+    }
   }
 
   public renderHitsMap()
@@ -326,6 +341,7 @@ class HitsArea extends TerrainComponent<Props>
             className='results-area-map-topbar'
             onMouseDown={this.handleMapMouseDown}
             style={backgroundColor(Colors().active)}
+            onDoubleClick={this.toggleMapOpen}
           >
             <ArrowIcon
               style={getStyle('fill', Colors().text1)}

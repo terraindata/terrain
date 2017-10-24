@@ -702,6 +702,7 @@ class MapComponent extends TerrainComponent<Props>
           onClick={this.handleOnMapClick}
           onMouseDown={this.handleOnMapClick}
           style={this.props.style}
+          maxBounds={[[-85, -180], [180, 85]]}
         >
           {
             this.props.markLocation ?

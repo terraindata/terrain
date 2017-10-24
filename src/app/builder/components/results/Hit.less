@@ -4,7 +4,7 @@
 @result-name-height: 36px;
 @result-score-height: 24px;
 @result-fields-wrapper-height: ~"100% - @{result-name-height} - @{result-score-height}";
-@result-icon-size: 17px;
+@result-icon-size: 20px;
 
 @result-name-bg: #cfd7c8;
 @result-score-bg: #dfe6d8;
@@ -70,7 +70,7 @@
     height: @result-name-height;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
-    padding: 10px 13px;
+    padding: 10px 9px;
     // background: @result-name-bg;
     box-sizing: border-box;
     position: relative;
@@ -308,7 +308,25 @@
   margin-right: 5px;
   box-sizing: border-box;
   vertical-align: bottom;
-  
-  border: 2px solid #fff;
+
+  &.result-spotlight-lit {
+      border: 2px solid #fff;
+  }
+  .result-spotlight-text {
+    position: relative;
+    top: 2px;
+    font-size: 11px;
+    left: 2px;
+  }
+  .result-spotlight-text-small {
+    font-size: 9px;
+    top: 3px;
+    left: 0px;
+  }
+  .result-spotlight-text-large {
+    top: 1px;
+    font-size: 12px;
+    left: 4px;
+  }
 }
   

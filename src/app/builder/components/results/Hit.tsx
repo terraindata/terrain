@@ -229,18 +229,27 @@ class HitComponent extends TerrainComponent<Props> {
 
   public renderSpotlight()
   {
-    if (!this.state.isSpotlit)
-    {
-      return null;
-    }
-
     return (
       <div
-        className='result-spotlight'
+        className={classNames({
+          'result-spotlight': true,
+          'result-spotlight-lit': this.state.isSpotlit,
+        })}
         style={{
-          background: this.state.spotlightColor,
+          background: this.state.isSpotlit ?
+            this.state.spotlightColor : 'transparent',
         }}
-      />
+      >
+        <div
+          className={classNames({
+            'result-spotlight-text': true,
+            'result-spotlight-text-small': this.props.index + 1 >= 100,
+            'result-spotlight-text-large': this.props.index + 1 < 10,
+          })}
+        >
+          {this.props.index + 1}
+        </div>
+      </div>
     );
   }
 
