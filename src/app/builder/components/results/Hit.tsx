@@ -79,6 +79,8 @@ export interface Props
   onExpand: (index: number) => void;
   expanded?: boolean;
   allowSpotlights: boolean;
+  onSpotlightAdded: (id, spotlightData) => void;
+  onSpotlightRemoved: (id) => void;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -216,6 +218,7 @@ class HitComponent extends TerrainComponent<Props> {
         spotlightData['color'] = spotlightColor;
         spotlightData['id'] = id;
         spotlightAction(id, spotlightData);
+        this.props.onSpotlightAdded(id, spotlightData);
       });
   }
 
@@ -224,6 +227,7 @@ class HitComponent extends TerrainComponent<Props> {
     this.setState({
       isSpotlit: false,
     });
+    this.props.onSpotlightRemoved(this.props.primaryKey);
     spotlightAction(this.props.primaryKey, null);
   }
 

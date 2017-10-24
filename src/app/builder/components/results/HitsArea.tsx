@@ -114,6 +114,7 @@ interface State
   mapHeight?: number;
   mouseStartY?: number;
   mapMaxHeight?: number;
+  spotlightHits?: Immutable.Map<string, any>;
 }
 
 @Radium
@@ -129,6 +130,7 @@ class HitsArea extends TerrainComponent<Props>
     mapHeight: 25,
     mouseStartY: 0,
     mapMaxHeight: undefined,
+    spotlightHits: Immutable.Map<string, any>({}),
   };
 
   public hitsFodderRange = _.range(0, 25);
@@ -144,6 +146,20 @@ class HitsArea extends TerrainComponent<Props>
         // reset infinite scroll
         this.state.onHitsLoaded(false);
       }
+    }
+    if (this.props.resultsState.hits !== nextProps.resultsState.hits)
+    {
+      let spotlightHits = Map({});
+      nextProps.resultsState.hits.forEach((hit) =>
+      {
+        if (this.state.spotlightHits.get(hit.primaryKey))
+        {
+          spotlightHits = spotlightHits.set(hit.primaryKey, this.state.spotlightHits.get(hit.primaryKey));
+        }
+      });
+      this.setState({
+        spotlightHits,
+      });
     }
   }
 
@@ -195,6 +211,8 @@ class HitsArea extends TerrainComponent<Props>
           allowSpotlights={this.props.allowSpotlights}
           index={-1}
           primaryKey={hit.primaryKey}
+          onSpotlightAdded={this.handleSpotlightAdded}
+          onSpotlightRemoved={this.handleSpotlightRemoved}
         />
       </div>
     );
@@ -234,6 +252,20 @@ class HitsArea extends TerrainComponent<Props>
     return !query || (!query.tql && !query.cards.size);
   }
 
+  public handleSpotlightAdded(id, spotlightData)
+  {
+    this.setState({
+      spotlightHits: this.state.spotlightHits.set(id, spotlightData),
+    });
+  }
+
+  public handleSpotlightRemoved(id)
+  {
+    this.setState({
+      spotlightHits: this.state.spotlightHits.delete(id),
+    });
+  }
+
   public buildAggregationMap(locations, hits)
   {
     const allMapsData = [];
@@ -246,10 +278,13 @@ class HitsArea extends TerrainComponent<Props>
         const { resultsConfig } = this.props.query;
         const name = resultsConfig.enabled && resultsConfig.name !== undefined ?
           hit.fields.get(resultsConfig.name) : hit.fields.get('_id');
+        const spotlight = this.state.spotlightHits.get(hit.primaryKey);
+        const color = spotlight !== undefined && spotlight.color !== undefined ? spotlight.color : 'black';
         multiLocations.push({
           location: hit.fields.get(field),
           name,
           index: i + 1,
+          color,
         });
       });
       allMapsData.push({ target, multiLocations });
@@ -320,7 +355,7 @@ class HitsArea extends TerrainComponent<Props>
 
   public renderHitsMap()
   {
-    if (_.keys(this.locations).length === 0)
+    if (_.keys(this.locations).length === 0 || this.state.hitFormat === 'table')
     {
       return null;
     }
@@ -521,6 +556,8 @@ class HitsArea extends TerrainComponent<Props>
                   primaryKey={hit.primaryKey}
                   allowSpotlights={this.props.allowSpotlights}
                   locations={this.locations}
+                  onSpotlightAdded={this.handleSpotlightAdded}
+                  onSpotlightRemoved={this.handleSpotlightRemoved}
                 />
               );
             })
@@ -538,6 +575,7 @@ class HitsArea extends TerrainComponent<Props>
     return (
       <div
         className='results-area-results-wrapper'
+        style={{ height: `calc(100% - ${this.state.mapHeight + 24}px)` }}
       >
         {
           hitsContent
