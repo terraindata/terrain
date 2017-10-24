@@ -688,6 +688,42 @@ export const Ajax =
       );
     },
 
+    getAnalyzers(
+      index: string,
+      onLoad: (resp: object) => void,
+      onError?: (resp: any) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'get',
+        'import/analyzers',
+        { index },
+        (response) =>
+        {
+          let responseData: object = null;
+          try
+          {
+            responseData = response;
+          }
+          catch (e)
+          {
+            onError && onError(e.message);
+          }
+
+          if (responseData !== undefined)
+          {
+            // needs to be outside of the try/catch so that any errors it throws aren't caught
+            onLoad(responseData);
+          }
+        },
+      );
+      return;
+    },
+
     getStreamingProgress(onLoad: (resp: any) => void,
       onError: (resp: any) => void,
     )

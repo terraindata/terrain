@@ -227,7 +227,7 @@ class LibraryItem extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.library-item .library-item-title-bar .library-item-icon svg, .cls-1 ', { fill: Colors().text3 });
+    ColorsActions.setStyle('.library-item .library-item-title-bar .library-item-icon svg, .cls-1 ', { fill: Colors().iconColor });
   }
 
   public componentDidMount()
@@ -438,7 +438,7 @@ class LibraryItem extends TerrainComponent<Props>
                     })}
                     style={
                       isSelected ? backgroundColor(Colors().active) :
-                        backgroundColor(Colors().bg2, Colors().inactiveHover)
+                        backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().bg3 : Colors().bg2, Colors().inactiveHover)
                     }
                   >
                     <div

@@ -44,10 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:member-ordering member-access no-var-requires
+// tslint:disable:member-ordering member-access no-var-requires strict-boolean-expressions
 
 import * as Immutable from 'immutable';
 import { make } from '../../blocks/BlockUtils';
+import { Query } from '../../items/types/Query';
 import { Backend, cardsDeckToList } from '../types/Backend';
 import MySQLBlocks from './blocks/MySQLBlocks';
 import MySQLCardsDeck from './blocks/MySQLCardsDeck';
@@ -55,8 +56,29 @@ import CardsToSQL from './conversion/CardsToSQL';
 import SQLToCards from './conversion/SQLToCards';
 const syntaxConfig = require('../../../shared/database/mysql/syntax/SQLSyntaxConfig.json');
 
-class MySQLBackend implements Backend
+export class MySQLBackend implements Backend
 {
+  public static loadingQuery(query: Query, queryReady: (query: Query) => void): Query
+  {
+    // legacy mysql model
+    if (!query.cardsAndCodeInSync)
+    {
+      if (query.tql)
+      {
+        query = SQLToCards(
+          query,
+          queryReady,
+        );
+      }
+      else
+      {
+        // blank
+        query = query
+          .set('cardsAndCodeInSync', true);
+      }
+    }
+    return query;
+  }
   type = 'mysql';
   name = 'MySQL';
 

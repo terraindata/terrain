@@ -164,13 +164,12 @@ export class Import
       let imprtConf: ImportConfig;
       if (headless)
       {
-        const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateId']));
+        const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateId']));
         if (templates.length === 0)
         {
           return reject('Invalid template ID provided: ' + String(fields['templateId']));
         }
         const template: ImportTemplateConfig = templates[0];
-
         imprtConf = {
           columnTypes: template['columnTypes'],
           dbid: template['dbid'],
@@ -572,7 +571,7 @@ export class Import
       const dateColumns: string[] = [];
       for (const colName of Object.keys(imprt.columnTypes))
       {
-        if (imprt.columnTypes.hasOwnProperty(colName) && this._getESType(imprt.columnTypes[colName]) === 'date')
+        if (imprt.columnTypes.hasOwnProperty(colName) && this._getESType(imprt.columnTypes[colName])['type'] === 'date')
         {
           dateColumns.push(colName);
         }
@@ -787,16 +786,25 @@ export class Import
 
   /* return ES type from type specification format of ImportConfig
    * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
-  private _getESType(typeObject: object, withinArray: boolean = false): string
+  private _getESType(typeObject: object, withinArray: boolean = false, isIndexAnalyzed?: string, typeAnalyzer?: string): object
   {
     switch (typeObject['type'])
     {
       case 'array':
-        return this._getESType(typeObject['innerType'], true);
+        return this._getESType(typeObject['innerType'], true,
+          typeObject['index'] !== undefined ? typeObject['index'] : isIndexAnalyzed,
+          typeObject['analyzer'] !== undefined ? typeObject['analyzer'] : typeAnalyzer);
       case 'object':
-        return withinArray ? 'nested' : 'object';
+        return withinArray ? (typeObject['index'] === 'analyzed' ?
+          { type: 'nested', index: typeObject['index'], analyzer: typeObject['analyzer'] } :
+          { type: 'nested', index: typeObject['index'] })
+          : (typeObject['index'] === 'analyzed' ?
+            { type: 'object', index: typeObject['index'], analyzer: typeObject['analyzer'] } :
+            { type: 'object', index: typeObject['index'] });
       default:
-        return typeObject['type'];
+        return typeObject['index'] === 'analyzed' ?
+          { type: typeObject['type'], index: typeObject['index'], analyzer: typeObject['analyzer'] } :
+          { type: typeObject['type'], index: typeObject['index'] };
     }
   }
 
@@ -853,17 +861,21 @@ export class Import
     const body: object = {};
     for (const key of Object.keys(mapping))
     {
-      if (mapping.hasOwnProperty(key) && key !== '__isNested__')
+      if (mapping.hasOwnProperty(key) && key !== '__isNested__' && mapping[key].hasOwnProperty('type'))
       {
-        if (typeof mapping[key] === 'string')
+        if (typeof mapping[key]['type'] === 'string')
         {
-          body[key] = { type: mapping[key] };
+          body[key] = { type: mapping[key]['type'], index: mapping[key]['index'] };
+          if (body[key]['index'] === 'analyzed')
+          {
+            body[key]['analyzer'] = mapping[key]['analyzer'];
+          }
           if (mapping[key] === 'text')
           {
             body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256 } };
           }
         }
-        else if (typeof mapping[key] === 'object')
+        else if (typeof mapping[key]['type'] === 'object')
         {
           body[key] = this._getMappingForSchemaHelper(mapping[key]);
         }

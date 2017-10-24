@@ -85,9 +85,9 @@ export async function authenticatePersistentAccessToken(req: object): Promise<ob
       return reject('Missing one or more auth fields.');
     }
     const importTemplate: object[] =
-      await importTemplates.loginWithPersistentAccessToken(Number(req['templateId']), req['persistentAccessToken']);
+      await importTemplates.loginWithPersistentAccessToken(Number(parseInt(req['templateId'], 10)), req['persistentAccessToken']);
     const exportTemplate: object[] =
-      await exportTemplates.loginWithPersistentAccessToken(Number(req['templateId']), req['persistentAccessToken']);
+      await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(req['templateId'], 10)), req['persistentAccessToken']);
     const template = importTemplate.concat(exportTemplate);
     if (template.length === 0)
     {
@@ -107,9 +107,9 @@ export async function authenticateStreamPersistentAccessToken(req: http.Incoming
       return reject(`Missing one or more auth fields. ${fields['templateId']} , ${fields['persistentAccessToken']}`);
     }
     const importTemplate: object[] =
-      await importTemplates.loginWithPersistentAccessToken(Number(req['templateId']), req['persistentAccessToken']);
+      await importTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
     const exportTemplate: object[] =
-      await exportTemplates.loginWithPersistentAccessToken(Number(req['templateId']), req['persistentAccessToken']);
+      await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
     const template = importTemplate.concat(exportTemplate);
     if (template.length === 0)
     {

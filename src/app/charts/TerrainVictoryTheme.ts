@@ -43,67 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { merge } from 'lodash';
+import { VictoryTheme } from 'victory';
 
-// tslint:disable:no-var-requires
+const strokeDasharray = '10, 0';
 
-import * as classNames from 'classnames';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { Colors, getStyle } from '../../colors/Colors';
-import ColorsActions from './../../colors/data/ColorsActions';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './DragHandleStyle.less';
+const theme = {
+  axis: {
+    style: {
+      grid: {
+        strokeDasharray,
+      },
+    },
+  },
+};
 
-const Handle = require('./../../../images/icon_drag_1.svg');
-
-export interface Props
-{
-  id?: number;
-  hiddenByDefault?: boolean;
-  showWhenHoveringClassName?: string;
-  useAltColor?: boolean;
-  connectDragSource?: (el: El) => El;
-}
-
-@Radium
-class DragHandle extends TerrainComponent<Props>
-{
-  public componentWillMount()
-  {
-    const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
-    ColorsActions.setStyle('.drag-icon ', { fill: this.props.useAltColor ? Colors().altText2 : Colors().iconColor });
-    ColorsActions.setStyle('.drag-icon:hover ', { fill: Colors().inactiveHover });
-    ColorsActions.setStyle('.drag-icon:active ', { fill: Colors().active });
-    ColorsActions.setStyle('.' + hoveringClassName, { opacity: '0.85 !important' as any });
-  }
-
-  public renderHandle()
-  {
-    return (
-      <div
-        key={this.props.id}
-        style={{
-          'opacity': this.props.hiddenByDefault ? 0 : 0.85,
-          ':hover': {
-            opacity: 0.85,
-          },
-        }}
-      >
-        <Handle className='drag-icon' />
-      </div>
-    );
-  }
-
-  public render()
-  {
-    return (
-      (
-        this.props.connectDragSource !== undefined ?
-          this.props.connectDragSource(this.renderHandle()) :
-          this.renderHandle()
-      )
-    );
-  }
-}
-
-export default DragHandle;
+export default merge({}, VictoryTheme.material, theme);
