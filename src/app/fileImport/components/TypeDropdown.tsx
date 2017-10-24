@@ -63,6 +63,7 @@ const ELASTIC_TYPE_INDEXES = List(FileImportTypes.ELASTIC_TYPE_INDEXES);
 export interface Props
 {
   columnId: number;
+  exporting: boolean;
   recursionDepth: number;
   columnType: ColumnTypesTree;
   columnTypeAnalyzer: List<string>;
@@ -116,10 +117,11 @@ class TypeDropdown extends TerrainComponent<Props>
             columnType={this.props.columnType.innerType}
             columnTypeAnalyzer={this.props.columnTypeAnalyzer}
             tooltips={this.props.tooltips}
+            exporting={this.props.exporting}
           />
         }
         {
-          this.props.columnType.type === 'text' &&
+          !this.props.exporting && this.props.columnType.type === 'text' &&
           <span>
             <div
               className='fi-type-dropdown'

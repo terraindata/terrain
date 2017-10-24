@@ -224,6 +224,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             recursionDepth={0}
             columnType={this.props.columnType}
             columnTypeAnalyzer={this.props.analyzers}
+            exporting={this.props.exporting}
           />
         </div>
       </div>

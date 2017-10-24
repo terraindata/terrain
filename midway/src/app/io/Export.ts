@@ -225,15 +225,7 @@ export class Export
         return reject(e);
       }
 
-      if (qryObj['body'] !== undefined && qryObj['body']['size'] !== undefined)
-      {
-        if (typeof qryObj['body']['size'] === 'number' && qryObj['body']['size'] > this.MAX_ROW_THRESHOLD)
-        {
-          qryObj['body']['from'] = 0;
-          qryObj['body']['size'] = this.MAX_ROW_THRESHOLD;
-          qryObj['body']['query'] = { function_score: { random_score: {}, query: qryObj['body']['query'] } };
-        }
-      }
+      qryObj = this._shouldRandomSample(qryObj);
 
       if (typeof mapping === 'string')
       {
@@ -400,6 +392,8 @@ export class Export
           return reject(e.message as string);
         }
       }
+
+      qry = this._shouldRandomSample(qry as object);
       const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
       if (database === undefined)
       {
@@ -433,13 +427,28 @@ export class Export
       {
         return reject('Variant not found.');
       }
-      const qry: object | string = await this._getQueryFromVariant(variants[0]);
+      let qry: object | string = await this._getQueryFromVariant(variants[0]);
       if (typeof qry === 'string')
       {
         return reject(qry);
       }
+      qry = this._shouldRandomSample(qry as object);
       return resolve(await this._getAllFieldsAndTypesFromQuery(elasticClient, qry));
     });
+  }
+
+  private _shouldRandomSample(qry: object): object
+  {
+    if (qry['body'] !== undefined && qry['body']['size'] !== undefined)
+    {
+      if (typeof qry['body']['size'] === 'number' && qry['body']['size'] > this.MAX_ROW_THRESHOLD)
+      {
+        qry['body']['from'] = 0;
+        qry['body']['size'] = this.MAX_ROW_THRESHOLD;
+        qry['body']['query'] = { function_score: { random_score: {}, query: qry['body']['query'] } };
+      }
+    }
+    return qry;
   }
 
   private async _getQueryFromVariant(variant: ItemConfig): Promise<object | string>
