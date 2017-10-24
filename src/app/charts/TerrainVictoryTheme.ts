@@ -43,70 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { merge } from 'lodash';
+import { VictoryTheme } from 'victory';
 
-// tslint:disable:member-ordering member-access no-var-requires strict-boolean-expressions
+const strokeDasharray = '10, 0';
 
-import * as Immutable from 'immutable';
-import { make } from '../../blocks/BlockUtils';
-import { Query } from '../../items/types/Query';
-import { Backend, cardsDeckToList } from '../types/Backend';
-import MySQLBlocks from './blocks/MySQLBlocks';
-import MySQLCardsDeck from './blocks/MySQLCardsDeck';
-import CardsToSQL from './conversion/CardsToSQL';
-import SQLToCards from './conversion/SQLToCards';
-const syntaxConfig = require('../../../shared/database/mysql/syntax/SQLSyntaxConfig.json');
+const theme = {
+  axis: {
+    style: {
+      grid: {
+        strokeDasharray,
+      },
+    },
+  },
+};
 
-export class MySQLBackend implements Backend
-{
-  public static loadingQuery(query: Query, queryReady: (query: Query) => void): Query
-  {
-    // legacy mysql model
-    if (!query.cardsAndCodeInSync)
-    {
-      if (query.tql)
-      {
-        query = SQLToCards(
-          query,
-          queryReady,
-        );
-      }
-      else
-      {
-        // blank
-        query = query
-          .set('cardsAndCodeInSync', true);
-      }
-    }
-    return query;
-  }
-  type = 'mysql';
-  name = 'MySQL';
-
-  blocks = MySQLBlocks;
-  creatingType = MySQLBlocks.creating.type;
-  inputType = MySQLBlocks.input.type;
-  getRootCards = () =>
-  {
-    return Immutable.List([make(MySQLBlocks, 'sfw')]);
-  }
-  topLevelCards = Immutable.List<string>([MySQLBlocks.sfw.type]);
-
-  // Ordering of the cards deck
-  cardsDeck = MySQLCardsDeck;
-  cardsList = cardsDeckToList(MySQLCardsDeck);
-
-  queryToCode = CardsToSQL.toSQL;
-
-  codeToQuery = SQLToCards;
-
-  parseQuery = (query) => null;
-
-  parseTreeToQueryString = CardsToSQL.toSQL;
-
-  syntaxConfig = syntaxConfig;
-
-  // function to get transform bars?
-  // autocomplete?
-}
-
-export default new MySQLBackend();
+export default merge({}, VictoryTheme.material, theme);

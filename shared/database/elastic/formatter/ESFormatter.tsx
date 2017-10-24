@@ -64,16 +64,18 @@ interface TokenParts
 class ESFormatter
 {
   public tab: string;
+  private parameterInString: boolean;
 
-  constructor(indentSize: number = 2)
+  constructor(indentSize: number = 2, parameterInString: boolean = false)
   {
     this.tab = (' ').repeat(indentSize);
+    this.parameterInString = parameterInString;
   }
 
   public formatQuery(parser: ESJSONParser): string
   {
     const tokens: FlaggedToken[] = ESParserTokenizer.getTokens(parser, true);
-    const accumulation: TokenParts = tokens.map(this.mapTokens).reduce(this.reduceParts.bind(this));
+    const accumulation: TokenParts = tokens.map((t) => this.mapTokens(t)).reduce(this.reduceParts.bind(this));
     return accumulation.str;
   }
 
@@ -87,7 +89,7 @@ class ESFormatter
     return { head: a.head, str: a.str + sewn + b.str, tail: b.tail, depth: b.depth };
   }
 
-  protected mapTokens(value: FlaggedToken, i: number, arr: FlaggedToken[]): TokenParts
+  protected mapTokens(value: FlaggedToken): TokenParts
   {
     if (value.isKeyword)
     {
@@ -102,6 +104,14 @@ class ESFormatter
       case ESJSONType.boolean:
       case ESJSONType.number:
       case ESJSONType.string:
+        if (this.parameterInString === true && value.parserToken.substring.startsWith('"@'))
+        {
+          const s = value.parserToken.substring.trim();
+          return { head: '', str: s.substring(1, s.length - 1), tail: '', depth: value.depth };
+        } else
+        {
+          return { head: '', str: value.parserToken.substring.trim(), tail: '', depth: value.depth };
+        }
       case ESJSONType.parameter:
         return { head: '', str: value.parserToken.substring.trim(), tail: '', depth: value.depth };
       case ESJSONType.array:
