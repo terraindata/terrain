@@ -127,7 +127,7 @@ class TooltipStyleGenerator
           'border-radius': '0px',
           'padding': '0px',
           'box-shadow': 'none',
-        }
+        },
       );
     }
     return defaultStyle;
