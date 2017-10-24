@@ -1264,6 +1264,18 @@ export const Ajax =
       );
     },
 
+    logout(
+      onSave: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        'auth/logout',
+        {},
+        onSave,
+        {},
+      );
+    },
+
     getAnalytics(
       variantIds: ID[],
       start: Date,
