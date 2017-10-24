@@ -270,8 +270,8 @@ class App extends TerrainComponent<Props>
   public componentWillMount()
   {
     ColorsActions.setStyle('input', { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder });
-    ColorsActions.setStyle('input:hover', { 'background': Colors().inputFocusBg + ' !important', 'border-color': Colors().inactiveHover });
-    ColorsActions.setStyle('input:focus', { 'background': Colors().inputFocusBg + ' !important', 'border-color': Colors().inputBorder });
+    ColorsActions.setStyle('input:hover', { 'background': Colors().inputFocusBg, 'border-color': Colors().inactiveHover });
+    ColorsActions.setStyle('input:focus', { 'background': Colors().inputFocusBg, 'border-color': Colors().inputBorder });
     ColorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
     ColorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
     ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
