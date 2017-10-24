@@ -92,6 +92,9 @@ export interface Card extends IRecord<Card>
     tqlGlue?: string;
     topTql?: string;
 
+    // This is used for the distance card, it will be overwritten by parser on load unless saved as metadata
+    map_text?: string;
+
     anythingAccepts?: boolean;
 
     // returns an object with default values for a new card
@@ -157,7 +160,7 @@ export interface CardConfig
   };
 }
 
-export const allCardsMetaFields = allBlocksMetaFields.concat(['closed', 'tuning', 'tuningClosed']);
+export const allCardsMetaFields = allBlocksMetaFields.concat(['closed', 'tuning', 'tuningClosed', 'map_text']);
 
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
@@ -172,6 +175,7 @@ export const _card = (config: CardConfig) =>
     closed: false,
     tuning: false,
     tuningClosed: false,
+    map_text: '',
   });
 
   if (config.static.metaFields)

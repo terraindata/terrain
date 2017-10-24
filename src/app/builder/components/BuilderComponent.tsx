@@ -57,7 +57,8 @@ import Dropdown from '../../common/components/Dropdown';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderActions from '../data/BuilderActions';
-import BuilderStore from '../data/BuilderStore';
+import { BuilderState, BuilderStore } from '../data/BuilderStore';
+import SpotlightStore from '../data/SpotlightStore';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 
@@ -377,6 +378,28 @@ class BuilderComponent extends TerrainComponent<Props>
                   tuningMode={this.props.tuningMode}
                 />
               ))
+            }
+          </div>
+        );
+        break;
+      case DisplayType.MAP:
+        const MapComp = d.component as any;
+        content = (
+          <div
+            key={key}
+            className={'builder-component-wrapper builder-component-wrapper-wide'}
+          >
+            {
+              React.cloneElement(
+                <MapComp />,
+                {
+                  keyPath,
+                  data,
+                  parentKeyPath,
+                  canEdit: this.props.canEdit,
+                  helpOn: this.props.helpOn,
+                },
+              )
             }
           </div>
         );

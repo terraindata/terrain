@@ -66,6 +66,7 @@ const GearIcon = require('./../../../../images/icon_gear.svg?name=GearIcon');
 const TextIcon = require('./../../../../images/icon_text_12x18.svg?name=TextIcon');
 const ImageIcon = require('./../../../../images/icon_profile_16x16.svg?name=ImageIcon');
 const HandleIcon = require('./../../../../images/icon_handle.svg?name=HandleIcon');
+const MarkerIcon = require('./../../../../images/icon_marker.svg?name=MarkerIcon');
 
 export interface Props
 {
@@ -449,6 +450,11 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
     this.changeFormat('type', 'image');
   }
 
+  public changeToMap()
+  {
+    this.changeFormat('type', 'map');
+  }
+
   public toggleRaw(event)
   {
     this.changeFormat('showRaw', event.target.checked);
@@ -496,6 +502,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
   {
     const { format } = this.props;
     const image = format && format.type === 'image';
+    const map = format && format.type === 'map';
 
     const selected: boolean = this.props.is !== null && this.props.isAvailableField;
     const mainStyle = [
@@ -561,8 +568,9 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
         <div className={classNames({
           'results-config-field-format': true,
           'results-config-field-format-showing': this.state.showFormat,
-          'results-config-field-format-text': !image,
+          'results-config-field-format-text': !(image || map),
           'results-config-field-format-image': image,
+          'results-config-field-format-map': map,
         })}>
           <div className='results-config-format-header'>
             <input
@@ -586,7 +594,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             <div className='results-config-text-btn'
               key={'text-btn-' + this.props.field}
               onClick={this.changeToText}
-              style={image ? inactiveBtnStyle : activeBtnStyle}
+              style={(image || map) ? inactiveBtnStyle : activeBtnStyle}
             >
               <TextIcon /> Text
             </div>
@@ -596,6 +604,13 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
               style={image ? activeBtnStyle : inactiveBtnStyle}
             >
               <ImageIcon /> Image
+            </div>
+            <div className='results-config-map-btn'
+              key={'map-btn-' + this.props.field}
+              onClick={this.changeToMap}
+              style={map ? activeBtnStyle : inactiveBtnStyle}
+            >
+              <MarkerIcon /> Map
             </div>
           </div>
 

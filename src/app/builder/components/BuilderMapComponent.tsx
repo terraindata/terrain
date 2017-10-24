@@ -43,90 +43,90 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as classNames from 'classnames';
-import * as _ from 'lodash';
-import * as Radium from 'radium';
+
+// tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-var-requires
 import * as React from 'react';
-import { backgroundColor, Colors } from '../../colors/Colors';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './Switch.less';
+import MapComponent from '../../common/components/MapComponent';
+import TerrainComponent from '../../common/components/TerrainComponent';
+import BuilderActions from '../data/BuilderActions';
+import { BuilderState, BuilderStore } from '../data/BuilderStore';
+import SpotlightStore from '../data/SpotlightStore';
+
+const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
 export interface Props
 {
-  first: string;
-  second: string;
-  selected: number;
-  onChange: (selected: number) => void;
-  small?: boolean;
-  medium?: boolean;
-  darker?: boolean;
+  keyPath: KeyPath;
+  data: any;
+  canEdit: boolean;
+  helpOn: boolean;
+  parentKeyPath: KeyPath;
 }
 
-@Radium
-class Switch extends TerrainComponent<Props>
+class BuilderMapComponent extends TerrainComponent<Props>
 {
-  public handleSwitch()
+  public state:
   {
-    this.props.onChange((this.props.selected + 1) % 2);
+    showExpanded: boolean,
+    inputs: any,
+    spotlights: any,
+  } = {
+    showExpanded: false,
+    inputs: null,
+    spotlights: null,
+  };
+
+  public constructor(props: Props)
+  {
+    super(props);
+    this._subscribe(SpotlightStore, {
+      isMounted: false,
+      storeKeyPath: ['spotlights'],
+      stateKey: 'spotlights',
+    });
+    this._subscribe(BuilderStore, {
+      stateKey: 'builderState',
+      updater: (builderState: BuilderState) =>
+      {
+        if (builderState.query.inputs !== this.state.inputs)
+        {
+          this.setState({
+            inputs: builderState.query.inputs,
+          });
+        }
+      },
+    });
   }
 
   public render()
   {
-    const classes = classNames({
-      'switch': true,
-      'switch-on-first': this.props.selected === 1,
-      'switch-on-second': this.props.selected !== 1,
-      'switch-small': this.props.small,
-      'switch-medium': this.props.medium,
-      'noselect': true,
-    });
-
+    const { distance, distanceUnit, geopoint, map_text, field } = this.props.data;
     return (
-      <div
-        className={classes}
-        onClick={this.handleSwitch}
-        style={this.props.darker ? SWITCH_DARKER_STYLE : SWITCH_STYLE}
-      >
-        <div
-          className='switch-on'
-          style={backgroundColor(Colors().active)}
+      <div className='cards-builder-map-component'>
+        <MapComponent
+          keyPath={this.props.keyPath}
+          location={geopoint.toJS !== undefined ? geopoint.toJS() : geopoint}
+          address={map_text !== undefined ? map_text : ''}
+          markLocation={true}
+          showDistanceCircle={true}
+          showSearchBar={true}
+          zoomControl={true}
+          distance={parseFloat(distance)}
+          distanceUnit={distanceUnit}
+          geocoder='photon'
+          hideSearchSettings={true}
+          inputs={this.state.inputs}
+          textKeyPath={this._ikeyPath(this.props.parentKeyPath, 'map_text')}
+          spotlights={this.state.spotlights}
+          field={field}
+          keepAddressInSync={true}
+          canEdit={this.props.canEdit}
+          colorMarker={true}
+          className={'builder-map-component-wrapper'}
         />
-        <div
-          className='switch-first'
-          style={this.props.selected === 1 ? ACTIVE_SECTION_STYLE : undefined}
-        >
-          {
-            this.props.first
-          }
-        </div>
-        <div
-          className='switch-second'
-          style={this.props.selected !== 1 ? ACTIVE_SECTION_STYLE : undefined}
-        >
-          {
-            this.props.second
-          }
-        </div>
       </div>
     );
   }
 }
 
-const SWITCH_STYLE = {
-  'backgroundColor': Colors().bg3,
-  'color': Colors().text2,
-
-  ':hover': {
-    color: Colors().text1,
-  },
-};
-
-const SWITCH_DARKER_STYLE = _.extend({}, SWITCH_STYLE, {
-  backgroundColor: Colors().bg1,
-});
-
-const ACTIVE_SECTION_STYLE = {
-  color: '#fff',
-};
-
-export default Switch;
+export default BuilderMapComponent;
