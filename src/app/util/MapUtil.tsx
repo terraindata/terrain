@@ -194,7 +194,7 @@ const MapUtil = {
     }
   },
 
-  getBounds(geohash)
+  getGeohashBounds(geohash)
   {
     if (geohash.length === 0)
     {
@@ -259,7 +259,7 @@ const MapUtil = {
   // Given a geohash return the lat and long for it
   decodeGeohash(geohash)
   {
-    const bounds = MapUtil.getBounds(geohash);
+    const bounds = MapUtil.getGeohashBounds(geohash);
     if (bounds === null)
     {
       return null;
@@ -320,6 +320,16 @@ const MapUtil = {
       lon = geopoint[0];
     }
     return [lat, lon];
+  },
+
+  getBounds(points: any)
+  {
+    const geopoints = points.map((point) => MapUtil.getCoordinatesFromGeopoint(point));
+    const latitudes = geopoints.map((geopoint) => geopoint[0]);
+    const longitudes = geopoints.map((geopoint) => geopoint[1]);
+    const bottomRight = [Math.min.apply(null, latitudes), Math.min.apply(null, longitudes)];
+    const topLeft = [Math.max.apply(null, latitudes), Math.max.apply(null, longitudes)];
+    return [bottomRight, topLeft];
   },
 
 };

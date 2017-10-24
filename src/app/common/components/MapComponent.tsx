@@ -69,6 +69,7 @@ export interface Props
   secondLocation?: [number, number] | number[];
   secondAddress?: string;
   bounds?: [number[]];
+  onMapClick?: (event) => void;
 
   onChange?: (value) => void;
   geocoder?: string;
@@ -102,6 +103,7 @@ export interface Props
   boundingRectangles?: BoundingRectangle[];
 
   className?: string;
+  style?: string;
 }
 
 interface LocationData
@@ -634,9 +636,17 @@ class MapComponent extends TerrainComponent<Props>
     return null;
   }
 
+  public handleOnMapClick(event)
+  {
+    if (this.props.onMapClick !== undefined)
+    {
+      this.props.onMapClick(event);
+    }
+  }
+
   public renderMap()
   {
-    const { location, secondLocation } = this.props;
+    const { location, secondLocation, multiLocations } = this.props;
     const address = this.props.address !== undefined && this.props.address !== '' ? this.props.address : this.state.address;
     const primaryMarkerColor = this.props.colorMarker ? Colors().builder.cards.categories.filter : 'black';
     // const secondColor;
@@ -665,19 +675,33 @@ class MapComponent extends TerrainComponent<Props>
         [secondLocation[0] + 0.05, secondLocation[1]]];
       }
     }
+    else if (multiLocations !== undefined && multiLocations.length > 0)
+    {
+      const locations = multiLocations.map((loc) => loc.location);
+      if (location !== undefined)
+      {
+        locations.push(List([location[1], location[0]]));
+      }
+      bounds = MapUtil.getBounds(locations);
+    }
     else
     {
       center = location;
     }
     const mapProps = bounds !== undefined ? { bounds } : { center };
     return (
-      <div className={this.props.className}>
+      <div
+        className={this.props.className}
+      >
         <Map
           {...mapProps}
           zoomControl={this.props.zoomControl}
           zoom={this.state.zoom}
           ref='map'
           onViewportChanged={this.setZoomLevel}
+          onClick={this.handleOnMapClick}
+          onMouseDown={this.handleOnMapClick}
+          style={this.props.style}
         >
           {
             this.props.markLocation ?

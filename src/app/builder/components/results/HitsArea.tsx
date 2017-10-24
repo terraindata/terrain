@@ -50,8 +50,8 @@ import * as Immutable from 'immutable';
 import './HitsArea.less';
 const { Map, List } = Immutable;
 import * as classNames from 'classnames';
-import * as _ from 'lodash';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
 // import * as moment from 'moment';
 const moment = require('moment');
@@ -65,6 +65,7 @@ import Modal from '../../../common/components/Modal';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
+import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
@@ -79,6 +80,8 @@ import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
+
+const ArrowIcon = require('./../../../../images/icon_arrow.svg?name=ArrowIcon');
 
 const HITS_PAGE_SIZE = 20;
 
@@ -110,6 +113,7 @@ interface State
   showingExport?: boolean;
   mapHeight?: number;
   mouseStartY?: number;
+  mapMaxHeight?: number;
 }
 
 @Radium
@@ -124,6 +128,7 @@ class HitsArea extends TerrainComponent<Props>
     hitFormat: 'icon',
     mapHeight: 25,
     mouseStartY: 0,
+    mapMaxHeight: undefined,
   };
 
   public hitsFodderRange = _.range(0, 25);
@@ -259,9 +264,12 @@ class HitsArea extends TerrainComponent<Props>
     $('body').on('mousemove', this.handleMapMouseMove);
     const el = this.refs['map'];
     const cr = el['getBoundingClientRect']();
+    const parentEl = this.refs['resultsarea'];
+    const parentCr = parentEl['getBoundingClientRect']();
     this.setState({
       mapHeight: cr.height,
       mouseStartY: event.pageY,
+      mapMaxHeight: parentCr.height,
     });
   }
 
@@ -274,14 +282,24 @@ class HitsArea extends TerrainComponent<Props>
 
   public handleMapMouseMove(event)
   {
-    const dY = Math.min(300, this.state.mouseStartY - event.pageY);
-    console.log(event.pageY);
-    console.log(this.state.mouseStartY);
-    console.log(dY);
+    // console.log("START", this.state.mouseStartY);
+    // console.log("MOVED TO", event.pageY);
+    const dY = this.state.mouseStartY - event.pageY;
+    const newHeight = dY + this.state.mapHeight;
+    // console.log("NEW HEIGHT", newHeight);
     event.preventDefault();
     event.stopPropagation();
     this.setState({
-      mapHeight: dY,
+      mapHeight: newHeight,
+      mouseStartY: event.pageY,
+    });
+  }
+
+  public handleMapClick(event)
+  {
+    // set to full height
+    this.setState({
+      mapHeight: 300,
     });
   }
 
@@ -292,33 +310,58 @@ class HitsArea extends TerrainComponent<Props>
       return null;
     }
     const mapData = this.buildAggregationMap(this.locations, this.props.resultsState.hits);
+    const maxHeight = this.state.mapMaxHeight === undefined ? 300 : Math.min(300, this.state.mapMaxHeight - 80);
     if (mapData !== undefined && mapData.length > 0)
     {
       return (
         <div
-          className='results-area-map' style={{height: this.state.mapHeight}}
+          className='results-area-map'
+          style={{
+            height: this.state.mapHeight,
+            maxHeight,
+          }}
           ref='map'
         >
-            <div
-              className='results-area-map-topbar'
-              onMouseDown={this.handleMapMouseDown}
+          <div
+            className='results-area-map-topbar'
+            onMouseDown={this.handleMapMouseDown}
+            style={backgroundColor(Colors().active)}
+          >
+            <ArrowIcon
+              style={getStyle('fill', Colors().text1)}
+              className={classNames({
+                'results-area-map-arrow-left': true,
+                'results-area-map-arrow-rotate': this.state.mapHeight <= 25,
+              })}
             />
-            {
-             mapData.map((data, index) =>
-            <MapComponent
-              location={data.target}
-              multiLocations={data.multiLocations}
-              markLocation={true}
-              showSearchBar={false}
-              showDistanceCircle={false}
-              hideSearchSettings={true}
-              zoomControl={true}
-              colorMarker={true}
-              key={index}
+            <span style={fontColor(Colors().text1)}>
+              View Hits on Map
+            </span>
+            <ArrowIcon
+              style={getStyle('fill', Colors().text1)}
+              className={classNames({
+                'results-area-map-arrow-right': true,
+                'results-area-map-arrow-rotate': this.state.mapHeight <= 25,
+              })}
             />
-          )}
+          </div>
+          {
+            mapData.map((data, index) =>
+              <MapComponent
+                location={data.target}
+                multiLocations={data.multiLocations}
+                markLocation={true}
+                showSearchBar={false}
+                showDistanceCircle={false}
+                hideSearchSettings={true}
+                zoomControl={true}
+                colorMarker={true}
+                key={index}
+                className='results-area-map-container'
+                onMapClick={this.handleMapClick}
+              />,
+            )}
         </div>
-        )
       );
     }
     return null;
@@ -731,6 +774,7 @@ column if you have customized the results view.');
           'results-area-config-open': this.state.showingConfig,
           'results-area-table altBg': this.state.hitFormat === 'table',
         })}
+        ref='resultsarea'
       >
         {this.renderTopbar()}
         {this.renderHits()}

@@ -11,14 +11,49 @@
   overflow: hidden;
 
   .results-area-map {
-    max-height: 300px;
     min-height: 25px;
     width: 100%;
     position: absolute;
     bottom: 0px;
+    z-index: 500;
     .results-area-map-topbar {
       height: 25;
-      background: red;
+      border-top-right-radius: 3px;
+      border-top-left-radius: 3px;
+      cursor: pointer;
+      span {
+        position: absolute;
+        top: 4px;
+        left: calc(~"50% - 55px");
+      }
+      .results-area-map-arrow-right, .results-area-map-arrow-left {
+        height: 10px;
+        width: 10px;
+        position: absolute;
+        top: 7px;
+        .rotate180;
+        .transition;
+      }
+      .results-area-map-arrow-left {
+        left: calc(~"50% - 75px");
+      }
+      .results-area-map-arrow-right {
+        left: calc(~"50% + 65px");
+      }
+      .results-area-map-arrow-rotate {
+        top: 9px;
+        .rotate(0);
+      }
+    }
+    .results-area-map-container {
+      .leaflet-container
+      {
+        position: relative;
+        width: 100%;
+        bottom: 0px;
+        min-height: 275px;
+        max-height: 275px;
+      }
     }
   }
 
