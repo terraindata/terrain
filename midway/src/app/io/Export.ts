@@ -172,7 +172,6 @@ export class Export
       {
         exprt.objectKey = objectKeyValue;
       }
-
       let qry: string = '';
 
       // if (this.props.exporting)
@@ -226,10 +225,22 @@ export class Export
         return reject(e);
       }
 
+      if (qryObj['body'] !== undefined && qryObj['body']['size'] !== undefined)
+      {
+        if (typeof qryObj['body']['size'] === 'number' && qryObj['body']['size'] > this.MAX_ROW_THRESHOLD)
+        {
+          qryObj['body']['from'] = 0;
+          qryObj['body']['size'] = this.MAX_ROW_THRESHOLD;
+          qryObj['body']['query'] = { function_score: { random_score: {}, query: qryObj['body']['query'] } };
+        }
+      }
+
       if (typeof mapping === 'string')
       {
         return reject(mapping);
       }
+
+      winston.info(qry);
 
       let rankCounter: number = 1;
       let writer: any;
@@ -311,10 +322,11 @@ export class Export
           }
         }
 
+        winston.info('Beginning export transformations.');
         // transform documents with template
         try
         {
-          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true));
+          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
           for (const doc of returnDocs)
           {
             if (exprt.rank === true)
@@ -348,7 +360,7 @@ export class Export
             writer.write(JSON.stringify(returnDoc));
           }
         }
-        if (Math.min(resp.hits.total, qryObj['size']) > rankCounter - 1)
+        if (Math.min(resp.hits.total, qryObj['body']['size']) > rankCounter - 1)
         {
           elasticClient.scroll({
             scrollId: resp._scroll_id,
@@ -468,7 +480,7 @@ export class Export
       }
       else
       {
-        qrySize = qryObj['body']['size'];
+        qrySize = Math.min(qryObj['body']['size'], maxSize);
       }
       elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
       {
@@ -906,14 +918,6 @@ export class Export
       }
     }
 
-    for (const key of exprt.primaryKeys)
-    {
-      if (obj[key] === '' || obj[key] === null)
-      {
-        return 'Encountered an object with an empty primary key ("' + key + '"): ' + JSON.stringify(obj);
-      }
-    }
-
     return '';
   }
 
@@ -927,7 +931,23 @@ export class Export
   {
     switch (this.NUMERIC_TYPES.has(typeObj['type']) ? 'number' : typeObj['type'])
     {
-      case 'number':
+      case 'double':
+        if (item[field] === '' || item[field] === 'null')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          const parsedValue: number | boolean = typeParser.getDoubleFromString(String(item[field]));
+          if (typeof parsedValue === 'number')
+          {
+            item[field] = parsedValue;
+            return true;
+          }
+          return false;
+        }
+        break;
+      case 'long':
         if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;

@@ -65,7 +65,7 @@ Router.use('/templates', ExportTemplateRouter.routes(), ExportTemplateRouter.all
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const requestObj: object = JSON.parse(ctx.request.body.data).body;
-  Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'dbname', 'filetype', 'query', 'rank', 'transformations']);
+  Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'filetype', 'query', 'rank', 'transformations']);
   const exprtConf: ExportConfig = requestObj as ExportConfig;
 
   await perm.ImportPermissions.verifyExportRoute(ctx.state.user, requestObj);

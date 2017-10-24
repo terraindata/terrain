@@ -437,7 +437,6 @@ FileImportReducers[ActionTypes.exportFile] =
   {
     Ajax.exportFile(
       state.filetype,
-      action.payload.dbName,
       action.payload.serverId,
       Map<string, object>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&

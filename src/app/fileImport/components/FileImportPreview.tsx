@@ -666,17 +666,10 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      const dbName = getIndex('');
 
-      if (dbName === undefined || dbName === '')
-      {
-        this.setPreviewErrorMsg('Index must be selected in order to export results');
-        return;
-      }
       Actions.exportFile(
         stringQuery,
         this.props.serverId,
-        dbName,
         this.props.exportRank,
         this.state.typeObjectKey,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,

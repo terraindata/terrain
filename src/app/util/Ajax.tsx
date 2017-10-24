@@ -813,7 +813,6 @@ export const Ajax =
     },
 
     exportFile(filetype: string,
-      dbname: string,
       serverId: number,
       columnTypes: Immutable.Map<string, object>,
       transformations: Immutable.List<object>,
@@ -827,7 +826,6 @@ export const Ajax =
     {
       const payload: object = {
         dbid: serverId,
-        dbname,
         filetype,
         columnTypes,
         query,

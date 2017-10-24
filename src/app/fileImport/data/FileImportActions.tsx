@@ -116,12 +116,11 @@ const FileImportActions =
       }),
 
     exportFile:
-    (query: string, serverId: number, dbName: string, rank: boolean, objectKey: string, downloadFilename: string,
+    (query: string, serverId: number, rank: boolean, objectKey: string, downloadFilename: string,
       handleFileExportSuccess, handleFileExportError) =>
       $(ActionTypes.exportFile, {
         query,
         serverId,
-        dbName,
         rank,
         objectKey,
         downloadFilename,
