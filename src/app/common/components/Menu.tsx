@@ -147,6 +147,11 @@ export class Menu extends TerrainComponent<Props>
     $(document).off('click', this.close);
   }
 
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.menu-wrapper .menu-icon .st0 ', { fill: Colors().text3 });
+  }
+
   public componentWillUnmount()
   {
     $(document).off('click', this.close);

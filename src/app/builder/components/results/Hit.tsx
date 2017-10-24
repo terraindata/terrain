@@ -391,10 +391,6 @@ export function getResultValue(hit: Hit, field: string, config: ResultsConfig, i
   if (hit)
   {
     value = hit.fields.get(field);
-    if (List.isList(value))
-    {
-      value = JSON.stringify(value);
-    }
   }
   return ResultFormatValue(field, value, config, isTitle, overrideFormat, locations, color);
 }
