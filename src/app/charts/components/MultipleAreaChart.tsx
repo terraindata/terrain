@@ -44,11 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import ContainerDimensions from 'react-container-dimensions';
+import ColorManager from 'util/ColorManager';
 import Util from 'util/Util';
 import
 {
@@ -61,7 +63,6 @@ import
   VictoryLegend,
   VictoryPortal,
   VictoryScatter,
-  VictoryTheme,
   VictoryTooltip,
 } from 'victory';
 
@@ -86,7 +87,7 @@ const styles = {
   },
   bottomChart: {
     padding: { top: 10, bottom: 25, left: 50, right: 0 },
-    areas: { data: { fill: '#c43a31' } },
+    areas: (fill) => ({ data: { fill, fillOpacity: 0.4 } }),
   },
   legend: {
     border: {
@@ -139,8 +140,6 @@ interface State
   datasetColors: any;
 }
 
-const colors = ['blue', 'red', 'green', 'yellow'];
-
 export default class MultipleAreaChart extends TerrainComponent<Props> {
   public static defaultProps = {
     datasets: [],
@@ -172,7 +171,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
     datasets.keySeq().forEach((datasetId, index) =>
     {
-      datasetColors[datasetId] = colors[index % colors.length];
+      datasetColors[datasetId] = ColorManager.colorForKey(datasetId);
     });
 
     return datasetColors;
@@ -294,7 +293,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     const data = datasets
       .map((ds, key) =>
       {
-        let labelsStyle = { fill: this.getDatasetColor(ds.id) };
+        let labelsStyle = { fill: '#444' };
         const dataStyle = { fill: this.getDatasetColor(ds.id) };
 
         if (visibleDatasets.includes(key))
@@ -357,7 +356,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         mutation: (labelProps) =>
         {
           // Changes the VictoryLegend hover item text font size.
-          const newStyle = Object.assign({}, labelProps.style, { fontSize: 16 });
+          const newStyle = Object.assign({}, labelProps.style, { fontSize: 14 });
           return { style: newStyle };
         },
       },
@@ -433,6 +432,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
   public render()
   {
     const { datasets, xDataKey, yDataKey } = this.props;
+
     const data = this.renderData();
     const legend = this.renderLegend();
 
@@ -447,7 +447,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
             <VictoryChart
               domainPadding={{ y: [0, 30] }}
               scale={config.topChart.scale}
-              theme={VictoryTheme.material}
+              theme={TerrainVictoryTheme}
               padding={styles.topChart.padding}
               containerComponent={
                 <VictoryZoomVoronoiContainer
@@ -495,7 +495,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
             <VictoryChart
               scale={config.bottomChart.scale}
               padding={styles.bottomChart.padding}
-              theme={VictoryTheme.material}
+              theme={TerrainVictoryTheme}
               containerComponent={
                 <VictoryBrushContainer responsive={false}
                   brushDimension='x'
@@ -506,7 +506,9 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
             >
               <VictoryAxis />
               <VictoryArea
-                style={styles.bottomChart.areas}
+                style={styles.bottomChart
+                  .areas(this.getDatasetColor(datasets.keySeq().first()))
+                }
                 data={datasets.first() !== null ? datasets.first().data : []}
                 interpolation={config.bottomChart.interpolation}
                 x={xDataKey}

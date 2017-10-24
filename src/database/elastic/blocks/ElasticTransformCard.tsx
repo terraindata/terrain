@@ -116,7 +116,7 @@ export const elasticTransform = _card(
           showWhenCards: true,
           getAutoTerms: (schemaState): List<string> =>
           {
-            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Transform);
           },
         },
         // TODO, in the future, if we allow complicated formulas inside
