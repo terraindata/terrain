@@ -220,7 +220,7 @@ class HitsArea extends TerrainComponent<Props>
   public isQueryEmpty(): boolean
   {
     const { query } = this.props;
-    return !query || (!query.tql && !query.cards.size);
+    return !query || (!query.cards.size);
   }
 
   /*
