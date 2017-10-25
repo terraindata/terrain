@@ -207,6 +207,13 @@ LibraryReducers[ActionTypes.variants.status] =
       .set('changingStatus', false);
   };
 
+  LibraryReducers[ActionTypes.variants.fetchStatusInES] =
+    (state, action) =>
+    {
+      return state
+        .setIn(['variants', action.payload.variantId], action.payload.response);
+    };
+
 LibraryReducers[ActionTypes.variants.move] =
   (state, action) =>
     addVariant(

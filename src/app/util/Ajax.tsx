@@ -489,6 +489,23 @@ export const Ajax =
       // }
     },
 
+    getVariantStatus(variantId: ID,
+      dbid: number,
+      onLoad: (response: any) => void)
+    {
+      const payload = { dbid };
+      return Ajax.req(
+        'get',
+        `items/${variantId}`,
+        payload,
+        (response) =>
+        {
+          onLoad('Test string');
+          // onLoad(response as any);
+        },
+      );
+    },
+
     getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
     {
       return Ajax.req('get', 'versions/items/' + id, {}, (response: any) =>

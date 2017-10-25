@@ -53,6 +53,8 @@ const { List } = Immutable;
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import Util from './../../util/Util';
+import Actions from './../data/LibraryActions';
+import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
 
@@ -72,12 +74,33 @@ const LANGUAGES = Immutable.List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends TerrainComponent<Props>
 {
+  public state: {
+    variantStatusInState: string,
+  } = {
+    variantStatusInState: '',
+  };
+
+  constructor(props)
+  {
+    super(props);
+    this._subscribe(LibraryStore, {
+      stateKey: 'variantStatusInState',
+      storeKeyPath: ['variantStatusInES'],
+    });
+  }
+
+  public fetchStatus()
+  {
+    Actions.variants.fetchStatusInES(this.props.variant);
+  }
+
   public render()
   {
     if (!this.props.variant)
     {
       return null;
     }
+    this.fetchStatus();
 
     const { isBuilder, isSuperUser } = this.props;
     const { variant } = this.props;
@@ -122,6 +145,16 @@ class LibraryInfoColumn extends TerrainComponent<Props>
                   showName={true}
                   link={true}
                 />
+              </div>
+            </div>
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
+                Status
+              </div>
+              <div className='biv-cell-second'>
+                {
+                  this.state.variantStatusInState
+                }
               </div>
             </div>
           </div>
