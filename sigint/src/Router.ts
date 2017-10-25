@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import { Config } from './Config';
+import * as Demo from './Demo';
 import { EventConfig, Events } from './Events';
 
 export class Router
@@ -100,6 +101,11 @@ export class Router
       {
         ctx.body = fs.createReadStream('../analytics.js/build/bundle.js.map');
       }
+    });
+
+    this.appRouter.get('/demo/movies', async (ctx, next) =>
+    {
+      ctx.body = Demo.getMovies(ctx.request);
     });
 
     this.appRouter.use('/v1', this.router.routes(), this.router.allowedMethods());

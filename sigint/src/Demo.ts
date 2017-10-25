@@ -44,88 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as http from 'http';
-import * as Koa from 'koa';
-import serve = require('koa-static-server');
+import * as Elastic from 'elasticsearch';
+import * as fs from 'fs';
 import * as winston from 'winston';
 
-import cors = require('kcors');
+export const indexName = 'movies';
+export const typeName = 'data';
 
-import { CmdLineArgs } from './CmdLineArgs';
-import * as Config from './Config';
-import * as Events from './Events';
-import './Logging';
-import Middleware from './Middleware';
-import { Router } from './Router';
-
-export let CFG: Config.Config;
-
-class App
+export function getMovies(): object[]
 {
-  private static uncaughtExceptionHandler(err: Error): void
-  {
-    winston.error('Uncaught Exception: ' + err.toString());
-    // this is a good place to clean tangled resources
-    process.abort();
-  }
-
-  private static unhandledRejectionHandler(err: Error): void
-  {
-    winston.error('Unhandled Promise Rejection: ' + err.toString());
-  }
-
-  private app: Koa;
-  private config: Config.Config;
-  private heapAvail: number;
-
-  constructor(config: Config.Config = CmdLineArgs)
-  {
-    process.on('uncaughtException', App.uncaughtExceptionHandler);
-    process.on('unhandledRejection', App.unhandledRejectionHandler);
-
-    // first, load config from a config file, if one is specified
-    config = Config.loadConfigFromFile(config);
-
-    winston.debug('Using configuration: ' + JSON.stringify(config));
-    this.config = config;
-    CFG = this.config;
-
-    this.app = new Koa();
-    this.app.proxy = true;
-    this.app.use(async (ctx, next) =>
-    {
-      // tslint:disable-next-line:no-empty
-      ctx.req.setTimeout(0, () => { });
-      await next();
-    });
-    this.app.use(cors());
-
-    this.app.use(Middleware.bodyParser({ jsonLimit: '10gb', formLimit: '10gb' }));
-    this.app.use(Middleware.logger(winston));
-    this.app.use(Middleware.responseTime());
-
-    if (config.demo === true)
-    {
-      winston.info('Demo mode enabled. Demo website will be served at /demo');
-      this.app.use(serve({ rootDir: 'demo', rootPath: '/demo' }));
-    }
-
-    const router = new Router(config);
-    this.app.use(router.routes());
-  }
-
-  public async start(): Promise<http.Server>
-  {
-    await Config.handleConfig(this.config);
-
-    winston.info('Listening on port ' + String(this.config.port));
-    return this.app.listen(this.config.port);
-  }
-
-  public getConfig(): Config.Config
-  {
-    return this.config;
-  }
+  return [];
 }
-
-export default App;
