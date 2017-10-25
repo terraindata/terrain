@@ -179,6 +179,7 @@ class AggregationMap extends TerrainComponent<Props>
     return (
       <MapComponent
         {...props}
+        zoomControl={true}
       />
     );
   }

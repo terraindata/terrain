@@ -74,14 +74,13 @@ import HitsTable from './HitsTable';
 import Radium = require('radium');
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
+import DragHandle from '../../../common/components/DragHandle';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import MapComponent from '../../../common/components/MapComponent';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
-
-const ArrowIcon = require('./../../../../images/icon_arrow.svg?name=ArrowIcon');
 
 const HITS_PAGE_SIZE = 20;
 
@@ -117,6 +116,9 @@ interface State
   spotlightHits?: Immutable.Map<string, any>;
 }
 
+const MAP_MAX_HEIGHT = 300;
+const MAP_MIN_HEIGHT = 25; // height of top bar on map
+
 @Radium
 class HitsArea extends TerrainComponent<Props>
 {
@@ -127,7 +129,7 @@ class HitsArea extends TerrainComponent<Props>
     showingExport: false,
     hitsPages: 1,
     hitFormat: 'icon',
-    mapHeight: 25,
+    mapHeight: MAP_MIN_HEIGHT,
     mouseStartY: 0,
     mapMaxHeight: undefined,
     spotlightHits: Immutable.Map<string, any>({}),
@@ -306,6 +308,8 @@ class HitsArea extends TerrainComponent<Props>
       mouseStartY: event.pageY,
       mapMaxHeight: parentCr.height,
     });
+    event.preventDefault();
+    event.stopPropagation();
   }
 
   public handleMapMouseUp(event)
@@ -313,6 +317,8 @@ class HitsArea extends TerrainComponent<Props>
     $('body').off('mouseup', this.handleMapMouseUp);
     $('body').off('mouseleave', this.handleMapMouseUp);
     $('body').off('mousemove', this.handleMapMouseMove);
+    event.preventDefault();
+    event.stopPropagation();
   }
 
   public handleMapMouseMove(event)
@@ -329,9 +335,11 @@ class HitsArea extends TerrainComponent<Props>
 
   public handleMapClick(event)
   {
+    event.originalEvent.preventDefault();
+    event.originalEvent.stopPropagation();
     // set to full height
     this.setState({
-      mapHeight: 300,
+      mapHeight: MAP_MAX_HEIGHT,
     });
   }
 
@@ -339,28 +347,29 @@ class HitsArea extends TerrainComponent<Props>
   {
     const el = this.refs['map'];
     const cr = el['getBoundingClientRect']();
-    if (cr.height <= 25)
+    if (cr.height <= MAP_MIN_HEIGHT)
     {
       this.setState({
-        mapHeight: 300,
+        mapHeight: MAP_MAX_HEIGHT,
       });
     }
     else
     {
       this.setState({
-        mapHeight: 25,
+        mapHeight: MAP_MIN_HEIGHT,
       });
     }
   }
 
   public renderHitsMap()
   {
-    if (_.keys(this.locations).length === 0 || this.state.hitFormat === 'table')
+    if (_.keys(this.locations).length === 0)
     {
       return null;
     }
     const mapData = this.buildAggregationMap(this.locations, this.props.resultsState.hits);
-    const maxHeight = this.state.mapMaxHeight === undefined ? 300 : Math.min(300, this.state.mapMaxHeight - 80);
+    const maxHeight = this.state.mapMaxHeight === undefined ? MAP_MAX_HEIGHT :
+      Math.min(MAP_MAX_HEIGHT, this.state.mapMaxHeight - 80);
     if (mapData !== undefined && mapData.length > 0)
     {
       return (
@@ -374,27 +383,20 @@ class HitsArea extends TerrainComponent<Props>
         >
           <div
             className='results-area-map-topbar'
-            onMouseDown={this.handleMapMouseDown}
-            style={backgroundColor(Colors().active)}
-            onDoubleClick={this.toggleMapOpen}
+            onMouseUp={this.toggleMapOpen}
+            style={backgroundColor(localStorage.getItem('theme') === 'DARK' ? Colors().bg3 : Colors().bg2)}
           >
-            <ArrowIcon
-              style={getStyle('fill', Colors().text1)}
-              className={classNames({
-                'results-area-map-arrow-left': true,
-                'results-area-map-arrow-rotate': this.state.mapHeight <= 25,
-              })}
-            />
+            <div
+              onMouseDown={this.handleMapMouseDown}
+              className='results-area-map-handle-wrapper'
+            >
+              <DragHandle
+                key={'results-area-map-handle'}
+              />
+            </div>
             <span style={fontColor(Colors().text1)}>
               View Hits on Map
             </span>
-            <ArrowIcon
-              style={getStyle('fill', Colors().text1)}
-              className={classNames({
-                'results-area-map-arrow-right': true,
-                'results-area-map-arrow-rotate': this.state.mapHeight <= 25,
-              })}
-            />
           </div>
           {
             mapData.map((data, index) =>
@@ -500,6 +502,8 @@ class HitsArea extends TerrainComponent<Props>
             onExpand={this.handleExpand}
             hitsLoading={resultsState.loading}
             allowSpotlights={this.props.allowSpotlights}
+            onSpotlightAdded={this.handleSpotlightAdded}
+            onSpotlightRemoved={this.handleSpotlightRemoved}
           />
         </div>
       );
@@ -571,11 +575,11 @@ class HitsArea extends TerrainComponent<Props>
         </InfiniteScroll>
       );
     }
-
+    const mapHeight = Math.min(this.state.mapHeight, MAP_MAX_HEIGHT);
     return (
       <div
         className='results-area-results-wrapper'
-        style={{ height: `calc(100% - ${this.state.mapHeight + 24}px)` }}
+        style={{ height: `calc(100% - ${mapHeight + 24}px)` }}
       >
         {
           hitsContent
