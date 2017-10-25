@@ -376,7 +376,7 @@ class Library extends TerrainComponent<any>
                   /> : (
                     <div className='library-analytics-error'>
                       <p>An error occurred while fetching the analytics data</p>
-                      <ul>{analytics.errors.map((e) => <li>* {e}</li>)}</ul>
+                      <ul>{analytics.errors.map((e, i) => <li key={i}>* {e}</li>)}</ul>
                     </div>)
                 ) :
                 <Loading
