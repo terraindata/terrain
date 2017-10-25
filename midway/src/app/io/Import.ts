@@ -63,26 +63,21 @@ import * as Tasty from '../../tasty/Tasty';
 import { ItemConfig, Items } from '../items/Items';
 import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
-import { ExportTemplateConfig, ImportTemplateBase, ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
+import { ImportTemplateConfig, ImportTemplates } from './templates/ImportTemplates';
+import { TemplateBase } from './templates/Templates';
+
 const importTemplates = new ImportTemplates();
 
 const TastyItems: Items = new Items();
 const typeParser: SharedUtil.CSVTypeParser = new SharedUtil.CSVTypeParser();
 
-export interface ImportConfig extends ImportTemplateBase
+export interface ImportConfig extends TemplateBase
 {
   file: stream.Readable;
-  filetype: string;     // either 'json' or 'csv'
+  filetype: string;
   isNewlineSeparatedJSON?: boolean;      // defaults to false
   requireJSONHaveAllFields?: boolean;    // defaults to true
   update: boolean;      // false means replace (instead of update) ; default should be true
-}
-
-export interface ExportConfig extends ImportConfig, ExportTemplateConfig
-{
-  filetype: string;
-  rank?: boolean;
-  objectKey?: string;
 }
 
 export class Import
@@ -101,6 +96,7 @@ export class Import
     double: new Set(['text', 'double']),
     boolean: new Set(['text', 'boolean']),
     date: new Set(['text', 'date']),
+    geo_point: new Set(['array', 'geo_point']),
     // object: new Set(['object', 'nested']),
     // nested: new Set(['nested']),
   };
@@ -115,242 +111,6 @@ export class Import
   private chunkCount: number;
   private chunkQueue: object[];
   private nextChunk: string;
-
-  public async export(exprt: ExportConfig, headless: boolean): Promise<stream.Readable | string>
-  {
-    return new Promise<stream.Readable | string>(async (resolve, reject) =>
-    {
-      const database: DatabaseController | undefined = DatabaseRegistry.get(exprt.dbid);
-      if (database === undefined)
-      {
-        return reject('Database "' + exprt.dbid.toString() + '" not found.');
-      }
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File export currently is only supported for Elastic databases.');
-      }
-      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-
-      const dbSchema: Tasty.Schema = await database.getTasty().schema();
-
-      if (exprt.filetype !== 'csv' && exprt.filetype !== 'json' && exprt.filetype !== 'json [type object]')
-      {
-        return reject('Filetype must be either CSV or JSON.');
-      }
-      if (exprt.filetype === 'json [type object]' && exprt.objectKey === undefined)
-      {
-        return reject('Must provide an object key if exporting in json [type object] format.');
-      }
-      if (headless)
-      {
-        // get a template given the template ID
-        const templates: ImportTemplateConfig[] = await importTemplates.getExport(exprt.templateId);
-        if (templates.length === 0)
-        {
-          return reject('Template not found. Did you supply an export template ID?');
-        }
-        const template = templates[0] as object;
-        if (exprt.dbid !== template['dbid'])
-        {
-          return reject('Template database ID does not match supplied database ID.');
-        }
-        for (const templateKey of Object.keys(template))
-        {
-          exprt[templateKey] = template[templateKey];
-        }
-      }
-
-      let qry: string = '';
-      // get query data from variantId or query
-      if (exprt.variantId !== undefined && exprt.query === undefined)
-      {
-        const variants: ItemConfig[] = await TastyItems.get(exprt.variantId);
-        if (variants.length === 0)
-        {
-          return reject('Variant not found.');
-        }
-        if (variants[0]['meta'] !== undefined)
-        {
-          const variantMeta: object = JSON.parse(variants[0]['meta'] as string);
-          if (variantMeta['query'] !== undefined && variantMeta['query']['tql'] !== undefined)
-          {
-            qry = variantMeta['query']['tql'];
-          }
-        }
-      }
-      else if (exprt.variantId === undefined && exprt.query !== undefined)
-      {
-        qry = exprt.query;
-      }
-      else
-      {
-        return reject('Must provide either variant ID or query, not both or neither.');
-      }
-      if (qry === '')
-      {
-        return reject('Empty query provided.');
-      }
-
-      let qryObj: object;
-      try
-      {
-        qryObj = JSON.parse(qry);
-      }
-      catch (e)
-      {
-        return reject(e);
-      }
-
-      if (qryObj['index'] === '')
-      {
-        return reject('Must provide an index.');
-      }
-      if (qryObj['index'] !== exprt['dbname'])
-      {
-        return reject('Query index name does not match supplied index name.');
-      }
-      const tableName: string = qryObj['type'] !== '' ? qryObj['type'] : undefined;
-      let rankCounter: number = 1;
-      let writer: any;
-      if (exprt.filetype === 'csv')
-      {
-        writer = csvWriter();
-      }
-      else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-      {
-        writer = new stream.PassThrough();
-      }
-      const pass = new stream.PassThrough();
-      writer.pipe(pass);
-
-      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-      {
-        if (exprt.filetype === 'json [type object]')
-        {
-          writer.write('{ \"');
-          writer.write(exprt.objectKey);
-          writer.write('\":');
-        }
-        writer.write('[');
-      }
-
-      qryObj['scroll'] = this.SCROLL_TIMEOUT;
-      let errMsg: string = '';
-      let isFirstJSONObj: boolean = true;
-      elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
-      {
-        if (resp.hits === undefined || resp.hits.total === 0)
-        {
-          writer.end();
-          errMsg = 'Nothing to export.';
-          return reject(errMsg);
-        }
-        const newDocs: object[] = resp.hits.hits as object[];
-        if (newDocs.length === 0)
-        {
-          writer.end();
-          return resolve(pass);
-        }
-        let returnDocs: object[] = [];
-
-        const fieldArrayDepths: object = {};
-        for (const doc of newDocs)
-        {
-          // verify schema mapping with documents and fix documents accordingly
-          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname, tableName);
-          if (typeof newDoc === 'string')
-          {
-            writer.end();
-            errMsg = newDoc;
-            return reject(errMsg);
-          }
-          for (const field of Object.keys(newDoc))
-          {
-            if (newDoc[field] !== null && newDoc[field] !== undefined)
-            {
-              if (fieldArrayDepths[field] === undefined)
-              {
-                fieldArrayDepths[field] = new Set<number>();
-              }
-              fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
-            }
-            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
-            {
-              newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
-            }
-          }
-          returnDocs.push(newDoc as object);
-        }
-        for (const field of Object.keys(fieldArrayDepths))
-        {
-          if (fieldArrayDepths[field].size > 1)
-          {
-            errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
-            return reject(errMsg);
-          }
-        }
-
-        // transform documents with template
-        try
-        {
-          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true));
-          for (const doc of returnDocs)
-          {
-            if (exprt.rank === true)
-            {
-              if (doc['terrainRank'] !== undefined)
-              {
-                errMsg = 'Conflicting field: terrainRank.';
-                return reject(errMsg);
-              }
-              doc['terrainRank'] = rankCounter;
-            }
-            rankCounter++;
-          }
-        } catch (e)
-        {
-          writer.end();
-          errMsg = e;
-          return reject(errMsg);
-        }
-
-        // export to csv
-        for (const returnDoc of returnDocs)
-        {
-          if (exprt.filetype === 'csv')
-          {
-            writer.write(returnDoc);
-          }
-          else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-          {
-            isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-            writer.write(JSON.stringify(returnDoc));
-          }
-        }
-        if (Math.min(resp.hits.total, qryObj['size']) > rankCounter - 1)
-        {
-          elasticClient.scroll({
-            scrollId: resp._scroll_id,
-            scroll: this.SCROLL_TIMEOUT,
-          }, getMoreUntilDone);
-        }
-        else
-        {
-          if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-          {
-            writer.write(']');
-            if (exprt.filetype === 'json [type object]')
-            {
-              writer.write('}');
-            }
-          }
-          writer.end();
-          resolve(pass);
-        }
-      }.bind(this),
-      );
-    });
-  }
 
   public async upsert(files: stream.Readable[] | stream.Readable, fields: object, headless: boolean): Promise<ImportConfig>
   {
@@ -405,13 +165,12 @@ export class Import
       let imprtConf: ImportConfig;
       if (headless)
       {
-        const templates: ImportTemplateConfig[] = await importTemplates.getImport(Number(fields['templateId']));
+        const templates: ImportTemplateConfig[] = await importTemplates.get(Number(fields['templateId']));
         if (templates.length === 0)
         {
           return reject('Invalid template ID provided: ' + String(fields['templateId']));
         }
         const template: ImportTemplateConfig = templates[0];
-
         imprtConf = {
           columnTypes: template['columnTypes'],
           dbid: template['dbid'],
@@ -419,6 +178,7 @@ export class Import
           file,
           filetype: fields['filetype'],
           isNewlineSeparatedJSON,
+          name: template['name'],
           originalNames: template['originalNames'],
           primaryKeyDelimiter: template['primaryKeyDelimiter'],
           primaryKeys: template['primaryKeys'],
@@ -444,6 +204,7 @@ export class Import
             file,
             filetype: fields['filetype'],
             isNewlineSeparatedJSON,
+            name: fields['name'],
             originalNames,
             primaryKeyDelimiter: fields['primaryKeyDelimiter'] === undefined ? '-' : fields['primaryKeyDelimiter'],
             primaryKeys,
@@ -811,7 +572,7 @@ export class Import
       const dateColumns: string[] = [];
       for (const colName of Object.keys(imprt.columnTypes))
       {
-        if (imprt.columnTypes.hasOwnProperty(colName) && this._getESType(imprt.columnTypes[colName]) === 'date')
+        if (imprt.columnTypes.hasOwnProperty(colName) && this._getESType(imprt.columnTypes[colName])['type'] === 'date')
         {
           dateColumns.push(colName);
         }
@@ -972,6 +733,32 @@ export class Import
           }
         }
         break;
+      case 'geo_point':
+        if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          try
+          {
+            if (typeof item[field] === 'string')
+            {
+              item[field] = JSON.parse(item[field]);
+            }
+          } catch (e)
+          {
+            return false;
+          }
+          if (Array.isArray(item[field]))
+          {
+            if (item[field].length !== 2 || typeof item[field][0] !== 'number' || typeof item[field][1] !== 'number')
+            {
+              return false;
+            }
+          }
+        }
+        break;
       default:  // "text" case, leave as string
     }
     return true;
@@ -1026,16 +813,25 @@ export class Import
 
   /* return ES type from type specification format of ImportConfig
    * typeObject: contains "type" field (string), and "innerType" field (object) in the case of array/object types */
-  private _getESType(typeObject: object, withinArray: boolean = false): string
+  private _getESType(typeObject: object, withinArray: boolean = false, isIndexAnalyzed?: string, typeAnalyzer?: string): object
   {
     switch (typeObject['type'])
     {
       case 'array':
-        return this._getESType(typeObject['innerType'], true);
+        return this._getESType(typeObject['innerType'], true,
+          typeObject['index'] !== undefined ? typeObject['index'] : isIndexAnalyzed,
+          typeObject['analyzer'] !== undefined ? typeObject['analyzer'] : typeAnalyzer);
       case 'object':
-        return withinArray ? 'nested' : 'object';
+        return withinArray ? (typeObject['index'] === 'analyzed' ?
+          { type: 'nested', index: typeObject['index'], analyzer: typeObject['analyzer'] } :
+          { type: 'nested', index: typeObject['index'] })
+          : (typeObject['index'] === 'analyzed' ?
+            { type: 'object', index: typeObject['index'], analyzer: typeObject['analyzer'] } :
+            { type: 'object', index: typeObject['index'] });
       default:
-        return typeObject['type'];
+        return typeObject['index'] === 'analyzed' ?
+          { type: typeObject['type'], index: typeObject['index'], analyzer: typeObject['analyzer'] } :
+          { type: typeObject['type'], index: typeObject['index'] };
     }
   }
 
@@ -1092,17 +888,21 @@ export class Import
     const body: object = {};
     for (const key of Object.keys(mapping))
     {
-      if (mapping.hasOwnProperty(key) && key !== '__isNested__')
+      if (mapping.hasOwnProperty(key) && key !== '__isNested__' && mapping[key].hasOwnProperty('type'))
       {
-        if (typeof mapping[key] === 'string')
+        if (typeof mapping[key]['type'] === 'string')
         {
-          body[key] = { type: mapping[key] };
+          body[key] = { type: mapping[key]['type'], index: mapping[key]['index'] };
+          if (body[key]['index'] === 'analyzed')
+          {
+            body[key]['analyzer'] = mapping[key]['analyzer'];
+          }
           if (mapping[key] === 'text')
           {
             body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256 } };
           }
         }
-        else if (typeof mapping[key] === 'object')
+        else if (typeof mapping[key]['type'] === 'object')
         {
           body[key] = this._getMappingForSchemaHelper(mapping[key]);
         }
@@ -1388,9 +1188,16 @@ export class Import
             counter++;
             if (counter === this.chunkCount)
             {
-              await this._deleteStreamingTempFolder();
-              winston.info('File Import: deleted streaming temp folder.');
-              resolve();
+              try
+              {
+                await this._deleteStreamingTempFolder();
+                winston.info('File Import: deleted streaming temp folder.');
+                resolve();
+              }
+              catch (e)
+              {
+                reject(e);
+              }
             }
             thisResolve();
           }));
@@ -1399,7 +1206,7 @@ export class Import
   }
 
   /* asynchronously perform transformations on each item to upsert, and check against expected resultant types */
-  private async _transformAndCheck(allItems: object[], imprt: ImportConfig | ExportConfig,
+  private async _transformAndCheck(allItems: object[], imprt: ImportConfig,
     dontCheck?: boolean): Promise<object[][]>
   {
     const promises: Array<Promise<object[]>> = [];

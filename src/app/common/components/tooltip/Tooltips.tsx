@@ -60,6 +60,10 @@ import { backgroundColor, borderColor, Colors, fontColor } from './../../../colo
 
 import './Tooltips.less';
 
+const tooltipTitleStyle = { maxWidth: '400px', display: 'inline-block' };
+// tooltipMaxWidth makes text-only tooltips have a consistent size
+// tippy-popper's max-width is 400 by default but we override it so that large html tooltips work.
+
 function assertUnreachable(param: never): never
 {
   throw new Error('Unreachable code reached');
@@ -259,7 +263,6 @@ export interface TooltipProps
   arrowSize?: 'small' | 'regular' | 'big';
   animateFill?: boolean;
   duration?: number;
-  hideDuration?: number;
   distance?: number;
   offset?: number; // appears to be inconsistent when over inline lements
   hideOnClick?: boolean | 'persistent';
@@ -276,7 +279,7 @@ export interface TooltipProps
   theme?: Theme;
   className?: string;
   style?: any;
-  key?: any;
+  key?: any; // not naturally a react-tippy option
 }
 
 export const defaultProps: TooltipProps = {
@@ -285,9 +288,9 @@ export const defaultProps: TooltipProps = {
   theme: 'alt',
   animation: 'shift',
   position: 'top-start',
-  delay: 100,
+  delay: 600,
   duration: 200,
-  hideDuration: 200,
+  hideDelay: 0,
 };
 
 export function generateThemeStyles()
@@ -306,24 +309,29 @@ export function generateThemeStyles()
 
 export function tooltip(innerComponent: any, options: TooltipProps | string)
 {
-  if (options === undefined || options === '')
+  if (options === undefined || options === '') // don't wrap with tooltip if options is not provided
   {
     return innerComponent;
   }
   else if (typeof options === 'string')
   {
     const props: TooltipProps = { ...defaultProps };
-    props.title = options;
+    props.html = <span style={tooltipTitleStyle}> {options} </span>;
     return <Tooltip children={innerComponent} {...props} />;
   }
   else if ((options.title === '' || options.title === undefined || options.title === null)
     && (options.html === null || options.html === undefined))
-  {
+  { // don't wrap with a tooltip if no title or html is provided
     return innerComponent;
   }
   else
   {
     const props = _.defaults({}, options, defaultProps);
+    if (props.html === undefined || props.html === null)
+    {
+      props.html = <span style={tooltipTitleStyle}> {props.title} </span>;
+      props.title = undefined;
+    }
     return <Tooltip children={innerComponent} {...props} />;
   }
 }

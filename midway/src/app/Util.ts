@@ -51,8 +51,9 @@ import * as request from 'request';
 import * as rimraf from 'rimraf';
 import * as sha1 from 'sha1';
 
-import { templates } from './import/ImportTemplateRouter';
-import { ImportTemplateConfig } from './import/ImportTemplates';
+import { exportTemplates } from './io/templates/ExportTemplateRouter';
+import { importTemplates } from './io/templates/ImportTemplateRouter';
+import { ImportTemplateConfig } from './io/templates/ImportTemplates';
 import { UserConfig, Users } from './users/Users';
 
 const users = new Users();
@@ -83,8 +84,11 @@ export async function authenticatePersistentAccessToken(req: object): Promise<ob
     {
       return reject('Missing one or more auth fields.');
     }
-    const template: ImportTemplateConfig[] =
-      await templates.loginWithPersistentAccessToken(Number(req['templateId']), req['persistentAccessToken']);
+    const importTemplate: object[] =
+      await importTemplates.loginWithPersistentAccessToken(Number(parseInt(req['templateId'], 10)), req['persistentAccessToken']);
+    const exportTemplate: object[] =
+      await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(req['templateId'], 10)), req['persistentAccessToken']);
+    const template = importTemplate.concat(exportTemplate);
     if (template.length === 0)
     {
       return resolve({ template: null });
@@ -102,8 +106,11 @@ export async function authenticateStreamPersistentAccessToken(req: http.Incoming
     {
       return reject(`Missing one or more auth fields. ${fields['templateId']} , ${fields['persistentAccessToken']}`);
     }
-    const template: ImportTemplateConfig[] =
-      await templates.loginWithPersistentAccessToken(Number(fields['templateId']), fields['persistentAccessToken']);
+    const importTemplate: object[] =
+      await importTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
+    const exportTemplate: object[] =
+      await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
+    const template = importTemplate.concat(exportTemplate);
     if (template.length === 0)
     {
       return resolve({ files, fields, template: null });

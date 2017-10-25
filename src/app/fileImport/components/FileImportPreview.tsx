@@ -52,6 +52,8 @@ import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
+
+import { getIndex, getType } from 'database/elastic/blocks/ElasticBlockHelpers';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
@@ -147,6 +149,9 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalTitle: string,
     responseModalError: boolean,
     previewErrorMsg: string,
+    analyzers: List<string>,
+    exportColumnNames: List<string>,
+    exportColumnTypes: List<object>,
   } = {
     templateOptions: List([]),
     appliedTemplateName: '',
@@ -175,25 +180,48 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalTitle: '',
     responseModalError: false,
     previewErrorMsg: '',
+    analyzers: List([]),
+    exportColumnNames: List([]),
+    exportColumnTypes: List([]),
   };
 
   public confirmedLeave: boolean = false;
+
+  constructor(props)
+  {
+    super(props);
+    this._subscribe(FileImportStore, {
+      stateKey: 'analyzers',
+      storeKeyPath: ['columnAnalyzers'],
+    });
+    this._subscribe(FileImportStore, {
+      stateKey: 'exportColumnNames',
+      storeKeyPath: ['columnNames'],
+    });
+    this._subscribe(FileImportStore, {
+      stateKey: 'exportColumnTypes',
+      storeKeyPath: ['columnTypes'],
+    });
+  }
 
   public componentDidMount()
   {
     if (this.props.exporting)
     {
+      const dbName = getIndex('');
+      const tableName = getType('');
+      Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
       const parsedQuery = JSON.parse(stringQuery);
-      const dbName = parsedQuery['index'];
-      const tableName = parsedQuery['type'];
-      Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
+      Actions.fetchTypesFromQuery(this.props.serverId, parsedQuery);
     } // Parse the TQL and set the filters so that when we fetch we get the right templates.
+
+    Actions.fetchColumnAnalyzers();
 
     Actions.fetchTemplates(this.props.exporting);
     this.setState({
-      templateOptions: this.props.templates.map((template, i) => template.templateName),
+      templateOptions: this.props.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
     });
 
     if (!this.props.exporting && this.props.router !== undefined)
@@ -396,11 +424,8 @@ class FileImportPreview extends TerrainComponent<Props>
     }
     if (this.props.exporting)
     {
-      const stringQuery: string =
-        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      const parsedQuery = JSON.parse(stringQuery);
-      const dbName = parsedQuery['index'];
-      const tableName = parsedQuery['type'];
+      const dbName = getIndex('');
+      const tableName = getType('');
       Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess,
         this.props.serverId, dbName, tableName);
     }
@@ -641,18 +666,10 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      const parsedQuery = JSON.parse(stringQuery);
-      const dbName = parsedQuery['index'];
 
-      if (dbName === undefined || dbName === '')
-      {
-        this.setPreviewErrorMsg('Index must be selected in order to export results');
-        return;
-      }
       Actions.exportFile(
         stringQuery,
         this.props.serverId,
-        dbName,
         this.props.exportRank,
         this.state.typeObjectKey,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,
@@ -1037,6 +1054,7 @@ class FileImportPreview extends TerrainComponent<Props>
         columnNames={this.props.columnNames}
         isIncluded={this.props.columnsToInclude.get(key)}
         columnType={this.props.columnTypes.get(key)}
+        analyzers={this.state.analyzers}
         isPrimaryKey={this.props.exporting ? null : this.props.primaryKeys.includes(key)}
         columnOptions={this.props.columnOptions}
         exporting={this.props.exporting}

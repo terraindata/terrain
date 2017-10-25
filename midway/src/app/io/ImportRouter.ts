@@ -53,11 +53,14 @@ import { HA } from '../App';
 import { Permissions } from '../permissions/Permissions';
 import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
-import { ExportConfig, Import } from './Import';
+import { Import } from './Import';
+import ImportTemplateRouter from './templates/ImportTemplateRouter';
 
 const Router = new KoaRouter();
 export const imprt: Import = new Import();
 const perm: Permissions = new Permissions();
+
+Router.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.allowedMethods());
 
 Router.post('/', async (ctx, next) =>
 {
@@ -77,41 +80,20 @@ Router.post('/', async (ctx, next) =>
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], false);
 });
 
-Router.post('/export', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/analyzers', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const requestObj: object = JSON.parse(ctx.request.body.data).body;
-  Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'dbname', 'filetype', 'query', 'rank', 'transformations']);
-  const exprtConf: ExportConfig = requestObj as ExportConfig;
-
-  await perm.ImportPermissions.verifyExportRoute(ctx.state.user, requestObj);
-
-  const exportReturn: stream.Readable | string = await imprt.export(exprtConf, false);
-
-  ctx.type = 'text/plain';
-  ctx.attachment(ctx.request.body.filename);
-  ctx.body = exportReturn;
+  let allAnalyzers: string[] = ['standard', 'simple', 'whitespace', 'stop', 'keyword', 'pattern', 'english', 'fingerprint'];
+  if (ctx.query.index !== undefined)
+  {
+    const newAnalyzers: string[] = [];
+    allAnalyzers = allAnalyzers.concat(newAnalyzers);
+  }
+  ctx.body = allAnalyzers;
 });
 
-Router.post('/export/headless', async (ctx, next) =>
+Router.post('/analyzers', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const exprtConf: ExportConfig = ctx.request.body.body;
-  const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.body);
-  if (authStream['template'] === null)
-  {
-    ctx.status = 400;
-    return;
-  }
-  Util.verifyParameters(exprtConf, ['templateId']);
-
-  if (exprtConf.templateId !== authStream['template']['id'])
-  {
-    ctx.body = 'Authenticating template ID does not match export template ID.';
-  }
-  else
-  {
-    const exportReturn: stream.Readable | string = await imprt.export(exprtConf, true);
-    ctx.body = exportReturn;
-  }
+  ctx.body = '';
 });
 
 Router.post('/headless', async (ctx, next) =>
@@ -124,7 +106,6 @@ Router.post('/headless', async (ctx, next) =>
     return;
   }
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
-
   // optional parameters: hasCsvHeader, isNewlineSeparatedJSON, requireJSONHaveAllFields, update
   ctx.body = await imprt.upsert(authStream['files'], authStream['fields'], true);
 });

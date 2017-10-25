@@ -59,19 +59,21 @@ const ControlActions =
     importExport:
     {
       setTemplates:
-      (templates: List<Template>) =>
-        $(ActionTypes.importExport.setTemplates, { templates }),
+      (templates: List<Template>, exporting: boolean) =>
+        $(ActionTypes.importExport.setTemplates, { templates, exporting }),
 
       fetchTemplates:
-      () =>
+      (exporting: boolean) =>
         $(ActionTypes.importExport.fetchTemplates, {
+          exporting,
           setTemplates: ControlActions.importExport.setTemplates,
         }),
 
       deleteTemplate:
-      (templateId: number, handleDeleteTemplateSuccess, handleDeleteTemplateError, templateName: string) =>
+      (templateId: number, exporting: boolean, handleDeleteTemplateSuccess, handleDeleteTemplateError, templateName: string) =>
         $(ActionTypes.importExport.deleteTemplate, {
           templateId,
+          exporting,
           handleDeleteTemplateSuccess,
           handleDeleteTemplateError,
           fetchTemplates: ControlActions.importExport.fetchTemplates,
@@ -79,9 +81,10 @@ const ControlActions =
         }),
 
       resetTemplateToken:
-      (templateId: number, handleResetSuccess, handleResetError) =>
+      (templateId: number, exporting: boolean, handleResetSuccess, handleResetError) =>
         $(ActionTypes.importExport.resetTemplateToken, {
           templateId,
+          exporting,
           handleResetSuccess,
           handleResetError,
           fetchTemplates: ControlActions.importExport.fetchTemplates,

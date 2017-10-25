@@ -236,7 +236,7 @@ FileImportReducers[ActionTypes.setTypeObjectKey] =
   (state, action) =>
     state
       .set('isDirty', true)
-      .set('objectKey', action.payload.setTypeObjectKey)
+      .set('objectKey', action.payload.typeObjectKey)
   ;
 
 FileImportReducers[ActionTypes.changePrimaryKey] =
@@ -297,6 +297,70 @@ FileImportReducers[ActionTypes.setColumnType] =
       .set('isDirty', true)
       .setIn(keyPath, action.payload.type);
   };
+
+FileImportReducers[ActionTypes.setColumnTypes] =
+  (state, action) =>
+  {
+    const { previewColumns, columnNames } = state;
+    return state
+      .set('columnTypes', List(columnNames.map((colName) =>
+        action.payload.newColumnTypes[colName] ?
+          FileImportTypes._ColumnTypesTree(action.payload.newColumnTypes[colName])
+          :
+          FileImportTypes._ColumnTypesTree())));
+  };
+
+FileImportReducers[ActionTypes.fetchTypesFromQuery] =
+  (state, action) =>
+  {
+    Ajax.getTypesFromQuery(
+      state.serverId,
+      action.payload.query,
+      (namesAndTypes) =>
+      {
+        action.payload.setColumnTypes(namesAndTypes);
+      });
+    return state;
+  };
+
+FileImportReducers[ActionTypes.setColumnTypeIndex] =
+  (state, action) =>
+  {
+    const keyPath = ['columnTypes', action.payload.columnId];
+    keyPath.push('index');
+    return state
+      .set('isDirty', true)
+      .setIn(keyPath, action.payload.index);
+  };
+
+FileImportReducers[ActionTypes.setColumnTypeAnalyzer] =
+  (state, action) =>
+  {
+    const keyPath = ['columnTypes', action.payload.columnId];
+    keyPath.push('analyzer');
+    return state
+      .set('isDirty', true)
+      .setIn(keyPath, action.payload.analyzer);
+  };
+
+FileImportReducers[ActionTypes.fetchColumnAnalyzers] =
+  (state, action) =>
+  {
+    Ajax.getAnalyzers(
+      state.dbName,
+      (analyzerArr) =>
+      {
+        const analyzers: List<string> = List<string>(analyzerArr);
+        action.payload.setAnalyzers(analyzers);
+      },
+    );
+    return state;
+  };
+
+FileImportReducers[ActionTypes.setAnalyzers] =
+  (state, action) =>
+    state.set('columnAnalyzers', action.payload.analyzers)
+  ;
 
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
@@ -373,7 +437,6 @@ FileImportReducers[ActionTypes.exportFile] =
   {
     Ajax.exportFile(
       state.filetype,
-      action.payload.dbName,
       action.payload.serverId,
       Map<string, object>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&
@@ -404,7 +467,8 @@ FileImportReducers[ActionTypes.setTemplates] =
 FileImportReducers[ActionTypes.saveTemplate] =
   (state, action) =>
   {
-    const { serverId, dbName, tableName } = action.payload;
+    const { serverId, dbName, tableName, objectKey } = action.payload;
+
     Ajax.saveTemplate(
       dbName !== undefined ? dbName : state.dbName,
       tableName !== undefined ? tableName : state.tableName,
@@ -419,6 +483,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       action.payload.templateName,
       action.payload.exporting,
       state.primaryKeyDelimiter,
+      state.objectKey,
       () =>
       {
         action.payload.handleTemplateSaveSuccess();
@@ -461,7 +526,9 @@ FileImportReducers[ActionTypes.updateTemplate] =
 FileImportReducers[ActionTypes.deleteTemplate] =
   (state, action) =>
   {
-    Ajax.deleteTemplate(action.payload.templateId,
+    Ajax.deleteTemplate(
+      action.payload.templateId,
+      action.payload.exporting,
       () =>
       {
         action.payload.handleDeleteTemplateSuccess(action.payload.templateName);
@@ -487,7 +554,7 @@ FileImportReducers[ActionTypes.fetchTemplates] =
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
           FileImportTypes._Template({
-            export: template['export'],
+            export: action.payload.exporting,
             templateId: template['id'],
             templateName: template['name'],
             originalNames: List<string>(template['originalNames']),

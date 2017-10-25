@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, Colors } from '../../colors/Colors';
@@ -58,6 +59,7 @@ export interface Props
   onChange: (selected: number) => void;
   small?: boolean;
   medium?: boolean;
+  darker?: boolean;
 }
 
 @Radium
@@ -83,7 +85,7 @@ class Switch extends TerrainComponent<Props>
       <div
         className={classes}
         onClick={this.handleSwitch}
-        style={SWITCH_STYLE}
+        style={this.props.darker ? SWITCH_DARKER_STYLE : SWITCH_STYLE}
       >
         <div
           className='switch-on'
@@ -118,6 +120,10 @@ const SWITCH_STYLE = {
     color: Colors().text1,
   },
 };
+
+const SWITCH_DARKER_STYLE = _.extend({}, SWITCH_STYLE, {
+  backgroundColor: Colors().bg1,
+});
 
 const ACTIVE_SECTION_STYLE = {
   color: '#fff',

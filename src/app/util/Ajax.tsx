@@ -705,6 +705,42 @@ export const Ajax =
       );
     },
 
+    getAnalyzers(
+      index: string,
+      onLoad: (resp: object) => void,
+      onError?: (resp: any) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'get',
+        'import/analyzers',
+        { index },
+        (response) =>
+        {
+          let responseData: object = null;
+          try
+          {
+            responseData = response;
+          }
+          catch (e)
+          {
+            onError && onError(e.message);
+          }
+
+          if (responseData !== undefined)
+          {
+            // needs to be outside of the try/catch so that any errors it throws aren't caught
+            onLoad(responseData);
+          }
+        },
+      );
+      return;
+    },
+
     getStreamingProgress(onLoad: (resp: any) => void,
       onError: (resp: any) => void,
     )
@@ -794,7 +830,6 @@ export const Ajax =
     },
 
     exportFile(filetype: string,
-      dbname: string,
       serverId: number,
       columnTypes: Immutable.Map<string, object>,
       transformations: Immutable.List<object>,
@@ -808,7 +843,6 @@ export const Ajax =
     {
       const payload: object = {
         dbid: serverId,
-        dbname,
         filetype,
         columnTypes,
         query,
@@ -823,7 +857,7 @@ export const Ajax =
       };
       Ajax.req(
         'post',
-        'import/export/',
+        'export/',
         payload,
         onLoadHandler,
         {
@@ -845,6 +879,7 @@ export const Ajax =
       name: string,
       exporting: boolean,
       primaryKeyDelimiter: string,
+      objectKey: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -860,14 +895,16 @@ export const Ajax =
         name,
         export: exporting,
         primaryKeyDelimiter,
+        objectKey,
       };
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/create',
+        routeType + '/templates/create',
         payload,
         onLoadHandler,
         {
@@ -900,9 +937,10 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/' + String(templateId),
+        routeType + '/templates/' + String(templateId),
         payload,
         onLoadHandler,
         {
@@ -912,7 +950,9 @@ export const Ajax =
       return;
     },
 
-    deleteTemplate(templateId: number,
+    deleteTemplate(
+      templateId: number,
+      exporting: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -921,9 +961,10 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/delete/' + String(templateId),
+        routeType + '/templates/delete/' + String(templateId),
         {},
         onLoadHandler,
         {
@@ -955,10 +996,10 @@ export const Ajax =
       {
         payload['importOnly'] = true;
       }
-
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/',
+        routeType + '/templates/',
         payload,
         (response: object[]) =>
         {
@@ -968,14 +1009,15 @@ export const Ajax =
     },
 
     getAllTemplates(
+      exporting: boolean,
       onLoad: (templates: object[]) => void,
     )
     {
       const payload: object = {};
-
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/',
+        routeType + '/templates/',
         payload,
         (response: object[]) =>
         {
@@ -984,7 +1026,9 @@ export const Ajax =
       );
     },
 
-    resetTemplateToken(templateId: number,
+    resetTemplateToken(
+      templateId: number,
+      exporting: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -993,13 +1037,35 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       return Ajax.req(
         'post',
-        'templates/updateAccessToken/',
+        routeType + '/templates/updateAccessToken/',
         { id: String(templateId) },
         onLoadHandler,
         {
           onError,
+        },
+      );
+    },
+
+    getTypesFromQuery(
+      connectionId: number,
+      query: object,
+      onLoad: (templates: object) => void,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        query,
+      };
+      Ajax.req(
+        'post',
+        'export/types',
+        payload,
+        (response: object) =>
+        {
+          onLoad(response);
         },
       );
     },
@@ -1231,6 +1297,18 @@ export const Ajax =
         {
           onError,
         },
+      );
+    },
+
+    logout(
+      onSave: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        'auth/logout',
+        {},
+        onSave,
+        {},
       );
     },
 

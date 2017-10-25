@@ -55,6 +55,8 @@
     top: calc((@menu-collapsed-size - @menu-icon-height) / 2);
     opacity: 1;
     
+    fill: currentColor;
+    
     .transition;
 
   }
@@ -141,6 +143,14 @@
         
         &:hover {
           background-color: #fff !important; 
+        }
+      }
+
+      &.menu-option-selected {
+        background-color: #d0efe7;
+
+        &:hover {
+          background-color: #d0efe7 !important;
         }
       }
       

@@ -63,7 +63,8 @@ const { List } = Immutable;
 
 class ControlStateC
 {
-  public importExportTemplates: List<Template> = List([]);
+  public importTemplates: List<Template> = List([]);
+  public exportTemplates: List<Template> = List([]);
   public importExportScheduledJobs: List<SchedulerConfig> = List([]);
   public importExportCredentials: List<CredentialConfig> = List([]);
 }

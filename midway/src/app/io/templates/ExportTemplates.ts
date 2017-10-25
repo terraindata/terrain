@@ -46,108 +46,73 @@ THE SOFTWARE.
 
 import * as srs from 'secure-random-string';
 import * as winston from 'winston';
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
+import * as Tasty from '../../../tasty/Tasty';
+import * as App from '../../App';
 
-import { UserConfig } from '../users/UserRouter';
-import * as Util from '../Util';
+import { UserConfig } from '../../users/UserRouter';
+import * as Util from '../../Util';
 
-export interface ImportTemplateBase
+import { TemplateBase, TemplateBaseStringified } from './Templates';
+
+export interface ExportTemplateConfig extends TemplateBase
 {
-  // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
-  // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
-  columnTypes: object;
-  dbid: number;           // instance id
-  dbname: string;         // for elastic, index name
-  export?: boolean;       // export type template
-  originalNames: string[];    // array of strings (oldName)
-  persistentAccessToken?: string;    // persistent access token
-  primaryKeyDelimiter?: string;
-  primaryKeys: string[];  // newName of primary key(s)
-  tablename: string;      // for elastic, type name
-  transformations: object[];  // list of in-order data transformations
-}
-
-export interface ImportTemplateConfig extends ImportTemplateBase
-{
-  id?: number;
-  name: string;
-}
-
-interface ImportTemplateConfigStringified
-{
-  columnTypes: string;
-  dbid: number;
-  dbname: string;
-  export: boolean;
-  id?: number;
-  name: string;
-  originalNames: string;
-  persistentAccessToken?: string;
-  primaryKeyDelimiter: string;
-  primaryKeys: string;
-  tablename: string;
-  transformations: string;
-}
-
-export interface ExportTemplateConfig extends ImportTemplateBase
-{
-  id?: number;
-  name: string;
+  objectKey?: string;
   query?: string;
+  rank?: boolean;
   templateId?: number;
   variantId?: number;
 }
 
-export class ImportTemplates
+export interface ExportTemplateBaseStringified extends TemplateBaseStringified
 {
-  private templateTable: Tasty.Table;
+  objectKey?: string;
+  rank?: boolean;
+}
+
+export class ExportTemplates
+{
+  private exportTemplateTable: Tasty.Table;
 
   constructor()
   {
-    this.templateTable = new Tasty.Table(
-      'importTemplates',
+    this.exportTemplateTable = new Tasty.Table(
+      'exportTemplates',
       ['id'],
       [
         'columnTypes',
         'dbid',
         'dbname',
-        'export',
         'name',
+        'objectKey',
         'originalNames',
         'persistentAccessToken',
         'primaryKeyDelimiter',
         'primaryKeys',
+        'rank',
         'tablename',
         'transformations',
       ],
     );
   }
 
-  public async delete(user: UserConfig, id: number): Promise<ImportTemplateConfig[]>
+  public async delete(user: UserConfig, id: number): Promise<ExportTemplateConfig[]>
   {
-    return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
+    return new Promise<ExportTemplateConfig[]>(async (resolve, reject) =>
     {
-      const results: ImportTemplateConfig[] = await this.get(id);
+      const results: ExportTemplateConfig[] = await this.get(id);
       // template id specified but template not found
       if (results.length === 0)
       {
         return reject('Invalid template id passed');
       }
 
-      const deleted: ImportTemplateConfigStringified[] =
-        await App.DB.delete(this.templateTable, { id }) as ImportTemplateConfigStringified[];
-      resolve(this._parseConfig(deleted) as ImportTemplateConfig[]);
+      const deleted: ExportTemplateBaseStringified[] =
+        await App.DB.delete(this.exportTemplateTable, { id }) as ExportTemplateBaseStringified[];
+      resolve(this._parseConfig(deleted) as ExportTemplateConfig[]);
     });
   }
 
-  public async get(id?: number): Promise<ImportTemplateConfig[]>
-  {
-    const filter: object = (id !== undefined) ? { id } : {};
-    return this.select([], filter);
-  }
-
-  public async getExport(id?: number): Promise<ImportTemplateConfig[]>
+  public async get(id?: number): Promise<ExportTemplateConfig[]>
   {
     const filter: object = { export: true };
     if (id !== undefined)
@@ -157,38 +122,28 @@ export class ImportTemplates
     return this.select([], filter);
   }
 
-  public async getImport(id?: number): Promise<ImportTemplateConfig[]>
-  {
-    const filter: object = { export: false };
-    if (id !== undefined)
-    {
-      filter['id'] = id;
-    }
-    return this.select([], filter);
-  }
-
-  public async loginWithPersistentAccessToken(templateId: number, persistentAccessToken: string): Promise<ImportTemplateConfig[]>
+  public async loginWithPersistentAccessToken(templateId: number, persistentAccessToken: string): Promise<ExportTemplateConfig[]>
   {
     return this.select([], { id: templateId, persistentAccessToken });
   }
 
-  public async select(columns: string[], filter: object): Promise<ImportTemplateConfig[]>
+  public async select(columns: string[], filter: object): Promise<ExportTemplateConfig[]>
   {
-    return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
+    return new Promise<ExportTemplateConfig[]>(async (resolve, reject) =>
     {
-      const templates: ImportTemplateConfigStringified[] =
-        await App.DB.select(this.templateTable, columns, filter) as ImportTemplateConfigStringified[];
-      resolve(this._parseConfig(templates) as ImportTemplateConfig[]);
+      const templates: ExportTemplateBaseStringified[] =
+        await App.DB.select(this.exportTemplateTable, columns, filter) as ExportTemplateBaseStringified[];
+      resolve(this._parseConfig(templates) as ExportTemplateConfig[]);
     });
   }
 
-  public async updateAccessToken(user: UserConfig, templateID: number): Promise<ImportTemplateConfig>
+  public async updateAccessToken(user: UserConfig, templateID: number): Promise<ExportTemplateConfig>
   {
-    return new Promise<ImportTemplateConfig>(async (resolve, reject) =>
+    return new Promise<ExportTemplateConfig>(async (resolve, reject) =>
     {
       if (templateID !== undefined)
       {
-        const results: ImportTemplateConfig[] = await this.get(templateID);
+        const results: ExportTemplateConfig[] = await this.get(templateID);
         // template id specified but template not found
         if (results.length === 0)
         {
@@ -198,22 +153,22 @@ export class ImportTemplates
         {
           return reject('Insufficient Permissions');
         }
-        const template: ImportTemplateConfig = results[0] as ImportTemplateConfig;
+        const template: ExportTemplateConfig = results[0] as ExportTemplateConfig;
         template['persistentAccessToken'] = srs({ length: 256 });
-        const upserted: ImportTemplateConfigStringified =
-          await App.DB.upsert(this.templateTable, this._stringifyConfig(template)) as ImportTemplateConfigStringified;
-        resolve(this._parseConfig(upserted) as ImportTemplateConfig);
+        const upserted: ExportTemplateBaseStringified =
+          await App.DB.upsert(this.exportTemplateTable, this._stringifyConfig(template)) as ExportTemplateBaseStringified;
+        resolve(this._parseConfig(upserted) as ExportTemplateConfig);
       }
     });
   }
 
-  public async upsert(user: UserConfig, template: ImportTemplateConfig): Promise<ImportTemplateConfig>
+  public async upsert(user: UserConfig, template: ExportTemplateConfig): Promise<ExportTemplateConfig>
   {
-    return new Promise<ImportTemplateConfig>(async (resolve, reject) =>
+    return new Promise<ExportTemplateConfig>(async (resolve, reject) =>
     {
       if (template.id !== undefined)
       {
-        const results: ImportTemplateConfig[] = await this.get(template.id);
+        const results: ExportTemplateConfig[] = await this.get(template.id);
         // template id specified but template not found
         if (results.length === 0)
         {
@@ -231,14 +186,14 @@ export class ImportTemplates
         );
         template['persistentAccessToken'] = persistentAccessToken;
       }
-      const upserted: ImportTemplateConfigStringified =
-        await App.DB.upsert(this.templateTable, this._stringifyConfig(template)) as ImportTemplateConfigStringified;
-      resolve(this._parseConfig(upserted) as ImportTemplateConfig);
+      const upserted: ExportTemplateBaseStringified =
+        await App.DB.upsert(this.exportTemplateTable, this._stringifyConfig(template)) as ExportTemplateBaseStringified;
+      resolve(this._parseConfig(upserted) as ExportTemplateConfig);
     });
   }
 
-  private _parseConfig(stringified: ImportTemplateConfigStringified | ImportTemplateConfigStringified[]):
-    ImportTemplateConfig | ImportTemplateConfig[]
+  private _parseConfig(stringified: ExportTemplateBaseStringified | ExportTemplateBaseStringified[]):
+    ExportTemplateConfig | ExportTemplateConfig[]
   {
     if (Array.isArray(stringified))
     {
@@ -246,41 +201,44 @@ export class ImportTemplates
     }
     return this._parseConfigHelper(stringified);
   }
-  private _parseConfigHelper(stringified: ImportTemplateConfigStringified): ImportTemplateConfig
+
+  private _parseConfigHelper(stringified: ExportTemplateBaseStringified): ExportTemplateConfig
   {
-    const template: ImportTemplateConfig =
+    const template: ExportTemplateConfig =
       {
         persistentAccessToken: stringified['persistentAccessToken'],
         columnTypes: JSON.parse(stringified['columnTypes']),
         dbid: stringified['dbid'],
         dbname: stringified['dbname'],
-        export: stringified['export'],
         id: stringified['id'],
         name: stringified['name'],
+        objectKey: stringified['objectKey'] !== undefined ? stringified['objectKey'] : '',
         originalNames: JSON.parse(stringified['originalNames']),
         primaryKeyDelimiter: stringified['primaryKeyDelimiter'],
         primaryKeys: JSON.parse(stringified['primaryKeys']),
+        rank: stringified['rank'] !== undefined ? stringified['rank'] : false,
         tablename: stringified['tablename'],
         transformations: JSON.parse(stringified['transformations']),
       };
     return template;
   }
 
-  private _stringifyConfig(template: ImportTemplateConfig): ImportTemplateConfigStringified
+  private _stringifyConfig(template: ExportTemplateConfig): ExportTemplateBaseStringified
   {
-    const stringified: ImportTemplateConfigStringified =
+    const stringified: ExportTemplateBaseStringified =
       {
         persistentAccessToken: template['persistentAccessToken'],
         columnTypes: JSON.stringify(template['columnTypes']),
         dbid: template['dbid'],
         dbname: template['dbname'],
-        export: template['export'] === true ? true : false,
         id: template['id'],
         name: template['name'],
+        objectKey: template['objectKey'] !== undefined ? template['objectKey'] : '',
         originalNames: JSON.stringify(template['originalNames']),
         // hack around silly linter complaint below
         primaryKeyDelimiter: (template['primaryKeyDelimiter'] === undefined ? '-' : template['primaryKeyDelimiter']) as string,
         primaryKeys: JSON.stringify(template['primaryKeys']),
+        rank: template['rank'] !== undefined ? template['rank'] : false,
         tablename: template['tablename'],
         transformations: JSON.stringify(template['transformations']),
       };
@@ -288,4 +246,4 @@ export class ImportTemplates
   }
 }
 
-export default ImportTemplates;
+export default ExportTemplates;

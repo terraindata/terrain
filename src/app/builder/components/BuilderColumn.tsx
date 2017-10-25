@@ -182,9 +182,9 @@ const BuilderColumn = createReactClass<any, any>(
       this.unsubUser = UserStore.subscribe(rejigger);
       this.unsubRoles = RolesStore.subscribe(rejigger);
 
-      ColorsActions.setStyle('.builder-column .builder-title-bar-options .bc-options-svg .cls-1 ', { fill: Colors().text3 });
-      ColorsActions.setStyle('.builder-column .builder-title-bar-options .menu-wrapper ', { 'border-color': Colors().text3 });
-      ColorsActions.setStyle('.builder-column .builder-title-bar .builder-title-bar-title svg .cls-1', { fill: Colors().text3 });
+      ColorsActions.setStyle('.builder-column .builder-title-bar-options .bc-options-svg .cls-1 ', { fill: Colors().iconColor });
+      ColorsActions.setStyle('.builder-column .builder-title-bar-options .menu-wrapper ', { 'border-color': Colors().iconColor });
+      ColorsActions.setStyle('.builder-column .builder-title-bar .builder-title-bar-title svg .cls-1', { fill: Colors().iconColor });
 
     },
 
@@ -312,7 +312,7 @@ const BuilderColumn = createReactClass<any, any>(
       const options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map((index) => ({
         text: COLUMNS[index],
         onClick: this.switchView,
-        disabled: index === this.state.column,
+        selected: index === this.state.column,
         icon: menuIcons[index].icon,
         iconColor: menuIcons[index].color,
       })));
@@ -346,9 +346,9 @@ const BuilderColumn = createReactClass<any, any>(
           <div
             className='builder-title-bar'
             style={{
-              'box-shadow': '0px 3px 9px ' + Colors().boxShadow,
-              'borderColor': Colors().stroke,
-              'backgroundColor': Colors().bg2,
+              boxShadow: '0px 3px 9px ' + Colors().boxShadow,
+              borderColor: Colors().stroke,
+              backgroundColor: Colors().bg2,
             }}
           >
             {

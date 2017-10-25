@@ -232,8 +232,15 @@
           margin-top: 6px;
         }
 
+        .results-config-map-btn {
+          svg {
+            margin-right: -8px;
+          }
+        }
+
         .results-config-text-btn,
-        .results-config-image-btn {
+        .results-config-image-btn,
+        .results-config-map-btn {
           padding: 3px 0px;
           flex-grow: 1;
           text-align: center;
@@ -263,6 +270,10 @@
 
         }
 
+        .results-config-map {
+          display: none;
+        }
+
         .results-config-image {
           display: none;
         }
@@ -270,6 +281,13 @@
         &.results-config-field-format-text {
           .results-config-text-btn {
             .rc-selected;
+          }
+        }
+
+        &.results-config-field-format-map {
+          .results-config-map {
+            display: block;
+            marg: 6px;
           }
         }
 
