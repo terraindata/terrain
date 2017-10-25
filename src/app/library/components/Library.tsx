@@ -368,11 +368,17 @@ class Library extends TerrainComponent<any>
           <div className='library-bottom'>
             <div className='library-analytics-chart-wrapper'>
               {analytics.loaded ?
-                <MultipleAreaChart
-                  datasets={datasets}
-                  xDataKey={'key'}
-                  yDataKey={'doc_count'}
-                /> :
+                (analytics.errors.length === 0 ?
+                  <MultipleAreaChart
+                    datasets={datasets}
+                    xDataKey={'key'}
+                    yDataKey={'doc_count'}
+                  /> : (
+                    <div className='library-analytics-error'>
+                      <p>An error occurred while fetching the analytics data</p>
+                      <ul>{analytics.errors.map((e) => <li>* {e}</li>)}</ul>
+                    </div>)
+                ) :
                 <Loading
                   width={150}
                   height={150}

@@ -54,10 +54,12 @@ const AnalyticsReducer = {};
 AnalyticsReducer[ActionTypes.fetchStart] =
   (state, action: Action<{}>) =>
   {
-    return state.set('loaded', false);
+    return state
+      .set('loaded', false)
+      .set('errors', []);
   };
 
-AnalyticsReducer[ActionTypes.fetch] =
+AnalyticsReducer[ActionTypes.fetchSuccess] =
   (state, action: Action<{ analytics: any }>) =>
   {
     const { analytics } = action.payload;
@@ -70,6 +72,17 @@ AnalyticsReducer[ActionTypes.fetch] =
         .set('loaded', true)
         .setIn(['data', parseInt(variantId, 10)], variantAnalytics);
     });
+
+    return nextState;
+  };
+
+AnalyticsReducer[ActionTypes.fetchFailure] =
+  (state, action: Action<{ errors: string[] }>) =>
+  {
+    const { errors } = action.payload;
+    const nextState = state
+      .set('loaded', true)
+      .set('errors', state.get('errors').concat(errors));
 
     return nextState;
   };
