@@ -70,7 +70,8 @@ AnalyticsReducer[ActionTypes.fetchSuccess] =
       const variantAnalytics = analytics[variantId];
       nextState = nextState
         .set('loaded', true)
-        .setIn(['data', parseInt(variantId, 10)], variantAnalytics);
+        .setIn(['data', parseInt(variantId, 10)], variantAnalytics)
+        .set('errors', []);
     });
 
     return nextState;

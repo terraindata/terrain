@@ -92,10 +92,32 @@ describe('AnalyticsReducer', () =>
     expect(reducer(undefined, {})).toEqual(analytics);
   });
 
+  describe('#fetchStart', () =>
+  {
+    it('should handle analytics.fetchStart and clear errors', () =>
+    {
+      analytics = analytics.set('errors', ['error 1']);
+
+      const nextState = reducer(analytics, {
+        type: ActionTypes.fetchStart,
+      });
+
+      expect(
+        nextState,
+      ).toEqual(
+        analytics
+          .set('loaded', false)
+          .set('errors', []),
+      );
+    });
+  });
+
   describe('#fetchSuccess', () =>
   {
-    it('should handle analytics.fetchSuccess', () =>
+    it('should handle analytics.fetchSuccess and clear errors', () =>
     {
+      analytics = analytics.set('errors', ['error 1']);
+
       const nextState = reducer(analytics, {
         type: ActionTypes.fetchSuccess,
         payload: {
@@ -108,7 +130,8 @@ describe('AnalyticsReducer', () =>
       ).toEqual(
         analytics
           .set('loaded', true)
-          .setIn(['data', 1], analyticsResponse[1]),
+          .setIn(['data', 1], analyticsResponse[1])
+          .set('errors', []),
       );
     });
   });
