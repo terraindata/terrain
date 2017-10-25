@@ -1303,7 +1303,7 @@ export const Ajax =
       intervalId: number,
       aggregation: string,
       onLoad: (response: any) => void,
-      onError?: (ev: Event) => void)
+      onError?: (error: any) => void)
     {
       const args = {
         variantid: variantIds.join(','),
@@ -1327,7 +1327,7 @@ export const Ajax =
           }
           catch (e)
           {
-            onError && onError(response as any);
+            onError && onError(JSON.parse(response) as any);
           }
         },
         { onError, urlArgs: args });

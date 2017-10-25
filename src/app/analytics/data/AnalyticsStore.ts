@@ -50,6 +50,7 @@ import Util from 'util/Util';
 class AnalyticsStateC
 {
   public loaded = false;
+  public errors: string[] = [];
   public data: IMMap<ID, any> = Immutable.Map({});
   public selectedMetric: ID = 1;
   public selectedInterval: string = 'day';
