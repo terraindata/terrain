@@ -137,7 +137,7 @@ class CardSelector extends TerrainComponent<Props>
     currentCategory: CardCategory;
   } = {
     searchValue: '',
-    focusedIndex: -1,
+    focusedIndex: 0,
     inputElement: undefined,
     categoryListElement: undefined,
     computedHeight: -1,
@@ -149,7 +149,7 @@ class CardSelector extends TerrainComponent<Props>
     super(props);
     this.computeAvailableCategories = memoizeOne(this.computeAvailableCategories);
     this.getCardSuggestionSet = memoizeOne(this.getCardSuggestionSet);
-    this.calculateOptionCategories = memoizeOne(this.calculateOptionCategories);
+    this.computeOptionCategories = memoizeOne(this.computeOptionCategories);
     this.categoryClickedWrapper = _.memoize(this.categoryClickedWrapper, (item: CardCategory) => item.name);
     const available = this.computeAvailableCategories(this.props.cardTypeList, this.props.card);
     this.state.currentCategory = available.get(0);
@@ -191,7 +191,7 @@ class CardSelector extends TerrainComponent<Props>
   }
 
   // (memoized) that returns a list of the categories that each card falls under
-  public calculateOptionCategories(cardTypeList: List<string>, creatingCard: CardConfig): List<Set<string>>
+  public computeOptionCategories(cardTypeList: List<string>, creatingCard: CardConfig): List<Set<string>>
   {
     const suggestionSet = this.getCardSuggestionSet(creatingCard);
     return cardTypeList.map((v, i) =>
@@ -210,11 +210,22 @@ class CardSelector extends TerrainComponent<Props>
 
   public computeMaxHeight(cardListLength: number): string
   {
-    const potentialSelectorHeight = cardListLength * 70;
+    const optionHeight = 71; // should match height of option
+    const potentialSelectorHeight = cardListLength * optionHeight;
     const categoryHeight = this.state.categoryListElement !== undefined ?
       this.state.categoryListElement.clientHeight : 0;
 
-    return Math.max(categoryHeight, Math.min(potentialSelectorHeight, 400)) + 'px';
+    return Math.max(categoryHeight, Math.min(potentialSelectorHeight, optionHeight * 5)) + 'px';
+  }
+
+  // it is not possible to use the KeyboardFocus component since our input element needs focus
+  public handleKeyDown(event)
+  {
+    // arrow keys: up = 38, down = 40, enter = 13
+    if (event.keyCode === 38)
+    {
+      // const focusedIndex = Math.min(this.state.focusedIndex + 1, this.props.length - 1)
+    }
   }
 
   public handleSearchTextboxChange(ev: any)
@@ -242,44 +253,95 @@ class CardSelector extends TerrainComponent<Props>
     });
   }
 
-  public renderCardOption(type: string, index: number)
-  {
-    const { overrideText } = this.props;
+  // memoization dependencies: optionCategories,
+  // public renderCardOption(type: string, index: number)
+  // {
+  //   const { overrideText } = this.props;
 
-    const optionCategories = this.calculateOptionCategories(this.props.cardTypeList, this.props.card);
-    const currentCategory = this.state.currentCategory.name;
+  //   const optionCategories = this.computeOptionCategories(this.props.cardTypeList, this.props.card);
+  //   const currentCategory = this.state.currentCategory.name;
 
-    if (optionCategories.get(index).has(currentCategory))
-    {
-      return (
-        <CreateCardOption
-          card={AllBackendsMap[this.props.language].blocks[type] as CardConfig}
-          index={index}
-          searchText={this.state.searchValue}
-          onClick={this.props.handleCardClick}
-          overrideTitle={
-            overrideText &&
-            overrideText.get(index) &&
-            overrideText.get(index).text
-          }
-          isFocused={this.state.focusedIndex === index}
-          key={index.toString()}
-        />
-      );
-    }
-    return null; // null won't be rendered
-  }
+  //   if (optionCategories.get(index).has(currentCategory))
+  //   {
+  //     return (
+  //       <CreateCardOption
+  //         card={AllBackendsMap[this.props.language].blocks[type] as CardConfig}
+  //         index={index}
+  //         searchText={this.state.searchValue}
+  //         onClick={this.props.handleCardClick}
+  //         overrideTitle={
+  //           overrideText &&
+  //           overrideText.get(index) &&
+  //           overrideText.get(index).text
+  //         }
+  //         isFocused={this.state.focusedIndex === index}
+  //         key={index.toString()}
+  //       />
+  //     );
+  //   }
+  //   return null; // null won't be rendered
+  // }
 
+  // public renderCardOptions()
+  // {
+  //   return this.props.cardTypeList.map(this.renderCardOption);
+  // }
+
+  // parameterize all these variables so we can memioze by arguments
   public renderCardOptions()
   {
-    return this.props.cardTypeList.map(this.renderCardOption);
+    const options = this.computeCardOptions(
+      this.props.cardTypeList,
+      this.props.overrideText,
+      this.computeOptionCategories(this.props.cardTypeList, this.props.card),
+      this.state.currentCategory.name,
+      this.props.language,
+      this.state.searchValue,
+      this.state.focusedIndex,
+      this.props.handleCardClick,
+    );
+    return options;
+  }
+
+  public computeCardOptions(
+    cardTypeList,
+    overrideText,
+    optionCategories,
+    currentCategory,
+    language,
+    searchValue,
+    focusedIndex,
+    handleCardClick
+  )
+  {
+    return cardTypeList.map((type: string, index: number) => {
+      if (optionCategories.get(index).has(currentCategory))
+      {
+        return (
+          <CreateCardOption
+            card={AllBackendsMap[language].blocks[type] as CardConfig}
+            index={index}
+            searchText={searchValue}
+            onClick={handleCardClick}
+            overrideTitle={
+              overrideText &&
+              overrideText.get(index) &&
+              overrideText.get(index).text
+            }
+            isFocused={focusedIndex === index}
+            key={index.toString()}
+          />
+        );
+      }
+      return null; // null won't be rendered
+    });
   }
 
   public renderCategory(item: CardCategory, index: number)
   {
     let categoryStyle = _.extend({},
       fontColor(item.color),
-      borderColor(Colors().border1),
+      borderColor(Colors().bg1),
       getStyle('borderLeftColor', item.color),
     );
 
@@ -293,7 +355,7 @@ class CardSelector extends TerrainComponent<Props>
     else
     {
       categoryStyle = _.extend({}, categoryStyle,
-        backgroundColor(Colors().bg2, cardHoverBackground(item.color, Colors().bg3)),
+        backgroundColor(Colors().bg3, cardHoverBackground(item.color, Colors().bg3)),
       );
     }
 
@@ -353,6 +415,7 @@ class CardSelector extends TerrainComponent<Props>
     const rootStyle = _.extend({},
       backgroundColor(Colors().bg1),
       this.props.overrideWidth ? getStyle('width', this.props.overrideWidth) : {},
+      getStyle('outline', 'none'),
     );
     const inputStyle = _.extend({},
       {
@@ -367,7 +430,7 @@ class CardSelector extends TerrainComponent<Props>
       backgroundColor(Colors().inputBg),
     );
 
-    const innerBg = cardHoverBackground(this.state.currentCategory.color, Colors().bg3);
+    // const innerBg = cardHoverBackground(this.state.currentCategory.color, Colors().bg3);
     const selectorInnerStyle = _.extend({},
       borderColor(Colors().border1),
       getStyle('height', this.computeMaxHeight(this.props.cardTypeList.size)),
@@ -382,6 +445,8 @@ class CardSelector extends TerrainComponent<Props>
         })}
         ref='selector'
         style={rootStyle}
+        onKeyDown={this.handleKeyDown}
+        tabIndex={-1}
       >
         <div className='inset-shadow-veil' />
 

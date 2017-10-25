@@ -129,7 +129,16 @@ class CreateCardOption extends TerrainComponent<Props>
     const text = capitalize(this.props.overrideTitle || card.static.title);
     const description = card.static.description || 'Create a ' + card.static.title + ' card.';
     const searchResult = this.searchForText(text, description, this.props.searchText);
-
+    const leftRightColor = this.props.isFocused ? Colors().inactiveHover : Colors().bg3;
+    const topBottomColor = this.props.isFocused ? Colors().inactiveHover : Colors().bg1;
+    const mainStyle = _.extend({},
+      getStyle('borderTopColor', topBottomColor),
+      getStyle('borderBottomColor', topBottomColor),
+      getStyle('borderRightColor', leftRightColor),
+      getStyle('borderLeftColor', leftRightColor),
+      fontColor(Colors().text2, Colors().text1),
+      backgroundColor(Colors().bg3, Colors().highlight)
+    );
     const titleStyle = _.extend({},
       fontColor(card.static.colors[0]),
     );
@@ -138,14 +147,9 @@ class CreateCardOption extends TerrainComponent<Props>
         <div
           className={classNames({
             'create-card-option': true,
-            'create-card-option-focused': this.props.isFocused,
           })}
           onClick={this.handleClick}
-          style={[
-            borderColor(Colors().highlight),
-            backgroundColor(Colors().bg1, Colors().darkerHighlight),
-            fontColor(Colors().text2, Colors().text1),
-          ]}
+          style={mainStyle}
           key='create-option'
         >
           <div
