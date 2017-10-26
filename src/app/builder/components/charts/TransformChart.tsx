@@ -793,16 +793,16 @@ const TransformChart = {
     const stdDev = Math.abs(pointsData[1].x - pointsData[0].x);
     const maxY = this._normal(average, average, stdDev);
     const scaleFactor = pointsData[1].y / maxY;
-        const data = this._getNormalData(scales, average, stdDev, domainMin, domainMax, scaleFactor);
-        const line = d3.svg.line()
-            .x((d) =>
-            {
-                return d['dontScale'] ? d['x'] : scales.realX(d['x']);
-            })
-            .y((d) =>
-            {
-                return scales.realPointY(d['y']);
-            });
+    const data = this._getNormalData(scales, average, stdDev, domainMin, domainMax, scaleFactor);
+    const line = d3.svg.line()
+      .x((d) =>
+      {
+        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
+      })
+      .y((d) =>
+      {
+        return scales.realPointY(d['y']);
+      });
 
     // console.log(data);
     // console.log(this._getLinesData(pointsData, scales));
@@ -815,20 +815,20 @@ const TransformChart = {
   },
 
   _getNormalData(scales, average, stdDev, min, max, scaleFactor)
-    {
-        const data = [];
-        const stepSize = (max - min) * 0.01;
+  {
+    const data = [];
+    const stepSize = (max - min) * (1 / 32);
     for (let i = (min - stepSize); i < (max + stepSize); i += stepSize)
-        {
-            const y = this._normal(i, average, stdDev);
-            data.push({ y: y * scaleFactor, x: i, id: i, selected: false });
-        }
-        data.sort(function(a, b)
-        {
-            return a.x - b.x;
-        });
+    {
+      const y = this._normal(i, average, stdDev);
+      data.push({ y: y * scaleFactor, x: i, id: i, selected: false });
+    }
+    data.sort(function(a, b)
+    {
+      return a.x - b.x;
+    });
     if (data.length)
-        {
+    {
       const range = (scaleMax(scales.x) - scaleMin(scales.x));
       data.unshift({
         x: scaleMin(scales.x) - range,
@@ -856,14 +856,14 @@ const TransformChart = {
         dontScale: true,
       });
     }
-        return data;
-    },
+    return data;
+  },
 
-    _normal(x, average, stdDev)
-    {
-        x = (x - average) / stdDev;
-        return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
-    },
+  _normal(x, average, stdDev)
+  {
+    x = (x - average) / stdDev;
+    return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
+  },
 
   _drawLines(el, scales, pointsData, onClick, onMove, onRelease, canEdit)
   {

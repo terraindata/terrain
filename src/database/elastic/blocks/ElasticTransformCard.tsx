@@ -156,13 +156,42 @@ export const elasticTransform = _card(
 
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
+        let ranges = [];
+        let outputs = [];
+        const min = parseFloat(block['domain'].get(0));
+        const max = parseFloat(block['domain'].get(1));
+        const stepSize = Math.abs(max - min) / 31;
+        if (block['mode'] === 'normal')
+        {
+          const NORMAL_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
+          const normal = (x, avg, std) =>
+          {
+            x = (x - avg) / std;
+            return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / std;
+          };
+          const average = block['scorePoints'].get(1).value;
+          const stdDev = Math.abs(average - block['scorePoints'].get(0).value);
+          const maxY = normal(average, average, stdDev);
+          const scaleFactor = block['scorePoints'].get(1).score / maxY;
+          for (let i = min; i <= max; i += stepSize)
+          {
+            const y = normal(i, average, stdDev) * scaleFactor;
+            ranges.push(i);
+            outputs.push(y);
+          }
+        }
+        else
+        {
+          ranges = block['scorePoints'].map((scorePt) => scorePt.value).toArray();
+          outputs = block['scorePoints'].map((scorePt) => scorePt.score).toArray();
+        }
         return {
           a: 0,
           b: 1,
           numerators: [[block['input'], 1]],
           denominators: [],
-          ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
-          outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
+          ranges,
+          outputs,
         };
       },
 
