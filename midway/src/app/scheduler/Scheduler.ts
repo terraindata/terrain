@@ -47,7 +47,6 @@ THE SOFTWARE.
 import * as naturalSort from 'javascript-natural-sort';
 import * as nodeScheduler from 'node-schedule';
 import * as request from 'request';
-import * as requestPromise from 'request-promise-native';
 import * as Client from 'ssh2-sftp-client';
 import * as stream from 'stream';
 import * as winston from 'winston';

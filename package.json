@@ -159,7 +159,6 @@
     "redux-immutable": "^4.0.0",
     "redux-thunk": "^2.2.0",
     "request": "^2.83.0",
-    "request-promise-native": "^1.0.5",
     "secure-random-string": "^1.0.0",
     "sha1": "^1.1.1",
     "sqlite3": "^3.1.9",
