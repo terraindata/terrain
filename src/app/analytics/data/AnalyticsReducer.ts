@@ -116,6 +116,13 @@ AnalyticsReducer[ActionTypes.selectAnalyticsConnection] =
     return state.set('selectedAnalyticsConnection', connectionName);
   };
 
+AnalyticsReducer[ActionTypes.pinVariant] =
+  (state, action: Action<{ variantId: ID }>) =>
+  {
+    const { variantId } = action.payload;
+    return state.setIn(['pinnedVariants', variantId], true);
+  };
+
 const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
 {
   let nextState = state;

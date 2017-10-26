@@ -206,6 +206,14 @@ const Actions =
         payload: { connectionName },
       };
     },
+
+    pinVariant: (variantId) =>
+    {
+      return {
+        type: ActionTypes.pinVariant,
+        payload: { variantId },
+      };
+    },
   };
 
 export default Actions;

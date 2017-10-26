@@ -55,6 +55,7 @@ export const AnalyticsActionTypes =
     selectInterval: '',
     selectDateRange: '',
     selectAnalyticsConnection: '',
+    pinVariant: '',
   };
 
 Util.setValuesToKeys(AnalyticsActionTypes, 'analytics');

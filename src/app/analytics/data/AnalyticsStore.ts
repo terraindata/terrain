@@ -56,6 +56,7 @@ class AnalyticsStateC
   public selectedInterval: string = 'day';
   public selectedDateRange: ID = 1;
   public selectedAnalyticsConnection: string = '';
+  public pinnedVariants: Immutable.Map<ID, boolean> = Immutable.Map<ID, boolean>({});
 }
 
 const AnalyticsState_Record = Immutable.Record(new AnalyticsStateC());
