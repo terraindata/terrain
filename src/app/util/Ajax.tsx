@@ -489,21 +489,44 @@ export const Ajax =
       // }
     },
 
-    getVariantStatus(variantId: ID,
+    getVariantStatus(
+      variantId: ID,
       dbid: number,
-      onLoad: (response: any) => void)
+      onLoad: (resp: object) => void,
+      onError?: (resp: any) => void,
+    )
     {
-      const payload = { dbid };
-      return Ajax.req(
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
         'get',
-        `items/${variantId}`,
-        payload,
-        (response) =>
+        'items/live/' + variantId,
+        {},
+        (response: object) =>
         {
-          onLoad('Test string');
-          // onLoad(response as any);
+          let responseData: object;
+          try
+          {
+            responseData = response;
+          }
+          catch (e)
+          {
+            onError && onError(e.message);
+          }
+
+          if (responseData !== undefined)
+          {
+            // needs to be outside of the try/catch so that any errors it throws aren't caught
+            onLoad(responseData);
+          }
+        },
+        {
+          onError, urlArgs: { dbid },
         },
       );
+      return;
     },
 
     getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
@@ -718,7 +741,7 @@ export const Ajax =
       Ajax.req(
         'get',
         'import/analyzers',
-        { index },
+        {},
         (response) =>
         {
           let responseData: object = null;
@@ -736,6 +759,9 @@ export const Ajax =
             // needs to be outside of the try/catch so that any errors it throws aren't caught
             onLoad(responseData);
           }
+        },
+        {
+          onError, urlArgs: { index },
         },
       );
       return;

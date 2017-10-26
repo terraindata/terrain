@@ -89,13 +89,13 @@ Router.get('/live', passport.authenticate('access-token-local'), async (ctx, nex
       return parsed;
     });
   }
-  ctx.body = await items.getLiveVariants(typeArr);
+  ctx.body = JSON.stringify(await items.getLiveVariants(typeArr));
 });
 
 Router.get('/live/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const status: string = await items.checkVariantInES(ctx.params.id, parseInt(ctx.query.dbid as string, 10));
-  ctx.body = status;
+  ctx.body = JSON.stringify(status);
 });
 
 Router.get('/status/:id', passport.authenticate('access-token-local'), async (ctx, next) =>

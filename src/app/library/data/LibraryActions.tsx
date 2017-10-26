@@ -294,21 +294,6 @@ const Actions =
       (variant: Variant, status: ItemStatus, confirmed?: boolean) =>
         $(ActionTypes.variants.status, { variant, status, confirmed }),
 
-      fetchStatusInES:
-      (variant: Variant) =>
-      {
-        console.log('hi');
-        Ajax.getVariantStatus(
-          variant.id,
-          variant.db.id as number,
-          (response) =>
-          {
-            console.log(response);
-            $(ActionTypes.variants.fetchStatusInES, { response });
-          },
-        );
-      },
-
       fetchVersion:
       (variantId: string, onNoVersion: (variantId: string) => void) =>
       {

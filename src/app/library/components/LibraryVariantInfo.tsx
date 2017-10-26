@@ -52,6 +52,7 @@ import './LibraryVariantInfo.less';
 const { List } = Immutable;
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
+import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
 import Actions from './../data/LibraryActions';
 import LibraryStore from './../data/LibraryStore';
@@ -80,18 +81,32 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     variantStatusInState: '',
   };
 
-  constructor(props)
+  public fetchStatus(variant: Variant)
   {
-    super(props);
-    this._subscribe(LibraryStore, {
-      stateKey: 'variantStatusInState',
-      storeKeyPath: ['variantStatusInES'],
-    });
+    if (variant !== undefined)
+    {
+      Ajax.getVariantStatus(
+        variant.id,
+        variant.db.id as number,
+        (response) =>
+        {
+          this.setState({ variantStatusInState: response });
+        },
+      );
+    }
   }
 
-  public fetchStatus()
+  public componentDidMount()
   {
-    Actions.variants.fetchStatusInES(this.props.variant);
+    this.fetchStatus(this.props.variant);
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (nextProps.variant !== this.props.variant)
+    {
+      this.fetchStatus(nextProps.variant);
+    }
   }
 
   public render()
@@ -100,7 +115,6 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     {
       return null;
     }
-    this.fetchStatus();
 
     const { isBuilder, isSuperUser } = this.props;
     const { variant } = this.props;

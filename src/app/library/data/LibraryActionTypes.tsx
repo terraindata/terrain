@@ -67,7 +67,6 @@ export let LibraryActionTypes =
     {
       create, change, move,
       status: '',
-      fetchStatusInES: '',
       fetchVersion: '',
       loadVersion: '',
       select: '',
