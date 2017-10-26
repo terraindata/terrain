@@ -876,7 +876,8 @@ const TransformChart = {
 
     const alpha = pointsData[1].x - (pointsData[0].x * Math.log(1 - pointsData[1].y))/(Math.log(1 - pointsData[0].y));
     const tau = Math.log(1-pointsData[1].y)/ (pointsData[1].x + alpha);
-
+    console.log('alpha', alpha);
+    console.log('tau', tau);
     const data = this._getExponentialData(scales, alpha, tau, domainMin, domainMax);
     const line = d3.svg.line()
       .x((d) =>
