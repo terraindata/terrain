@@ -6,8 +6,48 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
           type="text/css">
     <link rel="stylesheet" href="theme.css" type="text/css">
+    <script>
+        let movieList = [
+            {
+              title: "Interstellar",
+              posterpath: "nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg",
+              overview: `Interstellar chronicles the adventures of a group of explorers who make use of a newly discovered
+                wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an
+                interstellar voyage.`,
+            },
+            {
+              title: "The Matrix",
+              posterpath: "lZpWprJqbIFpEV5uoHfoK0KCnTW.jpg",
+              overview: `Set in the 22nd century, The Matrix tells the story of a computer hacker who joins a group of
+                underground insurgents fighting the vast and powerful computers who now rule the earth.`,
+            },
+            {
+              title: "Django Unchained",
+              posterpath: "5WJnxuw41sddupf8cwOxYftuvJG.jpg",
+              overview: `With the help of a German bounty hunter, a freed slave sets out to rescue his wife from a brutal
+                Mississippi plantation owner.`,
+            },
+            {
+              title: "WALL-E",
+              posterpath: "9cJETuLMc6R0bTWRA5i7ctY9bxk.jpg",
+              overview: `WALL·E is the last robot left on an Earth that has been overrun with garbage and all humans have fled to
+                outer space. For 700 years he has continued to try and clean up the mess, but has developed some rather
+                interesting human-like qualities. When a ship arrives with a sleek new type of robot, WALL·E thinks he's
+                finally found a friend and stows away on the ship when it leaves.`,
+            },
+            {
+              title: "300",
+              posterpath: "bYR8O1H1ZlME7Dm9ysfTYZnRDpw.jpg",
+              overview: `Based on Frank Miller's graphic novel, "300" is very loosely based the 480 B.C. Battle of Thermopylae,
+                where the King of Sparta led his army against the advancing Persians; the battle is said to have
+                inspired all of Greece to band together against the Persians, and helped usher in the world's first
+                democracy.`
+            }
+        ];
+    </script>
 </head>
 <body>
+
 <div class="py-5">
     <div class="container">
         <div class="row">
@@ -147,28 +187,31 @@
     </div>
 </div>
 
-<div id="modal5" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">300</h4>
-            </div>
-            <div class="modal-body">
-                Based on Frank Miller's graphic novel, "300" is very loosely based the 480 B.C. Battle of Thermopylae,
-                where the King of Sparta led his army against the advancing Persians; the battle is said to have
-                inspired all of Greece to band together against the Persians, and helped usher in the world's first
-                democracy.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+<script>
+    $("#movieDetails").loadTemplate($("#templateDetails"), movieList);
+</script>
+
+<script type="text/html" id="templateDetails"
+    <div id="modal5" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" data-value="title"></h4>
+                </div>
+                <div class="modal-body" data-value="overview"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</script>
 
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.loadtemplate/1.5.10/jquery.loadTemplate.min.js"
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
         integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"

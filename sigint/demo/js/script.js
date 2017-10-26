@@ -42,16 +42,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+'use strict';
 
-import * as Elastic from 'elasticsearch';
-import * as fs from 'fs';
-import * as winston from 'winston';
+window.movieSearch = angular.module('movieSearch', []);
 
-export const indexName = 'movies';
-export const typeName = 'data';
-
-export function getMovies(request: any): object[]
+movieSearch.controller('movieCtrl', function($scope, $location, $http)
 {
-  return [];
-}
+  $scope.movies = [];
+  $scope.page = 0;
+  $scope.allResults = false;
+
+  $scope.searchTerm = $location.search().q;
+
+  $scope.search = function()
+  {
+    $scope.page = 0;
+    $scope.movies = [];
+    $scope.allResults = false;
+    $location.search({'q': $scope.searchTerm});
+    $scope.loadMore();
+  };
+
+  $scope.loadMore = function()
+  {
+    if ($scope.searchTerm === '' || $scope.searchTerm === undefined)
+    {
+      return;
+    }
+
+    console.log($scope.esServer);
+    $http.get('http://localhost/?s=' + $scope.searchTerm + '&page=' + $scope.page++)
+    .then(function(results)
+    {
+      if(results.length !== 10)
+      {
+        $scope.allResults = true;
+      }
+
+      var ii = 0;
+      for(;ii < results.length; ii++)
+      {
+        $scope.movies.push(results[ii]);
+      }
+    });
+  };
+
+  $scope.loadMore();
+});
