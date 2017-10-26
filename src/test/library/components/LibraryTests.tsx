@@ -98,6 +98,10 @@ describe('Library', () =>
     }),
   });
 
+  const analyticsActions = {
+    selectAnalyticsConnection: (connectionName) => { return; },
+  };
+
   let libraryComponent = null;
 
   beforeEach(() =>
@@ -106,6 +110,7 @@ describe('Library', () =>
       <Library
         library={library}
         analytics={analytics}
+        analyticsActions={analyticsActions}
         schema={schema}
         router={{ params: { groupId: '1' } }}
       />,

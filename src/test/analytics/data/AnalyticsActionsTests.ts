@@ -184,6 +184,7 @@ describe('AnalyticsActions', () =>
       it('should create a analytics.fetchSuccess action after the variant analytics have been fetched', (done) =>
       {
         Ajax.getAnalytics = (
+          connectionId: number,
           variantIds: ID[],
           startParam: Date,
           endParam: Date,
@@ -204,7 +205,7 @@ describe('AnalyticsActions', () =>
           },
         ];
 
-        const store = mockStore({ analytics });
+        const store = mockStore(Immutable.Map({ analytics, schema }));
 
         store.dispatch(
           Actions.fetch(
@@ -228,6 +229,7 @@ describe('AnalyticsActions', () =>
       it('should create an analytics.fetchFailure action', (done) =>
       {
         Ajax.getAnalytics = (
+          connectionId: number,
           variantIds: ID[],
           startParam: Date,
           endParam: Date,
