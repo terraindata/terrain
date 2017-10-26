@@ -221,7 +221,7 @@ class CardSelector extends TerrainComponent<Props>
 
   public computeMaxHeight(cardListLength: number): string
   {
-    const optionHeight = 71; // should match height of option
+    const optionHeight = 72; // should match height of option
     const potentialSelectorHeight = cardListLength * optionHeight;
     const categoryHeight = this.state.categoryListElement !== undefined ?
       this.state.categoryListElement.clientHeight : 0;
