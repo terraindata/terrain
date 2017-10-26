@@ -67,6 +67,7 @@ export interface Props
   searchText: string;
   overrideTitle?: string;
   isFocused?: boolean;
+  outerRef?: (elem) => void;
 }
 
 const matchStyle = {
@@ -151,6 +152,7 @@ class CreateCardOption extends TerrainComponent<Props>
           onClick={this.handleClick}
           style={mainStyle}
           key='create-option'
+          ref={this.props.outerRef}
         >
           <div
             className='create-card-option-title'
