@@ -65,7 +65,7 @@ Router.use('/templates', ExportTemplateRouter.routes(), ExportTemplateRouter.all
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const requestObj: object = JSON.parse(ctx.request.body.data).body;
-  Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'dbname', 'filetype', 'query', 'rank', 'transformations']);
+  Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'filetype', 'query', 'rank', 'transformations']);
   const exprtConf: ExportConfig = requestObj as ExportConfig;
 
   await perm.ImportPermissions.verifyExportRoute(ctx.state.user, requestObj);
@@ -75,6 +75,13 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   ctx.type = 'text/plain';
   ctx.attachment(ctx.request.body.filename);
   ctx.body = exportReturn;
+});
+
+Router.post('/types', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const typeObj: object = ctx.request.body.body;
+  Util.verifyParameters(typeObj, ['dbid', 'query']);
+  ctx.body = await exprt.getNamesAndTypesFromQuery(typeObj['dbid'], typeObj['query']);
 });
 
 Router.post('/headless', async (ctx, next) =>

@@ -59,6 +59,13 @@ module.exports =
         filename: "bundle.js",
     },
 
+    // NOTE: this should also be added to the production config
+    devServer: {
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        }
+    },
+
     resolve:
     {
         // it is important that .tsx is before .less, so that it resolves first, so that files that share a name resolve correctly

@@ -43,7 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import * as AuthTypes from '../AuthTypes';
+import Ajax from './../../util/Ajax';
 import ActionTypes from './AuthActionTypes';
 
 const AuthReducer = {};
@@ -61,8 +63,11 @@ AuthReducer[ActionTypes.login] =
 AuthReducer[ActionTypes.logout] =
   (state: AuthTypes.AuthState, action) =>
   {
-    delete localStorage['accessToken'];
-    delete localStorage['id'];
+    Ajax.logout((success) =>
+    {
+      delete localStorage['accessToken'];
+      delete localStorage['id'];
+    });
     return state.set('accessToken', null).set('id', null);
   };
 

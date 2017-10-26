@@ -63,95 +63,12 @@ import { ElasticBlocks } from './blocks/ElasticBlocks';
 import ElasticCardsDeck from './blocks/ElasticCardsDeck';
 import CardsToElastic from './conversion/CardsToElastic';
 import ElasticToCards from './conversion/ElasticToCards';
+import LoadElasticQuery from './conversion/LoadElasticQuery';
 import { ElasticParseTreeToQuery, ParseElasticQuery } from './conversion/ParseElasticQuery';
 const syntaxConfig = require('../../../shared/database/elastic/syntax/ElasticSyntaxConfig.json');
 
 export class ElasticBackend implements Backend
 {
-
-  public static upgradeQuery(query: Query): Query
-  {
-    const parser = new ESJSONParser(query.tql, true);
-    const root = parser.getValue();
-
-    if (parser.hasError())
-    {
-      return query;
-    }
-
-    if (root.index || root.type || root.from || root.size)
-    {
-      return ElasticBackend.upgradeQueryRoot(query, parser);
-    }
-
-    return query;
-  }
-
-  public static loadingQuery(query: Query, queryReady: (query: Query) => void): Query
-  {
-    query = ElasticBackend.upgradeQuery(query);
-
-    if (query.cards && query.cards.size > 0)
-    {
-      // Elastic cards must start from the body card
-      if (query.cards.get(0)['type'] !== 'eqlbody')
-      {
-        query = query.set('cardsAndCodeInSync', false);
-      }
-    }
-
-    if (query.tql)
-    {
-      query = query.set('parseTree', ParseElasticQuery(query));
-    }
-    else
-    {
-      query = query.set('parseTree', null);
-    }
-
-    if (query.cardsAndCodeInSync === false)
-    {
-      if (query.tql)
-      {
-        query = ElasticToCards(query, queryReady);
-      } else
-      {
-        query = query.set('cardsAndCodeInSync', true);
-      }
-    }
-
-    return query;
-  }
-
-  private static upgradeQueryRoot(query: Query, parser: ESJSONParser = null): Query
-  {
-    if (parser === null)
-    {
-      parser = new ESJSONParser(query.tql, true);
-    }
-    const root = parser.getValue();
-
-    const theIndex = root.index || null;
-    const theType = root.type || null;
-    const theFrom = root.from || null;
-    const theSize = root.size || null;
-
-    const newRootValue = ESQueryTransform.upgradeRoot(root, theIndex, theType, theFrom, theSize);
-    const newRootValueParser = new ESJSONParser(JSON.stringify(newRootValue), true);
-
-    if (newRootValueParser.hasError())
-    {
-      console.log('Error: New query: ' + JSON.stringify(newRootValue) +
-        ', has errors: ' + JSON.stringify(newRootValueParser.getErrorMessages()));
-      return query;
-    }
-    const newQuery = ESConverter.formatES(newRootValueParser);
-    query = query
-      .set('tql', newQuery)
-      .set('cardsAndCodeInSync', false);
-
-    return query;
-  }
 
   type = 'elastic';
   name = 'Elastic';
@@ -169,6 +86,8 @@ export class ElasticBackend implements Backend
   // Ordering of the cards deck
   cardsDeck = ElasticCardsDeck;
   cardsList = cardsDeckToList(ElasticCardsDeck);
+
+  loadQuery = LoadElasticQuery.loadQuery;
 
   queryToCode = CardsToElastic.toElastic;
 

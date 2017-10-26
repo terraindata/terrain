@@ -123,13 +123,8 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         // wrong XHR
         return state;
       }
-      if (query.language === 'elastic')
-      {
-        query = ElasticBackend.loadingQuery(query, Actions.changeQuery);
-      } else
-      {
-        query = MySQLBackend.loadingQuery(query, Actions.changeQuery);
-      }
+
+      query = AllBackendsMap[query.language].loadQuery(query, Actions.changeQuery);
 
       return state
         .set('query', query)

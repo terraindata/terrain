@@ -813,7 +813,6 @@ export const Ajax =
     },
 
     exportFile(filetype: string,
-      dbname: string,
       serverId: number,
       columnTypes: Immutable.Map<string, object>,
       transformations: Immutable.List<object>,
@@ -827,7 +826,6 @@ export const Ajax =
     {
       const payload: object = {
         dbid: serverId,
-        dbname,
         filetype,
         columnTypes,
         query,
@@ -1030,6 +1028,27 @@ export const Ajax =
         onLoadHandler,
         {
           onError,
+        },
+      );
+    },
+
+    getTypesFromQuery(
+      connectionId: number,
+      query: object,
+      onLoad: (templates: object) => void,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        query,
+      };
+      Ajax.req(
+        'post',
+        'export/types',
+        payload,
+        (response: object) =>
+        {
+          onLoad(response);
         },
       );
     },
@@ -1264,6 +1283,18 @@ export const Ajax =
       );
     },
 
+    logout(
+      onSave: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        'auth/logout',
+        {},
+        onSave,
+        {},
+      );
+    },
+
     getAnalytics(
       variantIds: ID[],
       start: Date,
@@ -1272,7 +1303,7 @@ export const Ajax =
       intervalId: number,
       aggregation: string,
       onLoad: (response: any) => void,
-      onError?: (ev: Event) => void)
+      onError?: (error: any) => void)
     {
       const args = {
         variantid: variantIds.join(','),
@@ -1296,7 +1327,7 @@ export const Ajax =
           }
           catch (e)
           {
-            onError && onError(response as any);
+            onError && onError(JSON.parse(response) as any);
           }
         },
         { onError, urlArgs: args });

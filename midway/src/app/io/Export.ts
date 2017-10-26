@@ -47,6 +47,7 @@ THE SOFTWARE.
 import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
+import * as equal from 'deep-equal';
 import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
@@ -117,6 +118,7 @@ export class Export
   private BATCH_SIZE: number = 5000;
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);
   private SCROLL_TIMEOUT: string = '60s';
+  private MAX_ROW_THRESHOLD: number = 2000;
 
   public async export(exprt: ExportConfig, headless: boolean): Promise<stream.Readable | string>
   {
@@ -132,8 +134,6 @@ export class Export
         return reject('File export currently is only supported for Elastic databases.');
       }
       const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-
-      const dbSchema: Tasty.Schema = await database.getTasty().schema();
 
       if (exprt.filetype !== 'csv' && exprt.filetype !== 'json' && exprt.filetype !== 'json [type object]')
       {
@@ -164,13 +164,26 @@ export class Export
           exprt[templateKey] = template[templateKey];
         }
       }
-
+      if (exprt.columnTypes === undefined)
+      {
+        return reject('Must provide export template column types.');
+      }
       if (exprt.filetype === 'json [type object]' && objectKeyValue !== undefined)
       {
         exprt.objectKey = objectKeyValue;
       }
-
       let qry: string = '';
+
+      // if (this.props.exporting)
+      // {
+      //   const stringQuery: string =
+      //     ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      //   const parsedQuery = JSON.parse(stringQuery);
+      //   const dbName = parsedQuery['index'];
+      //   const tableName = parsedQuery['type'];
+      //   Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
+      // } // Parse the TQL and set the filters so that when we fetch we get the right templates.
+
       // get query data from variantId or query
       if (exprt.variantId !== undefined && exprt.query === undefined)
       {
@@ -202,6 +215,7 @@ export class Export
       }
 
       let qryObj: object;
+      const mapping: object = exprt.columnTypes;
       try
       {
         qryObj = JSON.parse(qry);
@@ -210,16 +224,16 @@ export class Export
       {
         return reject(e);
       }
-      const [queryIndex, queryType] = temporaryFindIndexAndType(qryObj);
-      if (queryIndex === '')
+
+      qryObj = this._shouldRandomSample(qryObj);
+
+      if (typeof mapping === 'string')
       {
-        return reject('Must provide an index.');
+        return reject(mapping);
       }
-      if (queryIndex !== exprt['dbname'])
-      {
-        return reject('Query index name does not match supplied index name.');
-      }
-      const tableName: string | undefined = queryType !== '' ? queryType : undefined;
+
+      winston.info(qry);
+
       let rankCounter: number = 1;
       let writer: any;
       if (exprt.filetype === 'csv')
@@ -267,7 +281,7 @@ export class Export
         for (const doc of newDocs)
         {
           // verify schema mapping with documents and fix documents accordingly
-          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], dbSchema, exprt.dbname, tableName);
+          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], mapping);
           if (typeof newDoc === 'string')
           {
             writer.end();
@@ -300,10 +314,11 @@ export class Export
           }
         }
 
+        winston.info('Beginning export transformations.');
         // transform documents with template
         try
         {
-          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, true));
+          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
           for (const doc of returnDocs)
           {
             if (exprt.rank === true)
@@ -337,7 +352,7 @@ export class Export
             writer.write(JSON.stringify(returnDoc));
           }
         }
-        if (Math.min(resp.hits.total, qryObj['size']) > rankCounter - 1)
+        if (Math.min(resp.hits.total, qryObj['body']['size']) > rankCounter - 1)
         {
           elasticClient.scroll({
             scrollId: resp._scroll_id,
@@ -360,6 +375,322 @@ export class Export
       }.bind(this),
       );
     });
+  }
+
+  public async getNamesAndTypesFromQuery(dbid: number, qry: object | string): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      if (typeof qry === 'string')
+      {
+        try
+        {
+          qry = JSON.parse(qry);
+        }
+        catch (e)
+        {
+          return reject(e.message as string);
+        }
+      }
+
+      qry = this._shouldRandomSample(qry as object);
+      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+      if (database === undefined)
+      {
+        return reject('Database "' + dbid.toString() + '" not found.');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return reject('File export currently is only supported for Elastic databases.');
+      }
+      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+      return resolve(await this._getAllFieldsAndTypesFromQuery(elasticClient, qry as object));
+    });
+  }
+
+  public async getNamesAndTypesFromVariant(dbid: number, variantId: number): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+      if (database === undefined)
+      {
+        return reject('Database "' + dbid.toString() + '" not found.');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return reject('File export currently is only supported for Elastic databases.');
+      }
+      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+      const variants: ItemConfig[] = await TastyItems.get(variantId);
+      if (variants.length === 0)
+      {
+        return reject('Variant not found.');
+      }
+      let qry: object | string = await this._getQueryFromVariant(variants[0]);
+      if (typeof qry === 'string')
+      {
+        return reject(qry);
+      }
+      qry = this._shouldRandomSample(qry as object);
+      return resolve(await this._getAllFieldsAndTypesFromQuery(elasticClient, qry));
+    });
+  }
+
+  private _shouldRandomSample(qry: object): object
+  {
+    if (qry['body'] !== undefined && qry['body']['size'] !== undefined)
+    {
+      if (typeof qry['body']['size'] === 'number' && qry['body']['size'] > this.MAX_ROW_THRESHOLD)
+      {
+        qry['body']['from'] = 0;
+        qry['body']['size'] = this.MAX_ROW_THRESHOLD;
+        qry['body']['query'] = { function_score: { random_score: {}, query: qry['body']['query'] } };
+      }
+    }
+    return qry;
+  }
+
+  private async _getQueryFromVariant(variant: ItemConfig): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      let qry: object = {};
+      try
+      {
+        if (variant.meta !== undefined)
+        {
+          qry = JSON.parse(variant.meta)['query']['tql'];
+        }
+      }
+      catch (e)
+      {
+        return resolve('Malformed variant');
+      }
+      return resolve(qry);
+    });
+  }
+
+  private async _getAllFieldsAndTypesFromQuery(elasticClient: ElasticClient, qryObj: object, maxSize?: number): Promise<object | string>
+  {
+    return new Promise<object | string>(async (resolve, reject) =>
+    {
+      const fieldObj: object = {};
+      let fieldsAndTypes: object = {};
+      let rankCounter = 1;
+      let qrySize: number = 0;
+      if (maxSize === undefined)
+      {
+        maxSize = this.MAX_ROW_THRESHOLD;
+      }
+      if (qryObj['body'] === undefined || (qryObj['body'] !== undefined && qryObj['body']['size'] === undefined))
+      {
+        qrySize = maxSize;
+      }
+      else
+      {
+        qrySize = Math.min(qryObj['body']['size'], maxSize);
+      }
+      elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
+      {
+        if (resp.hits === undefined || (resp.hits !== undefined && resp.hits.hits === undefined))
+        {
+          return resolve(fieldObj);
+        }
+        const newDocs: object[] = resp.hits.hits as object[];
+        if (newDocs.length === undefined)
+        {
+          return resolve('Something was wrong with the query.');
+        }
+        if (newDocs.length === 0)
+        {
+          return resolve(fieldObj);
+        }
+        fieldsAndTypes = await this._getFieldsAndTypesFromDocuments(newDocs, fieldsAndTypes);
+        rankCounter += newDocs.length;
+        if (Math.min(Math.min(resp.hits.total, qrySize), maxSize as number) > rankCounter - 1)
+        {
+          elasticClient.scroll({
+            scrollId: resp._scroll_id,
+            scroll: this.SCROLL_TIMEOUT,
+          }, getMoreUntilDone);
+        }
+        else
+        {
+          for (const field of Object.keys(fieldsAndTypes))
+          {
+            fieldObj[field] = this._getPriorityType(fieldsAndTypes[field] as string[]);
+          }
+          return resolve(fieldObj);
+        }
+      }.bind(this),
+      );
+    });
+  }
+
+  // boolean, long, double, string, array, object ({...})
+  // returns an object with keys as the fields and values as arrays of the detected types
+  private async _getFieldsAndTypesFromDocuments(docs: object[], fieldObj: object): Promise<object>
+  {
+    if (fieldObj === undefined)
+    {
+      fieldObj = {};
+    }
+    return new Promise<object>(async (resolve, reject) =>
+    {
+      for (const doc of docs)
+      {
+        const fields: string[] = Object.keys(doc['_source']);
+        for (const field of fields)
+        {
+          let fullTypeObj = {};
+          fullTypeObj = { type: 'text', index: 'not_analyzed', analyzer: null };
+          switch (typeof doc['_source'][field])
+          {
+            case 'number':
+              fullTypeObj['type'] = doc['_source'][field] % 1 === 0 ? 'long' : 'double';
+              if (!fieldObj.hasOwnProperty(field))
+              {
+                fieldObj[field] = [fullTypeObj];
+              }
+              else
+              {
+                if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
+                  .indexOf(true) > -1)
+                {
+                  fieldObj[field].concat(fullTypeObj);
+                }
+              }
+              break;
+            case 'boolean':
+              fullTypeObj['type'] = 'boolean';
+              if (!fieldObj.hasOwnProperty(field))
+              {
+                fieldObj[field] = [fullTypeObj];
+              }
+              else
+              {
+                if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
+                  .indexOf(true) < 0)
+                {
+                  fieldObj[field].concat(fullTypeObj);
+                }
+              }
+              break;
+            case 'object':
+              fullTypeObj['type'] = Array.isArray(doc['_source'][field]) === true ? 'array' : 'object';
+              if (!fieldObj.hasOwnProperty(field))
+              {
+                fieldObj[field] = [fullTypeObj['type'] === 'array' ?
+                  this._recursiveArrayTypeHelper(doc['_source'][field]) : fullTypeObj];
+              }
+              else
+              {
+                if (fullTypeObj['type'] === 'array')
+                {
+                  const fullArrayObj: object = this._recursiveArrayTypeHelper(doc['_source'][field]);
+                  if (fieldObj[field].indexOf(fullArrayObj) < 0)
+                  {
+                    fieldObj[field].concat(fullArrayObj);
+                  }
+                }
+                else
+                {
+                  if (fieldObj[field].map((typeObj) => typeObj['type'] === fullTypeObj['type'])
+                    .indexOf(true) < 0)
+                  {
+                    fieldObj[field].concat(fullTypeObj);
+                  }
+                }
+              }
+              break;
+            default:
+              fullTypeObj['index'] = 'analyzed';
+              fullTypeObj['analyzer'] = 'standard';
+              if (!fieldObj.hasOwnProperty(field))
+              {
+                fieldObj[field] = [fullTypeObj];
+              }
+              else
+              {
+                fieldObj[field].concat(fullTypeObj);
+              }
+          }
+        }
+      }
+      return resolve(fieldObj);
+    });
+  }
+
+  private _recursiveArrayTypeHelper(fieldValue: any): object
+  {
+    if (Array.isArray(fieldValue))
+    {
+      return { type: 'array', innerType: this._recursiveArrayTypeHelper(fieldValue[0]) };
+    }
+    else
+    {
+      switch (typeof fieldValue)
+      {
+        case 'number':
+          return { type: fieldValue % 1 === 0 ? 'long' : 'double', innerType: null, index: 'not_analyzed', analyzer: null };
+        case 'boolean':
+          return { type: 'boolean', innerType: null, index: 'not_analyzed', analyzer: null };
+        case 'object':
+          return { type: 'object', innerType: null, index: 'not_analyzed', analyzer: null };
+        default:
+          return { type: 'text', innerType: null, index: 'analyzed', analyzer: 'standard' };
+      }
+    }
+  }
+
+  private _getInnermostType(arrayType: object): string
+  {
+    while (arrayType['type'] === 'array' && arrayType['innerType'] !== undefined && typeof arrayType['innerType'] === 'object')
+    {
+      arrayType = arrayType['innerType'];
+    }
+    return arrayType['type'];
+  }
+
+  private _getPriorityType(types: object[]): object
+  {
+    const topPriorityTypes: string[] = ['array', 'object']; // string is default case
+    if (types.length === 1)
+    {
+      return types[0];
+    }
+
+    for (const type of topPriorityTypes)
+    {
+      if (types.map((typesObj) => typesObj['type']).indexOf('array') >= 0)
+      {
+        const arrayTypes: object[] = types.filter((typeObj) => typeObj['type'] === 'array');
+        const innermostTypes: string[] = arrayTypes.map((arrayType) =>
+        {
+          return this._getInnermostType(arrayType);
+        });
+        if (types.length === 1)
+        {
+          return arrayTypes[0];
+        }
+        if (equal(innermostTypes.sort(), ['double', 'long']))
+        {
+          return { type: 'double', index: 'not_analyzed', analyzer: null };
+        }
+        return { type: 'text', index: 'analyzed', analyzer: 'standard' };
+      }
+      else if (types.map((typesObj) => typesObj['type']).indexOf('object') >= 0)
+      {
+        return { type: 'object', index: 'not_analyzed', analyzer: null };
+      }
+    }
+
+    if (equal(types.map((typeObj) => typeObj['type']).sort(), ['double', 'long']))
+    {
+      return { type: 'double', index: 'not_analyzed', analyzer: null };
+    }
+    return { type: 'text', index: 'analyzed', analyzer: 'standard' };
   }
 
   private _applyTransforms(obj: object, transforms: object[]): object
@@ -499,43 +830,25 @@ export class Export
     return typeObj['type'];
   }
 
-  private async _checkDocumentAgainstMapping(document: object, schema: Tasty.Schema,
-    database: string, tableName: string): Promise<object | string>
+  private async _checkDocumentAgainstMapping(document: object, mapping: object): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
       const newDocument: object = document;
-      if (schema.tableNames(database).length === 0)
+      const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(mapping), Object.keys(document));
+      for (const field of fieldsInMappingNotInDocument)
       {
-        return resolve('Schema not found for database ' + database);
+        newDocument[field] = null;
+        // TODO: Case 740
+        // if (fields[field]['type'] === 'text')
+        // {
+        //   newDocument[field] = '';
+        // }
       }
-      let tableNameArr: string[] = [];
-      if (tableName !== undefined)
+      const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(mapping));
+      for (const field of fieldsInDocumentNotMapping)
       {
-        tableNameArr = [tableName];
-      }
-      else
-      {
-        tableNameArr = schema.tableNames(database);
-      }
-      for (const table of tableNameArr)
-      {
-        const fields: object = schema.fields(database, table);
-        const fieldsInMappingNotInDocument: string[] = _.difference(Object.keys(fields), Object.keys(document));
-        for (const field of fieldsInMappingNotInDocument)
-        {
-          newDocument[field] = null;
-          // TODO: Case 740
-          // if (fields[field]['type'] === 'text')
-          // {
-          //   newDocument[field] = '';
-          // }
-        }
-        const fieldsInDocumentNotMapping = _.difference(Object.keys(newDocument), Object.keys(fields));
-        for (const field of fieldsInDocumentNotMapping)
-        {
-          delete newDocument[field];
-        }
+        delete newDocument[field];
       }
       resolve(newDocument);
     });
@@ -614,14 +927,6 @@ export class Export
       }
     }
 
-    for (const key of exprt.primaryKeys)
-    {
-      if (obj[key] === '' || obj[key] === null)
-      {
-        return 'Encountered an object with an empty primary key ("' + key + '"): ' + JSON.stringify(obj);
-      }
-    }
-
     return '';
   }
 
@@ -635,7 +940,23 @@ export class Export
   {
     switch (this.NUMERIC_TYPES.has(typeObj['type']) ? 'number' : typeObj['type'])
     {
-      case 'number':
+      case 'double':
+        if (item[field] === '' || item[field] === 'null')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          const parsedValue: number | boolean = typeParser.getDoubleFromString(String(item[field]));
+          if (typeof parsedValue === 'number')
+          {
+            item[field] = parsedValue;
+            return true;
+          }
+          return false;
+        }
+        break;
+      case 'long':
         if (item[field] === '' || item[field] === 'null')
         {
           item[field] = null;

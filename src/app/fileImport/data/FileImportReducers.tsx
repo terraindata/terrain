@@ -298,6 +298,31 @@ FileImportReducers[ActionTypes.setColumnType] =
       .setIn(keyPath, action.payload.type);
   };
 
+FileImportReducers[ActionTypes.setColumnTypes] =
+  (state, action) =>
+  {
+    const { previewColumns, columnNames } = state;
+    return state
+      .set('columnTypes', List(columnNames.map((colName) =>
+        action.payload.newColumnTypes[colName] ?
+          FileImportTypes._ColumnTypesTree(action.payload.newColumnTypes[colName])
+          :
+          FileImportTypes._ColumnTypesTree())));
+  };
+
+FileImportReducers[ActionTypes.fetchTypesFromQuery] =
+  (state, action) =>
+  {
+    Ajax.getTypesFromQuery(
+      state.serverId,
+      action.payload.query,
+      (namesAndTypes) =>
+      {
+        action.payload.setColumnTypes(namesAndTypes);
+      });
+    return state;
+  };
+
 FileImportReducers[ActionTypes.setColumnTypeIndex] =
   (state, action) =>
   {
@@ -412,7 +437,6 @@ FileImportReducers[ActionTypes.exportFile] =
   {
     Ajax.exportFile(
       state.filetype,
-      action.payload.dbName,
       action.payload.serverId,
       Map<string, object>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&
