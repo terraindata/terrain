@@ -925,7 +925,7 @@ class FileImportPreview extends TerrainComponent<Props>
           </div>
         </div>
         {
-          this.props.filetype === 'json' || this.props.exporting &&
+          (this.props.filetype === 'json' || this.props.exporting) &&
           <div
             className='flex-container fi-preview-template'
           >
