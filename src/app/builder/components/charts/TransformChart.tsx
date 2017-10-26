@@ -461,6 +461,7 @@ const TransformChart = {
 
   _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData)
   {
+    console.log(spotlights);
     const g = d3.select(el).selectAll('.spotlights');
 
     const spotlight = g.selectAll('.spotlight')
@@ -474,8 +475,9 @@ const TransformChart = {
       .attr('class', 'spotlight')
       .attr('id', (d) => d['fields']['_id']);
     spotlightEnter.append('circle');
+    spotlightEnter.append('text').attr('class', 'spotlight-rank');
     spotlightEnter.append('rect');
-    spotlightEnter.append('text');
+    spotlightEnter.append('text').attr('class', 'spotlight-tooltip');
 
     const minX = scaleDomainMin(scales.realX);
     const maxX = scaleDomainMax(scales.realX);
@@ -519,12 +521,12 @@ const TransformChart = {
       return xToBucket[x];
     };
 
-    const getSpotlightY = (d) =>
+    const getSpotlightY = (d, increaseOffset) =>
     {
       const x = getSpotlightX(d);
       const bucket = getBucket(d);
 
-      if (ys[bucket])
+      if (ys[bucket] && increaseOffset)
       {
         ys[bucket].offset += OFFSET;
       }
@@ -570,14 +572,21 @@ const TransformChart = {
 
     spotlight
       .select('circle')
-      .attr('cy', (d) => getSpotlightY(d))
+      .attr('cy', (d) => getSpotlightY(d, true))
       .attr('cx', (d) => getFinalX(d))
       .attr('fill', (d) => d['color'])
       .attr('r', (d) => SPOTLIGHT_SIZE / 2)
       ;
 
+    // TODO POSITON AND SIZE BASED ON LENGTH OF NUM
+    spotlight.select('.spotlight-rank')
+      .attr('y', (d) => getSpotlightY(d, false) + 3)
+      .attr('x', (d) => getFinalX(d) - 3)
+      .attr('fill', '#fff')
+      .text((d) => d['rank'] + 1);
+
     spotlight
-      .select('text')
+      .select('.spotlight-tooltip')
       .text((d) => d['name'])
       .attr('class', (d) => 'spotlight-tooltip spotlight-tooltip-' + d['id'])
       .attr('y', (d) => idToY[d['id']] + 5)
@@ -623,7 +632,11 @@ const TransformChart = {
         const y = d['y'];
         const offset = d['offset'];
         const radius = SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING;
+        console.log('x', x);
+        console.log('y', y);
+        console.log('offset', offset);
         let straightHeight = offset - radius * 2 - 2;
+        console.log(straightHeight);
         if (straightHeight < 0)
         {
           straightHeight = 0;
@@ -644,7 +657,7 @@ const TransformChart = {
         str = str.replace(/h/g, straightHeight + '');
         str = str.replace(/r/g, radius + '');
         str = str.replace(/p/g, pinR + '');
-
+        console.log(str);
         return str;
       })
       .attr('transform', (d) =>
@@ -674,7 +687,7 @@ const TransformChart = {
         return '';
       });
 
-    spotlight.selectAll('text, rect')
+    spotlight.selectAll('.spotlight-tooltip, rect')
       .attr('transform', (d) =>
       {
         let rotate = '0';
