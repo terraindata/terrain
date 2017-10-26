@@ -172,7 +172,7 @@ export class CreateCardOption extends TerrainComponent<Props>
                 {card.static.description}
               </span>,
               size: 'small',
-              position: 'left',
+              position: 'bottom',
             },
           )
         }
