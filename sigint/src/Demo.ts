@@ -48,10 +48,62 @@ import * as Elastic from 'elasticsearch';
 import * as fs from 'fs';
 import * as winston from 'winston';
 
-export const indexName = 'movies';
-export const typeName = 'data';
+import { makePromiseCallback } from './Util';
 
-export function getMovies(request: any): object[]
+export const index = 'movies';
+export const type = 'data';
+
+export interface Query
 {
-  return [];
+  s: string;
+  q: string;
+  p: number;
+}
+
+export async function search(query: Query): Promise<object[]>
+{
+  const client = new Elastic.Client({
+    host: query.s,
+  });
+
+  try
+  {
+    await new Promise((resolve, reject) =>
+    {
+      client.ping({
+        requestTimeout: 100,
+      }, makePromiseCallback(resolve, reject));
+    });
+  }
+  catch (e)
+  {
+    winston.error('creating ES client for host: ' + String(query.s) + ': ' + String(e));
+    return [];
+  }
+
+  try
+  {
+    const resp: any = await new Promise((resolve, reject) =>
+    {
+      client.search({
+        index,
+        type,
+        q: 'title:' + query.q,
+        from: (query.p * 10),
+        size: 10,
+      }, makePromiseCallback(resolve, reject));
+    });
+
+    if (resp.hits.hits === undefined)
+    {
+      return [];
+    }
+
+    return resp.hits.hits.map((m) => m._source);
+  }
+  catch (e)
+  {
+    winston.error('querying ES: ' + String(query.q) + ': ' + String(e));
+    return [];
+  }
 }

@@ -44,45 +44,51 @@ THE SOFTWARE.
 
 'use strict';
 
-window.movieSearch = angular.module('movieSearch', []);
+window.terrainSearch = angular.module('terrainSearch', []);
 
-movieSearch.controller('movieCtrl', function($scope, $location, $http)
+terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 {
-  $scope.movies = [];
-  $scope.page = 0;
-  $scope.allResults = false;
+  $scope.results = [];
 
   $scope.searchTerm = $location.search().q;
+  $scope.esServer = $location.search().es;
+  $scope.page = $location.search().p;
 
   $scope.search = function()
   {
     $scope.page = 0;
-    $scope.movies = [];
-    $scope.allResults = false;
-    $location.search({'q': $scope.searchTerm});
+    $scope.results = [];
+    $location.search({
+      'q': $scope.searchTerm,
+      'es': $scope.esServer,
+      'p': $scope.page,
+    });
     $scope.loadMore();
   };
 
   $scope.loadMore = function()
   {
-    if ($scope.searchTerm === '' || $scope.searchTerm === undefined)
+    if ($scope.page === undefined)
     {
-      return;
+      $scope.page = 0;
     }
 
-    console.log($scope.esServer);
-    $http.get('http://localhost/?s=' + $scope.searchTerm + '&page=' + $scope.page++)
-    .then(function(results)
+    if ($scope.searchTerm === undefined)
     {
-      if(results.length !== 10)
-      {
-        $scope.allResults = true;
-      }
+      $scope.searchTerm = '';
+    }
 
-      var ii = 0;
-      for(;ii < results.length; ii++)
+    if ($scope.esServer === undefined)
+    {
+      $scope.esServer = 'http://localhost:9200';
+    }
+
+    $http.get('/demo/search?s=' + encodeURIComponent($scope.esServer) + '&q=' + $scope.searchTerm + '&p=' + $scope.page++)
+    .then((response) =>
+    {
+      if (response.status === 200)
       {
-        $scope.movies.push(results[ii]);
+        $scope.results = response.data;
       }
     });
   };

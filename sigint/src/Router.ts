@@ -103,9 +103,9 @@ export class Router
       }
     });
 
-    this.appRouter.get('/demo/movies', async (ctx, next) =>
+    this.appRouter.get('/demo/search', async (ctx, next) =>
     {
-      ctx.body = Demo.getMovies(ctx.request);
+      ctx.body = await Demo.search(ctx.request.query);
     });
 
     this.appRouter.use('/v1', this.router.routes(), this.router.allowedMethods());
