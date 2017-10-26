@@ -63,7 +63,7 @@ import { Card, CardConfig } from 'src/blocks/types/Card';
 import { AllBackendsMap } from 'src/database/AllBackends';
 import { backgroundColor, borderColor, cardHoverBackground, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
 
-import {CreateCardOption, searchForText} from './CreateCardOption';
+import { CreateCardOption, searchForText } from './CreateCardOption';
 import './CreateCardTool.less';
 
 function getCardCategory(card: CardConfig): string
@@ -155,7 +155,7 @@ class CardSelector extends TerrainComponent<Props>
     this.getCardSuggestionSet = memoizeOne(this.getCardSuggestionSet);
     this.computeOptionCategories = memoizeOne(this.computeOptionCategories);
     this.computeCardOptions = memoizeOne(this.computeCardOptions);
-    this.categoryClickedWrapper = _.memoize(this.categoryClickedWrapper, (item: CardCategory) => item.name);
+    this.changeCategoryWrapper = _.memoize(this.changeCategoryWrapper, (item: CardCategory) => item.name);
     const available = this.computeAvailableCategories(this.props.cardTypeList, this.props.card);
     this.state.currentCategory = available.get(0);
     // even if there are no cards, 'all' will always be there.
@@ -229,38 +229,30 @@ class CardSelector extends TerrainComponent<Props>
     return Math.max(categoryHeight, Math.min(potentialSelectorHeight, optionHeight * 5)) + 'px';
   }
 
-  // it is not possible to use the KeyboardFocus component since our input element needs focus
-  public handleKeyDown(event)
+  public handleEnterKey()
   {
-    // arrow keys: up = 38, down = 40, enter = 13
-    if (event.keyCode !== 40 && event.keyCode !== 38 && event.keyCode !== 13)
-    {
-      return; // so we don't waste computation on regular keystrokes
-    }
+    const type = this.props.cardTypeList.get(this.state.focusedIndex);
+    const optionCard = AllBackendsMap[this.props.language].blocks[type] as CardConfig;
+    this.props.handleCardClick(optionCard, this.state.focusedIndex);
+  }
 
-    if (event.keyCode === 13) // enter
-    {
-      const type = this.props.cardTypeList.get(this.state.focusedIndex);
-      const optionCard = AllBackendsMap[this.props.language].blocks[type] as CardConfig;
-      this.props.handleCardClick(optionCard, this.state.focusedIndex);
-      return;
-    }
-
+  public handleArrowKey(event)
+  {
     const indexList = this.getCardOptions().map((v, i) => v.index).toList();
     const currentListIndex = indexList.indexOf(this.state.focusedIndex);
-    let newFocusedListIndex = -1;
 
-    if (event.keyCode === 40) // down
+    if (indexList.size > 0 && currentListIndex !== -1)
     {
-      newFocusedListIndex = Math.min(currentListIndex + 1, indexList.size - 1);
-    }
-    if (event.keyCode === 38) // up
-    {
-      newFocusedListIndex = Math.max(currentListIndex - 1, 0);
-    }
+      let newFocusedListIndex = -1;
+      if (event.keyCode === 40) // down (go 'up' the list since list is top to bottom)
+      {
+        newFocusedListIndex = Math.min(currentListIndex + 1, indexList.size - 1);
+      }
+      else if (event.keyCode === 38) // up (go 'down' the list)
+      {
+        newFocusedListIndex = Math.max(currentListIndex - 1, 0);
+      }
 
-    if (indexList.size > 0 && newFocusedListIndex !== -1)
-    {
       const focusedIndex = indexList.get(newFocusedListIndex);
       const elem = this.state.optionMap.get(focusedIndex);
       if (elem !== null && elem !== undefined)
@@ -268,7 +260,7 @@ class CardSelector extends TerrainComponent<Props>
         const scrollTop = this.state.innerSelectorElement.scrollTop;
         const topToTopDistance =
           scrollTop - (elem.offsetTop - elem.clientHeight / 2.0 - 3);
-          // minus three for the border width (2px + integer truncation)
+        // minus three for the border width (2px + integer truncation)
         const bottomToBottomDistance =
           scrollTop + this.state.innerSelectorElement.clientHeight
           - (elem.offsetTop + elem.clientHeight / 2.0);
@@ -276,8 +268,7 @@ class CardSelector extends TerrainComponent<Props>
         {
           const newScrollTop =
             scrollTop - (event.keyCode === 38 ? topToTopDistance : bottomToBottomDistance);
-          $(this.state.innerSelectorElement).animate({ scrollTop: newScrollTop }, {duration: 150, queue: false});
-          // this.state.innerSelectorElement.scrollTop = newScrollTop;
+          $(this.state.innerSelectorElement).animate({ scrollTop: newScrollTop }, { duration: 150, queue: false });
         }
       }
 
@@ -287,9 +278,54 @@ class CardSelector extends TerrainComponent<Props>
     }
   }
 
+  public handleCtrlArrowKey(event)
+  {
+    const availableCategories = this.computeAvailableCategories(this.props.cardTypeList, this.props.card);
+    const categoryIndex = availableCategories.indexOf(this.state.currentCategory);
+
+    if (availableCategories.size > 0 && categoryIndex !== -1)
+    {
+      let newIndex = categoryIndex;
+      if (event.keyCode === 38) // up (decrease index, since list items displayed top to bottom)
+      {
+        newIndex = Math.max(categoryIndex - 1, 0);
+      }
+      else if (event.keyCode === 40) // down
+      {
+        newIndex = Math.min(categoryIndex + 1, availableCategories.size - 1);
+      }
+
+      const newCategory = availableCategories.get(newIndex);
+      this.changeCategoryWrapper(newCategory)(); // get the click handler for the category and 'click' it.
+    }
+  }
+
+  // it is not possible to use the KeyboardFocus component since our input element needs focus
+  public handleKeyDown(event)
+  {
+
+    if (event.keyCode === 13) // enter
+    {
+      this.handleEnterKey();
+    }
+
+    if (event.keyCode === 38 || event.keyCode === 40) // up and down
+    {
+      if (event.ctrlKey)
+      {
+        this.handleCtrlArrowKey(event);
+      }
+      else
+      {
+        this.handleArrowKey(event);
+      }
+    }
+
+  }
+
   public handleSearchTextboxChange(ev: any)
   {
-    const indexList = this.getCardOptions({searchValue: ev.target.value}).map((v, i) => v.index).toList();
+    const indexList = this.getCardOptions({ searchValue: ev.target.value }).map((v, i) => v.index).toList();
     const currentListIndex = indexList.indexOf(this.state.focusedIndex);
     let focusedIndex = this.state.focusedIndex;
     if (currentListIndex === -1 && indexList.size > 0)
@@ -325,8 +361,8 @@ class CardSelector extends TerrainComponent<Props>
       categoryName?: string,
       searchValue?: string,
       focusedIndex?: number,
-    } = {}
-  ): List<{index: number, option: any}>
+    } = {},
+  ): List<{ index: number, option: any }>
   {
     const options = this.computeCardOptions(
       this.props.cardTypeList,
@@ -350,10 +386,11 @@ class CardSelector extends TerrainComponent<Props>
     language,
     searchValue,
     focusedIndex,
-    handleCardClick
-  ): List<{index: number, option: any}>
+    handleCardClick,
+  ): List<{ index: number, option: any }>
   {
-    return cardTypeList.map((type: string, index: number) => {
+    return cardTypeList.map((type: string, index: number) =>
+    {
       const optionCard = AllBackendsMap[language].blocks[type] as CardConfig;
       const title = (overrideText && overrideText.get(index) && overrideText.get(index).text)
         || optionCard.static.title;
@@ -362,25 +399,29 @@ class CardSelector extends TerrainComponent<Props>
 
       if (optionCategories.get(index).has(currentCategory) && searchResult)
       {
-        return {index, option: (
-          <CreateCardOption
-            title={searchResult[0]}
-            description={searchResult[1]}
-            card={optionCard}
-            index={index}
-            outerRef={(elem) => {
-              if (elem !== null)
+        return {
+          index, option: (
+            <CreateCardOption
+              title={searchResult[0]}
+              description={searchResult[1]}
+              card={optionCard}
+              index={index}
+              outerRef={(elem) =>
               {
-                this.setState((prevState, props) => {
-                  return { optionMap: prevState.optionMap.set(index, elem)}
-                });
-              }
-            }}
-            onClick={handleCardClick}
-            isFocused={focusedIndex === index}
-            key={index.toString()}
-          />
-        )};
+                if (elem !== null)
+                {
+                  this.setState((prevState, props) =>
+                  {
+                    return { optionMap: prevState.optionMap.set(index, elem) };
+                  });
+                }
+              }}
+              onClick={handleCardClick}
+              isFocused={focusedIndex === index}
+              key={index.toString()}
+            />
+          ),
+        };
       }
       return null;
     }).filter((val) => val !== null).toList();
@@ -413,7 +454,7 @@ class CardSelector extends TerrainComponent<Props>
         className='card-category-list-item'
         style={categoryStyle}
         key={index}
-        onClick={this.categoryClickedWrapper(item)}
+        onClick={this.changeCategoryWrapper(item)}
       >
         {item.name}
       </div>
@@ -421,18 +462,20 @@ class CardSelector extends TerrainComponent<Props>
   }
 
   // memoized higher order function that handles category click
-  public categoryClickedWrapper(item: CardCategory)
+  public changeCategoryWrapper(item: CardCategory)
   {
     return () =>
     {
       this.state.inputElement.focus();
 
-      const indexList = this.getCardOptions({categoryName: item.name}).map((v, i) => v.index);
+      const indexList = this.getCardOptions({ categoryName: item.name }).map((v, i) => v.index);
       let focusedIndex = this.state.focusedIndex;
       if (item.name !== this.state.currentCategory.name && indexList.size > 0)
       {
         focusedIndex = indexList.get(0);
       }
+
+      $(this.state.innerSelectorElement).animate({ scrollTop: 0 }, { duration: 150, queue: false });
 
       this.setState({
         currentCategory: item,
@@ -505,8 +548,6 @@ class CardSelector extends TerrainComponent<Props>
         onKeyDown={this.handleKeyDown}
         tabIndex={-1}
       >
-        <div className='inset-shadow-veil' />
-
         <div className='selectors-row'>
           <div className='card-category-selector'>
             <div className='create-card-column-title' style={columnTitleStyle}>

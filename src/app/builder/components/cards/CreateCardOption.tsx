@@ -136,38 +136,38 @@ export class CreateCardOption extends TerrainComponent<Props>
       getStyle('borderRightColor', leftRightColor),
       getStyle('borderLeftColor', leftRightColor),
       fontColor(Colors().text2, Colors().text1),
-      backgroundColor(Colors().bg3, Colors().highlight)
+      backgroundColor(Colors().bg3, Colors().highlight),
     );
     const titleStyle = _.extend({},
       fontColor(card.static.colors[0]),
     );
     return (
+      <div
+        className={classNames({
+          'create-card-option': true,
+        })}
+        onClick={this.handleClick}
+        style={mainStyle}
+        key='create-option'
+        ref={this.props.outerRef}
+      >
         <div
-          className={classNames({
-            'create-card-option': true,
-          })}
-          onClick={this.handleClick}
-          style={mainStyle}
-          key='create-option'
-          ref={this.props.outerRef}
+          className='create-card-option-title'
+          key='create-title'
+          style={titleStyle}
         >
-          <div
-            className='create-card-option-title'
-            key='create-title'
-            style={titleStyle}
-          >
-            {
-              this.props.title
-            }
-          </div>
-          <div
-            className='create-card-option-description'
-          >
-            {
-              this.props.description
-            }
-          </div>
+          {
+            this.props.title
+          }
         </div>
+        <div
+          className='create-card-option-description'
+        >
+          {
+            this.props.description
+          }
+        </div>
+      </div>
     );
   }
 }

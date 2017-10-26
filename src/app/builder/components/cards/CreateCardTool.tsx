@@ -189,51 +189,7 @@ class CreateCardTool extends TerrainComponent<Props>
         open={this.props.open}
       />
     );
-
-    // return (
-    //   <div
-    //     onClick={this.props.onToggle}
-    //     className='create-card-placeholder'
-    //     style={{
-    //       borderColor: Colors().inactiveHover,
-    //       ':hover': {
-    //         background: Colors().inactiveHover,
-    //       }
-    //     }}
-    //   >
-    //     {
-    //       this.props.open ? <CloseIcon /> : <AddIcon />
-    //     }
-    //   </div>
-    // );
   }
-
-  // handleFocus()
-  // {
-  //   this.setState({
-  //     focusedIndex: 0,
-  //   });
-  // }
-
-  // handleFocusLost()
-  // {
-  //   this.setState({
-  //     focusedIndex: -1,
-  //   });
-  // }
-
-  // handleFocusedIndexChange(focusedIndex: number)
-  // {
-  //   this.setState({
-  //     focusedIndex,
-  //   });
-  // }
-
-  // handleKeyboardSelect(index: number)
-  // {
-  //   const type = this.getCardTypeList().get(index);
-  //   this.createCard(type);
-  // }
 
   public render()
   {
@@ -267,7 +223,7 @@ class CreateCardTool extends TerrainComponent<Props>
         className={classes}
         style={_.extend(
           style,
-          {}, // backgroundColor(Colors().bg1),
+          {},
         )}
       >
         {
@@ -289,47 +245,8 @@ class CreateCardTool extends TerrainComponent<Props>
           language={this.props.language}
           handleCardDrop={this.props.handleCardDrop}
         />
-        {
-          // <KeyboardFocus
-          //   onFocus={this.handleFocus}
-          //   onFocusLost={this.handleFocusLost}
-          //   index={this.state.focusedIndex}
-          //   onIndexChange={this.handleFocusedIndexChange}
-          //   length={cardTypeList.size}
-          //   onSelect={this.handleKeyboardSelect}
-          // />
-        }
       </div>
     );
   }
 }
 export default CreateCardTool;
-
-// const cardTarget =
-// {
-//   canDrop(props, monitor)
-//   {
-//     return true;
-//   },
-
-//   drop(props, monitor, component)
-//   {
-//     const item = monitor.getItem();
-//     if(monitor.isOver({ shallow: true}))
-//     {
-//       props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
-
-//       setTimeout(() =>
-//       {
-//         // Actions.cards.move(item, props.index || 0, props.parentId); // TODO
-//       }, 250);
-//     }
-//   }
-// }
-
-// const dropCollect = (connect, monitor) =>
-// ({
-//   connectDropTarget: connect.dropTarget(),
-// });
-
-// export default DropTarget('CARD', cardTarget, dropCollect)(CreateCardTool);
