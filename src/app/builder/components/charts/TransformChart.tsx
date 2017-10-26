@@ -64,6 +64,7 @@ const scaleMin = (scale) => scale.range()[0];
 const scaleMax = (scale) => scale.range()[scale.range().length - 1];
 const scaleDomainMin = (scale) => scale.domain()[0];
 const scaleDomainMax = (scale) => scale.domain()[scale.domain().length - 1];
+const NORMAL_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
 
 const TransformChart = {
 
@@ -168,7 +169,7 @@ const TransformChart = {
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
-      state.canEdit, state.colors);
+      state.canEdit, state.domain, state.mode, state.colors);
 
     d3.select(el).select('.inner-svg').on('mousedown', () =>
     {
@@ -783,6 +784,86 @@ const TransformChart = {
     }
     return linesPointsData;
   },
+
+  _drawNormalLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domainMin, domainMax)
+  {
+    const linesPointsData = _.clone(pointsData);
+
+    const average = pointsData[1].x;
+    const stdDev = Math.abs(pointsData[1].x - pointsData[0].x);
+    const maxY = this._normal(average, average, stdDev);
+    const scaleFactor = pointsData[1].y / maxY;
+        const data = this._getNormalData(scales, average, stdDev, domainMin, domainMax, scaleFactor);
+        const line = d3.svg.line()
+            .x((d) =>
+            {
+                return d['dontScale'] ? d['x'] : scales.realX(d['x']);
+            })
+            .y((d) =>
+            {
+                return scales.realPointY(d['y']);
+            });
+
+    // console.log(data);
+    // console.log(this._getLinesData(pointsData, scales));
+    const lines = d3.select(el).select('.lines')
+      .attr('d', line(data))
+      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
+
+    d3.select(el).select('.lines-bg')
+      .attr('d', line(data));
+  },
+
+  _getNormalData(scales, average, stdDev, min, max, scaleFactor)
+    {
+        const data = [];
+        const stepSize = (max - min) * 0.01;
+    for (let i = (min - stepSize); i < (max + stepSize); i += stepSize)
+        {
+            const y = this._normal(i, average, stdDev);
+            data.push({ y: y * scaleFactor, x: i, id: i, selected: false });
+        }
+        data.sort(function(a, b)
+        {
+            return a.x - b.x;
+        });
+    if (data.length)
+        {
+      const range = (scaleMax(scales.x) - scaleMin(scales.x));
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: data[0].y,
+        id: '*%*-first',
+        dontScale: true,
+      });
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: -1,
+        id: '*%*-first-anchor',
+        dontScale: true,
+      });
+
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: data[data.length - 1].y,
+        id: '*%*-last',
+        dontScale: true,
+      });
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: -1,
+        id: '*%*-last-anchor',
+        dontScale: true,
+      });
+    }
+        return data;
+    },
+
+    _normal(x, average, stdDev)
+    {
+        x = (x - average) / stdDev;
+        return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
+    },
 
   _drawLines(el, scales, pointsData, onClick, onMove, onRelease, canEdit)
   {
@@ -1402,7 +1483,7 @@ const TransformChart = {
     point.exit().remove();
   },
 
-  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit, colors)
+  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit, domain, mode, colors)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -1418,7 +1499,20 @@ const TransformChart = {
     d3.select(el).select('.inner-svg').select('.overlay').remove();
     this._drawBars(el, scales, barsData, colors);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
-    this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+    switch (mode)
+    {
+      case 'linear':
+        this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+        break;
+      case 'normal':
+        this._drawNormalLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+        break;
+      case 'logarithmic':
+      case 'exponential':
+      case 'sigmoid':
+      default:
+        this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+    }
     this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors);
     if (!pointsData.length)
     {

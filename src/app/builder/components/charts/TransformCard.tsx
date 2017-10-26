@@ -239,7 +239,6 @@ class TransformCard extends TerrainComponent<Props>
     const spotlights = this.state.spotlights;
     const { data } = this.props;
     const width = this.props.containerWidth ? this.props.containerWidth + 55 : 300;
-
     return (
       <div
         className='transform-card-inner'
@@ -259,6 +258,7 @@ class TransformCard extends TerrainComponent<Props>
           width={width}
           language={this.props.language}
           colors={this.props.data.static.colors}
+          mode={this.props.data.mode}
         />
         <TransformCardPeriscope
           onDomainChange={this.handleChartDomainChange}

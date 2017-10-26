@@ -86,6 +86,7 @@ export interface Props
   language: string;
   colors: [string, string];
   spotlights: any; // TODO spawtlights
+  mode: string;
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
@@ -435,6 +436,7 @@ class TransformCardChart extends TerrainComponent<Props>
       inputKey: overrideState.inputKey || this.props.inputKey,
       colors: this.props.colors,
       contextOptions: this.getContextOptions(),
+      mode: overrideState.mode || this.props.mode,
     };
 
     return chartState;

@@ -82,6 +82,7 @@ export const elasticTransform = _card(
 
     noTitle: true,
     cannotBeMoved: true,
+    mode: 'linear',
 
     static: {
       language: 'elastic',
@@ -109,15 +110,33 @@ export const elasticTransform = _card(
       },
       display: [
         {
-          displayType: DisplayType.TEXT,
-          // help: ManualConfig.help['input'],
-          key: 'input',
-          placeholder: 'Input field',
-          showWhenCards: true,
-          getAutoTerms: (schemaState): List<string> =>
-          {
-            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Transform);
-          },
+          displayType: DisplayType.FLEX,
+          key: 'transform-flex',
+          flex: [
+            {
+              displayType: DisplayType.TEXT,
+              // help: ManualConfig.help['input'],
+              key: 'input',
+              placeholder: 'Input field',
+              showWhenCards: true,
+              getAutoTerms: (schemaState): List<string> =>
+              {
+                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Transform);
+              },
+              style: {
+                marginLeft: -16,
+                width: '121%',
+              },
+            },
+            {
+              displayType: DisplayType.DROPDOWN,
+              options: List(['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid']),
+              key: 'mode',
+              style: {
+                width: '50%',
+              },
+            },
+          ],
         },
         // TODO, in the future, if we allow complicated formulas inside
         //  transforms, then we can change this back to a cards view
