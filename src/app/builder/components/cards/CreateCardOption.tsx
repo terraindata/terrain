@@ -64,16 +64,39 @@ export interface Props
   index: number;
   card: CardConfig;
   onClick: (card: CardConfig, index: number) => void;
-  searchText: string;
-  overrideTitle?: string;
+  title: string;
+  description: string;
   isFocused?: boolean;
   outerRef?: (elem) => void;
 }
 
-const matchStyle = {
-  backgroundColor: Colors().inactiveHover,
-  color: '#FFF',
-};
+export function searchForText(title: string, description: string, searchText: string): any[] | boolean
+{
+  title = capitalize(title);
+  const searchValueLowerCase = searchText.toLowerCase();
+  if (searchText === '')
+  {
+    return [title, description];
+  }
+  else
+  {
+    if (title.toLowerCase().indexOf(searchValueLowerCase) !== -1 || description.toLowerCase().indexOf(searchValueLowerCase) !== -1)
+    {
+      return [
+        <Highlight search={searchText} matchElement='span' matchStyle={matchStyle}>
+          {title}
+        </Highlight>,
+        <Highlight search={searchText} matchElement='span' matchStyle={matchStyle}>
+          {description}
+        </Highlight>,
+      ];
+    }
+    else
+    {
+      return false;
+    }
+  }
+}
 
 // https://stackoverflow.com/questions/4878756/how-to-capitalize-first-letter-of-each-word-like-a-2-word-city
 function capitalize(str)
@@ -81,39 +104,17 @@ function capitalize(str)
   return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 }
 
+const matchStyle = {
+  backgroundColor: Colors().inactiveHover,
+  color: '#FFF',
+};
+
 @Radium
-class CreateCardOption extends TerrainComponent<Props>
+export class CreateCardOption extends TerrainComponent<Props>
 {
   private handleClick()
   {
     this.props.onClick(this.props.card, this.props.index);
-  }
-
-  public searchForText(title: string, description: string, searchText: string): any[] | boolean
-  {
-    const searchValueLowerCase = searchText.toLowerCase();
-    if (searchText === '')
-    {
-      return [title, description];
-    }
-    else
-    {
-      if (title.toLowerCase().indexOf(searchValueLowerCase) !== -1 || description.toLowerCase().indexOf(searchValueLowerCase) !== -1)
-      {
-        return [
-          <Highlight search={searchText} matchElement='span' matchStyle={matchStyle}>
-            {title}
-          </Highlight>,
-          <Highlight search={searchText} matchElement='span' matchStyle={matchStyle}>
-            {description}
-          </Highlight>,
-        ];
-      }
-      else
-      {
-        return false;
-      }
-    }
   }
 
   public render()
@@ -127,9 +128,6 @@ class CreateCardOption extends TerrainComponent<Props>
       return null;
     }
 
-    const text = capitalize(this.props.overrideTitle || card.static.title);
-    const description = card.static.description || 'Create a ' + card.static.title + ' card.';
-    const searchResult = this.searchForText(text, description, this.props.searchText);
     const leftRightColor = this.props.isFocused ? Colors().inactiveHover : Colors().bg3;
     const topBottomColor = this.props.isFocused ? Colors().inactiveHover : Colors().bg1;
     const mainStyle = _.extend({},
@@ -144,7 +142,6 @@ class CreateCardOption extends TerrainComponent<Props>
       fontColor(card.static.colors[0]),
     );
     return (
-      !searchResult ? null :
         <div
           className={classNames({
             'create-card-option': true,
@@ -160,18 +157,17 @@ class CreateCardOption extends TerrainComponent<Props>
             style={titleStyle}
           >
             {
-              searchResult[0]
+              this.props.title
             }
           </div>
           <div
             className='create-card-option-description'
           >
             {
-              searchResult[1]
+              this.props.description
             }
           </div>
         </div>
     );
   }
 }
-export default CreateCardOption;

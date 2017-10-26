@@ -63,7 +63,7 @@ import { Card, CardConfig } from 'src/blocks/types/Card';
 import { AllBackendsMap } from 'src/database/AllBackends';
 import { backgroundColor, borderColor, cardHoverBackground, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
 
-import CreateCardOption from './CreateCardOption';
+import {CreateCardOption, searchForText} from './CreateCardOption';
 import './CreateCardTool.less';
 
 function getCardCategory(card: CardConfig): string
@@ -175,7 +175,7 @@ class CardSelector extends TerrainComponent<Props>
     return Set(List(suggestions));
   }
 
-  // (memoized) return list ofcategories where there exist cards that fall under that category.
+  // (memoized) return list of categories where there exist cards that fall under that category.
   public computeAvailableCategories(cardTypeList: List<string>, creatingCard: CardConfig): List<CardCategory>
   {
     const counts = categoryCounter.toJS();
@@ -235,17 +235,26 @@ class CardSelector extends TerrainComponent<Props>
     // arrow keys: up = 38, down = 40, enter = 13
     if (event.keyCode !== 40 && event.keyCode !== 38 && event.keyCode !== 13)
     {
+      return; // so we don't waste computation on regular keystrokes
+    }
+
+    if (event.keyCode === 13) // enter
+    {
+      const type = this.props.cardTypeList.get(this.state.focusedIndex);
+      const optionCard = AllBackendsMap[this.props.language].blocks[type] as CardConfig;
+      this.props.handleCardClick(optionCard, this.state.focusedIndex);
       return;
     }
 
     const indexList = this.getCardOptions().map((v, i) => v.index).toList();
     const currentListIndex = indexList.indexOf(this.state.focusedIndex);
     let newFocusedListIndex = -1;
-    if (event.keyCode === 40)
+
+    if (event.keyCode === 40) // down
     {
       newFocusedListIndex = Math.min(currentListIndex + 1, indexList.size - 1);
     }
-    if (event.keyCode === 38)
+    if (event.keyCode === 38) // up
     {
       newFocusedListIndex = Math.max(currentListIndex - 1, 0);
     }
@@ -345,11 +354,19 @@ class CardSelector extends TerrainComponent<Props>
   ): List<{index: number, option: any}>
   {
     return cardTypeList.map((type: string, index: number) => {
-      if (optionCategories.get(index).has(currentCategory))
+      const optionCard = AllBackendsMap[language].blocks[type] as CardConfig;
+      const title = (overrideText && overrideText.get(index) && overrideText.get(index).text)
+        || optionCard.static.title;
+      const description = optionCard.static.description || 'Create a ' + optionCard.static.title + ' card.';
+      const searchResult = searchForText(title, description, searchValue);
+
+      if (optionCategories.get(index).has(currentCategory) && searchResult)
       {
         return {index, option: (
           <CreateCardOption
-            card={AllBackendsMap[language].blocks[type] as CardConfig}
+            title={searchResult[0]}
+            description={searchResult[1]}
+            card={optionCard}
             index={index}
             outerRef={(elem) => {
               if (elem !== null)
@@ -359,13 +376,7 @@ class CardSelector extends TerrainComponent<Props>
                 });
               }
             }}
-            searchText={searchValue}
             onClick={handleCardClick}
-            overrideTitle={
-              overrideText &&
-              overrideText.get(index) &&
-              overrideText.get(index).text
-            }
             isFocused={focusedIndex === index}
             key={index.toString()}
           />
