@@ -64,14 +64,6 @@ export const exprt: Export = new Export();
 export const imprt: Import = new Import();
 export const credentials: Credentials = new Credentials();
 
-// const sftpconfig: object =
-//   {
-//     host: '10.1.1.103',
-//     port: 22,
-//     username: 'testuser',
-//     password: 'Terrain123!',
-//   };
-
 export interface SchedulerConfig
 {
   active?: number;                   // whether the schedule is running (different from currentlyRunning)
@@ -216,11 +208,6 @@ export class Scheduler
         jobId = 2;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
-      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'http')
-      {
-        jobId = 3;
-        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
-      }
       req.active = 1;
       req.archived = 0;
       req.jobId = jobId;
@@ -283,7 +270,6 @@ export class Scheduler
     // 0: import via sftp
     // 1: export via sftp
     // 2: import via http
-    // 3: export via http
     await this.createJob(async (scheduleID: number, fields: object, // 0
       transport: object, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
@@ -445,45 +431,46 @@ export class Scheduler
     {
       return new Promise<any>(async (resolveJob, rejectJob) =>
       {
-        const url: string = transport['url'];
-        let httpConfig = {};
+        let httpJobConfig;
         try
         {
           await this.setJobStatus(scheduleID, 1);
           const creds: CredentialConfig[] = await credentials.get(transport['id'], transport['type']);
           if (creds.length === 0)
           {
-            return rejectJob('No SFTP credentials matched parameters.');
+            return rejectJob('No HTTP credentials matched parameters.');
           }
           try
           {
-            httpConfig = JSON.parse(creds[0].meta);
+            httpJobConfig = JSON.parse(creds[0].meta);
           }
           catch (e)
           {
             return rejectJob(e.message);
           }
+          if (httpJobConfig['baseURL'] === undefined ||
+            (httpJobConfig['baseURL'] !== undefined && transport['filename'] !== undefined
+              && transport['filename'].substr(0, httpJobConfig['baseURL'].length) !== httpJobConfig['baseURL']))
+          {
+            return rejectJob('Invalid base URL ' + (transport['filename'].substr(0, httpJobConfig['baseURL'].length) as string));
+          }
+          delete httpJobConfig['baseURL'];
+          httpJobConfig['uri'] = transport['filename'];
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
-          requestPromise(httpConfig).then(async (data: stream.Readable) =>
+          const readStream: any = new stream.PassThrough();
+          try
           {
-            try
-            {
-              winston.info('Schedule ' + scheduleID.toString() + ': Starting import with http');
-              const result = await imprt.upsert(data, fields, true);
-              await this.setJobStatus(scheduleID, 0);
-              winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import with http.');
-              return resolveJob('Successfully completed scheduled import with http.');
-            }
-            catch (e)
-            {
-              winston.info('Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string));
-            }
-            return rejectJob('Failure to import.');
-          })
-          .catch( (err) =>
+            request(httpJobConfig).pipe(readStream);
+            winston.info('Schedule ' + scheduleID.toString() + ': Starting import with http');
+            const result = await imprt.upsert(readStream, fields, true);
+            await this.setJobStatus(scheduleID, 0);
+            winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import with http.');
+            return resolveJob('Successfully completed scheduled import with http.');
+          }
+          catch (e)
           {
-            winston.info('Schedule ' + scheduleID.toString() + ': Failed to complete scheduled import with http.');
-          });
+            winston.info('Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string));
+          }
 
           await this.setJobStatus(scheduleID, 0);
           return rejectJob('Failed to import.');

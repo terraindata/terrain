@@ -68,8 +68,13 @@ curl -X POST -H 'Accept: application/json' -H 'Content-Type: application/json' -
 
 Stores credentials such as SFTP, SSH, email, etc. for the scheduler. Create a new credential from localhost using a cURL request:
 ```
-curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"id":<user id>,"accessToken":"<access token>","body":{"name":"<name>","type":"<sftp/ssh/email/etc.>","permissions":1,"meta":"{\"host\":\"<SFTP IP>\",\"port\":<SFTP port, usually 22>,\"username\":\"<username>\",\"password\":\"<password>\"}"}}' 'localhost:3000/midway/v1/credentials'
+curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"id":<user id>,"accessToken":"<access token>","body":{"name":"<name>","type":"<sftp/http/email/etc.>","permissions":1,"meta":"{\"host\":\"<SFTP IP>\",\"port\":<SFTP port, usually 22>,\"username\":\"<username>\",\"password\":\"<password>\"}"}}' 'localhost:3000/midway/v1/credentials'
 ``` 
+
+Sample HTTP request credential (with meta field populated):
+```
+curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"id":<user id>,"accessToken":"<access token>","body":{"name":"<name>","type":"http","createdBy":1,"permissions":1,"meta":"{\"method\":\"GET\",\"baseURL\":\"<base URL>\",\"gzip\":true,\"headers\":{\"Content-Type\":\"text/csv\",\"Authorization\":\"<Basic HTTP Authorization>\"}}"}}' 'localhost:3000/midway/v1/credentials'
+```
 
 Get a list of credentials from localhost using a cURL request:
 ```
@@ -80,7 +85,7 @@ curl -X GET 'localhost:3000/midway/v1/credentials/?id=<user id>&accessToken=<acc
 
 Allows users to schedule persistent jobs within Midway. Headless cURL request:
 ```
-curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"templateId":<template id>,"persistentAccessToken":"<persistent template access token>","body":{"jobType":"<import or export>","schedule":"<cron format>","sort":"<asc or desc>","transport":{"type":"<sftp/ssh/email/etc.","id":<credentials id>,"filename":"<full path to file in SFTP server>"}, "paramsJob": {<params for headless import or export i.e. "dbid":<database id>,"templateId":<template id>, "variantId":<variant id>,"filetype":"<csv or json or json [type object]>">}}}' '<midway url>/midway/v1/scheduler/create'
+curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"id":<user id>,"accessToken":"<access token>","body":{"jobType":"<import or export>","schedule":"<cron format>","sort":"<asc or desc>","transport":{"type":"<sftp/ssh/email/etc.","id":<credentials id>,"filename":"<full path to file in SFTP server>"}, "paramsJob": {<params for headless import or export i.e. "dbid":<database id>,"templateId":<template id>, "variantId":<variant id>,"filetype":"<csv or json or json [type object]>">}}}' '<midway url>/midway/v1/scheduler/create'
 ```
 
 ## Testing

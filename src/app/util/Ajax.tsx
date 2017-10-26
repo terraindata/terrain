@@ -1071,7 +1071,6 @@ export const Ajax =
     },
 
     getCredentialConfigs(
-      type: string,
       onLoad: (credentials: object[]) => void,
     )
     {
@@ -1084,9 +1083,6 @@ export const Ajax =
         (response: object[]) =>
         {
           onLoad(response);
-        },
-        {
-          urlArgs: { type },
         },
       );
     },
