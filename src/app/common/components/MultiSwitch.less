@@ -1,0 +1,49 @@
+@import "../../common/Common.less";
+
+@br: 4px;
+
+.multi-switch {
+  display: inline-block;
+  cursor: pointer;
+  border-radius: @br;
+  position: relative;
+  // overflow: hidden;
+  font-size: @font-size;
+
+  width: 100%;
+
+  .multi-switch-option {
+    padding: @half-spacing @spacing;
+    display: flex;
+    align-items: center;
+    .transition;
+
+    .multi-switch-option-inner {
+      flex-grow: 1;
+    }
+
+    &:first-child {
+      border-top-left-radius: @br;
+      border-top-right-radius: @br;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: @br;
+      border-bottom-right-radius: @br;
+    }
+  }
+
+  &.multi-switch-small {
+    .multi-switch-option {
+      padding: @half-spacing / 2 @half-spacing;
+      font-size: @small-font-size;
+    }
+  }
+
+  &.multi-switch-large {
+    .multi-switch-option {
+      padding: @spacing;
+      font-size: @pretty-large-font-size;
+    }
+  }
+}

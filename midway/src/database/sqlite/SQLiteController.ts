@@ -83,6 +83,11 @@ class SQLiteController extends DatabaseController
   {
     throw new Error('No QueryHandler is currently implemented for SQLite.');
   }
+
+  public getAnalyticsDB(): object
+  {
+    throw new Error('Analytics backend is currently not implemented for SQLite.');
+  }
 }
 
 export default SQLiteController;

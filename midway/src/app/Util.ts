@@ -51,7 +51,20 @@ import * as request from 'request';
 import * as rimraf from 'rimraf';
 import * as sha1 from 'sha1';
 
-import { users } from './users/UserRouter';
+import { exportTemplates } from './io/templates/ExportTemplateRouter';
+import { importTemplates } from './io/templates/ImportTemplateRouter';
+import { ImportTemplateConfig } from './io/templates/ImportTemplates';
+import { UserConfig, Users } from './users/Users';
+
+const users = new Users();
+
+export async function authenticateNormal(req: object): Promise<UserConfig | null>
+{
+  return new Promise<UserConfig | null>(async (resolve, reject) =>
+  {
+    resolve(await users.loginWithAccessToken(Number(req['id']), req['accessToken']));
+  });
+}
 
 export async function authenticateStream(req: http.IncomingMessage): Promise<object>
 {
@@ -63,18 +76,47 @@ export async function authenticateStream(req: http.IncomingMessage): Promise<obj
   });
 }
 
-export function buildDesiredHash(nameToType: object): string
+export async function authenticatePersistentAccessToken(req: object): Promise<object>
 {
-  let strToHash: string = 'object';   // TODO: check
-  const nameToTypeArr: any[] = Object.keys(nameToType).sort();
-  for (const name in nameToTypeArr)
+  return new Promise<object>(async (resolve, reject) =>
   {
-    if (nameToType.hasOwnProperty(name))
+    if (req['templateId'] === undefined || req['persistentAccessToken'] === undefined)
     {
-      strToHash += '|' + name + ':' + (nameToType[name] as string) + '|';
+      return reject('Missing one or more auth fields.');
     }
-  }
-  return sha1(strToHash);
+    const importTemplate: object[] =
+      await importTemplates.loginWithPersistentAccessToken(Number(parseInt(req['templateId'], 10)), req['persistentAccessToken']);
+    const exportTemplate: object[] =
+      await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(req['templateId'], 10)), req['persistentAccessToken']);
+    const template = importTemplate.concat(exportTemplate);
+    if (template.length === 0)
+    {
+      return resolve({ template: null });
+    }
+    resolve({ template: template[0] });
+  });
+}
+
+export async function authenticateStreamPersistentAccessToken(req: http.IncomingMessage): Promise<object>
+{
+  return new Promise<object>(async (resolve, reject) =>
+  {
+    const { files, fields } = await asyncBusboy(req);
+    if (fields['templateId'] === undefined || fields['persistentAccessToken'] === undefined)
+    {
+      return reject(`Missing one or more auth fields. ${fields['templateId']} , ${fields['persistentAccessToken']}`);
+    }
+    const importTemplate: object[] =
+      await importTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
+    const exportTemplate: object[] =
+      await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
+    const template = importTemplate.concat(exportTemplate);
+    if (template.length === 0)
+    {
+      return resolve({ files, fields, template: null });
+    }
+    resolve({ files, fields, template: template[0] });
+  });
 }
 
 export function getEmptyObject(payload: object): object
@@ -130,19 +172,6 @@ export function getRequest(url)
       }
     });
   });
-}
-
-export function isJSON(str: string): boolean
-{
-  try
-  {
-    JSON.parse(str);
-  }
-  catch (e)
-  {
-    return false;
-  }
-  return true;
 }
 
 export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)

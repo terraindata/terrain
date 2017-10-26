@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 // TODO change / remove
 import Query from '../../../items/types/Query';
 
+import MapUtil from '../../../../src/app/util/MapUtil';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 import { Card } from '../../../blocks/types/Card';
@@ -59,8 +60,32 @@ import Blocks from '../blocks/ElasticBlocks';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+import ESCardParser from './ESCardParser';
 
 const { make } = BlockUtils;
+
+const UNIT_MAPPINGS = {
+  'mi': 'mi',
+  'yd': 'yd',
+  'ft': 'ft',
+  'in': 'in',
+  'km': 'km',
+  'm': 'm',
+  'cm': 'cm',
+  'mm': 'mm',
+  'nmi': 'nmi',
+  'miles': 'mi',
+  'meters': 'm',
+  'yards': 'yd',
+  'feet': 'ft',
+  'inch': 'in',
+  'inches': 'in',
+  'kilometers': 'km',
+  'centimeters': 'cm',
+  'millimeters': 'mm',
+  'NM': 'nmi',
+  'nautical miles': 'nmi',
+};
 
 export default function ElasticToCards(
   query: Query,
@@ -77,8 +102,9 @@ export default function ElasticToCards(
     try
     {
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'root');
-      const cards = BlockUtils.reconcileCards(query.cards, List([rootCard]));
+      const rootCard = parseCardFromValueInfo(rootValueInfo);
+      let cards = BlockUtils.reconcileCards(query.cards, rootCard['cards']);
+      cards = ESCardParser.parseAndUpdateCards(cards);
       return query
         .set('cards', cards)
         .set('cardsAndCodeInSync', true);
@@ -159,6 +185,45 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         sortType,
       }, true);
   }
+  else if (isDistanceCard(valueInfo))
+  {
+    const distanceAndUnit = valueInfo.objectChildren.distance.propertyValue.value;
+    const match = /[a-zA-Z]/.exec(distanceAndUnit);
+    const distance = distanceAndUnit.substring(0, match.index).replace(/ /g, '');
+    let distanceUnit = UNIT_MAPPINGS[distanceAndUnit.substring(match.index)];
+    if (distanceUnit === undefined)
+    {
+      distanceUnit = 'm';
+    }
+    let distanceType = 'arc';
+    if (valueInfo.objectChildren.distance_type !== undefined)
+    {
+      distanceType = valueInfo.objectChildren.distance_type.propertyValue.value;
+    }
+
+    // Get variable name for field
+    let field: string;
+    _.keys(valueInfo.objectChildren).forEach((key) =>
+    {
+      if (key !== 'distance' && key !== 'distance_type')
+      {
+        field = key;
+      }
+    });
+    const fieldValue = valueInfo.value[field];
+    const coords = MapUtil.getCoordinatesFromGeopoint(fieldValue);
+    return make(
+      Blocks, 'elasticDistance',
+      {
+        distance,
+        distanceType,
+        distanceUnit,
+        field,
+        geopoint: coords,
+        map_text: '',
+      },
+      true);
+  }
 
   const clauseCardType = 'eql' + valueInfo.clause.type;
   if (typeof valueInfo.value !== 'object')
@@ -187,9 +252,15 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       },
     ));
   }
-
   return make(Blocks, clauseCardType, valueMap, true);
 };
+
+function isDistanceCard(valueInfo: ESValueInfo): boolean
+{
+  const isBool = (valueInfo.clause.clauseType === ESClauseType.ESWildcardStructureClause) &&
+    (valueInfo.clause.name === 'geo_distance');
+  return isBool;
+}
 
 function isFilterCard(valueInfo: ESValueInfo): boolean
 {
@@ -284,7 +355,6 @@ function parseFilterBlock(boolQuery: string, filters: any): Block[]
       }, true),
     );
   });
-  console.log(filterBlocks);
   return filterBlocks;
 }
 

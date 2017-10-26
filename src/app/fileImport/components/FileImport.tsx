@@ -54,14 +54,13 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import { server } from '../../../../midway/src/Midway';
-import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
+import { backgroundColor, buttonColors, Colors, disabledButtonColors, fontColor } from '../../colors/Colors';
 import Modal from '../../common/components/Modal';
 import { isValidIndexName, isValidTypeName } from './../../../../shared/database/elastic/ElasticUtil';
-import { CSVTypeParser, parseCSV, ParseCSVConfig, parseJSONSubset, parseNewlineJSON } from './../../../../shared/Util';
+import { CSVTypeParser, parseCSV, ParseCSVConfig, parseNewlineJSONSubset, parseObjectListJSONSubset } from './../../../../shared/Util';
 import Autocomplete from './../../common/components/Autocomplete';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import SchemaStore from './../../schema/data/SchemaStore';
 import { databaseId, tableId } from './../../schema/SchemaTypes';
 import * as SchemaTypes from './../../schema/SchemaTypes';
 import has = Reflect.has;
@@ -72,7 +71,6 @@ import * as FileImportTypes from './../FileImportTypes';
 import { Steps } from './../FileImportTypes';
 import './FileImport.less';
 import FileImportPreview from './FileImportPreview';
-import FileImportPreviewRow from './FileImportPreviewRow';
 
 const HTML5Backend = require('react-dnd-html5-backend');
 const { List } = Immutable;
@@ -82,56 +80,67 @@ const PREVIEW_CHUNK_SIZE = FileImportTypes.PREVIEW_CHUNK_SIZE;
 
 export interface Props
 {
+  schema: SchemaTypes.SchemaState;
   params?: any;
   location?: any;
   router?: any;
   route?: any;
 }
 
+interface State
+{
+  fileImportState: FileImportTypes.FileImportState;
+  columnOptionNames: List<string>;
+  stepId: number;
+  servers?: SchemaTypes.ServerMap;
+  serverNames: List<string>;
+  serverIndex: number;
+  dbs?: SchemaTypes.DatabaseMap;
+  dbNames: List<string>;
+  tables?: SchemaTypes.TableMap;
+  tableNames: List<string>;
+  fileSelected: boolean;
+}
+
 @Radium
 class FileImport extends TerrainComponent<any>
 {
-  public state: {
-    fileImportState: FileImportTypes.FileImportState;
-    columnOptionNames: List<string>;
-    stepId: number;
-    servers?: SchemaTypes.ServerMap;
-    serverNames: List<string>;
-    serverIndex: number;
-    dbs?: SchemaTypes.DatabaseMap;
-    dbNames: List<string>;
-    tables?: SchemaTypes.TableMap;
-    tableNames: List<string>;
-    fileSelected: boolean;
-  } = {
-    fileImportState: FileImportStore.getState(),
-    columnOptionNames: List([]),
-    stepId: 0,
-    serverIndex: -1,
-    serverNames: List([]),
-    dbNames: List([]),
-    tableNames: List([]),
-    fileSelected: false,
-  };
+  public state: State;
 
   constructor(props)
   {
     super(props);
 
+    const { schema } = props;
+
+    this.state = {
+      fileImportState: FileImportStore.getState(),
+      columnOptionNames: List([]),
+      stepId: 0,
+      serverIndex: -1,
+      dbNames: List([]),
+      tableNames: List([]),
+      fileSelected: false,
+      servers: schema.servers,
+      dbs: schema.databases,
+      tables: schema.tables,
+      serverNames: schema.servers.keySeq().toList(),
+    };
+
     this._subscribe(FileImportStore, {
       stateKey: 'fileImportState',
     });
+  }
 
-    this._subscribe(SchemaStore, {
-      updater: (schemaState: SchemaTypes.SchemaState) =>
-      {
-        this.setState({
-          servers: schemaState.servers,
-          dbs: schemaState.databases,
-          tables: schemaState.tables,
-          serverNames: schemaState.servers.keySeq().toList(),
-        });
-      },
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    const { schema } = nextProps;
+
+    this.setState({
+      servers: schema.servers,
+      dbs: schema.databases,
+      tables: schema.tables,
+      serverNames: schema.servers.keySeq().toList(),
     });
   }
 
@@ -211,7 +220,7 @@ class FileImport extends TerrainComponent<any>
     let items: object[] = [];
     if (isNewlineSeparatedJSON)
     {
-      const newlineJSON: object[] | string = parseNewlineJSON(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+      const newlineJSON: object[] | string = parseNewlineJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
       if (typeof newlineJSON === 'string')
       {
         Actions.setErrorMsg(newlineJSON);
@@ -223,7 +232,7 @@ class FileImport extends TerrainComponent<any>
     {
       try
       {
-        items = parseJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
+        items = parseObjectListJSONSubset(file, FileImportTypes.NUMBER_PREVIEW_ROWS);
       }
       catch (e)
       {
@@ -306,7 +315,6 @@ class FileImport extends TerrainComponent<any>
       }
 
       let columnNames: string[] = [];
-      let previewRows: string[][];
       switch (filetype)
       {
         case 'json':
@@ -334,25 +342,16 @@ class FileImport extends TerrainComponent<any>
           :
           _.range(columnNames.length);
 
-      previewRows = items.map((item) =>
-        columnNamesToMap.map((value) =>
-          item[value] === undefined ?
-            ''
-            :
-            typeof item[value] === 'string' ? item[value] : JSON.stringify(item[value]),
-        ),
-      );
-
       let previewColumns;
       switch (filetype)
       {
         case 'csv':
           previewColumns = columnNamesToMap.map((name) =>
-            items.map((item) => item[name]));
+            List(items.map((item) => item[name])));
           break;
         case 'json':
           previewColumns = columnNamesToMap.map((name) =>
-            items.map((item) => JSON.stringify(item[name])));
+            List(items.map((item) => JSON.stringify(item[name]))));
           break;
         default:
       }
@@ -364,7 +363,7 @@ class FileImport extends TerrainComponent<any>
       const types: string[][] = previewColumns.map((column) => typeParser.getBestTypeFromArrayAsArray(column));
       const treeTypes: FileImportTypes.ColumnTypesTree[] = types.map(this.buildColumnTypesTreeFromArray);
 
-      Actions.chooseFile(filetype, file.size, List<List<string>>(previewRows), List<string>(columnNames), List(treeTypes));
+      Actions.chooseFile(filetype, file.size, List(previewColumns), List(columnNames), List(treeTypes));
       this.setState({
         fileSelected: true,
       });
@@ -406,7 +405,7 @@ class FileImport extends TerrainComponent<any>
     }
     Actions.saveFile(file.target.files[0], filetype);
 
-    if (filetype === 'csv') // csv shows preview rows on choose csv header step
+    if (filetype === 'csv')
     {
       this.parseFile(file.target.files[0], filetype, false, false);
     }
@@ -426,14 +425,14 @@ class FileImport extends TerrainComponent<any>
   {
     Actions.changeHasCsvHeader(hasCsvHeader);
     const { file, filetype } = this.state.fileImportState;
-    this.parseFile(file, filetype, hasCsvHeader, false); // TODO: what happens on error?
+    this.parseFile(file, filetype, hasCsvHeader, false);
   }
 
   public handleJSONFormatChoice(isNewlineSeparatedJSON: boolean)
   {
     Actions.changeIsNewlineSeparatedJSON(isNewlineSeparatedJSON);
     const { file, filetype } = this.state.fileImportState;
-    this.parseFile(file, filetype, false, isNewlineSeparatedJSON); // TODO: what happens on error?
+    this.parseFile(file, filetype, false, isNewlineSeparatedJSON);
   }
 
   public handleSelectDb(dbName: string)
@@ -456,6 +455,20 @@ class FileImport extends TerrainComponent<any>
       return;
     }
     this.incrementStep();
+  }
+
+  public onFileImportSuccess()
+  {
+    this.setState({
+      stepId: Steps.Success,
+    });
+  }
+
+  public importAnotherFile()
+  {
+    this.setState({
+      stepId: Steps.ChooseFile,
+    });
   }
 
   public renderSelect()
@@ -481,13 +494,13 @@ class FileImport extends TerrainComponent<any>
 
   public renderCsv()
   {
-    const { previewRows } = this.state.fileImportState;
+    const { previewColumns } = this.state.fileImportState;
     return (
       <div
-        className='fi-content-csv'
+        className='fi-content-csv-wrapper'
       >
         <div
-          className='fi-content-csv-wrapper'
+          className='fi-content-csv'
         >
           <div
             className='fi-content-csv-option button'
@@ -507,16 +520,41 @@ class FileImport extends TerrainComponent<any>
           </div>
         </div>
         <div
-          className='fi-content-rows-container'
+          className='fi-content-preview-columns-wrapper'
         >
-          {
-            previewRows.map((items, key) =>
-              <FileImportPreviewRow
-                key={key}
-                items={items}
-              />,
-            )
-          }
+          <div
+            className='flex-container fi-content-preview-columns'
+          >
+            {
+              previewColumns.map((column, columnKey) =>
+                <div
+                  key={columnKey}
+                  className='flex-container fi-content-preview-columns-column'
+                >
+                  {
+                    column.map((item, itemKey) =>
+                      <div
+                        key={columnKey + itemKey}
+                        className='fi-content-preview-columns-column-cell'
+                        style={[
+                          fontColor(Colors().text1),
+                          backgroundColor(Colors().bg2),
+                        ]}
+                      >
+                        <div
+                          className='fi-content-preview-columns-column-cell-text'
+                        >
+                          {
+                            item
+                          }
+                        </div>
+                      </div>,
+                    )
+                  }
+                </div>,
+              )
+            }
+          </div>
         </div>
       </div>
     );
@@ -526,10 +564,10 @@ class FileImport extends TerrainComponent<any>
   {
     return (
       <div
-        className='fi-content-json'
+        className='fi-content-json-wrapper'
       >
         <div
-          className='fi-content-json-wrapper'
+          className='fi-content-json'
         >
           {
             tooltip(
@@ -586,26 +624,15 @@ class FileImport extends TerrainComponent<any>
     );
   }
 
-  public onFileImportSuccess()
-  {
-    this.setState({
-      stepId: Steps.Success,
-    });
-  }
-
-  public importAnotherFile()
-  {
-    this.setState({
-      stepId: Steps.ChooseFile,
-    });
-  }
-
   public renderContent()
   {
     const { fileImportState } = this.state;
     const { filetype, filesize, serverName, serverId, dbName, tableName } = fileImportState;
-    const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
-    const { templates, transforms, uploadInProgress, elasticUpdate, requireJSONHaveAllFields, exportRank } = fileImportState;
+
+    const { previewColumns, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
+    const { templates, transforms, uploadInProgress, elasticUpdate, requireJSONHaveAllFields, exportRank, objectKey } = fileImportState;
+    // const { previewRows, columnNames, columnsToInclude, columnTypes, primaryKeys, primaryKeyDelimiter } = fileImportState;
+    // const { templates, transforms, uploadInProgress, elasticUpdate, requireJSONHaveAllFields, exportRank, objectKey } = fileImportState;
 
     let content;
     switch (this.state.stepId)
@@ -681,7 +708,8 @@ class FileImport extends TerrainComponent<any>
       case Steps.Preview:
         content =
           <FileImportPreview
-            previewRows={previewRows}
+            exporting={false}
+            previewColumns={previewColumns}
             primaryKeys={primaryKeys}
             primaryKeyDelimiter={primaryKeyDelimiter}
             columnNames={columnNames}
@@ -693,10 +721,10 @@ class FileImport extends TerrainComponent<any>
             uploadInProgress={uploadInProgress}
             filetype={filetype}
             requireJSONHaveAllFields={requireJSONHaveAllFields}
+            objectKey={objectKey}
             exportRank={exportRank}
             elasticUpdate={elasticUpdate}
-            exporting={false}
-            filesize={filesize}
+            showProgressBar={filesize > FileImportTypes.MIN_PROGRESSBAR_FILESIZE}
             handleFileImportSuccess={this.onFileImportSuccess}
             router={this.props.router}
             route={this.props.route}
@@ -735,7 +763,7 @@ class FileImport extends TerrainComponent<any>
     return (
       <div
         className='fi-content'
-        style={this.state.stepId === Steps.ChooseFile ? backgroundColor(Colors().bg1) : backgroundColor(Colors().bg3)}
+        style={backgroundColor(this.state.stepId === Steps.ChooseFile ? Colors().bg1 : Colors().bg3)}
       >
         {
           content
@@ -780,7 +808,6 @@ class FileImport extends TerrainComponent<any>
       default:
     }
 
-    // TODO: add carrot icon arrows
     return (
       <div
         className='flex-container fi-nav'
@@ -804,13 +831,10 @@ class FileImport extends TerrainComponent<any>
           <div
             className='fi-next-button button'
             onClick={nextEnabled ? this.incrementStep : this._fn(this.setError, errorMsg)}
-            style={nextEnabled ?
-              buttonColors()
-              :
-              {
-                background: Colors().bg3,
-              }
-            }
+            style={[
+              nextEnabled ? buttonColors() : disabledButtonColors(),
+              fontColor(Colors().text1),
+            ]}
             ref='fi-next-button'
           >
             Next
@@ -860,6 +884,7 @@ class FileImport extends TerrainComponent<any>
 }
 
 // ReactRouter does not like the output of DragDropContext, hence the `any` cast
-const ExportFileImport = DragDropContext(HTML5Backend)(FileImport) as any;
+const FileImportContainer = Util.createContainer(FileImport, ['schema'], {});
+const ExportFileImport = DragDropContext(HTML5Backend)(FileImportContainer) as any;
 
 export default ExportFileImport;

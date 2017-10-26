@@ -60,12 +60,11 @@ import CardsArea from './CardsArea';
 import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
 const Dimensions = require('react-dimensions');
+import { Cards } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
+import { ElasticBlocks } from '../../../../database/elastic/blocks/ElasticBlocks';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import ColorsActions from './../../../colors/data/ColorsActions';
-
-import { Cards } from '../../../../blocks/types/Card';
-import { ElasticBlocks } from '../../../../database/elastic/blocks/ElasticBlocks';
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
@@ -82,16 +81,15 @@ export interface Props
 
   containerWidth?: number;
   containerHeight?: number;
+
 }
 
 class CardsColumn extends TerrainComponent<Props>
 {
   public state: {
     keyPath: KeyPath;
-    learningMode: boolean;
   } = {
     keyPath: this.computeKeyPath(this.props),
-    learningMode: false,
   };
 
   public innerHeight: number = -1;
@@ -104,9 +102,9 @@ class CardsColumn extends TerrainComponent<Props>
   public componentWillMount()
   {
     ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon ',
-      { fill: Colors().altBg1, background: Colors().bg3 });
+      { fill: Colors().text3, background: Colors().bg3 });
     ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon &:hover ',
-      { 'fill': Colors().bg3, 'background-color': Colors().altBg1 });
+      { 'fill': Colors().bg3, 'background-color': Colors().text3 });
   }
 
   public computeKeyPath(props: Props): KeyPath
@@ -140,28 +138,23 @@ class CardsColumn extends TerrainComponent<Props>
     //   });
   }
 
-  public toggleLearningMode()
-  {
-    this.setState({
-      learningMode: !this.state.learningMode,
-    });
-  }
-
-  public renderTopbar()
-  {
-    return (
-      <div className='cards-area-top-bar'>
-        <div className='cards-area-white-space' />
-        <Switch
-          first='Standard'
-          second='Learning'
-          onChange={this.toggleLearningMode}
-          selected={this.state.learningMode ? 2 : 1}
-          small={true}
-        />
-      </div>
-    );
-  }
+  // public renderTopbar()
+  // {
+  //   return (
+  //     <div
+  //       className='cards-area-top-bar'
+  //       style={backgroundColor(Colors().bg2)}
+  //     >
+  //       <div className='cards-area-white-space' />
+  //       <Switch
+  //         first='Standard'
+  //         second='Tuning'
+  //         onChange={this._toggle('tuningMode')}
+  //         small={true}
+  //       />
+  //     </div>
+  //   );
+  // }
 
   public toggleDeck()
   {
@@ -210,7 +203,6 @@ class CardsColumn extends TerrainComponent<Props>
     const { cards, canEdit } = props;
     const { keyPath } = this.state;
     const canHaveDeck = canEdit;
-
     return (
       <div
         className={classNames({

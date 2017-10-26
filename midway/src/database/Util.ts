@@ -100,7 +100,11 @@ export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MyS
   }
 }
 
-export function makeDatabaseController(type: string, dsnString: string): SQLiteController | MySQLController | ElasticController
+export function makeDatabaseController(
+  type: string,
+  dsnString: string,
+  analyticsIndex?: string,
+  analyticsType?: string): SQLiteController | MySQLController | ElasticController
 {
   type = type.toLowerCase();
   if (type === 'sqlite')
@@ -116,7 +120,7 @@ export function makeDatabaseController(type: string, dsnString: string): SQLiteC
   else if (type === 'elasticsearch' || type === 'elastic')
   {
     const config = DSNToConfig(type, dsnString) as ElasticConfig;
-    return new ElasticController(config, 0, 'Elastic');
+    return new ElasticController(config, 0, 'Elastic', analyticsIndex, analyticsType);
   }
   else
   {

@@ -53,6 +53,7 @@ import * as React from 'react';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import ColorsActions from '../../../colors/data/ColorsActions';
 import DragHandle from '../../../common/components/DragHandle';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ManualInfo from '../../../manual/components/ManualInfo';
@@ -94,6 +95,7 @@ export interface Props
   addColumn?: (number, string?) => void;
   columnIndex?: number;
   handleCardDrop?: (type: string) => any;
+  tuningMode?: boolean;
 }
 
 interface IMoveState
@@ -278,6 +280,12 @@ class CardField extends TerrainComponent<Props>
     $('.card-field-wrapper-moving').removeClass('card-field-wrapper-moving');
   }
 
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.card-field-add .st0', { fill: Colors().iconColor });
+
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.index !== this.props.index)
@@ -359,6 +367,7 @@ class CardField extends TerrainComponent<Props>
             addColumn={this.props.addColumn}
             columnIndex={this.props.columnIndex}
             language={this.props.language}
+            tuningMode={this.props.tuningMode}
           />
         }
         <div
@@ -372,7 +381,7 @@ class CardField extends TerrainComponent<Props>
           ref='cardField'
         >
           {
-            !renderTools && this.props.canEdit && this.props.isFirstRow &&
+            !renderTools && this.props.canEdit && this.props.isFirstRow && !this.props.tuningMode &&
             tooltip(
               <div
                 className='card-field-top-add card-field-add'
@@ -430,6 +439,7 @@ class CardField extends TerrainComponent<Props>
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
               language={this.props.language}
+              tuningMode={this.props.tuningMode}
             />
           </div>
           {
@@ -460,7 +470,6 @@ class CardField extends TerrainComponent<Props>
                       : null
                   }
                   {
-                    !this.props.isOnlyRow &&
                     tooltip(
                       <div
                         className='card-field-remove'
@@ -496,6 +505,7 @@ class CardField extends TerrainComponent<Props>
               addColumn={this.props.addColumn}
               columnIndex={this.props.columnIndex}
               language={this.props.language}
+              tuningMode={this.props.tuningMode}
             />
           </div>
         }
@@ -512,7 +522,7 @@ const REMOVE_TOOL_STYLE = _.extend({},
 const ADD_TOOL_STYLE = _.extend({},
   getStyle('fill', Colors().text1),
   backgroundColor('transparent', Colors().inactiveHover),
-  borderColor(Colors().text1),
+  borderColor(Colors().iconColor),
 );
 
 const CARD_FIELD_MOVING_STYLE = _.extend({},

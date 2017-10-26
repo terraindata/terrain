@@ -46,74 +46,48 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
 import * as winston from 'winston';
 
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../Util';
-import { EventConfig, Events } from './Events';
+import { EventMetadataConfig, Events } from './Events';
 
 export const events: Events = new Events();
-
 const Router = new KoaRouter();
 
-// Get an event tracker.
-Router.post('/', async (ctx, next) =>
-{
-  ctx.body = await events.JSONHandler(ctx.request.ip, ctx.request.body.body);
-});
-
-// Handle client response for event tracker
-Router.post('/update/', async (ctx, next) =>
-{
-  try
-  {
-    const event: EventConfig =
-      {
-        id: ctx.request.body['id'],
-        ip: ctx.request.ip,
-        message: ctx.request.body['message'],
-        payload: ctx.request.body['payload'],
-        type: ctx.request.body['type'],
-        url: ctx.request.body['url'],
-      };
-    // TODO in production, use this instead
-    // await events.decodeMessage(event);
-    // ctx.body = '';
-    if (await events.decodeMessage(event))
-    {
-      ctx.body = 'Success'; // for dev/testing purposes only
-    }
-    else
-    {
-      ctx.body = '';
-    }
-  }
-  catch (e)
-  {
-    ctx.body = '';
-  }
-
-});
-
-// supported parameters:
+// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
 // * variantid: list of variantids
+// * database: database (connection) id
 // * start: start time of the interval
 // * end: end time of the interval
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
-// * agg (optional): an elastic aggregate operation. if unspecified or `none`, return all raw events between the interval
-// * field (optional; required if *agg* is specified): list of fields to operate on.
-//    if unspecified, it returns or aggregates all of the fields in the event.
-// * interval (required if *agg* is specified): the resolution of interval for aggregation operations.
+// * agg: supported aggregation operations are:
+//     `select` - returns all events between the specified interval
+//     `histogram` - returns a histogram of events between the specified interval
+//     `rate` - returns a ratio of two events between the specified interval
+// * field (optional):
+//     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
+// * interval (optional; required if `agg` is `histogram` or `rate`):
+//     the resolution of interval for aggregation operations.
 //     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
 //     also supported are values such as `1.5h`, `90m` etc.
 //
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   Util.verifyParameters(
     JSON.parse(JSON.stringify(ctx.request.query)),
-    ['start', 'end', 'eventid', 'variantid'],
+    ['database', 'start', 'end', 'eventid', 'variantid', 'agg'],
   );
   winston.info('getting events for variant');
-  const response: object[] = await events.getEventData(ctx.request.query);
+
+  const database: DatabaseController | undefined = DatabaseRegistry.get(Number(ctx.request.query.database));
+  if (database === undefined)
+  {
+    throw new Error('Database "' + String(ctx.request.query.database) + '" does not exist or does not have analytics enabled.');
+  }
+
+  const response: object[] = await events.AggregationHandler(database, ctx.request.query);
   ctx.body = response.reduce((acc, x) =>
   {
     for (const key in x)
@@ -125,6 +99,81 @@ Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =
       }
     }
   }, {});
+});
+
+Router.get('/:databaseid', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('getting all events');
+  const databaseid = ctx.params.databaseid;
+  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
+  }
+  ctx.body = await events.getMetadata(database);
+});
+
+Router.get('/:databaseid/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const databaseid = ctx.params.databaseid;
+  const id = ctx.params.id;
+  winston.info('getting event ID ' + String(id));
+
+  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
+  }
+
+  ctx.body = await events.getMetadata(database, { id });
+});
+
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add event');
+  const event: EventMetadataConfig = ctx.request.body.body;
+  Util.verifyParameters(event, ['database', 'name']);
+  if (event.id !== undefined)
+  {
+    throw new Error('Invalid parameter event ID');
+  }
+
+  const databaseid = ctx.request.body.body.database;
+  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
+  }
+
+  ctx.body = await events.addEventMetadata(database, events);
+});
+
+Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('update event');
+  const event: EventMetadataConfig = ctx.request.body.body;
+  Util.verifyParameters(event, ['database', 'name']);
+  if (event.id === undefined)
+  {
+    event.id = Number(ctx.params.id);
+  }
+  else
+  {
+    if (event.id !== Number(ctx.params.id))
+    {
+      throw new Error('Event ID does not match the supplied id in the URL');
+    }
+  }
+
+  const databaseid = ctx.request.body.body.database;
+  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
+  if (database === undefined)
+  {
+    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
+  }
+
+  winston.info('modify event' + String(event.id));
+  ctx.body = await events.addEventMetadata(database, event);
 });
 
 export default Router;

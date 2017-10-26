@@ -49,7 +49,7 @@ var path = require("path");
 
 module.exports =
 {
-    entry: "./lib/analytics.ts",
+    entry: "./lib/TerrainAnalytics.ts",
     devtool: "cheap-module-source-map",
 
     output:
@@ -78,15 +78,11 @@ module.exports =
                         },
                     }),
             },
-            {
-                test: /\.js(x?)$/,
-                exclude: [/node_modules/],
-                loader: ""
-            },
         ],
     },
 
     plugins:
     [
     ],
+
 };

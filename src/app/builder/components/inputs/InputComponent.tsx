@@ -58,7 +58,9 @@ import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
+
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../colors/Colors';
+import MapComponent from '../../../common/components/MapComponent';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -81,6 +83,7 @@ const TYPE_OPTIONS =
     InputType[0],
     InputType[1],
     InputType[2],
+    InputType[3],
   ]);
 
 const colorForInputType = (inputType: InputType): string =>
@@ -93,6 +96,8 @@ const colorForInputType = (inputType: InputType): string =>
       return Colors().builder.cards.stringClause;
     case InputType.DATE:
       return Colors().builder.cards.enumClause;
+    case InputType.LOCATION:
+      return Colors().builder.cards.enumClause;
     default:
       return '#f00';
   }
@@ -101,6 +106,20 @@ const colorForInputType = (inputType: InputType): string =>
 @Radium
 class InputComponent extends TerrainComponent<Props>
 {
+
+  constructor(props: Props)
+  {
+    super(props);
+
+    this.state =
+      {
+        address: '',
+        latitude: 0.0,
+        longitude: 0.0,
+        focused: false,
+      };
+  }
+
   public getKeyPath(type?: string)
   {
     const keyPath = List(['query', 'inputs']);
@@ -162,10 +181,37 @@ class InputComponent extends TerrainComponent<Props>
       );
     }
 
+    if (this.props.input.inputType === InputType.LOCATION)
+    {
+      let value = this.props.input.value.toJS !== undefined ? this.props.input.value.toJS() : this.props.input.value;
+      let markLocation: boolean = false;
+      if (value && value.location && value.address)
+      {
+        markLocation = true;
+      }
+      else
+      {
+        value = { location: [37.4449002, -122.16174969999997], address: '' };
+      }
+      return (
+        <MapComponent
+          onChange={this.changeValue}
+          address={value.address}
+          location={value.location}
+          markLocation={markLocation}
+          showDirectDistance={false}
+          showSearchBar={true}
+          zoomControl={true}
+          keepAddressInSync={false}
+          geocoder='photon'
+          className='input-map-wrapper'
+        />);
+    }
+
     return (
       <BuilderTextbox
         canEdit={true}
-        value={this.props.input.value}
+        value={typeof this.props.input.value !== 'string' ? this.props.input.value.address : this.props.input.value}
         className='input-text input-text-second'
         keyPath={this.getKeyPath('value')}
         isNumber={this.props.input.inputType === InputType.NUMBER}
@@ -250,7 +296,7 @@ class InputComponent extends TerrainComponent<Props>
               canEdit={true}
               textColor={colorForInputType}
             />
-            <div className='input-close' onClick={this.closeInput}>
+            <div className='input-close close' onClick={this.closeInput}>
               <CloseIcon />
             </div>
           </div>

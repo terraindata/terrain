@@ -110,7 +110,8 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
       keyPath = keyPath.skipLast(1).toList();
     } while (
       keyPath.size &&
-      !storeState.getIn(keyPath)._isCard
+      storeState.getIn(keyPath)
+      && !storeState.getIn(keyPath)._isCard
     );
     return keyPath;
   }
@@ -129,7 +130,7 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
       return true;
     }
 
-    return state.getIn(parentCardKeyPath).get('childrenHaveKeys');
+    return state.getIn(parentCardKeyPath) && state.getIn(parentCardKeyPath).get('childrenHaveKeys');
   }
 
   public componentWillReceiveProps(newProps)

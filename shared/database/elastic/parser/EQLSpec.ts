@@ -102,6 +102,17 @@ const EQLSpec: ESClause[] =
         desc: 'A string. Strings are enclosed in double quotes ("example string"). Quotes and other special symbols can be encoded by escaping them. See json.org for more information.',
         url: 'http://www.json.org/',
       }),
+    new ESStringClause('time_string',
+      {
+        path: ['value'],
+        desc: 'A string that represents a duration of time with a number followed by an elasticsearch time unit. 30m is thirty minutes, 2d is two days, and so on.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#time-units',
+      }),
+    new ESStringClause('timezone_string',
+      {
+        path: ['value'],
+        desc: 'A string that represents a timezone: UTC, a timezone id (PDT etc.), or a local independent fixed offset [+-]hh:mm.',
+      }),
     new ESObjectClause('object',
       {
         path: ['value'],
@@ -175,6 +186,7 @@ const EQLSpec: ESClause[] =
         'NM',
       ],
       {}),
+    // node_modules/elasticsearch/src/lib/apis/6_x.js
     new ESStructureClause('root',
       {
         index: 'index',
@@ -182,14 +194,12 @@ const EQLSpec: ESClause[] =
         from: 'from',
         size: 'size',
         body: 'body',
-        search_type: 'search_type',
       },
       {
         name: 'root clause',
         path: ['primary'],
         desc: 'The outermost clause object that contains an entire search query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template: { index: null, type: null, from: null, size: null, body: null },
         suggestions: ['body', 'index', 'type', 'from', 'size'],
       }),
     new ESIndexClause('index',
@@ -214,44 +224,806 @@ const EQLSpec: ESClause[] =
         path: ['control'],
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
-        template: 1000,
+        template: '1000',
+      }),
+    new ESEnumClause('explain_wildcards',
+      ['open', 'closed', 'none', 'all'],
+      {
+        path: ['control'],
+        desc: 'Explain wildcards.',
+        template: 'open',
       }),
     new ESStructureClause('body',
       {
-        from: 'from',
-        size: 'size',
-        sort: 'sort_clause',
-        track_scores: 'track_scores',
-        query: 'query',
-        _source: '_source',
-        _name: 'query_name',
-        stored_fields: 'field[]',
-        script_fields: 'script_fields',
-        docvalue_fields: 'field[]',
-        post_filter: 'post_filter',
-        highlight: 'highlight',
-        rescore: 'rescore',
-        explain: 'explain',
+        query: 'query', // object
+        sort: 'sort_clause',  // value or object or array
+        script_fields: 'script_fields', // object
+        aggregations: 'aggs_query',
+        from: 'from', // value
+        size: 'size', // value
+        timeout: 'time_string', // value
+        terminate_after: 'number', // value
+        min_score: 'number',
         version: 'version',
-        indices_boost: 'index_boost[]',
-        min_score: 'min_score',
-        inner_hits: 'inner_hits',
-        collapse: 'collapse', // TODO: continue adding from here
-        search_after: 'search_after',
+        explain: 'explain',
+        track_scores: 'track_scores',
+        _source: '_source', // value or object or array
+        stored_fields: 'field[]', // value or array
+        profile: 'boolean',
+        post_filter: 'post_filter', // object
+        indices_boost: 'index_boost[]', // array
+        aggs: 'aggs_query',
+        highlight: 'highlight',
         suggest: 'suggest',
-        aggregations: 'any[]',
-        aggs: 'any',
-        cutoff_frequency: 'cutoff_frequency',
-        minimum_should_match: 'minimum_should_match',
+        rescore: 'rescore', // object or array
+        slice: 'slice', // object
+        collapse: 'collapse', // TODO: continue adding from here object
+        script: 'script',
+        docvalue_fields: 'field[]', // array
+        stats: 'number[]',
+        search_after: 'search_after',
+        ignore_failure: 'boolean',
+        all_fields: 'boolean',
+        // ext: 'ext', not much documents about the usage of this ext
+        //        _name: 'query_name',
+        //        inner_hits: 'inner_hits',
+        //      cutoff_frequency: 'cutoff_frequency',
+        //        minimum_should_match: 'minimum_should_match',
       },
       {
         name: 'body',
         path: ['primary'],
         desc: 'The object containing the filtering, sorting, matching, and aggregation logic for a query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
-        template: { query: null },
+        template: {
+          'query:query': {
+            'bool:elasticFilter': null,
+          },
+          'sort:elasticScore': null,
+          'from:from': 0,
+          'size:size': 1000,
+          'track_scores:track_scores': true,
+        },
         suggestions: ['query', 'sort', 'from', 'size'],
       }),
+    new ESStructureClause('slice',
+      {
+        field: 'field',
+        id: 'number',
+        max: 'number',
+      },
+      {
+        path: ['primary'],
+        name: 'slice',
+        desc: 'A slice allowing to split a scroll in multiple partitions',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html',
+      }),
+    // aggregation
+    // AggregatorFactories.java
+    new ESMapClause('aggs_query',
+      'aggregation_name',
+      'aggregation_builder',
+      {
+        path: ['aggregation'],
+        name: 'aggregation query',
+        desc: 'Create and name an aggregation query.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations',
+      }),
+    new ESStringClause('aggregation_name',
+      {
+        path: ['aggregation'],
+        desc: 'names this aggregation, must be alpha-numeric and can only contain \'_\' and \'-\'',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations',
+      }),
+    new ESStructureClause('aggregation_builder',
+      {
+        aggs: 'aggs_query',
+        aggregations: 'aggs_query',
+        avg: 'metric_avg',
+        cardinality: 'metric_cardinality',
+        extended_stats: 'metric_extend_stats',
+        geo_bounds: 'metric_geo_bounds',
+        centroid: 'metric_centroid',
+        percentiles: 'metric_percentiles',
+        percentile_ranks: 'metric_percentiles',
+        stats: 'metric_stats',
+        sum: 'metric_sum',
+        top_hits: 'inner_hits',
+        value_count: 'metric_value_count',
+        scripted_metric: 'scripted_metric',
+        max: 'metric_max',
+        min: 'metric_min',
+        filters: 'bucket_filters',
+        filter: 'bucket_filter',
+        adjacency_matrix: 'bucket_adjacency',
+        histogram: 'bucket_histogram',
+        date_histogram: 'bucket_date_histogram',
+        range: 'bucket_range',
+        date_range: 'bucket_date_range',
+        ip_ranges: 'bucket_ip_range',
+        geo_distance: 'bucket_geo_distance',
+        geohash_grid: 'bucket_geohash_grid',
+        sampler: 'bucket_sampler',
+        terms: 'bucket_terms',
+        significant_terms: 'bucket_significant_terms',
+        children: 'bucket_children',
+        diversified_sampler: 'bucket_diversified_sampler',
+        global: 'bucket_global',
+        missing: 'bucket_missing',
+        nested: 'bucket_nested',
+        reverse_nested: 'bucket_reverse_nested',
+      },
+      {
+        path: ['aggregations'],
+        desc: 'Provides aggregated data based on the aggregation query.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html#_structuring_aggregations.',
+      }),
+    new ESStructureClause('bucket_terms',
+      {
+        field: 'field', // any field
+        size: 'number',
+        shard_size: 'number',
+        order: 'terms_order',
+        min_doc_count: 'number',
+        shard_min_doc_count: 'number',
+        execution_hint: 'string',
+        include: 'include_values',
+        exclude: 'exclude_values',
+        collect_mode: 'collect_mode',
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A multi-bucket value source based aggregation where buckets are dynamically built - one per unique value.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-terms-aggregation.html',
+      }),
+    new ESEnumClause('collect_mode',
+      [
+        'breadth_first',
+        'depth_first',
+      ],
+      {
+        path: ['bucket aggregation'],
+        desc: 'Deferring calculation of child aggregations',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-terms-aggregation.html#_collect_mode',
+      }),
+    new ESMapClause('terms_order',
+      'terms_order_key',
+      'sort_order',
+      {
+        path: ['bucket aggregation'],
+        desc: 'Controls the order of the buckets.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-order',
+      },
+    ),
+    new ESEnumClause('terms_order_key',
+      [
+        '_term',
+        '_count',
+      ],
+      {
+        path: ['bucket aggregation'],
+        desc: 'Controls the order of the buckets.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-order',
+      }),
+    new ESVariantClause('include_values',
+      {
+        string: 'terms_filter_regular_string',
+        array: 'terms_filter_string[]',
+        object: 'terms_filter_partition',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'Includes the values for which buckets will be created.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-terms-aggregation.html#_filtering_values_2',
+      }),
+    new ESVariantClause('exclude_values',
+      {
+        string: 'terms_filter_regular_string',
+        array: 'terms_filter_string[]',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'Excludes the values for which buckets will be created.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-terms-aggregation.html#_filtering_values_2',
+      }),
+    new ESStringClause('terms_filter_regular_string',
+      {
+        path: ['bucket aggregation'],
+        desc: 'Filters the values with a regular expression string, such as ".*sport.*".',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-terms-aggregation.html#_filtering_values_2',
+      }),
+    new ESStringClause('terms_filter_string',
+      {
+        path: ['bucket aggregation'],
+        desc: 'Filters the values with a exact string, such as "mazda".',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-terms-aggregation.html#_filtering_values_with_exact_values',
+      }),
+    new ESStructureClause('terms_filter_partition',
+      {
+        partition: 'number',
+        num_partitions: 'number',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'Groups the field’s values into a number of partitions at query-time and processing only one partition in each request.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-terms-aggregation.html#_filtering_values_with_partitions',
+      },
+    ),
+    new ESStructureClause('bucket_range',
+      {
+        field: 'field', // numerical field
+        ranges: 'ranges_number[]',
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+        keyed: 'boolean',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A multi-bucket value source based aggregation that enables the user to define a set of ranges - each representing a bucket.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-aggregations-bucket-range-aggregation.html',
+      },
+    ),
+    new ESStructureClause('bucket_date_range',
+      {
+        field: 'field', // geo field
+        ranges: 'ranges_time[]',
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+        keyed: 'boolean',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A multi-bucket value source based aggregation that enables the user to define a set of date ranges - each representing a bucket.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-daterange-aggregation.html',
+      },
+    ),
+    new ESStructureClause('bucket_missing',
+      {
+        field: 'field', // geo field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'Creates a bucket of all documents in the current document set context that are missing a field value',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-missing-aggregation.html',
+      },
+    ),
+    new ESStructureClause('bucket_nested',
+      {
+        path: 'string',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A special single bucket aggregation that enables aggregating nested documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-nested-aggregation.html',
+      },
+    ),
+    new ESStructureClause('bucket_reverse_nested',
+      {
+        path: 'string',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A special single bucket aggregation that enables aggregating on parent docs from nested documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-reverse-nested-aggregation.html',
+      },
+    ),
+    new ESStructureClause('bucket_ip_range',
+      {
+        field: 'field', // ip field
+        ranges: 'ranges_ip[]',
+        missing: 'number',
+        value_type: 'string',
+        keyed: 'boolean',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A multi-bucket value source based aggregation that enables the user to define a set of IP ranges - each representing a bucket.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-iprange-aggregation.html',
+      },
+    ),
+    new ESStructureClause('bucket_geo_distance',
+      {
+        field: 'field', // numerical field
+        origin: 'geo_point_type',
+        ranges: 'ranges_number[]',
+        unit: 'distance_unit',
+        distance_type: 'string', // plane, etc.
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+        keyed: 'boolean',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A multi-bucket aggregation that works on geo_point fields and conceptually works very similar to the range aggregation.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-daterange-aggregation.html#date-format-pattern',
+      },
+    ),
+    new ESStructureClause('bucket_geohash_grid',
+      {
+        field: 'field', // numerical field
+        precision: 'number',
+        size: 'number',
+        shard_size: 'number',
+        missing: 'number',
+        value_type: 'string',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A multi-bucket aggregation that works on geo_point fields and groups points into buckets that represent cells in a grid.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-geohashgrid-aggregation.html',
+      },
+    ),
+    new ESStructureClause('bucket_global',
+      {
+        // global is an empty object, and only can be placed as top level aggregators.
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'Defines a single bucket of all the documents within the search execution context. This context is defined by the indices and the document types you’re searching on, but is not influenced by the search query itself.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-global-aggregation.html',
+      }),
+    new ESStructureClause('bucket_sampler',
+      {
+        shard_size: 'number',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A filtering aggregation used to limit any sub aggregations\' processing to a sample of the top-scoring documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-sampler-aggregation.html',
+      }),
+    new ESStructureClause('bucket_significant_terms',
+      {
+        shard_size: 'number',
+        min_doc_count: 'number',
+        shard_min_doc_count: 'number',
+        size: 'number',
+        execution_hint: 'string',
+        background_filter: 'query',
+        include: 'include_values',
+        exclude: 'exclude_values',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'An aggregation that returns interesting or unusual occurrences of terms in a set.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-significantterms-aggregation.html',
+      }),
+    new ESStructureClause('ranges_number',
+      {
+        to: 'number',
+        from: 'number',
+        key: 'string',
+      },
+      {
+        path: ['bucket aggregation'],
+        name: 'To From',
+        desc: 'Ranges for buckets of a range aggregation',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.2/search-aggregations-bucket-range-aggregation.html',
+      }),
+    new ESStructureClause('ranges_time',
+      {
+        to: 'string',
+        from: 'string',
+        key: 'string',
+      },
+      {
+        path: ['bucket aggregation'],
+        name: 'To From',
+        desc: 'Ranges for buckets of time.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-daterange-aggregation.html#date-format-pattern',
+      }),
+    new ESStructureClause('ranges_ip',
+      {
+        to: 'string',
+        from: 'string',
+        key: 'string',
+        mask: 'string',
+      },
+      {
+        path: ['bucket aggregation'],
+        name: 'To From',
+        desc: 'Ranges for buckets of ip addresses.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-iprange-aggregation.html',
+      }),
+    new ESStructureClause('geo_point_object',
+      {
+        lat: 'number',
+        lon: 'number',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'Object format of geo_point type, like { "lat" : 52.376, "lon" : 4.894 }.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html',
+      }),
+    new ESStringClause('geo_point_string',
+      {
+        path: ['bucket aggregation'],
+        desc: 'String format of geo_point type: "lat,lon"',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html',
+      }),
+    new ESReferenceClause('geo_point_array',
+      'number[]',
+      {
+        path: ['bucket aggregation'],
+        desc: 'Array format of geo_point type: [ lat, lon]',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html',
+      }),
+    new ESVariantClause('geo_point_type',
+      {
+        string: 'geo_point_string',
+        object: 'geo_point_object',
+        array: 'geo_point_array',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'geo_point type can be expressed as an object, an array, or a string',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html',
+      }),
+    new ESStructureClause('bucket_histogram',
+      {
+        field: 'field', // numeric field
+        offset: 'number',
+        interval: 'number',
+        min_doc_count: 'number',
+        extended_bounds: 'extended_bounds',
+        order: 'histogram_order',
+        missing: 'number',
+        keyed: 'boolean',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A multi-bucket values source based aggregation that can be applied on numeric values extracted from the documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-histogram-aggregation.html',
+      }),
+    new ESStructureClause('bucket_date_histogram',
+      {
+        field: 'field', // numeric field
+        offset: 'number',
+        interval: 'time_string',
+        min_doc_count: 'number',
+        extended_bounds: 'extended_bounds',
+        order: 'histogram_order',
+        missing: 'number',
+        keyed: 'boolean',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+        timezone: 'timezone_string',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A multi-bucket values source based aggregation that can be applied on date values extracted from the documents',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-histogram-aggregation.html',
+      }),
+    new ESMapClause('histogram_order',
+      'histogram_order_key',
+      'sort_order',
+      {
+        path: ['bucket aggregation'],
+        desc: 'Controls how the returned buckets are sorted.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-histogram-aggregation.html#_order',
+      },
+    ),
+    new ESEnumClause('histogram_order_key',
+      [
+        '_key',
+        '_count',
+      ],
+      {
+        path: ['bucket aggregation'],
+        desc: 'Controls the order of returned buckets by their key or doc_count.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-histogram-aggregation.html#_order',
+      }),
+    new ESStructureClause('extended_bounds',
+      {
+        min: 'number',
+        max: 'number',
+      },
+      {
+        path: ['extended_bounds'],
+        desc: 'Bounds for buckets of a histogram aggregation',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-histogram-aggregation.html',
+      }),
+    // AvgAggregationBuilder.java
+    // ValuesSourceParserHelper.declareNumericFields(PARSER, true, true, false);
+    new ESStructureClause('metric_avg',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that computes the average of numeric values that are extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-avg-aggregation.html',
+      }),
+    // CardinalityAggregationBuilder.java
+    // ValuesSourceParserHelper.declareAnyFields(PARSER, true, false);
+    // PARSER.declareLong(CardinalityAggregationBuilder::precisionThreshold, CardinalityAggregationBuilder.PRECISION_THRESHOLD_FIELD);
+    new ESStructureClause('metric_cardinality',
+      {
+        field: 'field', // any field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        precision_threshold: 'number',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that calculates an approximate count of distinct values.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-cardinality-aggregation.html#_counts_are_approximate',
+      }),
+    // ExtendedStatsAggregationBuilder.java
+    //        ValuesSourceParserHelper.declareNumericFields(PARSER, true, true, false);
+    // PARSER.declareDouble(ExtendedStatsAggregationBuilder::sigma, ExtendedStatsAggregator.SIGMA_FIELD);
+    new ESStructureClause('metric_extend_stats',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+        sigma: 'number',
+      },
+      {
+        name: 'extend stats aggregation',
+        path: ['metric aggregation'],
+        desc: 'A multi-value metrics aggregation that computes stats over numeric values extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-avg-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_geo_bounds',
+      {
+        field: 'field', // GEOPOINT field
+        missing: 'number',
+        value_type: 'string',
+        wrap_longitude: 'boolean',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A metric aggregation that computes the bounding box containing all geo_point values for a field.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-geobounds-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_centroid',
+      {
+        field: 'field', // GEOPOINT field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A metric aggregation that computes the weighted centroid from all coordinate values for a Geo-point datatype field.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-geocentroid-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_max',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that keeps track and returns the maximum value.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-max-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_value_count',
+      {
+        field: 'field', // any field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that counts the number of values that are extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-valuecount-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_min',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that keeps track and returns the minimum value.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-min-aggregation.html',
+      }),
+
+    new ESStructureClause('metric_percentiles',
+      {
+        field: 'field', // numerical field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+        percents: 'number[]', // double array
+        keyed: 'boolean',
+        tdigest: 'percentiles_tdigest',
+        hdr: 'percentiles_hdr',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A multi-value metrics aggregation that calculates one or more percentiles over numeric values extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-percentile-aggregation.html',
+      }),
+
+    new ESStructureClause('percentiles_tdigest',
+      {
+        compression: 'number',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'Compression controls memory usage and approximation error',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-percentile-aggregation.html#search-aggregations-metrics-percentile-aggregation-compression',
+      }),
+
+    new ESStructureClause('percentiles_hdr',
+      {
+        number_of_significant_value_digits: 'number',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'Uses HDR Histogram to compute percentiles.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-percentile-aggregation.html#_hdr_histogram',
+      }),
+
+    new ESStructureClause('scripted_metric',
+      {
+        init_script: 'script',
+        map_script: 'script',
+        combine_script: 'script',
+        reduce_script: 'script',
+        params: 'script_params',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A metric aggregation that executes using scripts to provide a metric output. (experimental)',
+        url: 'A metric aggregation that executes using scripts to provide a metric output.',
+      }),
+    new ESStructureClause('metric_stats',
+      {
+        field: 'field', // numeric field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A multi-value metrics aggregation that computes stats over numeric values extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-stats-aggregation.html',
+      }),
+    new ESStructureClause('metric_sum',
+      {
+        field: 'field', // numeric field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        format: 'string',
+      },
+      {
+        path: ['metric aggregation'],
+        desc: 'A single-value metrics aggregation that sums up numeric values that are extracted from the aggregated documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-sum-aggregation.html',
+      }),
+
+    new ESStructureClause('bucket_filter',
+      {
+        filter: 'query',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'Defines a single bucket of all the documents in the current document set context that match a specified filter.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-filter-aggregation.html',
+      }),
+
+    new ESStructureClause('bucket_filters',
+      {
+        other_bucket_key: 'boolean',  // false default
+        other_bucket: 'string', // "_other_"
+        filters: 'aggregation_filters',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'Defines a multi bucket aggregation where each bucket is associated with a filter. Each bucket will collect all documents that match its associated filter.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-filters-aggregation.html',
+      }),
+
+    new ESVariantClause('aggregation_filters',
+      {
+        object: 'keyed_filters',
+        array: 'anonymous_filters',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'Lists filters.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-filters-aggregation.html#search-aggregations-bucket-filters-aggregation',
+      }),
+
+    new ESMapClause('keyed_filters',
+      'string',
+      'query',
+      {
+        path: ['bucket aggregation'],
+        desc: 'A named filter.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-filters-aggregation.html#search-aggregations-bucket-filters-aggregation',
+      }),
+
+    new ESReferenceClause('anonymous_filters',
+      'query[]',
+      {
+        path: ['bucket aggregation'],
+        desc: 'An anonymous filter.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-filters-aggregation.html#_anonymous_filters',
+      }),
+
+    new ESStructureClause('bucket_adjacency',
+      {
+        filters: 'aggregation_filters',
+        separator: 'query_string_default_operator',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A bucket aggregation returning a form of adjacency matrix.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-adjacency-matrix-aggregation.html',
+      }),
+
+    // TODO: need a runtime type checking to check the shape
+    new ESStructureClause('bucket_children',
+      {
+        type: 'field',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'A special single bucket aggregation that enables aggregating from buckets on parent document types to buckets on child documents.',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-children-aggregation.html',
+      }),
+
+    new ESStructureClause('bucket_diversified_sampler',
+      {
+        field: 'field', // any field
+        missing: 'number',
+        value_type: 'string',
+        script: 'script',
+        shard_size: 'number',
+        max_docs_per_value: 'number',
+        execution_hint: 'string',
+      },
+      {
+        path: ['bucket aggregation'],
+        desc: 'Adds the ability to limit the number of matches that share a common value such as an "author".',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-diversified-sampler-aggregation.html',
+      }),
+
     new ESVariantClause('sort_object',
       {
         'object:_script': 'script_sort',
@@ -741,6 +1513,7 @@ const EQLSpec: ESClause[] =
         desc: 'The name of the stored script to call.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-scripting-using.html#modules-scripting-stored-scripts',
       }),
+    // FetchSourceContext.java
     new ESVariantClause('_source',
       {
         object: 'includeExclude',
@@ -766,6 +1539,7 @@ const EQLSpec: ESClause[] =
       }),
     new ESStructureClause('query',
       {
+        geo_distance: 'geo_distance',
         bool: 'bool_query',
         term: 'term_query',
         terms: 'terms_query',
@@ -819,6 +1593,26 @@ const EQLSpec: ESClause[] =
         name: 'constant score query',
         desc: 'A query clause that is not used to compute result scores.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html',
+      }),
+    new ESWildcardStructureClause('geo_distance',
+      {
+        distance: 'distance',
+        distance_type: 'distance_type',
+      },
+      'field',
+      'geo_point',
+      {
+        path: ['geo_distance'],
+        name: 'geo_distance',
+        desc: 'Filters in and out documents that meet given distance requirements',
+        url: 'https://www.elastic.co/guide/en/elasticsearch/reference/5.4/query-dsl-geo-distance-query.html',
+        required: ['distance'],
+      }),
+    new ESStringClause('distance',
+      {
+        name: 'distance',
+        path: ['geo_distance'],
+        desc: 'The distance, in various units, from a specified location',
       }),
     new ESStructureClause('bool_query',
       {
@@ -1184,8 +1978,8 @@ const EQLSpec: ESClause[] =
         desc: 'Settings for a match clause.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-query.html',
         template: {
-          query: '',
-          operator: null,
+          'query:string': '',
+          'operator:match_operator': null,
         },
         required: ['query'],
         suggestions: ['query', 'operator', 'analyzer', 'max_expansions', 'slop', 'lenient'],
@@ -1670,9 +2464,9 @@ const EQLSpec: ESClause[] =
         desc: 'Queries nested documents.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-nested-query.html',
         template: {
-          path: '',
-          score_mode: null,
-          query: null,
+          'path:field': '',
+          'score_mode:nested_score_mode': null,
+          'query:query': null,
         },
         required: ['path', 'query'],
         suggestions: ['path', 'score_mode', 'query'],
@@ -1700,9 +2494,9 @@ const EQLSpec: ESClause[] =
         desc: 'Matches documents that have nested (child) documents that match this query',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-has-child-query.html',
         template: {
-          type: '',
-          score_mode: null,
-          query: null,
+          'type:field': '',
+          'score_mode:has_child_score_mode': null,
+          'query:query': null,
         },
         required: ['type', 'query'],
         suggestions: ['type', 'query', 'score_mode'],
@@ -1728,9 +2522,9 @@ const EQLSpec: ESClause[] =
         desc: 'Query that returns nested (child) documents that have parents that match the query.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-has-parent-query.html',
         template: {
-          parent_type: '',
-          score: null,
-          query: null,
+          'parent_type:type': '',
+          'score:has_parent_score': null,
+          'query:query': null,
         },
         required: ['parent_type', 'query'],
       }),

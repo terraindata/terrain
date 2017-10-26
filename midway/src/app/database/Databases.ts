@@ -55,7 +55,7 @@ import { UserConfig } from '../users/UserRouter';
 import * as Util from '../Util';
 
 // CREATE TABLE databases (id integer PRIMARY KEY, name text NOT NULL, type text NOT NULL, \
-// dsn text NOT NULL, status text);
+// dsn text NOT NULL, status text, isAnalytics bool NOT NULL, analyticsIndex text, analyticsType text);
 
 export interface DatabaseConfig
 {
@@ -65,6 +65,9 @@ export interface DatabaseConfig
   dsn: string;
   host: string;
   status?: string;
+  isAnalytics: boolean;
+  analyticsIndex?: string;
+  analyticsType?: string;
 }
 
 export class Databases
@@ -82,6 +85,9 @@ export class Databases
         'dsn',
         'host',
         'status',
+        'isAnalytics',
+        'analyticsIndex',
+        'analyticsType',
       ],
     );
   }
@@ -95,7 +101,7 @@ export class Databases
     return App.DB.delete(this.databaseTable, { id } as DatabaseConfig);
   }
 
-  public async select(columns: string[], filter: object): Promise<DatabaseConfig[]>
+  public async select(columns: string[], filter?: object): Promise<DatabaseConfig[]>
   {
     return App.DB.select(this.databaseTable, columns, filter) as Promise<DatabaseConfig[]>;
   }
@@ -131,6 +137,11 @@ export class Databases
       db = Util.updateObject(results[0], db);
     }
 
+    if (db.isAnalytics === undefined)
+    {
+      db.isAnalytics = false;
+    }
+
     return App.DB.upsert(this.databaseTable, db) as Promise<DatabaseConfig>;
   }
 
@@ -148,7 +159,7 @@ export class Databases
       throw new Error('Database does not have an ID');
     }
 
-    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn);
+    const controller: DatabaseController = DBUtil.makeDatabaseController(db.type, db.dsn, db.analyticsIndex, db.analyticsType);
     DatabaseRegistry.set(db.id, controller);
 
     // try to provision built-in scripts to the connected database

@@ -13,24 +13,6 @@
   input {
     font-size: @font-size;
     padding: 6px;
-    
-    // background: rgba(0,0,0,0.25);
-    color: #fff;
-    
-    &::placeholder {
-      // color: rgba(255,255,255,0.5) !important;
-    }
-    
-    &:hover {
-      input {
-        background: rgba(0,0,0,0.37);
-      }
-    }
-    
-    &:focus {
-      color: #fff;
-      background: rgba(0,0,0,.5);
-    }
   }
 
   &.builder-tb-accepts-cards {
@@ -106,6 +88,13 @@
   }
 
   &.builder-tb-cards {
+    cursor: pointer;
+    
+    &:hover {
+      .builder-tb-cards-toggle {
+        opacity: 1;
+      }
+    }
   }
 
   @card-chip-width: 20px;
@@ -250,11 +239,5 @@
     fill: #fff;
   }
 
-  opacity: 0;
-  &:hover {
-    opacity: 0.9;
-  }
-  &:active {
-    opacity: 1.0;
-  }
+  opacity: 0.5;
 }

@@ -4,6 +4,14 @@
   position: relative;
   &.builder-component-wrapper-wide {
     width: 100%;
+    .builder-tb {
+      width: 91%;
+    }
+    .dropdown-wrapper {
+      .dropdown-value {
+        width: 91%;
+      }
+    }
   }
   .builder-component-help-right {
     right: 10px;
@@ -21,6 +29,12 @@
     left: 0%;
     top: 90%;
   }
+}
+
+.builder-map-component-wrapper {
+  width: calc(~"100% + 21px");
+  margin-left: -12px;
+  margin-bottom: -9px;
 }
 
 .bc-expandable-expanded, .bc-expandable-collapsed {

@@ -48,6 +48,7 @@ import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
+import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 
 export const enum AutocompleteMatchType
@@ -55,7 +56,19 @@ export const enum AutocompleteMatchType
   Index = 1,
   Type = 2,
   Field = 3,
+  Transform = 4,
 }
+
+export const TransformableTypes =
+  [
+    'long',
+    'double',
+    'short',
+    'byte',
+    'integer',
+    'half_float',
+    'float',
+  ];
 
 export const ElasticBlockHelpers = {
   autocompleteMatches(schemaState, matchType: AutocompleteMatchType): List<string>
@@ -76,6 +89,12 @@ export const ElasticBlockHelpers = {
       ).toList();
     }
 
+    const metaFields = ['_index', '_type', '_uid', '_id',
+      '_source', '_size',
+      '_all', '_field_names',
+      '_parent', '_routing',
+      '_meta'];
+
     if (index !== null)
     {
       const indexId = state.db.name + '/' + String(index);
@@ -89,16 +108,35 @@ export const ElasticBlockHelpers = {
         ).toList();
       }
 
-      // else we are in the Field case...
+      // else we are in the Field or Transform case...
 
       // 2. Need to get current type
-
       const type = getType();
+
+      // 3. If Transform, return columns matching server/index/type that can be transformed
+      if (matchType === AutocompleteMatchType.Transform)
+      {
+        if (type !== null)
+        {
+          const typeId = state.db.name + '/' + String(index) + '.' + String(type);
+          const transformableFields = schemaState.columns.filter(
+            (column) => column.serverId === String(server) &&
+              column.databaseId === String(indexId) &&
+              column.tableId === String(typeId) &&
+              TransformableTypes.indexOf(column.datatype) !== -1,
+          ).map(
+            (column) => column.name,
+          ).toList().concat(List(['_score', '_size']));
+          return transformableFields;
+        }
+        return List(['_score', '_size']);
+      }
+
       if (type !== null)
       {
         const typeId = state.db.name + '/' + String(index) + '.' + String(type);
 
-        // 3. Return columns matching this (server+)index+type
+        // 4. Return all columns matching this (server+)index+type
 
         return schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
@@ -106,52 +144,57 @@ export const ElasticBlockHelpers = {
             column.tableId === String(typeId),
         ).map(
           (column) => column.name,
-        ).toList().push('_all');
+        ).toList().concat(List(metaFields));
       }
     }
 
-    return List();
+    return List(metaFields);
   },
 };
 
-export function findCardTypeInRoot(name: string): Block | null
+export function findCardType(name: string): Block | null
 {
   const state = BuilderStore.getState();
-  const rootCard = state.query.cards.get(0);
-  if (rootCard === undefined)
+  let theCard = null;
+  forAllCards(state.query.cards, (card) =>
   {
-    return null;
-  }
-  const isTheCard = (card) => card['type'] === name;
-  const theCard = rootCard['cards'].find(isTheCard);
-  if (theCard === undefined)
-  {
-    return null;
-  }
+    if (card.type === name)
+    {
+      theCard = card;
+    }
+  });
   return theCard;
 }
 
 export function getIndex(notSetIndex: string = null): string | null
 {
-  const c = findCardTypeInRoot('eqlindex');
+  const c = findCardType('elasticFilter');
   if (c === null)
   {
     return notSetIndex;
   } else
   {
-    return c['value'];
+    if (c['currentIndex'] === '')
+    {
+      return notSetIndex;
+    }
+    return c['currentIndex'];
   }
 }
 
 export function getType(notSetType: string = null): string | null
 {
-  const c = findCardTypeInRoot('eqltype');
+  const c = findCardType('elasticFilter');
   if (c === null)
   {
     return notSetType;
   } else
   {
-    return c['value'];
+    if (c['currentType'] === '')
+    {
+      return notSetType;
+    }
+    return c['currentType'];
   }
 }
 

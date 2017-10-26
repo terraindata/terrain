@@ -227,14 +227,11 @@ class DeployModalColumn extends TerrainComponent<Props>
 
         <div className='deploy-modal-info deploy-modal-info-status'>
           <div className='deploy-modal-info-row-lower deploy-modal-info-status-row'>
-            <span
-              style={fontColor(Colors().altText2)}
-            >
+            <span>
               Current status:
               </span>
             <span
               className='deploy-modal-info-bold'
-              style={fontColor(Colors().altText1)}
             >
               {
                 variant.status
@@ -242,14 +239,11 @@ class DeployModalColumn extends TerrainComponent<Props>
             </span>
           </div>
           <div className='deploy-modal-info-row-lower'>
-            <span
-              style={fontColor(Colors().altText2)}
-            >
+            <span>
               Changing to status:
               </span>
             <span
               className='deploy-modal-info-bold'
-              style={fontColor(Colors().altText1)}
             >
               {
                 status

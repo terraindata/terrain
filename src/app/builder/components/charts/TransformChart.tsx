@@ -164,6 +164,7 @@ const TransformChart = {
 
     const barsData = state._cache.computedBarsData;
     const scales = this._scales(el, state.domain, barsData, state.width, state.height);
+
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
@@ -305,6 +306,74 @@ const TransformChart = {
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY));
+  },
+
+  _drawDisabledOverlay(el, scales)
+  {
+    d3.select(el).select('.inner-svg').select('.overlay').remove();
+    d3.select(el).select('.inner-svg').select('.no-point-overlay').remove();
+    const overlay = d3.select(el).select('.inner-svg').append('g')
+      .attr('class', 'overlay');
+
+    const width = scaleMax(scales.x) - scaleMin(scales.x);
+    const height = scaleMin(scales.pointY) - scaleMax(scales.pointY);
+
+    overlay.append('rect')
+      .attr('x', 0)
+      .attr('width', width)
+      .attr('y', 0)
+      .attr('height', height)
+      .attr('fill', Colors().bg1)
+      .attr('opacity', 0.5);
+
+    overlay.append('text')
+      .attr('x', 10)
+      .attr('y', height / 2)
+      .attr('text-anchor', 'start')
+      .attr('fill', Colors().text1)
+      .text('Select an input field using the textbox above to begin');
+  },
+
+  _overlayMouseoverFactory: (el) => (overlay) =>
+  {
+    d3.select(el).select('.inner-svg').select('.no-point-overlay').remove();
+  },
+
+  _overlayMouseoutFactory: (el, scales, drawNoPointsOverlay) => (overlay) =>
+  {
+    drawNoPointsOverlay(el, scales);
+    return false;
+  },
+
+  _drawNoPointsOverlay(el, scales)
+  {
+    d3.select(el).select('.inner-svg').select('.overlay').remove();
+    d3.select(el).select('.inner-svg').select('.no-point-overlay').remove();
+    const overlay = d3.select(el).select('.inner-svg').append('g')
+      .attr('class', 'no-point-overlay');
+
+    const width = scaleMax(scales.x) - scaleMin(scales.x);
+    const height = scaleMin(scales.pointY) - scaleMax(scales.pointY);
+
+    overlay.append('rect')
+      .attr('x', 0)
+      .attr('width', width)
+      .attr('y', 0)
+      .attr('height', height)
+      .attr('fill', Colors().bg1)
+      .attr('opacity', 0.5);
+
+    overlay.append('text')
+      .attr('x', 10)
+      .attr('y', height / 2)
+      .attr('text-anchor', 'start')
+      .attr('fill', Colors().text1)
+      .text('Double click anywhere on the graph to add a Transform point');
+
+    const self = this;
+    overlay.on('mouseout', this._overlayMouseoutFactory(el, scales, self._drawNoPointsOverlay));
+    overlay.on('mouseover', this._overlayMouseoverFactory(el));
+    // overlay.on('mouseleave', onMouseLeave(this, el, scales, onMouseEnter, onMouseLeave));
   },
 
   _drawAxes(el, scales, width, height)
@@ -1264,7 +1333,7 @@ const TransformChart = {
     for (const menuText of Object.keys(menuOptions))
     {
       const item = menu.append('div');
-      item.attr('style', `display: block; color: ${Colors().altBg1}`)
+      item.attr('style', `display: block; color: ${Colors().activeText}`)
         .attr('class', 'chart-context-menu-item')
         .text(menuText);
       item.on('mousedown', () => { menuOptions[menuText](d3.select(el), d3.mouse(this)); });
@@ -1341,10 +1410,24 @@ const TransformChart = {
 
     this._drawBg(el, scales);
     this._drawAxes(el, scales, width, height);
+    if (inputKey === '' || inputKey === undefined)
+    {
+      this._drawDisabledOverlay(el, scales);
+      return;
+    }
+    d3.select(el).select('.inner-svg').select('.overlay').remove();
     this._drawBars(el, scales, barsData, colors);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
     this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors);
+    if (!pointsData.length)
+    {
+      this._drawNoPointsOverlay(el, scales);
+    }
+    else
+    {
+      d3.select(el).select('.inner-svg').select('.no-point-overlay').remove();
+    }
     this._movePointEditMenu(el, height);
   },
 

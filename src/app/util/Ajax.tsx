@@ -688,6 +688,62 @@ export const Ajax =
       );
     },
 
+    getAnalyzers(
+      index: string,
+      onLoad: (resp: object) => void,
+      onError?: (resp: any) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'get',
+        'import/analyzers',
+        { index },
+        (response) =>
+        {
+          let responseData: object = null;
+          try
+          {
+            responseData = response;
+          }
+          catch (e)
+          {
+            onError && onError(e.message);
+          }
+
+          if (responseData !== undefined)
+          {
+            // needs to be outside of the try/catch so that any errors it throws aren't caught
+            onLoad(responseData);
+          }
+        },
+      );
+      return;
+    },
+
+    getStreamingProgress(onLoad: (resp: any) => void,
+      onError: (resp: any) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'post',
+        'import/progress/',
+        {},
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+      return;
+    },
+
     importFile(file: File,
       filetype: string,
       dbname: string,
@@ -757,12 +813,12 @@ export const Ajax =
     },
 
     exportFile(filetype: string,
-      dbname: string,
       serverId: number,
       columnTypes: Immutable.Map<string, object>,
       transformations: Immutable.List<object>,
       query: string,
       rank: boolean,
+      objectKey: string,
       downloadFilename: string,
       onLoad: (resp: any) => void,
       onError?: (ev: string) => void,
@@ -770,11 +826,11 @@ export const Ajax =
     {
       const payload: object = {
         dbid: serverId,
-        dbname,
         filetype,
         columnTypes,
         query,
         rank,
+        objectKey,
         transformations,
       };
       const onLoadHandler = (resp) =>
@@ -784,7 +840,7 @@ export const Ajax =
       };
       Ajax.req(
         'post',
-        'import/export/',
+        'export/',
         payload,
         onLoadHandler,
         {
@@ -806,6 +862,7 @@ export const Ajax =
       name: string,
       exporting: boolean,
       primaryKeyDelimiter: string,
+      objectKey: string,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -821,14 +878,16 @@ export const Ajax =
         name,
         export: exporting,
         primaryKeyDelimiter,
+        objectKey,
       };
       const onLoadHandler = (resp) =>
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/create',
+        routeType + '/templates/create',
         payload,
         onLoadHandler,
         {
@@ -861,9 +920,10 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/' + String(templateId),
+        routeType + '/templates/' + String(templateId),
         payload,
         onLoadHandler,
         {
@@ -873,7 +933,9 @@ export const Ajax =
       return;
     },
 
-    deleteTemplate(templateId: number,
+    deleteTemplate(
+      templateId: number,
+      exporting: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -882,9 +944,10 @@ export const Ajax =
       {
         onLoad(resp);
       };
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/delete/' + String(templateId),
+        routeType + '/templates/delete/' + String(templateId),
         {},
         onLoadHandler,
         {
@@ -916,14 +979,163 @@ export const Ajax =
       {
         payload['importOnly'] = true;
       }
-
+      const routeType = exporting ? 'export' : 'import';
       Ajax.req(
         'post',
-        'templates/',
+        routeType + '/templates/',
         payload,
         (response: object[]) =>
         {
           onLoad(response);
+        },
+      );
+    },
+
+    getAllTemplates(
+      exporting: boolean,
+      onLoad: (templates: object[]) => void,
+    )
+    {
+      const payload: object = {};
+      const routeType = exporting ? 'export' : 'import';
+      Ajax.req(
+        'post',
+        routeType + '/templates/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+      );
+    },
+
+    resetTemplateToken(
+      templateId: number,
+      exporting: boolean,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      const routeType = exporting ? 'export' : 'import';
+      return Ajax.req(
+        'post',
+        routeType + '/templates/updateAccessToken/',
+        { id: String(templateId) },
+        onLoadHandler,
+        {
+          onError,
+        },
+      );
+    },
+
+    getTypesFromQuery(
+      connectionId: number,
+      query: object,
+      onLoad: (templates: object) => void,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        query,
+      };
+      Ajax.req(
+        'post',
+        'export/types',
+        payload,
+        (response: object) =>
+        {
+          onLoad(response);
+        },
+      );
+    },
+
+    getAllScheduledJobs(
+      onLoad: (schedules: object[]) => void,
+    )
+    {
+      const payload: object = {};
+
+      Ajax.req(
+        'get',
+        'scheduler/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+      );
+    },
+
+    getCredentialConfigs(
+      type: string,
+      onLoad: (credentials: object[]) => void,
+    )
+    {
+      const payload = {};
+
+      Ajax.req(
+        'get',
+        'scheduler/connections/',
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+        {
+          urlArgs: { type },
+        },
+      );
+    },
+
+    createSchedule(
+      params: {
+        name: string,
+        jobType: string,
+        paramsJob: object,
+        schedule: string,
+        sort: string,
+        transport: object,
+      },
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      return Ajax.req(
+        'post',
+        'scheduler/create/',
+        params,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+        {
+          onError,
+        },
+      );
+    },
+
+    deleteSchedule(
+      id: ID,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const payload = {};
+
+      return Ajax.req(
+        'post',
+        'scheduler/delete/' + String(id),
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+        {
+          onError,
         },
       );
     },
@@ -1071,21 +1283,64 @@ export const Ajax =
       );
     },
 
-    getAnalytics(variantId: ID, start: Date, end: Date,
-      metricId: number, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
+    logout(
+      onSave: (response: any) => void)
+    {
+      return Ajax.req(
+        'post',
+        'auth/logout',
+        {},
+        onSave,
+        {},
+      );
+    },
+
+    getAnalytics(
+      variantIds: ID[],
+      start: Date,
+      end: Date,
+      metricId: number,
+      intervalId: number,
+      aggregation: string,
+      onLoad: (response: any) => void,
+      onError?: (error: any) => void)
     {
       const args = {
-        start: start.toISOString(),
-        end: end.toISOString(),
-        interval: 'day',
+        variantid: variantIds.join(','),
+        start,
+        end,
         eventid: metricId.toString(),
-        agg: 'date_histogram',
+        interval: intervalId,
+        agg: aggregation,
         field: '@timestamp',
       };
 
       return Ajax.req(
         'get',
-        `events/variants/${variantId}`,
+        `events/agg`,
+        {},
+        (response: any) =>
+        {
+          try
+          {
+            onLoad(response);
+          }
+          catch (e)
+          {
+            onError && onError(JSON.parse(response) as any);
+          }
+        },
+        { onError, urlArgs: args });
+    },
+
+    getServerTime(
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void,
+    )
+    {
+      return Ajax.req(
+        'get',
+        'time',
         {},
         (response: any) =>
         {
@@ -1098,7 +1353,7 @@ export const Ajax =
             onError && onError(response as any);
           }
         },
-        { urlArgs: args });
+        { onError });
     },
   };
 

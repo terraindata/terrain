@@ -64,6 +64,8 @@ export interface Props
   button?: string;
   onClick?: () => void;
   inline?: boolean; // render inline, rather than absolutely middle
+  buttons?: string[];
+  buttonFunctions?: [() => void];
 }
 
 @Radium
@@ -93,11 +95,31 @@ class InfoArea extends TerrainComponent<Props>
         className={'info-area-' + thing}
         onClick={onClick ? this.props.onClick : null}
         style={style}
+        key={thing}
       >
         {
           this.props[thing]
         }
       </div>
+    );
+  }
+
+  public renderButtons()
+  {
+    const style = buttonColors();
+    return (
+      this.props.buttons.map((button, i) =>
+        <div
+          className={'info-area-button'}
+          onClick={this.props.buttonFunctions[i]}
+          style={style}
+          key={'button_' + String(i)}
+        >
+          {
+            this.props.buttons[i]
+          }
+        </div>,
+      )
     );
   }
 
@@ -109,11 +131,14 @@ class InfoArea extends TerrainComponent<Props>
           'info-area': true,
           'info-area-inline': this.props.inline,
         })}
-        style={backgroundColor(Colors().emptyBg)}
+        style={backgroundColor(Colors().bg3)}
       >
         {this.renderThing('large')}
         {this.renderThing('small')}
-        {this.renderThing('button', true)}
+        <div className='info-area-buttons-container'>
+          {this.renderThing('button', true)}
+          {this.props.buttons !== undefined ? this.renderButtons() : null}
+        </div>
       </div>
     );
   }

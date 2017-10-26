@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import { extend } from 'lodash';
-import UserStore from '../users/data/UserStore';
+import * as $ from 'jquery';
 
 const Color = require('color');
 
@@ -87,12 +87,15 @@ interface Theme
 
   highlight: string; // for slight emphasis
   darkerHighlight: string; // for depth effect with highlight
+  stroke: string; // should stand out against any background
 
   boxShadow: string; // shadow color
 
   fadedOutBg: string; // for obscuring background contents behind a dark blur
 
   inputBg: string;
+  inputFocusBg: string;
+  inputBorder: string;
 
   scrollbarBG: string;
   scrollbarPiece: string;
@@ -105,6 +108,8 @@ interface Theme
   resultLine: string;
 
   tqlEditor: string;
+
+  iconColor: string;
 
   // DO NOT USE these below colors anymore -- these need to be cleaned up
 
@@ -338,12 +343,15 @@ const DARK: Theme =
 
     highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
     darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
+    stroke: 'rgba(255,255,255,0.15)', // stands out against any background
 
     boxShadow: 'rgba(0, 0, 0, 0.39)',
 
     fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
 
     inputBg: 'rgba(0,0,0,0.25)',
+    inputBorder: 'rgba(0,0,0,0.25)',
+    inputFocusBg: 'rgba(0,0,0,0.5)',
 
     active: darkActive,
     activeText: '#fff',
@@ -363,6 +371,8 @@ const DARK: Theme =
     resultLine: 'rgba(255,255,255,0.25)',
 
     tqlEditor: 'monokai',
+
+    iconColor: '#fff',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
@@ -432,7 +442,7 @@ const DARK: Theme =
       // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
       cards: {
 
-        cardBgOpacity: 0.45,
+        cardBgOpacity: 0.15,
 
         cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
 
@@ -443,7 +453,7 @@ const DARK: Theme =
           primary: '#4fc0ba',
           control: '#fad14b',
           sort: '#1eb4fa',
-          filter: '#38fa1e',
+          filter: '#77f067',
           match: '#b161bc',
           score: '#1eb4fa',
           script: '#4fc0ba',
@@ -545,11 +555,11 @@ const LIGHT: Theme =
   {
     // Use these colors
 
-    bg1: 'rgb(225, 227, 231)',
+    bg1: 'rgb(220, 222, 226)',
     bg2: 'rgb(237, 239, 243)',
     bg3: '#fff',
 
-    emptyBg: 'rgb(249, 251, 255)',
+    emptyBg: '#c7cacf', // 'rgb(249, 251, 255)',
 
     border1: 'rgb(200, 202, 206)',
     border2: 'rgb(100,105,107)',
@@ -557,25 +567,28 @@ const LIGHT: Theme =
 
     text1: '#161616',
     text2: '#242424',
-    text3: '#424242',
+    text3: 'rgba(0,0,0,0.40)',
 
-    altBg1: 'rgba(0,0,0,0.40)', //'rgb(39, 39, 39)',
+    altBg1: '#fff',
     altBg2: '#EDEFF3',
 
-    altText1: '#fff',
-    altText2: '#fff',
-    altText3: 'rgba(255,255,255,0.5)',
+    altText1: '#000',
+    altText2: '#242424',
+    altText3: '#424242',
 
     altHighlight: 'rgba(255,255,255,0.15)',
 
-    highlight: 'rgba(210,215,219,0.75)', // for slight emphasis
-    darkerHighlight: 'rgba(0,0,0,0.15)', // to make a depth effect with highlight
+    highlight: 'rgba(210,215,219,0.25)', // for slight emphasis
+    darkerHighlight: 'rgb(210,215,219,0.5)', // to make a depth effect with highlight
+    stroke: '#aaa', // stands out against any background
 
-    boxShadow: 'rgba(0, 0, 0, 0.05)',
+    boxShadow: 'rgba(130,130,130,0.3)',
 
-    fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
+    fadedOutBg: 'rgba(255, 255, 255, 0.75)', // bg to cover up things when they are faded out
 
-    inputBg: 'rgb(237, 239, 243)',
+    inputBg: 'rgba(255,255,255,1)', //237, 239, 243)',
+    inputBorder: 'rgb(200, 202, 206)',
+    inputFocusBg: '#fff',
 
     active: darkActive,
     activeText: '#fff',
@@ -595,6 +608,8 @@ const LIGHT: Theme =
     resultLine: 'rgba(0,0,0,0.25)',
 
     tqlEditor: 'default',
+
+    iconColor: 'rgba(0, 0, 0, 0.4)',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 
@@ -779,19 +794,19 @@ const HALLOWEEN: Theme =
   {
     // Use these colors
 
-    bg1: 'rgb(39, 39, 39)',
-    bg2: 'rgb(47, 47, 47)',
-    bg3: 'rgb(60, 63, 65)',
+    bg1: 'rgb(0,0,0)',
+    bg2: 'rgb(12,12,12)',
+    bg3: 'rgb(24,24,24)',
 
-    emptyBg: 'rgb(21, 21, 21)',
+    emptyBg: 'rgb(0,0,0)',
 
     border1: 'rgb(72,72,72)',
     border2: 'rgb(100,105,107)',
     border3: 'rgb(125,130,139)',
 
-    text1: '#fff',
-    text2: 'rgba(255,255,255,0.85)',
-    text3: 'rgba(255,255,255,0.5)',
+    text1: 'rgb(253,234,191)',
+    text2: 'rgb(255,216,130)',
+    text3: 'rgb(247,187,51)',
 
     altBg1: '#fff',
     altBg2: '#EDEFF3',
@@ -799,6 +814,8 @@ const HALLOWEEN: Theme =
     altText1: '#000',
     altText2: '#242424',
     altText3: '#424242',
+    
+    iconColor: halloweenActive,
 
     altHighlight: 'rgba(210,215,219,0.75)',
 
@@ -818,13 +835,13 @@ const HALLOWEEN: Theme =
     activeHover: Color(halloweenActive).fade(0.75).string(),
 
     scrollbarBG: 'rgba(255,255,255,0.15)',
-    scrollbarPiece: 'rgba(255,255,255,0.25)',
+    scrollbarPiece: halloweenActive,
 
-    altScrollbarPiece: 'rgba(0, 0, 0, 0.15)',
+    altScrollbarPiece: halloweenActive,
 
     error: '#d14f42',
 
-    import: '#1efab4',
+    import: halloweenActive,
 
     resultLine: 'rgba(255,255,255,0.25)',
 
@@ -906,18 +923,18 @@ const HALLOWEEN: Theme =
 
         //by category
         categories: {
-          primary: '#4fc0ba',
-          control: '#fad14b',
-          sort: '#1eb4fa',
-          filter: '#38fa1e',
-          match: '#b161bc',
-          score: '#1eb4fa',
-          script: '#4fc0ba',
-          compound: '#fad14b',
-          join: '#fad14b',
-          geo: '#0ee06b',
-          suggest: '#bbfa1e',
-          parameter: code.inputParameter,
+          primary: halloweenActive,
+          control: halloweenActive,
+          sort: halloweenActive,
+          filter: halloweenActive,
+          match: halloweenActive,
+          score: halloweenActive,
+          script: halloweenActive,
+          compound: halloweenActive,
+          join: halloweenActive,
+          geo: halloweenActive,
+          suggest: halloweenActive,
+          parameter: halloweenActive,
         },
 
         //by clause type
@@ -1019,6 +1036,8 @@ export const ThemesInt =
     HALLOWEEN: 2,
   };
 
+export const ThemesArray = ['DARK', 'LIGHT', 'HALLOWEEN'];
+
 const curTheme = 'DARK';
 
 export function Colors()
@@ -1072,26 +1091,31 @@ export function altStyle()
 export function cardStyle(strongColor, bgColor, hoverBg?: string, small?: boolean, hovered?: boolean)
 {
   const key = 'card-' + strongColor + bgColor + hoverBg + small + hovered;
+  const smallWeight = (localStorage.getItem('theme') === 'DARK') ? ' 2px 2px 4px 1px' : ' 1px 1px 2px 1px';
+  const largeWeight = (localStorage.getItem('theme') === 'DARK') ? ' 3px 3px 5px 2px ' : ' 2px 2px 3px 1px';
 
   if (!CACHE[key])
   {
     const borderHover = Color(strongColor).alpha(0.5);
     const backgroundHover = Color(bgColor).mix(Color(strongColor), Colors().builder.cards.cardBgOpacity);
+    const sideBorderColorLight = (localStorage.getItem('theme') === 'DARK') ? Colors().darkerHighlight : 'rgba(0,0,0,0.20)';
+    const sideBorderColorDark = (localStorage.getItem('theme') === 'DARK') ? Colors().darkerHighlight : 'rgba(0,0,0,0.30)';
 
     CACHE[key] = {
       background: hovered ? backgroundHover : bgColor,
       color: strongColor,
 
-      boxShadow: small ? Colors().boxShadow + ' 2px 2px 4px 1px' :
-        '3px 3px 5px 2px ' + Colors().boxShadow,
+      boxShadow: small ? Colors().boxShadow + smallWeight :
+        Colors().boxShadow + largeWeight,
+
       borderWidth: 1,
       borderStyle: 'solid',
       borderLeftWidth: '3px',
       borderLeftColor: strongColor,
 
-      borderTopColor: hovered ? borderHover : Colors().highlight,
-      borderRightColor: hovered ? borderHover : Colors().darkerHighlight,
-      borderBottomColor: hovered ? borderHover : Colors().darkerHighlight,
+      borderTopColor: hovered ? borderHover : sideBorderColorLight,
+      borderRightColor: hovered ? borderHover : sideBorderColorDark,
+      borderBottomColor: hovered ? borderHover : sideBorderColorDark,
       transition: 'background 0.15s',
       [hoverBg && ':hover']: {
         background: hoverBg,
@@ -1195,6 +1219,15 @@ export function getCardColors(category: string | undefined, typeColor: string): 
   }
 
   return [color, colors.bg3];
+}
+
+if (localStorage['theme'] === 'HALLOWEEN')
+{
+  $('body').append('<style> img { -webkit-filter: hue-rotate(180deg); filter: hue-rotate(180deg); }</style>');
+  
+  $('body').append('<img src="https://clipartion.com/wp-content/uploads/2015/11/web-spider-gothickyrachan.png" style="position: fixed; \
+      top: 0px; right: 0px; width: 50%; -webkit-filter: invert(100%); filter: invert(100%); pointer-events: none;" />')
+  
 }
 
 export default Colors;

@@ -47,19 +47,109 @@ import Actions from 'analytics/data/AnalyticsActions';
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import * as Immutable from 'immutable';
-import * as nock from 'nock';
-import configureMockStore from 'redux-mock-store';
-import thunk from 'redux-thunk';
+import { Ajax, createMockStore } from '../../helpers';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
-const middlewares = [thunk];
-const mockStore = configureMockStore(middlewares);
+const analyticsResponse = [
+  {
+    key_as_string: '2015-06-02T00:00:00.000Z',
+    key: 1433203200000,
+    doc_count: 10320,
+  },
+  {
+    key_as_string: '2015-06-03T00:00:00.000Z',
+    key: 1433289600000,
+    doc_count: 12582,
+  },
+  {
+    key_as_string: '2015-06-04T00:00:00.000Z',
+    key: 1433376000000,
+    doc_count: 12279,
+  },
+  {
+    key_as_string: '2015-06-05T00:00:00.000Z',
+    key: 1433462400000,
+    doc_count: 6187,
+  },
+  {
+    key_as_string: '2015-06-06T00:00:00.000Z',
+    key: 1433548800000,
+    doc_count: 937,
+  },
+];
+
+const analyticsErrorResponse = {
+  errors: [
+    {
+      status: 400,
+      title: `Route /midway/v1/events/agg?id=1&
+accessToken=some-token&variantid=6&
+start=2017-10-25T00%3A00%3A00.000Z&end=2017-10-25T15%3A39%3A59.335Z&eventid=1&
+interval=day&agg=histogram&field=%40timestamp has an error.`,
+      detail: 'Parameter "database" not found in request object.',
+      source: {
+        ctx: {
+          request: {
+            method: 'GET',
+            url: `/midway/v1/events/agg?id=1&accessToken=some-token&variantid=6&
+start=2017-10-25T00%3A00%3A00.000Z&end=2017-10-25T15%3A39%3A59.335Z&eventid=1&interval=day&
+agg=histogram&field=%40timestamp`,
+            header: {
+              'host': 'localhost:3000',
+              'connection': 'keep-alive',
+              'pragma': 'no-cache',
+              'cache-control': 'no-cache',
+              'origin': 'http://localhost:8080',
+              'user-agent': 'Mozilla/5.0',
+              'content-type': 'application/json',
+              'accept': '*/*',
+              'referer': 'http://localhost:8080/analytics/1/13',
+              'accept-encoding': 'gzip, deflate, br',
+              'accept-language': 'en-US,en;q=0.8,es-419;q=0.6,es;q=0.4,ms;q=0.2,fr;q=0.2,pt;q=0.2',
+            },
+          },
+          response: {
+            status: 400,
+            message: 'Bad Request',
+            header: {
+              'vary': 'Origin',
+              'access-control-allow-origin': 'http://localhost:8080',
+              'content-type': 'application/json; charset=utf-8',
+              'x-response-time': '45ms',
+              'set-cookie': [],
+            },
+          },
+          app: {
+            subdomainOffset: 2,
+            proxy: true,
+            env: 'development',
+          },
+          originalUrl: `/midway/v1/events/agg?id=1&accessToken=some-token&variantid=6&
+start=2017-10-25T00%3A00%3A00.000Z&end=2017-10-25T15%3A39%3A59.335Z&eventid=1&interval=day&
+agg=histogram&field=%40timestamp`,
+          req: '<original node req>',
+          res: '<original node res>',
+          socket: '<original node socket>',
+        },
+        err: {
+
+        },
+      },
+    },
+  ],
+};
+
+const serverTimeResponse = { serverTime: '2015-06-06T00:00:00.000Z' };
+
+const mockStore = createMockStore();
 
 describe('AnalyticsActions', () =>
 {
   const analytics: AnalyticsState = _AnalyticsState({});
   const metricId = 1;
+  const intervalId = 'day';
+  const dateRangeId = 1;
 
   describe('#fetch', () =>
   {
@@ -68,69 +158,86 @@ describe('AnalyticsActions', () =>
     const start = new Date(2015, 5, 2);
     const end = new Date(2015, 5, 20);
 
-    const analyticsResponse = [
-      {
-        key_as_string: '2015-06-02T00:00:00.000Z',
-        key: 1433203200000,
-        doc_count: 10320,
-      },
-      {
-        key_as_string: '2015-06-03T00:00:00.000Z',
-        key: 1433289600000,
-        doc_count: 12582,
-      },
-      {
-        key_as_string: '2015-06-04T00:00:00.000Z',
-        key: 1433376000000,
-        doc_count: 12279,
-      },
-      {
-        key_as_string: '2015-06-05T00:00:00.000Z',
-        key: 1433462400000,
-        doc_count: 6187,
-      },
-      {
-        key_as_string: '2015-06-06T00:00:00.000Z',
-        key: 1433548800000,
-        doc_count: 937,
-      },
-    ];
+    Ajax.getServerTime = (
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void,
+    ) => onLoad(serverTimeResponse);
 
-    afterEach(() =>
+    describe('when fetch is successful', () =>
     {
-      nock.cleanAll();
+      it('should create a analytics.fetchSuccess action after the variant analytics have been fetched', (done) =>
+      {
+        Ajax.getAnalytics = (
+          variantIds: ID[],
+          startParam: Date,
+          endParam: Date,
+          metricIdParam: number,
+          intervalIdParam: string,
+          agg: string,
+          onLoad: (response: any) => void,
+          onError?: (ev: Event) => void,
+        ) => onLoad(analyticsResponse);
+
+        const expectedActions = [
+          {
+            type: ActionTypes.fetchStart,
+          },
+          {
+            type: ActionTypes.fetchSuccess,
+            payload: { analytics: analyticsResponse },
+          },
+        ];
+
+        const store = mockStore({ analytics });
+
+        store.dispatch(
+          Actions.fetch([variantId], metricId, intervalId, dateRangeId, (analyticsResponseParam) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+            done();
+          }),
+        );
+      });
     });
 
-    it('should create a analytics.fetch action after the variant analytics have been fetched', () =>
+    describe('when fetch fails', () =>
     {
-      nock(MIDWAY_BASE_URL)
-        .get(`/events/variants/${variantId}?
-id=1&
-accessToken=${accessToken}&
-start=${start.toISOString()}&
-end=${end.toISOString()}&
-metric=${metricId.toString()}&
-interval=day&
-eventid=${metricId.toString()}&
-agg=date_histogram&
-field=@timestamp`)
-        .reply(200, analyticsResponse);
+      it('should create an analytics.fetchFailure action', (done) =>
+      {
+        Ajax.getAnalytics = (
+          variantIds: ID[],
+          startParam: Date,
+          endParam: Date,
+          metricIdParam: number,
+          intervalIdParam: string,
+          agg: string,
+          onLoad: (response: any) => void,
+          onError?: (error: any) => void,
+        ) => onError(JSON.stringify(analyticsErrorResponse));
 
-      const expectedActions = [
-        {
-          type: ActionTypes.fetch,
-          payload: { variantId, analytics: analyticsResponse },
-        },
-      ];
+        const errorMessages = analyticsErrorResponse.errors.map((error) => error.detail);
+        const expectedActions = [
+          {
+            type: ActionTypes.fetchStart,
+          },
+          {
+            type: ActionTypes.fetchFailure,
+            payload: { errors: errorMessages },
+          },
+        ];
 
-      const store = mockStore({ analytics });
+        const store = mockStore({ analytics });
 
-      store.dispatch(
-        Actions.fetch(variantId, metricId, (variantIdParam, analyticsResponseParam) =>
-        {
-          expect(store.getActions()).toEqual(expectedActions);
-        }),
-      );
+        store.dispatch(
+          Actions.fetch([variantId], metricId, intervalId, dateRangeId, () => { return; },
+            (error) =>
+            {
+              expect(store.getActions()).toEqual(expectedActions);
+              done();
+            },
+          ),
+        );
+      });
     });
   });
 
@@ -148,6 +255,42 @@ field=@timestamp`)
       const store = mockStore({ analytics });
 
       store.dispatch(Actions.selectMetric(metricId));
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+
+  describe('#selectInterval', () =>
+  {
+    it('should create a analytics.selectInterval', () =>
+    {
+      const expectedActions = [
+        {
+          type: ActionTypes.selectInterval,
+          payload: { intervalId },
+        },
+      ];
+
+      const store = mockStore({ analytics });
+
+      store.dispatch(Actions.selectInterval(intervalId));
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+
+  describe('#selectDateRange', () =>
+  {
+    it('should create a analytics.selectDateRange', () =>
+    {
+      const expectedActions = [
+        {
+          type: ActionTypes.selectDateRange,
+          payload: { dateRangeId },
+        },
+      ];
+
+      const store = mockStore({ analytics });
+
+      store.dispatch(Actions.selectDateRange(dateRangeId));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });

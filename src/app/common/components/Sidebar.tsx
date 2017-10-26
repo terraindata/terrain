@@ -65,6 +65,7 @@ export interface ILink
   icon: any;
   text: string;
   route: string;
+  enabled?: boolean;
 }
 
 export interface Props
@@ -83,8 +84,17 @@ export class Sidebar extends TerrainComponent<Props>
   {
     ColorsActions.setStyle('.sidebar-expand-icon', { fill: Colors().text2 });
     ColorsActions.setStyle('.sidebar-expand:hover .sidebar-expand-icon', { fill: Colors().text1 });
-    ColorsActions.setStyle('.sidebar-link svg', { fill: Colors().altBg1 });
-    ColorsActions.setStyle('.sidebar-link-inner-selected svg', { fill: '#fff !important' });
+    ColorsActions.setStyle('.sidebar-link svg', { fill: Colors().iconColor });
+    ColorsActions.setStyle('.sidebar-link .sidebar-link-inner-selected svg', { fill: Colors().activeText });
+  }
+
+  public handleLinkDisabled(link)
+  {
+    return (e) =>
+    {
+      e.preventDefault();
+      alert(`You have not set up ${link.text}`);
+    };
   }
 
   public render()
@@ -109,6 +119,7 @@ export class Sidebar extends TerrainComponent<Props>
             <Link
               to={link.route}
               key={index}
+              onClick={link.enabled === false ? this.handleLinkDisabled(link) : null}
             >
               <div
                 className={Util.objToClassname({

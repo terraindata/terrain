@@ -62,18 +62,20 @@ class FileImportStateC extends BaseClass
   public filetype: string = '';
   public filesize: number = 0;
 
-  public previewRows: List<List<string>> = List([]);
+  public previewColumns: List<List<string>> = List([]);
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
   public hasCsvHeader: boolean = false;
   public isNewlineSeparatedJSON: boolean = false;
   public requireJSONHaveAllFields: boolean = true;
+  public objectKey: string = 'Products';
   public exportRank: boolean = true;
 
   public originalNames: List<string> = List([]);
   public columnNames: List<string> = List([]);
   public columnsToInclude: List<boolean> = List([]);
   public columnTypes: List<ColumnTypesTree> = List([]);
+  public columnAnalyzers: List<string> = List([]);
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
@@ -130,21 +132,26 @@ export const _Transform =
 
 class TemplateC
 {
+  public export = false;
   public templateId = -1;
   public templateName = '';
   public originalNames: List<string> = List([]);
   public columnTypes: List<ColumnTypesTree> = List([]);
   public transformations: List<Transform> = List([]);
-  public hasCsvHeader: boolean = true;
   public primaryKeys: List<number> = List([]);
   public primaryKeyDelimiter: string = '-';
-  public export = false;
+  public objectKey?: string = '';
+  public persistentAccessToken?: string = '';
+  public dbid?: number = -1;
+  public dbname?: string = '';
+  public tablename?: string = '';
 }
 
 const Template_Record = Immutable.Record(new TemplateC());
 export interface Template extends TemplateC, IRecord<Template> { }
 export const _Template =
   (config: {
+    export: boolean;
     templateId: number;
     templateName: string;
     originalNames: List<string>;
@@ -152,7 +159,11 @@ export const _Template =
     transformations: List<object>;
     primaryKeys: List<number>;
     primaryKeyDelimiter: string;
-    export: boolean;
+    objectKey?: string;
+    persistentAccessToken?: string;
+    dbid?: number;
+    dbname?: string;
+    tablename?: string;
   }) =>
   {
     return new Template_Record(config) as any as Template;
@@ -162,6 +173,8 @@ export const _Template =
 class ColumnTypesTreeC
 {
   public type = 'text';
+  public index = 'analyzed';
+  public analyzer = 'standard';
   public innerType?: ColumnTypesTree = null;
 }
 
@@ -171,20 +184,21 @@ export const _ColumnTypesTree = (config?: any) =>
 {
   config = config || {};
   config.type = config.type || 'text';
+  config.index = config.index || (config.type === 'text' ? 'analyzed' : 'not_analyzed');
+  config.analyzer = config.analyzer || (config.type === 'text' ? 'standard' : null);
   config.innerType = config.innerType || null;
 
   return new ColumnTypesTree_Record(config) as any as ColumnTypesTree;
 };
 
 export const NUMBER_PREVIEW_ROWS = 5;
-
-export const PREVIEW_CHUNK_SIZE = 10000000; // (10mb) - amount to read in order to extract preview rows
-
-export const MIN_PROGRESSBAR_FILESIZE = 500000; // (500kb) - threshold to display progressbar (spinning wheel)
+export const PREVIEW_CHUNK_SIZE = 10000000; // (10mb) amount to read in order to extract preview rows
+export const MIN_PROGRESSBAR_FILESIZE = 500000; // (500kb) threshold to display progressbar
 
 export const FILE_TYPES =
   [
     'json',
+    'json [type object]',
     'csv',
   ];
 
@@ -201,6 +215,18 @@ export const ELASTIC_TYPES =
     'integer',
     'half_float',
     'float',
+    'geo_point',
+  ];
+
+export const ELASTIC_TYPE_INDEXES =
+  [
+    'analyzed',
+    'not_analyzed',
+    'no',
+  ];
+
+export const ELASTIC_TYPE_ANALYZERS = // left blank to be populated by a call to midway
+  [
   ];
 
 // contains set of transforms applicable to each elastic type
@@ -223,6 +249,7 @@ export const TRANSFORM_TYPES =
     ['duplicate'],    // integer
     ['duplicate'],    // half_float
     ['duplicate'],    // float
+    ['duplicate'],    // geopoint
   ];
 
 export const STEP_NAMES =

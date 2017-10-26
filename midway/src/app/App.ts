@@ -61,10 +61,12 @@ import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
 import { databases } from './database/DatabaseRouter';
+import { events } from './events/EventRouter';
 import './Logging';
 import Middleware from './Middleware';
 import NotFoundRouter from './NotFoundRouter';
 import MidwayRouter from './Router';
+import { scheduler } from './scheduler/SchedulerRouter';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
 import Users from './users/Users';
@@ -141,8 +143,6 @@ class App
 
   public async start(): Promise<http.Server>
   {
-    // tslint:disable-next-line:no-floating-promises
-
     // create application schema
     await Schema.createAppSchema(this.config.db as string, this.DB);
 
@@ -160,7 +160,16 @@ class App
       {
         await databases.connect({} as any, db.id);
       }
+
+      if (db.analyticsIndex !== undefined && db.analyticsType !== undefined)
+      {
+        await events.initializeEventMetadata(DB, db.analyticsIndex, db.analyticsType);
+      }
     }
+
+    // setup stored users
+    await scheduler.initializeJobs();
+    await scheduler.initializeSchedules();
 
     const heapStats: object = v8.getHeapStatistics();
     this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));

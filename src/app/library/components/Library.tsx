@@ -44,7 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
+import Loading from 'common/components/Loading';
 import RadioButtons from 'common/components/RadioButtons';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
@@ -172,23 +175,64 @@ class Library extends TerrainComponent<any>
     localStorage.setItem(lastPath, location.pathname);
   }
 
-  public handleRadioButtonClick(optionValue)
+  public handleMetricRadioButtonClick(optionValue)
   {
+    const { analytics } = this.props;
     const { selectedVariants } = this.props.library;
-    selectedVariants
-      .forEach((variantId) =>
-      {
-        const numericVariantId = parseInt(variantId, 10);
-        const numericOptionValue = parseInt(optionValue, 10);
-        this.props.analyticsActions.fetch(numericVariantId, numericOptionValue);
-        this.props.analyticsActions.selectMetric(optionValue);
-      });
+    const selectedVariantIds = selectedVariants.toJS();
+
+    let numericOptionValue = null;
+    if (optionValue.indexOf(',') > -1)
+    {
+      numericOptionValue = optionValue.split(',').map((o) => parseInt(o, 10));
+    } else
+    {
+      numericOptionValue = parseInt(optionValue, 10);
+    }
+
+    this.props.analyticsActions.selectMetric(optionValue);
+    this.props.analyticsActions.fetch(
+      selectedVariantIds,
+      numericOptionValue,
+      analytics.selectedInterval,
+      analytics.selectedDateRange,
+    );
+  }
+
+  public handleIntervalRadioButtonClick(optionValue)
+  {
+    const { analytics } = this.props;
+    const { selectedVariants } = this.props.library;
+    const selectedVariantIds = selectedVariants.toJS();
+
+    this.props.analyticsActions.selectInterval(optionValue);
+    this.props.analyticsActions.fetch(
+      selectedVariantIds,
+      analytics.selectedMetric,
+      optionValue,
+      analytics.selectedDateRange,
+    );
+  }
+
+  public handleDateRangeRadioButtonClick(optionValue)
+  {
+    const { analytics } = this.props;
+    const { selectedVariants } = this.props.library;
+    const selectedVariantIds = selectedVariants.toJS();
+    const numericOptionValue = parseInt(optionValue, 10);
+
+    this.props.analyticsActions.selectDateRange(optionValue);
+    this.props.analyticsActions.fetch(
+      selectedVariantIds,
+      analytics.selectedMetric,
+      analytics.selectedInterval,
+      numericOptionValue,
+    );
   }
 
   public render()
   {
     const { library: libraryState, analytics } = this.props;
-
     const {
       dbs,
       groups,
@@ -198,7 +242,7 @@ class Library extends TerrainComponent<any>
       groupsOrder,
     } = libraryState;
 
-    const { selectedMetric } = analytics;
+    const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
 
     const { router, basePath, variantsMultiselect } = this.props;
     const { params } = router;
@@ -270,6 +314,7 @@ class Library extends TerrainComponent<any>
               params,
               basePath,
               groupActions: this.props.libraryGroupActions,
+              variants,
             }}
             isFocused={algorithm === undefined}
           />
@@ -285,7 +330,7 @@ class Library extends TerrainComponent<any>
               basePath,
               algorithmActions: this.props.libraryAlgorithmActions,
             }}
-            isFocused={variantIds !== null && variantIds.length === 0}
+            isFocused={variantIds === null}
           />
           <VariantsColumn
             {...{
@@ -301,6 +346,7 @@ class Library extends TerrainComponent<any>
               variantActions: this.props.libraryVariantActions,
               analytics,
               analyticsActions: this.props.analyticsActions,
+              algorithms,
             }}
           />
           {!variantsMultiselect ?
@@ -320,26 +366,33 @@ class Library extends TerrainComponent<any>
         </div>
         {variantsMultiselect && selectedVariants.count() > 0 ?
           <div className='library-bottom'>
-            <div style={{ width: '80%', height: '100%' }}>
-              <MultipleAreaChart
-                datasets={datasets}
-                xDataKey={'key'}
-                yDataKey={'doc_count'}
-              />
+            <div className='library-analytics-chart-wrapper'>
+              {analytics.loaded ?
+                (analytics.errors.length === 0 ?
+                  <MultipleAreaChart
+                    datasets={datasets}
+                    xDataKey={'key'}
+                    yDataKey={'doc_count'}
+                  /> : (
+                    <div className='library-analytics-error'>
+                      <p>An error occurred while fetching the analytics data</p>
+                      <ul>{analytics.errors.map((e, i) => <li key={i}>* {e}</li>)}</ul>
+                    </div>)
+                ) :
+                <Loading
+                  width={150}
+                  height={150}
+                  loading={true}
+                  loaded={false}
+                />
+              }
             </div>
-            <div style={{
-              width: '20%',
-              height: '100%',
-              backgroundColor: '#333',
-              marginLeft: '10px',
-            }}>
-              <RadioButtons
-                optionShadow={true}
-                selected={selectedMetric.toString()}
-                options={[
-                  { value: '1', label: 'CTR', onClick: this.handleRadioButtonClick },
-                  { value: '2', label: 'Conversions', onClick: this.handleRadioButtonClick },
-                ]}
+            <div className='library-analytics-selector-wrapper'>
+              <AnalyticsSelector
+                analytics={analytics}
+                onMetricSelect={this.handleMetricRadioButtonClick}
+                onIntervalSelect={this.handleIntervalRadioButtonClick}
+                onDateRangeSelect={this.handleDateRangeRadioButtonClick}
               />
             </div>
           </div> : null

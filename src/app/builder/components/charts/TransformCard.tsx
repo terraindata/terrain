@@ -307,6 +307,7 @@ class TransformCard extends TerrainComponent<Props>
 
     const min = this.state.maxDomain.get(0);
     const max = this.state.maxDomain.get(1);
+
     const elasticHistogram = (resp.result as ElasticQueryResult).aggregations;
     const hits = (resp.result as ElasticQueryResult).hits;
     let totalDoc = 0;
@@ -347,7 +348,6 @@ class TransformCard extends TerrainComponent<Props>
       queryXhr: null,
       queryId: null,
     });
-
     const agg = (resp.result as ElasticQueryResult).aggregations;
     if (agg === undefined || agg['minimum'] === undefined || agg['maximum'] === undefined)
     {

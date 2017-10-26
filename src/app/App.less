@@ -106,23 +106,25 @@ textarea, input {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
-input[type=text], input[type=email], input[type=tel],
-input[type=num], input[type=password]
+// input[type=text], input[type=email], input[type=tel],
+// input[type=num], input[type=password]
+input
 {
+  width: 100%;
+  font-size: @medium-font-size;
+  -webkit-appearance: none;
+  border-radius: 5px;
+  padding: 5px;
+
+  &:disabled {
+    background: #f5f5f5;
+  }
+
   .transition;
   // border: 1px solid rgba(0,0,0,0);
   border-radius: 3px;
 
-  &:hover:not(:disabled) {
-    border-color: #fff;
-  }
-
-  &:focus:not(:disabled) {
-   border-color: #fff;
-  }
-
   &.standard-input { // TODO make this the default
-    background: #fff;
     padding: @spacing;
     margin: @spacing;
     width: calc(~"100% - @{spacing} * 2");
@@ -132,9 +134,11 @@ input[type=num], input[type=password]
 
     &:hover,
     &:focus {
-      border: 1px solid #ccd1d7;
+      border: 1px solid;
     }
   }
+  
+  border: 1px solid rgba(0,0,0,0);
 }
 
 .button,

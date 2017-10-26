@@ -83,6 +83,9 @@ beforeAll(async (done) =>
             type: 'elastic',
             dsn: 'http://127.0.0.1:9200',
             host: 'http://127.0.0.1:9200',
+            isAnalytics: true,
+            analyticsIndex: 'terrain-analytics',
+            analyticsType: 'events',
           },
         ],
       };
@@ -897,22 +900,21 @@ describe('File import route tests', () =>
   });
 });
 
-describe('File import templates route tests', () =>
+describe('File export templates route tests', () =>
 {
-  test('Create template: POST /midway/v1/templates/create', async () =>
+  let persistentAccessToken: string = '';
+  test('Create template: POST /midway/v1/export/templates/create', async () =>
   {
     await request(server)
-      .post('/midway/v1/templates/create')
+      .post('/midway/v1/export/templates/create')
       .send({
         id: 1,
         accessToken: 'ImAnAdmin',
         body: {
           name: 'my_template',
-
           dbid: 1,
-          dbname: 'test_elastic_db',
-          tablename: 'fileImportTestTable',
-
+          dbname: 'movies',
+          tablename: 'data',
           originalNames: ['pkey', 'column1', 'column2'],
           columnTypes:
           {
@@ -930,14 +932,14 @@ describe('File import templates route tests', () =>
         expect(response.text).not.toBe('Unauthorized');
         const respData = JSON.parse(response.text);
         expect(respData.length).toBeGreaterThan(0);
+        persistentAccessToken = respData[0]['persistentAccessToken'];
         expect(respData[0])
           .toMatchObject({
             id: 1,
             name: 'my_template',
-
             dbid: 1,
-            dbname: 'test_elastic_db',
-            tablename: 'fileImportTestTable',
+            dbname: 'movies',
+            tablename: 'data',
 
             originalNames: ['pkey', 'column1', 'column2'],
             columnTypes:
@@ -948,18 +950,19 @@ describe('File import templates route tests', () =>
             },
             primaryKeys: ['pkey'],
             transformations: [],
+            persistentAccessToken,
           });
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/templates/create request returned an error: ' + String(error));
+        fail('POST /midway/v1/export/templates/create request returned an error: ' + String(error));
       });
   });
 
-  test('Get all templates: GET /midway/v1/templates/', async () =>
+  test('Get all import templates: GET /midway/v1/export/templates/', async () =>
   {
     await request(server)
-      .get('/midway/v1/templates/')
+      .get('/midway/v1/export/templates/')
       .query({
         id: 1,
         accessToken: 'ImAnAdmin',
@@ -975,8 +978,8 @@ describe('File import templates route tests', () =>
           name: 'my_template',
 
           dbid: 1,
-          dbname: 'test_elastic_db',
-          tablename: 'fileImportTestTable',
+          dbname: 'movies',
+          tablename: 'data',
 
           originalNames: ['pkey', 'column1', 'column2'],
           columnTypes:
@@ -987,18 +990,19 @@ describe('File import templates route tests', () =>
           },
           primaryKeys: ['pkey'],
           transformations: [],
+          persistentAccessToken,
         });
       })
       .catch((error) =>
       {
-        fail('GET /midway/v1/templates/ request returned an error: ' + String(error));
+        fail('GET /midway/v1/export/templates/ request returned an error: ' + String(error));
       });
   });
 
-  test('Get filtered templates: POST /midway/v1/templates/', async () =>
+  test('Get filtered templates: POST /midway/v1/export/templates/', async () =>
   {
     await request(server)
-      .post('/midway/v1/templates/')
+      .post('/midway/v1/export/templates/')
       .send({
         id: 1,
         accessToken: 'ImAnAdmin',
@@ -1016,7 +1020,187 @@ describe('File import templates route tests', () =>
       })
       .catch((error) =>
       {
-        fail('POST /midway/v1/templates/ request returned an error: ' + String(error));
+        fail('POST /midway/v1/export/templates/ request returned an error: ' + String(error));
+      });
+  });
+
+  test('Post headless export: POST /midway/v1/export/headless', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/export/headless')
+      .send({
+        templateId: 1,
+        persistentAccessToken,
+        body: {
+          dbid: 1,
+          dbname: 'movies',
+          templateId: 1,
+          filetype: 'csv',
+          query: '{\"body\":{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+          + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}}',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).toBe(undefined);
+        expect(response.body).not.toBe(undefined);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/export/headless request returned an error: ' + String(error));
+      });
+  });
+});
+
+describe('Credentials tests', () =>
+{
+  test('POST /midway/v1/credentials', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/credentials')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          createdBy: 1,
+          meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
+          name: 'SFTP Test 1',
+          type: 'sftp',
+          permissions: 1,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        const result: object = JSON.parse(response.text);
+        expect(Array.isArray(result)).toBe(true);
+        const resultAsArray: object[] = result as object[];
+        expect(resultAsArray[0]).toMatchObject({
+          createdBy: 1,
+          id: 1,
+          meta: '',
+          name: 'SFTP Test 1',
+          type: 'sftp',
+          permissions: 1,
+        });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/credentials request returned an error: ' + String(error));
+      });
+  });
+
+  test('GET /midway/v1/credentials', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/credentials')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        const result = JSON.parse(response.text);
+        expect(result).toMatchObject([{
+          createdBy: 1,
+          id: 1,
+          meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
+          name: 'SFTP Test 1',
+          permissions: 1,
+          type: 'sftp',
+        }]);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/credentials request returned an error: ' + String(error));
+      });
+  });
+});
+
+describe('Analytics aggregation route tests', () =>
+{
+  test('GET /midway/v1/events/ (select)', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/events/agg')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        database: 1,
+        start: new Date(2015, 5, 2, 1, 27, 4),
+        end: new Date(2015, 5, 2, 1, 27, 14),
+        eventid: 1,
+        variantid: 1,
+        agg: 'select',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['1'].length).toEqual(2);
+      });
+  });
+
+  test('GET /midway/v1/events/ (histogram)', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/events/agg')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        database: 1,
+        start: new Date(2015, 5, 2, 1, 27, 4),
+        end: new Date(2015, 5, 2, 1, 27, 14),
+        eventid: 1,
+        variantid: 1,
+        agg: 'histogram',
+        interval: 'second',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['1'].length).toEqual(4);
+      });
+  });
+
+  test('GET /midway/v1/events/ (rate)', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/events/agg')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        database: 1,
+        start: new Date(2015, 5, 2, 1, 27, 4),
+        end: new Date(2015, 5, 2, 3, 27, 4),
+        eventid: '2,1',
+        variantid: 1,
+        agg: 'rate',
+        interval: 'hour',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['1'].length).toEqual(3);
       });
   });
 });

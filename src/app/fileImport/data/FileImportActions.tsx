@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { SchemaActions } from '../../schema/data/SchemaStore';
+import SchemaActions from 'schema/data/SchemaActions';
 import * as FileImportTypes from './../FileImportTypes';
 import ActionTypes from './FileImportActionTypes';
 import { FileImportStore } from './FileImportStore';
@@ -67,6 +67,18 @@ const FileImportActions =
     changeTableName:
     (tableName: string) =>
       $(ActionTypes.changeTableName, { tableName }),
+
+    setServerDbTable:
+    (serverId: number, name: string, dbName: string, tableName: string) =>
+      $(ActionTypes.setServerDbTable, { serverId, name, dbName, tableName }),
+
+    fetchTypesFromQuery:
+    (serverId: number, query: object) =>
+      $(ActionTypes.fetchTypesFromQuery, { serverId, query, setColumnTypes: FileImportActions.setColumnTypes }),
+
+    setColumnTypes:
+    (newColumnTypes) =>
+      $(ActionTypes.setColumnTypes, { newColumnTypes }),
 
     changeHasCsvHeader:
     (hasCsvHeader: boolean) =>
@@ -104,13 +116,13 @@ const FileImportActions =
       }),
 
     exportFile:
-    (query: string, serverId: number, dbName: string, rank: boolean, downloadFilename: string,
+    (query: string, serverId: number, rank: boolean, objectKey: string, downloadFilename: string,
       handleFileExportSuccess, handleFileExportError) =>
       $(ActionTypes.exportFile, {
         query,
         serverId,
-        dbName,
         rank,
+        objectKey,
         downloadFilename,
         handleFileExportSuccess,
         handleFileExportError,
@@ -132,18 +144,37 @@ const FileImportActions =
     (columnId: number, recursionDepth: number, type: string) =>
       $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
-    updatePreviewRows:
-    (transform: Transform) =>
-      $(ActionTypes.updatePreviewRows, { transform }),
+    setColumnTypeIndex:
+    (columnId: number, index: string) =>
+      $(ActionTypes.setColumnTypeIndex, { columnId, index }),
 
-    saveTemplate:
-    (templateName: string, exporting: boolean, handleTemplateSaveSuccess) =>
+    setColumnTypeAnalyzer:
+    (columnId: number, analyzer: string) =>
+      $(ActionTypes.setColumnTypeAnalyzer, { columnId, analyzer }),
+
+    fetchColumnAnalyzers:
+    () =>
+      $(ActionTypes.fetchColumnAnalyzers, { setAnalyzers: FileImportActions.setAnalyzers }),
+
+    setAnalyzers:
+    (analyzers) =>
+      $(ActionTypes.setAnalyzers, { analyzers }),
+
+    updatePreviewColumns:
+    (transform: Transform) =>
+      $(ActionTypes.updatePreviewColumns, { transform }),
+
+    saveTemplate: // if the database, server, and table haven't been selected in the file import process, they need to be given here
+    (templateName: string, exporting: boolean, handleTemplateSaveSuccess, serverId?: number, dbName?: string, tableName?: string) =>
       $(ActionTypes.saveTemplate, {
         templateName,
         exporting,
         setErrorMsg: FileImportActions.setErrorMsg,
         fetchTemplates: FileImportActions.fetchTemplates,
         handleTemplateSaveSuccess,
+        serverId,
+        dbName,
+        tableName,
       }),
 
     updateTemplate:
@@ -219,6 +250,10 @@ const FileImportActions =
     toggleExportRank:
     (exportRank: boolean) =>
       $(ActionTypes.toggleExportRank, { exportRank }),
+
+    setTypeObjectKey:
+    (typeObjectKey: string) =>
+      $(ActionTypes.setTypeObjectKey, { typeObjectKey }),
   };
 
 export default FileImportActions;

@@ -55,7 +55,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import { altStyle, backgroundColor, Colors, couldHover } from '../../colors/Colors';
+import { altStyle, backgroundColor, borderColor, Colors, couldHover } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 const InfoIcon = require('./../../../images/icon_info.svg');
@@ -79,6 +79,9 @@ export interface Props
   onBlur?: (event: React.FocusEvent<any>, value: string) => void;
   onEnter?: (value: string) => void;
   onSelectOption?: (value: string) => void;
+
+  autoFocus?: boolean;
+  moveCursorToEnd?: boolean;
 }
 
 @Radium
@@ -107,11 +110,11 @@ class Autocomplete extends TerrainComponent<Props>
       };
   }
 
-  public componentWillReceiveProps(nextProps)
+  public componentWillMount()
   {
-    this.value = nextProps.value;
+    this.value = this.props.value;
     this.setState({
-      value: nextProps.value,
+      value: this.props.value,
     });
   }
 
@@ -137,6 +140,12 @@ class Autocomplete extends TerrainComponent<Props>
       open: true,
       selectedIndex: -1,
     });
+
+    // On initial focus, make sure that the cursor is at the end of the text box (for map component text inputs)
+    if (this.props.moveCursorToEnd)
+    {
+      (event.target as any).selectionStart = (event.target as any).selectionEnd = (event.target as any).selectionStart + 1;
+    }
 
     this.props.onFocus && this.props.onFocus(event);
   }
@@ -310,35 +319,28 @@ class Autocomplete extends TerrainComponent<Props>
 
     const open = this.state.open && !!options && options.size > 0;
 
-    const inputStyle = this.props.disabled ?
-      _.extend({}, this.props.style ? this.props.style : {},
-        backgroundColor(Colors().darkerHighlight, Colors().highlight),
-      )
-      :
-      this.props.style;
-
-    const inputElem =
-      <input
-        style={inputStyle}
-        ref='input'
-        type='text'
-        className={classNames({
-          [inputClassName]: true,
-          'ac-input-disabled': this.props.disabled,
-          'ac-input-has-tooltip': this.props.help !== undefined,
-        })}
-        value={this.state.value}
-        onChange={this.handleChange}
-        onFocus={this.handleFocus}
-        onBlur={this.handleBlur}
-        onKeyDown={this.handleKeydown}
-        disabled={this.props.disabled}
-        placeholder={this.props.placeholder}
-      />;
-
     return (
       <div className='autocomplete'>
-        {inputElem}
+        <input
+          style={[
+            this.props.disabled ? DISABLED_STYLE : ENABLED_STYLE,
+            this.props.style,
+          ]}
+          ref='input'
+          type='text'
+          className={classNames({
+            [inputClassName]: true,
+            'ac-input-disabled': this.props.disabled,
+            'ac-input-has-tooltip': this.props.help !== undefined,
+          })}
+          value={this.state.value}
+          onChange={this.handleChange}
+          onFocus={this.handleFocus}
+          onBlur={this.handleBlur}
+          onKeyDown={this.handleKeydown}
+          disabled={this.props.disabled}
+          placeholder={this.props.placeholder}
+        />
         {
           this.props.help &&
           <div className='tooltip-icon-positioning'>
@@ -382,4 +384,11 @@ class Autocomplete extends TerrainComponent<Props>
   //     this.renderOption("", -1)
   // }
 }
+
+const DISABLED_STYLE = backgroundColor(Colors().darkerHighlight, Colors().highlight);
+
+const ENABLED_STYLE = {
+  ':focus': borderColor(Colors().active),
+};
+
 export default Autocomplete;

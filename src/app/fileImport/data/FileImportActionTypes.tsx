@@ -50,6 +50,7 @@ const FileImportActionTypes =
     changeServer: '',
     changeDbName: '',
     changeTableName: '',
+    setServerDbTable: '',
     changeDbText: '',
     changeTableText: '',
     changeHasCsvHeader: '',
@@ -63,7 +64,7 @@ const FileImportActionTypes =
     setColumnToInclude: '',
     setColumnName: '',
     setColumnType: '',
-    updatePreviewRows: '',
+    updatePreviewColumns: '',
     saveTemplate: '',
     fetchTemplates: '',
     setTemplates: '',
@@ -77,7 +78,14 @@ const FileImportActionTypes =
     togglePreviewColumn: '',
     setExportFiletype: '',
     toggleExportRank: '',
+    setTypeObjectKey: '',
     setErrorMsg: '',
+    fetchTypesFromQuery: '',
+    setColumnTypes: '',
+    fetchColumnAnalyzers: '',
+    setAnalyzers: '',
+    setColumnTypeIndex: '',
+    setColumnTypeAnalyzer: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

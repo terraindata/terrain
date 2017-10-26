@@ -55,29 +55,116 @@ import { ItemStatus } from '../../../items/types/Item';
 
 import Ajax from './../../util/Ajax';
 
+function calculateDateRange(api, dateRangeId: number, callback)
+{
+  let start = null;
+  let end = null;
+
+  api.getServerTime(
+    (serverTimeResponse) =>
+    {
+      const { serverTime } = serverTimeResponse;
+      const serverTimeDate = new Date(serverTime);
+      const serverTimeTimestamp = serverTimeDate.getTime();
+
+      end = serverTimeDate.toISOString(); // Today at current time
+      switch (dateRangeId)
+      {
+        case 1: // Today
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()));
+          start = start.toISOString(); // Today at 0:00 UTC
+          break;
+        case 2:
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()) - (7 * 86400000))
+            .toISOString(); // 7 days since today
+          break;
+        case 3:
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()) - (30 * 86400000))
+            .toISOString(); // 7 days since today
+          break;
+        default:
+          start = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate()))
+            .toISOString(); // Fetch today's analytics by default
+          break;
+      }
+
+      callback({ start, end });
+    },
+  );
+}
+
 const Actions =
   {
     fetch: (
-      variantId: number,
+      variantIds: ID[],
       metricId,
-      callback?: (variantId: ID, analyticsVariants: any) => void,
-    ) => (dispatch) =>
+      intervalId,
+      dateRangeId,
+      callback?: (analyticsVariants: any) => void,
+      errorCallback?: (response) => void,
+    ) => (dispatch, getState, api) =>
       {
-        const start = new Date(2015, 5, 2);
-        const end = new Date(2015, 5, 20);
-        const mappedVariantId = variantId > 3 ? variantId % 4 + 1 : variantId;
-        return Ajax.getAnalytics(
-          mappedVariantId,
-          start,
-          end,
-          metricId,
-          (variantAnalytics) =>
+        dispatch({ type: ActionTypes.fetchStart });
+
+        const numericDateRangeId = parseInt(dateRangeId, 10);
+        calculateDateRange(
+          api,
+          numericDateRangeId,
+          (dateRange) =>
           {
-            dispatch({
-              type: ActionTypes.fetch,
-              payload: { variantId, analytics: variantAnalytics },
-            });
-            callback && callback(variantId, variantAnalytics);
+            const start = dateRange.start;
+            const end = dateRange.end;
+
+            let aggregation = '';
+            if (metricId.length === 2)
+            {
+              aggregation = 'rate';
+            } else
+            {
+              aggregation = 'histogram';
+            }
+
+            return api.getAnalytics(
+              variantIds,
+              start,
+              end,
+              metricId,
+              intervalId,
+              aggregation,
+              (variantAnalytics) =>
+              {
+                dispatch({
+                  type: ActionTypes.fetchSuccess,
+                  payload: {
+                    analytics: variantAnalytics,
+                  },
+                });
+                callback && callback(variantAnalytics);
+              },
+              (errorResponse) =>
+              {
+                const error = JSON.parse(errorResponse);
+                dispatch({
+                  type: ActionTypes.fetchFailure,
+                  payload: {
+                    errors: error.errors.map((e) => e.detail),
+                  },
+                });
+                errorCallback && errorCallback(error);
+              },
+            );
           },
         );
       },
@@ -87,6 +174,22 @@ const Actions =
       return {
         type: ActionTypes.selectMetric,
         payload: { metricId },
+      };
+    },
+
+    selectInterval: (intervalId) =>
+    {
+      return {
+        type: ActionTypes.selectInterval,
+        payload: { intervalId },
+      };
+    },
+
+    selectDateRange: (dateRangeId) =>
+    {
+      return {
+        type: ActionTypes.selectDateRange,
+        payload: { dateRangeId },
       };
     },
   };

@@ -64,8 +64,10 @@ export interface Props
   title?: string;
   error?: boolean;
   fill?: boolean;
+  wide?: boolean;
   confirm?: boolean;
   confirmButtonText?: string;
+  confirmDisabled?: boolean; // if true, confirm button is disabled
   onConfirm?: () => void;
   onClose: () => void;
   children?: any;
@@ -82,6 +84,7 @@ export interface Props
   closeOnConfirm?: boolean;
   className?: string;
   noFooterPadding?: boolean; // TODO: find better way
+  inputClassName?: string;
 }
 
 @Radium
@@ -106,6 +109,11 @@ class Modal extends TerrainComponent<Props>
     }
   }
 
+  public handleFocus(e)
+  {
+    e.target.select(); // text input field value will show selected
+  }
+
   public render()
   {
     const defaultTitle = this.props.error ? 'Error' : 'Please Confirm';
@@ -122,6 +130,20 @@ class Modal extends TerrainComponent<Props>
       backgroundColor('#fff'),
       borderColor('#EDEFF3'),
     ];
+
+    const confirmButtonStyle = this.props.confirmDisabled ?
+      [
+        fontColor(Colors().activeText),
+        backgroundColor(Colors().activeHover),
+        borderColor(Colors().altBg2),
+        getStyle('cursor', 'default'),
+      ]
+      :
+      [
+        backgroundColor(Colors().active, Colors().activeHover),
+        borderColor(Colors().active, Colors().activeHover),
+        fontColor(Colors().activeText),
+      ];
 
     return (
       <FadeInOut
@@ -140,6 +162,7 @@ class Modal extends TerrainComponent<Props>
             }
             className={classNames({
               'modal-content': true,
+              'modal-content-wide': this.props.wide,
               'modal-content-fill': this.props.fill,
               'modal-content-allow-overflow': this.props.allowOverflow,
               [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
@@ -153,7 +176,7 @@ class Modal extends TerrainComponent<Props>
               })}
               style={[
                 fontColor(Colors().altText1),
-                backgroundColor(Colors().altBg1),
+                backgroundColor('#fff'),
               ]}
             >
               <div
@@ -163,7 +186,9 @@ class Modal extends TerrainComponent<Props>
                 })}
                 style={[
                   fontColor(Colors().text1),
-                  this.props.error ? backgroundColor(Colors().error) : backgroundColor(Colors().bg3),
+                  this.props.error ? backgroundColor(Colors().error) :
+                    (localStorage.getItem('theme') === 'DARK') ? backgroundColor(Colors().bg3) : backgroundColor(Colors().bg2),
+
                 ]}
               >
                 {
@@ -205,16 +230,17 @@ class Modal extends TerrainComponent<Props>
               {
                 this.props.showTextbox &&
                 <input
-                  style={[
-                    fontColor(Colors().altText2),
-                    backgroundColor(Colors().altBg1),
-                  ]}
                   type='text'
-                  className='standard-input'
+                  className={classNames({
+                    'standard-input': true,
+                    [this.props.inputClassName]: this.props.inputClassName !== undefined && this.props.inputClassName !== '',
+                  })}
                   placeholder={this.props.textboxPlaceholderValue}
                   defaultValue={this.props.initialTextboxValue}
                   value={this.props.textboxValue}
                   onChange={this.handleTextboxChange} // see CardsDeck.tsx for example function
+                  autoFocus
+                  onFocus={this.handleFocus}
                 />
               }
               {
@@ -258,13 +284,12 @@ class Modal extends TerrainComponent<Props>
                   {
                     this.props.confirm ?
                       <div
-                        className='button modal-confirm-button'
+                        className={classNames({
+                          'button': true,
+                          'modal-confirm-button': true,
+                        })}
                         onClick={this.closeModalSuccess}
-                        style={[
-                          backgroundColor(Colors().active, Colors().activeHover),
-                          borderColor(Colors().active, Colors().activeHover),
-                          fontColor(Colors().activeText),
-                        ]}
+                        style={confirmButtonStyle}
                         key='modal-confirm-button'
                       >
                         {
