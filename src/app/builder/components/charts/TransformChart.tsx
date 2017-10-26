@@ -865,6 +865,90 @@ const TransformChart = {
     return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
   },
 
+  _drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domainMin, domainMax)
+  {
+    const linesPointsData = _.clone(pointsData);
+
+    // const alpha_num = pointsData[1].x * Math.log(1-pointsData[0].y);
+    // const alpha_denom = (pointsData[0].x * Math.log(1-pointsData[1].y)) - Math.log(1-pointsData[0].y);
+    // const alpha = alpha_num/ alpha_denom;
+    // const tau = Math.log(1-pointsData[1].y)/ (pointsData[1].x + alpha);
+
+    const alpha = pointsData[1].x - (pointsData[0].x * Math.log(1 - pointsData[1].y))/(Math.log(1 - pointsData[0].y));
+    const tau = Math.log(1-pointsData[1].y)/ (pointsData[1].x + alpha);
+
+    const data = this._getExponentialData(scales, alpha, tau, domainMin, domainMax);
+    const line = d3.svg.line()
+      .x((d) =>
+      {
+        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
+      })
+      .y((d) =>
+      {
+        return scales.realPointY(d['y']);
+      });
+
+    // console.log(data);
+    // console.log(this._getLinesData(pointsData, scales));
+    const lines = d3.select(el).select('.lines')
+      .attr('d', line(data))
+      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
+
+    d3.select(el).select('.lines-bg')
+      .attr('d', line(data));
+  },
+
+  _getExponentialData(scales, alpha, tau, min, max)
+  {
+    const data = [];
+    const stepSize = (max - min) * (1 / 32);
+    for (let i = (min - stepSize); i < (max + stepSize); i += stepSize)
+    {
+       const y = this._exponential(i, alpha, tau);
+       data.push({ y: y, x: i, id: i, selected: false });
+    }
+    data.sort(function(a, b)
+    {
+      return a.x - b.x;
+    });
+    console.log(data);
+    if (data.length)
+    {
+      const range = (scaleMax(scales.x) - scaleMin(scales.x));
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: data[0].y,
+        id: '*%*-first',
+        dontScale: true,
+      });
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: -1,
+        id: '*%*-first-anchor',
+        dontScale: true,
+      });
+
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: data[data.length - 1].y,
+        id: '*%*-last',
+        dontScale: true,
+      });
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: -1,
+        id: '*%*-last-anchor',
+        dontScale: true,
+      });
+    }
+    return data;
+  },
+
+  _exponential(x, alpha, tau)
+  {
+    return 1 - Math.exp(tau * (x + alpha));
+  },
+
   _drawLines(el, scales, pointsData, onClick, onMove, onRelease, canEdit)
   {
     const lineFunction = d3.svg.line()
@@ -1507,8 +1591,10 @@ const TransformChart = {
       case 'normal':
         this._drawNormalLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
         break;
-      case 'logarithmic':
       case 'exponential':
+        this._drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+        break;
+      case 'logarithmic':
       case 'sigmoid':
       default:
         this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
