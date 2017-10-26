@@ -214,16 +214,16 @@ export class Items
       const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
       if (database === undefined)
       {
-        return resolve('Database "' + dbid.toString() + '" not found.');
+        return resolve('Database "' + dbid.toString() + '" not found');
       }
       if (database.getType() !== 'ElasticController')
       {
-        return resolve('Status metadata currently is only supported for Elastic databases.');
+        return resolve('Status metadata currently is only supported for Elastic databases');
       }
       const items: ItemConfig[] = await this.select([], { id: variantId } as object);
       if (items.length === 0)
       {
-        return resolve('Variant not found.');
+        return resolve('Variant not found');
       }
       const variantDeployedName: string = DeployVariant.getVariantDeployedName(items[0] as object);
 
@@ -232,7 +232,7 @@ export class Items
       {
         if (items[0].type !== 'VARIANT')
         {
-          return resolve('Item is not a variant.');
+          return resolve('Item is not a Variant');
         }
         if (resp['_id'] === variantDeployedName && resp['found'] === true && items[0].status === 'LIVE'
           && await this._verifyVariantScript(variantId, resp['_script']))
@@ -241,15 +241,15 @@ export class Items
         }
         else if (resp['_id'] === variantDeployedName && resp['found'] === true && items[0].status !== 'LIVE')
         {
-          return resolve('Variant found in ES instance but not LIVE.');
+          return resolve('Error: Variant found in ES instance but not LIVE');
         }
         else if (resp['_id'] === variantDeployedName && resp['found'] === false && items[0].status === 'LIVE')
         {
-          return resolve('Error, LIVE variant not found in ES instance.');
+          return resolve('Error: LIVE Variant not found in ES instance');
         }
         else
         {
-          return resolve('Variant is not LIVE.');
+          return resolve('Confirmed that Variant is not deployed');
         }
       }.bind(this));
     });
