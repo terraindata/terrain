@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
-import { extend } from 'lodash';
 import * as $ from 'jquery';
+import { extend } from 'lodash';
 
 const Color = require('color');
 
@@ -814,8 +814,12 @@ const HALLOWEEN: Theme =
     altText1: '#000',
     altText2: '#242424',
     altText3: '#424242',
-    
+
     iconColor: halloweenActive,
+    inputFocusBg: halloweenActive,
+    inputBorder: halloweenActive,
+
+    stroke: halloweenActive,
 
     altHighlight: 'rgba(210,215,219,0.75)',
 
@@ -1224,10 +1228,13 @@ export function getCardColors(category: string | undefined, typeColor: string): 
 if (localStorage['theme'] === 'HALLOWEEN')
 {
   $('body').append('<style> img { -webkit-filter: hue-rotate(180deg); filter: hue-rotate(180deg); }</style>');
-  
+
   $('body').append('<img src="https://clipartion.com/wp-content/uploads/2015/11/web-spider-gothickyrachan.png" style="position: fixed; \
-      top: 0px; right: 0px; width: 50%; -webkit-filter: invert(100%); filter: invert(100%); pointer-events: none;" />')
-  
+      top: 0px; right: 0px; width: 50%; -webkit-filter: invert(100%); filter: invert(100%); pointer-events: none;" />');
+
+  $('body').append("<iframe className='youtube-player' \
+    src='https://www.youtube.com/embed/SOFCQ2bfmHw?wmode=opaque&autohide=1&autoplay=1'>&lt;br /&gt;</iframe>");
+
 }
 
 export default Colors;
