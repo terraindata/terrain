@@ -133,14 +133,16 @@ class CardSelector extends TerrainComponent<Props>
     focusedIndex: number;
     inputElement: any;
     categoryListElement: any;
+    innerSelectorElement: any;
     computedHeight: number;
     currentCategory: CardCategory;
-    optionMap: IMMap<number, any>;
+    optionMap: IMMap<number, any>; // this is to allow proper scrolling when arrow keys are pressed
   } = {
     searchValue: '',
     focusedIndex: 0,
     inputElement: undefined,
     categoryListElement: undefined,
+    innerSelectorElement: undefined,
     computedHeight: -1,
     currentCategory: categories.get(0),
     optionMap: Map(),
@@ -157,6 +159,13 @@ class CardSelector extends TerrainComponent<Props>
     const available = this.computeAvailableCategories(this.props.cardTypeList, this.props.card);
     this.state.currentCategory = available.get(0);
     // even if there are no cards, 'all' will always be there.
+
+    const indexList = this.getCardOptions().map((v, i) => v.index).toList();
+    const currentListIndex = indexList.indexOf(this.state.focusedIndex);
+    if (currentListIndex === -1 && indexList.size > 0)
+    {
+      this.state.focusedIndex = indexList.get(0);
+    }
   }
 
   // (memoized) return a set that contains the suggested types
@@ -247,8 +256,22 @@ class CardSelector extends TerrainComponent<Props>
       const elem = this.state.optionMap.get(focusedIndex);
       if (elem !== null && elem !== undefined)
       {
-        elem.scrollIntoView(event.keyCode === 38);
+        const scrollTop = this.state.innerSelectorElement.scrollTop;
+        const topToTopDistance =
+          scrollTop - (elem.offsetTop - elem.clientHeight / 2.0 - 3);
+          // minus three for the border width (2px + integer truncation)
+        const bottomToBottomDistance =
+          scrollTop + this.state.innerSelectorElement.clientHeight
+          - (elem.offsetTop + elem.clientHeight / 2.0);
+        if (topToTopDistance > 0 || bottomToBottomDistance < 0)
+        {
+          const newScrollTop =
+            scrollTop - (event.keyCode === 38 ? topToTopDistance : bottomToBottomDistance);
+          $(this.state.innerSelectorElement).animate({ scrollTop: newScrollTop }, {duration: 150, queue: false});
+          // this.state.innerSelectorElement.scrollTop = newScrollTop;
+        }
       }
+
       this.setState({
         focusedIndex,
       });
@@ -489,6 +512,7 @@ class CardSelector extends TerrainComponent<Props>
             <div
               className='create-card-selector-inner'
               style={selectorInnerStyle}
+              ref={this._setStateWrapper('innerSelectorElement')}
             >
               {
                 isEmpty &&
