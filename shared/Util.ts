@@ -492,11 +492,13 @@ export class CSVTypeParser
     }
     return parsedValue === false || parsedValue === true;
   }
-  // private _isDateHelper(value: string): boolean
-  // {
-  //   const parsedValue: any = Date.parse(value);
-  //   return !isNaN(parsedValue);
-  // }
+
+  private _isDateHelper(value: string): boolean
+  {
+    const dateFormatRegex = new RegExp('^(0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4})$');
+    return dateFormatRegex.test(value);
+  }
+
   private _isArrayHelper(value: string): boolean
   {
     let parsedValue: any;
@@ -537,10 +539,10 @@ export class CSVTypeParser
     {
       return ['double'];
     }
-    // if (this._isDateHelper(value))
-    // {
-    //   return ['date'];
-    // }
+    if (this._isDateHelper(value))
+    {
+      return ['date'];
+    }
     return ['text'];
   }
   // typeSet should already have JSON.stringify(['null']) removed
