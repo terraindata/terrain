@@ -817,7 +817,7 @@ const TransformChart = {
   _getNormalData(scales, average, stdDev, min, max, scaleFactor)
   {
     const data = [];
-    const stepSize = (max - min) * (1 / 32);
+    const stepSize = (max - min) * (1 / 100);
     for (let i = (min - stepSize); i < (max + stepSize); i += stepSize)
     {
       const y = this._normal(i, average, stdDev);
@@ -869,16 +869,10 @@ const TransformChart = {
   {
     const linesPointsData = _.clone(pointsData);
 
-    // const alpha_num = pointsData[1].x * Math.log(1-pointsData[0].y);
-    // const alpha_denom = (pointsData[0].x * Math.log(1-pointsData[1].y)) - Math.log(1-pointsData[0].y);
-    // const alpha = alpha_num/ alpha_denom;
-    // const tau = Math.log(1-pointsData[1].y)/ (pointsData[1].x + alpha);
+    const lambda = (Math.log(pointsData[1].y)/ pointsData[0].x - Math.log(pointsData[0].y) / pointsData[0].x) / (1 - pointsData[1].x/ pointsData[0].x);
+    const A = pointsData[1].y / Math.exp(-1 * lambda * pointsData[1].x);
 
-    const alpha = pointsData[1].x - (pointsData[0].x * Math.log(1 - pointsData[1].y))/(Math.log(1 - pointsData[0].y));
-    const tau = Math.log(1-pointsData[1].y)/ (pointsData[1].x + alpha);
-    console.log('alpha', alpha);
-    console.log('tau', tau);
-    const data = this._getExponentialData(scales, alpha, tau, domainMin, domainMax);
+    const data = this._getExponentialData(pointsData, scales, lambda, A, domainMin, domainMax);
     const line = d3.svg.line()
       .x((d) =>
       {
@@ -889,8 +883,6 @@ const TransformChart = {
         return scales.realPointY(d['y']);
       });
 
-    // console.log(data);
-    // console.log(this._getLinesData(pointsData, scales));
     const lines = d3.select(el).select('.lines')
       .attr('d', line(data))
       .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
@@ -899,13 +891,25 @@ const TransformChart = {
       .attr('d', line(data));
   },
 
-  _getExponentialData(scales, alpha, tau, min, max)
+  _getExponentialData(pointsData, scales, lambda, A, min, max)
   {
     const data = [];
-    const stepSize = (max - min) * (1 / 32);
-    for (let i = (min - stepSize); i < (max + stepSize); i += stepSize)
+    const stepSize = (max - min) * (1 / 100);
+    console.log(pointsData);
+    for (let i = pointsData[0].x; i < pointsData[1].x; i += stepSize)
     {
-       const y = this._exponential(i, alpha, tau);
+       //let y; 
+       // if (i < pointsData[0].x)
+       // {
+       //   y = pointsData[0].y;
+       // }
+       // else if (i > pointsData[1].x)
+       // {
+       //   y = pointsData[1].y;
+       // }
+       // else {
+       const y = this._exponential(i, lambda, A);
+       // }
        data.push({ y: y, x: i, id: i, selected: false });
     }
     data.sort(function(a, b)
@@ -945,9 +949,9 @@ const TransformChart = {
     return data;
   },
 
-  _exponential(x, alpha, tau)
+  _exponential(x, lambda, A)
   {
-    return 1 - Math.exp(tau * (x + alpha));
+    return A * Math.exp(-1 * lambda * x);
   },
 
   _drawLines(el, scales, pointsData, onClick, onMove, onRelease, canEdit)
