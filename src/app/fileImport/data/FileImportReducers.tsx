@@ -298,6 +298,70 @@ FileImportReducers[ActionTypes.setColumnType] =
       .setIn(keyPath, action.payload.type);
   };
 
+FileImportReducers[ActionTypes.setColumnTypes] =
+  (state, action) =>
+  {
+    const { previewColumns, columnNames } = state;
+    return state
+      .set('columnTypes', List(columnNames.map((colName) =>
+        action.payload.newColumnTypes[colName] ?
+          FileImportTypes._ColumnTypesTree(action.payload.newColumnTypes[colName])
+          :
+          FileImportTypes._ColumnTypesTree())));
+  };
+
+FileImportReducers[ActionTypes.fetchTypesFromQuery] =
+  (state, action) =>
+  {
+    Ajax.getTypesFromQuery(
+      state.serverId,
+      action.payload.query,
+      (namesAndTypes) =>
+      {
+        action.payload.setColumnTypes(namesAndTypes);
+      });
+    return state;
+  };
+
+FileImportReducers[ActionTypes.setColumnTypeIndex] =
+  (state, action) =>
+  {
+    const keyPath = ['columnTypes', action.payload.columnId];
+    keyPath.push('index');
+    return state
+      .set('isDirty', true)
+      .setIn(keyPath, action.payload.index);
+  };
+
+FileImportReducers[ActionTypes.setColumnTypeAnalyzer] =
+  (state, action) =>
+  {
+    const keyPath = ['columnTypes', action.payload.columnId];
+    keyPath.push('analyzer');
+    return state
+      .set('isDirty', true)
+      .setIn(keyPath, action.payload.analyzer);
+  };
+
+FileImportReducers[ActionTypes.fetchColumnAnalyzers] =
+  (state, action) =>
+  {
+    Ajax.getAnalyzers(
+      state.dbName,
+      (analyzerArr) =>
+      {
+        const analyzers: List<string> = List<string>(analyzerArr);
+        action.payload.setAnalyzers(analyzers);
+      },
+    );
+    return state;
+  };
+
+FileImportReducers[ActionTypes.setAnalyzers] =
+  (state, action) =>
+    state.set('columnAnalyzers', action.payload.analyzers)
+  ;
+
 FileImportReducers[ActionTypes.addTransform] =
   (state, action) =>
     state
@@ -373,7 +437,6 @@ FileImportReducers[ActionTypes.exportFile] =
   {
     Ajax.exportFile(
       state.filetype,
-      action.payload.dbName,
       action.payload.serverId,
       Map<string, object>(state.columnNames.map((colName, colId) =>
         state.columnsToInclude.get(colId) &&

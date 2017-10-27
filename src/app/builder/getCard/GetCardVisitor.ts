@@ -250,8 +250,8 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private variantClauseMapping: { [clauseType: string]: string[] } = {};
 
   private customCardTypesMap: { [elasticClauseType: string]: string[] } = {
-    body: ['elasticScore'],
-    query: ['elasticFilter'],
+    sort_clause: ['elasticScore'],
+    query: ['elasticFilter', 'elasticDistance'],
   };
 
   public constructor(config: EQLConfig)
@@ -588,10 +588,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   public visitESNullClause(clause: ESNullClause): any
   {
     return GetCardVisitor.seedCard(clause, {
+      value: 'null',
       noTitle: false,
       static: {
         colors: getCardColors(clause.path[0], Colors().builder.cards.nullClause),
-        preview: '',
+        preview: '[value]',
         display: [],
         tql: () => null,
         singleType: true,

@@ -62,7 +62,12 @@ export interface EventConfig
     referer?: string;
   };
   timestamp: Date;
+  intervalBucketSeconds: number;
+  intervalBucketMinutes: number;
+  intervalBucketHours: number;
+  intervalBucketDays: number;
   meta?: any;
+  hash: string;
 }
 
 export const indexName = 'terrain-analytics';

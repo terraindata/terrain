@@ -75,6 +75,7 @@ class FileImportStateC extends BaseClass
   public columnNames: List<string> = List([]);
   public columnsToInclude: List<boolean> = List([]);
   public columnTypes: List<ColumnTypesTree> = List([]);
+  public columnAnalyzers: List<string> = List([]);
 
   public transforms: List<Transform> = List([]);
   public templates: List<Template> = List([]);
@@ -172,6 +173,8 @@ export const _Template =
 class ColumnTypesTreeC
 {
   public type = 'text';
+  public index = 'analyzed';
+  public analyzer = 'standard';
   public innerType?: ColumnTypesTree = null;
 }
 
@@ -181,6 +184,8 @@ export const _ColumnTypesTree = (config?: any) =>
 {
   config = config || {};
   config.type = config.type || 'text';
+  config.index = config.index || (config.type === 'text' ? 'analyzed' : 'not_analyzed');
+  config.analyzer = config.analyzer || (config.type === 'text' ? 'standard' : null);
   config.innerType = config.innerType || null;
 
   return new ColumnTypesTree_Record(config) as any as ColumnTypesTree;
@@ -210,6 +215,18 @@ export const ELASTIC_TYPES =
     'integer',
     'half_float',
     'float',
+    'geo_point',
+  ];
+
+export const ELASTIC_TYPE_INDEXES =
+  [
+    'analyzed',
+    'not_analyzed',
+    'no',
+  ];
+
+export const ELASTIC_TYPE_ANALYZERS = // left blank to be populated by a call to midway
+  [
   ];
 
 // contains set of transforms applicable to each elastic type
@@ -232,6 +249,7 @@ export const TRANSFORM_TYPES =
     ['duplicate'],    // integer
     ['duplicate'],    // half_float
     ['duplicate'],    // float
+    ['duplicate'],    // geopoint
   ];
 
 export const STEP_NAMES =

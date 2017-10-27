@@ -73,6 +73,7 @@ export interface Props
   isPrimaryKey: boolean;
   columnOptions: List<string>;
   exporting: boolean;
+  analyzers: List<string>;
   onColumnNameChange(columnId: number, localColumnName: string);
   onTransform(columnId: number);
 }
@@ -211,24 +212,23 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public renderType()
   {
-    if (!this.props.exporting)
-    {
-      return (
+    return (
+      <div
+        className='flex-container fi-preview-column-field'
+      >
         <div
-          className='flex-container fi-preview-column-field flex-grow'
+          className='fi-preview-column-field-content'
         >
-          <div
-            className='fi-preview-column-field-content'
-          >
-            <TypeDropdown
-              columnId={this.props.columnId}
-              recursionDepth={0}
-              columnType={this.props.columnType}
-            />
-          </div>
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionDepth={0}
+            columnType={this.props.columnType}
+            columnTypeAnalyzer={this.props.analyzers}
+            exporting={this.props.exporting}
+          />
         </div>
-      );
-    }
+      </div>
+    );
   }
 
   public renderTransform()
@@ -273,13 +273,13 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
             this.renderName()
           }
           <div
-            className='flex-container-center'
+            className='fi-flex-container-center'
           >
             {
-              this.renderType()
+              this.renderTransform()
             }
             {
-              this.renderTransform()
+              this.renderType()
             }
           </div>
         </div>

@@ -71,7 +71,7 @@ class DragHandle extends TerrainComponent<Props>
   public componentWillMount()
   {
     const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
-    ColorsActions.setStyle('.drag-icon ', { fill: this.props.useAltColor ? Colors().altText2 : Colors().text2 });
+    ColorsActions.setStyle('.drag-icon ', { fill: this.props.useAltColor ? Colors().altText2 : Colors().iconColor });
     ColorsActions.setStyle('.drag-icon:hover ', { fill: Colors().inactiveHover });
     ColorsActions.setStyle('.drag-icon:active ', { fill: Colors().active });
     ColorsActions.setStyle('.' + hoveringClassName, { opacity: '0.85 !important' as any });

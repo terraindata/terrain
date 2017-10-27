@@ -49,6 +49,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../database/AllBackends';
+import { ElasticBackend } from '../../../database/elastic/ElasticBackend';
+import { MySQLBackend } from '../../../database/mysql/MySQLBackend';
 import BackendInstance from '../../../database/types/BackendInstance';
 import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
@@ -122,41 +124,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         return state;
       }
 
-      if (action.payload.query.tql)
-      {
-        query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(action.payload.query));
-      }
-      else
-      {
-        query = query.set('parseTree', null);
-      }
-
-      let correctCard = true;
-      if (query.language === 'elastic' && query.cards && query.cards.size > 0)
-      {
-        // Elastic cards must start from the root card
-        if (query.cards.get(0)['key'] !== 'root')
-        {
-          correctCard = false;
-        }
-      }
-
-      if (!(action.payload.query.cardsAndCodeInSync && correctCard))
-      {
-        if (action.payload.query.tql)
-        {
-          query = AllBackendsMap[query.language].codeToQuery(
-            query,
-            Actions.changeQuery,
-          );
-        }
-        else
-        {
-          // blank
-          query = query
-            .set('cardsAndCodeInSync', true);
-        }
-      }
+      query = AllBackendsMap[query.language].loadQuery(query, Actions.changeQuery);
 
       return state
         .set('query', query)

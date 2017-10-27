@@ -146,12 +146,23 @@ const Actions =
               (variantAnalytics) =>
               {
                 dispatch({
-                  type: ActionTypes.fetch,
+                  type: ActionTypes.fetchSuccess,
                   payload: {
                     analytics: variantAnalytics,
                   },
                 });
                 callback && callback(variantAnalytics);
+              },
+              (errorResponse) =>
+              {
+                const error = JSON.parse(errorResponse);
+                dispatch({
+                  type: ActionTypes.fetchFailure,
+                  payload: {
+                    errors: error.errors.map((e) => e.detail),
+                  },
+                });
+                errorCallback && errorCallback(error);
               },
             );
           },

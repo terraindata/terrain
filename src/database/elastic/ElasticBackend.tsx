@@ -44,20 +44,32 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires member-access
+// tslint:disable:no-var-requires member-access no-console strict-boolean-expressions
 
 import { List } from 'immutable';
 import { make } from '../../blocks/BlockUtils';
 import { Backend, cardsDeckToList } from '../types/Backend';
-import ElasticBlocks from './blocks/ElasticBlocks';
+
+import ESConverter from '../../../shared/database/elastic/formatter/ESConverter';
+import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
+import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
+import ESJSONType from '../../../shared/database/elastic/parser/ESJSONType';
+import ESQueryTransform from '../../../shared/database/elastic/parser/ESQueryTransform';
+import ESValueInfo from '../../../shared/database/elastic/parser/ESValueInfo';
+import { Query } from '../../items/types/Query';
+import { AllBackendsMap } from '../AllBackends';
+import { QueryRequest } from '../types/QueryRequest';
+import { ElasticBlocks } from './blocks/ElasticBlocks';
 import ElasticCardsDeck from './blocks/ElasticCardsDeck';
 import CardsToElastic from './conversion/CardsToElastic';
 import ElasticToCards from './conversion/ElasticToCards';
+import LoadElasticQuery from './conversion/LoadElasticQuery';
 import { ElasticParseTreeToQuery, ParseElasticQuery } from './conversion/ParseElasticQuery';
 const syntaxConfig = require('../../../shared/database/elastic/syntax/ElasticSyntaxConfig.json');
 
-class ElasticBackend implements Backend
+export class ElasticBackend implements Backend
 {
+
   type = 'elastic';
   name = 'Elastic';
 
@@ -67,7 +79,6 @@ class ElasticBackend implements Backend
 
   topLevelCards =
   List([
-    'eqltype',
     'eqlfrom',
     'eqlsize',
   ]);
@@ -75,6 +86,8 @@ class ElasticBackend implements Backend
   // Ordering of the cards deck
   cardsDeck = ElasticCardsDeck;
   cardsList = cardsDeckToList(ElasticCardsDeck);
+
+  loadQuery = LoadElasticQuery.loadQuery;
 
   queryToCode = CardsToElastic.toElastic;
 
@@ -93,7 +106,6 @@ class ElasticBackend implements Backend
       make(ElasticBlocks, 'eqlbody', { key: 'body' }),
     ]);
   }
-
   // function to get transform bars?
   // autocomplete?
 }

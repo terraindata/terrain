@@ -80,6 +80,12 @@ const FileImportActionTypes =
     toggleExportRank: '',
     setTypeObjectKey: '',
     setErrorMsg: '',
+    fetchTypesFromQuery: '',
+    setColumnTypes: '',
+    fetchColumnAnalyzers: '',
+    setAnalyzers: '',
+    setColumnTypeIndex: '',
+    setColumnTypeAnalyzer: '',
   };
 
 Util.setValuesToKeys(FileImportActionTypes, '');

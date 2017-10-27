@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions prefer-const
 
 import * as Immutable from 'immutable';
 import './ResultsArea.less';
@@ -73,8 +73,10 @@ import Radium = require('radium');
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
+import MapComponent from '../../../common/components/MapComponent';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
+import MapUtil from '../../../util/MapUtil';
 import { MAX_RESULTS, Result as ResultClass, ResultsState } from './ResultTypes';
 
 const RESULTS_PAGE_SIZE = 20;
@@ -221,6 +223,55 @@ class ResultsArea extends TerrainComponent<Props>
     return !query || (!query.tql && !query.cards.size);
   }
 
+  /*
+  The code below is code to build an aggregation map that shows the target location and
+  all the numbered locations of the reuslts.
+  To use this method and render a map(s):
+  // locations is created in renderResults() and is a map of fieldName: locationValue from the query
+  // results is from this.props.query.results
+  const mapData = this.buildAggregationMap(locations, results);
+  if (mapData !== undefined && mapData.length > 0)
+    {
+      return (
+        mapData.map((data, index) =>
+          <MapComponent
+            location={data.target}
+            multiLocations={data.multiLocations}
+            markLocation={true}
+            showSearchBar={false}
+            showDistanceCircle={false}
+            hideSearchSettings={true}
+            zoomControl={true}
+            colorMarker={true}
+            key={index}
+          />
+        )
+      );
+    }
+  */
+  public buildAggregationMap(locations, results)
+  {
+    const allMapsData = [];
+    _.keys(locations).forEach((field) =>
+    {
+      let multiLocations = [];
+      const target = MapUtil.getCoordinatesFromGeopoint(locations[field]);
+      results.forEach((result, i) =>
+      {
+        const { resultsConfig } = this.props.query;
+        const name = resultsConfig.enabled && resultsConfig.name !== undefined ?
+          result.fields.get(resultsConfig.name) : result.fields.get('_id');
+        multiLocations.push({
+          location: result.fields.get(field),
+          name,
+          index: i + 1,
+        });
+      });
+      allMapsData.push({ target, multiLocations });
+    });
+    return allMapsData;
+  }
+
   public renderResults()
   {
     const { resultsState } = this.props;
@@ -309,6 +360,25 @@ class ResultsArea extends TerrainComponent<Props>
     }
     else
     {
+      // Extract the geo_distance fields and values from the query
+      const geoDistances = this.props.query.tql.match(/"geo_distance": \{[^\}]*\}/g);
+      let locations = {};
+      if (geoDistances !== undefined && geoDistances !== null)
+      {
+        geoDistances.forEach((geoDist) =>
+        {
+          geoDist = '{' + geoDist + '}}';
+          const obj = JSON.parse(geoDist);
+          // find field that isn't distance or distance_type
+          _.keys(obj.geo_distance).forEach((key) =>
+          {
+            if (key !== 'distance' && key !== 'distance_type')
+            {
+              locations[key] = obj.geo_distance[key];
+            }
+          });
+        });
+      }
       resultsContent = (
         <InfiniteScroll
           className={classNames({
@@ -334,6 +404,7 @@ class ResultsArea extends TerrainComponent<Props>
                   key={index}
                   primaryKey={result.primaryKey}
                   allowSpotlights={this.props.allowSpotlights}
+                  locations={locations}
                 />
               );
             })

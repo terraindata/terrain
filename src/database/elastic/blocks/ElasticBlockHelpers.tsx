@@ -56,7 +56,19 @@ export const enum AutocompleteMatchType
   Index = 1,
   Type = 2,
   Field = 3,
+  Transform = 4,
 }
+
+export const TransformableTypes =
+  [
+    'long',
+    'double',
+    'short',
+    'byte',
+    'integer',
+    'half_float',
+    'float',
+  ];
 
 export const ElasticBlockHelpers = {
   autocompleteMatches(schemaState, matchType: AutocompleteMatchType): List<string>
@@ -96,16 +108,35 @@ export const ElasticBlockHelpers = {
         ).toList();
       }
 
-      // else we are in the Field case...
+      // else we are in the Field or Transform case...
 
       // 2. Need to get current type
-
       const type = getType();
+
+      // 3. If Transform, return columns matching server/index/type that can be transformed
+      if (matchType === AutocompleteMatchType.Transform)
+      {
+        if (type !== null)
+        {
+          const typeId = state.db.name + '/' + String(index) + '.' + String(type);
+          const transformableFields = schemaState.columns.filter(
+            (column) => column.serverId === String(server) &&
+              column.databaseId === String(indexId) &&
+              column.tableId === String(typeId) &&
+              TransformableTypes.indexOf(column.datatype) !== -1,
+          ).map(
+            (column) => column.name,
+          ).toList().concat(List(['_score', '_size']));
+          return transformableFields;
+        }
+        return List(['_score', '_size']);
+      }
+
       if (type !== null)
       {
         const typeId = state.db.name + '/' + String(index) + '.' + String(type);
 
-        // 3. Return columns matching this (server+)index+type
+        // 4. Return all columns matching this (server+)index+type
 
         return schemaState.columns.filter(
           (column) => column.serverId === String(server) &&

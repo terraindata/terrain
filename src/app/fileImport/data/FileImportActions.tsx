@@ -72,6 +72,14 @@ const FileImportActions =
     (serverId: number, name: string, dbName: string, tableName: string) =>
       $(ActionTypes.setServerDbTable, { serverId, name, dbName, tableName }),
 
+    fetchTypesFromQuery:
+    (serverId: number, query: object) =>
+      $(ActionTypes.fetchTypesFromQuery, { serverId, query, setColumnTypes: FileImportActions.setColumnTypes }),
+
+    setColumnTypes:
+    (newColumnTypes) =>
+      $(ActionTypes.setColumnTypes, { newColumnTypes }),
+
     changeHasCsvHeader:
     (hasCsvHeader: boolean) =>
       $(ActionTypes.changeHasCsvHeader, { hasCsvHeader }),
@@ -108,12 +116,11 @@ const FileImportActions =
       }),
 
     exportFile:
-    (query: string, serverId: number, dbName: string, rank: boolean, objectKey: string, downloadFilename: string,
+    (query: string, serverId: number, rank: boolean, objectKey: string, downloadFilename: string,
       handleFileExportSuccess, handleFileExportError) =>
       $(ActionTypes.exportFile, {
         query,
         serverId,
-        dbName,
         rank,
         objectKey,
         downloadFilename,
@@ -136,6 +143,22 @@ const FileImportActions =
     setColumnType:
     (columnId: number, recursionDepth: number, type: string) =>
       $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
+
+    setColumnTypeIndex:
+    (columnId: number, index: string) =>
+      $(ActionTypes.setColumnTypeIndex, { columnId, index }),
+
+    setColumnTypeAnalyzer:
+    (columnId: number, analyzer: string) =>
+      $(ActionTypes.setColumnTypeAnalyzer, { columnId, analyzer }),
+
+    fetchColumnAnalyzers:
+    () =>
+      $(ActionTypes.fetchColumnAnalyzers, { setAnalyzers: FileImportActions.setAnalyzers }),
+
+    setAnalyzers:
+    (analyzers) =>
+      $(ActionTypes.setAnalyzers, { analyzers }),
 
     updatePreviewColumns:
     (transform: Transform) =>
