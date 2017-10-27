@@ -53,17 +53,17 @@ import { makePromiseCallback } from './Util';
 export const index = 'movies';
 export const type = 'data';
 
-export interface Query
+export interface Request
 {
   s: string;
   q: string;
   p: number;
 }
 
-export async function search(query: Query): Promise<object[]>
+export async function search(req: Request): Promise<object[]>
 {
   const client = new Elastic.Client({
-    host: query.s,
+    host: req.s,
   });
 
   try
@@ -77,7 +77,7 @@ export async function search(query: Query): Promise<object[]>
   }
   catch (e)
   {
-    winston.error('creating ES client for host: ' + String(query.s) + ': ' + String(e));
+    winston.error('creating ES client for host: ' + String(req.s) + ': ' + String(e));
     return [];
   }
 
@@ -85,13 +85,42 @@ export async function search(query: Query): Promise<object[]>
   {
     const resp: any = await new Promise((resolve, reject) =>
     {
+      let query = {};
+      if (req.q === '')
+      {
+        query = {
+          match_all: {
+          },
+        };
+      }
+      else
+      {
+        query = {
+          match: {
+            title: req.q,
+          },
+        };
+      }
+
       client.search({
         index,
         type,
-        q: 'title:' + query.q,
-        from: (query.p * 10),
-        size: 10,
+        from: (req.p * 30),
+        size: 30,
+        body: {
+          query,
+        },
       }, makePromiseCallback(resolve, reject));
+
+      // client.searchTemplate({
+      //   body: {
+      //     id: 'terrain_14',
+      //     params: {
+      //       from: (req.p * 30),
+      //       size: 30,
+      //     },
+      //   },
+      // } as any, makePromiseCallback(resolve, reject));
     });
 
     if (resp.hits.hits === undefined)
@@ -103,7 +132,7 @@ export async function search(query: Query): Promise<object[]>
   }
   catch (e)
   {
-    winston.error('querying ES: ' + String(query.q) + ': ' + String(e));
+    winston.error('querying ES: ' + String(req.q) + ': ' + String(e));
     return [];
   }
 }
