@@ -155,6 +155,7 @@ export class Router
     }
 
     const date = new Date();
+    const now = date.now();
 
     const event: EventConfig = {
       eventid: req['eventid'],
@@ -167,10 +168,10 @@ export class Router
         referer: request.header.referer,
       },
       timestamp: date,
-      intervalBucketSeconds: Math.round(date.getTime()/1000),
-      intervalBucketMinutes: Math.round(date.getTime()/1000/60),
-      intervalBucketHours: Math.round(date.getTime()/1000/60/60),
-      intervalBucketDays: Math.round(date.getTime()/1000/60/60/24),
+      intervalBucketSeconds: Math.round(now/1000),
+      intervalBucketMinutes: Math.round(now/1000/60),
+      intervalBucketHours: Math.round(now/1000/60/60),
+      intervalBucketDays: Math.round(now/1000/60/60/24),
       meta,
       hash: stringHash(JSON.stringify(request.query)),
     };
