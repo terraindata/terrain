@@ -160,7 +160,11 @@ export const elasticTransform = _card(
         let outputs = [];
         const min = parseFloat(block['domain'].get(0));
         const max = parseFloat(block['domain'].get(1));
-        const stepSize = Math.abs(max - min) / 31;
+        const x1 = block['scorePoints'].get(0).value;
+        const x2 = block['scorePoints'].get(1).value;
+        const y1 = block['scorePoints'].get(0).score;
+        const y2 = block['scorePoints'].get(1).score;
+
         if (block['mode'] === 'normal')
         {
           const NORMAL_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
@@ -173,9 +177,26 @@ export const elasticTransform = _card(
           const stdDev = Math.abs(average - block['scorePoints'].get(0).value);
           const maxY = normal(average, average, stdDev);
           const scaleFactor = block['scorePoints'].get(1).score / maxY;
+          const stepSize = Math.abs(max - min) / 31;
           for (let i = min; i <= max; i += stepSize)
           {
             const y = normal(i, average, stdDev) * scaleFactor;
+            ranges.push(i);
+            outputs.push(y);
+          }
+        }
+        else if (block['mode'] === 'exponential')
+        {
+          const exponential = (x, l, a) =>
+          {
+            return a * Math.exp(-1 * l * x);
+          };
+          const lambda = (Math.log(y2) / x1 - Math.log(y1) / x1) / (1 - x2 / x1);
+          const A = y2 / Math.exp(-1 * lambda * x2);
+          const stepSize = (x2 - x1) * (1 / 100);
+          for (let i = x1; i < x2; i += stepSize)
+          {
+            const y = exponential(i, lambda, A);
             ranges.push(i);
             outputs.push(y);
           }
