@@ -120,7 +120,9 @@ AnalyticsReducer[ActionTypes.pinVariant] =
   (state, action: Action<{ variantId: ID }>) =>
   {
     const { variantId } = action.payload;
-    return state.setIn(['pinnedVariants', variantId], true);
+    const isVariantPinned = state.getIn(['pinnedVariants', variantId], false);
+
+    return state.setIn(['pinnedVariants', variantId], !isVariantPinned);
   };
 
 const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>

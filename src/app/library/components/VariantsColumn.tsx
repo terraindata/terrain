@@ -410,6 +410,11 @@ class VariantsColumn extends TerrainComponent<Props>
     }
   }
 
+  public handlePinVariant(variantId)
+  {
+    this.props.analyticsActions.pinVariant(variantId);
+  }
+
   public renderDuplicateDropdown()
   {
     const sorted = this.getSortedAlgorithms();
@@ -453,7 +458,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public renderVariant(id: ID, fadeIndex: number)
   {
-    const { multiselect, params, basePath } = this.props;
+    const { multiselect, params, basePath, analytics } = this.props;
     const currentVariantId = params.variantId;
     const variant = this.props.variants.get(id);
     const { selectedVariants } = this.props;
@@ -466,6 +471,7 @@ class VariantsColumn extends TerrainComponent<Props>
     const isSelected = multiselect ?
       selectedVariants.includes(variant.id.toString()) :
       currentVariantId === variant.id.toString();
+    const isPinned = analytics.get('pinnedVariants').get(variant.id, false);
 
     // if (me && roles)
     // {
@@ -503,6 +509,9 @@ class VariantsColumn extends TerrainComponent<Props>
         canDuplicate={canEdit}
         canUnarchive={variant.status === ItemStatus.Archive}
         canRename={variant.status !== ItemStatus.Live && variant.status !== ItemStatus.Default}
+        canPin={multiselect}
+        isPinned={isPinned}
+        onPin={this.handlePinVariant}
         key={variant.id}
         to={`/${basePath}/${this.props.groupId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'

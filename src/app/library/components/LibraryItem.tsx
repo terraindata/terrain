@@ -59,6 +59,8 @@ import ColorsActions from './../../colors/data/ColorsActions';
 import Menu from './../../common/components/Menu';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
+const PinIcon = require('../../../images/icon_pin.svg?name=PinIcon');
+const PinIconRed = require('../../../images/icon_pinRed.svg?name=PinIconRed');
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
 export interface Props
@@ -72,6 +74,7 @@ export interface Props
   canArchive: boolean;
   canDuplicate: boolean;
   canUnarchive: boolean;
+  canPin?: boolean;
   icon: any;
   to?: string;
   type: string;
@@ -103,6 +106,8 @@ export interface Props
   onSelect?: (id: ID) => void;
   onDoubleClick?: (id: ID) => void;
   isStarred?: boolean;
+  isPinned?: boolean;
+  onPin?: (variantId) => void;
 
   // populated by DnD code
   connectDropTarget?: (html: any) => JSX.Element;
@@ -117,6 +122,12 @@ export interface Props
 
 class LibraryItem extends TerrainComponent<Props>
 {
+  public static defaultProps: Partial<Props> = {
+    canPin: false,
+    isPinned: false,
+    onPin: (variantId) => { return },
+  };
+
   public state = {
     nameEditing: false,
     focusField: false,
@@ -340,6 +351,33 @@ class LibraryItem extends TerrainComponent<Props>
     event.target.select();
   }
 
+  public handlePin(event)
+  {
+    event.preventDefault();
+    event.stopPropagation();
+    const { id } = this.props;
+    this.props.onPin(id);
+  }
+
+  public renderPin() {
+    const { canPin } = this.props;
+
+    let pinComponent = null;
+    if (canPin) {
+      const { isPinned } = this.props;
+      const pinIconClass = 'library-item-pin' +
+        (isPinned ? ' library-item-pin-active' : '');
+
+      pinComponent = (
+        <div onClick={this.handlePin} className={pinIconClass}>
+          <PinIcon />
+        </div>
+      );
+    }
+
+    return pinComponent;
+  }
+
   public render()
   {
     const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging, isSelected } = this.props;
@@ -473,6 +511,7 @@ class LibraryItem extends TerrainComponent<Props>
                         <StarIcon />
                       </div>
                     }
+                    {this.renderPin()}
                     <Menu
                       options={menuOptions}
                     />

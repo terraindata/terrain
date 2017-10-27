@@ -221,7 +221,7 @@ describe('AnalyticsReducer', () =>
   {
     it('should handle analytics.pinVariant', () =>
     {
-      const nextState = reducer(analytics, {
+      let nextState = reducer(analytics, {
         type: ActionTypes.pinVariant,
         payload: {
           variantId,
@@ -229,6 +229,15 @@ describe('AnalyticsReducer', () =>
       });
 
       expect(nextState.pinnedVariants.get(variantId)).toEqual(true);
+
+      nextState = reducer(nextState, {
+        type: ActionTypes.pinVariant,
+        payload: {
+          variantId,
+        },
+      });
+
+      expect(nextState.pinnedVariants.get(variantId)).toEqual(false);
     });
   });
 });
