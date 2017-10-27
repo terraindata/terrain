@@ -155,7 +155,7 @@ export class Router
     }
 
     const date = new Date();
-    const now = date.now();
+    const now = date.getTime();
 
     const event: EventConfig = {
       eventid: req['eventid'],
