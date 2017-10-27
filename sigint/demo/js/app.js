@@ -44,54 +44,91 @@ THE SOFTWARE.
 
 'use strict';
 
-window.terrainSearch = angular.module('terrainSearch', []);
+window.terrainSearch = angular.module('terrainSearch', ['infinite-scroll']);
 
 terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 {
-  $scope.results = [];
-
-  $scope.searchTerm = $location.search().q;
-  $scope.esServer = $location.search().es;
+  $scope.cartItems = 0;
   $scope.page = $location.search().p;
+  $scope.searchTerm = $location.search().q;
+  $scope.esServer = $location.search().s;
+  $scope.variantID = $location.search().v;
+  $scope.results = [];
+  $scope.cart = [];
+  $scope.busy = false;
+  $scope.done = false;
+
+  if ($scope.page === undefined) $scope.page = 0;
+  if ($scope.searchTerm === undefined) $scope.searchTerm = '';
+  if ($scope.esServer === undefined) $scope.esServer = 'http://localhost:9200';
+  if ($scope.variantID === undefined) $scope.variantID = 123;
 
   $scope.search = function()
   {
     $scope.page = 0;
     $scope.results = [];
+    $scope.busy = false;
+    $scope.done = false;
+
+    if ($scope.searchTerm === undefined) $scope.searchTerm = '';
+    if ($scope.esServer === undefined) $scope.esServer = 'http://localhost:9200';
+    if ($scope.variantID === undefined) $scope.variantID = 123;
+
     $location.search({
       'q': $scope.searchTerm,
-      'es': $scope.esServer,
+      's': $scope.esServer,
       'p': $scope.page,
+      'v': $scope.variantID,
     });
     $scope.loadMore();
   };
 
   $scope.loadMore = function()
   {
-    if ($scope.page === undefined)
-    {
-      $scope.page = 0;
-    }
-
-    if ($scope.searchTerm === undefined)
-    {
-      $scope.searchTerm = '';
-    }
-
-    if ($scope.esServer === undefined)
-    {
-      $scope.esServer = 'http://localhost:9200';
-    }
+    if ($scope.busy) return;
+    if ($scope.done) return;
+    $scope.busy = true;
 
     $http.get('/demo/search?s=' + encodeURIComponent($scope.esServer) + '&q=' + $scope.searchTerm + '&p=' + $scope.page++)
     .then((response) =>
     {
       if (response.status === 200)
       {
-        $scope.results = response.data;
+        if (response.data.length > 0)
+        {
+          $scope.results = $scope.results.concat(response.data);
+        }
+        else
+        {
+          $scope.page--;
+          $scope.done = true;
+        }
       }
+      $scope.busy = false;
     });
   };
+
+  $scope.addItem = function(item)
+  {
+    $scope.cart.push(item);
+    $scope.cartItems++;
+  }
+
+  $scope.removeItem = function(item)
+  {
+    const i = $scope.cart.indexOf(item);
+    if (i !== -1)
+    {
+      $scope.cart.splice(i, 1);
+      $scope.cartItems--;
+    }
+  }
+
+  $scope.emptyCart = function(item)
+  {
+    $scope.cart = [];
+    $scope.cartItems = 0;
+  }
 
   $scope.loadMore();
 });
