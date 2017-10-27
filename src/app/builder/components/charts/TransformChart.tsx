@@ -804,8 +804,6 @@ const TransformChart = {
         return scales.realPointY(d['y']);
       });
 
-    // console.log(data);
-    // console.log(this._getLinesData(pointsData, scales));
     const lines = d3.select(el).select('.lines')
       .attr('d', line(data))
       .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
@@ -871,7 +869,6 @@ const TransformChart = {
 
     const lambda = (Math.log(pointsData[1].y)/ pointsData[0].x - Math.log(pointsData[0].y) / pointsData[0].x) / (1 - pointsData[1].x/ pointsData[0].x);
     const A = pointsData[1].y / Math.exp(-1 * lambda * pointsData[1].x);
-
     const data = this._getExponentialData(pointsData, scales, lambda, A, domainMin, domainMax);
     const line = d3.svg.line()
       .x((d) =>
@@ -894,8 +891,7 @@ const TransformChart = {
   _getExponentialData(pointsData, scales, lambda, A, min, max)
   {
     const data = [];
-    const stepSize = (max - min) * (1 / 100);
-    console.log(pointsData);
+    const stepSize = (pointsData[1].x - pointsData[0].x) * (1 / 100);
     for (let i = pointsData[0].x; i < pointsData[1].x; i += stepSize)
     {
        //let y; 
@@ -910,13 +906,12 @@ const TransformChart = {
        // else {
        const y = this._exponential(i, lambda, A);
        // }
-       data.push({ y: y, x: i, id: i, selected: false });
+       data.push({ y, x: i, id: i, selected: false });
     }
     data.sort(function(a, b)
     {
       return a.x - b.x;
     });
-    console.log(data);
     if (data.length)
     {
       const range = (scaleMax(scales.x) - scaleMin(scales.x));
@@ -952,6 +947,176 @@ const TransformChart = {
   _exponential(x, lambda, A)
   {
     return A * Math.exp(-1 * lambda * x);
+  },
+
+  _drawLogarithmicLines(el, scales, pointsData, onLineClick, onLineMove, canEdit)
+  {
+    const data = this._getLogarithmicData(pointsData, scales);
+    const line = d3.svg.line()
+      .x((d) =>
+      {
+        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
+      })
+      .y((d) =>
+      {
+        return scales.realPointY(d['y']);
+      });
+
+    const lines = d3.select(el).select('.lines')
+      .attr('d', line(data))
+      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
+
+    d3.select(el).select('.lines-bg')
+      .attr('d', line(data));
+  },
+
+  _getLogarithmicData(pointsData, scales)
+  {
+    const y1 = pointsData[0].y;
+    const y2 = pointsData[1].y;
+    const x1 = pointsData[0].x;
+    const x2 = pointsData[1].x;
+
+    const data = [];
+    const stepSize = Math.abs(pointsData[1].x - pointsData[0].x) * (1 / 100);
+    const yMax = y1 + 0.01;
+    if (pointsData[0].y > pointsData[1].y)
+    {
+      const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
+      const b = x2 - Math.log(yMax - y2) / k
+      for (let i = pointsData[0].x; i <= pointsData[1].x; i += stepSize)
+      {
+         const y = -1 * Math.exp(k * (i - b)) + yMax;
+         data.push({ y, x: i, id: i, selected: false });
+      }
+    }
+    else
+    {
+      const a = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / ( 1 - Math.log(x1) / Math.log(x2));
+      const b = (y2 - a) / Math.log(x2);
+      for (let i = pointsData[0].x; i <= pointsData[1].x; i += stepSize)
+      {
+         const y = this._logarithmic(i, a, b);
+         data.push({ y, x: i, id: i, selected: false });
+      }
+    }
+    if (data.length)
+    {
+      const range = (scaleMax(scales.x) - scaleMin(scales.x));
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: data[0].y,
+        id: '*%*-first',
+        dontScale: true,
+      });
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: -1,
+        id: '*%*-first-anchor',
+        dontScale: true,
+      });
+
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: data[data.length - 1].y,
+        id: '*%*-last',
+        dontScale: true,
+      });
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: -1,
+        id: '*%*-last-anchor',
+        dontScale: true,
+      });
+    }
+    return data;
+  },
+
+  _logarithmic(x, a, b)
+  {
+    return a + b * Math.log(x);
+  },
+
+   _drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, minDomain, maxDomain)
+  {
+    const linesPointsData = _.clone(pointsData);
+    const y1 = pointsData[0].y;
+    const y2 = pointsData[1].y;
+    const y3 = pointsData[2].y
+    const x1 = pointsData[0].x;
+    const x2 = pointsData[1].x;
+    const x3 = pointsData[2].x;
+    const a = (y1 * (1 - Math.exp(1 / x3))) / ( 1 - (y1 / y3) * (Math.exp(1 / x3)));
+    const k = -1 * Math.log(a - y3) / (y3 * (a * y2 - 1) + x2);
+    const b = (a / y2 - 1) / (Math.log(-1 * x2 * k));
+
+    const data = this._getSigmoidData(pointsData, scales, a, b, k);
+    const line = d3.svg.line()
+      .x((d) =>
+      {
+        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
+      })
+      .y((d) =>
+      {
+        return scales.realPointY(d['y']);
+      });
+
+    const lines = d3.select(el).select('.lines')
+      .attr('d', line(data))
+      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
+
+    d3.select(el).select('.lines-bg')
+      .attr('d', line(data));
+  },
+
+  _getSigmoidData(pointsData, scales, a, b, k, minDomain, maxDomain)
+  {
+    const data = [];
+    const stepSize = Math.abs(minDomain - maxDomain) * (1 / 100);
+    for (let i = minDomain; i < maxDomain; i += stepSize)
+    {
+       const y = this._sigmoid(i, a, b, k);
+       data.push({ y, x: i, id: i, selected: false });
+    }
+    data.sort(function(a, b)
+    {
+      return a.x - b.x;
+    });
+    if (data.length)
+    {
+      const range = (scaleMax(scales.x) - scaleMin(scales.x));
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: data[0].y,
+        id: '*%*-first',
+        dontScale: true,
+      });
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: -1,
+        id: '*%*-first-anchor',
+        dontScale: true,
+      });
+
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: data[data.length - 1].y,
+        id: '*%*-last',
+        dontScale: true,
+      });
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: -1,
+        id: '*%*-last-anchor',
+        dontScale: true,
+      });
+    }
+    return data;
+  },
+
+  _sigmoid(x, a, b, k)
+  {
+    return a / (1 + b * Math.exp(-1 * k * x));
   },
 
   _drawLines(el, scales, pointsData, onClick, onMove, onRelease, canEdit)
@@ -1600,7 +1765,10 @@ const TransformChart = {
         this._drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
         break;
       case 'logarithmic':
+        this._drawLogarithmicLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+        break;
       case 'sigmoid':
+        this._drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
       default:
         this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
