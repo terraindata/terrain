@@ -894,22 +894,11 @@ const TransformChart = {
   _getExponentialData(pointsData, scales, lambda, A, min, max)
   {
     const data = [];
-    const stepSize = (max - min) * (1 / 100);
-    console.log(pointsData);
+    const stepSize = (pointsData[1].x - pointsData[0].x) * (1 / 100);
+    //console.log(pointsData);
     for (let i = pointsData[0].x; i < pointsData[1].x; i += stepSize)
     {
-       //let y; 
-       // if (i < pointsData[0].x)
-       // {
-       //   y = pointsData[0].y;
-       // }
-       // else if (i > pointsData[1].x)
-       // {
-       //   y = pointsData[1].y;
-       // }
-       // else {
        const y = this._exponential(i, lambda, A);
-       // }
        data.push({ y: y, x: i, id: i, selected: false });
     }
     data.sort(function(a, b)
