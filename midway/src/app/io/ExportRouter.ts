@@ -91,6 +91,7 @@ Router.post('/headless', async (ctx, next) =>
   const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.body);
   if (authStream['template'] === null)
   {
+    ctx.body = 'Unauthorized';
     ctx.status = 400;
     return;
   }
@@ -102,8 +103,7 @@ Router.post('/headless', async (ctx, next) =>
   }
   else
   {
-    const exportReturn: stream.Readable | string = await exprt.export(exprtConf, true);
-    ctx.body = exportReturn;
+    ctx.body = await exprt.export(exprtConf, true);
   }
 });
 
@@ -112,6 +112,7 @@ Router.get('/headless', async (ctx, next) =>
   const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.query);
   if (authStream['template'] === null)
   {
+    ctx.body = 'Unauthorized';
     ctx.status = 400;
     return;
   }
@@ -125,11 +126,10 @@ Router.get('/headless', async (ctx, next) =>
     }
     catch (e)
     {
-      queryBody[key] = queryBody[key]; // can't get around linter error
+      // ignore
     }
   });
   const exprtConf: ExportConfig = queryBody as ExportConfig;
-  Util.verifyParameters(queryBody, ['templateId']);
 
   if (exprtConf.templateId !== authStream['template']['id'])
   {
@@ -137,8 +137,7 @@ Router.get('/headless', async (ctx, next) =>
   }
   else
   {
-    const exportReturn: stream.Readable | string = await exprt.export(exprtConf, true);
-    ctx.body = exportReturn;
+    ctx.body = await exprt.export(exprtConf, true);
   }
 });
 
