@@ -68,6 +68,7 @@ Router.post('/', async (ctx, next) =>
   const authStream: object = await Util.authenticateStream(ctx.req);
   if (authStream['user'] === null)
   {
+    ctx.body = 'Unauthorized';
     ctx.status = 400;
     return;
   }
@@ -102,6 +103,7 @@ Router.post('/headless', async (ctx, next) =>
   const authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
   if (authStream['template'] === null)
   {
+    ctx.body = 'Unauthorized';
     ctx.status = 400;
     return;
   }
