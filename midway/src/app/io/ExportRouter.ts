@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
@@ -94,6 +95,41 @@ Router.post('/headless', async (ctx, next) =>
     return;
   }
   Util.verifyParameters(exprtConf, ['templateId']);
+
+  if (exprtConf.templateId !== authStream['template']['id'])
+  {
+    ctx.body = 'Authenticating template ID does not match export template ID.';
+  }
+  else
+  {
+    const exportReturn: stream.Readable | string = await exprt.export(exprtConf, true);
+    ctx.body = exportReturn;
+  }
+});
+
+Router.get('/headless', async (ctx, next) =>
+{
+  const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.query);
+  if (authStream['template'] === null)
+  {
+    ctx.status = 400;
+    return;
+  }
+  const queryBody: object = _.extend({}, ctx.request.query);
+  delete queryBody['persistentAccessToken'];
+  Object.keys(queryBody).map((key) =>
+  {
+    try
+    {
+      queryBody[key] = JSON.parse(queryBody[key]);
+    }
+    catch (e)
+    {
+      queryBody[key] = queryBody[key]; // can't get around linter error
+    }
+  });
+  const exprtConf: ExportConfig = queryBody as ExportConfig;
+  Util.verifyParameters(queryBody, ['templateId']);
 
   if (exprtConf.templateId !== authStream['template']['id'])
   {
