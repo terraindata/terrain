@@ -106,6 +106,12 @@ class TransformCardChart extends TerrainComponent<Props>
     moveSeed: number;
     movedSeed: number;
     dragging: boolean;
+    // Save state of all modes of cards so that they go back during mode-change
+    linearPoints: ScorePoints,
+    normalPoints: ScorePoints,
+    exponentialPoints: ScorePoints,
+    logarithmicPoints: ScorePoints, // consider combining log/exp
+    sigmoidPoints: ScorePoints,
   } = {
     pointsCache: this.props.points,
     pointsBuffer: null,
@@ -113,6 +119,11 @@ class TransformCardChart extends TerrainComponent<Props>
     moveSeed: 0,
     movedSeed: -1,
     dragging: false,
+    linearPoints: null,
+    normalPoints: null,
+    exponentialPoints: null,
+    logarithmicPoints: null, // consider combining log/exp
+    sigmoidPoints: null,
   };
 
   constructor(props: Props)
@@ -467,6 +478,16 @@ class TransformCardChart extends TerrainComponent<Props>
     {
       this.setState({
         pointsBuffer: nextProps.points,
+      });
+    }
+    // Mode changed, save points
+    if (this.props.mode !== nextProps.mode)
+    {
+      const oldMode = this.props.mode + 'Points';
+      const newMode = nextProps.mode + 'Points';
+      this.setState({
+        [oldMode]: nextProps.points,
+        pointsCache: this.state[newMode] !== null ? this.state[newMode] : this.state.pointsCache,
       });
     }
   }
