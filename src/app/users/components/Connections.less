@@ -7,19 +7,19 @@
   .connections-row {
     color: @grey;
     text-align: left;
-    
+
     border-bottom: 1px solid #ccc;
     padding: 15px 0px;
     padding-bottom: 4px;
     font-size: 14px;
 
     display: flex;
-    
+
     .connections-items {
       flex-grow: 1;
       padding-left: 10px;
       width: 250px;
-      
+
       .connections-id {
         float: left;
         padding-right: 12px;
@@ -80,7 +80,7 @@
       }
     }
   }
-  
+
   .connections-show-disabled {
     margin-top: 10px;
     cursor: pointer;
@@ -104,13 +104,13 @@
     border: 1px solid #ccc;
     margin: 6px;
   }
-  
+
   .flex-grow {
     text-align: left;
     padding: 0px 6px;
     box-sizing: border-box;
   }
-  
+
   .button {
     width: 80px;
     font-size: 16px;
@@ -133,4 +133,27 @@
   line-height: 18px;
   font-weight: bold;
   margin-bottom: 40px;
+}
+
+.connections-analytics {
+  color: black;
+  text-align: left;
+  display: flex;
+  flex-direction: 'row';
+  border-top: 1px solid black;
+  margin-top: 8px;
+  padding-top: 5px;
+
+  .left-column, .right-column {
+    flex: 1;
+  }
+
+  input {
+    width: 100%;
+    margin: 6px;
+  }
+
+  b {
+    margin-left: 6px;
+  }
 }

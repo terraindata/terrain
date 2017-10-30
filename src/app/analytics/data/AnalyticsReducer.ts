@@ -109,6 +109,13 @@ AnalyticsReducer[ActionTypes.selectDateRange] =
     return state.set('selectedDateRange', dateRangeId);
   };
 
+AnalyticsReducer[ActionTypes.selectAnalyticsConnection] =
+  (state, action: Action<{ connectionName: string }>) =>
+  {
+    const { connectionName } = action.payload;
+    return state.set('selectedAnalyticsConnection', connectionName);
+  };
+
 const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
 {
   let nextState = state;

@@ -108,6 +108,7 @@ function calculateDateRange(api, dateRangeId: number, callback)
 const Actions =
   {
     fetch: (
+      connectionName: string,
       variantIds: ID[],
       metricId,
       intervalId,
@@ -117,6 +118,10 @@ const Actions =
     ) => (dispatch, getState, api) =>
       {
         dispatch({ type: ActionTypes.fetchStart });
+
+        const connection = getState().get('schema').servers.get(connectionName);
+        const connectionId = connection !== undefined ?
+          connection.connectionId : 1; // TODO: choose a suitable default connection
 
         const numericDateRangeId = parseInt(dateRangeId, 10);
         calculateDateRange(
@@ -137,6 +142,7 @@ const Actions =
             }
 
             return api.getAnalytics(
+              connectionId,
               variantIds,
               start,
               end,
@@ -190,6 +196,14 @@ const Actions =
       return {
         type: ActionTypes.selectDateRange,
         payload: { dateRangeId },
+      };
+    },
+
+    selectAnalyticsConnection: (connectionName) =>
+    {
+      return {
+        type: ActionTypes.selectAnalyticsConnection,
+        payload: { connectionName },
       };
     },
   };
