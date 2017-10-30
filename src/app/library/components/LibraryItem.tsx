@@ -125,7 +125,7 @@ class LibraryItem extends TerrainComponent<Props>
   public static defaultProps: Partial<Props> = {
     canPin: false,
     isPinned: false,
-    onPin: (variantId) => { return },
+    onPin: (variantId) => { return; },
   };
 
   public state = {
@@ -359,11 +359,13 @@ class LibraryItem extends TerrainComponent<Props>
     this.props.onPin(id);
   }
 
-  public renderPin() {
+  public renderPin()
+  {
     const { canPin } = this.props;
 
     let pinComponent = null;
-    if (canPin) {
+    if (canPin)
+    {
       const { isPinned } = this.props;
       const pinIconClass = 'library-item-pin' +
         (isPinned ? ' library-item-pin-active' : '');
@@ -380,7 +382,16 @@ class LibraryItem extends TerrainComponent<Props>
 
   public render()
   {
-    const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging, isSelected } = this.props;
+    const {
+      connectDropTarget,
+      connectDragSource,
+      isOver,
+      dragItemType,
+      draggingItemId,
+      isDragging,
+      isSelected,
+      canPin,
+    } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
 
     const { canArchive, canDuplicate, canUnarchive, canRename } = this.props;
@@ -479,13 +490,15 @@ class LibraryItem extends TerrainComponent<Props>
                         backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().bg3 : Colors().bg2, Colors().inactiveHover)
                     }
                   >
-                    <div
-                      className='library-item-icon'
-                    >
-                      {
-                        this.props.icon
-                      }
-                    </div>
+                    {canPin ? this.renderPin() :
+                      (<div
+                        className='library-item-icon'
+                      >
+                        {
+                          this.props.icon
+                        }
+                      </div>)
+                    }
                     <div
                       className='library-item-name'
                       style={fontColor(Colors().text1)}
@@ -511,7 +524,6 @@ class LibraryItem extends TerrainComponent<Props>
                         <StarIcon />
                       </div>
                     }
-                    {this.renderPin()}
                     <Menu
                       options={menuOptions}
                     />

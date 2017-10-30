@@ -68,7 +68,7 @@ export interface Props
   location?: any;
   router?: any;
   route?: any;
-  variantsMultiselect?: boolean;
+  canPinVariants?: boolean;
   basePath: string;
 }
 
@@ -84,7 +84,7 @@ class Library extends TerrainComponent<any>
     location: {},
     router: {},
     route: {},
-    variantsMultiselect: false,
+    canPinVariants: false,
   };
 
   public cancelSubscription = null;
@@ -140,6 +140,38 @@ class Library extends TerrainComponent<any>
     this.props.userActions.fetch();
   }
 
+  public componentWillReceiveProps(nextProps)
+  {
+    const { analytics } = this.props;
+    const { analytics: nextAnalytics } = nextProps;
+    const {
+      selectedAnalyticsConnection,
+      selectedMetric,
+      selectedInterval,
+      selectedDateRange,
+      pinnedVariants,
+    } = analytics;
+
+    const {
+      selectedAnalyticsConnection: nextSelectedAnalyticsConnection,
+      selectedMetric: nextSelectedMetric,
+      selectedInterval: nextSelectedInterval,
+      selectedDateRange: nextSelectedDateRange,
+      pinnedVariants: nextPinnedVariants,
+    } = nextAnalytics;
+
+    const analyticsFilterChanged = (selectedMetric !== nextSelectedMetric) ||
+      (selectedAnalyticsConnection !== nextSelectedAnalyticsConnection) ||
+      (selectedInterval !== nextSelectedInterval) ||
+      (selectedDateRange !== nextSelectedDateRange) ||
+      (pinnedVariants !== nextPinnedVariants);
+
+    if (analyticsFilterChanged)
+    {
+      this.fetchAnalytics(nextProps);
+    }
+  }
+
   public getData(variantId: ID)
   {
     const { analytics } = this.props;
@@ -158,13 +190,14 @@ class Library extends TerrainComponent<any>
 
   public getDatasets()
   {
-    const { library: libraryState } = this.props;
-    const { variants, selectedVariants } = libraryState;
+    const { library: libraryState, analytics } = this.props;
+    const { variants, selectedVariant } = libraryState;
 
     const datasets = variants
       .filter((variant) =>
       {
-        return selectedVariants.includes(variant.id.toString());
+        return selectedVariant === variant.id ||
+          analytics.pinnedVariants.get(variant.id, false);
       })
       .map((variant) =>
       {
@@ -191,15 +224,36 @@ class Library extends TerrainComponent<any>
     localStorage.setItem(lastPath, location.pathname);
   }
 
+  public fetchAnalytics(props)
+  {
+    const { analytics, library } = props;
+    const { selectedVariant } = library;
+    const { pinnedVariants } = analytics;
+
+    const variantIds = pinnedVariants.keySeq().toJS();
+    if (selectedVariant !== null && selectedVariant !== undefined)
+    {
+      variantIds.push(selectedVariant);
+    }
+
+    if (variantIds.length > 0)
+    {
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        variantIds,
+        analytics.selectedMetric,
+        analytics.selectedInterval,
+        analytics.selectedDateRange,
+      );
+    }
+  }
+
   public handleMetricRadioButtonClick(optionValue)
   {
     const { analytics } = this.props;
 
     if (analytics.selectedAnalyticsConnection !== null)
     {
-      const { selectedVariants } = this.props.library;
-      const selectedVariantIds = selectedVariants.toJS();
-
       let numericOptionValue = null;
       if (optionValue.indexOf(',') > -1)
       {
@@ -210,13 +264,6 @@ class Library extends TerrainComponent<any>
       }
 
       this.props.analyticsActions.selectMetric(optionValue);
-      this.props.analyticsActions.fetch(
-        analytics.selectedAnalyticsConnection,
-        selectedVariantIds,
-        numericOptionValue,
-        analytics.selectedInterval,
-        analytics.selectedDateRange,
-      );
     }
   }
 
@@ -226,17 +273,7 @@ class Library extends TerrainComponent<any>
 
     if (analytics.selectedAnalyticsConnection !== null)
     {
-      const { selectedVariants } = this.props.library;
-      const selectedVariantIds = selectedVariants.toJS();
-
       this.props.analyticsActions.selectInterval(optionValue);
-      this.props.analyticsActions.fetch(
-        analytics.selectedAnalyticsConnection,
-        selectedVariantIds,
-        analytics.selectedMetric,
-        optionValue,
-        analytics.selectedDateRange,
-      );
     }
   }
 
@@ -246,34 +283,15 @@ class Library extends TerrainComponent<any>
 
     if (analytics.selectedAnalyticsConnection !== null)
     {
-      const { selectedVariants } = this.props.library;
-      const selectedVariantIds = selectedVariants.toJS();
       const numericOptionValue = parseInt(optionValue, 10);
 
       this.props.analyticsActions.selectDateRange(optionValue);
-      this.props.analyticsActions.fetch(
-        analytics.selectedAnalyticsConnection,
-        selectedVariantIds,
-        analytics.selectedMetric,
-        analytics.selectedInterval,
-        numericOptionValue,
-      );
     }
   }
 
   public handleConnectionChange(connectionName)
   {
     const { analytics, schema } = this.props;
-    const { selectedVariants } = this.props.library;
-    const selectedVariantIds = selectedVariants.toJS();
-
-    this.props.analyticsActions.fetch(
-      connectionName,
-      selectedVariantIds,
-      analytics.selectedMetric,
-      analytics.selectedInterval,
-      analytics.selectedDateRange,
-    );
 
     this.props.analyticsActions.selectAnalyticsConnection(connectionName);
     localStorage.setItem('analyticsConnection', connectionName);
@@ -287,13 +305,20 @@ class Library extends TerrainComponent<any>
       groups,
       algorithms,
       variants,
-      selectedVariants,
+      selectedVariant,
       groupsOrder,
     } = libraryState;
 
-    const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
+    const {
+      selectedMetric,
+      selectedInterval,
+      selectedDateRange,
+      pinnedVariants,
+    } = analytics;
 
-    const { router, basePath, variantsMultiselect } = this.props;
+    const hasPinnedVariants = pinnedVariants.valueSeq().includes(true);
+
+    const { router, basePath, canPinVariants } = this.props;
     const { params } = router;
 
     const datasets = this.getDatasets();
@@ -384,12 +409,12 @@ class Library extends TerrainComponent<any>
           <VariantsColumn
             {...{
               variants,
-              selectedVariants,
+              selectedVariant,
               variantsOrder,
               groupId,
               algorithmId,
               params,
-              multiselect: variantsMultiselect,
+              canPinItems: canPinVariants,
               basePath,
               router,
               variantActions: this.props.libraryVariantActions,
@@ -398,7 +423,7 @@ class Library extends TerrainComponent<any>
               algorithms,
             }}
           />
-          {!variantsMultiselect ?
+          {!canPinVariants ?
             <LibraryInfoColumn
               {...{
                 dbs,
@@ -413,7 +438,7 @@ class Library extends TerrainComponent<any>
               }}
             /> : null}
         </div>
-        {variantsMultiselect && selectedVariants.count() > 0 ?
+        {canPinVariants && (selectedVariant !== null || hasPinnedVariants) ?
           <div className='library-bottom'>
             <div className='library-analytics-chart-wrapper'>
               {analytics.loaded ?

@@ -46,7 +46,6 @@ THE SOFTWARE.
 import Actions from 'analytics/data/AnalyticsActions';
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
-import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import * as Immutable from 'immutable';
 import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import { Ajax, createMockStore } from '../../helpers';

@@ -51,6 +51,7 @@ import * as React from 'react';
 const moment = require('moment');
 
 import * as Immutable from 'immutable';
+import { uniq } from 'lodash';
 
 import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
@@ -84,16 +85,17 @@ export interface Props
 {
   basePath: string;
   variants: Immutable.Map<ID, Variant>;
-  selectedVariants: Immutable.List<ID>;
+  selectedVariant: ID;
   variantsOrder: Immutable.List<ID>;
   groupId: ID;
   algorithmId: ID;
   algorithms: Immutable.Map<ID, Algorithm>;
-  multiselect?: boolean;
+  canPinItems: boolean;
   params?: any;
   variantActions?: any;
   analytics: any;
   analyticsActions?: any;
+  router?: any;
 }
 
 class VariantsColumn extends TerrainComponent<Props>
@@ -126,23 +128,38 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    const { multiselect, params, analytics } = this.props;
+    const { canPinItems, router, analytics } = this.props;
+    const { params, location } = router;
+    const variantIds = [];
 
-    if (multiselect && params && params.variantId)
+    if (params && params.variantId !== null && params.variantId !== undefined)
     {
-      const variantIds = params.variantId.split(',');
-      variantIds.forEach((id) =>
+      this.props.variantActions.select(params.variantId);
+      variantIds.push(params.variantId);
+    }
+
+    if (canPinItems && location.query && location.query.pinned !== undefined)
+    {
+      const pinnedVariantIds = location.query.pinned.split(',');
+
+      pinnedVariantIds.forEach((id) =>
       {
         const numericId = parseInt(id, 10);
-        this.props.variantActions.select(id);
-        this.props.analyticsActions.fetch(
-          analytics.selectedAnalyticsConnection,
-          [numericId],
-          analytics.selectedMetric,
-          analytics.selectedInterval,
-          analytics.selectedDateRange,
-        );
+
+        this.props.analyticsActions.pinVariant(numericId);
+        variantIds.push(numericId);
       });
+    }
+
+    if (variantIds.length > 0)
+    {
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        uniq(variantIds),
+        analytics.selectedMetric,
+        analytics.selectedInterval,
+        analytics.selectedDateRange,
+      );
     }
 
     this._subscribe(UserStore, {
@@ -178,14 +195,29 @@ class VariantsColumn extends TerrainComponent<Props>
       });
     }
 
-    const { multiselect, selectedVariants, basePath } = this.props;
-    const { params } = nextProps;
+    const { canPinItems, selectedVariant, basePath, analytics } = this.props;
+    const { params, analytics: nextAnalytics } = nextProps;
     const { groupId, algorithmId } = params;
-    const nextSelectedVariants = nextProps.selectedVariants;
-    if (multiselect && !selectedVariants.equals(nextSelectedVariants))
+    const nextSelectedVariant = nextProps.selectedVariant;
+    const pinnedVariants = nextAnalytics.pinnedVariants.keySeq().toJS();
+
+    if (canPinItems &&
+      (selectedVariant !== nextSelectedVariant ||
+        analytics.pinnedVariants !== nextAnalytics.pinnedVariants)
+    )
     {
-      browserHistory
-        .replace(`/${basePath}/${groupId}/${algorithmId}/${nextSelectedVariants.join(',')}`);
+      const pinnedParams = pinnedVariants.length > 0 ? `/?pinned=${pinnedVariants.join(',')}` : '';
+      if (nextSelectedVariant !== null && nextSelectedVariant !== undefined)
+      {
+        browserHistory
+          .replace(`/${basePath}/${groupId}/${algorithmId}/${nextSelectedVariant}${pinnedParams}`);
+      }
+      else
+      {
+        browserHistory
+          .replace(`/${basePath}/${groupId}/${algorithmId}${pinnedParams}`);
+      }
+
     }
   }
 
@@ -367,44 +399,35 @@ class VariantsColumn extends TerrainComponent<Props>
   public handleItemSelect(id: ID)
   {
     const {
-      multiselect,
-      selectedVariants,
+      canPinItems,
+      selectedVariant,
       basePath,
       groupId,
       algorithmId,
       analytics,
     } = this.props;
 
-    if (multiselect)
+    if (selectedVariant === id)
     {
-      if (selectedVariants.includes(id.toString()))
-      {
-        this.props.variantActions.unselect(id.toString());
-      } else
-      {
-        this.props.variantActions.select(id.toString());
-        this.props.analyticsActions.fetch(
-          analytics.selectedAnalyticsConnection,
-          [id],
-          analytics.selectedMetric,
-          analytics.selectedInterval,
-          analytics.selectedDateRange,
-        );
-      }
+      this.props.variantActions.unselect(id);
     } else
     {
-      browserHistory.push(`/${basePath}/${groupId}/${algorithmId}/${id}`);
-      const { variantId } = this.props.params;
-      this.props.variantActions.unselectAll();
-      this.props.variantActions.select(variantId);
+      this.props.variantActions.select(id);
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        [id],
+        analytics.selectedMetric,
+        analytics.selectedInterval,
+        analytics.selectedDateRange,
+      );
     }
   }
 
   public handleDoubleClick(id: ID)
   {
-    const { multiselect } = this.props;
+    const { canPinItems } = this.props;
 
-    if (!multiselect)
+    if (canPinItems)
     {
       browserHistory.push(`/builder/?o=${id}`);
     }
@@ -412,7 +435,16 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handlePinVariant(variantId)
   {
+    const { analytics } = this.props;
+
     this.props.analyticsActions.pinVariant(variantId);
+    this.props.analyticsActions.fetch(
+      analytics.selectedAnalyticsConnection,
+      [variantId],
+      analytics.selectedMetric,
+      analytics.selectedInterval,
+      analytics.selectedDateRange,
+    );
   }
 
   public renderDuplicateDropdown()
@@ -458,20 +490,17 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public renderVariant(id: ID, fadeIndex: number)
   {
-    const { multiselect, params, basePath, analytics } = this.props;
+    const { canPinItems, params, basePath, analytics } = this.props;
     const currentVariantId = params.variantId;
     const variant = this.props.variants.get(id);
-    const { selectedVariants } = this.props;
     const index = this.props.variantsOrder.indexOf(id);
     const { me, roles } = this.state;
     let canEdit: boolean;
     let canDrag: boolean;
     canEdit = true;
     canDrag = true;
-    const isSelected = multiselect ?
-      selectedVariants.includes(variant.id.toString()) :
-      currentVariantId === variant.id.toString();
-    const isPinned = analytics.get('pinnedVariants').get(variant.id, false);
+    const isSelected = currentVariantId === variant.id.toString();
+    const isPinned = analytics.pinnedVariants.get(variant.id, false);
 
     // if (me && roles)
     // {
@@ -509,7 +538,7 @@ class VariantsColumn extends TerrainComponent<Props>
         canDuplicate={canEdit}
         canUnarchive={variant.status === ItemStatus.Archive}
         canRename={variant.status !== ItemStatus.Live && variant.status !== ItemStatus.Default}
-        canPin={multiselect}
+        canPin={canPinItems}
         isPinned={isPinned}
         onPin={this.handlePinVariant}
         key={variant.id}
