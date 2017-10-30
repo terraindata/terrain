@@ -55,7 +55,8 @@
             <div id="result-{{result.movieid}}" class="box card text-center" data-toggle="modal" data-target="#showDetail-{{result.movieid}}">
               <img class="card-img-top img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{result.posterpath}}" ng-if="result.posterpath.length" alt={{result.title}}>
               <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.posterpath.length" alt={{result.title}}>
-              <img ng-src="http://localhost:3001/v1?eventid=1&variantid={{variantID}}&meta=~(itemName~%27{{result.movieid}}~itemType~%27movie)" style="display:none">
+              <div ng-init="cardLoad(result)"></div>
+              <!--<img ng-src="http://localhost:3001/v1?eventid=1&variantid={{variantID}}&meta=~(itemName~%27{{result.movieid}}~itemType~%27movie)" style="display:none">-->
               <div class="card-body">
                 <h6 class="card-title">{{result.title}}</h6>
               </div>
@@ -72,7 +73,7 @@
                   <div class="modal-body text-center p-4 m-4">
                     <img class="img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{result.posterpath}}" ng-if="result.posterpath.length" alt={{result.title}}>
                     <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.posterpath.length" alt={{result.title}}>
-                    <img ng-src="http://localhost:3001/v1?eventid=2&variantid={{variantID}}&meta=~(itemName~%27{{result.movieid}}~itemType~%27movie)" style="display:none">
+                    <!--<img ng-src="http://localhost:3001/v1?eventid=2&variantid={{variantID}}&meta=~(itemName~%27{{result.movieid}}~itemType~%27movie)" style="display:none">-->
                     <p class="text-muted">{{result.tagline}}</p>
                     <br/>
                     <p class="font-weight-bold text-info">{{result.overview}}</p>
@@ -161,7 +162,7 @@
                     </div>
                     <div class="col text-right">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal"><span class="fa fa-times" aria-hidden="true"></span> Close</button>
-                      <button type="button" class="btn btn-primary" data-dismiss="modal"><span class="fa fa-credit-card" aria-hidden="true"></span> Checkout</button>
+                      <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="checkout()"><span class="fa fa-credit-card" aria-hidden="true"></span> Checkout</button>
                     </div>
                   </div>
                 </div>

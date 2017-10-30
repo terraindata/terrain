@@ -112,6 +112,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
   {
     $scope.cart.push(item);
     $scope.cartItems++;
+    TerrainAnalytics.logEvent('click', $scope.variantID, {addedIDs: $scope.cart.map((m) => m._id)});
   }
 
   $scope.removeItem = function(item)
@@ -128,6 +129,16 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
   {
     $scope.cart = [];
     $scope.cartItems = 0;
+  }
+
+  $scope.checkout = function()
+  {
+    TerrainAnalytics.logEvent('conversion', $scope.variantID, {purchasedIDs: $scope.cart.map((m) => m._id)});
+  }
+
+  $scope.cardLoad = function(result)
+  {
+    setTimeout(TerrainAnalytics.logEvent('view', $scope.variantID, {itemName: result.movieid, itemType: 'movie'}),0);
   }
 
   $scope.loadMore();

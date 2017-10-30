@@ -128,7 +128,7 @@ export async function search(req: Request): Promise<object[]>
       return [];
     }
 
-    return resp.hits.hits.map((m) => m._source);
+    return resp.hits.hits.map((m) => Object.assign({}, m._source, {_id: m._id}));
   }
   catch (e)
   {
