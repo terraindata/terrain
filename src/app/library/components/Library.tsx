@@ -99,14 +99,27 @@ class Library extends TerrainComponent<any>
 
     if (analytics.selectedAnalyticsConnection === '')
     {
-      const firstServerWithAnalytics = schema.servers.find(
-        (value, key) => value.isAnalytics,
-      );
-      if (firstServerWithAnalytics !== undefined)
+      const analyticsConnection = null;
+
+      const lastAnalyticsConnection = localStorage.getItem('analyticsConnection');
+      if (lastAnalyticsConnection !== null)
       {
         this.props.analyticsActions.selectAnalyticsConnection(
-          firstServerWithAnalytics.name,
+          lastAnalyticsConnection,
         );
+      }
+      else
+      {
+        const firstServerWithAnalytics = schema.servers.find(
+          (value, key) => value.isAnalytics,
+        );
+        if (firstServerWithAnalytics !== undefined)
+        {
+          this.props.analyticsActions.selectAnalyticsConnection(
+            firstServerWithAnalytics.name,
+          );
+          localStorage.setItem('analyticsConnection', firstServerWithAnalytics.name);
+        }
       }
     }
 
@@ -140,12 +153,6 @@ class Library extends TerrainComponent<any>
       data = analyticsData;
     }
 
-    // return [...Array(20).keys()].map((i) =>
-    // {
-    //  const time = new Date(2017, 8, i, 0, 0, 0);
-    //  return { time, value: _.random(1, 100) };
-    // });
-    // TODO: Replace by variantId when analytics mock data have correct variant ids.
     return data;
   }
 
@@ -269,6 +276,7 @@ class Library extends TerrainComponent<any>
     );
 
     this.props.analyticsActions.selectAnalyticsConnection(connectionName);
+    localStorage.setItem('analyticsConnection', connectionName);
   }
 
   public render()
