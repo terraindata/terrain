@@ -78,6 +78,7 @@ export const elasticTransform = _card(
 
     // make this list<string> since the values passed from BuilderTextBox are string.
     domain: List(['0', '100']),
+    dataDomain: List(['0', '100']),
     hasCustomDomain: false, // has the user set a custom domain
 
     noTitle: true,
@@ -158,8 +159,8 @@ export const elasticTransform = _card(
       {
         let ranges = [];
         let outputs = [];
-        const min = parseFloat(block['domain'].get(0));
-        const max = parseFloat(block['domain'].get(1));
+        const min = parseFloat(block['dataDomain'].get(0));
+        const max = parseFloat(block['dataDomain'].get(1));
         let x1;
         let x2;
         let y1;
@@ -268,7 +269,7 @@ export const elasticTransform = _card(
       //   }
       // ),
 
-      metaFields: ['domain', 'hasCustomDomain'],
+      metaFields: ['domain', 'dataDomain', 'hasCustomDomain'],
     },
   });
 

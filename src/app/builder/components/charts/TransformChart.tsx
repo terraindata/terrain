@@ -975,7 +975,7 @@ const TransformChart = {
     const stepSize = Math.abs(pointsData[1].x - pointsData[0].x) * (1 / 100);
     if (pointsData[0].y > pointsData[1].y)
     {
-      const yMax = y1 + 0.01;
+      const yMax = y1 + 0.05;
       const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
       const b = x2 - Math.log(yMax - y2) / k;
       for (let i = pointsData[0].x; i <= pointsData[1].x; i += stepSize)
@@ -1811,7 +1811,10 @@ const TransformChart = {
       default:
         this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
-    this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode);
+    if (mode === 'linear' || numPoints === 2)
+    {
+      this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode);
+    }
     if (!pointsData.length)
     {
       this._drawNoPointsOverlay(el, scales);
