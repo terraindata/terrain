@@ -44,12 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions prefer-const
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions prefer-const no-empty
 
 import * as Immutable from 'immutable';
 import './HitsArea.less';
 const { Map, List } = Immutable;
 import * as classNames from 'classnames';
+import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 // import * as moment from 'moment';
@@ -64,6 +65,7 @@ import Modal from '../../../common/components/Modal';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Ajax from '../../../util/Ajax';
+import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
@@ -72,6 +74,7 @@ import HitsTable from './HitsTable';
 import Radium = require('radium');
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
+import DragHandle from '../../../common/components/DragHandle';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
 import MapComponent from '../../../common/components/MapComponent';
 import Switch from '../../../common/components/Switch';
@@ -107,7 +110,14 @@ interface State
   onHitsLoaded?: (unchanged?: boolean) => void;
 
   showingExport?: boolean;
+  mapHeight?: number;
+  mouseStartY?: number;
+  mapMaxHeight?: number;
+  spotlightHits?: Immutable.Map<string, any>;
 }
+
+const MAP_MAX_HEIGHT = 300;
+const MAP_MIN_HEIGHT = 25; // height of top bar on map
 
 @Radium
 class HitsArea extends TerrainComponent<Props>
@@ -119,9 +129,14 @@ class HitsArea extends TerrainComponent<Props>
     showingExport: false,
     hitsPages: 1,
     hitFormat: 'icon',
+    mapHeight: MAP_MIN_HEIGHT,
+    mouseStartY: 0,
+    mapMaxHeight: undefined,
+    spotlightHits: Immutable.Map<string, any>({}),
   };
 
   public hitsFodderRange = _.range(0, 25);
+  public locations = {};
 
   public componentWillReceiveProps(nextProps)
   {
@@ -133,6 +148,20 @@ class HitsArea extends TerrainComponent<Props>
         // reset infinite scroll
         this.state.onHitsLoaded(false);
       }
+    }
+    if (this.props.resultsState.hits !== nextProps.resultsState.hits)
+    {
+      let spotlightHits = Map({});
+      nextProps.resultsState.hits.forEach((hit) =>
+      {
+        if (this.state.spotlightHits.get(hit.primaryKey))
+        {
+          spotlightHits = spotlightHits.set(hit.primaryKey, this.state.spotlightHits.get(hit.primaryKey));
+        }
+      });
+      this.setState({
+        spotlightHits,
+      });
     }
   }
 
@@ -184,6 +213,8 @@ class HitsArea extends TerrainComponent<Props>
           allowSpotlights={this.props.allowSpotlights}
           index={-1}
           primaryKey={hit.primaryKey}
+          onSpotlightAdded={this.handleSpotlightAdded}
+          onSpotlightRemoved={this.handleSpotlightRemoved}
         />
       </div>
     );
@@ -223,53 +254,170 @@ class HitsArea extends TerrainComponent<Props>
     return !query || (!query.cards.size);
   }
 
-  /*
-  The code below is code to build an aggregation map that shows the target location and
-  all the numbered locations of the reuslts.
-  To use this method and render a map(s):
-  // locations is created in renderResults() and is a map of fieldName: locationValue from the query
-  // results is from this.props.query.results
-  const mapData = this.buildAggregationMap(locations, results);
-  if (mapData !== undefined && mapData.length > 0)
-    {
-      return (
-        mapData.map((data, index) =>
-          <MapComponent
-            location={data.target}
-            multiLocations={data.multiLocations}
-            markLocation={true}
-            showSearchBar={false}
-            showDistanceCircle={false}
-            hideSearchSettings={true}
-            zoomControl={true}
-            colorMarker={true}
-            key={index}
-          />
-        )
-      );
-    }
-  */
-  public buildAggregationMap(locations, results)
+  public handleSpotlightAdded(id, spotlightData)
+  {
+    this.setState({
+      spotlightHits: this.state.spotlightHits.set(id, spotlightData),
+    });
+  }
+
+  public handleSpotlightRemoved(id)
+  {
+    this.setState({
+      spotlightHits: this.state.spotlightHits.delete(id),
+    });
+  }
+
+  public buildAggregationMap(locations, hits)
   {
     const allMapsData = [];
     _.keys(locations).forEach((field) =>
     {
       let multiLocations = [];
       const target = MapUtil.getCoordinatesFromGeopoint(locations[field]);
-      results.forEach((result, i) =>
+      hits.forEach((hit, i) =>
       {
         const { resultsConfig } = this.props.query;
         const name = resultsConfig.enabled && resultsConfig.name !== undefined ?
-          result.fields.get(resultsConfig.name) : result.fields.get('_id');
+          hit.fields.get(resultsConfig.name) : hit.fields.get('_id');
+        const spotlight = this.state.spotlightHits.get(hit.primaryKey);
+        const color = spotlight !== undefined && spotlight.color !== undefined ? spotlight.color : 'black';
         multiLocations.push({
-          location: result.fields.get(field),
+          location: hit.fields.get(field),
           name,
           index: i + 1,
+          color,
         });
       });
       allMapsData.push({ target, multiLocations });
     });
     return allMapsData;
+  }
+
+  public handleMapMouseDown(event)
+  {
+    $('body').on('mouseup', this.handleMapMouseUp);
+    $('body').on('mouseleave', this.handleMapMouseUp);
+    $('body').on('mousemove', this.handleMapMouseMove);
+    const el = this.refs['map'];
+    const cr = el['getBoundingClientRect']();
+    const parentEl = this.refs['resultsarea'];
+    const parentCr = parentEl['getBoundingClientRect']();
+    this.setState({
+      mapHeight: cr.height,
+      mouseStartY: event.pageY,
+      mapMaxHeight: parentCr.height,
+    });
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  public handleMapMouseUp(event)
+  {
+    $('body').off('mouseup', this.handleMapMouseUp);
+    $('body').off('mouseleave', this.handleMapMouseUp);
+    $('body').off('mousemove', this.handleMapMouseMove);
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  public handleMapMouseMove(event)
+  {
+    const dY = this.state.mouseStartY - event.pageY;
+    const newHeight = dY + this.state.mapHeight;
+    event.preventDefault();
+    event.stopPropagation();
+    this.setState({
+      mapHeight: newHeight,
+      mouseStartY: event.pageY,
+    });
+  }
+
+  public handleMapClick(event)
+  {
+    event.originalEvent.preventDefault();
+    event.originalEvent.stopPropagation();
+    // set to full height
+    this.setState({
+      mapHeight: MAP_MAX_HEIGHT,
+    });
+  }
+
+  public toggleMapOpen(event)
+  {
+    const el = this.refs['map'];
+    const cr = el['getBoundingClientRect']();
+    if (cr.height <= MAP_MIN_HEIGHT)
+    {
+      this.setState({
+        mapHeight: MAP_MAX_HEIGHT,
+      });
+    }
+    else
+    {
+      this.setState({
+        mapHeight: MAP_MIN_HEIGHT,
+      });
+    }
+  }
+
+  public renderHitsMap()
+  {
+    if (_.keys(this.locations).length === 0)
+    {
+      return null;
+    }
+    const mapData = this.buildAggregationMap(this.locations, this.props.resultsState.hits);
+    const maxHeight = this.state.mapMaxHeight === undefined ? MAP_MAX_HEIGHT :
+      Math.min(MAP_MAX_HEIGHT, this.state.mapMaxHeight - 80);
+    if (mapData !== undefined && mapData.length > 0)
+    {
+      return (
+        <div
+          className='results-area-map'
+          style={{
+            height: this.state.mapHeight,
+            maxHeight,
+          }}
+          ref='map'
+        >
+          <div
+            className='results-area-map-topbar'
+            onMouseUp={this.toggleMapOpen}
+            style={backgroundColor(localStorage.getItem('theme') === 'DARK' ? Colors().bg3 : Colors().bg2)}
+          >
+            <div
+              onMouseDown={this.handleMapMouseDown}
+              className='results-area-map-handle-wrapper'
+            >
+              <DragHandle
+                key={'results-area-map-handle'}
+              />
+            </div>
+            <span style={fontColor(Colors().text1)}>
+              View Hits on Map
+            </span>
+          </div>
+          {
+            mapData.map((data, index) =>
+              <MapComponent
+                location={data.target}
+                multiLocations={data.multiLocations}
+                markLocation={true}
+                showSearchBar={false}
+                showDistanceCircle={false}
+                hideSearchSettings={true}
+                zoomControl={true}
+                colorMarker={true}
+                key={index}
+                className='results-area-map-container'
+                onMapClick={this.handleMapClick}
+              />,
+            )}
+        </div>
+      );
+    }
+    return null;
   }
 
   public renderHits()
@@ -354,6 +502,8 @@ class HitsArea extends TerrainComponent<Props>
             onExpand={this.handleExpand}
             hitsLoading={resultsState.loading}
             allowSpotlights={this.props.allowSpotlights}
+            onSpotlightAdded={this.handleSpotlightAdded}
+            onSpotlightRemoved={this.handleSpotlightRemoved}
           />
         </div>
       );
@@ -362,21 +512,26 @@ class HitsArea extends TerrainComponent<Props>
     {
       // Extract the geo_distance fields and values from the query
       const geoDistances = this.props.query.tql.match(/"geo_distance": \{[^\}]*\}/g);
-      let locations = {};
+      this.locations = {};
       if (geoDistances !== undefined && geoDistances !== null)
       {
         geoDistances.forEach((geoDist) =>
         {
           geoDist = '{' + geoDist + '}}';
-          const obj = JSON.parse(geoDist);
-          // find field that isn't distance or distance_type
-          _.keys(obj.geo_distance).forEach((key) =>
+          try
           {
-            if (key !== 'distance' && key !== 'distance_type')
+            const obj = JSON.parse(geoDist);
+            // find field that isn't distance or distance_type
+            _.keys(obj.geo_distance).forEach((key) =>
             {
-              locations[key] = obj.geo_distance[key];
-            }
-          });
+              if (key !== 'distance' && key !== 'distance_type')
+              {
+                this.locations[key] = obj.geo_distance[key];
+              }
+            });
+          }
+          catch (e)
+          { }
         });
       }
       hitsContent = (
@@ -404,7 +559,9 @@ class HitsArea extends TerrainComponent<Props>
                   key={index}
                   primaryKey={hit.primaryKey}
                   allowSpotlights={this.props.allowSpotlights}
-                  locations={locations}
+                  locations={this.locations}
+                  onSpotlightAdded={this.handleSpotlightAdded}
+                  onSpotlightRemoved={this.handleSpotlightRemoved}
                 />
               );
             })
@@ -418,10 +575,11 @@ class HitsArea extends TerrainComponent<Props>
         </InfiniteScroll>
       );
     }
-
+    const mapHeight = Math.min(this.state.mapHeight, MAP_MAX_HEIGHT);
     return (
       <div
         className='results-area-results-wrapper'
+        style={{ height: `calc(100% - ${mapHeight + 24}px)` }}
       >
         {
           hitsContent
@@ -674,9 +832,11 @@ column if you have customized the results view.');
           'results-area-config-open': this.state.showingConfig,
           'results-area-table altBg': this.state.hitFormat === 'table',
         })}
+        ref='resultsarea'
       >
         {this.renderTopbar()}
         {this.renderHits()}
+        {this.renderHitsMap()}
         {this.renderExpandedHit()}
         {this.props.showCustomizeView && this.renderConfig()}
         {this.props.showExport && this.renderExport()}

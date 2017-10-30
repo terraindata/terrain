@@ -110,7 +110,6 @@ export class Menu extends TerrainComponent<Props>
 
     return (
       <div
-
         className={classNames({
           'menu-option': true,
           'menu-option-disabled': option.disabled,

@@ -68,6 +68,8 @@ export interface Props
   onExpand: (index: number) => void;
   hitsLoading: boolean;
   allowSpotlights: boolean;
+  onSpotlightAdded: (id, spotlightData) => void;
+  onSpotlightRemoved: (id) => void;
 }
 
 export default class HitsTable extends TerrainComponent<Props>
@@ -317,12 +319,14 @@ export default class HitsTable extends TerrainComponent<Props>
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);
+    this.props.onSpotlightAdded(id, spotlightData);
   }
 
   public unspotlight(row: number)
   {
     const hit = this.state.rows && this.state.rows.get(row);
     spotlightAction(hit.primaryKey, null);
+    this.props.onSpotlightRemoved(hit.primaryKey);
   }
 
   public rowRenderer(props)

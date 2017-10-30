@@ -79,6 +79,8 @@ export interface Props
   onExpand: (index: number) => void;
   expanded?: boolean;
   allowSpotlights: boolean;
+  onSpotlightAdded: (id, spotlightData) => void;
+  onSpotlightRemoved: (id) => void;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -165,7 +167,6 @@ class HitComponent extends TerrainComponent<Props> {
     {
       return null;
     }
-
     const color = this.state.isSpotlit ? this.state.spotlightColor : 'black';
     const value = getResultValue(this.props.hit, field, this.props.resultsConfig, false, overrideFormat, this.props.locations, color);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
@@ -217,6 +218,7 @@ class HitComponent extends TerrainComponent<Props> {
         spotlightData['color'] = spotlightColor;
         spotlightData['id'] = id;
         spotlightAction(id, spotlightData);
+        this.props.onSpotlightAdded(id, spotlightData);
       });
   }
 
@@ -225,23 +227,33 @@ class HitComponent extends TerrainComponent<Props> {
     this.setState({
       isSpotlit: false,
     });
+    this.props.onSpotlightRemoved(this.props.primaryKey);
     spotlightAction(this.props.primaryKey, null);
   }
 
   public renderSpotlight()
   {
-    if (!this.state.isSpotlit)
-    {
-      return null;
-    }
-
     return (
       <div
-        className='result-spotlight'
+        className={classNames({
+          'result-spotlight': true,
+          'result-spotlight-lit': this.state.isSpotlit,
+        })}
         style={{
-          background: this.state.spotlightColor,
+          background: this.state.isSpotlit ?
+            this.state.spotlightColor : 'transparent',
         }}
-      />
+      >
+        <div
+          className={classNames({
+            'result-spotlight-text': true,
+            'result-spotlight-text-small': this.props.index + 1 >= 100,
+            'result-spotlight-text-large': this.props.index + 1 < 10,
+          })}
+        >
+          {this.props.index + 1}
+        </div>
+      </div>
     );
   }
 
@@ -372,7 +384,6 @@ class HitComponent extends TerrainComponent<Props> {
     ));
   }
 }
-
 export function getResultValue(hit: Hit, field: string, config: ResultsConfig, isTitle: boolean,
   overrideFormat?: any, locations?: { [field: string]: any }, color?: string)
 {

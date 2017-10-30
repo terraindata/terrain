@@ -68,6 +68,7 @@ import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import './Aggregation.less';
 import AggregationGaussian from './AggregationGaussian';
 import AggregationHistogram from './AggregationHistogram';
+import AggregationMap from './AggregationMap';
 import AggregationScatterPlot from './AggregationScatterPlot';
 import AggregationsTable from './AggregationsTable';
 import { Aggregation as AggregationClass } from './ResultTypes';
@@ -92,6 +93,7 @@ export enum DISPLAY_TYPES
   Table,
   Raw,
   Gaussian,
+  Map,
 }
 
 const DISPLAY_TYPE_NAMES = {
@@ -100,6 +102,7 @@ const DISPLAY_TYPE_NAMES = {
   [DISPLAY_TYPES.Table]: 'Table',
   [DISPLAY_TYPES.Raw]: 'Raw',
   [DISPLAY_TYPES.Gaussian]: 'Graph',
+  [DISPLAY_TYPES.Map]: 'Map',
 };
 
 @Radium
@@ -174,6 +177,8 @@ class AggregationComponent extends TerrainComponent<Props> {
         return this.canBeScatterPlot(aggregation);
       case DISPLAY_TYPES.Gaussian:
         return this.canBeGaussian(aggregation);
+      case DISPLAY_TYPES.Map:
+        return this.canBeMap(aggregation);
       default:
         return true;
     }
@@ -214,6 +219,10 @@ class AggregationComponent extends TerrainComponent<Props> {
     else if (this.canBeGaussian(aggregation))
     {
       displayType = DISPLAY_TYPES.Gaussian;
+    }
+    else if (this.canBeMap(aggregation))
+    {
+      displayType = DISPLAY_TYPES.Map;
     }
     else if (this.canBeTable(aggregation))
     {
@@ -274,6 +283,10 @@ class AggregationComponent extends TerrainComponent<Props> {
     if (this.canBeGaussian())
     {
       options.push(String(DISPLAY_TYPES.Gaussian));
+    }
+    if (this.canBeMap())
+    {
+      options.push(String(DISPLAY_TYPES.Map));
     }
     if (this.canBeTable())
     {
@@ -410,6 +423,8 @@ class AggregationComponent extends TerrainComponent<Props> {
         return this.renderScatterPlot(values);
       case DISPLAY_TYPES.Gaussian:
         return this.renderGaussian(values);
+      case DISPLAY_TYPES.Map:
+        return this.renderMap(values);
       case DISPLAY_TYPES.Raw:
         return <pre className='aggregation-raw'> {JSON.stringify(values, undefined, 2)} </pre>;
       default:
@@ -469,6 +484,23 @@ class AggregationComponent extends TerrainComponent<Props> {
         return this.findKey(value, k);
       }
     }
+  }
+
+  public canBeMap(overrideAggregation?)
+  {
+    const aggregation = overrideAggregation !== undefined ? overrideAggregation : this.props.aggregation;
+    const values = _.values(aggregation)[0];
+    return this.findKey(values, 'bounds') !== undefined || this.findKey(values, 'location') !== undefined;
+  }
+
+  public renderMap(values)
+  {
+    return (
+      <AggregationMap
+        data={values}
+        colors={[Colors().active, Colors().activeHover]}
+        containerWidth={this.props.containerWidth - 100}
+      />);
   }
 
   // Has to be an extended stats aggregation
