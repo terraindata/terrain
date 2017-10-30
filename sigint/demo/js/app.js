@@ -63,6 +63,10 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
   if ($scope.esServer === undefined) $scope.esServer = 'http://localhost:9200';
   if ($scope.variantID === undefined) $scope.variantID = 123;
 
+  $scope.$watch('$viewContentLoaded', function () {
+    TerrainAnalytics.logEvent('view', $scope.variantID, {itemName: 'home', itemType: 'page'});
+  });
+
   $scope.search = function()
   {
     $scope.page = 0;
@@ -138,7 +142,12 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 
   $scope.cardLoad = function(result)
   {
-    setTimeout(TerrainAnalytics.logEvent('view', $scope.variantID, {itemName: result.movieid, itemType: 'movie'}),0);
+    setTimeout(TerrainAnalytics.logEvent('view', $scope.variantID, {itemName: result.movieid, itemType: 'movie'}),1);
+  }
+
+  $scope.cardDisplay = function(result)
+  {
+    setTimeout(TerrainAnalytics.logEvent('view', $scope.variantID, {itemName: result.movieid, itemType: 'movieDetail'}),1);
   }
 
   $scope.loadMore();

@@ -52,11 +52,10 @@
         <div class="no-results text-center" ng-hide="results.length">No results</div>
         <div class="row justify-content-between justify-content-md-center align-items-start">
           <div class="col col-md-2 p-3" ng-cloak ng-repeat="result in results">
-            <div id="result-{{result.movieid}}" class="box card text-center" data-toggle="modal" data-target="#showDetail-{{result.movieid}}">
+            <div id="result-{{result.movieid}}" class="box card text-center" data-toggle="modal" data-target="#showDetail-{{result.movieid}}" ng-click="cardDisplay(result)">
               <img class="card-img-top img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{result.posterpath}}" ng-if="result.posterpath.length" alt={{result.title}}>
               <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.posterpath.length" alt={{result.title}}>
               <div ng-init="cardLoad(result)"></div>
-              <!--<img ng-src="http://localhost:3001/v1?eventid=1&variantid={{variantID}}&meta=~(itemName~%27{{result.movieid}}~itemType~%27movie)" style="display:none">-->
               <div class="card-body">
                 <h6 class="card-title">{{result.title}}</h6>
               </div>
@@ -73,7 +72,6 @@
                   <div class="modal-body text-center p-4 m-4">
                     <img class="img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{result.posterpath}}" ng-if="result.posterpath.length" alt={{result.title}}>
                     <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.posterpath.length" alt={{result.title}}>
-                    <!--<img ng-src="http://localhost:3001/v1?eventid=2&variantid={{variantID}}&meta=~(itemName~%27{{result.movieid}}~itemType~%27movie)" style="display:none">-->
                     <p class="text-muted">{{result.tagline}}</p>
                     <br/>
                     <p class="font-weight-bold text-info">{{result.overview}}</p>
@@ -190,10 +188,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ngInfiniteScroll/1.3.0/ng-infinite-scroll.min.js"></script>
     <script src="js/app.js" type="text/javascript"></script>
     <script src='http://localhost:3001/bundle.js' data-server="http://localhost:3001/v1/"></script>
-    <script>
-      $(document).ready(function () {
-        TerrainAnalytics.logEvent('view', 1, {itemName: 'home', itemType: 'page'});
-      });
-    </script>
   </body>
 </html>
