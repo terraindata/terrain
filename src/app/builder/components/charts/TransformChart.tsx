@@ -190,11 +190,15 @@ const TransformChart = {
       // Draw Point + menu on double click
       d3.select(el).select('.inner-svg').on('dblclick', function()
       {
-        const isvg = d3.select(el).select('.inner-svg');
-        state.onCreate(
-          scales.x.invert(d3.mouse(this)[0] + parseInt(isvg.attr('x'), 10)),
-          scales.realPointY.invert(d3.mouse(this)[1] + parseInt(isvg.attr('y'), 10)),
-        );
+        // Only allow point creation in linear mode (other modes have set # of points)
+        if (state.mode === 'linear')
+        {
+          const isvg = d3.select(el).select('.inner-svg');
+          state.onCreate(
+            scales.x.invert(d3.mouse(this)[0] + parseInt(isvg.attr('x'), 10)),
+            scales.realPointY.invert(d3.mouse(this)[1] + parseInt(isvg.attr('y'), 10)),
+          );
+        }
         return false;
       });
 
@@ -234,6 +238,7 @@ const TransformChart = {
           currentObject &&
           (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) // delete/backspace key
           && !$('input').is(':focus')
+          && state.mode === 'linear'
         )
         {
           d3.event['preventDefault']();
@@ -968,9 +973,9 @@ const TransformChart = {
 
     const data = [];
     const stepSize = Math.abs(pointsData[1].x - pointsData[0].x) * (1 / 100);
-    const yMax = y1 + 0.01;
     if (pointsData[0].y > pointsData[1].y)
     {
+      const yMax = y1 + 0.01;
       const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
       const b = x2 - Math.log(yMax - y2) / k;
       for (let i = pointsData[0].x; i <= pointsData[1].x; i += stepSize)
@@ -1592,6 +1597,7 @@ const TransformChart = {
 
   _rightClickFactory: (el, onDelete, scales, colors, drawMenu) => function(point)
   {
+    console.log('right click factory');
     drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales, colors);
     return false;
   },
@@ -1685,7 +1691,7 @@ const TransformChart = {
     d3.event['stopPropagation']();
   },
 
-  _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors)
+  _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode)
   {
     const g = d3.select(el).selectAll('.points');
 
@@ -1695,9 +1701,36 @@ const TransformChart = {
     point.enter()
       .append('circle');
 
+    const pointYValue = (d) =>
+    {
+      // constrain y values of normal points so that they remain on the line
+      if (mode === 'normal')
+      {
+        const average = pointsData[1].x;
+        const stdDev = Math.abs(pointsData[1].x - pointsData[0].x);
+        const maxY = this._normal(average, average, stdDev);
+        const scaleFactor = pointsData[1].y / maxY;
+        const y = this._normal(d['x'], average, stdDev) * scaleFactor;
+        return scales.realPointY(y);
+      }
+      return scales.realPointY(d['y']);
+    };
+
+    const pointId = (d, i) =>
+    {
+      if (mode === 'normal')
+      {
+        if (i === 1)
+        {
+          return 'Average';
+        }
+        return 'Standard Deviation';
+      }
+    };
+
     point
       .attr('cx', (d) => scales.realX(d['x']))
-      .attr('cy', (d) => scales.realPointY(d['y']))
+      .attr('cy', pointYValue)
       .attr('fill', '#fff')
       .attr('style', (d) => 'stroke: ' + (d['selected'] ? Colors().error : colors[0]))
       .attr('class', (d) =>
@@ -1706,14 +1739,21 @@ const TransformChart = {
       .attr('r', 10);
 
     point
-      .attr('_id', (d) => d['id']);
+      .attr('_id', pointId);
 
     if (canEdit)
     {
       point.on('mousedown', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
       point.on('touchstart', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
       point.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
-      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, colors, this._drawMenu));
+      if (mode === 'linear')
+      {
+        point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, colors, this._drawMenu));
+      }
+      else
+      {
+        point.on('contextmenu', null);
+      }
       point.on('click', this._mouseClickFactory(el, scales, onMove, onRelease, colors, this._editPointPosition, this._drawPointEditMenu));
       point.on('mouseout', this._mouseoutFactory(el));
       point.on('dblclick', this._doubleclickFactory(el));
@@ -1738,27 +1778,40 @@ const TransformChart = {
     d3.select(el).select('.inner-svg').select('.overlay').remove();
     this._drawBars(el, scales, barsData, colors);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
+    const numPoints = pointsData.length;
     switch (mode)
     {
       case 'linear':
         this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
         break;
       case 'normal':
-        this._drawNormalLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+        if (numPoints >= 2)
+        {
+          this._drawNormalLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+        }
         break;
       case 'exponential':
-        this._drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+        if (numPoints >= 2)
+        {
+          this._drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+        }
         break;
       case 'logarithmic':
-        this._drawLogarithmicLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+        if (numPoints >= 2)
+        {
+          this._drawLogarithmicLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+        }
         break;
       case 'sigmoid':
-        this._drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+        if (numPoints >= 2)
+        {
+          this._drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+        }
         break;
       default:
         this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
-    this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors);
+    this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode);
     if (!pointsData.length)
     {
       this._drawNoPointsOverlay(el, scales);

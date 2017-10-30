@@ -174,6 +174,18 @@ export const elasticTransform = _card(
           stepSize = Math.abs(x2 - x1) * (1 / 31);
         }
 
+        if (block['scorePoints'].size <= 1)
+        {
+          return {
+            a: 0,
+            b: 1,
+            numerators: [[block['input'], 1]],
+            denominators: [],
+            ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
+            outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
+          };
+        }
+
         switch (block['mode'])
         {
           case 'normal':
