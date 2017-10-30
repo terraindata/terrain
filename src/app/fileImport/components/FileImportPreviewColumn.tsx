@@ -212,25 +212,23 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
 
   public renderType()
   {
-    if (!this.props.exporting)
-    {
-      return (
+    return (
+      <div
+        className='flex-container fi-preview-column-field'
+      >
         <div
-          className='flex-container fi-preview-column-field'
+          className='fi-preview-column-field-content'
         >
-          <div
-            className='fi-preview-column-field-content'
-          >
-            <TypeDropdown
-              columnId={this.props.columnId}
-              recursionDepth={0}
-              columnType={this.props.columnType}
-              columnTypeAnalyzer={this.props.analyzers}
-            />
-          </div>
+          <TypeDropdown
+            columnId={this.props.columnId}
+            recursionDepth={0}
+            columnType={this.props.columnType}
+            columnTypeAnalyzer={this.props.analyzers}
+            exporting={this.props.exporting}
+          />
         </div>
-      );
-    }
+      </div>
+    );
   }
 
   public renderTransform()

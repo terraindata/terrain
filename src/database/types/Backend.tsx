@@ -77,6 +77,11 @@ export interface Backend
   cardsDeck: List<List<string>>;
   cardsList: List<string>;
 
+  loadQuery(
+    query: Query,
+    queryReady: (query: Query) => void,
+  ): Query;
+
   queryToCode(
     query: Query,
     options: CardsToCodeOptions,

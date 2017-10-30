@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
@@ -65,7 +66,7 @@ Router.use('/templates', ExportTemplateRouter.routes(), ExportTemplateRouter.all
 Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   const requestObj: object = JSON.parse(ctx.request.body.data).body;
-  Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'dbname', 'filetype', 'query', 'rank', 'transformations']);
+  Util.verifyParameters(requestObj, ['columnTypes', 'dbid', 'filetype', 'query', 'rank', 'transformations']);
   const exprtConf: ExportConfig = requestObj as ExportConfig;
 
   await perm.ImportPermissions.verifyExportRoute(ctx.state.user, requestObj);
@@ -77,12 +78,20 @@ Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) 
   ctx.body = exportReturn;
 });
 
+Router.post('/types', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  const typeObj: object = ctx.request.body.body;
+  Util.verifyParameters(typeObj, ['dbid', 'query']);
+  ctx.body = await exprt.getNamesAndTypesFromQuery(typeObj['dbid'], typeObj['query']);
+});
+
 Router.post('/headless', async (ctx, next) =>
 {
   const exprtConf: ExportConfig = ctx.request.body.body;
   const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.body);
   if (authStream['template'] === null)
   {
+    ctx.body = 'Unauthorized';
     ctx.status = 400;
     return;
   }
@@ -94,8 +103,41 @@ Router.post('/headless', async (ctx, next) =>
   }
   else
   {
-    const exportReturn: stream.Readable | string = await exprt.export(exprtConf, true);
-    ctx.body = exportReturn;
+    ctx.body = await exprt.export(exprtConf, true);
+  }
+});
+
+Router.get('/headless', async (ctx, next) =>
+{
+  const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.query);
+  if (authStream['template'] === null)
+  {
+    ctx.body = 'Unauthorized';
+    ctx.status = 400;
+    return;
+  }
+  const queryBody: object = _.extend({}, ctx.request.query);
+  delete queryBody['persistentAccessToken'];
+  Object.keys(queryBody).map((key) =>
+  {
+    try
+    {
+      queryBody[key] = JSON.parse(queryBody[key]);
+    }
+    catch (e)
+    {
+      // ignore
+    }
+  });
+  const exprtConf: ExportConfig = queryBody as ExportConfig;
+
+  if (exprtConf.templateId !== authStream['template']['id'])
+  {
+    ctx.body = 'Authenticating template ID does not match export template ID.';
+  }
+  else
+  {
+    ctx.body = await exprt.export(exprtConf, true);
   }
 });
 

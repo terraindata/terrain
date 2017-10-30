@@ -150,6 +150,8 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalError: boolean,
     previewErrorMsg: string,
     analyzers: List<string>,
+    exportColumnNames: List<string>,
+    exportColumnTypes: List<object>,
   } = {
     templateOptions: List([]),
     appliedTemplateName: '',
@@ -179,6 +181,8 @@ class FileImportPreview extends TerrainComponent<Props>
     responseModalError: false,
     previewErrorMsg: '',
     analyzers: List([]),
+    exportColumnNames: List([]),
+    exportColumnTypes: List([]),
   };
 
   public confirmedLeave: boolean = false;
@@ -190,6 +194,14 @@ class FileImportPreview extends TerrainComponent<Props>
       stateKey: 'analyzers',
       storeKeyPath: ['columnAnalyzers'],
     });
+    this._subscribe(FileImportStore, {
+      stateKey: 'exportColumnNames',
+      storeKeyPath: ['columnNames'],
+    });
+    this._subscribe(FileImportStore, {
+      stateKey: 'exportColumnTypes',
+      storeKeyPath: ['columnTypes'],
+    });
   }
 
   public componentDidMount()
@@ -199,13 +211,17 @@ class FileImportPreview extends TerrainComponent<Props>
       const dbName = getIndex('');
       const tableName = getType('');
       Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
+      const stringQuery: string =
+        ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
+      const parsedQuery = JSON.parse(stringQuery);
+      Actions.fetchTypesFromQuery(this.props.serverId, parsedQuery);
     } // Parse the TQL and set the filters so that when we fetch we get the right templates.
 
     Actions.fetchColumnAnalyzers();
 
     Actions.fetchTemplates(this.props.exporting);
     this.setState({
-      templateOptions: this.props.templates.map((template, i) => template.templateName),
+      templateOptions: this.props.templates.map((template, i) => String(template.templateId) + ': ' + template.templateName),
     });
 
     if (!this.props.exporting && this.props.router !== undefined)
@@ -650,17 +666,10 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      const dbName = getIndex('');
 
-      if (dbName === undefined || dbName === '')
-      {
-        this.setPreviewErrorMsg('Index must be selected in order to export results');
-        return;
-      }
       Actions.exportFile(
         stringQuery,
         this.props.serverId,
-        dbName,
         this.props.exportRank,
         this.state.typeObjectKey,
         this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,
@@ -916,7 +925,7 @@ class FileImportPreview extends TerrainComponent<Props>
           </div>
         </div>
         {
-          this.props.filetype === 'json' || this.props.exporting &&
+          (this.props.filetype === 'json' || this.props.exporting) &&
           <div
             className='flex-container fi-preview-template'
           >

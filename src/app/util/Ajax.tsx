@@ -813,7 +813,6 @@ export const Ajax =
     },
 
     exportFile(filetype: string,
-      dbname: string,
       serverId: number,
       columnTypes: Immutable.Map<string, object>,
       transformations: Immutable.List<object>,
@@ -827,7 +826,6 @@ export const Ajax =
     {
       const payload: object = {
         dbid: serverId,
-        dbname,
         filetype,
         columnTypes,
         query,
@@ -1034,6 +1032,27 @@ export const Ajax =
       );
     },
 
+    getTypesFromQuery(
+      connectionId: number,
+      query: object,
+      onLoad: (templates: object) => void,
+    )
+    {
+      const payload: object = {
+        dbid: connectionId,
+        query,
+      };
+      Ajax.req(
+        'post',
+        'export/types',
+        payload,
+        (response: object) =>
+        {
+          onLoad(response);
+        },
+      );
+    },
+
     getAllScheduledJobs(
       onLoad: (schedules: object[]) => void,
     )
@@ -1052,7 +1071,6 @@ export const Ajax =
     },
 
     getCredentialConfigs(
-      type: string,
       onLoad: (credentials: object[]) => void,
     )
     {
@@ -1065,9 +1083,6 @@ export const Ajax =
         (response: object[]) =>
         {
           onLoad(response);
-        },
-        {
-          urlArgs: { type },
         },
       );
     },
@@ -1181,6 +1196,7 @@ export const Ajax =
     },
 
     createDb(name: string, dsn: string, type: string,
+      isAnalytics: boolean, analyticsIndex: string, analyticsType: string,
       onSave: (response: any) => void,
       onError: (response: any) => void)
     {
@@ -1192,6 +1208,9 @@ export const Ajax =
           dsn,
           host: dsn,
           type,
+          isAnalytics,
+          analyticsIndex,
+          analyticsType,
         },
         onSave,
         {
@@ -1277,6 +1296,7 @@ export const Ajax =
     },
 
     getAnalytics(
+      connectionId: number,
       variantIds: ID[],
       start: Date,
       end: Date,
@@ -1284,7 +1304,7 @@ export const Ajax =
       intervalId: number,
       aggregation: string,
       onLoad: (response: any) => void,
-      onError?: (ev: Event) => void)
+      onError?: (error: any) => void)
     {
       const args = {
         variantid: variantIds.join(','),
@@ -1294,6 +1314,7 @@ export const Ajax =
         interval: intervalId,
         agg: aggregation,
         field: '@timestamp',
+        database: connectionId,
       };
 
       return Ajax.req(
@@ -1308,7 +1329,7 @@ export const Ajax =
           }
           catch (e)
           {
-            onError && onError(response as any);
+            onError && onError(JSON.parse(response) as any);
           }
         },
         { onError, urlArgs: args });

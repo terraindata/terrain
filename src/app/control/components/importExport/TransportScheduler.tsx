@@ -166,7 +166,7 @@ export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidation
 
   if (filename === '' || filename === undefined)
   {
-    requests.push('Please Enter a Filename');
+    requests.push('Please Enter a Path');
   }
 
   if (credentialId === undefined || credentialId === -1)
@@ -513,7 +513,7 @@ class TransportScheduler extends TerrainComponent<Props>
         <div className='headless-form-block'>
           <div className='headless-form-column' style={columnStyle}>
             <div className='headless-form-label'>
-              {typeText} Filename
+              {typeText} Path
             </div>
             <div className='headless-form-input'>
               <input

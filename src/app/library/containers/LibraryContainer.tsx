@@ -60,6 +60,7 @@ const mapStateToProps = (state) =>
     analytics: state.get('analytics'),
     library: state.get('library'),
     roles: state.get('roles'),
+    schema: state.get('schema'),
     users: state.get('users'),
   };
 };

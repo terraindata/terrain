@@ -95,13 +95,7 @@ const KEY_INLINE_DISPLAYS = [
   DisplayType.DROPDOWN,
 ];
 
-// Clause types that have static keys
-const STATIC_KEY_CLAUSE_TYPES = [
-  // ESClauseType.ESStructureClause,
-  // ESClauseType.ESWildcardStructureClause,
-];
-
-const KEY_DISPLAY: Display =
+export const KEY_DISPLAY: Display =
   {
     displayType: DisplayType.TEXT,
     key: 'key',
@@ -113,7 +107,7 @@ const KEY_DISPLAY: Display =
     },
   };
 
-const STATIC_KEY_DISPLAY: Display =
+export const STATIC_KEY_DISPLAY: Display =
   {
     displayType: DisplayType.LABEL,
     key: 'key',
@@ -190,8 +184,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       // prepend the display with our standard key text display
       const objStatic = obj['static'];
       const display = objStatic['display'];
-      const keyDisplay = STATIC_KEY_CLAUSE_TYPES.indexOf(clause.clauseType) !== -1 ?
-        _.extend({}, STATIC_KEY_DISPLAY, { label: clause.type }) : KEY_DISPLAY;
+      const keyDisplay = KEY_DISPLAY;
       if (display === undefined)
       {
         objStatic['display'] = keyDisplay;
