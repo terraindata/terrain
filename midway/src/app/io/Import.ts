@@ -818,9 +818,7 @@ export class Import
     switch (typeObject['type'])
     {
       case 'array':
-        return this._getESType(typeObject['innerType'], true,
-          typeObject['index'] !== undefined ? typeObject['index'] : isIndexAnalyzed,
-          typeObject['analyzer'] !== undefined ? typeObject['analyzer'] : typeAnalyzer);
+        return this._getESType(typeObject['innerType'], true);
       case 'object':
         return withinArray ? (typeObject['index'] === 'analyzed' ?
           { type: 'nested', index: typeObject['index'], analyzer: typeObject['analyzer'] } :
@@ -897,7 +895,7 @@ export class Import
           {
             body[key]['analyzer'] = mapping[key]['analyzer'];
           }
-          if (mapping[key] === 'text')
+          if (body[key]['type'] === 'text')
           {
             body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256 } };
           }
