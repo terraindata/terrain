@@ -890,14 +890,15 @@ export class Import
       {
         if (typeof mapping[key]['type'] === 'string')
         {
-          body[key] = { type: mapping[key]['type'], index: mapping[key]['index'] };
-          if (body[key]['index'] === 'analyzed')
+          body[key] = { type: mapping[key]['type'] };
+          if (mapping[key]['type'] === 'text' && mapping[key]['index'] === 'not_analyzed')
           {
-            body[key]['analyzer'] = mapping[key]['analyzer'];
+            body[key]['type'] = 'keyword';
+            body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256, index: false } };
           }
-          if (body[key]['type'] === 'text')
+          else if (mapping[key]['type'] === 'text' && mapping[key]['index'] === 'analyzed')
           {
-            body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256 } };
+            body[key]['fields'] = { keyword: { type: 'text', index: true, analyzer: mapping[key]['analyzer'] } };
           }
         }
         else if (typeof mapping[key]['type'] === 'object')
