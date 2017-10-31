@@ -1032,79 +1032,78 @@ const TransformChart = {
   },
 
   _drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domainMin, domainMax)
- {
-   const linesPointsData = _.clone(pointsData);
+  {
+    const linesPointsData = _.clone(pointsData);
+    const a = pointsData[0].y;
+    const x = pointsData[1].x;
+    const y = pointsData[1].y;
+    const x0 = pointsData[2].x;
+    const L = pointsData[3].y - pointsData[0].y;
+    const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+    const data = this._getSigmoidData(pointsData, scales, a, k, x0, L, domainMin, domainMax);
+    const line = d3.svg.line()
+      .x((d) =>
+      {
+        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
+      })
+      .y((d) =>
+      {
+        return scales.realPointY(d['y']);
+      });
 
-   const a = pointsData[0].y;
-   const x = pointsData[1].x;
-   const y = pointsData[1].y;
-   const x0 = pointsData[2].x;
-   const L = pointsData[3].y - pointsData[0].y;
-   const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
-   const data = this._getSigmoidData(pointsData, scales, a, k, x0, L, domainMin, domainMax);
-   const line = d3.svg.line()
-     .x((d) =>
-     {
-       return d['dontScale'] ? d['x'] : scales.realX(d['x']);
-     })
-     .y((d) =>
-     {
-       return scales.realPointY(d['y']);
-     });
+    const lines = d3.select(el).select('.lines')
+      .attr('d', line(data))
+      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
 
-   const lines = d3.select(el).select('.lines')
-     .attr('d', line(data))
-     .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
+    d3.select(el).select('.lines-bg')
+      .attr('d', line(data));
+  },
 
-   d3.select(el).select('.lines-bg')
-     .attr('d', line(data));
- },
+  _getSigmoidData(pointsData, scales, a, k, x0, L, min, max)
+  {
+    const data = [];
+    const stepSize = (max - min) * (1 / 100);
+    for (let i = (min - stepSize); i < (max + stepSize); i += stepSize)
+    {
+      const y = this._sigmoid(i, a, k, x0, L);
+      data.push({ y, x: i, id: i, selected: false });
+    }
+    if (data.length)
+    {
+      const range = (scaleMax(scales.x) - scaleMin(scales.x));
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: data[0].y,
+        id: '*%*-first',
+        dontScale: true,
+      });
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: -1,
+        id: '*%*-first-anchor',
+        dontScale: true,
+      });
 
- _getSigmoidData(pointsData, scales, a, k, x0, L, min, max)
- {
-   const data = [];
-   const stepSize = (max - min) * (1 / 100);
-   for (let i = (min - stepSize); i < (max + stepSize); i += stepSize)
-   {
-     const y = this._sigmoid(i, a, k, x0, L);
-     data.push({ y, x: i, id: i, selected: false });
-   }
-   if (data.length)
-   {
-     const range = (scaleMax(scales.x) - scaleMin(scales.x));
-     data.unshift({
-       x: scaleMin(scales.x) - range,
-       y: data[0].y,
-       id: '*%*-first',
-       dontScale: true,
-     });
-     data.unshift({
-       x: scaleMin(scales.x) - range,
-       y: -1,
-       id: '*%*-first-anchor',
-       dontScale: true,
-     });
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: data[data.length - 1].y,
+        id: '*%*-last',
+        dontScale: true,
+      });
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: -1,
+        id: '*%*-last-anchor',
+        dontScale: true,
+      });
+    }
+    return data;
+  },
 
-     data.push({
-       x: scaleMax(scales.x) + range,
-       y: data[data.length - 1].y,
-       id: '*%*-last',
-       dontScale: true,
-     });
-     data.push({
-       x: scaleMax(scales.x) + range,
-       y: -1,
-       id: '*%*-last-anchor',
-       dontScale: true,
-     });
-   }
-   return data;
- },
-
- _sigmoid(x, a, k, x0, L)
- {
-   return L / (1 + Math.exp(-1 * k * (x - x0))) + a;
- },
+  _sigmoid(x, a, k, x0, L)
+  {
+    return L / (1 + Math.exp(-1 * k * (x - x0))) + a;
+  },
 
   _drawLines(el, scales, pointsData, onClick, onMove, onRelease, canEdit)
   {
@@ -1170,7 +1169,11 @@ const TransformChart = {
       {
         return scales.realX.invert(parseFloat(point.getAttribute('cx')));
       });
-      onMove(point.attr('_id'), newY, newX, pointValues, cx, d3.event['altKey']);
+      const pointScores = d3.select(el).selectAll('.point')[0].map((point: any) =>
+      {
+        return scales.realPointY.invert(parseFloat(point.getAttribute('cy')));
+      });
+      onMove(point.attr('_name'), point.attr('_id'), newY, newX, pointValues, pointScores, cx, d3.event['altKey']);
       drawCrossHairs(el, d3.mouse(this), scales, parseFloat(point.attr('cx')), newY, colors);
     };
 
@@ -1344,6 +1347,10 @@ const TransformChart = {
     {
       return scales.realX.invert(parseFloat(p.getAttribute('cx')));
     });
+    const pointScores = d3.select(el).selectAll('.point')[0].map((point: any) =>
+    {
+      return scales.realPointY.invert(parseFloat(point.getAttribute('cy')));
+    });
     const xValueNode: any = inputX.node();
     const yValueNode: any = inputY.node();
     const x = parseFloat(xValueNode.value) || 0;
@@ -1351,10 +1358,12 @@ const TransformChart = {
     const x_raw = parseFloat(inputX.attr('raw_value')) + (x - parseFloat(inputX.attr('value')));
     const y_raw = parseFloat(inputY.attr('raw_value')) + (y - parseFloat(inputY.attr('value')));
     onMove(
+      point.attr('_name'),
       point.attr('_id'),
       y_raw,
       x_raw,
       pointValues,
+      pointScores,
       scales.realX.invert(parseFloat(point.attr('cx'))),
       d3.event['altKey'],
     );
@@ -1594,7 +1603,6 @@ const TransformChart = {
 
   _rightClickFactory: (el, onDelete, scales, colors, drawMenu) => function(point)
   {
-    console.log('right click factory');
     drawMenu(el, d3.mouse(this), 'Delete', () => onDelete(point.id), scales, colors);
     return false;
   },
@@ -1688,6 +1696,7 @@ const TransformChart = {
     d3.event['stopPropagation']();
   },
 
+  // TODO DOES THIS NEED TO BE SEP. FUNCTION ?....
   _drawSigmoidPoints(el, scales, pointsData, onMove, onRelease, onSelect, onPointMoveStart, canEdit, colors)
   {
     const g = d3.select(el).selectAll('.points');
@@ -1695,14 +1704,12 @@ const TransformChart = {
     const point = g.selectAll('circle')
       .data(pointsData, (d) => d['id']);
 
-     const a = pointsData[0].y;
-     const x = pointsData[1].x;
-     const y = pointsData[1].y;
-     const x0 = pointsData[2].x;
-     const L = pointsData[3].y - pointsData[0].y;
-     const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
-     const x1 = pointsData[0].x;
-     const y1 = pointsData[0].y;
+    const a = pointsData[0].y;
+    const x = pointsData[1].x;
+    const y = pointsData[1].y;
+    const x0 = pointsData[2].x;
+    const L = pointsData[3].y - pointsData[0].y;
+    const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
     point.enter()
       .append('circle');
 
@@ -1720,7 +1727,7 @@ const TransformChart = {
       return scales.realX(d['x']);
     };
 
-    const pointId = (d, i) =>
+    const pointName = (d, i) =>
     {
       switch (i)
       {
@@ -1732,6 +1739,8 @@ const TransformChart = {
           return 'x0';
         case 3:
           return 'L';
+        default:
+          return '';
       }
     };
 
@@ -1746,7 +1755,8 @@ const TransformChart = {
       .attr('r', 10);
 
     point
-      .attr('_id', pointId);
+      .attr('_id', (d) => d['id'])
+      .attr('_name', pointName);
 
     if (canEdit)
     {
@@ -1760,7 +1770,7 @@ const TransformChart = {
     }
 
     point.exit().remove();
-   }
+  },
 
   _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode)
   {
@@ -1787,7 +1797,7 @@ const TransformChart = {
       return scales.realPointY(d['y']);
     };
 
-    const pointId = (d, i) =>
+    const pointName = (d, i) =>
     {
       if (mode === 'normal')
       {
@@ -1811,7 +1821,8 @@ const TransformChart = {
       .attr('r', 10);
 
     point
-      .attr('_id', pointId);
+      .attr('_id', (d) => d['id'])
+      .attr('_name', pointName);
 
     if (canEdit)
     {
@@ -1884,7 +1895,7 @@ const TransformChart = {
       default:
         this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
-    if ((mode === 'linear' || numPoints === 2) && mode !== 'sigmoid')
+    if (mode === 'linear' || numPoints === 2)
     {
       this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode);
     }

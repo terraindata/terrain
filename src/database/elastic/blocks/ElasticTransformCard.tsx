@@ -157,6 +157,17 @@ export const elasticTransform = _card(
 
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
+        if (block['scorePoints'].size <= 1)
+        {
+          return {
+            a: 0,
+            b: 1,
+            numerators: [[block['input'], 1]],
+            denominators: [],
+            ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
+            outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
+          };
+        }
         let ranges = [];
         let outputs = [];
         const min = parseFloat(block['dataDomain'].get(0));
@@ -173,18 +184,6 @@ export const elasticTransform = _card(
           y1 = block['scorePoints'].get(0).score;
           y2 = block['scorePoints'].get(1).score;
           stepSize = Math.abs(x2 - x1) * (1 / 31);
-        }
-
-        if (block['scorePoints'].size <= 1)
-        {
-          return {
-            a: 0,
-            b: 1,
-            numerators: [[block['input'], 1]],
-            denominators: [],
-            ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
-            outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
-          };
         }
 
         switch (block['mode'])
@@ -248,6 +247,32 @@ export const elasticTransform = _card(
             }
             break;
           case 'sigmoid':
+            if (block['scorePoints'].size !== 4)
+            {
+              return {
+                a: 0,
+                b: 1,
+                numerators: [[block['input'], 1]],
+                denominators: [],
+                ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
+                outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
+              };
+            }
+            const offset = y1;
+            const xVal = x2;
+            const yVal = y2;
+            const x0 = block['scorePoints'].get(2).value;
+            const L = block['scorePoints'].get(3).score - block['scorePoints'].get(0).score;
+            const exp = (-1 * Math.log(L / (yVal - offset) - 1)) / (xVal - x0);
+            stepSize = Math.abs(max - min) / 31;
+            for (let i = min; i < max; i += stepSize)
+            {
+              const y = L / (1 + Math.exp(-1 * exp * (i - x0))) + offset;
+              ranges.push(i);
+              outputs.push(y);
+            }
+            break;
+
           case 'linear':
           default:
             ranges = block['scorePoints'].map((scorePt) => scorePt.value).toArray();
