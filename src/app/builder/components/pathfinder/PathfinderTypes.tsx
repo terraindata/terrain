@@ -56,7 +56,58 @@ class PathT extends BaseClass
   filter: Filter;
   score: Score;
 }
+
 export type Path = PathC & IRecord<PathC>;
-export const _Path = (config?: {[key:string]: any}) => 
+export const _Path = (config?: {[key: string]: any}) =>
   New<Path>(new PathC(config), config);
 
+class FilterC extends BaseClass
+{
+  minMatches: number | string = 0;
+  lines: List<FilterLine> = List<FilterLine>([]);
+}
+
+export type Filter = FilterC & IRecord<FilterC>;
+export const _Filter = (config?: {[key: string]: any}) =>
+  New<Filter>(new FilterC(config), config);
+
+class ScoreC extends BaseClass
+{
+  lines: List<ScoreLine> = List<ScoreLine>([]);
+}
+
+export type Score = ScoreC & IRecord<ScoreC>;
+export const _Score = (config?: {[key: string]: any}) =>
+  New<Score>(new ScoreC(config), config);
+
+class LineC extends BaseClass
+{
+  field: string = ''; // autocomplete
+  weight: number = 1;
+}
+
+export type Line = LineC & IRecord<LineC>;
+export const _Line = (config?: {[key: string]: any}) =>
+  New<Line>(new LineC(config), config);
+
+class ScoreLineC extends Line
+{
+  type: string = 'transform';
+  sortOrder: string = 'desc';
+  transformData: any = {}; // TODO
+}
+
+export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
+export const _ScoreLine = (config?: {[key: string]: any}) =>
+  New<ScoreLine>(new ScoreLineC(config), config);
+
+class FilterLineC extends Line
+{
+  method: string = ''; // autocomplete
+  value: string | number = 0;
+  filter: Filter;
+}
+
+export type FilterLine = FilterLineC & IRecord<FilterLineC>;
+export const _FilterLine = (config?: {[key: string]: any}) =>
+  New<FilterLine>(new FilterLineC(config), config);
