@@ -145,12 +145,12 @@ const FileImportActions =
       $(ActionTypes.setColumnType, { columnId, recursionDepth, type }),
 
     setColumnTypeIndex:
-    (columnId: number, index: string) =>
-      $(ActionTypes.setColumnTypeIndex, { columnId, index }),
+    (columnId: number, recursionDepth: number, index: string) =>
+      $(ActionTypes.setColumnTypeIndex, { columnId, recursionDepth, index }),
 
     setColumnTypeAnalyzer:
-    (columnId: number, analyzer: string) =>
-      $(ActionTypes.setColumnTypeAnalyzer, { columnId, analyzer }),
+    (columnId: number, recursionDepth: number, analyzer: string) =>
+      $(ActionTypes.setColumnTypeAnalyzer, { columnId, recursionDepth, analyzer }),
 
     fetchColumnAnalyzers:
     () =>

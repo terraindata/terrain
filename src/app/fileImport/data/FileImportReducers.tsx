@@ -327,7 +327,12 @@ FileImportReducers[ActionTypes.setColumnTypeIndex] =
   (state, action) =>
   {
     const keyPath = ['columnTypes', action.payload.columnId];
+    for (let i = 0; i < action.payload.recursionDepth; i++)
+    {
+      keyPath.push('innerType');
+    }
     keyPath.push('index');
+
     return state
       .set('isDirty', true)
       .setIn(keyPath, action.payload.index);
@@ -337,6 +342,10 @@ FileImportReducers[ActionTypes.setColumnTypeAnalyzer] =
   (state, action) =>
   {
     const keyPath = ['columnTypes', action.payload.columnId];
+    for (let i = 0; i < action.payload.recursionDepth; i++)
+    {
+      keyPath.push('innerType');
+    }
     keyPath.push('analyzer');
     return state
       .set('isDirty', true)
