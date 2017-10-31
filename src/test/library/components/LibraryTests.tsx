@@ -51,6 +51,7 @@ import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
+import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import { ItemType } from '../../../items/types/Item';
 
 describe('Library', () =>
@@ -83,6 +84,24 @@ describe('Library', () =>
     selectedMetric: 1,
   });
 
+  const schema: SchemaState = _SchemaState({
+    servers: Immutable.Map({
+      'My ElasticSearch Instance': {
+        id: 'My ElasticSearch Instance',
+        type: 'server',
+        name: 'My ElasticSearch Instance',
+        connectionId: 1,
+        isAnalytics: true,
+        analyticsIndex: 'terrain-analytics',
+        analyticsType: 'events',
+      },
+    }),
+  });
+
+  const analyticsActions = {
+    selectAnalyticsConnection: (connectionName) => { return; },
+  };
+
   let libraryComponent = null;
 
   beforeEach(() =>
@@ -91,6 +110,8 @@ describe('Library', () =>
       <Library
         library={library}
         analytics={analytics}
+        analyticsActions={analyticsActions}
+        schema={schema}
         router={{ params: { groupId: '1' } }}
       />,
     );

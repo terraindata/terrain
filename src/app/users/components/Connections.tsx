@@ -50,6 +50,8 @@ import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 
+import FadeInOut from 'common/components/FadeInOut';
+import Switch from 'common/components/Switch';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
@@ -73,6 +75,9 @@ interface Server extends BackendInstance
 {
   host: string;
   status: string;
+  isAnalytics: boolean;
+  analyticsIndex: string;
+  analyticsType: string;
 }
 
 export interface Props
@@ -93,6 +98,7 @@ class Connections extends TerrainComponent<Props>
     addingConnection: boolean,
     errorModalOpen: boolean,
     errorModalMessage: string,
+    analyticsEnabled: number,
   } = {
     typeIndex: 0,
     loading: true,
@@ -101,9 +107,12 @@ class Connections extends TerrainComponent<Props>
     addingConnection: false,
     errorModalOpen: false,
     errorModalMessage: '',
+    analyticsEnabled: 0,
   };
 
   public xhr: XMLHttpRequest = null;
+  public analyticsIndex: any = null;
+  public analyticsType: any = null;
 
   public ConnectionTypes = List(
     [
@@ -129,6 +138,7 @@ class Connections extends TerrainComponent<Props>
         {
           this.setState({
             servers,
+            loading: false,
           });
         }
       });
@@ -201,6 +211,26 @@ class Connections extends TerrainComponent<Props>
               }
             </div>
           </div>
+          {server.isAnalytics ?
+            (<div>
+              <div className='connections-item-info-row'>
+                Analytics Index:
+                  <div className='connections-item-info-value'>
+                  {
+                    server.analyticsIndex
+                  }
+                </div>
+              </div>
+              <div className='connections-item-info-row'>
+                Analytics Type:
+                  <div className='connections-item-info-value'>
+                  {
+                    server.analyticsType
+                  }
+                </div>
+              </div>
+            </div>) : null
+          }
         </div>
       );
     }
@@ -262,6 +292,12 @@ class Connections extends TerrainComponent<Props>
     const name: string = this.refs['name']['value'];
     const address: string = this.refs['address']['value'];
     const type = this.ConnectionTypes.get(this.state.typeIndex);
+    const { analyticsEnabled } = this.state;
+    const isAnalytics = analyticsEnabled === 1;
+    const analyticsIndex = this.analyticsIndex !== undefined ?
+      this.analyticsIndex.value : null;
+    const analyticsType = this.analyticsType !== undefined ?
+      this.analyticsType.value : null;
 
     if (!name.length)
     {
@@ -287,13 +323,21 @@ class Connections extends TerrainComponent<Props>
       addingConnection: false,
     });
 
-    Ajax.createDb(name, address, type, this.fetchConnections, (error) =>
-    {
-      this.setState({
-        errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
-        errorModalOpen: true,
-      });
-    },
+    Ajax.createDb(
+      name,
+      address,
+      type,
+      isAnalytics,
+      analyticsIndex,
+      analyticsType,
+      this.fetchConnections,
+      (error) =>
+      {
+        this.setState({
+          errorModalMessage: 'Error creating connection: ' + JSON.stringify(error),
+          errorModalOpen: true,
+        });
+      },
     );
   }
 
@@ -351,6 +395,7 @@ class Connections extends TerrainComponent<Props>
                 </div>
               </div>
             </div>
+            {this.renderAnalyticsConnection()}
             <div className='button' onClick={this.createConnection}>
               Create
             </div>
@@ -371,6 +416,48 @@ class Connections extends TerrainComponent<Props>
     return null;
   }
 
+  public renderAnalyticsConnection()
+  {
+    const { analyticsEnabled } = this.state;
+
+    return (
+      <div className='connections-analytics flex-container'>
+        <div className='left-column flex-grow'>
+          <h4>Set Analytics Index and Type</h4>
+          <Switch
+            medium={true}
+            first='On'
+            second='Off'
+            selected={analyticsEnabled}
+            onChange={this.handleAnalyticsSwitch}
+          />
+        </div>
+        <div className='right-column flex-grow'>
+          <FadeInOut open={analyticsEnabled === 1}>
+            <div className='flex-grow'>
+              <b>Index</b>
+              <div>
+                <input
+                  ref={(input) => this.analyticsIndex = input}
+                  placeholder='Index'
+                />
+              </div>
+            </div>
+            <div className='flex-grow'>
+              <b>Type</b>
+              <div>
+                <input
+                  ref={(input) => this.analyticsType = input}
+                  placeholder='Type'
+                />
+              </div>
+            </div>
+          </FadeInOut>
+        </div>
+      </div>
+    );
+  }
+
   public toggleErrorModal()
   {
     this.setState({
@@ -378,15 +465,24 @@ class Connections extends TerrainComponent<Props>
     });
   }
 
+  public handleAnalyticsSwitch(selected)
+  {
+    this.setState((state) =>
+    {
+      return { analyticsEnabled: selected };
+    });
+  }
+
   public render()
   {
     const { servers, loading } = this.state;
+
     return (
       <div>
         <div className='connections'>
           <div className='connections-page-title'>
             Database Connections
-        </div>
+          </div>
           {
             loading &&
             <InfoArea large='Loading...' />

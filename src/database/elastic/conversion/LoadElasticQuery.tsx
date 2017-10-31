@@ -51,6 +51,7 @@ import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParse
 import ESQueryTransform from '../../../../shared/database/elastic/parser/ESQueryTransform';
 import { Query } from '../../../items/types/Query';
 import ElasticToCards from './ElasticToCards';
+import ESCardParser from './ESCardParser';
 import { ParseElasticQuery } from './ParseElasticQuery';
 
 export default class LoadElasticQuery
@@ -104,6 +105,10 @@ export default class LoadElasticQuery
       {
         query = query.set('cardsAndCodeInSync', true);
       }
+    } else
+    {
+      const parsedCards = ESCardParser.parseAndUpdateCards(query.cards);
+      query = query.set('cards', parsedCards);
     }
 
     return query;

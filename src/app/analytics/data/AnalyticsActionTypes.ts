@@ -54,6 +54,7 @@ export const AnalyticsActionTypes =
     selectMetric: '',
     selectInterval: '',
     selectDateRange: '',
+    selectAnalyticsConnection: '',
   };
 
 Util.setValuesToKeys(AnalyticsActionTypes, 'analytics');

@@ -44,18 +44,24 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import { AnalyticsState } from 'analytics/data/AnalyticsStore';
+import Dropdown from 'common/components/Dropdown';
 import MultiSwitch from 'common/components/MultiSwitch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import { Server } from 'schema/SchemaTypes';
 import Ajax from 'util/Ajax';
 
 interface Props
 {
   analytics: AnalyticsState;
+  servers: Immutable.Map<string, Server>;
+  analyticsConnection?: string;
+
   onMetricSelect: (value: number | string) => void;
   onIntervalSelect: (value: number | string) => void;
   onDateRangeSelect: (value: number | string) => void;
+  onConnectionChange: (value: string) => void;
 }
 
 const METRICS = Immutable.List([
@@ -80,13 +86,39 @@ const DATE_RANGES = Immutable.List([
 
 class AnalyticsSelector extends TerrainComponent<Props>
 {
+  public handleConnectionChange(optionIndex)
+  {
+    const options = this.getConnectionOptions();
+
+    this.props.onConnectionChange(options.get(optionIndex));
+  }
+
+  public getConnectionOptions()
+  {
+    const { servers } = this.props;
+
+    const serversWithAnalytics = servers.filter((s) => s.isAnalytics);
+
+    return serversWithAnalytics.keySeq().toList();
+  }
+
   public render()
   {
-    const { analytics } = this.props;
+    const { analytics, servers, analyticsConnection } = this.props;
     const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
+
+    const options = this.getConnectionOptions();
 
     return (
       <div>
+        <Dropdown
+          onChange={this.handleConnectionChange}
+          options={options}
+          canEdit={true}
+          className='bic-db-dropdown'
+          directionBias={90}
+          selectedIndex={options.indexOf(analyticsConnection)}
+        />
         <p>Metric</p>
         <MultiSwitch
           options={METRICS}

@@ -319,9 +319,15 @@ export function parseElasticDb(elasticServer: object,
   setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void,
   dispatch)
 {
+  const isAnalytics = elasticServer['isAnalytics'] !== undefined &&
+    elasticServer['isAnalytics'] === 1;
+
   let server = SchemaTypes._Server({
     name: elasticServer['name'],
     connectionId: elasticServer['id'],
+    isAnalytics,
+    analyticsIndex: elasticServer['analyticsIndex'],
+    analyticsType: elasticServer['analyticsType'],
   });
   const serverId = server.id;
 

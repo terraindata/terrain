@@ -1196,6 +1196,7 @@ export const Ajax =
     },
 
     createDb(name: string, dsn: string, type: string,
+      isAnalytics: boolean, analyticsIndex: string, analyticsType: string,
       onSave: (response: any) => void,
       onError: (response: any) => void)
     {
@@ -1207,6 +1208,9 @@ export const Ajax =
           dsn,
           host: dsn,
           type,
+          isAnalytics,
+          analyticsIndex,
+          analyticsType,
         },
         onSave,
         {
@@ -1292,6 +1296,7 @@ export const Ajax =
     },
 
     getAnalytics(
+      connectionId: number,
       variantIds: ID[],
       start: Date,
       end: Date,
@@ -1309,6 +1314,7 @@ export const Ajax =
         interval: intervalId,
         agg: aggregation,
         field: '@timestamp',
+        database: connectionId,
       };
 
       return Ajax.req(
