@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import { BaseClass, New } from '../../../Classes';
 
-class PathT extends BaseClass
+class PathC extends BaseClass
 {
   source: Source;
   filter: Filter;
@@ -60,3 +60,63 @@ export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: {[key:string]: any}) => 
   New<Path>(new PathC(config), config);
 
+class SourceC extends BaseClass
+{
+  dataSource: DataSource = _ElasticDataSource();
+  count: number | string = 'all';
+  start: number = 0;
+}
+export type Source = SourceC & IRecord<SourceC>;
+export const _Source = (config?: {[key:string]: any}) => 
+  New<Source>(new SourceC(config), config);
+
+abstract class DataSource extends BaseClass
+{
+  // ... shared data source attributes go here
+  abstract getFieldAutocompleteOptions: 
+    (context?: AutocompleteContext) => List<AutocompleteOption>;
+}
+
+type AutocompleteContext = any;
+
+class ElasticDataSourceC extends DataSource
+{
+  indexes: List<string> = List([]);
+  types: List<string> = List([]);
+  
+  getFieldAutocompleteOptions = (context?: any) =>
+  {
+    return List([
+      _AutocompleteOption({
+        name: 'Inventory',
+      }),
+      _AutocompleteOption({
+        name: 'Reviews',
+      }),
+      _AutocompleteOption({
+        name: 'Title',
+      }),
+      _AutocompleteOption({
+        name: 'Description',
+      }),
+    ]);
+  }
+}
+export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>;
+export const _ElasticDataSource = (config?: {[key:string]: any}) => 
+  New<ElasticDataSource>(new ElasticDataSourceC(config), config);
+
+
+
+/**
+ * Section: Classes representing parts of the view
+ */
+
+class AutocompleteOptionC extends BaseClass
+{
+  name: string = '';
+  metaContent: any = '';
+}
+export type AutocompleteOption = AutocompleteOptionC & IRecord<AutocompleteOptionC>;
+export const _AutocompleteOption = (config?: {[key:string]: any}) => 
+  New<AutocompleteOption>(new AutocompleteOptionC(config), config);
