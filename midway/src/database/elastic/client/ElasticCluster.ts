@@ -73,6 +73,17 @@ class ElasticCluster
     return this.delegate.cluster.health(params, callback);
   }
 
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-cluster-state
+   * @param params
+   * @param callback
+   */
+  public state(params: Elastic.ClusterStateParams, callback: (error: any, response: any) => void): void
+  {
+    this.log('state', params);
+    return this.delegate.cluster.state(params, callback);
+  }
+
   private log(methodName: string, info: any)
   {
     this.controller.log('ElasticCluster.' + methodName, info);
