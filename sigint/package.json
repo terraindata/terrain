@@ -5,7 +5,9 @@
   "main": "src/Main.ts",
   "private": true,
   "scripts": {
-    "start": "nodemon --exec ./node_modules/.bin/ts-node $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./src/Main.ts",
+    "start-dev": "nodemon --exec ./node_modules/.bin/ts-node $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./src/Main.ts",
+    "start": "node build/src/Main.js",
+    "postinstall": "tsc -p .",
     "lint": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;",
