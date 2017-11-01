@@ -1,6 +1,8 @@
 # sigint: Terrain Analytics Server
 
-The Terrain Analytics Server (sigint) tracks analytics events associated with variants served by Terrain. For instance, clickstream analytics events such as "impression", "click", "conversion", etc. can be tracked through a simple integration of the Terrain Analytics client library (analytics.js). The server optionally serves a website that serves as a demo of how to embed client functionality associated with analytics in a demo/e-commerce website. To see a demo in action, start the server in demo mode (`yarn start --demo`) and navigate to (`http://localhost:3001`).
+The Terrain Analytics Server (sigint) tracks analytics events associated with variants served by Terrain. For instance, clickstream analytics events such as "impression", "click", "conversion", etc. can be tracked through a simple integration with the Terrain Analytics client library (analytics.js). Tracked events are stored in a backing datastore (only supported, at the moment, is [ElasticSearch](https://www.elastic.co/)).
+
+The server optionally serves a website that serves as a demo of how to embed analytics client functionality in a demo/e-commerce website. To see the demo in action, start the server in demo mode (`yarn start --demo`) and navigate to (`http://localhost:3001`).
 
 ## Project Commands
    - **bench**:
