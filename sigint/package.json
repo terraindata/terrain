@@ -1,7 +1,7 @@
 {
   "name": "sigint",
   "version": "1.0.0",
-  "description": "sigint: Terrain Analytics Server",
+  "description": "Terrain Analytics Server",
   "main": "src/Main.ts",
   "private": true,
   "scripts": {
@@ -12,7 +12,8 @@
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;",
     "test": "jest . --forceExit --coverage",
-    "bench": "ts-node test/Benchmark.ts"
+    "bench": "ts-node test/Benchmark.ts",
+    "doc": "apidoc -i src"
   },
   "repository": {
     "type": "git",
@@ -42,6 +43,10 @@
     },
     "testURL": "http://localhost"
   },
+  "apidoc": {
+    "title": "sigint: Terrain Analytics Server API Documentation",
+    "url": "https://api.terraindata.com/sigint/v1"
+  },
   "dependencies": {
     "command-line-args": "^4.0.7",
     "command-line-usage": "^4.0.1",
@@ -63,6 +68,7 @@
     "@types/jest": "^21.1.2",
     "@types/koa": "^2.0.39",
     "@types/node": "^8.0.32",
+    "apidoc": "^0.17.6",
     "bench-rest": "^1.2.4",
     "jest": "^21.2.1",
     "nodemon": "^1.12.1",
