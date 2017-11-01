@@ -509,7 +509,7 @@ export class ResultsManager extends TerrainComponent<Props>
       fields = results.get(0).fields.keySeq().toList();
     }
 
-    const loading = false; 
+    const loading = false;
 
     const changes: any = {
       results,

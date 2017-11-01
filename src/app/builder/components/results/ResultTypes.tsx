@@ -89,7 +89,7 @@ class ResultsStateC extends BaseClass
   public valid: boolean = false; // are these results still valid for the given query?
 
   public loading: boolean = false; // if we're still loading any fields, besides for the count
-  
+
   public hasLoadedResults: boolean = false;
   public hasLoadedAllFields: boolean = false;
   public hasLoadedCount: boolean = false;
