@@ -260,10 +260,10 @@ class Library extends TerrainComponent<any>
         numericOptionValue = optionValue.split(',').map((o) => parseInt(o, 10));
       } else
       {
-        numericOptionValue = parseInt(optionValue, 10);
+        numericOptionValue = [parseInt(optionValue, 10)];
       }
 
-      this.props.analyticsActions.selectMetric(optionValue);
+      this.props.analyticsActions.selectMetric(numericOptionValue);
     }
   }
 
@@ -273,7 +273,8 @@ class Library extends TerrainComponent<any>
 
     if (analytics.selectedAnalyticsConnection !== null)
     {
-      this.props.analyticsActions.selectInterval(optionValue);
+      const numericOptionValue = parseInt(optionValue, 10);
+      this.props.analyticsActions.selectInterval(numericOptionValue);
     }
   }
 
@@ -285,7 +286,7 @@ class Library extends TerrainComponent<any>
     {
       const numericOptionValue = parseInt(optionValue, 10);
 
-      this.props.analyticsActions.selectDateRange(optionValue);
+      this.props.analyticsActions.selectDateRange(numericOptionValue);
     }
   }
 
@@ -295,6 +296,11 @@ class Library extends TerrainComponent<any>
 
     this.props.analyticsActions.selectAnalyticsConnection(connectionName);
     localStorage.setItem('analyticsConnection', connectionName);
+  }
+
+  public handleLegendClick(datasetId)
+  {
+    this.props.analyticsActions.pinVariant(datasetId);
   }
 
   public render()
@@ -447,6 +453,7 @@ class Library extends TerrainComponent<any>
                     datasets={datasets}
                     xDataKey={'key'}
                     yDataKey={'doc_count'}
+                    onLegendClick={this.handleLegendClick}
                   /> : (
                     <div className='library-analytics-error'>
                       <p>An error occurred while fetching the analytics data</p>

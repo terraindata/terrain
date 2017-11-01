@@ -133,6 +133,7 @@ const Actions =
             const end = dateRange.end;
 
             let aggregation = '';
+
             if (metricId.length === 2)
             {
               aggregation = 'rate';
