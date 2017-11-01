@@ -88,7 +88,7 @@ export default class ESCardParser extends ESParser
     // update the cards
     const updatedRootCard = ESCardParser.updateCardBeforeParsing(rootCard);
     // parsing
-    const parsedCard = new ESCardParser(rootCard);
+    const parsedCard = new ESCardParser(updatedRootCard);
     // interpreting
     const state = BuilderStore.getState();
     let inputs = state.query && state.query.inputs;
