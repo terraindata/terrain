@@ -489,6 +489,46 @@ export const Ajax =
       // }
     },
 
+    getVariantStatus(
+      variantId: ID,
+      dbid: number,
+      onLoad: (resp: object) => void,
+      onError?: (resp: any) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'get',
+        'items/live/' + variantId,
+        {},
+        (response: object) =>
+        {
+          let responseData: object;
+          try
+          {
+            responseData = response;
+          }
+          catch (e)
+          {
+            onError && onError(e.message);
+          }
+
+          if (responseData !== undefined)
+          {
+            // needs to be outside of the try/catch so that any errors it throws aren't caught
+            onLoad(responseData);
+          }
+        },
+        {
+          onError, urlArgs: { dbid },
+        },
+      );
+      return;
+    },
+
     getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
     {
       return Ajax.req('get', 'versions/items/' + id, {}, (response: any) =>
@@ -701,7 +741,7 @@ export const Ajax =
       Ajax.req(
         'get',
         'import/analyzers',
-        { index },
+        {},
         (response) =>
         {
           let responseData: object = null;
@@ -719,6 +759,9 @@ export const Ajax =
             // needs to be outside of the try/catch so that any errors it throws aren't caught
             onLoad(responseData);
           }
+        },
+        {
+          onError, urlArgs: { index },
         },
       );
       return;
@@ -1071,7 +1114,6 @@ export const Ajax =
     },
 
     getCredentialConfigs(
-      type: string,
       onLoad: (credentials: object[]) => void,
     )
     {
@@ -1084,9 +1126,6 @@ export const Ajax =
         (response: object[]) =>
         {
           onLoad(response);
-        },
-        {
-          urlArgs: { type },
         },
       );
     },
@@ -1200,6 +1239,7 @@ export const Ajax =
     },
 
     createDb(name: string, dsn: string, type: string,
+      isAnalytics: boolean, analyticsIndex: string, analyticsType: string,
       onSave: (response: any) => void,
       onError: (response: any) => void)
     {
@@ -1211,6 +1251,9 @@ export const Ajax =
           dsn,
           host: dsn,
           type,
+          isAnalytics,
+          analyticsIndex,
+          analyticsType,
         },
         onSave,
         {
@@ -1296,6 +1339,7 @@ export const Ajax =
     },
 
     getAnalytics(
+      connectionId: number,
       variantIds: ID[],
       start: Date,
       end: Date,
@@ -1313,6 +1357,7 @@ export const Ajax =
         interval: intervalId,
         agg: aggregation,
         field: '@timestamp',
+        database: connectionId,
       };
 
       return Ajax.req(

@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
+import * as $ from 'jquery';
 import { extend } from 'lodash';
 
 const Color = require('color');
@@ -787,12 +788,259 @@ const LIGHT: Theme =
     },
   };
 
-export const Themes: { [name: string]: Theme } =
+const halloweenActive = '#ffa125';
+
+const HALLOWEEN: Theme =
   {
-    DARK, LIGHT,
+    // Use these colors
+
+    bg1: 'rgb(0,0,0)',
+    bg2: 'rgb(12,12,12)',
+    bg3: 'rgb(24,24,24)',
+
+    emptyBg: 'rgb(0,0,0)',
+
+    border1: 'rgb(72,72,72)',
+    border2: 'rgb(100,105,107)',
+    border3: 'rgb(125,130,139)',
+
+    text1: 'rgb(253,234,191)',
+    text2: 'rgb(255,216,130)',
+    text3: 'rgb(247,187,51)',
+
+    altBg1: '#fff',
+    altBg2: '#EDEFF3',
+
+    altText1: '#000',
+    altText2: '#242424',
+    altText3: '#424242',
+
+    iconColor: halloweenActive,
+    inputFocusBg: halloweenActive,
+    inputBorder: halloweenActive,
+
+    stroke: halloweenActive,
+
+    altHighlight: 'rgba(210,215,219,0.75)',
+
+    highlight: 'rgba(255,255,255,0.15)', // for slight emphasis
+    darkerHighlight: 'rgba(255,255,255,0.05)', // to make a depth effect with highlight
+
+    boxShadow: 'rgba(0, 0, 0, 0.39)',
+
+    fadedOutBg: 'rgba(0,0,0,0.75)', // bg to cover up things when they are faded out
+
+    inputBg: 'rgba(0,0,0,0.25)',
+
+    active: halloweenActive,
+    activeText: '#fff',
+    inactiveHover: Color(halloweenActive).fade(0.25).string(),
+    inactiveHoverText: '#fff',
+    activeHover: Color(halloweenActive).fade(0.75).string(),
+
+    scrollbarBG: 'rgba(255,255,255,0.15)',
+    scrollbarPiece: halloweenActive,
+
+    altScrollbarPiece: halloweenActive,
+
+    error: '#d14f42',
+
+    import: halloweenActive,
+
+    resultLine: 'rgba(255,255,255,0.25)',
+
+    tqlEditor: 'monokai',
+
+    // DO NOT USE these below colors anymore -- these need to be cleaned up
+
+    // text
+    text:
+    {
+      baseDark: '#000000',
+      secondaryDark: 'rgba(0,0,0,0.50)',
+      baseLight: '#FFFFFF',
+      secondaryLight: 'rgba(255,255,255,0.80)',
+      thirdLight: 'rgba(255,255,255,0.5)',
+
+      link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
+      linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
+    },
+
+    button:
+    {
+      text: '#FFFFFF',
+      background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
+      backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
+    },
+
+    // Library ------
+
+    library:
+    {
+      // item
+      item: {
+        title: '#424242',
+        body: '#4B4B4B',
+        activeBody: '#4C7C9C',
+      },
+
+      // info graph selection btn
+      infoGraphBtn: {
+        btnBase: '#696666',
+        btnRoll: '#6E6B6B',
+        btnSelected: '#828080',
+        btnRadioBase: 'rgba(0,0,0,0.50)',
+        btnRadioSelected: '#80CCFF',
+      },
+
+      //text box
+      textbox: {
+        base: '#FFFFFF',
+      },
+    },
+
+    // Builder -----------------------------
+
+    builder: {
+      // tab area
+      tabs: {
+        background: '#151515',
+        tabActive: '#272727',
+        tabTopRibbon: '#4C7C9C',
+        tabInactive: 'rgba(39,39,39,50)',
+        tabTopRibbonInactive: 'rgba(76, 124, 156, 0.5)',
+      },
+
+      // deck
+      deck: {
+        background: '#2B2A2A',
+      },
+
+      // deck cards --temporary values, colors will be grouped. Inactive on deck all cards are at 70% opacity. Bullet circle is 100% Opacity. When rolled over Opacity is 90%.
+      cards: {
+
+        cardBgOpacity: 0.45,
+
+        cardBase: 'rgba(47, 47, 47, 0)', //'rgb(60, 63, 65)', //'#2F2F2F', // '#424242', // TODO
+
+        // card theme colors
+
+        //by category
+        categories: {
+          primary: halloweenActive,
+          control: halloweenActive,
+          sort: halloweenActive,
+          filter: halloweenActive,
+          match: halloweenActive,
+          score: halloweenActive,
+          script: halloweenActive,
+          compound: halloweenActive,
+          join: halloweenActive,
+          geo: halloweenActive,
+          suggest: halloweenActive,
+          parameter: halloweenActive,
+        },
+
+        //by clause type
+        anyClause: code.anyClause,
+        arrayClause: code.arrayClause,
+        baseClause: code.baseClause,
+        booleanClause: code.booleanClause,
+        enumClause: code.enumClause,
+        fieldClause: code.fieldClause,
+        indexClause: code.indexClause,
+        mapClause: code.mapClause,
+        nullClause: code.nullClause,
+        numberClause: code.numberClause,
+        objectClause: code.objectClause,
+        stringClause: code.stringClause,
+        structureClause: code.structureClause,
+        typeClause: code.typeClause,
+        inputParameter: code.inputParameter,
+
+        card1: '#559DCE',
+        card2: '#397DD0',
+        card3: '#D14F42',
+        card4: '#D55A44',
+        card5: '#DA6846',
+        card6: '#DD7547',
+        card7: '#DD8846',
+        card8: '#DAA043',
+        card9: '#D9B540',
+        card10: '#86A760',
+        card11: '#659F72',
+        card12: '#4B977F',
+        card13: '#39908B',
+        card14: '#2E8C9A',
+        card15: '#2589AA',
+        card16: '#466AA3',
+        card17: '#824BA0',
+        card18: '#B161BC',
+        card19: '#319AA9',
+        card20: '#4A979A',
+        card21: '#3A91A5',
+
+        card1BG: Color('#559DCE').alpha(.2).string(),
+        card2BG: Color('#397DD0').alpha(0.2).string(),
+        card3BG: Color('#D14F42').alpha(0.2).string(),
+        card4BG: Color('#D55A44').alpha(0.2).string(),
+        card5BG: Color('#DA6846').alpha(0.2).string(),
+        card6BG: Color('#DD7547').alpha(0.2).string(),
+        card7BG: Color('#DD8846').alpha(0.2).string(),
+        card8BG: Color('#DAA043').alpha(0.2).string(),
+        card9BG: Color('#D9B540').alpha(0.2).string(),
+        card10BG: Color('#86A760').alpha(0.2).string(),
+        card11BG: Color('#659F72').alpha(0.2).string(),
+        card12BG: Color('#4B977F').alpha(0.2).string(),
+        card13BG: Color('#39908B').alpha(0.2).string(),
+        card14BG: Color('#2E8C9A').alpha(0.2).string(),
+        card15BG: Color('#2589AA').alpha(0.2).string(),
+        card16BG: Color('#466AA3').alpha(0.2).string(),
+        card17BG: Color('#824BA0').alpha(0.2).string(),
+        card18BG: Color('#B161BC').alpha(0.2).string(),
+        card19BG: Color('#319AA9').alpha(0.2).string(),
+        card20BG: Color('#4A979A').alpha(0.2).string(),
+        card21BG: Color('#3A91A5').alpha(0.2).string(),
+      },
+
+      //builder column
+      builderColumn: {
+        background: 'rgba(0,0,0,0)', // 'rgb(47, 47, 47)', //'rgb(60, 63, 65)',
+      },
+
+      inputs:
+      {
+        background: '#626262',
+      },
+    },
+
+    // File import -----------------------------
+
+    fileimport: {
+      preview: {
+        column: {
+          base: '#00a0f4',
+          typeDropdown: '#005d69',
+          transform: '#a2af93',
+        },
+        cell: '#f1d7d7',
+      },
+    },
   };
 
-export const ThemesArray = ['DARK', 'LIGHT'];
+export const Themes: { [name: string]: Theme } =
+  {
+    DARK, LIGHT, HALLOWEEN,
+  };
+
+export const ThemesInt =
+  {
+    DARK: 0,
+    LIGHT: 1,
+    HALLOWEEN: 2,
+  };
+
+export const ThemesArray = ['DARK', 'LIGHT', 'HALLOWEEN'];
 
 const curTheme = 'DARK';
 
@@ -981,6 +1229,18 @@ export function getCardColors(category: string | undefined, typeColor: string): 
   }
 
   return [color, colors.bg3];
+}
+
+if (localStorage['theme'] === 'HALLOWEEN')
+{
+  $('body').append('<style> img { -webkit-filter: hue-rotate(180deg); filter: hue-rotate(180deg); }</style>');
+
+  $('body').append('<img src="https://clipartion.com/wp-content/uploads/2015/11/web-spider-gothickyrachan.png" style="position: fixed; \
+      top: 0px; right: 0px; width: 50%; -webkit-filter: invert(100%); filter: invert(100%); pointer-events: none;" />');
+
+  $('body').append("<iframe className='youtube-player' \
+    src='https://www.youtube.com/embed/SOFCQ2bfmHw?wmode=opaque&autohide=1&autoplay=1'>&lt;br /&gt;</iframe>");
+
 }
 
 export default Colors;

@@ -48,8 +48,11 @@ import * as fs from 'fs';
 import jsurl = require('jsurl');
 import * as KoaRouter from 'koa-router';
 import * as _ from 'lodash';
+import stringHash = require('string-hash');
+import * as winston from 'winston';
 
 import { Config } from './Config';
+import * as Demo from './Demo';
 import { EventConfig, Events } from './Events';
 
 export class Router
@@ -79,9 +82,9 @@ export class Router
     this.appRouter.get('/bundle.js', async (ctx, next) =>
     {
       ctx.type = 'js';
-      if (fs.existsSync('/build/bundle.js'))
+      if (fs.existsSync('./build/bundle.js'))
       {
-        ctx.body = fs.createReadStream('/build/bundle.js');
+        ctx.body = fs.createReadStream('./build/bundle.js');
       }
       else
       {
@@ -91,14 +94,19 @@ export class Router
     this.appRouter.get('/bundle.js.map', async (ctx, next) =>
     {
       ctx.type = 'js';
-      if (fs.existsSync('/build/bundle.js.map'))
+      if (fs.existsSync('./build/bundle.js.map'))
       {
-        ctx.body = fs.createReadStream('/build/bundle.js.map');
+        ctx.body = fs.createReadStream('./build/bundle.js.map');
       }
       else
       {
         ctx.body = fs.createReadStream('../analytics.js/build/bundle.js.map');
       }
+    });
+
+    this.appRouter.get('/demo/search', async (ctx, next) =>
+    {
+      ctx.body = await Demo.search(ctx.request.query);
     });
 
     this.appRouter.use('/v1', this.router.routes(), this.router.allowedMethods());
@@ -153,6 +161,9 @@ export class Router
       meta = req['meta'];
     }
 
+    const date = new Date();
+    const now = date.getTime();
+
     const event: EventConfig = {
       eventid: req['eventid'],
       variantid: req['variantid'],
@@ -163,8 +174,13 @@ export class Router
         useragent: request.useragent,
         referer: request.header.referer,
       },
-      timestamp: new Date(),
+      timestamp: date,
+      intervalBucketSeconds: Math.round(now/1000),
+      intervalBucketMinutes: Math.round(now/1000/60),
+      intervalBucketHours: Math.round(now/1000/60/60),
+      intervalBucketDays: Math.round(now/1000/60/60/24),
       meta,
+      hash: stringHash(JSON.stringify(request.query)),
     };
 
     if (_.difference(Object.keys(req), Object.keys(event).concat(['id', 'accessToken'])).length > 0)

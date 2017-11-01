@@ -446,7 +446,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     value = 'null';
     italics = true;
   }
-  if (format && format.type !== 'map')
+  if ((format && format.type !== 'map') || !format)
   {
     if (List.isList(value))
     {

@@ -168,12 +168,10 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
         requests.push('Please Provide an Export Object Key');
       }
 
-      command = `curl -X POST  -H 'Content-Type: ${contentTypeText}' ` +
-        `-H 'Accept: application/json' -d ` +
-        `'{"id": ${template.templateId}, "persistentAccessToken": "${template.persistentAccessToken}", ` +
-        `"body": {"dbid": ${template.dbid}, "filetype": "${fileType}", ` +
-        `"templateId": ${template.templateId}, "variantId": ${variantId}}}' ` +
-        `${midwayURL}/midway/v1/export/headless`;
+      command = `${midwayURL}/midway/v1/export/headless` +
+        `?id=${template.templateId}&persistentAccessToken=${template.persistentAccessToken}` +
+        `&dbid=${template.dbid}&filetype=${fileType}` +
+        `&templateId=${template.templateId}&variantId=${variantId}`;
     }
     else // import
     {
