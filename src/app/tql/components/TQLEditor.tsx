@@ -135,7 +135,7 @@ class TQLEditor extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-    // this.executeChange = _.debounce(this.executeChange, 300);
+    this.executeChange = _.debounce(this.executeChange, 300);
   }
 
   public componentWillMount()
