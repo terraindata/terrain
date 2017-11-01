@@ -44,73 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import cmdLineArgs = require('command-line-args');
-import cmdLineUsage = require('command-line-usage');
-import { Config } from './Config';
-
-const optionList = [
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
+{
+  return (error: Error, response: T) =>
   {
-    alias: 'c',
-    defaultValue: 'config.json',
-    name: 'config',
-    type: String,
-    typeLabel: 'file',
-    description: 'Configuration file to use.',
-  },
-  {
-    alias: 'p',
-    defaultValue: 3001,
-    name: 'port',
-    type: Number,
-    typeLabel: 'number',
-    description: 'Port to listen on.',
-  },
-  {
-    name: 'debug',
-    type: Boolean,
-    description: 'Turn on debug mode.',
-  },
-  {
-    name: 'demo',
-    type: Boolean,
-    description: 'Serve Terrain demo website.',
-  },
-  {
-    alias: 'h',
-    name: 'help',
-    type: Boolean,
-    description: 'Show help and usage information.',
-  },
-  {
-    alias: 'v',
-    name: 'verbose',
-    type: Boolean,
-    description: 'Print verbose information.',
-  },
-  {
-    alias: 'd',
-    name: 'db',
-    type: String,
-    defaultValue: 'http://127.0.0.1:9200',
-    description: 'Analytics datastore connection parameters',
-  },
-];
-
-const sections = [
-  {
-    header: 'sigint 1.0',
-    content: 'Terrain Analytics Server.',
-  },
-  {
-    header: 'Options',
-    optionList,
-  },
-];
-
-export let CmdLineArgs: Config = cmdLineArgs(optionList,
-  {
-    partial: true,
-  });
-
-export const CmdLineUsage = cmdLineUsage(sections);
-export default CmdLineArgs;
+    if (error !== null && error !== undefined)
+    {
+      reject(error);
+    }
+    else
+    {
+      resolve(response);
+    }
+  };
+}
