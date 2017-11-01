@@ -197,7 +197,7 @@ export class ResultsManager extends TerrainComponent<Props>
       if (!this.props.query || nextProps.query.id !== this.props.query.id)
       {
         this.changeResults({
-          results: List([]),
+          results: undefined,
         });
       }
     }
@@ -205,7 +205,7 @@ export class ResultsManager extends TerrainComponent<Props>
     if (this.props.variantPath !== undefined && (this.props.variantPath !== nextProps.variantPath))
     {
       this.changeResults({
-        results: List([]),
+        results: undefined,
       });
     }
 
@@ -509,8 +509,7 @@ export class ResultsManager extends TerrainComponent<Props>
       fields = results.get(0).fields.keySeq().toList();
     }
 
-    const loading = (isAllFields && !resultsState.hasLoadedResults) ||
-      (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields);
+    const loading = false; 
 
     const changes: any = {
       results,
