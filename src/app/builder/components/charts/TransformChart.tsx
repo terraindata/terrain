@@ -1729,16 +1729,15 @@ const TransformChart = {
         if (i === 3 || i === 0)
         {
           const x0 = pointsData[2].x;
-          const a = pointsData[0].y;
           const x = pointsData[1].x;
           const y = pointsData[1].y;
-          const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
-          const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
-                        Math.log(L / (0.01) - 1) / (-1 * k) + x0;
+          let k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
           if (k === 0)
           {
-            return scales.realPointY(d['y']);
+            k = 0.1;
           }
+          const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
+            Math.log(L / (0.01) - 1) / (-1 * k) + x0;
           if (xVal < domain[0])
           {
             return scales.realPointY(this._sigmoid(domain[0], a, k, x0, L));
@@ -1765,18 +1764,12 @@ const TransformChart = {
           const y = pointsData[1].y;
           const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
           const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
-                        Math.log(L / (0.01) - 1) / (-1 * k) + x0;
-          if ((i === 3 && d['x'] > xVal) || (i === 0 && d['x'] < xVal))
-          {
-            console.log(d['x']);
-            console.log(xVal);
-            return scales.realX(d['x']);
-          }
+            Math.log(L / (0.01) - 1) / (-1 * k) + x0;
           return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
         }
       }
       return scales.realX(d['x']);
-    }
+    };
 
     const pointName = (d, i) =>
     {
