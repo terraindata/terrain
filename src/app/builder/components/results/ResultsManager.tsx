@@ -424,39 +424,39 @@ export class ResultsManager extends TerrainComponent<Props>
         ),
       });
 
-      let allFieldsQueryCode;
-      try
-      {
-        allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
-          query,
-          {
-            allFields: true,
-            replaceInputs: true,
-          },
-        );
-      }
-      catch (err)
-      {
-        console.log('Could not generate all field Elastic request, reason:' + err);
-      }
-      if (allFieldsQueryCode)
-      {
-        this.setState({
-          allQuery: Ajax.query(
-            allFieldsQueryCode,
-            db,
-            (resp) =>
-            {
-              this.handleM2QueryResponse(resp, true);
-            },
-            (err) =>
-            {
-              this.handleM2RouteError(err, true);
-            },
-          ),
-        });
-
-      }
+      // let allFieldsQueryCode;
+      // try
+      // {
+      //   allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
+      //     query,
+      //     {
+      //       allFields: true,
+      //       replaceInputs: true,
+      //     },
+      //   );
+      // }
+      // catch (err)
+      // {
+      //   console.log('Could not generate all field Elastic request, reason:' + err);
+      // }
+      // if (allFieldsQueryCode)
+      // {
+      //   this.setState({
+      //     allQuery: Ajax.query(
+      //       allFieldsQueryCode,
+      //       db,
+      //       (resp) =>
+      //       {
+      //         this.handleM2QueryResponse(resp, true);
+      //       },
+      //       (err) =>
+      //       {
+      //         this.handleM2RouteError(err, true);
+      //       },
+      //     ),
+      //   });
+      //
+      // }
 
       this.changeResults({
         loading: true,
