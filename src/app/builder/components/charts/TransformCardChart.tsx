@@ -462,6 +462,23 @@ class TransformCardChart extends TerrainComponent<Props>
     }
   }
 
+  public onFitCurveToData()
+  {
+    const pointsMax = this.state.pointsCache.max((a, b) => a.value - b.value).value;
+    const pointsMin = this.state.pointsCache.min((a, b) => a.value - b.value).value;
+    const tailWidth = this.state.pointsCache.size === 1 ? 1 : (pointsMax - pointsMin) * 0.05;
+    const pointsDomain = pointsMax - pointsMin + 2 * tailWidth;
+
+    const domainPadding = 0.05 * (this.props.domain.get(1) - this.props.domain.get(0));
+    const currDomain = this.props.domain.get(1) - this.props.domain.get(0) - 2 * domainPadding;
+    const scaleFactor = currDomain / pointsDomain;
+    const points = this.state.pointsCache.map((point) => {
+      point = point.set('value', point.value * scaleFactor);
+      return point;
+    });
+    this.updatePoints(points.toList(), );
+  }
+
   public onZoomToData(el, mouse)
   {
     this.props.onRequestZoomToData();
@@ -479,6 +496,7 @@ class TransformCardChart extends TerrainComponent<Props>
       'Zoom out': this.onZoomOut,
       'Auto-center on curve': this.onZoomToFit,
       'Auto-center on data': this.onZoomToData,
+      'Fit curve to data': this.onFitCurveToData,
     };
     if (this.props.mode === 'linear')
     {

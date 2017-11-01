@@ -1696,93 +1696,17 @@ const TransformChart = {
     d3.event['stopPropagation']();
   },
 
-  // TODO DOES THIS NEED TO BE SEP. FUNCTION ?....
-  _drawSigmoidPoints(el, scales, pointsData, onMove, onRelease, onSelect, onPointMoveStart, canEdit, colors)
+  _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain)
   {
     const g = d3.select(el).selectAll('.points');
 
     const point = g.selectAll('circle')
       .data(pointsData, (d) => d['id']);
 
-    const a = pointsData[0].y;
-    const x = pointsData[1].x;
-    const y = pointsData[1].y;
-    const x0 = pointsData[2].x;
-    const L = pointsData[3].y - pointsData[0].y;
-    const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
     point.enter()
       .append('circle');
 
     const pointYValue = (d, i) =>
-    {
-      if (i === 2)
-      {
-        return scales.realPointY(L / 2 + a);
-      }
-      return scales.realPointY(d['y']);
-    };
-
-    const pointXValue = (d, i) =>
-    {
-      return scales.realX(d['x']);
-    };
-
-    const pointName = (d, i) =>
-    {
-      switch (i)
-      {
-        case 0:
-          return 'a';
-        case 1:
-          return 'k';
-        case 2:
-          return 'x0';
-        case 3:
-          return 'L';
-        default:
-          return '';
-      }
-    };
-
-    point
-      .attr('cx', pointXValue)
-      .attr('cy', pointYValue)
-      .attr('fill', '#fff')
-      .attr('style', (d) => 'stroke: ' + (d['selected'] ? Colors().error : colors[0]))
-      .attr('class', (d) =>
-        'point' + (d['selected'] ? ' point-selected' : '')
-        + (canEdit ? '' : ' point-disabled'))
-      .attr('r', 10);
-
-    point
-      .attr('_id', (d) => d['id'])
-      .attr('_name', pointName);
-
-    if (canEdit)
-    {
-      point.on('mousedown', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
-      point.on('touchstart', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
-      point.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
-      point.on('contextmenu', null);
-      point.on('click', this._mouseClickFactory(el, scales, onMove, onRelease, colors, this._editPointPosition, this._drawPointEditMenu));
-      point.on('mouseout', this._mouseoutFactory(el));
-      point.on('dblclick', this._doubleclickFactory(el));
-    }
-
-    point.exit().remove();
-  },
-
-  _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode)
-  {
-    const g = d3.select(el).selectAll('.points');
-
-    const point = g.selectAll('circle')
-      .data(pointsData, (d) => d['id']);
-
-    point.enter()
-      .append('circle');
-
-    const pointYValue = (d) =>
     {
       // constrain y values of normal points so that they remain on the line
       if (mode === 'normal')
@@ -1794,8 +1718,65 @@ const TransformChart = {
         const y = this._normal(d['x'], average, stdDev) * scaleFactor;
         return scales.realPointY(y);
       }
+      if (mode === 'sigmoid')
+      {
+        const a = pointsData[0].y;
+        const L = pointsData[3].y - pointsData[0].y;
+        if (i === 2)
+        {
+          return scales.realPointY(L / 2 + a);
+        }
+        if (i === 3 || i === 0)
+        {
+          const x0 = pointsData[2].x;
+          const a = pointsData[0].y;
+          const x = pointsData[1].x;
+          const y = pointsData[1].y;
+          const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+          const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
+                        Math.log(L / (0.01) - 1) / (-1 * k) + x0;
+          if (k === 0)
+          {
+            return scales.realPointY(d['y']);
+          }
+          if (xVal < domain[0])
+          {
+            return scales.realPointY(this._sigmoid(domain[0], a, k, x0, L));
+          }
+          if (xVal > domain[1])
+          {
+            return scales.realPointY(this._sigmoid(domain[1], a, k, x0, L));
+          }
+        }
+      }
       return scales.realPointY(d['y']);
     };
+
+    const pointXValue = (d, i) =>
+    {
+      if (mode === 'sigmoid')
+      {
+        if (i === 3 || i === 0)
+        {
+          const L = pointsData[3].y - pointsData[0].y;
+          const x0 = pointsData[2].x;
+          const a = pointsData[0].y;
+          const x = pointsData[1].x;
+          const y = pointsData[1].y;
+          const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+          const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
+                        Math.log(L / (0.01) - 1) / (-1 * k) + x0;
+          if ((i === 3 && d['x'] > xVal) || (i === 0 && d['x'] < xVal))
+          {
+            console.log(d['x']);
+            console.log(xVal);
+            return scales.realX(d['x']);
+          }
+          return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
+        }
+      }
+      return scales.realX(d['x']);
+    }
 
     const pointName = (d, i) =>
     {
@@ -1807,11 +1788,27 @@ const TransformChart = {
         }
         return 'Standard Deviation';
       }
+      else if (mode === 'sigmoid')
+      {
+        switch (i)
+        {
+          case 0:
+            return 'a';
+          case 1:
+            return 'k';
+          case 2:
+            return 'x0';
+          case 3:
+            return 'L';
+          default:
+            return '';
+        }
+      }
       return d['id'];
     };
 
     point
-      .attr('cx', (d) => scales.realX(d['x']))
+      .attr('cx', pointXValue)
       .attr('cy', pointYValue)
       .attr('fill', '#fff')
       .attr('style', (d) => 'stroke: ' + (d['selected'] ? Colors().error : colors[0]))
@@ -1889,15 +1886,15 @@ const TransformChart = {
         if (numPoints >= 4)
         {
           this._drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
-          this._drawSigmoidPoints(el, scales, pointsData, onMove, onRelease, onSelect, onPointMoveStart, canEdit, colors);
+          // this._drawSigmoidPoints(el, scales, pointsData, onMove, onRelease, onSelect, onPointMoveStart, canEdit, colors);
         }
         break;
       default:
         this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
-    if (mode === 'linear' || numPoints === 2)
+    if (mode === 'linear' || numPoints === 2 || (mode === 'sigmoid' && numPoints === 4))
     {
-      this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode);
+      this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain.x);
     }
     if (!pointsData.length)
     {
