@@ -294,9 +294,9 @@ class Connections extends TerrainComponent<Props>
     const type = this.ConnectionTypes.get(this.state.typeIndex);
     const { analyticsEnabled } = this.state;
     const isAnalytics = analyticsEnabled === 1;
-    const analyticsIndex = this.analyticsIndex !== undefined ?
+    const analyticsIndex = this.analyticsIndex !== null ?
       this.analyticsIndex.value : null;
-    const analyticsType = this.analyticsType !== undefined ?
+    const analyticsType = this.analyticsType !== null ?
       this.analyticsType.value : null;
 
     if (!name.length)
