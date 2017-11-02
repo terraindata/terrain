@@ -112,7 +112,9 @@ export const STATIC_KEY_DISPLAY: Display =
     displayType: DisplayType.LABEL,
     key: 'key',
     style: {
-      maxWidth: 100,
+      textAlign: 'left',
+      maxWidth: 300,
+      width: 58,
       fontSize: 16,
     },
     className: 'card-elastic-key-label',
