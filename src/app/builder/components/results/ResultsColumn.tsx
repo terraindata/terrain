@@ -105,7 +105,8 @@ class ResultsColumn extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (!this.props.resultsState.hits.equals(nextProps.resultsState.hits) && this.state.selectedTab !== 0)
+    if (this.props.resultsState.hits !== undefined && nextProps.resultsState.hits !== undefined &&
+      !this.props.resultsState.hits.equals(nextProps.resultsState.hits) && this.state.selectedTab !== 0)
     {
       this.setState({
         highlightedTabs: this.state.highlightedTabs.set('hits', true),
@@ -178,9 +179,10 @@ class ResultsColumn extends TerrainComponent<Props>
     {
       case 'Hits':
         const hits = this.props.resultsState.hits;
-        if (hits.size < MAX_HITS)
+        const size = hits === undefined ? 0 : hits.size;
+        if (size < MAX_HITS)
         {
-          return String(hits.size);
+          return String(size);
         }
         return String(MAX_HITS) + '+';
       case 'Aggregations':
