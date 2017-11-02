@@ -482,7 +482,7 @@ export class ResultsManager extends TerrainComponent<Props>
     let hits: Hits =
       (resultsState.hasLoadedResults || resultsState.hasLoadedAllFields)
         ? resultsState.hits : List([]);
-    if (hits === undefined) 
+    if (hits === undefined)
     {
       hits = List([]);
     }
