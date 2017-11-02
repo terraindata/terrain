@@ -59,7 +59,7 @@ export interface Backend
   type: string;
   name: string;
 
-  // The Building Blocks of Terraformer
+  // The Building Blocks of Terrain
   // Blocks are either a card or some inside part of a card.
   // Note: each type should be unique among the whole scope of cards in all languages.
   blocks:
