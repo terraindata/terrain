@@ -52,6 +52,9 @@ const { Map, List } = Immutable;
 
 import { Block, BlockConfig } from './types/Block';
 import { Card, Cards } from './types/Card';
+
+import { DisplayType } from './displays/Display';
+
 // import { AllBackendsMap } from '../database/AllBackends';
 
 export function getChildIds(_block: Block): IMMap<ID, boolean>
@@ -231,6 +234,11 @@ export const cardsForServer = (value: any) =>
   if (value && value.static)
   {
     delete value.static;
+    // because .static is deleted, we should reset other related fields
+    if (value.keyDisplayType)
+    {
+      value.keyDisplayType = DisplayType.TEXT;
+    }
   }
 
   if (Array.isArray(value))

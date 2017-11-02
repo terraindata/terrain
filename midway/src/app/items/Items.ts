@@ -45,6 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import DeployVariant from '../../../../shared/deploy/DeployVariant';
+import DatabaseController from '../../database/DatabaseController';
+import ElasticClient from '../../database/elastic/client/ElasticClient';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import { UserConfig } from '../users/Users';
@@ -128,6 +131,36 @@ export class Items
     });
   }
 
+  public async checkStatusVariants(dbid: number): Promise<string[] | string>
+  {
+    return new Promise<string[] | string>(async (resolve, reject) =>
+    {
+      const result: string[] | string = await this._getAllVariantsInCluster(dbid);
+      if (!Array.isArray(result))
+      {
+        return reject(result as string);
+      }
+      return resolve(result);
+    });
+  }
+
+  public async checkVariantInES(variantId?: number, dbid?: number): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      if (variantId === undefined || isNaN(variantId))
+      {
+        return reject('Must provide variant id.');
+      }
+      if (dbid === undefined || isNaN(dbid))
+      {
+        return reject('Must provide database id.');
+      }
+      const liveScripts: string = await this._checkVariantInESHelper(variantId, dbid);
+      return resolve(liveScripts);
+    });
+  }
+
   // both regular and superusers can create items
   // only superusers can change existing items that are not BUILD status
   // both regular and superusers can change items that are not LIVE or DEFAULT status
@@ -171,6 +204,96 @@ export class Items
       }
 
       resolve(await App.DB.upsert(this.itemTable, item) as ItemConfig);
+    });
+  }
+
+  private async _checkVariantInESHelper(variantId: number, dbid: number): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+      if (database === undefined)
+      {
+        return resolve('Database "' + dbid.toString() + '" not found');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return resolve('Status metadata currently is only supported for Elastic databases');
+      }
+      const items: ItemConfig[] = await this.select([], { id: variantId } as object);
+      if (items.length === 0)
+      {
+        return resolve('Variant not found');
+      }
+      const variantDeployedName: string = DeployVariant.getVariantDeployedName(items[0] as object);
+
+      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+      elasticClient.getScript({ id: variantDeployedName, lang: 'mustache' }, async function getState(err, resp)
+      {
+        if (items[0].type !== 'VARIANT')
+        {
+          return resolve('Item is not a Variant');
+        }
+        if (resp['_id'] === variantDeployedName && resp['found'] === true && items[0].status === 'LIVE'
+          && await this._verifyVariantScript(variantId, resp['_script']))
+        {
+          return resolve('Variant is LIVE as ' + (variantDeployedName as string));
+        }
+        else if (resp['_id'] === variantDeployedName && resp['found'] === true && items[0].status !== 'LIVE')
+        {
+          return resolve('Error: Variant found in ES instance but not LIVE');
+        }
+        else if (resp['_id'] === variantDeployedName && resp['found'] === false && items[0].status === 'LIVE')
+        {
+          return resolve('Error: LIVE Variant not found in ES instance');
+        }
+        else
+        {
+          return resolve('Confirmed that Variant is not deployed');
+        }
+      }.bind(this));
+    });
+  }
+
+  private async _getAllVariantsInCluster(dbid: number): Promise<string[] | string>
+  {
+    return new Promise<string[] | string>(async (resolve, reject) =>
+    {
+      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+      if (database === undefined)
+      {
+        return resolve('Database "' + dbid.toString() + '" not found.');
+      }
+      if (database.getType() !== 'ElasticController')
+      {
+        return resolve('Status metadata currently is only supported for Elastic databases.');
+      }
+      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+      elasticClient.cluster.state({}, function getState(err, resp)
+      {
+        let storedScriptNames: string[] = [];
+        if (resp['metadata'] !== undefined && resp['metadata']['stored_scripts'] !== undefined)
+        {
+          const storedScripts = resp['metadata']['stored_scripts'] as object;
+          storedScriptNames = Object.keys(storedScripts);
+          storedScriptNames = storedScriptNames.map((storedScriptName) =>
+          {
+            return storedScriptName.startsWith('mustache#') ? storedScriptName.substring(9) : '';
+          }).filter((storedScriptName) =>
+          {
+            return storedScriptName.length > 0;
+          });
+        }
+        return resolve(storedScriptNames);
+      });
+    });
+  }
+
+  private async _verifyVariantScript(variantId: number, storedScript: string): Promise<boolean>
+  {
+    return new Promise<boolean>(async (resolve, reject) =>
+    {
+      return resolve(true);
     });
   }
 }

@@ -49,6 +49,7 @@ import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
+import { _Server } from 'schema/SchemaTypes';
 
 describe('AnalyticsSelector', () =>
 {
@@ -58,20 +59,36 @@ describe('AnalyticsSelector', () =>
     selectedMetric: 1,
   });
 
+  const servers = Immutable.Map({
+    'My ElasticSearch Instance': _Server({
+      name: 'My ElasticSearch Instance',
+      connectionId: 1,
+      isAnalytics: true,
+      analyticsIndex: 'terrain-analytics',
+      analyticsType: 'events',
+    }),
+  });
+
+  const analyticsConnection = 'My ElasticSearch Instance';
+
   let analyticsComponent = null;
 
   const onMetricSelect = (value) => null;
   const onIntervalSelect = (value) => null;
   const onDateRangeSelect = (value) => null;
+  const onConnectionChange = (value) => null;
 
   beforeEach(() =>
   {
     analyticsComponent = shallow(
       <AnalyticsSelector
         analytics={analytics}
+        servers={servers}
+        analyticsConnection={analyticsConnection}
         onMetricSelect={onMetricSelect}
         onIntervalSelect={onIntervalSelect}
         onDateRangeSelect={onDateRangeSelect}
+        onConnectionChange={onConnectionChange}
       />,
     );
   });

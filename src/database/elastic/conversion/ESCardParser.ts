@@ -62,8 +62,14 @@ import { BuilderStore } from 'builder/data/BuilderStore';
 
 import { toInputMap } from '../../../blocks/types/Input';
 
+import { KEY_DISPLAY, STATIC_KEY_DISPLAY } from 'builder/getCard/GetCardVisitor';
 import * as Immutable from 'immutable';
+import ESStructureClause from '../../../../shared/database/elastic/parser/clauses/ESStructureClause';
+import { DisplayType } from '../../../blocks/displays/Display';
 import { Card } from '../../../blocks/types/Card';
+
+import * as _ from 'lodash';
+import Util from 'util/Util';
 
 export default class ESCardParser extends ESParser
 {
@@ -83,7 +89,7 @@ export default class ESCardParser extends ESParser
     // update the cards
     const updatedRootCard = ESCardParser.updateCardBeforeParsing(rootCard);
     // parsing
-    const parsedCard = new ESCardParser(rootCard);
+    const parsedCard = new ESCardParser(updatedRootCard);
     // interpreting
     const state = BuilderStore.getState();
     let inputs = state.query && state.query.inputs;
@@ -94,7 +100,7 @@ export default class ESCardParser extends ESParser
     const params: { [name: string]: any; } = toInputMap(inputs);
     const cardInterpreter = new ESInterpreter(parsedCard, params);
     // update filter card
-    const newRootCard = ESCardParser.updateCardErrors(updatedRootCard, parsedCard);
+    const newRootCard = ESCardParser.updateCardAfterParsing(updatedRootCard, parsedCard);
     if (newRootCard === rootCard)
     {
       return cards;
@@ -121,27 +127,119 @@ export default class ESCardParser extends ESParser
     return rootCard;
   }
 
-  private static updateCardErrors(rootCard, parsedCard: ESCardParser)
+  private static updateCardErrors(element: ESValueInfo, rootCard)
   {
-    parsedCard.getValueInfo().recursivelyVisit((element: ESValueInfo) =>
+    if (element.errors.length > 0)
     {
-      const card: Block = element.card;
-      if (!card)
+      const errorsKeyPath = element.cardPath.push('errors');
+      let cardErrors = rootCard.getIn(errorsKeyPath);
+      for (const e of element.errors)
       {
-        return true;
+        cardErrors = cardErrors.push(e.message);
       }
-      if (element.errors.length > 0)
+      rootCard = rootCard.setIn(errorsKeyPath, cardErrors);
+    }
+    return rootCard;
+  }
+
+  private static getStaticKeyDisplay(key: string)
+  {
+    const display = _.extend({}, Util.deeperCloneObj(STATIC_KEY_DISPLAY), { label: key });
+    // if the key is too long, we have to increase the size
+    if (key.length * display.style.fontSize > display.style.width)
+    {
+      display.style.width = key.length * display.style.fontSize;
+    }
+    return display;
+  }
+
+  private static labelCardKey(rootCard, card, cardPath)
+  {
+    const display = card.static.display;
+    if (Array.isArray(display))
+    {
+      display.map((d, i) =>
       {
-        const errorsKeyPath = element.cardPath.push('errors');
-        let cardErrors = rootCard.getIn(errorsKeyPath);
-        for (const e of element.errors)
+        if (d.key === 'key')
         {
-          cardErrors = cardErrors.push(e.message);
+          if (d.displayType !== DisplayType.LABEL)
+          {
+            display[i] = ESCardParser.getStaticKeyDisplay(card.key);
+          }
         }
-        rootCard = rootCard.setIn(errorsKeyPath, cardErrors);
+      });
+    } else
+    {
+      if (display.key === 'key')
+      {
+        if (display.displayType !== DisplayType.LABEL)
+        {
+          card.static.display = ESCardParser.getStaticKeyDisplay(card.key);
+        }
+      } else
+      {
+        if (display.displayType === DisplayType.FLEX)
+        {
+          display.flex.map((d, i) =>
+          {
+            if (d.key === 'key')
+            {
+              if (d.displayType !== DisplayType.LABEL)
+              {
+                display.flex[i] = ESCardParser.getStaticKeyDisplay(card.key);
+              }
+            }
+          });
+        }
       }
-      return true;
-    });
+    }
+    return rootCard.setIn(cardPath.push('keyDisplayType'), DisplayType.LABEL);
+  }
+
+  private static updateCardKey(element: ESValueInfo, rootCard)
+  {
+    if (element.clause instanceof ESStructureClause)
+    {
+      const card = element.card;
+      if (card.type === rootCard.type)
+      {
+        // root card
+        if ((card as Card).keyDisplayType !== DisplayType.LABEL)
+        {
+          rootCard = ESCardParser.labelCardKey(rootCard, card, element.cardPath);
+        }
+      }
+      card.cards.map((childCard, i) =>
+      {
+        if (childCard._isCard === true)
+        {
+          if (childCard.keyDisplayType !== DisplayType.LABEL)
+          {
+            rootCard = ESCardParser.labelCardKey(rootCard, childCard, element.cardPath.push('cards', i));
+          }
+        }
+      });
+    }
+    return rootCard;
+  }
+
+  private static updateCardAfterParsing(rootCard, parsedCard: ESCardParser)
+  {
+    const valueInfo = parsedCard.getValueInfo();
+    if (valueInfo)
+    {
+      valueInfo.recursivelyVisit((element: ESValueInfo) =>
+      {
+        const card = element.card;
+        if (!card)
+        {
+          return true;
+        }
+        rootCard = ESCardParser.updateCardErrors(element, rootCard);
+        rootCard = ESCardParser.updateCardKey(element, rootCard);
+        return true;
+      });
+    }
     return rootCard;
   }
 

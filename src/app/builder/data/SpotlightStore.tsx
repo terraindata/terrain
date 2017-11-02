@@ -78,7 +78,7 @@ interface SpotlightAction
   type: string;
   payload:
   {
-    result: any;
+    hit: any;
     id: string;
   };
 }
@@ -88,13 +88,13 @@ export const SpotlightStore: IStore<SpotlightState> = Redux.createStore(
     spotlight:
     (state: SpotlightState, action: SpotlightAction) =>
     {
-      const { result, id } = action.payload;
-      if (!result)
+      const { hit, id } = action.payload;
+      if (!hit)
       {
         return state.removeIn(['spotlights', id]);
       }
 
-      return state.setIn(['spotlights', id], _.extend({ id }, result));
+      return state.setIn(['spotlights', id], _.extend({ id }, hit));
     },
 
     clearSpotlights:
@@ -105,14 +105,14 @@ export const SpotlightStore: IStore<SpotlightState> = Redux.createStore(
   }, DefaultState),
   DefaultState);
 
-export function spotlightAction(id: string, result: any)
+export function spotlightAction(id: string, hit: any)
 {
   SpotlightStore.dispatch({
     type: 'spotlight',
     payload:
     {
       id,
-      result: result == null ? null : _.extend(result, { id }),
+      hit: hit == null ? null : _.extend(hit, { id }),
     },
   });
 }

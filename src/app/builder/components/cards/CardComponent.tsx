@@ -720,6 +720,7 @@ class _CardComponent extends TerrainComponent<Props>
             open={true}
             onClose={this.handleCardToolClose}
             accepts={this.props.display && this.props.display.accepts}
+            data={this.props.card}
             language={this.props.card.static.language}
             handleCardDrop={this.props.handleCardDrop}
           />
@@ -911,11 +912,11 @@ class _CardComponent extends TerrainComponent<Props>
             {
               this.props.canEdit &&
               !card['cannotBeMoved'] &&
-              this.state.hovering &&
+              (this.state.hovering || card.errors.size > 0) &&
               <div className='card-help-wrapper'>
                 {
                   tooltip(
-                    <HelpIcon className='card-help-icon' />,
+                    <HelpIcon className={classNames(card.errors.size > 0 ? 'card-error-icon' : 'card-help-icon')} />,
                     {
                       html: <CardHelpTooltip staticInfo={card.static} errors={card.errors} />,
                       trigger: 'click',

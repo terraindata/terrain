@@ -48,6 +48,7 @@ import * as Elastic from 'elasticsearch';
 import * as winston from 'winston';
 
 import { Config } from './Config';
+import { makePromiseCallback } from './Util';
 
 export interface EventConfig
 {
@@ -61,26 +62,16 @@ export interface EventConfig
     referer?: string;
   };
   timestamp: Date;
+  intervalBucketSeconds: number;
+  intervalBucketMinutes: number;
+  intervalBucketHours: number;
+  intervalBucketDays: number;
   meta?: any;
+  hash: string;
 }
 
 export const indexName = 'terrain-analytics';
 export const typeName = 'events';
-
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
 
 export class Events
 {
