@@ -239,40 +239,63 @@ class TransformCardChart extends TerrainComponent<Props>
     {
       points = this.state.initialPoints.map((scorePoint, i) =>
       {
-        // TODO SET SCORE SO THAT STD DEV IS SAME...
-        scorePoint = scorePoint.set('score', Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1));
-        const domainMin = this.props.domain.get(0);
-        const domainMax = this.props.domain.get(1);
-        const domainRange = domainMax - domainMin;
-        min = (i - 1) >= 0 ?
-          Math.max(this.props.domain.get(0), pointValues[i - 1] + domainRange / 1000)
-          : domainMin;
-        max = (i + 1) < pointValues.length ?
-          Math.min(this.props.domain.get(1), pointValues[i + 1] - domainRange / 1000)
-          : domainMax;
-        scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
-        return scorePoint;
+        if (scorePoint.id === pointId)
+        {
+          scorePoint = scorePoint.set('score', Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1));
+          const domainMin = this.props.domain.get(0);
+          const domainMax = this.props.domain.get(1);
+          const domainRange = domainMax - domainMin;
+          min = (i - 1) >= 0 ?
+            Math.max(this.props.domain.get(0), pointValues[i - 1] + domainRange / 1000)
+            : domainMin;
+          max = (i + 1) < pointValues.length ?
+            Math.min(this.props.domain.get(1), pointValues[i + 1] - domainRange / 1000)
+            : domainMax;
+          scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
+          return scorePoint;
+        }
+        else
+        {
+          // Set standard deviation points so that the standand deviation is maintained as the average moves
+          const newAverage = pointValues[1] - valueDiff; // Update to be value min max...
+          const oldStdDeviation = Math.abs(pointValues[0] - pointValues[1]);
+          const x = (oldStdDeviation - newAverage) / oldStdDeviation);
+          const newValue = newAverage - oldStdDeviation;
+          const newScore = NORMAL_CONSTANT * Math.exp(-.5 * x * x) / oldStdDeviation;
+          scorePoint = scorePoint.set('score', Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1));
+          const domainMax = this.props.domain.get(1);
+          const domainRange = domainMax - domainMin;
+          min = (i - 1) >= 0 ?
+            Math.max(this.props.domain.get(0), pointValues[i - 1] + domainRange / 1000)
+            : domainMin;
+          max = (i + 1) < pointValues.length ?
+            Math.min(this.props.domain.get(1), pointValues[i + 1] - domainRange / 1000)
+            : domainMax;
+          scorePoint = scorePoint.set('value', Util.valueMinMax(newValue, min, max));
+          return scorePoint;
+        }
+
       });
     }
 
-    else if (this.props.mode === 'sigmoid' && pointName === 'x0')
-    {
-      points = this.state.initialPoints.map((scorePoint, i) =>
-      {
-        scorePoint = scorePoint.set('score', Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1));
-        const domainMin = this.props.domain.get(0);
-        const domainMax = this.props.domain.get(1);
-        const domainRange = domainMax - domainMin;
-        min = (i - 1) >= 0 ?
-          Math.max(this.props.domain.get(0), pointValues[i - 1] + domainRange / 1000)
-          : domainMin;
-        max = (i + 1) < pointValues.length ?
-          Math.min(this.props.domain.get(1), pointValues[i + 1] - domainRange / 1000)
-          : domainMax;
-        scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
-        return scorePoint;
-      });
-    }
+    // else if (this.props.mode === 'sigmoid' && pointName === 'x0')
+    // {
+    //   points = this.state.initialPoints.map((scorePoint, i) =>
+    //   {
+    //     scorePoint = scorePoint.set('score', Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1));
+    //     const domainMin = this.props.domain.get(0);
+    //     const domainMax = this.props.domain.get(1);
+    //     const domainRange = domainMax - domainMin;
+    //     min = (i - 1) >= 0 ?
+    //       Math.max(this.props.domain.get(0), pointValues[i - 1] + domainRange / 1000)
+    //       : domainMin;
+    //     max = (i + 1) < pointValues.length ?
+    //       Math.min(this.props.domain.get(1), pointValues[i + 1] - domainRange / 1000)
+    //       : domainMax;
+    //     scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
+    //     return scorePoint;
+    //   });
+    // }
     else if (this.props.mode === 'sigmoid' && pointName === 'k')
     {
       const x0 = pointValues[2];
@@ -302,7 +325,9 @@ class TransformCardChart extends TerrainComponent<Props>
     {
       points = this.state.initialPoints.map((scorePoint) =>
       {
-        if (scorePoint.id === pointId || this.state.selectedPointIds.get(scorePoint.id))
+        if (scorePoint.id === pointId ||
+          this.state.selectedPointIds.get(scorePoint.id) ||
+          (this.props.mode === 'sigmoid' && pointName === 'x0'))
         {
           let scoreMin = 0;
           let scoreMax = 1;
