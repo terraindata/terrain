@@ -56,7 +56,7 @@ import { Tooltip } from 'react-tippy';
 import 'react-tippy/dist/tippy.css';
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import { backgroundColor, borderColor, Colors, fontColor } from './../../../colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from './../../../colors/Colors';
 
 import './Tooltips.less';
 
@@ -90,7 +90,7 @@ type ShowDirection = 'top' | 'bottom' | 'left' | 'right';
 
 class TooltipStyleGenerator
 {
-  public static generateStyle(theme: string, bgColor: string, textColor: string): object
+  public static generateStyle(theme: Theme, bgColor: string, textColor: string): object
   {
     let classes = {};
     for (const combination of classCombinations)
@@ -102,7 +102,7 @@ class TooltipStyleGenerator
       classes = _.extend(classes, objToAdd);
     }
     const bodyClass = {
-      [TooltipStyleGenerator.getSimpleClassName(theme)]: TooltipStyleGenerator.styleForBody(bgColor, textColor),
+      [TooltipStyleGenerator.getSimpleClassName(theme)]: TooltipStyleGenerator.styleForBody(theme, bgColor, textColor),
     };
     const bodyAnimateFillClass = {
       [TooltipStyleGenerator.getSimpleClassName(theme) + '[data-animatefill]']: {
@@ -113,13 +113,24 @@ class TooltipStyleGenerator
     return classes;
   }
 
-  private static styleForBody(bgColor: string, textColor: string): object
+  private static styleForBody(theme: Theme, bgColor: string, textColor: string): object
   {
-    return {
+    const defaultStyle = {
       'color': textColor,
       'box-shadow': `0 4px 20px 4px ${Colors().boxShadow}, 0 4px 80px -8px ${Colors().boxShadow}`,
       'background-color': bgColor,
     };
+    if (theme === 'noStyle')
+    {
+      return _.extend({}, defaultStyle,
+        {
+          'border-radius': '0px',
+          'padding': '0px',
+          'box-shadow': 'none',
+        },
+      );
+    }
+    return defaultStyle;
   }
 
   private static styleForArrow(modifier: ArrowModifier, direction: ShowDirection, color: string): object
@@ -220,6 +231,7 @@ export interface Themes
   faded: ThemeInfo;
   alt: ThemeInfo;
   error: ThemeInfo;
+  noStyle: ThemeInfo;
 }
 
 export type Theme = keyof Themes;
@@ -240,6 +252,10 @@ export const TOOLTIP_THEMES: Themes = {
   error: {
     backgroundColor: () => Colors().error,
     fontColor: () => Colors().text1,
+  },
+  noStyle: {
+    backgroundColor: () => 'rgba(0,0,0,0)', // none does not work
+    fontColor: () => 'none',
   },
 };
 
@@ -301,7 +317,7 @@ export function generateThemeStyles()
     const theme: ThemeInfo = TOOLTIP_THEMES[themeName];
     const bgColor = theme.backgroundColor();
     const textColor = theme.fontColor();
-    const classes = TooltipStyleGenerator.generateStyle(themeName, bgColor, textColor);
+    const classes = TooltipStyleGenerator.generateStyle(themeName as Theme, bgColor, textColor);
     allClasses = _.extend(allClasses, classes);
   }
   return allClasses;

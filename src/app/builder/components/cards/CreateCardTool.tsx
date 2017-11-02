@@ -48,24 +48,28 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
-import * as BlockUtils from '../../../../blocks/BlockUtils';
-import { CardConfig } from '../../../../blocks/types/Card';
-import { AllBackendsMap } from '../../../../database/AllBackends';
-import { backgroundColor, Colors } from '../../../colors/Colors';
-import CreateLine from '../../../common/components/CreateLine';
-import KeyboardFocus from '../../../common/components/KeyboardFocus';
-import TerrainComponent from '../../../common/components/TerrainComponent';
-import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
+
+import { backgroundColor, Colors } from 'app/colors/Colors';
+import Actions from 'builder/data/BuilderActions';
+import CreateLine from 'common/components/CreateLine';
+import KeyboardFocus from 'common/components/KeyboardFocus';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as BlockUtils from 'src/blocks/BlockUtils';
+import { Card, CardConfig } from 'src/blocks/types/Card';
+import { AllBackendsMap } from 'src/database/AllBackends';
+
+import Util from 'util/Util';
+
 import CardDropArea from './CardDropArea';
-import CreateCardOption from './CreateCardOption';
+import CardSelector from './CardSelector';
 import './CreateCardTool.less';
 
-const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
-const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
-const AddCardIcon = require('./../../../../images/icon_addCard_22x17.svg?name=AddCardIcon');
+const AddIcon = require('images/icon_add_7x7.svg?name=AddIcon');
+const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
+const AddCardIcon = require('images/icon_addCard_22x17.svg?name=AddCardIcon');
 
 export interface Props
 {
@@ -78,6 +82,7 @@ export interface Props
   dy?: number;
   className?: string;
   accepts: List<string>;
+  data: any;
   onToggle?: () => void;
   onClose?: () => void; // like toggle, but only called when explicitly closed
   onMinimize?: () => void; // TODO see if these should be consolidated
@@ -101,6 +106,12 @@ class CreateCardTool extends TerrainComponent<Props>
   } = {
     focusedIndex: -1,
   };
+
+  constructor(props)
+  {
+    super(props);
+    this.extractTypeFromOverride = memoizeOne(this.extractTypeFromOverride);
+  }
 
   public handleCardClick(block, index)
   {
@@ -137,78 +148,20 @@ class CreateCardTool extends TerrainComponent<Props>
     this.props.onToggle && this.props.onToggle();
   }
 
-  public renderCardOption(type: string, index: number)
+  public extractTypeFromOverride(overrideText)
   {
-    const { overrideText } = this.props;
-
-    return (
-      <CreateCardOption
-        card={AllBackendsMap[this.props.language].blocks[type] as CardConfig}
-        index={index}
-        onClick={this.handleCardClick}
-        overrideTitle={
-          overrideText &&
-          overrideText.get(index) &&
-          overrideText.get(index).text
-        }
-        isFocused={this.state.focusedIndex === index}
-        key={'' + index}
-      />
-    );
+    return overrideText.map((t) => t.type).toList();
   }
 
   public getCardTypeList(): List<string>
   {
+
     if (this.props.overrideText)
     {
-      // TODO consider memoizing this.
-      return this.props.overrideText.map((t) => t.type).toList();
+      return this.extractTypeFromOverride(this.props.overrideText);
     }
+
     return this.props.accepts || AllBackendsMap[this.props.language].cardsList;
-  }
-
-  public renderCardSelector()
-  {
-    const cardTypeList = this.getCardTypeList();
-    const isEmpty = cardTypeList.size === 0;
-
-    return (
-      <div
-        className={classNames({
-          'create-card-selector': true,
-          'create-card-selector-open': this.props.open,
-          'create-card-selector-focused': this.state.focusedIndex !== -1,
-        })}
-        ref='selector'
-        style={
-          backgroundColor(Colors().bg2)
-        }
-      >
-        <div className='create-card-selector-inner'>
-          {
-            isEmpty &&
-            <div className='create-card-empty'>
-              There are no remaining cards that can be created here.
-                </div>
-          }
-          {
-            cardTypeList.map(this.renderCardOption)
-          }
-          {
-            _.map(_.range(0, 10), (i) => <div className='create-card-button-fodder' key={i} />)
-          }
-        </div>
-      </div>
-    );
-    // {
-    //   !this.props.cannotClose &&
-    //   <div
-    //     className='close create-card-close'
-    //     onClick={this.handleCloseClick}
-    //   >
-    //     <CloseIcon />
-    //   </div>
-    // }
   }
 
   public handleCloseClick()
@@ -236,50 +189,6 @@ class CreateCardTool extends TerrainComponent<Props>
         open={this.props.open}
       />
     );
-
-    // return (
-    //   <div
-    //     onClick={this.props.onToggle}
-    //     className='create-card-placeholder'
-    //     style={{
-    //       borderColor: Colors().inactiveHover,
-    //       ':hover': {
-    //         background: Colors().inactiveHover,
-    //       }
-    //     }}
-    //   >
-    //     {
-    //       this.props.open ? <CloseIcon /> : <AddIcon />
-    //     }
-    //   </div>
-    // );
-  }
-
-  handleFocus()
-  {
-    this.setState({
-      focusedIndex: 0,
-    });
-  }
-
-  handleFocusLost()
-  {
-    this.setState({
-      focusedIndex: -1,
-    });
-  }
-
-  handleFocusedIndexChange(focusedIndex: number)
-  {
-    this.setState({
-      focusedIndex,
-    });
-  }
-
-  handleKeyboardSelect(index: number)
-  {
-    const type = this.getCardTypeList().get(index);
-    this.createCard(type);
   }
 
   public render()
@@ -308,67 +217,36 @@ class CreateCardTool extends TerrainComponent<Props>
     }
 
     const cardTypeList = this.getCardTypeList();
+
     return (
       <div
         className={classes}
         style={_.extend(
           style,
-          {}, // backgroundColor(Colors().bg1),
+          {},
         )}
       >
         {
           this.renderPlaceholder()
         }
-        {
-          this.renderCardSelector()
-        }
+        <CardSelector
+          cardTypeList={this.getCardTypeList()}
+          open={this.props.open}
+          card={this.props.data as CardConfig}
+          language={this.props.language}
+          handleCardClick={this.handleCardClick}
+          overrideText={this.props.overrideText}
+        />
         <CardDropArea
           index={this.props.index}
           keyPath={this.props.keyPath}
-          accepts={this.getCardTypeList()}
+          accepts={cardTypeList}
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
           handleCardDrop={this.props.handleCardDrop}
-        />
-        <KeyboardFocus
-          onFocus={this.handleFocus}
-          onFocusLost={this.handleFocusLost}
-          index={this.state.focusedIndex}
-          onIndexChange={this.handleFocusedIndexChange}
-          length={cardTypeList.size}
-          onSelect={this.handleKeyboardSelect}
         />
       </div>
     );
   }
 }
 export default CreateCardTool;
-
-// const cardTarget =
-// {
-//   canDrop(props, monitor)
-//   {
-//     return true;
-//   },
-
-//   drop(props, monitor, component)
-//   {
-//     const item = monitor.getItem();
-//     if(monitor.isOver({ shallow: true}))
-//     {
-//       props.dndListener && props.dndListener.trigger('droppedCard', monitor.getItem());
-
-//       setTimeout(() =>
-//       {
-//         // Actions.cards.move(item, props.index || 0, props.parentId); // TODO
-//       }, 250);
-//     }
-//   }
-// }
-
-// const dropCollect = (connect, monitor) =>
-// ({
-//   connectDropTarget: connect.dropTarget(),
-// });
-
-// export default DropTarget('CARD', cardTarget, dropCollect)(CreateCardTool);

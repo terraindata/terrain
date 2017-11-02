@@ -48,6 +48,8 @@ import jsurl = require('jsurl');
 declare let ClientJS: any;
 import 'clientjs';
 
+// tslint:disable:strict-boolean-expressions
+
 // Use the 'data-server' attribute to specify the backend server
 // <script src='...' data-server='http://<terrain-analytics-domain>/sigint/v1/'>
 

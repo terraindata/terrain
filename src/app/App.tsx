@@ -215,7 +215,7 @@ class App extends TerrainComponent<Props>
 
     if (Util.getIEVersion())
     {
-      alert('Terraformer is not meant to work in Internet Explorer. Please try another browser.');
+      alert('Terrain is not meant to work in Internet Explorer. Please try another browser.');
     }
 
     // Respond to authentication state changes.
@@ -380,7 +380,7 @@ class App extends TerrainComponent<Props>
     {
       return (
         <InfoArea
-          large="Terraformer cannot be used successfully on this browser in 'private' / 'incognito' mode. Please switch to another browser or turn off incognito mode."
+          large="Terrain cannot be used successfully on this browser in 'private' / 'incognito' mode. Please switch to another browser or turn off incognito mode."
         />
       );
     }

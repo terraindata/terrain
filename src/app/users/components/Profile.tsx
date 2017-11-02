@@ -178,10 +178,10 @@ are still a system administrator yourself.)'))
   public toggleDisabled()
   {
     if (window.confirm(this.state.user.isDisabled ?
-      'Are you sure you want to re-enable this user? They will be able to log in to Terraformer again.'
+      'Are you sure you want to re-enable this user? They will be able to log in to Terrain again.'
       :
       'Are you sure you want to disable this user? \
-The user will not be able to log in to Terraformer, nor will they \
+The user will not be able to log in to Terrain, nor will they \
 be able to view any information or make any changes. They will \
 immediately be logged out of any existing sessions. \
 (You can re-enable this user later, if needed.)'))

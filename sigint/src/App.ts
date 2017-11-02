@@ -110,6 +110,12 @@ class App
     if (config.demo === true)
     {
       winston.info('Demo mode enabled. Demo website will be served at /demo');
+
+      /**
+       * @api {get} /demo Serve the Terrain Analytics demo website
+       * @apiName getDemo
+       * @apiGroup Demo
+       */
       this.app.use(serve({ rootDir: 'demo', rootPath: '/demo' }));
     }
   }

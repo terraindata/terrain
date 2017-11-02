@@ -1,11 +1,9 @@
 @import "../../../common/Common.less";
 
-@focus-color: @bright-green;
+@item-row-height: 500px;
 
 .create-card-wrapper {
-  
   position: relative;
-  @create-card-border-radius: 5px;
   padding-right: 0px;
   
   &.create-card-closed {
@@ -19,99 +17,88 @@
       border: 2px solid @drag-color;
     }
   }
-  
-  @button-padding: @standard-margin / 2;
-  
-  &.create-card-opening .create-card-selector {
-    height: 0px;
+
+  .create-card-tooltip-spawn {
+    position: relative;
+    height: 1px;
   }
-  
-  .create-card-selector {
-    overflow: auto;
-    max-height: 0px;
-    &.create-card-selector-open {
-      max-height: 250px;
-    }
-    
-    
-    border-radius: @create-card-border-radius;
-    box-sizing: border-box;
-    .transition;
-    
-    &:hover,
-    &.create-card-selector-focused {
-      border-color: @focus-color;
-    }
-    
-    .create-card-selector-inner {
-      padding: @standard-margin;
-    }
-  }
-  
-  
-  
-  // .create-card-placeholder {
-  //   @h: 18px;
-  //   height: @h;
-  //   width: calc(~"100% - 24px");
-  //   display: inline-block;
-  //   position: relative;
-  //   border-radius: 3px;
-  //   // margin-top: 6px;
-  //   margin-bottom: 6px;
-  //   margin-left: 12px;
-  //   margin-right: 12px;
-  //   box-sizing: border-box;
-  //   text-align: center;
-  //   cursor: pointer;
-    
-  //   // border: 1px solid #fff;
-    
-  //   opacity: 0.2;
-    
-  //   svg {
-  //     @sh: @h * 2 / 3;
-  //     height: @sh;
-  //     margin-top: (@h - @sh)/2;
-  //     fill: #fff;
-  //   }
-    
-  //   &:hover {
-  //     background: #47a7ff;
-  //     opacity: 1;
-  //     svg {
-  //       fill: #fff;
-  //     }
-  //   }
-    
-  //   .transition;
-  // }
-  
-  &.create-card-open {
-    // .create-card-placeholder {
-    //   // margin-bottom: 0px;
-            
-    //   // svg {
-    //   //   fill: #f00;
-    //   // }
-      
-    //   // &:hover {
-    //   //   background: #f00;
-    //   //   svg {
-    //   //     fill: #fff;
-    //   //   }
-    //   // }
-    // }
-  }
-  
-  // .create-card-close {
-  //   position: absolute;
-  //   right: 8px;
-  //   top: 8px;
-  //   background: rgba(255,0,0,0.25);
-  // }
+
 }
 
+.create-card-selector {
+  @create-card-border-radius: 3px;
+
+  position:relative;
+  overflow: hidden;
+  max-height: 0px;
+  &.create-card-selector-open {
+    max-height: 600px;
+  }
+  
+  border-radius: @create-card-border-radius;
+  box-sizing: border-box;
+  .transition;
+
+  .selectors-row
+  {
+    display: flex;
+  }
+
+  .create-card-column-title {
+    height: 1em;
+    padding: @half-spacing 0px;
+    text-align: center;
+  }
+
+  .create-card-selector-column {
+    flex: 1;
+
+    .create-card-selector-inner {
+      margin: @spacing 0px;
+      margin-right: @spacing;
+      padding-right: @quarter-spacing;
+      overflow: auto;
+    }
+  }
+
+  .card-category-selector {
+    width: 160px;
+
+    .card-category-list {
+      margin: @spacing;
+      display: block;
+      .card-category-list-item {
+        height: 24px;
+        cursor: pointer;
+        margin: 0px;
+        justify-content: center;
+        padding: 3px;
+        display: flex;
+        align-items: center;
+        text-transform: capitalize;
+        border-top: 1px solid;
+        border-left: 3px solid;
+        border-right: 1px solid;
+        .big-text;
+        .transition;
+        &:last-child {
+          border-bottom: 1px solid;
+        }
+      }
+    }
+  }
+
+  .card-search-line {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid;
+    .card-search-input {
+      padding: @half-spacing;
+      border-radius: 0px;
+      background-color: none;
+    }
+  }
+}
 
 .card-hovering, .create-card-open {
   .create-line-row {
@@ -120,34 +107,4 @@
   .card .create-line-row {
     opacity: 0.2;
   }
-  // .create-card-wrapper.create-card-closed {
-  //   .create-card-placeholder {
-  //     opacity: 1;
-  //     background: rgba(255,255,255,0.15);
-  //   }
-  // }
-  // .card {
-  //   .create-card-wrapper.create-card-closed {
-  //     .create-card-placeholder {
-  //       opacity: 0.2;
-  //       background: none;
-  //     }
-  //   } 
-  // }
 }
-
-// a little experiment to make the placeholders only appear on card hover
-// .create-card-wrapper {
-//   height: 0px;
-//   overflow: hidden;
-// }
-
-// .card-hovering {
-//   .create-card-wrapper {
-//     height: auto;
-//   }
-  
-//   .card .create-card-wrapper {
-//     height: 0px;
-//   }
-// }
