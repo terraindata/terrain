@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import './LibraryItem.less';
 const { List } = Immutable;
@@ -120,6 +121,7 @@ export interface Props
   isFocused: boolean; // is this the last thing focused / selected?
 }
 
+// Note: for some very weird reason, adding @Radium here causes an infinite loop in Analytics
 class LibraryItem extends TerrainComponent<Props>
 {
   public static defaultProps: Partial<Props> = {
@@ -371,7 +373,22 @@ class LibraryItem extends TerrainComponent<Props>
         (isPinned ? ' library-item-pin-active' : '');
 
       pinComponent = (
-        <div onClick={this.handlePin} className={pinIconClass}>
+        <div
+          onClick={this.handlePin}
+          className={pinIconClass}
+          style={isPinned ?
+            {
+              backgroundColor: Colors().active,
+              color: Colors().activeText,
+              borderColor: Colors().darkerHighlight,
+            } :
+            {
+              backgroundColor: Colors().darkerHighlight,
+              color: Colors().activeText,
+              borderColor: Colors().active,
+            }
+          }
+        >
           <PinIcon />
         </div>
       );

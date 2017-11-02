@@ -85,24 +85,30 @@
       width: 24px;
       height: 24px;
       border-radius: 24px;
-      margin: -2px 6px 0 0;
+      margin: -3px 12px 0 0;
       position: relative;
       svg {
         opacity: 1;
         height: 16px;
-        fill: rgba(255,255,255, 1);
-        stroke: #000;
-        stroke-width: 2px;
+        fill: currentColor;
         position: absolute;
         left: calc(7px);
         top: calc(5px);
+        
       }
-      // position: absolute;
-      // right: 0px;
+      .transition;
+      
+      // note: ideally this would be replaced by Radium, but it's not working
+      border: 1px solid rgba(0,0,0,0);
+      
+      &:not(:hover) {
+        border-color: rgba(0,0,0,0) !important;
+      }
     }
-    .library-item-pin-active {
-      background-color: rgba(0,0,0, .2);
-      box-shadow: inset 0 0 10px #111;
+    &.library-item-pin-active {
+      svg {
+        .wiggle;
+      }
     }
   }
 
