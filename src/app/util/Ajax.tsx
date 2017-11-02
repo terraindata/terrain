@@ -906,6 +906,7 @@ export const Ajax =
       exporting: boolean,
       primaryKeyDelimiter: string,
       objectKey: string,
+      rank: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -922,6 +923,7 @@ export const Ajax =
         export: exporting,
         primaryKeyDelimiter,
         objectKey,
+        rank,
       };
       const onLoadHandler = (resp) =>
       {
