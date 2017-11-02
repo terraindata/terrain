@@ -565,7 +565,15 @@ class MapComponent extends TerrainComponent<Props>
     {
       const location = MapUtil.getCoordinatesFromGeopoint(spotlight.fields[this.props.field]);
       const address = spotlight.name;
-      return this.renderMarker(address, location, false, -1, spotlight.color, false, String(address) + '_' + String(index));
+      return this.renderMarker(
+        address,
+        location,
+        false,
+        Number(spotlight.rank) + 1,
+        spotlight.color,
+        false,
+        String(address) + '_' + String(index),
+      );
     }
     return null;
   }

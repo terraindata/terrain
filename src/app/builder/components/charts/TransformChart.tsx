@@ -560,20 +560,20 @@ const TransformChart = {
         if (text)
         {
           textYs[bucket] =
-          {
-            y,
-            offset: INITIAL_OFFSET,
-            x,
-          };
+            {
+              y,
+              offset: INITIAL_OFFSET,
+              x,
+            };
         }
         else
         {
           ys[bucket] =
-          {
-            y,
-            offset: INITIAL_OFFSET,
-            x,
-          };
+            {
+              y,
+              offset: INITIAL_OFFSET,
+              x,
+            };
         }
       }
 
@@ -584,8 +584,9 @@ const TransformChart = {
 
     const fontSize = (d) =>
     {
-      if (d['rank'] + 1 < 10) {
-        return 'font-size: 10px;'
+      if (d['rank'] + 1 < 10)
+      {
+        return 'font-size: 10px;';
       }
       else if (d['rank'] + 1 < 100)
       {
@@ -596,7 +597,8 @@ const TransformChart = {
 
     const getTextOffset = (d) =>
     {
-      if (d['rank'] + 1 < 10) {
+      if (d['rank'] + 1 < 10)
+      {
         return 3;
       }
       else if (d['rank'] + 1 < 100)
@@ -604,11 +606,12 @@ const TransformChart = {
         return 4;
       }
       return 5;
-    }
+    };
 
     const isvg = d3.select(el).select('.inner-svg');
 
-    const getFinalX = (d, offset = false) => {
+    const getFinalX = (d, offset = false) =>
+    {
       if (!offset)
       {
         return scales.realX(ys[getBucket(d)].x);
@@ -631,7 +634,7 @@ const TransformChart = {
       .attr('x', (d) => getFinalX(d, true))
       .attr('fill', '#fff')
       .attr('style', fontSize)
-      .text((d) => d['rank'] + 1)
+      .text((d) => d['rank'] + 1);
 
     spotlight
       .select('.spotlight-tooltip')
