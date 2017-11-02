@@ -152,6 +152,10 @@ class HitsArea extends TerrainComponent<Props>
     if (this.props.resultsState.hits !== nextProps.resultsState.hits)
     {
       let spotlightHits = Map({});
+      if (nextProps.resultsState.hits === undefined)
+      {
+        return;
+      }
       nextProps.resultsState.hits.forEach((hit) =>
       {
         if (this.state.spotlightHits.get(hit.primaryKey))
@@ -270,6 +274,10 @@ class HitsArea extends TerrainComponent<Props>
 
   public buildAggregationMap(locations, hits)
   {
+    if (hits === undefined)
+    {
+      return [];
+    }
     const allMapsData = [];
     _.keys(locations).forEach((field) =>
     {
