@@ -316,6 +316,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     spotlightData['name'] = getResultName(result, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
+    spotlightData['rank'] = row;
     spotlightAction(id, spotlightData);
   }
 

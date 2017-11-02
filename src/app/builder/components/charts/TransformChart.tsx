@@ -461,7 +461,6 @@ const TransformChart = {
 
   _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData)
   {
-    console.log(spotlights);
     const g = d3.select(el).selectAll('.spotlights');
 
     const spotlight = g.selectAll('.spotlight')
@@ -492,6 +491,7 @@ const TransformChart = {
     const SPOTLIGHT_SPACING = SPOTLIGHT_SIZE + SPOTLIGHT_PADDING * 2;
 
     const ys: _.Dictionary<{ y: number, offset: number, x: number }> = {};
+    const textYs: _.Dictionary<{ y: number, offset: number, x: number }> = {};
     const idToY = {};
     const xToBucket = {};
     const getBucket = (d) =>
@@ -521,14 +521,18 @@ const TransformChart = {
       return xToBucket[x];
     };
 
-    const getSpotlightY = (d, increaseOffset) =>
+    const getSpotlightY = (d, text = false) =>
     {
       const x = getSpotlightX(d);
       const bucket = getBucket(d);
 
-      if (ys[bucket] && increaseOffset)
+      if (!text && ys[bucket])
       {
         ys[bucket].offset += OFFSET;
+      }
+      else if (text && textYs[bucket])
+      {
+        textYs[bucket].offset += OFFSET;
       }
       else
       {
@@ -553,37 +557,81 @@ const TransformChart = {
         }
 
         const y = scales.realPointY(yVal);
-        ys[bucket] =
+        if (text)
+        {
+          textYs[bucket] =
           {
             y,
             offset: INITIAL_OFFSET,
             x,
           };
+        }
+        else
+        {
+          ys[bucket] =
+          {
+            y,
+            offset: INITIAL_OFFSET,
+            x,
+          };
+        }
       }
 
-      const finalY = ys[bucket].y - ys[bucket].offset;
+      const finalY = text ? textYs[bucket].y - textYs[bucket].offset : ys[bucket].y - ys[bucket].offset;
       idToY[d['id']] = finalY;
       return finalY;
     };
 
+    const fontSize = (d) =>
+    {
+      if (d['rank'] + 1 < 10) {
+        return 'font-size: 10px;'
+      }
+      else if (d['rank'] + 1 < 100)
+      {
+        return 'font-size: 8px';
+      }
+      return 'font-size: 6px';
+    };
+
+    const getTextOffset = (d) =>
+    {
+      if (d['rank'] + 1 < 10) {
+        return 3;
+      }
+      else if (d['rank'] + 1 < 100)
+      {
+        return 4;
+      }
+      return 5;
+    }
+
     const isvg = d3.select(el).select('.inner-svg');
 
-    const getFinalX = (d) => scales.realX(ys[getBucket(d)].x);
+    const getFinalX = (d, offset = false) => {
+      if (!offset)
+      {
+        return scales.realX(ys[getBucket(d)].x);
+
+      }
+      const shift = getTextOffset(d);
+      return scales.realX(ys[getBucket(d)].x) - shift;
+    };
 
     spotlight
       .select('circle')
-      .attr('cy', (d) => getSpotlightY(d, true))
+      .attr('cy', (d) => getSpotlightY(d))
       .attr('cx', (d) => getFinalX(d))
       .attr('fill', (d) => d['color'])
       .attr('r', (d) => SPOTLIGHT_SIZE / 2)
       ;
 
-    // TODO POSITON AND SIZE BASED ON LENGTH OF NUM
     spotlight.select('.spotlight-rank')
-      .attr('y', (d) => getSpotlightY(d, false) + 3)
-      .attr('x', (d) => getFinalX(d) - 3)
+      .attr('y', (d) => getSpotlightY(d, true) + 3)
+      .attr('x', (d) => getFinalX(d, true))
       .attr('fill', '#fff')
-      .text((d) => d['rank'] + 1);
+      .attr('style', fontSize)
+      .text((d) => d['rank'] + 1)
 
     spotlight
       .select('.spotlight-tooltip')
@@ -632,11 +680,7 @@ const TransformChart = {
         const y = d['y'];
         const offset = d['offset'];
         const radius = SPOTLIGHT_SIZE / 2 + SPOTLIGHT_PADDING;
-        console.log('x', x);
-        console.log('y', y);
-        console.log('offset', offset);
         let straightHeight = offset - radius * 2 - 2;
-        console.log(straightHeight);
         if (straightHeight < 0)
         {
           straightHeight = 0;
@@ -657,7 +701,6 @@ const TransformChart = {
         str = str.replace(/h/g, straightHeight + '');
         str = str.replace(/r/g, radius + '');
         str = str.replace(/p/g, pinR + '');
-        console.log(str);
         return str;
       })
       .attr('transform', (d) =>
@@ -687,7 +730,7 @@ const TransformChart = {
         return '';
       });
 
-    spotlight.selectAll('.spotlight-tooltip, rect')
+    spotlight.selectAll('.spotlight-tooltip, rect, .spotlight-rank')
       .attr('transform', (d) =>
       {
         let rotate = '0';
