@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as http from 'http';
 import * as Koa from 'koa';
+import serve = require('koa-static-server');
 import * as winston from 'winston';
 
 import cors = require('kcors');
@@ -105,6 +106,12 @@ class App
 
     const router = new Router(config);
     this.app.use(router.routes());
+
+    if (config.demo === true)
+    {
+      winston.info('Demo mode enabled. Demo website will be served at /demo');
+      this.app.use(serve({ rootDir: 'demo', rootPath: '/demo' }));
+    }
   }
 
   public async start(): Promise<http.Server>

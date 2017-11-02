@@ -118,6 +118,16 @@ class Autocomplete extends TerrainComponent<Props>
     });
   }
 
+  public componentWillReceiveProps(nextProps)
+  {
+    if (this.props.value !== nextProps.value)
+    {
+      this.setState({
+        value: nextProps.value,
+      });
+    }
+  }
+
   public handleChange(event)
   {
     let { target } = event;

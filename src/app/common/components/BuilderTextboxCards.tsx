@@ -101,10 +101,12 @@ class BuilderTextboxCards extends React.Component<Props, any>
       <FadeInOut
         open={!this.props.value[closedKey]}
       >
-        <div className={classNames({
-          'builder-tb-cards-area': true,
-          [this.props.className]: !!this.props.className,
-        })} ref='tb'>
+        <div
+          className={classNames({
+            'builder-tb-cards-area': true,
+            [this.props.className]: !!this.props.className,
+          })}
+        >
           <CardComponent
             {...this.props}
             singleCard={true}

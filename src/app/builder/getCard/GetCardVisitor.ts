@@ -103,7 +103,7 @@ export const KEY_DISPLAY: Display =
     className: 'card-muted-input card-elastic-key-input',
     component: ElasticKeyBuilderTextbox,
     style: {
-      maxWidth: 100,
+      // maxWidth: 100,
     },
   };
 

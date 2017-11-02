@@ -44,55 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions
-
-import * as _ from 'lodash';
-
-import { BuilderStore } from '../../../app/builder/data/BuilderStore';
-import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
-import Query from '../../../items/types/Query';
-import Options from '../../types/CardsToCodeOptions';
-
-import { isInput } from '../../../blocks/types/Input';
-import ESCardParser from './ESCardParser';
-import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
-
-class CardsToElastic
+export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
 {
-  public static toElastic(query: Query, options: Options = {}): string
+  return (error: Error, response: T) =>
   {
-    const body = {};
-    const rootCard = query.cards.get(0);
-
-    const rootCardValue = CardsToElastic.blockToElastic(rootCard, options);
-    if (rootCardValue !== null)
+    if (error !== null && error !== undefined)
     {
-      body['body'] = rootCardValue;
+      reject(error);
     }
-    const eql = ESQueryToCode(body as ESQueryObject, options, query.inputs);
-    return eql;
-  }
-
-  public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
-  {
-    if (typeof block !== 'object')
+    else
     {
-      return block;
+      resolve(response);
     }
-    if (block && block.static && block.static.tql)
-    {
-      const tql = block.static.tql as TQLRecursiveObjectFn;
-      let value = tql(block, CardsToElastic.blockToElastic, options);
-
-      if ((value === undefined || (typeof (value) === 'number' && isNaN(value)))
-        && isInput(block['value'], BuilderStore.getState().query.inputs))
-      {
-        value = block['value'];
-      }
-      return value;
-    }
-    return null;
-  }
+  };
 }
-
-export default CardsToElastic;
