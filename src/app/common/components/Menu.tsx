@@ -64,8 +64,8 @@ export interface MenuOption
   text: string;
   onClick: (index: number, id: string) => void;
   disabled?: boolean;
-  icon?: any;
   selected?: boolean;
+  icon?: any;
   iconColor?: string;
 }
 
@@ -110,7 +110,6 @@ export class Menu extends TerrainComponent<Props>
 
     return (
       <div
-
         className={classNames({
           'menu-option': true,
           'menu-option-disabled': option.disabled,
@@ -146,6 +145,11 @@ export class Menu extends TerrainComponent<Props>
       open: false,
     });
     $(document).off('click', this.close);
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.menu-wrapper .menu-icon .st0 ', { fill: Colors().text3 });
   }
 
   public componentWillUnmount()
