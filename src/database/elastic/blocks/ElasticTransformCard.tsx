@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands max-line-length
 
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 
 import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -132,6 +132,10 @@ export const elasticTransform = _card(
             {
               displayType: DisplayType.DROPDOWN,
               options: List(['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid']),
+              optionsDisplayName: Map({
+                linear: 'freeform', logarithmic: 'logarithmic',
+                exponential: 'exponential', normal: 'bell-curve', sigmoid: 's-curve'
+              })
               key: 'mode',
               style: {
                 width: '50%',
