@@ -50,9 +50,14 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import './LibraryVariantInfo.less';
 const { List } = Immutable;
+import { MidwayError } from './../../../../shared/error/MidwayError';
+import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
+import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
+import Actions from './../data/LibraryActions';
+import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
 
@@ -72,6 +77,58 @@ const LANGUAGES = Immutable.List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends TerrainComponent<Props>
 {
+  public state: {
+    variantStatus: string,
+    variantStatusErrorModalOpen: boolean,
+    errorModalMessage: string,
+  } = {
+    variantStatus: 'Loading...',
+    variantStatusErrorModalOpen: false,
+    errorModalMessage: '',
+  };
+
+  public componentDidMount()
+  {
+    this.fetchStatus(this.props.variant);
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (nextProps.variant !== this.props.variant)
+    {
+      this.fetchStatus(nextProps.variant);
+    }
+  }
+
+  public toggleVariantStatusError()
+  {
+    this.setState({
+      variantStatusErrorModalOpen: !this.state.variantStatusErrorModalOpen,
+    });
+  }
+
+  public fetchStatus(variant: Variant)
+  {
+    if (variant !== undefined)
+    {
+      this.setState({ variantStatus: 'Loading...' });
+      Ajax.getVariantStatus(
+        variant.id,
+        variant.db.id as number,
+        (response) =>
+        {
+          this.setState({ variantStatus: response });
+        },
+        (error) =>
+        {
+          const readable: string = MidwayError.fromJSON(error).getDetail();
+          this.setState({ errorModalMessage: readable });
+          this.toggleVariantStatusError();
+        },
+      );
+    }
+  }
+
   public render()
   {
     if (!this.props.variant)
@@ -124,8 +181,24 @@ class LibraryInfoColumn extends TerrainComponent<Props>
                 />
               </div>
             </div>
+            <div className='biv-row'>
+              <div className='biv-cell-first'>
+                Deployed Status
+              </div>
+              <div className='biv-cell-second'>
+                {
+                  this.state.variantStatus
+                }
+              </div>
+            </div>
           </div>
         </div>
+        <Modal
+          message={this.state.errorModalMessage}
+          onClose={this.toggleVariantStatusError}
+          open={this.state.variantStatusErrorModalOpen}
+          error={true}
+        />
       </div>
     );
   }

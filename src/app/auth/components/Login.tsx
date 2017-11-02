@@ -216,7 +216,7 @@ class Login extends TerrainComponent<Props>
 
   public registerNewUser()
   {
-    alert('Signing up for Terraformer has not been implemented yet');
+    alert('Signing up for Terrain has not been implemented yet');
   }
 
   public toggleErrorModal()

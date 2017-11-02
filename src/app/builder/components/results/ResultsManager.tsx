@@ -197,7 +197,7 @@ export class ResultsManager extends TerrainComponent<Props>
       if (!this.props.query || nextProps.query.id !== this.props.query.id)
       {
         this.changeResults({
-          hits: List([]),
+          hits: undefined,
           aggregations: {},
         });
       }
@@ -206,12 +206,12 @@ export class ResultsManager extends TerrainComponent<Props>
     if (this.props.variantPath !== undefined && (this.props.variantPath !== nextProps.variantPath))
     {
       this.changeResults({
-        hits: List([]),
+        hits: undefined,
         aggregations: {},
       });
     }
 
-    if (nextProps.resultsState.hits !== this.props.resultsState.hits)
+    if (nextProps && (nextProps.resultsState.hits !== this.props.resultsState.hits))
     {
       // update spotlights
       let nextState = nextProps.resultsState;
@@ -426,39 +426,39 @@ export class ResultsManager extends TerrainComponent<Props>
         ),
       });
 
-      let allFieldsQueryCode;
-      try
-      {
-        allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
-          query,
-          {
-            allFields: true,
-            replaceInputs: true,
-          },
-        );
-      }
-      catch (err)
-      {
-        console.log('Could not generate all field Elastic request, reason:' + err);
-      }
-      if (allFieldsQueryCode)
-      {
-        this.setState({
-          allQuery: Ajax.query(
-            allFieldsQueryCode,
-            db,
-            (resp) =>
-            {
-              this.handleM2QueryResponse(resp, true);
-            },
-            (err) =>
-            {
-              this.handleM2RouteError(err, true);
-            },
-          ),
-        });
-
-      }
+      // let allFieldsQueryCode;
+      // try
+      // {
+      //   allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
+      //     query,
+      //     {
+      //       allFields: true,
+      //       replaceInputs: true,
+      //     },
+      //   );
+      // }
+      // catch (err)
+      // {
+      //   console.log('Could not generate all field Elastic request, reason:' + err);
+      // }
+      // if (allFieldsQueryCode)
+      // {
+      //   this.setState({
+      //     allQuery: Ajax.query(
+      //       allFieldsQueryCode,
+      //       db,
+      //       (resp) =>
+      //       {
+      //         this.handleM2QueryResponse(resp, true);
+      //       },
+      //       (err) =>
+      //       {
+      //         this.handleM2RouteError(err, true);
+      //       },
+      //     ),
+      //   });
+      //
+      // }
 
       this.changeResults({
         loading: true,
@@ -511,8 +511,7 @@ export class ResultsManager extends TerrainComponent<Props>
       fields = hits.get(0).fields.keySeq().toList();
     }
 
-    const loading = (isAllFields && !resultsState.hasLoadedResults) ||
-      (!isAllFields && !resultsState.hasLoadedAllFields && !this.props.noExtraFields);
+    const loading = false;
 
     const changes: any = {
       hits,

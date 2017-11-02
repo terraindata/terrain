@@ -489,6 +489,46 @@ export const Ajax =
       // }
     },
 
+    getVariantStatus(
+      variantId: ID,
+      dbid: number,
+      onLoad: (resp: object) => void,
+      onError?: (resp: any) => void,
+    )
+    {
+      const onLoadHandler = (resp) =>
+      {
+        onLoad(resp);
+      };
+      Ajax.req(
+        'get',
+        'items/live/' + variantId,
+        {},
+        (response: object) =>
+        {
+          let responseData: object;
+          try
+          {
+            responseData = response;
+          }
+          catch (e)
+          {
+            onError && onError(e.message);
+          }
+
+          if (responseData !== undefined)
+          {
+            // needs to be outside of the try/catch so that any errors it throws aren't caught
+            onLoad(responseData);
+          }
+        },
+        {
+          onError, urlArgs: { dbid },
+        },
+      );
+      return;
+    },
+
     getVersions(id: ID, onLoad: (versions: any) => void, onError?: (ev: Event) => void)
     {
       return Ajax.req('get', 'versions/items/' + id, {}, (response: any) =>
@@ -701,7 +741,7 @@ export const Ajax =
       Ajax.req(
         'get',
         'import/analyzers',
-        { index },
+        {},
         (response) =>
         {
           let responseData: object = null;
@@ -719,6 +759,9 @@ export const Ajax =
             // needs to be outside of the try/catch so that any errors it throws aren't caught
             onLoad(responseData);
           }
+        },
+        {
+          onError, urlArgs: { index },
         },
       );
       return;
@@ -863,6 +906,7 @@ export const Ajax =
       exporting: boolean,
       primaryKeyDelimiter: string,
       objectKey: string,
+      rank: boolean,
       onLoad: (resp: object[]) => void,
       onError?: (ev: string) => void,
     )
@@ -879,6 +923,7 @@ export const Ajax =
         export: exporting,
         primaryKeyDelimiter,
         objectKey,
+        rank,
       };
       const onLoadHandler = (resp) =>
       {

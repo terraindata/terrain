@@ -44,55 +44,95 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions
+import * as Elastic from 'elasticsearch';
+import * as fs from 'fs';
+import * as winston from 'winston';
 
-import * as _ from 'lodash';
+import { makePromiseCallback } from './Util';
 
-import { BuilderStore } from '../../../app/builder/data/BuilderStore';
-import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
-import Query from '../../../items/types/Query';
-import Options from '../../types/CardsToCodeOptions';
+export const index = 'movies';
+export const type = 'data';
 
-import { isInput } from '../../../blocks/types/Input';
-import ESCardParser from './ESCardParser';
-import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
-
-class CardsToElastic
+export interface Request
 {
-  public static toElastic(query: Query, options: Options = {}): string
-  {
-    const body = {};
-    const rootCard = query.cards.get(0);
-
-    const rootCardValue = CardsToElastic.blockToElastic(rootCard, options);
-    if (rootCardValue !== null)
-    {
-      body['body'] = rootCardValue;
-    }
-    const eql = ESQueryToCode(body as ESQueryObject, options, query.inputs);
-    return eql;
-  }
-
-  public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
-  {
-    if (typeof block !== 'object')
-    {
-      return block;
-    }
-    if (block && block.static && block.static.tql)
-    {
-      const tql = block.static.tql as TQLRecursiveObjectFn;
-      let value = tql(block, CardsToElastic.blockToElastic, options);
-
-      if ((value === undefined || (typeof (value) === 'number' && isNaN(value)))
-        && isInput(block['value'], BuilderStore.getState().query.inputs))
-      {
-        value = block['value'];
-      }
-      return value;
-    }
-    return null;
-  }
+  s: string;
+  q: string;
+  p: number;
 }
 
-export default CardsToElastic;
+export async function search(req: Request): Promise<object[]>
+{
+  const client = new Elastic.Client({
+    host: req.s,
+  });
+
+  try
+  {
+    await new Promise((resolve, reject) =>
+    {
+      client.ping({
+        requestTimeout: 100,
+      }, makePromiseCallback(resolve, reject));
+    });
+  }
+  catch (e)
+  {
+    winston.error('creating ES client for host: ' + String(req.s) + ': ' + String(e));
+    return [];
+  }
+
+  try
+  {
+    const resp: any = await new Promise((resolve, reject) =>
+    {
+      let query = {};
+      if (req.q === '')
+      {
+        query = {
+          match_all: {
+          },
+        };
+      }
+      else
+      {
+        query = {
+          match: {
+            title: req.q,
+          },
+        };
+      }
+
+      client.search({
+        index,
+        type,
+        from: (req.p * 30),
+        size: 30,
+        body: {
+          query,
+        },
+      }, makePromiseCallback(resolve, reject));
+
+      // client.searchTemplate({
+      //   body: {
+      //     id: 'terrain_14',
+      //     params: {
+      //       from: (req.p * 30),
+      //       size: 30,
+      //     },
+      //   },
+      // } as any, makePromiseCallback(resolve, reject));
+    });
+
+    if (resp.hits.hits === undefined)
+    {
+      return [];
+    }
+
+    return resp.hits.hits.map((m) => Object.assign({}, m._source, {_id: m._id}));
+  }
+  catch (e)
+  {
+    winston.error('querying ES: ' + String(req.q) + ': ' + String(e));
+    return [];
+  }
+}
