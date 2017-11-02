@@ -58,19 +58,21 @@ import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
 import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
-import { getResultName } from './Result';
-import { Results } from './ResultTypes';
+import { getResultName } from './Hit';
+import { Hits } from './ResultTypes';
 
 export interface Props
 {
-  results: Results;
+  hits: Hits;
   resultsConfig?: ResultsConfig;
   onExpand: (index: number) => void;
-  resultsLoading: boolean;
+  hitsLoading: boolean;
   allowSpotlights: boolean;
+  onSpotlightAdded: (id, spotlightData) => void;
+  onSpotlightRemoved: (id) => void;
 }
 
-export default class ResultsTable extends TerrainComponent<Props>
+export default class HitsTable extends TerrainComponent<Props>
 {
   public state: {
     random: number;
@@ -88,13 +90,13 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (nextProps.results !== this.props.results || nextProps.resultsConfig !== this.props.resultsConfig)
+    if (nextProps.hits !== this.props.hits || nextProps.resultsConfig !== this.props.resultsConfig)
     {
       // force the table to update
       this.setState({
         random: Math.random(),
         columns: this.getColumns(nextProps),
-        rows: nextProps.results,
+        rows: nextProps.hits,
       });
     }
   }
@@ -144,7 +146,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     }
     else
     {
-      const resultFields = props.results.size ? props.results.get(0).fields : Map({});
+      const resultFields = props.hits.size ? props.hits.get(0).fields : Map({});
       resultFields.map(
         (value, field) =>
           cols.push({
@@ -161,7 +163,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     // NOTE: Passing any empty cols array will cause our table library to crashhhh
     if (cols.length === 0)
     {
-      if (this.props.resultsLoading)
+      if (this.props.hitsLoading)
       {
         cols = [
           {
@@ -175,7 +177,7 @@ export default class ResultsTable extends TerrainComponent<Props>
         cols = [
           {
             key: 'none',
-            name: 'No results',
+            name: 'No hits',
           },
         ];
       }
@@ -191,7 +193,7 @@ export default class ResultsTable extends TerrainComponent<Props>
       stateKey: 'spotlightState',
     });
 
-    this.setState({ rows: this.props.results });
+    this.setState({ rows: this.props.hits });
   }
 
   public getRow(i: number): object
@@ -251,7 +253,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     let rows;
     if (sortDirection === 'NONE')
     {
-      rows = this.props.results;
+      rows = this.props.hits;
     }
     else
     {
@@ -295,7 +297,7 @@ export default class ResultsTable extends TerrainComponent<Props>
     else
     {
       this.setState({
-        rows: this.props.results.filter((r) =>
+        rows: this.props.hits.filter((r) =>
           (r.fields.get(filter.column.key).toString().toLowerCase().includes(filter.filterTerm.toLowerCase()))),
       });
     }
@@ -303,34 +305,36 @@ export default class ResultsTable extends TerrainComponent<Props>
 
   public clearFilters()
   {
-    this.setState({ rows: this.props.results });
+    this.setState({ rows: this.props.hits });
   }
 
   public spotlight(row: number)
   {
-    const result = this.state.rows && this.state.rows.get(row);
-    const id = result.primaryKey;
+    const hit = this.state.rows && this.state.rows.get(row);
+    const id = hit.primaryKey;
     const spotlightColor = ColorManager.altColorForKey(id);
 
-    const spotlightData = result.toJS();
-    spotlightData['name'] = getResultName(result, this.props.resultsConfig);
+    const spotlightData = hit.toJS();
+    spotlightData['name'] = getResultName(hit, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightAction(id, spotlightData);
+    this.props.onSpotlightAdded(id, spotlightData);
   }
 
   public unspotlight(row: number)
   {
-    const result = this.state.rows && this.state.rows.get(row);
-    spotlightAction(result.primaryKey, null);
+    const hit = this.state.rows && this.state.rows.get(row);
+    spotlightAction(hit.primaryKey, null);
+    this.props.onSpotlightRemoved(hit.primaryKey);
   }
 
   public rowRenderer(props)
   {
     if (this.state.selectedIndexes.includes(props.idx))
     {
-      const result = this.state.rows && this.state.rows.get(props.idx);
-      const id = result.primaryKey;
+      const hit = this.state.rows && this.state.rows.get(props.idx);
+      const id = hit.primaryKey;
       const spotlight = this.state.spotlightState.getIn(['spotlights', id]);
       if (spotlight === undefined)
       {

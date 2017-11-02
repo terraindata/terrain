@@ -64,7 +64,7 @@ import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
 import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import { _Result, MAX_RESULTS, Result, Results, ResultsState } from './ResultTypes';
+import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
 
 export interface Props
 {
@@ -96,7 +96,7 @@ interface State
 
 const stateQueries = ['query', 'allQuery', 'countQuery', 'transformQuery'];
 
-let RESULTS_CACHE: { [primaryKey: string]: Result };
+let HITS_CACHE: { [primaryKey: string]: Hit };
 
 export class ResultsManager extends TerrainComponent<Props>
 {
@@ -186,7 +186,7 @@ export class ResultsManager extends TerrainComponent<Props>
         && (!this.props.query ||
           (
             this.props.query.tql !== nextProps.query.tql ||
-            this.props.query.cards !== nextProps.query.cards ||
+            // this.props.query.cards !== nextProps.query.cards ||
             this.props.query.inputs !== nextProps.query.inputs
           )
         )
@@ -197,7 +197,8 @@ export class ResultsManager extends TerrainComponent<Props>
       if (!this.props.query || nextProps.query.id !== this.props.query.id)
       {
         this.changeResults({
-          results: undefined,
+          hits: undefined,
+          aggregations: {},
         });
       }
     }
@@ -205,11 +206,12 @@ export class ResultsManager extends TerrainComponent<Props>
     if (this.props.variantPath !== undefined && (this.props.variantPath !== nextProps.variantPath))
     {
       this.changeResults({
-        results: undefined,
+        hits: undefined,
+        aggregations: {},
       });
     }
 
-    if (nextProps.query && (nextProps.resultsState.results !== this.props.resultsState.results))
+    if (nextProps.query && (nextProps.resultsState.hits !== this.props.resultsState.hits))
     {
       // update spotlights
       let nextState = nextProps.resultsState;
@@ -218,16 +220,16 @@ export class ResultsManager extends TerrainComponent<Props>
       SpotlightStore.getState().spotlights.map(
         (spotlight, id) =>
         {
-          let resultIndex = nextState.results && nextState.results.findIndex(
-            (r) => getPrimaryKeyFor(r, resultsConfig) === id,
+          let hitIndex = nextState.hits && nextState.hits.findIndex(
+            (h) => getPrimaryKeyFor(h, resultsConfig) === id,
           );
-          if (resultIndex !== -1)
+          if (hitIndex !== -1)
           {
             spotlightAction(id, _.extend({
               color: spotlight.color,
               name: spotlight.name,
             },
-              nextState.results.get(resultIndex).toJS(),
+              nextState.hits.get(hitIndex).toJS(),
             ));
             // TODO something more like this
             // spotlightAction(id,
@@ -320,7 +322,7 @@ export class ResultsManager extends TerrainComponent<Props>
     const tql = AllBackendsMap[query.language].queryToCode(
       query,
       {
-        limit: MAX_RESULTS,
+        limit: MAX_HITS,
         replaceInputs: true,
       },
     );
@@ -362,7 +364,7 @@ export class ResultsManager extends TerrainComponent<Props>
           {
             allFields: true,
             transformAliases: true,
-            limit: MAX_RESULTS,
+            limit: MAX_HITS,
             replaceInputs: true,
           });
         this.setState({
@@ -468,51 +470,51 @@ export class ResultsManager extends TerrainComponent<Props>
     }
   }
 
-  private updateResults(resultsData: any[], isAllFields: boolean)
+  private updateResults(resultsData: any, isAllFields: boolean)
   {
     const { resultsState } = this.props;
-
-    const resultsCount = resultsData.length;
-    if (resultsData.length > MAX_RESULTS)
+    const hitsData = resultsData.hits;
+    const resultsCount = hitsData.length;
+    if (hitsData.length > MAX_HITS)
     {
-      resultsData.splice(MAX_RESULTS, resultsData.length - MAX_RESULTS);
+      hitsData.splice(MAX_HITS, hitsData.length - MAX_HITS);
     }
-    let results: Results =
+    let hits: Hits =
       (resultsState.hasLoadedResults || resultsState.hasLoadedAllFields)
-        ? resultsState.results : List([]);
-    resultsData.map(
-      (resultData, index) =>
+        ? resultsState.hits : List([]);
+    hitsData.map(
+      (hitData, index) =>
       {
-        let result: Result = results.get(index) || _Result();
-        result = result.set(
+        let hit: Hit = hits.get(index) || _Hit();
+        hit = hit.set(
           'fields',
-          result.fields.merge(resultData),
+          hit.fields.merge(hitData),
         );
 
-        result = result.set(
+        hit = hit.set(
           'primaryKey',
-          getPrimaryKeyFor(result, this.props.query.resultsConfig, index),
+          getPrimaryKeyFor(hit, this.props.query.resultsConfig, index),
         );
 
         if (!isAllFields)
         {
-          result = result.set('rawFields', Map(resultData));
+          hit = hit.set('rawFields', Map(hitData));
         }
 
-        results = results.set(index, result);
+        hits = hits.set(index, hit);
       },
     );
 
     let fields = List<string>([]);
-    if (results.get(0))
+    if (hits.get(0))
     {
-      fields = results.get(0).fields.keySeq().toList();
+      fields = hits.get(0).fields.keySeq().toList();
     }
 
     const loading = false;
 
     const changes: any = {
-      results,
+      hits,
       fields,
       hasError: false,
       loading,
@@ -520,11 +522,13 @@ export class ResultsManager extends TerrainComponent<Props>
       errorLine: null,
       mainErrorMessage: null,
       subErrorMessage: null,
+      aggregations: resultsData.aggregations,
+      rawResult: resultsData.rawResult,
     };
 
     if (!resultsState.hasLoadedCount)
     {
-      changes['count'] = results.size;
+      changes['count'] = hits.size;
     }
 
     const filteredFields = List(_.filter(fields.toArray(), (val) => !(val.charAt(0) === '_')));
@@ -533,9 +537,9 @@ export class ResultsManager extends TerrainComponent<Props>
       originalNames: filteredFields,
       preview: List(filteredFields.map((field) =>
       {
-        return results.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((result) =>
+        return hits.slice(0, FileImportTypes.NUMBER_PREVIEW_ROWS).map((hit) =>
         {
-          const value = result.fields.get(String(field));
+          const value = hit.fields.get(String(field));
           return Array.isArray(value) || typeof (value) === 'boolean' ? JSON.stringify(value) : value;
         });
       })),
@@ -566,7 +570,8 @@ export class ResultsManager extends TerrainComponent<Props>
         _id: hit._id,
       });
     });
-    this.updateResults(resultsData, isAllFields);
+    const aggregations = resultsData.aggregations;
+    this.updateResults({ hits, aggregations, rawResult: resultsData }, isAllFields);
   }
 
   private handleM2QueryResponse(response: MidwayQueryResponse, isAllFields: boolean)
@@ -596,7 +601,8 @@ export class ResultsManager extends TerrainComponent<Props>
         _id: hit._id,
       });
     });
-    this.updateResults(hits, isAllFields);
+    const aggregations = resultsData.aggregations;
+    this.updateResults({ hits, aggregations, rawResult: resultsData }, isAllFields);
   }
 
   private handleM1Error(response: any, isAllFields?: boolean)
@@ -723,16 +729,16 @@ export class ResultsManager extends TerrainComponent<Props>
   }
 }
 
-function getPrimaryKeyFor(result: Result, config: ResultsConfig, index?: number): string
+function getPrimaryKeyFor(hit: Hit, config: ResultsConfig, index?: number): string
 {
   if (config && config.primaryKeys.size)
   {
     return config.primaryKeys.map(
-      (field) => result.fields.get(field),
+      (field) => hit.fields.get(field),
     ).join('-and-');
   }
 
-  return index + ': ' + JSON.stringify(result.fields.toJS()); // 'result-' + Math.floor(Math.random() * 100000000);
+  return index + ': ' + JSON.stringify(hit.fields.toJS()); // 'result-' + Math.floor(Math.random() * 100000000);
 }
 
 export default ResultsManager;
