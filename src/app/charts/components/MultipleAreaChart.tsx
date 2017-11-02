@@ -60,7 +60,6 @@ import
   VictoryBar,
   VictoryBrushContainer,
   VictoryChart,
-  VictoryContainer,
   VictoryGroup,
   VictoryLabel,
   VictoryLegend,
@@ -92,19 +91,19 @@ const styles = {
         fillOpacity: .8,
         strokeOpacity: .6,
         fill,
-      }
+      },
     }),
-    tooltip: { fill: 'white' }
+    tooltip: { fill: 'white' },
     tooltipFlyout: { fill: 'black', rx: 5, ry: 5 },
   },
   bottomChart: {
     padding: { top: 0, bottom: 0, left: 0, right: 0 },
-    bars: (fill) => ({ data: { fill, fillOpacity: 0.4 } }),
+    bars: (fill) => ({ data: { fill, fillOpacity: 0.4, width: 10 } }),
   },
   legend: {
     title: {
       fontSize: 15,
-      fill: 'white',
+      fill: 'rgba(255,255,255,0.75)',
       fontWeight: 'bold',
     },
     borderPadding: {
@@ -311,13 +310,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     const data = datasets
       .map((ds, key) =>
       {
-        let labelsStyle = { fill: '#fff' };
+        const labelsStyle = { fill: 'rgba(255,255,255,0.75)' };
         const dataStyle = { fill: this.getDatasetColor(ds.id) };
-
-        if (visibleDatasets.includes(key))
-        {
-          labelsStyle = Object.assign({}, labelsStyle, { textDecoration: 'underline' });
-        }
 
         return {
           id: ds.id,
@@ -398,7 +392,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
             ),
           };
         },
-      }
+      },
     ];
   }
 
@@ -464,7 +458,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
       <div style={styles.wrapper}>
         <div style={styles.topChartWrapper}>
           <ContainerDimensions>
-            {({width, height}) => (
+            {({ width, height }) => (
               <VictoryChart
                 domainPadding={{ y: [0, 30] }}
                 scale={config.topChart.scale}
@@ -511,14 +505,14 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                 </VictoryGroup>
                 <VictoryAxis
                   offsetY={height - styles.topChart.padding.top}
-                  style={{ tickLabels: { fill: 'white', fontWeight: 'bold', padding: 2 } }}
-                  tickLabelComponent={<VictoryLabel dx={24}/>}
+                  style={{ tickLabels: { fill: 'rgba(255,255,255,0.75)', fontWeight: 'bold', padding: 2 } }}
+                  tickLabelComponent={<VictoryLabel dx={24} />}
                 />
                 <VictoryAxis
                   dependentAxis
                   offsetX={width}
-                  style={{ tickLabels: { fill: 'white', fontWeight: 'bold', padding: 2 } }}
-                  tickLabelComponent={<VictoryLabel dy={7}/>}
+                  style={{ tickLabels: { fill: 'rgba(255,255,255,0.75)', fontWeight: 'bold', padding: 2 } }}
+                  tickLabelComponent={<VictoryLabel dy={7} />}
                 />
                 {legend}
               </VictoryChart>
@@ -527,7 +521,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         </div>
         <div style={styles.bottomChartWrapper}>
           <ContainerDimensions>
-            {({width, height}) => (
+            {({ width, height }) => (
               <VictoryChart
                 scale={config.bottomChart.scale}
                 padding={styles.bottomChart.padding}
@@ -539,10 +533,10 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                     brushDimension='x'
                     brushDomain={this.state.brushDomain}
                     onBrushDomainChange={this.handleBrush}
-                    brushStyle={{stroke: "transparent", fill: "white", fillOpacity: 0.1}}
+                    brushStyle={{ stroke: 'transparent', fill: 'white', fillOpacity: 0.1 }}
                     handleStyle={{
                       stroke: 1,
-                      fill: "grey",
+                      fill: 'grey',
                       fillOpacity: 1,
                       height: height - 10,
                       rx: 2,
@@ -560,15 +554,17 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                     ticks: { size: 0 },
                   }}
                 />
-                <VictoryBar
-                  style={styles.bottomChart
-                    .bars(this.getDatasetColor(datasets.keySeq().first()))
-                  }
-                  data={datasets.first() !== null ? datasets.first().data : []}
-                  interpolation={config.bottomChart.interpolation}
-                  x={xDataKey}
-                  y={yDataKey}
-                />
+                <VictoryGroup offset={15}>
+                  {datasets.map((d) => (<VictoryBar
+                    style={styles.bottomChart
+                      .bars(this.getDatasetColor(d.id))
+                    }
+                    data={datasets.first() !== null ? d.data : []}
+                    interpolation={config.bottomChart.interpolation}
+                    x={xDataKey}
+                    y={yDataKey}
+                  />))}
+                </VictoryGroup>
               </VictoryChart>
             )}
           </ContainerDimensions>
