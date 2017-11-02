@@ -463,17 +463,6 @@ class HitsArea extends TerrainComponent<Props>
 
     if (!hits)
     {
-      if (resultsState.rawResult)
-      {
-        hitsContent = (
-          <div className='result-text'>
-            {
-              resultsState.rawResult
-            }
-          </div>
-        );
-      }
-
       if (resultsState.loading)
       {
         hitsAreOutdated = true;
