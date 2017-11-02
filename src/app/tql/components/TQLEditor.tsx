@@ -49,10 +49,10 @@ THE SOFTWARE.
 import * as React from 'react';
 
 import * as _ from 'lodash';
+
 const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
-import { BuilderStore } from '../../builder/data/BuilderStore';
 import { Colors } from '../../colors/Colors';
 import ColorsActions from '../../colors/data/ColorsActions';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -110,8 +110,11 @@ export interface Props
   onChange?(tql: string, noAction?: boolean, manualRequest?: boolean);
 
   toggleSyntaxPopup?(event, line);
+
   defineTerm?(value, event);
+
   turnSyntaxPopupOff?();
+
   hideTermDefinition?();
 }
 
@@ -351,10 +354,12 @@ class TQLEditor extends TerrainComponent<Props>
     document.body.appendChild(tt);
     tt.style.top = Math.max(0, e.clientY - tt.offsetHeight - 5).toString() + 'px';
     tt.style.left = (e.clientX + 5).toString() + 'px';
+
     if (tt.style.opacity != null)
     {
       tt.style.opacity = '1';
     }
+
     return tt;
   }
 
@@ -366,10 +371,12 @@ class TQLEditor extends TerrainComponent<Props>
     {
       return;
     }
+
     const box = target.getBoundingClientRect();
     const x = ((box.left as number) + (box.right as number)) / 2;
     const y = ((box.top as number) + (box.bottom as number)) / 2;
     const spans = cm.findMarksAt(cm.coordsChar({ left: x, top: y }, 'client'));
+
     let ann: MarkerAnnotation;
     for (let i = 0; i < spans.length; ++i)
     {
@@ -380,10 +387,12 @@ class TQLEditor extends TerrainComponent<Props>
         break;
       }
     }
+
     if (!ann)
     {
       return;
     }
+
     if (ann.showing === false)
     {
       ann.showing = true;
@@ -393,17 +402,20 @@ class TQLEditor extends TerrainComponent<Props>
 
   private registerCodeMirror(cmInstance)
   {
-    this.setState({
-      codeMirrorInstance: cmInstance,
-    });
+    this.setState(
+      {
+        codeMirrorInstance: cmInstance,
+      });
+
     /*
      * change event (https://codemirror.net/doc/manual.html#events) is fired before CodeMirror updates the DOM.
-     * Because highlightES changes how codemirror renders the content, we have to call it in the chagne callback.
+     * Because highlightES changes how codemirror renders the content, we have to call it in the change callback.
      */
     cmInstance.on('change', this.handleHighlighting);
+
     /*
      * changes event is fired after CodeMirror updates the DOM.
-     * Because handleTQLChange may change the react state and the change could be expensieve, we call this after
+     * Because handleTQLChange may change the react state and the change could be expensive, we call this after
      * CodeMirror updates the DOM.
      */
     cmInstance.on('changes', this.handleTQLChange);

@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import { Display } from '../displays/Display';
+import { Display, DisplayType } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
 
 import ESClause from '../../../shared/database/elastic/parser/clauses/ESClause';
@@ -69,6 +69,7 @@ export interface Card extends IRecord<Card>
   // whether a card in tuning column is collapsed (needs to be sep. from closed)
   tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
   errors: List<string>;
+  keyDisplayType: DisplayType;
 
   // the following fields are excluded from the server save
   static: {
@@ -170,6 +171,7 @@ export const _card = (config: CardConfig) =>
   config = _.extend(config, {
     id: '',
     errors: Immutable.List([]),
+    keyDisplayType: DisplayType.TEXT,
     _isCard: true,
     _isBlock: true,
     closed: false,

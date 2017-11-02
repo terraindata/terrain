@@ -124,6 +124,16 @@ class ElasticClient
   }
 
   /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-getscript
+   */
+  public getScript<T>(params: Elastic.GetScriptParams,
+    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+  {
+    this.log('get script', params);
+    this.delegate.getScript(params, callback);
+  }
+
+  /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-index
    */
   public index<T>(params: Elastic.IndexDocumentParams<T>, callback: (error: any, response: any) => void): void
@@ -160,16 +170,6 @@ class ElasticClient
   }
 
   /**
-   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
-   */
-  public search<T>(params: Elastic.SearchParams,
-    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
-  {
-    this.log('search', params);
-    this.delegate.search(params, callback);
-  }
-
-  /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-scroll
    */
   public scroll<T>(params: Elastic.ScrollParams,
@@ -177,6 +177,16 @@ class ElasticClient
   {
     this.log('scroll', params);
     this.delegate.scroll(params, callback);
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
+   */
+  public search<T>(params: Elastic.SearchParams,
+    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+  {
+    this.log('search', params);
+    this.delegate.search(params, callback);
   }
 
   public getDelegate(): Elastic.Client

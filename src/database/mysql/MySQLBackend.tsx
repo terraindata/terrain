@@ -58,7 +58,7 @@ const syntaxConfig = require('../../../shared/database/mysql/syntax/SQLSyntaxCon
 
 export class MySQLBackend implements Backend
 {
-  public static loadingQuery(query: Query, queryReady: (query: Query) => void): Query
+  private static loadQuery(query: Query, queryReady: (query: Query) => void): Query
   {
     // legacy mysql model
     if (!query.cardsAndCodeInSync)
@@ -94,6 +94,8 @@ export class MySQLBackend implements Backend
   // Ordering of the cards deck
   cardsDeck = MySQLCardsDeck;
   cardsList = cardsDeckToList(MySQLCardsDeck);
+
+  loadQuery = MySQLBackend.loadQuery;
 
   queryToCode = CardsToSQL.toSQL;
 

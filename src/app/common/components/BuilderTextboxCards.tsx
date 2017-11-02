@@ -101,11 +101,11 @@ class BuilderTextboxCards extends React.Component<Props, any>
       <FadeInOut
         open={!this.props.value[closedKey]}
       >
-        <div className={classNames({
-          'builder-tb-cards-area': true,
-          [this.props.className]: !!this.props.className,
-        })}
-        // ref='tb'
+        <div
+          className={classNames({
+            'builder-tb-cards-area': true,
+            [this.props.className]: !!this.props.className,
+          })}
         >
           <CardComponent
             {...this.props}
@@ -113,7 +113,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
             card={this.props.value as Card}
             index={null}
             display={this.props.display}
-          // tuningMode={this.props.tuningMode}
+            tuningMode={this.props.tuningMode}
           />
         </div>
       </FadeInOut>

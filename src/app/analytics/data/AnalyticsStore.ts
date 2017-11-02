@@ -55,6 +55,7 @@ class AnalyticsStateC
   public selectedMetric: ID = 1;
   public selectedInterval: string = 'day';
   public selectedDateRange: ID = 1;
+  public selectedAnalyticsConnection: string = '';
 }
 
 const AnalyticsState_Record = Immutable.Record(new AnalyticsStateC());

@@ -75,8 +75,6 @@ export interface Props
 export interface State
 {
   libraryState: LibraryState;
-  selectedDomain: any;
-  zoomDomain: any;
 }
 
 class Library extends TerrainComponent<any>
@@ -93,13 +91,37 @@ class Library extends TerrainComponent<any>
 
   public state: State = {
     libraryState: null,
-    selectedDomain: {},
-    zoomDomain: {},
   };
 
   public componentWillMount()
   {
-    const { basePath } = this.props;
+    const { basePath, analytics, schema } = this.props;
+
+    if (analytics.selectedAnalyticsConnection === '')
+    {
+      const analyticsConnection = null;
+
+      const lastAnalyticsConnection = localStorage.getItem('analyticsConnection');
+      if (lastAnalyticsConnection !== null)
+      {
+        this.props.analyticsActions.selectAnalyticsConnection(
+          lastAnalyticsConnection,
+        );
+      }
+      else
+      {
+        const firstServerWithAnalytics = schema.servers.find(
+          (value, key) => value.isAnalytics,
+        );
+        if (firstServerWithAnalytics !== undefined)
+        {
+          this.props.analyticsActions.selectAnalyticsConnection(
+            firstServerWithAnalytics.name,
+          );
+          localStorage.setItem('analyticsConnection', firstServerWithAnalytics.name);
+        }
+      }
+    }
 
     if ((!this.props.params || !this.props.params.groupId))
     {
@@ -131,12 +153,6 @@ class Library extends TerrainComponent<any>
       data = analyticsData;
     }
 
-    // return [...Array(20).keys()].map((i) =>
-    // {
-    //  const time = new Date(2017, 8, i, 0, 0, 0);
-    //  return { time, value: _.random(1, 100) };
-    // });
-    // TODO: Replace by variantId when analytics mock data have correct variant ids.
     return data;
   }
 
@@ -178,61 +194,94 @@ class Library extends TerrainComponent<any>
   public handleMetricRadioButtonClick(optionValue)
   {
     const { analytics } = this.props;
-    const { selectedVariants } = this.props.library;
-    const selectedVariantIds = selectedVariants.toJS();
 
-    let numericOptionValue = null;
-    if (optionValue.indexOf(',') > -1)
+    if (analytics.selectedAnalyticsConnection !== null)
     {
-      numericOptionValue = optionValue.split(',').map((o) => parseInt(o, 10));
-    } else
-    {
-      numericOptionValue = parseInt(optionValue, 10);
+      const { selectedVariants } = this.props.library;
+      const selectedVariantIds = selectedVariants.toJS();
+
+      let numericOptionValue = null;
+      if (optionValue.indexOf(',') > -1)
+      {
+        numericOptionValue = optionValue.split(',').map((o) => parseInt(o, 10));
+      } else
+      {
+        numericOptionValue = parseInt(optionValue, 10);
+      }
+
+      this.props.analyticsActions.selectMetric(optionValue);
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        selectedVariantIds,
+        numericOptionValue,
+        analytics.selectedInterval,
+        analytics.selectedDateRange,
+      );
     }
-
-    this.props.analyticsActions.selectMetric(optionValue);
-    this.props.analyticsActions.fetch(
-      selectedVariantIds,
-      numericOptionValue,
-      analytics.selectedInterval,
-      analytics.selectedDateRange,
-    );
   }
 
   public handleIntervalRadioButtonClick(optionValue)
   {
     const { analytics } = this.props;
-    const { selectedVariants } = this.props.library;
-    const selectedVariantIds = selectedVariants.toJS();
 
-    this.props.analyticsActions.selectInterval(optionValue);
-    this.props.analyticsActions.fetch(
-      selectedVariantIds,
-      analytics.selectedMetric,
-      optionValue,
-      analytics.selectedDateRange,
-    );
+    if (analytics.selectedAnalyticsConnection !== null)
+    {
+      const { selectedVariants } = this.props.library;
+      const selectedVariantIds = selectedVariants.toJS();
+
+      this.props.analyticsActions.selectInterval(optionValue);
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        selectedVariantIds,
+        analytics.selectedMetric,
+        optionValue,
+        analytics.selectedDateRange,
+      );
+    }
   }
 
   public handleDateRangeRadioButtonClick(optionValue)
   {
     const { analytics } = this.props;
+
+    if (analytics.selectedAnalyticsConnection !== null)
+    {
+      const { selectedVariants } = this.props.library;
+      const selectedVariantIds = selectedVariants.toJS();
+      const numericOptionValue = parseInt(optionValue, 10);
+
+      this.props.analyticsActions.selectDateRange(optionValue);
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        selectedVariantIds,
+        analytics.selectedMetric,
+        analytics.selectedInterval,
+        numericOptionValue,
+      );
+    }
+  }
+
+  public handleConnectionChange(connectionName)
+  {
+    const { analytics, schema } = this.props;
     const { selectedVariants } = this.props.library;
     const selectedVariantIds = selectedVariants.toJS();
-    const numericOptionValue = parseInt(optionValue, 10);
 
-    this.props.analyticsActions.selectDateRange(optionValue);
     this.props.analyticsActions.fetch(
+      connectionName,
       selectedVariantIds,
       analytics.selectedMetric,
       analytics.selectedInterval,
-      numericOptionValue,
+      analytics.selectedDateRange,
     );
+
+    this.props.analyticsActions.selectAnalyticsConnection(connectionName);
+    localStorage.setItem('analyticsConnection', connectionName);
   }
 
   public render()
   {
-    const { library: libraryState, analytics } = this.props;
+    const { library: libraryState, analytics, schema } = this.props;
     const {
       dbs,
       groups,
@@ -390,9 +439,12 @@ class Library extends TerrainComponent<any>
             <div className='library-analytics-selector-wrapper'>
               <AnalyticsSelector
                 analytics={analytics}
+                servers={schema.servers}
+                analyticsConnection={analytics.selectedAnalyticsConnection}
                 onMetricSelect={this.handleMetricRadioButtonClick}
                 onIntervalSelect={this.handleIntervalRadioButtonClick}
                 onDateRangeSelect={this.handleDateRangeRadioButtonClick}
+                onConnectionChange={this.handleConnectionChange}
               />
             </div>
           </div> : null
