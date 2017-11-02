@@ -49,6 +49,7 @@ THE SOFTWARE.
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESQueryTransform from '../../../../shared/database/elastic/parser/ESQueryTransform';
+import { forAllCards } from '../../../blocks/BlockUtils';
 import { Query } from '../../../items/types/Query';
 import ElasticToCards from './ElasticToCards';
 import ESCardParser from './ESCardParser';
