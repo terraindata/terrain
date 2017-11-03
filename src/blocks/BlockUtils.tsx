@@ -177,7 +177,12 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
     block.id = 'block-' + Math.random();
   }
 
-  return blockTypeToBlockRecord[block.type](block);
+  let theBlock = blockTypeToBlockRecord[block.type](block);
+  if (theBlock.static)
+  {
+    theBlock = theBlock.set('static', _.cloneDeep(theBlock.static));
+  }
+  return theBlock;
 };
 
 // private, maps a type (string) to the backing Immutable Record
