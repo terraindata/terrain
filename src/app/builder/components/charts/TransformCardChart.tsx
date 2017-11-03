@@ -234,8 +234,10 @@ class TransformCardChart extends TerrainComponent<Props>
     let max: number;
     let points;
 
-    if ((this.props.mode === 'normal' && pointName === 'Average') ||
-      (this.props.mode === 'sigmoid' && pointName === 'x0'))
+    if ((this.props.mode === 'normal' && pointName === 'Average')
+      // ||
+     // (this.props.mode === 'sigmoid' && pointName === 'x0')
+     )
     {
       points = this.state.initialPoints.map((scorePoint, i) =>
       {
@@ -253,31 +255,31 @@ class TransformCardChart extends TerrainComponent<Props>
         return scorePoint;
       });
     }
-    else if (this.props.mode === 'sigmoid' && pointName === 'k')
-    {
-      const x0 = pointValues[2];
-      const L = pointScores[3];
-      const a = pointScores[0];
-      points = this.state.initialPoints.map((scorePoint, i) =>
-      {
-        if (scorePoint.id === pointId)
-        {
-          // constrain score to be between L and a scores
-          let value = 0;
-          if (a > L)
-          {
-            value = Util.valueMinMax(scorePoint.score - scoreDiff, L, a);
-          }
-          else
-          {
-            value = Util.valueMinMax(scorePoint.score - scoreDiff, a, L);
-          }
-          scorePoint = scorePoint.set('score', value);
-          scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, pointValues[0], x0 - 0.001 * x0));
-        }
-        return scorePoint;
-      });
-    }
+    // else if (this.props.mode === 'sigmoid' && pointName === 'k')
+    // {
+    //   const x0 = pointValues[2];
+    //   const L = pointScores[3];
+    //   const a = pointScores[0];
+    //   points = this.state.initialPoints.map((scorePoint, i) =>
+    //   {
+    //     if (scorePoint.id === pointId)
+    //     {
+    //       // constrain score to be between L and a scores
+    //       let value = 0;
+    //       if (a > L)
+    //       {
+    //         value = Util.valueMinMax(scorePoint.score - scoreDiff, L, a);
+    //       }
+    //       else
+    //       {
+    //         value = Util.valueMinMax(scorePoint.score - scoreDiff, a, L);
+    //       }
+    //       scorePoint = scorePoint.set('score', value);
+    //       scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, pointValues[0], x0 - 0.001 * x0));
+    //     }
+    //     return scorePoint;
+    //   });
+    // }
     else
     {
       points = this.state.initialPoints.map((scorePoint) =>
@@ -290,17 +292,17 @@ class TransformCardChart extends TerrainComponent<Props>
           {
             scoreMin = 0.001;
           }
-          if (this.props.mode === 'sigmoid')
-          {
-            if (pointName === 'L')
-            {
-              scoreMin = pointScores[1];
-            }
-            if (pointName === 'a')
-            {
-              scoreMax = pointScores[1];
-            }
-          }
+          // if (this.props.mode === 'sigmoid')
+          // {
+          //   if (pointName === 'L')
+          //   {
+          //     scoreMin = pointScores[1];
+          //   }
+          //   if (pointName === 'a')
+          //   {
+          //     scoreMax = pointScores[1];
+          //   }
+          // }
           scorePoint = scorePoint.set('score',
             Util.valueMinMax(scorePoint.score - scoreDiff, scoreMin, scoreMax));
           if (!(this.state.selectedPointIds.size > 1) && !altKey)
@@ -316,7 +318,6 @@ class TransformCardChart extends TerrainComponent<Props>
               const domainMin = this.props.domain.get(0);
               const domainMax = this.props.domain.get(1);
               const domainRange = domainMax - domainMin;
-
               min = (index - 1) >= 0 ?
                 Math.max(this.props.domain.get(0), pointValues[index - 1] + domainRange / 1000)
                 : domainMin;
@@ -330,7 +331,7 @@ class TransformCardChart extends TerrainComponent<Props>
             }
             if (this.props.mode === 'normal')
             {
-              max = max - 0.01 * (this.props.domain.get(1) - this.props.domain.get(0));
+              max = max - 0.011 * (this.props.domain.get(1) - this.props.domain.get(0));
             }
             scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
           }

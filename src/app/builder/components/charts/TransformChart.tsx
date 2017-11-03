@@ -199,6 +199,23 @@ const TransformChart = {
             scales.realPointY.invert(d3.mouse(this)[1] + parseInt(isvg.attr('y'), 10)),
           );
         }
+        else
+        {
+          d3.select(el).select('.popup').remove();
+          const popup = d3.select(el).select('.inner-svg').append('g')
+            .attr('class', 'popup');
+          const containerWidth = d3.select(el).select('.inner-svg').node().getBBox().width;
+          const x = (containerWidth - 195) / 2;
+          popup.append('text')
+            .attr('x', x > 0 ? x : 100)
+            .attr('y', 15)
+            .attr('fill', 'red')
+            .text('Cannot add points in this mode')
+            ;
+            setTimeout(() => {
+              d3.select(el).select('.popup').remove();
+            }, 1000);
+          }
         return false;
       });
 
@@ -245,6 +262,29 @@ const TransformChart = {
           d3.event['stopPropagation']();
           d3.select('.transform-tooltip').remove();
           deletePoints(el, state.onDelete);
+        }
+        if (
+          currentObject &&
+          (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) // delete/backspace key
+          && !$('input').is(':focus')
+          && state.mode !== 'linear'
+          )
+        {
+          // draw something that says you cannot delete points in this mode
+          d3.select(el).select('.popup').remove();
+          const popup = d3.select(el).select('.inner-svg').append('g')
+            .attr('class', 'popup');
+          const containerWidth = d3.select(el).select('.inner-svg').node().getBBox().width;
+          const x = (containerWidth - 195) / 2;
+          popup.append('text')
+            .attr('x', x > 0 ? x : 100)
+            .attr('y', 15)
+            .attr('fill', 'red')
+            .text('Cannot delete points in this mode')
+            ;
+            setTimeout(() => {
+              d3.select(el).select('.popup').remove();
+            }, 1000);
         }
       });
     }
@@ -380,6 +420,23 @@ const TransformChart = {
     overlay.on('mouseout', this._overlayMouseoutFactory(el, scales, self._drawNoPointsOverlay));
     overlay.on('mouseover', this._overlayMouseoverFactory(el));
     // overlay.on('mouseleave', onMouseLeave(this, el, scales, onMouseEnter, onMouseLeave));
+  },
+
+  _drawInfoPopup(el, scales, width, height, message)
+  {
+    const isvg = d3.select(el).select('.inner-svg');
+    isvg.append('rect')
+      .attr('x', 100)
+      .attr('y', 100)
+      .attr('height', 100)
+      .attr('width', 100)
+      .attr('color', 'red')
+      .append('text')
+      .attr('x', 100)
+      .attr('y', 100)
+      .attr('font-color', 'green')
+      .text('TESTING')
+      ;
   },
 
   _drawAxes(el, scales, width, height)
@@ -826,10 +883,6 @@ const TransformChart = {
       const y = this._normal(i, average, stdDev);
       data.push({ y: y * scaleFactor, x: i, id: i, selected: false });
     }
-    data.sort(function(a, b)
-    {
-      return a.x - b.x;
-    });
     if (data.length)
     {
       const range = (scaleMax(scales.x) - scaleMin(scales.x));
@@ -868,13 +921,24 @@ const TransformChart = {
     return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
   },
 
-  _drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domainMin, domainMax)
+  _drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domainMin, domainMax)
   {
     const linesPointsData = _.clone(pointsData);
-
-    const lambda = (Math.log(pointsData[1].y) / pointsData[0].x - Math.log(pointsData[0].y) / pointsData[0].x) / (1 - pointsData[1].x / pointsData[0].x);
-    const A = pointsData[1].y / Math.exp(-1 * lambda * pointsData[1].x);
-    const data = this._getExponentialData(pointsData, scales, lambda, A, domainMin, domainMax);
+    const x1 = pointsData[0].x;
+    let y1 = pointsData[0].y;
+    const x2 = pointsData[1].x;
+    let y2 = pointsData[1].y;
+    if (Math.abs(x1 - x2) <= (domainMax - domainMin) / 900)
+    {
+      this._drawLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit);
+      return;
+    }
+    const shift = y2 < y1 ? y2 - 0.001 : y1 - 0.001;
+    y1 -= shift;
+    y2 -= shift;
+    const lambda = (Math.log(y2) / x1 - Math.log(y1) / x1) / (1 - x2 / x1);
+    const A = y2 / Math.exp(-1 * lambda * x2);
+    const data = this._getExponentialData(pointsData, scales, lambda, A, domainMin, domainMax, shift);
     const line = d3.svg.line()
       .x((d) =>
       {
@@ -893,19 +957,17 @@ const TransformChart = {
       .attr('d', line(data));
   },
 
-  _getExponentialData(pointsData, scales, lambda, A, min, max)
+  _getExponentialData(pointsData, scales, lambda, A, min, max, shift)
   {
     const data = [];
     const stepSize = (pointsData[1].x - pointsData[0].x) * (1 / 100);
-    for (let i = pointsData[0].x; i < pointsData[1].x; i += stepSize)
+    let x = pointsData[0].x;
+    for (let i = 0; i <= 100; i++)
     {
-      const y = this._exponential(i, lambda, A);
-      data.push({ y, x: i, id: i, selected: false });
+      const y = this._exponential(x, lambda, A);
+      data.push({y: y + shift, x, id: i, selectd: false});
+      x += stepSize;
     }
-    data.sort(function(a, b)
-    {
-      return a.x - b.x;
-    });
     if (data.length)
     {
       const range = (scaleMax(scales.x) - scaleMin(scales.x));
@@ -1034,12 +1096,23 @@ const TransformChart = {
   _drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domainMin, domainMax)
   {
     const linesPointsData = _.clone(pointsData);
-    const a = pointsData[0].y;
-    const x = pointsData[1].x;
-    const y = pointsData[1].y;
-    const x0 = pointsData[2].x;
-    const L = pointsData[3].y - pointsData[0].y;
-    const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+    // const a = pointsData[0].y;
+    // const x = pointsData[1].x;
+    // const y = pointsData[1].y;
+    // const x0 = pointsData[2].x;
+    // const L = pointsData[3].y - pointsData[0].y;
+    // const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+    const a = 0;
+    const L = 1;
+    const x1 = pointsData[0].x;
+    const y1 = pointsData[0].y;
+    const x2 = pointsData[1].x;
+    const y2 = pointsData[1].y;
+    const x3 = pointsData[2].x;
+    const y3 = pointsData[2].y;
+    const p = Math.log(1 / y2 - 1) / Math.log(1 / y1 - 1);
+    const x0 = (x2 - x1 * p) / (1 - p);
+    const k = -1 * Math.log(1 / y1 - 1) / (x1 - x0);
     const data = this._getSigmoidData(pointsData, scales, a, k, x0, L, domainMin, domainMax);
     const line = d3.svg.line()
       .x((d) =>
@@ -1718,56 +1791,56 @@ const TransformChart = {
         const y = this._normal(d['x'], average, stdDev) * scaleFactor;
         return scales.realPointY(y);
       }
-      if (mode === 'sigmoid')
-      {
-        const a = pointsData[0].y;
-        const L = pointsData[3].y - pointsData[0].y;
-        if (i === 2)
-        {
-          return scales.realPointY(L / 2 + a);
-        }
-        if (i === 3 || i === 0)
-        {
-          const x0 = pointsData[2].x;
-          const x = pointsData[1].x;
-          const y = pointsData[1].y;
-          let k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
-          if (k === 0)
-          {
-            k = 0.1;
-          }
-          const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
-            Math.log(L / (0.01) - 1) / (-1 * k) + x0;
-          if (xVal < domain[0])
-          {
-            return scales.realPointY(this._sigmoid(domain[0], a, k, x0, L));
-          }
-          if (xVal > domain[1])
-          {
-            return scales.realPointY(this._sigmoid(domain[1], a, k, x0, L));
-          }
-        }
-      }
+      // if (mode === 'sigmoid')
+      // {
+      //   const a = pointsData[0].y;
+      //   const L = pointsData[3].y - pointsData[0].y;
+      //   if (i === 2)
+      //   {
+      //     return scales.realPointY(L / 2 + a);
+      //   }
+      //   if (i === 3 || i === 0)
+      //   {
+      //     const x0 = pointsData[2].x;
+      //     const x = pointsData[1].x;
+      //     const y = pointsData[1].y;
+      //     let k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+      //     if (k === 0)
+      //     {
+      //       k = 0.1;
+      //     }
+      //     const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
+      //       Math.log(L / (0.01) - 1) / (-1 * k) + x0;
+      //     if (xVal < domain[0])
+      //     {
+      //       return scales.realPointY(this._sigmoid(domain[0], a, k, x0, L));
+      //     }
+      //     if (xVal > domain[1])
+      //     {
+      //       return scales.realPointY(this._sigmoid(domain[1], a, k, x0, L));
+      //     }
+      //   }
+      // }
       return scales.realPointY(d['y']);
     };
 
     const pointXValue = (d, i) =>
     {
-      if (mode === 'sigmoid')
-      {
-        if (i === 3 || i === 0)
-        {
-          const L = pointsData[3].y - pointsData[0].y;
-          const x0 = pointsData[2].x;
-          const a = pointsData[0].y;
-          const x = pointsData[1].x;
-          const y = pointsData[1].y;
-          const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
-          const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
-            Math.log(L / (0.01) - 1) / (-1 * k) + x0;
-          return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
-        }
-      }
+      // if (mode === 'sigmoid')
+      // {
+      //   if (i === 3 || i === 0)
+      //   {
+      //     const L = pointsData[3].y - pointsData[0].y;
+      //     const x0 = pointsData[2].x;
+      //     const a = pointsData[0].y;
+      //     const x = pointsData[1].x;
+      //     const y = pointsData[1].y;
+      //     const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+      //     const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
+      //       Math.log(L / (0.01) - 1) / (-1 * k) + x0;
+      //     return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
+      //   }
+      // }
       return scales.realX(d['x']);
     };
 
@@ -1866,7 +1939,7 @@ const TransformChart = {
       case 'exponential':
         if (numPoints >= 2)
         {
-          this._drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+          this._drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1]);
         }
         break;
       case 'logarithmic':
@@ -1879,7 +1952,6 @@ const TransformChart = {
         if (numPoints >= 4)
         {
           this._drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
-          // this._drawSigmoidPoints(el, scales, pointsData, onMove, onRelease, onSelect, onPointMoveStart, canEdit, colors);
         }
         break;
       default:
