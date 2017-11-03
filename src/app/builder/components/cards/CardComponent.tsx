@@ -57,7 +57,7 @@ import * as React from 'react';
 import { DragSource } from 'react-dnd';
 const { createDragPreview } = require('react-dnd-text-dragpreview');
 import { Display } from '../../../../blocks/displays/Display';
-import { Card } from '../../../../blocks/types/Card';
+import { Card, getCardTitle } from '../../../../blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
@@ -289,7 +289,7 @@ class _CardComponent extends TerrainComponent<Props>
     }
 
     this.dragPreview = createDragPreview(
-      this.props.card.static.title + ' (' + BlockUtils.getPreview(this.props.card) + ')',
+      getCardTitle(this.props.card) + ' (' + BlockUtils.getPreview(this.props.card) + ')',
       {
         // backgroundColor: this.props.card.static.colors[0],
         // borderColor: this.props.card.static.colors[0],
@@ -881,7 +881,7 @@ class _CardComponent extends TerrainComponent<Props>
                     'card-preview': true,
                     'card-preview-hidden': this.state.opening,
                   })}>
-                    {this.props.card.static.title + ' (' + BlockUtils.getPreview(this.props.card) + ')'}
+                    {getCardTitle(this.props.card) + ' (' + BlockUtils.getPreview(this.props.card) + ')'}
                   </div>
                   :
                   null
