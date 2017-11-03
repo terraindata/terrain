@@ -72,6 +72,7 @@ import CardsColumn from './cards/CardsColumn';
 import TuningColumn from './cards/TuningColumn';
 import InputsArea from './inputs/InputsArea';
 import ResultsArea from './results/ResultsArea';
+import PathfinderColumn from './pathfinder/PathfinderColumn';
 
 const SplitScreenIcon = require('./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -92,9 +93,10 @@ enum COLUMNS
   Inputs,
   Schema,
   Tuning,
+  Pathfinder,
 }
 // Manual,
-const NUM_COLUMNS = 6;
+const NUM_COLUMNS = 7;
 
 const menuIcons = [
   { icon: <BuilderIcon />, color: '#76a2c1' },
@@ -103,6 +105,7 @@ const menuIcons = [
   { icon: <InputsIcon />, color: '#c2b694' },
   { icon: <ManualIcon />, color: '#a98abf' },
   { icon: <TuningIcon />, color: 'black' },
+  { icon: <BuilderIcon />, color: '#76a2c1' },
 ]; // TODO add schema icon above
 
 // interface Props
@@ -277,6 +280,12 @@ const BuilderColumn = createReactClass<any, any>(
             columnIndex={this.props.index}
             cardsAndCodeInSync={query.cardsAndCodeInSync}
             language={query.language}
+          />;
+        
+        case COLUMNS.Pathfinder:
+          return <PathfinderColumn
+            canEdit={canEdit}
+            path={query.path}
           />;
         // case COLUMNS.Manual:
         //   return <Manual

@@ -62,7 +62,7 @@ import './Dropdown.less';
 
 export interface Props
 {
-  options: List<string | El>;
+  options: List<string | number | El>;
   selectedIndex: number;
   keyPath?: KeyPath; // TODO required?
   onChange?: (index: number, event?: any) => void; // TODO remove?

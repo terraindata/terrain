@@ -87,11 +87,20 @@ const { List, Map } = Immutable;
 import { BaseClass, New } from '../../../Classes';
 
 
+export const PathfinderSteps =
+[
+  'Source',
+  'Filter',
+  'Score',
+];
+
 class PathC extends BaseClass
 {
-  public source: Source;
-  public filter: Filter;
-  public score: Score;
+  public source: Source = _Source();
+  public filter: Filter = _Filter();
+  public score: Score = _Score();
+  
+  public step: string = PathfinderSteps[0];
 }
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
@@ -153,11 +162,24 @@ export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
   New<FilterLine>(new FilterLineC(config), config);
 
+  
+export const sourceCountOptions = List([
+  'all',
+  1,
+  2,
+  3,
+  5,
+  10,
+  50,
+  100,
+  'other',
+]);
 
 class SourceC extends BaseClass
 {
   public dataSource: DataSource = _ElasticDataSource();
-  public count: number | string = 'all';
+  public count: number | string = sourceCountOptions.get(0);
+  public countIndex: number = 0;
   public start: number = 0;
 }
 export type Source = SourceC & IRecord<SourceC>;

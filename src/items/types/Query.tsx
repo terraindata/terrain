@@ -53,6 +53,7 @@ import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';
+import { Path, _Path } from '../../app/builder/components/pathfinder/PathfinderTypes';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
@@ -85,6 +86,8 @@ class QueryC
   deckOpen: boolean = false; // TODO change back to TRUE once deck is complete
 
   cardsAndCodeInSync: boolean = false;
+
+  path: Path = _Path();
 
   meta: IMMap<string, any> = Map<string, any>({});
 
