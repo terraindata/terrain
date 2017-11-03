@@ -1775,7 +1775,7 @@ const EQLSpec: ESClause[] =
     new ESVariantClause('terms_value',
       {
         object: 'terms_lookup',
-        array: 'any[]',
+        array: 'base[]',
       },
       {
         path: ['filter'],
