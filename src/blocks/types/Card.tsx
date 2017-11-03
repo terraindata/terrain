@@ -79,7 +79,9 @@ export function getCardCategory(card: CardConfig): string
 
 export function getCardTitle(card: CardConfig): string
 {
-  return card.static.title;
+  return card.static !== undefined ? card.static.title : card.key;
+  // card.key is not the most proper alternative if there is no static title defined,
+  // but it is the best that can be done statically.
 }
 
 export interface Card extends IRecord<Card>
