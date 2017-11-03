@@ -251,13 +251,7 @@ LibraryReducers[ActionTypes.variants.select] =
     }>,
   ) =>
   {
-    const alreadySelected = state.selectedVariants.includes(action.payload.variantId);
-    if (!alreadySelected)
-    {
-      return state.set('selectedVariants', state.selectedVariants.push(action.payload.variantId));
-    }
-
-    return state;
+    return state.set('selectedVariant', parseInt(action.payload.variantId, 10));
   };
 
 LibraryReducers[ActionTypes.variants.unselect] =
@@ -268,20 +262,8 @@ LibraryReducers[ActionTypes.variants.unselect] =
     }>,
   ) =>
   {
-    const variantIndex = state.selectedVariants.indexOf(action.payload.variantId);
-    if (variantIndex > -1)
-    {
-      return state.set('selectedVariants', state.selectedVariants.remove(variantIndex));
-    }
-
-    return state;
+    return state.set('selectedVariant', null);
   };
-
-LibraryReducers[ActionTypes.variants.unselectAll] =
-  (
-    state: LibraryState,
-    action: Action<{}>,
-  ) => state.set('selectedVariants', state.selectedVariants.clear());
 
 function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
 {
