@@ -52,91 +52,91 @@ import { BaseClass, New } from '../../../Classes';
 
 class PathC extends BaseClass
 {
-  source: Source;
-  filter: Filter;
-  score: Score;
+  public source: Source;
+  public filter: Filter;
+  public score: Score;
 }
 
 export type Path = PathC & IRecord<PathC>;
-export const _Path = (config?: {[key: string]: any}) =>
+export const _Path = (config?: { [key: string]: any }) =>
   New<Path>(new PathC(config), config);
 
 class FilterC extends BaseClass
 {
-  minMatches: number | string = 0;
-  lines: List<FilterLine> = List<FilterLine>([]);
+  public minMatches: number | string = 0;
+  public lines: List<FilterLine> = List<FilterLine>([]);
 }
 
 export type Filter = FilterC & IRecord<FilterC>;
-export const _Filter = (config?: {[key: string]: any}) =>
+export const _Filter = (config?: { [key: string]: any }) =>
   New<Filter>(new FilterC(config), config);
 
 class ScoreC extends BaseClass
 {
-  lines: List<ScoreLine> = List<ScoreLine>([]);
+  public lines: List<ScoreLine> = List<ScoreLine>([]);
 }
 
 export type Score = ScoreC & IRecord<ScoreC>;
-export const _Score = (config?: {[key: string]: any}) =>
+export const _Score = (config?: { [key: string]: any }) =>
   New<Score>(new ScoreC(config), config);
 
 class LineC extends BaseClass
 {
-  field: string = ''; // autocomplete
-  weight: number = 1;
+  public field: string = ''; // autocomplete
+  public weight: number = 1;
 }
 
 export type Line = LineC & IRecord<LineC>;
-export const _Line = (config?: {[key: string]: any}) =>
+export const _Line = (config?: { [key: string]: any }) =>
   New<Line>(new LineC(config), config);
 
-class ScoreLineC extends Line
+class ScoreLineC extends LineC
 {
-  type: string = 'transform';
-  sortOrder: string = 'desc';
-  transformData: any = {}; // TODO
+  public type: string = 'transform';
+  public sortOrder: string = 'desc';
+  public transformData: any = {}; // TODO
 }
 
 export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
-export const _ScoreLine = (config?: {[key: string]: any}) =>
+export const _ScoreLine = (config?: { [key: string]: any }) =>
   New<ScoreLine>(new ScoreLineC(config), config);
 
-class FilterLineC extends Line
+class FilterLineC extends LineC
 {
-  method: string = ''; // autocomplete
-  value: string | number = 0;
-  filter: Filter;
+  public method: string = ''; // autocomplete
+  public value: string | number = 0;
+  public filter: Filter;
 }
 
 export type FilterLine = FilterLineC & IRecord<FilterLineC>;
-export const _FilterLine = (config?: {[key: string]: any}) =>
+export const _FilterLine = (config?: { [key: string]: any }) =>
   New<FilterLine>(new FilterLineC(config), config);
 
 class SourceC extends BaseClass
 {
-  dataSource: DataSource = _ElasticDataSource();
-  count: number | string = 'all';
-  start: number = 0;
+  public dataSource: DataSource = _ElasticDataSource();
+  public count: number | string = 'all';
+  public start: number = 0;
 }
 export type Source = SourceC & IRecord<SourceC>;
-export const _Source = (config?: {[key:string]: any}) => 
+export const _Source = (config?: { [key: string]: any }) =>
   New<Source>(new SourceC(config), config);
 
 abstract class DataSource extends BaseClass
 {
   // ... shared data source attributes go here
-  abstract getFieldAutocompleteOptions: 
-    (context?: AutocompleteContext) => List<AutocompleteOption>;
+  public abstract getFieldAutocompleteOptions:
+  (context?: AutocompleteContext) => List<AutocompleteOption>;
 }
 
 type AutocompleteContext = any;
 
 class ElasticDataSourceC extends DataSource
 {
-  indexes: List<string> = List([]);
-  types: List<string> = List([]);
-  
-  getFieldAutocompleteOptions = (context?: any) =>
+  public indexes: List<string> = List([]);
+  public types: List<string> = List([]);
+
+  public getFieldAutocompleteOptions = (context?: any) =>
   {
     return List([
       _AutocompleteOption({
@@ -155,7 +155,7 @@ class ElasticDataSourceC extends DataSource
   }
 }
 export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>;
-export const _ElasticDataSource = (config?: {[key:string]: any}) => 
+export const _ElasticDataSource = (config?: { [key: string]: any }) =>
   New<ElasticDataSource>(new ElasticDataSourceC(config), config);
 
 /**
@@ -164,10 +164,9 @@ export const _ElasticDataSource = (config?: {[key:string]: any}) =>
 
 class AutocompleteOptionC extends BaseClass
 {
-  name: string = '';
-  metaContent: any = '';
+  public name: string = '';
+  public metaContent: any = '';
 }
 export type AutocompleteOption = AutocompleteOptionC & IRecord<AutocompleteOptionC>;
-export const _AutocompleteOption = (config?: {[key:string]: any}) => 
+export const _AutocompleteOption = (config?: { [key: string]: any }) =>
   New<AutocompleteOption>(new AutocompleteOptionC(config), config);
->>>>>>> a808c6d0e744a1b81b42939f85118a904ee3f1ef
