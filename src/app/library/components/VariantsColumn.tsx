@@ -201,9 +201,8 @@ class VariantsColumn extends TerrainComponent<Props>
     const nextSelectedVariant = nextProps.selectedVariant;
     const pinnedVariants = nextAnalytics.pinnedVariants.keySeq().toJS();
 
-    if (canPinItems &&
-      (selectedVariant !== nextSelectedVariant ||
-        analytics.pinnedVariants !== nextAnalytics.pinnedVariants)
+    if (selectedVariant !== nextSelectedVariant ||
+      (canPinItems && analytics.pinnedVariants !== nextAnalytics.pinnedVariants)
     )
     {
       const pinnedParams = pinnedVariants.length > 0 ? `/?pinned=${pinnedVariants.join(',')}` : '';
@@ -427,7 +426,7 @@ class VariantsColumn extends TerrainComponent<Props>
   {
     const { canPinItems } = this.props;
 
-    if (canPinItems)
+    if (!canPinItems)
     {
       browserHistory.push(`/builder/?o=${id}`);
     }
