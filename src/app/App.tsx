@@ -280,7 +280,7 @@ class App extends TerrainComponent<Props>
     ColorsActions.setStyle('.close svg, svg.close', { fill: Colors().iconColor });
     ColorsActions.setStyle('.close:hover svg, svg.close:hover', { fill: Colors().activeText });
     ColorsActions.setStyle('.dropdown-value', { 'border-color': Colors().inputBorder });
-    ColorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().text3 });
+    ColorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().activeText });
     ColorsActions.setStyle('.button', { backgroundColor: Colors().active, color: Colors().activeText });
 
     const tooltipStyles = generateThemeStyles();
