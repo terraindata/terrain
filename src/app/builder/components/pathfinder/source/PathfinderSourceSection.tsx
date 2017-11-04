@@ -79,15 +79,15 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
     return (
       <div
-        className='pathfinder-section'
+        className='pf-section'
       >
         <div
-          className='pathfinder-line'
+          className='pf-line'
         >
-          <div>
+          <div className='pf-piece'>
             Find
           </div>
-          <div>
+          <div className='pf-piece'>
             <Dropdown
               selectedIndex={this.getCountSelectedIndex()}
               options={sourceCountOptions}
@@ -97,7 +97,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
           </div>
           {
             this.shouldShowCustomCount() ?
-              <div>
+              <div className='pf-piece'>
                 <Autocomplete
                   value={source.count as string}
                   onChange={this.handleCountTextChange}
@@ -108,6 +108,13 @@ class PathfinderSourceSection extends TerrainComponent<Props>
               </div>
             : null
           }
+          <div className='pf-piece'>
+            <Dropdown
+              options={List(['Choose a type of data', 'Products', 'Customers', 'Purchases', 'Reviews'])}
+              selectedIndex={0}
+              canEdit={canEdit}
+            />
+          </div>
         </div>
       </div>
     );

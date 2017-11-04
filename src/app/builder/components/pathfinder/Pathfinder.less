@@ -1,6 +1,26 @@
 @import "../../../common/Common.less";
 
-
-.pathfinder-line {
-	display: flex;
+.pathfinder-column {
+	padding: @spacing;
+	padding-top: 2 * @spacing;
+	margin-left: -12px;
+	margin-right: -6px;
+	font-size: @pretty-large-font-size;
+	
+	.pf-section {
+		margin-bottom: @spacing;
+	}
+	
+	.pf-line {
+		display: flex;
+		
+		.pf-piece {
+			margin: 0px @half-spacing;
+			
+			.dropdown-wrapper {
+				margin-top: -4px;
+			}
+		}
+	}
 }
+

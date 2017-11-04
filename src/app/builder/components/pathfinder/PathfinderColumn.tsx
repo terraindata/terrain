@@ -50,6 +50,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
+import * as Radium from 'radium';
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
@@ -67,6 +68,7 @@ export interface Props
   canEdit: boolean;
 }
 
+@Radium
 class PathfinderColumn extends TerrainComponent<Props>
 {
   public state: {
@@ -82,6 +84,10 @@ class PathfinderColumn extends TerrainComponent<Props>
     return (
       <div
         className='pathfinder-column'
+        style={[
+          backgroundColor(Colors().bg3),
+          fontColor(Colors().text3),
+        ]}
       >
         <PathfinderSourceSection
           source={path.source}
