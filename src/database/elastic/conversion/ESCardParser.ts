@@ -69,6 +69,7 @@ import { DisplayType } from '../../../blocks/displays/Display';
 import { Card } from '../../../blocks/types/Card';
 
 import * as _ from 'lodash';
+import Util from 'util/Util';
 
 export default class ESCardParser extends ESParser
 {
@@ -141,6 +142,17 @@ export default class ESCardParser extends ESParser
     return rootCard;
   }
 
+  private static getStaticKeyDisplay(key: string)
+  {
+    const display = _.extend({}, _.cloneDeep(STATIC_KEY_DISPLAY), { label: key });
+    // if the key is too long, we have to increase the size
+    if (key.length * display.style.fontSize > display.style.width)
+    {
+      display.style.width = key.length * display.style.fontSize;
+    }
+    return display;
+  }
+
   private static labelCardKey(rootCard, card, cardPath)
   {
     const display = card.static.display;
@@ -152,7 +164,7 @@ export default class ESCardParser extends ESParser
         {
           if (d.displayType !== DisplayType.LABEL)
           {
-            display[i] = _.extend({}, STATIC_KEY_DISPLAY, { label: card.key });
+            display[i] = ESCardParser.getStaticKeyDisplay(card.key);
           }
         }
       });
@@ -162,7 +174,7 @@ export default class ESCardParser extends ESParser
       {
         if (display.displayType !== DisplayType.LABEL)
         {
-          card.static.display = _.extend({}, STATIC_KEY_DISPLAY, { label: card.key });
+          card.static.display = ESCardParser.getStaticKeyDisplay(card.key);
         }
       } else
       {
@@ -174,7 +186,7 @@ export default class ESCardParser extends ESParser
             {
               if (d.displayType !== DisplayType.LABEL)
               {
-                display.flex[i] = _.extend({}, STATIC_KEY_DISPLAY, { label: card.key });
+                display.flex[i] = ESCardParser.getStaticKeyDisplay(card.key);
               }
             }
           });

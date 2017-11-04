@@ -162,6 +162,7 @@ describe('AnalyticsActions', () =>
     }),
   });
 
+  const variantId = 1;
   const metricId = 1;
   const intervalId = 'day';
   const dateRangeId = 1;
@@ -169,7 +170,6 @@ describe('AnalyticsActions', () =>
 
   describe('#fetch', () =>
   {
-    const variantId = 1;
     const accessToken = 'valid-access-token';
     const start = new Date(2015, 5, 2);
     const end = new Date(2015, 5, 20);
@@ -274,7 +274,7 @@ describe('AnalyticsActions', () =>
 
   describe('#selectMetric', () =>
   {
-    it('should create a analytics.selectMetric', () =>
+    it('should create an analytics.selectMetric action', () =>
     {
       const expectedActions = [
         {
@@ -283,7 +283,7 @@ describe('AnalyticsActions', () =>
         },
       ];
 
-      const store = mockStore({ analytics });
+      const store = mockStore(Immutable.Map({ analytics, schema }));
 
       store.dispatch(Actions.selectMetric(metricId));
       expect(store.getActions()).toEqual(expectedActions);
@@ -292,7 +292,7 @@ describe('AnalyticsActions', () =>
 
   describe('#selectInterval', () =>
   {
-    it('should create a analytics.selectInterval', () =>
+    it('should create an analytics.selectInterval action', () =>
     {
       const expectedActions = [
         {
@@ -301,7 +301,7 @@ describe('AnalyticsActions', () =>
         },
       ];
 
-      const store = mockStore({ analytics });
+      const store = mockStore(Immutable.Map({ analytics, schema }));
 
       store.dispatch(Actions.selectInterval(intervalId));
       expect(store.getActions()).toEqual(expectedActions);
@@ -310,7 +310,7 @@ describe('AnalyticsActions', () =>
 
   describe('#selectDateRange', () =>
   {
-    it('should create a analytics.selectDateRange', () =>
+    it('should create an analytics.selectDateRange action', () =>
     {
       const expectedActions = [
         {
@@ -319,9 +319,27 @@ describe('AnalyticsActions', () =>
         },
       ];
 
-      const store = mockStore({ analytics });
+      const store = mockStore(Immutable.Map({ analytics, schema }));
 
       store.dispatch(Actions.selectDateRange(dateRangeId));
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+
+  describe('#pinVariant', () =>
+  {
+    it('should create an analytics.pinVariant action', () =>
+    {
+      const expectedActions = [
+        {
+          type: ActionTypes.pinVariant,
+          payload: { variantId },
+        },
+      ];
+
+      const store = mockStore(Immutable.Map({ analytics, schema }));
+
+      store.dispatch(Actions.pinVariant(variantId));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });
