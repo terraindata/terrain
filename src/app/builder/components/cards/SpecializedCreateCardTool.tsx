@@ -148,6 +148,7 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
           language={this.props.language}
           className={this.props.className}
           accepts={accepts}
+          data={this.props.data}
           handleCardDrop={this.props.handleCardDrop}
 
           open={this.state.open}

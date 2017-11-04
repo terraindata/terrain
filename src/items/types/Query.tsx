@@ -50,6 +50,7 @@ import { List, Map, Record } from 'immutable';
 
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import { Aggregation } from '../../app/builder/components/results/ResultTypes';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';
@@ -84,10 +85,12 @@ class QueryC
   parseTree: ESInterpreter = null;
   lastMutation: number = 0;
   deckOpen: boolean = false; // TODO change back to TRUE once deck is complete
-
   cardsAndCodeInSync: boolean = false;
 
   path: Path = _Path();
+
+  resultsViewMode: string = 'Hits';
+  aggregationList: Map<string, Aggregation> = Map<string, Aggregation>({});
 
   meta: IMMap<string, any> = Map<string, any>({});
 
@@ -97,7 +100,7 @@ class QueryC
   //modelVersion = CurrentQueryModelVersion; // 2 is for the first version of Node midway
   modelVersion = 2;
 
-  //what order the cards are in the tuning column
+  // what order the cards are in the tuning column
   tuningOrder: List<string> = List([]);
   cardKeyPaths: Map<ID, KeyPath> = Map<ID, KeyPath>({});
 
@@ -115,6 +118,7 @@ export const _Query = (config?: object) =>
   config['meta'] = Map<string, any>(config['meta']);
   config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);
   config['tuningOrder'] = List<string>(config['tuningOrder']);
+  config['aggregationList'] = Map<string, Aggregation>(config['aggregationList']);
   const query = new Query_Record(config) as any as Query;
 
   return query;

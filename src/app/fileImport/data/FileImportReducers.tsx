@@ -493,6 +493,7 @@ FileImportReducers[ActionTypes.saveTemplate] =
       action.payload.exporting,
       state.primaryKeyDelimiter,
       state.objectKey,
+      state.exportRank,
       () =>
       {
         action.payload.handleTemplateSaveSuccess();

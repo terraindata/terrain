@@ -88,7 +88,7 @@ export default class ESCardParser extends ESParser
     // update the cards
     const updatedRootCard = ESCardParser.updateCardBeforeParsing(rootCard);
     // parsing
-    const parsedCard = new ESCardParser(rootCard);
+    const parsedCard = new ESCardParser(updatedRootCard);
     // interpreting
     const state = BuilderStore.getState();
     let inputs = state.query && state.query.inputs;
@@ -213,17 +213,21 @@ export default class ESCardParser extends ESParser
 
   private static updateCardAfterParsing(rootCard, parsedCard: ESCardParser)
   {
-    parsedCard.getValueInfo().recursivelyVisit((element: ESValueInfo) =>
+    const valueInfo = parsedCard.getValueInfo();
+    if (valueInfo)
     {
-      const card = element.card;
-      if (!card)
+      valueInfo.recursivelyVisit((element: ESValueInfo) =>
       {
+        const card = element.card;
+        if (!card)
+        {
+          return true;
+        }
+        rootCard = ESCardParser.updateCardErrors(element, rootCard);
+        rootCard = ESCardParser.updateCardKey(element, rootCard);
         return true;
-      }
-      rootCard = ESCardParser.updateCardErrors(element, rootCard);
-      rootCard = ESCardParser.updateCardKey(element, rootCard);
-      return true;
-    });
+      });
+    }
     return rootCard;
   }
 

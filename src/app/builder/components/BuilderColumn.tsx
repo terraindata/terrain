@@ -71,8 +71,8 @@ import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
 import CardsColumn from './cards/CardsColumn';
 import TuningColumn from './cards/TuningColumn';
 import InputsArea from './inputs/InputsArea';
-import ResultsArea from './results/ResultsArea';
 import PathfinderColumn from './pathfinder/PathfinderColumn';
+import ResultsColumn from './results/ResultsColumn';
 
 const SplitScreenIcon = require('./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -243,7 +243,7 @@ const BuilderColumn = createReactClass<any, any>(
           />;
 
         case COLUMNS.Results:
-          return <ResultsArea
+          return <ResultsColumn
             query={query}
             canEdit={canEdit}
             db={this.props.variant.db}

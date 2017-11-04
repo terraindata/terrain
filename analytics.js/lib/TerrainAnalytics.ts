@@ -48,12 +48,16 @@ import jsurl = require('jsurl');
 declare let ClientJS: any;
 import 'clientjs';
 
+// tslint:disable:strict-boolean-expressions
+
 // Use the 'data-server' attribute to specify the backend server
 // <script src='...' data-server='http://<terrain-analytics-domain>/sigint/v1/'>
 
 const scripts = document.getElementsByTagName('script');
 const currentScript = scripts[scripts.length - 1];
 const server = currentScript.getAttribute('data-server');
+const client = new ClientJS();
+let fingerprint = null;
 
 const TerrainAnalytics = {
   eventIDs: {
@@ -66,9 +70,9 @@ const TerrainAnalytics = {
 
   logEvent(eventNameOrID: string | any, variantOrSourceID: string | any, meta?: any)
   {
-    const client = new ClientJS();
     const eventID = typeof eventNameOrID === 'string' ? TerrainAnalytics.eventIDs[eventNameOrID] : eventNameOrID;
-    const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] : client.getFingerprint();
+    const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] :
+      (fingerprint || (fingerprint = client.getFingerprint()));
 
     let paramString = 'eventid=' + String(eventID)
       + '&visitorid=' + String(visitorID)

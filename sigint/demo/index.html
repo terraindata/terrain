@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <title>
+      Terrain: Search
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link href="css/screen.css" media="screen" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div class="container-fullwidth" ng-app='terrainSearch' ng-controller='searchCtrl'>
+      <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand" href="https://www.terraindata.com"><img src="img/logo.png" alt="Terrain" width="160px"></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">About</a>
+              </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+              <label for="setESServer" class="mr-sm-3">ElasticSearch Server</label>
+              <input class="form-control mr-sm-2" id="setESServer" ng-model="esServer" type="search" placeholder="http://localhost:9200" aria-label="Set ES Server">
+              <span class="mr-sm-4"></span>
+              <label for="setVariant" class="mr-sm-2">Variant ID</label>
+              <input class="form-control mr-4 col-3" id="setVariant" ng-model="variantID" type="search" placeholder="123" aria-label="Set Variant">
+            </form>
+            <button type="button" class="btn btn-primary col-1" data-toggle="modal" data-target="#shoppingCart">
+              <span class="fa fa-shopping-cart" aria-hidden="true"></span> Cart <span class="badge badge-light mx-2" ng-if="cartItems" ng-model="cartItems">{{cartItems}}</span>
+            </button>
+          </div>
+        </nav>
+      </header>
+      <div class="row justify-content-center align-items-center pt-5">
+        <div class="col-md-4">
+            <div class="input-group input-group-lg">
+              <input ng-model="searchTerm" ng-change="search()" type="text" class="form-control" placeholder="Search for..." aria-label="Search for...">
+            </div>
+        </div>
+      </div>
+      <section infinite-scroll="loadMore()" infinite-scroll-use-document-bottom="true" infinite-scroll-disabled='busy' class="results p-5 m-5">
+        <div class="no-results text-center" ng-hide="results.length">No results</div>
+        <div class="row justify-content-between justify-content-md-center align-items-start">
+          <div class="col col-md-2 p-3" ng-cloak ng-repeat="result in results">
+            <div id="result-{{result.movieid}}" class="box card text-center" data-toggle="modal" data-target="#showDetail-{{result.movieid}}" ng-click="cardDisplay(result)">
+              <img class="card-img-top img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{result.posterpath}}" ng-if="result.posterpath.length" alt={{result.title}}>
+              <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.posterpath.length" alt={{result.title}}>
+              <div ng-init="cardLoad(result)"></div>
+              <div class="card-body">
+                <h6 class="card-title">{{result.title}}</h6>
+              </div>
+            </div>
+            <div class="modal fade" id="showDetail-{{result.movieid}}" tabindex="-1" role="dialog" aria-labelledby="showDetailLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="showDetailLabel">{{result.title}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span class="fa fa-times" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <div class="modal-body text-center p-4 m-4">
+                    <img class="img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{result.posterpath}}" ng-if="result.posterpath.length" alt={{result.title}}>
+                    <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.posterpath.length" alt={{result.title}}>
+                    <p class="text-muted">{{result.tagline}}</p>
+                    <br/>
+                    <p class="font-weight-bold text-info">{{result.overview}}</p>
+                    <br/>
+                    <table class="table table-sm table-striped">
+                      <tbody class="text-right">
+                        <tr>
+                          <td class="text-muted">Vote Count</td>
+                          <td>{{result.votecount}}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Vote Average</td>
+                          <td>{{result.voteaverage}}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Budget</td>
+                          <td>{{result.budget | currency}}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Revenue</td>
+                          <td>{{result.revenue | currency}}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Release Date</td>
+                          <td>{{result.releasedate | date}}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Runtime</td>
+                          <td>{{result.runtime}} minutes</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Language</td>
+                          <td>{{result.language}}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Genre(s)</td>
+                          <td style="overflow: hidden; max-width: 40px; word-wrap: break-word;">{{result.genres}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><span class="fa fa-times" aria-hidden="true"></span> Close</button>
+                    <button type="button" class="btn btn-primary" ng-click="addItem(result)" data-dismiss="modal"><span class="fa fa-cart-plus" aria-hidden="true"></span> Add to Cart</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div ng-show='busy && !done && results.length'>Loading data...</div>
+        </div>
+      </section>
+      <div class="modal fade" id="shoppingCart" tabindex="-1" role="dialog" aria-labelledby="shoppingCartLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="shoppingCartLabel">Shopping Cart</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span class="fa fa-times" aria-hidden="true"></span>
+                </button>
+              </div>
+              <div class="modal-body text-center p-4 m-4">
+                <div class="text-center" ng-hide="cart.length">Your shopping cart is empty</div>
+                <table class="table table-striped table-hover text-center">
+                  <tbody>
+                    <tr ng-cloak ng-repeat="item in cart">
+                      <td class="align-middle">
+                        <img class="thumbnail img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{item.posterpath}}" ng-if="item.posterpath.length" alt={{item.title}}>
+                        <img class="thumbnail card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!item.posterpath.length" alt={{item.title}}>
+                      </td>
+                      <td class="align-middle font-weight-bold">{{item.title}}</td>
+                      <td class="align-middle">
+                        <button type="button" class="close" ng-click="removeItem(item)" aria-label="Trash">
+                          <span class="fa fa-trash" aria-hidden="true"></span>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="modal-footer">
+                <div class="container">
+                  <div class="row">
+                    <div class="col">
+                      <button type="button" class="btn btn-danger clearfix float-left align-left" ng-click="emptyCart()"><span class="fa fa-trash-o" aria-hidden="true"></span> Empty Cart</button>
+                    </div>
+                    <div class="col text-right">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal"><span class="fa fa-times" aria-hidden="true"></span> Close</button>
+                      <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="checkout()"><span class="fa fa-credit-card" aria-hidden="true"></span> Checkout</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container text-center">
+        <span class="text-muted">Powered by <a href="http://terraindata.com/">Terrain</a>. &copy; 2017 Terrain Data, Inc. All rights reserved.</span>
+      </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+            integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ngInfiniteScroll/1.3.0/ng-infinite-scroll.min.js"></script>
+    <script src="js/app.js" type="text/javascript"></script>
+    <script src='http://localhost:3001/bundle.js' data-server="http://localhost:3001/v1/"></script>
+  </body>
+</html>

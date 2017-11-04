@@ -720,6 +720,7 @@ class _CardComponent extends TerrainComponent<Props>
             open={true}
             onClose={this.handleCardToolClose}
             accepts={this.props.display && this.props.display.accepts}
+            data={this.props.card}
             language={this.props.card.static.language}
             handleCardDrop={this.props.handleCardDrop}
           />

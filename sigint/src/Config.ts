@@ -54,6 +54,7 @@ export interface Config
   config?: string;
   port?: number;
   debug?: boolean;
+  demo?: boolean;
   help?: boolean;
   verbose?: boolean;
   db?: string;
