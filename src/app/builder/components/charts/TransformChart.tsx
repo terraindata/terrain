@@ -630,7 +630,7 @@ const TransformChart = {
       ;
 
     spotlight.select('.spotlight-rank')
-      .attr('y', (d) => getSpotlightY(d, true) + 3)
+      .attr('y', (d) => getSpotlightY(d, true) + 4)
       .attr('x', (d) => getFinalX(d, true))
       .attr('fill', '#fff')
       .attr('style', fontSize)
