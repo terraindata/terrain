@@ -94,7 +94,7 @@ const TerrainAnalytics = {
     const event = assembleParams(true, eventName, variantOrSourceId, meta);
     batch.push(event);
     batchSize += sizeof(event);
-    // GET requests should be under 2kB.  If we get too close to this limit,
+    // GET requests should be under 2KB.  If we get too close to this limit,
     // immediately process and reset the buffer.
     if (batchSize >= 1900) {
       logQueue();

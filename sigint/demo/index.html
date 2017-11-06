@@ -51,7 +51,7 @@
       <section infinite-scroll="loadMore()" infinite-scroll-use-document-bottom="true" infinite-scroll-disabled='busy' class="results p-5 m-5">
         <div class="no-results text-center" ng-hide="results.length">No results</div>
         <div class="row justify-content-between justify-content-md-center align-items-start">
-          <div class="col col-md-2 p-3" ng-cloak ng-repeat="result in results">
+          <div class="col col-md-2 p-3" ng-cloak ng-repeat="result in results" ng-init="$last && doneLoading()">
             <div id="result-{{result.movieid}}" class="box card text-center" data-toggle="modal" data-target="#showDetail-{{result.movieid}}" ng-click="cardDisplay(result)">
               <img class="card-img-top img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{result.posterpath}}" ng-if="result.posterpath.length" alt={{result.title}}>
               <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.posterpath.length" alt={{result.title}}>
