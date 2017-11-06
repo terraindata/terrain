@@ -83,17 +83,9 @@ export interface EventConfig
   meta?: any;
 }
 
-export interface EventMetadataConfig
-{
-  id: number | string;
-  name: string;
-  description?: string;
-}
-
 export class Events
 {
   private eventTable: Tasty.Table;
-  private eventMetadataTable: Tasty.Table;
 
   public async initializeEventMetadata(tasty: Tasty.Tasty, index: string, type: string): Promise<void>
   {
@@ -109,57 +101,6 @@ export class Events
       ],
       index,
     );
-
-    this.eventMetadataTable = new Tasty.Table(
-      type + '-metadata',
-      [],
-      [
-        'id',
-        'name',
-      ],
-      index,
-    );
-
-    tasty.upsert(this.eventMetadataTable,
-      [
-        {
-          id: 1,
-          name: 'view',
-          description:
-          `Page view or impression event. This event fires off when a page
-          serving a variant is loaded or viewed.`,
-        },
-        {
-          id: 2,
-          name: 'click',
-          description:
-          `Item or page click event. This event is generated through an interaction
-          with the page or item served by a variant.`,
-        },
-        {
-          id: 3,
-          name: 'conversion',
-          description:
-          `An event denoting an item transaction or conversion. This event is generated
-          when an item served by a variant gets bought.`,
-        },
-        {
-          id: 4,
-          name: 'addtocart',
-          description:
-          `An event denoting that an item was added to the cart.`,
-        },
-      ]).then().catch();
-  }
-
-  public async getMetadata(controller: DatabaseController, filter?: object): Promise<string>
-  {
-    return JSON.stringify(controller.getTasty().select(this.eventMetadataTable, [], filter));
-  }
-
-  public async addEventMetadata(controller: DatabaseController, event: object): Promise<EventMetadataConfig>
-  {
-    return controller.getTasty().upsert(this.eventMetadataTable, event) as Promise<EventMetadataConfig>;
   }
 
   /*
@@ -330,12 +271,39 @@ export class Events
     return this.buildQuery(controller, body.build());
   }
 
+  public generateSelectEventsQuery(controller: DatabaseController, variantid?: string): Elastic.SearchParams
+  {
+    const body = bodybuilder()
+      .filter('term', 'variantid', variantid)
+      .filter('term', 'eventid', request.eventid)
+      .filter('range', '@timestamp', {
+        gte: request.start,
+        lte: request.end,
+      });
+
+    return this.buildQuery(controller, body.build());
+  }
+
   public async getAllEvents(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>((resolve, reject) =>
     {
       const query = this.generateSelectQuery(controller, variantid, request);
       this.runQuery(controller, query, (response) =>
+      {
+        resolve({
+          [variantid]: response['hits'].hits.map((e) => e['_source']),
+        });
+      }, reject);
+    });
+  }
+
+  public async getEventsList(controller: DatabaseController, variantid?: number): Promise<object>
+  {
+    return new Promise<object>((resolve, reject) =>
+    {
+      const query = this.generateSelectQuery(controller, variantid);
+      this.runQuery(controller as ElasticController, query, (response) =>
       {
         resolve({
           [variantid]: response['hits'].hits.map((e) => e['_source']),
