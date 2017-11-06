@@ -851,13 +851,20 @@ const TransformChart = {
 
   _drawNormalLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domainMin, domainMax)
   {
-    const linesPointsData = _.clone(pointsData);
-
     const average = pointsData[1].x;
-    const stdDev = Math.abs(pointsData[1].x - pointsData[0].x);
-    const maxY = this._normal(average, average, stdDev);
-    const scaleFactor = pointsData[1].y / maxY;
-    const data = this._getNormalData(scales, average, stdDev, domainMin, domainMax, scaleFactor);
+    // Left half of data
+    let stdDev = Math.abs(pointsData[1].x - pointsData[0].x);
+    let maxY = this._normal(average, average, stdDev);
+    let scaleFactor = pointsData[1].y / maxY;
+    const leftData = this._getNormalData(scales, average, stdDev, domainMin, average, scaleFactor);
+
+    // Right half of data
+    stdDev = Math.abs(pointsData[2].x - pointsData[1].x);
+    maxY = this._normal(average, average, stdDev);
+    scaleFactor = pointsData[1].y / maxY;
+    const rightData = this._getNormalData(scales, average, stdDev, average, domainMax, scaleFactor);
+    const data = this._addNormalBoundingData(scales, leftData.concat(rightData));
+
     const line = d3.svg.line()
       .x((d) =>
       {
@@ -879,41 +886,43 @@ const TransformChart = {
   _getNormalData(scales, average, stdDev, min, max, scaleFactor)
   {
     const data = [];
-    const stepSize = (max - min) * (1 / 100);
-    for (let i = (min - stepSize); i < (max + stepSize); i += stepSize)
+    const stepSize = (max - min) * (1 / 50);
+    for (let i = min; i <= max; i += stepSize)
     {
       const y = this._normal(i, average, stdDev);
       data.push({ y: y * scaleFactor, x: i, id: i, selected: false });
     }
-    if (data.length)
-    {
-      const range = (scaleMax(scales.x) - scaleMin(scales.x));
-      data.unshift({
-        x: scaleMin(scales.x) - range,
-        y: data[0].y,
-        id: '*%*-first',
-        dontScale: true,
-      });
-      data.unshift({
-        x: scaleMin(scales.x) - range,
-        y: -1,
-        id: '*%*-first-anchor',
-        dontScale: true,
-      });
+    return data;
+  },
 
-      data.push({
-        x: scaleMax(scales.x) + range,
-        y: data[data.length - 1].y,
-        id: '*%*-last',
-        dontScale: true,
-      });
-      data.push({
-        x: scaleMax(scales.x) + range,
-        y: -1,
-        id: '*%*-last-anchor',
-        dontScale: true,
-      });
-    }
+  _addNormalBoundingData(scales, data)
+  {
+    const range = (scaleMax(scales.x) - scaleMin(scales.x));
+    data.unshift({
+      x: scaleMin(scales.x) - range,
+      y: data[0].y,
+      id: '*%*-first',
+      dontScale: true,
+    });
+    data.unshift({
+      x: scaleMin(scales.x) - range,
+      y: -1,
+      id: '*%*-first-anchor',
+      dontScale: true,
+    });
+
+    data.push({
+      x: scaleMax(scales.x) + range,
+      y: data[data.length - 1].y,
+      id: '*%*-last',
+      dontScale: true,
+    });
+    data.push({
+      x: scaleMax(scales.x) + range,
+      y: -1,
+      id: '*%*-last-anchor',
+      dontScale: true,
+    });
     return data;
   },
 
@@ -1785,7 +1794,8 @@ const TransformChart = {
       if (mode === 'normal')
       {
         const average = pointsData[1].x;
-        const stdDev = Math.abs(pointsData[1].x - pointsData[0].x);
+        const stdDev = i === 0 ? Math.abs(pointsData[1].x - pointsData[0].x)
+          : Math.abs(pointsData[2].x - pointsData[1].x);
         const maxY = this._normal(average, average, stdDev);
         const scaleFactor = pointsData[1].y / maxY;
         const y = this._normal(d['x'], average, stdDev) * scaleFactor;
@@ -1798,11 +1808,17 @@ const TransformChart = {
     {
       if (mode === 'normal')
       {
-        if (i === 1)
+        switch (i)
         {
-          return 'Average';
+          case 0:
+            return 'Standard Deviation 1';
+          case 1:
+            return 'Average';
+          case 2:
+            return 'Standard Deviation 2';
+          default:
+            return '';
         }
-        return 'Standard Deviation';
       }
       return d['id'];
     };
@@ -1886,26 +1902,26 @@ const TransformChart = {
 
     const pointXValue = (d, i) =>
     {
-        if (i === 3 || i === 0)
+      if (i === 3 || i === 0)
+      {
+        const L = pointsData[3].y - pointsData[0].y;
+        const x0 = pointsData[2].x;
+        const a = pointsData[0].y;
+        const x = pointsData[1].x;
+        const y = pointsData[1].y;
+        const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+        const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
+          Math.log(L / (0.01) - 1) / (-1 * k) + x0;
+        if (i === 3 && d['x'] >= xVal)
         {
-          const L = pointsData[3].y - pointsData[0].y;
-          const x0 = pointsData[2].x;
-          const a = pointsData[0].y;
-          const x = pointsData[1].x;
-          const y = pointsData[1].y;
-          const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
-          const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
-            Math.log(L / (0.01) - 1) / (-1 * k) + x0;
-          if (i === 3 && d['x'] >= xVal)
-          {
-            return scales.realX(Util.valueMinMax(d['x'], domain[0], domain[1]));
-          }
-          if (i === 0 && d['x'] <= xVal)
-          {
-            return scales.realX(Util.valueMinMax(d['x'], domain[0], domain[1]));
-          }
-          return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
+          return scales.realX(Util.valueMinMax(d['x'], domain[0], domain[1]));
         }
+        if (i === 0 && d['x'] <= xVal)
+        {
+          return scales.realX(Util.valueMinMax(d['x'], domain[0], domain[1]));
+        }
+        return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
+      }
       return scales.realX(d['x']);
     };
 
@@ -1984,7 +2000,7 @@ const TransformChart = {
         this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
         break;
       case 'normal':
-        if (numPoints >= 2)
+        if (numPoints >= 3)
         {
           this._drawNormalLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
         }
@@ -2011,7 +2027,7 @@ const TransformChart = {
       default:
         this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
-    if (mode === 'linear' || numPoints === 2)
+    if (mode === 'linear' || numPoints === 2 || (mode === 'normal' && numPoints === 3))
     {
       this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain.x);
     }
