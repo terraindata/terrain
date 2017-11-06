@@ -58,26 +58,25 @@ describe('VariantsColumn', () =>
   const groupId = 1;
   const algId = 2;
   const variantId = 3;
-  const library = _LibraryState({
-    groups: Immutable.Map<number, LibraryTypes.Group>({
-      [groupId]: LibraryTypes._Group({
-        id: groupId,
-        name: 'Group 1',
-      }),
-    }),
-    algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({
-      [algId]: LibraryTypes._Algorithm({
-        id: algId,
-        name: 'Algorithm 1',
-      }),
-    }),
-    variants: Immutable.Map<number, LibraryTypes.Variant>({
-      [variantId]: LibraryTypes._Variant({
-        id: variantId,
-        name: 'Variant 1',
-      }),
-    }),
+  let library = _LibraryState({
+    groups: Immutable.Map<number, LibraryTypes.Group>({}),
+    algorithms: Immutable.Map<number, LibraryTypes.Group>({}),
+    variants: Immutable.Map<number, LibraryTypes.Variant>({}),
   });
+
+  library = library
+    .setIn(['groups', groupId], LibraryTypes._Group({
+      id: groupId,
+      name: 'Group 1',
+    }))
+    .setIn(['algorithms', algId], LibraryTypes._Algorithm({
+      id: algId,
+      name: 'Algorithm 1',
+    }))
+    .setIn(['variants', variantId], LibraryTypes._Variant({
+      id: variantId,
+      name: 'Variant 1',
+    }));
 
   const analytics: AnalyticsState = _AnalyticsState({
     loaded: true,
@@ -117,19 +116,19 @@ describe('VariantsColumn', () =>
   {
     describe('when canPinItems is set to false', () =>
     {
-      it('should redirect the builder', () =>
+      it('should redirect to the builder', () =>
       {
         browserHistory.push = jest.fn();
         variantsColumnComponent.instance().handleDoubleClick(variantId);
 
         expect(browserHistory.push).toHaveBeenCalledTimes(1);
-        expect(browserHistory.push).toHaveBeenCalledWith('/builder/?o=3');
+        expect(browserHistory.push).toHaveBeenCalledWith(`/builder/?o=${variantId}`);
       });
     });
 
     describe('when canPinItems is set to true', () =>
     {
-      it('should redirect the builder', () =>
+      it('should NOT redirect to the builder', () =>
       {
         variantsColumnComponent = shallow(
           <VariantsColumn
