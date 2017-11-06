@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import jsurl = require('jsurl');
+import sizeof = require('object-sizeof');
 declare let ClientJS: any;
 import 'clientjs';
 
@@ -58,12 +59,23 @@ const currentScript = scripts[scripts.length - 1];
 const server = currentScript.getAttribute('data-server');
 const client = new ClientJS();
 let fingerprint = null;
+let batch = [];
+let batchSize = 0; // memoized so we aren't always computing sizeof(batch)
 
 const TerrainAnalytics = {
-  logEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
+  assembleParams(asObject: bool, eventName: string | any, variantOrSourceId: string | any, meta?: any)
   {
     const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] :
       (fingerprint || (fingerprint = client.getFingerprint()));
+
+    if (asObject)
+    {
+      return Object.assign({
+        eventname: eventName,
+        visitorid: String(visitorID),
+        variantid: String(variantOrSourceID),
+      }, meta !== null && meta !== undefined ? meta : undefined);
+    }
 
     let paramString = 'eventname=' + String(eventName)
       + '&visitorid=' + String(visitorID)
@@ -71,11 +83,37 @@ const TerrainAnalytics = {
 
     if (meta !== null && meta !== undefined)
     {
-      paramString += '&meta=' + String(jsurl.stringify(meta));
+      paramString += '&meta=' + jsurl.stringify(meta);
     }
 
+    return paramString;
+  },
+
+  queueEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
+  {
+    const event = assembleParams(true, eventName, variantOrSourceId, meta);
+    batch.push(event);
+    batchSize += sizeof(event);
+    // GET requests should be under 2kB.  If we get too close to this limit,
+    // immediately process and reset the buffer.
+    if (batchSize >= 1900) {
+      logQueue();
+    }
+  },
+
+  logQueue()
+  {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', (server || '') + '?' + paramString, true);
+    xhr.open('GET', (server || '') + '?batch=' + jsurl.stringify(batch), true);
+    xhr.send();
+    batch = [];
+    batchSize = 0;
+  }
+
+  logEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
+  {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', (server || '') + '?' + assembleParams(false, eventName, variantOrSourceId, meta), true);
     xhr.send();
   },
 };
