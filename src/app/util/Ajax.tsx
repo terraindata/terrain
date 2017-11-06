@@ -1358,7 +1358,7 @@ export const Ajax =
         eventname: metric,
         interval: intervalId,
         agg: aggregation,
-        field: '@timestamp',
+        field: 'timestamp',
         database: connectionId,
       };
 

@@ -117,13 +117,13 @@ export class Events
       .size(0)
       .filter('term', 'variantid', variantid)
       .filter('term', 'eventname', request.eventname)
-      .filter('range', '@timestamp', {
+      .filter('range', 'timestamp', {
         gte: request.start,
         lte: request.end,
       })
       .aggregation(
       'date_histogram',
-      '@timestamp',
+      'timestamp',
       request.agg,
       {
         interval: request.interval,
@@ -158,14 +158,14 @@ export class Events
       // .orFilter('term', 'eventname', eventnames[0])
       // .orFilter('term', 'eventname', eventnames[1])
       .filter('term', 'variantid', variantid)
-      .filter('range', '@timestamp', {
+      .filter('range', 'timestamp', {
         gte: request.start,
         lte: request.end,
       })
 
       .aggregation(
       'date_histogram',
-      '@timestamp',
+      'timestamp',
       'histogram',
       {
         interval: request.interval,
@@ -251,7 +251,7 @@ export class Events
     let body = bodybuilder()
       .filter('term', 'variantid', variantid)
       .filter('term', 'eventname', request.eventname)
-      .filter('range', '@timestamp', {
+      .filter('range', 'timestamp', {
         gte: request.start,
         lte: request.end,
       });
