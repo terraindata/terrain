@@ -56,7 +56,7 @@ describe('AnalyticsSelector', () =>
   const analytics: AnalyticsState = _AnalyticsState({
     loaded: false,
     data: Immutable.Map({}),
-    selectedMetric: 1,
+    selectedMetric: [1],
   });
 
   const servers = Immutable.Map({
