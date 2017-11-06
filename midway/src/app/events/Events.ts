@@ -271,15 +271,15 @@ export class Events
     return this.buildQuery(controller, body.build());
   }
 
-  public generateSelectEventsQuery(controller: DatabaseController, variantid?: string): Elastic.SearchParams
+  public generateSelectEventsQuery(controller: DatabaseController, variantid?: number): Elastic.SearchParams
   {
-    const body = bodybuilder()
-      .filter('term', 'variantid', variantid)
-      .filter('term', 'eventid', request.eventid)
-      .filter('range', '@timestamp', {
-        gte: request.start,
-        lte: request.end,
-      });
+    let body = bodybuilder()
+      .aggregation('terms', 'eventid');
+
+    if (variantid !== undefined)
+    {
+      body = body.filter('term', 'variantid', variantid);
+    }
 
     return this.buildQuery(controller, body.build());
   }
@@ -302,12 +302,19 @@ export class Events
   {
     return new Promise<object>((resolve, reject) =>
     {
-      const query = this.generateSelectQuery(controller, variantid);
+      const query = this.generateSelectEventsQuery(controller, variantid);
       this.runQuery(controller as ElasticController, query, (response) =>
       {
-        resolve({
-          [variantid]: response['hits'].hits.map((e) => e['_source']),
-        });
+        if (variantid !== undefined)
+        {
+          resolve({
+            [variantid]: response['aggregations']['aggs_terms_eventid'].buckets,
+          });
+        }
+        else
+        {
+          resolve(response['aggregations']['aggs_terms_eventid'].buckets);
+        }
       }, reject);
     });
   }
