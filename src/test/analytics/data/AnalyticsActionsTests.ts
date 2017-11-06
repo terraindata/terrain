@@ -163,7 +163,7 @@ describe('AnalyticsActions', () =>
   });
 
   const variantId = 1;
-  const metricId = 1;
+  const metric = 'impressions';
   const intervalId = 'day';
   const dateRangeId = 1;
   const connectionName = 'My ElasticSearch Instance';
@@ -188,7 +188,7 @@ describe('AnalyticsActions', () =>
           variantIds: ID[],
           startParam: Date,
           endParam: Date,
-          metricIdParam: number,
+          metricParam: string,
           intervalIdParam: string,
           agg: string,
           onLoad: (response: any) => void,
@@ -211,7 +211,7 @@ describe('AnalyticsActions', () =>
           Actions.fetch(
             connectionName,
             [variantId],
-            metricId,
+            metric,
             intervalId,
             dateRangeId,
             (analyticsResponseParam) =>
@@ -233,7 +233,7 @@ describe('AnalyticsActions', () =>
           variantIds: ID[],
           startParam: Date,
           endParam: Date,
-          metricIdParam: number,
+          metricParam: string,
           intervalIdParam: string,
           agg: string,
           onLoad: (response: any) => void,
@@ -257,7 +257,7 @@ describe('AnalyticsActions', () =>
           Actions.fetch(
             connectionName,
             [variantId],
-            metricId,
+            metric,
             intervalId,
             dateRangeId,
             () => { return; },
@@ -279,13 +279,13 @@ describe('AnalyticsActions', () =>
       const expectedActions = [
         {
           type: ActionTypes.selectMetric,
-          payload: { metricId },
+          payload: { metric },
         },
       ];
 
       const store = mockStore(Immutable.Map({ analytics, schema }));
 
-      store.dispatch(Actions.selectMetric(metricId));
+      store.dispatch(Actions.selectMetric(metric));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });

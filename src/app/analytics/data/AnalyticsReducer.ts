@@ -89,10 +89,10 @@ AnalyticsReducer[ActionTypes.fetchFailure] =
   };
 
 AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metricId: ID }>) =>
+  (state, action: Action<{ metric: string }>) =>
   {
-    const { metricId } = action.payload;
-    return state.set('selectedMetric', metricId);
+    const { metric } = action.payload;
+    return state.set('selectedMetric', metric);
   };
 
 AnalyticsReducer[ActionTypes.selectInterval] =
