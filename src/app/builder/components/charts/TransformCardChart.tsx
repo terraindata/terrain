@@ -236,8 +236,8 @@ class TransformCardChart extends TerrainComponent<Props>
 
     if ((this.props.mode === 'normal' && pointName === 'Average')
       // ||
-     // (this.props.mode === 'sigmoid' && pointName === 'x0')
-     )
+      // (this.props.mode === 'sigmoid' && pointName === 'x0')
+    )
     {
       points = this.state.initialPoints.map((scorePoint, i) =>
       {
@@ -287,7 +287,7 @@ class TransformCardChart extends TerrainComponent<Props>
         if (scorePoint.id === pointId || this.state.selectedPointIds.get(scorePoint.id))
         {
           let scoreMin = 0;
-          let scoreMax = 1;
+          const scoreMax = 1;
           if (this.props.mode === 'exponential')
           {
             scoreMin = 0.001;

@@ -134,8 +134,8 @@ export const elasticTransform = _card(
               options: List(['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid']),
               optionsDisplayName: Map({
                 linear: 'freeform', logarithmic: 'logarithmic',
-                exponential: 'exponential', normal: 'bell-curve', sigmoid: 's-curve'
-              })
+                exponential: 'exponential', normal: 'bell-curve', sigmoid: 's-curve',
+              }),
               key: 'mode',
               style: {
                 width: '50%',

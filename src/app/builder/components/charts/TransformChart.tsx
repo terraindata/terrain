@@ -201,10 +201,9 @@ const TransformChart = {
         }
         else
         {
-          d3.select(el).select('.popup').remove();
           const popup = d3.select(el).select('.inner-svg').append('g')
             .attr('class', 'popup');
-          const containerWidth = d3.select(el).select('.inner-svg').node().getBBox().width;
+          const containerWidth = d3.select(el).select('.bg').node().getBBox().width;
           const x = (containerWidth - 195) / 2;
           popup.append('text')
             .attr('x', x > 0 ? x : 100)
@@ -212,10 +211,11 @@ const TransformChart = {
             .attr('fill', 'red')
             .text('Cannot add points in this mode')
             ;
-            setTimeout(() => {
-              d3.select(el).select('.popup').remove();
-            }, 1000);
-          }
+          setTimeout(() =>
+          {
+            d3.select(el).select('.popup').remove();
+          }, 1300);
+        }
         return false;
       });
 
@@ -268,23 +268,23 @@ const TransformChart = {
           (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) // delete/backspace key
           && !$('input').is(':focus')
           && state.mode !== 'linear'
-          )
+        )
         {
           // draw something that says you cannot delete points in this mode
-          d3.select(el).select('.popup').remove();
           const popup = d3.select(el).select('.inner-svg').append('g')
             .attr('class', 'popup');
-          const containerWidth = d3.select(el).select('.inner-svg').node().getBBox().width;
-          const x = (containerWidth - 195) / 2;
+          const containerWidth = d3.select(el).select('.bg').node().getBBox().width;
+          const x = (containerWidth - 211) / 2;
           popup.append('text')
             .attr('x', x > 0 ? x : 100)
             .attr('y', 15)
             .attr('fill', 'red')
             .text('Cannot delete points in this mode')
             ;
-            setTimeout(() => {
-              d3.select(el).select('.popup').remove();
-            }, 1000);
+          setTimeout(() =>
+          {
+            d3.select(el).select('.popup').remove();
+          }, 1300);
         }
       });
     }
@@ -363,7 +363,8 @@ const TransformChart = {
 
     const width = scaleMax(scales.x) - scaleMin(scales.x);
     const height = scaleMin(scales.pointY) - scaleMax(scales.pointY);
-
+    const containerWidth = d3.select(el).select('.bg').node().getBBox().width;
+    const x = (containerWidth - 279) / 2;
     overlay.append('rect')
       .attr('x', 0)
       .attr('width', width)
@@ -373,7 +374,7 @@ const TransformChart = {
       .attr('opacity', 0.5);
 
     overlay.append('text')
-      .attr('x', 10)
+      .attr('x', x >= 0 ? x : 10)
       .attr('y', height / 2)
       .attr('text-anchor', 'start')
       .attr('fill', Colors().text1)
@@ -400,6 +401,8 @@ const TransformChart = {
 
     const width = scaleMax(scales.x) - scaleMin(scales.x);
     const height = scaleMin(scales.pointY) - scaleMax(scales.pointY);
+    const containerWidth = d3.select(el).select('.bg').node().getBBox().width;
+    const x = (containerWidth - 296) / 2;
 
     overlay.append('rect')
       .attr('x', 0)
@@ -410,7 +413,7 @@ const TransformChart = {
       .attr('opacity', 0.5);
 
     overlay.append('text')
-      .attr('x', 10)
+      .attr('x', x >= 0 ? x : 10)
       .attr('y', height / 2)
       .attr('text-anchor', 'start')
       .attr('fill', Colors().text1)
@@ -419,7 +422,6 @@ const TransformChart = {
     const self = this;
     overlay.on('mouseout', this._overlayMouseoutFactory(el, scales, self._drawNoPointsOverlay));
     overlay.on('mouseover', this._overlayMouseoverFactory(el));
-    // overlay.on('mouseleave', onMouseLeave(this, el, scales, onMouseEnter, onMouseLeave));
   },
 
   _drawInfoPopup(el, scales, width, height, message)
@@ -965,7 +967,7 @@ const TransformChart = {
     for (let i = 0; i <= 100; i++)
     {
       const y = this._exponential(x, lambda, A);
-      data.push({y: y + shift, x, id: i, selectd: false});
+      data.push({ y: y + shift, x, id: i, selectd: false });
       x += stepSize;
     }
     if (data.length)
@@ -1104,12 +1106,10 @@ const TransformChart = {
     // const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
     const a = 0;
     const L = 1;
-    const x1 = pointsData[0].x;
-    const y1 = pointsData[0].y;
-    const x2 = pointsData[1].x;
-    const y2 = pointsData[1].y;
-    const x3 = pointsData[2].x;
-    const y3 = pointsData[2].y;
+    const x1 = pointsData[1].x;
+    const y1 = pointsData[1].y;
+    const x2 = pointsData[2].x;
+    const y2 = pointsData[2].y;
     const p = Math.log(1 / y2 - 1) / Math.log(1 / y1 - 1);
     const x0 = (x2 - x1 * p) / (1 - p);
     const k = -1 * Math.log(1 / y1 - 1) / (x1 - x0);
