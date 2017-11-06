@@ -2,32 +2,37 @@
 
 .create-card-option {
   .transition;
-  
-  display: flex;
-  align-items: center;
+
+  height: 70px;
   box-sizing: border-box;
-  border: 1px solid;
-  
-  padding: 6px;
-  // border-bottom: 1px solid rgba(255,255,255,0.15);
-  margin-bottom: 6px;
-  border-radius: 3px;
+  padding: @half-spacing;
+  border-radius: 1px;
   width: 100%;
-  
   cursor: pointer;
-  
-  .create-card-option-button {
-    flex: 0 0 150px; // don't grow, don't shrink, start at 150px
-    text-align: center;
+  border: 1px solid;
+
+  .create-card-option-description {
+    padding-left: @spacing;
+    padding-right: @half-spacing;
+    height: 32px;
+    overflow: hidden;
+    text-align: left;
+    position: relative;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .create-card-option-title {
+    text-align: left;
     padding: 3px;
-    text-transform: capitalize;
-    
+    .big-text;
     .transition;
   }
-  
-  .create-card-option-description {
-    flex-grow: 1;
-    padding-left: 12px;
-  }
 }
-   
+
+.create-card-option-description-tooltip {
+  text-align: left;
+  max-width: 400px;
+  display: inline-block;
+}

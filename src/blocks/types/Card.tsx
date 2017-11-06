@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import { Display } from '../displays/Display';
+import { Display, DisplayType } from '../displays/Display';
 import { allBlocksMetaFields, Block, BlockConfig, TQLFn, verifyBlockConfigKeys } from './Block';
 
 import ESClause from '../../../shared/database/elastic/parser/clauses/ESClause';
@@ -57,6 +57,32 @@ import ESValueInfo from '../../../shared/database/elastic/parser/ESValueInfo';
 export type InitFn = (blockSpec: { [type: string]: BlockConfig }, extraConfig?: { [key: string]: any }, skipTemplate?: boolean) => {
   [k: string]: any;
 };
+
+/*
+ *  Returns the category that the card belongs to
+ */
+export function getCardCategory(card: CardConfig): string
+{
+  if (card === undefined)
+  {
+    return '';
+  }
+  else if (card.static === undefined || card.static.clause === undefined)
+  {
+    return card.key;
+  }
+  else
+  {
+    return card.static.clause.path[0];
+  }
+}
+
+export function getCardTitle(card: CardConfig): string
+{
+  return card.static !== undefined ? card.static.title : card.key;
+  // card.key is not the most proper alternative if there is no static title defined,
+  // but it is the best that can be done statically.
+}
 
 export interface Card extends IRecord<Card>
 {
@@ -69,6 +95,7 @@ export interface Card extends IRecord<Card>
   // whether a card in tuning column is collapsed (needs to be sep. from closed)
   tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
   errors: List<string>;
+  keyDisplayType: DisplayType;
 
   // the following fields are excluded from the server save
   static: {
@@ -170,6 +197,7 @@ export const _card = (config: CardConfig) =>
   config = _.extend(config, {
     id: '',
     errors: Immutable.List([]),
+    keyDisplayType: DisplayType.TEXT,
     _isCard: true,
     _isBlock: true,
     closed: false,

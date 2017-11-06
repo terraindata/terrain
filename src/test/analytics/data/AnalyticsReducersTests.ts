@@ -82,6 +82,8 @@ describe('AnalyticsReducer', () =>
     ],
   };
 
+  const variantId = 1;
+
   beforeEach(() =>
   {
     analytics = _AnalyticsState({});
@@ -212,6 +214,30 @@ describe('AnalyticsReducer', () =>
       ).toEqual(
         '2',
       );
+    });
+  });
+
+  describe('#pinVariant', () =>
+  {
+    it('should handle analytics.pinVariant', () =>
+    {
+      let nextState = reducer(analytics, {
+        type: ActionTypes.pinVariant,
+        payload: {
+          variantId,
+        },
+      });
+
+      expect(nextState.pinnedVariants.get(variantId)).toEqual(true);
+
+      nextState = reducer(nextState, {
+        type: ActionTypes.pinVariant,
+        payload: {
+          variantId,
+        },
+      });
+
+      expect(nextState.pinnedVariants.get(variantId)).toEqual(false);
     });
   });
 });

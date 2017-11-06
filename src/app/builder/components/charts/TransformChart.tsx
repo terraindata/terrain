@@ -864,7 +864,7 @@ const TransformChart = {
 
   _deletePoints(el, onDelete)
   {
-    d3.select('.point-edit-menu').remove();
+    d3.select(el).select('.point-edit-menu').remove();
     const selectedIds = d3.select(el).selectAll('.point-selected')[0].map((point: any) =>
     {
       return point.getAttribute('_id');
@@ -1074,8 +1074,8 @@ const TransformChart = {
     {
       return;
     }
-    const inputX = d3.select('#xVal');
-    const inputY = d3.select('#yVal');
+    const inputX = d3.select(el).select('#xVal');
+    const inputY = d3.select(el).select('#yVal');
 
     const pointValues = d3.select(el).selectAll('.point')[0].map((p: any) =>
     {
@@ -1324,7 +1324,7 @@ const TransformChart = {
       );
       if (text === 'Delete')
       {
-        d3.select('.transform-tooltip').remove();
+        d3.select(el).select('.transform-tooltip').remove();
       }
     });
   },
@@ -1386,7 +1386,7 @@ const TransformChart = {
 
     menu.on('mousedown', () =>
     {
-      d3.select('.right-menu').remove();
+      d3.select(el).select('.right-menu').remove();
     });
 
     for (const menuText of Object.keys(menuOptions))

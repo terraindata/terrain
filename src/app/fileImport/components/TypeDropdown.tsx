@@ -82,13 +82,17 @@ class TypeDropdown extends TerrainComponent<Props>
   public handleTypeIndexChange(typeIndexIndex: number)
   {
     const index = FileImportTypes.ELASTIC_TYPE_INDEXES[typeIndexIndex];
-    Actions.setColumnTypeIndex(this.props.columnId, index);
+    if (index !== 'analyzed')
+    {
+      Actions.setColumnTypeAnalyzer(this.props.columnId, this.props.recursionDepth, null);
+    }
+    Actions.setColumnTypeIndex(this.props.columnId, this.props.recursionDepth, index);
   }
 
   public handleTypeAnalyzerChange(typeAnalyzerIndex: number)
   {
     const analyzer = this.props.columnTypeAnalyzer.get(typeAnalyzerIndex);
-    Actions.setColumnTypeAnalyzer(this.props.columnId, analyzer);
+    Actions.setColumnTypeAnalyzer(this.props.columnId, this.props.recursionDepth, analyzer);
   }
 
   public render()

@@ -162,7 +162,7 @@ ControlReducer[ActionTypes.importExport.setSchedules] =
 ControlReducer[ActionTypes.importExport.fetchCredentials] =
   (state, action) =>
   {
-    Ajax.getCredentialConfigs('sftp',
+    Ajax.getCredentialConfigs(
       (credentialsArr) =>
       {
         const credentials: List<CredentialConfig> = List<CredentialConfig>(credentialsArr.map((credential) =>

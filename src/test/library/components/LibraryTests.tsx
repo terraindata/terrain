@@ -51,6 +51,7 @@ import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
+import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import { ItemType } from '../../../items/types/Item';
 
 describe('Library', () =>
@@ -78,10 +79,29 @@ describe('Library', () =>
   })));
 
   const analytics: AnalyticsState = _AnalyticsState({
-    loaded: false,
+    loaded: true,
     data: Immutable.Map({}),
     selectedMetric: 1,
   });
+
+  const schema: SchemaState = _SchemaState({
+    servers: Immutable.Map({
+      'My ElasticSearch Instance': {
+        id: 'My ElasticSearch Instance',
+        type: 'server',
+        name: 'My ElasticSearch Instance',
+        connectionId: 1,
+        isAnalytics: true,
+        analyticsIndex: 'terrain-analytics',
+        analyticsType: 'events',
+      },
+    }),
+  });
+
+  const analyticsActions = {
+    selectAnalyticsConnection: (connectionName) => { return; },
+    fetch: () => { return; },
+  };
 
   let libraryComponent = null;
 
@@ -91,19 +111,21 @@ describe('Library', () =>
       <Library
         library={library}
         analytics={analytics}
+        analyticsActions={analyticsActions}
+        schema={schema}
         router={{ params: { groupId: '1' } }}
       />,
     );
   });
 
-  describe('when props.variantsMultiselect is true', () =>
+  describe('when props.canPinVariants is true', () =>
   {
     beforeEach(() =>
     {
-      libraryComponent.setProps({ variantsMultiselect: true });
+      libraryComponent.setProps({ canPinVariants: true });
     });
 
-    describe('and props.selectedVariants is empty', () =>
+    describe('and neither props.selectedVariant nor analytics.pinnedVariants are set', () =>
     {
       it('should have 3 columns', () =>
       {
@@ -115,12 +137,12 @@ describe('Library', () =>
       });
     });
 
-    describe('and props.selectedVariants is NOT empty', () =>
+    describe('and props.selectedVariant is set', () =>
     {
       it('should have 3 columns and display the analytics chart', () =>
       {
         const selectedVariants = library.get('selectedVariants');
-        const nextLibrary = library.set('selectedVariants', selectedVariants.push(1));
+        const nextLibrary = library.set('selectedVariant', 1);
         libraryComponent.setProps({
           library: nextLibrary,
         });
@@ -129,12 +151,34 @@ describe('Library', () =>
         expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
         expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
+        expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
+        expect(libraryComponent.find('AnalyticsSelector')).toHaveLength(1);
+      });
+    });
+
+    describe('and props.analytics.pinnedVariants is set', () =>
+    {
+      it('should have 3 columns and display the analytics chart', () =>
+      {
+        const selectedVariants = library.get('selectedVariants');
+        const nextAnalytics = analytics.setIn(
+          ['pinnedVariants', 1], true,
+        );
+        libraryComponent.setProps({
+          analytics: nextAnalytics,
+        });
+
+        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
+        expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
         expect(libraryComponent.find('AnalyticsSelector')).toHaveLength(1);
       });
     });
   });
 
-  describe('when variantsMultiselect prop is false', () =>
+  describe('when canPinVariants prop is false', () =>
   {
     it('should have 4 columns', () =>
     {

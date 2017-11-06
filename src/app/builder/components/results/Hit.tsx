@@ -51,18 +51,17 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import './Result.less';
+import './Hit.less';
 const { List } = Immutable;
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
+import MapUtil from '../../../util/MapUtil';
 import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
 import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-
-import MapUtil from '../../../util/MapUtil';
-import { Result } from './ResultTypes';
+import { Hit } from './ResultTypes';
 
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
@@ -72,7 +71,7 @@ const MAX_DEFAULT_FIELDS = 4;
 
 export interface Props
 {
-  result: Result;
+  hit: Hit;
 
   resultsConfig: ResultsConfig;
   index: number;
@@ -80,6 +79,8 @@ export interface Props
   onExpand: (index: number) => void;
   expanded?: boolean;
   allowSpotlights: boolean;
+  onSpotlightAdded: (id, spotlightData) => void;
+  onSpotlightRemoved: (id) => void;
 
   isOver?: boolean;
   isDragging?: boolean;
@@ -91,7 +92,7 @@ export interface Props
 }
 
 @Radium
-class ResultComponent extends TerrainComponent<Props> {
+class HitComponent extends TerrainComponent<Props> {
   public state: {
     isSpotlit: boolean;
     spotlightColor: string;
@@ -122,7 +123,7 @@ class ResultComponent extends TerrainComponent<Props> {
     const prevSpotlights = SpotlightStore.getState().spotlights;
     for (const key in nextProps)
     {
-      if (key !== 'result' && this.props[key] !== nextProps[key])
+      if (key !== 'hit' && this.props[key] !== nextProps[key])
       {
         if (prevSpotlights.get(nextProps.primaryKey))
         {
@@ -149,7 +150,7 @@ class ResultComponent extends TerrainComponent<Props> {
       }
     }
 
-    return !_.isEqual(this.props.result.toJS(), nextProps.result.toJS());
+    return !_.isEqual(this.props.hit.toJS(), nextProps.hit.toJS());
   }
 
   public renderExpandedField(value, field)
@@ -167,7 +168,7 @@ class ResultComponent extends TerrainComponent<Props> {
       return null;
     }
     const color = this.state.isSpotlit ? this.state.spotlightColor : 'black';
-    const value = getResultValue(this.props.result, field, this.props.resultsConfig, false, overrideFormat, this.props.locations, color);
+    const value = getResultValue(this.props.hit, field, this.props.resultsConfig, false, overrideFormat, this.props.locations, color);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
@@ -212,12 +213,13 @@ class ResultComponent extends TerrainComponent<Props> {
       spotlightColor,
     }, function()
       {
-        const spotlightData = this.props.result.toJS();
-        spotlightData['name'] = getResultName(this.props.result, this.props.resultsConfig, this.props.locations, spotlightColor);
+        const spotlightData = this.props.hit.toJS();
+        spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig, this.props.locations, spotlightColor);
         spotlightData['color'] = spotlightColor;
         spotlightData['id'] = id;
         spotlightData['rank'] = this.props.index;
         spotlightAction(id, spotlightData);
+        this.props.onSpotlightAdded(id, spotlightData);
       });
   }
 
@@ -226,23 +228,33 @@ class ResultComponent extends TerrainComponent<Props> {
     this.setState({
       isSpotlit: false,
     });
+    this.props.onSpotlightRemoved(this.props.primaryKey);
     spotlightAction(this.props.primaryKey, null);
   }
 
   public renderSpotlight()
   {
-    if (!this.state.isSpotlit)
-    {
-      return null;
-    }
-
     return (
       <div
-        className='result-spotlight'
+        className={classNames({
+          'result-spotlight': true,
+          'result-spotlight-lit': this.state.isSpotlit,
+        })}
         style={{
-          background: this.state.spotlightColor,
+          background: this.state.isSpotlit ?
+            this.state.spotlightColor : 'transparent',
         }}
-      />
+      >
+        <div
+          className={classNames({
+            'result-spotlight-text': true,
+            'result-spotlight-text-small': this.props.index + 1 >= 100,
+            'result-spotlight-text-large': this.props.index + 1 < 10,
+          })}
+        >
+          {this.props.index + 1}
+        </div>
+      </div>
     );
   }
 
@@ -253,7 +265,7 @@ class ResultComponent extends TerrainComponent<Props> {
 
   public render()
   {
-    const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, result } = this.props;
+    const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, hit } = this.props;
 
     const classes = classNames({
       'result': true,
@@ -275,8 +287,8 @@ class ResultComponent extends TerrainComponent<Props> {
       );
     }
     const color = this.state.isSpotlit ? this.state.spotlightColor : 'black';
-    const name = getResultName(result, resultsConfig, this.props.locations, color);
-    const fields = getResultFields(result, resultsConfig);
+    const name = getResultName(hit, resultsConfig, this.props.locations, color);
+    const fields = getResultFields(hit, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
 
     let bottomContent: any;
@@ -299,7 +311,7 @@ class ResultComponent extends TerrainComponent<Props> {
             All Fields
           </div>
           {
-            result.fields.map(
+            hit.fields.map(
               (value, key) =>
                 this.renderExpandedField(value, key),
             )
@@ -373,13 +385,13 @@ class ResultComponent extends TerrainComponent<Props> {
     ));
   }
 }
-export function getResultValue(result: Result, field: string, config: ResultsConfig, isTitle: boolean,
+export function getResultValue(hit: Hit, field: string, config: ResultsConfig, isTitle: boolean,
   overrideFormat?: any, locations?: { [field: string]: any }, color?: string)
 {
   let value: any;
-  if (result)
+  if (hit)
   {
-    value = result.fields.get(field);
+    value = hit.fields.get(field);
   }
   return ResultFormatValue(field, value, config, isTitle, overrideFormat, locations, color);
 }
@@ -389,7 +401,7 @@ export function resultsConfigHasFields(config: ResultsConfig): boolean
   return config && config.enabled && config.fields && config.fields.size > 0;
 }
 
-export function getResultFields(result: Result, config: ResultsConfig): string[]
+export function getResultFields(hit: Hit, config: ResultsConfig): string[]
 {
   let fields: string[];
 
@@ -399,13 +411,13 @@ export function getResultFields(result: Result, config: ResultsConfig): string[]
   }
   else
   {
-    fields = result.fields.keySeq().toArray();
+    fields = hit.fields.keySeq().toArray();
   }
 
   return fields;
 }
 
-export function getResultName(result: Result, config: ResultsConfig, locations?: { [field: string]: any }, color?: string)
+export function getResultName(hit: Hit, config: ResultsConfig, locations?: { [field: string]: any }, color?: string)
 {
   let nameField: string;
 
@@ -415,10 +427,10 @@ export function getResultName(result: Result, config: ResultsConfig, locations?:
   }
   else
   {
-    nameField = _.first(getResultFields(result, config));
+    nameField = _.first(getResultFields(hit, config));
   }
 
-  return getResultValue(result, nameField, config, true, null, locations, color);
+  return getResultValue(hit, nameField, config, true, null, locations, color);
 }
 
 export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean,
@@ -447,7 +459,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     value = 'null';
     italics = true;
   }
-  if (format && format.type !== 'map')
+  if ((format && format.type !== 'map') || !format)
   {
     if (List.isList(value))
     {
@@ -529,7 +541,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
   return value;
 }
 
-export default ResultComponent;
+export default HitComponent;
 
 // DnD stuff
 

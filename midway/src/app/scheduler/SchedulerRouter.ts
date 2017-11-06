@@ -60,20 +60,13 @@ const users = new Users();
 export const credentials: Credentials = new Credentials();
 export const scheduler: Scheduler = new Scheduler();
 
-const allowedTypes: string[] = ['sftp'];
+const allowedTypes: string[] = ['http', 'sftp'];
 
 // Get connections from credentials table, requires type=<one of allowedTypes>
 Router.get('/connections', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   await perm.CredentialPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
-  if (ctx.query.type === undefined || allowedTypes.indexOf(ctx.query.type) < 0)
-  {
-    ctx.body = await Promise.reject('Must provide a type of this format: ' + JSON.stringify(allowedTypes) as string);
-  }
-  else
-  {
-    ctx.body = await credentials.getNames(ctx.query.type);
-  }
+  ctx.body = await credentials.getNames(ctx.query.type);
 });
 
 // Get job by search parameter, or all if none provided

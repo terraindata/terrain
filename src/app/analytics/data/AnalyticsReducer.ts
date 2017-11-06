@@ -109,6 +109,22 @@ AnalyticsReducer[ActionTypes.selectDateRange] =
     return state.set('selectedDateRange', dateRangeId);
   };
 
+AnalyticsReducer[ActionTypes.selectAnalyticsConnection] =
+  (state, action: Action<{ connectionName: string }>) =>
+  {
+    const { connectionName } = action.payload;
+    return state.set('selectedAnalyticsConnection', connectionName);
+  };
+
+AnalyticsReducer[ActionTypes.pinVariant] =
+  (state, action: Action<{ variantId: ID }>) =>
+  {
+    const { variantId } = action.payload;
+    const isVariantPinned = state.getIn(['pinnedVariants', variantId], false);
+
+    return state.setIn(['pinnedVariants', variantId], !isVariantPinned);
+  };
+
 const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
 {
   let nextState = state;

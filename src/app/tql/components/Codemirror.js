@@ -140,9 +140,9 @@ var CodeMirror = createReactClass({
   handleRightClick(self, event)
   {
     event.preventDefault();
-    this.codeMirror.on('mousedown', this.props.hideTermDefinition);
     if (this.props.defineTerm)
     {
+      this.codeMirror.on('mousedown', this.props.hideTermDefinition);
       this.props.defineTerm(this.codeMirror.getSelection(), event);
     }
   },

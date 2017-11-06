@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
@@ -90,6 +91,7 @@ Router.post('/headless', async (ctx, next) =>
   const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.body);
   if (authStream['template'] === null)
   {
+    ctx.body = 'Unauthorized';
     ctx.status = 400;
     return;
   }
@@ -101,8 +103,41 @@ Router.post('/headless', async (ctx, next) =>
   }
   else
   {
-    const exportReturn: stream.Readable | string = await exprt.export(exprtConf, true);
-    ctx.body = exportReturn;
+    ctx.body = await exprt.export(exprtConf, true);
+  }
+});
+
+Router.get('/headless', async (ctx, next) =>
+{
+  const authStream: object = await Util.authenticatePersistentAccessToken(ctx.request.query);
+  if (authStream['template'] === null)
+  {
+    ctx.body = 'Unauthorized';
+    ctx.status = 400;
+    return;
+  }
+  const queryBody: object = _.extend({}, ctx.request.query);
+  delete queryBody['persistentAccessToken'];
+  Object.keys(queryBody).map((key) =>
+  {
+    try
+    {
+      queryBody[key] = JSON.parse(queryBody[key]);
+    }
+    catch (e)
+    {
+      // ignore
+    }
+  });
+  const exprtConf: ExportConfig = queryBody as ExportConfig;
+
+  if (exprtConf.templateId !== authStream['template']['id'])
+  {
+    ctx.body = 'Authenticating template ID does not match export template ID.';
+  }
+  else
+  {
+    ctx.body = await exprt.export(exprtConf, true);
   }
 });
 
