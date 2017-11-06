@@ -235,8 +235,7 @@ class TransformCardChart extends TerrainComponent<Props>
     let points;
 
     if ((this.props.mode === 'normal' && pointName === 'Average')
-      // ||
-      // (this.props.mode === 'sigmoid' && pointName === 'x0')
+      || (this.props.mode === 'sigmoid' && pointName === 'x0')
     )
     {
       points = this.state.initialPoints.map((scorePoint, i) =>
@@ -255,54 +254,43 @@ class TransformCardChart extends TerrainComponent<Props>
         return scorePoint;
       });
     }
-    // else if (this.props.mode === 'sigmoid' && pointName === 'k')
-    // {
-    //   const x0 = pointValues[2];
-    //   const L = pointScores[3];
-    //   const a = pointScores[0];
-    //   points = this.state.initialPoints.map((scorePoint, i) =>
-    //   {
-    //     if (scorePoint.id === pointId)
-    //     {
-    //       // constrain score to be between L and a scores
-    //       let value = 0;
-    //       if (a > L)
-    //       {
-    //         value = Util.valueMinMax(scorePoint.score - scoreDiff, L, a);
-    //       }
-    //       else
-    //       {
-    //         value = Util.valueMinMax(scorePoint.score - scoreDiff, a, L);
-    //       }
-    //       scorePoint = scorePoint.set('score', value);
-    //       scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, pointValues[0], x0 - 0.001 * x0));
-    //     }
-    //     return scorePoint;
-    //   });
-    // }
+    else if (this.props.mode === 'sigmoid' && pointName === 'k')
+    {
+      const x0 = pointValues[2];
+      const L = pointScores[3];
+      const a = pointScores[0];
+      points = this.state.initialPoints.map((scorePoint, i) =>
+      {
+        if (scorePoint.id === pointId)
+        {
+          // constrain score to be between L and a scores
+          let value = 0;
+          if (a > L)
+          {
+            value = Util.valueMinMax(scorePoint.score - scoreDiff, L, a);
+          }
+          else
+          {
+            value = Util.valueMinMax(scorePoint.score - scoreDiff, a, L);
+          }
+          scorePoint = scorePoint.set('score', value);
+          scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, pointValues[0], x0 - 0.001 * x0));
+        }
+        return scorePoint;
+      });
+    }
     else
     {
       points = this.state.initialPoints.map((scorePoint) =>
       {
         if (scorePoint.id === pointId || this.state.selectedPointIds.get(scorePoint.id))
         {
-          let scoreMin = 0;
-          const scoreMax = 1;
-          if (this.props.mode === 'exponential')
+          let scoreMin = this.props.mode === 'exponential' ? 0.001 : 0;
+          const scoreMax = this.props.mode === 'sigmoid' && pointName === 'a' ? pointScores[1] : 1;
+          if (this.props.mode === 'sigmoid' && pointName === 'L')
           {
-            scoreMin = 0.001;
+              scoreMin = pointScores[1];
           }
-          // if (this.props.mode === 'sigmoid')
-          // {
-          //   if (pointName === 'L')
-          //   {
-          //     scoreMin = pointScores[1];
-          //   }
-          //   if (pointName === 'a')
-          //   {
-          //     scoreMax = pointScores[1];
-          //   }
-          // }
           scorePoint = scorePoint.set('score',
             Util.valueMinMax(scorePoint.score - scoreDiff, scoreMin, scoreMax));
           if (!(this.state.selectedPointIds.size > 1) && !altKey)
