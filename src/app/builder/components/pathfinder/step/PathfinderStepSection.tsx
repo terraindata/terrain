@@ -50,12 +50,12 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Path, Source } from '../PathfinderTypes';
-import PathfinderText from '../PathfinderText';
 import Dropdown from 'app/common/components/Dropdown';
+import PathfinderText from '../PathfinderText';
+import { Path, Source } from '../PathfinderTypes';
 
 export interface Props
 {
@@ -67,15 +67,15 @@ export interface Props
 class PathfinderStepSection extends TerrainComponent<Props>
 {
   public state: {
-    
+
   } = {
-    
+
   };
 
   public render()
   {
     const { path, step } = this.props;
-    
+
     const { title, content } = this.parseStep();
 
     return (
@@ -89,7 +89,7 @@ class PathfinderStepSection extends TerrainComponent<Props>
             title
           }
         </div>
-        
+
         <div
           className='pathfinder-step-content'
         >
@@ -100,23 +100,23 @@ class PathfinderStepSection extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private parseStep(): { title: string; content: any; }
   {
     const { canEdit } = this.props;
-    
+
     switch (this.props.step)
     {
-      
+
     }
-    
+
     return {
       title: PathfinderText.finalStepTitle,
       content: <Dropdown
         selectedIndex={0}
         options={PATHFINDER_TASKS}
         canEdit={canEdit}
-      />
+      />,
     };
   }
 }

@@ -345,11 +345,11 @@ class Dropdown extends TerrainComponent<Props>
         :
         backgroundColor(Colors().darkerHighlight)
       ,
-      this.state.open ? 
-        fontColor(Colors().activeText) : 
+      this.state.open ?
+        fontColor(Colors().activeText) :
         fontColor(
-          customColor || Colors().text1, 
-          this.props.canEdit ? Colors().activeText : (customColor || Colors().text1)
+          customColor || Colors().text1,
+          this.props.canEdit ? Colors().activeText : (customColor || Colors().text1),
         ),
       borderColor(Colors().inputBorder),
     ];

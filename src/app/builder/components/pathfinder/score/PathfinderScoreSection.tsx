@@ -48,13 +48,16 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Path, Source, Score } from '../PathfinderTypes';
+import Util from '../../../../util/Util';
+import BuilderActions from '../../../data/BuilderActions';
+import { _ScoreLine, Path, Score, Source } from '../PathfinderTypes';
+import PathfinderScoreLine from './PathfinderScoreLine';
 
 export interface Props
 {
@@ -70,16 +73,27 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   } = {
   };
 
-  public renderScoreLine(line, index)
+  public handleDeleteLine(index)
   {
-    return (
-      <div
-        key={index}
-      >
-        SCORE LINE!
-        {line}
-      </div>
-    );
+    // Remove line
+    BuilderActions.change(List(['query', 'path', 'score']), this.props.score.lines.splice(index, 1));
+  }
+
+  public handleAddLine()
+  {
+    BuilderActions.change(List(['query', 'path', 'score', 'lines']), this.props.score.lines.push(_ScoreLine()));
+  }
+
+  public handleFieldChange(index, field)
+  {
+    const newLine = this.props.score.lines.get(index).set('field', field);
+    BuilderActions.change(List(['query', 'path', 'score', 'lines']), this.props.score.lines.set(index, newLine));
+  }
+
+  public handleWeightChange(index, weight)
+  {
+    const newLine = this.props.score.lines.get(index).set('weight', weight);
+    BuilderActions.change(List(['query', 'path', 'score', 'lines']), this.props.score.lines.set(index, newLine));
   }
 
   public renderScoreLines()
@@ -87,7 +101,22 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     return (
       <div>
         {
-          _.map(this.props.score.lines.toJS(), this.renderScoreLine)
+          _.map(Util.asJS(this.props.score.lines), (line, index) =>
+          {
+            return (
+              <PathfinderScoreLine
+                key={index}
+                line={line}
+                step={this.props.step}
+                source={this.props.source}
+                onDelete={this.handleDeleteLine}
+                index={index}
+                onFieldChange={this.handleFieldChange}
+                onWeightChange={this.handleWeightChange}
+                canEdit={this.props.canEdit}
+              />
+            );
+          })
         }
       </div>
     );
@@ -110,12 +139,17 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       <div
         className='pathfinder-section'
       >
-      {
-        this.renderTitle()
-      }
-      {
-        this.renderScoreLines()
-      }
+        {
+          this.renderTitle()
+        }
+        {
+          this.renderScoreLines()
+        }
+        <div
+          onClick={this.handleAddLine}
+        >
+          Add another factor to score on
+        </div>
 
       </div>
     );

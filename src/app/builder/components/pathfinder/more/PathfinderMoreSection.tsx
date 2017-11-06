@@ -50,8 +50,8 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import { Path, Source } from '../PathfinderTypes';
 
@@ -64,9 +64,9 @@ export interface Props
 class PathfinderSourceSection extends TerrainComponent<Props>
 {
   public state: {
-    
+
   } = {
-    
+
   };
 
   public render()
