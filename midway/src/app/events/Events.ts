@@ -274,6 +274,7 @@ export class Events
   public generateSelectEventsQuery(controller: DatabaseController, variantid?: number): Elastic.SearchParams
   {
     let body = bodybuilder()
+      .size(0)
       .aggregation('terms', 'eventid');
 
     if (variantid !== undefined)
@@ -308,12 +309,12 @@ export class Events
         if (variantid !== undefined)
         {
           resolve({
-            [variantid]: response['aggregations']['aggs_terms_eventid'].buckets,
+            [variantid]: response['aggregations']['agg_terms_eventid'].buckets,
           });
         }
         else
         {
-          resolve(response['aggregations']['aggs_terms_eventid'].buckets);
+          resolve(response['aggregations']['agg_terms_eventid'].buckets);
         }
       }, reject);
     });

@@ -101,16 +101,18 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
   }, {});
 });
 
-Router.get('/:databaseid', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/:databaseid/:variantid?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all events');
-  const databaseid = ctx.params.databaseid;
+  const databaseid = Number(ctx.params.databaseid);
   const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
   if (database === undefined)
   {
     throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
-  ctx.body = await events.getEventsList(database);
+
+  const variantid = ctx.params.variantid !== undefined ? Number(ctx.params.variantid) : undefined;
+  ctx.body = await events.getEventsList(database, variantid);
 });
 
 export default Router;
