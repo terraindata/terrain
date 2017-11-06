@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as $ from 'jquery';
 import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
@@ -66,10 +67,40 @@ export interface Props
 class PathfinderSourceSection extends TerrainComponent<Props>
 {
   public state: {
-    
   } = {
-    
   };
+
+  public renderScoreLine(line, index)
+  {
+    return (
+      <div
+        key={index}
+      >
+        SCORE LINE!
+        {line}
+      </div>
+    );
+  }
+
+  public renderScoreLines()
+  {
+    return (
+      <div>
+        {
+          _.map(this.props.score.lines.toJS(), this.renderScoreLine)
+        }
+      </div>
+    );
+  }
+
+  public renderTitle()
+  {
+    return (
+      <div>
+        I want to sort my data using the following factors:
+      </div>
+    );
+  }
 
   public render()
   {
@@ -79,6 +110,13 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       <div
         className='pathfinder-section'
       >
+      {
+        this.renderTitle()
+      }
+      {
+        this.renderScoreLines()
+      }
+
       </div>
     );
   }
