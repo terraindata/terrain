@@ -228,6 +228,7 @@ export class ResultsManager extends TerrainComponent<Props>
             spotlightAction(id, _.extend({
               color: spotlight.color,
               name: spotlight.name,
+              rank: hitIndex,
             },
               nextState.hits.get(hitIndex).toJS(),
             ));
