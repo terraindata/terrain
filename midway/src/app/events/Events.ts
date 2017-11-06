@@ -60,7 +60,7 @@ import * as Util from '../Util';
 export interface AggregationRequest
 {
   variantid: string;
-  eventid: string;
+  eventname: string;
   start: string;
   end: string;
   agg: string;
@@ -70,7 +70,7 @@ export interface AggregationRequest
 
 export interface EventConfig
 {
-  eventid: number | string;
+  eventname: number | string;
   variantid: number | string;
   visitorid: number | string;
   timestamp: Date | string;
@@ -93,7 +93,7 @@ export class Events
       type,
       [],
       [
-        'eventid',
+        'eventname',
         'variantid',
         'visitorid',
         'source',
@@ -116,7 +116,7 @@ export class Events
     const body = bodybuilder()
       .size(0)
       .filter('term', 'variantid', variantid)
-      .filter('term', 'eventid', request.eventid)
+      .filter('term', 'eventname', request.eventname)
       .filter('range', '@timestamp', {
         gte: request.start,
         lte: request.end,
@@ -148,15 +148,15 @@ export class Events
 
   public generateRateQuery(controller: DatabaseController, variantid: string, request: AggregationRequest): Elastic.SearchParams
   {
-    const eventids: string[] = request.eventid.split(',');
-    const numerator = request.agg + '_' + eventids[0];
-    const denominator = request.agg + '_' + eventids[1];
-    const rate = request.agg + '_' + eventids[0] + '_' + eventids[1];
+    const eventnames: string[] = request.eventname.split(',');
+    const numerator = request.agg + '_' + eventnames[0];
+    const denominator = request.agg + '_' + eventnames[1];
+    const rate = request.agg + '_' + eventnames[0] + '_' + eventnames[1];
 
     const body = bodybuilder()
       .size(0)
-      // .orFilter('term', 'eventid', eventids[0])
-      // .orFilter('term', 'eventid', eventids[1])
+      // .orFilter('term', 'eventname', eventnames[0])
+      // .orFilter('term', 'eventname', eventnames[1])
       .filter('term', 'variantid', variantid)
       .filter('range', '@timestamp', {
         gte: request.start,
@@ -176,12 +176,12 @@ export class Events
         numerator,
         {
           term: {
-            eventid: eventids[0],
+            eventname: eventnames[0],
           },
         },
         (agg1) => agg1.aggregation(
           'value_count',
-          'eventid',
+          'eventname',
           'count',
         ),
       )
@@ -191,12 +191,12 @@ export class Events
         denominator,
         {
           term: {
-            eventid: eventids[1],
+            eventname: eventnames[1],
           },
         },
         (agg1) => agg1.aggregation(
           'value_count',
-          'eventid',
+          'eventname',
           'count',
         ),
       )
@@ -220,10 +220,10 @@ export class Events
   {
     return new Promise<object>(async (resolve, reject) =>
     {
-      const eventids: string[] = request.eventid.split(',');
-      const numerator = request.agg + '_' + eventids[0];
-      const denominator = request.agg + '_' + eventids[1];
-      const rate = request.agg + '_' + eventids[0] + '_' + eventids[1];
+      const eventnames: string[] = request.eventname.split(',');
+      const numerator = request.agg + '_' + eventnames[0];
+      const denominator = request.agg + '_' + eventnames[1];
+      const rate = request.agg + '_' + eventnames[0] + '_' + eventnames[1];
 
       const query = this.generateRateQuery(controller, variantid, request);
       this.runQuery(controller, query, (response) =>
@@ -250,7 +250,7 @@ export class Events
   {
     let body = bodybuilder()
       .filter('term', 'variantid', variantid)
-      .filter('term', 'eventid', request.eventid)
+      .filter('term', 'eventname', request.eventname)
       .filter('range', '@timestamp', {
         gte: request.start,
         lte: request.end,
@@ -338,10 +338,10 @@ export class Events
     }
     else if (request['agg'] === 'rate')
     {
-      const eventids = request['eventid'].split(',');
-      if (eventids.length < 2)
+      const eventnames = request['eventname'].split(',');
+      if (eventnames.length < 2)
       {
-        throw new Error('Two \"eventid\" values are required to compute a rate');
+        throw new Error('Two \"eventname\" values are required to compute a rate');
       }
 
       if (request['interval'] === undefined)
