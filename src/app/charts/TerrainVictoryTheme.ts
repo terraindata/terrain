@@ -53,6 +53,7 @@ const theme = {
     style: {
       grid: {
         strokeDasharray,
+        strokeOpacity: 0.2,
       },
     },
   },
