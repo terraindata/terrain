@@ -52,7 +52,7 @@ import { makePromiseCallback } from './Util';
 
 export interface EventConfig
 {
-  eventid: number | string;
+  eventname: string;
   variantid: number | string;
   visitorid: number | string;
   source: {

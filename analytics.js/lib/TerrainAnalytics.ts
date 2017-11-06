@@ -60,21 +60,12 @@ const client = new ClientJS();
 let fingerprint = null;
 
 const TerrainAnalytics = {
-  eventIDs: {
-    view: 1,
-    impression: 1,
-    click: 2,
-    transaction: 3,
-    conversion: 3,
-  },
-
-  logEvent(eventNameOrID: string | any, variantOrSourceID: string | any, meta?: any)
+  logEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
   {
-    const eventID = typeof eventNameOrID === 'string' ? TerrainAnalytics.eventIDs[eventNameOrID] : eventNameOrID;
     const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] :
       (fingerprint || (fingerprint = client.getFingerprint()));
 
-    let paramString = 'eventid=' + String(eventID)
+    let paramString = 'eventname=' + String(eventName)
       + '&visitorid=' + String(visitorID)
       + '&variantid=' + String(variantOrSourceID);
 
