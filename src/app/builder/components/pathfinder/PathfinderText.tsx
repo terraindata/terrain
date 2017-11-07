@@ -70,6 +70,10 @@ export const PathfinderText = {
   finalStepTitle: `
 		You can edit your algorithm directly above, or pick one of these actions to perform on it.
 	`,
+
+  scoreStepSubtitle: `
+	The score for each result will be the sum of the following factors:
+  `
 };
 
 export default PathfinderText;

@@ -58,6 +58,7 @@ import Util from '../../../../util/Util';
 import BuilderActions from '../../../data/BuilderActions';
 import { _ScoreLine, Path, Score, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
+import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 
 export interface Props
 {
@@ -70,18 +71,41 @@ export interface Props
 class PathfinderSourceSection extends TerrainComponent<Props>
 {
   public state: {
+    allWeights: Array<{ weight: number }>;
   } = {
+    allWeights: [],
   };
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (nextProps.score !== this.props.score)
+    {
+      this.updateWeights(nextProps.score.lines);
+    }
+  }
+
+  public updateWeights(lines)
+  {
+    const allWeights = lines.toJS().map((line) => {
+      return {weight: line.weight};
+    });
+    this.setState({
+      allWeights,
+    });
+  }
 
   public handleDeleteLine(index)
   {
-    // Remove line
-    BuilderActions.change(List(['query', 'path', 'score']), this.props.score.lines.splice(index, 1));
+    const newLines = this.props.score.lines.delete(index);
+    BuilderActions.change(List(['query', 'path', 'score', 'lines']), newLines);
+    this.updateWeights(newLines);
   }
 
   public handleAddLine()
   {
-    BuilderActions.change(List(['query', 'path', 'score', 'lines']), this.props.score.lines.push(_ScoreLine()));
+    const newLines = this.props.score.lines.push(_ScoreLine());
+    BuilderActions.change(List(['query', 'path', 'score', 'lines']), newLines);
+    this.updateWeights(newLines);
   }
 
   public handleFieldChange(index, field)
@@ -93,7 +117,9 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   public handleWeightChange(index, weight)
   {
     const newLine = this.props.score.lines.get(index).set('weight', weight);
-    BuilderActions.change(List(['query', 'path', 'score', 'lines']), this.props.score.lines.set(index, newLine));
+    const newLines = this.props.score.lines.set(index, newLine);
+    BuilderActions.change(List(['query', 'path', 'score', 'lines']), newLines);
+    this.updateWeights(newLines);
   }
 
   public renderScoreLines()
@@ -114,6 +140,8 @@ class PathfinderSourceSection extends TerrainComponent<Props>
                 onFieldChange={this.handleFieldChange}
                 onWeightChange={this.handleWeightChange}
                 canEdit={this.props.canEdit}
+                keyPath={List(['query', 'path', 'score', 'lines', index])}
+                allWeights={this.state.allWeights}
               />
             );
           })
@@ -134,14 +162,12 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   public render()
   {
     const { source, step } = this.props;
-
     return (
       <div
-        className='pathfinder-section'
+        className='pf-section'
       >
-        {
-          this.renderTitle()
-        }
+        <div className='pathfinder-section-title'>{PathfinderText.scoreStepTitle}</div>
+        <div className='pathfinder-section-subtitle'>{PathfinderText.scoreStepSubtitle}</div>
         {
           this.renderScoreLines()
         }

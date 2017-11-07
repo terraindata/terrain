@@ -56,6 +56,10 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import Autocomplete from '../../../../common/components/Autocomplete';
 import { Path, Score, ScoreLine, Source } from '../PathfinderTypes';
+import ScoreBar from '../../charts/ScoreBar';
+import {BuilderStore} from './../../../data/BuilderStore';
+import BuilderActions from './../../../data/BuilderActions';
+import TransformCard from '../../charts/TransformCard';
 
 export interface Props
 {
@@ -67,6 +71,8 @@ export interface Props
   onDelete: (index) => void;
   onFieldChange: (index, field) => void;
   onWeightChange: (index, weight) => void;
+  allWeights: Array<{ weight: number }>;
+  keyPath: KeyPath;
 }
 
 class PathfinderSourceLine extends TerrainComponent<Props>
@@ -74,14 +80,26 @@ class PathfinderSourceLine extends TerrainComponent<Props>
   public state: {
     field: string;
     weight: number;
+    expandTransform: boolean;
   } = {
     field: this.props.line.field,
     weight: this.props.line.weight,
+    expandTransform: true;
   };
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (this.props.line !== nextProps.line) 
+    {
+      this.setState({
+        field: nextProps.line.field,
+        weight: nextProps.line.weight,
+      });
+    }
+  }
 
   public handleFieldChange(field)
   {
-    // Probably call parent funciton
     this.setState({
       field,
     });
@@ -96,31 +114,65 @@ class PathfinderSourceLine extends TerrainComponent<Props>
     this.props.onWeightChange(this.props.index, event.target.value);
   }
 
+  public renderTransformChart()
+  {
+    const data = {
+      input: this.state.field,
+      domain: List([0, 100]),
+      hasCustomDomain: false,
+      scorePoints: List([]),
+      static: {
+        colors: ["#1eb4fa", "rgb(60, 63, 65)"]
+      }
+    };
+
+    return (<TransformCard 
+          builderState={BuilderStore.getState()}
+          canEdit={this.props.canEdit}
+          className={'builder-comp-list-item'}
+          data={data}
+          handleCardDrop={undefined}
+          helpOn={undefined}
+          keyPath={this.props.keyPath.push('transformData')}
+          language={'elastic'}
+          onChange={BuilderActions.change}
+          parentData={undefined}
+        />);
+  }
+
   public render()
   {
     const { source, step } = this.props;
 
     return (
-      <div
-        className='pathfinder-section'
-      >
-        <span>Scoring</span>
-        <Autocomplete
-          value={this.state.field}
-          onChange={this.handleFieldChange}
-          options={List(['price', 'margin', 'conversion'])} // TODO getAutoOptions from PathTypes ?
-          placeholder={'field'}
-        />
-        <span>with a weight of</span>
-        <input
-          value={this.state.weight}
-          onChange={this.handleWeightChange}
-        />
+      <div>
         <div
-          onClick={this._fn(this.props.onDelete, this.props.index)}
+          className='pf-score-line'
         >
-          Delete this factor
-        </div>
+            <ScoreBar
+              parentData={{weights: this.props.allWeights}}
+              data={{weight: this.state.weight}}
+              keyPath={this.props.keyPath.push('weight')} 
+            />
+            <input
+              value={this.state.weight}
+              onChange={this.handleWeightChange}
+            />
+            <span>times their</span>
+            <Autocomplete
+              value={this.state.field}
+              onChange={this.handleFieldChange}
+              options={List(['price', 'margin', 'conversion'])} // TODO getAutoOptions from PathTypes ?
+              placeholder={'field'}
+            />
+            <span onClick={this._toggle('expandTransform')}>Score: </span>
+          </div>
+          {this.state.expandTransform && this.renderTransformChart()}
+          <div
+            onClick={this._fn(this.props.onDelete, this.props.index)}
+          >
+            Delete this factor
+          </div>
       </div>
     );
   }
