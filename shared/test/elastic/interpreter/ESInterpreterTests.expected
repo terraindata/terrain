@@ -303,7 +303,7 @@
   },
   "search-3" : {
     "query" : {
-      "type" : {"value" : "data"}
+      "match" : {"_index" : "movies"}
     },
     "sort" : ["_score"]
   },
