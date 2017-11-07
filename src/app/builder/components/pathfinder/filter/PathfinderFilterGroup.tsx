@@ -53,18 +53,18 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Filter, FilterLine, Path, Source } from '../PathfinderTypes';
+import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import Dropdown from 'app/common/components/Dropdown';
 
 export interface Props
 {
-  filter: Filter;
+  filterGroup: FilterGroup;
   source: Source;
   canEdit: boolean;
   depth: number;
   keyPath: KeyPath;
-  onChange(keyPath: KeyPath, filter: Filter | FilterLine);
+  onChange(keyPath: KeyPath, filterGroup: FilterGroup | FilterLine);
 }
 
 const filterDropdownOptions = List([
@@ -86,7 +86,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
 
   public render()
   {
-    const { source, filter, canEdit } = this.props;
+    const { source, filterGroup, canEdit } = this.props;
     
     
 
@@ -132,7 +132,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
       value = 1;
     }
     
-    this.props.onChange(this.props.keyPath, this.props.filter.set('minMatches', value));
+    this.props.onChange(this.props.keyPath, this.props.filterGroup.set('minMatches', value));
   }
   
   private getDropdownSelectedIndex(): number

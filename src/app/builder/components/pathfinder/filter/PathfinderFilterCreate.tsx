@@ -53,7 +53,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { FilterLine, Path, Source, Filter, _Filter, _FilterLine } from '../PathfinderTypes';
+import { FilterLine, Path, Source, FilterGroup, _FilterGroup, _FilterLine } from '../PathfinderTypes';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
@@ -74,8 +74,6 @@ class PathfinderFilterCreate extends TerrainComponent<Props>
   {
     const { source, filterLine, canEdit } = this.props;
     
-    
-
     return (
       <PathfinderLine
         canDelete={false}
@@ -83,22 +81,25 @@ class PathfinderFilterCreate extends TerrainComponent<Props>
         canEdit={canEdit}
         depth={this.props.depth}
       >
-        <PathfinderCreateLine
-          canEdit={canEdit}
-          onCreate={this.handleCreateFilterLine}
-          text={PathfinderText.createFilterLine}
-        />
-        <PathfinderCreateLine
-          canEdit={canEdit}
-          onCreate={this.handleCreateFilterGroup}
-          text={PathfinderText.createFilterGroup}
-        />
+        <div>
+          <PathfinderCreateLine
+            canEdit={canEdit}
+            onCreate={this.handleCreateFilterLine}
+            text={PathfinderText.createFilterLine}
+          />
+          <PathfinderCreateLine
+            canEdit={canEdit}
+            onCreate={this.handleCreateFilterGroup}
+            text={PathfinderText.createFilterGroup}
+          />
+        </div>
       </PathfinderLine>
     );
   }
   
   private handleCreateFilterLine()
   {
+    console.log(this.props.keyPath);
     this.props.onChange(this.props.keyPath, _FilterLine());
   }
   

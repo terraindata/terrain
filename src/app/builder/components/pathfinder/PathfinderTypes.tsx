@@ -95,7 +95,7 @@ export const PathfinderSteps =
 class PathC extends BaseClass
 {
   public source: Source = _Source();
-  public filter: Filter = _Filter();
+  public filterGroup: FilterGroup = _FilterGroup();
   public score: Score = _Score();
   public step: string = PathfinderSteps[0];
 }
@@ -106,18 +106,18 @@ export const _Path = (config?: { [key: string]: any }) =>
   path = path
     .set('source', _Source(path['source']))
     .set('score', _Score(path['score']))
-    .set('filter', _Filter(path['filter']));
+    .set('filterGroup', _FilterGroup(path['filterGroup']));
   return path;
 };
 
-class FilterC extends BaseClass
+class FilterGroupC extends BaseClass
 {
   public minMatches: number | string = 'all';
   public lines: List<FilterLine> = List<FilterLine>([]);
 }
-export type Filter = FilterC & IRecord<FilterC>;
-export const _Filter = (config?: { [key: string]: any }) =>
-  New<Filter>(new FilterC(config), config);
+export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;
+export const _FilterGroup = (config?: { [key: string]: any }) =>
+  New<FilterGroup>(new FilterGroupC(config), config);
 
 class ScoreC extends BaseClass
 {
@@ -160,7 +160,7 @@ class FilterLineC extends LineC
   public value: string | number = 0;
 
   // Members for when it is a group of filter conditions
-  public filter: Filter = null;
+  public filterGroup: FilterGroup = null;
 }
 export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
