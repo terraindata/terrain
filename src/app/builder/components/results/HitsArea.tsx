@@ -87,7 +87,6 @@ const HITS_PAGE_SIZE = 20;
 export interface Props
 {
   resultsState: ResultsState;
-  exportState?: FileImportState;
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
@@ -759,37 +758,37 @@ column if you have customized the results view.');
 
   public renderExport()
   {
-    const { previewColumns, columnNames, columnsToInclude, columnTypes, templates, transforms,
-      filetype, requireJSONHaveAllFields, exportRank, elasticUpdate, objectKey } = this.props.exportState;
-    // const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
-    //   filetype, requireJSONHaveAllFields, exportRank, objectKey, elasticUpdate } = this.props.exportState;
+    // const { previewColumns, columnNames, columnsToInclude, columnTypes, templates, transforms,
+    //   filetype, requireJSONHaveAllFields, exportRank, elasticUpdate, objectKey } = this.props.exportState;
+    // // const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
+    // //   filetype, requireJSONHaveAllFields, exportRank, objectKey, elasticUpdate } = this.props.exportState;
 
-    const content =
-      <div
-        style={backgroundColor(Colors().bg1)}
-      >
-        <FileImportPreview
-          exporting={true}
-          filetype={filetype}
-          previewColumns={previewColumns}
-          columnNames={columnNames}
-          columnsToInclude={columnsToInclude}
-          columnTypes={columnTypes}
-          templates={templates}
-          transforms={transforms}
-          columnOptions={List([])}
-          uploadInProgress={false}
-          requireJSONHaveAllFields={requireJSONHaveAllFields}
-          objectKey={objectKey}
-          exportRank={exportRank}
-          elasticUpdate={elasticUpdate}
-          query={this.props.query}
-          inputs={this.props.query.inputs}
-          serverId={Number(this.props.db.id)}
-          variantName={this.props.variantName}
-        />
-      </div>;
-
+    // const content =
+    //   <div
+    //     style={backgroundColor(Colors().bg1)}
+    //   >
+    //     <FileImportPreview
+    //       exporting={true}
+    //       filetype={filetype}
+    //       previewColumns={previewColumns}
+    //       columnNames={columnNames}
+    //       columnsToInclude={columnsToInclude}
+    //       columnTypes={columnTypes}
+    //       templates={templates}
+    //       transforms={transforms}
+    //       columnOptions={List([])}
+    //       uploadInProgress={false}
+    //       requireJSONHaveAllFields={requireJSONHaveAllFields}
+    //       objectKey={objectKey}
+    //       exportRank={exportRank}
+    //       elasticUpdate={elasticUpdate}
+    //       query={this.props.query}
+    //       inputs={this.props.query.inputs}
+    //       serverId={Number(this.props.db.id)}
+    //       variantName={this.props.variantName}
+    //     />
+    //   </div>;
+    const content = <div> Hi :) </div>
     return (
       <Modal
         open={this.state.showingExport}

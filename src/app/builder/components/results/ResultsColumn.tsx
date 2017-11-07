@@ -71,7 +71,6 @@ const ClipboardIcon = require('images/icon_clipboard.svg');
 export interface Props
 {
   resultsState: ResultsState;
-  exportState?: FileImportState;
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
@@ -223,7 +222,6 @@ class ResultsColumn extends TerrainComponent<Props>
             showExport={this.props.showExport}
             showCustomizeView={this.props.showCustomizeView}
             allowSpotlights={this.props.allowSpotlights}
-            exportState={this.props.exportState}
           />
         );
       case 1:

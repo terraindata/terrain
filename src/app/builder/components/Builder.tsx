@@ -103,7 +103,6 @@ export interface Props
 class Builder extends TerrainComponent<Props>
 {
   public state: {
-    exportState: FileImportTypes.FileImportState,
     builderState: BuilderState,
     variants: IMMap<ID, Variant>,
 
@@ -126,7 +125,6 @@ class Builder extends TerrainComponent<Props>
     savingAs?: boolean;
 
   } = {
-    exportState: FileImportStore.getState(),
     builderState: BuilderStore.getState(),
     variants: LibraryStore.getState().variants,
 
@@ -176,10 +174,6 @@ class Builder extends TerrainComponent<Props>
     this._subscribe(LibraryStore, {
       stateKey: 'variants',
       storeKeyPath: ['variants'],
-    });
-
-    this._subscribe(FileImportStore, {
-      stateKey: 'exportState',
     });
 
     let colKeys: List<number>;
@@ -642,7 +636,6 @@ class Builder extends TerrainComponent<Props>
       content: query && <BuilderColumn
         query={query}
         resultsState={this.state.builderState.resultsState}
-        exportState={this.state.exportState}
         index={index}
         colKey={key}
         variant={variant}
