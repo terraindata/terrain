@@ -46,9 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
-/** 
- * User Friendly Builder, Codename: Pathfinder
-  
+/*
+  User Friendly Builder, Codename: Pathfinder
   Planned Data Model:
   Variant / Query has a Path (datastructure name open to change)
   Path has one of each section:
@@ -57,27 +56,27 @@ THE SOFTWARE.
   - Full Text Search: (maybe)
   - Score: For scoring and sorting
   - More: (planned) for Aggs, Facets, other things
- 
+
   Source has:
     - datasource (where data is coming from. Changes for Elastic/SQL/etc.)
        implements autocomplete generating methods, which accept a context
     - start and count (i.e. skip / take)
-  
+
   Reusable data types:
     - Lines. Pieces that can be added / deleted / potentially drag and dropped
         specific Lines implement this abstract class
-  
+
   Filter has:
     - collection of Filter Lines, which specify each filter condition
     - minimum number of matches ("all", 0, 1, 2...)
     - Filter Lines can also be Filters themselves
-  
+
   Full Text Search has: (if included)
     - same as Filter. Potentially, the weights only show up here, not in Filter.
-  
+
   Score has:
     - collection of ScoreLines, which can specify a transform or linear score
-  
+
   More has:
     TBD
  */
@@ -86,26 +85,30 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import { BaseClass, New } from '../../../Classes';
 
-
 export const PathfinderSteps =
-[
-  'Source',
-  'Filter',
-  'Score',
-];
+  [
+    'Source',
+    'Filter',
+    'Score',
+  ];
 
 class PathC extends BaseClass
 {
   public source: Source = _Source();
   public filter: Filter = _Filter();
   public score: Score = _Score();
-  
   public step: string = PathfinderSteps[0];
 }
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
-  New<Path>(new PathC(config), config);
-
+{
+  let path = New<Path>(new PathC(config || {}), config);
+  path = path
+    .set('source', _Source(path['source']))
+    .set('score', _Score(path['score']))
+    .set('filter', _Filter(path['filter']));
+  return path;
+};
 
 class FilterC extends BaseClass
 {
@@ -116,15 +119,18 @@ export type Filter = FilterC & IRecord<FilterC>;
 export const _Filter = (config?: { [key: string]: any }) =>
   New<Filter>(new FilterC(config), config);
 
-
 class ScoreC extends BaseClass
 {
   public lines: List<ScoreLine> = List<ScoreLine>([]);
 }
 export type Score = ScoreC & IRecord<ScoreC>;
 export const _Score = (config?: { [key: string]: any }) =>
-  New<Score>(new ScoreC(config), config);
-
+{
+  let score = New<Score>(new ScoreC(config || {}), config);
+  score = score
+    .set('lines', List(score['lines'].map((line) => _ScoreLine(line))));
+  return score;
+};
 
 class LineC extends BaseClass
 {
@@ -134,19 +140,17 @@ export type Line = LineC & IRecord<LineC>;
 export const _Line = (config?: { [key: string]: any }) =>
   New<Line>(new LineC(config), config);
 
-
 class ScoreLineC extends LineC
 {
   public field: string = ''; // autocomplete
   public type: string = 'transform';
   public transformData: any = {}; // TODO
-  
+
   public sortOrder: string = 'desc'; // only used for certain types
 }
 export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
 export const _ScoreLine = (config?: { [key: string]: any }) =>
   New<ScoreLine>(new ScoreLineC(config), config);
-
 
 class FilterLineC extends LineC
 {
@@ -154,7 +158,7 @@ class FilterLineC extends LineC
   public field: string = ''; // autocomplete
   public method: string = ''; // autocomplete
   public value: string | number = 0;
-  
+
   // Members for when it is a group of filter conditions
   public filter: Filter = null;
 }
@@ -162,7 +166,6 @@ export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
   New<FilterLine>(new FilterLineC(config), config);
 
-  
 export const sourceCountOptions = List([
   'all',
   1,

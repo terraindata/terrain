@@ -50,11 +50,11 @@ import { List, Map, Record } from 'immutable';
 
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import { _ResultsConfig } from '../../../shared/results/types/ResultsConfig';
+import { _Path, Path } from '../../app/builder/components/pathfinder/PathfinderTypes';
 import { Aggregation } from '../../app/builder/components/results/ResultTypes';
 import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';
-import { Path, _Path } from '../../app/builder/components/pathfinder/PathfinderTypes';
 
 // A query can be viewed and edited in the Builder
 // currently, only Variants have Queries, 1:1, but that may change
@@ -119,6 +119,7 @@ export const _Query = (config?: object) =>
   config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);
   config['tuningOrder'] = List<string>(config['tuningOrder']);
   config['aggregationList'] = Map<string, Aggregation>(config['aggregationList']);
+  config['path'] = _Path(config['path']);
   const query = new Query_Record(config) as any as Query;
 
   return query;

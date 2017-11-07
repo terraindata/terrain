@@ -49,74 +49,81 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
-import * as Radium from 'radium';
+import * as _ from 'lodash';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
-import InfoArea from '../../../common/components/InfoArea';
-import TerrainComponent from './../../../common/components/TerrainComponent';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import PathfinderFilterSection from './filter/PathfinderFilterSection';
-import './Pathfinder.less';
-import { Path } from './PathfinderTypes';
-import PathfinderScoreSection from './score/PathfinderScoreSection';
-import PathfinderSourceSection from './source/PathfinderSourceSection';
-import PathfinderStepSection from './step/PathfinderStepSection';
+import Autocomplete from '../../../../common/components/Autocomplete';
+import { Path, Score, ScoreLine, Source } from '../PathfinderTypes';
 
 export interface Props
 {
-  path: Path;
+  line: ScoreLine;
+  source: Source;
+  step: string;
   canEdit: boolean;
+  index: number;
+  onDelete: (index) => void;
+  onFieldChange: (index, field) => void;
+  onWeightChange: (index, weight) => void;
 }
 
-@Radium
-class PathfinderColumn extends TerrainComponent<Props>
+class PathfinderSourceLine extends TerrainComponent<Props>
 {
   public state: {
-
+    field: string;
+    weight: number;
   } = {
-
+    field: this.props.line.field,
+    weight: this.props.line.weight,
   };
+
+  public handleFieldChange(field)
+  {
+    // Probably call parent funciton
+    this.setState({
+      field,
+    });
+    this.props.onFieldChange(this.props.index, field);
+  }
+
+  public handleWeightChange(event)
+  {
+    this.setState({
+      weight: event.target.value,
+    });
+    this.props.onWeightChange(this.props.index, event.target.value);
+  }
 
   public render()
   {
-    const { path, canEdit } = this.props;
+    const { source, step } = this.props;
 
     return (
       <div
-        className='pathfinder-column'
-        style={[
-          backgroundColor(Colors().bg3),
-          fontColor(Colors().text3),
-        ]}
+        className='pathfinder-section'
       >
-        <PathfinderSourceSection
-          source={path.source}
-          step={path.step}
-          canEdit={canEdit}
+        <span>Scoring</span>
+        <Autocomplete
+          value={this.state.field}
+          onChange={this.handleFieldChange}
+          options={List(['price', 'margin', 'conversion'])} // TODO getAutoOptions from PathTypes ?
+          placeholder={'field'}
         />
-
-        <PathfinderFilterSection
-          source={path.source}
-          filter={path.filter}
-          step={path.step}
-          canEdit={canEdit}
+        <span>with a weight of</span>
+        <input
+          value={this.state.weight}
+          onChange={this.handleWeightChange}
         />
-
-        <PathfinderScoreSection
-          source={path.source}
-          score={path.score}
-          step={path.step}
-          canEdit={canEdit}
-        />
-
-        <PathfinderStepSection
-          step={path.step}
-          path={path}
-          canEdit={canEdit}
-        />
+        <div
+          onClick={this._fn(this.props.onDelete, this.props.index)}
+        >
+          Delete this factor
+        </div>
       </div>
     );
   }
 }
 
-export default PathfinderColumn;
+export default PathfinderSourceLine;

@@ -50,13 +50,13 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Path, Source, sourceCountOptions } from '../PathfinderTypes';
-import Dropdown from 'app/common/components/Dropdown';
-import Autocomplete from 'app/common/components/Autocomplete';
 import BuilderActions from 'app/builder/data/BuilderActions';
+import Autocomplete from 'app/common/components/Autocomplete';
+import Dropdown from 'app/common/components/Dropdown';
+import { Path, Source, sourceCountOptions } from '../PathfinderTypes';
 
 export interface Props
 {
@@ -68,9 +68,9 @@ export interface Props
 class PathfinderSourceSection extends TerrainComponent<Props>
 {
   public state: {
-    
+
   } = {
-    
+
   };
 
   public render()
@@ -106,7 +106,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
                   disabled={!canEdit}
                 />
               </div>
-            : null
+              : null
           }
           <div className='pf-piece'>
             <Dropdown
@@ -119,19 +119,19 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private changeSource(source: Source)
   {
     BuilderActions.change(List(['query', 'path', 'source']), source);
   }
-  
+
   private getCountSelectedIndex(): number
   {
     if (this.shouldShowCustomCount())
     {
       return sourceCountOptions.size - 1;
     }
-    
+
     return this.props.source.countIndex;
   }
 
@@ -150,20 +150,18 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     this.changeSource(
       this.props.source
         .set('countIndex', index)
-        .set('count', value)
+        .set('count', value),
     );
   }
-  
+
   private handleCountTextChange(value)
   {
     this.changeSource(
       this.props.source
         .set('countIndex', sourceCountOptions.size - 1)
-        .set('count', +value)
+        .set('count', +value),
     );
   }
 }
-
-
 
 export default PathfinderSourceSection;

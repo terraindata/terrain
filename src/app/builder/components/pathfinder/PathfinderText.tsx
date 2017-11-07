@@ -42,25 +42,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+
 // Centralized place for text used in Pathfinder
 
 export const PathfinderText = {
-	
-	// Steps
-	
-	pickSourceStepTitle: `
+
+  // Steps
+
+  pickSourceStepTitle: `
 		Where are the data that you care about located?
 	`,
-	
-	filterStepTitle: `
+
+  filterStepTitle: `
 		Let's find the data you want by filtering out everything that isn't a match.
 	`,
-	
-	scoreStepTitle: `
+
+  scoreStepTitle: `
 		Let's score your results, so that the best picks show up in the top spots.
 	`,
-	
-	finalStepTitle: `
+
+  finalStepTitle: `
 		You can edit your algorithm directly above, or pick one of these actions to perform on it.
 	`,
 };

@@ -281,7 +281,7 @@ const BuilderColumn = createReactClass<any, any>(
             cardsAndCodeInSync={query.cardsAndCodeInSync}
             language={query.language}
           />;
-        
+
         case COLUMNS.Pathfinder:
           return <PathfinderColumn
             canEdit={canEdit}
