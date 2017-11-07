@@ -59,22 +59,23 @@ const currentScript = scripts[scripts.length - 1];
 const server = currentScript.getAttribute('data-server');
 const client = new ClientJS();
 let fingerprint = null;
-let batch: string[] = [];
+let batch: any[] = [];
 let batchSize = 0; // memoized so we aren't always computing sizeof(batch)
 
 const TerrainAnalytics = {
-  assembleParams(asObject: boolean, eventName: string | any, variantOrSourceID: string | any, meta?: any): string
+  assembleParams(asObject: boolean, eventName: string | any, variantOrSourceID: string | any, meta?: any): string | object
   {
     const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] :
       (fingerprint || (fingerprint = client.getFingerprint()));
 
     if (asObject)
     {
-      return Object.assign({
+      return {
         eventname: eventName,
         visitorid: String(visitorID),
         variantid: String(variantOrSourceID),
-      }, meta !== null && meta !== undefined ? meta : undefined);
+        meta,
+      };
     }
 
     let paramString = 'eventname=' + String(eventName)
