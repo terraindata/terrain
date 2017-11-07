@@ -53,7 +53,12 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Filter, Path, Source } from '../PathfinderTypes';
+import { Filter, Path, Source, FilterLine } from '../PathfinderTypes';
+import PathfinderFilterGroup from './PathfinderFilterGroup';
+import PathfinderFilterLine from './PathfinderFilterLine';
+import PathfinderFilterCreate from './PathfinderFilterCreate';
+import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
+import BuilderActions from 'app/builder/data/BuilderActions';
 
 export interface Props
 {
@@ -63,7 +68,7 @@ export interface Props
   canEdit: boolean;
 }
 
-class PathfinderSourceSection extends TerrainComponent<Props>
+class PathfinderFilterSection extends TerrainComponent<Props>
 {
   public state: {
 
@@ -73,15 +78,134 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public render()
   {
-    const { source, step } = this.props;
+    const { source, step, filter, canEdit } = this.props;
+
+    // flatten tree
+    let entries: FilterEntry[] = [];
+    this.buildFilterTree(filter, entries, 0, List(['query', 'path']));
 
     return (
       <div
         className='pathfinder-section'
       >
+        {
+          entries.map(this.renderFilterEntry)
+        }
       </div>
     );
   }
+  
+  private handleFilterChange(keyPath: KeyPath, filter: Filter | FilterLine)
+  {
+    BuilderActions.change(keyPath, filter);
+  }
+  
+  private handleFilterDelete(keyPath: KeyPath)
+  {
+    const parentKeyPath = keyPath.butLast().toList()
+    const parent = this.props.filter.getIn(parentKeyPath.skip(2).toList());
+    const index = keyPath.last();
+    BuilderActions.change(parentKeyPath, parent.splice(index, 1));
+  }
+  
+  private buildFilterTree(filter: Filter, entries: FilterEntry[], depth: number, keyPath: KeyPath): void
+  {
+    keyPath = keyPath.push('filter');
+    
+    entries.push({
+      filter,
+      depth,
+      keyPath,
+    });
+    
+    depth ++;
+    
+    keyPath = keyPath.push('lines');
+    
+    filter.lines.map((filterLine, index) =>
+    {
+      if(filterLine.filter)
+      {
+        // it is a filter group
+        this.buildFilterTree(filterLine.filter, entries, depth, keyPath.push(index));
+      }
+      else
+      {
+        entries.push({
+          filterLine,
+          depth,
+          keyPath: keyPath.push(index),
+        });
+      }
+    });
+    
+    entries.push({
+      isCreateSection: true,
+      depth,
+      keyPath: keyPath.push(filter.lines.size),
+    });
+  }
+  
+  private renderFilterEntry(filterEntry: FilterEntry, index: number): El
+  {
+    const { source, canEdit } = this.props;
+    
+    if (filterEntry.filter)
+    {
+      return (
+        <PathfinderFilterGroup
+          filter={filterEntry.filter}
+          source={source}
+          canEdit={canEdit}
+          depth={filterEntry.depth}
+          keyPath={filterEntry.keyPath}
+          onChange={this.handleFilterChange}
+          key={index}
+        />
+      );
+    }
+    
+    if (filterEntry.filterLine)
+    {
+      return (
+        <PathfinderFilterLine
+          filterLine={filterEntry.filterLine}
+          source={source}
+          canEdit={canEdit}
+          depth={filterEntry.depth}
+          keyPath={filterEntry.keyPath}
+          onChange={this.handleFilterChange}
+          onDelete={this.handleFilterDelete}
+          key={index}
+        />
+      );
+    }
+    
+    if (filterEntry.isCreateSection)
+    {
+      return (
+        <PathfinderFilterCreate
+          source={source}
+          canEdit={canEdit}
+          depth={filterEntry.depth}
+          keyPath={filterEntry.keyPath}
+          onChange={this.handleFilterChange}
+          key={index}
+        />
+      );
+    }
+    
+    throw new Error('Uncrecognized filter entry: ' + JSON.stringify(filterEntry));
+  }
 }
 
-export default PathfinderSourceSection;
+interface FilterEntry
+{
+  filter?: Filter;
+  filterLine?: FilterLine;
+  isCreateSection?: boolean;
+  depth: number;
+  keyPath: KeyPath;
+}
+
+export default PathfinderFilterSection;
