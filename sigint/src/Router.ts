@@ -67,11 +67,16 @@ export class Router
     this.events = new Events(config);
 
     /**
-     * @api {post} / Track an event (GET)
+     * @api {post} / Track an event (POST)
      * @apiName postEvent
      * @apiGroup Tracking
      *
-     * @apiDescription Track an analytics event using a GET request. Event parameters can be provided using the GET query string.
+     * @apiDescription Track an analytics event using a POST request. Event parameters can be provided using the POST payload / body.
+     *
+     * @apiParam {String} eventname Name of the tracking event
+     * @apiParam {Number} variantid ID of the Terrain variant to track this event for
+     * @apiParam {Number} visitorid A unique ID to identify the current visitor
+     * @apiParam {Object} meta Auxiliary information associated with the tracking event
      *
      * @apiExample {curl} Example usage:
      *     curl http://localhost:3001/v1?eventname=impression&visitorid=3161077040&variantid=123&meta=~(itemName~343~itemType~%27movie)
@@ -83,15 +88,11 @@ export class Router
     });
 
     /**
-     * @api {get} / Track an event (POST)
+     * @api {get} / Track an event (GET)
      * @apiName getEvent
      * @apiGroup Tracking
-     * @apiDescription Track an analytics event using a POST request. Event parameters can be provided using the POST payload / body.
      *
-     * @apiParam {String} eventname Name of the tracking event
-     * @apiParam {Number} variantid ID of the Terrain variant to track this event for
-     * @apiParam {Number} visitorid A unique ID to identify the current visitor
-     * @apiParam {Object} meta Auxiliary information associated with the tracking event
+     * @apiDescription Track an analytics event using a GET request. Event parameters can be provided using the GET query string.
      */
     this.router.get('/', async (ctx, next) =>
     {
