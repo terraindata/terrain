@@ -142,7 +142,12 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 
   $scope.cardLoad = function(result)
   {
-    setTimeout(TerrainAnalytics.logEvent('view', $scope.variantID, {itemName: result.movieid, itemType: 'movie'}),1);
+    setTimeout(TerrainAnalytics.queueEvent('view', $scope.variantID, {itemName: result.movieid, itemType: 'movie'}),1);
+  }
+
+  $scope.doneLoading = function()
+  {
+    TerrainAnalytics.logQueue();
   }
 
   $scope.cardDisplay = function(result)
