@@ -151,6 +151,6 @@ export default class ESQueryTransform
 
       rootvalue['body'] = bodyValue;
     }
-    return { body: rootvalue['body'] };
+    return rootvalue['body'];
   }
 }

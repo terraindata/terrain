@@ -410,11 +410,14 @@ export class ResultsManager extends TerrainComponent<Props>
         },
       );
 
+      const searchQuery = '{ "body" : ' + eql + '}';
+
+      console.log('query: ' + searchQuery);
       this.setState({
         lastQuery: query,
         queriedTql: eql,
         query: Ajax.query(
-          eql,
+          searchQuery,
           db,
           (resp) =>
           {
