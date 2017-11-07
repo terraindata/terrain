@@ -2,667 +2,655 @@
   "empty query" : {
   },
   "simple query" : {
-    "index" : "movies",
-    "type" : "data",
     "from" : 0,
     "size" : 10
   },
   "nested simple query" : {
-    "index" : "movies",
-    "type" : "data",
-    "body" : {
-      "from" : 0,
-      "size" : 10
+    "from" : 0,
+    "size" : 10,
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}}
+        ]
+      }
     }
   },
-  "body query" : {
-    "index" : "movies",
-    "type" : "data",
-    "body" : {
-      "query" : {
-      },
-      "sort" : ["_score"]
-    }
+  "nested query with sort" : {
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}}
+        ]
+      }
+    },
+    "sort" : ["_score"]
   },
   "_source query" : {
-    "index" : "movies",
-    "type" : "data",
     "size" : 10,
-    "body" : {
-      "_source" : [
-        "movieid",
-        "title",
-        "releasedate"
-      ]
+    "_source" : [
+      "movieid",
+      "title",
+      "releasedate"
+    ],
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}}
+        ]
+      }
     }
   },
   "must_not query" : {
-    "index" : "movies",
-    "type" : "data",
     "size" : 10,
-    "body" : {
-      "query" : {
-        "bool" : {
-          "must_not" : [
-            {
-              "match" : {
-                "title" : "Toy Story (1995)"
-              }
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}}
+        ],
+        "must_not" : [
+          {
+            "match" : {
+              "title" : "Toy Story (1995)"
             }
-          ]
-        }
+          }
+        ]
       }
     }
   },
   "complex query 1" : {
-    "index" : "movies",
-    "type" : "data",
     "from" : 20,
     "size" : 10,
-    "body" : {
-      "_source" : [
-        "movieid",
-        "title",
-        "releasedate"
-      ],
-      "sort" : [
-        {
-          "movieid" : {
-            "order" : "desc"
-          }
-        },
-        {
-          "releasedate" : {
-            "order" : "asc"
-          }
+    "_source" : [
+      "movieid",
+      "title",
+      "releasedate"
+    ],
+    "sort" : [
+      {
+        "movieid" : {
+          "order" : "desc"
         }
-      ],
-      "query" : {
-        "bool" : {
-          "filter" : {
-            "bool" : {
-              "must" : [
-                {
-                  "range" : {
-                    "releasedate" : {
-                      "gte" : "2007-03-24"
-                    }
-                  }
-                },
-                {
-                  "range" : {
-                    "releasedate" : {
-                      "lt" : "2017-03-24"
-                    }
+      },
+      {
+        "releasedate" : {
+          "order" : "asc"
+        }
+      }
+    ],
+    "query" : {
+      "bool" : {
+        "filter" : {
+          "bool" : {
+            "must" : [
+              {"match" : {"_index" : "movies"}},
+              {"match" : {"_data" : "data"}},
+              {
+                "range" : {
+                  "releasedate" : {
+                    "gte" : "2007-03-24"
                   }
                 }
-              ]
-            }
-          },
-          "must_not" : {
-            "match" : {
-              "movieid" : 2134
-            }
+              },
+              {
+                "range" : {
+                  "releasedate" : {
+                    "lt" : "2017-03-24"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "must_not" : {
+          "match" : {
+            "movieid" : 2134
           }
         }
       }
     }
   },
   "sort query 1" : {
-    "index" : "movies",
-    "type" : "data",
-    "body" : {
-      "query" : {},
-      "sort" : [
-        {
-          "revenue" : "desc"
-        },
-        {
-          "movieid" : "asc"
-        }
-      ]
-    },
+    "query" : {},
+    "sort" : [
+      {
+        "revenue" : "desc"
+      },
+      {
+        "movieid" : "asc"
+      }
+    ],
     "size" : 20
   },
   "complex query 2" : {
-    "index" : "movies",
-    "type" : "data",
     "from" : 0,
     "size" : 5,
-    "body" : {
-      "query" : {
-        "bool" : {
-          "must" : [
-            {
-              "match" : {
-                "status" : "Released"
-              }
-            },
-            {
-              "match" : {
-                "language" : "en"
-              }
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}},
+          {
+            "match" : {
+              "status" : "Released"
             }
-          ],
-          "must_not" : [
-            {
-              "term" : {
-                "budget" : 0
-              }
-            },
-            {
-              "term" : {
-                "revenue" : 0
-              }
+          },
+          {
+            "match" : {
+              "language" : "en"
             }
-          ],
-          "minimum_should_match" : 1,
-          "should" : [
-            {
-              "match" : {
-                "genres" : "Thriller"
-              }
-            },
-            {
-              "match" : {
-                "genres" : "Action"
-              }
+          }
+        ],
+        "must_not" : [
+          {
+            "term" : {
+              "budget" : 0
             }
-          ]
-        }
-      },
-      "sort" : {
-        "_script" : {
-          "type" : "number",
-          "order" : "desc",
-          "script" : {
-            "stored" : "terrain_PWLScore",
-            "params" : {
-              "factors" : [
-                {
-                  "weight" : 0.1,
-                  "ranges" : [
-                    -100.0,
-                    100.0
-                  ],
-                  "outputs" : [
-                    0.0,
-                    1.0
-                  ]
-                },
-                {
-                  "weight" : 0.2,
-                  "a" : 0.0,
-                  "b" : 1.0,
-                  "numerators" : [
-                    [
-                      "popularity",
-                      1
-                    ]
-                  ],
-                  "denominators" : [],
-                  "ranges" : [
-                    0.0,
-                    2.5,
-                    5.0,
-                    10.0,
-                    50.0
-                  ],
-                  "outputs" : [
-                    0.0,
-                    0.2,
-                    0.5,
-                    0.8,
-                    1.0
-                  ]
-                },
-                {
-                  "weight" : 0.2,
-                  "a" : 25.0,
-                  "b" : 10.0,
-                  "numerators" : [
-                    [
-                      "voteaverage",
-                      1
-                    ]
-                  ],
-                  "denominators" : [
-                    [
-                      "votecount",
-                      1
-                    ]
-                  ],
-                  "ranges" : [
-                    0.0,
-                    4.0,
-                    5.0,
-                    10.0
-                  ],
-                  "outputs" : [
-                    0.0,
-                    0.1,
-                    0.5,
-                    1.0
-                  ]
-                },
-                {
-                  "weight" : 0.5,
-                  "a" : 0.0,
-                  "b" : 1.0,
-                  "numerators" : [
-                    [
-                      "revenue",
-                      1
-                    ],
-                    [
-                      "budget",
-                      -1
-                    ]
-                  ],
-                  "denominators" : [
-                    [
-                      "budget",
-                      1
-                    ]
-                  ],
-                  "ranges" : [
-                    -10.0,
-                    1.0,
-                    2.0,
-                    10.0
-                  ],
-                  "outputs" : [
-                    0.0,
-                    0.1,
-                    0.5,
-                    1.0
-                  ]
-                }
-              ]
+          },
+          {
+            "term" : {
+              "revenue" : 0
             }
+          }
+        ],
+        "minimum_should_match" : 1,
+        "should" : [
+          {
+            "match" : {
+              "genres" : "Thriller"
+            }
+          },
+          {
+            "match" : {
+              "genres" : "Action"
+            }
+          }
+        ]
+      }
+    },
+    "sort" : {
+      "_script" : {
+        "type" : "number",
+        "order" : "desc",
+        "script" : {
+          "stored" : "terrain_PWLScore",
+          "params" : {
+            "factors" : [
+              {
+                "weight" : 0.1,
+                "ranges" : [
+                  -100.0,
+                  100.0
+                ],
+                "outputs" : [
+                  0.0,
+                  1.0
+                ]
+              },
+              {
+                "weight" : 0.2,
+                "a" : 0.0,
+                "b" : 1.0,
+                "numerators" : [
+                  [
+                    "popularity",
+                    1
+                  ]
+                ],
+                "denominators" : [],
+                "ranges" : [
+                  0.0,
+                  2.5,
+                  5.0,
+                  10.0,
+                  50.0
+                ],
+                "outputs" : [
+                  0.0,
+                  0.2,
+                  0.5,
+                  0.8,
+                  1.0
+                ]
+              },
+              {
+                "weight" : 0.2,
+                "a" : 25.0,
+                "b" : 10.0,
+                "numerators" : [
+                  [
+                    "voteaverage",
+                    1
+                  ]
+                ],
+                "denominators" : [
+                  [
+                    "votecount",
+                    1
+                  ]
+                ],
+                "ranges" : [
+                  0.0,
+                  4.0,
+                  5.0,
+                  10.0
+                ],
+                "outputs" : [
+                  0.0,
+                  0.1,
+                  0.5,
+                  1.0
+                ]
+              },
+              {
+                "weight" : 0.5,
+                "a" : 0.0,
+                "b" : 1.0,
+                "numerators" : [
+                  [
+                    "revenue",
+                    1
+                  ],
+                  [
+                    "budget",
+                    -1
+                  ]
+                ],
+                "denominators" : [
+                  [
+                    "budget",
+                    1
+                  ]
+                ],
+                "ranges" : [
+                  -10.0,
+                  1.0,
+                  2.0,
+                  10.0
+                ],
+                "outputs" : [
+                  0.0,
+                  0.1,
+                  0.5,
+                  1.0
+                ]
+              }
+            ]
           }
         }
       }
     }
   },
   "search-1" : {
-    "index" : "movies",
-    "type" : "data",
     "from" : 0,
     "size" : 10
   },
   "search-2" : {
-    "index" : "movies",
-    "type" : "data",
-    "body" : {
-      "from" : 0,
-      "size" : 10
+    "from" : 0,
+    "size" : 10,
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}}
+        ]
+      }
     }
   },
   "search-3" : {
-    "index" : "movies",
-    "type" : "data",
-    "body" : {
-      "query" : {
-        "type" : "data"
-      },
-      "sort" : ["_score"]
-    }
+    "query" : {
+      "type" : {"value" : "data"}
+    },
+    "sort" : ["_score"]
   },
   "search-4" : {
-    "index" : "movies",
-    "type" : "data",
     "from" : 0,
     "size" : 1000,
-    "body" : {
-      "query" : {
-        "bool" : {
-          "must" : {
-            "match" : {
-              "genres" : "Drama"
-            },
-            "range" : {
-              "releaseDate" : {
-                "gt" : 2000,
-                "lt" : 2010
-              }
-            }
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}},
+          {"match" : {"genres" : "Drama"}}
+        ],
+        "range" : {
+          "releaseDate" : {
+            "gt" : 2000,
+            "lt" : 2010
           }
         }
       }
     }
   },
   "search-5" : {
-    "index" : "movies",
-    "type" : "data",
     "size" : 10,
-    "body" : {
-      "_source" : [
-        "movieid",
-        "title",
-        "releasedate"
-      ]
+    "_source" : [
+      "movieid",
+      "title",
+      "releasedate"
+    ],
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}}
+        ]
+      }
     }
   },
   "search-6" : {
-    "index" : "movies",
-    "type" : "data",
     "size" : 10,
-    "body" : {
-      "query" : {
-        "bool" : {
-          "must_not" : [
-            {
-              "match" : {
-                "title" : "Toy Story (1995)"
-              }
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}}
+        ],
+        "must_not" : [
+          {
+            "match" : {
+              "title" : "Toy Story (1995)"
             }
-          ]
-        }
+          }
+        ]
       }
     }
   },
   "search-7" : {
-    "index" : "movies",
-    "type" : "data",
     "from" : 0,
     "size" : 100,
-    "body" : {
-      "query" : {
-        "bool" : {
-          "must" : {
-            "match" : {"genres" : "Action"}
-          },
-          "must_not" : {
-            "match" : {
-              "title" : "Toy Story (1995)"
-            }
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}},
+          {"match" : {"genres" : "Action"}}
+        ],
+        "must_not" : {
+          "match" : {
+            "title" : "Toy Story (1995)"
           }
         }
       }
     }
   },
   "search-8" : {
-    "index" : "movies",
-    "type" : "data",
     "from" : 20,
     "size" : 10,
-    "body" : {
-      "_source" : [
-        "movieid",
-        "title",
-        "releasedate"
-      ],
-      "sort" : [
-        {
-          "movieid" : {
-            "order" : "desc"
-          }
-        },
-        {
-          "releasedate" : {
-            "order" : "asc"
-          }
+    "_source" : [
+      "movieid",
+      "title",
+      "releasedate"
+    ],
+    "sort" : [
+      {
+        "movieid" : {
+          "order" : "desc"
         }
-      ],
-      "query" : {
-        "bool" : {
-          "filter" : {
-            "bool" : {
-              "must" : [
-                {
-                  "range" : {
-                    "releasedate" : {
-                      "gte" : "2007-03-24"
-                    }
-                  }
-                },
-                {
-                  "range" : {
-                    "releasedate" : {
-                      "lt" : "2017-03-24"
-                    }
+      },
+      {
+        "releasedate" : {
+          "order" : "asc"
+        }
+      }
+    ],
+    "query" : {
+      "bool" : {
+        "filter" : {
+          "bool" : {
+            "must" : [
+              {"match" : {"_index" : "movies"}},
+              {"match" : {"_data" : "data"}},
+              {
+                "range" : {
+                  "releasedate" : {
+                    "gte" : "2007-03-24"
                   }
                 }
-              ]
-            }
-          },
-          "must_not" : [
-            {
-              "match" : {
-                "movieid" : 2134
+              },
+              {
+                "range" : {
+                  "releasedate" : {
+                    "lt" : "2017-03-24"
+                  }
+                }
               }
+            ]
+          }
+        },
+        "must_not" : [
+          {
+            "match" : {
+              "movieid" : 2134
             }
-          ]
-        }
+          }
+        ]
       }
     }
   },
   "search-9" : {
-    "index" : "movies",
-    "type" : "data",
-    "body" : {
-      "query" : {},
-      "sort" : [
-        {
-          "revenue" : "desc"
-        },
-        {
-          "movieid" : "asc"
-        }
-      ]
-    },
+    "query" : {},
+    "sort" : [
+      {
+        "revenue" : "desc"
+      },
+      {
+        "movieid" : "asc"
+      }
+    ],
     "size" : 20
   },
   "search-10" : {
-    "index" : "movies",
-    "type" : "data",
     "from" : 0,
     "size" : 5,
-    "body" : {
-      "query" : {
-        "bool" : {
-          "must" : [
-            {
-              "match" : {
-                "status" : "Released"
-              }
-            },
-            {
-              "match" : {
-                "language" : "en"
-              }
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}},
+          {
+            "match" : {
+              "status" : "Released"
             }
-          ],
-          "must_not" : [
-            {
-              "term" : {
-                "budget" : 0
-              }
-            },
-            {
-              "term" : {
-                "revenue" : 0
-              }
+          },
+          {
+            "match" : {
+              "language" : "en"
             }
-          ],
-          "minimum_should_match" : 1,
-          "should" : [
-            {
-              "match" : {
-                "genres" : "Thriller"
-              }
-            },
-            {
-              "match" : {
-                "genres" : "Action"
-              }
+          }
+        ],
+        "must_not" : [
+          {
+            "term" : {
+              "budget" : 0
             }
-          ]
-        }
-      },
-      "sort" : {
-        "_script" : {
-          "type" : "number",
-          "order" : "desc",
-          "script" : {
-            "stored" : "terrain_PWLScore",
-            "params" : {
-              "factors" : [
-                {
-                  "weight" : 0.1,
-                  "ranges" : [
-                    -100.0,
-                    100.0
-                  ],
-                  "outputs" : [
-                    0.0,
-                    1.0
-                  ]
-                },
-                {
-                  "weight" : 0.2,
-                  "a" : 0.0,
-                  "b" : 1.0,
-                  "numerators" : [
-                    [
-                      "popularity",
-                      1
-                    ]
-                  ],
-                  "denominators" : [],
-                  "ranges" : [
-                    0.0,
-                    2.5,
-                    5.0,
-                    10.0,
-                    50.0
-                  ],
-                  "outputs" : [
-                    0.0,
-                    0.2,
-                    0.5,
-                    0.8,
-                    1.0
-                  ]
-                },
-                {
-                  "weight" : 0.2,
-                  "a" : 25.0,
-                  "b" : 10.0,
-                  "numerators" : [
-                    [
-                      "voteaverage",
-                      1
-                    ]
-                  ],
-                  "denominators" : [
-                    [
-                      "votecount",
-                      1
-                    ]
-                  ],
-                  "ranges" : [
-                    0.0,
-                    4.0,
-                    5.0,
-                    10.0
-                  ],
-                  "outputs" : [
-                    0.0,
-                    0.1,
-                    0.5,
-                    1.0
-                  ]
-                },
-                {
-                  "weight" : 0.5,
-                  "a" : 0.0,
-                  "b" : 1.0,
-                  "numerators" : [
-                    [
-                      "revenue",
-                      1
-                    ],
-                    [
-                      "budget",
-                      -1
-                    ]
-                  ],
-                  "denominators" : [
-                    [
-                      "budget",
-                      1
-                    ]
-                  ],
-                  "ranges" : [
-                    -10.0,
-                    1.0,
-                    2.0,
-                    10.0
-                  ],
-                  "outputs" : [
-                    0.0,
-                    0.1,
-                    0.5,
-                    1.0
-                  ]
-                }
-              ]
+          },
+          {
+            "term" : {
+              "revenue" : 0
             }
+          }
+        ],
+        "minimum_should_match" : 1,
+        "should" : [
+          {
+            "match" : {
+              "genres" : "Thriller"
+            }
+          },
+          {
+            "match" : {
+              "genres" : "Action"
+            }
+          }
+        ]
+      }
+    },
+    "sort" : {
+      "_script" : {
+        "type" : "number",
+        "order" : "desc",
+        "script" : {
+          "stored" : "terrain_PWLScore",
+          "params" : {
+            "factors" : [
+              {
+                "weight" : 0.1,
+                "ranges" : [
+                  -100.0,
+                  100.0
+                ],
+                "outputs" : [
+                  0.0,
+                  1.0
+                ]
+              },
+              {
+                "weight" : 0.2,
+                "a" : 0.0,
+                "b" : 1.0,
+                "numerators" : [
+                  [
+                    "popularity",
+                    1
+                  ]
+                ],
+                "denominators" : [],
+                "ranges" : [
+                  0.0,
+                  2.5,
+                  5.0,
+                  10.0,
+                  50.0
+                ],
+                "outputs" : [
+                  0.0,
+                  0.2,
+                  0.5,
+                  0.8,
+                  1.0
+                ]
+              },
+              {
+                "weight" : 0.2,
+                "a" : 25.0,
+                "b" : 10.0,
+                "numerators" : [
+                  [
+                    "voteaverage",
+                    1
+                  ]
+                ],
+                "denominators" : [
+                  [
+                    "votecount",
+                    1
+                  ]
+                ],
+                "ranges" : [
+                  0.0,
+                  4.0,
+                  5.0,
+                  10.0
+                ],
+                "outputs" : [
+                  0.0,
+                  0.1,
+                  0.5,
+                  1.0
+                ]
+              },
+              {
+                "weight" : 0.5,
+                "a" : 0.0,
+                "b" : 1.0,
+                "numerators" : [
+                  [
+                    "revenue",
+                    1
+                  ],
+                  [
+                    "budget",
+                    -1
+                  ]
+                ],
+                "denominators" : [
+                  [
+                    "budget",
+                    1
+                  ]
+                ],
+                "ranges" : [
+                  -10.0,
+                  1.0,
+                  2.0,
+                  10.0
+                ],
+                "outputs" : [
+                  0.0,
+                  0.1,
+                  0.5,
+                  1.0
+                ]
+              }
+            ]
           }
         }
       }
     }
   },
   "search-11" : {
-    "index" : "movies",
-    "type" : "movies",
     "from" : 0,
     "size" : 1000,
-    "body" : {
-      "query" : {
-        "bool" : {
-          "should" : {
-            "range" : {
-              "budget" : {
-                "gte" : 100000000
-              }
+    "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_data" : "data"}}
+        ],
+        "should" : {
+          "range" : {
+            "budget" : {
+              "gte" : 100000000
             }
           }
         }
-      },
-      "sort" : {
-        "_script" : {
-          "type" : "number",
-          "order" : "desc",
-          "script" : {
-            "stored" : "terrain_PWLScore",
-            "params" : {
-              "factors" : [
-                {
-                  "weight" : 1,
-                  "a" : 0,
-                  "b" : 1,
-                  "numerators" : [
-                    [
-                      "budget",
-                      1
-                    ]
-                  ],
-                  "denominators" : [
-                  ],
-                  "ranges" : [
-                    2,
-                    15
-                  ],
-                  "outputs" : [
-                    0.2,
-                    0.5
+      }
+    },
+    "sort" : {
+      "_script" : {
+        "type" : "number",
+        "order" : "desc",
+        "script" : {
+          "stored" : "terrain_PWLScore",
+          "params" : {
+            "factors" : [
+              {
+                "weight" : 1,
+                "a" : 0,
+                "b" : 1,
+                "numerators" : [
+                  [
+                    "budget",
+                    1
                   ]
-                }
-              ]
-            }
+                ],
+                "denominators" : [
+                ],
+                "ranges" : [
+                  2,
+                  15
+                ],
+                "outputs" : [
+                  0.2,
+                  0.5
+                ]
+              }
+            ]
           }
         }
       }
