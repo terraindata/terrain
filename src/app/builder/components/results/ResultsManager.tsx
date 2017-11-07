@@ -412,7 +412,6 @@ export class ResultsManager extends TerrainComponent<Props>
 
       const searchQuery = '{ "body" : ' + eql + '}';
 
-      console.log('query: ' + searchQuery);
       this.setState({
         lastQuery: query,
         queriedTql: eql,
