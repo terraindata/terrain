@@ -15,7 +15,8 @@ before_script:
 stages:
   - lint
   - style
-  - test
+  - test-front
+  - test-back
   - build
   - deploy
 
@@ -29,12 +30,18 @@ style:
    - yarn run style
   stage: style
 
+test-frontend:
+  script:
+   - yarn run test-front
+  stage: test-front
+  when: always
+
 test-backend:
   script:
    - yarn run test-back-setup
-   - yarn run test
+   - yarn run test-back
    - yarn run test-back-teardown
-  stage: test
+  stage: test-back
   when: always
   artifacts:
     paths:
