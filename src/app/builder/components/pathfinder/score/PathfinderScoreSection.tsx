@@ -77,6 +77,11 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     allWeights: [],
   };
 
+  public componentWillMount()
+  {
+    this.updateWeights(this.props.score.lines);
+  }
+
   public componentWillReceiveProps(nextProps)
   {
     if (nextProps.score !== this.props.score)
@@ -126,6 +131,8 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public renderScoreLines()
   {
+    console.log(this.props.score.lines);
+    console.log(this.state.allWeights);
     return (
       <div>
         {
@@ -168,8 +175,8 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       <div
         className='pf-section'
       >
-        <div className='pathfinder-section-title'>{PathfinderText.scoreStepTitle}</div>
-        <div className='pathfinder-section-subtitle'>{PathfinderText.scoreStepSubtitle}</div>
+        <div className='pf-section-title'>{PathfinderText.scoreStepTitle}</div>
+        <div className='pf-section-subtitle'>{PathfinderText.scoreStepSubtitle}</div>
         {
           this.renderScoreLines()
         }

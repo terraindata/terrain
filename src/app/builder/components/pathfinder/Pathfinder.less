@@ -1,7 +1,7 @@
 @import "../../../common/Common.less";
 
 .pathfinder-column {
-	padding: @spacing;
+	padding: @spacing @double-spacing;
 	padding-top: 2 * @spacing;
 	margin-left: -12px;
 	margin-right: -6px;
@@ -13,6 +13,8 @@
 		.pf-section-subtitle {
 			font-size: @font-size;
 			padding-top: 4px;
+			padding-bottom: 8px;
+			font-style: italic;
 		}
 	}		
 	.pf-create {
@@ -32,22 +34,19 @@
 			}
 		}
 		.pf-score-line-weight {
-			max-width: 50px;
+			flex-basis: 50px;
 			margin: 0px 4px;
 		}
 		.pf-score-line-text {
 			font-size: @small-font-size;
 			margin: 0px 4px;
-			padding-top: 7px;	
+			padding-top: 7px;
+			&.pf-score-line-text-long {
+				flex-basis: 100px;	
+			}
 		}	
-		.pf-line-delete {
-			height: 16px;
-		    width: 16px;
-		    border-radius: 50%;
-		    cursor: pointer;
-		    margin-top: 8px;
-		    margin-right: 4px;
-		    border: 1px solid;
+		&.pf-score-line-inner {
+			padding: 0px 12px;
 		}
 	}
 	.pf-score-line-transform {
@@ -56,7 +55,10 @@
 				width: 100%;
 			}
 		}
-
+	.pf-line-right {
+		position: relative;
+		top: 8px;
+	}
 	.pf-score-line {
 		margin: 12px;
 	}

@@ -78,7 +78,6 @@ class PathfinderLine extends TerrainComponent<Props>
   public render()
   {
     const { canDrag, canDelete, canEdit, children } = this.props;
-
     return (
       <div
         className={classNames({

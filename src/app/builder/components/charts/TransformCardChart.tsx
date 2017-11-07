@@ -64,7 +64,7 @@ interface ScorePoint
   value: number;
   set: (f: string, v: any) => ScorePoint;
 }
-type ScorePoints = List<ScorePoint>;
+export type ScorePoints = List<ScorePoint>;
 
 const ZOOM_FACTOR = 2.0;
 

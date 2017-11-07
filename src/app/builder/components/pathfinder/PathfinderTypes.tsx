@@ -84,6 +84,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import { BaseClass, New } from '../../../Classes';
+import { ScorePoints } from '../charts/TransformCardChart';
 
 export const PathfinderSteps =
   [
@@ -144,13 +145,23 @@ class ScoreLineC extends LineC
 {
   public field: string = ''; // autocomplete
   public type: string = 'transform';
-  public transformData: any = {}; // TODO
+  public transformData: TransformData = _TransformData(); // TODO
 
   public sortOrder: string = 'desc'; // only used for certain types
 }
 export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
 export const _ScoreLine = (config?: { [key: string]: any }) =>
   New<ScoreLine>(new ScoreLineC(config), config);
+
+class TransformDataC extends BaseClass
+{
+  public scorePoints: ScorePoints = List([]);
+  public domain: List<number> = List([]);
+}
+
+export type TransformData = TransformDataC & IRecord<TransformDataC>;
+export const _TransformData = (config?: {[key: string]: any}) =>
+  New<TransformData>(new TransformDataC(config), config);
 
 class FilterLineC extends LineC
 {

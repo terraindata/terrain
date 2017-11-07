@@ -61,7 +61,7 @@ import { Path } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 import PathfinderStepSection from './step/PathfinderStepSection';
-
+import ColorsActions from '../../../colors/data/ColorsActions';
 export interface Props
 {
   path: Path;
@@ -76,6 +76,12 @@ class PathfinderColumn extends TerrainComponent<Props>
   } = {
 
   };
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.pf-section-title', 
+      { 'color': Colors().text1);
+  }
 
   public render()
   {

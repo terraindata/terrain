@@ -60,6 +60,8 @@ import ScoreBar from '../../charts/ScoreBar';
 import { BuilderStore } from './../../../data/BuilderStore';
 import BuilderActions from './../../../data/BuilderActions';
 import TransformCard from '../../charts/TransformCard';
+import PathfinderLine from '../PathfinderLine';
+
 const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 
 export interface Props
@@ -143,46 +145,49 @@ class PathfinderSourceLine extends TerrainComponent<Props>
     </div>);
   }
 
+  public renderLineContents()
+  {
+    return (<div className='pf-line pf-score-line-inner'>
+      <ScoreBar
+        parentData={{ weights: this.props.allWeights }}
+        data={{ weight: this.state.weight }}
+        keyPath={this.props.keyPath.push('weight')}
+      />
+      <input
+        value={this.state.weight}
+        onChange={this.handleWeightChange}
+        className='pf-score-line-weight'
+      />
+      <span className='pf-score-line-text pf-score-line-text-long'>times their</span>
+      <Autocomplete
+        value={this.state.field}
+        onChange={this.handleFieldChange}
+        options={List(['price', 'margin', 'conversion'])} // TODO getAutoOptions from PathTypes ?
+        placeholder={'field'}
+      />
+      <span
+        onClick={this._toggle('expandTransform')}
+        className='pf-score-line-text'
+      >
+        Score:
+      </span>
+    </div>);
+}
+
   public render()
   {
     const { source, step } = this.props;
 
     return (
       <div className='pf-score-line'>
-        <div
-          className='pf-line'
-        >
-          <div
-            onClick={this._fn(this.props.onDelete, this.props.index)}
-            className='pf-line-delete'
-            style={_.extend({}, borderColor(Colors().text1, Colors().active), getStyle('fill', Colors().text1, Colors().active))}
-          >
-            <CloseIcon />
-          </div>
-          <ScoreBar
-            parentData={{ weights: this.props.allWeights }}
-            data={{ weight: this.state.weight }}
-            keyPath={this.props.keyPath.push('weight')}
-          />
-          <input
-            value={this.state.weight}
-            onChange={this.handleWeightChange}
-            className='pf-score-line-weight'
-          />
-          <span className='pf-score-line-text'>times their</span>
-          <Autocomplete
-            value={this.state.field}
-            onChange={this.handleFieldChange}
-            options={List(['price', 'margin', 'conversion'])} // TODO getAutoOptions from PathTypes ?
-            placeholder={'field'}
-          />
-          <span
-            onClick={this._toggle('expandTransform')}
-            className='pf-score-line-text'
-          >
-            Score:
-            </span>
-        </div>
+        <PathfinderLine 
+          canDrag={true}
+          canDelete={true}
+          canEdit={this.props.canEdit}
+          children={this.renderLineContents()}
+          onDelete={this.props.onDelete}
+          index={this.props.index}
+        />
         {this.state.expandTransform && this.renderTransformChart()}
       </div>
     );

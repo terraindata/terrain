@@ -122,28 +122,28 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
     keyPath = keyPath.push('lines');
 
-    filter.lines.map((filterLine, index) =>
-    {
-      if (filterLine.filter)
-      {
-        // it is a filter group
-        this.buildFilterTree(filterLine.filter, entries, depth, keyPath.push(index));
-      }
-      else
-      {
-        entries.push({
-          filterLine,
-          depth,
-          keyPath: keyPath.push(index),
-        });
-      }
-    });
+    // filter.lines.map((filterLine, index) =>
+    // {
+    //   if (filterLine.filter)
+    //   {
+    //     // it is a filter group
+    //     this.buildFilterTree(filterLine.filter, entries, depth, keyPath.push(index));
+    //   }
+    //   else
+    //   {
+    //     entries.push({
+    //       filterLine,
+    //       depth,
+    //       keyPath: keyPath.push(index),
+    //     });
+    //   }
+    // });
 
-    entries.push({
-      isCreateSection: true,
-      depth,
-      keyPath: keyPath.push(filter.lines.size),
-    });
+    // entries.push({
+    //   isCreateSection: true,
+    //   depth,
+    //   keyPath: keyPath.push(filter.lines.size),
+    // });
   }
 
   private renderFilterEntry(filterEntry: FilterEntry, index: number): El
