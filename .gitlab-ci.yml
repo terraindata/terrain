@@ -32,7 +32,7 @@ style:
 test-backend:
   script:
    - yarn run test-back-setup
-   - yarn run test-back
+   - yarn run test
    - yarn run test-back-teardown
   stage: test
   when: always
