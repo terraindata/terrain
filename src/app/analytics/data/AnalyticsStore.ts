@@ -52,7 +52,7 @@ class AnalyticsStateC
   public loaded = false;
   public errors: string[] = [];
   public data: IMMap<ID, any> = Immutable.Map({});
-  public selectedMetric: ID[] = [1];
+  public selectedMetric: ID[] = ['impression'];
   public selectedInterval: string = 'day';
   public selectedDateRange: ID = 1;
   public selectedAnalyticsConnection: string = '';
