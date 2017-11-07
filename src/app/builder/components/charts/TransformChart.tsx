@@ -539,8 +539,9 @@ const TransformChart = {
       .attr('class', 'spotlight')
       .attr('id', (d) => d['fields']['_id']);
     spotlightEnter.append('circle');
+    spotlightEnter.append('text').attr('class', 'spotlight-rank');
     spotlightEnter.append('rect');
-    spotlightEnter.append('text');
+    spotlightEnter.append('text').attr('class', 'spotlight-tooltip');
 
     const minX = scaleDomainMin(scales.realX);
     const maxX = scaleDomainMax(scales.realX);
@@ -555,6 +556,7 @@ const TransformChart = {
     const SPOTLIGHT_SPACING = SPOTLIGHT_SIZE + SPOTLIGHT_PADDING * 2;
 
     const ys: _.Dictionary<{ y: number, offset: number, x: number }> = {};
+    const textYs: _.Dictionary<{ y: number, offset: number, x: number }> = {};
     const idToY = {};
     const xToBucket = {};
     const getBucket = (d) =>
@@ -584,14 +586,18 @@ const TransformChart = {
       return xToBucket[x];
     };
 
-    const getSpotlightY = (d) =>
+    const getSpotlightY = (d, text = false) =>
     {
       const x = getSpotlightX(d);
       const bucket = getBucket(d);
 
-      if (ys[bucket])
+      if (!text && ys[bucket])
       {
         ys[bucket].offset += OFFSET;
+      }
+      else if (text && textYs[bucket])
+      {
+        textYs[bucket].offset += OFFSET;
       }
       else
       {
@@ -616,22 +622,69 @@ const TransformChart = {
         }
 
         const y = scales.realPointY(yVal);
-        ys[bucket] =
-          {
-            y,
-            offset: INITIAL_OFFSET,
-            x,
-          };
+        if (text)
+        {
+          textYs[bucket] =
+            {
+              y,
+              offset: INITIAL_OFFSET,
+              x,
+            };
+        }
+        else
+        {
+          ys[bucket] =
+            {
+              y,
+              offset: INITIAL_OFFSET,
+              x,
+            };
+        }
       }
 
-      const finalY = ys[bucket].y - ys[bucket].offset;
+      const finalY = text ? textYs[bucket].y - textYs[bucket].offset : ys[bucket].y - ys[bucket].offset;
       idToY[d['id']] = finalY;
       return finalY;
     };
 
+    const fontSize = (d) =>
+    {
+      if (d['rank'] + 1 < 10)
+      {
+        return 'font-size: 10px;';
+      }
+      else if (d['rank'] + 1 < 100)
+      {
+        return 'font-size: 8px';
+      }
+      return 'font-size: 6px';
+    };
+
+    const getTextOffset = (d) =>
+    {
+      if (d['rank'] + 1 < 10)
+      {
+        return 3;
+      }
+      else if (d['rank'] + 1 < 100)
+      {
+        return 4;
+      }
+      return 5;
+    };
+
     const isvg = d3.select(el).select('.inner-svg');
 
-    const getFinalX = (d) => scales.realX(ys[getBucket(d)].x);
+    const getFinalX = (d, offset = false) =>
+    {
+      if (!offset)
+      {
+        return scales.realX(ys[getBucket(d)].x);
+
+      }
+      const shift = getTextOffset(d);
+      return scales.realX(ys[getBucket(d)].x) - shift;
+    };
 
     spotlight
       .select('circle')
@@ -641,8 +694,15 @@ const TransformChart = {
       .attr('r', (d) => SPOTLIGHT_SIZE / 2)
       ;
 
+    spotlight.select('.spotlight-rank')
+      .attr('y', (d) => getSpotlightY(d, true) + 4)
+      .attr('x', (d) => getFinalX(d, true))
+      .attr('fill', '#fff')
+      .attr('style', fontSize)
+      .text((d) => d['rank'] + 1);
+
     spotlight
-      .select('text')
+      .select('.spotlight-tooltip')
       .text((d) => d['name'])
       .attr('class', (d) => 'spotlight-tooltip spotlight-tooltip-' + d['id'])
       .attr('y', (d) => idToY[d['id']] + 5)
@@ -709,7 +769,6 @@ const TransformChart = {
         str = str.replace(/h/g, straightHeight + '');
         str = str.replace(/r/g, radius + '');
         str = str.replace(/p/g, pinR + '');
-
         return str;
       })
       .attr('transform', (d) =>
@@ -739,7 +798,7 @@ const TransformChart = {
         return '';
       });
 
-    spotlight.selectAll('text, rect')
+    spotlight.selectAll('.spotlight-tooltip, rect, .spotlight-rank')
       .attr('transform', (d) =>
       {
         let rotate = '0';
@@ -1208,7 +1267,7 @@ const TransformChart = {
 
   _deletePoints(el, onDelete)
   {
-    d3.select('.point-edit-menu').remove();
+    d3.select(el).select('.point-edit-menu').remove();
     const selectedIds = d3.select(el).selectAll('.point-selected')[0].map((point: any) =>
     {
       return point.getAttribute('_id');
@@ -1422,8 +1481,8 @@ const TransformChart = {
     {
       return;
     }
-    const inputX = d3.select('#xVal');
-    const inputY = d3.select('#yVal');
+    const inputX = d3.select(el).select('#xVal');
+    const inputY = d3.select(el).select('#yVal');
 
     const pointValues = d3.select(el).selectAll('.point')[0].map((p: any) =>
     {
@@ -1678,7 +1737,7 @@ const TransformChart = {
       );
       if (text === 'Delete')
       {
-        d3.select('.transform-tooltip').remove();
+        d3.select(el).select('.transform-tooltip').remove();
       }
     });
   },
@@ -1740,7 +1799,7 @@ const TransformChart = {
 
     menu.on('mousedown', () =>
     {
-      d3.select('.right-menu').remove();
+      d3.select(el).select('.right-menu').remove();
     });
 
     for (const menuText of Object.keys(menuOptions))

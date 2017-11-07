@@ -129,6 +129,7 @@ interface Props
   datasets: Immutable.Map<ID, Dataset>;
   xDataKey: string; // The key to get the value of x from the data
   yDataKey: string; // The key to get the value of y from the data
+  onLegendClick?: (datasetId: ID) => void;
 }
 
 interface State
@@ -145,6 +146,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     datasets: [],
     xDataKey: 'x',
     yDataKey: 'y',
+    onLegendClick: (datasetId) => { return; },
   };
 
   public state: State = {
@@ -330,7 +332,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
   public handleLegendClick(e, props)
   {
-    this.toggleDatasetVisibility(props.datum.id);
+    this.props.onLegendClick(props.datum.id);
   }
 
   public handleLegendMouseOver(e, props)

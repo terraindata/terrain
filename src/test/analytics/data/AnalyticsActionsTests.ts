@@ -162,14 +162,14 @@ describe('AnalyticsActions', () =>
     }),
   });
 
-  const metricId = 1;
+  const variantId = 1;
+  const metric = 'impressions';
   const intervalId = 'day';
   const dateRangeId = 1;
   const connectionName = 'My ElasticSearch Instance';
 
   describe('#fetch', () =>
   {
-    const variantId = 1;
     const accessToken = 'valid-access-token';
     const start = new Date(2015, 5, 2);
     const end = new Date(2015, 5, 20);
@@ -188,7 +188,7 @@ describe('AnalyticsActions', () =>
           variantIds: ID[],
           startParam: Date,
           endParam: Date,
-          metricIdParam: number,
+          metricParam: string,
           intervalIdParam: string,
           agg: string,
           onLoad: (response: any) => void,
@@ -211,7 +211,7 @@ describe('AnalyticsActions', () =>
           Actions.fetch(
             connectionName,
             [variantId],
-            metricId,
+            metric,
             intervalId,
             dateRangeId,
             (analyticsResponseParam) =>
@@ -233,7 +233,7 @@ describe('AnalyticsActions', () =>
           variantIds: ID[],
           startParam: Date,
           endParam: Date,
-          metricIdParam: number,
+          metricParam: string,
           intervalIdParam: string,
           agg: string,
           onLoad: (response: any) => void,
@@ -257,7 +257,7 @@ describe('AnalyticsActions', () =>
           Actions.fetch(
             connectionName,
             [variantId],
-            metricId,
+            metric,
             intervalId,
             dateRangeId,
             () => { return; },
@@ -274,25 +274,25 @@ describe('AnalyticsActions', () =>
 
   describe('#selectMetric', () =>
   {
-    it('should create a analytics.selectMetric', () =>
+    it('should create an analytics.selectMetric action', () =>
     {
       const expectedActions = [
         {
           type: ActionTypes.selectMetric,
-          payload: { metricId },
+          payload: { metric },
         },
       ];
 
-      const store = mockStore({ analytics });
+      const store = mockStore(Immutable.Map({ analytics, schema }));
 
-      store.dispatch(Actions.selectMetric(metricId));
+      store.dispatch(Actions.selectMetric(metric));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });
 
   describe('#selectInterval', () =>
   {
-    it('should create a analytics.selectInterval', () =>
+    it('should create an analytics.selectInterval action', () =>
     {
       const expectedActions = [
         {
@@ -301,7 +301,7 @@ describe('AnalyticsActions', () =>
         },
       ];
 
-      const store = mockStore({ analytics });
+      const store = mockStore(Immutable.Map({ analytics, schema }));
 
       store.dispatch(Actions.selectInterval(intervalId));
       expect(store.getActions()).toEqual(expectedActions);
@@ -310,7 +310,7 @@ describe('AnalyticsActions', () =>
 
   describe('#selectDateRange', () =>
   {
-    it('should create a analytics.selectDateRange', () =>
+    it('should create an analytics.selectDateRange action', () =>
     {
       const expectedActions = [
         {
@@ -319,9 +319,27 @@ describe('AnalyticsActions', () =>
         },
       ];
 
-      const store = mockStore({ analytics });
+      const store = mockStore(Immutable.Map({ analytics, schema }));
 
       store.dispatch(Actions.selectDateRange(dateRangeId));
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+
+  describe('#pinVariant', () =>
+  {
+    it('should create an analytics.pinVariant action', () =>
+    {
+      const expectedActions = [
+        {
+          type: ActionTypes.pinVariant,
+          payload: { variantId },
+        },
+      ];
+
+      const store = mockStore(Immutable.Map({ analytics, schema }));
+
+      store.dispatch(Actions.pinVariant(variantId));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });

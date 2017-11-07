@@ -112,7 +112,9 @@ export const STATIC_KEY_DISPLAY: Display =
     displayType: DisplayType.LABEL,
     key: 'key',
     style: {
-      maxWidth: 100,
+      textAlign: 'left',
+      maxWidth: 300,
+      width: 58,
       fontSize: 16,
     },
     className: 'card-elastic-key-label',
@@ -166,9 +168,10 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
     // fill in simple defaults, but allow overrides
     obj['static'] = _.extend({
-      title: clause.name,
       clause,
+      title: clause.name,
       colors: getCardColors(clause.path[0], Colors().border2),
+      category: clause.path[0],
       language: 'elastic',
       description: clause.desc,
       url: clause.url,

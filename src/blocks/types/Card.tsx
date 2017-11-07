@@ -58,6 +58,32 @@ export type InitFn = (blockSpec: { [type: string]: BlockConfig }, extraConfig?: 
   [k: string]: any;
 };
 
+/*
+ *  Returns the category that the card belongs to
+ */
+export function getCardCategory(card: CardConfig): string
+{
+  if (card === undefined)
+  {
+    return '';
+  }
+  else if (card.static === undefined || card.static.clause === undefined)
+  {
+    return card.key;
+  }
+  else
+  {
+    return card.static.clause.path[0];
+  }
+}
+
+export function getCardTitle(card: CardConfig): string
+{
+  return card.static !== undefined ? card.static.title : card.key;
+  // card.key is not the most proper alternative if there is no static title defined,
+  // but it is the best that can be done statically.
+}
+
 export interface Card extends IRecord<Card>
 {
   id: string;

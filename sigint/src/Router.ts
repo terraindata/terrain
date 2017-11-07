@@ -66,12 +66,33 @@ export class Router
     this.router = new KoaRouter();
     this.events = new Events(config);
 
+    /**
+     * @api {post} / Track an event (GET)
+     * @apiName postEvent
+     * @apiGroup Tracking
+     *
+     * @apiDescription Track an analytics event using a GET request. Event parameters can be provided using the GET query string.
+     *
+     * @apiExample {curl} Example usage:
+     *     curl http://localhost:3001/v1?eventname=impression&visitorid=3161077040&variantid=123&meta=~(itemName~343~itemType~%27movie)
+     */
     this.router.post('/', async (ctx, next) =>
     {
       await this.storeEvent(ctx.request);
       ctx.body = '';
     });
 
+    /**
+     * @api {get} / Track an event (POST)
+     * @apiName getEvent
+     * @apiGroup Tracking
+     * @apiDescription Track an analytics event using a POST request. Event parameters can be provided using the POST payload / body.
+     *
+     * @apiParam {String} eventname Name of the tracking event
+     * @apiParam {Number} variantid ID of the Terrain variant to track this event for
+     * @apiParam {Number} visitorid A unique ID to identify the current visitor
+     * @apiParam {Object} meta Auxiliary information associated with the tracking event
+     */
     this.router.get('/', async (ctx, next) =>
     {
       await this.storeEvent(ctx.request);
@@ -79,6 +100,12 @@ export class Router
     });
 
     this.appRouter = new KoaRouter();
+
+    /**
+     * @api {get} /bundle.js Serve Terrain analytics.js library
+     * @apiName getBundle
+     * @apiGroup AnalyticsJS
+     */
     this.appRouter.get('/bundle.js', async (ctx, next) =>
     {
       ctx.type = 'js';
@@ -91,6 +118,12 @@ export class Router
         ctx.body = fs.createReadStream('../analytics.js/build/bundle.js');
       }
     });
+
+    /**
+     * @api {get} /bundle.js.map Serve Terrain analytics.js library sourcemap
+     * @apiName getBundleMap
+     * @apiGroup AnalyticsJS
+     */
     this.appRouter.get('/bundle.js.map', async (ctx, next) =>
     {
       ctx.type = 'js';
@@ -104,6 +137,24 @@ export class Router
       }
     });
 
+    /**
+     * @api {get} /demo/search Search endpoint for the Terrain Analytics demo website
+     * @apiPrivate
+     * @apiName getDemoSearch
+     * @apiGroup Demo
+     *
+     * @apiParam {String} s ElasticSearch server to query
+     * @apiParam {String} q Title to search
+     * @apiParam {Number} p Page ID
+     *
+     * @apiParamExample {json} Request-Example:
+     *     {
+     *       "s": "http://localhost:9200",
+     *       "q": "Star",
+     *       "p": 0,
+     *     }
+     * @apiSuccess {Object[]} results Results of the search query.
+     */
     this.appRouter.get('/demo/search', async (ctx, next) =>
     {
       ctx.body = await Demo.search(ctx.request.query);
@@ -165,7 +216,7 @@ export class Router
     const now = date.getTime();
 
     const event: EventConfig = {
-      eventid: req['eventid'],
+      eventname: req['eventname'],
       variantid: req['variantid'],
       visitorid: req['visitorid'],
       source: {
@@ -175,10 +226,10 @@ export class Router
         referer: request.header.referer,
       },
       timestamp: date,
-      intervalBucketSeconds: Math.round(now/1000),
-      intervalBucketMinutes: Math.round(now/1000/60),
-      intervalBucketHours: Math.round(now/1000/60/60),
-      intervalBucketDays: Math.round(now/1000/60/60/24),
+      intervalBucketSeconds: Math.round(now / 1000),
+      intervalBucketMinutes: Math.round(now / 1000 / 60),
+      intervalBucketHours: Math.round(now / 1000 / 60 / 60),
+      intervalBucketDays: Math.round(now / 1000 / 60 / 60 / 24),
       meta,
       hash: stringHash(JSON.stringify(request.query)),
     };

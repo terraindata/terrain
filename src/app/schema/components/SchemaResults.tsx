@@ -56,7 +56,7 @@ import * as PropTypes from 'prop-types';
 import Util from 'util/Util';
 import { _ResultsConfig } from '../../../../shared/results/types/ResultsConfig';
 import { _Query, Query } from '../../../items/types/Query';
-import ResultsArea from '../../builder/components/results/ResultsArea';
+import HitsArea from '../../builder/components/results/HitsArea';
 import { ResultsManager } from '../../builder/components/results/ResultsManager';
 import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
 import InfoArea from '../../common/components/InfoArea';
@@ -220,7 +220,7 @@ class SchemaResults extends TerrainComponent<Props>
               }}
               className={'schema-results-wrapper'}
             >
-              <ResultsArea
+              <HitsArea
                 query={this.state.resultsQuery}
                 canEdit={false}
                 db={this.state.resultsServer}

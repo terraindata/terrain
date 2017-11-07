@@ -52,7 +52,7 @@ import * as winston from 'winston';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../Util';
-import { EventMetadataConfig, Events } from './Events';
+import { Events } from './Events';
 
 export const events: Events = new Events();
 const Router = new KoaRouter();
@@ -101,79 +101,18 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
   }, {});
 });
 
-Router.get('/:databaseid', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/:databaseid/:variantid?', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting all events');
-  const databaseid = ctx.params.databaseid;
-  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
-  if (database === undefined)
-  {
-    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
-  }
-  ctx.body = await events.getMetadata(database);
-});
-
-Router.get('/:databaseid/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  const databaseid = ctx.params.databaseid;
-  const id = ctx.params.id;
-  winston.info('getting event ID ' + String(id));
-
+  const databaseid = Number(ctx.params.databaseid);
   const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
   if (database === undefined)
   {
     throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
 
-  ctx.body = await events.getMetadata(database, { id });
-});
-
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('add event');
-  const event: EventMetadataConfig = ctx.request.body.body;
-  Util.verifyParameters(event, ['database', 'name']);
-  if (event.id !== undefined)
-  {
-    throw new Error('Invalid parameter event ID');
-  }
-
-  const databaseid = ctx.request.body.body.database;
-  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
-  if (database === undefined)
-  {
-    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
-  }
-
-  ctx.body = await events.addEventMetadata(database, events);
-});
-
-Router.post('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('update event');
-  const event: EventMetadataConfig = ctx.request.body.body;
-  Util.verifyParameters(event, ['database', 'name']);
-  if (event.id === undefined)
-  {
-    event.id = Number(ctx.params.id);
-  }
-  else
-  {
-    if (event.id !== Number(ctx.params.id))
-    {
-      throw new Error('Event ID does not match the supplied id in the URL');
-    }
-  }
-
-  const databaseid = ctx.request.body.body.database;
-  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
-  if (database === undefined)
-  {
-    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
-  }
-
-  winston.info('modify event' + String(event.id));
-  ctx.body = await events.addEventMetadata(database, event);
+  const variantid = ctx.params.variantid !== undefined ? Number(ctx.params.variantid) : undefined;
+  ctx.body = await events.getEventsList(database, variantid);
 });
 
 export default Router;

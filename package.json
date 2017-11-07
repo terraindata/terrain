@@ -48,6 +48,7 @@
     ],
     "mapCoverage": true,
     "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|svg\\?.*|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/mocks/fileMock.ts",
       "^auth/(.*)$": "<rootDir>/src/app/auth/$1",
       "^analytics/(.*)$": "<rootDir>/src/app/analytics/$1",
       "^app/(.*)$": "<rootDir>/src/app/$1",
@@ -64,13 +65,13 @@
       "^roles/(.*)$": "<rootDir>/src/app/roles/$1",
       "^schema/(.*)$": "<rootDir>/src/app/schema/$1",
       "^shared/(.*)$": "<rootDir>/shared/$1",
+      "^src/(.*)$": "<rootDir>/src/$1",
       "^store/(.*)$": "<rootDir>/src/app/store/$1",
       "^tql/(.*)$": "<rootDir>/src/app/tql/$1",
       "^users/(.*)$": "<rootDir>/src/app/users/$1",
       "^util/(.*)$": "<rootDir>/src/app/util/$1",
       "^x/(.*)$": "<rootDir>/src/app/x/$1",
-      "^.+\\.(css|less|scss)$": "ts-jest",
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|svg\\?.*|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/mocks/fileMock.ts"
+      "^.+\\.(css|less|scss)$": "ts-jest"
     },
     "globals": {
       "DEV": true,
@@ -146,6 +147,7 @@
     "react-dnd-html5-backend": "^2.1.2",
     "react-dnd-text-dragpreview": "^0.2.3",
     "react-dom": "^15.0.1",
+    "react-highlighter": "^0.4.0",
     "react-leaflet": "^1.7.0",
     "react-modal": "^1.4.0",
     "react-redux": "^5.0.5",

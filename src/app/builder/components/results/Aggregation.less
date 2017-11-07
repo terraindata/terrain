@@ -1,0 +1,128 @@
+@import "../../../common/Common.less";
+
+.aggregation {
+  margin: 40px;
+  margin-left: 46px;
+  margin-bottom: 0px;
+  border-bottom: 1px solid;
+
+  .aggregation-title-bar {
+    display: inline-block;
+    margin-bottom: 10px;
+    width: 100%;
+
+    .arrow-icon {
+      width: 10px;
+      cursor: pointer;
+      position: relative;
+      top: -2px;
+      left: -5px;
+      .transition;
+      .rotate(180deg);
+      &.arrow-icon-closed {
+        .rotate(90deg);
+      }
+    }
+
+    .aggregation-title-bar-title {
+
+      display: inline;
+      padding: 8px;
+      padding-left:4px;
+      position: relative;
+      height: 40px;
+      cursor: pointer;
+      font-size: 16px;
+      padding-right: calc(~"100% - 220px");
+      .aggregation-title-bar-value {
+        font-size: 14px;
+        font-weight: normal;
+        padding-left: 3px;
+      }
+    }
+
+    .aggregation-title-bar-options {
+      float: right; 
+      position: relative;
+      top: -3px;
+
+      .clipboard-icon-wrapper {
+        display: inline;
+        position: absolute;
+        right: 24px;
+        top: 1px;    
+        cursor: pointer;
+        .clipboard-icon {
+          height: 27px;
+          width: 23px;
+        }
+      }
+
+      .aggregation-display-type-dropdown {
+          margin-right: 52px;
+          font-size: 14px;
+          width: 110px;
+          display: inline;
+          position: absolute;
+          right: 24px;
+          height: 28px;
+          margin-top: 0px;
+        .dropdown-value {
+          padding-top: 0px;
+          background-color: #fff !important;
+          color: black !important;
+        }
+        .dropdown-value:before {
+          border-top: 7px solid rgba(0,0,0,0.4) !important;
+        }
+        .dropdown-option-value-selected
+        {
+          padding-top:14.5px;
+        }
+        .dropdown-options-wrapper
+        {
+          min-width: 110px;
+        }
+      }
+
+
+      .aggregation-title-bar-export {
+        .rotate180;
+        display: inline-block;
+        cursor: pointer;
+        position: absolute;
+        right: 50px;
+        top: 6px;
+        .aggregation-title-bar-export-icon {
+          height: 18px;
+        }
+      }
+    }
+    &.aggregation-title-bar-closed {
+      width: calc(~"100% - 1px");
+      padding-right: 20px;
+      padding-bottom: 24px;
+     }
+
+  }
+
+  .aggregation-expanded {
+    padding-bottom: 24px;
+    border-left: 1px solid;
+    left: 8px;
+    display: block;
+    margin-top: -16px;
+    padding-top: 32px;
+    padding-left: 12px;
+  }
+
+  .aggregation-raw {
+    margin: 0px;
+  }
+}
+
+
+
+
+
+

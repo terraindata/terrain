@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import MultipleAreaChart from 'charts/components/MultipleAreaChart';
-import { shallow } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 import * as Immutable from 'immutable';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
@@ -74,6 +74,7 @@ describe('MultipleAreaChart', () =>
       ],
     },
   });
+  const handleLegendClick = jest.fn();
 
   beforeEach(() =>
   {
@@ -82,6 +83,7 @@ describe('MultipleAreaChart', () =>
         datasets={datasets}
         xDataKey={'xaxis'}
         yDataKey={'yaxis'}
+        onLegendClick={handleLegendClick}
       />,
     );
   });
@@ -185,16 +187,12 @@ describe('MultipleAreaChart', () =>
 
   describe('#handleLegendClick', () =>
   {
-    it('should call toggleDatasetVisibility', () =>
+    it('should call props.onLegendClick', () =>
     {
-      chartComponent.instance().toggleDatasetVisibility = jest.fn();
-
       chartComponent.instance().handleLegendClick({}, { datum: { id: 1 } });
 
-      expect(chartComponent.instance().toggleDatasetVisibility)
+      expect(chartComponent.instance().props.onLegendClick)
         .toHaveBeenCalledTimes(1);
-      expect(chartComponent.instance().toggleDatasetVisibility)
-        .toHaveBeenCalledWith(1);
     });
   });
 
