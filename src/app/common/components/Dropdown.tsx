@@ -78,6 +78,7 @@ export interface Props
   openDown?: boolean;
   tooltips?: List<any>;
   wrapperTooltip?: string;
+  placeholder?: string;
 }
 
 @Radium
@@ -399,6 +400,22 @@ class Dropdown extends TerrainComponent<Props>
                   }
                 </div>,
               )
+            }
+            {
+              this.props.placeholder &&
+                <div
+                  key={-1}
+                  className={classNames({
+                    'dropdown-option-inner': true,
+                    'dropdown-option-value-selected': -1 === selectedIndex,
+                    'dropdown-option-placeholder': true,
+                  })}
+                  style={fontColor(Colors().text3)}
+                >
+                  {
+                    this.props.placeholder
+                  }
+                </div> 
             }
           </div>,
           {

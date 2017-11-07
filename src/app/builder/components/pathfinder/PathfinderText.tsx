@@ -48,6 +48,11 @@ THE SOFTWARE.
 
 export const PathfinderText = {
 
+	// Source section
+	firstWord: 'Find',
+	chooseDataSourceDropdownPrompt: 'Choose a data source',
+
+
   // Steps
 
   pickSourceStepTitle: `

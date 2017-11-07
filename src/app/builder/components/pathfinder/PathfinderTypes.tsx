@@ -194,6 +194,8 @@ abstract class DataSource extends BaseClass
   // ... shared data source attributes go here
   public abstract getFieldAutocompleteOptions:
   (context?: AutocompleteContext) => List<AutocompleteOption>;
+  
+  public name: string = '';
 }
 
 /* Consider splitting this into its own class */

@@ -56,7 +56,8 @@ const { List, Map } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
-import { Path, Source, sourceCountOptions } from '../PathfinderTypes';
+import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
+import { Path, Source, sourceCountOptions, _ElasticDataSource } from '../PathfinderTypes';
 
 export interface Props
 {
@@ -85,7 +86,9 @@ class PathfinderSourceSection extends TerrainComponent<Props>
           className='pf-line'
         >
           <div className='pf-piece'>
-            Find
+            {
+              PathfinderText.firstWord
+            }
           </div>
           <div className='pf-piece'>
             <Dropdown
@@ -110,9 +113,11 @@ class PathfinderSourceSection extends TerrainComponent<Props>
           }
           <div className='pf-piece'>
             <Dropdown
-              options={List(['Choose a type of data', 'Products', 'Customers', 'Purchases', 'Reviews'])}
-              selectedIndex={0}
+              options={this.getDataSourceOptions()}
+              selectedIndex={this.getSelectedDataSourceIndex()}
               canEdit={canEdit}
+              onChange={this.handleSourceDropdownChange}
+              placeholder={PathfinderText.chooseDataSourceDropdownPrompt}
             />
           </div>
         </div>
@@ -161,6 +166,28 @@ class PathfinderSourceSection extends TerrainComponent<Props>
         .set('countIndex', sourceCountOptions.size - 1)
         .set('count', +value),
     );
+  }
+  
+  private getDataSourceOptions(): List<string>
+  {
+    // TODO
+    return List(['Products', 'Customers', 'Purchases', 'Reviews']);
+  }
+  
+  private getSelectedDataSourceIndex(): number
+  {
+    console.log(this.getDataSourceOptions().indexOf(this.props.source.dataSource.name));
+    return this.getDataSourceOptions().indexOf(this.props.source.dataSource.name);
+  }
+  
+  private handleSourceDropdownChange(sourceIndex: number)
+  {
+    this.changeSource(this.props.source.set(
+      'dataSource',
+      _ElasticDataSource({
+        name: this.getDataSourceOptions().get(sourceIndex),
+      })
+    ));
   }
 }
 
