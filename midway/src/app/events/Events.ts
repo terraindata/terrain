@@ -70,7 +70,7 @@ export interface AggregationRequest
 
 export interface EventConfig
 {
-  eventname: number | string;
+  eventname: string;
   variantid: number | string;
   visitorid: number | string;
   timestamp: Date | string;
@@ -181,7 +181,7 @@ export class Events
         },
         (agg1) => agg1.aggregation(
           'value_count',
-          'eventname',
+          'eventname.keyword',
           'count',
         ),
       )
@@ -196,7 +196,7 @@ export class Events
         },
         (agg1) => agg1.aggregation(
           'value_count',
-          'eventname',
+          'eventname.keyword',
           'count',
         ),
       )
