@@ -124,12 +124,10 @@
         border-right: 7px solid transparent;
         border-left: 7px solid transparent;
     }
-    &:not(.dropdown-disabled) {
-      &:hover {
-        &:before {
-          opacity: 1;
-        }
-      }
+  }
+  &:not(.dropdown-disabled):hover {
+    .dropdown-value:before {
+      opacity: 1;
     }
   }
   
