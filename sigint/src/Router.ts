@@ -67,36 +67,44 @@ export class Router
     this.events = new Events(config);
 
     /**
-     * @api {post} / Track an event (POST)
+     * @api {post} / Track analytics event(s) (POST)
      * @apiName postEvent
      * @apiGroup Tracking
      *
      * @apiDescription Track an analytics event using a POST request. Event parameters can be provided using the POST payload / body.
      *
-     * @apiParam {String} eventname Name of the tracking event
-     * @apiParam {Number} variantid ID of the Terrain variant to track this event for
-     * @apiParam {Number} visitorid A unique ID to identify the current visitor
-     * @apiParam {Object} meta Auxiliary information associated with the tracking event
+     * @apiParam {String} eventname Mandatory Name of the tracking event
+     * @apiParam {Number} variantid Mandatory ID of the Terrain variant to track this event for
+     * @apiParam {Number} visitorid Mandatory A unique ID to identify the current visitor
+     * @apiParam {Object} meta Mandatory Auxiliary information associated with the tracking event
+     * @apiParam {Object} batch Optional A batch registration request
      *
-     * @apiExample {curl} Example usage:
-     *     curl http://localhost:3001/v1?eventname=impression&visitorid=3161077040&variantid=123&meta=~(itemName~343~itemType~%27movie)
      */
     this.router.post('/', async (ctx, next) =>
     {
-      await this.storeEvent(ctx.request);
+      await this.storeBatchEvents(ctx.request);
       ctx.body = '';
     });
 
     /**
-     * @api {get} / Track an event (GET)
+     * @api {get} / Track analytics event(s) (GET)
      * @apiName getEvent
      * @apiGroup Tracking
      *
+     * @apiParam {String} eventname Name of the tracking event
+     * @apiParam {Number} variantid ID of the Terrain variant to track this event for
+     * @apiParam {Number} visitorid A unique ID to identify the current visitor
+     * @apiParam {Object} meta Auxiliary information associated with the tracking event
+     * @apiParam {Object} batch Optional A batch registration request
+     *
      * @apiDescription Track an analytics event using a GET request. Event parameters can be provided using the GET query string.
+     *
+     * @apiExample {curl} Example usage:
+     *     curl http://localhost:3001/v1?eventname=impression&visitorid=3161077040&variantid=123&meta=~(itemName~343~itemType~%27movie)
      */
     this.router.get('/', async (ctx, next) =>
     {
-      await this.storeEvent(ctx.request);
+      await this.storeBatchEvents(ctx.request);
       ctx.body = '';
     });
 
@@ -181,45 +189,25 @@ export class Router
     }
   }
 
-  private async storeEvent(request: any)
+  private async storeEvent(request: any, event: any)
   {
-    if (request.body !== undefined && Object.keys(request.body).length > 0 &&
-      request.query !== undefined && Object.keys(request.query).length > 0)
-    {
-      return this.logError('Both request query and body cannot be set.');
-    }
-
-    if ((request.body === undefined ||
-      request.body !== undefined && Object.keys(request.body).length === 0) &&
-      (request.query === undefined ||
-        request.query !== undefined && Object.keys(request.query).length === 0))
-    {
-      return this.logError('Either request query or body parameters are required.');
-    }
-
-    let req: object = request.body;
-    if (req === undefined || (req !== undefined && Object.keys(req).length === 0))
-    {
-      req = request.query;
-    }
-
-    let meta = req['meta'];
+    let meta = event['meta'];
     try
     {
-      meta = jsurl.parse(req['meta']);
+      meta = jsurl.parse(event['meta']);
     }
     catch (e)
     {
-      meta = req['meta'];
+      meta = event['meta'];
     }
 
     const date = new Date();
     const now = date.getTime();
 
-    const event: EventConfig = {
-      eventname: req['eventname'],
-      variantid: req['variantid'],
-      visitorid: req['visitorid'],
+    const ev: EventConfig = {
+      eventname: event['eventname'],
+      variantid: event['variantid'],
+      visitorid: event['visitorid'],
       source: {
         ip: request.ip,
         host: request.host,
@@ -235,18 +223,70 @@ export class Router
       hash: stringHash(JSON.stringify(request.query)),
     };
 
-    if (_.difference(Object.keys(req), Object.keys(event).concat(['id', 'accessToken'])).length > 0)
+    const unexpectedFields = _.difference(Object.keys(event), Object.keys(ev).concat(['id', 'accessToken', 'batch']));
+    if (unexpectedFields.length > 0)
     {
-      return this.logError('storing analytics event: unexpected fields encountered');
+      return this.logError('storing analytics event: unexpected fields encountered ' + JSON.stringify(unexpectedFields));
     }
 
     try
     {
-      await this.events.store(event);
+      await this.events.store(ev);
     }
     catch (e)
     {
       return this.logError('storing analytics event: ' + JSON.stringify(e));
+    }
+  }
+
+  private async storeBatchEvents(request: any)
+  {
+    if (request.body !== undefined && Object.keys(request.body).length > 0 &&
+      request.query !== undefined && Object.keys(request.query).length > 0)
+    {
+      return this.logError('Both request query and body cannot be set.');
+    }
+
+    if ((request.body === undefined ||
+      request.body !== undefined && Object.keys(request.body).length === 0) &&
+      (request.query === undefined ||
+        request.query !== undefined && Object.keys(request.query).length === 0))
+    {
+      return this.logError('Either request query or body parameters are required.');
+    }
+
+    let event: object = request.body;
+    if (event === undefined || (event !== undefined && Object.keys(event).length === 0))
+    {
+      event = request.query;
+    }
+
+    if (event['batch'] !== undefined)
+    {
+      let events = [];
+      try
+      {
+        events = jsurl.parse(event['batch']);
+      }
+      catch (e)
+      {
+        events = event['batch'];
+      }
+
+      // insert batched events
+      if (!Array.isArray(events))
+      {
+        return this.logError('Expected batch parameter to be an array.');
+      }
+
+      events.forEach((ev) => {
+        // non-blocking store
+        this.storeEvent(request, ev);
+      });
+    }
+    else
+    {
+      await this.storeEvent(request, event);
     }
   }
 
