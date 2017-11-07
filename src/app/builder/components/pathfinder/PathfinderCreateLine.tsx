@@ -44,43 +44,47 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// Centralized place for text used in Pathfinder
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-export const PathfinderText = {
+import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
+import * as $ from 'jquery';
+import * as React from 'react';
+import * as Radium from 'radium';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import TerrainComponent from 'app/common/components/TerrainComponent';
+const { List, Map } = Immutable;
 
-	// Source section
-	firstWord: 'Find',
-	chooseDataSourceDropdownPrompt: 'Choose a data source',
-	
-	// Filter section
-	firstFilterIntro: 'With',
-	nestedFilterIntro: '',
-	filterGroupPost: 'of the following:',
-	createFilterLine: 'filter condition',
-	createFilterGroup: 'group of filter conditions',
+export interface Props
+{
+  canEdit: boolean;
+  onCreate();
+  text: string;
+}
 
+@Radium
+class PathfinderCreateLine extends TerrainComponent<Props>
+{
+  public render()
+  {
+    const { onCreate, canEdit, text } = this.props;
+    
+    if (!canEdit)
+    {
+      return null;
+    }
 
-  // Steps
+    return (
+      <div
+        className='pf-create'
+        style={fontColor(Colors().text3, Colors().active)}
+      >
+        + Add a { text } 
+      </div>
+    );
+  }
+  
+  
+}
 
-  pickSourceStepTitle: `
-		Where are the data that you care about located?
-	`,
-
-  filterStepTitle: `
-		Let's find the data you want by filtering out everything that isn't a match.
-	`,
-
-  scoreStepTitle: `
-		Let's score your results, so that the best picks show up in the top spots.
-	`,
-
-  finalStepTitle: `
-		You can edit your algorithm directly above, or pick one of these actions to perform on it.
-	`,
-
-  scoreStepSubtitle: `
-	The score for each result will be the sum of the following factors:
-  `
-};
-
-export default PathfinderText;
+export default PathfinderCreateLine;

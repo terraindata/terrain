@@ -44,43 +44,68 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// Centralized place for text used in Pathfinder
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-export const PathfinderText = {
+import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
+import * as $ from 'jquery';
+import * as React from 'react';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
+const { List, Map } = Immutable;
+import { FilterLine, Path, Source, Filter, _Filter, _FilterLine } from '../PathfinderTypes';
+import PathfinderLine from '../PathfinderLine';
+import PathfinderCreateLine from '../PathfinderCreateLine';
+import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 
-	// Source section
-	firstWord: 'Find',
-	chooseDataSourceDropdownPrompt: 'Choose a data source',
-	
-	// Filter section
-	firstFilterIntro: 'With',
-	nestedFilterIntro: '',
-	filterGroupPost: 'of the following:',
-	createFilterLine: 'filter condition',
-	createFilterGroup: 'group of filter conditions',
+export interface Props
+{
+  source: Source;
+  canEdit: boolean;
+  depth: number;
+  keyPath: KeyPath;
+  onChange(keyPath: KeyPath, filter: Filter | FilterLine);
+}
 
+class PathfinderFilterCreate extends TerrainComponent<Props>
+{
 
-  // Steps
+  public render()
+  {
+    const { source, filterLine, canEdit } = this.props;
+    
+    
 
-  pickSourceStepTitle: `
-		Where are the data that you care about located?
-	`,
+    return (
+      <PathfinderLine
+        canDelete={false}
+        canDrag={false}
+        canEdit={canEdit}
+        depth={this.props.depth}
+      >
+        <PathfinderCreateLine
+          canEdit={canEdit}
+          onCreate={this.handleCreateFilterLine}
+          text={PathfinderText.createFilterLine}
+        />
+        <PathfinderCreateLine
+          canEdit={canEdit}
+          onCreate={this.handleCreateFilterGroup}
+          text={PathfinderText.createFilterGroup}
+        />
+      </PathfinderLine>
+    );
+  }
+  
+  private handleCreateFilterLine()
+  {
+    this.props.onChange(this.props.keyPath, _FilterLine());
+  }
+  
+  private handleCreateFilterGroup()
+  {
+    this.props.onChange(this.props.keyPath, _FilterGroup());
+  }
+}
 
-  filterStepTitle: `
-		Let's find the data you want by filtering out everything that isn't a match.
-	`,
-
-  scoreStepTitle: `
-		Let's score your results, so that the best picks show up in the top spots.
-	`,
-
-  finalStepTitle: `
-		You can edit your algorithm directly above, or pick one of these actions to perform on it.
-	`,
-
-  scoreStepSubtitle: `
-	The score for each result will be the sum of the following factors:
-  `
-};
-
-export default PathfinderText;
+export default PathfinderFilterCreate;

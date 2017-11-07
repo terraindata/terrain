@@ -44,43 +44,56 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// Centralized place for text used in Pathfinder
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-export const PathfinderText = {
+import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
+import * as $ from 'jquery';
+import * as React from 'react';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import TerrainComponent from './../../../../common/components/TerrainComponent';
+const { List, Map } = Immutable;
+import { FilterLine, Path, Source, Filter } from '../PathfinderTypes';
+import PathfinderLine from '../PathfinderLine';
 
-	// Source section
-	firstWord: 'Find',
-	chooseDataSourceDropdownPrompt: 'Choose a data source',
-	
-	// Filter section
-	firstFilterIntro: 'With',
-	nestedFilterIntro: '',
-	filterGroupPost: 'of the following:',
-	createFilterLine: 'filter condition',
-	createFilterGroup: 'group of filter conditions',
+export interface Props
+{
+  filterLine: FilterLine;
+  source: Source;
+  canEdit: boolean;
+  depth: number;
+  keyPath: KeyPath;
+  onChange(keyPath: KeyPath, filter: Filter | FilterLine);
+  onDelete(keyPath: KeyPath);
+}
 
+class PathfinderFilterLine extends TerrainComponent<Props>
+{
+  public state: {
 
-  // Steps
+  } = {
 
-  pickSourceStepTitle: `
-		Where are the data that you care about located?
-	`,
+  };
 
-  filterStepTitle: `
-		Let's find the data you want by filtering out everything that isn't a match.
-	`,
+  public render()
+  {
+    const { source, filterLine, canEdit } = this.props;
+    
+    
 
-  scoreStepTitle: `
-		Let's score your results, so that the best picks show up in the top spots.
-	`,
+    return (
+      <PathfinderLine
+        canDelete={true}
+        canDrag={true}
+        canEdit={canEdit}
+        onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
+      >
+        A filter
+      </PathfinderLine>
+    );
+  }
+  
+  
+}
 
-  finalStepTitle: `
-		You can edit your algorithm directly above, or pick one of these actions to perform on it.
-	`,
-
-  scoreStepSubtitle: `
-	The score for each result will be the sum of the following factors:
-  `
-};
-
-export default PathfinderText;
+export default PathfinderFilterLine;
