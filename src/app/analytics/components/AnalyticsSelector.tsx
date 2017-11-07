@@ -51,6 +51,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import { Server } from 'schema/SchemaTypes';
 import Ajax from 'util/Ajax';
+import './AnalyticsSelector.less';
 
 interface Props
 {
@@ -119,27 +120,38 @@ class AnalyticsSelector extends TerrainComponent<Props>
           directionBias={90}
           selectedIndex={options.indexOf(analyticsConnection)}
         />
-        <p>Metric</p>
-        <MultiSwitch
-          options={METRICS}
-          value={selectedMetric.toString()}
-          usesValues
-          onChange={this.props.onMetricSelect}
-        />
-        <p>Interval</p>
-        <MultiSwitch
-          options={INTERVALS}
-          value={selectedInterval}
-          usesValues
-          onChange={this.props.onIntervalSelect}
-        />
-        <p>Date Range</p>
-        <MultiSwitch
-          options={DATE_RANGES}
-          value={selectedDateRange.toString()}
-          usesValues
-          onChange={this.props.onDateRangeSelect}
-        />
+        <div className='analytics-selector'>
+          <div className='analytics-selector-multiswitch'>
+            <p>Metric</p>
+            <MultiSwitch
+              options={METRICS}
+              value={selectedMetric.toString()}
+              usesValues
+              onChange={this.props.onMetricSelect}
+              small={true}
+            />
+          </div>
+          <div className='analytics-selector-multiswitch'>
+            <p>Interval</p>
+            <MultiSwitch
+              options={INTERVALS}
+              value={selectedInterval}
+              usesValues
+              onChange={this.props.onIntervalSelect}
+              small={true}
+            />
+          </div>
+          <div className='analytics-selector-multiswitch'>
+            <p>Date Range</p>
+            <MultiSwitch
+              options={DATE_RANGES}
+              value={selectedDateRange.toString()}
+              usesValues
+              onChange={this.props.onDateRangeSelect}
+              small={true}
+            />
+          </div>
+        </div>
       </div>
     );
   }

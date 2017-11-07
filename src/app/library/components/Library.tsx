@@ -385,7 +385,7 @@ class Library extends TerrainComponent<any>
     }
 
     return (
-      <div className='library'>
+      <div className='library library-layout-horizontal'>
         <div className='library-top'>
           <GroupsColumn
             {...{
