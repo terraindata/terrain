@@ -53,7 +53,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { FilterLine, Path, Source, Filter } from '../PathfinderTypes';
+import { FilterLine, Path, Source } from '../PathfinderTypes';
 import PathfinderLine from '../PathfinderLine';
 
 export interface Props

@@ -53,7 +53,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Filter, Path, Source, FilterLine } from '../PathfinderTypes';
+import { Path, Source, FilterLine } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
