@@ -264,8 +264,7 @@ class Library extends TerrainComponent<any>
 
     if (analytics.selectedAnalyticsConnection !== null)
     {
-      const numericOptionValue = parseInt(optionValue, 10);
-      this.props.analyticsActions.selectInterval(numericOptionValue);
+      this.props.analyticsActions.selectInterval(optionValue);
     }
   }
 
