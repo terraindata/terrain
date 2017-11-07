@@ -134,7 +134,7 @@ const Actions =
 
             let aggregation = '';
 
-            if (metric === 'ctr' || metric === 'conversionrate')
+            if (metric === 'click,impression' || metric === 'conversion,impression')
             {
               aggregation = 'rate';
             } else

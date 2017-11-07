@@ -254,16 +254,7 @@ class Library extends TerrainComponent<any>
 
     if (analytics.selectedAnalyticsConnection !== null)
     {
-      let numericOptionValue = null;
-      if (optionValue.indexOf(',') > -1)
-      {
-        numericOptionValue = optionValue.split(',').map((o) => parseInt(o, 10));
-      } else
-      {
-        numericOptionValue = [parseInt(optionValue, 10)];
-      }
-
-      this.props.analyticsActions.selectMetric(numericOptionValue);
+      this.props.analyticsActions.selectMetric(optionValue);
     }
   }
 
@@ -273,8 +264,7 @@ class Library extends TerrainComponent<any>
 
     if (analytics.selectedAnalyticsConnection !== null)
     {
-      const numericOptionValue = parseInt(optionValue, 10);
-      this.props.analyticsActions.selectInterval(numericOptionValue);
+      this.props.analyticsActions.selectInterval(optionValue);
     }
   }
 

@@ -66,11 +66,11 @@ interface Props
 }
 
 const METRICS = Immutable.List([
-  { value: 'impressions', label: 'Impressions' },
-  { value: 'clicks', label: 'Clicks' },
-  { value: 'conversions', label: 'Conversions' },
-  { value: 'ctr', label: 'CTR' },
-  { value: 'conversionrate', label: 'Conversion Rate' },
+  { value: 'impression', label: 'Impressions' },
+  { value: 'click', label: 'Clicks' },
+  { value: 'conversion', label: 'Conversions' },
+  { value: 'click,impression', label: 'CTR' },
+  { value: 'conversion,impression', label: 'Conversion Rate' },
 ]);
 
 const INTERVALS = Immutable.List([
