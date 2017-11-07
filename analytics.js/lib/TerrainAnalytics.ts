@@ -59,11 +59,11 @@ const currentScript = scripts[scripts.length - 1];
 const server = currentScript.getAttribute('data-server');
 const client = new ClientJS();
 let fingerprint = null;
-let batch = [];
+let batch: string[] = [];
 let batchSize = 0; // memoized so we aren't always computing sizeof(batch)
 
 const TerrainAnalytics = {
-  assembleParams(asObject: bool, eventName: string | any, variantOrSourceId: string | any, meta?: any)
+  assembleParams(asObject: boolean, eventName: string | any, variantOrSourceID: string | any, meta?: any): string
   {
     const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] :
       (fingerprint || (fingerprint = client.getFingerprint()));
@@ -91,13 +91,14 @@ const TerrainAnalytics = {
 
   queueEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
   {
-    const event = assembleParams(true, eventName, variantOrSourceId, meta);
+    const event = TerrainAnalytics.assembleParams(true, eventName, variantOrSourceID, meta);
     batch.push(event);
     batchSize += sizeof(event);
     // GET requests should be under 2KB.  If we get too close to this limit,
     // immediately process and reset the buffer.
-    if (batchSize >= 1900) {
-      logQueue();
+    if (batchSize >= 1900)
+    {
+      TerrainAnalytics.logQueue();
     }
   },
 
@@ -108,12 +109,12 @@ const TerrainAnalytics = {
     xhr.send();
     batch = [];
     batchSize = 0;
-  }
+  },
 
   logEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
   {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', (server || '') + '?' + assembleParams(false, eventName, variantOrSourceId, meta), true);
+    xhr.open('GET', (server || '') + '?' + TerrainAnalytics.assembleParams(false, eventName, variantOrSourceID, meta), true);
     xhr.send();
   },
 };
