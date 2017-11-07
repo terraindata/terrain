@@ -12,7 +12,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ]
       }
     }
@@ -22,7 +22,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ]
       }
     },
@@ -39,7 +39,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ]
       }
     }
@@ -50,7 +50,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ],
         "must_not" : [
           {
@@ -88,7 +88,7 @@
           "bool" : {
             "must" : [
               {"match" : {"_index" : "movies"}},
-              {"match" : {"_data" : "data"}},
+              {"match" : {"_type" : "data"}},
               {
                 "range" : {
                   "releasedate" : {
@@ -133,7 +133,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}},
+          {"match" : {"_type" : "data"}},
           {
             "match" : {
               "status" : "Released"
@@ -296,7 +296,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ]
       }
     }
@@ -314,15 +314,17 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}},
-          {"match" : {"genres" : "Drama"}}
-        ],
-        "range" : {
-          "releaseDate" : {
-            "gt" : 2000,
-            "lt" : 2010
+          {"match" : {"_type" : "data"}},
+          {"match" : {"genres" : "Drama"}},
+          {
+            "range" : {
+              "releaseDate" : {
+                "gt" : 2000,
+                "lt" : 2010
+              }
+            }
           }
-        }
+        ]
       }
     }
   },
@@ -337,7 +339,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ]
       }
     }
@@ -348,7 +350,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ],
         "must_not" : [
           {
@@ -367,7 +369,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}},
+          {"match" : {"_type" : "data"}},
           {"match" : {"genres" : "Action"}}
         ],
         "must_not" : {
@@ -404,7 +406,7 @@
           "bool" : {
             "must" : [
               {"match" : {"_index" : "movies"}},
-              {"match" : {"_data" : "data"}},
+              {"match" : {"_type" : "data"}},
               {
                 "range" : {
                   "releasedate" : {
@@ -451,7 +453,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}},
+          {"match" : {"_type" : "data"}},
           {
             "match" : {
               "status" : "Released"
@@ -610,7 +612,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ],
         "should" : {
           "range" : {

@@ -619,12 +619,14 @@ describe('Query route tests', () =>
     async () =>
     {
       const template: string = `{
-                   "index" : "movies",
-                   "type" : "data",
                    "from" : 0,
                    "size" : {{#toJson}}size{{/toJson}},
-                   "body" : {
-                     "query" : {
+                   "query" : {
+                      "bool" : {
+                        "must" : [
+                          {"match" : {"_index" : "movies"}},
+                          {"match" : {"_type" : "data"}}
+                        ]
                       }
                    }
                 }`;

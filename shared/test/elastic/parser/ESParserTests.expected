@@ -73,7 +73,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data stuff"}}
+          {"match" : {"_type" : "data stuff"}}
         ]
       }
     }
@@ -85,7 +85,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ],
         "must_not" : [{"match" : {"title" : "blah blah"}}]
       }
@@ -260,7 +260,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ]
       }
     }
@@ -278,7 +278,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}},
+          {"match" : {"_type" : "data"}},
           {"match" : {"genres" : "Drama"}}
         ],
         "range" : {
@@ -301,7 +301,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ]
       }
     }
@@ -312,7 +312,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ],
         "must_not" : [
           {
@@ -331,7 +331,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}},
+          {"match" : {"_type" : "data"}},
           {"match" : {"genres" : "Action"}}
         ],
         "must_not" : {
@@ -368,7 +368,7 @@
           "bool" : {
             "must" : [
               {"match" : {"_index" : "movies"}},
-              {"match" : {"_data" : "data"}},
+              {"match" : {"_type" : "data"}},
               {
                 "range" : {
                   "releasedate" : {
@@ -415,7 +415,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}},
+          {"match" : {"_type" : "data"}},
           {
             "match" : {
               "status" : "Released"
@@ -574,7 +574,7 @@
       "bool" : {
         "must" : [
           {"match" : {"_index" : "movies"}},
-          {"match" : {"_data" : "data"}}
+          {"match" : {"_type" : "data"}}
         ],
         "should" : {
           "range" : {
