@@ -7189,15 +7189,15 @@ react-copy-to-clipboard@^5.0.1:
     copy-to-clipboard "^3"
     prop-types "^15.5.8"
 
-react-data-grid-addons@^2.0.57:
-  version "2.0.57"
-  resolved "https://registry.yarnpkg.com/react-data-grid-addons/-/react-data-grid-addons-2.0.57.tgz#35aba7a19e6952d125ad4e052531039a01b9d54f"
+react-data-grid-addons@^2.0.73:
+  version "2.0.73"
+  resolved "https://registry.yarnpkg.com/react-data-grid-addons/-/react-data-grid-addons-2.0.73.tgz#3c91e6cda483acc62ac204e5f7510d40d99ad87f"
   dependencies:
-    react-data-grid "^2.0.57"
+    react-data-grid "^2.0.73"
 
-react-data-grid@^2.0.57:
-  version "2.0.57"
-  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-2.0.57.tgz#684e5b89a631669290077bf14ffd39dca343ccdc"
+react-data-grid@^2.0.73:
+  version "2.0.73"
+  resolved "https://registry.yarnpkg.com/react-data-grid/-/react-data-grid-2.0.73.tgz#8c718b2cc5f3c2f7e34485d55b08e7bdcabfbb20"
 
 react-day-picker@^6.1.0:
   version "6.1.0"
