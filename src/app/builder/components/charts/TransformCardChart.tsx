@@ -57,7 +57,7 @@ import TerrainComponent from '../../../common/components/TerrainComponent';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 
-interface ScorePoint
+export interface ScorePoint
 {
   id: string;
   score: number;

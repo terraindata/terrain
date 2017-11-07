@@ -336,7 +336,6 @@ const BuilderColumn = createReactClass<any, any>(
 
     render()
     {
-      console.log(this.props.query.cards);
       const { query, canEdit, cantEditReason } = this.props;
 
       return this.renderPanel((

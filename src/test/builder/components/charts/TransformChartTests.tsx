@@ -43,29 +43,27 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import TransformCardChart from 'builder/components/charts/TransformCardChart';
+// tslint:disable:no-empty
+import TransformCardChart, { ScorePoint } from 'builder/components/charts/TransformCardChart';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import {List, Map} from 'immutable';
+import { List, Map } from 'immutable';
 import * as React from 'react';
-import * as _ from 'lodash';
 
 jest.mock('react-dom', () => ({
-  findDOMNode: () => {},
+  findDOMNode: () => { },
 }));
 
 describe('TransformCardChart', () =>
 {
-  let testPoints = List([
+  let chartComponent = null;
+  const chartState = {
+    points: List<ScorePoint>([
       {
         id: 'block-1',
         score: 0.1,
         value: 1,
-      },
-      {
-      id: 'block-2',
-      score: 0.5,
-      value: 3,
+        set: (key, value) => { },
       },
     ]),
     bars: List([
@@ -76,7 +74,7 @@ describe('TransformCardChart', () =>
         range: {
           min: 0,
           max: 5,
-        }
+        },
       },
       {
         id: 'bar-2',
@@ -85,26 +83,20 @@ describe('TransformCardChart', () =>
         range: {
           min: 5,
           max: 10,
-        }
-      }  
-    ]);
-  let chartComponent = null;
-  const chartState = {
-    points: testPoints,
+        },
+      },
+    ]),
     domain: List([0, 10]),
     range: List([0, 1]),
-    keyPath: [],
+    keyPath: List([]),
     canEdit: true,
     inputKey: 'price',
-    updatePoints: (points: ScorePoints, released?: boolean) => {
-      console.log('UPDATE POINTS');
-      testPoints = points;
-    },
-    onRequestDomainChange: (domain: List<number>, overrideMaxDomain: boolean) => {},
-    onRequestZoomToData: () => {},
+    updatePoints: (points, released?: boolean) => { },
+    onRequestDomainChange: (domain: List<number>, overrideMaxDomain: boolean) => { },
+    onRequestZoomToData: () => { },
     width: 300,
     language: 'elastic',
-    colors: ['blue', 'green'],
+    colors: ['blue', 'green'] as [string, string],
     spotlights: [],
     mode: 'linear',
   };
@@ -113,120 +105,78 @@ describe('TransformCardChart', () =>
   {
     chartComponent = shallow(
       <TransformCardChart
-        points={testPoints}
-        domain={List([0, 10])}
-        range={List([0, 1])}
-        keyPath={[]}
-        canEdit={true}
-        inputKey={'price'}
-        updatePoints={(points: ScorePoints, released?: boolean) => {
-          console.log('UPDATE POINTS');
-          testPoints = points;
-        }}
-        onRequestDomainChange={(domain: List<number>, overrideMaxDomain: boolean) => {}}
-        onRequestZoomToData={() => {}}
-        width={300}
-        language='elastic'
-        colors={['blue', 'green']}
-        spotlights={[]}
-        mode={'linear'}
+        {...chartState}
       />,
-      {createNodeMock}
     );
   });
 
-  it('should render a transform card chart', () =>
+  it('should render a transform card chart with one point', () =>
   {
-    // Should have one div for the transform chart
     expect(chartComponent.find('div')).toHaveLength(1);
+    expect(chartComponent.state().pointsCache.toJS()).toHaveLength(1);
   });
 
-  it('should have two points', () =>
+  describe('#componentWillReciveProps', () =>
   {
-    expect(chartComponent.state().pointsCache.toJS()).toHaveLength(2);
-  });
-
-  describe('#componentWillReceiveProps', () => {
-    it('should update the linear points cache when mode is changed', () =>
+    it('should update mode caches when mode changes', () =>
     {
-      const newMode = 'normal';
-      chartComponent.setProps(_.extend({}, chartState, {mode: newMode}));
+      // Changing mode from linear -> normal, linear cache will have one point
+      chartComponent.setProps({ mode: 'normal' });
+      chartComponent.instance().getChartState({ mode: 'normal', points: List([]) });
+      expect(chartComponent.state().linearPoints.toJS()).toHaveLength(1);
 
-      expect(chartComponent.state().linearPoints.toJS()).toHaveLength(2);
-    })
-  });
+      // Changing mode from normal -> log, linear cache will have one point, normal 3
+      chartComponent.setProps({ mode: 'logarithmic', points: List([]) });
+      chartComponent.instance().getChartState({ mode: 'logarithmic' });
+      expect(chartComponent.state().normalPoints.toJS()).toHaveLength(3);
+      expect(chartComponent.state().linearPoints.toJS()).toHaveLength(1);
 
-  describe('#getChartState', () => {
-    it('should change the number of points to 3 when mode is normal', () => 
-    {
-      chartComponent.instance().getChartState(_.extend({}, chartState, {mode: 'normal'}));
-      // console.log(chartComponent.state());
-      // console.log(testPoints);
-      // expect(chartComponent.state().pointsCache.toJS()).toHaveLength(3);
-      // expect(testPoints.toJS()).toHaveLength(3);
+      // Changing mode from log -> sigmoid, linear: 1, log: 2, normal: 3
+      chartComponent.setProps({ mode: 'sigmoid' });
+      chartComponent.instance().getChartState({ mode: 'sigmoid' });
+      expect(chartComponent.state().normalPoints.toJS()).toHaveLength(3);
+      expect(chartComponent.state().linearPoints.toJS()).toHaveLength(1);
+      expect(chartComponent.state().logarithmicPoints.toJS()).toHaveLength(2);
+
+      // Changing mode sigmoid -> exponential
+      chartComponent.setProps({ mode: 'exponential' });
+      chartComponent.instance().getChartState({ mode: 'exponential' });
+      expect(chartComponent.state().normalPoints.toJS()).toHaveLength(3);
+      expect(chartComponent.state().linearPoints.toJS()).toHaveLength(1);
+      expect(chartComponent.state().logarithmicPoints.toJS()).toHaveLength(2);
+      expect(chartComponent.state().sigmoidPoints.toJS()).toHaveLength(4);
+
+      // exponential -> linear, will use linearPoints in pointsCache
+      chartComponent.setProps({ mode: 'linear' });
+      expect(chartComponent.state().pointsCache.toJS()).toHaveLength(1);
+
     });
   });
 
-  // describe('#handleZoom', () =>
-  // {
-  //   it('should update state.brushDomain (that handles the brush)', () =>
-  //   {
-  //     expect(chartComponent.state().brushDomain).toEqual({});
-  //     const nextZoomDomain = { x: [0, 5], y: [10, 15] };
-  //     chartComponent.instance().handleZoom(nextZoomDomain);
+  describe('#getChartState', () =>
+  {
+    it('should create 3 points when mode is normal', () =>
+    {
+      chartComponent.instance().getChartState({ mode: 'normal' });
+      expect(chartComponent.state().pointsCache.toJS()).toHaveLength(3);
+    });
 
-  //     expect(chartComponent.state().brushDomain).toEqual(nextZoomDomain);
-  //   });
-  // });
+    it('should create 4 points when mode is sigmoid', () =>
+    {
+      chartComponent.instance().getChartState({ mode: 'sigmoid' });
+      expect(chartComponent.state().pointsCache.toJS()).toHaveLength(4);
+    });
 
-  // describe('#handleBrush', () =>
-  // {
-  //   it('should update state.zoomDomain', () =>
-  //   {
-  //     expect(chartComponent.state().zoomDomain).toEqual({});
-  //     const nextBrushDomain = { x: [0, 5], y: [10, 15] };
-  //     chartComponent.instance().handleBrush(nextBrushDomain);
+    it('should create 2 points when mode is exponential', () =>
+    {
+      chartComponent.instance().getChartState({ mode: 'exponential' });
+      expect(chartComponent.state().pointsCache.toJS()).toHaveLength(2);
+    });
 
-  //     expect(chartComponent.state().zoomDomain).toEqual(nextBrushDomain);
-  //   });
-  // });
-
-  // describe('#handleLegendClick', () =>
-  // {
-  //   it('should call toggleDatasetVisibility', () =>
-  //   {
-  //     chartComponent.instance().toggleDatasetVisibility = jest.fn();
-
-  //     chartComponent.instance().handleLegendClick({}, { datum: { id: 1 } });
-
-  //     expect(chartComponent.instance().toggleDatasetVisibility)
-  //       .toHaveBeenCalledTimes(1);
-  //     expect(chartComponent.instance().toggleDatasetVisibility)
-  //       .toHaveBeenCalledWith(1);
-  //   });
-  // });
-
-  // describe('#toggleDatasetVisibility', () =>
-  // {
-  //   describe('when the dataset is currently visible', () =>
-  //   {
-  //     it('should remove the dataset from the visible list', () =>
-  //     {
-  //       chartComponent.instance().toggleDatasetVisibility('1');
-
-  //       expect(chartComponent.state().visibleDatasets.toJS()).not.toContain('1');
-  //     });
-  //   });
-
-  //   describe('when the dataset is NOT currently visible', () =>
-  //   {
-  //     it('should add the dataset from the visible list', () =>
-  //     {
-  //       chartComponent.instance().toggleDatasetVisibility('1');
-  //       chartComponent.instance().toggleDatasetVisibility('1');
-
-  //       expect(chartComponent.state().visibleDatasets.toJS()).toContain('1');
-  //     });
-  //   });
-  // });
+    it('should create 2 points when mode is logarithmic', () =>
+    {
+      chartComponent.instance().getChartState({ mode: 'logarithmic' });
+      expect(chartComponent.state().pointsCache.toJS()).toHaveLength(2);
+    });
+  });
 });
