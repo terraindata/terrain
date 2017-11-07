@@ -87,8 +87,8 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
   public render()
   {
     const { source, filter, canEdit } = this.props;
-    
-    
+
+
 
     return (
       <div
@@ -118,33 +118,33 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
             PathfinderText.filterGroupPost
           }
         </div>
-        
+
       </div>
     );
   }
-  
+
   private handleDropdownChange(index: number)
   {
     let value = filterDropdownOptions[index];
-    
+
     if (value === 'any')
     {
       value = 1;
     }
-    
+
     this.props.onChange(this.props.keyPath, this.props.filter.set('minMatches', value));
   }
-  
+
   private getDropdownSelectedIndex(): number
   {
     const value = this.props.filter.minMatches;
     console.log(value, filterDropdownOptions.indexOf(value));
-    
+
     if (value === 1)
     {
       return filterDropdownOptions.indexOf('any');
     }
-    
+
     return filterDropdownOptions.indexOf(value);
   }
 }

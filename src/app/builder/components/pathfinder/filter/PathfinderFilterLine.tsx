@@ -78,8 +78,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   public render()
   {
     const { source, filterLine, canEdit } = this.props;
-    
-    
+
+
 
     return (
       <PathfinderLine
@@ -92,8 +92,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       </PathfinderLine>
     );
   }
-  
-  
+
+
 }
 
 export default PathfinderFilterLine;

@@ -59,6 +59,7 @@ import BuilderActions from '../../../data/BuilderActions';
 import { _ScoreLine, Path, Score, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
+import PathfinderCreateLine from '../PathfinderCreateLine';
 
 export interface Props
 {
@@ -86,8 +87,9 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public updateWeights(lines)
   {
-    const allWeights = lines.toJS().map((line) => {
-      return {weight: line.weight};
+    const allWeights = lines.toJS().map((line) =>
+    {
+      return { weight: line.weight };
     });
     this.setState({
       allWeights,
@@ -101,7 +103,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     this.updateWeights(newLines);
   }
 
-  public handleAddLine()
+  public handleAddScoreLine()
   {
     const newLines = this.props.score.lines.push(_ScoreLine());
     BuilderActions.change(List(['query', 'path', 'score', 'lines']), newLines);
@@ -171,11 +173,11 @@ class PathfinderSourceSection extends TerrainComponent<Props>
         {
           this.renderScoreLines()
         }
-        <div
-          onClick={this.handleAddLine}
-        >
-          Add another factor to score on
-        </div>
+        <PathfinderCreateLine
+          canEdit={this.props.canEdit}
+          onCreate={this.handleAddScoreLine}
+          text={PathfinderText.createScoreLine}
+        />
 
       </div>
     );

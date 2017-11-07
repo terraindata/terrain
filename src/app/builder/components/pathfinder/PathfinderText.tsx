@@ -48,17 +48,17 @@ THE SOFTWARE.
 
 export const PathfinderText = {
 
-	// Source section
-	firstWord: 'Find',
-	chooseDataSourceDropdownPrompt: 'Choose a data source',
-	
-	// Filter section
-	firstFilterIntro: 'With',
-	nestedFilterIntro: '',
-	filterGroupPost: 'of the following:',
-	createFilterLine: 'filter condition',
-	createFilterGroup: 'group of filter conditions',
+  // Source section
+  firstWord: 'Find',
+  chooseDataSourceDropdownPrompt: 'Choose a data source',
 
+  // Filter section
+  firstFilterIntro: 'With',
+  nestedFilterIntro: '',
+  filterGroupPost: 'of the following:',
+  createFilterLine: 'filter condition',
+  createFilterGroup: 'group of filter conditions',
+  createScoreLine: 'factor to score on',
 
   // Steps
 

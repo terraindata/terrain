@@ -80,7 +80,7 @@ class PathfinderStepSection extends TerrainComponent<Props>
 
     return (
       <div
-        className='pathfinder-section'
+        className='pf-section'
       >
         <div
           className='pathfinder-step-title'

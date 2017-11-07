@@ -167,19 +167,19 @@ class PathfinderSourceSection extends TerrainComponent<Props>
         .set('count', +value),
     );
   }
-  
+
   private getDataSourceOptions(): List<string>
   {
     // TODO
     return List(['Products', 'Customers', 'Purchases', 'Reviews']);
   }
-  
+
   private getSelectedDataSourceIndex(): number
   {
     console.log(this.getDataSourceOptions().indexOf(this.props.source.dataSource.name));
     return this.getDataSourceOptions().indexOf(this.props.source.dataSource.name);
   }
-  
+
   private handleSourceDropdownChange(sourceIndex: number)
   {
     this.changeSource(this.props.source.set(

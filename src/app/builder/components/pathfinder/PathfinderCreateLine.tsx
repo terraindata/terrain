@@ -68,7 +68,7 @@ class PathfinderCreateLine extends TerrainComponent<Props>
   public render()
   {
     const { onCreate, canEdit, text } = this.props;
-    
+
     if (!canEdit)
     {
       return null;
@@ -78,13 +78,12 @@ class PathfinderCreateLine extends TerrainComponent<Props>
       <div
         className='pf-create'
         style={fontColor(Colors().text3, Colors().active)}
+        onClick={onCreate}
       >
-        + Add a { text } 
+        + Add a {text}
       </div>
     );
   }
-  
-  
 }
 
 export default PathfinderCreateLine;

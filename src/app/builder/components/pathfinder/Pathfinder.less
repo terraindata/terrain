@@ -10,10 +10,14 @@
     overflow: auto;
 	.pf-section {
 		margin-bottom: @spacing;
-		.pathfinder-section-subtitle {
+		.pf-section-subtitle {
 			font-size: @font-size;
 			padding-top: 4px;
 		}
+	}		
+	.pf-create {
+		.transition;
+		cursor: pointer;
 	}
 	
 	.pf-line {
@@ -26,11 +30,35 @@
 				margin-top: -4px;
 			}
 		}
-		
-		.pf-create {
-			.transition;
-			cursor: pointer;
+
+		.pf-score-line-weight {
+			max-width: 50px;
+			margin: 0px 4px;
 		}
+		.pf-score-line-text {
+			font-size: @small-font-size;
+			margin: 0px 4px;
+			padding-top: 7px;
+		}
+		.pf-line-delete {
+			height: 16px;
+		    width: 16px;
+		    border-radius: 50%;
+		    cursor: pointer;
+		    margin-top: 8px;
+		    margin-right: 4px;
+		    border: 1px solid;
+		}
+	}
+	.pf-score-line-transform {
+			.transform-card-inner {
+				margin-left: -17px;
+				width: 100%;
+			}
+		}
+
+	.pf-score-line {
+		margin: 12px;
 	}
 }
 

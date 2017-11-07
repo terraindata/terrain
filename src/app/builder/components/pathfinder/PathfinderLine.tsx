@@ -50,7 +50,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import DragHandle from 'app/common/components/DragHandle';
@@ -99,30 +99,30 @@ class PathfinderLine extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private renderLeft(): El
   {
     if (!this.props.canEdit || !this.props.canDrag)
     {
       return null;
     }
-    
+
     return (
       <div className='pf-line-left'>
         <DragHandle
-          
+
         />
       </div>
     );
   }
-  
+
   private renderRight(): El
   {
     if (!this.props.canEdit || !this.props.canDelete)
     {
       return null;
     }
-    
+
     return (
       <div className='pf-line-right'>
         <div

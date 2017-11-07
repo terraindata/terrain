@@ -86,7 +86,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
     return (
       <div
-        className='pathfinder-section'
+        className='pf-section'
       >
         {
           entries.map(this.renderFilterEntry)
@@ -94,12 +94,12 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private handleFilterChange(keyPath: KeyPath, filter: Filter | FilterLine)
   {
     BuilderActions.change(keyPath, filter);
   }
-  
+
   private handleFilterDelete(keyPath: KeyPath)
   {
     const parentKeyPath = keyPath.butLast().toList()
@@ -107,24 +107,24 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const index = keyPath.last();
     BuilderActions.change(parentKeyPath, parent.splice(index, 1));
   }
-  
+
   private buildFilterTree(filter: Filter, entries: FilterEntry[], depth: number, keyPath: KeyPath): void
   {
     keyPath = keyPath.push('filter');
-    
+
     entries.push({
       filter,
       depth,
       keyPath,
     });
-    
-    depth ++;
-    
+
+    depth++;
+
     keyPath = keyPath.push('lines');
-    
+
     filter.lines.map((filterLine, index) =>
     {
-      if(filterLine.filter)
+      if (filterLine.filter)
       {
         // it is a filter group
         this.buildFilterTree(filterLine.filter, entries, depth, keyPath.push(index));
@@ -138,18 +138,18 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         });
       }
     });
-    
+
     entries.push({
       isCreateSection: true,
       depth,
       keyPath: keyPath.push(filter.lines.size),
     });
   }
-  
+
   private renderFilterEntry(filterEntry: FilterEntry, index: number): El
   {
     const { source, canEdit } = this.props;
-    
+
     if (filterEntry.filter)
     {
       return (
@@ -164,7 +164,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         />
       );
     }
-    
+
     if (filterEntry.filterLine)
     {
       return (
@@ -180,7 +180,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         />
       );
     }
-    
+
     if (filterEntry.isCreateSection)
     {
       return (
@@ -194,7 +194,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         />
       );
     }
-    
+
     throw new Error('Uncrecognized filter entry: ' + JSON.stringify(filterEntry));
   }
 }

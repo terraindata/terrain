@@ -403,19 +403,19 @@ class Dropdown extends TerrainComponent<Props>
             }
             {
               this.props.placeholder &&
-                <div
-                  key={-1}
-                  className={classNames({
-                    'dropdown-option-inner': true,
-                    'dropdown-option-value-selected': -1 === selectedIndex,
-                    'dropdown-option-placeholder': true,
-                  })}
-                  style={fontColor(Colors().text3)}
-                >
-                  {
-                    this.props.placeholder
-                  }
-                </div> 
+              <div
+                key={-1}
+                className={classNames({
+                  'dropdown-option-inner': true,
+                  'dropdown-option-value-selected': -1 === selectedIndex,
+                  'dropdown-option-placeholder': true,
+                })}
+                style={fontColor(Colors().text3)}
+              >
+                {
+                  this.props.placeholder
+                }
+              </div>
             }
           </div>,
           {
