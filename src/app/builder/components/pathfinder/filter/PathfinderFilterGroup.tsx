@@ -134,7 +134,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
 
   private getDropdownSelectedIndex(): number
   {
-    const value = this.props.filter.minMatches;
+    const value = this.props.filterGroup.minMatches;
     console.log(value, filterDropdownOptions.indexOf(value));
 
     if (value === 1)

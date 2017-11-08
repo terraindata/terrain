@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+// tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -53,7 +53,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Path, Source, FilterLine } from '../PathfinderTypes';
+import { Path, Source, FilterLine, FilterGroup } from '../PathfinderTypes';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
@@ -62,7 +62,7 @@ import BuilderActions from 'app/builder/data/BuilderActions';
 
 export interface Props
 {
-  filter: Filter;
+  filterGroup: FilterGroup;
   source: Source;
   step: string;
   canEdit: boolean;
@@ -78,12 +78,12 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public render()
   {
-    const { source, step, filter, canEdit } = this.props;
+    const { source, step, filterGroup, canEdit } = this.props;
 
     // flatten tree
     let entries: FilterEntry[] = [];
-    this.buildFilterTree(filter, entries, 0, List(['query', 'path']));
-
+    this.buildFilterTree(filterGroup, entries, 0, List(['query', 'path']));
+    console.log(entries);
     return (
       <div
         className='pf-section'
@@ -95,7 +95,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     );
   }
 
-  private handleFilterChange(keyPath: KeyPath, filter: Filter | FilterLine)
+  private handleFilterChange(keyPath: KeyPath, filter: FilterGroup | FilterLine)
   {
     BuilderActions.change(keyPath, filter);
   }
@@ -103,17 +103,17 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   private handleFilterDelete(keyPath: KeyPath)
   {
     const parentKeyPath = keyPath.butLast().toList()
-    const parent = this.props.filter.getIn(parentKeyPath.skip(2).toList());
+    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(2).toList());
     const index = keyPath.last();
     BuilderActions.change(parentKeyPath, parent.splice(index, 1));
   }
 
-  private buildFilterTree(filter: Filter, entries: FilterEntry[], depth: number, keyPath: KeyPath): void
+  private buildFilterTree(filterGroup: FilterGroup, entries: FilterEntry[], depth: number, keyPath: KeyPath): void
   {
-    keyPath = keyPath.push('filter');
+    keyPath = keyPath.push('filterGroup');
 
     entries.push({
-      filter,
+      filterGroup,
       depth,
       keyPath,
     });
@@ -122,12 +122,13 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
     keyPath = keyPath.push('lines');
 
-    filter.lines.map((filterLine, index) =>
+    filterGroup.lines.map((filterLine, index) =>
     {
-      if (filterLine.filter)
+      console.log(filterLine);
+      if (filterLine.filterGroup)
       {
         // it is a filter group
-        this.buildFilterTree(filterLine.filter, entries, depth, keyPath.push(index));
+        this.buildFilterTree(filterLine.filterGroup, entries, depth, keyPath.push(index));
       }
       else
       {
@@ -142,7 +143,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     entries.push({
       isCreateSection: true,
       depth,
-      keyPath: keyPath.push(filter.lines.size),
+      keyPath: keyPath.push(filterGroup.lines.size),
     });
   }
 
@@ -150,11 +151,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   {
     const { source, canEdit } = this.props;
 
-    if (filterEntry.filter)
+    if (filterEntry.filterGroup)
     {
       return (
         <PathfinderFilterGroup
-          filter={filterEntry.filter}
+          filterGroup={filterEntry.filterGroup}
           source={source}
           canEdit={canEdit}
           depth={filterEntry.depth}
@@ -201,7 +202,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
 interface FilterEntry
 {
-  filter?: Filter;
+  filterGroup?: FilterGroup;
   filterLine?: FilterLine;
   isCreateSection?: boolean;
   depth: number;

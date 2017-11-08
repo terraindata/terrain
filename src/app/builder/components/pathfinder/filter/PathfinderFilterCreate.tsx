@@ -64,12 +64,11 @@ export interface Props
   canEdit: boolean;
   depth: number;
   keyPath: KeyPath;
-  onChange(keyPath: KeyPath, filter: Filter | FilterLine);
+  onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine);
 }
 
 class PathfinderFilterCreate extends TerrainComponent<Props>
 {
-
   public render()
   {
     const { canEdit } = this.props;
@@ -104,7 +103,10 @@ class PathfinderFilterCreate extends TerrainComponent<Props>
 
   private handleCreateFilterGroup()
   {
-    this.props.onChange(this.props.keyPath, _FilterGroup());
+    console.log(this.props.keyPath, _FilterGroup());
+    this.props.onChange(this.props.keyPath, _FilterLine({
+      filterGroup: _FilterGroup(),
+    }));
   }
 }
 
