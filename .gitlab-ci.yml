@@ -12,6 +12,7 @@ cache:
 before_script:
   - yarn
   - ( cd sigint && yarn )
+  - ( cd analytics.js && yarn )
 
 stages:
   - lint
