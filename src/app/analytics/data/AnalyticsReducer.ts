@@ -89,7 +89,7 @@ AnalyticsReducer[ActionTypes.fetchFailure] =
   };
 
 AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metric: ID[] }>) =>
+  (state, action: Action<{ metric: string }>) =>
   {
     const { metric } = action.payload;
     return state.set('selectedMetric', metric);

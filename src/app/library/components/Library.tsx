@@ -304,7 +304,7 @@ class Library extends TerrainComponent<any>
   {
     const { singleColumn, router } = this.props;
     const params = router !== undefined && router.params !== undefined ? router.params : {};
-    const { groupId, algorithmId, variantId } = params;
+    const { groupId, algorithmId, variantId } = params;
 
     return !singleColumn ||
       (groupId === undefined &&
@@ -316,7 +316,7 @@ class Library extends TerrainComponent<any>
         algorithmId === undefined &&
         variantId === undefined &&
         columnName === Library.ALGORITHMS_COLUMN
-      ) || 
+      ) ||
       (groupId !== undefined &&
         algorithmId !== undefined &&
         columnName === Library.VARIANTS_COLUMN
