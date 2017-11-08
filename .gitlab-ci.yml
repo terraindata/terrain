@@ -11,6 +11,7 @@ cache:
 
 before_script:
   - yarn
+  - ( cd sigint && yarn )
 
 stages:
   - lint
