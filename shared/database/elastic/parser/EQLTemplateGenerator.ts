@@ -54,7 +54,7 @@ export default class EQLTemplateGenerator
     return ESParameterSubstituter.generate(source,
       (param: string): string =>
       {
-        return ' {{#toJson}}@' + param + '{{/toJson}} ';
+        return ' {{#toJson}}' + param + '{{/toJson}} ';
       });
   }
 }

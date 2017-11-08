@@ -57,7 +57,7 @@ import { Events } from './Events';
 export const events: Events = new Events();
 const Router = new KoaRouter();
 
-// * eventid: the type of event (1: view / impression, 2: click / add-to-cart,  3: transaction)
+// * eventname: the event name (view / impression, click / add-to-cart, transaction)
 // * variantid: list of variantids
 // * database: database (connection) id
 // * start: start time of the interval
@@ -77,7 +77,7 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
 {
   Util.verifyParameters(
     JSON.parse(JSON.stringify(ctx.request.query)),
-    ['database', 'start', 'end', 'eventid', 'variantid', 'agg'],
+    ['database', 'start', 'end', 'eventname', 'variantid', 'agg'],
   );
   winston.info('getting events for variant');
 

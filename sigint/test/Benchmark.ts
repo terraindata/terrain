@@ -77,12 +77,12 @@ export const flow = {
   main: [
     {
       post: host + '/v1', json: {
-        eventid: '#{INDEX}',
+        eventname: 'click',
         variantid: '#{INDEX}',
         visitorid: '#{INDEX}',
       },
     },
-    { get: host + '/v1?eventid=#{INDEX}&variantid=#{INDEX}&visitorid=#{INDEX}' },
+    { get: host + '/v1?eventname=click&variantid=#{INDEX}&visitorid=#{INDEX}' },
   ],
 };
 
