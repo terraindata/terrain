@@ -55,8 +55,8 @@ const d3 = require('d3');
 // import * as d3 from 'd3';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import TransformUtil, { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 import Util from '../../../util/Util';
-import TransformUtil from '../../../util/TransformUtil';
 
 const xMargin = 45;
 const yMargin = 10;
@@ -942,11 +942,11 @@ const TransformChart = {
 
   _drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domainMin, domainMax, getData)
   {
-    const {ranges, outputs} = getData(100, pointsData, domainMin, domainMax);
+    const { ranges, outputs } = getData(100, pointsData, domainMin, domainMax);
     let data = ranges.map((x, i) =>
-      {
-        return {x, y: outputs[i], id: i, selected: false }
-      });
+    {
+      return { x, y: outputs[i], id: i, selected: false };
+    });
     data = this._addBoundingData(scales, data);
 
     const line = d3.svg.line()
@@ -965,84 +965,6 @@ const TransformChart = {
 
     d3.select(el).select('.lines-bg')
       .attr('d', line(data));
-  },
-
-  _drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domainMin, domainMax)
-  {
-    const linesPointsData = _.clone(pointsData);
-    const a = pointsData[0].y;
-    const x = pointsData[1].x;
-    const y = pointsData[1].y;
-    const x0 = pointsData[2].x;
-    const L = pointsData[3].y - pointsData[0].y;
-    const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
-    // const a = 0;
-    // const L = 1;
-    // const x1 = pointsData[1].x;
-    // const y1 = pointsData[1].y;
-    // const x2 = pointsData[2].x;
-    // const y2 = pointsData[2].y;
-    // const p = Math.log(1 / y2 - 1) / Math.log(1 / y1 - 1);
-    // const x0 = (x2 - x1 * p) / (1 - p);
-    // const k = -1 * Math.log(1 / y1 - 1) / (x1 - x0);
-    const data = this._getSigmoidData(pointsData, scales, a, k, x0, L, domainMin, domainMax);
-    const line = d3.svg.line()
-      .x((d) =>
-      {
-        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
-      })
-      .y((d) =>
-      {
-        return scales.realPointY(d['y']);
-      });
-
-    const lines = d3.select(el).select('.lines')
-      .attr('d', line(data))
-      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
-
-    d3.select(el).select('.lines-bg')
-      .attr('d', line(data));
-  },
-
-  _getSigmoidData(pointsData, scales, a, k, x0, L, min, max)
-  {
-    const data = [];
-    const stepSize = (max - min) * (1 / 100);
-    for (let i = (min - stepSize); i < (max + stepSize); i += stepSize)
-    {
-      const y = TransformUtil._sigmoid(i, a, k, x0, L);
-      data.push({ y, x: i, id: i, selected: false });
-    }
-    if (data.length)
-    {
-      const range = (scaleMax(scales.x) - scaleMin(scales.x));
-      data.unshift({
-        x: scaleMin(scales.x) - range,
-        y: data[0].y,
-        id: '*%*-first',
-        dontScale: true,
-      });
-      data.unshift({
-        x: scaleMin(scales.x) - range,
-        y: -1,
-        id: '*%*-first-anchor',
-        dontScale: true,
-      });
-
-      data.push({
-        x: scaleMax(scales.x) + range,
-        y: data[data.length - 1].y,
-        id: '*%*-last',
-        dontScale: true,
-      });
-      data.push({
-        x: scaleMax(scales.x) + range,
-        y: -1,
-        id: '*%*-last-anchor',
-        dontScale: true,
-      });
-    }
-    return data;
   },
 
   _sigmoid(x, a, k, x0, L)
@@ -1664,7 +1586,56 @@ const TransformChart = {
         const y = TransformUtil._normal(d['x'], average, stdDev) * scaleFactor;
         return scales.realPointY(y);
       }
+      // Constrain all y values so that poitns remain on the sigmoid line
+      if (mode === 'sigmoid')
+      {
+        const a = pointsData[0].y;
+        const L = pointsData[3].y - pointsData[0].y;
+        if (i === 2)
+        {
+          return scales.realPointY(L / 2 + a);
+        }
+        if (i === 3 || i === 0)
+        {
+          const x0 = pointsData[2].x;
+          const x = pointsData[1].x;
+          const y = pointsData[1].y;
+          let k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+          if (k === 0)
+          {
+            k = 0.001;
+          }
+          const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
+            Math.log(L / (0.01) - 1) / (-1 * k) + x0;
+          if (xVal < domain[0])
+          {
+            return scales.realPointY(TransformUtil._sigmoid(domain[0], a, k, x0, L));
+          }
+          if (xVal > domain[1])
+          {
+            return scales.realPointY(TransformUtil._sigmoid(domain[1], a, k, x0, L));
+          }
+        }
+      }
       return scales.realPointY(d['y']);
+    };
+
+    const pointXValue = (d, i) =>
+    {
+      // Constrain x values for sigmoid so that points remain on lines
+      if (mode === 'sigmoid' && (i === 3 || i === 0))
+      {
+        const L = pointsData[3].y - pointsData[0].y;
+        const x0 = pointsData[2].x;
+        const a = pointsData[0].y;
+        const x = pointsData[1].x;
+        const y = pointsData[1].y;
+        const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+        const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
+          Math.log(L / (0.01) - 1) / (-1 * k) + x0;
+        return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
+      }
+      return scales.realX(d['x']);
     };
 
     const pointName = (d, i) =>
@@ -1683,118 +1654,23 @@ const TransformChart = {
             return '';
         }
       }
+      else if (mode === 'sigmoid')
+      {
+        switch (i)
+        {
+          case 0:
+            return 'a';
+          case 1:
+            return 'k';
+          case 2:
+            return 'x0';
+          case 3:
+            return 'L';
+          default:
+            return '';
+        }
+      }
       return d['id'];
-    };
-
-    point
-      .attr('cx', (d) => scales.realX(d['x']))
-      .attr('cy', pointYValue)
-      .attr('fill', '#fff')
-      .attr('style', (d) => 'stroke: ' + (d['selected'] ? Colors().error : colors[0]))
-      .attr('class', (d) =>
-        'point' + (d['selected'] ? ' point-selected' : '')
-        + (canEdit ? '' : ' point-disabled'))
-      .attr('r', 10);
-
-    point
-      .attr('_id', (d) => d['id'])
-      .attr('_name', pointName);
-
-    if (canEdit)
-    {
-      point.on('mousedown', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
-      point.on('touchstart', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
-      point.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
-      if (mode === 'linear')
-      {
-        point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, colors, this._drawMenu));
-      }
-      else
-      {
-        point.on('contextmenu', null);
-      }
-      point.on('click', this._mouseClickFactory(el, scales, onMove, onRelease, colors, this._editPointPosition, this._drawPointEditMenu));
-      point.on('mouseout', this._mouseoutFactory(el));
-      point.on('dblclick', this._doubleclickFactory(el));
-    }
-
-    point.exit().remove();
-  },
-
-  _drawSigmoidPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain)
-  {
-    const g = d3.select(el).selectAll('.points');
-
-    const point = g.selectAll('circle')
-      .data(pointsData, (d) => d['id']);
-
-    point.enter()
-      .append('circle');
-
-    const pointYValue = (d, i) =>
-    {
-      const a = pointsData[0].y;
-      const L = pointsData[3].y - pointsData[0].y;
-      if (i === 2)
-      {
-        return scales.realPointY(L / 2 + a);
-      }
-      if (i === 3 || i === 0)
-      {
-        const x0 = pointsData[2].x;
-        const x = pointsData[1].x;
-        const y = pointsData[1].y;
-        let k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
-        if (k === 0)
-        {
-          k = 0.001;
-        }
-        const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
-          Math.log(L / (0.01) - 1) / (-1 * k) + x0;
-        if (xVal < domain[0])
-        {
-          return scales.realPointY(TransformUtil._sigmoid(domain[0], a, k, x0, L));
-        }
-        if (xVal > domain[1])
-        {
-          return scales.realPointY(TransformUtil._sigmoid(domain[1], a, k, x0, L));
-        }
-      }
-      return scales.realPointY(d['y']);
-    };
-
-    const pointXValue = (d, i) =>
-    {
-      if (i === 3 || i === 0)
-      {
-        const L = pointsData[3].y - pointsData[0].y;
-        const x0 = pointsData[2].x;
-        const a = pointsData[0].y;
-        const x = pointsData[1].x;
-        const y = pointsData[1].y;
-        const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
-        const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
-          Math.log(L / (0.01) - 1) / (-1 * k) + x0;
-        return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
-      }
-      return scales.realX(d['x']);
-    };
-
-    const pointName = (d, i) =>
-    {
-      switch (i)
-      {
-        case 0:
-          return 'a';
-        case 1:
-          return 'k';
-        case 2:
-          return 'x0';
-        case 3:
-          return 'L';
-        default:
-          return '';
-      }
     };
 
     point
@@ -1852,13 +1728,13 @@ const TransformChart = {
     switch (mode)
     {
       case 'normal':
-        if (numPoints === 3)
+        if (numPoints === NUM_CURVE_POINTS.normal)
         {
           this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getNormalData);
         }
         break;
       case 'exponential':
-        if (numPoints === 2)
+        if (numPoints === NUM_CURVE_POINTS.exponential)
         {
           if (Math.abs(pointsData[1].x - pointsData[0].x) <= (domain.x[1] - domain.x[0]) / 900)
           {
@@ -1868,22 +1744,25 @@ const TransformChart = {
         }
         break;
       case 'logarithmic':
-        if (numPoints === 2)
+        if (numPoints === NUM_CURVE_POINTS.logarithmic)
         {
           this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getLogarithmicData);
         }
         break;
       case 'sigmoid':
-        if (numPoints === 4)
+        if (numPoints === NUM_CURVE_POINTS.sigmoid)
         {
           this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getSigmoidData);
-          this._drawSigmoidPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain.x);
         }
         break;
       default:
         this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
-    if (mode === 'linear' || numPoints === 2 || (mode === 'normal' && numPoints === 3))
+    if (mode === 'linear'
+      || (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential)
+      || (mode === 'logarithmic' && numPoints === NUM_CURVE_POINTS.logarithmic)
+      || (mode === 'normal' && numPoints === NUM_CURVE_POINTS.normal)
+      || (mode === 'sigmoid' && numPoints === NUM_CURVE_POINTS.sigmoid))
     {
       this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain.x);
     }

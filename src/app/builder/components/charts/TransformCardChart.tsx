@@ -54,6 +54,7 @@ import * as ReactDOM from 'react-dom';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
+import { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 
@@ -222,14 +223,16 @@ class TransformCardChart extends TerrainComponent<Props>
     let min: number;
     let max: number;
     let points;
+    const { mode } = this.props;
 
-    if ((this.props.mode === 'normal' && pointName === 'Average')
-      || (this.props.mode === 'sigmoid' && pointName === 'x0')
+    // In normal mode when moving the center point or sigmoid when moving the center point, move all of the other points as well
+    if ((mode === 'normal' && pointName === 'Average')
+      || (mode === 'sigmoid' && pointName === 'x0')
     )
     {
       points = this.state.initialPoints.map((scorePoint, i) =>
       {
-        scorePoint = scorePoint.set('score', Util.valueMinMax(scorePoint.score - scoreDiff, 0, 1));
+        scorePoint = scorePoint.set('score', Util.valueMinMax(scorePoint.score - scoreDiff, mode === 'sigmoid' ? 0.001 : 0, 1));
         const domainMin = this.props.domain.get(0);
         const domainMax = this.props.domain.get(1);
         const domainRange = domainMax - domainMin;
@@ -239,32 +242,11 @@ class TransformCardChart extends TerrainComponent<Props>
         max = (i + 1) < pointValues.length ?
           Math.min(this.props.domain.get(1), pointValues[i + 1] - domainRange / 1000)
           : domainMax;
-        scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
-        return scorePoint;
-      });
-    }
-    else if (this.props.mode === 'sigmoid' && pointName === 'k')
-    {
-      const x0 = pointValues[2];
-      const L = pointScores[3];
-      const a = pointScores[0];
-      points = this.state.initialPoints.map((scorePoint, i) =>
-      {
-        if (scorePoint.id === pointId)
+        if (mode === 'sigmoid' && min <= 0)
         {
-          // constrain score to be between L and a scores
-          let value = 0;
-          if (a > L)
-          {
-            value = Util.valueMinMax(scorePoint.score - scoreDiff, L, a);
-          }
-          else
-          {
-            value = Util.valueMinMax(scorePoint.score - scoreDiff, a, L);
-          }
-          scorePoint = scorePoint.set('score', value);
-          scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, pointValues[0], x0 - 0.001 * x0));
+          min = 0.0011 * (this.props.domain.get(1) - this.props.domain.get(0));
         }
+        scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
         return scorePoint;
       });
     }
@@ -274,11 +256,16 @@ class TransformCardChart extends TerrainComponent<Props>
       {
         if (scorePoint.id === pointId || this.state.selectedPointIds.get(scorePoint.id))
         {
-          let scoreMin = this.props.mode === 'exponential' ? 0.001 : 0;
-          const scoreMax = this.props.mode === 'sigmoid' && pointName === 'a' ? pointScores[1] : 1;
-          if (this.props.mode === 'sigmoid' && pointName === 'L')
+          let scoreMin = (mode === 'exponential' || mode === 'sigmoid') ? 0.001 : 0;
+          let scoreMax = mode === 'sigmoid' && pointName === 'a' ? pointScores[1] : 1;
+          if (mode === 'sigmoid' && pointName === 'L')
           {
             scoreMin = pointScores[1];
+          }
+          else if (mode === 'sigmoid' && pointName === 'k')
+          {
+            scoreMin = Math.min(pointScores[0], pointScores[3]);
+            scoreMax = Math.max(pointScores[0], pointScores[3]);
           }
           scorePoint = scorePoint.set('score',
             Util.valueMinMax(scorePoint.score - scoreDiff, scoreMin, scoreMax));
@@ -302,9 +289,14 @@ class TransformCardChart extends TerrainComponent<Props>
                 Math.min(this.props.domain.get(1), pointValues[index + 1] - domainRange / 1000)
                 : domainMax;
             }
-            if ((this.props.mode === 'logarithmic' || this.props.mode === 'exponential') && min <= 0)
+            if ((mode === 'logarithmic' || mode === 'exponential' || mode === 'sigmoid') && min <= 0)
             {
               min = 0.0011 * (this.props.domain.get(1) - this.props.domain.get(0));
+            }
+            if (mode === 'sigmoid' && pointName === 'k')
+            {
+              min = pointValues[0];
+              max = pointValues[2] - 0.001 * pointValues[2];
             }
             scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
           }
@@ -482,6 +474,58 @@ class TransformCardChart extends TerrainComponent<Props>
     TransformChart.update(ReactDOM.findDOMNode(this), this.getChartState());
   }
 
+  public createPoints(scores, values)
+  {
+    let points = List([]);
+    let scorePoints: ScorePoints = List([]);
+    for (let i = 0; i < values.length; i++)
+    {
+      const p = this.onCreate(values[i], scores[i], false);
+      points = points.push({
+        x: values[i],
+        y: scores[i],
+        id: p.id,
+        selected: false,
+      });
+      scorePoints = scorePoints.push(p);
+    }
+    this.updatePoints(scorePoints);
+    return points;
+  }
+
+  public updatePointsSize(newSize: number, points, xDomain)
+  {
+    const oldSize = points.size;
+    if (oldSize < newSize)
+    {
+      let scorePoints: ScorePoints = List([]);
+      points = List([]);
+      for (let i = 0; i < newSize; i++)
+      {
+        const value = Math.random() * (xDomain[1] - xDomain[0]) + xDomain[0];
+        const score = Math.random();
+        const p = this.onCreate(value, score, false);
+        points = points.push({
+          x: value,
+          y: score,
+          id: p.id,
+          selected: false,
+        });
+        scorePoints = scorePoints.push(p);
+      }
+      this.updatePoints(scorePoints);
+    }
+    else if (oldSize > newSize)
+    {
+      for (let i = oldSize - 1; i >= newSize; i--)
+      {
+        this.onDelete(points.get(i).id);
+      }
+      points = points.splice(newSize);
+    }
+    return points;
+  }
+
   public getChartState(overrideState?: any)
   {
     overrideState = overrideState || {};
@@ -495,67 +539,26 @@ class TransformCardChart extends TerrainComponent<Props>
     const mode = overrideState.mode || this.props.mode;
     const xDomain = (overrideState && overrideState.domain && overrideState.domain.toJS()) || this.props.domain.toJS();
 
-    // When the chart is in log/exp/normal mode, must restrict the # of points to 2 or 3
-    if ((mode === 'logarithmic' || mode === 'exponential'))
+    // Make sure the chart has the correct number of points for it's mode
+    // If not, change the number of points
+    if ((mode === 'logarithmic' && points.size !== NUM_CURVE_POINTS.logarithmic)
+      || (mode === 'exponential' && points.size !== NUM_CURVE_POINTS.exponential))
     {
-      const pointsNeeded = 2;
-      const oldSize = points.size;
-      if (oldSize < pointsNeeded)
-      {
-        let scorePoints: ScorePoints = List([]);
-        points = List([]);
-        for (let i = 0; i < pointsNeeded; i++)
-        {
-          const value = Math.random() * (xDomain[1] - xDomain[0]) + xDomain[0];
-          const score = Math.random();
-          const p = this.onCreate(value, score, false);
-          points = points.push({
-            x: value,
-            y: score,
-            id: p.id,
-            selected: false,
-          });
-          scorePoints = scorePoints.push(p);
-        }
-        this.updatePoints(scorePoints);
-      }
-      else if (oldSize > pointsNeeded)
-      {
-        for (let i = oldSize - 1; i >= pointsNeeded; i--)
-        {
-          const p = points.get(i);
-          if (p !== undefined)
-          {
-            this.onDelete(points.get(i).id);
-          }
-        }
-        points = points.splice(pointsNeeded);
-      }
+      points = this.updatePointsSize(2, points, xDomain);
     }
-    if (mode === 'sigmoid' || mode === 'normal')
+    else if (mode === 'sigmoid' && points.size !== NUM_CURVE_POINTS.sigmoid)
     {
-      const pointsNeeded = mode === 'normal' ? 3 : 4;
-      if (points.size !== pointsNeeded)
-      {
-        const domainRange = xDomain[1] - xDomain[0];
-        const values = mode === 'normal' ? [0.3 * domainRange, 0.5 * domainRange, 0.7 * domainRange] :
-          [0.1 * domainRange, 0.56 * domainRange, 0.6 * domainRange, 0.9 * domainRange];
-        const scores = mode === 'normal' ? [0.6, 0.9, 0.6] : [0.1, 0.344, 0.5, 0.9];
-        let scorePoints: ScorePoints = List([]);
-        points = List([]);
-        for (let i = 0; i < pointsNeeded; i++)
-        {
-          const p = this.onCreate(values[i], scores[i], false);
-          points = points.push({
-            x: values[i],
-            y: scores[i],
-            id: p.id,
-            selected: false,
-          });
-          scorePoints = scorePoints.push(p);
-        }
-        this.updatePoints(scorePoints);
-      }
+      const domainRange = xDomain[1] - xDomain[0];
+      const values = [0.1 * domainRange, 0.56 * domainRange, 0.6 * domainRange, 0.9 * domainRange];
+      const scores = [0.1, 0.344, 0.5, 0.9];
+      points = this.createPoints(scores, values);
+    }
+    else if (mode === 'normal' && points.size !== NUM_CURVE_POINTS.normal)
+    {
+      const domainRange = xDomain[1] - xDomain[0];
+      const values = [0.3 * domainRange, 0.5 * domainRange, 0.7 * domainRange];
+      const scores = [0.6, 0.9, 0.6];
+      points = this.createPoints(scores, values);
     }
 
     const spotlights = overrideState.spotlights || this.props.spotlights || [];
@@ -610,28 +613,34 @@ class TransformCardChart extends TerrainComponent<Props>
     {
       this.debouncedUpdatePoints.flush();
       // Do some checks to make sure points are allowed
+      // In sigmoid mode, just create new points because using existing points from previous mode is dangerous
       let points = nextProps.points;
       if (this.props.mode !== nextProps.mode)
       {
-        points = nextProps.points.map((point) =>
+        if (nextProps.mode === 'sigmoid')
+        {
+          const xDomain = nextProps.domain.toJS();
+          const domainRange = xDomain[1] - xDomain[0];
+          const values = [0.1 * domainRange, 0.56 * domainRange, 0.6 * domainRange, 0.9 * domainRange];
+          const scores = [0.1, 0.344, 0.5, 0.9];
+          points = this.createPoints(scores, values);
+        }
+        else
         {
           const min = 0.0011 * (this.props.domain.get(1) - this.props.domain.get(0));
-          switch (nextProps.mode)
+          points = nextProps.points.map((point, i) =>
           {
-            case 'exponential':
-              point = point.set('score', Math.max(0.001, point.score));
+            if (nextProps.mode === 'exponential' || nextProps.mode === 'logarithmic')
+            {
               point = point.set('value', Math.max(min, point.value));
-              break;
-            case 'logarithmic':
-              point = point.set('value', Math.max(min, point.value));
-              break;
-            case 'sigmoid':
-            case 'normal':
-            case 'linear':
-            default:
-          }
-          return point;
-        });
+              if (nextProps.mode !== 'logarithmic')
+              {
+                point = point.set('score', Math.max(0.001, point.score));
+              }
+            }
+            return point;
+          });
+        }
       }
 
       this.setState({

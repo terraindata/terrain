@@ -55,8 +55,8 @@ import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card } from '../../../blocks/types/Card';
 
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
+import TransformUtil, { NUM_CURVE_POINTS } from '../../../app/util/TransformUtil';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
-import TransformUtil from '../../../app/util/TransformUtil';
 
 export const scorePoint = _block(
   {
@@ -164,24 +164,24 @@ export const elasticTransform = _card(
       {
         let ranges = [];
         let outputs = [];
-        let data = undefined;
+        let data;
         const min = parseFloat(block['dataDomain'].get(0));
         const max = parseFloat(block['dataDomain'].get(1));
-        if (block['mode'] === 'normal' && block['scorePoints'].size === 3)
+        if (block['mode'] === 'normal' && block['scorePoints'].size === NUM_CURVE_POINTS.normal)
         {
           data = TransformUtil.getNormalData(31, block['scorePoints'].toJS(), min, max);
         }
-        else if (block['mode'] === 'exponential' && block['scorePoints'].size === 2)
+        else if (block['mode'] === 'exponential' && block['scorePoints'].size === NUM_CURVE_POINTS.exponential)
         {
           data = TransformUtil.getExponentialData(31, block['scorePoints'].toJS());
         }
-        else if (block['mode'] === 'logarithmic' && block['scorePoints'].size === 2)
+        else if (block['mode'] === 'logarithmic' && block['scorePoints'].size === NUM_CURVE_POINTS.logarithmic)
         {
           data = TransformUtil.getLogarithmicData(31, block['scorePoints'].toJS());
         }
-        else if (block['mode'] === 'sigmoid' && block['scorePoints'].size === 4)
+        else if (block['mode'] === 'sigmoid' && block['scorePoints'].size === NUM_CURVE_POINTS.sigmoid)
         {
-          data = TransformUtil.getSigmoidData(31, block['scorePoints'].toJS(), max, min);
+          data = TransformUtil.getSigmoidData(31, block['scorePoints'].toJS(), min, max);
         }
         else
         {
@@ -210,7 +210,7 @@ export const elasticTransform = _card(
       //   }
       // ),
 
-      metaFields: ['domain', 'dataDomain', 'hasCustomDomain']
+      metaFields: ['domain', 'dataDomain', 'hasCustomDomain'],
     },
   });
 
