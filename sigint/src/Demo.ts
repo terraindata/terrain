@@ -55,9 +55,10 @@ export const type = 'data';
 
 export interface Request
 {
-  s: string;
-  q: string;
-  p: number;
+  s: string; // server address
+  q: string; // query string
+  p: string; // page number
+  v: string; // variant id
 }
 
 export async function search(req: Request): Promise<object[]>
@@ -85,42 +86,41 @@ export async function search(req: Request): Promise<object[]>
   {
     const resp: any = await new Promise((resolve, reject) =>
     {
-      let query = {};
-      if (req.q === '')
+      const from = Number(req.p) * 30;
+      const size = 30;
+
+      if (req.v === undefined || req.v === '123')
       {
-        query = {
-          match_all: {
+        winston.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
+        client.search({
+          index,
+          type,
+          from,
+          size,
+          body: {
+            query: {
+              prefix: {
+                'title.keyword': req.q,
+              },
+            },
           },
-        };
+        }, makePromiseCallback(resolve, reject));
       }
       else
       {
-        query = {
-          match: {
-            title: req.q,
+        winston.info('Calling Terrain variant: terrain_' + req.v +
+          '(from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
+        client.searchTemplate({
+          body: {
+            id: 'terrain_' + req.v,
+            params: {
+              from: (Number(req.p) * 30),
+              size: 30,
+              title: '\"' + req.q + '\"',
+            },
           },
-        };
+        } as any, makePromiseCallback(resolve, reject));
       }
-
-      client.search({
-        index,
-        type,
-        from: (req.p * 30),
-        size: 30,
-        body: {
-          query,
-        },
-      }, makePromiseCallback(resolve, reject));
-
-      // client.searchTemplate({
-      //   body: {
-      //     id: 'terrain_14',
-      //     params: {
-      //       from: (req.p * 30),
-      //       size: 30,
-      //     },
-      //   },
-      // } as any, makePromiseCallback(resolve, reject));
     });
 
     if (resp.hits.hits === undefined)
