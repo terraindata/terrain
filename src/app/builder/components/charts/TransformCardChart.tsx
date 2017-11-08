@@ -542,7 +542,7 @@ class TransformCardChart extends TerrainComponent<Props>
     if ((mode === 'logarithmic' && points.size !== NUM_CURVE_POINTS.logarithmic)
       || (mode === 'exponential' && points.size !== NUM_CURVE_POINTS.exponential))
     {
-      points = this.updatePointsSize(NUM_CURVE_PONTS.logarithmic, points, xDomain);
+      points = this.updatePointsSize(NUM_CURVE_POINTS.logarithmic, points, xDomain);
     }
     else if (mode === 'sigmoid' && points.size !== NUM_CURVE_POINTS.sigmoid)
     {
