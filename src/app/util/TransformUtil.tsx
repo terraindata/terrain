@@ -55,9 +55,50 @@ import Util from './Util';
 const NORMAL_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
 
 const TransformUtil = {
-  getLogarithmicData()
-  {
 
+  getLogarithmicData(numPoints, pointsData, domainMin?, domainMax?)
+  {
+    const x1 = pointsData[0].x || pointsData[0].value;
+    let y1 = pointsData[0].y || pointsData[0].score;
+    const x2 = pointsData[1].x || pointsData[1].value;
+    let y2 = pointsData[1].y || pointsData[1].score;
+
+    let ranges = [];
+    let outputs = [];
+    const stepSize = Math.abs(pointsData[1].x - pointsData[0].x) * (1 / numPoints);
+    if (pointsData[0].y > pointsData[1].y)
+    {
+      const yMax = y1 + 0.05;
+      const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
+      const b = x2 - Math.log(yMax - y2) / k;
+      let x = pointsData[0].x;
+      for (let i = 0; i <= 100; i++)
+      {
+        const y = -1 * Math.exp(k * (x - b)) + yMax;
+        ranges.push(x);
+        outputs.push(y);
+        x += stepSize;
+      }
+    }
+    else
+    {
+      const a = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / (1 - Math.log(x1) / Math.log(x2));
+      const b = (y2 - a) / Math.log(x2);
+      let x = pointsData[0].x;
+      for (let i = 0; i <= 100; i++)
+      {
+        const y = this._logarithmic(x, a, b);
+        ranges.push(x);
+        outputs.push(y);
+        x += stepSize;
+      }
+    }
+    return {ranges, outputs};
+  },
+
+    _logarithmic(x, a, b)
+  {
+    return a + b * Math.log(x);
   },
 
   getExponentialData(numPoints, pointsData)
@@ -94,34 +135,30 @@ const TransformUtil = {
 
   getNormalData(numPoints, pointsData, domainMin, domainMax)
   {
-    if (pointsData.length !== 3)
-    {
-      return {xData: [], yData: []};
-    }
-
     const average = pointsData[1].x || pointsData[1].value;
     const rightPoint = pointsData[0].x || pointsData[0].value;
     const leftPoint = pointsData[2].x || pointsData[2].value;
+    const averageHeight = pointsData[1].y || pointsData[1].score;
     // Left half of data
-    let stdDev = Math.abs(pointsData[1].x - pointsData[0].x);
+    let stdDev = Math.abs(average - rightPoint);
     let maxY = TransformUtil._normal(average, average, stdDev);
-    let scaleFactor = pointsData[1].y / maxY;
-    const left = TransformUtil._getNormalDataSubset(average, stdDev, domainMin, average, scaleFactor);
+    let scaleFactor = averageHeight / maxY;
+    const left = TransformUtil._getNormalDataSubset(average, stdDev, domainMin, average, scaleFactor, Math.floor(numPoints / 2));
 
     // Right half of data
-    stdDev = Math.abs(pointsData[2].x - pointsData[1].x);
+    stdDev = Math.abs(leftPoint - average);
     maxY = TransformUtil._normal(average, average, stdDev);
-    scaleFactor = pointsData[1].y / maxY;
-    const right = TransformUtil._getNormalDataSubset(average, stdDev, average, domainMax, scaleFactor);
+    scaleFactor = averageHeight / maxY;
+    const right = TransformUtil._getNormalDataSubset(average, stdDev, average, domainMax, scaleFactor, Math.floor(numPoints / 2));
 
     return {ranges: left.xData.concat(right.xData), outputs: left.yData.concat(right.yData)};
   },
 
-  _getNormalDataSubset(average, stdDev, min, max, scaleFactor)
+  _getNormalDataSubset(average, stdDev, min, max, scaleFactor, numPoints)
   {
     const xData = [];
     const yData = [];
-    const stepSize = (max - min) * (1 / 50);
+    const stepSize = (max - min) / numPoints;
     for (let i = min; i <= max; i += stepSize)
     {
       const y = TransformUtil._normal(i, average, stdDev);
@@ -136,6 +173,8 @@ const TransformUtil = {
     x = (x - average) / stdDev;
     return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
   },
+
+
 
   getSigmoidData()
   {

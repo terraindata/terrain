@@ -162,102 +162,64 @@ export const elasticTransform = _card(
 
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
-        if (block['scorePoints'].size <= 1)
-        {
-          return {
-            a: 0,
-            b: 1,
-            numerators: [[block['input'], 1]],
-            denominators: [],
-            ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
-            outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
-          };
-        }
         let ranges = [];
         let outputs = [];
-        const min = parseFloat(block['dataDomain'].get(0));
-        const max = parseFloat(block['dataDomain'].get(1));
-        let x1;
-        let x2;
-        let y1;
-        let y2;
-        let stepSize;
-        if (block['scorePoints'].size > 1)
+        let data = undefined;
+        if (block['mode'] === 'normal' && block['scorePoints'].size === 3)
         {
-          x1 = block['scorePoints'].get(0).value;
-          x2 = block['scorePoints'].get(1).value;
-          y1 = block['scorePoints'].get(0).score;
-          y2 = block['scorePoints'].get(1).score;
-          stepSize = Math.abs(x2 - x1) * (1 / 31);
-        }
-
-        switch (block['mode'])
-        {
-          case 'normal':
-            { ranges, outputs } = TransformUtil.getNormalData(31,
+          console.log(parseFloat(block['dataDomain'].get(0)));
+          console.log(parseFloat(block['dataDomain'].get(1)));
+          data = TransformUtil.getNormalData(31,
                      block['scorePoints'].toJS(),
                      parseFloat(block['dataDomain'].get(0)),
                      parseFloat(block['dataDomain'].get(1)));
-            break;
-          case 'exponential':
-            { ranges, outputs} = TransformUtil.getExponentialData(31, block['scorePoints'].toJS());
-            break;
-          case 'logarithmic':
-            if (y1 > y2)
-            {
-              const yMax = y1 + 0.01;
-              const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
-              const b = x2 - Math.log(yMax - y2) / k;
-              for (let i = x1; i <= x2; i += stepSize)
-              {
-                const y = -1 * Math.exp(k * (i - b)) + yMax;
-                ranges.push(i);
-                outputs.push(y);
-              }
-            }
-            else
-            {
-              const a = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / (1 - Math.log(x1) / Math.log(x2));
-              const b = (y2 - a) / Math.log(x2);
-              for (let i = x1; i <= x2; i += stepSize)
-              {
-                const y = a + b * Math.log(i);
-                ranges.push(i);
-                outputs.push(y);
-              }
-            }
-            break;
-          case 'sigmoid':
-            if (block['scorePoints'].size !== 4)
-            {
-              return {
-                a: 0,
-                b: 1,
-                numerators: [[block['input'], 1]],
-                denominators: [],
-                ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
-                outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
-              };
-            }
-            const offset = y1;
-            const xVal = x2;
-            const yVal = y2;
-            const x0 = block['scorePoints'].get(2).value;
-            const L = block['scorePoints'].get(3).score - block['scorePoints'].get(0).score;
-            const exp = (-1 * Math.log(L / (yVal - offset) - 1)) / (xVal - x0);
-            stepSize = Math.abs(max - min) / 31;
-            for (let i = min; i < max; i += stepSize)
-            {
-              const y = L / (1 + Math.exp(-1 * exp * (i - x0))) + offset;
-              ranges.push(i);
-              outputs.push(y);
-            }
-            break;
+        }
+        else if (block['mode'] === 'exponential' && block['scorePoints'].size === 2)
+        {
+          data = TransformUtil.getExponentialData(31, block['scorePoints'].toJS());
+        }
+        else if (block['mode'] === 'logarithmic' && block['scorePoints'].size === 2)
+        {
+          data = TransformUtil.getLogarithmicData(31, block['scorePoints'].toJS());
+        }
+        else if (block['mode'] === 'sigmoid' && block['scorePoints'].size === 4)
+        {
+          if (block['scorePoints'].size !== 4)
+          {
+            return {
+              a: 0,
+              b: 1,
+              numerators: [[block['input'], 1]],
+              denominators: [],
+              ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
+              outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
+            };
+          }
+          const offset = y1;
+          const xVal = x2;
+          const yVal = y2;
+          const x0 = block['scorePoints'].get(2).value;
+          const L = block['scorePoints'].get(3).score - block['scorePoints'].get(0).score;
+          const exp = (-1 * Math.log(L / (yVal - offset) - 1)) / (xVal - x0);
+          stepSize = Math.abs(max - min) / 31;
+          for (let i = min; i < max; i += stepSize)
+          {
+            const y = L / (1 + Math.exp(-1 * exp * (i - x0))) + offset;
+            ranges.push(i);
+            outputs.push(y);
+          }
 
-          case 'linear':
-          default:
-            ranges = block['scorePoints'].map((scorePt) => scorePt.value).toArray();
-            outputs = block['scorePoints'].map((scorePt) => scorePt.score).toArray();
+        }
+        else
+        {
+          ranges = block['scorePoints'].map((scorePt) => scorePt.value).toArray();
+          outputs = block['scorePoints'].map((scorePt) => scorePt.score).toArray();
+        }
+        if (data !== undefined)
+        {
+          console.log(data);
+          ranges = data.ranges;
+          outputs = data.outputs;
         }
         return {
           a: 0,

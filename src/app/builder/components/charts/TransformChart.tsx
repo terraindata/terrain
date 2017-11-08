@@ -940,17 +940,9 @@ const TransformChart = {
     return data;
   },
 
-  _normal(x, average, stdDev)
-  {
-    x = (x - average) / stdDev;
-    return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
-  },
-
   _drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domainMin, domainMax, getData)
   {
     const {ranges, outputs} = getData(100, pointsData, domainMin, domainMax);
-    console.log(ranges);
-    console.log(outputs);
     let data = ranges.map((x, i) =>
       {
         return {x, y: outputs[i], id: i, selected: false }
@@ -973,98 +965,6 @@ const TransformChart = {
 
     d3.select(el).select('.lines-bg')
       .attr('d', line(data));
-  },
-
-  _drawLogarithmicLines(el, scales, pointsData, onLineClick, onLineMove, canEdit)
-  {
-    const data = this._getLogarithmicData(pointsData, scales);
-    const line = d3.svg.line()
-      .x((d) =>
-      {
-        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
-      })
-      .y((d) =>
-      {
-        return scales.realPointY(d['y']);
-      });
-
-    const lines = d3.select(el).select('.lines')
-      .attr('d', line(data))
-      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
-
-    d3.select(el).select('.lines-bg')
-      .attr('d', line(data));
-  },
-
-  _getLogarithmicData(pointsData, scales)
-  {
-    const y1 = pointsData[0].y;
-    const y2 = pointsData[1].y;
-    const x1 = pointsData[0].x;
-    const x2 = pointsData[1].x;
-
-    const data = [];
-    const stepSize = Math.abs(pointsData[1].x - pointsData[0].x) * (1 / 100);
-    if (pointsData[0].y > pointsData[1].y)
-    {
-      const yMax = y1 + 0.05;
-      const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
-      const b = x2 - Math.log(yMax - y2) / k;
-      let x = pointsData[0].x;
-      for (let i = 0; i <= 100; i++)
-      {
-        const y = -1 * Math.exp(k * (x - b)) + yMax;
-        data.push({ y, x, id: i, selected: false });
-        x += stepSize;
-      }
-    }
-    else
-    {
-      const a = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / (1 - Math.log(x1) / Math.log(x2));
-      const b = (y2 - a) / Math.log(x2);
-      let x = pointsData[0].x;
-      for (let i = 0; i <= 100; i++)
-      {
-        const y = this._logarithmic(x, a, b);
-        data.push({ y, x, id: i, selected: false });
-        x += stepSize;
-      }
-    }
-    if (data.length)
-    {
-      const range = (scaleMax(scales.x) - scaleMin(scales.x));
-      data.unshift({
-        x: scaleMin(scales.x) - range,
-        y: data[0].y,
-        id: '*%*-first',
-        dontScale: true,
-      });
-      data.unshift({
-        x: scaleMin(scales.x) - range,
-        y: -1,
-        id: '*%*-first-anchor',
-        dontScale: true,
-      });
-
-      data.push({
-        x: scaleMax(scales.x) + range,
-        y: data[data.length - 1].y,
-        id: '*%*-last',
-        dontScale: true,
-      });
-      data.push({
-        x: scaleMax(scales.x) + range,
-        y: -1,
-        id: '*%*-last-anchor',
-        dontScale: true,
-      });
-    }
-    return data;
-  },
-
-  _logarithmic(x, a, b)
-  {
-    return a + b * Math.log(x);
   },
 
   _drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domainMin, domainMax)
@@ -1759,9 +1659,9 @@ const TransformChart = {
         const average = pointsData[1].x;
         const stdDev = i === 0 ? Math.abs(pointsData[1].x - pointsData[0].x)
           : Math.abs(pointsData[2].x - pointsData[1].x);
-        const maxY = this._normal(average, average, stdDev);
+        const maxY = TransformUtil._normal(average, average, stdDev);
         const scaleFactor = pointsData[1].y / maxY;
-        const y = this._normal(d['x'], average, stdDev) * scaleFactor;
+        const y = TransformUtil._normal(d['x'], average, stdDev) * scaleFactor;
         return scales.realPointY(y);
       }
       return scales.realPointY(d['y']);
@@ -1959,9 +1859,6 @@ const TransformChart = {
     const numPoints = pointsData.length;
     switch (mode)
     {
-      case 'linear':
-        this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
-        break;
       case 'normal':
         if (numPoints >= 3)
         {
@@ -1971,13 +1868,17 @@ const TransformChart = {
       case 'exponential':
         if (numPoints >= 2)
         {
+          if (Math.abs(pointsData[1].x - pointsData[0].x) <= (domain.x[1] - domain.x[0]) / 900)
+          {
+            this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+          }
           this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getExponentialData);
         }
         break;
       case 'logarithmic':
         if (numPoints >= 2)
         {
-          this._drawLogarithmicLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+          this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getLogarithmicData);
         }
         break;
       case 'sigmoid':
