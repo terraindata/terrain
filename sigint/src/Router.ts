@@ -152,7 +152,7 @@ export class Router
      * @apiName getDemoSearch
      * @apiGroup Demo
      *
-     * @apiParam {String} s ElasticSearch server to query
+     * @apiParam {String} s Elasticsearch server to query
      * @apiParam {String} q Title to search
      * @apiParam {Number} p Page number
      * @apiParam {Number} v Variant ID
