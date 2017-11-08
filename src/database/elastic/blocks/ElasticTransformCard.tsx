@@ -190,90 +190,71 @@ export const elasticTransform = _card(
           y2 = block['scorePoints'].get(1).score;
           stepSize = Math.abs(x2 - x1) * (1 / 31);
         }
-
-        switch (block['mode'])
+        
+        if (block['mode'] === 'normal')
         {
-          case 'normal':
-            const NORMAL_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
-            const normal = (x, avg, std) =>
-            {
-              x = (x - avg) / std;
-              return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / std;
-            };
-            const average = block['scorePoints'].get(1).value;
-            const stdDev = Math.abs(average - block['scorePoints'].get(0).value);
-            const maxY = normal(average, average, stdDev);
-            const scaleFactor = block['scorePoints'].get(1).score / maxY;
-            stepSize = Math.abs(max - min) / 31;
-            for (let i = min; i <= max; i += stepSize)
-            {
-              const y = normal(i, average, stdDev) * scaleFactor;
-              ranges.push(i);
-              outputs.push(y);
-            }
-            break;
-          case 'exponential':
-            const {xData, yData} = TransformUtil.getExponentialData(31, block['scorePoints'].toJS());
-            ranges = xData;
-            outputs = yData;
-            break;
-          case 'logarithmic':
-            if (y1 > y2)
-            {
-              const yMax = y1 + 0.01;
-              const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
-              const b = x2 - Math.log(yMax - y2) / k;
-              for (let i = x1; i <= x2; i += stepSize)
-              {
-                const y = -1 * Math.exp(k * (i - b)) + yMax;
-                ranges.push(i);
-                outputs.push(y);
-              }
-            }
-            else
-            {
-              const a = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / (1 - Math.log(x1) / Math.log(x2));
-              const b = (y2 - a) / Math.log(x2);
-              for (let i = x1; i <= x2; i += stepSize)
-              {
-                const y = a + b * Math.log(i);
-                ranges.push(i);
-                outputs.push(y);
-              }
-            }
-            break;
-          case 'sigmoid':
-            if (block['scorePoints'].size !== 4)
-            {
-              return {
-                a: 0,
-                b: 1,
-                numerators: [[block['input'], 1]],
-                denominators: [],
-                ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
-                outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
-              };
-            }
-            const offset = y1;
-            const xVal = x2;
-            const yVal = y2;
-            const x0 = block['scorePoints'].get(2).value;
-            const L = block['scorePoints'].get(3).score - block['scorePoints'].get(0).score;
-            const exp = (-1 * Math.log(L / (yVal - offset) - 1)) / (xVal - x0);
-            stepSize = Math.abs(max - min) / 31;
-            for (let i = min; i < max; i += stepSize)
-            {
-              const y = L / (1 + Math.exp(-1 * exp * (i - x0))) + offset;
-              ranges.push(i);
-              outputs.push(y);
-            }
-            break;
-
-          case 'linear':
-          default:
-            ranges = block['scorePoints'].map((scorePt) => scorePt.value).toArray();
-            outputs = block['scorePoints'].map((scorePt) => scorePt.score).toArray();
+          const NORMAL_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
+          const normal = (x, avg, std) =>
+          {
+            x = (x - avg) / std;
+            return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / std;
+          };
+          const average = block['scorePoints'].get(1).value;
+          const stdDev = Math.abs(average - block['scorePoints'].get(0).value);
+          const maxY = normal(average, average, stdDev);
+          const scaleFactor = block['scorePoints'].get(1).score / maxY;
+          stepSize = Math.abs(max - min) / 31;
+          for (let i = min; i <= max; i += stepSize)
+          {
+            const y = normal(i, average, stdDev) * scaleFactor;
+            ranges.push(i);
+            outputs.push(y);
+          }
         }
+        else if (block['mode'] === 'exponential')
+        {
+          const {xData, yData} = TransformUtil.getExponentialData(31, block['scorePoints'].toJS());
+          ranges = xData;
+          outputs = yData;
+        }
+        else if (block['mode'] ==='logarithmic')
+        {
+          let {ranges, outputs} = TransformUtil.getLogarithmicData(31, block['scorePoints'].toJS());
+        }
+        else if (block['mode'] === 'sigmoid')
+        {
+          if (block['scorePoints'].size !== 4)
+          {
+            return {
+              a: 0,
+              b: 1,
+              numerators: [[block['input'], 1]],
+              denominators: [],
+              ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
+              outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
+            };
+          }
+          const offset = y1;
+          const xVal = x2;
+          const yVal = y2;
+          const x0 = block['scorePoints'].get(2).value;
+          const L = block['scorePoints'].get(3).score - block['scorePoints'].get(0).score;
+          const exp = (-1 * Math.log(L / (yVal - offset) - 1)) / (xVal - x0);
+          stepSize = Math.abs(max - min) / 31;
+          for (let i = min; i < max; i += stepSize)
+          {
+            const y = L / (1 + Math.exp(-1 * exp * (i - x0))) + offset;
+            ranges.push(i);
+            outputs.push(y);
+          }
+
+        }
+        else  (block['mode'] === 'linear')
+        {
+          ranges = block['scorePoints'].map((scorePt) => scorePt.value).toArray();
+          outputs = block['scorePoints'].map((scorePt) => scorePt.score).toArray();
+        }
+        
         return {
           a: 0,
           b: 1,

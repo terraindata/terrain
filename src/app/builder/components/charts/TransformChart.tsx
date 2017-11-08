@@ -1053,98 +1053,6 @@ const TransformChart = {
       .attr('d', line(data));
   },
 
-  _drawLogarithmicLines(el, scales, pointsData, onLineClick, onLineMove, canEdit)
-  {
-    const data = this._getLogarithmicData(pointsData, scales);
-    const line = d3.svg.line()
-      .x((d) =>
-      {
-        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
-      })
-      .y((d) =>
-      {
-        return scales.realPointY(d['y']);
-      });
-
-    const lines = d3.select(el).select('.lines')
-      .attr('d', line(data))
-      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
-
-    d3.select(el).select('.lines-bg')
-      .attr('d', line(data));
-  },
-
-  _getLogarithmicData(pointsData, scales)
-  {
-    const y1 = pointsData[0].y;
-    const y2 = pointsData[1].y;
-    const x1 = pointsData[0].x;
-    const x2 = pointsData[1].x;
-
-    const data = [];
-    const stepSize = Math.abs(pointsData[1].x - pointsData[0].x) * (1 / 100);
-    if (pointsData[0].y > pointsData[1].y)
-    {
-      const yMax = y1 + 0.05;
-      const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
-      const b = x2 - Math.log(yMax - y2) / k;
-      let x = pointsData[0].x;
-      for (let i = 0; i <= 100; i++)
-      {
-        const y = -1 * Math.exp(k * (x - b)) + yMax;
-        data.push({ y, x, id: i, selected: false });
-        x += stepSize;
-      }
-    }
-    else
-    {
-      const a = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / (1 - Math.log(x1) / Math.log(x2));
-      const b = (y2 - a) / Math.log(x2);
-      let x = pointsData[0].x;
-      for (let i = 0; i <= 100; i++)
-      {
-        const y = this._logarithmic(x, a, b);
-        data.push({ y, x, id: i, selected: false });
-        x += stepSize;
-      }
-    }
-    if (data.length)
-    {
-      const range = (scaleMax(scales.x) - scaleMin(scales.x));
-      data.unshift({
-        x: scaleMin(scales.x) - range,
-        y: data[0].y,
-        id: '*%*-first',
-        dontScale: true,
-      });
-      data.unshift({
-        x: scaleMin(scales.x) - range,
-        y: -1,
-        id: '*%*-first-anchor',
-        dontScale: true,
-      });
-
-      data.push({
-        x: scaleMax(scales.x) + range,
-        y: data[data.length - 1].y,
-        id: '*%*-last',
-        dontScale: true,
-      });
-      data.push({
-        x: scaleMax(scales.x) + range,
-        y: -1,
-        id: '*%*-last-anchor',
-        dontScale: true,
-      });
-    }
-    return data;
-  },
-
-  _logarithmic(x, a, b)
-  {
-    return a + b * Math.log(x);
-  },
-
   _drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domainMin, domainMax)
   {
     const linesPointsData = _.clone(pointsData);
@@ -2055,7 +1963,7 @@ const TransformChart = {
       case 'logarithmic':
         if (numPoints >= 2)
         {
-          this._drawLogarithmicLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+          this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getLogarithmicData);
         }
         break;
       case 'sigmoid':
