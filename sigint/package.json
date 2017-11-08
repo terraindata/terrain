@@ -11,7 +11,7 @@
     "lint": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;",
-    "test": "jest . --forceExit --coverage",
+    "test": "../jest . --forceExit --coverage",
     "bench": "ts-node test/Benchmark.ts",
     "doc": "apidoc -i src"
   },
