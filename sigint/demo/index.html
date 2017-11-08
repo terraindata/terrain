@@ -21,15 +21,9 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
-                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">About</a>
-              </li>
             </ul>
             <form class="form-inline my-2 my-lg-0">
-              <label for="setESServer" class="mr-sm-3">ElasticSearch Server</label>
+              <label for="setESServer" class="mr-sm-3">Elasticsearch Server</label>
               <input class="form-control mr-sm-2" id="setESServer" ng-model="esServer" type="search" placeholder="http://localhost:9200" aria-label="Set ES Server">
               <span class="mr-sm-4"></span>
               <label for="setVariant" class="mr-sm-2">Variant ID</label>
@@ -42,7 +36,7 @@
         </nav>
       </header>
       <div class="row justify-content-center align-items-center pt-5">
-        <div class="col-md-4">
+        <div class="col-md-12">
             <div class="input-group input-group-lg">
               <input ng-model="searchTerm" ng-change="search()" type="text" class="form-control" placeholder="Search for..." aria-label="Search for...">
             </div>
@@ -51,9 +45,8 @@
       <section infinite-scroll="loadMore()" infinite-scroll-use-document-bottom="true" infinite-scroll-disabled='busy' class="results p-5 m-5">
         <div class="no-results text-center" ng-hide="results.length">No results</div>
         <div class="row justify-content-between justify-content-md-center align-items-start">
-          <div class="col col-md-2 p-3" ng-cloak ng-repeat="result in results" ng-init="$last && doneLoading()">
-            <div id="result-{{result.movieid}}" class="box card text-center" data-toggle="modal" data-target="#showDetail-{{result.movieid}}" ng-click="cardDisplay(result)">
-              <img class="card-img-top img-fluid" ng-src="http://image.tmdb.org/t/p/w185/{{result.posterpath}}" ng-if="result.posterpath.length" alt={{result.title}}>
+          <div class="col col-md-4 p-3 col-sm-6 col-xs-1 col-lg-2" ng-cloak ng-repeat="result in results" ng-init="$last && doneLoading()">
+            <div id="result-{{result.movieid}}" class="box card text-center" data-toggle="modal" data-target="#showDetail-{{result.movieid}}" style="background-image:url(http://image.tmdb.org/t/p/w185/{{result.posterpath}})" ng-click="cardDisplay(result)">
               <img class="card-img-top img-fluid" ng-src="img/placeholder.png" ng-if="!result.posterpath.length" alt={{result.title}}>
               <div ng-init="cardLoad(result)"></div>
               <div class="card-body">
