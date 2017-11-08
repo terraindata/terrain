@@ -1345,7 +1345,7 @@ export const Ajax =
       variantIds: ID[],
       start: Date,
       end: Date,
-      metricId: number,
+      metric: string,
       intervalId: number,
       aggregation: string,
       onLoad: (response: any) => void,
@@ -1355,10 +1355,10 @@ export const Ajax =
         variantid: variantIds.join(','),
         start,
         end,
-        eventid: metricId.toString(),
+        eventname: metric,
         interval: intervalId,
         agg: aggregation,
-        field: '@timestamp',
+        field: 'timestamp',
         database: connectionId,
       };
 

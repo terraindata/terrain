@@ -167,14 +167,14 @@ describe('AnalyticsReducer', () =>
       const nextState = reducer(analytics, {
         type: ActionTypes.selectMetric,
         payload: {
-          metricId: '100',
+          metric: [100],
         },
       });
 
       expect(
         nextState.selectedMetric,
       ).toEqual(
-        '100',
+        [100],
       );
     });
   });

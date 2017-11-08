@@ -228,6 +228,7 @@ export class ResultsManager extends TerrainComponent<Props>
             spotlightAction(id, _.extend({
               color: spotlight.color,
               name: spotlight.name,
+              rank: hitIndex,
             },
               nextState.hits.get(hitIndex).toJS(),
             ));
@@ -409,11 +410,13 @@ export class ResultsManager extends TerrainComponent<Props>
         },
       );
 
+      const searchQuery = '{ "body" : ' + eql + '}';
+
       this.setState({
         lastQuery: query,
         queriedTql: eql,
         query: Ajax.query(
-          eql,
+          searchQuery,
           db,
           (resp) =>
           {

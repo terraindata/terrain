@@ -40,7 +40,8 @@
   },
   "dependencies": {
     "clientjs": "^0.1.11",
-    "jsurl": "^0.1.5"
+    "jsurl": "^0.1.5",
+    "object-sizeof": "^1.2.0"
   },
   "devDependencies": {
     "ts-loader": "^2.3.7",

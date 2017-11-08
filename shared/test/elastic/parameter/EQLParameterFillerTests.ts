@@ -61,7 +61,7 @@ beforeAll(async (done) =>
 
 function testGeneration(testString: string,
   params: { [param: string]: any },
-  expectedValue: string)
+  expectedValue: any)
 {
   winston.info('testing \'' + testString + '\'');
 
@@ -74,46 +74,111 @@ function testGeneration(testString: string,
   const result = ESParameterFiller.generate(valueInfo, params);
 
   winston.info(result);
-  expect(result).toEqual(expectedValue);
+  expect(JSON.parse(result)).toEqual(expectedValue);
 }
 
 test('test generate template queries', () =>
 {
-  testGeneration('true', {}, 'true');
-  testGeneration('false', {}, 'false');
-  testGeneration('null', {}, 'null');
+  testGeneration('true', {}, true);
+  testGeneration('false', {}, false);
+  testGeneration('null', {}, null);
 
-  testGeneration(`{"index" : "movies","type" : "data","from" : 0,"size" : 10}`,
+  testGeneration(`
+{
+  "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_type" : "data"}}
+        ]
+      }
+    },
+    "from" : 0,
+    "size" : 10
+}`,
     {},
-    ` { "index":"movies","type":"data","from":0,"size":10 } `);
 
-  testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : @size}`,
+    {
+      query: {
+        bool: {
+          must: [
+            { match: { _index: 'movies' } },
+            { match: { _type: 'data' } },
+          ],
+        },
+      },
+      from: 0,
+      size: 10,
+    });
+
+  testGeneration(`
+{
+  "query" : {
+      "bool" : {
+        "must" : [
+          {"match" : {"_index" : "movies"}},
+          {"match" : {"_type" : @type}}
+        ]
+      }
+    },
+    "from" : @from,
+    "size" : @size
+}`,
     {
       type: 'data',
       from: 0,
       size: 10,
     },
-    ` { "index":"movies","type":"data","from":0,"size":10 } `);
+
+    {
+      query: {
+        bool: {
+          must: [
+            { match: { _index: 'movies' } },
+            { match: { _type: 'data' } },
+          ],
+        },
+      },
+      from: 0,
+      size: 10,
+    });
 
   testGeneration(`
   {
-    "index" : "movies",
-    "type" : "data",
     "size" : @size,
     "from" : @from,
     "body" : {
       "query" : {
         "bool" : {
+        "must" : [
+            {"match" : {"_index" : "movies"}},
+            {"match" : {"_type" : @type}}
+          ],
           "must_not" : [{"match" : {"title" : @bad_title}}]
         }
       }
     }
   }`,
     {
+      type: 'data',
       from: 0,
       size: 10,
       bad_title: 'blah blah',
     },
-    ` { "index":"movies","type":"data","size":10,"from":0,"body": { "query": { "bool": { "must_not":[ { "match": { "title":"blah blah" }  } ] }  }  }  } `);
 
+    {
+      size: 10,
+      from: 0,
+      body: {
+        query: {
+          bool: {
+            must: [
+              { match: { _index: 'movies' } },
+              { match: { _type: 'data' } },
+            ],
+            must_not: [{ match: { title: 'blah blah' } }],
+          },
+        },
+      },
+    });
 });
