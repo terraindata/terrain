@@ -165,14 +165,11 @@ export const elasticTransform = _card(
         let ranges = [];
         let outputs = [];
         let data = undefined;
+        const min = parseFloat(block['dataDomain'].get(0));
+        const max = parseFloat(block['dataDomain'].get(1));
         if (block['mode'] === 'normal' && block['scorePoints'].size === 3)
         {
-          console.log(parseFloat(block['dataDomain'].get(0)));
-          console.log(parseFloat(block['dataDomain'].get(1)));
-          data = TransformUtil.getNormalData(31,
-                     block['scorePoints'].toJS(),
-                     parseFloat(block['dataDomain'].get(0)),
-                     parseFloat(block['dataDomain'].get(1)));
+          data = TransformUtil.getNormalData(31, block['scorePoints'].toJS(), min, max);
         }
         else if (block['mode'] === 'exponential' && block['scorePoints'].size === 2)
         {
@@ -184,40 +181,16 @@ export const elasticTransform = _card(
         }
         else if (block['mode'] === 'sigmoid' && block['scorePoints'].size === 4)
         {
-          if (block['scorePoints'].size !== 4)
-          {
-            return {
-              a: 0,
-              b: 1,
-              numerators: [[block['input'], 1]],
-              denominators: [],
-              ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
-              outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
-            };
-          }
-          const offset = y1;
-          const xVal = x2;
-          const yVal = y2;
-          const x0 = block['scorePoints'].get(2).value;
-          const L = block['scorePoints'].get(3).score - block['scorePoints'].get(0).score;
-          const exp = (-1 * Math.log(L / (yVal - offset) - 1)) / (xVal - x0);
-          stepSize = Math.abs(max - min) / 31;
-          for (let i = min; i < max; i += stepSize)
-          {
-            const y = L / (1 + Math.exp(-1 * exp * (i - x0))) + offset;
-            ranges.push(i);
-            outputs.push(y);
-          }
-
+          data = TransformUtil.getSigmoidData(31, block['scorePoints'].toJS(), max, min);
         }
         else
         {
           ranges = block['scorePoints'].map((scorePt) => scorePt.value).toArray();
           outputs = block['scorePoints'].map((scorePt) => scorePt.score).toArray();
         }
+
         if (data !== undefined)
         {
-          console.log(data);
           ranges = data.ranges;
           outputs = data.outputs;
         }
@@ -237,7 +210,7 @@ export const elasticTransform = _card(
       //   }
       // ),
 
-      metaFields: ['domain', 'dataDomain', 'hasCustomDomain'],
+      metaFields: ['domain', 'dataDomain', 'hasCustomDomain']
     },
   });
 

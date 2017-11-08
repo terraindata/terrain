@@ -1884,7 +1884,7 @@ const TransformChart = {
       case 'sigmoid':
         if (numPoints >= 4)
         {
-          this._drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+          this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getSigmoidData);
           this._drawSigmoidPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain.x);
         }
         break;

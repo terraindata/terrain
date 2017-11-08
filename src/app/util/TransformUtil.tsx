@@ -87,7 +87,7 @@ const TransformUtil = {
       let x = pointsData[0].x;
       for (let i = 0; i <= 100; i++)
       {
-        const y = this._logarithmic(x, a, b);
+        const y = TransformUtil._logarithmic(x, a, b);
         ranges.push(x);
         outputs.push(y);
         x += stepSize;
@@ -174,12 +174,48 @@ const TransformUtil = {
     return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
   },
 
+  //         const offset = y1;
+  //         const xVal = x2;
+  //         const yVal = y2;
+  //         const x0 = block['scorePoints'].get(2).value;
+  //         const L = block['scorePoints'].get(3).score - block['scorePoints'].get(0).score;
+  //         const exp = (-1 * Math.log(L / (yVal - offset) - 1)) / (xVal - x0);
+  //         stepSize = Math.abs(max - min) / 31;
+  //         for (let i = min; i < max; i += stepSize)
+  //         {
+  //           const y = L / (1 + Math.exp(-1 * exp * (i - x0))) + offset;
+  //           ranges.push(i);
+  //           outputs.push(y);
+  //         }
 
-
-  getSigmoidData()
+  getSigmoidData(numPoints, pointsData, domainMin, domainMax)
   {
-
+    const a = pointsData[0].y || pointsData[0].score;
+    const x = pointsData[1].x || pointsData[1].value;
+    const y = pointsData[1].y || pointsData[1].score;
+    const x0 = pointsData[2].x || pointsData[2].value;
+    const y3 = pointsData[3].y || pointsData[3].score;
+    const y0 = pointsData[0].y || pointsData[3].score;
+    const L = y3 - y0;
+    const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+   
+    let ranges = [];
+    let outputs = [];
+    const stepSize = (domainMax - domainMin) * (1 / numPoints);
+    for (let i = (domainMin - stepSize); i < (domainMax + stepSize); i += stepSize)
+    {
+      const y = TransformUtil._sigmoid(i, a, k, x0, L);
+      ranges.push(i);
+      outputs.push(y);
+    }
+    return {ranges, outputs};
   },
+
+  _sigmoid(x, a, k, x0, L)
+  {
+    return L / (1 + Math.exp(-1 * k * (x - x0))) + a;
+  },
+
 
 };
 export default TransformUtil;
