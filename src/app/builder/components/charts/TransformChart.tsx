@@ -909,52 +909,6 @@ const TransformChart = {
     return linesPointsData;
   },
 
-  _drawNormalLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domainMin, domainMax)
-  {
-    const average = pointsData[1].x;
-    // Left half of data
-    let stdDev = Math.abs(pointsData[1].x - pointsData[0].x);
-    let maxY = this._normal(average, average, stdDev);
-    let scaleFactor = pointsData[1].y / maxY;
-    const leftData = this._getNormalData(scales, average, stdDev, domainMin, average, scaleFactor);
-
-    // Right half of data
-    stdDev = Math.abs(pointsData[2].x - pointsData[1].x);
-    maxY = this._normal(average, average, stdDev);
-    scaleFactor = pointsData[1].y / maxY;
-    const rightData = this._getNormalData(scales, average, stdDev, average, domainMax, scaleFactor);
-    const data = this._addBoundingData(scales, leftData.concat(rightData));
-
-    const line = d3.svg.line()
-      .x((d) =>
-      {
-        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
-      })
-      .y((d) =>
-      {
-        return scales.realPointY(d['y']);
-      });
-
-    const lines = d3.select(el).select('.lines')
-      .attr('d', line(data))
-      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
-
-    d3.select(el).select('.lines-bg')
-      .attr('d', line(data));
-  },
-
-  _getNormalData(scales, average, stdDev, min, max, scaleFactor)
-  {
-    const data = [];
-    const stepSize = (max - min) * (1 / 50);
-    for (let i = min; i <= max; i += stepSize)
-    {
-      const y = this._normal(i, average, stdDev);
-      data.push({ y: y * scaleFactor, x: i, id: i, selected: false });
-    }
-    return data;
-  },
-
   _addBoundingData(scales, data)
   {
     const range = (scaleMax(scales.x) - scaleMin(scales.x));
@@ -992,46 +946,14 @@ const TransformChart = {
     return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
   },
 
-  _drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domainMin, domainMax)
-  {
-    // TODO TODO TODO add to switch
-    if (Math.abs(pointsData[0].x - pointsData[1].x) <= (domainMax - domainMin) / 900)
-    {
-      this._drawLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit);
-      return;
-    }
-
-    const {xData, yData} = TransformUtil.getExponentialData(100, pointsData);
-    let data = xData.map((x, i) =>
-      {
-        return {x, y: yData[i], id: i, selected: false }
-      });
-    data = this._addBoundingData(scales, data);
-
-    const line = d3.svg.line()
-      .x((d) =>
-      {
-        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
-      })
-      .y((d) =>
-      {
-        return scales.realPointY(d['y']);
-      });
-
-    const lines = d3.select(el).select('.lines')
-      .attr('d', line(data))
-      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
-
-    d3.select(el).select('.lines-bg')
-      .attr('d', line(data));
-  },
-
   _drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domainMin, domainMax, getData)
   {
-    const {xData, yData} = getData(100, pointsData);
-    let data = xData.map((x, i) =>
+    const {ranges, outputs} = getData(100, pointsData, domainMin, domainMax);
+    console.log(ranges);
+    console.log(outputs);
+    let data = ranges.map((x, i) =>
       {
-        return {x, y: yData[i], id: i, selected: false }
+        return {x, y: outputs[i], id: i, selected: false }
       });
     data = this._addBoundingData(scales, data);
 
@@ -2043,7 +1965,7 @@ const TransformChart = {
       case 'normal':
         if (numPoints >= 3)
         {
-          this._drawNormalLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+          this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getNormalData);
         }
         break;
       case 'exponential':

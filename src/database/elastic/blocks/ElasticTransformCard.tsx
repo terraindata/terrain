@@ -194,28 +194,13 @@ export const elasticTransform = _card(
         switch (block['mode'])
         {
           case 'normal':
-            const NORMAL_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
-            const normal = (x, avg, std) =>
-            {
-              x = (x - avg) / std;
-              return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / std;
-            };
-            const average = block['scorePoints'].get(1).value;
-            const stdDev = Math.abs(average - block['scorePoints'].get(0).value);
-            const maxY = normal(average, average, stdDev);
-            const scaleFactor = block['scorePoints'].get(1).score / maxY;
-            stepSize = Math.abs(max - min) / 31;
-            for (let i = min; i <= max; i += stepSize)
-            {
-              const y = normal(i, average, stdDev) * scaleFactor;
-              ranges.push(i);
-              outputs.push(y);
-            }
+            { ranges, outputs } = TransformUtil.getNormalData(31,
+                     block['scorePoints'].toJS(),
+                     parseFloat(block['dataDomain'].get(0)),
+                     parseFloat(block['dataDomain'].get(1)));
             break;
           case 'exponential':
-            const {xData, yData} = TransformUtil.getExponentialData(31, block['scorePoints'].toJS());
-            ranges = xData;
-            outputs = yData;
+            { ranges, outputs} = TransformUtil.getExponentialData(31, block['scorePoints'].toJS());
             break;
           case 'logarithmic':
             if (y1 > y2)
