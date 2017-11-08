@@ -1028,10 +1028,10 @@ const TransformChart = {
 
   _drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domainMin, domainMax, getData)
   {
-    const {xData, yData} = getData(100, pointsData);
-    let data = xData.map((x, i) =>
+    const {ranges, outputs} = getData(100, pointsData, domainMin, domainMax);
+    let data = ranges.map((x, i) =>
       {
-        return {x, y: yData[i], id: i, selected: false }
+        return {x, y: outputs[i], id: i, selected: false }
       });
     data = this._addBoundingData(scales, data);
 
@@ -1969,7 +1969,7 @@ const TransformChart = {
       case 'sigmoid':
         if (numPoints >= 4)
         {
-          this._drawSigmoidLines(el, scales, pointsData, onLineClick, onLineMove, canEdit, domain.x[0], domain.x[1]);
+          this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getSigmoidData);
           this._drawSigmoidPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain.x);
         }
         break;
