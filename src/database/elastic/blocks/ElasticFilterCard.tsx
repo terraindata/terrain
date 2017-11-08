@@ -159,8 +159,10 @@ export const elasticFilterBlock = _block(
       init: (blocksConfig, extraConfig?, skipTemplate?) =>
       {
         const config = {};
-        config['field'] = (extraConfig && extraConfig.field) || '';
-        config['value'] = (extraConfig && extraConfig.value) || '';
+        config['field'] = (extraConfig && extraConfig.field !== undefined && extraConfig.field !== null)
+          ? extraConfig.field : '';
+        config['value'] = (extraConfig && extraConfig.value !== undefined && extraConfig.value !== null)
+          ? extraConfig.value : '';
         config['boolQuery'] = (extraConfig && extraConfig.boolQuery) || 'must';
         config['filterOp'] = (extraConfig && extraConfig.filterOp) || '=';
         return config;
