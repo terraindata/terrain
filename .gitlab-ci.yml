@@ -17,6 +17,7 @@ stages:
   - style
   - test-front
   - test-back
+  - test-sigint
   - build
   - deploy
 
@@ -46,6 +47,12 @@ test-backend:
   artifacts:
     paths:
       - coverage
+
+test-sigint:
+  script:
+    - cd sigint && yarn run test && cd ..
+  stage: test-sigint
+  when: always
 
 build-frontend:
   script:
