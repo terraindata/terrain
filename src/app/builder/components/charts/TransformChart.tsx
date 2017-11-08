@@ -204,6 +204,7 @@ const TransformChart = {
           const popup = d3.select(el).select('.inner-svg').append('g')
             .attr('class', 'popup');
           const containerWidth = d3.select(el).select('.bg').node().getBBox().width;
+          // 195 is the width of the text, used to center it in the contianer
           const x = (containerWidth - 195) / 2;
           popup.append('text')
             .attr('x', x > 0 ? x : 100)
@@ -270,10 +271,10 @@ const TransformChart = {
           && state.mode !== 'linear'
         )
         {
-          // draw something that says you cannot delete points in this mode
           const popup = d3.select(el).select('.inner-svg').append('g')
             .attr('class', 'popup');
           const containerWidth = d3.select(el).select('.bg').node().getBBox().width;
+          // 211 is the width of the text, used to center it in the container
           const x = (containerWidth - 211) / 2;
           popup.append('text')
             .attr('x', x > 0 ? x : 100)
@@ -422,22 +423,6 @@ const TransformChart = {
     const self = this;
     overlay.on('mouseout', this._overlayMouseoutFactory(el, scales, self._drawNoPointsOverlay));
     overlay.on('mouseover', this._overlayMouseoverFactory(el));
-  },
-
-  _drawInfoPopup(el, scales, width, height, message)
-  {
-    const isvg = d3.select(el).select('.inner-svg');
-    isvg.append('rect')
-      .attr('x', 100)
-      .attr('y', 100)
-      .attr('height', 100)
-      .attr('width', 100)
-      .attr('color', 'red')
-      .append('text')
-      .attr('x', 100)
-      .attr('y', 100)
-      .attr('font-color', 'green')
-      ;
   },
 
   _drawAxes(el, scales, width, height)
@@ -1723,39 +1708,34 @@ const TransformChart = {
     this._drawBars(el, scales, barsData, colors);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
     const numPoints = pointsData.length;
-    switch (mode)
+    let curveFn;
+    if (mode === 'normal' && numPoints === NUM_CURVE_POINTS.normal)
     {
-      case 'normal':
-        if (numPoints === NUM_CURVE_POINTS.normal)
-        {
-          this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getNormalData);
-        }
-        break;
-      case 'exponential':
-        if (numPoints === NUM_CURVE_POINTS.exponential)
-        {
-          if (Math.abs(pointsData[1].x - pointsData[0].x) <= (domain.x[1] - domain.x[0]) / 900)
-          {
-            this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
-          }
-          this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getExponentialData);
-        }
-        break;
-      case 'logarithmic':
-        if (numPoints === NUM_CURVE_POINTS.logarithmic)
-        {
-          this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getLogarithmicData);
-        }
-        break;
-      case 'sigmoid':
-        if (numPoints === NUM_CURVE_POINTS.sigmoid)
-        {
-          this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getSigmoidData);
-        }
-        break;
-      default:
-        this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+      curveFn = TransformUtil.getNormalData;
     }
+    else if (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential
+      && Math.abs(pointsData[1].x - pointsData[0].x) > (domain.x[1] - domain.x[0]) / 900) // points can't be too close horiz.
+    {
+      curveFn = TransformUtil.getExponentialData;
+    }
+    else if (mode === 'logarithmic' && numPoints === NUM_CURVE_POINTS.logarithmic)
+    {
+      curveFn = TransformUtil.getLogarithmicData;
+    }
+    else if (mode === 'sigmoid' && numPoints === NUM_CURVE_POINTS.sigmoid)
+    {
+      curveFn = TransformUtil.getSigmoidData;
+    }
+
+    if (curveFn !== undefined)
+    {
+      this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], curveFn);
+    }
+    else
+    {
+      this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+    }
+
     if (mode === 'linear'
       || (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential)
       || (mode === 'logarithmic' && numPoints === NUM_CURVE_POINTS.logarithmic)

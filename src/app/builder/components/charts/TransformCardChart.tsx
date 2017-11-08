@@ -68,6 +68,7 @@ export interface ScorePoint
 type ScorePoints = List<ScorePoint>;
 
 const ZOOM_FACTOR = 2.0;
+const OFFSET_FACTOR = 0.0011;
 
 import TransformChart from './TransformChart';
 
@@ -244,7 +245,7 @@ class TransformCardChart extends TerrainComponent<Props>
           : domainMax;
         if (mode === 'sigmoid' && min <= 0)
         {
-          min = 0.0011 * (this.props.domain.get(1) - this.props.domain.get(0));
+          min = OFFSET_FACTOR * (this.props.domain.get(1) - this.props.domain.get(0));
         }
         scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
         return scorePoint;
@@ -291,7 +292,7 @@ class TransformCardChart extends TerrainComponent<Props>
             }
             if ((mode === 'logarithmic' || mode === 'exponential' || mode === 'sigmoid') && min <= 0)
             {
-              min = 0.0011 * (this.props.domain.get(1) - this.props.domain.get(0));
+              min = OFFSET_FACTOR * (this.props.domain.get(1) - this.props.domain.get(0));
             }
             if (mode === 'sigmoid' && pointName === 'k')
             {
@@ -625,7 +626,7 @@ class TransformCardChart extends TerrainComponent<Props>
         }
         else
         {
-          const min = 0.0011 * (this.props.domain.get(1) - this.props.domain.get(0));
+          const min = OFFSET_FACTOR * (this.props.domain.get(1) - this.props.domain.get(0));
           points = nextProps.points.map((point, i) =>
           {
             if (nextProps.mode === 'exponential' || nextProps.mode === 'logarithmic')

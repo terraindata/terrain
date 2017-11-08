@@ -46,8 +46,28 @@ THE SOFTWARE.
 
 //  tslint:disable:no-bitwise no-console
 
-// This file contains all the functionality for getting points data for the parameterized transform curves
-// It is used by the TransformChart to draw lines and the Elastic Transform Card to pass data into the PWL script
+/*
+  This file contains all the functionality for getting points data for the parameterized transform curves
+  It is used by the TransformChart to draw lines and the Elastic Transform Card to pass data into the PWL script
+
+  Logarithmic:
+    Two different functions are used for growth versus decay to get the desired shape of the curve
+
+  Exponential:
+    The curve is shifted down so that the lower point is at 0, the curve is built and then it is shifted back up
+    This helps make the curve look more curvy and less linear
+
+  Normal:
+    The two halves of the graph are calculated using points 0 and 2 as the standard deviations, and this data
+    is merged together
+
+  Sigmoid:
+    The fourth point is used to get L (the upper bound) and the first is used as a (lower bound)
+    The third point is used as x0, the center x point of the sigmoid curve
+    The second points is then used to calculate k, the steepness of the curve
+    In the future, the fourth and first point might no longer be necessary if the curve is bounded between 0 and 1.
+ */
+
 'use strict';
 
 import Util from './Util';
@@ -79,7 +99,7 @@ const TransformUtil = {
       const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
       const b = x2 - Math.log(yMax - y2) / k;
       let x = pointsData[0].x;
-      for (let i = 0; i <= 100; i++)
+      for (let i = 0; i <= numPoints; i++)
       {
         const y = -1 * Math.exp(k * (x - b)) + yMax;
         ranges.push(x);
@@ -92,7 +112,7 @@ const TransformUtil = {
       const a: number = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / (1 - Math.log(x1) / Math.log(x2));
       const b: number = (y2 - a) / Math.log(x2);
       let x = pointsData[0].x;
-      for (let i = 0; i <= 100; i++)
+      for (let i = 0; i <= numPoints; i++)
       {
         const y = TransformUtil._logarithmic(x, a, b);
         ranges.push(x);
