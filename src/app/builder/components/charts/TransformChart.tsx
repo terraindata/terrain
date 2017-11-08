@@ -1110,20 +1110,24 @@ const TransformChart = {
       const yMax = y1 + 0.05;
       const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
       const b = x2 - Math.log(yMax - y2) / k;
-      for (let i = pointsData[0].x; i <= pointsData[1].x; i += stepSize)
+      let x = pointsData[0].x;
+      for (let i = 0; i <= 100; i++)
       {
-        const y = -1 * Math.exp(k * (i - b)) + yMax;
-        data.push({ y, x: i, id: i, selected: false });
+        const y = -1 * Math.exp(k * (x - b)) + yMax;
+        data.push({ y, x, id: i, selected: false });
+        x += stepSize;
       }
     }
     else
     {
       const a = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / (1 - Math.log(x1) / Math.log(x2));
       const b = (y2 - a) / Math.log(x2);
-      for (let i = pointsData[0].x; i <= pointsData[1].x; i += stepSize)
+      let x = pointsData[0].x;
+      for (let i = 0; i <= 100; i++)
       {
-        const y = this._logarithmic(i, a, b);
-        data.push({ y, x: i, id: i, selected: false });
+        const y = this._logarithmic(x, a, b);
+        data.push({ y, x, id: i, selected: false });
+        x += stepSize;
       }
     }
     if (data.length)

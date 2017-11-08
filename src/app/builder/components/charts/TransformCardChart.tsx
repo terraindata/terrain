@@ -106,12 +106,6 @@ class TransformCardChart extends TerrainComponent<Props>
     moveSeed: number;
     movedSeed: number;
     dragging: boolean;
-    // Save state of all modes of cards so that they go back during mode-change
-    linearPoints: ScorePoints,
-    normalPoints: ScorePoints,
-    exponentialPoints: ScorePoints,
-    logarithmicPoints: ScorePoints, // consider combining log/exp
-    sigmoidPoints: ScorePoints,
   } = {
     pointsCache: this.props.points,
     pointsBuffer: null,
@@ -119,11 +113,6 @@ class TransformCardChart extends TerrainComponent<Props>
     moveSeed: 0,
     movedSeed: -1,
     dragging: false,
-    linearPoints: null,
-    normalPoints: null,
-    exponentialPoints: null,
-    logarithmicPoints: null, // consider combining log/exp
-    sigmoidPoints: null,
   };
 
   constructor(props: Props)
@@ -313,17 +302,9 @@ class TransformCardChart extends TerrainComponent<Props>
                 Math.min(this.props.domain.get(1), pointValues[index + 1] - domainRange / 1000)
                 : domainMax;
             }
-            if (this.props.mode === 'logarithmic' && min <= 0)
+            if ((this.props.mode === 'logarithmic' || this.props.mode === 'exponential') && min <= 0)
             {
               min = 0.0011 * (this.props.domain.get(1) - this.props.domain.get(0));
-            }
-            if (this.props.mode === 'normal' && pointName === 'Standard Deviation 1')
-            {
-              max = max - 0.011 * (this.props.domain.get(1) - this.props.domain.get(0));
-            }
-            if (this.props.mode === 'normal' && pointName === 'Standard Deviation 2')
-            {
-              min = min + 0.011 * (this.props.domain.get(1) - this.props.domain.get(0));
             }
             scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
           }
@@ -515,7 +496,7 @@ class TransformCardChart extends TerrainComponent<Props>
     const xDomain = (overrideState && overrideState.domain && overrideState.domain.toJS()) || this.props.domain.toJS();
 
     // When the chart is in log/exp/normal mode, must restrict the # of points to 2 or 3
-    if ((mode === 'logarithmic' || mode === 'exponential') && this.state[mode + 'Points'] === null)
+    if ((mode === 'logarithmic' || mode === 'exponential'))
     {
       const pointsNeeded = 2;
       const oldSize = points.size;
@@ -551,7 +532,7 @@ class TransformCardChart extends TerrainComponent<Props>
         points = points.splice(pointsNeeded);
       }
     }
-    if ((mode === 'sigmoid' || mode === 'normal') && this.state[mode + 'Points'] === null)
+    if (mode === 'sigmoid' || mode === 'normal')
     {
       const pointsNeeded = mode === 'normal' ? 3 : 4;
       if (points.size !== pointsNeeded)
@@ -628,8 +609,33 @@ class TransformCardChart extends TerrainComponent<Props>
     if (!this.state.dragging)
     {
       this.debouncedUpdatePoints.flush();
+      // Do some checks to make sure points are allowed
+      let points = nextProps.points;
+      if (this.props.mode !== nextProps.mode)
+      {
+        points = nextProps.points.map((point) =>
+        {
+          const min = 0.0011 * (this.props.domain.get(1) - this.props.domain.get(0));
+          switch (nextProps.mode)
+          {
+            case 'exponential':
+              point = point.set('score', Math.max(0.001, point.score));
+              point = point.set('value', Math.max(min, point.value));
+              break;
+            case 'logarithmic':
+              point = point.set('value', Math.max(min, point.value));
+              break;
+            case 'sigmoid':
+            case 'normal':
+            case 'linear':
+            default:
+          }
+          return point;
+        });
+      }
+
       this.setState({
-        pointsCache: nextProps.points,
+        pointsCache: points,
         pointsBuffer: null,
       });
     }
@@ -637,31 +643,6 @@ class TransformCardChart extends TerrainComponent<Props>
     {
       this.setState({
         pointsBuffer: nextProps.points,
-      });
-    }
-    // Mode changed, save points
-    if (this.props.mode !== nextProps.mode)
-    {
-      const oldMode = this.props.mode + 'Points';
-      const newMode = nextProps.mode + 'Points';
-      const points = nextProps.points.map((point) =>
-      {
-        if (nextProps.mode === 'exponential' && this.state[newMode] === null)
-        {
-          const score = point.score < 0.01 ? 0.01 : point.score;
-          point = point.set('score', score);
-        }
-        if (nextProps.mode === 'logarithmic' && this.state[newMode] === null)
-        {
-          const min = 0.0011 * (this.props.domain.get(1) - this.props.domain.get(1));
-          const value = point.value < min ? min : point.value;
-          point = point.set('value', value);
-        }
-        return point;
-      });
-      this.setState({
-        [oldMode]: this.state.pointsCache,
-        pointsCache: this.state[newMode] !== null ? this.state[newMode] : points,
       });
     }
   }

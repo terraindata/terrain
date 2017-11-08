@@ -118,64 +118,42 @@ describe('TransformCardChart', () =>
 
   describe('#componentWillReciveProps', () =>
   {
-    it('should update mode caches when mode changes', () =>
+    it('should update points cache', () =>
     {
-      // Changing mode from linear -> normal, linear cache will have one point
-      chartComponent.setProps({ mode: 'normal' });
-      chartComponent.instance().getChartState({ mode: 'normal', points: List([]) });
-      expect(chartComponent.state().linearPoints.toJS()).toHaveLength(1);
+      // Changing mode from linear -> normal, must be three points
+      const newPoints = List<ScorePoint>([
+        {
+          id: 'block-1',
+          score: 0.1,
+          value: 1,
+          set: (key, value) => { },
+        },
+        {
+          id: 'block-2',
+          score: 0.2,
+          value: 2,
+          set: (key, value) => { },
+        }]);
 
-      // Changing mode from normal -> log, linear cache will have one point, normal 3
-      chartComponent.setProps({ mode: 'logarithmic', points: List([]) });
-      chartComponent.instance().getChartState({ mode: 'logarithmic' });
-      expect(chartComponent.state().normalPoints.toJS()).toHaveLength(3);
-      expect(chartComponent.state().linearPoints.toJS()).toHaveLength(1);
-
-      // Changing mode from log -> sigmoid, linear: 1, log: 2, normal: 3
-      chartComponent.setProps({ mode: 'sigmoid' });
-      chartComponent.instance().getChartState({ mode: 'sigmoid' });
-      expect(chartComponent.state().normalPoints.toJS()).toHaveLength(3);
-      expect(chartComponent.state().linearPoints.toJS()).toHaveLength(1);
-      expect(chartComponent.state().logarithmicPoints.toJS()).toHaveLength(2);
-
-      // Changing mode sigmoid -> exponential
-      chartComponent.setProps({ mode: 'exponential' });
-      chartComponent.instance().getChartState({ mode: 'exponential' });
-      expect(chartComponent.state().normalPoints.toJS()).toHaveLength(3);
-      expect(chartComponent.state().linearPoints.toJS()).toHaveLength(1);
-      expect(chartComponent.state().logarithmicPoints.toJS()).toHaveLength(2);
-      expect(chartComponent.state().sigmoidPoints.toJS()).toHaveLength(4);
-
-      // exponential -> linear, will use linearPoints in pointsCache
-      chartComponent.setProps({ mode: 'linear' });
-      expect(chartComponent.state().pointsCache.toJS()).toHaveLength(1);
-
+      chartComponent.setProps({ points: newPoints });
+      expect(chartComponent.state().pointsCache.toJS()).toEqual(newPoints.toJS());
     });
   });
 
   describe('#getChartState', () =>
   {
-    it('should create 3 points when mode is normal', () =>
+    it('should update the number of points based on the mode', () =>
     {
       chartComponent.instance().getChartState({ mode: 'normal' });
       expect(chartComponent.state().pointsCache.toJS()).toHaveLength(3);
-    });
 
-    it('should create 4 points when mode is sigmoid', () =>
-    {
+      chartComponent.instance().getChartState({ mode: 'logarithmic' });
+      expect(chartComponent.state().pointsCache.toJS()).toHaveLength(2);
+
       chartComponent.instance().getChartState({ mode: 'sigmoid' });
       expect(chartComponent.state().pointsCache.toJS()).toHaveLength(4);
-    });
 
-    it('should create 2 points when mode is exponential', () =>
-    {
       chartComponent.instance().getChartState({ mode: 'exponential' });
-      expect(chartComponent.state().pointsCache.toJS()).toHaveLength(2);
-    });
-
-    it('should create 2 points when mode is logarithmic', () =>
-    {
-      chartComponent.instance().getChartState({ mode: 'logarithmic' });
       expect(chartComponent.state().pointsCache.toJS()).toHaveLength(2);
     });
   });
