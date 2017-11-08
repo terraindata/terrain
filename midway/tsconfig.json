@@ -21,6 +21,8 @@
         "../node_modules",
         "../src",
         "build",
-        "../coverage"
+        "../coverage",
+        "../analytics.js",
+        "../sigint"
     ]
 }
