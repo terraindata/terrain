@@ -102,26 +102,26 @@ describe('Demo website tests', () =>
   test('GET /demo/search', async () =>
   {
     await request(server)
-    .get('/demo/search')
-    .query({
-      s: 'http://localhost:9200',
-      q: 'Whiplash',
-      p: 0,
-      v: 123,
-    })
-    .expect(200)
-    .then((response) =>
-    {
-      expect(response.text).not.toBe('');
-      if (response.text === '')
+      .get('/demo/search')
+      .query({
+        s: 'http://localhost:9200',
+        q: 'Whiplash',
+        p: 0,
+        v: 123,
+      })
+      .expect(200)
+      .then((response) =>
       {
-        fail('GET /demo/search request returned empty response body');
-      }
-      const result = JSON.parse(response.text);
-      expect(Array.isArray(result)).toBe(true);
-      expect(result.length).toEqual(1);
-    });
-});
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /demo/search request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toEqual(1);
+      });
+  });
 
   test('Invalid GET /demo/search', async () =>
   {
