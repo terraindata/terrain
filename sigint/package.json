@@ -11,7 +11,7 @@
     "lint": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;",
-    "test": "../jest . --forceExit --coverage",
+    "test": "jest . --forceExit --coverage",
     "bench": "ts-node test/Benchmark.ts",
     "doc": "apidoc -i src"
   },
@@ -65,7 +65,7 @@
     "winston": "^2.4.0"
   },
   "devDependencies": {
-    "@types/jest": "^21.1.2",
+    "@types/jest": "^21.1.5",
     "@types/koa": "^2.0.39",
     "@types/node": "^8.0.32",
     "apidoc": "^0.17.6",
