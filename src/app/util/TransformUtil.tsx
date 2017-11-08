@@ -132,7 +132,6 @@ const TransformUtil = {
     return A * Math.exp(-1 * lambda * x);
   },
 
-
   getNormalData(numPoints, pointsData, domainMin, domainMax)
   {
     const average = pointsData[1].x || pointsData[1].value;

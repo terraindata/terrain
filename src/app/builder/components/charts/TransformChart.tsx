@@ -65,7 +65,6 @@ const scaleMin = (scale) => scale.range()[0];
 const scaleMax = (scale) => scale.range()[scale.range().length - 1];
 const scaleDomainMin = (scale) => scale.domain()[0];
 const scaleDomainMax = (scale) => scale.domain()[scale.domain().length - 1];
-const NORMAL_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
 
 const TransformChart = {
 
@@ -438,7 +437,6 @@ const TransformChart = {
       .attr('x', 100)
       .attr('y', 100)
       .attr('font-color', 'green')
-      .text('TESTING')
       ;
   },
 
@@ -1697,14 +1695,6 @@ const TransformChart = {
         const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
         const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
           Math.log(L / (0.01) - 1) / (-1 * k) + x0;
-        // if (i === 3 && d['x'] >= xVal)
-        // {
-        //   return scales.realX(Util.valueMinMax(d['x'], domain[0], domain[1]));
-        // }
-        // if (i === 0 && d['x'] <= xVal)
-        // {
-        //   return scales.realX(Util.valueMinMax(d['x'], domain[0], domain[1]));
-        // }
         return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
       }
       return scales.realX(d['x']);
