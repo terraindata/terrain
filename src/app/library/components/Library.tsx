@@ -70,6 +70,7 @@ export interface Props
   route?: any;
   canPinVariants?: boolean;
   basePath: string;
+  singleColumn?: boolean;
 }
 
 export interface State
@@ -79,12 +80,18 @@ export interface State
 
 class Library extends TerrainComponent<any>
 {
+  // Give names to each of the library columns
+  public static GROUPS_COLUMN = 'groups';
+  public static ALGORITHMS_COLUMN = 'algorithms';
+  public static VARIANTS_COLUMN = 'variants';
+
   public static defaultProps: Partial<Props> = {
     params: {},
     location: {},
     router: {},
     route: {},
     canPinVariants: false,
+    singleColumn: false,
   };
 
   public cancelSubscription = null;
@@ -293,9 +300,41 @@ class Library extends TerrainComponent<any>
     this.props.analyticsActions.pinVariant(datasetId);
   }
 
+  public isColumnVisible(columnName)
+  {
+    const { singleColumn, router } = this.props;
+    const params = router !== undefined && router.params !== undefined ? router.params : {};
+    const { groupId, algorithmId, variantId } = params;
+
+    return !singleColumn ||
+      (groupId === undefined &&
+        algorithmId === undefined &&
+        variantId === undefined &&
+        columnName === Library.GROUPS_COLUMN
+      ) ||
+      (groupId !== undefined &&
+        algorithmId === undefined &&
+        variantId === undefined &&
+        columnName === Library.ALGORITHMS_COLUMN
+      ) || 
+      (groupId !== undefined &&
+        algorithmId !== undefined &&
+        columnName === Library.VARIANTS_COLUMN
+      );
+  }
+
   public render()
   {
-    const { library: libraryState, analytics, schema } = this.props;
+    const {
+      library: libraryState,
+      analytics,
+      schema,
+      router,
+      basePath,
+      canPinVariants,
+      singleColumn,
+    } = this.props;
+
     const {
       dbs,
       groups,
@@ -313,8 +352,6 @@ class Library extends TerrainComponent<any>
     } = analytics;
 
     const hasPinnedVariants = pinnedVariants.valueSeq().includes(true);
-
-    const { router, basePath, canPinVariants } = this.props;
     const { params } = router;
 
     const datasets = this.getDatasets();
@@ -374,51 +411,71 @@ class Library extends TerrainComponent<any>
       this.setLastPath();
     }
 
+    const algorithmsReferrer = singleColumn && group !== undefined ?
+      {
+        label: group.name,
+        path: `/${basePath}`,
+      } : null;
+
+    const variantsReferrer = singleColumn && algorithm !== undefined ?
+      {
+        label: algorithm.name,
+        path: `/${basePath}/${groupId}`,
+      } : null;
+
     return (
       <div className='library'>
         <div className='library-top'>
-          <GroupsColumn
-            {...{
-              groups,
-              groupsOrder,
-              params,
-              basePath,
-              groupActions: this.props.libraryGroupActions,
-              variants,
-            }}
-            isFocused={algorithm === undefined}
-          />
-          <AlgorithmsColumn
-            {...{
-              dbs,
-              groups,
-              algorithms,
-              variants,
-              algorithmsOrder,
-              groupId,
-              params,
-              basePath,
-              algorithmActions: this.props.libraryAlgorithmActions,
-            }}
-            isFocused={variantIds === null}
-          />
-          <VariantsColumn
-            {...{
-              variants,
-              selectedVariant,
-              variantsOrder,
-              groupId,
-              algorithmId,
-              params,
-              canPinItems: canPinVariants,
-              basePath,
-              router,
-              variantActions: this.props.libraryVariantActions,
-              analytics,
-              analyticsActions: this.props.analyticsActions,
-              algorithms,
-            }}
-          />
+          {this.isColumnVisible(Library.GROUPS_COLUMN) ?
+            <GroupsColumn
+              {...{
+                groups,
+                groupsOrder,
+                params,
+                basePath,
+                groupActions: this.props.libraryGroupActions,
+                variants,
+              }}
+              isFocused={algorithm === undefined}
+            /> : null
+          }
+          {this.isColumnVisible(Library.ALGORITHMS_COLUMN) ?
+            <AlgorithmsColumn
+              {...{
+                dbs,
+                groups,
+                algorithms,
+                variants,
+                algorithmsOrder,
+                groupId,
+                params,
+                basePath,
+                algorithmActions: this.props.libraryAlgorithmActions,
+                referrer: algorithmsReferrer,
+              }}
+              isFocused={variantIds === null}
+            /> : null
+          }
+          {this.isColumnVisible(Library.VARIANTS_COLUMN) ?
+            <VariantsColumn
+              {...{
+                variants,
+                selectedVariant,
+                variantsOrder,
+                groupId,
+                algorithmId,
+                params,
+                canPinItems: canPinVariants,
+                basePath,
+                router,
+                variantActions: this.props.libraryVariantActions,
+                analytics,
+                analyticsActions: this.props.analyticsActions,
+                algorithms,
+                referrer: variantsReferrer,
+              }}
+            /> : null
+          }
           {!canPinVariants ?
             <LibraryInfoColumn
               {...{
