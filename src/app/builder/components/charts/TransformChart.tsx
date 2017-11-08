@@ -56,6 +56,7 @@ const d3 = require('d3');
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import Util from '../../../util/Util';
+import TransformUtil from '../../../util/TransformUtil';
 
 const xMargin = 45;
 const yMargin = 10;
@@ -922,7 +923,7 @@ const TransformChart = {
     maxY = this._normal(average, average, stdDev);
     scaleFactor = pointsData[1].y / maxY;
     const rightData = this._getNormalData(scales, average, stdDev, average, domainMax, scaleFactor);
-    const data = this._addNormalBoundingData(scales, leftData.concat(rightData));
+    const data = this._addBoundingData(scales, leftData.concat(rightData));
 
     const line = d3.svg.line()
       .x((d) =>
@@ -954,7 +955,7 @@ const TransformChart = {
     return data;
   },
 
-  _addNormalBoundingData(scales, data)
+  _addBoundingData(scales, data)
   {
     const range = (scaleMax(scales.x) - scaleMin(scales.x));
     data.unshift({
@@ -993,22 +994,20 @@ const TransformChart = {
 
   _drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domainMin, domainMax)
   {
-    const linesPointsData = _.clone(pointsData);
-    const x1 = pointsData[0].x;
-    let y1 = pointsData[0].y;
-    const x2 = pointsData[1].x;
-    let y2 = pointsData[1].y;
-    if (Math.abs(x1 - x2) <= (domainMax - domainMin) / 900)
+    // TODO TODO TODO add to switch
+    if (Math.abs(pointsData[0].x - pointsData[1].x) <= (domainMax - domainMin) / 900)
     {
       this._drawLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit);
       return;
     }
-    const shift = y2 < y1 ? y2 - 0.001 : y1 - 0.001;
-    y1 -= shift;
-    y2 -= shift;
-    const lambda = (Math.log(y2) / x1 - Math.log(y1) / x1) / (1 - x2 / x1);
-    const A = y2 / Math.exp(-1 * lambda * x2);
-    const data = this._getExponentialData(pointsData, scales, lambda, A, domainMin, domainMax, shift);
+
+    const {xData, yData} = TransformUtil.getExponentialData(100, pointsData);
+    let data = xData.map((x, i) =>
+      {
+        return {x, y: yData[i], id: i, selected: false }
+      });
+    data = this._addBoundingData(scales, data);
+
     const line = d3.svg.line()
       .x((d) =>
       {
@@ -1027,52 +1026,31 @@ const TransformChart = {
       .attr('d', line(data));
   },
 
-  _getExponentialData(pointsData, scales, lambda, A, min, max, shift)
+  _drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domainMin, domainMax, getData)
   {
-    const data = [];
-    const stepSize = (pointsData[1].x - pointsData[0].x) * (1 / 100);
-    let x = pointsData[0].x;
-    for (let i = 0; i <= 100; i++)
-    {
-      const y = this._exponential(x, lambda, A);
-      data.push({ y: y + shift, x, id: i, selectd: false });
-      x += stepSize;
-    }
-    if (data.length)
-    {
-      const range = (scaleMax(scales.x) - scaleMin(scales.x));
-      data.unshift({
-        x: scaleMin(scales.x) - range,
-        y: data[0].y,
-        id: '*%*-first',
-        dontScale: true,
+    const {xData, yData} = getData(100, pointsData);
+    let data = xData.map((x, i) =>
+      {
+        return {x, y: yData[i], id: i, selected: false }
       });
-      data.unshift({
-        x: scaleMin(scales.x) - range,
-        y: -1,
-        id: '*%*-first-anchor',
-        dontScale: true,
+    data = this._addBoundingData(scales, data);
+
+    const line = d3.svg.line()
+      .x((d) =>
+      {
+        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
+      })
+      .y((d) =>
+      {
+        return scales.realPointY(d['y']);
       });
 
-      data.push({
-        x: scaleMax(scales.x) + range,
-        y: data[data.length - 1].y,
-        id: '*%*-last',
-        dontScale: true,
-      });
-      data.push({
-        x: scaleMax(scales.x) + range,
-        y: -1,
-        id: '*%*-last-anchor',
-        dontScale: true,
-      });
-    }
-    return data;
-  },
+    const lines = d3.select(el).select('.lines')
+      .attr('d', line(data))
+      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
 
-  _exponential(x, lambda, A)
-  {
-    return A * Math.exp(-1 * lambda * x);
+    d3.select(el).select('.lines-bg')
+      .attr('d', line(data));
   },
 
   _drawLogarithmicLines(el, scales, pointsData, onLineClick, onLineMove, canEdit)
@@ -2071,7 +2049,7 @@ const TransformChart = {
       case 'exponential':
         if (numPoints >= 2)
         {
-          this._drawExponentialLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1]);
+          this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getExponentialData);
         }
         break;
       case 'logarithmic':

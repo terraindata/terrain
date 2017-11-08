@@ -56,6 +56,7 @@ import { _card } from '../../../blocks/types/Card';
 
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
+import TransformUtil from '../../../app/util/TransformUtil';
 
 export const scorePoint = _block(
   {
@@ -212,18 +213,9 @@ export const elasticTransform = _card(
             }
             break;
           case 'exponential':
-            const exponential = (x, l, a) =>
-            {
-              return a * Math.exp(-1 * l * x);
-            };
-            const lambda = (Math.log(y2) / x1 - Math.log(y1) / x1) / (1 - x2 / x1);
-            const A = y2 / Math.exp(-1 * lambda * x2);
-            for (let i = x1; i < x2; i += stepSize)
-            {
-              const y = exponential(i, lambda, A);
-              ranges.push(i);
-              outputs.push(y);
-            }
+            const {xData, yData} = TransformUtil.getExponentialData(31, block['scorePoints'].toJS());
+            ranges = xData;
+            outputs = yData;
             break;
           case 'logarithmic':
             if (y1 > y2)
