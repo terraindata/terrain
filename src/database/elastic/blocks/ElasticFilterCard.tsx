@@ -351,19 +351,9 @@ export const elasticFilter = _card({
           inner:
           [
             {
-              displayType: DisplayType.TEXT,
-              key: 'field',
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'boolQuery',
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'filterOp',
-              style: {
-                maxWidth: 75,
-              },
+              displayType: DisplayType.LABEL,
+              label: 'Index:',
+              key: null,
             },
             {
               displayType: DisplayType.TEXT,
@@ -388,19 +378,9 @@ export const elasticFilter = _card({
           inner:
           [
             {
-              displayType: DisplayType.TEXT,
-              key: 'field',
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'boolQuery',
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'filterOp',
-              style: {
-                maxWidth: 75,
-              },
+              displayType: DisplayType.LABEL,
+              label: 'Type:',
+              key: null,
             },
             {
               displayType: DisplayType.TEXT,
