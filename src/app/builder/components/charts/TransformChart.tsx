@@ -1010,7 +1010,7 @@ const TransformChart = {
     const stepSize = (max - min) * (1 / 100);
     for (let i = (min - stepSize); i < (max + stepSize); i += stepSize)
     {
-      const y = this._sigmoid(i, a, k, x0, L);
+      const y = TransformUtil._sigmoid(i, a, k, x0, L);
       data.push({ y, x: i, id: i, selected: false });
     }
     if (data.length)
@@ -1753,11 +1753,11 @@ const TransformChart = {
           Math.log(L / (0.01) - 1) / (-1 * k) + x0;
         if (xVal < domain[0])
         {
-          return scales.realPointY(this._sigmoid(domain[0], a, k, x0, L));
+          return scales.realPointY(TransformUtil._sigmoid(domain[0], a, k, x0, L));
         }
         if (xVal > domain[1])
         {
-          return scales.realPointY(this._sigmoid(domain[1], a, k, x0, L));
+          return scales.realPointY(TransformUtil._sigmoid(domain[1], a, k, x0, L));
         }
       }
       return scales.realPointY(d['y']);
@@ -1775,14 +1775,6 @@ const TransformChart = {
         const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
         const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
           Math.log(L / (0.01) - 1) / (-1 * k) + x0;
-        // if (i === 3 && d['x'] >= xVal)
-        // {
-        //   return scales.realX(Util.valueMinMax(d['x'], domain[0], domain[1]));
-        // }
-        // if (i === 0 && d['x'] <= xVal)
-        // {
-        //   return scales.realX(Util.valueMinMax(d['x'], domain[0], domain[1]));
-        // }
         return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
       }
       return scales.realX(d['x']);
@@ -1860,13 +1852,13 @@ const TransformChart = {
     switch (mode)
     {
       case 'normal':
-        if (numPoints >= 3)
+        if (numPoints === 3)
         {
           this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getNormalData);
         }
         break;
       case 'exponential':
-        if (numPoints >= 2)
+        if (numPoints === 2)
         {
           if (Math.abs(pointsData[1].x - pointsData[0].x) <= (domain.x[1] - domain.x[0]) / 900)
           {
@@ -1876,13 +1868,13 @@ const TransformChart = {
         }
         break;
       case 'logarithmic':
-        if (numPoints >= 2)
+        if (numPoints === 2)
         {
           this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getLogarithmicData);
         }
         break;
       case 'sigmoid':
-        if (numPoints >= 4)
+        if (numPoints === 4)
         {
           this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], TransformUtil.getSigmoidData);
           this._drawSigmoidPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain.x);

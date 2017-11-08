@@ -174,20 +174,6 @@ const TransformUtil = {
     return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
   },
 
-  //         const offset = y1;
-  //         const xVal = x2;
-  //         const yVal = y2;
-  //         const x0 = block['scorePoints'].get(2).value;
-  //         const L = block['scorePoints'].get(3).score - block['scorePoints'].get(0).score;
-  //         const exp = (-1 * Math.log(L / (yVal - offset) - 1)) / (xVal - x0);
-  //         stepSize = Math.abs(max - min) / 31;
-  //         for (let i = min; i < max; i += stepSize)
-  //         {
-  //           const y = L / (1 + Math.exp(-1 * exp * (i - x0))) + offset;
-  //           ranges.push(i);
-  //           outputs.push(y);
-  //         }
-
   getSigmoidData(numPoints, pointsData, domainMin, domainMax)
   {
     const a = pointsData[0].y || pointsData[0].score;
@@ -195,8 +181,7 @@ const TransformUtil = {
     const y = pointsData[1].y || pointsData[1].score;
     const x0 = pointsData[2].x || pointsData[2].value;
     const y3 = pointsData[3].y || pointsData[3].score;
-    const y0 = pointsData[0].y || pointsData[3].score;
-    const L = y3 - y0;
+    const L = y3 - a;
     const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
    
     let ranges = [];
