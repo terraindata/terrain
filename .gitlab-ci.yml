@@ -50,7 +50,7 @@ test-backend:
 
 test-sigint:
   script:
-    - cd sigint && yarn run test && cd ..
+    - ( cd sigint && yarn run test )
   stage: test-sigint
   when: always
 

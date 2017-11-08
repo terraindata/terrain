@@ -84,7 +84,7 @@ const TerrainAnalytics = {
 
     if (meta !== null && meta !== undefined)
     {
-      paramString += '&meta=' + jsurl.stringify(meta);
+      paramString += '&meta=' + String(jsurl.stringify(meta));
     }
 
     return paramString;
@@ -106,7 +106,7 @@ const TerrainAnalytics = {
   logQueue()
   {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', (server || '') + '?batch=' + jsurl.stringify(batch), true);
+    xhr.open('GET', (server || '') + '?batch=' + String(jsurl.stringify(batch)), true);
     xhr.send();
     batch = [];
     batchSize = 0;
@@ -115,7 +115,7 @@ const TerrainAnalytics = {
   logEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
   {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', (server || '') + '?' + TerrainAnalytics.assembleParams(false, eventName, variantOrSourceID, meta), true);
+    xhr.open('GET', (server || '') + '?' + String(TerrainAnalytics.assembleParams(false, eventName, variantOrSourceID, meta)), true);
     xhr.send();
   },
 };
