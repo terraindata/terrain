@@ -357,7 +357,6 @@ class TransformCardChart extends TerrainComponent<Props>
     {
       score = 0;
     }
-    // const { points } = this.props;
     const points = this.state.pointsCache;
     let index = 0;
     while (points.get(index) && points.get(index).value < value)
@@ -429,7 +428,6 @@ class TransformCardChart extends TerrainComponent<Props>
     const pointsMax = this.state.pointsCache.max((a, b) => a.value - b.value).value;
     const pointsMin = this.state.pointsCache.min((a, b) => a.value - b.value).value;
     const pointsDomain = pointsMax - pointsMin;
-    // pointsDomain = this.props.mode === 'normal' ? pointsDomain * 2 : pointsDomain;
 
     const domainPadding = 0.05 * (this.props.domain.get(1) - this.props.domain.get(0));
     const currDomain = this.props.domain.get(1) - this.props.domain.get(0) - 2 * domainPadding;
@@ -544,7 +542,7 @@ class TransformCardChart extends TerrainComponent<Props>
     if ((mode === 'logarithmic' && points.size !== NUM_CURVE_POINTS.logarithmic)
       || (mode === 'exponential' && points.size !== NUM_CURVE_POINTS.exponential))
     {
-      points = this.updatePointsSize(2, points, xDomain);
+      points = this.updatePointsSize(NUM_CURVE_PONTS.logarithmic, points, xDomain);
     }
     else if (mode === 'sigmoid' && points.size !== NUM_CURVE_POINTS.sigmoid)
     {

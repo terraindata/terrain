@@ -65,7 +65,6 @@ const scaleMin = (scale) => scale.range()[0];
 const scaleMax = (scale) => scale.range()[scale.range().length - 1];
 const scaleDomainMin = (scale) => scale.domain()[0];
 const scaleDomainMax = (scale) => scale.domain()[scale.domain().length - 1];
-const NORMAL_CONSTANT = 1 / Math.sqrt(2 * Math.PI);
 
 const TransformChart = {
 
@@ -438,7 +437,6 @@ const TransformChart = {
       .attr('x', 100)
       .attr('y', 100)
       .attr('font-color', 'green')
-      .text('TESTING')
       ;
   },
 
