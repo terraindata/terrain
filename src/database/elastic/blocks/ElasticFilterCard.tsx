@@ -159,8 +159,10 @@ export const elasticFilterBlock = _block(
       init: (blocksConfig, extraConfig?, skipTemplate?) =>
       {
         const config = {};
-        config['field'] = (extraConfig && extraConfig.field) || '';
-        config['value'] = (extraConfig && extraConfig.value) || '';
+        config['field'] = (extraConfig && extraConfig.field !== undefined && extraConfig.field !== null)
+          ? extraConfig.field : '';
+        config['value'] = (extraConfig && extraConfig.value !== undefined && extraConfig.value !== null)
+          ? extraConfig.value : '';
         config['boolQuery'] = (extraConfig && extraConfig.boolQuery) || 'must';
         config['filterOp'] = (extraConfig && extraConfig.filterOp) || '=';
         return config;
@@ -351,19 +353,9 @@ export const elasticFilter = _card({
           inner:
           [
             {
-              displayType: DisplayType.TEXT,
-              key: 'field',
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'boolQuery',
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'filterOp',
-              style: {
-                maxWidth: 75,
-              },
+              displayType: DisplayType.LABEL,
+              label: 'Index:',
+              key: null,
             },
             {
               displayType: DisplayType.TEXT,
@@ -388,19 +380,9 @@ export const elasticFilter = _card({
           inner:
           [
             {
-              displayType: DisplayType.TEXT,
-              key: 'field',
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'boolQuery',
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'filterOp',
-              style: {
-                maxWidth: 75,
-              },
+              displayType: DisplayType.LABEL,
+              label: 'Type:',
+              key: null,
             },
             {
               displayType: DisplayType.TEXT,
