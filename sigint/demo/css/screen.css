@@ -169,3 +169,14 @@ nav input[type='search'] {
 .badge {
   border-radius: 99px;
 }
+
+.navbar-toggler-icon {
+  color: #fff;
+  // invert the black image
+  -webkit-filter: invert(100%);
+  filter: invert(100%);  
+}
+
+button {
+  cursor: pointer;
+}
