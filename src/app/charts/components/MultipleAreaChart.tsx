@@ -417,24 +417,6 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     ];
   }
 
-  public toggleDatasetVisibility(datasetId)
-  {
-    const { visibleDatasets } = this.state;
-
-    if (visibleDatasets.includes(datasetId))
-    {
-      const datasetIdIndex = visibleDatasets.indexOf(datasetId);
-      this.setState({
-        visibleDatasets: visibleDatasets.remove(datasetIdIndex),
-      });
-    } else
-    {
-      this.setState({
-        visibleDatasets: visibleDatasets.push(datasetId),
-      });
-    }
-  }
-
   public formatDate(timestamp)
   {
     const date = new Date(timestamp);
