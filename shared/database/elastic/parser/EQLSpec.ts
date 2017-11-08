@@ -68,11 +68,6 @@ import ESWildcardStructureClause from './clauses/ESWildcardStructureClause';
 
 const EQLSpec: ESClause[] =
   [
-    new ESAnyClause('any', {
-      path: ['value'],
-      desc: 'Any valid JSON value.',
-      url: 'http://www.json.org/',
-    }),
     new ESBaseClause('base',
       {
         name: 'value',
@@ -100,6 +95,33 @@ const EQLSpec: ESClause[] =
       {
         path: ['value'],
         desc: 'A string. Strings are enclosed in double quotes ("example string"). Quotes and other special symbols can be encoded by escaping them. See json.org for more information.',
+        url: 'http://www.json.org/',
+      }),
+    new ESMapClause('any_object',
+      'string',
+      'any_value',
+      {
+        path: ['value'],
+        desc: 'Any valid JSON object.',
+        url: 'http://www.json.org',
+      }),
+    new ESVariantClause('any_value',
+      {
+        object: 'any_object',
+        string: 'string',
+        number: 'number',
+        boolean: 'boolean',
+        array: 'any_array',
+      },
+      {
+        path: ['value'],
+        desc: 'Any valid JSON value.',
+        url: 'http://www.json.org/',
+      }),
+    new ESArrayClause('any_array', 'any_value',
+      {
+        path: ['value'],
+        desc: 'Any valid JSON array value.',
         url: 'http://www.json.org/',
       }),
     new ESStringClause('time_string',
@@ -1542,7 +1564,7 @@ const EQLSpec: ESClause[] =
         path: ['script'],
         desc: 'The code for this inline script',
       }),
-    new ESMapClause('script_params', 'string', 'any',
+    new ESMapClause('script_params', 'string', 'any_value',
       {
         path: ['script'],
         desc: 'Parameters to pass to the script.',
