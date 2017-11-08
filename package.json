@@ -16,10 +16,11 @@
     "commit-log": "git log --pretty=format:\"%h%x09%an%x09%ad%x09%s\" | head -n 10 > src/commitlog.txt",
     "build-prod": "yarn commit-log && webpack --config webpack.config.prod.js --output-filename ./midway/src/assets/bundle.js",
     "build": "yarn commit-log && webpack --config webpack.config.js --output-filename ./midway/src/assets/bundle.js",
-    "lint": "yarn lint-front && yarn lint-back",
+    "lint": "yarn lint-front && yarn lint-back && yarn lint-sigint",
     "lint-parallel": "npm-run-all --parallel lint-front lint-back",
-    "lint-back": "tslint -c tslint.json --fix --type-check --project midway/tsconfig.json",
     "lint-front": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
+    "lint-back": "tslint -c tslint.json --fix --type-check --project midway/tsconfig.json",
+    "lint-sigint": "cd sigint && tslint -c tslint.json --fix --type-check --project tsconfig.json ; cd ..",
     "style": "find midway src shared -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1",
     "fix": "yarn style && yarn lint-parallel;",
     "diff-style": "git ls-files -m  \\*.ts\\* | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1"
