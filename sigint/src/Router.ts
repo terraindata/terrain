@@ -154,13 +154,15 @@ export class Router
      *
      * @apiParam {String} s ElasticSearch server to query
      * @apiParam {String} q Title to search
-     * @apiParam {Number} p Page ID
+     * @apiParam {Number} p Page number
+     * @apiParam {Number} v Variant ID
      *
      * @apiParamExample {json} Request-Example:
      *     {
      *       "s": "http://localhost:9200",
      *       "q": "Star",
      *       "p": 0,
+     *       "v": 8,
      *     }
      * @apiSuccess {Object[]} results Results of the search query.
      */
@@ -279,8 +281,10 @@ export class Router
         return this.logError('Expected batch parameter to be an array.');
       }
 
-      events.forEach((ev) => {
-        // non-blocking store
+      events.forEach((ev) =>
+      {
+        // store the event in a non-blocking manner
+        // tslint:disable:next-line no-floating-promises
         this.storeEvent(request, ev);
       });
     }

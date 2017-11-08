@@ -93,7 +93,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
     if ($scope.done) return;
     $scope.busy = true;
 
-    $http.get('/demo/search?s=' + encodeURIComponent($scope.esServer) + '&q=' + $scope.searchTerm + '&p=' + $scope.page++)
+    $http.get('/demo/search?s=' + encodeURIComponent($scope.esServer) + '&q=' + $scope.searchTerm + '&p=' + $scope.page++ + '&v=' + $scope.variantID)
     .then((response) =>
     {
       if (response.status === 200)
