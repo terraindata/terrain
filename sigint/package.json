@@ -30,7 +30,7 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
-    "testRegex": "/test/.+Tests\\.(ts|tsx|js)$",
+    "testRegex": "/test/.+Tests\\.(ts)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -65,7 +65,7 @@
     "winston": "^2.4.0"
   },
   "devDependencies": {
-    "@types/jest": "^21.1.2",
+    "@types/jest": "^21.1.5",
     "@types/koa": "^2.0.39",
     "@types/node": "^8.0.32",
     "apidoc": "^0.17.6",

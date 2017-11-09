@@ -58,8 +58,9 @@ beforeAll(async (done) =>
     const options =
       {
         debug: true,
+        demo: true,
         db: 'http://127.0.0.1:9200',
-        port: 43002,
+        port: 43003,
       };
 
     const app = new App(options);
@@ -72,52 +73,69 @@ beforeAll(async (done) =>
   done();
 });
 
-describe('Event insertion tests', () =>
+describe('Demo website tests', () =>
 {
-  test('GET /v1/', async () =>
+  test('GET /demo/search', async () =>
   {
     await request(server)
-      .get('/v1/')
+      .get('/demo/search')
       .query({
-        eventname: 'impression',
-        variantid: 111,
-        visitorid: 123456,
+        s: 'http://localhost:9200',
+        q: '',
+        p: 0,
+        v: 123,
       })
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('');
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /demo/search request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toBeGreaterThan(0);
       });
   });
 
-  test('POST /v1/', async () =>
+  test('GET /demo/search', async () =>
   {
     await request(server)
-      .post('/v1/')
-      .send({
-        eventname: 'click',
-        variantid: 111,
-        visitorid: 123456,
+      .get('/demo/search')
+      .query({
+        s: 'http://localhost:9200',
+        q: 'Whiplash',
+        p: 0,
+        v: 123,
       })
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('');
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /demo/search request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toEqual(1);
       });
   });
 
-  test('Invalid GET /v1/', async () =>
+  test('Invalid GET /demo/search', async () =>
   {
     await request(server)
-      .get('/v1/')
+      .get('/demo/search')
       .query({
-        eventname: 'click',
-        visitorid: 123456,
+        s: '',
+        q: 123456,
+        p: 1,
       })
       .expect(200)
       .then((response) =>
       {
-        expect(response.text).toBe('');
+        expect(response.text).toBe('[]');
       });
   });
 });
