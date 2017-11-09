@@ -108,7 +108,7 @@ import BuilderReducers from './BuilderReducers';
 
 import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
 
-export const BuilderStore: IStore<BuilderState> = Redux.createStore(
+const BuilderStore: IStore<BuilderState> = Redux.createStore(
   (
     state: BuilderState = DefaultState,
     action: Action<{
