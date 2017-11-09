@@ -64,6 +64,12 @@ build-frontend:
   stage: build
   when: always
 
+build-analytics-js:
+  script:
+   - ( cd analytics.js && yarn run build )
+  stage: build
+  when: always
+
 build-frontend-prod:
   script:
    - yarn run build-prod
