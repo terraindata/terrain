@@ -233,7 +233,7 @@ class TransformCardChart extends TerrainComponent<Props>
     {
       points = this.state.initialPoints.map((scorePoint, i) =>
       {
-        scorePoint = scorePoint.set('score', Util.valueMinMax(scorePoint.score - scoreDiff, mode === 'sigmoid' ? 0.001 : 0, 1));
+        scorePoint = scorePoint.set('score', Util.valueMinMax(scorePoint.score - scoreDiff, mode === 'sigmoid' ? OFFSET_FACTOR : 0, 1));
         const domainMin = this.props.domain.get(0);
         const domainMax = this.props.domain.get(1);
         const domainRange = domainMax - domainMin;
@@ -257,7 +257,7 @@ class TransformCardChart extends TerrainComponent<Props>
       {
         if (scorePoint.id === pointId || this.state.selectedPointIds.get(scorePoint.id))
         {
-          let scoreMin = (mode === 'exponential' || mode === 'sigmoid') ? 0.001 : 0;
+          let scoreMin = (mode === 'exponential' || mode === 'sigmoid') ? OFFSET_FACTOR : 0;
           let scoreMax = mode === 'sigmoid' && pointName === 'a' ? pointScores[1] : 1;
           if (mode === 'sigmoid' && pointName === 'L')
           {
@@ -297,7 +297,7 @@ class TransformCardChart extends TerrainComponent<Props>
             if (mode === 'sigmoid' && pointName === 'k')
             {
               min = pointValues[0];
-              max = pointValues[2] - 0.001 * pointValues[2];
+              max = pointValues[2] - OFFSET_FACTOR * pointValues[2];
             }
             scorePoint = scorePoint.set('value', Util.valueMinMax(scorePoint.value - valueDiff, min, max));
           }
@@ -634,7 +634,7 @@ class TransformCardChart extends TerrainComponent<Props>
               point = point.set('value', Math.max(min, point.value));
               if (nextProps.mode !== 'logarithmic')
               {
-                point = point.set('score', Math.max(0.001, point.score));
+                point = point.set('score', Math.max(OFFSET_FACTOR, point.score));
               }
             }
             return point;
