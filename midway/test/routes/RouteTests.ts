@@ -1121,6 +1121,31 @@ describe('Credentials tests', () =>
   });
 });
 
+describe('Analytics events route tests', () =>
+{
+  test('GET /midway/v1/events/ (get events)', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/events/1')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toEqual(3);
+      });
+  });
+});
+
 describe('Analytics aggregation route tests', () =>
 {
   test('GET /midway/v1/events/ (select)', async () =>
