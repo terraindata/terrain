@@ -31,23 +31,37 @@
 		.pf-piece {
 			margin: 0px @half-spacing;
 		}
-		.pf-score-line-weight {
-			flex-basis: 50px;
-			margin: 0px 4px;
+		.pf-score-line-inner {
+			.builder-tb {
+				flex-basis: 50px;
+				margin: 0px 4px;
+			}
 		}
 		.pf-score-line-text {
-			font-size: @small-font-size;
+			font-size: @font-size;
 			margin: 0px 4px;
-			&.pf-score-line-text-long {
-				flex-basis: 100px;	
-			}
+			flex-basis: 50px;	
 		}	
 		&.pf-score-line-inner {
 			padding: 0px 12px;
+
 		}
 		.pf-line-right {
+			display: flex;
 			.expand {
 				cursor: pointer;
+			}
+			.close {
+				margin-top: 6px;
+    			margin-left: 6px;
+			}
+			.pf-score-line-expand {
+				display: flex;
+				font-size: @font-size;
+				span {
+					padding-right: 6px;
+    				padding-top: 3px;
+				}
 			}
 		}
 	}

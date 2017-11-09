@@ -142,7 +142,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
   {
     return (
       <div className='pf-score-line-expand'>
-        Score
+        <span>Score:</span>
         <div className='pf-score-line-transform-preview'>
           <TransformChartPreviewWrapper
             points={this.props.line.transformData.scorePoints}
@@ -173,7 +173,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
         isNumber={true}
         autoDisabled={true}
       />
-      <span className='pf-score-line-text pf-score-line-text-long'>times their</span>
+      <span className='pf-score-line-text'>times</span>
       <Dropdown
         options={this.props.dropdownOptions}
         selectedIndex={this.state.fieldIndex}

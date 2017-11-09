@@ -70,7 +70,8 @@ const TransformChartPreview = {
   create(el, state)
   {
     d3.select(el).attr('class', 'transform-chart-preview-wrapper');
-
+    const borderColor = localStorage.getItem('theme') === 'DARK' ? Colors().inputFocusBg : Colors().border1);
+console.log(borderColor)
     const svg = d3
       .select(el)
       .append('svg')
@@ -78,11 +79,12 @@ const TransformChartPreview = {
       .attr('width', state.width)
       .attr('height', state.height)
       .attr('viewBox', '0 0 ' + state.width + ' ' + state.height)
+      .attr('style', 'border-color: ' + borderColor)
       ;
 
     svg.append('rect')
       .attr('class', 'bg')
-      .attr('fill', '#fff');
+      .attr('fill', Colors().inputBg);
 
     const innerSvg = svg.append('svg')
       .attr('class', 'inner-svg')
