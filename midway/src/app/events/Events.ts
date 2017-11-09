@@ -324,7 +324,7 @@ export class Events
   {
     const variantids = request['variantid'].split(',');
     const promises: Array<Promise<any>> = [];
-    if (request['agg'] === 'histogram')
+    if (request['agg'] === 'histogram' || request['agg'] === 'count')
     {
       if (request['interval'] === undefined)
       {

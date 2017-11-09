@@ -64,11 +64,11 @@ const Router = new KoaRouter();
 // * end: end time of the interval
 // * agg: supported aggregation operations are:
 //     `select` - returns all events between the specified interval
-//     `histogram` - returns a histogram of events between the specified interval
+//     `count` - returns a count (histogram) of events between the specified interval
 //     `rate` - returns a ratio of two events between the specified interval
 // * field (optional):
 //     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
-// * interval (optional; required if `agg` is `histogram` or `rate`):
+// * interval (optional; required if `agg` is `count` or `rate`):
 //     the resolution of interval for aggregation operations.
 //     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
 //     also supported are values such as `1.5h`, `90m` etc.
