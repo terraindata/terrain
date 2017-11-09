@@ -57,15 +57,15 @@ import * as React from 'react';
 const moment = require('moment');
 const ReactModal = require('react-modal');
 
-import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
-import BackendInstance from '../../../../database/types/BackendInstance';
-import Query from '../../../../items/types/Query';
-import InfoArea from '../../../common/components/InfoArea';
-import Modal from '../../../common/components/Modal';
-import FileImportPreview from '../../../fileImport/components/FileImportPreview';
-import { FileImportState } from '../../../fileImport/FileImportTypes';
-import Ajax from '../../../util/Ajax';
-import Util from '../../../util/Util';
+import BackendInstance from 'database/types/BackendInstance';
+import ETLExportDisplay from 'etl/components/ETLExportDisplay';
+import { ResultsConfig } from 'shared/results/types/ResultsConfig';
+
+import Query from 'src/items/types/Query';
+
+import Modal from 'common/components/Modal';
+import Ajax from 'util/Ajax';
+import Util from 'util/Util';
 import Actions from '../../data/BuilderActions';
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
@@ -73,13 +73,15 @@ import HitsTable from './HitsTable';
 
 import Radium = require('radium');
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
-import DragHandle from '../../../common/components/DragHandle';
-import InfiniteScroll from '../../../common/components/InfiniteScroll';
-import MapComponent from '../../../common/components/MapComponent';
-import Switch from '../../../common/components/Switch';
-import TerrainComponent from '../../../common/components/TerrainComponent';
-import MapUtil from '../../../util/MapUtil';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from 'app/colors/Colors';
+
+import DragHandle from 'common/components/DragHandle';
+import InfiniteScroll from 'common/components/InfiniteScroll';
+import InfoArea from 'common/components/InfoArea';
+import MapComponent from 'common/components/MapComponent';
+import Switch from 'common/components/Switch';
+import TerrainComponent from 'common/components/TerrainComponent';
+import MapUtil from 'util/MapUtil';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
 const HITS_PAGE_SIZE = 20;
@@ -788,7 +790,14 @@ column if you have customized the results view.');
     //       variantName={this.props.variantName}
     //     />
     //   </div>;
-    const content = <div> Hi :) </div>
+    const content = (
+      <ETLExportDisplay
+        query={this.props.query}
+        serverId={this.props.db.id}
+        variantName={this.props.variantName}
+      />
+    );
+
     return (
       <Modal
         open={this.state.showingExport}

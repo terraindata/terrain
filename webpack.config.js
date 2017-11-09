@@ -80,6 +80,7 @@ module.exports =
             control: path.resolve(__dirname, 'src/app/control'),
             database: path.resolve(__dirname, 'src/database'),
             deploy: path.resolve(__dirname, 'src/app/deploy'),
+            etl: path.resolve(__dirname, 'src/app/etl'),
             fileImport: path.resolve(__dirname, 'src/app/fileImport'),
             images: path.resolve(__dirname, 'src/images'),
             library: path.resolve(__dirname, 'src/app/library'),
