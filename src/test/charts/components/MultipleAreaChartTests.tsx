@@ -88,31 +88,18 @@ describe('MultipleAreaChart', () =>
     );
   });
 
-  it('should render a multiple area chart', () =>
+  describe('#renderData', () =>
   {
-    expect(chartComponent.find('VictoryChart')).toHaveLength(2);
+    it('should return one area and one scatter per visible dataset', () =>
+    {
+      chartComponent.setState({ visibleDatasets: Immutable.List(['1']) });
 
-    const topChartComponent = chartComponent.find('VictoryChart').at(0);
-    const visibleDatasetsCount = chartComponent.state().visibleDatasets.count();
-    expect(topChartComponent.find('VictoryGroup')).toHaveLength(1);
-    expect(topChartComponent.find('VictoryArea')).toHaveLength(visibleDatasetsCount);
-    expect(topChartComponent.find('VictoryScatter')).toHaveLength(visibleDatasetsCount);
-    expect(topChartComponent.find('VictoryLegend')).toHaveLength(1);
+      const visibleDatasetsCount = chartComponent.state().visibleDatasets.count();
+      const data = chartComponent.instance().renderData();
 
-    const topChartLegendComponent = topChartComponent.find('VictoryLegend');
-    const topChartLegendData = topChartLegendComponent.props().data;
-    expect(topChartLegendData).toHaveLength(2);
-    expect(topChartLegendData[0]).toMatchObject(
-      { id: variantId, name: variantName, labels: {} },
-    );
-
-    const topChartAreaComponent = topChartComponent.find('VictoryArea').first();
-    expect(topChartAreaComponent.props().x).toEqual('xaxis');
-    expect(topChartAreaComponent.props().y).toEqual('yaxis');
-
-    const bottomChartComponent = chartComponent.find('VictoryChart').at(1);
-    expect(bottomChartComponent.find('VictoryAxis')).toHaveLength(1);
-    expect(bottomChartComponent.find('VictoryArea')).toHaveLength(1);
+      expect(data.areas.length).toEqual(visibleDatasetsCount);
+      expect(data.scatters.length).toEqual(visibleDatasetsCount);
+    });
   });
 
   it('should set all datasets as visible by default', () =>
@@ -120,15 +107,6 @@ describe('MultipleAreaChart', () =>
     // jmansor: I don't like these assertions, there must be something better
     // to assert on Immutable objects.
     expect(chartComponent.state().visibleDatasets.toJS()).toEqual(datasets.keySeq().toJS());
-  });
-
-  it('should only show datasets marked as visible', () =>
-  {
-    chartComponent.setState({ visibleDatasets: Immutable.List(['1']) });
-    const topChartComponent = chartComponent.find('VictoryChart').at(0);
-
-    expect(topChartComponent.find('VictoryArea')).toHaveLength(1);
-    expect(topChartComponent.find('VictoryArea').props().name).toEqual('area-1');
   });
 
   describe('#componentWillReceiveProps', () =>
@@ -193,30 +171,6 @@ describe('MultipleAreaChart', () =>
 
       expect(chartComponent.instance().props.onLegendClick)
         .toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('#toggleDatasetVisibility', () =>
-  {
-    describe('when the dataset is currently visible', () =>
-    {
-      it('should remove the dataset from the visible list', () =>
-      {
-        chartComponent.instance().toggleDatasetVisibility('1');
-
-        expect(chartComponent.state().visibleDatasets.toJS()).not.toContain('1');
-      });
-    });
-
-    describe('when the dataset is NOT currently visible', () =>
-    {
-      it('should add the dataset from the visible list', () =>
-      {
-        chartComponent.instance().toggleDatasetVisibility('1');
-        chartComponent.instance().toggleDatasetVisibility('1');
-
-        expect(chartComponent.state().visibleDatasets.toJS()).toContain('1');
-      });
     });
   });
 });

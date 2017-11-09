@@ -55,7 +55,7 @@ class AnalyticsStateC
   // TODO: dynamically populate metrics for each variant and select the first metric
   public selectedMetric: string = 'impression';
   public selectedInterval: string = 'day';
-  public selectedDateRange: ID = 1;
+  public selectedDateRange: ID = 3;
   public selectedAnalyticsConnection: string = '';
   public pinnedVariants: Immutable.Map<ID, boolean> = Immutable.Map<ID, boolean>({});
 }
