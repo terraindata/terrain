@@ -82,7 +82,7 @@ THE SOFTWARE.
  */
 
 import * as Immutable from 'immutable';
-const { List, Map } = Immutable;
+const { List, Map, Record } = Immutable;
 import { BaseClass, New } from '../../../Classes';
 import { ScorePoints } from '../charts/TransformCardChart';
 
@@ -145,23 +145,50 @@ class ScoreLineC extends LineC
 {
   public field: string = ''; // autocomplete
   public type: string = 'transform';
-  public transformData: TransformData = _TransformData(); // TODO
+  public transformData: TransformData = _TransformData();
+  public expanded: boolean = true;
 
   public sortOrder: string = 'desc'; // only used for certain types
 }
 export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
-export const _ScoreLine = (config?: { [key: string]: any }) =>
-  New<ScoreLine>(new ScoreLineC(config), config);
+export const _ScoreLine = (config?: { [key: string]: any }) => {
+  let scoreLine = New<ScoreLine>(new ScoreLineC(config), config);
+  scoreLine = scoreLine
+    .set('transformData', _TransformData(scoreLine['transformData']));
+  return scoreLine;
+};
 
 class TransformDataC extends BaseClass
 {
-  public scorePoints: ScorePoints = List([]);
-  public domain: List<number> = List([]);
+  public scorePoints: List<ScorePoint> = List([]);
+  public domain: List<number> = List([0, 10]);
 }
 
 export type TransformData = TransformDataC & IRecord<TransformDataC>;
-export const _TransformData = (config?: {[key: string]: any}) =>
-  New<TransformData>(new TransformDataC(config), config);
+export const _TransformData = (config?: {[key: string]: any}) => {
+  let transform = New<TransformData>(new TransformDataC(config), config);
+  transform = transform
+    .set('scorePoints', List(transform['scorePoints'].map((p) => _ScorePoint(p))))
+    .set('domain', List(transform['domain']));
+  return transform;
+};
+
+class ScorePointC extends BaseClass
+{
+  public value: number = 0;
+  public score: number = 0;
+  public id: string = '';
+  public type: string = 'scorePoint';
+  public static: any = {
+    language: 'elastic',
+    metaFields: ['id'],
+    tql: '$score, $value',
+  }
+}
+
+export type ScorePoint = ScorePointC & IRecord<ScorePointC>;
+export const _ScorePoint = (config?: {[key: string]: any}) =>
+   New<ScorePoint>(new ScorePointC(config), config);
 
 class FilterLineC extends LineC
 {

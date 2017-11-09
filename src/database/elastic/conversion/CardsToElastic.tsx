@@ -61,13 +61,13 @@ class CardsToElastic
 {
   public static toElastic(query: Query, options: Options = {}): string
   {
-    const body = {};
+    let body = {};
     const rootCard = query.cards.get(0);
 
     const rootCardValue = CardsToElastic.blockToElastic(rootCard, options);
     if (rootCardValue !== null)
     {
-      body['body'] = rootCardValue;
+      body = rootCardValue;
     }
     const eql = ESQueryToCode(body as ESQueryObject, options, query.inputs);
     return eql;

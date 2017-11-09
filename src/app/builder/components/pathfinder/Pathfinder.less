@@ -25,13 +25,11 @@
 	
 	.pf-line {
 		display: flex;
+		align-items: center;
+		margin: @half-spacing 0px;
 		
 		.pf-piece {
 			margin: 0px @half-spacing;
-			
-			.dropdown-wrapper {
-				margin-top: -4px;
-			}
 		}
 		.pf-score-line-weight {
 			flex-basis: 50px;
@@ -40,7 +38,6 @@
 		.pf-score-line-text {
 			font-size: @small-font-size;
 			margin: 0px 4px;
-			padding-top: 7px;
 			&.pf-score-line-text-long {
 				flex-basis: 100px;	
 			}
@@ -55,10 +52,6 @@
 				width: 100%;
 			}
 		}
-	.pf-line-right {
-		position: relative;
-		top: 8px;
-	}
 	.pf-score-line {
 		margin: 12px;
 	}

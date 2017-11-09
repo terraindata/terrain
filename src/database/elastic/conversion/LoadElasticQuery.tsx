@@ -67,7 +67,7 @@ export default class LoadElasticQuery
       return query;
     }
 
-    if (root.index || root.type || root.from || root.size)
+    if (root.index || root.type || root.body)
     {
       return LoadElasticQuery.upgradeQueryRoot(query, parser);
     }

@@ -619,12 +619,14 @@ describe('Query route tests', () =>
     async () =>
     {
       const template: string = `{
-                   "index" : "movies",
-                   "type" : "data",
                    "from" : 0,
                    "size" : {{#toJson}}size{{/toJson}},
-                   "body" : {
-                     "query" : {
+                   "query" : {
+                      "bool" : {
+                        "must" : [
+                          {"match" : {"_index" : "movies"}},
+                          {"match" : {"_type" : "data"}}
+                        ]
                       }
                    }
                 }`;
@@ -1129,10 +1131,10 @@ describe('Analytics aggregation route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2015, 5, 2, 1, 27, 4),
-        end: new Date(2015, 5, 2, 1, 27, 14),
-        eventid: 1,
-        variantid: 1,
+        start: new Date(2017, 10, 6, 7, 24, 4),
+        end: new Date(2017, 10, 6, 7, 26, 4),
+        eventname: 'impression',
+        variantid: 5,
         agg: 'select',
       })
       .expect(200)
@@ -1144,7 +1146,7 @@ describe('Analytics aggregation route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['1'].length).toEqual(2);
+        expect(respData['5'].length).toEqual(3);
       });
   });
 
@@ -1156,12 +1158,12 @@ describe('Analytics aggregation route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2015, 5, 2, 1, 27, 4),
-        end: new Date(2015, 5, 2, 1, 27, 14),
-        eventid: 1,
-        variantid: 1,
+        start: new Date(2017, 10, 6, 7, 24, 4),
+        end: new Date(2017, 10, 6, 7, 28, 4),
+        eventname: 'impression',
+        variantid: 5,
         agg: 'histogram',
-        interval: 'second',
+        interval: 'minute',
       })
       .expect(200)
       .then((response) =>
@@ -1172,7 +1174,7 @@ describe('Analytics aggregation route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['1'].length).toEqual(4);
+        expect(respData['5'].length).toEqual(3);
       });
   });
 
@@ -1184,10 +1186,10 @@ describe('Analytics aggregation route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2015, 5, 2, 1, 27, 4),
-        end: new Date(2015, 5, 2, 3, 27, 4),
-        eventid: '2,1',
-        variantid: 1,
+        start: new Date(2017, 10, 6, 7, 24, 4),
+        end: new Date(2017, 10, 6, 10, 24, 4),
+        eventname: 'click,impression',
+        variantid: 5,
         agg: 'rate',
         interval: 'hour',
       })
@@ -1200,7 +1202,7 @@ describe('Analytics aggregation route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['1'].length).toEqual(3);
+        expect(respData['5'].length).toEqual(4);
       });
   });
 });

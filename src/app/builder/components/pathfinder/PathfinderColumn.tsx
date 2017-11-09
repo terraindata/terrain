@@ -103,7 +103,7 @@ class PathfinderColumn extends TerrainComponent<Props>
 
         <PathfinderFilterSection
           source={path.source}
-          filter={path.filter}
+          filterGroup={path.filterGroup}
           step={path.step}
           canEdit={canEdit}
         />

@@ -217,6 +217,7 @@ class HitComponent extends TerrainComponent<Props> {
         spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig, this.props.locations, spotlightColor);
         spotlightData['color'] = spotlightColor;
         spotlightData['id'] = id;
+        spotlightData['rank'] = this.props.index;
         spotlightAction(id, spotlightData);
         this.props.onSpotlightAdded(id, spotlightData);
       });

@@ -110,7 +110,7 @@ const Actions =
     fetch: (
       connectionName: string,
       variantIds: ID[],
-      metricId,
+      metric,
       intervalId,
       dateRangeId,
       callback?: (analyticsVariants: any) => void,
@@ -134,7 +134,7 @@ const Actions =
 
             let aggregation = '';
 
-            if (metricId.length === 2)
+            if (metric === 'click,impression' || metric === 'conversion,impression')
             {
               aggregation = 'rate';
             } else
@@ -147,7 +147,7 @@ const Actions =
               variantIds,
               start,
               end,
-              metricId,
+              metric,
               intervalId,
               aggregation,
               (variantAnalytics) =>
@@ -176,11 +176,11 @@ const Actions =
         );
       },
 
-    selectMetric: (metricId) =>
+    selectMetric: (metric) =>
     {
       return {
         type: ActionTypes.selectMetric,
-        payload: { metricId },
+        payload: { metric },
       };
     },
 

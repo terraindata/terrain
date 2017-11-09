@@ -318,6 +318,7 @@ export default class HitsTable extends TerrainComponent<Props>
     spotlightData['name'] = getResultName(hit, this.props.resultsConfig);
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
+    spotlightData['rank'] = row;
     spotlightAction(id, spotlightData);
     this.props.onSpotlightAdded(id, spotlightData);
   }

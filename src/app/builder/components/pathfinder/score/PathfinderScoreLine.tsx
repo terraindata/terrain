@@ -72,8 +72,7 @@ export interface Props
   canEdit: boolean;
   index: number;
   onDelete: (index) => void;
-  onFieldChange: (index, field) => void;
-  onWeightChange: (index, weight) => void;
+  onValueChange: (key: string, index: number, newValue: any) => void;
   allWeights: Array<{ weight: number }>;
   keyPath: KeyPath;
 }
@@ -83,11 +82,11 @@ class PathfinderSourceLine extends TerrainComponent<Props>
   public state: {
     field: string;
     weight: number;
-    expandTransform: boolean;
+    expanded: boolean;
   } = {
     field: this.props.line.field,
     weight: this.props.line.weight,
-    expandTransform: true,
+    expanded: this.props.line.expanded,
   };
 
   public componentWillReceiveProps(nextProps)
@@ -106,7 +105,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
     this.setState({
       field,
     });
-    this.props.onFieldChange(this.props.index, field);
+    this.props.onValueChange('field', this.props.index, field);
   }
 
   public handleWeightChange(event)
@@ -114,34 +113,41 @@ class PathfinderSourceLine extends TerrainComponent<Props>
     this.setState({
       weight: event.target.value,
     });
-    this.props.onWeightChange(this.props.index, event.target.value);
+    this.props.onValueChange('weight', this.props.index, event.target.value);
+  }
+
+  public handleExpandedChange(expanded)
+  {    
+    this.props.onValueChange('expanded', this.props.index, expanded);
   }
 
   public renderTransformChart()
   {
     const data = {
       input: this.state.field,
-      domain: List([0, 100]),
+      domain: this.props.line.transformData.domain,
       hasCustomDomain: false,
-      scorePoints: List([]),
+      scorePoints: this.props.line.transformData.scorePoints,
       static: {
         colors: ["#1eb4fa", "rgb(60, 63, 65)"]
       }
     };
+    console.log(data);
 
-    return (<div className='pf-score-line-transform'>
-      <TransformCard
-        builderState={BuilderStore.getState()}
-        canEdit={this.props.canEdit}
-        className={'builder-comp-list-item'}
-        data={data}
-        handleCardDrop={undefined}
-        helpOn={undefined}
-        keyPath={this.props.keyPath.push('transformData')}
-        language={'elastic'}
-        onChange={BuilderActions.change}
-        parentData={undefined}
-      />
+    return (
+      <div className='pf-score-line-transform'>
+        <TransformCard
+          builderState={BuilderStore.getState()}
+          canEdit={this.props.canEdit}
+          className={'builder-comp-list-item'}
+          data={data}
+          handleCardDrop={undefined}
+          helpOn={undefined}
+          keyPath={this.props.keyPath.push('transformData')}
+          language={'elastic'}
+          onChange={BuilderActions.change}
+          parentData={undefined}
+        />
     </div>);
   }
 
@@ -165,12 +171,6 @@ class PathfinderSourceLine extends TerrainComponent<Props>
         options={List(['price', 'margin', 'conversion'])} // TODO getAutoOptions from PathTypes ?
         placeholder={'field'}
       />
-      <span
-        onClick={this._toggle('expandTransform')}
-        className='pf-score-line-text'
-      >
-        Score:
-      </span>
     </div>);
 }
 
@@ -187,8 +187,10 @@ class PathfinderSourceLine extends TerrainComponent<Props>
           children={this.renderLineContents()}
           onDelete={this.props.onDelete}
           index={this.props.index}
+          onExpand={this.handleExpandedChange}
+          expanded={this.props.line.expanded}
+          expandableContent={this.renderTransformChart()}
         />
-        {this.state.expandTransform && this.renderTransformChart()}
       </div>
     );
   }

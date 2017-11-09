@@ -54,6 +54,7 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../..
 import TerrainComponent from 'app/common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import DragHandle from 'app/common/components/DragHandle';
+import FadeInOut from 'app/common/components/FadeInOut';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
@@ -65,35 +66,46 @@ export interface Props
   children?: any;
   onDelete?: (index: number) => void;
   depth?: number;
+  // For expandable section, like transform chart
+  expanded: boolean;
+  expandableContent?: any;
+  onExpand?: (index: number, expanded: boolean) => void;
 }
 
 class PathfinderLine extends TerrainComponent<Props>
 {
   public state: {
-
   } = {
-
   };
 
   public render()
   {
     const { canDrag, canDelete, canEdit, children } = this.props;
     return (
-      <div
-        className={classNames({
-          'pf-line': true,
-          'pf-line-draggable': canDrag,
-          'pf-line-deletable': canDelete,
-        })}
-      >
-        {
-          this.renderLeft()
-        }
-        {
-          children
-        }
-        {
-          this.renderRight()
+      <div className='pf-line-wrapper'>
+        <div
+          className={classNames({
+            'pf-line': true,
+            'pf-line-draggable': canDrag,
+            'pf-line-deletable': canDelete,
+          })}
+        >
+          {
+            this.renderLeft()
+          }
+          {
+            children
+          }
+          {
+            this.renderRight()
+          }
+        </div>
+        {this.props.expandableContent !== undefined &&
+          <FadeInOut
+            open={this.props.expanded}
+          >
+            {this.props.expandableContent}
+          </FadeInOut>
         }
       </div>
     );
@@ -117,19 +129,31 @@ class PathfinderLine extends TerrainComponent<Props>
 
   private renderRight(): El
   {
-    if (!this.props.canEdit || !this.props.canDelete)
+    if ((!this.props.canEdit || !this.props.canDelete) && this.props.expandableContent === undefined)
     {
       return null;
     }
 
     return (
       <div className='pf-line-right'>
+      {
+      this.props.expandableContent !== undefined &&
+      <div
+          className='expand'
+          onClick={this._fn(this.props.onExpand, !this.props.expanded)}
+        >
+          Expand
+        </div>
+      }
+      {
+        this.props.canEdit && this.props.canDelete &&
         <div
           className='close'
           onClick={this._fn(this.props.onDelete, this.props.index)}
         >
           <RemoveIcon />
         </div>
+      }
       </div>
     );
   }

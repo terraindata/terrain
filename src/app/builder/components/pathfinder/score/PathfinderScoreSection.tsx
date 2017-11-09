@@ -115,28 +115,23 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     this.updateWeights(newLines);
   }
 
-  public handleFieldChange(index, field)
+  public handleValueChange(key, index, value)
   {
-    const newLine = this.props.score.lines.get(index).set('field', field);
-    BuilderActions.change(List(['query', 'path', 'score', 'lines']), this.props.score.lines.set(index, newLine));
-  }
-
-  public handleWeightChange(index, weight)
-  {
-    const newLine = this.props.score.lines.get(index).set('weight', weight);
+    const newLine = this.props.score.lines.get(index).set(key, value);
     const newLines = this.props.score.lines.set(index, newLine);
     BuilderActions.change(List(['query', 'path', 'score', 'lines']), newLines);
-    this.updateWeights(newLines);
+    if (key === 'weight')
+    {
+      this.updateWeights(newLines);
+    }
   }
 
   public renderScoreLines()
   {
-    console.log(this.props.score.lines);
-    console.log(this.state.allWeights);
     return (
       <div>
         {
-          _.map(Util.asJS(this.props.score.lines), (line, index) =>
+          this.props.score.lines.map((line, index) =>
           {
             return (
               <PathfinderScoreLine
@@ -146,8 +141,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
                 source={this.props.source}
                 onDelete={this.handleDeleteLine}
                 index={index}
-                onFieldChange={this.handleFieldChange}
-                onWeightChange={this.handleWeightChange}
+                onValueChange={this.handleValueChange}
                 canEdit={this.props.canEdit}
                 keyPath={List(['query', 'path', 'score', 'lines', index])}
                 allWeights={this.state.allWeights}
