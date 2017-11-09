@@ -54,6 +54,7 @@ import * as React from 'react';
 import { Link } from 'react-router';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
 export interface Props
 {
@@ -89,7 +90,12 @@ class LibraryColumn extends TerrainComponent<Props>
         {referrer !== null ?
           <div className='library-column-referrer'>
             <div className='library-column-referrer-back-button'>
-              <Link to={referrer.path}>{'< Back'}</Link>
+              <Link to={referrer.path}>
+                <div className='link link-with-svg-180'>
+                  <ExpandIcon className='rotate180' />
+                  <div>Back</div>
+                </div>
+              </Link>
             </div>
             <div className='library-column-referrer-label'>{referrer.label}</div>
           </div> : null

@@ -43,18 +43,23 @@
 
   .library-column-referrer {
     position: relative;
-    height: 30px;
+    min-height: @title-height;
+    display: flex;
+    align-items: center;
+    padding: @half-spacing;
+    box-sizing: border-box;
   }
 
+  @back-width: 55px;
   .library-column-referrer-back-button {
-    position: absolute;
-    left: 10px;
-    top: 8px;
+    min-width: @back-width;
   }
 
   .library-column-referrer-label {
-    font-size: 16px;
+    padding-right: @back-width;
+    flex-grow: 1;
+    font-size: @font-size;
     text-align: center;
-    margin-top: 7px;
+    // margin-top: 7px;
   }
 }
