@@ -44,92 +44,88 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
+// tslint:disable:no-empty restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
-import * as Radium from 'radium';
-import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
-import InfoArea from '../../../common/components/InfoArea';
-import TerrainComponent from './../../../common/components/TerrainComponent';
+import * as _ from 'lodash';
 const { List, Map } = Immutable;
-import PathfinderFilterSection from './filter/PathfinderFilterSection';
-import './Pathfinder.less';
-import { Path } from './PathfinderTypes';
-import PathfinderScoreSection from './score/PathfinderScoreSection';
-import PathfinderSourceSection from './source/PathfinderSourceSection';
-import PathfinderStepSection from './step/PathfinderStepSection';
-import ColorsActions from '../../../colors/data/ColorsActions';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import TerrainComponent from '../../../common/components/TerrainComponent';
+
+interface ScorePoint
+{
+  id: string;
+  score: number;
+  value: number;
+  set: (f: string, v: any) => ScorePoint;
+}
+export type ScorePoints = List<ScorePoint>;
+
+const ZOOM_FACTOR = 2.0;
+
+import TransformChartPreview from './TransformChartPreview';
+
 export interface Props
 {
-  path: Path;
-  canEdit: boolean;
+  points: ScorePoints;
+  domain: List<number>;
+  range: List<number>;
+  height: number;
+  width: number;
 }
 
-@Radium
-class PathfinderColumn extends TerrainComponent<Props>
+// http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
+
+class TransformChartPreviewWrapper extends TerrainComponent<Props>
 {
-  public state: {
 
-  } = {
-
-  };
-
-  public componentWillMount()
+  public componentDidMount()
   {
-    ColorsActions.setStyle('.pf-section-title', 
-      { 'color': Colors().text1});
+    const el = ReactDOM.findDOMNode(this);
+    TransformChartPreview.create(el, this.getChartState());
   }
 
-  public getKeyPath()
+  public componentDidUpdate()
   {
-    return List(['query', 'path']);
+    TransformChartPreview.update(ReactDOM.findDOMNode(this), this.getChartState());
+  }
+
+  public getChartState()
+  {
+
+    const points = this.props.points.map((scorePoint) => ({
+      x: scorePoint.value,
+      y: scorePoint.score,
+      id: scorePoint.id,
+      selected: false,
+    }));
+
+    const chartState = {
+      pointsData: points.toJS(),
+      domain: {
+        x: this.props.domain.toJS(),
+        y: this.props.range.toJS(),
+      },
+      width: this.props.width,
+      height: this.props.height,
+      colors: ["#1eb4fa", "rgb(60, 63, 65)"], // TODO
+    };
+
+    return chartState;
+  }
+
+  public componentWillUnmount()
+  {
+   const el = ReactDOM.findDOMNode(this);
+    TransformChartPreview.destroy(el);
   }
 
   public render()
   {
-    const { path, canEdit } = this.props;
-    const keyPath = this.getKeyPath();
-
     return (
-      <div
-        className='pathfinder-column'
-        style={[
-          backgroundColor(Colors().bg3),
-          fontColor(Colors().text3),
-        ]}
-      >
-        <PathfinderSourceSection
-          source={path.source}
-          step={path.step}
-          canEdit={canEdit}
-        />
-
-        <PathfinderFilterSection
-          source={path.source}
-          filterGroup={path.filterGroup}
-          step={path.step}
-          canEdit={canEdit}
-        />
-
-        <PathfinderScoreSection
-          source={path.source}
-          score={path.score}
-          step={path.step}
-          canEdit={canEdit}
-          keyPath={keyPath.push('score')}
-        />
-
-        <PathfinderStepSection
-          step={path.step}
-          path={path}
-          canEdit={canEdit}
-        />
-      </div>
+      <div />
     );
   }
 }
-
-export default PathfinderColumn;
+export default TransformChartPreviewWrapper;

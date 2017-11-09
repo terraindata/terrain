@@ -84,7 +84,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { List, Map, Record } = Immutable;
 import { BaseClass, New } from '../../../Classes';
-import { ScorePoints } from '../charts/TransformCardChart';
+import ElasticBlockHelpers, {AutocompleteMatchType} from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 
 export const PathfinderSteps =
   [
@@ -123,6 +123,10 @@ export const _FilterGroup = (config?: { [key: string]: any }) =>
 class ScoreC extends BaseClass
 {
   public lines: List<ScoreLine> = List<ScoreLine>([]);
+  public getTransformDropdownOptions = (schemaState: any) =>
+  {
+    return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Transform);
+  }
 }
 export type Score = ScoreC & IRecord<ScoreC>;
 export const _Score = (config?: { [key: string]: any }) =>

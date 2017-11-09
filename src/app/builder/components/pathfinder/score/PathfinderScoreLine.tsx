@@ -54,13 +54,15 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import Autocomplete from '../../../../common/components/Autocomplete';
 import { Path, Score, ScoreLine, Source } from '../PathfinderTypes';
 import ScoreBar from '../../charts/ScoreBar';
 import { BuilderStore } from './../../../data/BuilderStore';
 import BuilderActions from './../../../data/BuilderActions';
 import TransformCard from '../../charts/TransformCard';
 import PathfinderLine from '../PathfinderLine';
+import Dropdown from '../../../../common/components/Dropdown';
+import BuilderTextbox from '../../../../common/components/BuilderTextbox';
+import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 
 const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 
@@ -75,18 +77,19 @@ export interface Props
   onValueChange: (key: string, index: number, newValue: any) => void;
   allWeights: Array<{ weight: number }>;
   keyPath: KeyPath;
+  dropdownOptions: List<string>;
 }
 
 class PathfinderSourceLine extends TerrainComponent<Props>
 {
   public state: {
-    field: string;
     weight: number;
     expanded: boolean;
+    fieldIndex: number;
   } = {
-    field: this.props.line.field,
     weight: this.props.line.weight,
     expanded: this.props.line.expanded,
+    fieldIndex: this.props.dropdownOptions.indexOf(this.props.line.field),
   };
 
   public componentWillReceiveProps(nextProps)
@@ -94,26 +97,11 @@ class PathfinderSourceLine extends TerrainComponent<Props>
     if (this.props.line !== nextProps.line) 
     {
       this.setState({
-        field: nextProps.line.field,
+        fieldIndex: nextProps.dropdownOptions.indexOf(this.props.line.field),
         weight: nextProps.line.weight,
+        expanded: nextProps.line.expanded,
       });
     }
-  }
-
-  public handleFieldChange(field)
-  {
-    this.setState({
-      field,
-    });
-    this.props.onValueChange('field', this.props.index, field);
-  }
-
-  public handleWeightChange(event)
-  {
-    this.setState({
-      weight: event.target.value,
-    });
-    this.props.onValueChange('weight', this.props.index, event.target.value);
   }
 
   public handleExpandedChange(expanded)
@@ -124,15 +112,14 @@ class PathfinderSourceLine extends TerrainComponent<Props>
   public renderTransformChart()
   {
     const data = {
-      input: this.state.field,
+      input: this.props.line.field,
       domain: this.props.line.transformData.domain,
       hasCustomDomain: false,
       scorePoints: this.props.line.transformData.scorePoints,
       static: {
-        colors: ["#1eb4fa", "rgb(60, 63, 65)"]
+        colors: ["#1eb4fa", "rgb(60, 63, 65)"] // TODO
       }
     };
-    console.log(data);
 
     return (
       <div className='pf-score-line-transform'>
@@ -151,6 +138,24 @@ class PathfinderSourceLine extends TerrainComponent<Props>
     </div>);
   }
 
+  public renderTransformChartPreview()
+  {
+    return (
+      <div className='pf-score-line-expand'>
+        Score
+        <div className='pf-score-line-transform-preview'>
+          <TransformChartPreviewWrapper
+            points={this.props.line.transformData.scorePoints}
+            domain={this.props.line.transformData.domain}
+            range={List([0, 1])}
+            height={25}
+            width={30}
+          />
+        </div>
+      </div>
+    );
+  }
+
   public renderLineContents()
   {
     return (<div className='pf-line pf-score-line-inner'>
@@ -159,23 +164,28 @@ class PathfinderSourceLine extends TerrainComponent<Props>
         data={{ weight: this.state.weight }}
         keyPath={this.props.keyPath.push('weight')}
       />
-      <input
-        value={this.state.weight}
-        onChange={this.handleWeightChange}
-        className='pf-score-line-weight'
+      <BuilderTextbox
+        keyPath={this.props.keyPath.push('weight')}
+        value={this.props.line.weight}
+        language={'elastic'}
+        canEdit={this.props.canEdit}
+        placeholder={'weight'}
+        isNumber={true}
+        autoDisabled={true}
       />
       <span className='pf-score-line-text pf-score-line-text-long'>times their</span>
-      <Autocomplete
-        value={this.state.field}
-        onChange={this.handleFieldChange}
-        options={List(['price', 'margin', 'conversion'])} // TODO getAutoOptions from PathTypes ?
-        placeholder={'field'}
+      <Dropdown
+        options={this.props.dropdownOptions}
+        selectedIndex={this.state.fieldIndex}
+        canEdit={this.props.canEdit}
+        keyPath={this.props.keyPath.push('field')}
       />
     </div>);
 }
 
   public render()
   {
+    console.log(this.props.keyPath);
     const { source, step } = this.props;
 
     return (
@@ -190,6 +200,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
           onExpand={this.handleExpandedChange}
           expanded={this.props.line.expanded}
           expandableContent={this.renderTransformChart()}
+          expandButton={this.renderTransformChartPreview()}
         />
       </div>
     );

@@ -67,9 +67,10 @@ export interface Props
   onDelete?: (index: number) => void;
   depth?: number;
   // For expandable section, like transform chart
-  expanded: boolean;
+  expanded?: boolean;
   expandableContent?: any;
   onExpand?: (index: number, expanded: boolean) => void;
+  expandButton?: any; // What the user presses to expand the section
 }
 
 class PathfinderLine extends TerrainComponent<Props>
@@ -142,7 +143,7 @@ class PathfinderLine extends TerrainComponent<Props>
           className='expand'
           onClick={this._fn(this.props.onExpand, !this.props.expanded)}
         >
-          Expand
+          {this.props.expandButton}
         </div>
       }
       {

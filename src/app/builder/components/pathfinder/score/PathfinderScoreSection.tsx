@@ -60,6 +60,7 @@ import { _ScoreLine, Path, Score, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import PathfinderCreateLine from '../PathfinderCreateLine';
+import TerrainStore from 'store/TerrainStore';
 
 export interface Props
 {
@@ -67,6 +68,7 @@ export interface Props
   source: Source;
   step: string;
   canEdit: boolean;
+  keyPath: KeyPath;
 }
 
 class PathfinderSourceSection extends TerrainComponent<Props>
@@ -104,14 +106,14 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   public handleDeleteLine(index)
   {
     const newLines = this.props.score.lines.delete(index);
-    BuilderActions.change(List(['query', 'path', 'score', 'lines']), newLines);
+    BuilderActions.change(this.props.keyPath.push('lines'), newLines);
     this.updateWeights(newLines);
   }
 
   public handleAddScoreLine()
   {
     const newLines = this.props.score.lines.push(_ScoreLine());
-    BuilderActions.change(List(['query', 'path', 'score', 'lines']), newLines);
+    BuilderActions.change(this.props.keyPath.push('lines'), newLines);
     this.updateWeights(newLines);
   }
 
@@ -119,7 +121,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     const newLine = this.props.score.lines.get(index).set(key, value);
     const newLines = this.props.score.lines.set(index, newLine);
-    BuilderActions.change(List(['query', 'path', 'score', 'lines']), newLines);
+    BuilderActions.change(this.props.keyPath.push('lines'), newLines);
     if (key === 'weight')
     {
       this.updateWeights(newLines);
@@ -128,6 +130,8 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public renderScoreLines()
   {
+    const dropdownOptions = this.props.score.getTransformDropdownOptions(TerrainStore.getState().get('schema'));
+    const keyPath = this.props.keyPath.push('lines');
     return (
       <div>
         {
@@ -143,8 +147,9 @@ class PathfinderSourceSection extends TerrainComponent<Props>
                 index={index}
                 onValueChange={this.handleValueChange}
                 canEdit={this.props.canEdit}
-                keyPath={List(['query', 'path', 'score', 'lines', index])}
+                keyPath={keyPath.push(index)}
                 allWeights={this.state.allWeights}
+                dropdownOptions={dropdownOptions}
               />
             );
           })
