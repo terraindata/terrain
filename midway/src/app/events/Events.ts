@@ -271,7 +271,7 @@ export class Events
     return this.buildQuery(controller, body.build());
   }
 
-  public generateSelectEventsQuery(controller: DatabaseController, variantid?: number): Elastic.SearchParams
+  public generateSelectEventsQuery(controller: DatabaseController, variantid?: string): Elastic.SearchParams
   {
     let body = bodybuilder()
       .size(0)
@@ -285,7 +285,7 @@ export class Events
     return this.buildQuery(controller, body.build());
   }
 
-  public async getAllEvents(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
+  public async getSelect(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>((resolve, reject) =>
     {
@@ -299,7 +299,7 @@ export class Events
     });
   }
 
-  public async getEventsList(controller: DatabaseController, variantid?: number): Promise<object>
+  public async getDistinct(controller: DatabaseController, variantid?: string): Promise<object>
   {
     return new Promise<object>((resolve, reject) =>
     {
@@ -354,11 +354,18 @@ export class Events
         promises.push(this.getRate(controller as ElasticController, variantid, request));
       }
     }
+    else if (request['agg'] === 'distinct')
+    {
+      for (const variantid of variantids)
+      {
+        promises.push(this.getDistinct(controller as ElasticController, variantid));
+      }
+    }
     else if (request['agg'] === 'select')
     {
       for (const variantid of variantids)
       {
-        promises.push(this.getAllEvents(controller as ElasticController, variantid, request));
+        promises.push(this.getSelect(controller as ElasticController, variantid, request));
       }
     }
     return Promise.all(promises);

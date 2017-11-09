@@ -65,6 +65,7 @@ const Router = new KoaRouter();
 // * agg: supported aggregation operations are:
 //     `select` - returns all events between the specified interval
 //     `count` - returns a count (histogram) of events between the specified interval
+//     `distinct` - returns the (distinct) set of events in the database
 //     `rate` - returns a ratio of two events between the specified interval
 // * field (optional):
 //     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
@@ -111,8 +112,7 @@ Router.get('/:databaseid/:variantid?', passport.authenticate('access-token-local
     throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
 
-  const variantid = ctx.params.variantid !== undefined ? Number(ctx.params.variantid) : undefined;
-  ctx.body = await events.getEventsList(database, variantid);
+  ctx.body = await events.getDistinct(database, ctx.params.variantid);
 });
 
 export default Router;
