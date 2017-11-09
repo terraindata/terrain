@@ -19,6 +19,12 @@
         "node_modules",
         "build",
         "coverage",
-        "doc"
+        "doc",
+        "../node_modules",
+        "../src",
+        "../analytics.js",
+        "../coverage",
+        "../midway",
+        "../shared"
     ]
 }

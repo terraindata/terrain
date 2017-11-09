@@ -11,12 +11,15 @@ cache:
 
 before_script:
   - yarn
+  - ( cd sigint && yarn )
+  - ( cd analytics.js && yarn )
 
 stages:
   - lint
   - style
   - test-front
   - test-back
+  - test-sigint
   - build
   - deploy
 
@@ -47,9 +50,23 @@ test-backend:
     paths:
       - coverage
 
+test-sigint:
+  script:
+    - yarn run test-sigint-setup
+    - ( cd sigint && yarn run test )
+    - yarn run test-sigint-teardown
+  stage: test-sigint
+  when: always
+
 build-frontend:
   script:
    - yarn run build
+  stage: build
+  when: always
+
+build-analytics-js:
+  script:
+   - ( cd analytics.js && yarn run build )
   stage: build
   when: always
 
