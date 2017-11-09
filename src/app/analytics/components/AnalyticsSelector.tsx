@@ -73,6 +73,7 @@ const METRICS = Immutable.List([
 ]);
 
 const INTERVALS = Immutable.List([
+  { value: 'hour', label: 'Hourly' },
   { value: 'day', label: 'Daily' },
   { value: 'week', label: 'Weekly' },
   { value: 'month', label: 'Monthly' },
