@@ -44,20 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands strict-boolean-expressions
+// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
 import './LibraryColumn.less';
 
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
+import { Link } from 'react-router';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
+const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
 export interface Props
 {
   index: number;
   title: string;
+  referrer?: { label: string, path: string };
 }
 
 const COLUMN_STYLE = _.extend({},
@@ -72,12 +75,31 @@ const TITLE_STYLE = _.extend({},
 
 class LibraryColumn extends TerrainComponent<Props>
 {
+  public static defaultProps = {
+    referrer: null,
+  };
+
   public render()
   {
+    const { referrer } = this.props;
+
     return (
       <div
         className={'library-column library-column-' + this.props.index}
       >
+        {referrer !== null ?
+          <div className='library-column-referrer'>
+            <div className='library-column-referrer-back-button'>
+              <Link to={referrer.path}>
+                <div className='link link-with-svg-180'>
+                  <ExpandIcon className='rotate180' />
+                  <div>Back</div>
+                </div>
+              </Link>
+            </div>
+            <div className='library-column-referrer-label'>{referrer.label}</div>
+          </div> : null
+        }
         {
           this.props.title &&
           <div

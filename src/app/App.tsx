@@ -283,6 +283,9 @@ class App extends TerrainComponent<Props>
     ColorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().text1 });
     ColorsActions.setStyle('.dropdown-wrapper:not(.dropdown-disabled):hover .dropdown-value:before', { 'border-top': '7px solid ' + Colors().activeText });
     ColorsActions.setStyle('.button', { backgroundColor: Colors().active, color: Colors().activeText });
+    ColorsActions.setStyle('.link', { color: Colors().active });
+    ColorsActions.setStyle('.link:hover', { color: Colors().import });
+    ColorsActions.setStyle('.link:active', { color: Colors().active });
 
     const tooltipStyles = generateThemeStyles();
     _.map(tooltipStyles, (value, key) =>
