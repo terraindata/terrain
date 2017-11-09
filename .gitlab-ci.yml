@@ -52,7 +52,9 @@ test-backend:
 
 test-sigint:
   script:
+    - yarn run test-sigint-setup
     - ( cd sigint && yarn run test )
+    - yarn run test-sigint-teardown
   stage: test-sigint
   when: always
 
