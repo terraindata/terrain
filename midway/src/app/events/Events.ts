@@ -275,7 +275,7 @@ export class Events
   {
     let body = bodybuilder()
       .size(0)
-      .aggregation('terms', 'eventname');
+      .aggregation('terms', 'eventname.keyword');
 
     if (variantid !== undefined)
     {
@@ -309,12 +309,12 @@ export class Events
         if (variantid !== undefined)
         {
           resolve({
-            [variantid]: response['aggregations']['agg_terms_eventname'].buckets,
+            [variantid]: response['aggregations']['agg_terms_eventname.keyword'].buckets,
           });
         }
         else
         {
-          resolve(response['aggregations']['agg_terms_eventname'].buckets);
+          resolve(response['aggregations']['agg_terms_eventname.keyword'].buckets);
         }
       }, reject);
     });
