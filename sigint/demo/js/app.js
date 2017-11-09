@@ -93,7 +93,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
     if ($scope.done) return;
     $scope.busy = true;
 
-    $http.get('/demo/search?s=' + encodeURIComponent($scope.esServer) + '&q=' + $scope.searchTerm + '&p=' + $scope.page++)
+    $http.get('/demo/search?s=' + encodeURIComponent($scope.esServer) + '&q=' + $scope.searchTerm + '&p=' + $scope.page++ + '&v=' + $scope.variantID)
     .then((response) =>
     {
       if (response.status === 200)
@@ -142,7 +142,12 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 
   $scope.cardLoad = function(result)
   {
-    setTimeout(TerrainAnalytics.logEvent('view', $scope.variantID, {itemName: result.movieid, itemType: 'movie'}),1);
+    setTimeout(TerrainAnalytics.queueEvent('view', $scope.variantID, {itemName: result.movieid, itemType: 'movie'}),1);
+  }
+
+  $scope.doneLoading = function()
+  {
+    TerrainAnalytics.logQueue();
   }
 
   $scope.cardDisplay = function(result)

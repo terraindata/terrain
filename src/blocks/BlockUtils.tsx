@@ -52,6 +52,9 @@ const { Map, List } = Immutable;
 
 import { Block, BlockConfig } from './types/Block';
 import { Card, Cards } from './types/Card';
+
+import { DisplayType } from './displays/Display';
+
 // import { AllBackendsMap } from '../database/AllBackends';
 
 export function getChildIds(_block: Block): IMMap<ID, boolean>
@@ -174,7 +177,12 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
     block.id = 'block-' + Math.random();
   }
 
-  return blockTypeToBlockRecord[block.type](block);
+  let theBlock = blockTypeToBlockRecord[block.type](block);
+  if (theBlock.static)
+  {
+    theBlock = theBlock.set('static', _.cloneDeep(theBlock.static));
+  }
+  return theBlock;
 };
 
 // private, maps a type (string) to the backing Immutable Record
@@ -231,6 +239,11 @@ export const cardsForServer = (value: any) =>
   if (value && value.static)
   {
     delete value.static;
+    // because .static is deleted, we should reset other related fields
+    if (value.keyDisplayType)
+    {
+      value.keyDisplayType = DisplayType.TEXT;
+    }
   }
 
   if (Array.isArray(value))

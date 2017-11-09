@@ -58,7 +58,7 @@ import * as BlockUtils from '../../../blocks/BlockUtils';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { SchemaState } from 'schema/SchemaTypes';
 import { Display } from '../../../blocks/displays/Display';
-import { Card, CardString } from '../../../blocks/types/Card';
+import { Card, CardString, getCardTitle } from '../../../blocks/types/Card';
 import { isInput } from '../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
@@ -486,7 +486,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     // {
     // var card = cards.get(0);
     const color = card.static.colors[0] as string;
-    const title: string = card.static.title;
+    const title: string = getCardTitle(card);
     const preview = BlockUtils.getPreview(card);
     // }
     // else

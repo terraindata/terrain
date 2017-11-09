@@ -136,14 +136,6 @@ export function ESParseTreeToCode(parser: ESJSONParser, options?: Options, input
 
 export function ESQueryToCode(queryObject: ESQueryObject, options?: Options, inputs?: List<Input>): string
 {
-  if (options && options.allFields === true)
-  {
-    if (queryObject.body && queryObject.body._source)
-    {
-      queryObject.body._source = [];
-    }
-  }
-
   const text: string = stringifyWithParameters(queryObject, inputs);
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, options);

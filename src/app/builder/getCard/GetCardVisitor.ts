@@ -112,7 +112,9 @@ export const STATIC_KEY_DISPLAY: Display =
     displayType: DisplayType.LABEL,
     key: 'key',
     style: {
-      maxWidth: 100,
+      textAlign: 'left',
+      maxWidth: 300,
+      width: 58,
       fontSize: 16,
     },
     className: 'card-elastic-key-label',
@@ -244,7 +246,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private variantClauseMapping: { [clauseType: string]: string[] } = {};
 
   private customCardTypesMap: { [elasticClauseType: string]: string[] } = {
-    sort_clause: ['elasticScore'],
+    body: ['elasticScore'],
     query: ['elasticFilter', 'elasticDistance'],
   };
 

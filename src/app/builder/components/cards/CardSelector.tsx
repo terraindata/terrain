@@ -59,28 +59,28 @@ type Set<T> = Immutable.Set<T>;
 const Color = require('color');
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import { Card, CardConfig } from 'src/blocks/types/Card';
+import { Card, CardConfig, getCardCategory, getCardTitle } from 'src/blocks/types/Card';
 import { AllBackendsMap } from 'src/database/AllBackends';
 import { backgroundColor, borderColor, cardHoverBackground, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
 
 import { CreateCardOption, searchForText } from './CreateCardOption';
 import './CreateCardTool.less';
 
-function getCardCategory(card: CardConfig): string
-{
-  if (card === undefined)
-  {
-    return '';
-  }
-  else if (card.static === undefined || card.static.clause === undefined)
-  {
-    return card.key;
-  }
-  else
-  {
-    return card.static.clause.path[0];
-  }
-}
+// function getCardCategory(card: CardConfig): string
+// {
+//   if (card === undefined)
+//   {
+//     return '';
+//   }
+//   else if (card.static === undefined || card.static.clause === undefined)
+//   {
+//     return card.key;
+//   }
+//   else
+//   {
+//     return card.static.clause.path[0];
+//   }
+// }
 
 interface CardCategory
 {
@@ -393,8 +393,8 @@ class CardSelector extends TerrainComponent<Props>
     {
       const optionCard = AllBackendsMap[language].blocks[type] as CardConfig;
       const title = (overrideText && overrideText.get(index) && overrideText.get(index).text)
-        || optionCard.static.title;
-      const description = optionCard.static.description || 'Create a ' + optionCard.static.title + ' card.';
+        || getCardTitle(optionCard);
+      const description = optionCard.static.description || 'Create a ' + title + ' card.';
       const searchResult = searchForText(title, description, searchValue);
 
       if (optionCategories.get(index).has(currentCategory) && searchResult)

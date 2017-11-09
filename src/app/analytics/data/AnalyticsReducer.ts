@@ -89,10 +89,10 @@ AnalyticsReducer[ActionTypes.fetchFailure] =
   };
 
 AnalyticsReducer[ActionTypes.selectMetric] =
-  (state, action: Action<{ metricId: ID }>) =>
+  (state, action: Action<{ metric: ID[] }>) =>
   {
-    const { metricId } = action.payload;
-    return state.set('selectedMetric', metricId);
+    const { metric } = action.payload;
+    return state.set('selectedMetric', metric);
   };
 
 AnalyticsReducer[ActionTypes.selectInterval] =
@@ -114,6 +114,15 @@ AnalyticsReducer[ActionTypes.selectAnalyticsConnection] =
   {
     const { connectionName } = action.payload;
     return state.set('selectedAnalyticsConnection', connectionName);
+  };
+
+AnalyticsReducer[ActionTypes.pinVariant] =
+  (state, action: Action<{ variantId: ID }>) =>
+  {
+    const { variantId } = action.payload;
+    const isVariantPinned = state.getIn(['pinnedVariants', variantId], false);
+
+    return state.setIn(['pinnedVariants', variantId], !isVariantPinned);
   };
 
 const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
