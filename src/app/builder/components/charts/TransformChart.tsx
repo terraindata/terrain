@@ -892,37 +892,6 @@ const TransformChart = {
     return linesPointsData;
   },
 
-  _addBoundingData(scales, data)
-  {
-    const range = (scaleMax(scales.x) - scaleMin(scales.x));
-    data.unshift({
-      x: scaleMin(scales.x) - range,
-      y: data[0].y,
-      id: '*%*-first',
-      dontScale: true,
-    });
-    data.unshift({
-      x: scaleMin(scales.x) - range,
-      y: -1,
-      id: '*%*-first-anchor',
-      dontScale: true,
-    });
-
-    data.push({
-      x: scaleMax(scales.x) + range,
-      y: data[data.length - 1].y,
-      id: '*%*-last',
-      dontScale: true,
-    });
-    data.push({
-      x: scaleMax(scales.x) + range,
-      y: -1,
-      id: '*%*-last-anchor',
-      dontScale: true,
-    });
-    return data;
-  },
-
   _drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domainMin, domainMax, getData)
   {
     const { ranges, outputs } = getData(100, pointsData, domainMin, domainMax);
@@ -930,7 +899,7 @@ const TransformChart = {
     {
       return { x, y: outputs[i], id: i, selected: false };
     });
-    data = this._addBoundingData(scales, data);
+    data = this._getLinesData(data, scales, true);
 
     const line = d3.svg.line()
       .x((d) =>

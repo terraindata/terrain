@@ -97,7 +97,7 @@ export class BuilderStateClass
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
 const BuilderState_Record = Immutable.Record(new BuilderStateClass());
-export const _BuilderState = (config?: any) =>
+const _BuilderState = (config?: any) =>
 {
   return new BuilderState_Record(config || {}) as any as BuilderState;
 };
