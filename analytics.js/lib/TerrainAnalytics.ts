@@ -60,7 +60,7 @@ const server = currentScript.getAttribute('data-server');
 const client = new ClientJS();
 let fingerprint = null;
 let batch: any[] = [];
-let batchSize = 0; // memoized so we aren't always computing sizeof(batch)
+let batchSize: number = 0; // memoized so we aren't always computing sizeof(batch)
 
 const TerrainAnalytics = {
   assembleParams(asObject: boolean, eventName: string | any, variantOrSourceID: string | any, meta?: any): string | object
@@ -90,7 +90,7 @@ const TerrainAnalytics = {
     return paramString;
   },
 
-  queueEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
+  logEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
   {
     const event = TerrainAnalytics.assembleParams(true, eventName, variantOrSourceID, meta);
     batch.push(event);
@@ -99,12 +99,23 @@ const TerrainAnalytics = {
     // immediately process and reset the buffer.
     if (batchSize >= 1900)
     {
-      TerrainAnalytics.logQueue();
+      TerrainAnalytics.flushLog();
+    }
+    else if (batch.length === 1)
+    {
+      // buffer will get flushed no later than
+      // 50ms after first event is added to buffer
+      setTimeout(() => TerrainAnalytics.flushLog(), 50);
     }
   },
 
-  logQueue()
+  flushLog()
   {
+    if (batchSize === 0)
+    {
+      // don't send empty requests
+      return;
+    }
     const xhr = new XMLHttpRequest();
     xhr.open('GET', (server || '') + '?batch=' + String(jsurl.stringify(batch)), true);
     xhr.send();
@@ -112,7 +123,7 @@ const TerrainAnalytics = {
     batchSize = 0;
   },
 
-  logEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
+  logEventImmediately(eventName: string | any, variantOrSourceID: string | any, meta?: any)
   {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', (server || '') + '?' + String(TerrainAnalytics.assembleParams(false, eventName, variantOrSourceID, meta)), true);

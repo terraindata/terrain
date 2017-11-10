@@ -137,17 +137,17 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 
   $scope.checkout = function()
   {
-    TerrainAnalytics.logEvent('conversion', $scope.variantID, {purchasedIDs: $scope.cart.map((m) => m._id)});
+    TerrainAnalytics.logEventImmediately('conversion', $scope.variantID, {purchasedIDs: $scope.cart.map((m) => m._id)});
   }
 
   $scope.cardLoad = function(result)
   {
-    setTimeout(TerrainAnalytics.queueEvent('view', $scope.variantID, {itemName: result.movieid, itemType: 'movie'}),1);
+    setTimeout(TerrainAnalytics.logEvent('view', $scope.variantID, {itemName: result.movieid, itemType: 'movie'}),1);
   }
 
   $scope.doneLoading = function()
   {
-    TerrainAnalytics.logQueue();
+    TerrainAnalytics.flushLog();
   }
 
   $scope.cardDisplay = function(result)
