@@ -55,6 +55,7 @@ import * as winston from 'winston';
 
 import { json } from 'd3-request';
 import * as SharedElasticUtil from '../../../../shared/database/elastic/ElasticUtil';
+import { FieldTypes } from '../../../../shared/etl/FieldTypes';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
@@ -68,6 +69,7 @@ import { TemplateBase } from './templates/Templates';
 
 const importTemplates = new ImportTemplates();
 
+const fieldTypes = new FieldTypes();
 const TastyItems: Items = new Items();
 const typeParser: SharedUtil.CSVTypeParser = new SharedUtil.CSVTypeParser();
 
@@ -96,6 +98,7 @@ export class Import
     double: new Set(['text', 'double']),
     boolean: new Set(['text', 'boolean']),
     date: new Set(['text', 'date']),
+    nested: new Set(['nested']),
     geo_point: new Set(['array', 'geo_point']),
     // object: new Set(['object', 'nested']),
     // nested: new Set(['nested']),
@@ -237,7 +240,7 @@ export class Import
       {
         return reject(configError);
       }
-      const expectedMapping: object = this._getMappingForSchema(imprtConf);
+      const expectedMapping: object = await this._getMappingForSchema(imprtConf);
       const mappingForSchema: object | string =
         this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprtConf.dbname);
       if (typeof mappingForSchema === 'string')
@@ -759,6 +762,29 @@ export class Import
           }
         }
         break;
+      case 'nested':
+        if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          try
+          {
+            if (typeof item[field] === 'object')
+            {
+              item[field] = JSON.parse(item[field]);
+            }
+          } catch (e)
+          {
+            return false;
+          }
+          if (Array.isArray(item[field]))
+          {
+            return false;
+          }
+        }
+        break;
       default:  // "text" case, leave as string
     }
     return true;
@@ -867,15 +893,19 @@ export class Import
   }
 
   /* converts type specification from ImportConfig into ES mapping format (ready to insert using ElasticDB.putMapping()) */
-  private _getMappingForSchema(imprt: ImportConfig): object
+  private async _getMappingForSchema(imprt: ImportConfig): Promise<object>
   {
-    // create mapping containing new fields
-    const mapping: object = {};
-    Object.keys(imprt.columnTypes).forEach((val) =>
+    return new Promise<object>(async (resolve, reject) =>
     {
-      mapping[val] = this._getESType(imprt.columnTypes[val]);
-    });
-    return this._getMappingForSchemaHelper(mapping);
+      // create mapping containing new fields
+      // const mapping: object = {};
+      // Object.keys(imprt.columnTypes).forEach((val) =>
+      // {
+      //   mapping[val] = this._getESType(imprt.columnTypes[val]);
+      // });
+      resolve(await fieldTypes.getESMappingFromDocument(imprt.columnTypes));
+      // return this._getMappingForSchemaHelper(mapping);
+      });
   }
 
   /* recursive helper function for _getMappingForSchema(...)
@@ -893,12 +923,15 @@ export class Import
           body[key] = { type: mapping[key]['type'] };
           if (mapping[key]['type'] === 'text' && mapping[key]['index'] === 'not_analyzed')
           {
+            body[key]['index'] = true;
             body[key]['type'] = 'keyword';
             body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256, index: false } };
           }
           else if (mapping[key]['type'] === 'text' && mapping[key]['index'] === 'analyzed')
           {
-            body[key]['fields'] = { keyword: { type: 'text', index: true, analyzer: mapping[key]['analyzer'] } };
+            body[key]['index'] = true;
+            body[key]['analyzer'] = mapping[key]['analyzer'];
+            body[key]['fields'] = { keyword: { type: 'keyword', index: true, analyzer: mapping[key]['analyzer'] } };
           }
         }
         else if (typeof mapping[key]['type'] === 'object')
@@ -961,6 +994,10 @@ export class Import
   {
     const thisType: string = SharedUtil.getType(item);
     if (thisType === 'null')
+    {
+      return true;
+    }
+    if (thisType === 'object' && typeObj['type'] === 'nested')
     {
       return true;
     }

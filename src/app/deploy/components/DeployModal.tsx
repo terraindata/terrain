@@ -142,6 +142,8 @@ class DeployModal extends TerrainComponent<Props>
         return;
       }
       const template = EQLTemplateGenerator.generate(valueInfo);
+      // console.log(template);
+      // const template2 = JSON.stringify(JSON.parse(template)['body']);
       const body: object = {
         id,
         body: {
