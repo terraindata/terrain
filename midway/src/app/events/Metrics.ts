@@ -50,7 +50,7 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../Util';
 
-// CREATE TABLE metrics (id integer PRIMARY KEY, database integer, label text NOT NULL, events text NOT NULL)
+// CREATE TABLE metrics (id integer PRIMARY KEY, database integer NOT NULL, label text NOT NULL, events text NOT NULL)
 
 export interface MetricConfig
 {
