@@ -46,13 +46,13 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
-import * as React from 'react';
 import * as Radium from 'radium';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
+import * as React from 'react';
 const { List, Map } = Immutable;
 
 export interface Props

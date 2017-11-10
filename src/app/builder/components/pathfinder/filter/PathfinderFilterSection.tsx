@@ -53,12 +53,12 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Path, Source, FilterLine, FilterGroup } from '../PathfinderTypes';
-import PathfinderFilterGroup from './PathfinderFilterGroup';
-import PathfinderFilterLine from './PathfinderFilterLine';
-import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
+import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
+import PathfinderFilterCreate from './PathfinderFilterCreate';
+import PathfinderFilterGroup from './PathfinderFilterGroup';
+import PathfinderFilterLine from './PathfinderFilterLine';
 
 export interface Props
 {
@@ -81,7 +81,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const { source, step, filterGroup, canEdit } = this.props;
 
     // flatten tree
-    let entries: FilterEntry[] = [];
+    const entries: FilterEntry[] = [];
     this.buildFilterTree(filterGroup, entries, 0, List(['query', 'path']));
     console.log(entries);
     return (
@@ -102,7 +102,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   private handleFilterDelete(keyPath: KeyPath)
   {
-    const parentKeyPath = keyPath.butLast().toList()
+    const parentKeyPath = keyPath.butLast().toList();
     const parent = this.props.filterGroup.getIn(parentKeyPath.skip(2).toList());
     const index = keyPath.last();
     BuilderActions.change(parentKeyPath, parent.splice(index, 1));

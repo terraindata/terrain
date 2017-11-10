@@ -70,8 +70,7 @@ const TransformChartPreview = {
   create(el, state)
   {
     d3.select(el).attr('class', 'transform-chart-preview-wrapper');
-    const borderColor = localStorage.getItem('theme') === 'DARK' ? Colors().inputFocusBg : Colors().border1);
-console.log(borderColor)
+    const borderColor = localStorage.getItem('theme') === 'DARK' ? Colors().inputFocusBg : Colors().border1;
     const svg = d3
       .select(el)
       .append('svg')
@@ -95,6 +94,7 @@ console.log(borderColor)
       .append('path')
       .attr('class', 'lines')
       .attr('style', 'stroke: ' + state.colors[0]);
+    this.update(el, state);
   },
 
   update(el, state)
@@ -116,7 +116,6 @@ console.log(borderColor)
   },
 
   // "private" stuff
-
 
   _drawBg(el, scales)
   {
@@ -144,7 +143,7 @@ console.log(borderColor)
         id: '*%*-last',
         dontScale: true,
       });
-    },
+    }
     const lineFunction = d3.svg.line()
       .x((d) => d['dontScale'] ? d['x'] : scales.realX(d['x']))
       .y((d) => scales.realPointY(d['y']));

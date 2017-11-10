@@ -53,9 +53,9 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import Dropdown from 'app/common/components/Dropdown';
+import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
 
 export interface Props
 {

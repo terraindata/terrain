@@ -376,7 +376,7 @@ const TransformChart = {
     // overlay.on('mouseleave', onMouseLeave(this, el, scales, onMouseEnter, onMouseLeave));
   },
 
-  _drawAxes(el, scales, width, height)
+  _drawAxes(el, scales, width, height, inputKey)
   {
     const yLeftAxis = d3.svg.axis()
       .scale(scales.pointY)
@@ -424,6 +424,24 @@ const TransformChart = {
         }
         return 'middle';
       });
+
+    d3.select(el).select('.bottom-title').remove();
+    d3.select(el).select('.left-title').remove();
+
+    d3.select(el).select('.bottomAxis')
+      .append('text')
+      .attr('class', 'bottom-title')
+      .attr('text-anchor', 'middle')
+      .attr('transform', 'translate(' + width  / 2 + ',80)')
+      .text(inputKey);
+
+    d3.select(el).select('.yLeftAxis')
+      .append('text')
+      .attr('class', 'left-title')
+      .attr('text-anchor', 'middle')
+      .attr('transform', 'translate(-30,' + height / 2 + ')rotate(-90)')
+      .text('Score');
+
   },
 
   _drawBars(el, scales, barsData, colors)
@@ -1468,7 +1486,7 @@ const TransformChart = {
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-    this._drawAxes(el, scales, width, height);
+    this._drawAxes(el, scales, width, height, inputKey);
     if (inputKey === '' || inputKey === undefined)
     {
       this._drawDisabledOverlay(el, scales);

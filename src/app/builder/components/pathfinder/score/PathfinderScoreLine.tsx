@@ -54,15 +54,15 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Path, Score, ScoreLine, Source } from '../PathfinderTypes';
-import ScoreBar from '../../charts/ScoreBar';
-import { BuilderStore } from './../../../data/BuilderStore';
-import BuilderActions from './../../../data/BuilderActions';
-import TransformCard from '../../charts/TransformCard';
-import PathfinderLine from '../PathfinderLine';
-import Dropdown from '../../../../common/components/Dropdown';
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
+import Dropdown from '../../../../common/components/Dropdown';
+import ScoreBar from '../../charts/ScoreBar';
+import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
+import PathfinderLine from '../PathfinderLine';
+import { Path, Score, ScoreLine, Source } from '../PathfinderTypes';
+import BuilderActions from './../../../data/BuilderActions';
+import { BuilderStore } from './../../../data/BuilderStore';
 
 const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 
@@ -94,7 +94,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (this.props.line !== nextProps.line) 
+    if (this.props.line !== nextProps.line)
     {
       this.setState({
         fieldIndex: nextProps.dropdownOptions.indexOf(this.props.line.field),
@@ -105,7 +105,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
   }
 
   public handleExpandedChange(expanded)
-  {    
+  {
     this.props.onValueChange('expanded', this.props.index, expanded);
   }
 
@@ -117,8 +117,8 @@ class PathfinderSourceLine extends TerrainComponent<Props>
       hasCustomDomain: false,
       scorePoints: this.props.line.transformData.scorePoints,
       static: {
-        colors: ["#1eb4fa", "rgb(60, 63, 65)"] // TODO
-      }
+        colors: ['#1eb4fa', 'rgb(60, 63, 65)'], // TODO
+      },
     };
 
     return (
@@ -149,7 +149,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
             domain={this.props.line.transformData.domain}
             range={List([0, 1])}
             height={25}
-            width={30}
+            width={33}
           />
         </div>
       </div>
@@ -158,39 +158,40 @@ class PathfinderSourceLine extends TerrainComponent<Props>
 
   public renderLineContents()
   {
-    return (<div className='pf-line pf-score-line-inner'>
-      <ScoreBar
-        parentData={{ weights: this.props.allWeights }}
-        data={{ weight: this.state.weight }}
-        keyPath={this.props.keyPath.push('weight')}
-      />
-      <BuilderTextbox
-        keyPath={this.props.keyPath.push('weight')}
-        value={this.props.line.weight}
-        language={'elastic'}
-        canEdit={this.props.canEdit}
-        placeholder={'weight'}
-        isNumber={true}
-        autoDisabled={true}
-      />
-      <span className='pf-score-line-text'>times</span>
-      <Dropdown
-        options={this.props.dropdownOptions}
-        selectedIndex={this.state.fieldIndex}
-        canEdit={this.props.canEdit}
-        keyPath={this.props.keyPath.push('field')}
-      />
-    </div>);
+    return (
+      <div className='pf-line pf-score-line-inner'>
+        <ScoreBar
+          parentData={{ weights: this.props.allWeights }}
+          data={{ weight: this.state.weight }}
+          keyPath={this.props.keyPath.push('weight')}
+        />
+        <BuilderTextbox
+          keyPath={this.props.keyPath.push('weight')}
+          value={this.props.line.weight}
+          language={'elastic'}
+          canEdit={this.props.canEdit}
+          placeholder={'weight'}
+          isNumber={true}
+          autoDisabled={true}
+        />
+        <span className='pf-score-line-text'>times</span>
+        <Dropdown
+          options={this.props.dropdownOptions}
+          selectedIndex={this.state.fieldIndex}
+          canEdit={this.props.canEdit}
+          keyPath={this.props.keyPath.push('field')}
+        />
+      </div>
+    );
 }
 
   public render()
   {
-    console.log(this.props.keyPath);
     const { source, step } = this.props;
 
     return (
       <div className='pf-score-line'>
-        <PathfinderLine 
+        <PathfinderLine
           canDrag={true}
           canDelete={true}
           canEdit={this.props.canEdit}

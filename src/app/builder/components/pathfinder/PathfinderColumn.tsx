@@ -55,13 +55,13 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../..
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import ColorsActions from '../../../colors/data/ColorsActions';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import './Pathfinder.less';
 import { Path } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 import PathfinderStepSection from './step/PathfinderStepSection';
-import ColorsActions from '../../../colors/data/ColorsActions';
 export interface Props
 {
   path: Path;
@@ -79,8 +79,8 @@ class PathfinderColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.pf-section-title', 
-      { 'color': Colors().text1});
+    ColorsActions.setStyle('.pf-section-title',
+      { color: Colors().text1});
   }
 
   public getKeyPath()

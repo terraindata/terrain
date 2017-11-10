@@ -53,11 +53,11 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
-import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import { Path, Source, sourceCountOptions, _ElasticDataSource } from '../PathfinderTypes';
+import { _ElasticDataSource, Path, Source, sourceCountOptions } from '../PathfinderTypes';
 
 export interface Props
 {
@@ -186,7 +186,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       'dataSource',
       _ElasticDataSource({
         name: this.getDataSourceOptions().get(sourceIndex),
-      })
+      }),
     ));
   }
 }

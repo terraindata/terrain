@@ -46,16 +46,17 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
+import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
-import TerrainComponent from 'app/common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import DragHandle from 'app/common/components/DragHandle';
 import FadeInOut from 'app/common/components/FadeInOut';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
+import { tooltip } from 'app/common/components/tooltip/Tooltips';
 
 export interface Props
 {
@@ -148,12 +149,12 @@ class PathfinderLine extends TerrainComponent<Props>
       }
       {
         this.props.canEdit && this.props.canDelete &&
-        <div
+        tooltip(<div
           className='close'
           onClick={this._fn(this.props.onDelete, this.props.index)}
         >
           <RemoveIcon />
-        </div>
+        </div>, 'Delete')
       }
       </div>
     );

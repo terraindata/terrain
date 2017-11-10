@@ -54,13 +54,13 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
+import TerrainStore from 'store/TerrainStore';
 import Util from '../../../../util/Util';
 import BuilderActions from '../../../data/BuilderActions';
+import PathfinderCreateLine from '../PathfinderCreateLine';
 import { _ScoreLine, Path, Score, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
-import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import PathfinderCreateLine from '../PathfinderCreateLine';
-import TerrainStore from 'store/TerrainStore';
 
 export interface Props
 {
@@ -130,7 +130,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public renderScoreLines()
   {
-    const dropdownOptions = this.props.score.getTransformDropdownOptions(TerrainStore.getState().get('schema'));
+    const dropdownOptions = this.props.score.getTransformDropdownOptions((TerrainStore.getState() as any).get('schema'));
     const keyPath = this.props.keyPath.push('lines');
     return (
       <div>

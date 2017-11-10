@@ -53,10 +53,10 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { FilterLine, Path, Source, FilterGroup, _FilterGroup, _FilterLine } from '../PathfinderTypes';
-import PathfinderLine from '../PathfinderLine';
-import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
+import PathfinderCreateLine from '../PathfinderCreateLine';
+import PathfinderLine from '../PathfinderLine';
+import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
 
 export interface Props
 {

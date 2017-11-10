@@ -109,7 +109,7 @@ class TransformChartPreviewWrapper extends TerrainComponent<Props>
       },
       width: this.props.width,
       height: this.props.height,
-      colors: ["#1eb4fa", "rgb(60, 63, 65)"], // TODO
+      colors: ['#1eb4fa', 'rgb(60, 63, 65)'], // TODO
     };
 
     return chartState;

@@ -83,8 +83,8 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map, Record } = Immutable;
-import { BaseClass, New } from '../../../Classes';
 import ElasticBlockHelpers, {AutocompleteMatchType} from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { BaseClass, New } from '../../../Classes';
 
 export const PathfinderSteps =
   [
@@ -187,7 +187,7 @@ class ScorePointC extends BaseClass
     language: 'elastic',
     metaFields: ['id'],
     tql: '$score, $value',
-  }
+  };
 }
 
 export type ScorePoint = ScorePointC & IRecord<ScorePointC>;

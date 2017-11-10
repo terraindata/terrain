@@ -53,8 +53,8 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { FilterLine, Path, Source, FilterGroup } from '../PathfinderTypes';
 import PathfinderLine from '../PathfinderLine';
+import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
 
 export interface Props
 {
@@ -79,8 +79,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { source, filterLine, canEdit } = this.props;
 
-
-
     return (
       <PathfinderLine
         canDelete={true}
@@ -92,7 +90,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       </PathfinderLine>
     );
   }
-
 
 }
 

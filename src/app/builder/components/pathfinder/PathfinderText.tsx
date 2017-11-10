@@ -80,7 +80,7 @@ export const PathfinderText = {
 
   scoreStepSubtitle: `
 	The score for each result will be the sum of the following factors:
-  `
+  `,
 };
 
 export default PathfinderText;
