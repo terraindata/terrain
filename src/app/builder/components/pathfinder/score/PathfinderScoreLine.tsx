@@ -190,7 +190,6 @@ class PathfinderSourceLine extends TerrainComponent<Props>
     const { source, step } = this.props;
 
     return (
-      <div className='pf-score-line'>
         <PathfinderLine
           canDrag={true}
           canDelete={true}
@@ -203,7 +202,6 @@ class PathfinderSourceLine extends TerrainComponent<Props>
           expandableContent={this.renderTransformChart()}
           expandButton={this.renderTransformChartPreview()}
         />
-      </div>
     );
   }
 }

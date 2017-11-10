@@ -61,6 +61,8 @@ import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import { _ScoreLine, Path, Score, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
+import DragHandle from 'app/common/components/DragHandle';
+import DragAndDrop from 'app/common/components/DragAndDrop';
 
 export interface Props
 {
@@ -128,33 +130,34 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     }
   }
 
-  public renderScoreLines()
+  public getScoreLines(scoreLines)
   {
     const dropdownOptions = this.props.score.getTransformDropdownOptions((TerrainStore.getState() as any).get('schema'));
     const keyPath = this.props.keyPath.push('lines');
     return (
-      <div>
+        scoreLines.map((line, index) =>
         {
-          this.props.score.lines.map((line, index) =>
-          {
-            return (
-              <PathfinderScoreLine
-                key={index}
-                line={line}
-                step={this.props.step}
-                source={this.props.source}
-                onDelete={this.handleDeleteLine}
-                index={index}
-                onValueChange={this.handleValueChange}
-                canEdit={this.props.canEdit}
-                keyPath={keyPath.push(index)}
-                allWeights={this.state.allWeights}
-                dropdownOptions={dropdownOptions}
-              />
-            );
-          })
-        }
-      </div>
+          return (
+          { content: <PathfinderScoreLine
+              key={index}
+              line={line}
+              step={this.props.step}
+              source={this.props.source}
+              onDelete={this.handleDeleteLine}
+              index={index}
+              onValueChange={this.handleValueChange}
+              canEdit={this.props.canEdit}
+              keyPath={keyPath.push(index)}
+              allWeights={this.state.allWeights}
+              dropdownOptions={dropdownOptions}
+            />,
+            key: index,
+            draggable: true,
+            dragHandle: <DragHandle/>,
+            dragHandleStyle: {'padding-top': '8px'}
+          }
+          );
+        }).toList()
     );
   }
 
@@ -170,15 +173,16 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   public render()
   {
     const { source, step } = this.props;
+    const lines = this.getScoreLines(this.props.score.lines);
     return (
       <div
         className='pf-section'
       >
         <div className='pf-section-title'>{PathfinderText.scoreStepTitle}</div>
         <div className='pf-section-subtitle'>{PathfinderText.scoreStepSubtitle}</div>
-        {
-          this.renderScoreLines()
-        }
+        <DragAndDrop
+          draggableItems={lines}
+        />
         <PathfinderCreateLine
           canEdit={this.props.canEdit}
           onCreate={this.handleAddScoreLine}

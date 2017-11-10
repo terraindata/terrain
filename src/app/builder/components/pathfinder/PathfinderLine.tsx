@@ -115,18 +115,19 @@ class PathfinderLine extends TerrainComponent<Props>
 
   private renderLeft(): El
   {
-    if (!this.props.canEdit || !this.props.canDrag)
-    {
-      return null;
-    }
+    return null
+    // if (!this.props.canEdit || !this.props.canDrag)
+    // {
+    //   return null;
+    // }
 
-    return (
-      <div className='pf-line-left'>
-        <DragHandle
+    // return (
+    //   <div className='pf-line-left'>
+    //     <DragHandle
 
-        />
-      </div>
-    );
+    //     />
+    //   </div>
+    // );
   }
 
   private renderRight(): El
@@ -154,7 +155,7 @@ class PathfinderLine extends TerrainComponent<Props>
           onClick={this._fn(this.props.onDelete, this.props.index)}
         >
           <RemoveIcon />
-        </div>, 'Delete')
+        </div>, 'Delete'
       }
       </div>
     );
