@@ -322,10 +322,10 @@ export class Events
 
   public async AggregationHandler(controller: DatabaseController, request: AggregationRequest): Promise<object[]>
   {
-    const variantids = request['variantid'].split(',');
     const promises: Array<Promise<any>> = [];
     if (request['agg'] === 'histogram' || request['agg'] === 'count')
     {
+      const variantids = request['variantid'].split(',');
       if (request['interval'] === undefined)
       {
         throw new Error('Required parameter \"interval\" is missing');
@@ -338,6 +338,7 @@ export class Events
     }
     else if (request['agg'] === 'rate')
     {
+      const variantids = request['variantid'].split(',');
       const eventnames = request['eventname'].split(',');
       if (eventnames.length < 2)
       {
@@ -356,13 +357,22 @@ export class Events
     }
     else if (request['agg'] === 'distinct')
     {
-      for (const variantid of variantids)
+      if (request['variantid'] !== undefined)
       {
-        promises.push(this.getDistinct(controller as ElasticController, variantid));
+        const variantids = request['variantid'].split(',');
+        for (const variantid of variantids)
+        {
+          promises.push(this.getDistinct(controller as ElasticController, variantid));
+        }
+      }
+      else
+      {
+        promises.push(this.getDistinct(controller as ElasticController));
       }
     }
     else if (request['agg'] === 'select')
     {
+      const variantids = request['variantid'].split(',');
       for (const variantid of variantids)
       {
         promises.push(this.getSelect(controller as ElasticController, variantid, request));

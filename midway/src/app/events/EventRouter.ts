@@ -79,31 +79,48 @@ const Router = new KoaRouter();
 //
 Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  const request = JSON.parse(JSON.stringify(ctx.request.query));
   Util.verifyParameters(
-    JSON.parse(JSON.stringify(ctx.request.query)),
-    ['database', 'start', 'end', 'eventname', 'variantid', 'agg'],
+    request,
+    ['database', 'agg'],
   );
-  winston.info('getting events for variant');
 
-  const databaseid = Number(ctx.request.query.database);
+  if (ctx.request.query['agg'] !== 'distinct')
+  {
+    Util.verifyParameters(
+      request,
+      ['start', 'end', 'eventname', 'variantid'],
+    );
+  }
+
+  winston.info('computing aggregation on events');
+
+  const databaseid = Number(request.database);
   const db: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
   if (db === undefined)
   {
     throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
 
-  const response: object[] = await events.AggregationHandler(db, ctx.request.query);
-  ctx.body = response.reduce((acc, x) =>
+  const response: object[] = await events.AggregationHandler(db, request);
+  if (request['variantid'] !== undefined)
   {
-    for (const key in x)
+    ctx.body = response.reduce((acc, x) =>
     {
-      if (x.hasOwnProperty(key) !== undefined)
+      for (const key in x)
       {
-        acc[key] = x[key];
-        return acc;
+        if (x.hasOwnProperty(key) !== undefined)
+        {
+          acc[key] = x[key];
+          return acc;
+        }
       }
-    }
-  }, {});
+    }, {});
+  }
+  else
+  {
+    ctx.body = response[0];
+  }
 });
 
 Router.get('/metrics/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
