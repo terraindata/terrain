@@ -386,7 +386,6 @@ const TransformChart = {
       .orient('left');
     d3.select(el).select('.yLeftAxis')
       .attr('transform', 'translate(' + xMargin + ',0)')
-      .style('color', '#000000')
       .call(yLeftAxis);
 
     const yRightAxis = d3.svg.axis()
@@ -433,6 +432,7 @@ const TransformChart = {
       .attr('class', 'bottom-title')
       .attr('text-anchor', 'middle')
       .attr('transform', 'translate(' + width  / 2 + ',80)')
+      .style('fill', Colors().text1)
       .text(inputKey);
 
     d3.select(el).select('.yLeftAxis')
@@ -440,6 +440,7 @@ const TransformChart = {
       .attr('class', 'left-title')
       .attr('text-anchor', 'middle')
       .attr('transform', 'translate(-30,' + height / 2 + ')rotate(-90)')
+      .style('fill', Colors().text1)
       .text('Score');
 
   },
