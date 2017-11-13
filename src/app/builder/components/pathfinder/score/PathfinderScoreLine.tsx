@@ -60,7 +60,7 @@ import ScoreBar from '../../charts/ScoreBar';
 import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
-import { Path, Score, ScoreLine, Source } from '../PathfinderTypes';
+import { Path, Score, ScoreLine, Source, ChoiceOption } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 
@@ -77,7 +77,7 @@ export interface Props
   onValueChange: (key: string, index: number, newValue: any) => void;
   allWeights: Array<{ weight: number }>;
   keyPath: KeyPath;
-  dropdownOptions: List<string>;
+  dropdownOptions: List<ChoiceOption>;
 }
 
 class PathfinderSourceLine extends TerrainComponent<Props>
@@ -89,7 +89,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
   } = {
     weight: this.props.line.weight,
     expanded: this.props.line.expanded,
-    fieldIndex: this.props.dropdownOptions.indexOf(this.props.line.field),
+    fieldIndex: this.props.dropdownOptions.map((v) => v.name).toList().indexOf(this.props.line.field),
   };
 
   public componentWillReceiveProps(nextProps)
@@ -97,7 +97,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
     if (this.props.line !== nextProps.line)
     {
       this.setState({
-        fieldIndex: nextProps.dropdownOptions.indexOf(this.props.line.field),
+        fieldIndex: nextProps.dropdownOptions.map((v) => v.name).toList().indexOf(this.props.line.field),
         weight: nextProps.line.weight,
         expanded: nextProps.line.expanded,
       });
@@ -176,7 +176,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
         />
         <span className='pf-score-line-text'>times</span>
         <Dropdown
-          options={this.props.dropdownOptions}
+          options={this.props.dropdownOptions.map((v) => v.name).toList()}
           selectedIndex={this.state.fieldIndex}
           canEdit={this.props.canEdit}
           keyPath={this.props.keyPath.push('field')}

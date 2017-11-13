@@ -67,6 +67,7 @@ export interface Props
   children?: any;
   onDelete?: (index: number) => void;
   depth?: number;
+  pieces?: List<PathfinderPiece>;
   // For expandable section, like transform chart
   expanded?: boolean;
   expandableContent?: any;
@@ -74,7 +75,13 @@ export interface Props
   expandButton?: any; // What the user presses to expand the section
 }
 
-class PathfinderLine extends TerrainComponent<Props>
+export type PathfinderPiece = El | 
+  {
+    content: El,
+    visible: boolean,
+  };
+
+export class PathfinderLine extends TerrainComponent<Props>
 {
   public state: {
   } = {
@@ -82,7 +89,7 @@ class PathfinderLine extends TerrainComponent<Props>
 
   public render()
   {
-    const { canDrag, canDelete, canEdit, children } = this.props;
+    const { canDrag, canDelete, canEdit, children, pieces } = this.props;
     return (
       <div className='pf-line-wrapper'>
         <div
@@ -94,6 +101,9 @@ class PathfinderLine extends TerrainComponent<Props>
         >
           {
             this.renderLeft()
+          }
+          {
+            this.renderPieces()
           }
           {
             children
@@ -111,6 +121,42 @@ class PathfinderLine extends TerrainComponent<Props>
         }
       </div>
     );
+  }
+  
+  private renderPieces(): El[]
+  {
+    const { pieces } = this.props;
+    if (pieces === undefined || pieces === null)
+    {
+      return null;
+    }
+    
+    return pieces.map((piece, index) =>
+    {
+      let content = piece as El;
+      let showing = true;
+      
+      if (piece['showing'] !== undefined && piece['content'] !== undefined)
+      {
+        // it is the interface version
+        content = piece['content'] as El;
+        showing = piece['showing'] as boolean;
+      }
+      
+      return (
+        <div
+          className={classNames({
+            'pf-piece': true,
+            'pf-piece-hidden': !showing,
+          })}
+          key={index}
+        >
+          {
+            content
+          }
+        </div>
+      );
+    }).toArray();
   }
 
   private renderLeft(): El

@@ -84,6 +84,17 @@ const keyPathForId = (node: any, id: string): (Array<string | number> | boolean)
 };
 
 const Util = {
+  
+  // Sets all the key/value pairs on newContextMap on currentContextRecord.
+  // Updates the record with new values, but if none of the values have changed,
+  // then Immutable will return the same Record reference, for performance.
+  reconcileContext(currentContextRecord, newContextMap) {
+    _.map(newContextMap, (value, key) => {
+      currentContextRecord = currentContextRecord.set(key, value);
+    });
+    return currentContextRecord;
+  },
+  
   // Return a random integer [min, max)
   // assumes min of 0 if not passed.
   randInt(...args: number[]): number

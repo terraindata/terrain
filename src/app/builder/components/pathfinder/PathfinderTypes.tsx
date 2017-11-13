@@ -85,6 +85,7 @@ import * as Immutable from 'immutable';
 const { List, Map, Record } = Immutable;
 import ElasticBlockHelpers, {AutocompleteMatchType} from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
+import { SchemaState } from 'schema/SchemaTypes';
 
 export const PathfinderSteps =
   [
@@ -123,10 +124,6 @@ export const _FilterGroup = (config?: { [key: string]: any }) =>
 class ScoreC extends BaseClass
 {
   public lines: List<ScoreLine> = List<ScoreLine>([]);
-  public getTransformDropdownOptions = (schemaState: any) =>
-  {
-    return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Transform);
-  }
 }
 export type Score = ScoreC & IRecord<ScoreC>;
 export const _Score = (config?: { [key: string]: any }) =>
@@ -234,37 +231,93 @@ export const _Source = (config?: { [key: string]: any }) =>
 abstract class DataSource extends BaseClass
 {
   // ... shared data source attributes go here
-  public abstract getFieldAutocompleteOptions:
-  (context?: AutocompleteContext) => List<AutocompleteOption>;
+  public abstract getChoiceOptions:
+  (context?: ChoiceContext) => List<ChoiceOption>;
 
   public name: string = '';
 }
 
-/* Consider splitting this into its own class */
 
-type AutocompleteContext = any;
+// This class contains shared render-time information
+//  about the current overall context of Pathfinder
+class PathfinderContextC extends BaseClass
+{
+  source: Source = null;
+  step: string = null;
+  canEdit: boolean = null;
+  schemaState: SchemaState = null;
+}
+export type PathfinderContext = PathfinderContextC & IRecord<PathfinderContextC>;
+export const _PathfinderContext = (config?: {[key:string]: any}) => 
+  New<PathfinderContext>(new PathfinderContextC(config), config);
+
+
+/* Consider splitting these things below into its own class */
+
+// This type union shows what contexts and parameters are allowable
+//  for autocompletes and dropdowns
+type ChoiceContext = {
+  type: 'source',
+  schemaState: SchemaState,
+} | {
+  type: 'transformFields',
+  source: Source,
+  schemaState: SchemaState,
+} | {
+  type: 'fields',
+  source: Source,
+  schemaState: SchemaState,
+};
 
 class ElasticDataSourceC extends DataSource
 {
   public indexes: List<string> = List([]);
   public types: List<string> = List([]);
 
-  public getFieldAutocompleteOptions = (context?: any) =>
+  public getChoiceOptions = (context: ChoiceContext): List<ChoiceOption> =>
   {
-    return List([
-      _AutocompleteOption({
-        name: 'Inventory',
-      }),
-      _AutocompleteOption({
-        name: 'Reviews',
-      }),
-      _AutocompleteOption({
-        name: 'Title',
-      }),
-      _AutocompleteOption({
-        name: 'Description',
-      }),
-    ]);
+    if (context.type === 'source')
+    {
+      return context.schemaState.tables.valueSeq().map((table) =>
+        {
+          return _ChoiceOption({
+            name: context.schemaState.databases.get(table.databaseId).name + ' / ' + table.name,
+            value: table,
+            metaContent: null,
+          });
+        }
+      ).toList();
+    }
+    
+    if (context.type === 'transformFields')
+    {
+      // TODO need to actually use Source
+      return ElasticBlockHelpers.autocompleteMatches(context.schemaState, AutocompleteMatchType.Transform).map(
+        (value) =>
+        {
+          return _ChoiceOption({
+            name: value,
+            value,
+          });
+        }
+      ).toList();
+    }
+    
+    if (context.type === 'fields')
+    {
+      // TODO need to actually use Source
+      return ElasticBlockHelpers.autocompleteMatches(context.schemaState, AutocompleteMatchType.Field).map(
+        (value) =>
+        {
+          return _ChoiceOption({
+            name: value,
+            value,
+          });
+        }
+      ).toList();
+    }
+    
+    throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));
   }
 }
 export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>;
@@ -275,11 +328,12 @@ export const _ElasticDataSource = (config?: { [key: string]: any }) =>
  * Section: Classes representing parts of the view
  */
 
-class AutocompleteOptionC extends BaseClass
+class ChoiceOptionC extends BaseClass
 {
   public name: string = '';
   public metaContent: any = '';
+  public value: any = null; // a value to distinguish it to the parser
 }
-export type AutocompleteOption = AutocompleteOptionC & IRecord<AutocompleteOptionC>;
-export const _AutocompleteOption = (config?: { [key: string]: any }) =>
-  New<AutocompleteOption>(new AutocompleteOptionC(config), config);
+export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
+export const _ChoiceOption = (config?: { [key: string]: any }) =>
+  New<ChoiceOption>(new ChoiceOptionC(config), config);

@@ -58,13 +58,24 @@ export const PathfinderText = {
   filterGroupPost: 'of the following:',
   createFilterLine: 'filter condition',
   createFilterGroup: 'group of filter conditions',
-  createScoreLine: 'factor to score on',
+  createScoreLine: 'score factor',
+  
+  findSectionTitle: 'Find',
+  findSectionSubtitle: `
+    Choose where your data are located and filter out everything that isn't a match.`,
+  
+  scoreSectionTitle: 'Score',
+  scoreSectionSubtitle: `
+  Score your results, so that the best picks show up in the top spots.
+  The score for each result will be the sum of the following factors:
+  `,
 
   // Steps
 
   pickSourceStepTitle: `
 		Where are the data that you care about located?
 	`,
+
 
   filterStepTitle: `
 		Let's find the data you want by filtering out everything that isn't a match.
@@ -79,7 +90,7 @@ export const PathfinderText = {
 	`,
 
   scoreStepSubtitle: `
-	The score for each result will be the sum of the following factors:
+	
   `,
 };
 

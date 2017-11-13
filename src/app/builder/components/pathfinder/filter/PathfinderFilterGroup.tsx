@@ -60,7 +60,6 @@ import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
 export interface Props
 {
   filterGroup: FilterGroup;
-  source: Source;
   canEdit: boolean;
   depth: number;
   keyPath: KeyPath;
@@ -86,8 +85,8 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
 
   public render()
   {
-
-    const { source, filterGroup, canEdit } = this.props;
+    const { filterGroup, canEdit } = this.props;
+    
     return (
       <div
         className='pf-line'

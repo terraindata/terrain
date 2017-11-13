@@ -55,17 +55,17 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
-import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
+import { FilterGroup, FilterLine, Path, Source, PathfinderContext } from '../PathfinderTypes';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
+import DragHandle from 'app/common/components/DragHandle';
+import DragAndDrop from 'app/common/components/DragAndDrop';
 
 export interface Props
 {
+  pathfinderContext: PathfinderContext;
   filterGroup: FilterGroup;
-  source: Source;
-  step: string;
-  canEdit: boolean;
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
@@ -78,7 +78,8 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   public render()
   {
-    const { source, step, filterGroup, canEdit } = this.props;
+    const { source, step, canEdit } = this.props.pathfinderContext;
+    const { filterGroup } = this.props;
 
     // flatten tree
     const entries: FilterEntry[] = [];
@@ -149,14 +150,14 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   private renderFilterEntry(filterEntry: FilterEntry, index: number): El
   {
-    const { source, canEdit } = this.props;
+    const { pathfinderContext } = this.props;
+    const { source, canEdit } = pathfinderContext;
 
     if (filterEntry.filterGroup)
     {
       return (
         <PathfinderFilterGroup
           filterGroup={filterEntry.filterGroup}
-          source={source}
           canEdit={canEdit}
           depth={filterEntry.depth}
           keyPath={filterEntry.keyPath}
@@ -171,13 +172,13 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       return (
         <PathfinderFilterLine
           filterLine={filterEntry.filterLine}
-          source={source}
           canEdit={canEdit}
           depth={filterEntry.depth}
           keyPath={filterEntry.keyPath}
           onChange={this.handleFilterChange}
           onDelete={this.handleFilterDelete}
           key={index}
+          pathfinderContext={pathfinderContext}
         />
       );
     }
@@ -186,7 +187,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     {
       return (
         <PathfinderFilterCreate
-          source={source}
           canEdit={canEdit}
           depth={filterEntry.depth}
           keyPath={filterEntry.keyPath}
