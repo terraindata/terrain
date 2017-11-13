@@ -60,7 +60,7 @@ import * as Util from '../Util';
 export interface AggregationRequest
 {
   variantid: string;
-  eventid: string;
+  eventname: string;
   start: string;
   end: string;
   agg: string;
@@ -70,7 +70,7 @@ export interface AggregationRequest
 
 export interface EventConfig
 {
-  eventid: number | string;
+  eventname: string;
   variantid: number | string;
   visitorid: number | string;
   timestamp: Date | string;
@@ -83,17 +83,9 @@ export interface EventConfig
   meta?: any;
 }
 
-export interface EventMetadataConfig
-{
-  id: number | string;
-  name: string;
-  description?: string;
-}
-
 export class Events
 {
   private eventTable: Tasty.Table;
-  private eventMetadataTable: Tasty.Table;
 
   public async initializeEventMetadata(tasty: Tasty.Tasty, index: string, type: string): Promise<void>
   {
@@ -101,7 +93,7 @@ export class Events
       type,
       [],
       [
-        'eventid',
+        'eventname',
         'variantid',
         'visitorid',
         'source',
@@ -109,57 +101,6 @@ export class Events
       ],
       index,
     );
-
-    this.eventMetadataTable = new Tasty.Table(
-      type + '-metadata',
-      [],
-      [
-        'id',
-        'name',
-      ],
-      index,
-    );
-
-    tasty.upsert(this.eventMetadataTable,
-      [
-        {
-          id: 1,
-          name: 'view',
-          description:
-          `Page view or impression event. This event fires off when a page
-          serving a variant is loaded or viewed.`,
-        },
-        {
-          id: 2,
-          name: 'click',
-          description:
-          `Item or page click event. This event is generated through an interaction
-          with the page or item served by a variant.`,
-        },
-        {
-          id: 3,
-          name: 'conversion',
-          description:
-          `An event denoting an item transaction or conversion. This event is generated
-          when an item served by a variant gets bought.`,
-        },
-        {
-          id: 4,
-          name: 'addtocart',
-          description:
-          `An event denoting that an item was added to the cart.`,
-        },
-      ]).then().catch();
-  }
-
-  public async getMetadata(controller: DatabaseController, filter?: object): Promise<string>
-  {
-    return JSON.stringify(controller.getTasty().select(this.eventMetadataTable, [], filter));
-  }
-
-  public async addEventMetadata(controller: DatabaseController, event: object): Promise<EventMetadataConfig>
-  {
-    return controller.getTasty().upsert(this.eventMetadataTable, event) as Promise<EventMetadataConfig>;
   }
 
   /*
@@ -175,14 +116,14 @@ export class Events
     const body = bodybuilder()
       .size(0)
       .filter('term', 'variantid', variantid)
-      .filter('term', 'eventid', request.eventid)
-      .filter('range', '@timestamp', {
+      .filter('term', 'eventname', request.eventname)
+      .filter('range', 'timestamp', {
         gte: request.start,
         lte: request.end,
       })
       .aggregation(
       'date_histogram',
-      '@timestamp',
+      'timestamp',
       request.agg,
       {
         interval: request.interval,
@@ -207,24 +148,24 @@ export class Events
 
   public generateRateQuery(controller: DatabaseController, variantid: string, request: AggregationRequest): Elastic.SearchParams
   {
-    const eventids: string[] = request.eventid.split(',');
-    const numerator = request.agg + '_' + eventids[0];
-    const denominator = request.agg + '_' + eventids[1];
-    const rate = request.agg + '_' + eventids[0] + '_' + eventids[1];
+    const eventnames: string[] = request.eventname.split(',');
+    const numerator = request.agg + '_' + eventnames[0];
+    const denominator = request.agg + '_' + eventnames[1];
+    const rate = request.agg + '_' + eventnames[0] + '_' + eventnames[1];
 
     const body = bodybuilder()
       .size(0)
-      // .orFilter('term', 'eventid', eventids[0])
-      // .orFilter('term', 'eventid', eventids[1])
+      // .orFilter('term', 'eventname', eventnames[0])
+      // .orFilter('term', 'eventname', eventnames[1])
       .filter('term', 'variantid', variantid)
-      .filter('range', '@timestamp', {
+      .filter('range', 'timestamp', {
         gte: request.start,
         lte: request.end,
       })
 
       .aggregation(
       'date_histogram',
-      '@timestamp',
+      'timestamp',
       'histogram',
       {
         interval: request.interval,
@@ -235,12 +176,12 @@ export class Events
         numerator,
         {
           term: {
-            eventid: eventids[0],
+            eventname: eventnames[0],
           },
         },
         (agg1) => agg1.aggregation(
           'value_count',
-          'eventid',
+          'eventname.keyword',
           'count',
         ),
       )
@@ -250,12 +191,12 @@ export class Events
         denominator,
         {
           term: {
-            eventid: eventids[1],
+            eventname: eventnames[1],
           },
         },
         (agg1) => agg1.aggregation(
           'value_count',
-          'eventid',
+          'eventname.keyword',
           'count',
         ),
       )
@@ -279,10 +220,10 @@ export class Events
   {
     return new Promise<object>(async (resolve, reject) =>
     {
-      const eventids: string[] = request.eventid.split(',');
-      const numerator = request.agg + '_' + eventids[0];
-      const denominator = request.agg + '_' + eventids[1];
-      const rate = request.agg + '_' + eventids[0] + '_' + eventids[1];
+      const eventnames: string[] = request.eventname.split(',');
+      const numerator = request.agg + '_' + eventnames[0];
+      const denominator = request.agg + '_' + eventnames[1];
+      const rate = request.agg + '_' + eventnames[0] + '_' + eventnames[1];
 
       const query = this.generateRateQuery(controller, variantid, request);
       this.runQuery(controller, query, (response) =>
@@ -309,8 +250,8 @@ export class Events
   {
     let body = bodybuilder()
       .filter('term', 'variantid', variantid)
-      .filter('term', 'eventid', request.eventid)
-      .filter('range', '@timestamp', {
+      .filter('term', 'eventname', request.eventname)
+      .filter('range', 'timestamp', {
         gte: request.start,
         lte: request.end,
       });
@@ -330,7 +271,21 @@ export class Events
     return this.buildQuery(controller, body.build());
   }
 
-  public async getAllEvents(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
+  public generateSelectEventsQuery(controller: DatabaseController, variantid?: string): Elastic.SearchParams
+  {
+    let body = bodybuilder()
+      .size(0)
+      .aggregation('terms', 'eventname.keyword');
+
+    if (variantid !== undefined)
+    {
+      body = body.filter('term', 'variantid', variantid);
+    }
+
+    return this.buildQuery(controller, body.build());
+  }
+
+  public async getSelect(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>((resolve, reject) =>
     {
@@ -344,12 +299,33 @@ export class Events
     });
   }
 
+  public async getDistinct(controller: DatabaseController, variantid?: string): Promise<object>
+  {
+    return new Promise<object>((resolve, reject) =>
+    {
+      const query = this.generateSelectEventsQuery(controller, variantid);
+      this.runQuery(controller as ElasticController, query, (response) =>
+      {
+        if (variantid !== undefined)
+        {
+          resolve({
+            [variantid]: response['aggregations']['agg_terms_eventname.keyword'].buckets,
+          });
+        }
+        else
+        {
+          resolve(response['aggregations']['agg_terms_eventname.keyword'].buckets);
+        }
+      }, reject);
+    });
+  }
+
   public async AggregationHandler(controller: DatabaseController, request: AggregationRequest): Promise<object[]>
   {
-    const variantids = request['variantid'].split(',');
     const promises: Array<Promise<any>> = [];
-    if (request['agg'] === 'histogram')
+    if (request['agg'] === 'histogram' || request['agg'] === 'count')
     {
+      const variantids = request['variantid'].split(',');
       if (request['interval'] === undefined)
       {
         throw new Error('Required parameter \"interval\" is missing');
@@ -362,10 +338,11 @@ export class Events
     }
     else if (request['agg'] === 'rate')
     {
-      const eventids = request['eventid'].split(',');
-      if (eventids.length < 2)
+      const variantids = request['variantid'].split(',');
+      const eventnames = request['eventname'].split(',');
+      if (eventnames.length < 2)
       {
-        throw new Error('Two \"eventid\" values are required to compute a rate');
+        throw new Error('Two \"eventname\" values are required to compute a rate');
       }
 
       if (request['interval'] === undefined)
@@ -378,11 +355,27 @@ export class Events
         promises.push(this.getRate(controller as ElasticController, variantid, request));
       }
     }
+    else if (request['agg'] === 'distinct')
+    {
+      if (request['variantid'] !== undefined)
+      {
+        const variantids = request['variantid'].split(',');
+        for (const variantid of variantids)
+        {
+          promises.push(this.getDistinct(controller as ElasticController, variantid));
+        }
+      }
+      else
+      {
+        promises.push(this.getDistinct(controller as ElasticController));
+      }
+    }
     else if (request['agg'] === 'select')
     {
+      const variantids = request['variantid'].split(',');
       for (const variantid of variantids)
       {
-        promises.push(this.getAllEvents(controller as ElasticController, variantid, request));
+        promises.push(this.getSelect(controller as ElasticController, variantid, request));
       }
     }
     return Promise.all(promises);

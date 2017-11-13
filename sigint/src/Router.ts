@@ -49,8 +49,10 @@ import jsurl = require('jsurl');
 import * as KoaRouter from 'koa-router';
 import * as _ from 'lodash';
 import stringHash = require('string-hash');
+import * as winston from 'winston';
 
 import { Config } from './Config';
+import * as Demo from './Demo';
 import { EventConfig, Events } from './Events';
 
 export class Router
@@ -64,42 +66,109 @@ export class Router
     this.router = new KoaRouter();
     this.events = new Events(config);
 
+    /**
+     * @api {post} / Track analytics event(s) (POST)
+     * @apiName postEvent
+     * @apiGroup Tracking
+     *
+     * @apiDescription Track an analytics event using a POST request. Event parameters can be provided using the POST payload / body.
+     *
+     * @apiParam {String} eventname Mandatory Name of the tracking event
+     * @apiParam {Number} variantid Mandatory ID of the Terrain variant to track this event for
+     * @apiParam {Number} visitorid Mandatory A unique ID to identify the current visitor
+     * @apiParam {Object} meta Mandatory Auxiliary information associated with the tracking event
+     * @apiParam {Object} batch Optional A batch registration request
+     *
+     */
     this.router.post('/', async (ctx, next) =>
     {
-      await this.storeEvent(ctx.request);
+      await this.handleEvent(ctx.request);
       ctx.body = '';
     });
 
+    /**
+     * @api {get} / Track analytics event(s) (GET)
+     * @apiName getEvent
+     * @apiGroup Tracking
+     *
+     * @apiParam {String} eventname Name of the tracking event
+     * @apiParam {Number} variantid ID of the Terrain variant to track this event for
+     * @apiParam {Number} visitorid A unique ID to identify the current visitor
+     * @apiParam {Object} meta Auxiliary information associated with the tracking event
+     * @apiParam {Object} batch Optional A batch registration request
+     *
+     * @apiDescription Track an analytics event using a GET request. Event parameters can be provided using the GET query string.
+     *
+     * @apiExample {curl} Example usage:
+     *     curl http://localhost:3001/v1?eventname=impression&visitorid=3161077040&variantid=123&meta=~(itemName~343~itemType~%27movie)
+     */
     this.router.get('/', async (ctx, next) =>
     {
-      await this.storeEvent(ctx.request);
+      await this.handleEvent(ctx.request);
       ctx.body = '';
     });
 
     this.appRouter = new KoaRouter();
+
+    /**
+     * @api {get} /bundle.js Serve Terrain analytics.js library
+     * @apiName getBundle
+     * @apiGroup AnalyticsJS
+     */
     this.appRouter.get('/bundle.js', async (ctx, next) =>
     {
       ctx.type = 'js';
-      if (fs.existsSync('/build/bundle.js'))
+      if (fs.existsSync('./build/bundle.js'))
       {
-        ctx.body = fs.createReadStream('/build/bundle.js');
+        ctx.body = fs.createReadStream('./build/bundle.js');
       }
       else
       {
         ctx.body = fs.createReadStream('../analytics.js/build/bundle.js');
       }
     });
+
+    /**
+     * @api {get} /bundle.js.map Serve Terrain analytics.js library sourcemap
+     * @apiName getBundleMap
+     * @apiGroup AnalyticsJS
+     */
     this.appRouter.get('/bundle.js.map', async (ctx, next) =>
     {
       ctx.type = 'js';
-      if (fs.existsSync('/build/bundle.js.map'))
+      if (fs.existsSync('./build/bundle.js.map'))
       {
-        ctx.body = fs.createReadStream('/build/bundle.js.map');
+        ctx.body = fs.createReadStream('./build/bundle.js.map');
       }
       else
       {
         ctx.body = fs.createReadStream('../analytics.js/build/bundle.js.map');
       }
+    });
+
+    /**
+     * @api {get} /demo/search Search endpoint for the Terrain Analytics demo website
+     * @apiPrivate
+     * @apiName getDemoSearch
+     * @apiGroup Demo
+     *
+     * @apiParam {String} s Elasticsearch server to query
+     * @apiParam {String} q Title to search
+     * @apiParam {Number} p Page number
+     * @apiParam {Number} v Variant ID
+     *
+     * @apiParamExample {json} Request-Example:
+     *     {
+     *       "s": "http://localhost:9200",
+     *       "q": "Star",
+     *       "p": 0,
+     *       "v": 8,
+     *     }
+     * @apiSuccess {Object[]} results Results of the search query.
+     */
+    this.appRouter.get('/demo/search', async (ctx, next) =>
+    {
+      ctx.body = await Demo.search(ctx.request.query);
     });
 
     this.appRouter.use('/v1', this.router.routes(), this.router.allowedMethods());
@@ -122,7 +191,50 @@ export class Router
     }
   }
 
-  private async storeEvent(request: any)
+  private async prepareEvent(request: any, event: any): Promise<EventConfig>
+  {
+    let meta = event['meta'];
+    try
+    {
+      meta = jsurl.parse(event['meta']);
+    }
+    catch (e)
+    {
+      meta = event['meta'];
+    }
+
+    const date = new Date();
+    const now = date.getTime();
+
+    const ev: EventConfig = {
+      eventname: event['eventname'],
+      variantid: event['variantid'],
+      visitorid: event['visitorid'],
+      source: {
+        ip: request.ip,
+        host: request.host,
+        useragent: request.useragent,
+        referer: request.header.referer,
+      },
+      timestamp: date,
+      intervalBucketSeconds: Math.round(now / 1000),
+      intervalBucketMinutes: Math.round(now / 1000 / 60),
+      intervalBucketHours: Math.round(now / 1000 / 60 / 60),
+      intervalBucketDays: Math.round(now / 1000 / 60 / 60 / 24),
+      meta,
+      hash: stringHash(JSON.stringify(request.query)),
+    };
+
+    const unexpectedFields = _.difference(Object.keys(event), Object.keys(ev).concat(['id', 'accessToken', 'batch']));
+    if (unexpectedFields.length > 0)
+    {
+      this.logError('storing analytics event: unexpected fields encountered ' + JSON.stringify(unexpectedFields));
+    }
+
+    return ev;
+  }
+
+  private async handleEvent(request: any)
   {
     if (request.body !== undefined && Object.keys(request.body).length > 0 &&
       request.query !== undefined && Object.keys(request.query).length > 0)
@@ -138,56 +250,46 @@ export class Router
       return this.logError('Either request query or body parameters are required.');
     }
 
-    let req: object = request.body;
-    if (req === undefined || (req !== undefined && Object.keys(req).length === 0))
+    let event: object = request.body;
+    if (event === undefined || (event !== undefined && Object.keys(event).length === 0))
     {
-      req = request.query;
+      event = request.query;
     }
 
-    let meta = req['meta'];
-    try
+    if (event['batch'] !== undefined)
     {
-      meta = jsurl.parse(req['meta']);
-    }
-    catch (e)
-    {
-      meta = req['meta'];
-    }
+      let events = [];
+      try
+      {
+        events = jsurl.parse(event['batch']);
+      }
+      catch (e)
+      {
+        events = event['batch'];
+      }
 
-    const date = new Date();
-    const now = date.getTime();
+      // insert batched events
+      if (!Array.isArray(events))
+      {
+        return this.logError('Expected batch parameter to be an array.');
+      }
 
-    const event: EventConfig = {
-      eventid: req['eventid'],
-      variantid: req['variantid'],
-      visitorid: req['visitorid'],
-      source: {
-        ip: request.ip,
-        host: request.host,
-        useragent: request.useragent,
-        referer: request.header.referer,
-      },
-      timestamp: date,
-      intervalBucketSeconds: Math.round(now/1000),
-      intervalBucketMinutes: Math.round(now/1000/60),
-      intervalBucketHours: Math.round(now/1000/60/60),
-      intervalBucketDays: Math.round(now/1000/60/60/24),
-      meta,
-      hash: stringHash(JSON.stringify(request.query)),
-    };
-
-    if (_.difference(Object.keys(req), Object.keys(event).concat(['id', 'accessToken'])).length > 0)
-    {
-      return this.logError('storing analytics event: unexpected fields encountered');
+      const promises: Array<Promise<EventConfig>> = [];
+      events.forEach((ev) => promises.push(this.prepareEvent(request, ev)));
+      const evs = await Promise.all(promises);
+      await this.events.storeBulk(evs);
     }
-
-    try
+    else
     {
-      await this.events.store(event);
-    }
-    catch (e)
-    {
-      return this.logError('storing analytics event: ' + JSON.stringify(e));
+      const ev = await this.prepareEvent(request, event);
+      try
+      {
+        await this.events.store(ev);
+      }
+      catch (e)
+      {
+        this.logError('storing analytics event: ' + JSON.stringify(e));
+      }
     }
   }
 

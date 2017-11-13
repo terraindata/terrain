@@ -49,7 +49,7 @@ import { List } from 'immutable';
 import { divIcon, point } from 'leaflet';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Circle, Map, Marker, Polyline, Popup, TileLayer, ZoomControl } from 'react-leaflet';
+import { Circle, Map, Marker, Polygon, Polyline, Popup, Rectangle, TileLayer, ZoomControl } from 'react-leaflet';
 
 import Switch from 'common/components/Switch';
 import Actions from '../../builder/data/BuilderActions';
@@ -68,6 +68,8 @@ export interface Props
   address?: string;
   secondLocation?: [number, number] | number[];
   secondAddress?: string;
+  bounds?: [number[]];
+  onMapClick?: (event) => void;
 
   onChange?: (value) => void;
   geocoder?: string;
@@ -96,10 +98,12 @@ export interface Props
   field?: any;
   secondaryMarkerColor?: string;
 
-  // For displaying an aggregate map of locations
+  // For displaying an aggregate maps
   multiLocations?: LocationData[];
+  boundingRectangles?: BoundingRectangle[];
 
   className?: string;
+  style?: string;
 }
 
 interface LocationData
@@ -108,6 +112,13 @@ interface LocationData
   name: string;
   index: number;
   color?: string;
+}
+
+interface BoundingRectangle
+{
+  bottomRight: any;
+  topLeft: any;
+  name?: string;
 }
 
 // for map markers, distances must be converted to meters
@@ -538,6 +549,9 @@ class MapComponent extends TerrainComponent<Props>
         position={location}
         icon={icon}
         key={key}
+        ref={key}
+        onMouseOver={this._fn(this.openPopup, key)}
+        onMouseOut={this._fn(this.closePopup, key)}
         draggable={draggable}
         riseOnHover={true}
         onDragEnd={draggable ? this.handleDragEnd : null}
@@ -565,7 +579,15 @@ class MapComponent extends TerrainComponent<Props>
     {
       const location = MapUtil.getCoordinatesFromGeopoint(spotlight.fields[this.props.field]);
       const address = spotlight.name;
-      return this.renderMarker(address, location, false, -1, spotlight.color, false, String(address) + '_' + String(index));
+      return this.renderMarker(
+        address,
+        location,
+        false,
+        Number(spotlight.rank) + 1,
+        spotlight.color,
+        false,
+        String(address) + '_' + String(index),
+      );
     }
     return null;
   }
@@ -582,9 +604,70 @@ class MapComponent extends TerrainComponent<Props>
     return null;
   }
 
+  public openPopup(id)
+  {
+    if (id !== undefined && this.refs[id] !== undefined)
+    {
+      (this.refs[id] as any).leafletElement.openPopup();
+    }
+  }
+
+  public closePopup(id)
+  {
+    if (id !== undefined && this.refs[id] !== undefined)
+    {
+      (this.refs[id] as any).leafletElement.closePopup();
+    }
+  }
+
+  public renderBoundingRectangles(boundingRectangle, index)
+  {
+    if (boundingRectangle !== undefined)
+    {
+      const bottomRight = MapUtil.getCoordinatesFromGeopoint(boundingRectangle.bottomRight);
+      const topLeft = MapUtil.getCoordinatesFromGeopoint(boundingRectangle.topLeft);
+      const { name } = boundingRectangle;
+      const id = 'rect_' + String(index);
+      return <Rectangle
+        bounds={[bottomRight, topLeft]}
+        stroke={true}
+        color={Colors().active}
+        width={7}
+        fillColor={Colors().active}
+        fillOpacity={0.3}
+        key={id}
+        ref={id}
+        onMouseOver={this._fn(this.openPopup, id)}
+        onMouseOut={this._fn(this.closePopup, id)}
+      >
+        {
+          name !== '' && name !== undefined ?
+            <Popup
+              className='map-component-popup'
+              closeButton={false}
+              autoPan={false}
+            >
+              <span>{name}</span>
+            </Popup>
+            :
+            null
+        }
+      </Rectangle>;
+    }
+    return null;
+  }
+
+  public handleOnMapClick(event)
+  {
+    if (this.props.onMapClick !== undefined)
+    {
+      this.props.onMapClick(event);
+    }
+  }
+
   public renderMap()
   {
-    const { location, secondLocation } = this.props;
+    const { location, secondLocation, multiLocations } = this.props;
     const address = this.props.address !== undefined && this.props.address !== '' ? this.props.address : this.state.address;
     const primaryMarkerColor = this.props.colorMarker ? Colors().builder.cards.categories.filter : 'black';
     // const secondColor;
@@ -594,9 +677,13 @@ class MapComponent extends TerrainComponent<Props>
       return null;
     }
 
-    let center;
+    const center = location;
     let bounds;
-    if (secondLocation !== undefined)
+    if (this.props.bounds !== undefined)
+    {
+      bounds = this.props.bounds;
+    }
+    else if (secondLocation !== undefined)
     {
       if (location[0] > secondLocation[0])
       {
@@ -609,25 +696,39 @@ class MapComponent extends TerrainComponent<Props>
         [secondLocation[0] + 0.05, secondLocation[1]]];
       }
     }
-    else
+    else if (multiLocations !== undefined && multiLocations.length > 0)
     {
-      center = location;
+      const locations = multiLocations.map((loc) => loc.location);
+      if (location !== undefined)
+      {
+        locations.push(List([location[1], location[0]]));
+      }
+      bounds = MapUtil.getBounds(locations);
     }
     const mapProps = bounds !== undefined ? { bounds } : { center };
     return (
-      <div className={this.props.className}>
+      <div
+        className={this.props.className}
+      >
         <Map
           {...mapProps}
           zoomControl={this.props.zoomControl}
           zoom={this.state.zoom}
           ref='map'
           onViewportChanged={this.setZoomLevel}
+          onClick={this.handleOnMapClick}
+          onMouseDown={this.handleOnMapClick}
+          style={this.props.style}
+          maxBounds={[[85, -180], [-85, 180]]}
+          minZoom={1}
+          zoomDelta={0.5}
+          keyboard={false}
         >
           {
             this.props.markLocation ?
               this.renderMarker(address, location, secondLocation !== undefined, -1,
                 primaryMarkerColor,
-                secondLocation === undefined,
+                secondLocation === undefined && this.props.multiLocations === undefined,
               )
               :
               null
@@ -675,6 +776,13 @@ class MapComponent extends TerrainComponent<Props>
               />
               :
               null
+          }
+          {
+            this.props.boundingRectangles !== undefined && this.props.boundingRectangles.length > 0 ?
+              _.map(this.props.boundingRectangles, this.renderBoundingRectangles)
+              :
+              null
+
           }
           <TileLayer
             url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'

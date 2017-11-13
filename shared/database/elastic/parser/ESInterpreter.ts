@@ -110,7 +110,7 @@ export default class ESInterpreter
       const root: ESValueInfo = this.rootValueInfo;
       if (root.clause === undefined)
       {
-        root.clause = this.config.getClause('root');
+        root.clause = this.config.getClause('body');
       }
       root.recursivelyVisit(
         (info: ESValueInfo): boolean =>
@@ -142,7 +142,7 @@ export default class ESInterpreter
   public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
   {
     let token = null;
-    if (info !== null && info.tokens.length > 0)
+    if (info !== null && info !== undefined && info.tokens.length > 0)
     {
       token = info.tokens[0];
     }

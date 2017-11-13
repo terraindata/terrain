@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
 import './LibraryItem.less';
 const { List } = Immutable;
@@ -59,6 +60,8 @@ import ColorsActions from './../../colors/data/ColorsActions';
 import Menu from './../../common/components/Menu';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
+const PinIcon = require('../../../images/icon_pin.svg?name=PinIcon');
+const PinIconRed = require('../../../images/icon_pinRed.svg?name=PinIconRed');
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
 export interface Props
@@ -72,6 +75,7 @@ export interface Props
   canArchive: boolean;
   canDuplicate: boolean;
   canUnarchive: boolean;
+  canPin?: boolean;
   icon: any;
   to?: string;
   type: string;
@@ -103,6 +107,8 @@ export interface Props
   onSelect?: (id: ID) => void;
   onDoubleClick?: (id: ID) => void;
   isStarred?: boolean;
+  isPinned?: boolean;
+  onPin?: (variantId) => void;
 
   // populated by DnD code
   connectDropTarget?: (html: any) => JSX.Element;
@@ -115,8 +121,15 @@ export interface Props
   isFocused: boolean; // is this the last thing focused / selected?
 }
 
+// Note: for some very weird reason, adding @Radium here causes an infinite loop in Analytics
 class LibraryItem extends TerrainComponent<Props>
 {
+  public static defaultProps: Partial<Props> = {
+    canPin: false,
+    isPinned: false,
+    onPin: (variantId) => { return; },
+  };
+
   public state = {
     nameEditing: false,
     focusField: false,
@@ -340,9 +353,62 @@ class LibraryItem extends TerrainComponent<Props>
     event.target.select();
   }
 
+  public handlePin(event)
+  {
+    event.preventDefault();
+    event.stopPropagation();
+    const { id } = this.props;
+    this.props.onPin(id);
+  }
+
+  public renderPin()
+  {
+    const { canPin } = this.props;
+
+    let pinComponent = null;
+    if (canPin)
+    {
+      const { isPinned } = this.props;
+      const pinIconClass = 'library-item-pin' +
+        (isPinned ? ' library-item-pin-active' : '');
+
+      pinComponent = (
+        <div
+          onClick={this.handlePin}
+          className={pinIconClass}
+          style={isPinned ?
+            {
+              backgroundColor: Colors().active,
+              color: Colors().activeText,
+              borderColor: Colors().darkerHighlight,
+            } :
+            {
+              backgroundColor: Colors().darkerHighlight,
+              color: Colors().activeText,
+              borderColor: Colors().active,
+            }
+          }
+        >
+          <PinIcon />
+        </div>
+      );
+    }
+
+    return pinComponent;
+  }
+
   public render()
   {
-    const { connectDropTarget, connectDragSource, isOver, dragItemType, draggingItemId, isDragging, isSelected } = this.props;
+    const {
+      connectDropTarget,
+      connectDragSource,
+      isOver,
+      dragItemType,
+      draggingItemId,
+      isDragging,
+      isSelected,
+      canPin,
+    } = this.props;
     const draggingOver = isOver && dragItemType !== this.props.type;
 
     const { canArchive, canDuplicate, canUnarchive, canRename } = this.props;
@@ -441,13 +507,15 @@ class LibraryItem extends TerrainComponent<Props>
                         backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().bg3 : Colors().bg2, Colors().inactiveHover)
                     }
                   >
-                    <div
-                      className='library-item-icon'
-                    >
-                      {
-                        this.props.icon
-                      }
-                    </div>
+                    {canPin ? this.renderPin() :
+                      (<div
+                        className='library-item-icon'
+                      >
+                        {
+                          this.props.icon
+                        }
+                      </div>)
+                    }
                     <div
                       className='library-item-name'
                       style={fontColor(Colors().text1)}

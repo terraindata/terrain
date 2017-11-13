@@ -619,12 +619,14 @@ describe('Query route tests', () =>
     async () =>
     {
       const template: string = `{
-                   "index" : "movies",
-                   "type" : "data",
                    "from" : 0,
                    "size" : {{#toJson}}size{{/toJson}},
-                   "body" : {
-                     "query" : {
+                   "query" : {
+                      "bool" : {
+                        "must" : [
+                          {"match" : {"_index" : "movies"}},
+                          {"match" : {"_type" : "data"}}
+                        ]
                       }
                    }
                 }`;
@@ -1119,9 +1121,9 @@ describe('Credentials tests', () =>
   });
 });
 
-describe('Analytics aggregation route tests', () =>
+describe('Analytics events route tests', () =>
 {
-  test('GET /midway/v1/events/ (select)', async () =>
+  test('GET /midway/v1/events/agg (distinct)', async () =>
   {
     await request(server)
       .get('/midway/v1/events/agg')
@@ -1129,10 +1131,37 @@ describe('Analytics aggregation route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2015, 5, 2, 1, 27, 4),
-        end: new Date(2015, 5, 2, 1, 27, 14),
-        eventid: 1,
-        variantid: 1,
+        agg: 'distinct',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toEqual(3);
+      });
+  });
+});
+
+describe('Analytics route tests', () =>
+{
+  test('GET /midway/v1/events/agg (select)', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/events/agg')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        database: 1,
+        start: new Date(2017, 10, 6, 7, 24, 4),
+        end: new Date(2017, 10, 6, 7, 26, 4),
+        eventname: 'impression',
+        variantid: 5,
         agg: 'select',
       })
       .expect(200)
@@ -1144,11 +1173,11 @@ describe('Analytics aggregation route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['1'].length).toEqual(2);
+        expect(respData['5'].length).toEqual(3);
       });
   });
 
-  test('GET /midway/v1/events/ (histogram)', async () =>
+  test('GET /midway/v1/events/agg (histogram)', async () =>
   {
     await request(server)
       .get('/midway/v1/events/agg')
@@ -1156,12 +1185,12 @@ describe('Analytics aggregation route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2015, 5, 2, 1, 27, 4),
-        end: new Date(2015, 5, 2, 1, 27, 14),
-        eventid: 1,
-        variantid: 1,
+        start: new Date(2017, 10, 6, 7, 24, 4),
+        end: new Date(2017, 10, 6, 7, 28, 4),
+        eventname: 'impression',
+        variantid: 5,
         agg: 'histogram',
-        interval: 'second',
+        interval: 'minute',
       })
       .expect(200)
       .then((response) =>
@@ -1172,11 +1201,11 @@ describe('Analytics aggregation route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['1'].length).toEqual(4);
+        expect(respData['5'].length).toEqual(3);
       });
   });
 
-  test('GET /midway/v1/events/ (rate)', async () =>
+  test('GET /midway/v1/events/agg (rate)', async () =>
   {
     await request(server)
       .get('/midway/v1/events/agg')
@@ -1184,10 +1213,10 @@ describe('Analytics aggregation route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2015, 5, 2, 1, 27, 4),
-        end: new Date(2015, 5, 2, 3, 27, 4),
-        eventid: '2,1',
-        variantid: 1,
+        start: new Date(2017, 10, 6, 7, 24, 4),
+        end: new Date(2017, 10, 6, 10, 24, 4),
+        eventname: 'click,impression',
+        variantid: 5,
         agg: 'rate',
         interval: 'hour',
       })
@@ -1200,7 +1229,40 @@ describe('Analytics aggregation route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['1'].length).toEqual(3);
+        expect(respData['5'].length).toEqual(4);
+      });
+  });
+
+  test('GET /midway/v1/events/metrics', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/events/metrics')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          database: 1,
+          label: 'Click',
+          events: 'click',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({
+            database: 1,
+            label: 'Click',
+            events: 'click',
+          });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 });

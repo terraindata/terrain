@@ -124,10 +124,14 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     {
       // auto mode
       // this.checkForFolding(tql);
+
       if (tql === this.state.tql)
       {
         return;
       }
+
+      // console.log('unequal tql: "' + this.state.tql + '"\n to \n"'+tql +'"\n');
+
       this.setState({
         tql,
         highlightedLine: null,

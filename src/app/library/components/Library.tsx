@@ -68,8 +68,9 @@ export interface Props
   location?: any;
   router?: any;
   route?: any;
-  variantsMultiselect?: boolean;
+  canPinVariants?: boolean;
   basePath: string;
+  singleColumn?: boolean;
 }
 
 export interface State
@@ -79,12 +80,18 @@ export interface State
 
 class Library extends TerrainComponent<any>
 {
+  // Give names to each of the library columns
+  public static GROUPS_COLUMN = 'groups';
+  public static ALGORITHMS_COLUMN = 'algorithms';
+  public static VARIANTS_COLUMN = 'variants';
+
   public static defaultProps: Partial<Props> = {
     params: {},
     location: {},
     router: {},
     route: {},
-    variantsMultiselect: false,
+    canPinVariants: false,
+    singleColumn: false,
   };
 
   public cancelSubscription = null;
@@ -140,6 +147,38 @@ class Library extends TerrainComponent<any>
     this.props.userActions.fetch();
   }
 
+  public componentWillReceiveProps(nextProps)
+  {
+    const { analytics } = this.props;
+    const { analytics: nextAnalytics } = nextProps;
+    const {
+      selectedAnalyticsConnection,
+      selectedMetric,
+      selectedInterval,
+      selectedDateRange,
+      pinnedVariants,
+    } = analytics;
+
+    const {
+      selectedAnalyticsConnection: nextSelectedAnalyticsConnection,
+      selectedMetric: nextSelectedMetric,
+      selectedInterval: nextSelectedInterval,
+      selectedDateRange: nextSelectedDateRange,
+      pinnedVariants: nextPinnedVariants,
+    } = nextAnalytics;
+
+    const analyticsFilterChanged = (selectedMetric !== nextSelectedMetric) ||
+      (selectedAnalyticsConnection !== nextSelectedAnalyticsConnection) ||
+      (selectedInterval !== nextSelectedInterval) ||
+      (selectedDateRange !== nextSelectedDateRange) ||
+      (pinnedVariants !== nextPinnedVariants);
+
+    if (analyticsFilterChanged)
+    {
+      this.fetchAnalytics(nextProps);
+    }
+  }
+
   public getData(variantId: ID)
   {
     const { analytics } = this.props;
@@ -158,13 +197,14 @@ class Library extends TerrainComponent<any>
 
   public getDatasets()
   {
-    const { library: libraryState } = this.props;
-    const { variants, selectedVariants } = libraryState;
+    const { library: libraryState, analytics } = this.props;
+    const { variants, selectedVariant } = libraryState;
 
     const datasets = variants
       .filter((variant) =>
       {
-        return selectedVariants.includes(variant.id.toString());
+        return selectedVariant === variant.id ||
+          analytics.pinnedVariants.get(variant.id, false);
       })
       .map((variant) =>
       {
@@ -191,32 +231,37 @@ class Library extends TerrainComponent<any>
     localStorage.setItem(lastPath, location.pathname);
   }
 
+  public fetchAnalytics(props)
+  {
+    const { analytics, library } = props;
+    const { selectedVariant } = library;
+    const { pinnedVariants } = analytics;
+
+    const variantIds = pinnedVariants.keySeq().toJS();
+    if (selectedVariant !== null && selectedVariant !== undefined)
+    {
+      variantIds.push(selectedVariant);
+    }
+
+    if (variantIds.length > 0)
+    {
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        variantIds,
+        analytics.selectedMetric,
+        analytics.selectedInterval,
+        analytics.selectedDateRange,
+      );
+    }
+  }
+
   public handleMetricRadioButtonClick(optionValue)
   {
     const { analytics } = this.props;
 
     if (analytics.selectedAnalyticsConnection !== null)
     {
-      const { selectedVariants } = this.props.library;
-      const selectedVariantIds = selectedVariants.toJS();
-
-      let numericOptionValue = null;
-      if (optionValue.indexOf(',') > -1)
-      {
-        numericOptionValue = optionValue.split(',').map((o) => parseInt(o, 10));
-      } else
-      {
-        numericOptionValue = parseInt(optionValue, 10);
-      }
-
       this.props.analyticsActions.selectMetric(optionValue);
-      this.props.analyticsActions.fetch(
-        analytics.selectedAnalyticsConnection,
-        selectedVariantIds,
-        numericOptionValue,
-        analytics.selectedInterval,
-        analytics.selectedDateRange,
-      );
     }
   }
 
@@ -226,17 +271,7 @@ class Library extends TerrainComponent<any>
 
     if (analytics.selectedAnalyticsConnection !== null)
     {
-      const { selectedVariants } = this.props.library;
-      const selectedVariantIds = selectedVariants.toJS();
-
       this.props.analyticsActions.selectInterval(optionValue);
-      this.props.analyticsActions.fetch(
-        analytics.selectedAnalyticsConnection,
-        selectedVariantIds,
-        analytics.selectedMetric,
-        optionValue,
-        analytics.selectedDateRange,
-      );
     }
   }
 
@@ -246,54 +281,77 @@ class Library extends TerrainComponent<any>
 
     if (analytics.selectedAnalyticsConnection !== null)
     {
-      const { selectedVariants } = this.props.library;
-      const selectedVariantIds = selectedVariants.toJS();
       const numericOptionValue = parseInt(optionValue, 10);
 
-      this.props.analyticsActions.selectDateRange(optionValue);
-      this.props.analyticsActions.fetch(
-        analytics.selectedAnalyticsConnection,
-        selectedVariantIds,
-        analytics.selectedMetric,
-        analytics.selectedInterval,
-        numericOptionValue,
-      );
+      this.props.analyticsActions.selectDateRange(numericOptionValue);
     }
   }
 
   public handleConnectionChange(connectionName)
   {
     const { analytics, schema } = this.props;
-    const { selectedVariants } = this.props.library;
-    const selectedVariantIds = selectedVariants.toJS();
-
-    this.props.analyticsActions.fetch(
-      connectionName,
-      selectedVariantIds,
-      analytics.selectedMetric,
-      analytics.selectedInterval,
-      analytics.selectedDateRange,
-    );
 
     this.props.analyticsActions.selectAnalyticsConnection(connectionName);
     localStorage.setItem('analyticsConnection', connectionName);
   }
 
+  public handleLegendClick(datasetId)
+  {
+    this.props.analyticsActions.pinVariant(datasetId);
+  }
+
+  public isColumnVisible(columnName)
+  {
+    const { singleColumn, router } = this.props;
+    const params = router !== undefined && router.params !== undefined ? router.params : {};
+    const { groupId, algorithmId, variantId } = params;
+
+    return !singleColumn ||
+      (groupId === undefined &&
+        algorithmId === undefined &&
+        variantId === undefined &&
+        columnName === Library.GROUPS_COLUMN
+      ) ||
+      (groupId !== undefined &&
+        algorithmId === undefined &&
+        variantId === undefined &&
+        columnName === Library.ALGORITHMS_COLUMN
+      ) ||
+      (groupId !== undefined &&
+        algorithmId !== undefined &&
+        columnName === Library.VARIANTS_COLUMN
+      );
+  }
+
   public render()
   {
-    const { library: libraryState, analytics, schema } = this.props;
+    const {
+      library: libraryState,
+      analytics,
+      schema,
+      router,
+      basePath,
+      canPinVariants,
+      singleColumn,
+    } = this.props;
+
     const {
       dbs,
       groups,
       algorithms,
       variants,
-      selectedVariants,
+      selectedVariant,
       groupsOrder,
     } = libraryState;
 
-    const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
+    const {
+      selectedMetric,
+      selectedInterval,
+      selectedDateRange,
+      pinnedVariants,
+    } = analytics;
 
-    const { router, basePath, variantsMultiselect } = this.props;
+    const hasPinnedVariants = pinnedVariants.valueSeq().includes(true);
     const { params } = router;
 
     const datasets = this.getDatasets();
@@ -353,52 +411,72 @@ class Library extends TerrainComponent<any>
       this.setLastPath();
     }
 
+    const algorithmsReferrer = singleColumn && group !== undefined ?
+      {
+        label: group.name,
+        path: `/${basePath}`,
+      } : null;
+
+    const variantsReferrer = singleColumn && algorithm !== undefined ?
+      {
+        label: algorithm.name,
+        path: `/${basePath}/${groupId}`,
+      } : null;
+
     return (
       <div className='library'>
         <div className='library-top'>
-          <GroupsColumn
-            {...{
-              groups,
-              groupsOrder,
-              params,
-              basePath,
-              groupActions: this.props.libraryGroupActions,
-              variants,
-            }}
-            isFocused={algorithm === undefined}
-          />
-          <AlgorithmsColumn
-            {...{
-              dbs,
-              groups,
-              algorithms,
-              variants,
-              algorithmsOrder,
-              groupId,
-              params,
-              basePath,
-              algorithmActions: this.props.libraryAlgorithmActions,
-            }}
-            isFocused={variantIds === null}
-          />
-          <VariantsColumn
-            {...{
-              variants,
-              selectedVariants,
-              variantsOrder,
-              groupId,
-              algorithmId,
-              params,
-              multiselect: variantsMultiselect,
-              basePath,
-              router,
-              variantActions: this.props.libraryVariantActions,
-              analytics,
-              analyticsActions: this.props.analyticsActions,
-              algorithms,
-            }}
-          />
-          {!variantsMultiselect ?
+          {this.isColumnVisible(Library.GROUPS_COLUMN) ?
+            <GroupsColumn
+              {...{
+                groups,
+                groupsOrder,
+                params,
+                basePath,
+                groupActions: this.props.libraryGroupActions,
+                variants,
+              }}
+              isFocused={algorithm === undefined}
+            /> : null
+          }
+          {this.isColumnVisible(Library.ALGORITHMS_COLUMN) ?
+            <AlgorithmsColumn
+              {...{
+                dbs,
+                groups,
+                algorithms,
+                variants,
+                algorithmsOrder,
+                groupId,
+                params,
+                basePath,
+                algorithmActions: this.props.libraryAlgorithmActions,
+                referrer: algorithmsReferrer,
+              }}
+              isFocused={variantIds === null}
+            /> : null
+          }
+          {this.isColumnVisible(Library.VARIANTS_COLUMN) ?
+            <VariantsColumn
+              {...{
+                variants,
+                selectedVariant,
+                variantsOrder,
+                groupId,
+                algorithmId,
+                params,
+                canPinItems: canPinVariants,
+                basePath,
+                router,
+                variantActions: this.props.libraryVariantActions,
+                analytics,
+                analyticsActions: this.props.analyticsActions,
+                algorithms,
+                referrer: variantsReferrer,
+              }}
+            /> : null
+          }
+          {!canPinVariants ?
             <LibraryInfoColumn
               {...{
                 dbs,
@@ -413,7 +491,7 @@ class Library extends TerrainComponent<any>
               }}
             /> : null}
         </div>
-        {variantsMultiselect && selectedVariants.count() > 0 ?
+        {canPinVariants && (selectedVariant !== null || hasPinnedVariants) ?
           <div className='library-bottom'>
             <div className='library-analytics-chart-wrapper'>
               {analytics.loaded ?
@@ -422,6 +500,7 @@ class Library extends TerrainComponent<any>
                     datasets={datasets}
                     xDataKey={'key'}
                     yDataKey={'doc_count'}
+                    onLegendClick={this.handleLegendClick}
                   /> : (
                     <div className='library-analytics-error'>
                       <p>An error occurred while fetching the analytics data</p>

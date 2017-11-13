@@ -296,7 +296,14 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
               ]}
             >
               <div
-                className='fi-preview-column-cell-text'
+                key={key}
+                className={classNames({
+                  'fi-preview-column-cell': true,
+                })}
+                style={[
+                  fontColor(Colors().text1),
+                  backgroundColor(Colors().bg2),
+                ]}
               >
                 {
                   item

@@ -102,8 +102,8 @@ export default function ElasticToCards(
     try
     {
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      const rootCard = parseCardFromValueInfo(rootValueInfo);
-      let cards = BlockUtils.reconcileCards(query.cards, rootCard['cards']);
+      const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'body');
+      let cards = BlockUtils.reconcileCards(query.cards, List([rootCard]));
       cards = ESCardParser.parseAndUpdateCards(cards);
       return query
         .set('cards', cards)
@@ -111,6 +111,7 @@ export default function ElasticToCards(
     }
     catch (e)
     {
+      console.error(e);
       return query
         .set('cardsAndCodeInSync', false);
     }
@@ -264,6 +265,8 @@ function isDistanceCard(valueInfo: ESValueInfo): boolean
 
 function isFilterCard(valueInfo: ESValueInfo): boolean
 {
+  console.assert(valueInfo.clause, 'ValueInfo ' + JSON.stringify(valueInfo.value) + ' does not have the clause type');
+
   const isBool = (valueInfo.clause.clauseType === ESClauseType.ESStructureClause) &&
     (valueInfo.clause.name === 'bool');
 

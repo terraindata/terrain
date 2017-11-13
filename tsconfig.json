@@ -29,6 +29,7 @@
             "roles*": ["src/app/roles/*"],
             "schema*": ["src/app/schema/*"],
             "shared*": ["shared/*"],
+            "src*": ["src/*"],
             "store*": ["src/app/store/*"],
             "tql*": ["src/app/tql/*"],
             "users*": ["src/app/users/*"],

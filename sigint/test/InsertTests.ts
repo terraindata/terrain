@@ -51,8 +51,6 @@ import App from '../src/App';
 
 let server;
 
-/* tslint:disable:max-line-length */
-
 beforeAll(async (done) =>
 {
   try
@@ -81,7 +79,7 @@ describe('Event insertion tests', () =>
     await request(server)
       .get('/v1/')
       .query({
-        eventid: 111,
+        eventname: 'impression',
         variantid: 111,
         visitorid: 123456,
       })
@@ -97,7 +95,7 @@ describe('Event insertion tests', () =>
     await request(server)
       .post('/v1/')
       .send({
-        eventid: 222,
+        eventname: 'click',
         variantid: 111,
         visitorid: 123456,
       })
@@ -113,7 +111,7 @@ describe('Event insertion tests', () =>
     await request(server)
       .get('/v1/')
       .query({
-        eventid: 222,
+        eventname: 'click',
         visitorid: 123456,
       })
       .expect(200)

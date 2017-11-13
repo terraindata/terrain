@@ -93,6 +93,7 @@ export interface Props
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
   algorithmActions: any;
+  referrer?: { label: string, path: string };
 }
 
 class AlgorithmsColumn extends TerrainComponent<Props>
@@ -722,12 +723,13 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public render()
   {
-    const { algorithms, algorithmsOrder, groupId } = this.props;
+    const { algorithms, algorithmsOrder, groupId, referrer } = this.props;
 
     return (
       <LibraryColumn
         index={2}
         title='Algorithms'
+        referrer={referrer}
       >
         {
           this.renderCreateAlgorithmModal()

@@ -85,7 +85,7 @@ class Library extends TerrainComponent<Props>
   public componentWillUnmount()
   {
     // I know this is an anti-pattern, but I can't figure out a way around it
-    //  ResultsArea sometimes calls onItemsLoaded after this component has been unmounted
+    //  HitsArea sometimes calls onItemsLoaded after this component has been unmounted
     this.unmounted = true;
   }
 

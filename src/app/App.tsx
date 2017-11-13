@@ -215,7 +215,7 @@ class App extends TerrainComponent<Props>
 
     if (Util.getIEVersion())
     {
-      alert('Terraformer is not meant to work in Internet Explorer. Please try another browser.');
+      alert('Terrain is not meant to work in Internet Explorer. Please try another browser.');
     }
 
     // Respond to authentication state changes.
@@ -280,8 +280,12 @@ class App extends TerrainComponent<Props>
     ColorsActions.setStyle('.close svg, svg.close', { fill: Colors().iconColor });
     ColorsActions.setStyle('.close:hover svg, svg.close:hover', { fill: Colors().activeText });
     ColorsActions.setStyle('.dropdown-value', { 'border-color': Colors().inputBorder });
-    ColorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().text3 });
+    ColorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().text1 });
+    ColorsActions.setStyle('.dropdown-wrapper:not(.dropdown-disabled):hover .dropdown-value:before', { 'border-top': '7px solid ' + Colors().activeText });
     ColorsActions.setStyle('.button', { backgroundColor: Colors().active, color: Colors().activeText });
+    ColorsActions.setStyle('.link', { color: Colors().active });
+    ColorsActions.setStyle('.link:hover', { color: Colors().import });
+    ColorsActions.setStyle('.link:active', { color: Colors().active });
 
     const tooltipStyles = generateThemeStyles();
     _.map(tooltipStyles, (value, key) =>
@@ -380,7 +384,7 @@ class App extends TerrainComponent<Props>
     {
       return (
         <InfoArea
-          large="Terraformer cannot be used successfully on this browser in 'private' / 'incognito' mode. Please switch to another browser or turn off incognito mode."
+          large="Terrain cannot be used successfully on this browser in 'private' / 'incognito' mode. Please switch to another browser or turn off incognito mode."
         />
       );
     }

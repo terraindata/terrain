@@ -45,8 +45,11 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import jsurl = require('jsurl');
+import sizeof = require('object-sizeof');
 declare let ClientJS: any;
 import 'clientjs';
+
+// tslint:disable:strict-boolean-expressions
 
 // Use the 'data-server' attribute to specify the backend server
 // <script src='...' data-server='http://<terrain-analytics-domain>/sigint/v1/'>
@@ -54,23 +57,28 @@ import 'clientjs';
 const scripts = document.getElementsByTagName('script');
 const currentScript = scripts[scripts.length - 1];
 const server = currentScript.getAttribute('data-server');
+const client = new ClientJS();
+let fingerprint = null;
+let batch: any[] = [];
+let batchSize: number = 0; // memoized so we aren't always computing sizeof(batch)
 
 const TerrainAnalytics = {
-  eventIDs: {
-    view: 1,
-    impression: 1,
-    click: 2,
-    transaction: 3,
-    conversion: 3,
-  },
-
-  logEvent(eventNameOrID: string | any, variantOrSourceID: string | any, meta?: any)
+  assembleParams(asObject: boolean, eventName: string | any, variantOrSourceID: string | any, meta?: any): string | object
   {
-    const client = new ClientJS();
-    const eventID = typeof eventNameOrID === 'string' ? TerrainAnalytics.eventIDs[eventNameOrID] : eventNameOrID;
-    const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] : client.getFingerprint();
+    const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] :
+      (fingerprint || (fingerprint = client.getFingerprint()));
 
-    let paramString = 'eventid=' + String(eventID)
+    if (asObject)
+    {
+      return {
+        eventname: eventName,
+        visitorid: String(visitorID),
+        variantid: String(variantOrSourceID),
+        meta,
+      };
+    }
+
+    let paramString = 'eventname=' + String(eventName)
       + '&visitorid=' + String(visitorID)
       + '&variantid=' + String(variantOrSourceID);
 
@@ -79,8 +87,46 @@ const TerrainAnalytics = {
       paramString += '&meta=' + String(jsurl.stringify(meta));
     }
 
+    return paramString;
+  },
+
+  logEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
+  {
+    const event = TerrainAnalytics.assembleParams(true, eventName, variantOrSourceID, meta);
+    batch.push(event);
+    batchSize += sizeof(event);
+    // GET requests should be under 2KB.  If we get too close to this limit,
+    // immediately process and reset the buffer.
+    if (batchSize >= 1900)
+    {
+      TerrainAnalytics.flushLog();
+    }
+    else if (batch.length === 1)
+    {
+      // buffer will get flushed no later than
+      // 50ms after first event is added to buffer
+      setTimeout(() => TerrainAnalytics.flushLog(), 50);
+    }
+  },
+
+  flushLog()
+  {
+    if (batchSize === 0)
+    {
+      // don't send empty requests
+      return;
+    }
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', (server || '') + '?' + paramString, true);
+    xhr.open('GET', (server || '') + '?batch=' + String(jsurl.stringify(batch)), true);
+    xhr.send();
+    batch = [];
+    batchSize = 0;
+  },
+
+  logEventImmediately(eventName: string | any, variantOrSourceID: string | any, meta?: any)
+  {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', (server || '') + '?' + String(TerrainAnalytics.assembleParams(false, eventName, variantOrSourceID, meta)), true);
     xhr.send();
   },
 };

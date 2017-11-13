@@ -3,27 +3,62 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 sqlite_path=${DIR}/../../../
+use_mysql=1
+use_elastic=1
+use_sqlite=1
 
-if [ "$1" == "--sqlite-path" ];
-then
-	 sqlite_path=$2
-	 shift
-	 shift
-fi
+function usage {
+	 echo "Help!"
+}
 
-if [ $(docker ps -aq -f name=moviesdb-mysql | wc -l) != 0 ] ; then
+while [ -n "$1" ];
+do
+	 case "$1" in
+		  --help)
+				usage
+				exit 0
+				;;
+		  --use-mysql=*)
+				use_mysql="${1#*=}"
+				;;
+		  --use-elastic=*)
+				use_elastic="${1#*=}"
+				;;
+		  --sqlite-path)
+				sqlite_path=$2
+				shift
+				;;
+		  --sqlite-path=*)
+				sqlite_path="${1#*=}"
+				;;
+		  --use-sqlite=*)
+				use_sqlite="${1#*=}"
+				;;
+		  --*)
+				echo "Unknown option: $1" 1>&2
+				exit 1
+				;;
+		  *)
+				echo "Unknown option: $1" 1>&2
+				exit 1
+				;;
+	 esac
+	 shift
+done
+
+if [ "$use_mysql" == 1 ] && [ $(docker ps -aq -f name=moviesdb-mysql | wc -l) != 0 ] ; then
         echo "Stopping moviesdb docker mysql image..."
         docker stop moviesdb-mysql
         docker rm moviesdb-mysql || true
 fi
 
-if [ $(docker ps -aq -f name=moviesdb-elk | wc -l) != 0 ] ; then
+if [ "$use_elastic" == 1 ] && [ $(docker ps -aq -f name=moviesdb-elk | wc -l) != 0 ] ; then
         echo "Stopping moviesdb docker elk image..."
         docker stop moviesdb-elk
         docker rm moviesdb-elk || true
 fi
 
-if [ -f ${sqlite_path} ] ; then
+if [ "$use_sqlite" == 1 ] && [ -f ${sqlite_path} ] ; then
         echo "Deleting moviesdb sqlite database..."
         rm -f ${sqlite_path}/moviedb.db
 fi

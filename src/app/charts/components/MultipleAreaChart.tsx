@@ -57,9 +57,11 @@ import
   createContainer,
   VictoryArea,
   VictoryAxis,
+  VictoryBar,
   VictoryBrushContainer,
   VictoryChart,
   VictoryGroup,
+  VictoryLabel,
   VictoryLegend,
   VictoryPortal,
   VictoryScatter,
@@ -73,27 +75,36 @@ const styles = {
     flexFlow: 'column nowrap',
   },
   topChartWrapper: {
-    height: '80%',
+    height: '90%',
   },
   bottomChartWrapper: {
     width: '100%',
-    height: '20%',
+    height: '10%',
   },
   topChart: {
-    padding: { top: 50, bottom: 25, left: 50, right: 0 },
+    padding: { top: 25, bottom: 0, left: 0, right: 0 },
     areas: { data: { strokeWidth: 2, fillOpacity: 0.4 } },
-    scatters: { data: { strokeWidth: 1, stroke: 'white', fillOpacity: 0 } },
+    scatters: (fill) => ({
+      data: {
+        strokeWidth: 6,
+        stroke: fill,
+        fillOpacity: .8,
+        strokeOpacity: .6,
+        fill,
+      },
+    }),
     tooltip: { fill: 'white' },
+    tooltipFlyout: { fill: 'black', rx: 5, ry: 5 },
   },
   bottomChart: {
-    padding: { top: 10, bottom: 25, left: 50, right: 0 },
-    areas: (fill) => ({ data: { fill, fillOpacity: 0.4 } }),
+    padding: { top: 0, bottom: 0, left: 0, right: 0 },
+    bars: (fill) => ({ data: { fill, fillOpacity: 0.4, width: 10 } }),
   },
   legend: {
-    border: {
-      stroke: 'yellow',
-      fill: 'white',
-      padding: '5',
+    title: {
+      fontSize: 15,
+      fill: 'rgba(255,255,255,0.75)',
+      fontWeight: 'bold',
     },
     borderPadding: {
       left: 10,
@@ -129,6 +140,8 @@ interface Props
   datasets: Immutable.Map<ID, Dataset>;
   xDataKey: string; // The key to get the value of x from the data
   yDataKey: string; // The key to get the value of y from the data
+  onLegendClick?: (datasetId: ID) => void;
+  legendTitle?: string;
 }
 
 interface State
@@ -145,6 +158,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     datasets: [],
     xDataKey: 'x',
     yDataKey: 'y',
+    onLegendClick: (datasetId) => { return; },
+    legendTitle: 'CTR',
   };
 
   public state: State = {
@@ -207,6 +222,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     const { visibleDatasets, highlightDataset } = this.state;
     const areas = [];
     const scatters = [];
+    const lines = [];
 
     let areaToHightlight = null;
     let scatterToHightlight = null;
@@ -217,11 +233,12 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
       {
         if (key !== highlightDataset || highlightDataset === null)
         {
+          const datasetColor = this.getDatasetColor(key);
           areas.push(
             <VictoryArea
               key={key}
               name={`area-${key}`}
-              style={{ data: { fill: this.getDatasetColor(key) } }}
+              style={{ data: { fill: datasetColor } }}
               data={ds.data.map((d) => ({ ...d, l: true }))}
               interpolation={config.topChart.interpolation}
               x={xDataKey}
@@ -231,9 +248,9 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
           scatters.push(
             <VictoryScatter
               key={key}
-              style={styles.topChart.scatters}
+              style={styles.topChart.scatters(datasetColor)}
               data={ds.data}
-              size={(datum, active) => active ? 5 : 0}
+              size={(datum, active) => active ? 3 : 0}
               x={xDataKey}
               y={yDataKey}
             />,
@@ -287,19 +304,14 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
   public renderLegend()
   {
-    const { datasets } = this.props;
+    const { datasets, legendTitle } = this.props;
     const { visibleDatasets } = this.state;
 
     const data = datasets
       .map((ds, key) =>
       {
-        let labelsStyle = { fill: '#444' };
+        const labelsStyle = { fill: 'rgba(255,255,255,0.75)' };
         const dataStyle = { fill: this.getDatasetColor(ds.id) };
-
-        if (visibleDatasets.includes(key))
-        {
-          labelsStyle = Object.assign({}, labelsStyle, { textDecoration: 'underline' });
-        }
 
         return {
           id: ds.id,
@@ -311,14 +323,16 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
     return (
       <VictoryLegend
-        x={40}
-        y={9}
+        padding={0}
+        titleOrientation={'left'}
         name='legend'
         gutter={20}
         data={data.toArray()}
         orientation={config.legend.orientation}
-        style={{ border: styles.legend.border }}
-        borderPadding={styles.legend.borderPadding}
+        style={{
+          title: styles.legend.title,
+        }}
+        title={legendTitle}
       />
     );
   }
@@ -330,7 +344,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
   public handleLegendClick(e, props)
   {
-    this.toggleDatasetVisibility(props.datum.id);
+    this.props.onLegendClick(props.datum.id);
   }
 
   public handleLegendMouseOver(e, props)
@@ -403,24 +417,6 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     ];
   }
 
-  public toggleDatasetVisibility(datasetId)
-  {
-    const { visibleDatasets } = this.state;
-
-    if (visibleDatasets.includes(datasetId))
-    {
-      const datasetIdIndex = visibleDatasets.indexOf(datasetId);
-      this.setState({
-        visibleDatasets: visibleDatasets.remove(datasetIdIndex),
-      });
-    } else
-    {
-      this.setState({
-        visibleDatasets: visibleDatasets.push(datasetId),
-      });
-    }
-  }
-
   public formatDate(timestamp)
   {
     const date = new Date(timestamp);
@@ -444,77 +440,115 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
       <div style={styles.wrapper}>
         <div style={styles.topChartWrapper}>
           <ContainerDimensions>
-            <VictoryChart
-              domainPadding={{ y: [0, 30] }}
-              scale={config.topChart.scale}
-              theme={TerrainVictoryTheme}
-              padding={styles.topChart.padding}
-              containerComponent={
-                <VictoryZoomVoronoiContainer
-                  responsive={false}
-                  zoomDimension='x'
-                  voronoiDimension='x'
-                  zoomDomain={this.state.zoomDomain}
-                  cachedZoomDomain={this.state.zoomDomain}
-                  onZoomDomainChange={this.handleZoom}
-                  labels={(d) => d.l ? `${this.formatDate(d.x)} => ${d.y}` : null}
-                  labelComponent={
-                    <VictoryTooltip
-                      cornerRadius={0}
-                      flyoutStyle={styles.topChart.tooltip}
-                      dx={25}
-                    />
-                  }
-                />
-              }
-              events={[{
-                // indicate, by name, the component that listens to the event
-                childName: ['legend'],
-                // { 'data', 'labels' }, indicates if the texts or the dots
-                // of the legend items are the one that listens to the event.
-                target: 'labels',
-                eventHandlers: {
-                  onClick: this.handleLegendClick,
-                  onMouseOver: this.handleLegendMouseOver,
-                  onMouseOut: this.handleLegendMouseOut,
-                },
-              }]}
-            >
-              <VictoryGroup
-                style={styles.topChart.areas}
+            {({ width, height }) => (
+              <VictoryChart
+                domainPadding={{ y: [0, 30] }}
+                scale={config.topChart.scale}
+                theme={TerrainVictoryTheme}
+                padding={styles.topChart.padding}
+                width={width}
+                height={height}
+                containerComponent={
+                  <VictoryZoomVoronoiContainer
+                    responsive={false}
+                    zoomDimension='x'
+                    voronoiDimension='x'
+                    zoomDomain={this.state.zoomDomain}
+                    onZoomDomainChange={this.handleZoom}
+                    labels={(d) => d.l ? `${this.formatDate(d.x)} => ${d.y}` : null}
+                    labelComponent={
+                      <VictoryTooltip
+                        cornerRadius={4}
+                        flyoutStyle={styles.topChart.tooltipFlyout}
+                        style={styles.topChart.tooltip}
+                        dx={25}
+                      />
+                    }
+                  />
+                }
+                events={[{
+                  // indicate, by name, the component that listens to the event
+                  childName: ['legend'],
+                  // { 'data', 'labels' }, indicates if the texts or the dots
+                  // of the legend items are the one that listens to the event.
+                  target: 'labels',
+                  eventHandlers: {
+                    onClick: this.handleLegendClick,
+                    onMouseOver: this.handleLegendMouseOver,
+                    onMouseOut: this.handleLegendMouseOut,
+                  },
+                }]}
               >
-                {data.areas}
-                {data.scatters}
-              </VictoryGroup>
-              {legend}
-            </VictoryChart>
+                <VictoryGroup
+                  style={styles.topChart.areas}
+                >
+                  {data.areas}
+                  {data.scatters}
+                </VictoryGroup>
+                <VictoryAxis
+                  offsetY={height - styles.topChart.padding.top}
+                  style={{ tickLabels: { fill: 'rgba(255,255,255,0.75)', fontWeight: 'bold', padding: 2 } }}
+                  tickLabelComponent={<VictoryLabel dx={24} />}
+                />
+                <VictoryAxis
+                  dependentAxis
+                  offsetX={width}
+                  style={{ tickLabels: { fill: 'rgba(255,255,255,0.75)', fontWeight: 'bold', padding: 2 } }}
+                  tickLabelComponent={<VictoryLabel dy={7} />}
+                />
+                {legend}
+              </VictoryChart>
+            )}
           </ContainerDimensions>
         </div>
         <div style={styles.bottomChartWrapper}>
           <ContainerDimensions>
-            <VictoryChart
-              scale={config.bottomChart.scale}
-              padding={styles.bottomChart.padding}
-              theme={TerrainVictoryTheme}
-              containerComponent={
-                <VictoryBrushContainer responsive={false}
-                  brushDimension='x'
-                  brushDomain={this.state.brushDomain}
-                  onBrushDomainChange={this.handleBrush}
-                />
-              }
-            >
-              <VictoryAxis />
-              <VictoryArea
-                style={styles.bottomChart
-                  .areas(this.getDatasetColor(datasets.keySeq().first()))
+            {({ width, height }) => (
+              <VictoryChart
+                scale={config.bottomChart.scale}
+                padding={styles.bottomChart.padding}
+                theme={TerrainVictoryTheme}
+                height={height}
+                width={width}
+                containerComponent={
+                  <VictoryBrushContainer responsive={false}
+                    brushDimension='x'
+                    brushDomain={this.state.brushDomain}
+                    onBrushDomainChange={this.handleBrush}
+                    brushStyle={{ stroke: 'transparent', fill: 'white', fillOpacity: 0.1 }}
+                    handleStyle={{
+                      stroke: 1,
+                      fill: 'grey',
+                      fillOpacity: 1,
+                      height: height - 10,
+                      rx: 2,
+                      ry: 2,
+                      width: 6,
+                      y: 5,
+                    }}
+                  />
                 }
-                data={datasets.first() !== null ? datasets.first().data : []}
-                interpolation={config.bottomChart.interpolation}
-                x={xDataKey}
-                y={yDataKey}
-              />
-            </VictoryChart>
+              >
+                <VictoryAxis
+                  offsetY={height}
+                  style={{
+                    grid: { strokeWidth: 0 },
+                    ticks: { size: 0 },
+                  }}
+                />
+                <VictoryGroup offset={15}>
+                  {datasets.map((d) => (<VictoryBar
+                    style={styles.bottomChart
+                      .bars(this.getDatasetColor(d.id))
+                    }
+                    data={datasets.first() !== null ? d.data : []}
+                    interpolation={config.bottomChart.interpolation}
+                    x={xDataKey}
+                    y={yDataKey}
+                  />))}
+                </VictoryGroup>
+              </VictoryChart>
+            )}
           </ContainerDimensions>
         </div>
       </div>

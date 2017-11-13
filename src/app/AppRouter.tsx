@@ -78,7 +78,8 @@ class AppRouter extends TerrainComponent<{}> {
     const libraryLibrary = (props) => <Library basePath={'library'} {...props} />;
     const analyticsLibrary = (props) => (<Library
       basePath={'analytics'}
-      variantsMultiselect={true}
+      canPinVariants={true}
+      singleColumn={true}
       {...props}
     />);
 

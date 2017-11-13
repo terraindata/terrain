@@ -92,6 +92,6 @@ test('test generate template queries', () =>
     ` { "index":"movies","type":"data","from":0,"size":"10" } `);
 
   testGeneration(`{"index" : "movies","type" : @type,"from" : @from,"size" : "10"}`,
-    ` { "index":"movies","type": {{#toJson}}@type{{/toJson}} ,"from": {{#toJson}}@from{{/toJson}} ,"size":"10" } `);
+    ` { "index":"movies","type": {{#toJson}}type{{/toJson}} ,"from": {{#toJson}}from{{/toJson}} ,"size":"10" } `);
 
 });

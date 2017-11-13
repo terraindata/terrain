@@ -97,40 +97,40 @@ class TQLResultsBar extends TerrainComponent<Props>
       );
     }
 
-    const { results } = resultsState;
+    const { hits } = resultsState;
 
-    if (!results)
+    if (!hits)
     {
-      return <div>Compose a query to view results here.</div>;
+      return <div>Compose a query to view hits here.</div>;
     }
 
-    if (typeof results === 'string')
+    if (typeof hits === 'string')
     {
-      if (!results['length'])
+      if (!hits['length'])
       {
         return <em> "" (empty string)</em>;
       }
       return (
         <div>
           {
-            results
+            hits
           }
         </div>
       );
     }
 
-    if (!results.size)
+    if (!hits.size)
     {
-      return <div>There are no results for your query.</div>;
+      return <div>There are no hits for your query.</div>;
     }
 
     return (
       <div>
         {
-          results.map((result, i) =>
+          hits.map((hit, i) =>
             <div key={i}>
               {
-                JSON.stringify(result.rawFields.toJS())
+                JSON.stringify(hit.rawFields.toJS())
               }
             </div>,
           )

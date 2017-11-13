@@ -61,13 +61,15 @@ class CardsToElastic
 {
   public static toElastic(query: Query, options: Options = {}): string
   {
-    const body = {};
+    let body = {};
     const rootCard = query.cards.get(0);
-
-    const rootCardValue = CardsToElastic.blockToElastic(rootCard, options);
-    if (rootCardValue !== null)
+    if (rootCard && rootCard.type === 'eqlbody')
     {
-      body['body'] = rootCardValue;
+      const rootCardValue = CardsToElastic.blockToElastic(rootCard, options);
+      if (rootCardValue !== null)
+      {
+        body = rootCardValue;
+      }
     }
     const eql = ESQueryToCode(body as ESQueryObject, options, query.inputs);
     return eql;
@@ -79,7 +81,7 @@ class CardsToElastic
     {
       return block;
     }
-    if (block && block.static.tql)
+    if (block && block.static && block.static.tql)
     {
       const tql = block.static.tql as TQLRecursiveObjectFn;
       let value = tql(block, CardsToElastic.blockToElastic, options);

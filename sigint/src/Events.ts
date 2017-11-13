@@ -48,10 +48,11 @@ import * as Elastic from 'elasticsearch';
 import * as winston from 'winston';
 
 import { Config } from './Config';
+import { makePromiseCallback } from './Util';
 
 export interface EventConfig
 {
-  eventid: number | string;
+  eventname: string;
   variantid: number | string;
   visitorid: number | string;
   source: {
@@ -71,21 +72,6 @@ export interface EventConfig
 
 export const indexName = 'terrain-analytics';
 export const typeName = 'events';
-
-export function makePromiseCallback<T>(resolve: (T) => void, reject: (Error) => void)
-{
-  return (error: Error, response: T) =>
-  {
-    if (error !== null && error !== undefined)
-    {
-      reject(error);
-    }
-    else
-    {
-      resolve(response);
-    }
-  };
-}
 
 export class Events
 {
@@ -141,6 +127,31 @@ export class Events
         index: indexName,
         type: typeName,
         body: event,
+      },
+        makePromiseCallback(resolve, reject));
+    });
+  }
+
+  public async storeBulk(events: EventConfig[]): Promise<void>
+  {
+    const command = {
+      index: {
+        _index: indexName,
+        _type: typeName,
+      },
+    };
+
+    const body: any[] = [];
+    for (const event of events)
+    {
+      body.push(command);
+      body.push(event);
+    }
+
+    return new Promise<void>((resolve, reject) =>
+    {
+      this.client.bulk({
+        body,
       },
         makePromiseCallback(resolve, reject));
     });

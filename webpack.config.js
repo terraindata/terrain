@@ -87,6 +87,7 @@ module.exports =
             roles: path.resolve(__dirname, 'src/app/roles'),
             schema: path.resolve(__dirname, 'src/app/schema'),
             shared: path.resolve(__dirname, 'shared'),
+            src: path.resolve(__dirname, 'src'),
             store: path.resolve(__dirname, 'src/app/store'),
             tql: path.resolve(__dirname, 'src/app/tql'),
             users: path.resolve(__dirname, 'src/app/users'),
