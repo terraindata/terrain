@@ -201,7 +201,7 @@ class DragAndDrop extends TerrainComponent<Props>
                     {(provided2, snapshot2) => (
                       <div>
                         {this.renderItem(item, provided2, snapshot2)}
-                        {provided.placeholder}
+                        {provided2.placeholder}
                       </div>
                     )}
                   </Draggable>

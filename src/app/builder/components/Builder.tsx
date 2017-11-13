@@ -658,6 +658,7 @@ class Builder extends TerrainComponent<Props>
         canEdit={this.canEdit()}
         cantEditReason={this.cantEditReason()}
         onNavigationException={this.handleNavigationException}
+        schema={(TerrainStore.getState() as any).schema}
       />,
       // hidden: this.state && this.state.closingIndex === index,
       key,

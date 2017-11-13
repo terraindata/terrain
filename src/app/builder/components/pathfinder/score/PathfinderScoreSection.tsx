@@ -138,8 +138,6 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   {
     const { source, step, canEdit, schemaState } = this.props.pathfinderContext;
     let dropdownOptions = List([]);
-    console.log(source.dataSource);
-    console.log(source.dataSource.getChoiceOptions);
     if (source.dataSource.getChoiceOptions !== undefined)
     {
      dropdownOptions = source.dataSource.getChoiceOptions({

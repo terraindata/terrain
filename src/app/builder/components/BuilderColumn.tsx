@@ -147,6 +147,7 @@ const BuilderColumn = createReactClass<any, any>(
       canEdit: PropTypes.bool.isRequired,
       cantEditReason: PropTypes.string,
       onNavigationException: PropTypes.func,
+      schema: PropTypes.object,
     },
 
     getInitialState()
@@ -286,6 +287,7 @@ const BuilderColumn = createReactClass<any, any>(
           return <PathfinderColumn
             canEdit={canEdit}
             path={query.path}
+            schema={this.props.schema}
           />;
         // case COLUMNS.Manual:
         //   return <Manual

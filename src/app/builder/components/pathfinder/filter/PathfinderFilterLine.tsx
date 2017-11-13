@@ -80,9 +80,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine, canEdit, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
-    console.log(pathfinderContext);
-    console.log('HERE');
-    console.log(source.dataSource.getChoiceOptions({type: 'fields', source, schemaState: pathfinderContext.schemaState}));
     return (
       <PathfinderLine
         canDelete={true}

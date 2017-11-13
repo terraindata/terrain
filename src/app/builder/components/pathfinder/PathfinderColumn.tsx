@@ -83,7 +83,7 @@ class PathfinderColumn extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps: Props)
   {
     this.setState({
-      context: Util.reconcileContext(this.state.pathfinderContext,
+      pathfinderContext: Util.reconcileContext(this.state.pathfinderContext,
         this.getPathfinderContext(nextProps)),
     });
   }
