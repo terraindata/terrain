@@ -55,13 +55,12 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import Dropdown from 'app/common/components/Dropdown';
 import PathfinderText from '../PathfinderText';
-import { Path, Source } from '../PathfinderTypes';
+import { Path, PathfinderContext, Source } from '../PathfinderTypes';
 
 export interface Props
 {
+  pathfinderContext: PathfinderContext;
   path: Path;
-  step: string;
-  canEdit: boolean;
 }
 
 class PathfinderStepSection extends TerrainComponent<Props>
@@ -74,8 +73,8 @@ class PathfinderStepSection extends TerrainComponent<Props>
 
   public render()
   {
-    const { path, step } = this.props;
-
+    const { path } = this.props;
+    const { step } = this.props.pathfinderContext;
     const { title, content } = this.parseStep();
 
     return (
@@ -103,9 +102,9 @@ class PathfinderStepSection extends TerrainComponent<Props>
 
   private parseStep(): { title: string; content: any; }
   {
-    const { canEdit } = this.props;
+    const { canEdit, step } = this.props.pathfinderContext;
 
-    switch (this.props.step)
+    switch (step)
     {
 
     }

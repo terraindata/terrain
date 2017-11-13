@@ -46,70 +46,52 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as Radium from 'radium';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import Dropdown from 'app/common/components/Dropdown';
-import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
-import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
 
 export interface Props
 {
-  filterLine: FilterLine;
-  canEdit: boolean;
-  depth: number;
-  keyPath: KeyPath;
-  onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine);
-  onDelete(keyPath: KeyPath);
-  pathfinderContext: PathfinderContext;
+  title: string;
+  text: string;
 }
 
-class PathfinderFilterLine extends TerrainComponent<Props>
+@Radium
+class PathfinderSectionTitle extends TerrainComponent<Props>
 {
-  public state: {
-
-  } = {
-
-  };
-
   public render()
   {
-    const { filterLine, canEdit, pathfinderContext } = this.props;
-    const { source } = pathfinderContext;
-    console.log(pathfinderContext);
-    console.log('HERE');
-    console.log(source.dataSource.getChoiceOptions({type: 'fields', source, schemaState: pathfinderContext.schemaState}));
+    const { text, title } = this.props;
+
     return (
-      <PathfinderLine
-        canDelete={true}
-        canDrag={true}
-        canEdit={canEdit}
-        onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
-        pieces={List([
-          <Dropdown
-            options={/* TODO adapt dropdown */ source.dataSource.getChoiceOptions({
-              type: 'fields',
-              source,
-              schemaState: pathfinderContext.schemaState,
-            }).map((option) => option.name).toList()}
-            selectedIndex={ /* TODO */ 0}
-            canEdit={pathfinderContext.canEdit}
-          />,
-        ])}
+      <div
+        className='pf-section-title'
+        style={backgroundColor(Colors().bg2)}
       >
-      </PathfinderLine>
+        <div
+          className='pf-section-title-title'
+          style={fontColor(Colors().text2)}
+        >
+          {
+            title
+          }
+        </div>
+        <div
+          className='pf-section-title-text'
+          style={fontColor(Colors().text3)}
+        >
+          {
+            text
+          }
+        </div>
+      </div>
     );
   }
-
-  private getPieces()
-  {
-
-  }
-
 }
 
-export default PathfinderFilterLine;
+export default PathfinderSectionTitle;

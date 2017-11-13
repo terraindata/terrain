@@ -57,13 +57,12 @@ import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
-import { _ElasticDataSource, Path, Source, sourceCountOptions } from '../PathfinderTypes';
+import PathfinderSectionTitle from '../PathfinderSectionTitle';
+import { _ElasticDataSource, Path, PathfinderContext, Source, sourceCountOptions } from '../PathfinderTypes';
 
 export interface Props
 {
-  source: Source;
-  step: string;
-  canEdit: boolean;
+  pathfinderContext: PathfinderContext;
 }
 
 class PathfinderSourceSection extends TerrainComponent<Props>
@@ -76,12 +75,16 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public render()
   {
-    const { source, step, canEdit } = this.props;
+    const { source, step, canEdit } = this.props.pathfinderContext;
 
     return (
       <div
         className='pf-section'
       >
+        <PathfinderSectionTitle
+          title={PathfinderText.findSectionTitle}
+          text={PathfinderText.findSectionSubtitle}
+        />
         <div
           className='pf-line'
         >
@@ -137,7 +140,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       return sourceCountOptions.size - 1;
     }
 
-    return this.props.source.countIndex;
+    return this.props.pathfinderContext.source.countIndex;
   }
 
   // show a custom count if the user has chosen 'other' or if we cannot find
@@ -145,7 +148,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   //  dropdown options)
   private shouldShowCustomCount(): boolean
   {
-    const { count, countIndex } = this.props.source;
+    const { count, countIndex } = this.props.pathfinderContext.source;
     return sourceCountOptions.get(countIndex) === 'other' || sourceCountOptions.indexOf(count) === -1;
   }
 
@@ -153,7 +156,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     const value = index === sourceCountOptions.size - 1 ? '' : sourceCountOptions.get(index);
     this.changeSource(
-      this.props.source
+      this.props.pathfinderContext.source
         .set('countIndex', index)
         .set('count', value),
     );
@@ -162,7 +165,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   private handleCountTextChange(value)
   {
     this.changeSource(
-      this.props.source
+      this.props.pathfinderContext.source
         .set('countIndex', sourceCountOptions.size - 1)
         .set('count', +value),
     );
@@ -176,12 +179,12 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   private getSelectedDataSourceIndex(): number
   {
-    return this.getDataSourceOptions().indexOf(this.props.source.dataSource.name);
+    return this.getDataSourceOptions().indexOf(this.props.pathfinderContext.source.dataSource.name);
   }
 
   private handleSourceDropdownChange(sourceIndex: number)
   {
-    this.changeSource(this.props.source.set(
+    this.changeSource(this.props.pathfinderContext.source.set(
       'dataSource',
       _ElasticDataSource({
         name: this.getDataSourceOptions().get(sourceIndex),

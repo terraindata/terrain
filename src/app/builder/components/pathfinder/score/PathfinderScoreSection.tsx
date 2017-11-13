@@ -57,23 +57,21 @@ const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
-import TerrainStore from 'store/TerrainStore';
 import Util from '../../../../util/Util';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
-import { _ScoreLine, Path, Score, Source } from '../PathfinderTypes';
+import PathfinderSectionTitle from '../PathfinderSectionTitle';
+import { _ScoreLine, Path, PathfinderContext, Score, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
 
 export interface Props
 {
+  pathfinderContext: PathfinderContext;
   score: Score;
-  source: Source;
-  step: string;
-  canEdit: boolean;
   keyPath: KeyPath;
 }
 
-class PathfinderSourceSection extends TerrainComponent<Props>
+class PathfinderScoreSection extends TerrainComponent<Props>
 {
   public state: {
     allWeights: Array<{ weight: number }>;
@@ -138,8 +136,20 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public getScoreLines(scoreLines)
   {
-    const dropdownOptions = this.props.score.getTransformDropdownOptions((TerrainStore.getState() as any).get('schema'));
+    const { source, step, canEdit, schemaState } = this.props.pathfinderContext;
+    let dropdownOptions = List([]);
+    console.log(source.dataSource);
+    console.log(source.dataSource.getChoiceOptions);
+    if (source.dataSource.getChoiceOptions !== undefined)
+    {
+     dropdownOptions = source.dataSource.getChoiceOptions({
+      type: 'transformFields',
+      source,
+      schemaState,
+    });
+    }
     const keyPath = this.props.keyPath.push('lines');
+
     return (
       scoreLines.map((line, index) =>
       {
@@ -148,17 +158,16 @@ class PathfinderSourceSection extends TerrainComponent<Props>
             content: <PathfinderScoreLine
               key={index}
               line={line}
-              step={this.props.step}
-              source={this.props.source}
+              step={step}
               onDelete={this.handleDeleteLine}
               index={index}
               onValueChange={this.handleValueChange}
-              canEdit={this.props.canEdit}
               keyPath={keyPath.push(index)}
               allWeights={this.state.allWeights}
               dropdownOptions={dropdownOptions}
               animateScoreBars={this.state.animateScoreBars}
               onAnimateScoreBars={this.handleAnimateScoreBars}
+              pathfinderContext={this.props.pathfinderContext}
             />,
             key: index,
             draggable: true,
@@ -198,14 +207,16 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public render()
   {
-    const { source, step } = this.props;
+    const { source, step, canEdit } = this.props.pathfinderContext;
     const lines = this.getScoreLines(this.props.score.lines);
     return (
       <div
         className='pf-section'
       >
-        <div className='pf-section-title'>{PathfinderText.scoreStepTitle}</div>
-        <div className='pf-section-subtitle'>{PathfinderText.scoreStepSubtitle}</div>
+        <PathfinderSectionTitle
+          title={PathfinderText.scoreSectionTitle}
+          text={PathfinderText.scoreSectionSubtitle}
+        />
         <DragAndDrop
           draggableItems={lines}
           onDrop={this.handleLinesReorder}
@@ -213,14 +224,13 @@ class PathfinderSourceSection extends TerrainComponent<Props>
           className='drag-drop-pf-score'
         />
         <PathfinderCreateLine
-          canEdit={this.props.canEdit}
+          canEdit={canEdit}
           onCreate={this.handleAddScoreLine}
           text={PathfinderText.createScoreLine}
         />
-
       </div>
     );
   }
 }
 
-export default PathfinderSourceSection;
+export default PathfinderScoreSection;

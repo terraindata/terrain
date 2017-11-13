@@ -55,32 +55,53 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../..
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import { SchemaState } from 'schema/SchemaTypes';
+import TerrainStore from 'store/TerrainStore';
+import Util from 'util/Util';
 import ColorsActions from '../../../colors/data/ColorsActions';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import './Pathfinder.less';
-import { Path } from './PathfinderTypes';
+import { _PathfinderContext, Path, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 import PathfinderStepSection from './step/PathfinderStepSection';
+
 export interface Props
 {
   path: Path;
   canEdit: boolean;
+  schema: SchemaState;
 }
 
 @Radium
 class PathfinderColumn extends TerrainComponent<Props>
 {
-  public state: {
-
-  } = {
-
+  public state = {
+    pathfinderContext: _PathfinderContext(this.getPathfinderContext(this.props)),
   };
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    this.setState({
+      context: Util.reconcileContext(this.state.pathfinderContext,
+        this.getPathfinderContext(nextProps)),
+    });
+  }
 
   public componentWillMount()
   {
     ColorsActions.setStyle('.pf-section-title',
       { color: Colors().text1 });
+  }
+
+  public getPathfinderContext(props: Props)
+  {
+    return {
+      canEdit: props.canEdit,
+      source: props.path.source,
+      step: props.path.step,
+      schemaState: props.schema,
+    };
   }
 
   public getKeyPath()
@@ -92,7 +113,7 @@ class PathfinderColumn extends TerrainComponent<Props>
   {
     const { path, canEdit } = this.props;
     const keyPath = this.getKeyPath();
-
+    const { pathfinderContext } = this.state;
     return (
       <div
         className='pathfinder-column'
@@ -102,34 +123,31 @@ class PathfinderColumn extends TerrainComponent<Props>
         ]}
       >
         <PathfinderSourceSection
-          source={path.source}
-          step={path.step}
-          canEdit={canEdit}
+          pathfinderContext={pathfinderContext}
         />
 
         <PathfinderFilterSection
-          source={path.source}
+          pathfinderContext={pathfinderContext}
           filterGroup={path.filterGroup}
-          step={path.step}
-          canEdit={canEdit}
         />
 
         <PathfinderScoreSection
-          source={path.source}
+          pathfinderContext={pathfinderContext}
           score={path.score}
-          step={path.step}
-          canEdit={canEdit}
           keyPath={keyPath.push('score')}
         />
 
         <PathfinderStepSection
-          step={path.step}
+          pathfinderContext={pathfinderContext}
           path={path}
-          canEdit={canEdit}
         />
       </div>
     );
   }
 }
 
-export default PathfinderColumn;
+export default Util.createContainer(
+  PathfinderColumn,
+  ['schema'],
+  {},
+);

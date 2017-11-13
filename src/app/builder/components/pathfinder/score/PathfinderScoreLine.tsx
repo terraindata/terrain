@@ -60,7 +60,7 @@ import ScoreBar from '../../charts/ScoreBar';
 import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
-import { Path, Score, ScoreLine, Source } from '../PathfinderTypes';
+import { ChoiceOption, Path, Score, ScoreLine, Source, PathfinderContext } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 
@@ -69,20 +69,19 @@ const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 export interface Props
 {
   line: ScoreLine;
-  source: Source;
   step: string;
-  canEdit: boolean;
   index: number;
   onDelete: (index) => void;
   onValueChange: (key: string, index: number, newValue: any) => void;
   allWeights: Array<{ weight: number }>;
   keyPath: KeyPath;
-  dropdownOptions: List<string>;
   animateScoreBars?: boolean;
   onAnimateScoreBars?: () => void;
+  dropdownOptions: List<ChoiceOption>;
+  pathfinderContext: PathfinderContext;
 }
 
-class PathfinderSourceLine extends TerrainComponent<Props>
+class PathfinderScoreLine extends TerrainComponent<Props>
 {
   public state: {
     weight: number;
@@ -91,7 +90,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
   } = {
     weight: this.props.line.weight,
     expanded: this.props.line.expanded,
-    fieldIndex: this.props.dropdownOptions.indexOf(this.props.line.field),
+    fieldIndex: this.props.dropdownOptions.map((v) => v.name).toList().indexOf(this.props.line.field),
   };
 
   public componentWillReceiveProps(nextProps)
@@ -99,7 +98,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
     if (this.props.line !== nextProps.line)
     {
       this.setState({
-        fieldIndex: nextProps.dropdownOptions.indexOf(nextProps.line.field),
+        fieldIndex: nextProps.dropdownOptions.map((v) => v.name).toList().indexOf(nextProps.line.field),
         weight: nextProps.line.weight,
         expanded: nextProps.line.expanded,
       });
@@ -127,7 +126,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
       <div className='pf-score-line-transform'>
         <TransformCard
           builderState={BuilderStore.getState()}
-          canEdit={this.props.canEdit}
+          canEdit={this.props.pathfinderContext.canEdit}
           className={'builder-comp-list-item'}
           data={data}
           handleCardDrop={undefined}
@@ -172,7 +171,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
           keyPath={this.props.keyPath.push('weight')}
           value={this.props.line.weight}
           language={'elastic'}
-          canEdit={this.props.canEdit}
+          canEdit={this.props.pathfinderContext.canEdit}
           placeholder={'weight'}
           isNumber={true}
           autoDisabled={true}
@@ -180,9 +179,9 @@ class PathfinderSourceLine extends TerrainComponent<Props>
         />
         <span className='pf-score-line-text'>times</span>
         <Dropdown
-          options={this.props.dropdownOptions}
+          options={this.props.dropdownOptions.map((v) => v.name).toList()}
           selectedIndex={this.state.fieldIndex}
-          canEdit={this.props.canEdit}
+          canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('field')}
         />
       </div>
@@ -191,12 +190,13 @@ class PathfinderSourceLine extends TerrainComponent<Props>
 
   public render()
   {
-    const { source, step } = this.props;
+    console.log(this.props);
+    const { step } = this.props;
     return (
       <PathfinderLine
         canDrag={true}
         canDelete={true}
-        canEdit={this.props.canEdit}
+        canEdit={this.props.pathfinderContext.canEdit}
         children={this.renderLineContents()}
         onDelete={this.props.onDelete}
         index={this.props.index}
@@ -209,4 +209,4 @@ class PathfinderSourceLine extends TerrainComponent<Props>
   }
 }
 
-export default PathfinderSourceLine;
+export default PathfinderScoreLine;

@@ -60,7 +60,6 @@ import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, Source } from
 
 export interface Props
 {
-  source: Source;
   canEdit: boolean;
   depth: number;
   keyPath: KeyPath;

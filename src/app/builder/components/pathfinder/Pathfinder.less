@@ -1,15 +1,18 @@
 @import "../../../common/Common.less";
 
 .pathfinder-column {
-	padding: @spacing @double-spacing;
-	padding-top: 2 * @spacing;
+	padding: 0px @double-spacing;
+	padding-bottom: @double-spacing;
+	// padding-top: 2 * @spacing;
 	margin-left: -12px;
 	margin-right: -6px;
 	font-size: @pretty-large-font-size;
 	height: 100%;
-    overflow: auto;
+  overflow: auto;
+    
 	.pf-section {
-		margin-bottom: @spacing;
+		margin-bottom: 2 * @spacing;
+		
 		.pf-section-subtitle {
 			font-size: @font-size;
 			padding-top: 4px;
@@ -17,6 +20,21 @@
 			font-style: italic;
 		}
 	}		
+	
+	.pf-section-title {
+		padding: @spacing;
+		margin: 0px -2 * @spacing;
+		margin-bottom: @spacing;
+		
+		.pf-section-title-title {
+			font-size: @large-font-size;
+		}
+		
+		.pf-section-title-text {
+			font-size: @font-size;
+		}
+	}
+	
 	.pf-create {
 		.transition;
 		cursor: pointer;
