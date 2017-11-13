@@ -101,7 +101,14 @@ export class FieldTypes
           }
           type = this.getESTypeFromFullType(innerTypeArray);
           break;
-        case 'null':
+        case 'null': // treat as text
+          type = {
+            type: analyzed ? 'text' : 'keyword', index: true, fields:
+              {
+                keyword: analyzed ? { type: 'keyword', index: analyzed, analyzer }
+                  : { type: 'keyword', index: true, ignore_above: 256 },
+              },
+          };
           break;
         case 'text':
           type = {
@@ -183,7 +190,7 @@ export class FieldTypes
           }
           else
           {
-            type = { type: 'text', index: 'analyzed', analyzer: 'standard' };
+            type = { type: 'null', index: 'analyzed', analyzer: 'standard' };
           }
           break;
         default:
@@ -240,6 +247,73 @@ export class FieldTypes
       {
         return reject('No file specified.');
       }
+
+      let completeFieldTypeObj: object = {};
+      let contents: string = '';
+      const writeFile = new stream.PassThrough();
+      const newlineSplitOptions: string[] = ['\r\n', '\n'];
+      file.on('data', async (chunk) =>
+      {
+        const chunkStr: string = chunk.toString();
+        let hasNextLine: boolean = false;
+        let chunkSplitArr: string[] = [];
+        for (const newlineSplit of newlineSplitOptions)
+        {
+          chunkSplitArr = chunkStr.split(newlineSplit);
+          if (chunkSplitArr.length > 1) // chunk also includes next line
+          {
+            contents += chunkSplitArr[0];
+            hasNextLine = true;
+            break;
+          }
+        }
+        if (!hasNextLine)
+        {
+          contents += chunkStr;
+        }
+        else
+        {
+          const fieldType: object | string = await this._getFieldTypeFromLine(contents);
+          if (typeof fieldType === 'object')
+          {
+            completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldType as object);
+          }
+          for (let i = 1; i < chunkSplitArr.length - 1; ++i)
+          {
+            const fieldType: object | string = await this._getFieldTypeFromLine(contents);
+            if (typeof fieldType === 'object')
+            {
+              completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldType as object);
+            }
+          }
+          if (chunkSplitArr.length >= 2)
+          {
+            contents = chunkSplitArr[chunkSplitArr.length - 1];
+          }
+
+        }
+      });
+      file.on('error', async (e) =>
+      {
+        writeFile.end();
+        return reject(e);
+      });
+      file.on('end', async () =>
+      {
+        if (contents !== 0)
+        {
+          const fieldType: object | string = await this._getFieldTypeFromLine(contents);
+          if (typeof fieldType === 'object')
+          {
+            completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldType as object);
+          }
+        }
+        writeFile.write(completeFieldTypeObj);
+        writeFile.end();
+        resolve(writeFile);
+      });
+
+      /*
       let contents: string = '';
       const writeFile = new stream.PassThrough();
       const newlineSplitOptions: string[] = ['\r\n', '\n'];
@@ -265,10 +339,10 @@ export class FieldTypes
         }
         else
         {
-          writeFile.write(await this._getFieldTypeFromChunk(contents));
+          writeFile.write(await this._getFieldTypeFromLine(contents));
           for (let i = 1; i < chunkSplitArr.length; ++i)
           {
-            writeFile.write(await this._getFieldTypeFromChunk(chunkSplitArr[i]));
+            writeFile.write(await this._getFieldTypeFromLine(chunkSplitArr[i]));
           }
         }
       });
@@ -282,6 +356,7 @@ export class FieldTypes
         writeFile.end();
         resolve(writeFile);
       });
+      */
     });
   }
 
@@ -311,6 +386,7 @@ export class FieldTypes
       let contents: string = '';
       const writeFile = new stream.PassThrough();
       const newlineSplitOptions: string[] = ['\r\n', '\n'];
+      let didWriteFirstLine: boolean = false;
       file.on('data', async (chunk) =>
       {
         const chunkStr: string = chunk.toString();
@@ -336,6 +412,15 @@ export class FieldTypes
           if (Array.isArray(contentAsJSONArr) && contentAsJSONArr.length > 0)
           {
             const contentAsJSON: object = contentAsJSONArr[0];
+            if (didWriteFirstLine)
+            {
+              writeFile.write(',\n');
+            }
+            else
+            {
+              didWriteFirstLine = true;
+              writeFile.write('[');
+            }
             writeFile.write(contentAsJSON);
           }
           for (let i = 1; i < chunkSplitArr.length - 1; ++i)
@@ -344,7 +429,15 @@ export class FieldTypes
             if (Array.isArray(jsonObjArr) && jsonObjArr.length > 0)
             {
               const jsonObj: object = jsonObjArr[0];
-              writeFile.write('\n');
+              if (didWriteFirstLine)
+              {
+                writeFile.write(',\n');
+              }
+              else
+              {
+                didWriteFirstLine = true;
+                writeFile.write('[');
+              }
               writeFile.write(jsonObj);
             }
           }
@@ -352,7 +445,10 @@ export class FieldTypes
           {
             contents = chunkSplitArr[chunkSplitArr.length - 1];
           }
-          writeFile.write('\n');
+          else
+          {
+            contents = '';
+          }
         }
       });
       file.on('error', async (e) =>
@@ -362,9 +458,50 @@ export class FieldTypes
       });
       file.on('end', async () =>
       {
+        if (contents.length !== 0)
+        {
+          const contentAsJSONArr: object[] = await this._getJSONFromMySQLJSON(contents);
+          if (Array.isArray(contentAsJSONArr) && contentAsJSONArr.length > 0)
+          {
+            const contentAsJSON: object = contentAsJSONArr[0];
+            if (didWriteFirstLine)
+            {
+              writeFile.write(',\n');
+            }
+            else
+            {
+              didWriteFirstLine = true;
+              writeFile.write('[');
+            }
+            writeFile.write(contentAsJSON);
+          }
+        }
+        writeFile.write(']');
         writeFile.end();
         resolve(writeFile);
       });
+    });
+  }
+
+  private async _compareFieldTypeObjs(origFieldType, newFieldType): Promise<object>
+  {
+    return new Promise<object>(async (resolve, reject) =>
+    {
+      const returnFieldType = origFieldType;
+
+      type = { type: 'null', index: 'analyzed', analyzer: 'standard' };
+      Object.keys(newFieldType).forEach((newFieldTypeKey) =>
+      {
+        if (origFieldType[newFieldTypeKey] === undefined || origFieldType[newFieldTypeKey] === null)
+        {
+          origFieldType[newFieldTypeKey] = newFieldType[newFieldTypeKey];
+        }
+        else // both exist and they may not be the same
+        {
+
+        }
+      });
+      return resolve(newFieldType);
     });
   }
 
@@ -403,6 +540,7 @@ export class FieldTypes
       if (parsedLines.length === 1) // TODO: allow type detection from multiple lines
       {
         const anything = await this.getFullTypeFromDocument(parsedLines[0]);
+        console.log(JSON.stringify(Object.keys(anything)));
         return resolve(JSON.stringify(anything));
       }
     });
