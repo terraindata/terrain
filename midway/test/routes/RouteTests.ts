@@ -1121,9 +1121,36 @@ describe('Credentials tests', () =>
   });
 });
 
-describe('Analytics aggregation route tests', () =>
+describe('Analytics events route tests', () =>
 {
-  test('GET /midway/v1/events/ (select)', async () =>
+  test('GET /midway/v1/events/agg (distinct)', async () =>
+  {
+    await request(server)
+      .get('/midway/v1/events/agg')
+      .query({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        database: 1,
+        agg: 'distinct',
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Array.isArray(result)).toBe(true);
+        expect(result.length).toEqual(3);
+      });
+  });
+});
+
+describe('Analytics route tests', () =>
+{
+  test('GET /midway/v1/events/agg (select)', async () =>
   {
     await request(server)
       .get('/midway/v1/events/agg')
@@ -1150,7 +1177,7 @@ describe('Analytics aggregation route tests', () =>
       });
   });
 
-  test('GET /midway/v1/events/ (histogram)', async () =>
+  test('GET /midway/v1/events/agg (histogram)', async () =>
   {
     await request(server)
       .get('/midway/v1/events/agg')
@@ -1178,7 +1205,7 @@ describe('Analytics aggregation route tests', () =>
       });
   });
 
-  test('GET /midway/v1/events/ (rate)', async () =>
+  test('GET /midway/v1/events/agg (rate)', async () =>
   {
     await request(server)
       .get('/midway/v1/events/agg')
@@ -1203,6 +1230,39 @@ describe('Analytics aggregation route tests', () =>
         }
         const respData = JSON.parse(response.text);
         expect(respData['5'].length).toEqual(4);
+      });
+  });
+
+  test('GET /midway/v1/events/metrics', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/events/metrics')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          database: 1,
+          label: 'Click',
+          events: 'click',
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('');
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        expect(respData[0])
+          .toMatchObject({
+            database: 1,
+            label: 'Click',
+            events: 'click',
+          });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/items/ request returned an error: ' + String(error));
       });
   });
 });

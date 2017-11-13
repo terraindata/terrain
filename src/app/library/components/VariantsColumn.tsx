@@ -96,6 +96,7 @@ export interface Props
   analytics: any;
   analyticsActions?: any;
   router?: any;
+  referrer?: { label: string, path: string };
 }
 
 class VariantsColumn extends TerrainComponent<Props>
@@ -205,7 +206,7 @@ class VariantsColumn extends TerrainComponent<Props>
       (canPinItems && analytics.pinnedVariants !== nextAnalytics.pinnedVariants)
     )
     {
-      const pinnedParams = pinnedVariants.length > 0 ? `/?pinned=${pinnedVariants.join(',')}` : '';
+      const pinnedParams = canPinItems && pinnedVariants.length > 0 ? `/?pinned=${pinnedVariants.join(',')}` : '';
       if (nextSelectedVariant !== null && nextSelectedVariant !== undefined)
       {
         browserHistory
@@ -216,7 +217,6 @@ class VariantsColumn extends TerrainComponent<Props>
         browserHistory
           .replace(`/${basePath}/${groupId}/${algorithmId}${pinnedParams}`);
       }
-
     }
   }
 
@@ -665,10 +665,13 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public render()
   {
+    const { referrer } = this.props;
+
     return (
       <LibraryColumn
         index={3}
         title='Variants'
+        referrer={referrer}
       >
         {this.renderDuplicateModal()}
         {
