@@ -43,40 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as React from 'react';
-import Query from 'src/items/types/Query';
 import Util from 'util/Util';
 
-import ETLActions from 'etl/data/ETLActions';
-import { ETLState } from 'etl/ETLTypes';
-
-export interface Props
-{
-  query: Query;
-  serverId: string | number;
-  variantName: string;
-  etl: ETLState;
-  etlActions: ETLActions;
-}
-
-class ETLExportDisplay extends TerrainComponent<Props>
-{
-
-  public test()
+const ETLActionTypes =
   {
-    this.props.etlActions.placeholder(5);
-  }
+    placeholder: '',
+  };
 
-  public render()
-  {
-    return <div onClick={this.test}> hello there </div>;
-  }
-}
+Util.setValuesToKeys(ETLActionTypes, '');
 
-export default Util.createContainer(
-  ETLExportDisplay,
-  ['etl'],
-  { etlActions: ETLActions },
-);
+export default ETLActionTypes;

@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 
 import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
+import ETLReducer from 'etl/data/ETLReducers';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
@@ -60,6 +61,7 @@ import ColorsReducer from '../colors/data/ColorsReducers';
 const reducers = {
   analytics: AnalyticsReducer,
   colors: ColorsReducer,
+  etl: ETLReducer,
   library: LibraryReducer,
   roles: RolesReducer,
   schema: SchemaReducer,

@@ -43,40 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
 
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as React from 'react';
-import Query from 'src/items/types/Query';
-import Util from 'util/Util';
+import { _ETLState, ETLState } from '../ETLTypes';
+import ActionTypes from './ETLActionTypes';
 
-import ETLActions from 'etl/data/ETLActions';
-import { ETLState } from 'etl/ETLTypes';
+const { List, Map } = Immutable;
+const ETLReducer = {};
 
-export interface Props
-{
-  query: Query;
-  serverId: string | number;
-  variantName: string;
-  etl: ETLState;
-  etlActions: ETLActions;
-}
-
-class ETLExportDisplay extends TerrainComponent<Props>
-{
-
-  public test()
+ETLReducer[ActionTypes.placeholder] =
+  (state: ETLState, action) =>
   {
-    this.props.etlActions.placeholder(5);
-  }
+    return state.set('placeholder', action.payload.value);
+  };
 
-  public render()
+const ETLReducerWrapper = (state: ETLState = _ETLState(), action) =>
+{
+  let nextState = state;
+  if (ETLReducer[action.type])
   {
-    return <div onClick={this.test}> hello there </div>;
+    nextState = ETLReducer[action.type](state, action);
   }
-}
+  return nextState;
+};
 
-export default Util.createContainer(
-  ETLExportDisplay,
-  ['etl'],
-  { etlActions: ETLActions },
-);
+export default ETLReducerWrapper;

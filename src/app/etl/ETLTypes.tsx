@@ -44,39 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import TerrainComponent from 'common/components/TerrainComponent';
-import * as React from 'react';
-import Query from 'src/items/types/Query';
-import Util from 'util/Util';
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
-import ETLActions from 'etl/data/ETLActions';
-import { ETLState } from 'etl/ETLTypes';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+import { makeConstructor, WithIRecord } from '../Classes';
 
-export interface Props
+// Store type
+class ETLStateC
 {
-  query: Query;
-  serverId: string | number;
-  variantName: string;
-  etl: ETLState;
-  etlActions: ETLActions;
+  public placeholder: number = 0;
+  // public currentTemplate: ImportTemplate | ExportTemplate = _ExportTemplate({});
 }
-
-class ETLExportDisplay extends TerrainComponent<Props>
-{
-
-  public test()
-  {
-    this.props.etlActions.placeholder(5);
-  }
-
-  public render()
-  {
-    return <div onClick={this.test}> hello there </div>;
-  }
-}
-
-export default Util.createContainer(
-  ETLExportDisplay,
-  ['etl'],
-  { etlActions: ETLActions },
-);
+export type ETLState = WithIRecord<ETLStateC>
+export const _ETLState = makeConstructor<ETLState>(ETLStateC);
