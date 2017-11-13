@@ -115,7 +115,7 @@ class PathfinderLine extends TerrainComponent<Props>
 
   private renderLeft(): El
   {
-    return null
+    return null;
     // if (!this.props.canEdit || !this.props.canDrag)
     // {
     //   return null;
@@ -139,24 +139,24 @@ class PathfinderLine extends TerrainComponent<Props>
 
     return (
       <div className='pf-line-right'>
-      {
-      this.props.expandableContent !== undefined &&
-      <div
-          className='expand'
-          onClick={this._fn(this.props.onExpand, !this.props.expanded)}
-        >
-          {this.props.expandButton}
-        </div>
-      }
-      {
-        this.props.canEdit && this.props.canDelete &&
-        tooltip(<div
-          className='close'
-          onClick={this._fn(this.props.onDelete, this.props.index)}
-        >
-          <RemoveIcon />
-        </div>, 'Delete'
-      }
+        {
+          this.props.expandableContent !== undefined &&
+          <div
+            className='expand'
+            onClick={this._fn(this.props.onExpand, !this.props.expanded)}
+          >
+            {this.props.expandButton}
+          </div>
+        }
+        {
+          this.props.canEdit && this.props.canDelete &&
+          tooltip(<div
+            className='close'
+            onClick={this._fn(this.props.onDelete, this.props.index)}
+          >
+            <RemoveIcon />
+          </div>, 'Delete')
+        }
       </div>
     );
   }

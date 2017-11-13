@@ -176,7 +176,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   private getSelectedDataSourceIndex(): number
   {
-    console.log(this.getDataSourceOptions().indexOf(this.props.source.dataSource.name));
     return this.getDataSourceOptions().indexOf(this.props.source.dataSource.name);
   }
 

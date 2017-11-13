@@ -80,7 +80,7 @@ class PathfinderColumn extends TerrainComponent<Props>
   public componentWillMount()
   {
     ColorsActions.setStyle('.pf-section-title',
-      { color: Colors().text1});
+      { color: Colors().text1 });
   }
 
   public getKeyPath()

@@ -97,13 +97,11 @@ class PathfinderFilterCreate extends TerrainComponent<Props>
 
   private handleCreateFilterLine()
   {
-    console.log(this.props.keyPath);
     this.props.onChange(this.props.keyPath, _FilterLine());
   }
 
   private handleCreateFilterGroup()
   {
-    console.log(this.props.keyPath, _FilterGroup());
     this.props.onChange(this.props.keyPath, _FilterLine({
       filterGroup: _FilterGroup(),
     }));

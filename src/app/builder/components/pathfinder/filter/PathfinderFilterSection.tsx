@@ -83,7 +83,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     // flatten tree
     const entries: FilterEntry[] = [];
     this.buildFilterTree(filterGroup, entries, 0, List(['query', 'path']));
-    console.log(entries);
     return (
       <div
         className='pf-section'
@@ -124,7 +123,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
     filterGroup.lines.map((filterLine, index) =>
     {
-      console.log(filterLine);
       if (filterLine.filterGroup)
       {
         // it is a filter group

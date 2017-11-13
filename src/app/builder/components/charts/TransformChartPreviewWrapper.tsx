@@ -117,7 +117,7 @@ class TransformChartPreviewWrapper extends TerrainComponent<Props>
 
   public componentWillUnmount()
   {
-   const el = ReactDOM.findDOMNode(this);
+    const el = ReactDOM.findDOMNode(this);
     TransformChartPreview.destroy(el);
   }
 

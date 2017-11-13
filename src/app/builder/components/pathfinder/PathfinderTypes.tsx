@@ -83,7 +83,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map, Record } = Immutable;
-import ElasticBlockHelpers, {AutocompleteMatchType} from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
 
 export const PathfinderSteps =
@@ -155,7 +155,8 @@ class ScoreLineC extends LineC
   public sortOrder: string = 'desc'; // only used for certain types
 }
 export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
-export const _ScoreLine = (config?: { [key: string]: any }) => {
+export const _ScoreLine = (config?: { [key: string]: any }) =>
+{
   let scoreLine = New<ScoreLine>(new ScoreLineC(config), config);
   scoreLine = scoreLine
     .set('transformData', _TransformData(scoreLine['transformData']));
@@ -169,7 +170,8 @@ class TransformDataC extends BaseClass
 }
 
 export type TransformData = TransformDataC & IRecord<TransformDataC>;
-export const _TransformData = (config?: {[key: string]: any}) => {
+export const _TransformData = (config?: { [key: string]: any }) =>
+{
   let transform = New<TransformData>(new TransformDataC(config), config);
   transform = transform
     .set('scorePoints', List(transform['scorePoints'].map((p) => _ScorePoint(p))))
@@ -191,8 +193,8 @@ class ScorePointC extends BaseClass
 }
 
 export type ScorePoint = ScorePointC & IRecord<ScorePointC>;
-export const _ScorePoint = (config?: {[key: string]: any}) =>
-   New<ScorePoint>(new ScorePointC(config), config);
+export const _ScorePoint = (config?: { [key: string]: any }) =>
+  New<ScorePoint>(new ScorePointC(config), config);
 
 class FilterLineC extends LineC
 {

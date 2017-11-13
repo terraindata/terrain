@@ -431,7 +431,7 @@ const TransformChart = {
       .append('text')
       .attr('class', 'bottom-title')
       .attr('text-anchor', 'middle')
-      .attr('transform', 'translate(' + width  / 2 + ',80)')
+      .attr('transform', 'translate(' + width / 2 + ',80)')
       .style('fill', Colors().text1)
       .text(inputKey);
 

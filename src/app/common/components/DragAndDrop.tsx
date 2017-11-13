@@ -44,10 +44,13 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as Immutable from 'immutable';
+import * as $ from 'jquery';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+const { List, Map } = Immutable;
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import TerrainComponent from './TerrainComponent';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 interface DraggableItem
 {
@@ -59,7 +62,10 @@ interface DraggableItem
 
 export interface Props
 {
-  draggableItems: List<DraggableItem>; 
+  draggableItems: List<DraggableItem>;
+  onDrop: (items) => void;
+  onDragStart?: () => void;
+  className: string; // used for selection of this list
 }
 
 const grid = 8;
@@ -75,7 +81,6 @@ class DragAndDrop extends TerrainComponent<Props>
   public constructor(props)
   {
     super(props);
-    this.onDragEnd = this.onDragEnd.bind(this);
   }
 
   public componentWillReceiveProps(nextProps)
@@ -84,52 +89,61 @@ class DragAndDrop extends TerrainComponent<Props>
     {
       this.setState({
         items: nextProps.draggableItems,
-      })
+      });
     }
   }
 
   // Add styling got dragging items
-  public getItemStyle(draggableStyle, isDragging) 
+  public getItemStyle(draggableStyle, isDragging)
   {
     return ({
       ...draggableStyle,
-    })
+    });
   }
 
-  public reorder(list, startIndex, endIndex) 
+  public reorder(list, startIndex, endIndex)
   {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-
+    let result = List(list);
+    const moved = result.get(startIndex);
+    result = result.delete(startIndex).insert(endIndex, moved);
     return result;
   }
 
-  public getItems(count)
-  {
-    return Array.from({ length: count }, (v, k) => k).map(k => ({
-      id: `item-${k}`,
-      content: `item ${k}`,
-    }))
-  };
-
-  // TODO ADD PROP FOR ON DRAG END AND ON DRAG START
   public onDragEnd(result)
   {
     // dropped outside the list
-    if (!result.destination) {
+    if (!result.destination)
+    {
       return;
     }
 
     const items = this.reorder(
-      this.state.items,
+      this.props.draggableItems,
       result.source.index,
-      result.destination.index
+      result.destination.index,
     );
 
     this.setState({
       items,
     });
+    if (this.props.onDrop !== undefined)
+    {
+      this.props.onDrop(items);
+    }
+  }
+
+  public onDragStart(initial)
+  {
+    // blur all inputs (if an input is focused during drag it will cause issues)
+    const inputs = $('.' + this.props.className + ' input');
+    inputs.map((i, input) =>
+    {
+      (input as any).blur();
+    });
+    if (this.props.onDragStart !== undefined)
+    {
+      this.props.onDragStart();
+    }
   }
 
   public renderItem(item: DraggableItem, provided, snapshot)
@@ -152,47 +166,52 @@ class DragAndDrop extends TerrainComponent<Props>
         </div>
       );
     }
-      return (
-        <div
-          ref={provided.innerRef}
-          style={this.getItemStyle(
-            provided.draggableStyle,
-            snapshot.isDragging)}
-         { ...provided.dragHandleProps}
-        >
+    return (
+      <div
+        ref={provided.innerRef}
+        style={this.getItemStyle(
+          provided.draggableStyle,
+          snapshot.isDragging)}
+        { ...provided.dragHandleProps}
+      >
         {item.content}
-        </div>
-      );
+      </div>
+    );
   }
 
   public render()
   {
     return (
-      <DragDropContext onDragEnd={this.onDragEnd}>
-        <Droppable droppableId="droppable">
-          {(provided, snapshot) => (
-            <div
-              ref={provided.innerRef}
-            >
-              {this.state.items.map(item => (
-                <Draggable 
-                  key={item.key}
-                  draggableId={item.key}
-                  isDragDisabled={!item.draggable}
-                >
-                  {(provided, snapshot) => (
-                    <div>
-                      {this.renderItem(item, provided, snapshot)}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <div className={this.props.className}>
+        <DragDropContext
+          onDragEnd={this.onDragEnd}
+          onDragStart={this.onDragStart}
+        >
+          <Droppable droppableId='droppable'>
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+              >
+                {this.props.draggableItems.map((item) => (
+                  <Draggable
+                    key={item.key}
+                    draggableId={item.key}
+                    isDragDisabled={!item.draggable}
+                  >
+                    {(provided2, snapshot2) => (
+                      <div>
+                        {this.renderItem(item, provided2, snapshot2)}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </div>
     );
   }
 }

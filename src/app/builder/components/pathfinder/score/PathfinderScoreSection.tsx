@@ -55,14 +55,14 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../..
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
+import DragAndDrop from 'app/common/components/DragAndDrop';
+import DragHandle from 'app/common/components/DragHandle';
 import TerrainStore from 'store/TerrainStore';
 import Util from '../../../../util/Util';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import { _ScoreLine, Path, Score, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
-import DragHandle from 'app/common/components/DragHandle';
-import DragAndDrop from 'app/common/components/DragAndDrop';
 
 export interface Props
 {
@@ -77,8 +77,10 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 {
   public state: {
     allWeights: Array<{ weight: number }>;
+    animateScoreBars: boolean;
   } = {
     allWeights: [],
+    animateScoreBars: true,
   };
 
   public componentWillMount()
@@ -107,27 +109,31 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public handleDeleteLine(index)
   {
+    this.handleAnimateScoreBars();
     const newLines = this.props.score.lines.delete(index);
     BuilderActions.change(this.props.keyPath.push('lines'), newLines);
-    this.updateWeights(newLines);
   }
 
   public handleAddScoreLine()
   {
+    this.handleAnimateScoreBars();
     const newLines = this.props.score.lines.push(_ScoreLine());
     BuilderActions.change(this.props.keyPath.push('lines'), newLines);
-    this.updateWeights(newLines);
   }
 
   public handleValueChange(key, index, value)
   {
+    this.handleAnimateScoreBars();
     const newLine = this.props.score.lines.get(index).set(key, value);
     const newLines = this.props.score.lines.set(index, newLine);
     BuilderActions.change(this.props.keyPath.push('lines'), newLines);
-    if (key === 'weight')
-    {
-      this.updateWeights(newLines);
-    }
+  }
+
+  public handleAnimateScoreBars()
+  {
+    this.setState({
+      animateScoreBars: true,
+    });
   }
 
   public getScoreLines(scoreLines)
@@ -135,10 +141,11 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     const dropdownOptions = this.props.score.getTransformDropdownOptions((TerrainStore.getState() as any).get('schema'));
     const keyPath = this.props.keyPath.push('lines');
     return (
-        scoreLines.map((line, index) =>
-        {
-          return (
-          { content: <PathfinderScoreLine
+      scoreLines.map((line, index) =>
+      {
+        return (
+          {
+            content: <PathfinderScoreLine
               key={index}
               line={line}
               step={this.props.step}
@@ -150,15 +157,34 @@ class PathfinderSourceSection extends TerrainComponent<Props>
               keyPath={keyPath.push(index)}
               allWeights={this.state.allWeights}
               dropdownOptions={dropdownOptions}
+              animateScoreBars={this.state.animateScoreBars}
+              onAnimateScoreBars={this.handleAnimateScoreBars}
             />,
             key: index,
             draggable: true,
-            dragHandle: <DragHandle/>,
-            dragHandleStyle: {'padding-top': '8px'}
+            dragHandle: <DragHandle />,
+            dragHandleStyle: { 'padding-top': '8px' },
           }
-          );
-        }).toList()
+        );
+      }).toList()
     );
+  }
+
+  public handleLinesReorder(items)
+  {
+    const newOrder = items.map((line) => line.key);
+    const newLines = newOrder.map((index) =>
+    {
+      return this.props.score.lines.get(index);
+    });
+    BuilderActions.change(this.props.keyPath.push('lines'), newLines);
+  }
+
+  public handleDragStart()
+  {
+    this.setState({
+      animateScoreBars: false,
+    });
   }
 
   public renderTitle()
@@ -182,6 +208,9 @@ class PathfinderSourceSection extends TerrainComponent<Props>
         <div className='pf-section-subtitle'>{PathfinderText.scoreStepSubtitle}</div>
         <DragAndDrop
           draggableItems={lines}
+          onDrop={this.handleLinesReorder}
+          onDragStart={this.handleDragStart}
+          className='drag-drop-pf-score'
         />
         <PathfinderCreateLine
           canEdit={this.props.canEdit}

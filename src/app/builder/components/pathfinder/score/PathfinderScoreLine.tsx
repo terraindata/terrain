@@ -78,6 +78,8 @@ export interface Props
   allWeights: Array<{ weight: number }>;
   keyPath: KeyPath;
   dropdownOptions: List<string>;
+  animateScoreBars?: boolean;
+  onAnimateScoreBars?: () => void;
 }
 
 class PathfinderSourceLine extends TerrainComponent<Props>
@@ -97,7 +99,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
     if (this.props.line !== nextProps.line)
     {
       this.setState({
-        fieldIndex: nextProps.dropdownOptions.indexOf(this.props.line.field),
+        fieldIndex: nextProps.dropdownOptions.indexOf(nextProps.line.field),
         weight: nextProps.line.weight,
         expanded: nextProps.line.expanded,
       });
@@ -135,7 +137,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
           onChange={BuilderActions.change}
           parentData={undefined}
         />
-    </div>);
+      </div>);
   }
 
   public renderTransformChartPreview()
@@ -164,6 +166,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
           parentData={{ weights: this.props.allWeights }}
           data={{ weight: this.state.weight }}
           keyPath={this.props.keyPath.push('weight')}
+          noAnimation={!this.props.animateScoreBars}
         />
         <BuilderTextbox
           keyPath={this.props.keyPath.push('weight')}
@@ -173,6 +176,7 @@ class PathfinderSourceLine extends TerrainComponent<Props>
           placeholder={'weight'}
           isNumber={true}
           autoDisabled={true}
+          onChange={this.props.onAnimateScoreBars}
         />
         <span className='pf-score-line-text'>times</span>
         <Dropdown
@@ -183,25 +187,24 @@ class PathfinderSourceLine extends TerrainComponent<Props>
         />
       </div>
     );
-}
+  }
 
   public render()
   {
     const { source, step } = this.props;
-
     return (
-        <PathfinderLine
-          canDrag={true}
-          canDelete={true}
-          canEdit={this.props.canEdit}
-          children={this.renderLineContents()}
-          onDelete={this.props.onDelete}
-          index={this.props.index}
-          onExpand={this.handleExpandedChange}
-          expanded={this.props.line.expanded}
-          expandableContent={this.renderTransformChart()}
-          expandButton={this.renderTransformChartPreview()}
-        />
+      <PathfinderLine
+        canDrag={true}
+        canDelete={true}
+        canEdit={this.props.canEdit}
+        children={this.renderLineContents()}
+        onDelete={this.props.onDelete}
+        index={this.props.index}
+        onExpand={this.handleExpandedChange}
+        expanded={this.props.line.expanded}
+        expandableContent={this.renderTransformChart()}
+        expandButton={this.renderTransformChartPreview()}
+      />
     );
   }
 }

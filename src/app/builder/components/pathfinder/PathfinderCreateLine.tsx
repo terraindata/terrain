@@ -57,9 +57,9 @@ const { List, Map } = Immutable;
 
 export interface Props
 {
-  canEdit: boolean;
-  onCreate();
   text: string;
+  canEdit: boolean;
+  onCreate: () => void;
 }
 
 @Radium
