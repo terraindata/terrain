@@ -217,7 +217,9 @@ const Actions =
               // on load
               const id = response.id; // ??
               dispatch($(ActionTypes.variants.create, {
-                variant: variant.set('id', id),
+                variant: variant
+                  .set('id', id)
+                  .set('deployedName', variant.deployedName || 'terrain_' + String(id)),
               }));
               responseHandler && responseHandler(response, variant);
             },
@@ -276,17 +278,28 @@ const Actions =
         },
 
       deploy:
-      (variant: Variant, op: string, templateBody: object, toStatus: ItemStatus) => (dispatch) =>
+      (variant: Variant, op: string, templateBody: object, toStatus: ItemStatus, deployedName: string) => (dispatch) =>
       {
-        Ajax.deployQuery(
-          op,
-          templateBody,
-          variant.db,
+        variant = variant.set('deployedName', deployedName);
+        Actions.variants.change(variant);
+        console.log('updated variant:');
+        console.log(variant);
+
+        Ajax.saveItem(
+          variant,
           (response) =>
           {
-            // on load
-            dispatch(Actions.variants.status(variant, toStatus, true));
-          },
+            Ajax.deployQuery(
+              op,
+              templateBody,
+              variant.db,
+              (response) =>
+              {
+                // on load
+                dispatch(Actions.variants.status(variant, toStatus, true));
+              },
+            );
+          }
         );
       },
 

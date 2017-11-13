@@ -78,6 +78,7 @@ class DeployModal extends TerrainComponent<Props>
     defaultChecked: boolean;
     errorModalMessage: string;
     showErrorModal: boolean;
+    deployedName: string;
   } = {
     changingStatus: false,
     changingStatusOf: null,
@@ -85,6 +86,7 @@ class DeployModal extends TerrainComponent<Props>
     defaultChecked: false,
     errorModalMessage: '',
     showErrorModal: false,
+    deployedName: '',
   };
 
   public componentDidMount()
@@ -99,11 +101,13 @@ class DeployModal extends TerrainComponent<Props>
           changingStatusTo !== this.state.changingStatusTo
         )
         {
+          console.log('bloo1 ' + (changingStatusOf && changingStatusOf.deployedName));
           this.setState({
             changingStatus,
             changingStatusOf,
             changingStatusTo,
             defaultChecked: changingStatusTo === 'DEFAULT',
+            deployedName: (changingStatusOf && changingStatusOf.deployedName),
           });
         }
       },
@@ -123,7 +127,8 @@ class DeployModal extends TerrainComponent<Props>
     const state = LibraryStore.getState();
     const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
-    const id: string = DeployVariant.getVariantDeployedName(variant as object);
+    //const id: string = (variant as LibraryTypes.Variant).deployedName;
+    //console.log('deploy id = '+id);
 
     const { changingStatusTo } = this.state;
 
@@ -143,21 +148,21 @@ class DeployModal extends TerrainComponent<Props>
       }
       const template = EQLTemplateGenerator.generate(valueInfo);
       const body: object = {
-        id,
+        id: this.state.deployedName,
         body: {
           template,
         },
       };
-      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'putTemplate', body, changingStatusTo));
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant.set('deployedName', this.state.deployedName), 'putTemplate', body, changingStatusTo, this.state.deployedName));
     }
     else if ((changingStatusTo !== ItemStatus.Live && variant.status === 'LIVE')
       || (changingStatusTo !== ItemStatus.Default && variant.status === 'DEFAULT'))
     {
       // undeploy this variant
       const body: object = {
-        id,
+        id: this.state.deployedName,
       };
-      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'deleteTemplate', body, changingStatusTo));
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'deleteTemplate', body, changingStatusTo, this.state.deployedName));
     }
   }
 
@@ -197,12 +202,21 @@ class DeployModal extends TerrainComponent<Props>
     });
   }
 
+  public handleDeployedNameChange(deployedName: string)
+  {
+    this.setState({
+      deployedName,
+    });
+  }
+
   public render()
   {
     if (!this.state.changingStatus)
     {
       return null;
     }
+
+    console.log('rendering, this stae dn = '+this.state.deployedName);
 
     const { changingStatus, changingStatusOf, changingStatusTo } = this.state;
     const name = (changingStatusOf && changingStatusOf.name);
@@ -253,8 +267,10 @@ class DeployModal extends TerrainComponent<Props>
                 status={changingStatusTo}
                 onDeploy={this.handleDeploy}
                 defaultChecked={this.state.defaultChecked}
+                deployedName={this.state.deployedName}
                 defaultVariant={defaultVariant}
                 onDefaultCheckedChange={this.handleDefaultCheckedChange}
+                onDeployedNameChange={this.handleDeployedNameChange}
                 onCancelDeploy={this.handleClose}
               />
             </div>
