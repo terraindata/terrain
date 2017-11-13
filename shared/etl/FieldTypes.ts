@@ -63,9 +63,9 @@ export class FieldTypes
     return new Promise<object>(async (resolve, reject) =>
     {
       const documentMapping =
-      {
-        properties: {},
-      };
+        {
+          properties: {},
+        };
       const valueKeyArr: string[] = Object.keys(value);
       for (const key of valueKeyArr)
       {
@@ -104,13 +104,17 @@ export class FieldTypes
         case 'null':
           break;
         case 'text':
-          type = { type: analyzed ? 'text' : 'keyword', index: true, fields:
-            { keyword: analyzed ? { type: 'keyword', index: analyzed, analyzer }
-              : { type: 'keyword', index: true, ignore_above: 256 } } };
-            if (analyzed)
-            {
-              type['analyzer'] = analyzer;
-            }
+          type = {
+            type: analyzed ? 'text' : 'keyword', index: true, fields:
+              {
+                keyword: analyzed ? { type: 'keyword', index: analyzed, analyzer }
+                  : { type: 'keyword', index: true, ignore_above: 256 },
+              },
+          };
+          if (analyzed)
+          {
+            type['analyzer'] = analyzer;
+          }
           break;
         default:
           type = { type: value['type'] };
@@ -328,14 +332,25 @@ export class FieldTypes
         }
         else
         {
-          const contentAsJSON: object = (await this._getJSONFromMySQLJSON(contents))[0];
-          writeFile.write(contentAsJSON);
-
-          for (let i = 1; i < chunkSplitArr.length; ++i)
+          const contentAsJSONArr: object[] = await this._getJSONFromMySQLJSON(contents);
+          if (Array.isArray(contentAsJSONArr) && contentAsJSONArr.length > 0)
           {
-            const jsonObj: object = (await this._getJSONFromMySQLJSON(chunkSplitArr[i]))[0];
-            writeFile.write('\n');
-            writeFile.write(jsonObj);
+            const contentAsJSON: object = contentAsJSONArr[0];
+            writeFile.write(contentAsJSON);
+          }
+          for (let i = 1; i < chunkSplitArr.length - 1; ++i)
+          {
+            const jsonObjArr: object[] = await this._getJSONFromMySQLJSON(chunkSplitArr[i]);
+            if (Array.isArray(jsonObjArr) && jsonObjArr.length > 0)
+            {
+              const jsonObj: object = jsonObjArr[0];
+              writeFile.write('\n');
+              writeFile.write(jsonObj);
+            }
+          }
+          if (chunkSplitArr.length >= 2)
+          {
+            contents = chunkSplitArr[chunkSplitArr.length - 1];
           }
           writeFile.write('\n');
         }
@@ -388,7 +403,6 @@ export class FieldTypes
       if (parsedLines.length === 1) // TODO: allow type detection from multiple lines
       {
         const anything = await this.getFullTypeFromDocument(parsedLines[0]);
-        console.log(anything);
         return resolve(JSON.stringify(anything));
       }
     });
@@ -398,19 +412,36 @@ export class FieldTypes
   {
     return new Promise<object[]>(async (resolve, reject) =>
     {
-      const returnArr: object[] = [];
-      const csvRows: any = csvString.parse(chunk);
-      if (Array.isArray(csvRows))
+      try
       {
-        for (let rowIndex = 0; rowIndex < csvRows.length; ++rowIndex)
+        const returnArr: object[] = [];
+        const csvRows: any = csvString.parse(chunk);
+        if (Array.isArray(csvRows))
         {
-          if (Array.isArray(csvRows[rowIndex]) && csvRows[rowIndex].length > 0)
+          for (let rowIndex = 0; rowIndex < csvRows.length; ++rowIndex)
           {
-            returnArr.push(csvRows[rowIndex][0]);
+            if (Array.isArray(csvRows[rowIndex]) && csvRows[rowIndex].length > 0)
+            {
+              try
+              {
+                JSON.parse(csvRows[rowIndex][0]);
+                returnArr.push(csvRows[rowIndex][0]);
+              }
+              catch (e)
+              {
+                // do not push this line
+              }
+            }
           }
         }
+        return resolve(returnArr);
+
       }
-      return resolve(returnArr);
+      catch (e)
+      {
+        // winston.info('Error occurred while parsing: ' + (e.message as any).toString());
+        return resolve([]);
+      }
     });
   }
 

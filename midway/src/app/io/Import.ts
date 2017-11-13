@@ -905,7 +905,7 @@ export class Import
       // });
       resolve(await fieldTypes.getESMappingFromDocument(imprt.columnTypes));
       // return this._getMappingForSchemaHelper(mapping);
-      });
+    });
   }
 
   /* recursive helper function for _getMappingForSchema(...)
