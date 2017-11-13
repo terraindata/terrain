@@ -43,28 +43,81 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import * as Immutable from 'immutable';
-
-import { _ETLState, ETLState } from '../ETLTypes';
-import ActionTypes from './ETLActionTypes';
-
 const { List, Map } = Immutable;
-const ETLReducers = {};
+import { makeConstructor, WithIRecord } from 'src/app/Classes';
 
-ETLReducers[ActionTypes.placeholder] =
-  (state: ETLState, action) =>
-  {
-    return state.set('placeholder', action.payload.value);
-  };
-
-const ETLReducersWrapper = (state: ETLState = _ETLState(), action) =>
+export enum FILE_TYPE
 {
-  let nextState = state;
-  if (ETLReducers[action.type])
-  {
-    nextState = ETLReducers[action.type](state, action);
-  }
-  return nextState;
-};
+  JSON = 'json',
+  JSON_TYPE_OBJECT = 'json [type object]',
+  CSV = 'csv'
+}
 
-export default ETLReducersWrapper;
+class TemplateEditorStateC
+{
+  public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
+  public originalPreviewData: any; // figure out this type
+  public previewData: any;
+}
+export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
+export const _TemplateEditorState = makeConstructor<TemplateEditorStateC>(TemplateEditorStateC);
+
+interface TemplateBase
+{
+  templateId: ID;
+  templateName: string;
+  filetype: FILE_TYPE;
+  fieldMap: List<object>; // was column types
+  transformations: List<object>;
+  objectKey: string;
+  dbid: number;
+  dbname: string;
+  tablename: string;
+}
+
+interface ExportTemplateBase extends TemplateBase
+{
+  rank: boolean;
+}
+
+interface ImportTemplateBase extends TemplateBase
+{
+  primaryKeys: List<number>;
+  primaryKeyDelimiter: string;
+}
+
+class ExportTemplateC implements ExportTemplateBase
+{
+  public templateId = -1;
+  public templateName = '';
+  public filetype = FILE_TYPE.JSON;
+  public fieldMap = List([]);
+  public transformations = List([]);
+  public objectKey = '';
+  public dbid = -1;
+  public dbname = '';
+  public tablename = '';
+  public rank = true;
+}
+export type ExportTemplate = WithIRecord<ExportTemplateC>;
+export const _ExportTemplate = makeConstructor<ExportTemplateC>(ExportTemplateC);
+
+class ImportTemplateC implements ImportTemplateBase
+{
+  public templateId = -1;
+  public templateName = '';
+  public filetype = FILE_TYPE.JSON;
+  public fieldMap = List([]);
+  public transformations = List([]);
+  public objectKey = '';
+  public dbid = -1;
+  public dbname = '';
+  public tablename = '';
+  public primaryKeys = List([]);
+  public primaryKeyDelimiter = '-';
+}
+export type ImportTemplate = WithIRecord<ImportTemplateC>;
+export const _ImportTemplate = makeConstructor<ImportTemplateC>(ImportTemplateC);

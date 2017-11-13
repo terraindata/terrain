@@ -58,7 +58,7 @@ export interface Props
   serverId: string | number;
   variantName: string;
   etl: ETLState;
-  etlActions: ETLActions;
+  etlActions: any;
 }
 
 class ETLExportDisplay extends TerrainComponent<Props>

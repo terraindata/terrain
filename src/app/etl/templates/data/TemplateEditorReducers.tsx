@@ -43,28 +43,31 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
+import Ajax from 'util/Ajax';
 
-import { _ETLState, ETLState } from '../ETLTypes';
-import ActionTypes from './ETLActionTypes';
-
+import ActionTypes from 'etl/templates/data/TemplateEditorActionTypes';
+import { _TemplateEditorState, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import * as TemplateTypes from 'etl/templates/TemplateTypes';
 const { List, Map } = Immutable;
-const ETLReducers = {};
 
-ETLReducers[ActionTypes.placeholder] =
-  (state: ETLState, action) =>
-  {
-    return state.set('placeholder', action.payload.value);
+const TemplateEditorReducers = {};
+
+TemplateEditorReducers[ActionTypes.setPreviewData] =
+  (state, action) => {
+    return state;
   };
 
-const ETLReducersWrapper = (state: ETLState = _ETLState(), action) =>
+const TemplateEditorReducersWrapper = (state: TemplateEditorState = _TemplateEditorState(), action) =>
 {
   let nextState = state;
-  if (ETLReducers[action.type])
+  if (TemplateEditorReducers[action.type])
   {
-    nextState = ETLReducers[action.type](state, action);
+    nextState = TemplateEditorReducers[action.type](state, action);
   }
   return nextState;
-};
+}
 
-export default ETLReducersWrapper;
+export default TemplateEditorReducersWrapper;

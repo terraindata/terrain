@@ -50,6 +50,8 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
+import Actions from 'etl/templates/data/TemplateEditorActions';
+
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
@@ -57,7 +59,6 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
-import Actions from '../../../fileImport/data/FileImportActions';
 import * as FileImportTypes from '../../../fileImport/FileImportTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
@@ -305,7 +306,8 @@ export class ResultsManager extends TerrainComponent<Props>
     if (exportChanges)
     {
       const { filetype, filesize, preview, originalNames } = exportChanges;
-      Actions.chooseFile(filetype, filesize, preview, originalNames);
+      // Actions.setPreviewData(filetype, filesize, preview, originalNames);
+      Actions.setPreviewData({preview: 'blah', originalNames: 'hah'})
     }
 
     this.props.onResultsStateChange(resultsState);

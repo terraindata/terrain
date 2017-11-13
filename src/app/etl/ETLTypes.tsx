@@ -57,4 +57,4 @@ class ETLStateC
   // public currentTemplate: ImportTemplate | ExportTemplate = _ExportTemplate({});
 }
 export type ETLState = WithIRecord<ETLStateC>
-export const _ETLState = makeConstructor<ETLState>(ETLStateC);
+export const _ETLState = makeConstructor<ETLStateC>(ETLStateC);

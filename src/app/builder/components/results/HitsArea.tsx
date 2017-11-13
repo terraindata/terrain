@@ -589,65 +589,6 @@ class HitsArea extends TerrainComponent<Props>
     );
   }
 
-  /* public handleESresultExport()
-  {
-    this.props.onNavigationException();
-
-    const { xhr, queryId } = Ajax.query(
-      this.props.query.tql,
-      this.props.db,
-      _.noop,
-      _.noop,
-      false,
-      {
-        streaming: true,
-        streamingTo: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.json',
-      },
-    );
-
-    // TODO kill this on unmount
-    this.setState({
-      csvXhr: xhr,
-      csvQueryId: queryId,
-    });
-
-    alert('Your data is being prepared for export, and will be automatically downloaded when ready.\n\
-Note: this exports the results of your query, which may be different from the results in the Results \
-column if you have customized the results view.');
-  }*/
-
-  /*  handleExport()
-    {
-      this.props.onNavigationException();
-
-      const {xhr, queryId} = Ajax.query(
-        .toTQL(
-          this.props.query,
-          {
-            replaceInputs: true,
-          },
-        ),
-        this.props.db,
-        _.noop,
-        _.noop,
-        false,
-        {
-          csv: true,
-          csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
-        },
-      );
-
-      // TODO kill this on unmount
-      this.setState({
-        csvXhr: xhr,
-        csvQueryId: queryId,
-      });
-
-      alert('Your data are being prepared for export, and will automatically download when ready.\n\
-  Note: this exports the results of your query, which may be different from the results in the Results \
-  column if you have set a custom results view.');
-    }*/
-
   public toggleView()
   {
     this.setState({

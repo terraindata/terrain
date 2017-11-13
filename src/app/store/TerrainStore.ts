@@ -48,6 +48,7 @@ import * as Immutable from 'immutable';
 
 import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
 import ETLReducer from 'etl/data/ETLReducers';
+import TemplateEditorReducers from 'etl/templates/data/TemplateEditorReducers';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
@@ -65,6 +66,7 @@ const reducers = {
   library: LibraryReducer,
   roles: RolesReducer,
   schema: SchemaReducer,
+  templateEditor: TemplateEditorReducers,
   users: UserReducer,
 };
 
