@@ -50,7 +50,7 @@ import winston = require('winston');
 import App from '../src/App';
 
 const db = 'http://127.0.0.1:9200';
-const host = 'http://127.0.0.1:43002';
+let host = 'http://127.0.0.1:43002';
 let server;
 
 export async function startServer()
@@ -59,7 +59,7 @@ export async function startServer()
   {
     const options =
       {
-        debug: true,
+        debug: false,
         db,
         port: 43002,
       };
@@ -71,6 +71,18 @@ export async function startServer()
   {
     throw new Error('starting event server sigint: ' + String(e));
   }
+}
+
+if (process.argv.length > 2)
+{
+  host = process.argv[2];
+  winston.info('Using specified server address: ' + host);
+}
+else
+{
+  // if no host was specified, start a local server
+  // tslint:disable-next-line:no-floating-promises
+  startServer();
 }
 
 export const flow = {
@@ -92,8 +104,6 @@ const runOptions = {
   iterations: 1000,
 };
 
-// tslint:disable-next-line:no-floating-promises
-startServer();
 benchrest(flow, runOptions)
   .on('error', (err, ctx) => winston.error('Failed in %s with err: ', ctx, err))
   .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
