@@ -154,7 +154,7 @@ export const elasticTransform = _card(
               width: '131px',
               key: 'mode',
               style: {
-                width: '50%',
+                marginRight: '12px',
               },
             },
           ],
