@@ -44,9 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands max-line-length
+// tslint:disable:restrict-plus-operands max-line-length no-var-requires
 
 import { List, Map } from 'immutable';
+import * as React from 'react';
 
 import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -57,6 +58,12 @@ import { _card } from '../../../blocks/types/Card';
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../app/util/TransformUtil';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
+
+const SigmoidIcon =     require('../../../images/icon_sigmoid?name=SigmoidIcon');
+const LinearIcon =      require('../../../images/icon_linear?name=LinearIcon');
+const ExponentialIcon = require('../../../images/icon_exponential?name=ExponentialIcon');
+const LogarithmicIcon = require('../../../images/icon_logarithmic?name=LogarithmicIcon');
+const NormalIcon =      require('../../../images/icon_normal?name=NormalIcon');
 
 export const scorePoint = _block(
   {
@@ -137,6 +144,13 @@ export const elasticTransform = _card(
                 linear: 'freeform', logarithmic: 'logarithmic',
                 exponential: 'exponential', normal: 'bell-curve', sigmoid: 's-curve',
               }),
+              icons: Map({
+                linear: <LinearIcon/>,
+                logarithmic: <LogarithmicIcon/>
+                exponential: <ExponentialIcon/>
+                normal: <NormalIcon/>
+                sigmoid: <SigmoidIcon/>
+              })
               key: 'mode',
               style: {
                 width: '50%',

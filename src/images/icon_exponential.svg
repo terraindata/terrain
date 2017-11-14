@@ -1,0 +1,28 @@
+<svg
+   xmlns="http://www.w3.org/2000/svg"
+   viewBox="-293 385 24 24"
+   y="0px"
+   x="0px"
+>
+   <style
+     type="text/css">
+	.st0{fill:none;}
+   </style>
+
+     <path
+     d="M-293,385h24v24h-24V385z"
+     class="st0" />
+
+     <rect
+     y="385.75"
+     x="-292.25"
+     height="22.5"
+     width="22.5"
+     style="fill:none;fill-opacity:1;stroke-width:1.5;stroke-linecap:butt;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+
+     <path
+     style="fill:none;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     d="m -291.49505,405 h 2.89109 c 0,0 15.44554,1.74258 14.53465,-14.93069 l 3.60396,-0.11881"
+     />
+
+</svg>
