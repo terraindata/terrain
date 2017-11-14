@@ -51,6 +51,9 @@ import { startServer } from './Server';
 
 let host = 'http://127.0.0.1:43002';
 
+const visitors = ['2329090446', '2329090447', '2329090448', '2329090449'];
+const variants = ['125', '126', '225', '240'];
+
 if (process.argv.length > 2)
 {
   host = process.argv[2];
@@ -65,14 +68,13 @@ else
 
 export const flow = {
   main: [
-    {
-      post: host + '/v1', json: {
-        eventname: 'click',
-        variantid: '#{INDEX}',
-        visitorid: '#{INDEX}',
-      },
+    { get: '',
+      beforeHooks: [(all) => {
+        all.requestOptions.uri = host + '/v1?eventname=view&variantid=' + variants[Math.floor(Math.random() * variants.length)]
+          + '&visitorid=' + visitors[Math.floor(Math.random() * visitors.length)];
+        return all;
+      }],
     },
-    { get: host + '/v1?eventname=click&variantid=#{INDEX}&visitorid=#{INDEX}' },
   ],
 };
 

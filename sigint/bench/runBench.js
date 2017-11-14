@@ -70,7 +70,13 @@ exports.runBench = (request, response) => {
 
   var flow = {
     main: [
-      { get: host + '/v1?eventname=view&variantid=' + variants['#{INDEX}' % variants.length] + '&visitorid=' + visitors['#{INDEX}' % visitors.length] },
+      { get: '',
+        beforeHooks: [(all) => {
+          all.requestOptions.uri = host + '/v1?eventname=view&variantid=' + variants[Math.floor(Math.random() * variants.length)]
+            + '&visitorid=' + visitors[Math.floor(Math.random() * visitors.length)];
+          return all;
+        }],
+      },
     ],
   };
 
