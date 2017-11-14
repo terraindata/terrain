@@ -79,6 +79,11 @@ export const scorePoint = _block(
     },
   });
 
+// When a paramaterized transform curve is used, a linear interpolation of the curve is passed
+// to the PWL script. It uses this number of points to get a good approximation of the curve
+// while maintaining efficiency.
+const numPoints = 31;
+
 export const elasticTransform = _card(
   {
     input: '',
@@ -184,19 +189,19 @@ export const elasticTransform = _card(
         const max = parseFloat(block['dataDomain'].get(1));
         if (block['mode'] === 'normal' && block['scorePoints'].size === NUM_CURVE_POINTS.normal)
         {
-          data = TransformUtil.getNormalData(31, block['scorePoints'].toJS(), min, max);
+          data = TransformUtil.getNormalData(numPoints, block['scorePoints'].toJS(), min, max);
         }
         else if (block['mode'] === 'exponential' && block['scorePoints'].size === NUM_CURVE_POINTS.exponential)
         {
-          data = TransformUtil.getExponentialData(31, block['scorePoints'].toJS());
+          data = TransformUtil.getExponentialData(numPoints, block['scorePoints'].toJS());
         }
         else if (block['mode'] === 'logarithmic' && block['scorePoints'].size === NUM_CURVE_POINTS.logarithmic)
         {
-          data = TransformUtil.getLogarithmicData(31, block['scorePoints'].toJS());
+          data = TransformUtil.getLogarithmicData(numPoints, block['scorePoints'].toJS());
         }
         else if (block['mode'] === 'sigmoid' && block['scorePoints'].size === NUM_CURVE_POINTS.sigmoid)
         {
-          data = TransformUtil.getSigmoidData(31, block['scorePoints'].toJS(), min, max);
+          data = TransformUtil.getSigmoidData(numPoints, block['scorePoints'].toJS(), min, max);
         }
         else
         {

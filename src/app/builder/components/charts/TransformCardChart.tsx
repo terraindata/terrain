@@ -257,7 +257,11 @@ class TransformCardChart extends TerrainComponent<Props>
       {
         if (scorePoint.id === pointId || this.state.selectedPointIds.get(scorePoint.id))
         {
+          // With exponential or sigmoid mode, the point's score can never be 0 because of how
+          // the curve between points is calculated
           let scoreMin = (mode === 'exponential' || mode === 'sigmoid') ? OFFSET_FACTOR : 0;
+          // The lower bound of the sigmoid curve can't be dragged above the midpoint and
+          // The upper bound of the sigmoid curve can't be dragged below the midpoint
           let scoreMax = mode === 'sigmoid' && pointName === 'a' ? pointScores[1] : 1;
           if (mode === 'sigmoid' && pointName === 'L')
           {
@@ -265,6 +269,7 @@ class TransformCardChart extends TerrainComponent<Props>
           }
           else if (mode === 'sigmoid' && pointName === 'k')
           {
+            // The score of the point for determining steepness is bounded by the asymptotes of the curve
             scoreMin = Math.min(pointScores[0], pointScores[3]);
             scoreMax = Math.max(pointScores[0], pointScores[3]);
           }
@@ -290,10 +295,13 @@ class TransformCardChart extends TerrainComponent<Props>
                 Math.min(this.props.domain.get(1), pointValues[index + 1] - domainRange / 1000)
                 : domainMax;
             }
+            // The value of a point can't be exactly 0 in log, exponential or sigmoid, because of how the curves are calculated
             if ((mode === 'logarithmic' || mode === 'exponential' || mode === 'sigmoid') && min <= 0)
             {
               min = OFFSET_FACTOR * (this.props.domain.get(1) - this.props.domain.get(0));
             }
+            // the value of the steepness point cannot be exactly the value of the midpoint
+            // (since only one point in a sigmoid can have the midpoint value)
             if (mode === 'sigmoid' && pointName === 'k')
             {
               min = pointValues[0];
