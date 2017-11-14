@@ -424,7 +424,7 @@ class Library extends TerrainComponent<any>
       } : null;
 
     return (
-      <div className='library'>
+      <div className='library library-layout-horizontal'>
         <div className='library-top'>
           {this.isColumnVisible(Library.GROUPS_COLUMN) ?
             <GroupsColumn
