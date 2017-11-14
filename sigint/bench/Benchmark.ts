@@ -134,8 +134,8 @@ async function runBatchBenchmark()
 
   const batchRunOptions = {
     limit: 20,
-    prealloc: 10,
-    iterations: 10,
+    prealloc: 100,
+    iterations: 100,
   };
 
   winston.info('Running batch benchmark with parameters: ' + JSON.stringify(batchRunOptions));
