@@ -95,17 +95,15 @@ abstract class ActionReducer<T extends ObjectWithType>
     }
   }
 
-  public actionsForExport(): {act: (action: T) => any}
+  public actionsForExport(): (action: T) => any
   {
-    return {
-      act: this.act
-    };
+    return this.act;
   }
 }
 
 // ...
 // ...
-
+// ...
 
 interface ActionSetPreviewData
 {
@@ -120,9 +118,9 @@ interface ActionPlaceholder
   foo: any;
 }
 
-type ActionType = ActionSetPreviewData | ActionPlaceholder;
+type ActionPayloadType = ActionSetPreviewData | ActionPlaceholder;
 
-class TemplateEditorActionsClass extends ActionReducer<ActionType>
+class TemplateEditorActionsClass extends ActionReducer<ActionPayloadType>
 {
   public overrideAction(action)
   {
@@ -132,8 +130,40 @@ class TemplateEditorActionsClass extends ActionReducer<ActionType>
 
 export const TemplateEditorActions = (new TemplateEditorActionsClass()).actionsForExport();
 
-// ...
-// ...
+// interface Named
+// {
+//   type: 'hello';
+// }
+
+// function nameof<T>(name: keyof T)
+// {
+//   return name;
+// }
+
+type test = ActionPayloadType['actionType']
+
+type Reducer =
+{
+  [key in test]: string;
+}
+
+const Reducers: Reducer =
+{
+  setPreviewData: 'hello',
+  placeholder: 'yo',
+}
+
+// function execute(actionType: test)
+// {
+//   // if (Reducers[actionType] === undefined)
+//   // {
+//   //   const _unreachable: never = actionType;
+//   // }
+//   return Reducers[actionType];
+// }
+
+// // ...
+// // ...
 
 const TemplateEditorReducers = {};
 

@@ -72,7 +72,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
   public test()
   {
     // this.props.etlActions.placeholder(5);
-    this.props.templateEditorActions.act({
+    this.props.templateEditorActions({
       actionType: 'setPreviewData',
       preview: 'hi',
       originalNames: 'also hi',
