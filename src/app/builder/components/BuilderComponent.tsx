@@ -246,6 +246,7 @@ class BuilderComponent extends TerrainComponent<Props>
               textColor={this.props.textStyle && this.props.textStyle.color}
               tooltips={d.dropdownTooltips}
               icons={d.icons}
+              width={d.width}
             />
             {this.props.helpOn && d.help ?
               <ManualInfo

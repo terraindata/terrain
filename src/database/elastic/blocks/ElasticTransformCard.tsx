@@ -59,11 +59,11 @@ import TransformCard from '../../../app/builder/components/charts/TransformCard'
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../app/util/TransformUtil';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
 
-const SigmoidIcon =     require('../../../images/icon_sigmoid?name=SigmoidIcon');
-const LinearIcon =      require('../../../images/icon_linear?name=LinearIcon');
+const SigmoidIcon = require('../../../images/icon_sigmoid?name=SigmoidIcon');
+const LinearIcon = require('../../../images/icon_linear?name=LinearIcon');
 const ExponentialIcon = require('../../../images/icon_exponential?name=ExponentialIcon');
 const LogarithmicIcon = require('../../../images/icon_logarithmic?name=LogarithmicIcon');
-const NormalIcon =      require('../../../images/icon_normal?name=NormalIcon');
+const NormalIcon = require('../../../images/icon_normal?name=NormalIcon');
 
 export const scorePoint = _block(
   {
@@ -145,12 +145,13 @@ export const elasticTransform = _card(
                 exponential: 'exponential', normal: 'bell-curve', sigmoid: 's-curve',
               }),
               icons: Map({
-                linear: <LinearIcon/>,
-                logarithmic: <LogarithmicIcon/>
-                exponential: <ExponentialIcon/>
-                normal: <NormalIcon/>
-                sigmoid: <SigmoidIcon/>
-              })
+                linear: <LinearIcon />,
+                logarithmic: <LogarithmicIcon />,
+                exponential: <ExponentialIcon />,
+                normal: <NormalIcon />,
+                sigmoid: <SigmoidIcon />,
+              }),
+              width: '131px',
               key: 'mode',
               style: {
                 width: '50%',
