@@ -45,52 +45,132 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import benchrest = require('bench-rest');
+import jsurl = require('jsurl');
 import winston = require('winston');
 
 import { startServer } from './Server';
 
 let host = 'http://127.0.0.1:43002';
 
-const visitors = ['2329090446', '2329090447', '2329090448', '2329090449'];
-const variants = ['125', '126', '225', '240'];
+const batchSize = 100;
+const batchRequests: any[] = [];
 
-if (process.argv.length > 2)
+function generateBenchmarkData()
 {
-  host = process.argv[2];
-  winston.info('Using specified server address: ' + host);
-}
-else
-{
-  // if no host was specified, start a local server
-  // tslint:disable-next-line:no-floating-promises
-  startServer();
-}
+  const visitors = ['2329090446', '2329090447', '2329090448', '2329090449'];
+  const variants = ['125', '126', '225', '240'];
 
-export const flow = {
-  main: [
-    { get: '',
-      beforeHooks: [(all) => {
-        all.requestOptions.uri = host + '/v1?eventname=view&variantid=' + variants[Math.floor(Math.random() * variants.length)]
-          + '&visitorid=' + visitors[Math.floor(Math.random() * visitors.length)];
-        return all;
-      }],
-    },
-  ],
-};
-
-const runOptions = {
-  limit: 20,
-  prealloc: 1000,
-  iterations: 1000,
-};
-
-benchrest(flow, runOptions)
-  .on('error', (err, ctx) => winston.error('Failed in %s with err: ', ctx, err))
-  .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
-  .on('end', (stats, errorCount) =>
+  for (let i = 0; i < batchSize; i++)
   {
-    winston.info('error count: ', errorCount);
-    winston.info('stats', stats);
-    // TODO: teardown server here
-    process.exit();
+    batchRequests.push({
+      eventname: 'view',
+      variantid: variants[Math.floor(Math.random() * variants.length)],
+      visitorid: visitors[Math.floor(Math.random() * visitors.length)],
+    });
+  }
+}
+
+async function runBenchmark()
+{
+  const flow = {
+    main: [
+      { get: '',
+        beforeHooks: [(all) => {
+          all.requestOptions.uri = host + '/v1?'
+            + 'eventname=' + batchRequests[all.env.index % batchSize].eventname
+            + '&variantid=' + batchRequests[all.env.index % batchSize].variantid
+            + '&visitorid=' + batchRequests[all.env.index % batchSize].visitorid;
+          return all;
+        }],
+      },
+    ],
+  };
+
+  const runOptions = {
+    limit: 20,
+    prealloc: 1000,
+    iterations: 1000,
+  };
+
+  winston.info('Running benchmark with parameters: ' + JSON.stringify(runOptions));
+
+  return new Promise((resolve, reject) =>
+  {
+    benchrest(flow, runOptions)
+      .on('error', (err, ctx) => {
+        winston.error('Failed in %s with err: ', ctx, err);
+        reject(err);
+      })
+      .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
+      .on('end', (stats, errorCount) =>
+      {
+        winston.info('error count: ', errorCount);
+        resolve(stats);
+      });
   });
+}
+
+async function runBatchBenchmark()
+{
+  const batchFlow = {
+    main: [
+      { get: '',
+        beforeHooks: [(all) => {
+          all.requestOptions.uri = host + '/v1?'
+            + 'batch=' + String(jsurl.stringify(batchRequests));
+          return all;
+        }],
+      },
+    ],
+  };
+
+  const batchRunOptions = {
+    limit: 20,
+    prealloc: 10,
+    iterations: 10,
+  };
+
+  winston.info('Running batch benchmark with parameters: ' + JSON.stringify(batchRunOptions));
+
+  return new Promise((resolve, reject) =>
+  {
+    benchrest(batchFlow, batchRunOptions)
+    .on('error', (err, ctx) => {
+      winston.error('Failed in %s with err: ', ctx, err);
+      reject(err);
+    })
+    .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
+    .on('end', (stats, errorCount) =>
+    {
+      winston.info('error count: ', errorCount);
+      resolve(stats);
+    });
+  });
+}
+
+// =========================================================================
+
+(async () => {
+  if (process.argv.length > 2)
+  {
+    host = process.argv[2];
+    winston.info('Using specified server address: ' + host);
+  }
+  else
+  {
+    // if no host was specified, start a local server
+    // tslint:disable-next-line:no-floating-promises
+    startServer();
+  }
+
+  generateBenchmarkData();
+
+  const s1 = await runBenchmark();
+  winston.info(JSON.stringify(s1));
+
+  const s2 = await runBatchBenchmark();
+  winston.info(JSON.stringify(s2));
+
+  // TODO: shutdown server gracefully
+  process.exit(0);
+})();
