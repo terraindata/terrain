@@ -59,11 +59,11 @@ import TransformCard from '../../../app/builder/components/charts/TransformCard'
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../app/util/TransformUtil';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
 
-const SigmoidIcon = require('../../../images/icon_sigmoid?name=SigmoidIcon');
-const LinearIcon = require('../../../images/icon_linear?name=LinearIcon');
-const ExponentialIcon = require('../../../images/icon_exponential?name=ExponentialIcon');
-const LogarithmicIcon = require('../../../images/icon_logarithmic?name=LogarithmicIcon');
-const NormalIcon = require('../../../images/icon_normal?name=NormalIcon');
+const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
+const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
+const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIcon');
+const LogarithmicIcon = require('images/icon_logarithmic.svg?name=LogarithmicIcon');
+const NormalIcon = require('images/icon_normal.svg?name=NormalIcon');
 
 export const scorePoint = _block(
   {
