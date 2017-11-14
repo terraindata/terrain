@@ -53,12 +53,13 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Path, Source } from '../PathfinderTypes';
+import { Path, Source, More, PathfinderContext } from '../PathfinderTypes';
 
 export interface Props
 {
-  source: Source;
-  step: string;
+  pathfinderContext: PathfinderContext;
+  more: More;
+  keyPath: KeyPath;
 }
 
 class PathfinderSourceSection extends TerrainComponent<Props>
@@ -71,7 +72,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public render()
   {
-    const { source, step } = this.props;
 
     return (
       <div

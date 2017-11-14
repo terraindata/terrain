@@ -69,6 +69,10 @@ export const PathfinderText = {
   Score your results, so that the best picks show up in the top spots.
   The score for each result will be the sum of the following factors:
   `,
+  moreSectionTitle: 'More',
+  moreSectionSubtitle: `
+  Look at the metadata for your data and add facets to better understand your data.
+  `,
 
   // Steps
 

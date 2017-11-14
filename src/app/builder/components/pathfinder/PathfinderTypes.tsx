@@ -100,6 +100,7 @@ class PathC extends BaseClass
   public filterGroup: FilterGroup = _FilterGroup();
   public score: Score = _Score();
   public step: string = PathfinderSteps[0];
+  public more: More = _More();
 }
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
@@ -192,6 +193,35 @@ class ScorePointC extends BaseClass
 export type ScorePoint = ScorePointC & IRecord<ScorePointC>;
 export const _ScorePoint = (config?: { [key: string]: any }) =>
   New<ScorePoint>(new ScorePointC(config), config);
+
+class MoreC extends BaseClass
+{
+  public aggregations: List<AggregationLine> = List([]);
+}
+
+export type More = MoreC & IRecord<MoreC>;
+export const _More = (config?: { [key: string]: any }) =>
+{
+  let more = New<More>(new MoreC(config), config);
+  more = more
+    .set('aggregations', List(more.aggregations.map((agg) => _AggregationLine(agg))));
+  return more;
+};
+
+class AggregationLineC extends BaseClass
+{
+  public field: string = '';
+  public name: string = '';
+  // Type is the human readable version of elasticType
+  // e.g. type = Full Statistics, elasticType = extended_stats
+  public elasticType: string = '';
+  public type: string = '';
+  public advanced: any = {}; // TODO
+}
+
+export type AggregationLine = AggregationLineC & IRecord<AggregationLineC>;
+export const _AggregationLine = (config?: { [key: string]: any }) =>
+  New<AggregationLine>(new AggregationLineC(config), config);
 
 class FilterLineC extends LineC
 {

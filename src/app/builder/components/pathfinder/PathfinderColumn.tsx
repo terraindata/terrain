@@ -65,6 +65,7 @@ import { _PathfinderContext, Path, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 import PathfinderStepSection from './step/PathfinderStepSection';
+import PathfinderMoreSection from './more/PathfinderMoreSection';
 
 export interface Props
 {
@@ -135,6 +136,12 @@ class PathfinderColumn extends TerrainComponent<Props>
           pathfinderContext={pathfinderContext}
           score={path.score}
           keyPath={keyPath.push('score')}
+        />
+
+        <PathfinderMoreSection
+          pathfinderContext={pathfinderContext}
+          more={path.more}
+          keyPath={keyPath.push('more')}
         />
 
         <PathfinderStepSection
