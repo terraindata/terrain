@@ -74,12 +74,14 @@ async function runBenchmark()
 {
   const flow = {
     main: [
-      { get: '',
-        beforeHooks: [(all) => {
+      {
+        get: '',
+        beforeHooks: [(all) =>
+        {
           all.requestOptions.uri = host + '/v1?'
-            + 'eventname=' + batchRequests[all.env.index % batchSize].eventname
-            + '&variantid=' + batchRequests[all.env.index % batchSize].variantid
-            + '&visitorid=' + batchRequests[all.env.index % batchSize].visitorid;
+            + 'eventname=' + String(batchRequests[all.env.index % batchSize].eventname)
+            + '&variantid=' + String(batchRequests[all.env.index % batchSize].variantid)
+            + '&visitorid=' + String(batchRequests[all.env.index % batchSize].visitorid);
           return all;
         }],
       },
@@ -97,7 +99,8 @@ async function runBenchmark()
   return new Promise((resolve, reject) =>
   {
     benchrest(flow, runOptions)
-      .on('error', (err, ctx) => {
+      .on('error', (err, ctx) =>
+      {
         winston.error('Failed in %s with err: ', ctx, err);
         reject(err);
       })
@@ -114,8 +117,10 @@ async function runBatchBenchmark()
 {
   const batchFlow = {
     main: [
-      { get: '',
-        beforeHooks: [(all) => {
+      {
+        get: '',
+        beforeHooks: [(all) =>
+        {
           all.requestOptions.uri = host + '/v1?'
             + 'batch=' + String(jsurl.stringify(batchRequests));
           return all;
@@ -135,22 +140,24 @@ async function runBatchBenchmark()
   return new Promise((resolve, reject) =>
   {
     benchrest(batchFlow, batchRunOptions)
-    .on('error', (err, ctx) => {
-      winston.error('Failed in %s with err: ', ctx, err);
-      reject(err);
-    })
-    .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
-    .on('end', (stats, errorCount) =>
-    {
-      winston.info('error count: ', errorCount);
-      resolve(stats);
-    });
+      .on('error', (err, ctx) =>
+      {
+        winston.error('Failed in %s with err: ', ctx, err);
+        reject(err);
+      })
+      .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
+      .on('end', (stats, errorCount) =>
+      {
+        winston.info('error count: ', errorCount);
+        resolve(stats);
+      });
   });
 }
 
 // =========================================================================
 
-(async () => {
+(async () =>
+{
   if (process.argv.length > 2)
   {
     host = process.argv[2];
