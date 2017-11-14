@@ -44,14 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import benchrest = require('bench-rest');
-import winston = require('winston');
-
 import App from '../src/App';
 
 const db = 'http://127.0.0.1:9200';
-let host = 'http://127.0.0.1:43002';
-let server;
 
 export async function startServer()
 {
@@ -65,52 +60,10 @@ export async function startServer()
       };
 
     const app = new App(options);
-    server = await app.start();
+    return app.start();
   }
   catch (e)
   {
     throw new Error('starting event server sigint: ' + String(e));
   }
 }
-
-if (process.argv.length > 2)
-{
-  host = process.argv[2];
-  winston.info('Using specified server address: ' + host);
-}
-else
-{
-  // if no host was specified, start a local server
-  // tslint:disable-next-line:no-floating-promises
-  startServer();
-}
-
-export const flow = {
-  main: [
-    {
-      post: host + '/v1', json: {
-        eventname: 'click',
-        variantid: '#{INDEX}',
-        visitorid: '#{INDEX}',
-      },
-    },
-    { get: host + '/v1?eventname=click&variantid=#{INDEX}&visitorid=#{INDEX}' },
-  ],
-};
-
-const runOptions = {
-  limit: 20,
-  prealloc: 1000,
-  iterations: 1000,
-};
-
-benchrest(flow, runOptions)
-  .on('error', (err, ctx) => winston.error('Failed in %s with err: ', ctx, err))
-  .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
-  .on('end', (stats, errorCount) =>
-  {
-    winston.info('error count: ', errorCount);
-    winston.info('stats', stats);
-    // TODO: teardown server here
-    process.exit();
-  });

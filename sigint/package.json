@@ -12,7 +12,7 @@
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;",
     "test": "jest . --forceExit --coverage",
-    "bench": "ts-node test/Benchmark.ts",
+    "bench": "ts-node bench/Benchmark.ts",
     "doc": "apidoc -i src"
   },
   "repository": {
