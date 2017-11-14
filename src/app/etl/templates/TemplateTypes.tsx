@@ -59,8 +59,8 @@ export enum FILE_TYPE
 class TemplateEditorStateC
 {
   public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
-  public originalPreviewData: any; // figure out this type
-  public previewData: any;
+  public originalPreviewData: any = ''; // figure out this type
+  public previewData: any = '';
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeConstructor<TemplateEditorStateC>(TemplateEditorStateC);

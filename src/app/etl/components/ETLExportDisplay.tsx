@@ -52,6 +52,9 @@ import Util from 'util/Util';
 import ETLActions from 'etl/data/ETLActions';
 import { ETLState } from 'etl/ETLTypes';
 
+import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorReducers';
+import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+
 export interface Props
 {
   query: Query;
@@ -59,6 +62,8 @@ export interface Props
   variantName: string;
   etl: ETLState;
   etlActions: any;
+  templateEditor: TemplateEditorState;
+  templateEditorActions: typeof TemplateEditorActions;
 }
 
 class ETLExportDisplay extends TerrainComponent<Props>
@@ -66,7 +71,12 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
   public test()
   {
-    this.props.etlActions.placeholder(5);
+    // this.props.etlActions.placeholder(5);
+    this.props.templateEditorActions.act({
+      actionType: 'setPreviewData',
+      preview: 'hi',
+      originalNames: 'also hi',
+    })
   }
 
   public render()
@@ -77,6 +87,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
 export default Util.createContainer(
   ETLExportDisplay,
-  ['etl'],
-  { etlActions: ETLActions },
+  ['etl', 'templateEditor'],
+  { etlActions: ETLActions, templateEditorActions: TemplateEditorActions },
 );

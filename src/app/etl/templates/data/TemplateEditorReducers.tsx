@@ -44,19 +44,102 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import Ajax from 'util/Ajax';
 
-import ActionTypes from 'etl/templates/data/TemplateEditorActionTypes';
+// import ActionTypes from 'etl/templates/data/TemplateEditorActionTypes';
 import { _TemplateEditorState, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import * as TemplateTypes from 'etl/templates/TemplateTypes';
 const { List, Map } = Immutable;
 
+// const TemplateEditorReducers = {};
+
+// TemplateEditorReducers[ActionTypes.setPreviewData] =
+//   (state, action) => {
+//     return state;
+//   };
+
+// const TemplateEditorReducersWrapper = (state: TemplateEditorState = _TemplateEditorState(), action) =>
+// {
+//   let nextState = state;
+//   if (TemplateEditorReducers[action.type])
+//   {
+//     nextState = TemplateEditorReducers[action.type](state, action);
+//   }
+//   return nextState;
+// }
+
+// export default TemplateEditorReducersWrapper;
+
+interface ObjectWithType
+{
+  actionType: string;
+}
+
+interface WrappedPayload<T>
+{
+  type: string;
+  payload: T;
+}
+
+abstract class ActionReducer<T extends ObjectWithType>
+{
+  public act(action: T): WrappedPayload<T>
+  {
+    return {
+      type: action.actionType,
+      payload: action,
+    }
+  }
+
+  public actionsForExport(): {act: (action: T) => any}
+  {
+    return {
+      act: this.act
+    };
+  }
+}
+
+// ...
+// ...
+
+
+interface ActionSetPreviewData
+{
+  actionType: 'setPreviewData';
+  preview: any;
+  originalNames: any;
+}
+
+interface ActionPlaceholder
+{
+  actionType: 'placeholder';
+  foo: any;
+}
+
+type ActionType = ActionSetPreviewData | ActionPlaceholder;
+
+class TemplateEditorActionsClass extends ActionReducer<ActionType>
+{
+  public overrideAction(action)
+  {
+    return undefined;
+  }
+}
+
+export const TemplateEditorActions = (new TemplateEditorActionsClass()).actionsForExport();
+
+// ...
+// ...
+
 const TemplateEditorReducers = {};
 
-TemplateEditorReducers[ActionTypes.setPreviewData] =
-  (state, action) => {
+TemplateEditorReducers['setPreviewData'] = (state: TemplateEditorState, action) =>
+  {
+    console.log(state);
     return state;
   };
 
@@ -68,6 +151,6 @@ const TemplateEditorReducersWrapper = (state: TemplateEditorState = _TemplateEdi
     nextState = TemplateEditorReducers[action.type](state, action);
   }
   return nextState;
-}
+};
 
 export default TemplateEditorReducersWrapper;
