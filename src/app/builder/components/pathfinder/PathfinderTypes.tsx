@@ -267,6 +267,11 @@ type ChoiceContext = {
   type: 'fields',
   source: Source,
   schemaState: SchemaState,
+} | {
+  type: 'comparison',
+  source: Source,
+  schemaState: SchemaState,
+  field: string,
 };
 
 class ElasticDataSourceC extends DataSource

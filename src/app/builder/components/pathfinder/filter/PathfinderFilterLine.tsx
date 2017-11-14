@@ -96,6 +96,16 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             selectedIndex={ /* TODO */ 0}
             canEdit={pathfinderContext.canEdit}
           />,
+          <Dropdown
+            options={/* TODO adapt dropdown */ source.dataSource.getChoiceOptions({
+              type: 'comparison',
+              field: null, /* TODO field */
+              source,
+              schemaState: pathfinderContext.schemaState,
+            }).map((option) => option.name).toList()}
+            selectedIndex={ /* TODO */ 0}
+            canEdit={pathfinderContext.canEdit}
+          />,
         ])}
       >
       </PathfinderLine>
