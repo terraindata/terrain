@@ -107,7 +107,10 @@ async function runBenchmark()
       .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
       .on('end', (stats, errorCount) =>
       {
-        winston.info('error count: ', errorCount);
+        if (errorCount)
+        {
+          winston.info('error count: ', errorCount);
+        }
         resolve(stats);
       });
   });
@@ -148,7 +151,10 @@ async function runBatchBenchmark()
       .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
       .on('end', (stats, errorCount) =>
       {
-        winston.info('error count: ', errorCount);
+        if (errorCount)
+        {
+          winston.info('error count: ', errorCount);
+        }
         resolve(stats);
       });
   });
