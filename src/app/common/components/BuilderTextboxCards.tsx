@@ -113,7 +113,7 @@ class BuilderTextboxCards extends React.Component<Props, any>
             card={this.props.value as Card}
             index={null}
             display={this.props.display}
-          // tuningMode={this.props.tuningMode}
+            tuningMode={this.props.tuningMode}
           />
         </div>
       </FadeInOut>

@@ -91,7 +91,8 @@ export interface Display
   optionsDisplayName?: Immutable.Map<any, string>; // maps value to display name
   dropdownUsesRawValues?: boolean; // use the raw values, instead of the indices
   dropdownTooltips?: List<any>;
-
+  icons?: Immutable.Map<any, any>;
+  width?: string;
   // for labels
   label?: string;
 
