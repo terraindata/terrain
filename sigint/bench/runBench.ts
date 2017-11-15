@@ -44,13 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-const benchrest = require('bench-rest');
+import winston from 'winston';
+import * as Benchmark from './Benchmark';
 
-exports.runBench = (request, response) => {
-  var visitors = ['2329090446', '2329090447', '2329090448', '2329090449'];
-  var variants = ['125', '126', '225', '240'];
-
-  var host = undefined;
+exports.runBench = async (request, response) => {
+  let host;
   if (request.body.host !== undefined)
   {
     host = request.body.host;
@@ -68,45 +66,22 @@ exports.runBench = (request, response) => {
     });
   }
 
-  var flow = {
-    main: [
-      { get: '',
-        beforeHooks: [(all) => {
-          all.requestOptions.uri = host + '/v1?eventname=view&variantid=' + variants[Math.floor(Math.random() * variants.length)]
-            + '&visitorid=' + visitors[Math.floor(Math.random() * visitors.length)];
-          return all;
-        }],
-      },
-    ],
-  };
+  Benchmark.generateBenchmarkData();
 
-  var runOptions = {
-    prealloc: 1000,
-    limit: request.body.limit || request.query.limit || 10,
-    iterations: request.body.iterations || request.query.iterations || 1000,
-  };
+  try
+  {
+    const s1 = await Benchmark.runBenchmark(host);
+    winston.info(JSON.stringify(s1));
 
-  benchrest(flow, runOptions)
-  .on('error', (err, ctx) => {
-    console.log('Error running benchmark: ', ctx, err);
+    const s2 = await Benchmark.runBatchBenchmark(host);
+    winston.info(JSON.stringify(s2));
+
+    response.status(200).send([s1, s2]);
+  }
+  catch (err)
+  {
     response.status(500).send({
       error: 'Error running benchmark: ' + err,
-      ctx: ctx,
     });
-  })
-  .on('progress', (stats, percent, concurrent, ips) => console.log('Progress: %s complete', percent))
-  .on('end', (stats, errorCount) =>
-  {
-    if (errorCount)
-    {
-      response.status(500).send({
-        error: 'Encountered errors running benchmark',
-        count: errorCount,
-      });
-    }
-    else
-    {
-      response.status(200).send(stats);
-    }
-  });
+  }
 };

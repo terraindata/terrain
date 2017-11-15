@@ -1,12 +1,9 @@
 {
   "name": "sigint-bench",
   "version": "1.0.0",
-  "description": "Terrain Analytics Server Stress Testing",
+  "description": "Terrain Analytics Server Stress Testing Framework",
   "main": "runBench.js",
   "private": true,
-  "scripts": {
-    "bench": "node runBench.js"
-  },
   "repository": {
     "type": "git",
     "url": "http://git.terrain.int/terrain/Search"
@@ -15,9 +12,12 @@
     "Han Solo"
   ],
   "dependencies": {
-    "bench-rest": "^1.2.4"
+    "bench-rest": "^1.2.4",
+    "jsurl": "^0.1.5",
+    "winston": "^2.4.0"
   },
   "devDependencies": {
-    "serverless-google-cloudfunctions": "^1.1.1"
+    "serverless-google-cloudfunctions": "^1.1.1",
+    "serverless-plugin-typescript": "^1.1.3"
   }
 }
