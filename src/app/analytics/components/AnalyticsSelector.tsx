@@ -56,6 +56,7 @@ import './AnalyticsSelector.less';
 interface Props
 {
   analytics: AnalyticsState;
+  analyticsActions: any;
   servers: Immutable.Map<string, Server>;
   analyticsConnection?: string;
 
@@ -64,14 +65,6 @@ interface Props
   onDateRangeSelect: (value: number | string) => void;
   onConnectionChange: (value: string) => void;
 }
-
-const METRICS = Immutable.List([
-  { value: 'impression', label: 'Impressions' },
-  { value: 'click', label: 'Clicks' },
-  { value: 'conversion', label: 'Conversions' },
-  { value: 'click,impression', label: 'CTR' },
-  { value: 'conversion,impression', label: 'Conversion Rate' },
-]);
 
 const INTERVALS = Immutable.List([
   { value: 'hour', label: 'Hourly' },
@@ -104,28 +97,47 @@ class AnalyticsSelector extends TerrainComponent<Props>
     return serversWithAnalytics.keySeq().toList();
   }
 
+  public getMetricOptions()
+  {
+    const { analytics } = this.props;
+    let metricOptions = Immutable.List([]);
+
+    analytics.availableMetrics.map((m) =>
+    {
+      metricOptions = metricOptions.push({ value: m.events, label: m.label });
+    });
+
+    return metricOptions;
+  }
+
+  public componentDidMount()
+  {
+    this.props.analyticsActions.fetchAvailableMetrics();
+  }
+
   public render()
   {
     const { analytics, servers, analyticsConnection } = this.props;
     const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
 
-    const options = this.getConnectionOptions();
+    const connectionOptions = this.getConnectionOptions();
+    const metricOptions = this.getMetricOptions();
 
     return (
       <div>
         <Dropdown
           onChange={this.handleConnectionChange}
-          options={options}
+          options={connectionOptions}
           canEdit={true}
           className='bic-db-dropdown'
           directionBias={90}
-          selectedIndex={options.indexOf(analyticsConnection)}
+          selectedIndex={connectionOptions.indexOf(analyticsConnection)}
         />
         <div className='analytics-selector'>
           <div className='analytics-selector-multiswitch'>
             <p>Metric</p>
             <MultiSwitch
-              options={METRICS}
+              options={metricOptions}
               value={selectedMetric.toString()}
               usesValues
               onChange={this.props.onMetricSelect}

@@ -1402,6 +1402,29 @@ export const Ajax =
         },
         { onError });
     },
+
+    getAvailableMetrics(
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void,
+    )
+    {
+      return Ajax.req(
+        'get',
+        'events/metrics',
+        {},
+        (response: any) =>
+        {
+          try
+          {
+            onLoad(response);
+          }
+          catch (e)
+          {
+            onError && onError(response as any);
+          }
+        },
+        { onError });
+    },
   };
 
 export default Ajax;

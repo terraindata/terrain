@@ -125,6 +125,17 @@ AnalyticsReducer[ActionTypes.pinVariant] =
     return state.setIn(['pinnedVariants', variantId], !isVariantPinned);
   };
 
+AnalyticsReducer[ActionTypes.fetchAvailableMetricsSuccess] =
+  (state, action: Action<{ availableMetrics: any[] }>) =>
+  {
+    const { availableMetrics } = action.payload;
+
+    return state.set(
+      'availableMetrics',
+      state.availableMetrics.concat(availableMetrics),
+    );
+  };
+
 const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>
 {
   let nextState = state;
