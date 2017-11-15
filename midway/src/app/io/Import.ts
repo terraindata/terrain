@@ -89,6 +89,7 @@ export class Import
   private COMPATIBLE_TYPES: object =
   {
     text: new Set(['text']),
+    keyword: new Set(['keyword']),
     byte: new Set(['text', 'byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']),
     short: new Set(['text', 'short', 'integer', 'long', 'float', 'double']),
     integer: new Set(['text', 'integer', 'long', 'double']),
@@ -592,7 +593,7 @@ export class Import
       {
         if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
         {
-          return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj);
+          return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj) + ', expected: ' + targetKeys;
         }
         for (const key of Object.keys(obj))
         {

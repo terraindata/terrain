@@ -740,7 +740,8 @@ describe('File import route tests', () =>
       .field('accessToken', 'ImAnAdmin')
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
-        col1: { type: 'text' },
+        col1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+        col2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
         col3: { type: 'boolean' },
         col4: { type: 'date' },
       }))
