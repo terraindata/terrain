@@ -63,7 +63,6 @@ import DeployModalColumn from './DeployModalColumn';
 import EQLTemplateGenerator from '../../../../shared/database/elastic/parser/EQLTemplateGenerator';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
-import DeployVariant from '../../../../shared/deploy/DeployVariant';
 
 export interface Props
 {
@@ -101,7 +100,6 @@ class DeployModal extends TerrainComponent<Props>
           changingStatusTo !== this.state.changingStatusTo
         )
         {
-          console.log('bloo1 ' + (changingStatusOf && changingStatusOf.deployedName));
           this.setState({
             changingStatus,
             changingStatusOf,
@@ -127,8 +125,6 @@ class DeployModal extends TerrainComponent<Props>
     const state = LibraryStore.getState();
     const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
-    //const id: string = (variant as LibraryTypes.Variant).deployedName;
-    //console.log('deploy id = '+id);
 
     const { changingStatusTo } = this.state;
 
@@ -204,7 +200,6 @@ class DeployModal extends TerrainComponent<Props>
 
   public handleDeployedNameChange(deployedName: string)
   {
-    console.log('parent handle deployed name change ' + deployedName);
     this.setState({
       deployedName,
     });
@@ -216,8 +211,6 @@ class DeployModal extends TerrainComponent<Props>
     {
       return null;
     }
-
-    console.log('rendering, this stae dn = ' + this.state.deployedName);
 
     const { changingStatus, changingStatusOf, changingStatusTo } = this.state;
     const name = (changingStatusOf && changingStatusOf.name);

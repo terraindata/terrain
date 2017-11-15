@@ -108,11 +108,11 @@ export async function search(req: Request): Promise<object[]>
       }
       else
       {
-        winston.info('Calling Terrain variant: terrain_' + req.v +
+        winston.info('Calling Terrain variant: ' + req.v +
           '(from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
         client.searchTemplate({
           body: {
-            id: 'terrain_' + req.v,
+            id: req.v,
             params: {
               from: (Number(req.p) * 30),
               size: 30,

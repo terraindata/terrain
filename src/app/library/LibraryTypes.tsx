@@ -116,8 +116,6 @@ export const _Variant = (config?: any) =>
   {
     v = touchVariant(v);
   }
-  console.log('new variant created');
-  console.log(v);
   return v;
 };
 

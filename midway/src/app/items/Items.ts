@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DeployVariant from '../../../../shared/deploy/DeployVariant';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -106,6 +105,20 @@ export class Items
     return this.select([], {});
   }
 
+  public parseDeployedName(variant: ItemConfig): string
+  {
+    if (variant.meta === undefined)
+    {
+      return '';
+    }
+    const meta = JSON.parse(variant.meta);
+    if (meta['deployedName'] === undefined)
+    {
+      return '';
+    }
+    return meta['deployedName'];
+  }
+
   public async getLiveVariants(ids: number[]): Promise<string[] | object[]>
   {
     return new Promise<string[] | object[]>(async (resolve, reject) =>
@@ -115,7 +128,7 @@ export class Items
         const items: ItemConfig[] = await this.select([], { type: 'VARIANT', status: 'LIVE' } as object);
         const liveItems: object[] = items.map((item) =>
         {
-          return { id: item.id, name: DeployVariant.getVariantDeployedName(item as ItemConfig) };
+          return { id: item.id, name: this.parseDeployedName(item as ItemConfig) };
         });
         return resolve(liveItems);
       }
@@ -124,7 +137,7 @@ export class Items
         const liveItems: string[] = await Promise.all(ids.map(async (id) =>
         {
           const items: ItemConfig[] = await this.select([], { id, type: 'VARIANT', status: 'LIVE' } as object);
-          return items.length !== 0 ? DeployVariant.getVariantDeployedName(items[0] as ItemConfig) as string : '' as string;
+          return items.length !== 0 ? this.parseDeployedName(items[0] as ItemConfig) as string : '' as string;
         }));
         return resolve(liveItems);
       }

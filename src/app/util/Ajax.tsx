@@ -641,9 +641,6 @@ export const Ajax =
       }
       onLoad = onLoad || _.noop;
 
-      console.log('saving item data');
-      console.log(itemData);
-
       return Ajax.req(
         'post',
         route,

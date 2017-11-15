@@ -244,7 +244,7 @@ class Dropdown extends TerrainComponent<Props>
     $('body').unbind('click', this.close);
   }
 
-  public toggleOpen()
+  public toggleOpen(e)
   {
     if (!this.props.canEdit)
     {
@@ -276,6 +276,8 @@ class Dropdown extends TerrainComponent<Props>
     {
       this.close();
     }
+    e.preventDefault();
+    e.stopPropagation();
   }
 
   public getOptionName(option, index: number): string

@@ -115,17 +115,15 @@ class DeployModalColumn extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.setState({
-      deployedName: this.props.deployedName
+      deployedName: this.props.deployedName,
     });
   }
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    console.log('will receive props:');
-    console.log(nextProps);
     if (nextProps.variant !== this.props.variant ||
-        nextProps.status !== this.props.status ||
-        nextProps.deployedName !== this.props.deployedName)
+      nextProps.status !== this.props.status ||
+      nextProps.deployedName !== this.props.deployedName)
     {
       let nextDeployedName: string = nextProps.deployedName;
       if (nextProps.variant.deployedName !== this.props.variant.deployedName)
@@ -133,7 +131,6 @@ class DeployModalColumn extends TerrainComponent<Props>
         nextDeployedName = nextProps.variant.deployedName;
       }
 
-      console.log('lee ' + nextProps.deployedName);
       this.setState({
         confirmChecked: false,
         deployedName: nextDeployedName,
@@ -145,7 +142,7 @@ class DeployModalColumn extends TerrainComponent<Props>
   {
     this.props.onDeployedNameChange(e.target.value);
     this.setState({
-        deployedName: e.target.value,
+      deployedName: e.target.value,
     });
   }
 
@@ -183,11 +180,6 @@ class DeployModalColumn extends TerrainComponent<Props>
     const state = LibraryStore.getState();
     const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
-
-    console.log('variant:');
-    console.log(variant);
-    console.log('this.state:');
-    console.log(this.state);
 
     // let title = 'Deploy "' + name + '" to Live';
     // if(changingStatusTo !== ItemStatus.Live)
@@ -334,10 +326,10 @@ class DeployModalColumn extends TerrainComponent<Props>
           className='deploy-modal-info deploy-modal-info-status'>
           <div className='deploy-modal-info-row-lower deploy-modal-info-status-row'>
             <span>
-            <label htmlFor='deploy-modal-variant-name'>
-              Deployed variant name:
+              <label htmlFor='deploy-modal-variant-name'>
+                Deployed variant name:
             </label>
-            <input type='text' value={this.props.deployedName} onChange={this.handleDeployedNameChange} />
+              <input type='text' value={this.props.deployedName} onChange={this.handleDeployedNameChange} />
             </span>
           </div>
         </div>

@@ -282,10 +282,8 @@ const Actions =
       {
         if (variant.deployedName !== deployedName)
         {
-            variant = variant.set('deployedName', deployedName);
-            console.log('updated variant:');
-            console.log(variant);
-            dispatch(Actions.variants.change(variant));
+          variant = variant.set('deployedName', deployedName);
+          dispatch(Actions.variants.change(variant));
         }
 
         Ajax.deployQuery(
@@ -296,8 +294,6 @@ const Actions =
           {
             // on load
             dispatch(Actions.variants.status(variant, toStatus, true));
-            console.log('floop');
-            console.log(variant);
           },
         );
       },
