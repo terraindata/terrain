@@ -44,9 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands max-line-length
+// tslint:disable:restrict-plus-operands max-line-length no-var-requires
 
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
+import * as React from 'react';
 
 import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
@@ -55,7 +56,14 @@ import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card } from '../../../blocks/types/Card';
 
 import TransformCard from '../../../app/builder/components/charts/TransformCard';
+import TransformUtil, { NUM_CURVE_POINTS } from '../../../app/util/TransformUtil';
 import { AutocompleteMatchType, ElasticBlockHelpers } from './ElasticBlockHelpers';
+
+const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
+const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
+const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIcon');
+const LogarithmicIcon = require('images/icon_logarithmic.svg?name=LogarithmicIcon');
+const NormalIcon = require('images/icon_normal.svg?name=NormalIcon');
 
 export const scorePoint = _block(
   {
@@ -71,6 +79,11 @@ export const scorePoint = _block(
     },
   });
 
+// When a paramaterized transform curve is used, a linear interpolation of the curve is passed
+// to the PWL script. It uses this number of points to get a good approximation of the curve
+// while maintaining efficiency.
+const numPoints = 31;
+
 export const elasticTransform = _card(
   {
     input: '',
@@ -78,10 +91,12 @@ export const elasticTransform = _card(
 
     // make this list<string> since the values passed from BuilderTextBox are string.
     domain: List(['0', '100']),
+    dataDomain: List(['0', '100']),
     hasCustomDomain: false, // has the user set a custom domain
 
     noTitle: true,
     cannotBeMoved: true,
+    mode: 'linear',
 
     static: {
       language: 'elastic',
@@ -109,15 +124,45 @@ export const elasticTransform = _card(
       },
       display: [
         {
-          displayType: DisplayType.TEXT,
-          // help: ManualConfig.help['input'],
-          key: 'input',
-          placeholder: 'Input field',
-          showWhenCards: true,
-          getAutoTerms: (schemaState): List<string> =>
-          {
-            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Transform);
-          },
+          displayType: DisplayType.FLEX,
+          key: 'transform-flex',
+          flex: [
+            {
+              displayType: DisplayType.TEXT,
+              // help: ManualConfig.help['input'],
+              key: 'input',
+              placeholder: 'Input field',
+              showWhenCards: true,
+              getAutoTerms: (schemaState): List<string> =>
+              {
+                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Transform);
+              },
+              style: {
+                marginLeft: -16,
+                width: '121%',
+              },
+            },
+            {
+              displayType: DisplayType.DROPDOWN,
+              options: List(['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid']),
+              optionsDisplayName: Map({
+                linear: 'freeform', logarithmic: 'logarithmic',
+                exponential: 'exponential', normal: 'bell-curve', sigmoid: 's-curve',
+              }),
+              icons: Map({
+                linear: <LinearIcon />,
+                logarithmic: <LogarithmicIcon />,
+                exponential: <ExponentialIcon />,
+                normal: <NormalIcon />,
+                sigmoid: <SigmoidIcon />,
+              }),
+              width: '131px',
+              key: 'mode',
+              style: {
+                marginRight: '12px',
+              },
+            },
+          ],
         },
         // TODO, in the future, if we allow complicated formulas inside
         //  transforms, then we can change this back to a cards view
@@ -137,13 +182,45 @@ export const elasticTransform = _card(
 
       tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
       {
+        let ranges = [];
+        let outputs = [];
+        let data;
+        const min = parseFloat(block['dataDomain'].get(0));
+        const max = parseFloat(block['dataDomain'].get(1));
+        if (block['mode'] === 'normal' && block['scorePoints'].size === NUM_CURVE_POINTS.normal)
+        {
+          data = TransformUtil.getNormalData(numPoints, block['scorePoints'].toJS(), min, max);
+        }
+        else if (block['mode'] === 'exponential' && block['scorePoints'].size === NUM_CURVE_POINTS.exponential)
+        {
+          data = TransformUtil.getExponentialData(numPoints, block['scorePoints'].toJS());
+        }
+        else if (block['mode'] === 'logarithmic' && block['scorePoints'].size === NUM_CURVE_POINTS.logarithmic)
+        {
+          data = TransformUtil.getLogarithmicData(numPoints, block['scorePoints'].toJS());
+        }
+        else if (block['mode'] === 'sigmoid' && block['scorePoints'].size === NUM_CURVE_POINTS.sigmoid)
+        {
+          data = TransformUtil.getSigmoidData(numPoints, block['scorePoints'].toJS(), min, max);
+        }
+        else
+        {
+          ranges = block['scorePoints'].map((scorePt) => scorePt.value).toArray();
+          outputs = block['scorePoints'].map((scorePt) => scorePt.score).toArray();
+        }
+
+        if (data !== undefined)
+        {
+          ranges = data.ranges;
+          outputs = data.outputs;
+        }
         return {
           a: 0,
           b: 1,
           numerators: [[block['input'], 1]],
           denominators: [],
-          ranges: block['scorePoints'].map((scorePt) => scorePt.value).toArray(),
-          outputs: block['scorePoints'].map((scorePt) => scorePt.score).toArray(),
+          ranges,
+          outputs,
         };
       },
 
@@ -153,7 +230,7 @@ export const elasticTransform = _card(
       //   }
       // ),
 
-      metaFields: ['domain', 'hasCustomDomain'],
+      metaFields: ['domain', 'dataDomain', 'hasCustomDomain'],
     },
   });
 

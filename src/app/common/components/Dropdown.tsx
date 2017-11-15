@@ -54,7 +54,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Actions from '../../builder/data/BuilderActions';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -78,6 +78,7 @@ export interface Props
   openDown?: boolean;
   tooltips?: List<any>;
   wrapperTooltip?: string;
+  icons?: Immutable.Map<any, any>;
 }
 
 @Radium
@@ -94,6 +95,7 @@ class Dropdown extends TerrainComponent<Props>
         up: false,
         open: false,
         focusedIndex: -1,
+        width: 0,
       };
   }
 
@@ -160,7 +162,9 @@ class Dropdown extends TerrainComponent<Props>
       ':hover': {
         backgroundColor: Colors().inactiveHover,
         color: Colors().activeText,
+        stroke: Colors().activeText,
       },
+      'stroke': customColor,
     };
 
     if (focused)
@@ -179,7 +183,9 @@ class Dropdown extends TerrainComponent<Props>
         ':hover': {
           backgroundColor: customColor || Colors().active,
           color: Colors().activeText,
+          stroke: Colors().activeText,
         },
+        'stroke': Colors().activeText,
       });
     }
 
@@ -278,13 +284,16 @@ class Dropdown extends TerrainComponent<Props>
     }
   }
 
-  public getOptionName(option, index: number): string
+  public getOptionName(option, index: number): El
   {
-    if (this.props.optionsDisplayName)
+    const icon = this.props.icons !== undefined ? this.props.icons.get(option) : null;
+    const name = this.props.optionsDisplayName !== undefined ?
+      this.props.optionsDisplayName.get(option) : option;
+    if (icon)
     {
-      return this.props.optionsDisplayName.get(option);
+      return (<span>{icon}{name}</span>);
     }
-    return option;
+    return name;
   }
 
   handleFocus()
@@ -351,6 +360,12 @@ class Dropdown extends TerrainComponent<Props>
           customColor || Colors().text1,
           this.props.canEdit ? Colors().activeText : (customColor || Colors().text1),
         ),
+      this.state.open ?
+        getStyle('stroke', Colors().activeText) :
+        getStyle('stroke',
+          customColor || Colors().text1,
+          this.props.canEdit ? Colors().activeText : (customColor || Colors().text1),
+        ),
       borderColor(Colors().inputBorder),
     ];
 
@@ -391,8 +406,10 @@ class Dropdown extends TerrainComponent<Props>
                   key={index}
                   className={classNames({
                     'dropdown-option-inner': true,
+                    'dropdown-option-inner-hidden': this.props.icons !== undefined,
                     'dropdown-option-value-selected': index === selectedIndex,
                   })}
+                  style={this.props.icons ? { paddingTop: 6 } : {}}
                 >
                   {
                     this.getOptionName(option, index)
