@@ -59,6 +59,35 @@ export const enum AutocompleteMatchType
   Transform = 4,
 }
 
+export const enum FieldType
+{
+  Numerical,
+  Text,
+  Date,
+  Geopoint,
+  Any,
+}
+
+const FieldTypeMapping =
+{
+  [FieldType.Numerical]: ['long', 'double', 'short', 'byte', 'integer', 'half_float', 'float', 'boolean'],
+  [FieldType.Text]: ['text'],
+  [FieldType.Date]: ['date'],
+  [FieldType.Geopoint]: ['geo_point'],
+  [FieldType.Any]: ['text',
+                  'long',
+                  'boolean',
+                  'date',
+                  'array',
+                  'double',
+                  'short',
+                  'byte',
+                  'integer',
+                  'half_float',
+                  'float',
+                  'geo_point'],
+};
+
 export const TransformableTypes =
   [
     'long',
@@ -148,6 +177,53 @@ export const ElasticBlockHelpers = {
       }
     }
 
+    return List(metaFields);
+  },
+
+  getFieldsOfType(schemaState, fieldType): List<string>
+  {
+    const state = BuilderStore.getState();
+    const cards = state.query.cards;
+    const index = getIndex();
+    const server = BuilderStore.getState().db.name;
+
+    const metaFields = ['_index', '_type', '_uid', '_id',
+      '_source', '_size',
+      '_all', '_field_names',
+      '_parent', '_routing',
+      '_meta'];
+
+    if (index !== null)
+    {
+      const indexId = state.db.name + '/' + String(index);
+      // 2. Need to get current type
+      const type = getType();
+      if (type !== null)
+      {
+        const typeId = state.db.name + '/' + String(index) + '.' + String(type);
+        const fields = schemaState.columns.filter(
+            (column) => column.serverId === String(server) &&
+              column.databaseId === String(indexId) &&
+              column.tableId === String(typeId) &&
+              FieldTypeMapping[fieldType].indexOf(column.datatype) !== -1,
+          ).map(
+            (column) => column.name,
+          ).toList(); // concat meta fields if necessary
+          if (fieldType === FieldType.Numerical)
+          {
+            return fields.concat(List(['_score', '_size']));
+          }
+          if (fieldType === FieldType.Any)
+          {
+            return fields.concat(List(metaFields));
+          }
+          return fields;
+        }
+    }
+    if (fieldType === FieldType.Numerical)
+    {
+      return List(['_score', '_size']);
+    }
     return List(metaFields);
   },
 };

@@ -60,7 +60,7 @@ import ScoreBar from '../../charts/ScoreBar';
 import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
-import { ChoiceOption, Path, Score, ScoreLine, Source, PathfinderContext } from '../PathfinderTypes';
+import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 

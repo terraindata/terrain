@@ -73,6 +73,7 @@ export interface Props
   expandableContent?: any;
   onExpand?: (index: number, expanded: boolean) => void;
   expandButton?: any; // What the user presses to expand the section
+  expandOnLeft?: boolean;
 }
 
 export type PathfinderPiece = El |
@@ -161,19 +162,19 @@ export class PathfinderLine extends TerrainComponent<Props>
 
   private renderLeft(): El
   {
-    return null;
-    // if (!this.props.canEdit || !this.props.canDrag)
-    // {
-    //   return null;
-    // }
+    if (this.props.expandableContent === undefined || !this.props.expandOnLeft)
+    {
+      return null;
+    }
 
-    // return (
-    //   <div className='pf-line-left'>
-    //     <DragHandle
-
-    //     />
-    //   </div>
-    // );
+    return (
+      <div
+        className='pf-line-left expand'
+        onClick={this._fn(this.props.onExpand, !this.props.expanded)}
+      >
+         {this.props.expandButton}
+      </div>
+    );
   }
 
   private renderRight(): El
@@ -186,7 +187,7 @@ export class PathfinderLine extends TerrainComponent<Props>
     return (
       <div className='pf-line-right'>
         {
-          this.props.expandableContent !== undefined &&
+          this.props.expandableContent !== undefined && !this.props.expandOnLeft &&
           <div
             className='expand'
             onClick={this._fn(this.props.onExpand, !this.props.expanded)}

@@ -53,7 +53,14 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Path, Source, More, PathfinderContext } from '../PathfinderTypes';
+import BuilderActions from '../../../data/BuilderActions';
+import PathfinderCreateLine from '../PathfinderCreateLine';
+import PathfinderSectionTitle from '../PathfinderSectionTitle';
+import PathfinderText from '../PathfinderText';
+import { _AggregationLine, More, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import DragAndDrop, {DraggableItem} from './../../../../common/components/DragAndDrop';
+import DragHandle from './../../../../common/components/DragHandle';
+import PathfinderAggregationLine from './PathfinderAggregationLine';
 
 export interface Props
 {
@@ -62,7 +69,7 @@ export interface Props
   keyPath: KeyPath;
 }
 
-class PathfinderSourceSection extends TerrainComponent<Props>
+class PathfinderMoreSection extends TerrainComponent<Props>
 {
   public state: {
 
@@ -70,16 +77,73 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   };
 
+  public handleAddLine()
+  {
+    const newLines = this.props.more.aggregations.push(_AggregationLine());
+    BuilderActions.change(this.props.keyPath.push('aggregations'), newLines);
+  }
+
+  public handleDeleteLine(index)
+  {
+    const newLines = this.props.more.aggregations.delete(index);
+    BuilderActions.change(this.props.keyPath.push('aggregations'), newLines);
+  }
+
+  public handleLinesReorder(items)
+  {
+    const newOrder = items.map((line) => line.key);
+    const newLines = newOrder.map((index) =>
+    {
+      return this.props.more.aggregations.get(index);
+    });
+    BuilderActions.change(this.props.keyPath.push('aggregations'), newLines);
+  }
+
+  public getAggregationLines()
+  {
+    const lines: List<DraggableItem> = this.props.more.aggregations.map((agg, i) =>
+    {
+      return {
+        content: <PathfinderAggregationLine
+            pathfinderContext={this.props.pathfinderContext}
+            aggregation={agg}
+            keyPath={this.props.keyPath.push('aggregations').push(i)}
+            onDelete={this.handleDeleteLine}
+            index={i}
+            key={i}
+          />,
+        key: i,
+        draggable: true,
+        dragHandle: <DragHandle />,
+      };
+    }).toList();
+    return lines;
+  }
+
   public render()
   {
-
+    const { canEdit } = this.props.pathfinderContext;
     return (
       <div
-        className='pathfinder-section'
+        className='pf-section pf-more-section'
       >
+      <PathfinderSectionTitle
+        title={PathfinderText.moreSectionTitle}
+        text={PathfinderText.moreSectionSubtitle}
+      />
+      <DragAndDrop
+        draggableItems={this.getAggregationLines()}
+        onDrop={this.handleLinesReorder}
+        className='more-aggregations-drag-drop'
+      />
+      <PathfinderCreateLine
+        canEdit={canEdit}
+        onCreate={this.handleAddLine}
+        text={PathfinderText.createAggregationLine}
+      />
       </div>
     );
   }
 }
 
-export default PathfinderSourceSection;
+export default PathfinderMoreSection;

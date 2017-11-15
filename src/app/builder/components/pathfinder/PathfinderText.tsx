@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // Centralized place for text used in Pathfinder
+import {ADVANCED} from './PathfinderTypes';
 
 export const PathfinderText = {
 
@@ -59,6 +60,7 @@ export const PathfinderText = {
   createFilterLine: 'filter condition',
   createFilterGroup: 'group of filter conditions',
   createScoreLine: 'score factor',
+  createAggregationLine: 'metadata',
 
   findSectionTitle: 'Find',
   findSectionSubtitle: `
@@ -95,6 +97,41 @@ export const PathfinderText = {
   scoreStepSubtitle: `
 
   `,
+
+  aggregationAdvanced: {
+    [ADVANCED.Sigma]: {
+      key: 'sigma',
+      text: 'The standard deviation bounds should be ',
+      text2: ' standard deviations away from the average',
+      multiValue: false,
+
+    },
+    [ADVANCED.Compression]: {
+      text: 'Compression',
+      text2: '(A higher compression factor will lead to more accurate results)',
+      key: 'compression',
+      multiValue: false,
+
+    },
+    [ADVANCED.PercentileRanks]: {
+      text: 'Return the values at the following percentiles:',
+      text2: '',
+      key: 'percentiles',
+      multiValue: true,
+    },
+    [ADVANCED.Percentiles]: {
+      text: 'Return the percentiles of the following values:',
+      text2: '',
+      key: 'values',
+      multiValue: true,
+    },
+    [ADVANCED.SignficantDigits]: {
+      text: 'Returned values should be accurate to ',
+      text2: 'significant digits',
+      key: 'number_of_significant_value_digits',
+      multiValue: false,
+    },
+  },
 };
 
 export default PathfinderText;

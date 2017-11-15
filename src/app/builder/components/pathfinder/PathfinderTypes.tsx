@@ -84,7 +84,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { List, Map, Record } = Immutable;
 import { SchemaState } from 'schema/SchemaTypes';
-import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import ElasticBlockHelpers, { AutocompleteMatchType, FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
 
 export const PathfinderSteps =
@@ -109,7 +109,8 @@ export const _Path = (config?: { [key: string]: any }) =>
   path = path
     .set('source', _Source(path['source']))
     .set('score', _Score(path['score']))
-    .set('filterGroup', _FilterGroup(path['filterGroup']));
+    .set('filterGroup', _FilterGroup(path['filterGroup']))
+    .set('more', _More(path['more']));
   return path;
 };
 
@@ -202,9 +203,9 @@ class MoreC extends BaseClass
 export type More = MoreC & IRecord<MoreC>;
 export const _More = (config?: { [key: string]: any }) =>
 {
-  let more = New<More>(new MoreC(config), config);
+  let more = New<More>(new MoreC(config || {}), config);
   more = more
-    .set('aggregations', List(more.aggregations.map((agg) => _AggregationLine(agg))));
+    .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))));
   return more;
 };
 
@@ -216,12 +217,18 @@ class AggregationLineC extends BaseClass
   // e.g. type = Full Statistics, elasticType = extended_stats
   public elasticType: string = '';
   public type: string = '';
-  public advanced: any = {}; // TODO
+  public advanced: any = Map<string, any>({});
+  public expanded: boolean = false;
 }
 
 export type AggregationLine = AggregationLineC & IRecord<AggregationLineC>;
 export const _AggregationLine = (config?: { [key: string]: any }) =>
-  New<AggregationLine>(new AggregationLineC(config), config);
+ {
+   let aggregation = New<AggregationLine>(new AggregationLineC(config || {}), config);
+   aggregation = aggregation
+     .set('advanced', Map(aggregation['advanced']));
+   return aggregation;
+ };
 
 class FilterLineC extends LineC
 {
@@ -372,3 +379,77 @@ class ChoiceOptionC extends BaseClass
 export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
 export const _ChoiceOption = (config?: { [key: string]: any }) =>
   New<ChoiceOption>(new ChoiceOptionC(config), config);
+
+/*
+  Aggregation Types:
+*/
+
+// The advanced sections of aggregations have lines that fall into these types
+export enum ADVANCED {
+  Missing,
+  Sigma,
+  Percentiles,
+  PercentileRanks,
+  Compression,
+  SignficantDigits,
+}
+
+// The data that needs to be stored for each type of advanced field
+export const ADVANCED_MAPPINGS =
+{
+  [ADVANCED.Missing]: {missing: 0, ignoreMissing: true},
+  [ADVANCED.Sigma]: {sigma: 2},
+  [ADVANCED.Percentiles]: {percentiles: []},
+  [ADVANCED.PercentileRanks]: {values: []},
+  [ADVANCED.Compression]: {compression: 100},
+  [ADVANCED.SignficantDigits]: {number_of_significant_value_digits: 3},
+};
+
+interface AggregationData {
+  elasticType: string | List<string>; // Some (like facets) will have more than one elastic type
+  advanced: List<ADVANCED>; // Advanced settings that will appear in the expanded section
+  acceptedTypes: List<FieldType>; // The types of fields that can be aggregated on
+}
+
+// Each human readable aggregation type is mapped to its elastic type (or types),
+// the type of fields it can accept (numbers, text...), and the advanced fields it can accept
+export const AggregationTypes = Map<string, AggregationData>({
+  ['average of']:
+    {elasticType: 'avg', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date])},
+  minimum:
+    {elasticType: 'min', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date])},
+  maximum:
+    {elasticType: 'max', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date])},
+  ['sum of']:
+    {elasticType: 'sum', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date])},
+  ['number of values of']:
+    {elasticType: 'value_count', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Any])},
+  ['approx. number of values of']:
+    {elasticType: 'cardinality', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Any])},
+  ['geographic center of']:
+    {elasticType: 'geo_centroid', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Geopoint])},
+  ['geographic bounds of']:
+    {elasticType: 'geo_bounds', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Geopoint])},
+  ['percentiles of']:
+    {elasticType: 'percentiles', advanced:
+    List([ADVANCED.Missing, ADVANCED.Percentiles, ADVANCED.Compression, ADVANCED.SignficantDigits]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date])},
+  ['percentiles of values of']:
+    {elasticType: 'percentile_ranks', advanced:
+    List([ADVANCED.Missing, ADVANCED.PercentileRanks, ADVANCED.Compression, ADVANCED.SignficantDigits]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date])},
+  ['basic statistics for']:
+    {elasticType: 'stats', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date])},
+  ['full statistics for']:
+    {elasticType: 'extended_stats', advanced: List([ADVANCED.Missing, ADVANCED.Sigma]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date])},
+});

@@ -60,12 +60,12 @@ import TerrainStore from 'store/TerrainStore';
 import Util from 'util/Util';
 import ColorsActions from '../../../colors/data/ColorsActions';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
+import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
 import { _PathfinderContext, Path, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 import PathfinderStepSection from './step/PathfinderStepSection';
-import PathfinderMoreSection from './more/PathfinderMoreSection';
 
 export interface Props
 {
@@ -144,10 +144,12 @@ class PathfinderColumn extends TerrainComponent<Props>
           keyPath={keyPath.push('more')}
         />
 
-        <PathfinderStepSection
-          pathfinderContext={pathfinderContext}
-          path={path}
-        />
+      {
+        // <PathfinderStepSection
+        //         pathfinderContext={pathfinderContext}
+        //         path={path}
+        //       />
+      }
       </div>
     );
   }

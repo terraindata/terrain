@@ -121,7 +121,6 @@ export const _Query = (config?: object) =>
   config['aggregationList'] = Map<string, Aggregation>(config['aggregationList']);
   config['path'] = _Path(config['path']);
   const query = new Query_Record(config) as any as Query;
-
   return query;
 };
 
