@@ -69,6 +69,10 @@ describe('AnalyticsSelector', () =>
     }),
   });
 
+  const analyticsActions = {
+    fetchAvailableMetrics: jest.fn(),
+  };
+
   const analyticsConnection = 'My ElasticSearch Instance';
 
   let analyticsComponent = null;
@@ -83,6 +87,7 @@ describe('AnalyticsSelector', () =>
     analyticsComponent = shallow(
       <AnalyticsSelector
         analytics={analytics}
+        analyticsActions={analyticsActions}
         servers={servers}
         analyticsConnection={analyticsConnection}
         onMetricSelect={onMetricSelect}

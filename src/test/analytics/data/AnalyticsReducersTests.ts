@@ -84,6 +84,39 @@ describe('AnalyticsReducer', () =>
 
   const variantId = 1;
 
+  const availableMetrics = [
+    {
+      database: 1,
+      events: 'impression',
+      id: 2,
+      label: 'Impressions',
+    },
+    {
+      database: 1,
+      events: 'click',
+      id: 3,
+      label: 'Clicks\n',
+    },
+    {
+      database: 1,
+      events: 'conversion',
+      id: 4,
+      label: 'Conversions',
+    },
+    {
+      database: 1,
+      events: 'click,impression',
+      id: 5,
+      label: 'Click Through Rate',
+    },
+    {
+      database: 1,
+      events: 'conversion,impression',
+      id: 6,
+      label: 'Conversion Rate',
+    },
+  ];
+
   beforeEach(() =>
   {
     analytics = _AnalyticsState({});
@@ -238,6 +271,23 @@ describe('AnalyticsReducer', () =>
       });
 
       expect(nextState.pinnedVariants.get(variantId)).toEqual(false);
+    });
+  });
+
+  describe('#fetchAvailableMetricsSuccess', () =>
+  {
+    it('should handle analytics.fetchAvailableMetricsSuccess', () =>
+    {
+      const nextState = reducer(analytics, {
+        type: ActionTypes.fetchAvailableMetricsSuccess,
+        payload: {
+          availableMetrics,
+        },
+      });
+
+      expect(nextState.availableMetrics).toEqual(
+        analytics.availableMetrics.concat(availableMetrics),
+      );
     });
   });
 });
