@@ -50,30 +50,11 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import Ajax from 'util/Ajax';
 
-// import ActionTypes from 'etl/templates/data/TemplateEditorActionTypes';
 import { _TemplateEditorState, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import * as TemplateTypes from 'etl/templates/TemplateTypes';
 const { List, Map } = Immutable;
 
-// const TemplateEditorReducers = {};
-
-// TemplateEditorReducers[ActionTypes.setPreviewData] =
-//   (state, action) => {
-//     return state;
-//   };
-
-// const TemplateEditorReducersWrapper = (state: TemplateEditorState = _TemplateEditorState(), action) =>
-// {
-//   let nextState = state;
-//   if (TemplateEditorReducers[action.type])
-//   {
-//     nextState = TemplateEditorReducers[action.type](state, action);
-//   }
-//   return nextState;
-// }
-
-// export default TemplateEditorReducersWrapper;
-
+// inside some common file
 interface ObjectWithType
 {
   actionType: string;
@@ -85,8 +66,30 @@ interface WrappedPayload<T>
   payload: T;
 }
 
-abstract class ActionReducer<T extends ObjectWithType>
+interface HasKey<K, T>
 {
+  type: K;
+  payload: T & {actionType: K};
+}
+
+// type x = {
+//   y: {foo: string},
+//   b: {boo: string},
+// }
+// type z = x[keyof x]
+
+// const b: x['y'] = {foo: 'hi'};
+
+type ActionTypeUnion<T extends ObjectWithType> = T['actionType']; // union of all possible actionTypes
+type ConstrainedMap<T extends ObjectWithType, S> = // dictionary that must map all actionTypes and only actionTypes
+{
+  [key in ActionTypeUnion<T>]: (state, action: HasKey<key, T>) => S;
+}
+
+abstract class ActionReducer<T extends ObjectWithType, S>
+{
+  public abstract reducers: ConstrainedMap<T, S>;
+
   public act(action: T): WrappedPayload<T>
   {
     return {
@@ -99,11 +102,25 @@ abstract class ActionReducer<T extends ObjectWithType>
   {
     return this.act;
   }
+
+  public reducersForExport(_stateCreator): (state, action) => S
+  {
+    return (state: S = _stateCreator(), action) =>
+    {
+      let nextState = state;
+      if (this.reducers[action.type])
+      {
+        nextState = this.reducers[action.type](state, action);
+      }
+      return nextState;
+    }
+  }
 }
 
 // ...
 // ...
 // ...
+// inside the action reducer file
 
 interface ActionSetPreviewData
 {
@@ -118,69 +135,23 @@ interface ActionPlaceholder
   foo: any;
 }
 
-type ActionPayloadType = ActionSetPreviewData | ActionPlaceholder;
+type Actions = ActionSetPreviewData | ActionPlaceholder;
 
-class TemplateEditorActionsClass extends ActionReducer<ActionPayloadType>
+class TemplateEditorActionsClass extends ActionReducer<Actions, TemplateEditorState>
 {
-  public overrideAction(action)
+  public reducers: ConstrainedMap<Actions, TemplateEditorState> =
   {
-    return undefined;
+    setPreviewData: (state, action) => {
+      console.log('you called setPreviewData');
+      return state;
+    },
+    placeholder: (state, action) => {
+      console.log('you called placeholder');
+      return state;
+    }
   }
 }
 
-export const TemplateEditorActions = (new TemplateEditorActionsClass()).actionsForExport();
-
-// interface Named
-// {
-//   type: 'hello';
-// }
-
-// function nameof<T>(name: keyof T)
-// {
-//   return name;
-// }
-
-type test = ActionPayloadType['actionType']
-
-type Reducer =
-{
-  [key in test]: string;
-}
-
-const Reducers: Reducer =
-{
-  setPreviewData: 'hello',
-  placeholder: 'yo',
-}
-
-// function execute(actionType: test)
-// {
-//   // if (Reducers[actionType] === undefined)
-//   // {
-//   //   const _unreachable: never = actionType;
-//   // }
-//   return Reducers[actionType];
-// }
-
-// // ...
-// // ...
-
-const TemplateEditorReducers = {};
-
-TemplateEditorReducers['setPreviewData'] = (state: TemplateEditorState, action) =>
-  {
-    console.log(state);
-    return state;
-  };
-
-const TemplateEditorReducersWrapper = (state: TemplateEditorState = _TemplateEditorState(), action) =>
-{
-  let nextState = state;
-  if (TemplateEditorReducers[action.type])
-  {
-    nextState = TemplateEditorReducers[action.type](state, action);
-  }
-  return nextState;
-};
-
-export default TemplateEditorReducersWrapper;
+const ActionReducerInstance = new TemplateEditorActionsClass();
+export const TemplateEditorActions = ActionReducerInstance.actionsForExport();
+export const TemplateEditorReducers = ActionReducerInstance.reducersForExport(_TemplateEditorState);
