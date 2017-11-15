@@ -1298,7 +1298,23 @@ export class Import
         {
           if (node !== null)
           {
-            node = new Date(Date.parse(node)).toISOString();
+            const isMMDDYYYYFormat = new RegExp(/^((0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4}))$/);
+            if (isMMDDYYYYFormat.test(node))
+            {
+              try
+              {
+                const splitDate: string[] = node.split('/');
+                node = new Date(Date.parse([splitDate[2], splitDate[0], splitDate[1]].join('-'))).toISOString();
+              }
+              catch (e)
+              {
+                // do nothing
+              }
+            }
+            else
+            {
+              node = new Date(Date.parse(node)).toISOString();
+            }
           }
           return node;
         },
