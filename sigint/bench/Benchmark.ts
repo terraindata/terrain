@@ -48,14 +48,10 @@ import benchrest = require('bench-rest');
 import jsurl = require('jsurl');
 import winston = require('winston');
 
-import { startServer } from './Server';
-
-let host = 'http://127.0.0.1:43002';
-
 const batchSize = 100;
 const batchRequests: any[] = [];
 
-function generateBenchmarkData()
+export function generateBenchmarkData()
 {
   const visitors = ['2329090446', '2329090447', '2329090448', '2329090449'];
   const variants = ['125', '126', '225', '240'];
@@ -70,7 +66,7 @@ function generateBenchmarkData()
   }
 }
 
-async function runBenchmark()
+export async function runBenchmark(host: string)
 {
   const flow = {
     main: [
@@ -116,7 +112,7 @@ async function runBenchmark()
   });
 }
 
-async function runBatchBenchmark()
+export async function runBatchBenchmark(host: string)
 {
   const batchFlow = {
     main: [
@@ -159,31 +155,3 @@ async function runBatchBenchmark()
       });
   });
 }
-
-// =========================================================================
-
-(async () =>
-{
-  if (process.argv.length > 2)
-  {
-    host = process.argv[2];
-    winston.info('Using specified server address: ' + host);
-  }
-  else
-  {
-    // if no host was specified, start a local server
-    // tslint:disable-next-line:no-floating-promises
-    startServer();
-  }
-
-  generateBenchmarkData();
-
-  const s1 = await runBenchmark();
-  winston.info(JSON.stringify(s1));
-
-  const s2 = await runBatchBenchmark();
-  winston.info(JSON.stringify(s2));
-
-  // TODO: shutdown server gracefully
-  process.exit(0);
-})();
