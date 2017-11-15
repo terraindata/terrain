@@ -514,6 +514,7 @@ export class ResultsManager extends TerrainComponent<Props>
       },
     );
 
+    // Looks at first 100 results to get fields 
     let fieldsSet = Set<string>([]);
     if (hits && hits.size >= 0)
     {
