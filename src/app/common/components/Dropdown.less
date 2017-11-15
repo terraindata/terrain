@@ -91,14 +91,22 @@
     padding-top: 2px;
     
     border: 1px solid;
-    
+  svg {
+        height: 14px;
+        width: 14px;
+        margin-right: 6px;
+        position: relative;
+        top: 1px;
+      }
     .dropdown-option-inner {
       // we keep even the unselected ones around so that the width of
       //  the dropdown can take the width of the widest one
       padding: 0px;
       margin: 0px;
       opacity: 0;
-
+      &.dropdown-option-inner-hidden {
+        display: none;
+      }
       &.dropdown-option-value-selected {
         display: block;
         padding-top: 15px;
@@ -162,6 +170,13 @@
 
  .dropdown-option-inner {
     padding-top: 4px;
+    svg {
+      height: 14px;
+      width: 14px;
+      margin-right: 6px;
+      position: relative;
+      top: 1px;
+    }
  }
 
  &.dropdown-center {
