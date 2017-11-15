@@ -66,24 +66,10 @@ interface WrappedPayload<T>
   payload: T;
 }
 
-interface HasKey<K, T>
-{
-  type: K;
-  payload: T & {actionType: K};
-}
-
-// type x = {
-//   y: {foo: string},
-//   b: {boo: string},
-// }
-// type z = x[keyof x]
-
-// const b: x['y'] = {foo: 'hi'};
-
 type ActionTypeUnion<T extends ObjectWithType> = T['actionType']; // union of all possible actionTypes
 type ConstrainedMap<T extends ObjectWithType, S> = // dictionary that must map all actionTypes and only actionTypes
 {
-  [key in ActionTypeUnion<T>]: (state, action: HasKey<key, T>) => S;
+  [key in ActionTypeUnion<T>]: (state, action) => S;
 }
 
 abstract class ActionReducer<T extends ObjectWithType, S>
