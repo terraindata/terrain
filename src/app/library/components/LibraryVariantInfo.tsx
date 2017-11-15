@@ -115,6 +115,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       Ajax.getVariantStatus(
         variant.id,
         variant.db.id as number,
+        variant.deployedName,
         (response) =>
         {
           this.setState({ variantStatus: response });

@@ -94,7 +94,7 @@ Router.get('/live', passport.authenticate('access-token-local'), async (ctx, nex
 
 Router.get('/live/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const status: string = await items.checkVariantInES(ctx.params.id, parseInt(ctx.query.dbid as string, 10));
+  const status: string = await items.checkVariantInES(ctx.params.id, parseInt(ctx.query.dbid as string, 10), String(ctx.query.deployedName));
   ctx.body = JSON.stringify(status);
 });
 

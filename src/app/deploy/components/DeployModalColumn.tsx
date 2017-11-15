@@ -112,6 +112,13 @@ class DeployModalColumn extends TerrainComponent<Props>
     deployedName: '',
   };
 
+  public componentWillMount()
+  {
+    this.setState({
+      deployedName: this.props.deployedName
+    });
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
     console.log('will receive props:');
@@ -126,7 +133,7 @@ class DeployModalColumn extends TerrainComponent<Props>
         nextDeployedName = nextProps.variant.deployedName;
       }
 
-      console.log('lee '+nextProps.deployedName);
+      console.log('lee ' + nextProps.deployedName);
       this.setState({
         confirmChecked: false,
         deployedName: nextDeployedName,
@@ -138,7 +145,7 @@ class DeployModalColumn extends TerrainComponent<Props>
   {
     this.props.onDeployedNameChange(e.target.value);
     this.setState({
-        deployedName: e.target.value
+        deployedName: e.target.value,
     });
   }
 

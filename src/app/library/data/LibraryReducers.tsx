@@ -151,11 +151,15 @@ LibraryReducers[ActionTypes.variants.create] =
     );
 
 LibraryReducers[ActionTypes.variants.change] =
-  (state, action) =>
-    state.setIn(
+  (state, action) => {
+    console.log('in v change');
+    console.log(action.payload.variant.id);
+    console.log(action.payload.variant);
+    return state.setIn(
       ['variants', action.payload.variant.id],
       action.payload.variant,
     );
+  };
 
 LibraryReducers[ActionTypes.variants.status] =
   (state, action) =>

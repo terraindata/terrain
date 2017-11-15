@@ -280,26 +280,25 @@ const Actions =
       deploy:
       (variant: Variant, op: string, templateBody: object, toStatus: ItemStatus, deployedName: string) => (dispatch) =>
       {
-        variant = variant.set('deployedName', deployedName);
-        Actions.variants.change(variant);
-        console.log('updated variant:');
-        console.log(variant);
+        if (variant.deployedName !== deployedName)
+        {
+            variant = variant.set('deployedName', deployedName);
+            console.log('updated variant:');
+            console.log(variant);
+            dispatch(Actions.variants.change(variant));
+        }
 
-        Ajax.saveItem(
-          variant,
+        Ajax.deployQuery(
+          op,
+          templateBody,
+          variant.db,
           (response) =>
           {
-            Ajax.deployQuery(
-              op,
-              templateBody,
-              variant.db,
-              (response) =>
-              {
-                // on load
-                dispatch(Actions.variants.status(variant, toStatus, true));
-              },
-            );
-          }
+            // on load
+            dispatch(Actions.variants.status(variant, toStatus, true));
+            console.log('floop');
+            console.log(variant);
+          },
         );
       },
 

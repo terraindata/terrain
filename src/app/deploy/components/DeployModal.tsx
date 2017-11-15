@@ -153,7 +153,7 @@ class DeployModal extends TerrainComponent<Props>
           template,
         },
       };
-      TerrainStore.dispatch(LibraryActions.variants.deploy(variant.set('deployedName', this.state.deployedName), 'putTemplate', body, changingStatusTo, this.state.deployedName));
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'putTemplate', body, changingStatusTo, this.state.deployedName));
     }
     else if ((changingStatusTo !== ItemStatus.Live && variant.status === 'LIVE')
       || (changingStatusTo !== ItemStatus.Default && variant.status === 'DEFAULT'))
@@ -204,6 +204,7 @@ class DeployModal extends TerrainComponent<Props>
 
   public handleDeployedNameChange(deployedName: string)
   {
+    console.log('parent handle deployed name change ' + deployedName);
     this.setState({
       deployedName,
     });
@@ -216,7 +217,7 @@ class DeployModal extends TerrainComponent<Props>
       return null;
     }
 
-    console.log('rendering, this stae dn = '+this.state.deployedName);
+    console.log('rendering, this stae dn = ' + this.state.deployedName);
 
     const { changingStatus, changingStatusOf, changingStatusTo } = this.state;
     const name = (changingStatusOf && changingStatusOf.name);
