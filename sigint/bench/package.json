@@ -4,6 +4,9 @@
   "description": "Terrain Analytics Server Stress Testing Framework",
   "main": "runBench.js",
   "private": true,
+  "scripts": {
+    "bench": "ts-node -P ../ Main.ts"
+  },
   "repository": {
     "type": "git",
     "url": "http://git.terrain.int/terrain/Search"
@@ -18,6 +21,8 @@
   },
   "devDependencies": {
     "serverless-google-cloudfunctions": "^1.1.1",
-    "serverless-plugin-typescript": "^1.1.3"
+    "serverless-plugin-typescript": "^1.1.3",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.6.1"
   }
 }
