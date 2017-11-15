@@ -740,8 +740,7 @@ describe('File import route tests', () =>
       .field('accessToken', 'ImAnAdmin')
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
-        col1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
-        col2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+        col1: { type: 'text' },
         col3: { type: 'boolean' },
         col4: { type: 'date' },
       }))
@@ -805,9 +804,9 @@ describe('File import route tests', () =>
       .field('accessToken', 'ImAnAdmin')
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
-        column1: { type: 'text' },
-        column3: { type: 'boolean' },
-        column4: { type: 'date' },
+        col1: { type: 'text' },
+        col3: { type: 'boolean' },
+        col4: { type: 'date' },
       }))
       .field('dbid', '1')
       .field('dbname', 'test_elastic_db')
@@ -818,7 +817,23 @@ describe('File import route tests', () =>
       .field('originalNames', JSON.stringify(['pkey', 'column1', 'column2', 'column3', 'column4']))
       .field('primaryKeys', JSON.stringify(['pkey']))
       .field('tablename', 'fileImportTestTable')
-      .field('transformations', JSON.stringify([]))
+      .field('transformations', JSON.stringify([
+        {
+          name: 'rename',
+          colName: 'column1',
+          args: { newName: 'col1' },
+        },
+        {
+          name: 'rename',
+          colName: 'column3',
+          args: { newName: 'col3' },
+        },
+        {
+          name: 'rename',
+          colName: 'column4',
+          args: { newName: 'col4' },
+        },
+      ]))
       .field('update', 'false')
       .expect(200)
       .then(async (response) =>
@@ -841,16 +856,16 @@ describe('File import route tests', () =>
           expect(result['hits']['hits'][0]['_source'])
             .toMatchObject({
               pkey: 3,
-              column1: 'hi',
-              column3: false,
-              column4: new Date(Date.parse('1970-01-01')).toISOString(),
+              col1: 'hi',
+              col3: false,
+              col4: new Date(Date.parse('1970-01-01')).toISOString(),
             });
           expect(result['hits']['hits'][1]['_source'])
             .toMatchObject({
               pkey: 2,
-              column1: 'bye',
-              column3: null,
-              column4: null,
+              col1: 'bye',
+              col3: null,
+              col4: null,
             });
         }
         catch (e)
@@ -872,6 +887,7 @@ describe('File import route tests', () =>
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
         col1: { type: 'text' },
+        col2: { type: 'text' },
         col3: { type: 'boolean' },
         col4: { type: 'date' },
       }))
@@ -922,8 +938,8 @@ describe('File export templates route tests', () =>
           columnTypes:
           {
             pkey: { type: 'long' },
-            column1: { type: 'text' },
-            column2: { type: 'text' },
+            column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
           },
           primaryKeys: ['pkey'],
           transformations: [],
@@ -948,8 +964,8 @@ describe('File export templates route tests', () =>
             columnTypes:
             {
               pkey: { type: 'long' },
-              column1: { type: 'text' },
-              column2: { type: 'text' },
+              column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
             },
             primaryKeys: ['pkey'],
             transformations: [],
@@ -988,8 +1004,8 @@ describe('File export templates route tests', () =>
           columnTypes:
           {
             pkey: { type: 'long' },
-            column1: { type: 'text' },
-            column2: { type: 'text' },
+            column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
           },
           primaryKeys: ['pkey'],
           transformations: [],

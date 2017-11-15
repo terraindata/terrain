@@ -82,7 +82,7 @@ export class FieldTypes
     {
 
       let type: object = { type: 'text', fields: { keyword: { type: 'text', index: true, analyzer: 'standard' } } };
-      const analyzed: boolean = value['index'] === 'analyzed' ? true : false;
+      const analyzed: boolean = value['index'] === 'not_analyzed' ? false : true; // by default analyze all fields
       const analyzer: string = value['analyzer'] !== null ? value['analyzer'] : 'standard';
       switch (value['type'])
       {

@@ -1265,15 +1265,21 @@ export class Import
               return thisReject('Failed to apply transforms: ' + String(e));
             }
             // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
+            const specifiedColumnItem: object = {};
+            Object.keys(imprt.columnTypes).forEach((name) =>
+            {
+              specifiedColumnItem[name] = item[name];
+            });
+
             if (dontCheck !== true)
             {
-              const typeError: string = this._checkTypes(item, imprt);
+              const typeError: string = this._checkTypes(specifiedColumnItem, imprt);
               if (typeError !== '')
               {
                 return thisReject(typeError);
               }
             }
-            const trimmedItem: object = this._convertDateToESDateAndTrim(item, imprt.columnTypes);
+            const trimmedItem: object = this._convertDateToESDateAndTrim(specifiedColumnItem, imprt.columnTypes);
             transformedItems.push(trimmedItem);
           }
           thisResolve(transformedItems);
