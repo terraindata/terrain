@@ -91,6 +91,9 @@ interface WrappedPayload<ActionT>
   payload: ActionT;
 }
 
+export type ActPayload<AllActionsT extends AllActionsType<AllActionsT>> =
+  WrappedPayload<Unroll<AllActionsT>> | ((dispatch) => WrappedPayload<Unroll<AllActionsT>>);
+
 // The type of 'action' that a reducer operates on. This is actually the same type as WrappedPayload
 interface ReducerPayload<Key extends keyof AllActionsT, AllActionsT>
 {
@@ -113,12 +116,12 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
   public abstract reducers: ConstrainedMap<AllActionsT, StateType>;
 
   // child class should override this for special actions
-  public overrideAct(action: Unroll<AllActionsT>): WrappedPayload<Unroll<AllActionsT>>
+  public overrideAct(action: Unroll<AllActionsT>): ActPayload<AllActionsT>
   {
     return undefined;
   }
 
-  public _act(action: Unroll<AllActionsT>): WrappedPayload<Unroll<AllActionsT>>
+  public _act(action: Unroll<AllActionsT>): ActPayload<AllActionsT>
   {
     const override = this.overrideAct(action);
     if (override !== undefined)
@@ -149,3 +152,6 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     };
   }
 }
+
+// Type query utility to get the type of an action.
+export type GetType<K extends ActionTypeUnion<AllActionsT>, AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[K];
