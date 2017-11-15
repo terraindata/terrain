@@ -47,13 +47,13 @@ THE SOFTWARE.
 import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
+import { json } from 'd3-request';
 import * as csv from 'fast-csv';
 import * as _ from 'lodash';
 import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { json } from 'd3-request';
 import * as SharedElasticUtil from '../../../../shared/database/elastic/ElasticUtil';
 import { FieldTypes } from '../../../../shared/etl/FieldTypes';
 import * as SharedUtil from '../../../../shared/Util';
@@ -101,8 +101,6 @@ export class Import
     date: new Set(['text', 'date']),
     nested: new Set(['nested']),
     geo_point: new Set(['array', 'geo_point']),
-    // object: new Set(['object', 'nested']),
-    // nested: new Set(['nested']),
   };
   private MAX_ACTIVE_READS: number = 3;
   private MAX_ALLOWED_QUEUE_SIZE: number = 3;
@@ -896,17 +894,7 @@ export class Import
   /* converts type specification from ImportConfig into ES mapping format (ready to insert using ElasticDB.putMapping()) */
   private async _getMappingForSchema(imprt: ImportConfig): Promise<object>
   {
-    return new Promise<object>(async (resolve, reject) =>
-    {
-      // create mapping containing new fields
-      // const mapping: object = {};
-      // Object.keys(imprt.columnTypes).forEach((val) =>
-      // {
-      //   mapping[val] = this._getESType(imprt.columnTypes[val]);
-      // });
-      resolve(await fieldTypes.getESMappingFromDocument(imprt.columnTypes));
-      // return this._getMappingForSchemaHelper(mapping);
-    });
+    return fieldTypes.getESMappingFromDocument(imprt.columnTypes);
   }
 
   /* recursive helper function for _getMappingForSchema(...)
