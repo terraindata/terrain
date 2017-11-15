@@ -52,85 +52,8 @@ import Ajax from 'util/Ajax';
 
 import { _TemplateEditorState, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import * as TemplateTypes from 'etl/templates/TemplateTypes';
+import { AllActionsType, ConstrainedMap, TerrainRedux } from 'src/app/store/TerrainRedux';
 const { List, Map } = Immutable;
-
-// inside some common file
-
-// The type that defines all the possible action payloads
-// Also asserts that the key is the same as the actionType
-type AllActionsType<SelfT> =
-{
-  [key in keyof SelfT]: {actionType: key, [other: string]: any}
-}
-
-// Unrolls AllActionsT into a union of its members
-type Unroll<AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[keyof AllActionsT]
-
-// The type returned by an action whose payload is ActionT
-interface WrappedPayload<ActionT>
-{
-  type: string;
-  payload: ActionT;
-}
-
-// The type of 'action' that a reducer operates on. This is actually the same type as WrappedPayload
-interface ReducerPayload<Key extends keyof AllActionsT, AllActionsT>
-{
-  type: Key;
-  payload: AllActionsT[Key];
-}
-
-// union of all possible actionTypes strings
-type ActionTypeUnion<AllActionsT extends AllActionsType<AllActionsT>> = Unroll<AllActionsT>['actionType'];
-
-// dictionary that must map all actionTypes and only actionTypes
-// reducers must adhere to this map
-type ConstrainedMap<AllActionsT extends AllActionsType<AllActionsT>, S> =
-{
-  [key in ActionTypeUnion<AllActionsT>]: (state: S, action: ReducerPayload<key, AllActionsT>) => S;
-}
-
-abstract class ActionReducer<AllActionsT extends AllActionsType<AllActionsT>, StateType>
-{
-  public abstract reducers: ConstrainedMap<AllActionsT, StateType>;
-
-  // child class should override this for special actions
-  public overrideAct(action: Unroll<AllActionsT>): WrappedPayload<Unroll<AllActionsT>>
-  {
-    return undefined;
-  }
-
-  public _act(action: Unroll<AllActionsT>): WrappedPayload<Unroll<AllActionsT>>
-  {
-    const override = this.overrideAct(action);
-    if (override !== undefined)
-    {
-      return override;
-    }
-    return {
-      type: (action as any).actionType, // Can't seem to find a way around this type assertion
-      payload: action,
-    }
-  }
-
-  public _actionsForExport(): (action: Unroll<AllActionsT>) => any
-  {
-    return this._act.bind(this);
-  }
-
-  public _reducersForExport(_stateCreator): (state, action) => StateType
-  {
-    return (state: StateType = _stateCreator(), action) =>
-    {
-      let nextState = state;
-      if (this.reducers[action.type])
-      {
-        nextState = this.reducers[action.type](state, action);
-      }
-      return nextState;
-    }
-  }
-}
 
 // below would be in the actual implementation file for the actions/reducers:
 
@@ -139,7 +62,7 @@ interface ActionParamTypes extends AllActionsType<ActionParamTypes>
   setPreviewData: {
     actionType: 'setPreviewData';
     preview: any;
-    originalNames: any;
+    originalNames?: any;
   },
   placeholder: {
     actionType: 'placeholder';
@@ -147,7 +70,7 @@ interface ActionParamTypes extends AllActionsType<ActionParamTypes>
   }
 }
 
-class TemplateEditorActionsClass extends ActionReducer<ActionParamTypes, TemplateEditorState>
+class TemplateEditorActionsClass extends TerrainRedux<ActionParamTypes, TemplateEditorState>
 {
   public reducers: ConstrainedMap<ActionParamTypes, TemplateEditorState> =
   {
