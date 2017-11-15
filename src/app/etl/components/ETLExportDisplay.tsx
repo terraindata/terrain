@@ -76,11 +76,12 @@ class ETLExportDisplay extends TerrainComponent<Props>
       actionType: 'setPreviewData',
       preview: 'hi',
       originalNames: 'also hi',
-    })
+    });
   }
 
   public render()
   {
+    console.log(this.props.templateEditor.previewData);
     return <div onClick={this.test}> hello there </div>;
   }
 }

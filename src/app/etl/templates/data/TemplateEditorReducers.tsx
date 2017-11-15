@@ -84,30 +84,41 @@ interface ReducerPayload<Key extends keyof AllActionsT, AllActionsT>
 type ActionTypeUnion<AllActionsT extends AllActionsType<AllActionsT>> = Unroll<AllActionsT>['actionType'];
 
 // dictionary that must map all actionTypes and only actionTypes
-// reducers must follow this pattern
+// reducers must adhere to this map
 type ConstrainedMap<AllActionsT extends AllActionsType<AllActionsT>, S> =
 {
-  [key in ActionTypeUnion<AllActionsT>]: (state, action: ReducerPayload<key, AllActionsT>) => S;
+  [key in ActionTypeUnion<AllActionsT>]: (state: S, action: ReducerPayload<key, AllActionsT>) => S;
 }
 
 abstract class ActionReducer<AllActionsT extends AllActionsType<AllActionsT>, StateType>
 {
   public abstract reducers: ConstrainedMap<AllActionsT, StateType>;
 
-  public act(action: Unroll<AllActionsT>): WrappedPayload<Unroll<AllActionsT>>
+  // child class should override this for special actions
+  public overrideAct(action: Unroll<AllActionsT>): WrappedPayload<Unroll<AllActionsT>>
   {
+    return undefined;
+  }
+
+  public _act(action: Unroll<AllActionsT>): WrappedPayload<Unroll<AllActionsT>>
+  {
+    const override = this.overrideAct(action);
+    if (override !== undefined)
+    {
+      return override;
+    }
     return {
-      type: (action as any).actionType,
+      type: (action as any).actionType, // Can't seem to find a way around this type assertion
       payload: action,
     }
   }
 
-  public actionsForExport(): (action: Unroll<AllActionsT>) => any
+  public _actionsForExport(): (action: Unroll<AllActionsT>) => any
   {
-    return this.act;
+    return this._act.bind(this);
   }
 
-  public reducersForExport(_stateCreator): (state, action) => StateType
+  public _reducersForExport(_stateCreator): (state, action) => StateType
   {
     return (state: StateType = _stateCreator(), action) =>
     {
@@ -120,6 +131,8 @@ abstract class ActionReducer<AllActionsT extends AllActionsType<AllActionsT>, St
     }
   }
 }
+
+// below would be in the actual implementation file for the actions/reducers:
 
 interface ActionParamTypes extends AllActionsType<ActionParamTypes>
 {
@@ -139,16 +152,14 @@ class TemplateEditorActionsClass extends ActionReducer<ActionParamTypes, Templat
   public reducers: ConstrainedMap<ActionParamTypes, TemplateEditorState> =
   {
     setPreviewData: (state, action) => {
-      console.log('you called setPreviewData');
-      return state;
+      return state.set('previewData', action.payload.preview);
     },
     placeholder: (state, action) => {
-      console.log('you called placeholder');
       return state;
     },
   }
 }
 
 const ActionReducerInstance = new TemplateEditorActionsClass();
-export const TemplateEditorActions = ActionReducerInstance.actionsForExport();
-export const TemplateEditorReducers = ActionReducerInstance.reducersForExport(_TemplateEditorState);
+export const TemplateEditorActions = ActionReducerInstance._actionsForExport();
+export const TemplateEditorReducers = ActionReducerInstance._reducersForExport(_TemplateEditorState);
