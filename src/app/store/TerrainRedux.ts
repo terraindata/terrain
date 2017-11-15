@@ -79,10 +79,10 @@ THE SOFTWARE.
 export type AllActionsType<SelfT> =
 {
   [key in keyof SelfT]: {actionType: key, [other: string]: any}
-}
+};
 
 // Unrolls AllActionsT into a union of its members
-type Unroll<AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[keyof AllActionsT]
+type Unroll<AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[keyof AllActionsT];
 
 // The type returned by an action whose payload is ActionT
 interface WrappedPayload<ActionT>
@@ -106,7 +106,7 @@ type ActionTypeUnion<AllActionsT extends AllActionsType<AllActionsT>> = Unroll<A
 export type ConstrainedMap<AllActionsT extends AllActionsType<AllActionsT>, S> =
 {
   [key in ActionTypeUnion<AllActionsT>]: (state: S, action: ReducerPayload<key, AllActionsT>) => S;
-}
+};
 
 export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActionsT>, StateType>
 {
@@ -128,7 +128,7 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     return {
       type: (action as any).actionType, // Can't seem to find a way around this type assertion
       payload: action,
-    }
+    };
   }
 
   public _actionsForExport(): (action: Unroll<AllActionsT>) => any
@@ -146,6 +146,6 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
         nextState = this.reducers[action.type](state, action);
       }
       return nextState;
-    }
+    };
   }
 }
