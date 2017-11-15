@@ -47,7 +47,8 @@ THE SOFTWARE.
 import winston from 'winston';
 import * as Benchmark from './Benchmark';
 
-exports.runBench = async (request, response) => {
+exports.runBench = async (request, response) =>
+{
   let host;
   if (request.body.host !== undefined)
   {
@@ -81,7 +82,7 @@ exports.runBench = async (request, response) => {
   catch (err)
   {
     response.status(500).send({
-      error: 'Error running benchmark: ' + err,
+      error: 'Error running benchmark: ' + String(err),
     });
   }
 };
