@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as csvString from 'csv-string';
+import * as _ from 'lodash';
 import * as stream from 'stream';
 
 import { CSVTypeParser, isTypeConsistent } from '../Util';
@@ -69,10 +70,7 @@ export class FieldTypes
       const valueKeyArr: string[] = Object.keys(value);
       for (const key of valueKeyArr)
       {
-        if (key in valueKeyArr)
-        {
-          documentMapping['properties'][key] = await this.getESTypeFromFullType(value[key]);
-        }
+        documentMapping['properties'][key] = await this.getESTypeFromFullType(value[key]);
       }
       return resolve(documentMapping);
     });
@@ -104,19 +102,19 @@ export class FieldTypes
         case 'null': // treat as text
           type = {
             type: analyzed ? 'text' : 'keyword', index: true, fields:
-              {
-                keyword: analyzed ? { type: 'keyword', index: analyzed, analyzer }
-                  : { type: 'keyword', index: true, ignore_above: 256 },
-              },
+            {
+              keyword: analyzed ? { type: 'keyword', index: analyzed }
+                : { type: 'keyword', index: true, ignore_above: 256 },
+            },
           };
           break;
         case 'text':
           type = {
             type: analyzed ? 'text' : 'keyword', index: true, fields:
-              {
-                keyword: analyzed ? { type: 'keyword', index: analyzed, analyzer }
-                  : { type: 'keyword', index: true, ignore_above: 256 },
-              },
+            {
+              keyword: analyzed ? { type: 'keyword', index: analyzed }
+                : { type: 'keyword', index: true, ignore_above: 256 },
+            },
           };
           if (analyzed)
           {
@@ -273,23 +271,27 @@ export class FieldTypes
         }
         else
         {
-          const fieldType: object | string = await this._getFieldTypeFromLine(contents);
-          if (typeof fieldType === 'object')
+          let fieldTypeObjStr: object | string = await this._getFieldTypeFromChunk(contents);
+          if (typeof fieldTypeObjStr === 'object')
           {
-            completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldType as object);
+            completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldTypeObjStr as object);
           }
           for (let i = 1; i < chunkSplitArr.length - 1; ++i)
           {
-            const fieldType: object | string = await this._getFieldTypeFromLine(contents);
-            if (typeof fieldType === 'object')
+            fieldTypeObjStr = await this._getFieldTypeFromChunk(contents);
+            if (typeof fieldTypeObjStr === 'object')
             {
-              completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldType as object);
+              completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldTypeObjStr as object);
             }
           }
           if (chunkSplitArr.length >= 2)
           {
             contents = chunkSplitArr[chunkSplitArr.length - 1];
           }
+          else
+          {
+            contents = '';
+          }
 
         }
       });
@@ -300,64 +302,32 @@ export class FieldTypes
       });
       file.on('end', async () =>
       {
-        if (contents !== 0)
+        if (contents.length !== 0)
         {
-          const fieldType: object | string = await this._getFieldTypeFromLine(contents);
-          if (typeof fieldType === 'object')
+          const fieldTypeObjStr: object | string = await this._getFieldTypeFromChunk(contents);
+          if (typeof fieldTypeObjStr === 'object')
           {
-            completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldType as object);
+            completeFieldTypeObj = await this._compareFieldTypeObjs(completeFieldTypeObj, fieldTypeObjStr as object);
           }
         }
-        writeFile.write(completeFieldTypeObj);
+        completeFieldTypeObj = this._replaceNullWithText(completeFieldTypeObj);
+        writeFile.write(JSON.stringify(Object.keys(completeFieldTypeObj)));
+        writeFile.write('\n');
+        writeFile.write(JSON.stringify(completeFieldTypeObj));
         writeFile.end();
         resolve(writeFile);
       });
-
-      /*
-      let contents: string = '';
-      const writeFile = new stream.PassThrough();
-      const newlineSplitOptions: string[] = ['\r\n', '\n'];
-
-      file.on('data', async (chunk) =>
-      {
-        const chunkStr: string = chunk.toString();
-        let hasNextLine: boolean = false;
-        let chunkSplitArr: string[] = [];
-        for (const newlineSplit of newlineSplitOptions)
-        {
-          chunkSplitArr = chunkStr.split(newlineSplit);
-          if (chunkSplitArr.length > 1) // chunk also includes next line
-          {
-            contents += chunkSplitArr[0];
-            hasNextLine = true;
-            break;
-          }
-        }
-        if (!hasNextLine)
-        {
-          contents += chunkStr;
-        }
-        else
-        {
-          writeFile.write(await this._getFieldTypeFromLine(contents));
-          for (let i = 1; i < chunkSplitArr.length; ++i)
-          {
-            writeFile.write(await this._getFieldTypeFromLine(chunkSplitArr[i]));
-          }
-        }
-      });
-      file.on('error', async (e) =>
-      {
-        writeFile.end();
-        return reject(e);
-      });
-      file.on('end', async () =>
-      {
-        writeFile.end();
-        resolve(writeFile);
-      });
-      */
     });
+  }
+
+  public getInnermostType(arrayType: object, stopNested?: boolean): string
+  {
+    while (arrayType['type'] === 'array' && arrayType['innerType'] !== undefined && typeof arrayType['innerType'] === 'object'
+      && !(stopNested !== undefined && arrayType['type'] === 'nested'))
+    {
+      arrayType = arrayType['innerType'];
+    }
+    return arrayType['type'];
   }
 
   public async getJSONFromMySQLFormatStream(files: stream.Readable[] | stream.Readable, params: object): Promise<stream.Readable>
@@ -483,25 +453,64 @@ export class FieldTypes
     });
   }
 
+  private async _chooseBestType(types: object[]): Promise<object>
+  {
+    return new Promise<object>(async (resolve, reject) =>
+    {
+      const typeSet = new Set(types.map((typeObj) => typeObj['type']));
+      if (typeSet.size === 1 && !typeSet.has('array') && !typeSet.has('nested')) // base case: only 1 type and it's not array or nested
+      {
+        const regularTypes: object[] = types.filter((typeObj) => (typeObj['type'] !== 'array' && typeObj['type'] !== 'nested'));
+        return resolve(regularTypes[0]);
+      }
+      else if (typeSet.size === 1 && typeSet.has('nested')) // nested only
+      {
+        const nestedTypeObjs: object[] = types.filter((typeObj) => typeObj['type'] === 'nested').map((typeObj) => typeObj['innerType']);
+        let origNestedTypeObj: object = nestedTypeObjs[0];
+        for (let i = 1; i < nestedTypeObjs.length; ++i) // do an iterative compare and find the best mapping within the nested object
+        {
+          origNestedTypeObj = await this._compareFieldTypeObjs(origNestedTypeObj, nestedTypeObjs[i]);
+        }
+        return resolve({ type: 'nested', innerType: origNestedTypeObj });
+      }
+      else if (typeSet.size === 1 && typeSet.has('array'))
+      {
+        const arrayTypeObjs: object[] = types.filter((typeObj) => typeObj['type'] === 'array').map((typeObj) => typeObj['innerType']);
+        const innerArrayTypeObj: object = await this._chooseBestType(arrayTypeObjs);
+        return resolve({ type: 'array', innerType: innerArrayTypeObj });
+      }
+      else if (typeSet.size === 2 && typeSet.has('double') && typeSet.has('long'))
+      {
+        return resolve({ type: 'double', index: 'not_analyzed', analyzer: null });
+      }
+      return resolve({ type: 'text', index: 'analyzed', analyzer: 'standard' });
+    });
+  }
+
   private async _compareFieldTypeObjs(origFieldType, newFieldType): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
-      const returnFieldType = origFieldType;
-
-      type = { type: 'null', index: 'analyzed', analyzer: 'standard' };
-      Object.keys(newFieldType).forEach((newFieldTypeKey) =>
+      const returnFieldType = _.cloneDeep(origFieldType);
+      const origFieldTypeKeys = Object.keys(origFieldType);
+      const newFieldTypeKeys = Object.keys(newFieldType);
+      newFieldTypeKeys.forEach(async (key) =>
       {
-        if (origFieldType[newFieldTypeKey] === undefined || origFieldType[newFieldTypeKey] === null)
+        if (origFieldType[key] === undefined || this.getInnermostType(origFieldType[key]) === 'null')
         {
-          origFieldType[newFieldTypeKey] = newFieldType[newFieldTypeKey];
+          returnFieldType[key] = newFieldType[key];
         }
-        else // both exist and they may not be the same
+        else if (this.getInnermostType(newFieldType[key]) !== 'null') // both exist and they may not be the same
         {
-
+          returnFieldType[key] = await this._chooseBestType([origFieldType[key], newFieldType[key]]);
         }
       });
-      return resolve(newFieldType);
+      const keysInOrigNotInNewFieldType: any[] = _.xor(_.intersection(origFieldTypeKeys, newFieldTypeKeys), origFieldTypeKeys);
+      keysInOrigNotInNewFieldType.forEach((key) =>
+      {
+        returnFieldType[key] = origFieldType[key];
+      });
+      return resolve(returnFieldType);
     });
   }
 
@@ -540,8 +549,7 @@ export class FieldTypes
       if (parsedLines.length === 1) // TODO: allow type detection from multiple lines
       {
         const anything = await this.getFullTypeFromDocument(parsedLines[0]);
-        console.log(JSON.stringify(Object.keys(anything)));
-        return resolve(JSON.stringify(anything));
+        return resolve(anything);
       }
     });
   }
@@ -593,6 +601,26 @@ export class FieldTypes
     {
       return chunk.substring(1, chunk.length - 1).replace(/''/g, '\'').replace(/""/g, '"');
     }
+  }
+
+  private _replaceNullWithText(fieldObj: object): object
+  {
+    if (typeof fieldObj === 'object' && fieldObj !== null && fieldObj['type'] === 'null')
+    {
+      fieldObj['type'] = 'text';
+      return fieldObj;
+    }
+    else
+    {
+      Object.keys(fieldObj).forEach((key) =>
+      {
+        if (typeof fieldObj[key] === 'object' && fieldObj[key] !== null)
+        {
+          fieldObj[key] = this._replaceNullWithText(fieldObj[key]);
+        }
+      });
+    }
+    return fieldObj;
   }
 }
 

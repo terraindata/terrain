@@ -55,6 +55,7 @@ import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { Import } from './Import';
 import ImportTemplateRouter from './templates/ImportTemplateRouter';
+import { fieldTypes } from './templates/ImportTemplateRouter';
 
 const Router = new KoaRouter();
 export const imprt: Import = new Import();
@@ -95,6 +96,21 @@ Router.get('/analyzers', passport.authenticate('access-token-local'), async (ctx
 Router.post('/analyzers', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   ctx.body = '';
+});
+
+Router.post('/mysqlheadless', async (ctx, next) =>
+{
+  winston.info('importing to database, from mysql formatted file and template id');
+  const authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
+  if (authStream['template'] === null)
+  {
+    ctx.body = 'Unauthorized';
+    ctx.status = 400;
+    return;
+  }
+  Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
+  ctx.body = await imprt.upsert(
+    await fieldTypes.getJSONFromMySQLFormatStream(authStream['files'], authStream['fields']), authStream['fields'], true);
 });
 
 Router.post('/headless', async (ctx, next) =>

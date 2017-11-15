@@ -1264,35 +1264,102 @@ export class Import
               return thisReject('Failed to apply transforms: ' + String(e));
             }
             // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
-            const trimmedItem: object = {};
-            for (const name of Object.keys(imprt.columnTypes))
-            {
-              if (imprt.columnTypes.hasOwnProperty(name))
-              {
-                if (typeof item[name] === 'string')
-                {
-                  trimmedItem[name] = item[name].replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-                }
-                else
-                {
-                  trimmedItem[name] = item[name];
-                }
-              }
-            }
             if (dontCheck !== true)
             {
-              const typeError: string = this._checkTypes(trimmedItem, imprt);
+              const typeError: string = this._checkTypes(item, imprt);
               if (typeError !== '')
               {
                 return thisReject(typeError);
               }
             }
+            const trimmedItem: object = this._convertDateToESDateAndTrim(item, imprt.columnTypes);
             transformedItems.push(trimmedItem);
           }
           thisResolve(transformedItems);
         }));
     }
     return Promise.all(promises);
+  }
+
+  private _convertDateToESDateAndTrim(fieldObj: object, fieldTypesObj: object): object
+  {
+    const convertDateAndTrim =
+      {
+        double: (self, node, typeObj) => node,
+        float: (self, node, typeObj) => node,
+        long: (self, node, typeObj) => node,
+        boolean: (self, node, typeObj) => node,
+        null: (self, node, typeObj) => node,
+        short: (self, node, typeObj) => node,
+        byte: (self, node, typeObj) => node,
+        integer: (self, node, typeObj) => node,
+        half_float: (self, node, typeObj) => node,
+        date: (self, node, typeObj) =>
+        {
+          if (node !== null)
+          {
+            node = new Date(Date.parse(node)).toISOString();
+          }
+          return node;
+        },
+        text: (self, node, typeObj) =>
+        {
+          if (node !== null)
+          {
+            node = node.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+          }
+          return node;
+        },
+        keyword: (self, node, typeObj) =>
+        {
+          if (node !== null)
+          {
+            node = node.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+          }
+          return node;
+        },
+        array: (self, node, typeObj) =>
+        {
+          if (node !== null)
+          {
+            for (const ind in node)
+            {
+              if (node.hasOwnProperty(ind))
+              {
+                node[ind] = visit(self, node[ind], typeObj['innerType']);
+              }
+            }
+          }
+          return node;
+        },
+        nested: (self, node, typeObj) =>
+        {
+          if (node !== null)
+          {
+            for (const key in node)
+            {
+              if (node.hasOwnProperty(key))
+              {
+                node[key] = visit(self, node[key], typeObj['innerType'][key]);
+              }
+            }
+          }
+          return node;
+        },
+      };
+
+    function visit(visitor, obj, typeObj)
+    {
+      return visitor[typeObj['type']](visitor, obj, typeObj);
+    }
+
+    const returnObj: object = {};
+    Object.keys(fieldTypesObj).forEach((key) =>
+    {
+      returnObj[key] = visit(convertDateAndTrim, fieldObj[key], fieldTypesObj[key]);
+    });
+
+    return returnObj;
   }
 
   /* returns an error message if there are any; else returns empty string */

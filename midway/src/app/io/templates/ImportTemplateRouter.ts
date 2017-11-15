@@ -56,10 +56,10 @@ import * as Util from '../../Util';
 import { Import } from '../Import';
 import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 
+export const fieldTypes = new FieldTypes();
 export const importTemplates = new ImportTemplates();
 
 const Router = new KoaRouter();
-const fieldTypes = new FieldTypes();
 const imprt: Import = new Import();
 const perm: Permissions = new Permissions();
 

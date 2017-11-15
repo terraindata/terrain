@@ -417,8 +417,10 @@ export class CSVTypeParser
 
   public isDateHelper(value: string): boolean
   {
-    const dateFormatRegex = new RegExp('^(0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4})$');
-    return dateFormatRegex.test(value);
+    const MMDDYYYYRegex = new RegExp(/^((0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4}))$/);
+    const YYYYMMDDRegex = new RegExp(/([0-9]{4}-[0,1]{1}[0-9]{1}-[0-3]{1}[0-9]{1})/);
+    const ISORegex = new RegExp(/^([0-9]{4})-([0,1]{1}[0-9]{1})-([0-3]{1}[0-9]{1})( |T){0,1}([0-2]{1}[0-9]{1}):{0,1}([0-5]{1}[0-9]{1}):{0,1}([0-9]{2})(\.([0-9]{6})|((-|\+)?[0-9]{2}:[0-9]{2}))?Z?$/);
+    return MMDDYYYYRegex.test(value) || YYYYMMDDRegex.test(value) || ISORegex.test(value);
   }
 
   public isDoubleHelper(value: string): boolean
