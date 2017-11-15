@@ -55,43 +55,61 @@ import * as TemplateTypes from 'etl/templates/TemplateTypes';
 const { List, Map } = Immutable;
 
 // inside some common file
-interface ObjectWithType
+
+// The type that defines all the possible action payloads
+// Also asserts that the key is the same as the actionType
+type AllActionsType<SelfT> =
 {
-  actionType: string;
+  [key in keyof SelfT]: {actionType: key, [other: string]: any}
 }
 
-interface WrappedPayload<T>
+// Unrolls AllActionsT into a union of its members
+type Unroll<AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[keyof AllActionsT]
+
+// The type returned by an action whose payload is ActionT
+interface WrappedPayload<ActionT>
 {
   type: string;
-  payload: T;
+  payload: ActionT;
 }
 
-type ActionTypeUnion<T extends ObjectWithType> = T['actionType']; // union of all possible actionTypes
-type ConstrainedMap<T extends ObjectWithType, S> = // dictionary that must map all actionTypes and only actionTypes
+// The type of 'action' that a reducer operates on. This is actually the same type as WrappedPayload
+interface ReducerPayload<Key extends keyof AllActionsT, AllActionsT>
 {
-  [key in ActionTypeUnion<T>]: (state, action) => S;
+  type: Key;
+  payload: AllActionsT[Key];
 }
 
-abstract class ActionReducer<T extends ObjectWithType, S>
-{
-  public abstract reducers: ConstrainedMap<T, S>;
+// union of all possible actionTypes strings
+type ActionTypeUnion<AllActionsT extends AllActionsType<AllActionsT>> = Unroll<AllActionsT>['actionType'];
 
-  public act(action: T): WrappedPayload<T>
+// dictionary that must map all actionTypes and only actionTypes
+// reducers must follow this pattern
+type ConstrainedMap<AllActionsT extends AllActionsType<AllActionsT>, S> =
+{
+  [key in ActionTypeUnion<AllActionsT>]: (state, action: ReducerPayload<key, AllActionsT>) => S;
+}
+
+abstract class ActionReducer<AllActionsT extends AllActionsType<AllActionsT>, StateType>
+{
+  public abstract reducers: ConstrainedMap<AllActionsT, StateType>;
+
+  public act(action: Unroll<AllActionsT>): WrappedPayload<Unroll<AllActionsT>>
   {
     return {
-      type: action.actionType,
+      type: (action as any).actionType,
       payload: action,
     }
   }
 
-  public actionsForExport(): (action: T) => any
+  public actionsForExport(): (action: Unroll<AllActionsT>) => any
   {
     return this.act;
   }
 
-  public reducersForExport(_stateCreator): (state, action) => S
+  public reducersForExport(_stateCreator): (state, action) => StateType
   {
-    return (state: S = _stateCreator(), action) =>
+    return (state: StateType = _stateCreator(), action) =>
     {
       let nextState = state;
       if (this.reducers[action.type])
@@ -103,29 +121,22 @@ abstract class ActionReducer<T extends ObjectWithType, S>
   }
 }
 
-// ...
-// ...
-// ...
-// inside the action reducer file
-
-interface ActionSetPreviewData
+interface ActionParamTypes extends AllActionsType<ActionParamTypes>
 {
-  actionType: 'setPreviewData';
-  preview: any;
-  originalNames: any;
+  setPreviewData: {
+    actionType: 'setPreviewData';
+    preview: any;
+    originalNames: any;
+  },
+  placeholder: {
+    actionType: 'placeholder';
+    foo: any;
+  }
 }
 
-interface ActionPlaceholder
+class TemplateEditorActionsClass extends ActionReducer<ActionParamTypes, TemplateEditorState>
 {
-  actionType: 'placeholder';
-  foo: any;
-}
-
-type Actions = ActionSetPreviewData | ActionPlaceholder;
-
-class TemplateEditorActionsClass extends ActionReducer<Actions, TemplateEditorState>
-{
-  public reducers: ConstrainedMap<Actions, TemplateEditorState> =
+  public reducers: ConstrainedMap<ActionParamTypes, TemplateEditorState> =
   {
     setPreviewData: (state, action) => {
       console.log('you called setPreviewData');
@@ -134,7 +145,7 @@ class TemplateEditorActionsClass extends ActionReducer<Actions, TemplateEditorSt
     placeholder: (state, action) => {
       console.log('you called placeholder');
       return state;
-    }
+    },
   }
 }
 
