@@ -132,7 +132,7 @@ AnalyticsReducer[ActionTypes.fetchAvailableMetricsSuccess] =
 
     return state.set(
       'availableMetrics',
-      state.availableMetrics.concat(availableMetrics),
+      state.availableMetrics.clear().concat(availableMetrics),
     );
   };
 
