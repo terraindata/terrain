@@ -44,14 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import benchrest = require('bench-rest');
 import winston = require('winston');
 
 import App from '../src/App';
+import * as Benchmark from './Benchmark';
+
+let host = 'http://127.0.0.1:43002';
 
 const db = 'http://127.0.0.1:9200';
-const host = 'http://127.0.0.1:43002';
-let server;
 
 export async function startServer()
 {
@@ -59,13 +59,13 @@ export async function startServer()
   {
     const options =
       {
-        debug: true,
+        debug: false,
         db,
         port: 43002,
       };
 
     const app = new App(options);
-    server = await app.start();
+    return app.start();
   }
   catch (e)
   {
@@ -73,34 +73,28 @@ export async function startServer()
   }
 }
 
-export const flow = {
-  main: [
-    {
-      post: host + '/v1', json: {
-        eventname: 'click',
-        variantid: '#{INDEX}',
-        visitorid: '#{INDEX}',
-      },
-    },
-    { get: host + '/v1?eventname=click&variantid=#{INDEX}&visitorid=#{INDEX}' },
-  ],
-};
-
-const runOptions = {
-  limit: 20,
-  prealloc: 1000,
-  iterations: 1000,
-};
-
-// tslint:disable-next-line:no-floating-promises
-startServer();
-benchrest(flow, runOptions)
-  .on('error', (err, ctx) => winston.error('Failed in %s with err: ', ctx, err))
-  .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
-  .on('end', (stats, errorCount) =>
+(async () =>
+{
+  if (process.argv.length > 2)
   {
-    winston.info('error count: ', errorCount);
-    winston.info('stats', stats);
-    // TODO: teardown server here
-    process.exit();
-  });
+    host = process.argv[2];
+    winston.info('Using specified server address: ' + host);
+  }
+  else
+  {
+    // if no host was specified, start a local server
+    // tslint:disable-next-line:no-floating-promises
+    startServer();
+  }
+
+  Benchmark.generateBenchmarkData();
+
+  const s1 = await Benchmark.runBenchmark(host);
+  winston.info(JSON.stringify(s1));
+
+  const s2 = await Benchmark.runBatchBenchmark(host);
+  winston.info(JSON.stringify(s2));
+
+  // TODO: shutdown server gracefully
+  process.exit(0);
+})();
