@@ -89,7 +89,7 @@ export async function search(req: Request): Promise<object[]>
       const from = Number(req.p) * 30;
       const size = 30;
 
-      if (req.v === undefined || req.v === 'terrain_123')
+      if (req.v === undefined || req.v === 'MovieDemoAlgorithm')
       {
         winston.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
         client.search({
