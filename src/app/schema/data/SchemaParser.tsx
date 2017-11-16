@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import { SchemaActionType, SchemaActionTypes } from 'schema/data/SchemaRedux';
 import BackendInstance from '../../../database/types/BackendInstance';
 import * as SchemaTypes from '../SchemaTypes';
 const { Map, List } = Immutable;
@@ -314,10 +315,20 @@ export function parseMySQLDb(rawServer: object,
   });
 }
 
+/*
+
 export function parseElasticDb(elasticServer: object,
   schemaData: object,
   setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void,
   dispatch)
+{
+
+*/
+export function parseElasticDb(elasticServer: object,
+  schemaData: object,
+  // setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void,
+  directDispatch: (payload: SchemaActionType<'setServer'>) => void,
+)
 {
   const isAnalytics = elasticServer['isAnalytics'] !== undefined &&
     elasticServer['isAnalytics'] === 1;
@@ -435,7 +446,8 @@ export function parseElasticDb(elasticServer: object,
       });
 
     databases = databases.set(databaseId, database);
-    dispatch(setServerAction({
+    directDispatch({
+      actionType: 'setServer',
       server,
       databases,
       tables,
@@ -444,7 +456,7 @@ export function parseElasticDb(elasticServer: object,
       fieldProperties: fieldPropertiesMap,
       tableNames,
       columnNames: columnNamesByTable,
-    }));
+    });
 
     didSetServer = true;
   });
@@ -453,15 +465,16 @@ export function parseElasticDb(elasticServer: object,
   {
     // empty server, no dbs/indexes, need to set it manually
     // TODO change this terrible code flow
-    setServerAction({
-      server,
-      databases,
-      tables: Map<string, Table>(),
-      columns: Map<string, Column>(),
-      indexes: Map<string, Index>(),
-      fieldProperties: Map<string, FieldProperty>(),
-      tableNames: List<string>(),
-      columnNames: Map<string, List<string>>(),
-    });
+    // setServerAction({
+    //   server,
+    //   databases,
+    //   tables: Map<string, Table>(),
+    //   columns: Map<string, Column>(),
+    //   indexes: Map<string, Index>(),
+    //   fieldProperties: Map<string, FieldProperty>(),
+    //   tableNames: List<string>(),
+    //   columnNames: Map<string, List<string>>(),
+    // });
+    // commenting out because as far as I can tell, this code doesn't actually do anything
   }
 }

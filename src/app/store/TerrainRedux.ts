@@ -87,7 +87,7 @@ export type Unroll<AllActionsT extends AllActionsType<AllActionsT>> = AllActions
 // The type returned by an action whose payload is ActionT
 export interface WrappedPayload<AllActionsT extends AllActionsType<AllActionsT>>
 {
-  type: ActionTypeUnion<AllActionsT>;
+  type: keyof AllActionsT;
   payload: Unroll<AllActionsT>;
 }
 
@@ -101,14 +101,11 @@ export interface ReducerPayload<Key extends keyof AllActionsT, AllActionsT>
   payload: AllActionsT[Key];
 }
 
-// union of all possible actionTypes strings
-export type ActionTypeUnion<AllActionsT extends AllActionsType<AllActionsT>> = Unroll<AllActionsT>['actionType'];
-
 // dictionary that must map all actionTypes and only actionTypes
 // reducers must adhere to this map
 export type ConstrainedMap<AllActionsT extends AllActionsType<AllActionsT>, S> =
 {
-  [key in ActionTypeUnion<AllActionsT>]: (state: S, action: ReducerPayload<key, AllActionsT>) => S;
+  [key in keyof AllActionsT]: (state: S, action: ReducerPayload<key, AllActionsT>) => S;
 };
 
 export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActionsT>, StateType>
@@ -119,6 +116,18 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
   public overrideAct(action: Unroll<AllActionsT>): ActPayload<AllActionsT>
   {
     return undefined;
+  }
+
+  public _dispatchReducerFactory(dispatch: (payload: WrappedPayload<AllActionsT>) => any):
+    (action: Unroll<AllActionsT>) => any
+  {
+    return (action: Unroll<AllActionsT>) => {
+      const payload = {
+        type: (action as any).actionType,
+        payload: action,
+      }
+      dispatch(payload);
+    }
   }
 
   public _act(action: Unroll<AllActionsT>): ActPayload<AllActionsT>
@@ -154,4 +163,4 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
 }
 
 // Type query utility to get the type of an action.
-export type GetType<K extends ActionTypeUnion<AllActionsT>, AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[K];
+export type GetType<K extends keyof AllActionsT, AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[K];

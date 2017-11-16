@@ -45,12 +45,17 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
-
+import * as _ from 'lodash';
 import { _SchemaState, Column, Database, FieldProperty, Index, SchemaState, Server, Table } from 'schema/SchemaTypes';
-import { ActPayload, AllActionsType, ConstrainedMap, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 const { List, Map } = Immutable;
 
-export interface SchemaActionTypes extends AllActionsType<SchemaActionTypes>
+import BackendInstance from 'database/types/BackendInstance';
+import * as SchemaParser from 'schema/data/SchemaParser';
+import Ajax from 'util/Ajax';
+import AjaxM1 from 'util/AjaxM1';
+
+export interface SchemaActionTypes
 {
   fetch: {
     actionType: 'fetch';
@@ -160,7 +165,75 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
 
   public fetchAction(dispatch)
   {
-    return undefined;
+    const directDispatch = this._dispatchReducerFactory(dispatch);
+    directDispatch({
+      actionType: 'fetch'
+    });
+    Ajax.getDbs(
+      (dbs: object) =>
+      {
+        const m1Dbs: BackendInstance[] = [];
+        const m2Dbs: BackendInstance[] = [];
+        _.map((dbs as any),
+          (db: BackendInstance) =>
+          {
+            if (db.source === 'm1')
+            {
+              m1Dbs.push(db);
+            }
+            else
+            {
+              m2Dbs.push(db);
+            }
+          },
+        );
+        // Group all m1Dbs under a server e.g. "Other Databases"
+        // The m2Dbs are servers, so need to do parsing differently
+        directDispatch({
+          actionType: 'serverCount',
+          serverCount: Object.keys(m2Dbs).length,
+        });
+        _.map((dbs as any),
+          (db: BackendInstance) =>
+            (db.source === 'm1' ? AjaxM1.schema_m1 : Ajax.schema)(
+              db['id'],
+              (schemaData, error) =>
+              {
+                if (!error)
+                {
+                  if (db.source === 'm2')
+                  {
+                    if (db['type'] === 'mysql')
+                    {
+                      // Don't support MySQL for now
+                      // SchemaParser.parseMySQLDb(db, schemaData, SchemaActions.setServer);
+                    }
+                    else if (db['type'] === 'elastic')
+                    {
+                      // SchemaParser.parseElasticDb(db, schemaData, directDispatch);
+                    }
+                  }
+                  else
+                  {
+                    // Don't support old midway for now
+                    // SchemaParser.parseMySQLDbs_m1(db, schemaData, SchemaActions.addDbToServer);
+                  }
+                }
+              },
+              (error) =>
+              {
+                // TODO consider handling individual DB errors
+              }),
+        );
+      },
+      (dbError) =>
+      {
+        directDispatch({
+          actionType: 'error',
+          error: JSON.stringify(dbError),
+        });
+      },
+    );
   }
 
   public overrideAct(action: Unroll<SchemaActionTypes>)
@@ -172,5 +245,9 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
   }
 }
 
+const ReduxInstance = new SchemaRedux();
+export const SchemaActions = ReduxInstance._actionsForExport();
+export const SchemaReducers = ReduxInstance._reducersForExport(_SchemaState);
+export declare type SchemaActionType<K extends keyof SchemaActionTypes> = GetType<K, SchemaActionTypes>;
+
 export const placeholder = 'hi';
-console.log('hello');
