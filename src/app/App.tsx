@@ -300,7 +300,7 @@ class App extends TerrainComponent<Props>
     TerrainStore.dispatch(LibraryActions.fetch());
     LibraryStore.dispatch(LibraryActions.fetch());
     this.props.schemaActions({
-      actionType: 'fetch'
+      actionType: 'fetch',
     });
     // RolesActions.fetch();
   }

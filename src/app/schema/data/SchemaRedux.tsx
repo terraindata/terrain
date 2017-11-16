@@ -105,12 +105,14 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
 {
   public reducers: ConstrainedMap<SchemaActionTypes, SchemaState> =
   {
-    fetch: (state, action) => {
+    fetch: (state, action) =>
+    {
       return state
         .set('loading', true);
     },
 
-    setServer: (state, action) => {
+    setServer: (state, action) =>
+    {
       const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
       if (state.servers.size === state.serverCount - 1)
       {
@@ -126,7 +128,8 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
         .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
     },
 
-    addDbToServer: (state, action) => {
+    addDbToServer: (state, action) =>
+    {
       const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
 
       let newServer = server;
@@ -146,29 +149,33 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
         .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
     },
 
-    error: (state, action) => {
+    error: (state, action) =>
+    {
       return state; // this does not do anything
     },
 
-    serverCount: (state, action) => {
+    serverCount: (state, action) =>
+    {
       return state.set('serverCount', action.payload.serverCount);
     },
 
-    highlightId: (state, action) => {
+    highlightId: (state, action) =>
+    {
       return state.set('highlightedId', action.payload.id)
-      .set('highlightedInSearchResults', action.payload.inSearchResults);
+        .set('highlightedInSearchResults', action.payload.inSearchResults);
     },
 
-    selectId: (state, action) => {
+    selectId: (state, action) =>
+    {
       return state.set('selectedId', action.payload.id);
     },
-  }
+  };
 
   public fetchAction(dispatch)
   {
     const directDispatch = this._dispatchReducerFactory(dispatch);
     directDispatch({
-      actionType: 'fetch'
+      actionType: 'fetch',
     });
     Ajax.getDbs(
       (dbs: object) =>

@@ -74,12 +74,14 @@ THE SOFTWARE.
  * The inherited methods _actionsForExport and _reducersForExport are then invoked and exported
  */
 
+// tslint:disable:variable-name strict-boolean-expressions
+
 // The type that defines all the possible action payloads
 // Also asserts that the key is the same as the actionType
 export type AllActionsType<SelfT> =
-{
-  [key in keyof SelfT]: {actionType: key, [other: string]: any}
-};
+  {
+    [key in keyof SelfT]: { actionType: key, [other: string]: any }
+  };
 
 // Unrolls AllActionsT into a union of its members
 export type Unroll<AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[keyof AllActionsT];
@@ -104,9 +106,9 @@ export interface ReducerPayload<Key extends keyof AllActionsT, AllActionsT>
 // dictionary that must map all actionTypes and only actionTypes
 // reducers must adhere to this map
 export type ConstrainedMap<AllActionsT extends AllActionsType<AllActionsT>, S> =
-{
-  [key in keyof AllActionsT]: (state: S, action: ReducerPayload<key, AllActionsT>) => S;
-};
+  {
+    [key in keyof AllActionsT]: (state: S, action: ReducerPayload<key, AllActionsT>) => S;
+  };
 
 export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActionsT>, StateType>
 {
@@ -121,13 +123,14 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
   public _dispatchReducerFactory(dispatch: (payload: WrappedPayload<AllActionsT>) => any):
     (action: Unroll<AllActionsT>) => any
   {
-    return (action: Unroll<AllActionsT>) => {
+    return (action: Unroll<AllActionsT>) =>
+    {
       const payload = {
         type: (action as any).actionType,
         payload: action,
-      }
+      };
       dispatch(payload);
-    }
+    };
   }
 
   public _act(action: Unroll<AllActionsT>): ActPayload<AllActionsT>
