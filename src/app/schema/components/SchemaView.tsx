@@ -59,6 +59,9 @@ import SchemaSearchResults from './SchemaSearchResults';
 import SchemaTreeList from './SchemaTreeList';
 import Styles from './SchemaTreeStyles';
 
+import { SchemaActionTypes, placeholder } from 'schema/data/SchemaRedux';
+console.log(placeholder);
+
 export interface Props
 {
   fullPage: boolean;

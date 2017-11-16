@@ -82,27 +82,27 @@ export type AllActionsType<SelfT> =
 };
 
 // Unrolls AllActionsT into a union of its members
-type Unroll<AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[keyof AllActionsT];
+export type Unroll<AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[keyof AllActionsT];
 
 // The type returned by an action whose payload is ActionT
-interface WrappedPayload<ActionT>
+export interface WrappedPayload<AllActionsT extends AllActionsType<AllActionsT>>
 {
-  type: string;
-  payload: ActionT;
+  type: ActionTypeUnion<AllActionsT>;
+  payload: Unroll<AllActionsT>;
 }
 
 export type ActPayload<AllActionsT extends AllActionsType<AllActionsT>> =
-  WrappedPayload<Unroll<AllActionsT>> | ((dispatch) => WrappedPayload<Unroll<AllActionsT>>);
+  WrappedPayload<AllActionsT> | ((dispatch: (payload: WrappedPayload<AllActionsT>) => any) => any);
 
 // The type of 'action' that a reducer operates on. This is actually the same type as WrappedPayload
-interface ReducerPayload<Key extends keyof AllActionsT, AllActionsT>
+export interface ReducerPayload<Key extends keyof AllActionsT, AllActionsT>
 {
   type: Key;
   payload: AllActionsT[Key];
 }
 
 // union of all possible actionTypes strings
-type ActionTypeUnion<AllActionsT extends AllActionsType<AllActionsT>> = Unroll<AllActionsT>['actionType'];
+export type ActionTypeUnion<AllActionsT extends AllActionsType<AllActionsT>> = Unroll<AllActionsT>['actionType'];
 
 // dictionary that must map all actionTypes and only actionTypes
 // reducers must adhere to this map
