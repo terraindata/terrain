@@ -276,18 +276,44 @@ describe('AnalyticsReducer', () =>
 
   describe('#fetchAvailableMetricsSuccess', () =>
   {
-    it('should handle analytics.fetchAvailableMetricsSuccess', () =>
+    describe('when availableMetrics is empty', () =>
     {
-      const nextState = reducer(analytics, {
-        type: ActionTypes.fetchAvailableMetricsSuccess,
-        payload: {
-          availableMetrics,
-        },
-      });
+      it('should store the available metrics in the availableMetrics key', () =>
+      {
+        const nextState = reducer(analytics, {
+          type: ActionTypes.fetchAvailableMetricsSuccess,
+          payload: {
+            availableMetrics,
+          },
+        });
 
-      expect(nextState.availableMetrics).toEqual(
-        analytics.availableMetrics.concat(availableMetrics),
-      );
+        expect(nextState.availableMetrics).toEqual(
+          analytics.availableMetrics.concat(availableMetrics),
+        );
+      });
+    });
+
+    describe('when availableMetrics has been loaded previously', () =>
+    {
+      it('should clean availableMetrics key and then store the new fetched metrics', () =>
+      {
+        const analyticsWithAvailableMetrics = analytics.set(
+          'availableMetrics',
+          analytics.availableMetrics.push(availableMetrics[0]),
+        );
+
+        const nextState = reducer(analyticsWithAvailableMetrics, {
+          type: ActionTypes.fetchAvailableMetricsSuccess,
+          payload: {
+            availableMetrics,
+          },
+        });
+
+        expect(nextState.availableMetrics.count()).toEqual(5);
+        expect(nextState.availableMetrics).toEqual(
+          analytics.availableMetrics.concat(availableMetrics),
+        );
+      });
     });
   });
 });
