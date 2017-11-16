@@ -1466,13 +1466,14 @@ export class Import
         else
         {
           thisChunk = this.nextChunk + chunk;
-          let left: number = 0;
-          let right: number = 0;
+          let openBraces: number = 0;
+          let openBrackets: number = 0;
           let match: number = 0;
           let previousMatch: boolean = true;
+          let quotemarkCounter: number = 0;
           for (let i = 0; i < thisChunk.length; i++)
           {
-            if (left === right)
+            if (openBraces === 0 && openBrackets === 0 && quotemarkCounter % 2 === 0)
             {
               if (!previousMatch)
               {
@@ -1484,13 +1485,29 @@ export class Import
             {
               previousMatch = false;
             }
-            if (thisChunk.charAt(i) === '{')
+            if (quotemarkCounter % 2 === 0 && thisChunk.charAt(i) === '"' && i > 0 && thisChunk.charAt(i - 1) !== '\\') // entering str
             {
-              left++;
+              quotemarkCounter++;
             }
-            else if (thisChunk.charAt(i) === '}')
+            else if (quotemarkCounter % 2 !== 0 && thisChunk.charAt(i) === '"' && i > 0 && thisChunk.charAt(i - 1) !== '\\') // leaving str
             {
-              right++;
+              quotemarkCounter--;
+            }
+            else if (thisChunk.charAt(i) === '{' && quotemarkCounter % 2 === 0)
+            {
+              openBraces++;
+            }
+            else if (thisChunk.charAt(i) === '}' && quotemarkCounter % 2 === 0)
+            {
+              openBraces--;
+            }
+            else if (thisChunk.charAt(i) === '[' && quotemarkCounter % 2 === 0)
+            {
+              openBrackets++;
+            }
+            else if (thisChunk.charAt(i) === ']' && quotemarkCounter % 2 === 0)
+            {
+              openBrackets--;
             }
           }
           this.nextChunk = thisChunk.substring(match, thisChunk.length);
