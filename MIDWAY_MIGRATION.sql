@@ -107,3 +107,4 @@ DROP TABLE databases;
 ALTER TABLE databasesCopy RENAME TO databases;
 END TRANSACTION;
 ----------------------------------------------------------
+
