@@ -61,13 +61,14 @@ class VariantC extends ItemC
   public algorithmId: number = -1;
   public groupId: number = -1;
 
-  public excludeFields = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
+  public excludeFields: string[] = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
   // TODO try super or prototype
 
-  public lastEdited = '';
-  public lastUserId = -1;
-  public version = false;
-  public language = 'elastic';
+  public lastEdited: string = '';
+  public lastUserId: number = -1;
+  public version: boolean = false;
+  public language: string = 'elastic';
+  public deployedName: string = '';
 
   // don't use this!
   // TODO remove when variants can be saved without queries
@@ -107,6 +108,8 @@ export const _Variant = (config?: any) =>
   config.query = config.query || {};
   config.query.language = config.language;
   config.query = _Query(config.query);
+
+  config.deployedName = config.deployedName || (config.id ? 'terrain_' + String(config.id) : '');
 
   let v = new Variant_Record(config) as any as Variant;
   if (!config || !config.lastUserId || !config.lastEdited)

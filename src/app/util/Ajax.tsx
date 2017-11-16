@@ -492,6 +492,7 @@ export const Ajax =
     getVariantStatus(
       variantId: ID,
       dbid: number,
+      deployedName: string,
       onLoad: (resp: object) => void,
       onError?: (resp: any) => void,
     )
@@ -523,7 +524,7 @@ export const Ajax =
           }
         },
         {
-          onError, urlArgs: { dbid },
+          onError, urlArgs: { dbid, deployedName },
         },
       );
       return;

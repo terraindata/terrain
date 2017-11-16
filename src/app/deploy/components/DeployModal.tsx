@@ -63,7 +63,6 @@ import DeployModalColumn from './DeployModalColumn';
 import EQLTemplateGenerator from '../../../../shared/database/elastic/parser/EQLTemplateGenerator';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
-import DeployVariant from '../../../../shared/deploy/DeployVariant';
 
 export interface Props
 {
@@ -78,6 +77,7 @@ class DeployModal extends TerrainComponent<Props>
     defaultChecked: boolean;
     errorModalMessage: string;
     showErrorModal: boolean;
+    deployedName: string;
   } = {
     changingStatus: false,
     changingStatusOf: null,
@@ -85,6 +85,7 @@ class DeployModal extends TerrainComponent<Props>
     defaultChecked: false,
     errorModalMessage: '',
     showErrorModal: false,
+    deployedName: '',
   };
 
   public componentDidMount()
@@ -104,6 +105,7 @@ class DeployModal extends TerrainComponent<Props>
             changingStatusOf,
             changingStatusTo,
             defaultChecked: changingStatusTo === 'DEFAULT',
+            deployedName: (changingStatusOf && changingStatusOf.deployedName),
           });
         }
       },
@@ -123,7 +125,6 @@ class DeployModal extends TerrainComponent<Props>
     const state = LibraryStore.getState();
     const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
-    const id: string = DeployVariant.getVariantDeployedName(variant as object);
 
     const { changingStatusTo } = this.state;
 
@@ -143,21 +144,21 @@ class DeployModal extends TerrainComponent<Props>
       }
       const template = EQLTemplateGenerator.generate(valueInfo);
       const body: object = {
-        id,
+        id: this.state.deployedName,
         body: {
           template,
         },
       };
-      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'putTemplate', body, changingStatusTo));
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'putTemplate', body, changingStatusTo, this.state.deployedName));
     }
     else if ((changingStatusTo !== ItemStatus.Live && variant.status === 'LIVE')
       || (changingStatusTo !== ItemStatus.Default && variant.status === 'DEFAULT'))
     {
       // undeploy this variant
       const body: object = {
-        id,
+        id: this.state.deployedName,
       };
-      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'deleteTemplate', body, changingStatusTo));
+      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'deleteTemplate', body, changingStatusTo, this.state.deployedName));
     }
   }
 
@@ -194,6 +195,13 @@ class DeployModal extends TerrainComponent<Props>
   {
     this.setState({
       defaultChecked,
+    });
+  }
+
+  public handleDeployedNameChange(deployedName: string)
+  {
+    this.setState({
+      deployedName,
     });
   }
 
@@ -253,8 +261,10 @@ class DeployModal extends TerrainComponent<Props>
                 status={changingStatusTo}
                 onDeploy={this.handleDeploy}
                 defaultChecked={this.state.defaultChecked}
+                deployedName={this.state.deployedName}
                 defaultVariant={defaultVariant}
                 onDefaultCheckedChange={this.handleDefaultCheckedChange}
+                onDeployedNameChange={this.handleDeployedNameChange}
                 onCancelDeploy={this.handleClose}
               />
             </div>
