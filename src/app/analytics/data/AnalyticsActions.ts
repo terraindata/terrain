@@ -49,7 +49,6 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import LibraryStore from 'library/data/LibraryStore';
 import Util from 'util/Util';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
@@ -143,7 +142,7 @@ const Actions =
               aggregation = 'histogram';
             }
 
-            const variants = LibraryStore.getState().variants;
+            const variants = getState().variants;
             const deployedVariantNames = variantIds.map((id) =>
             {
               return variants.get(id).deployedName;
