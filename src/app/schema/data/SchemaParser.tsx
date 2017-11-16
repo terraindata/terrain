@@ -108,216 +108,215 @@ function recursiveParseFieldProperties(fieldProperty: FieldProperty, fieldProper
   return { fieldProperty, fieldPropertiesMap };
 }
 
-export function parseMySQLDbs_m1(db: BackendInstance,
-  colsData: object,
-  addDbToServerAction: (payload: SchemaTypes.AddDbToServerActionPayload) => void)
-{
-  let server: Server = SchemaTypes._Server({
-    name: 'Other MySQL Databases',
-    connectionId: -1,
-  });
-  const serverId = server.id;
+// export function parseMySQLDbs_m1(db: BackendInstance,
+//   colsData: object,
+//   addDbToServerAction: (payload: SchemaTypes.AddDbToServerActionPayload) => void)
+// {
+//   let server: Server = SchemaTypes._Server({
+//     name: 'Other MySQL Databases',
+//     connectionId: -1,
+//   });
+//   const serverId = server.id;
 
-  let databases: IMMap<string, Database> = Map<string, Database>();
+//   let databases: IMMap<string, Database> = Map<string, Database>();
 
-  let database = SchemaTypes._Database({
-    name: db['name'],
-    serverId: serverId as string,
-  });
-  const databaseId = database.id;
-  server = server.set('databaseIds', server.databaseIds.push(databaseId));
+//   let database = SchemaTypes._Database({
+//     name: db['name'],
+//     serverId: serverId as string,
+//   });
+//   const databaseId = database.id;
+//   server = server.set('databaseIds', server.databaseIds.push(databaseId));
 
-  let tables: IMMap<string, Table> = Map<string, Table>();
-  let columns: IMMap<string, Column> = Map<string, Column>();
-  const indexes: IMMap<string, Index> = Map<string, Index>();
-  const fieldProperties: IMMap<string, FieldProperty> = Map<string, FieldProperty>();
+//   let tables: IMMap<string, Table> = Map<string, Table>();
+//   let columns: IMMap<string, Column> = Map<string, Column>();
+//   const indexes: IMMap<string, Index> = Map<string, Index>();
+//   const fieldProperties: IMMap<string, FieldProperty> = Map<string, FieldProperty>();
 
-  let tableNames = List<string>();
-  let columnNamesByTable = Map<string, List<string>>();
+//   let tableNames = List<string>();
+//   let columnNamesByTable = Map<string, List<string>>();
 
-  _.map((colsData as any),
-    (col: {
-      TABLE_CATALOG: string,
-      TABLE_SCHEMA: string,
-      TABLE_NAME: string,
-      COLUMN_NAME: string,
-      ORDINAL_POSITION: number,
-      COLUMN_DEFAULT: string,
-      IS_NULLABLE: string,
-      DATA_TYPE: string,
-      CHARACTER_MAXIMUM_LENGTH: number,
-      CHARACTER_OCTET_LENGTH: number,
-      NUMERIC_PRECISION: number,
-      NUMERIC_SCALE: number,
-      DATETIME_PRECISION: number,
-      CHARACTER_SET_NAME: string,
-      COLLATION_NAME: string,
-      COLUMN_TYPE: string,
-      COLUMN_KEY: string,
-      EXTRA: string,
-      PRIVILEGES: string,
-      COLUMN_COMMENT: string,
-      GENERATION_EXPRESSION: string,
-    }) =>
-    {
-      const tableId = SchemaTypes.tableId(databaseId, col.TABLE_NAME);
-      let table = tables.get(tableId);
+//   _.map((colsData as any),
+//     (col: {
+//       TABLE_CATALOG: string,
+//       TABLE_SCHEMA: string,
+//       TABLE_NAME: string,
+//       COLUMN_NAME: string,
+//       ORDINAL_POSITION: number,
+//       COLUMN_DEFAULT: string,
+//       IS_NULLABLE: string,
+//       DATA_TYPE: string,
+//       CHARACTER_MAXIMUM_LENGTH: number,
+//       CHARACTER_OCTET_LENGTH: number,
+//       NUMERIC_PRECISION: number,
+//       NUMERIC_SCALE: number,
+//       DATETIME_PRECISION: number,
+//       CHARACTER_SET_NAME: string,
+//       COLLATION_NAME: string,
+//       COLUMN_TYPE: string,
+//       COLUMN_KEY: string,
+//       EXTRA: string,
+//       PRIVILEGES: string,
+//       COLUMN_COMMENT: string,
+//       GENERATION_EXPRESSION: string,
+//     }) =>
+//     {
+//       const tableId = SchemaTypes.tableId(databaseId, col.TABLE_NAME);
+//       let table = tables.get(tableId);
 
-      if (!table)
-      {
-        table = SchemaTypes._Table({
-          name: col.TABLE_NAME,
-          serverId,
-          databaseId,
-        });
-        tables = tables.set(tableId, table);
-        tableNames = tableNames.push(table.name);
-        database = database.set(
-          'tableIds', database.tableIds.push(tableId),
-        );
-      }
+//       if (!table)
+//       {
+//         table = SchemaTypes._Table({
+//           name: col.TABLE_NAME,
+//           serverId,
+//           databaseId,
+//         });
+//         tables = tables.set(tableId, table);
+//         tableNames = tableNames.push(table.name);
+//         database = database.set(
+//           'tableIds', database.tableIds.push(tableId),
+//         );
+//       }
 
-      const column = SchemaTypes._Column({
-        name: col.COLUMN_NAME,
-        serverId,
-        databaseId,
-        tableId,
-        defaultValue: col.COLUMN_DEFAULT,
-        datatype: col.DATA_TYPE,
-        isNullable: col.IS_NULLABLE === 'YES',
-        isPrimaryKey: col.COLUMN_KEY === 'PRI',
-      });
+//       const column = SchemaTypes._Column({
+//         name: col.COLUMN_NAME,
+//         serverId,
+//         databaseId,
+//         tableId,
+//         defaultValue: col.COLUMN_DEFAULT,
+//         datatype: col.DATA_TYPE,
+//         isNullable: col.IS_NULLABLE === 'YES',
+//         isPrimaryKey: col.COLUMN_KEY === 'PRI',
+//       });
 
-      columns = columns.set(column.id, column);
+//       columns = columns.set(column.id, column);
 
-      if (!columnNamesByTable.get(table.id))
-      {
-        columnNamesByTable = columnNamesByTable.set(table.id, List());
-      }
-      columnNamesByTable = columnNamesByTable.update(table.id,
-        (list) => list.push(column.name),
-      );
+//       if (!columnNamesByTable.get(table.id))
+//       {
+//         columnNamesByTable = columnNamesByTable.set(table.id, List());
+//       }
+//       columnNamesByTable = columnNamesByTable.update(table.id,
+//         (list) => list.push(column.name),
+//       );
 
-      tables = tables.setIn(
-        [tableId, 'columnIds'],
-        table.columnIds.push(column.id),
-      );
-    });
+//       tables = tables.setIn(
+//         [tableId, 'columnIds'],
+//         table.columnIds.push(column.id),
+//       );
+//     });
 
-  databases = databases.set(databaseId, database);
+//   databases = databases.set(databaseId, database);
 
-  addDbToServerAction({
-    server,
-    databases,
-    tables,
-    columns,
-    indexes,
-    fieldProperties,
-    tableNames,
-    columnNames: columnNamesByTable,
-  });
-}
+//   addDbToServerAction({
+//     server,
+//     databases,
+//     tables,
+//     columns,
+//     indexes,
+//     fieldProperties,
+//     tableNames,
+//     columnNames: columnNamesByTable,
+//   });
+// }
 
-export function parseMySQLDb(rawServer: object,
-  schemaData: object,
-  setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void)
-{
-  let server = SchemaTypes._Server({
-    name: rawServer['name'],
-    connectionId: rawServer['id'],
-  });
-  const serverId = server.id;
+// export function parseMySQLDb(rawServer: object,
+//   schemaData: object,
+//   setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void)
+// {
+//   let server = SchemaTypes._Server({
+//     name: rawServer['name'],
+//     connectionId: rawServer['id'],
+//   });
+//   const serverId = server.id;
 
-  let databases: IMMap<string, Database> = Map<string, Database>();
+//   let databases: IMMap<string, Database> = Map<string, Database>();
 
-  _.each((schemaData as any), (databaseValue, databaseKey, databaseList) =>
-  {
-    let database = SchemaTypes._Database({
-      name: databaseKey.toString(),
-      serverId: serverId as string,
-    });
-    const databaseId = database.id;
-    server = server.set('databaseIds', server.databaseIds.push(databaseId));
+//   _.each((schemaData as any), (databaseValue, databaseKey, databaseList) =>
+//   {
+//     let database = SchemaTypes._Database({
+//       name: databaseKey.toString(),
+//       serverId: serverId as string,
+//     });
+//     const databaseId = database.id;
+//     server = server.set('databaseIds', server.databaseIds.push(databaseId));
 
-    let tables: IMMap<string, Table> = Map<string, Table>();
-    let columns: IMMap<string, Column> = Map<string, Column>();
-    const indexes: IMMap<string, Index> = Map<string, Index>();
-    const fieldPropertiesMap: IMMap<string, FieldProperty> = Map<string, FieldProperty>();
+//     let tables: IMMap<string, Table> = Map<string, Table>();
+//     let columns: IMMap<string, Column> = Map<string, Column>();
+//     const indexes: IMMap<string, Index> = Map<string, Index>();
+//     const fieldPropertiesMap: IMMap<string, FieldProperty> = Map<string, FieldProperty>();
 
-    let tableNames = List<string>();
-    let columnIds = List<string>();
-    let columnNamesByTable = Map<string, List<string>>();
+//     let tableNames = List<string>();
+//     let columnIds = List<string>();
+//     let columnNamesByTable = Map<string, List<string>>();
 
-    _.each((databaseValue as any),
-      (tableFields, tableName, tableList) =>
-      {
-        const tableId = SchemaTypes.tableId(databaseId, (tableName as any) as string);
-        let table = tables.get(tableId);
+//     _.each((databaseValue as any),
+//       (tableFields, tableName, tableList) =>
+//       {
+//         const tableId = SchemaTypes.tableId(databaseId, (tableName as any) as string);
+//         let table = tables.get(tableId);
 
-        if (!table)
-        {
-          table = SchemaTypes._Table({
-            name: (tableName as any) as string,
-            databaseId,
-            serverId,
-          });
-          tables = tables.set(tableId, table);
-          tableNames = tableNames.push(table.name);
-          database = database.set(
-            'tableIds', database.tableIds.push(tableId),
-          );
-          database = database.set(
-            'databaseType', 'mysql',
-          );
-        }
+//         if (!table)
+//         {
+//           table = SchemaTypes._Table({
+//             name: (tableName as any) as string,
+//             databaseId,
+//             serverId,
+//           });
+//           tables = tables.set(tableId, table);
+//           tableNames = tableNames.push(table.name);
+//           database = database.set(
+//             'tableIds', database.tableIds.push(tableId),
+//           );
+//           database = database.set(
+//             'databaseType', 'mysql',
+//           );
+//         }
 
-        _.each((tableFields as any), (fieldProperties, fieldName, fieldList) =>
-        {
-          const column = SchemaTypes._Column({
-            name: (fieldName as any) as string,
-            serverId,
-            databaseId,
-            tableId,
-            datatype: fieldProperties['type'],
-          });
+//         _.each((tableFields as any), (fieldProperties, fieldName, fieldList) =>
+//         {
+//           const column = SchemaTypes._Column({
+//             name: (fieldName as any) as string,
+//             serverId,
+//             databaseId,
+//             tableId,
+//             datatype: fieldProperties['type'],
+//           });
 
-          columns = columns.set(column.id, column);
+//           columns = columns.set(column.id, column);
 
-          if (!columnNamesByTable.get(table.id))
-          {
-            columnNamesByTable = columnNamesByTable.set(table.id, List());
-          }
-          columnNamesByTable = columnNamesByTable.update(table.id,
-            (list) => list.push(column.name),
-          );
+//           if (!columnNamesByTable.get(table.id))
+//           {
+//             columnNamesByTable = columnNamesByTable.set(table.id, List());
+//           }
+//           columnNamesByTable = columnNamesByTable.update(table.id,
+//             (list) => list.push(column.name),
+//           );
 
-          columnIds = columnIds.push(column.id);
-        });
+//           columnIds = columnIds.push(column.id);
+//         });
 
-        tables = tables.setIn(
-          [tableId, 'columnIds'],
-          columnIds,
-        );
-      });
+//         tables = tables.setIn(
+//           [tableId, 'columnIds'],
+//           columnIds,
+//         );
+//       });
 
-    databases = databases.set(databaseId, database);
+//     databases = databases.set(databaseId, database);
 
-    setServerAction({
-      server,
-      databases,
-      tables,
-      columns,
-      indexes,
-      fieldProperties: fieldPropertiesMap,
-      tableNames,
-      columnNames: columnNamesByTable,
-    });
-  });
-}
+//     setServerAction({
+//       server,
+//       databases,
+//       tables,
+//       columns,
+//       indexes,
+//       fieldProperties: fieldPropertiesMap,
+//       tableNames,
+//       columnNames: columnNamesByTable,
+//     });
+//   });
+// }
 
 export function parseElasticDb(elasticServer: object,
   schemaData: object,
-  // setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void,
   directDispatch: (payload: SchemaActionType<'setServer'>) => void,
 )
 {
