@@ -182,7 +182,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     xDataKey: 'x',
     yDataKey: 'y',
     onLegendClick: (datasetId) => { return; },
-    legendTitle: 'CTR',
+    legendTitle: '',
   };
 
   public state: State = {
