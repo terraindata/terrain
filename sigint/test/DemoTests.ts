@@ -83,7 +83,7 @@ describe('Demo website tests', () =>
         s: 'http://localhost:9200',
         q: '',
         p: 0,
-        v: 123,
+        v: 'terrain_123',
       })
       .expect(200)
       .then((response) =>
@@ -107,7 +107,7 @@ describe('Demo website tests', () =>
         s: 'http://localhost:9200',
         q: 'Whiplash',
         p: 0,
-        v: 123,
+        v: 'terrain_123',
       })
       .expect(200)
       .then((response) =>
