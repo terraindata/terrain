@@ -215,6 +215,27 @@ const Actions =
         payload: { variantId },
       };
     },
+
+    fetchAvailableMetrics: (
+      callback?: (analyticsVariants: any) => void,
+    ) => (dispatch, getState, api) =>
+      {
+        dispatch({
+          type: ActionTypes.fetchAvailableMetricsStart,
+        });
+        return api.getAvailableMetrics(
+          (availableMetrics) =>
+          {
+            dispatch({
+              type: ActionTypes.fetchAvailableMetricsSuccess,
+              payload: {
+                availableMetrics,
+              },
+            });
+            callback && callback(availableMetrics);
+          },
+        );
+      },
   };
 
 export default Actions;

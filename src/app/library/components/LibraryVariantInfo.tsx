@@ -81,15 +81,30 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     variantStatus: string,
     variantStatusErrorModalOpen: boolean,
     errorModalMessage: string,
+    selectedVariant: ID,
   } = {
     variantStatus: 'Loading...',
     variantStatusErrorModalOpen: false,
     errorModalMessage: '',
+    selectedVariant: -1,
   };
 
   public componentDidMount()
   {
-    this.fetchStatus(this.props.variant);
+    this._subscribe(LibraryStore, {
+      updater: (state) =>
+      {
+        const { selectedVariant, changingStatusOf } = state;
+        if (selectedVariant !== this.state.selectedVariant || changingStatusOf)
+        {
+          this.setState({
+            selectedVariant,
+          });
+          this.fetchStatus(changingStatusOf || this.props.variant);
+        }
+      },
+      isMounted: true,
+    });
   }
 
   public componentWillReceiveProps(nextProps)
@@ -115,6 +130,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       Ajax.getVariantStatus(
         variant.id,
         variant.db.id as number,
+        variant.deployedName,
         (response) =>
         {
           this.setState({ variantStatus: response });

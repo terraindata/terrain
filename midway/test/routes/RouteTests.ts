@@ -1159,9 +1159,9 @@ describe('Analytics route tests', () =>
         accessToken: 'ImAnAdmin',
         database: 1,
         start: new Date(2017, 10, 6, 7, 24, 4),
-        end: new Date(2017, 10, 6, 7, 26, 4),
+        end: new Date(2017, 10, 6, 7, 32, 4),
         eventname: 'impression',
-        variantid: 5,
+        variantid: 'terrain_5',
         agg: 'select',
       })
       .expect(200)
@@ -1173,7 +1173,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['5'].length).toEqual(3);
+        expect(respData['terrain_5'].length).toEqual(2);
       });
   });
 
@@ -1186,9 +1186,9 @@ describe('Analytics route tests', () =>
         accessToken: 'ImAnAdmin',
         database: 1,
         start: new Date(2017, 10, 6, 7, 24, 4),
-        end: new Date(2017, 10, 6, 7, 28, 4),
+        end: new Date(2017, 10, 6, 7, 32, 4),
         eventname: 'impression',
-        variantid: 5,
+        variantid: 'terrain_5',
         agg: 'histogram',
         interval: 'minute',
       })
@@ -1201,7 +1201,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['5'].length).toEqual(3);
+        expect(respData['terrain_5'].length).toEqual(6);
       });
   });
 
@@ -1216,7 +1216,7 @@ describe('Analytics route tests', () =>
         start: new Date(2017, 10, 6, 7, 24, 4),
         end: new Date(2017, 10, 6, 10, 24, 4),
         eventname: 'click,impression',
-        variantid: 5,
+        variantid: 'terrain_5',
         agg: 'rate',
         interval: 'hour',
       })
@@ -1229,7 +1229,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['5'].length).toEqual(4);
+        expect(respData['terrain_5'].length).toEqual(4);
       });
   });
 
