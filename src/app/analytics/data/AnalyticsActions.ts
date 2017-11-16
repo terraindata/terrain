@@ -142,7 +142,7 @@ const Actions =
               aggregation = 'histogram';
             }
 
-            const variants = getState().variants;
+            const variants = getState().get('library').variants;
             const deployedVariantNames = variantIds.map((id) =>
             {
               return variants.get(id).deployedName;
