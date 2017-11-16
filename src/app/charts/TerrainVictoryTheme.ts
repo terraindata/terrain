@@ -46,6 +46,8 @@ THE SOFTWARE.
 import { merge } from 'lodash';
 import { VictoryTheme } from 'victory';
 
+const blueGrey300 = '#90A4AE';
+
 const strokeDasharray = '10, 0';
 
 const theme = {
@@ -53,6 +55,11 @@ const theme = {
     style: {
       grid: {
         strokeDasharray,
+        strokeOpacity: 0.2,
+      },
+      axis: {
+        stroke: blueGrey300,
+        strokeWidth: 1,
         strokeOpacity: 0.2,
       },
     },
