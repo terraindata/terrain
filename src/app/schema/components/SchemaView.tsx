@@ -49,7 +49,6 @@ THE SOFTWARE.
 const Radium = require('radium');
 import * as $ from 'jquery';
 import * as React from 'react';
-import SchemaActions from 'schema/data/SchemaActions';
 import FadeInOut from '../../common/components/FadeInOut';
 import Util from '../../util/Util';
 import * as SchemaTypes from '../SchemaTypes';
@@ -59,8 +58,7 @@ import SchemaSearchResults from './SchemaSearchResults';
 import SchemaTreeList from './SchemaTreeList';
 import Styles from './SchemaTreeStyles';
 
-import { SchemaActionTypes, placeholder } from 'schema/data/SchemaRedux';
-console.log(placeholder);
+import { SchemaActions } from 'schema/data/SchemaRedux';
 
 export interface Props
 {
@@ -69,7 +67,7 @@ export interface Props
   showResults: boolean;
   search?: string;
   schema: SchemaTypes.SchemaState;
-  schemaActions: any;
+  schemaActions: typeof SchemaActions;
 }
 
 const horizontalDivide = 50;
@@ -94,7 +92,11 @@ class SchemaView extends TerrainComponent<Props>
       search,
       highlightedIndex: -1,
     });
-    this.props.schemaActions.highlightId(null, false);
+    this.props.schemaActions({
+      actionType: 'highlightId',
+      id: null,
+      inSearchResults: false,
+    });
   }
 
   public handleSearchKeyDown(event)
@@ -120,9 +122,11 @@ class SchemaView extends TerrainComponent<Props>
         this.setState({
           highlightedIndex: index,
         });
-
-        this.props.schemaActions.highlightId(id, inSearchResults);
-
+        this.props.schemaActions({
+          actionType: 'highlightId',
+          id,
+          inSearchResults,
+        });
         break;
 
       case 13:
@@ -131,7 +135,10 @@ class SchemaView extends TerrainComponent<Props>
 
         if (schema.highlightedId)
         {
-          this.props.schemaActions.selectId(schema.highlightedId);
+          this.props.schemaActions({
+            actionType: 'selectId',
+            id: schema.highlightedId,
+          });
         }
 
         // var value = visibleOptions.get(this.state.selectedIndex);
@@ -161,7 +168,6 @@ class SchemaView extends TerrainComponent<Props>
   {
     const search = this.props.search || this.state.search;
     const { schema, showSearch, showResults } = this.props;
-
     return (
       <div
         style={Styles.schemaView as any}

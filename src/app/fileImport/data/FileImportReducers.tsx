@@ -430,7 +430,9 @@ FileImportReducers[ActionTypes.importFile] =
       {
         action.payload.handleFileImportSuccess();
         action.payload.changeUploadInProgress(false);
-        TerrainStore.dispatch(action.payload.fetchSchema());
+        action.payload.schemaActions({
+          actionType: 'fetchSchema'
+        });
       },
       (err: string) =>
       {

@@ -315,15 +315,6 @@ export function parseMySQLDb(rawServer: object,
   });
 }
 
-/*
-
-export function parseElasticDb(elasticServer: object,
-  schemaData: object,
-  setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void,
-  dispatch)
-{
-
-*/
 export function parseElasticDb(elasticServer: object,
   schemaData: object,
   // setServerAction: (payload: SchemaTypes.SetServerActionPayload) => void,

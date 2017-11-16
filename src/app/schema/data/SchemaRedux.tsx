@@ -151,15 +151,16 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
     },
 
     serverCount: (state, action) => {
-      return state;
+      return state.set('serverCount', action.payload.serverCount);
     },
 
     highlightId: (state, action) => {
-      return state;
+      return state.set('highlightedId', action.payload.id)
+      .set('highlightedInSearchResults', action.payload.inSearchResults);
     },
 
     selectId: (state, action) => {
-      return state;
+      return state.set('selectedId', action.payload.id);
     },
   }
 
@@ -210,7 +211,7 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
                     }
                     else if (db['type'] === 'elastic')
                     {
-                      // SchemaParser.parseElasticDb(db, schemaData, directDispatch);
+                      SchemaParser.parseElasticDb(db, schemaData, directDispatch);
                     }
                   }
                   else
@@ -240,7 +241,7 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
   {
     if (action.actionType === 'fetch')
     {
-      return this.fetchAction;
+      return this.fetchAction.bind(this);
     }
   }
 }
