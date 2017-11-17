@@ -257,5 +257,3 @@ const ReduxInstance = new SchemaRedux();
 export const SchemaActions = ReduxInstance._actionsForExport();
 export const SchemaReducers = ReduxInstance._reducersForExport(_SchemaState);
 export declare type SchemaActionType<K extends keyof SchemaActionTypes> = GetType<K, SchemaActionTypes>;
-
-export const placeholder = 'hi';
