@@ -48,45 +48,34 @@ import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './RadioButtons.less';
 
+export interface RadioButtonOption {
+  key: string;
+  display: string | El;
+}
+
 export interface Props
 {
-  selected?: string;
-  options: Array<{
-    value: string;
-    label?: string;
-    onClick: (optionValue?: any) => void
-  }>;
-  optionShadow?: boolean;
+  selected: string;
+  options: List<RadioButtonOption>;
+  onSelectOption: (key: string, otherKeys?: string[]) => void;
 }
 
 class RadioButtons extends TerrainComponent<Props>
 {
-  public static defaultProps = { optionShadow: false };
 
-  public renderOption(option)
+  public renderOption(option: RadioButtonOption)
   {
-    const { optionShadow } = this.props;
-    const style: any = {};
-
-    if (optionShadow)
-    {
-      style.boxShadow = '2px 2px 2px #222';
-      style.backgroundColor = '#666';
-      style.margin = '10px';
-      style.padding = '5px';
-    }
-
     return (
-      <div key={option.value} style={style} className='radio-button-option'>
+      <div key={option.key} className='radio-button-option'>
         <div
-          onClick={() => option.onClick(option.value)}
+          onClick={this._fn(this.props.onSelectOption, option.key, this.props.options.map((o) => o.key))}
           className={classNames({
             'radio-button': true,
-            'radio-button-selected': option.value === this.props.selected,
+            'radio-button-selected': option.key === this.props.selected,
           })}
         >
         </div>
-        {option.label !== undefined ? option.label : option.value}
+        {option.display}
         <br />
       </div>
     );

@@ -54,7 +54,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map, Set } = Immutable;
-import ElasticBlockHelpers, {FieldType} from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
+import ElasticBlockHelpers, { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
 import Dropdown from '../../../../common/components/Dropdown';
 import ScoreBar from '../../charts/ScoreBar';
@@ -62,10 +62,14 @@ import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderText from '../PathfinderText';
-import { ADVANCED, ADVANCED_MAPPINGS, AggregationLine, AggregationTypes,
- ChoiceOption, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import
+{
+  ADVANCED_MAPPINGS, AggregationLine, AggregationTypes,
+  ChoiceOption, Path, PathfinderContext, Source
+} from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
+import PathfinderAdvancedLine from './PathfinderAdvancedLine';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
@@ -120,15 +124,14 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public handleTypeChange(index)
   {
     const type = this.options.get(index);
-    BuilderActions.change(this.props.keyPath.push('elasticType'), AggregationTypes.get(type).elasticType);
-    // Get the advanced object by merging all of the advanced types for the given aggregation type
     const advancedTypes = AggregationTypes.get(type).advanced;
     let advancedObj = {};
-    advancedTypes.forEach((type) =>
+    advancedTypes.forEach((advancedType) =>
     {
-      advancedObj = _.extend({}, advancedObj, ADVANCED_MAPPINGS[type]);
+      advancedObj = _.extend({}, advancedObj, ADVANCED_MAPPINGS[advancedType]);
     });
     BuilderActions.change(this.props.keyPath.push('advanced'), Map(advancedObj));
+    BuilderActions.change(this.props.keyPath.push('elasticType'), AggregationTypes.get(type).elasticType);
     BuilderActions.change(this.props.keyPath.push('name'), type + ' ' + this.props.aggregation.field);
   }
 
@@ -163,9 +166,9 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     }
     let filteredOptions = Set([]);
     const acceptedTypes = AggregationTypes.get(type).acceptedTypes;
-    acceptedTypes.forEach((type) =>
+    acceptedTypes.forEach((fieldType) =>
     {
-      filteredOptions = filteredOptions.union(ElasticBlockHelpers.getFieldsOfType(schemaState, type).toSet());
+      filteredOptions = filteredOptions.union(ElasticBlockHelpers.getFieldsOfType(schemaState, fieldType).toSet());
     });
     return filteredOptions.toList().sort();
   }
@@ -176,7 +179,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     return (
       <div className='pf-line'>
         <span>
-        The
+          The
         </span>
         <Dropdown
           options={this.options}
@@ -199,70 +202,41 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
 
   public renderLine(key, text, text2, multiValue, i)
   {
-    const {aggregation} = this.props;
-    const {advanced} = aggregation;
-    const {canEdit} = this.props.pathfinderContext;
+    const { aggregation } = this.props;
+    const { advanced } = aggregation;
+    const { canEdit } = this.props.pathfinderContext;
     return (
-    <div className='pf-aggregation-advanced-line' key={i}>
-      <span>{text}</span>
-      {
-        !multiValue ?
-        <BuilderTextbox
-          value={advanced.get(key)}
-          keyPath={this.props.keyPath.push(key)}
-          canEdit={canEdit}
-          placeholder={'value'}
-        />
-        :
-        null // TODO ADD IN MULTILPE INPUTS
-      }
-      <span>{text2}</span>
-    </div>
+      <div className='pf-aggregation-advanced-line' key={i}>
+        <span>{text}</span>
+        {
+          !multiValue ?
+            <BuilderTextbox
+              value={advanced.get(key)}
+              keyPath={this.props.keyPath.push(key)}
+              canEdit={canEdit}
+              placeholder={'value'}
+            />
+            :
+            null // TODO ADD IN MULTILPE INPUTS
+        }
+        <span>{text2}</span>
+      </div>
     );
   }
 
-  // Render the individual pieces of the advanced section
-  public renderAdvancedLine(type: ADVANCED, i)
+  // Given a type of advanced section to return, and the advanced
+  // data from the aggregation return an PathfinderAdvancedLine with the
+  // correct information
+  public renderAdvancedLine(type, i)
   {
-    const {aggregation} = this.props;
-    const {advanced} = aggregation;
-    const {canEdit} = this.props.pathfinderContext;
-    if (type === ADVANCED.Missing) // Special case
-    {
-      return (
-        <div key={i} className='pf-aggregation-advanced-line'>
-          <span>If {aggregation.field} is missing from a document, </span>
-          <Dropdown
-            options={List([1, 0])}
-            optionsDisplayName={Map({[1]: 'ignore it', [0]: 'replace it'})}
-            selectedIndex={advanced.get('ignoreMissing') ? 0 : 1}
-            keyPath={this.props.keyPath.push('advanced').push('ignoreMissing')}
-            canEdit={canEdit}
-          />
-          {
-            !advanced.get('ignoreMissing') &&
-            <div>
-              <span>with</span>
-              <BuilderTextbox
-                value={advanced.get('missing')}
-                keyPath={this.props.keyPath.push('advanced').push('missing')}
-                language={'elastic'}
-                canEdit={canEdit}
-                placeholder={'value'}
-              />
-            </div>
-          }
-        </div>
-      );
-    }
-    const advancedInfo = PathfinderText.aggregationAdvanced[type];
-    return this.renderLine(
-      advancedInfo.key,
-      advancedInfo.text,
-      advancedInfo.text2,
-      advancedInfo.multiValue,
-      i,
-    );
+    const { canEdit } = this.props.pathfinderContext;
+    return <PathfinderAdvancedLine
+      key={i}
+      advancedType={type}
+      keyPath={this.props.keyPath.push('advanced')}
+      canEdit={canEdit}
+      advancedData={this.props.aggregation.advanced}
+    />;
   }
 
   // The advanced section allows the user to set more advanced things on their aggregation
@@ -294,7 +268,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           })
         }
       </div>
-      );
+    );
   }
 
   public render()
@@ -313,12 +287,12 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
         expandOnLeft={true}
         expandButton={
           <div
-          className={classNames({
-            'pf-aggregation-arrow': true,
-            'pf-aggregation-arrow-open': this.props.aggregation.expanded,
-          })}>
+            className={classNames({
+              'pf-aggregation-arrow': true,
+              'pf-aggregation-arrow-open': this.props.aggregation.expanded,
+            })}>
             <ArrowIcon />
-        </div>}
+          </div>}
       />
     );
   }

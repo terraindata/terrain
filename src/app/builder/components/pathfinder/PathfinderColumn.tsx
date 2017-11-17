@@ -144,12 +144,12 @@ class PathfinderColumn extends TerrainComponent<Props>
           keyPath={keyPath.push('more')}
         />
 
-      {
-        // <PathfinderStepSection
-        //         pathfinderContext={pathfinderContext}
-        //         path={path}
-        //       />
-      }
+        {
+          // <PathfinderStepSection
+          //         pathfinderContext={pathfinderContext}
+          //         path={path}
+          //       />
+        }
       </div>
     );
   }

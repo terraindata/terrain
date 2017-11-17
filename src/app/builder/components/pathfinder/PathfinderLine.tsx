@@ -172,7 +172,7 @@ export class PathfinderLine extends TerrainComponent<Props>
         className='pf-line-left expand'
         onClick={this._fn(this.props.onExpand, !this.props.expanded)}
       >
-         {this.props.expandButton}
+        {this.props.expandButton}
       </div>
     );
   }

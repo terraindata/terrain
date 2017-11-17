@@ -69,24 +69,24 @@ export const enum FieldType
 }
 
 const FieldTypeMapping =
-{
-  [FieldType.Numerical]: ['long', 'double', 'short', 'byte', 'integer', 'half_float', 'float', 'boolean'],
-  [FieldType.Text]: ['text'],
-  [FieldType.Date]: ['date'],
-  [FieldType.Geopoint]: ['geo_point'],
-  [FieldType.Any]: ['text',
-                  'long',
-                  'boolean',
-                  'date',
-                  'array',
-                  'double',
-                  'short',
-                  'byte',
-                  'integer',
-                  'half_float',
-                  'float',
-                  'geo_point'],
-};
+  {
+    [FieldType.Numerical]: ['long', 'double', 'short', 'byte', 'integer', 'half_float', 'float', 'boolean'],
+    [FieldType.Text]: ['text'],
+    [FieldType.Date]: ['date'],
+    [FieldType.Geopoint]: ['geo_point'],
+    [FieldType.Any]: ['text',
+      'long',
+      'boolean',
+      'date',
+      'array',
+      'double',
+      'short',
+      'byte',
+      'integer',
+      'half_float',
+      'float',
+      'geo_point'],
+  };
 
 export const TransformableTypes =
   [
@@ -202,23 +202,23 @@ export const ElasticBlockHelpers = {
       {
         const typeId = state.db.name + '/' + String(index) + '.' + String(type);
         const fields = schemaState.columns.filter(
-            (column) => column.serverId === String(server) &&
-              column.databaseId === String(indexId) &&
-              column.tableId === String(typeId) &&
-              FieldTypeMapping[fieldType].indexOf(column.datatype) !== -1,
-          ).map(
-            (column) => column.name,
-          ).toList(); // concat meta fields if necessary
-          if (fieldType === FieldType.Numerical)
-          {
-            return fields.concat(List(['_score', '_size']));
-          }
-          if (fieldType === FieldType.Any)
-          {
-            return fields.concat(List(metaFields));
-          }
-          return fields;
+          (column) => column.serverId === String(server) &&
+            column.databaseId === String(indexId) &&
+            column.tableId === String(typeId) &&
+            FieldTypeMapping[fieldType].indexOf(column.datatype) !== -1,
+        ).map(
+          (column) => column.name,
+        ).toList(); // concat meta fields if necessary
+        if (fieldType === FieldType.Numerical)
+        {
+          return fields.concat(List(['_score', '_size']));
         }
+        if (fieldType === FieldType.Any)
+        {
+          return fields.concat(List(metaFields));
+        }
+        return fields;
+      }
     }
     if (fieldType === FieldType.Numerical)
     {

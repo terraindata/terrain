@@ -43,60 +43,89 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { List, Map } from 'immutable';
+import * as React from 'react';
+import { ADVANCED } from '../PathfinderTypes';
+// import * as SchemaTypes from '../schema/SchemaTypes';
+// const ManualConfig = require('./../manual/ManualConfig.json');
 
-// Centralized place for text used in Pathfinder
-import { ADVANCED } from './PathfinderTypes';
+export interface AdvancedAggregationDisplay
+{
+  title: string;
+  items: AdvancedAggregationItem | AdvancedAggregationItem[];
 
-export const PathfinderText = {
+  // This is for groups of items where only one can be active at a time
+  // e.g. for percentiles, there are two ways of setting accuracy (compression and number of sig figs)
+  // but only one can be used
+  onlyOne?: boolean;
+}
 
-  // Source section
-  firstWord: 'Find',
-  chooseDataSourceDropdownPrompt: 'Choose a data source',
+export interface AdvancedAggregationItem
+{
+  text?: string;
+  inputType?: 'single' | 'multi' | 'range' | 'boolean';
+  tooltipText?: string;
+  component?: any; // Some advanced items need to be custom built
+  key: string;
+}
 
-  // Filter section
-  firstFilterIntro: 'With',
-  nestedFilterIntro: '',
-  filterGroupPost: 'of the following:',
-  createFilterLine: 'filter condition',
-  createFilterGroup: 'group of filter conditions',
-  createScoreLine: 'score factor',
-  createAggregationLine: 'metadata',
-
-  findSectionTitle: 'Find',
-  findSectionSubtitle: `
-    Choose where your data are located and filter out everything that isn't a match.`,
-
-  scoreSectionTitle: 'Score',
-  scoreSectionSubtitle: `
-  Score your results, so that the best picks show up in the top spots.
-  The score for each result will be the sum of the following factors:
-  `,
-  moreSectionTitle: 'More',
-  moreSectionSubtitle: `
-  Look at the metadata for your data and add facets to better understand your data.
-  `,
-
-  // Steps
-
-  pickSourceStepTitle: `
-		Where are the data that you care about located?
-	`,
-
-  filterStepTitle: `
-		Let's find the data you want by filtering out everything that isn't a match.
-	`,
-
-  scoreStepTitle: `
-		Let's score your results, so that the best picks show up in the top spots.
-	`,
-
-  finalStepTitle: `
-		You can edit your algorithm directly above, or pick one of these actions to perform on it.
-	`,
-
-  scoreStepSubtitle: `
-
-  `,
-};
-
-export default PathfinderText;
+export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDisplay>({
+  [ADVANCED.Sigma]: {
+    title: 'Standard Deviation Bounds',
+    onlyOne: false,
+    items: {
+      text: 'Sigma',
+      inputType: 'single',
+      tooltipText: '',
+      key: 'sigma',
+    },
+  },
+  [ADVANCED.Accuracy]: {
+    title: 'Accuracy',
+    onlyOne: true,
+    items: [
+      {
+        text: 'Compression',
+        inputType: 'single',
+        tooltipText: '',
+        key: 'compression',
+      },
+      {
+        text: 'Significant Digits',
+        inputType: 'single',
+        tooltipText: '',
+        key: 'number_of_significant_value_digits',
+      },
+    ],
+  },
+  [ADVANCED.Percentiles]: {
+    title: 'Percentiles',
+    onlyOne: false,
+    items: {
+      text: 'Return the values at the following percentiles',
+      inputType: 'multi',
+      tooltipText: '',
+      key: 'percentiles',
+    },
+  },
+  [ADVANCED.PercentileRanks]: {
+    title: 'Percentile Ranks',
+    onlyOne: false,
+    items: {
+      text: 'Return the percentiles of the following values',
+      inputType: 'multi',
+      tooltipText: '',
+      key: 'values',
+    },
+  },
+  [ADVANCED.Missing]: {
+    title: 'Missing',
+    onlyOne: false,
+    items: {
+      text: 'If a document is missing the field, replace it with ',
+      inputType: 'single',
+      tooltipText: '',
+      key: 'missing',
+    },
+  },
+});

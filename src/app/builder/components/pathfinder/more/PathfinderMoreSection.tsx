@@ -58,7 +58,7 @@ import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
 import { _AggregationLine, More, Path, PathfinderContext, Source } from '../PathfinderTypes';
-import DragAndDrop, {DraggableItem} from './../../../../common/components/DragAndDrop';
+import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
 
@@ -105,13 +105,13 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     {
       return {
         content: <PathfinderAggregationLine
-            pathfinderContext={this.props.pathfinderContext}
-            aggregation={agg}
-            keyPath={this.props.keyPath.push('aggregations').push(i)}
-            onDelete={this.handleDeleteLine}
-            index={i}
-            key={i}
-          />,
+          pathfinderContext={this.props.pathfinderContext}
+          aggregation={agg}
+          keyPath={this.props.keyPath.push('aggregations').push(i)}
+          onDelete={this.handleDeleteLine}
+          index={i}
+          key={i}
+        />,
         key: i,
         draggable: true,
         dragHandle: <DragHandle />,
@@ -127,20 +127,20 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       <div
         className='pf-section pf-more-section'
       >
-      <PathfinderSectionTitle
-        title={PathfinderText.moreSectionTitle}
-        text={PathfinderText.moreSectionSubtitle}
-      />
-      <DragAndDrop
-        draggableItems={this.getAggregationLines()}
-        onDrop={this.handleLinesReorder}
-        className='more-aggregations-drag-drop'
-      />
-      <PathfinderCreateLine
-        canEdit={canEdit}
-        onCreate={this.handleAddLine}
-        text={PathfinderText.createAggregationLine}
-      />
+        <PathfinderSectionTitle
+          title={PathfinderText.moreSectionTitle}
+          text={PathfinderText.moreSectionSubtitle}
+        />
+        <DragAndDrop
+          draggableItems={this.getAggregationLines()}
+          onDrop={this.handleLinesReorder}
+          className='more-aggregations-drag-drop'
+        />
+        <PathfinderCreateLine
+          canEdit={canEdit}
+          onCreate={this.handleAddLine}
+          text={PathfinderText.createAggregationLine}
+        />
       </div>
     );
   }

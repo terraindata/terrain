@@ -95,7 +95,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-  if (this.props.line !== nextProps.line)
+    if (this.props.line !== nextProps.line)
     {
       this.setState({
         fieldIndex: nextProps.dropdownOptions.map((v) => v.name).toList().indexOf(nextProps.line.field),
