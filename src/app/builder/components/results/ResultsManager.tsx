@@ -52,7 +52,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import Actions from 'etl/templates/data/TemplateEditorActions';
+// import Actions from 'etl/templates/data/TemplateEditorActions';
 
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
@@ -309,7 +309,7 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       const { filetype, filesize, preview, originalNames } = exportChanges;
       // Actions.setPreviewData(filetype, filesize, preview, originalNames);
-      Actions.setPreviewData({preview: 'blah', originalNames: 'hah'})
+      // Actions.setPreviewData({preview: 'blah', originalNames: 'hah'})
     }
 
     this.props.onResultsStateChange(resultsState);

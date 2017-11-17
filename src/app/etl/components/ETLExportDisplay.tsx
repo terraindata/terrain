@@ -52,7 +52,7 @@ import Util from 'util/Util';
 import ETLActions from 'etl/data/ETLActions';
 import { ETLState } from 'etl/ETLTypes';
 
-import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorReducers';
+import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 export interface Props
@@ -71,7 +71,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
   public test()
   {
-    // this.props.etlActions.placeholder(5);
     this.props.templateEditorActions({
       actionType: 'setPreviewData',
       preview: 'hi',
@@ -80,7 +79,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
   public render()
   {
-    console.log(this.props.templateEditor.previewData);
     return <div onClick={this.test}> hello there </div>;
   }
 }

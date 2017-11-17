@@ -47,13 +47,35 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-import { makeConstructor, WithIRecord } from 'src/app/Classes';
+import { makeConstructor, New, WithIRecord } from 'src/app/Classes';
 
-export enum FILE_TYPE
+export enum FILE_TYPES
 {
   JSON = 'json',
   JSON_TYPE_OBJECT = 'json [type object]',
   CSV = 'csv'
+}
+
+export enum LANGUAGES
+{
+  ELASTIC,
+}
+
+export enum ELASTIC_TYPES
+{
+  TEXT = 'text',
+  LONG = 'long',
+  BOOLEAN = 'boolean',
+  DATE = 'date',
+  ARRAY = 'array',
+  NESTED = 'nested',
+  DOUBLE = 'double',
+  SHORT = 'short',
+  BYTE = 'byte',
+  INTEGER = 'integer',
+  HALF_FLOAT = 'half_float',
+  FLOAT = 'float',
+  GEO_POINT = 'geo_point',
 }
 
 class TemplateEditorStateC
@@ -69,7 +91,8 @@ interface TemplateBase
 {
   templateId: ID;
   templateName: string;
-  filetype: FILE_TYPE;
+  language: LANGUAGES;
+  filetype: FILE_TYPES;
   fieldMap: List<object>; // was column types
   transformations: List<object>;
   objectKey: string;
@@ -93,7 +116,8 @@ class ExportTemplateC implements ExportTemplateBase
 {
   public templateId = -1;
   public templateName = '';
-  public filetype = FILE_TYPE.JSON;
+  public language: LANGUAGES.ELASTIC;
+  public filetype = FILE_TYPES.JSON;
   public fieldMap = List([]);
   public transformations = List([]);
   public objectKey = '';
@@ -109,7 +133,8 @@ class ImportTemplateC implements ImportTemplateBase
 {
   public templateId = -1;
   public templateName = '';
-  public filetype = FILE_TYPE.JSON;
+  public language: LANGUAGES.ELASTIC;
+  public filetype = FILE_TYPES.JSON;
   public fieldMap = List([]);
   public transformations = List([]);
   public objectKey = '';
@@ -121,3 +146,29 @@ class ImportTemplateC implements ImportTemplateBase
 }
 export type ImportTemplate = WithIRecord<ImportTemplateC>;
 export const _ImportTemplate = makeConstructor<ImportTemplateC>(ImportTemplateC);
+
+class TemplateFieldC
+{
+  public isPrimaryKey: boolean = false; // import only
+  public isAnalyzed: boolean = true; // import only
+  public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
+  public analyzer: string = '';
+
+  public value: any = '';
+  public mapChildren: Immutable.Map<string, TemplateField> = Map({});
+  public arrayChildren: List<TemplateField> = List([]);
+}
+export type TemplateField = WithIRecord<TemplateFieldC>;
+type TemplateFieldSubset =
+{
+  [key in (keyof TemplateFieldC) | 'id']?: any;
+}
+export const _TemplateField = (cfg?: any) =>
+{
+  const config = cfg || {} as TemplateFieldSubset;
+  config.type = config.type || ELASTIC_TYPES.TEXT;
+  config.isAnalyzed = config.isAnalyzed || (config.type === ELASTIC_TYPES.TEXT);
+  config.analyzer = config.analyzer || (config.type === ELASTIC_TYPES.TEXT ? 'standard' : null);
+  config.value = config.value || null;
+  return New<WithIRecord<TemplateFieldC>>(new TemplateFieldC(), config);
+}
