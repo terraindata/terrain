@@ -96,6 +96,7 @@ export interface Props
   showCustomizeView: boolean;
   allowSpotlights: boolean;
   onNavigationException: () => void;
+  ignoreEmptyCards?: boolean;
 }
 
 interface State
@@ -254,8 +255,8 @@ class HitsArea extends TerrainComponent<Props>
 
   public isQueryEmpty(): boolean
   {
-    const { query } = this.props;
-    return !query || (!query.cards.size);
+    const { query, ignoreEmptyCards } = this.props;
+    return !query || (!ignoreEmptyCards && !query.cards.size);
   }
 
   public handleSpotlightAdded(id, spotlightData)
