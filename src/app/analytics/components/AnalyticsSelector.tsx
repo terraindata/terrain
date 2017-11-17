@@ -67,6 +67,7 @@ interface Props
 }
 
 const INTERVALS = Immutable.List([
+  { value: 'minute', label: 'Minute' },
   { value: 'hour', label: 'Hourly' },
   { value: 'day', label: 'Daily' },
   { value: 'week', label: 'Weekly' },

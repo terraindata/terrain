@@ -165,7 +165,7 @@ describe('AnalyticsReducer', () =>
       ).toEqual(
         analytics
           .set('loaded', true)
-          .setIn(['data', 1], analyticsResponse[1])
+          .setIn(['data', '1'], analyticsResponse[1])
           .set('errors', []),
       );
     });

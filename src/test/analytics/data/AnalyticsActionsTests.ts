@@ -47,6 +47,8 @@ import Actions from 'analytics/data/AnalyticsActions';
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import * as Immutable from 'immutable';
+import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
 import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import { Ajax, createMockStore } from '../../helpers';
 
@@ -195,7 +197,7 @@ describe('AnalyticsActions', () =>
     }),
   });
 
-  const variantId = 1;
+  const variantId = '1';
   const metric = 'impressions';
   const intervalId = 'day';
   const dateRangeId = 1;
@@ -237,7 +239,13 @@ describe('AnalyticsActions', () =>
           },
         ];
 
-        const store = mockStore(Immutable.Map({ analytics, schema }));
+        const variant = LibraryTypes._Variant();
+        variant.set('deployedName', 'terrain_1');
+        const library: LibraryState = _LibraryState({
+          variants: Immutable.Map<number, LibraryTypes.Variant>({ 1: variant }),
+        });
+
+        const store = mockStore(Immutable.Map({ analytics, schema, library }));
 
         store.dispatch(
           Actions.fetch(
@@ -283,7 +291,12 @@ describe('AnalyticsActions', () =>
           },
         ];
 
-        const store = mockStore(Immutable.Map({ analytics, schema }));
+        const variant = LibraryTypes._Variant();
+        variant.set('deployedName', 'terrain_1');
+        const library: LibraryState = _LibraryState({
+          variants: Immutable.Map<number, LibraryTypes.Variant>({ 1: variant }),
+        });
+        const store = mockStore(Immutable.Map({ analytics, schema, library }));
 
         store.dispatch(
           Actions.fetch(
