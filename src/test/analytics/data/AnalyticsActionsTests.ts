@@ -242,7 +242,7 @@ describe('AnalyticsActions', () =>
         const variant = LibraryTypes._Variant();
         variant.set('deployedName', 'terrain_1');
         const library: LibraryState = _LibraryState({
-          variants: Immutable.Map<number, LibraryTypes.Variant>({1: variant}),
+          variants: Immutable.Map<number, LibraryTypes.Variant>({ 1: variant }),
         });
 
         const store = mockStore(Immutable.Map({ analytics, schema, library }));
@@ -294,7 +294,7 @@ describe('AnalyticsActions', () =>
         const variant = LibraryTypes._Variant();
         variant.set('deployedName', 'terrain_1');
         const library: LibraryState = _LibraryState({
-          variants: Immutable.Map<number, LibraryTypes.Variant>({1: variant}),
+          variants: Immutable.Map<number, LibraryTypes.Variant>({ 1: variant }),
         });
         const store = mockStore(Immutable.Map({ analytics, schema, library }));
 
