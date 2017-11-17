@@ -44,20 +44,14 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:variable-name max-classes-per-file strict-boolean-expressions
-
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import Ajax from 'util/Ajax';
 
 import { _TemplateEditorState, TemplateEditorState } from 'etl/templates/TemplateTypes';
-import * as TemplateTypes from 'etl/templates/TemplateTypes';
-import { AllActionsType, ConstrainedMap, TerrainRedux } from 'src/app/store/TerrainRedux';
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 const { List, Map } = Immutable;
 
-// below would be in the actual implementation file for the actions/reducers:
-
-interface ActionParamTypes extends AllActionsType<ActionParamTypes>
+export interface TemplateEditorActionTypes
 {
   setPreviewData: {
     actionType: 'setPreviewData';
@@ -70,9 +64,9 @@ interface ActionParamTypes extends AllActionsType<ActionParamTypes>
   }
 }
 
-class TemplateEditorActionsClass extends TerrainRedux<ActionParamTypes, TemplateEditorState>
+class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
 {
-  public reducers: ConstrainedMap<ActionParamTypes, TemplateEditorState> =
+  public reducers: ConstrainedMap<TemplateEditorActionTypes, TemplateEditorState> =
   {
     setPreviewData: (state, action) => {
       return state.set('previewData', action.payload.preview);
@@ -83,6 +77,7 @@ class TemplateEditorActionsClass extends TerrainRedux<ActionParamTypes, Template
   }
 }
 
-const ActionReducerInstance = new TemplateEditorActionsClass();
-export const TemplateEditorActions = ActionReducerInstance._actionsForExport();
-export const TemplateEditorReducers = ActionReducerInstance._reducersForExport(_TemplateEditorState);
+const ReduxInstance = new TemplateEditorActionsClass();
+export const TemplateEditorActions = ReduxInstance._actionsForExport();
+export const TemplateEditorReducers = ReduxInstance._reducersForExport(_TemplateEditorState);
+export declare type TemplateEditorActionType<K extends keyof TemplateEditorActionTypes> = GetType<K, TemplateEditorActionTypes>;
