@@ -47,13 +47,14 @@ THE SOFTWARE.
 /*
  * A brief how-to:
  * Child classes that extend TerrainRedux contain the logic and typings for Actions, Reducers, and ActionTypes
- * Child classes that extend TerrainRedux need to provide a 'manifest' type as a generic
+ * Child classes that extend TerrainRedux need to provide a 'manifest' type.
+ * This manifest type defines the name and payload type definitions for a set of actions and reducers.
  * The manifest is an interface with the following properties:
  * Every key of the interface is the name of each action / reducer (actions and reducers have identical names)
  * Every value of the interface is a named map that acts as the type definition for action payloads.
  * In each action payload the key 'actionType' is required and must be the same  as the key name.
  * e.g.
- * interface ActionsManifest
+ * interface FooActionTypes
  * {
  *   action1: {
  *     actionType: 'action1';
@@ -120,6 +121,8 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     return undefined;
   }
 
+  // creates a function that can directly dispatch reducers onto a store
+  // action creator needs to be bound first, so call this function from within a container
   public _dispatchReducerFactory(dispatch: (payload: WrappedPayload<AllActionsT>) => any):
     (action: Unroll<AllActionsT>) => any
   {
