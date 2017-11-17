@@ -89,7 +89,7 @@ export async function search(req: Request): Promise<object[]>
       const from = Number(req.p) * 30;
       const size = 30;
 
-      if (req.v === undefined || req.v === '123')
+      if (req.v === undefined || req.v === 'MovieDemoAlgorithm')
       {
         winston.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
         client.search({
@@ -108,11 +108,11 @@ export async function search(req: Request): Promise<object[]>
       }
       else
       {
-        winston.info('Calling Terrain variant: terrain_' + req.v +
+        winston.info('Calling Terrain variant: ' + req.v +
           '(from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
         client.searchTemplate({
           body: {
-            id: 'terrain_' + req.v,
+            id: req.v,
             params: {
               from: (Number(req.p) * 30),
               size: 30,

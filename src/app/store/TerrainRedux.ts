@@ -74,51 +74,66 @@ THE SOFTWARE.
  * The inherited methods _actionsForExport and _reducersForExport are then invoked and exported
  */
 
+// tslint:disable:variable-name strict-boolean-expressions
+
 // The type that defines all the possible action payloads
 // Also asserts that the key is the same as the actionType
 export type AllActionsType<SelfT> =
-{
-  [key in keyof SelfT]: {actionType: key, [other: string]: any}
-}
+  {
+    [key in keyof SelfT]: { actionType: key, [other: string]: any }
+  };
 
 // Unrolls AllActionsT into a union of its members
-type Unroll<AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[keyof AllActionsT]
+export type Unroll<AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[keyof AllActionsT];
 
 // The type returned by an action whose payload is ActionT
-interface WrappedPayload<ActionT>
+export interface WrappedPayload<AllActionsT extends AllActionsType<AllActionsT>>
 {
-  type: string;
-  payload: ActionT;
+  type: keyof AllActionsT;
+  payload: Unroll<AllActionsT>;
 }
 
+export type ActPayload<AllActionsT extends AllActionsType<AllActionsT>> =
+  WrappedPayload<AllActionsT> | ((dispatch: (payload: WrappedPayload<AllActionsT>) => any) => any);
+
 // The type of 'action' that a reducer operates on. This is actually the same type as WrappedPayload
-interface ReducerPayload<Key extends keyof AllActionsT, AllActionsT>
+export interface ReducerPayload<Key extends keyof AllActionsT, AllActionsT>
 {
   type: Key;
   payload: AllActionsT[Key];
 }
 
-// union of all possible actionTypes strings
-type ActionTypeUnion<AllActionsT extends AllActionsType<AllActionsT>> = Unroll<AllActionsT>['actionType'];
-
 // dictionary that must map all actionTypes and only actionTypes
 // reducers must adhere to this map
 export type ConstrainedMap<AllActionsT extends AllActionsType<AllActionsT>, S> =
-{
-  [key in ActionTypeUnion<AllActionsT>]: (state: S, action: ReducerPayload<key, AllActionsT>) => S;
-}
+  {
+    [key in keyof AllActionsT]: (state: S, action: ReducerPayload<key, AllActionsT>) => S;
+  };
 
 export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActionsT>, StateType>
 {
   public abstract reducers: ConstrainedMap<AllActionsT, StateType>;
 
   // child class should override this for special actions
-  public overrideAct(action: Unroll<AllActionsT>): WrappedPayload<Unroll<AllActionsT>>
+  public overrideAct(action: Unroll<AllActionsT>): ActPayload<AllActionsT>
   {
     return undefined;
   }
 
-  public _act(action: Unroll<AllActionsT>): WrappedPayload<Unroll<AllActionsT>>
+  public _dispatchReducerFactory(dispatch: (payload: WrappedPayload<AllActionsT>) => any):
+    (action: Unroll<AllActionsT>) => any
+  {
+    return (action: Unroll<AllActionsT>) =>
+    {
+      const payload = {
+        type: (action as any).actionType,
+        payload: action,
+      };
+      dispatch(payload);
+    };
+  }
+
+  public _act(action: Unroll<AllActionsT>): ActPayload<AllActionsT>
   {
     const override = this.overrideAct(action);
     if (override !== undefined)
@@ -128,7 +143,7 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     return {
       type: (action as any).actionType, // Can't seem to find a way around this type assertion
       payload: action,
-    }
+    };
   }
 
   public _actionsForExport(): (action: Unroll<AllActionsT>) => any
@@ -146,6 +161,9 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
         nextState = this.reducers[action.type](state, action);
       }
       return nextState;
-    }
+    };
   }
 }
+
+// Type query utility to get the type of an action.
+export type GetType<K extends keyof AllActionsT, AllActionsT extends AllActionsType<AllActionsT>> = AllActionsT[K];

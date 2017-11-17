@@ -61,7 +61,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
   if ($scope.page === undefined) $scope.page = 0;
   if ($scope.searchTerm === undefined) $scope.searchTerm = '';
   if ($scope.esServer === undefined) $scope.esServer = 'http://localhost:9200';
-  if ($scope.variantID === undefined) $scope.variantID = 123;
+  if ($scope.variantID === undefined) $scope.variantID = 'MovieDemoAlgorithm';
 
   $scope.$watch('$viewContentLoaded', function () {
     TerrainAnalytics.logEvent('view', $scope.variantID, {itemName: 'home', itemType: 'page'});
@@ -76,7 +76,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 
     if ($scope.searchTerm === undefined) $scope.searchTerm = '';
     if ($scope.esServer === undefined) $scope.esServer = 'http://localhost:9200';
-    if ($scope.variantID === undefined) $scope.variantID = 123;
+    if ($scope.variantID === undefined) $scope.variantID = 'MovieDemoAlgorithm';
 
     $location.search({
       'q': $scope.searchTerm,

@@ -423,6 +423,11 @@ class Library extends TerrainComponent<any>
         path: `/${basePath}/${groupId}`,
       } : null;
 
+    const selectedMetricObject = analytics.availableMetrics.find((metric) =>
+    {
+      return metric.events === selectedMetric;
+    });
+
     return (
       <div className='library library-layout-horizontal'>
         <div className='library-top'>
@@ -501,6 +506,9 @@ class Library extends TerrainComponent<any>
                     xDataKey={'key'}
                     yDataKey={'doc_count'}
                     onLegendClick={this.handleLegendClick}
+                    legendTitle={selectedMetricObject !== undefined ?
+                      selectedMetricObject.label : ''
+                    }
                   /> : (
                     <div className='library-analytics-error'>
                       <p>An error occurred while fetching the analytics data</p>
@@ -518,6 +526,7 @@ class Library extends TerrainComponent<any>
             <div className='library-analytics-selector-wrapper'>
               <AnalyticsSelector
                 analytics={analytics}
+                analyticsActions={this.props.analyticsActions}
                 servers={schema.servers}
                 analyticsConnection={analytics.selectedAnalyticsConnection}
                 onMetricSelect={this.handleMetricRadioButtonClick}

@@ -54,7 +54,7 @@ import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
 import RolesReducer from 'roles/data/RolesReducers';
-import SchemaReducer from 'schema/data/SchemaReducer';
+import { SchemaReducers } from 'schema/data/SchemaRedux';
 import UserReducer from 'users/data/UserReducers';
 import Ajax from 'util/Ajax';
 import ColorsReducer from '../colors/data/ColorsReducers';
@@ -65,8 +65,8 @@ const reducers = {
   etl: ETLReducer,
   library: LibraryReducer,
   roles: RolesReducer,
-  schema: SchemaReducer,
   templateEditor: TemplateEditorReducers,
+  schema: SchemaReducers,
   users: UserReducer,
 };
 
