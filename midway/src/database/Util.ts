@@ -50,6 +50,9 @@ import ElasticController from '../database/elastic/ElasticController';
 import MySQLConfig from '../database/mysql/MySQLConfig';
 import MySQLController from '../database/mysql/MySQLController';
 
+import PostgreSQLConfig from '../database/pg/PostgreSQLConfig';
+import PostgreSQLController from '../database/pg/PostgreSQLController';
+
 import SQLiteConfig from '../database/sqlite/SQLiteConfig';
 import SQLiteController from '../database/sqlite/SQLiteController';
 
@@ -61,7 +64,7 @@ export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MyS
       filename: dsnString,
     } as SQLiteConfig;
   }
-  else if (type === 'mysql')
+  else if (type === 'mysql' || type === 'postgres' || type === 'pg')
   {
     const idx = dsnString.lastIndexOf('@');
     const h0 = dsnString.substr(0, idx);
@@ -104,7 +107,7 @@ export function makeDatabaseController(
   type: string,
   dsnString: string,
   analyticsIndex?: string,
-  analyticsType?: string): SQLiteController | MySQLController | ElasticController
+  analyticsType?: string): SQLiteController | MySQLController | ElasticController | PostgreSQLController
 {
   type = type.toLowerCase();
   if (type === 'sqlite')
@@ -116,6 +119,11 @@ export function makeDatabaseController(
   {
     const config = DSNToConfig(type, dsnString) as MySQLConfig;
     return new MySQLController(config, 0, 'MySQL');
+  }
+  else if (type === 'postgresql' || type === 'pg')
+  {
+    const config = DSNToConfig(type, dsnString) as PostgreSQLConfig;
+    return new PostgreSQLController(config, 0, 'PostgreSQL');
   }
   else if (type === 'elasticsearch' || type === 'elastic')
   {
