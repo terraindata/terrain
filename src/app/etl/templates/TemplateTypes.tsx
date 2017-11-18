@@ -93,7 +93,7 @@ interface TemplateBase
   templateName: string;
   language: LANGUAGES;
   filetype: FILE_TYPES;
-  fieldMap: List<object>; // was column types
+  rootField: TemplateField; // was column types
   transformations: List<object>;
   objectKey: string;
   dbid: number;
@@ -118,7 +118,7 @@ class ExportTemplateC implements ExportTemplateBase
   public templateName = '';
   public language: LANGUAGES.ELASTIC;
   public filetype = FILE_TYPES.JSON;
-  public fieldMap = List([]);
+  public rootField = _TemplateField({isRoot: true});
   public transformations = List([]);
   public objectKey = '';
   public dbid = -1;
@@ -135,7 +135,7 @@ class ImportTemplateC implements ImportTemplateBase
   public templateName = '';
   public language: LANGUAGES.ELASTIC;
   public filetype = FILE_TYPES.JSON;
-  public fieldMap = List([]);
+  public rootField = _TemplateField({isRoot: true});
   public transformations = List([]);
   public objectKey = '';
   public dbid = -1;
@@ -149,14 +149,14 @@ export const _ImportTemplate = makeConstructor<ImportTemplateC>(ImportTemplateC)
 
 class TemplateFieldC
 {
+  public isRoot: boolean = false;
   public isPrimaryKey: boolean = false; // import only
   public isAnalyzed: boolean = true; // import only
   public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
   public analyzer: string = '';
-
-  public value: any = '';
-  public mapChildren: Immutable.Map<string, TemplateField> = Map({});
-  public arrayChildren: List<TemplateField> = List([]);
+  public originalName: string = '';
+  public name: string = '';
+  public children: Immutable.Map<string, TemplateField> = Map({});
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
 type TemplateFieldSubset =
@@ -169,6 +169,8 @@ export const _TemplateField = (cfg?: any) =>
   config.type = config.type || ELASTIC_TYPES.TEXT;
   config.isAnalyzed = config.isAnalyzed || (config.type === ELASTIC_TYPES.TEXT);
   config.analyzer = config.analyzer || (config.type === ELASTIC_TYPES.TEXT ? 'standard' : null);
-  config.value = config.value || null;
+  config.originalName = config.originalName || config.name || '';
+  config.name = config.name || config.originalName;
+
   return New<WithIRecord<TemplateFieldC>>(new TemplateFieldC(), config);
 }
