@@ -51,7 +51,7 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 const { List, Map } = Immutable;
 import DragHandle from 'app/common/components/DragHandle';
 import FadeInOut from 'app/common/components/FadeInOut';

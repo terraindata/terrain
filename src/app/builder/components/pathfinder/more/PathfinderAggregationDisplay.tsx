@@ -43,6 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import BuilderTextbox from 'app/common/components/BuilderTextbox';
+import Dropdown from 'app/common/components/Dropdown';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 import { ADVANCED } from '../PathfinderTypes';
@@ -65,7 +67,7 @@ export interface AdvancedAggregationItem
   text?: string;
   inputType?: 'single' | 'multi' | 'range' | 'boolean';
   tooltipText?: string;
-  component?: any; // Some advanced items need to be custom built
+  component?: (...args) => El; // Some advanced items need to be custom built
   key: string;
 }
 
@@ -122,9 +124,32 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
     title: 'Missing',
     onlyOne: false,
     items: {
-      text: 'If a document is missing the field, replace it with ',
-      inputType: 'single',
-      tooltipText: '',
+      component: (fieldName: string, keyPath: KeyPath, onChange, canEdit: boolean, replace: boolean, value?: any) =>
+      {
+        return (
+          <div className='pf-aggregation-missing'>
+            <span>If a document is missing {fieldName}, </span>
+            <Dropdown
+              options={List(['ignore it', 'replace it'])}
+              selectedIndex={replace ? 1 : 0}
+              onChange={onChange}
+              canEdit={canEdit}
+            />
+            {
+              replace ?
+                <div>
+                  <span>with</span>
+                  <BuilderTextbox
+                    value={value}
+                    keyPath={keyPath}
+                    canEdit={canEdit}
+                  />
+                </div>
+                : null
+            }
+          </div>
+        );
+      },
       key: 'missing',
     },
   },

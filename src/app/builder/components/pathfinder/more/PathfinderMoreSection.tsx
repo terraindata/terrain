@@ -50,9 +50,10 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import ColorsActions from 'app/colors/data/ColorsActions';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
@@ -76,6 +77,13 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   } = {
 
   };
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.pf-line-wrapper .expand', getStyle('fill', Colors().iconColor));
+    ColorsActions.setStyle('.pf-aggregation-arrow-open', { fill: Colors().active + ' !important' });
+    ColorsActions.setStyle('.pf-aggregation-arrow-advanced', getStyle('fill', Colors().iconColor));
+  }
 
   public handleAddLine()
   {

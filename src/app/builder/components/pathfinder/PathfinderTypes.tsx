@@ -227,7 +227,8 @@ export const _AggregationLine = (config?: { [key: string]: any }) =>
 {
   let aggregation = New<AggregationLine>(new AggregationLineC(config || {}), config);
   const advanced = {};
-  _.keys(aggregation['advanced']).map((key) => {
+  _.keys(aggregation['advanced']).map((key) =>
+  {
     if (Array.isArray(aggregation['advanced'][key]))
     {
       advanced[key] = List(aggregation['advanced'][key]);
@@ -236,7 +237,7 @@ export const _AggregationLine = (config?: { [key: string]: any }) =>
     {
       advanced[key] = aggregation['advanced'][key];
     }
-  })
+  });
   aggregation = aggregation
     .set('advanced', Map(advanced));
   return aggregation;
@@ -428,64 +429,64 @@ interface AggregationData
 export const AggregationTypes = Map<string, AggregationData>({
   ['average of']:
   {
-  elasticType: 'avg', advanced: List([ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date])
+    elasticType: 'avg', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   minimum:
   {
     elasticType: 'min', advanced: List([ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date])
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   maximum:
   {
     elasticType: 'max', advanced: List([ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date])
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   ['sum of']:
   {
     elasticType: 'sum', advanced: List([ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date])
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   ['number of values of']:
   {
-elasticType: 'value_count', advanced: List([ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Any])
-},
+    elasticType: 'value_count', advanced: List([ADVANCED.Missing]),
+    acceptedTypes: List([FieldType.Any]),
+  },
   ['approx. number of values of']:
   {
     elasticType: 'cardinality', advanced: List([ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Any])
+    acceptedTypes: List([FieldType.Any]),
   },
   ['geographic center of']:
   {
     elasticType: 'geo_centroid', advanced: List([ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Geopoint])
+    acceptedTypes: List([FieldType.Geopoint]),
   },
   ['geographic bounds of']:
   {
     elasticType: 'geo_bounds', advanced: List([ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Geopoint])
-},
+    acceptedTypes: List([FieldType.Geopoint]),
+  },
   ['percentiles of']:
   {
     elasticType: 'percentiles', advanced:
-      List([ADVANCED.Missing, ADVANCED.Percentiles, ADVANCED.Accuracy]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date])
-},
+    List([ADVANCED.Missing, ADVANCED.Percentiles, ADVANCED.Accuracy]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
+  },
   ['percentiles of values of']:
   {
     elasticType: 'percentile_ranks', advanced:
-      List([ADVANCED.Missing, ADVANCED.PercentileRanks, ADVANCED.Accuracy]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date])
+    List([ADVANCED.Missing, ADVANCED.PercentileRanks, ADVANCED.Accuracy]),
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   ['basic statistics for']:
   {
     elasticType: 'stats', advanced: List([ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date])
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   ['full statistics for']:
   {
     elasticType: 'extended_stats', advanced: List([ADVANCED.Missing, ADVANCED.Sigma]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date])
+    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
 });

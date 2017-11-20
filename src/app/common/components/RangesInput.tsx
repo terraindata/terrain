@@ -44,27 +44,35 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires
-import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
 import ColorsActions from 'app/colors/data/ColorsActions';
+import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import * as classNames from 'classnames';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import './MultiInputStyle.less';
+import './RangesInputStyle.less';
 
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
+export interface Range
+{
+  name: string;
+  from: number;
+  to: number;
+}
+
 export interface Props
 {
-  isNumber?: boolean;
   canEdit: boolean;
   keyPath?: KeyPath;
   action?: (keyPath, items) => void;
   onChange?: (items) => void;
-  items: List<number | string>;
+  ranges: List<Range>;
 }
 
-class MultiInput extends TerrainComponent<Props>
+class RangesInput extends TerrainComponent<Props>
 {
   public state: {
     newValue: string;
@@ -74,36 +82,56 @@ class MultiInput extends TerrainComponent<Props>
 
   public deleteItem(index)
   {
-    const newItems = this.props.items.delete(index);
+    const newRanges = this.props.ranges.delete(index);
+    this.changeRanges(newRanges);
+  }
+
+  public changeRanges(newRanges)
+  {
     if (this.props.onChange !== undefined)
     {
-      this.props.onChange(newItems);
+      this.props.onChange(newRanges);
     }
     if (this.props.keyPath !== undefined && this.props.action !== undefined)
     {
-      this.props.action(this.props.keyPath, newItems);
+      this.props.action(this.props.keyPath, newRanges);
     }
   }
 
   public renderItems()
   {
-    const { items } = this.props;
+    const { ranges } = this.props;
     return (
-      <div>
+      <div className='range-input-ranges-wrapper'>
         {
-          items.map((item, index) =>
+          ranges.map((range, index) =>
           {
             return (
               <div
-                className='multi-input-item'
                 key={index}
-                style={_.extend({}, backgroundColor(Colors().bg3), borderColor(Colors().bg1))}
-              >
-                {item}
+                className='range-input-item'>
+                <span>Name </span>
+                <BuilderTextbox
+                  value={range.name}
+                  keyPath={this.props.keyPath.push(index).push('name')}
+                  canEdit={this.props.canEdit}
+                />
+                <span>:</span>
+                <BuilderTextbox
+                  value={range.from}
+                  keyPath={this.props.keyPath.push(index).push('from')}
+                  canEdit={this.props.canEdit}
+                />
+                <span>-</span>
+                <BuilderTextbox
+                  value={range.to}
+                  keyPath={this.props.keyPath.push(index).push('to')}
+                  canEdit={this.props.canEdit}
+                />
                 {
                   this.props.canEdit ?
                     <div
-                      className='multi-input-item-delete'
+                      className='range-input-item-delete close'
                       onClick={this._fn(this.deleteItem, index)}
                     >
                       <RemoveIcon />
@@ -114,34 +142,9 @@ class MultiInput extends TerrainComponent<Props>
             );
           })
         }
-        {this.renderInput()}
+        {this.renderCreateRange()}
       </div>
     );
-  }
-
-  public handleCreateItem()
-  {
-    let newValue: any = this.state.newValue;
-    if (this.props.isNumber)
-    {
-      newValue = parseFloat(newValue);
-    }
-    this.props.action(this.props.keyPath, this.props.items.push(newValue));
-    this.setState({
-      newValue: '',
-    });
-  }
-
-  public handleKeyDown(e)
-  {
-    switch (e.keyCode)
-    {
-      case 13:
-      case 9:
-        this.handleCreateItem();
-        break;
-      default:
-    }
   }
 
   public handleValueChange(event)
@@ -151,20 +154,25 @@ class MultiInput extends TerrainComponent<Props>
     });
   }
 
-  public renderInput()
+  public handleAddRange()
+  {
+    const newRanges = this.props.ranges.push({ name: '', from: 0, to: 0 });
+    this.changeRanges(newRanges);
+  }
+
+  public renderCreateRange()
   {
     if (!this.props.canEdit)
     {
       return null;
     }
     return (
-      <div className='multi-input-input'>
-        <input
-          value={this.state.newValue}
-          onChange={this.handleValueChange}
-          placeholder={'Add value'}
-          onKeyDown={this.handleKeyDown}
-        />
+      <div
+        className='range-input-create'
+        style={fontColor(Colors().text3, Colors().active)}
+        onClick={this.handleAddRange}
+      >
+        + Add Interval
       </div>
     );
   }
@@ -172,11 +180,11 @@ class MultiInput extends TerrainComponent<Props>
   public render()
   {
     return (
-      <div className='multi-input-wrapper'>
+      <div className='range-input-wrapper'>
         {this.renderItems()}
       </div>
     );
   }
 }
 
-export default MultiInput;
+export default RangesInput;

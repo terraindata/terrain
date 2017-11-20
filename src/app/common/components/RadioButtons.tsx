@@ -48,7 +48,8 @@ import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './RadioButtons.less';
 
-export interface RadioButtonOption {
+export interface RadioButtonOption
+{
   key: string;
   display: string | El;
 }

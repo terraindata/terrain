@@ -50,17 +50,19 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/c
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as React from 'react';
 import * as _ from 'lodash';
+import * as React from 'react';
 const { List, Map } = Immutable;
+import BuilderActions from 'app/builder/data/BuilderActions';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
+import Dropdown from 'app/common/components/Dropdown';
 import FadeInOut from 'app/common/components/FadeInOut';
+import MultiInput from 'app/common/components/MultiInput';
+import RadioButtons, { RadioButtonOption } from 'app/common/components/RadioButtons';
+import RangesInput from 'app/common/components/RangesInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { ADVANCED } from '../PathfinderTypes';
 import { AdvancedDisplays } from './PathfinderAggregationDisplay';
-import RadioButtons, {RadioButtonOption} from 'app/common/components/RadioButtons';
-import BuilderActions from 'app/builder/data/BuilderActions';
-import MultiInput from 'app/common/components/MultiInput';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
@@ -70,6 +72,7 @@ export interface Props
   advancedData: any;
   keyPath: KeyPath;
   canEdit: boolean;
+  fieldName: string;
 }
 
 export class PathfinderAdvancedLine extends TerrainComponent<Props>
@@ -80,13 +83,33 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
     expanded: false,
   };
 
+  public handleMissingChange(index)
+  {
+    // ignore missing items
+    if (index === 0)
+    {
+      BuilderActions.change(this.props.keyPath, this.props.advancedData.delete('missing'));
+    }
+    // replace missing items
+    else if (index === 1)
+    {
+      BuilderActions.change(this.props.keyPath, this.props.advancedData.set('missing', 0));
+    }
+  }
+
   public renderAdvancedItem(item, i?)
   {
     if (item.component !== undefined)
     {
       return (
         <div key={i} className='pf-advanced-section-item'>
-            {item.component}
+          {item.component(
+            this.props.fieldName,
+            this.props.keyPath.push(item.key),
+            this.handleMissingChange,
+            this.props.canEdit,
+            this.props.advancedData.get(item.key) !== undefined,
+            this.props.advancedData.get(item.key))}
         </div>
       );
     }
@@ -94,36 +117,57 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
     switch (item.inputType)
     {
       case 'single':
-        content = 
-        <div className='pf-advanced-section-item' key={i}>
-          {item.text}
-          <BuilderTextbox
-            value={this.props.advancedData.get(item.key)}
-            canEdit={this.props.canEdit}
-            keyPath={this.props.keyPath.push(item.key)}
-            language='elastic'
-          />
-        </div>
-      break;
+        content =
+          <div className='pf-advanced-section-item' key={i}>
+            {item.text}
+            <BuilderTextbox
+              value={this.props.advancedData.get(item.key)}
+              canEdit={this.props.canEdit}
+              keyPath={this.props.keyPath.push(item.key)}
+              language='elastic'
+            />
+          </div>;
+        break;
       case 'multi':
-        content = 
-        <div className='pf-advacned-section-item' key={i}>
-          {item.text}
-          <MultiInput
-            items={this.props.advancedData.get(item.key)}
-            keyPath={this.props.keyPath.push(item.key)}
-            action={BuilderActions.change}
-            isNumber={true} // change ?
-            canEdit={this.props.canEdit}
-          />
-        </div>
+        content =
+          <div className='pf-advanced-section-item' key={i}>
+            {item.text}
+            <MultiInput
+              items={this.props.advancedData.get(item.key)}
+              keyPath={this.props.keyPath.push(item.key)}
+              action={BuilderActions.change}
+              isNumber={true} // change ?
+              canEdit={this.props.canEdit}
+            />
+          </div>;
         break;
       case 'range':
+        content =
+          <div className='pf-advanced-section-item' key={i}>
+            {item.text}
+            <RangesInput
+              ranges={this.props.advancedData.get(item.key)}
+              keyPath={this.props.keyPath.push(item.key)}
+              action={BuilderActions.change}
+              canEdit={this.props.canEdit}
+            />
+          </div>;
+        break;
       case 'boolean':
+        content =
+          <div className='pf-advanced-section-item' key={i}>
+            {item.text}
+            <Dropdown
+              canEdit={this.props.canEdit}
+              keyPath={this.props.keyPath.push(item.key)}
+              options={List(['true', 'false'])}
+              selectedIndex={this.props.advancedData.get(item.key) === 'true' ? 0 : 1}
+            />
+          </div>;
+        break;
       default:
     }
 
-;
     return content;
   }
 
@@ -144,13 +188,15 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
   {
     if (onlyOne)
     {
-      const options = List<RadioButtonOption>(items.map((item, i) => {
+      const options = List<RadioButtonOption>(items.map((item, i) =>
+      {
         return {
           key: item.key,
-          display: this.renderAdvancedItem(item, i)
-        }
+          display: this.renderAdvancedItem(item, i),
+        };
       }));
-      const selected = options.filter((opt) => {
+      const selected = options.filter((opt) =>
+      {
         return this.props.advancedData.get(opt.key) !== undefined;
       }).get(0).key;
       return (
@@ -178,7 +224,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
     const display = AdvancedDisplays.get(String(this.props.advancedType));
     return (
       <div>
-        <div 
+        <div
           className='pf-advanced-section-title'
           onClick={this._toggle('expanded')}
         >
@@ -186,7 +232,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
             'pf-aggregation-arrow': true,
             'pf-aggregation-arrow-advanced': true,
             'pf-aggregation-arrow-open': this.state.expanded,
-         })}
+          })}
           >
             <ArrowIcon />
           </div>

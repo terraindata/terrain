@@ -65,7 +65,7 @@ import PathfinderText from '../PathfinderText';
 import
 {
   ADVANCED_MAPPINGS, AggregationLine, AggregationTypes,
-  ChoiceOption, Path, PathfinderContext, Source
+  ChoiceOption, Path, PathfinderContext, Source,
 } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
@@ -236,6 +236,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       keyPath={this.props.keyPath.push('advanced')}
       canEdit={canEdit}
       advancedData={this.props.aggregation.advanced}
+      fieldName={this.props.aggregation.field}
     />;
   }
 
