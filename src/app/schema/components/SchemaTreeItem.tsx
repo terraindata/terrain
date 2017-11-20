@@ -139,6 +139,11 @@ class SchemaTreeItem extends TerrainComponent<Props>
   public lastHeaderClickTime: number = 0;
   public lastArrowClickTime: number = 0;
 
+  public componentWillMount()
+  {
+    this.componentWillReceiveProps(this.props);
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
     const { schema: state } = nextProps;
