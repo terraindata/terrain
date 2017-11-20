@@ -54,6 +54,7 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../..
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import Dropdown from 'app/common/components/Dropdown';
+import Autocomplete from 'app/common/components/Autocomplete';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
 
@@ -106,6 +107,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             selectedIndex={ /* TODO */ 0}
             canEdit={pathfinderContext.canEdit}
           />,
+          // consider showing all options, even when a search text has been entered
+          //  so that they can easily change it 
+          // and different labels for user inputs, fields, etc.
+          <Autocomplete 
+            
+          />
         ])}
       >
       </PathfinderLine>

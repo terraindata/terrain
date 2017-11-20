@@ -272,6 +272,11 @@ type ChoiceContext = {
   source: Source,
   schemaState: SchemaState,
   field: string,
+} | {
+  type: 'value',
+  source: Source,
+  schemaState: SchemaState,
+  field: string,
 };
 
 class ElasticDataSourceC extends DataSource
