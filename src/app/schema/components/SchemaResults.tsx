@@ -96,7 +96,6 @@ class SchemaResults extends TerrainComponent<Props>
       this.setState({
         initialized: true,
       });
-      return;
     }
     const { selectedId } = storeState;
     // TODO change if store changes
