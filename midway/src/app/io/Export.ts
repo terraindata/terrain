@@ -267,6 +267,10 @@ export class Export
 
       const originalMapping: object = {};
       // generate original mapping if there were any renames
+      const allNames = Object.keys(exprt.columnTypes);
+      allNames.forEach((value, i) => {
+        originalMapping[value] = value;
+      });
 
       const renameTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'rename');
 
