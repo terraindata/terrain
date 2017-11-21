@@ -51,6 +51,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
+import { isEqual } from 'lodash';
 import ContainerDimensions from 'react-container-dimensions';
 import ColorManager from 'util/ColorManager';
 import Util from 'util/Util';
@@ -68,6 +69,7 @@ import
   VictoryPortal,
   VictoryScatter,
   VictoryTooltip,
+  Line,
 } from 'victory';
 
 const styles = {
@@ -105,8 +107,16 @@ const styles = {
         fill,
       },
     }),
-    tooltip: { fill: 'white' },
-    tooltipFlyout: { fill: 'black', rx: 5, ry: 5 },
+    tooltipLegend: {
+      border: { stroke: "white", fill: 'black', fillOpacity: 0.4 },
+      title: {
+        fontSize: 15,
+        fill: 'rgba(255,255,255,0.75)',
+        fontWeight: 'bold',
+      },
+    },
+    tooltipLegendBorderPadding: { right: 30 },
+    activeDataVerticalLine: { stroke: 'rgba(0, 0, 0, .25)', strokeWidth: 1 },
   },
   bottomChart: {
     padding: { top: 0, bottom: 0, left: 0, right: 0 },
@@ -119,6 +129,7 @@ const styles = {
       height: height - 10,
       rx: 2,
       ry: 2,
+      width: 8,
       y: 5,
     }),
     axis: { grid: { strokeWidth: 0 }, ticks: { size: 0 } },
@@ -178,7 +189,23 @@ interface State
   visibleDatasets: List<ID>;
   highlightDataset: ID;
   datasetColors: any;
+  activeDataTitle: string;
+  activeData: Array<any>;
+  activeDataVerticalLine: {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  }
 }
+
+const CustomLabel = (props) => {
+  return (
+  <text x={props.x} y={props.y} style={props.style} >
+    <tspan style={{ fontWeight: 'bold' }}>{props.datum.value}</tspan>
+    <tspan dx={20} style={{ fill: 'white' }}>({props.datum.name})</tspan>
+  </text>
+)};
 
 export default class MultipleAreaChart extends TerrainComponent<Props> {
   public static defaultProps = {
@@ -196,6 +223,9 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     visibleDatasets: null,
     highlightDataset: null,
     datasetColors: {},
+    activeDataTitle: '',
+    activeData: [],
+    activeDataVerticalLine: null,
   };
 
   constructor(props)
@@ -267,7 +297,12 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               key={key}
               name={`area-${key}`}
               style={{ data: { fill: datasetColor } }}
-              data={ds.data.map((d) => ({ ...d, l: true }))}
+              data={ds.data.map((d) => ({
+                ...d,
+                l: true,
+                id: ds.id,
+                name: ds.label,
+              }))}
               interpolation={config.topChart.interpolation}
               x={xDataKey}
               y={yDataKey}
@@ -282,36 +317,6 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
               x={xDataKey}
               y={yDataKey}
             />,
-          );
-        }
-        else
-        {
-          areaToHightlight = (
-            <VictoryArea
-              name={`area-${key}`}
-              key={key}
-              style={{
-                data: {
-                  fill: this.getDatasetColor(key),
-                  strokeWidth: 3,
-                  fillOpacity: 0.7,
-                },
-              }}
-              data={ds.data}
-              interpolation={config.topChart.interpolation}
-              x={xDataKey}
-              y={yDataKey}
-            />
-          );
-
-          scatterToHightlight = (
-            <VictoryScatter
-              key={key}
-              size={(datum, active) => active ? 5 : 0}
-              data={ds.data}
-              x={xDataKey}
-              y={yDataKey}
-            />
           );
         }
       }
@@ -451,6 +456,39 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     ];
   }
 
+  public handleDataActivated(points, props) {
+    if (points.length > 0)
+    {
+      const xPoint = props.scale.x(points[0].x);
+      const yPoint = props.scale.y(points[0].y);
+      const yZeroPoint = props.scale.y(0);
+      const activeDataVerticalLine = {
+        x1: xPoint,
+        y1: styles.topChart.padding.top,
+        x2: xPoint,
+        y2: yZeroPoint,
+      };
+      this.setState(() => ({
+        activeDataTitle: this.formatDate(points[0].x),
+        activeData: points.filter(p => p.l),
+        activeDataVerticalLine,
+      }));
+    }
+
+    return points;
+  }
+
+  public handleDataDeactivated(points, props) {
+    if (!isEqual(points, props.activePoints))
+    {
+      this.setState(() => ({
+        activeData: [],
+      }));
+    }
+
+    return points;
+  }
+
   public formatDate(timestamp)
   {
     const date = new Date(timestamp);
@@ -466,7 +504,12 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     const data = this.renderData();
     const legend = this.renderLegend();
 
-    const { visibleDatasets } = this.state;
+    const {
+      visibleDatasets,
+      activeDataTitle,
+      activeData,
+      activeDataVerticalLine,
+    } = this.state;
 
     const VictoryZoomVoronoiContainer = createContainer('zoom', 'voronoi');
 
@@ -492,15 +535,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                     voronoiDimension='x'
                     zoomDomain={this.state.zoomDomain}
                     onZoomDomainChange={this.handleZoom}
-                    labels={(d) => d.l ? `${this.formatDate(d.x)} => ${d.y}` : null}
-                    labelComponent={
-                      <VictoryTooltip
-                        cornerRadius={4}
-                        flyoutStyle={styles.topChart.tooltipFlyout}
-                        style={styles.topChart.tooltip}
-                        dx={25}
-                      />
-                    }
+                    onActivated={this.handleDataActivated}
+                    onDeactivated={this.handleDataDeactivated}
                   />
                 }
                 events={[
@@ -534,7 +570,33 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                   style={styles.topChart.axis}
                   tickLabelComponent={<VictoryLabel dy={7} />}
                 />
+                {activeData.length > 0 ?
+                  <Line
+                    {...activeDataVerticalLine}
+                    style={styles.topChart.activeDataVerticalLine}
+                  /> : null
+                }
                 {legend}
+                {activeData.length > 0 ?
+                  <VictoryLegend
+                    y={50}
+                    x={10}
+                    padding={0}
+                    borderPadding={styles.topChart.tooltipLegendBorderPadding}
+                    name="tooltip"
+                    gutter={20}
+                    data={activeData.map(p => ({
+                      name: p.name,
+                      value: p[yDataKey],
+                      symbol: { fill: this.getDatasetColor(p.id) },
+                      labels: { fill: this.getDatasetColor(p.id) },
+                    }))}
+                    orientation={'vertical'}
+                    style={styles.topChart.tooltipLegend}
+                    title={activeDataTitle}
+                    labelComponent={<CustomLabel yDataKey={yDataKey} />}
+                  /> : null
+                }
               </VictoryChart>
             )}
           </ContainerDimensions>
