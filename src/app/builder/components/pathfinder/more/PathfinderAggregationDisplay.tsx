@@ -47,9 +47,8 @@ import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import Dropdown from 'app/common/components/Dropdown';
 import { List, Map } from 'immutable';
 import * as React from 'react';
+import PathfinderText from '../PathfinderText';
 import { ADVANCED } from '../PathfinderTypes';
-// import * as SchemaTypes from '../schema/SchemaTypes';
-// const ManualConfig = require('./../manual/ManualConfig.json');
 
 export interface AdvancedAggregationDisplay
 {
@@ -69,66 +68,78 @@ export interface AdvancedAggregationItem
   tooltipText?: string;
   component?: (...args) => El; // Some advanced items need to be custom built
   key: string;
+  defaultValue?: (...args) => string;
 }
 
 export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDisplay>({
   [ADVANCED.Sigma]: {
-    title: 'Standard Deviation Bounds',
+    title: PathfinderText.aggregation.sigma.title,
     onlyOne: false,
     items: {
-      text: 'Sigma',
+      text: PathfinderText.aggregation.sigma.text,
       inputType: 'single',
-      tooltipText: '',
+      tooltipText: PathfinderText.aggregation.sigma.tooltipText,
       key: 'sigma',
     },
   },
   [ADVANCED.Accuracy]: {
-    title: 'Accuracy',
+    title: PathfinderText.aggregation.accuracy.title,
     onlyOne: true,
     items: [
       {
-        text: 'Compression',
+        text: PathfinderText.aggregation.accuracy.text1,
         inputType: 'single',
-        tooltipText: '',
+        tooltipText: PathfinderText.aggregation.accuracy.tooltipText1,
         key: 'compression',
       },
       {
-        text: 'Significant Digits',
+        text: PathfinderText.aggregation.accuracy.text2,
         inputType: 'single',
-        tooltipText: '',
+        tooltipText: PathfinderText.aggregation.accuracy.tooltipText2,
         key: 'number_of_significant_value_digits',
       },
     ],
   },
   [ADVANCED.Percentiles]: {
-    title: 'Percentiles',
+    title: PathfinderText.aggregation.percentile.title,
     onlyOne: false,
     items: {
-      text: 'Return the values at the following percentiles',
+      text: PathfinderText.aggregation.percentile.text,
       inputType: 'multi',
-      tooltipText: '',
+      tooltipText: PathfinderText.aggregation.percentile.tooltipText,
       key: 'percentiles',
     },
   },
   [ADVANCED.PercentileRanks]: {
-    title: 'Percentile Ranks',
+    title: PathfinderText.aggregation.percentileRanks.title,
     onlyOne: false,
     items: {
-      text: 'Return the percentiles of the following values',
+      text: PathfinderText.aggregation.percentileRanks.text,
       inputType: 'multi',
-      tooltipText: '',
+      tooltipText: PathfinderText.aggregation.percentileRanks.tooltipText,
       key: 'values',
     },
   },
+  [ADVANCED.Name]: {
+    title: 'Name',
+    onlyOne: false,
+    items: {
+      text: '',
+      inputType: 'textbox',
+      tooltipText: '',
+      key: 'name',
+      defaultValue: (fieldName: string, aggregationName: string) => fieldName + ' ' + aggregationName,
+    },
+  },
   [ADVANCED.Missing]: {
-    title: 'Missing',
+    title: PathfinderText.aggregation.missing.title,
     onlyOne: false,
     items: {
       component: (fieldName: string, keyPath: KeyPath, onChange, canEdit: boolean, replace: boolean, value?: any) =>
       {
         return (
           <div className='pf-aggregation-missing'>
-            <span>If a document is missing {fieldName}, </span>
+            <span>{PathfinderText.aggregation.missing.text} {fieldName}, </span>
             <Dropdown
               options={List(['ignore it', 'replace it'])}
               selectedIndex={replace ? 1 : 0}
@@ -136,15 +147,15 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
               canEdit={canEdit}
             />
             {
+              replace ? <span>with</span> : null
+            }
+            {
               replace ?
-                <div>
-                  <span>with</span>
-                  <BuilderTextbox
-                    value={value}
-                    keyPath={keyPath}
-                    canEdit={canEdit}
-                  />
-                </div>
+                <BuilderTextbox
+                  value={value}
+                  keyPath={keyPath}
+                  canEdit={canEdit}
+                />
                 : null
             }
           </div>

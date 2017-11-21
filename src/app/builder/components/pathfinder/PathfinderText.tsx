@@ -97,6 +97,37 @@ export const PathfinderText = {
   scoreStepSubtitle: `
 
   `,
+
+  aggregation:
+  {
+    missing: {
+      title: 'Missing',
+      text: 'If a document is missing',
+      tooltipText: '',
+    },
+    percentileRanks: {
+      title: 'Percentile Ranks',
+      text: 'Return the percentiles of the following values',
+      tooltipText: 'The percentile of each of these values of the selected field will be returned',
+    },
+    percentile: {
+      title: 'Percentiles',
+      text: 'Return the values at the following percentiles',
+      tooltipText: 'The value at each of the following percentiles will be returned',
+    },
+    accuracy: {
+      title: 'Accuracy',
+      text1: 'Compression',
+      tooltipText1: 'A higher compression value will lead to more accurate results but take longer. The default is 100',
+      text2: 'Significant Digits',
+      tooltipText2: 'A higher number of significant digits will be more precise, but will take longer. An HDR histogram will be used.',
+    },
+    sigma: {
+      title: 'Standard Deviation Bounds',
+      text: 'Sigma',
+      tooltipText: 'Where to set the standard deviation bounds, in terms of the number of deviations away from the average',
+    },
+  },
 };
 
 export default PathfinderText;

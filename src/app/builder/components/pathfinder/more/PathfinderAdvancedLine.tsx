@@ -118,57 +118,59 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
     {
       case 'single':
         content =
-          <div className='pf-advanced-section-item' key={i}>
-            {item.text}
-            <BuilderTextbox
-              value={this.props.advancedData.get(item.key)}
-              canEdit={this.props.canEdit}
-              keyPath={this.props.keyPath.push(item.key)}
-              language='elastic'
-            />
-          </div>;
+          <BuilderTextbox
+            value={this.props.advancedData.get(item.key)}
+            canEdit={this.props.canEdit}
+            keyPath={this.props.keyPath.push(item.key)}
+            language='elastic'
+          />;
         break;
       case 'multi':
         content =
-          <div className='pf-advanced-section-item' key={i}>
-            {item.text}
-            <MultiInput
-              items={this.props.advancedData.get(item.key)}
-              keyPath={this.props.keyPath.push(item.key)}
-              action={BuilderActions.change}
-              isNumber={true} // change ?
-              canEdit={this.props.canEdit}
-            />
-          </div>;
+          <MultiInput
+            items={this.props.advancedData.get(item.key)}
+            keyPath={this.props.keyPath.push(item.key)}
+            action={BuilderActions.change}
+            isNumber={true} // change ?
+            canEdit={this.props.canEdit}
+          />;
         break;
       case 'range':
         content =
-          <div className='pf-advanced-section-item' key={i}>
-            {item.text}
-            <RangesInput
-              ranges={this.props.advancedData.get(item.key)}
-              keyPath={this.props.keyPath.push(item.key)}
-              action={BuilderActions.change}
-              canEdit={this.props.canEdit}
-            />
-          </div>;
+          <RangesInput
+            ranges={this.props.advancedData.get(item.key)}
+            keyPath={this.props.keyPath.push(item.key)}
+            action={BuilderActions.change}
+            canEdit={this.props.canEdit}
+          />;
         break;
       case 'boolean':
         content =
-          <div className='pf-advanced-section-item' key={i}>
-            {item.text}
-            <Dropdown
-              canEdit={this.props.canEdit}
-              keyPath={this.props.keyPath.push(item.key)}
-              options={List(['true', 'false'])}
-              selectedIndex={this.props.advancedData.get(item.key) === 'true' ? 0 : 1}
-            />
-          </div>;
+          <Dropdown
+            canEdit={this.props.canEdit}
+            keyPath={this.props.keyPath.push(item.key)}
+            options={List(['true', 'false'])}
+            selectedIndex={this.props.advancedData.get(item.key) === 'true' ? 0 : 1}
+          />;
+        break;
+      case 'textbox':
+        content =
+          <BuilderTextbox
+            value={this.props.advancedData.get(item.key)}
+            keyPath={this.props.keyPath.push('name')}
+            language={'elastic'}
+            canEdit={this.props.canEdit}
+            placeholder={'Name'}
+          />;
         break;
       default:
     }
 
-    return content;
+    return tooltip(
+      <div className='pf-advanced-section-item' key={i}>
+        <span> {item.text}</span>
+        {content}
+      </div>, item.tooltipText);
   }
 
   public handleSelectedItemChange(key, otherKeys)
@@ -223,7 +225,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
   {
     const display = AdvancedDisplays.get(String(this.props.advancedType));
     return (
-      <div>
+      <div className='pf-advanced-section'>
         <div
           className='pf-advanced-section-title'
           onClick={this._toggle('expanded')}
