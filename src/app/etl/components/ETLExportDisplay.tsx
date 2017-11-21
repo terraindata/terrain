@@ -45,15 +45,19 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Radium from 'radium';
 import * as React from 'react';
+import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Query from 'src/items/types/Query';
 import Util from 'util/Util';
 
 import ETLActions from 'etl/data/ETLActions';
 import { ETLState } from 'etl/ETLTypes';
-
+import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+
+import './ETLExportDisplay.less';
 
 export interface Props
 {
@@ -66,20 +70,30 @@ export interface Props
   templateEditorActions: typeof TemplateEditorActions;
 }
 
+@Radium
 class ETLExportDisplay extends TerrainComponent<Props>
 {
-
-  public test()
-  {
-    this.props.templateEditorActions({
-      actionType: 'setPreviewData',
-      preview: 'hi',
-    });
-  }
-
   public render()
   {
-    return <div onClick={this.test}> hello there </div>;
+    return (
+      <div
+        className='etl-export-display-wrapper'
+        style={[backgroundColor(Colors().bg1), fontColor(Colors().text1)]}
+      >
+        <TemplateEditor/>
+        <div>
+          <div className='export-button'
+            style={{
+              color: Colors().import,
+              border: 'solid 1px ' + Colors().import,
+              background: Colors().bg3,
+            }}
+          >
+            Export
+          </div>
+        </div>
+      </div>
+    );
   }
 }
 
