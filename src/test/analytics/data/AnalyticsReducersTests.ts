@@ -149,14 +149,22 @@ describe('AnalyticsReducer', () =>
 
   describe('#fetchSuccess', () =>
   {
+    const start = new Date(2015, 5, 2);
+    const end = new Date(2015, 5, 20);
+
     it('should handle analytics.fetchSuccess and clear errors', () =>
     {
       analytics = analytics.set('errors', ['error 1']);
+      const dateRangeDomain = {
+        start: start.getTime(),
+        end: end.getTime(),
+      };
 
       const nextState = reducer(analytics, {
         type: ActionTypes.fetchSuccess,
         payload: {
           analytics: analyticsResponse,
+          dateRangeDomain,
         },
       });
 
@@ -166,6 +174,7 @@ describe('AnalyticsReducer', () =>
         analytics
           .set('loaded', true)
           .setIn(['data', '1'], analyticsResponse[1])
+          .set('selectedDateRangeDomain', dateRangeDomain)
           .set('errors', []),
       );
     });
