@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // Centralized place for text used in Pathfinder
+import { ADVANCED } from './PathfinderTypes';
 
 export const PathfinderText = {
 
@@ -59,6 +60,7 @@ export const PathfinderText = {
   createFilterLine: 'filter condition',
   createFilterGroup: 'group of filter conditions',
   createScoreLine: 'score factor',
+  createAggregationLine: 'metadata',
 
   findSectionTitle: 'Find',
   findSectionSubtitle: `
@@ -68,6 +70,10 @@ export const PathfinderText = {
   scoreSectionSubtitle: `
   Score your results, so that the best picks show up in the top spots.
   The score for each result will be the sum of the following factors:
+  `,
+  moreSectionTitle: 'More',
+  moreSectionSubtitle: `
+  Look at the metadata for your data and add facets to better understand your data.
   `,
 
   // Steps

@@ -60,7 +60,7 @@ import ScoreBar from '../../charts/ScoreBar';
 import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
-import { ChoiceOption, Path, Score, ScoreLine, Source, PathfinderContext } from '../PathfinderTypes';
+import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 
@@ -95,7 +95,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-  if (this.props.line !== nextProps.line)
+    if (this.props.line !== nextProps.line)
     {
       this.setState({
         fieldIndex: nextProps.dropdownOptions.map((v) => v.name).toList().indexOf(nextProps.line.field),

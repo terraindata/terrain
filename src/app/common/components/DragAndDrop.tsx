@@ -52,7 +52,7 @@ const { List, Map } = Immutable;
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import TerrainComponent from './TerrainComponent';
 
-interface DraggableItem
+export interface DraggableItem
 {
   content: any;
   key: string | number;

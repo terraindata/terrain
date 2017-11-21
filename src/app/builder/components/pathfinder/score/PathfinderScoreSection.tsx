@@ -140,11 +140,11 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     let dropdownOptions = List([]);
     if (source.dataSource.getChoiceOptions !== undefined)
     {
-     dropdownOptions = source.dataSource.getChoiceOptions({
-      type: 'transformFields',
-      source,
-      schemaState,
-    });
+      dropdownOptions = source.dataSource.getChoiceOptions({
+        type: 'transformFields',
+        source,
+        schemaState,
+      });
     }
     const keyPath = this.props.keyPath.push('lines');
 

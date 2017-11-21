@@ -283,7 +283,7 @@ class Dropdown extends TerrainComponent<Props>
   {
     if (this.props.optionsDisplayName)
     {
-      return this.props.optionsDisplayName.get(option);
+      return this.props.optionsDisplayName.toJS()[option];
     }
     return option;
   }

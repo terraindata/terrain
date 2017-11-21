@@ -50,18 +50,27 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import { Path, Source } from '../PathfinderTypes';
+import ColorsActions from 'app/colors/data/ColorsActions';
+import BuilderActions from '../../../data/BuilderActions';
+import PathfinderCreateLine from '../PathfinderCreateLine';
+import PathfinderSectionTitle from '../PathfinderSectionTitle';
+import PathfinderText from '../PathfinderText';
+import { _AggregationLine, More, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
+import DragHandle from './../../../../common/components/DragHandle';
+import PathfinderAggregationLine from './PathfinderAggregationLine';
 
 export interface Props
 {
-  source: Source;
-  step: string;
+  pathfinderContext: PathfinderContext;
+  more: More;
+  keyPath: KeyPath;
 }
 
-class PathfinderSourceSection extends TerrainComponent<Props>
+class PathfinderMoreSection extends TerrainComponent<Props>
 {
   public state: {
 
@@ -69,17 +78,80 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   };
 
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.pf-line-wrapper .expand', getStyle('fill', Colors().iconColor));
+    ColorsActions.setStyle('.pf-aggregation-arrow-open', { fill: Colors().active + ' !important' });
+    ColorsActions.setStyle('.pf-aggregation-arrow-advanced', getStyle('fill', Colors().iconColor));
+  }
+
+  public handleAddLine()
+  {
+    const newLines = this.props.more.aggregations.push(_AggregationLine());
+    BuilderActions.change(this.props.keyPath.push('aggregations'), newLines);
+  }
+
+  public handleDeleteLine(index)
+  {
+    const newLines = this.props.more.aggregations.delete(index);
+    BuilderActions.change(this.props.keyPath.push('aggregations'), newLines);
+  }
+
+  public handleLinesReorder(items)
+  {
+    const newOrder = items.map((line) => line.key);
+    const newLines = newOrder.map((index) =>
+    {
+      return this.props.more.aggregations.get(index);
+    });
+    BuilderActions.change(this.props.keyPath.push('aggregations'), newLines);
+  }
+
+  public getAggregationLines()
+  {
+    const lines: List<DraggableItem> = this.props.more.aggregations.map((agg, i) =>
+    {
+      return {
+        content: <PathfinderAggregationLine
+          pathfinderContext={this.props.pathfinderContext}
+          aggregation={agg}
+          keyPath={this.props.keyPath.push('aggregations').push(i)}
+          onDelete={this.handleDeleteLine}
+          index={i}
+          key={i}
+        />,
+        key: i,
+        draggable: true,
+        dragHandle: <DragHandle />,
+      };
+    }).toList();
+    return lines;
+  }
+
   public render()
   {
-    const { source, step } = this.props;
-
+    const { canEdit } = this.props.pathfinderContext;
     return (
       <div
-        className='pathfinder-section'
+        className='pf-section pf-more-section'
       >
+        <PathfinderSectionTitle
+          title={PathfinderText.moreSectionTitle}
+          text={PathfinderText.moreSectionSubtitle}
+        />
+        <DragAndDrop
+          draggableItems={this.getAggregationLines()}
+          onDrop={this.handleLinesReorder}
+          className='more-aggregations-drag-drop'
+        />
+        <PathfinderCreateLine
+          canEdit={canEdit}
+          onCreate={this.handleAddLine}
+          text={PathfinderText.createAggregationLine}
+        />
       </div>
     );
   }
 }
 
-export default PathfinderSourceSection;
+export default PathfinderMoreSection;
