@@ -285,7 +285,6 @@ class SchemaResults extends TerrainComponent<Props>
           this.showsResults(this.state.selectedItem) ?
             <div
               style={{
-                marginLeft: 12,
                 paddingRight: 6,
                 boxSizing: 'border-box',
               }}

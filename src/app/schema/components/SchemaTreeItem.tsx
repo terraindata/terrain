@@ -409,7 +409,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
                 onDoubleClick={this.handleHeaderDoubleClick}
               >
                 {
-                  hasChildren &&
+                  hasChildren && !this.props.search &&
                   <div style={[this.state.open ? Styles.arrowOpen : Styles.arrow]} key='arrow'>
                     <ArrowIcon
                       className={'schema-arrow-icon'}
