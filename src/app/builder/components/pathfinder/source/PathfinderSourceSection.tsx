@@ -57,8 +57,9 @@ import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
+import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _ElasticDataSource, Path, PathfinderContext, Source, sourceCountOptions } from '../PathfinderTypes';
+import { _ElasticDataSource, Path, PathfinderContext, Source, sourceCountOptions, sourceCountDropdownOptions } from '../PathfinderTypes';
 
 export interface Props
 {
@@ -94,26 +95,18 @@ class PathfinderSourceSection extends TerrainComponent<Props>
             }
           </div>
           <div className='pf-piece'>
-            <Dropdown
-              selectedIndex={this.getCountSelectedIndex()}
-              options={sourceCountOptions}
-              onChange={this.handleCountDropdownChange}
+            <AdvancedDropdown
+              options={sourceCountDropdownOptions}
+              value={source.count}
+              onChange={this.handleCountChange}
               canEdit={canEdit}
+              placeholder={'# of results'}
+              textPlaceholder={'#'}
+              textShouldBeNumber={true}
+              directionBias={100}
+              textboxWidth={70}
             />
           </div>
-          {
-            this.shouldShowCustomCount() ?
-              <div className='pf-piece'>
-                <Autocomplete
-                  value={source.count as string}
-                  onChange={this.handleCountTextChange}
-                  placeholder='a number'
-                  options={null}
-                  disabled={!canEdit}
-                />
-              </div>
-              : null
-          }
           <div className='pf-piece'>
             <Dropdown
               options={this.getDataSourceOptions()}
@@ -132,42 +125,12 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     BuilderActions.change(List(['query', 'path', 'source']), source);
   }
-
-  private getCountSelectedIndex(): number
-  {
-    if (this.shouldShowCustomCount())
-    {
-      return sourceCountOptions.size - 1;
-    }
-
-    return this.props.pathfinderContext.source.countIndex;
-  }
-
-  // show a custom count if the user has chosen 'other' or if we cannot find
-  //  the stored value in the dropdown (which would happen if we change the
-  //  dropdown options)
-  private shouldShowCustomCount(): boolean
-  {
-    const { count, countIndex } = this.props.pathfinderContext.source;
-    return sourceCountOptions.get(countIndex) === 'other' || sourceCountOptions.indexOf(count) === -1;
-  }
-
-  private handleCountDropdownChange(index: number)
-  {
-    const value = index === sourceCountOptions.size - 1 ? '' : sourceCountOptions.get(index);
-    this.changeSource(
-      this.props.pathfinderContext.source
-        .set('countIndex', index)
-        .set('count', value),
-    );
-  }
-
-  private handleCountTextChange(value)
+  
+  private handleCountChange(value: string | number)
   {
     this.changeSource(
       this.props.pathfinderContext.source
-        .set('countIndex', sourceCountOptions.size - 1)
-        .set('count', +value),
+        .set('count', value)
     );
   }
 

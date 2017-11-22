@@ -87,6 +87,7 @@ const { List, Map, Record } = Immutable;
 import { SchemaState } from 'schema/SchemaTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType, FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
+import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 
 export const PathfinderSteps =
   [
@@ -269,11 +270,45 @@ export const sourceCountOptions = List([
   'other',
 ]);
 
+export const sourceCountDropdownOptions = List<AdvancedDropdownOption>([
+  {
+    value: 'all',
+    displayName: 'all',
+  },
+  {
+    value: 1,
+    displayName: 1,
+  },
+  {
+    value: 2,
+    displayName: 2,
+  },
+  {
+    value: 3,
+    displayName: 3,
+  },
+  {
+    value: 5,
+    displayName: 5,
+  },
+  {
+    value: 10,
+    displayName: 10,
+  },
+  {
+    value: 100,
+    displayName: 100,
+  },
+  {
+    value: 1000,
+    displayName: 1000,
+  },
+]);
+
 class SourceC extends BaseClass
 {
   public dataSource: DataSource = _ElasticDataSource();
   public count: number | string = sourceCountOptions.get(0);
-  public countIndex: number = 0;
   public start: number = 0;
 }
 export type Source = SourceC & IRecord<SourceC>;

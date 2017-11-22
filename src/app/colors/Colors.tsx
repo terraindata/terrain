@@ -1183,34 +1183,34 @@ export function disabledButtonColors()
   return CACHE['disabledButtonColors' + curTheme];
 }
 
-export function getStyle(style: string, color: string, hoverColor?: string): object
+export function getStyle(style: string, value: string | number, hoverValue?: string | number): object
 {
   if (!dynamicMap[curTheme])
   {
     dynamicMap[curTheme] = {};
   }
-  if (!dynamicMap[curTheme][color])
+  if (!dynamicMap[curTheme][value])
   {
-    dynamicMap[curTheme][color] = {};
+    dynamicMap[curTheme][value] = {};
   }
-  if (!dynamicMap[curTheme][color][style])
+  if (!dynamicMap[curTheme][value][style])
   {
-    dynamicMap[curTheme][color][style] = {};
+    dynamicMap[curTheme][value][style] = {};
   }
-  if (!dynamicMap[curTheme][color][style][hoverColor])
+  if (!dynamicMap[curTheme][value][style][hoverValue])
   {
-    dynamicMap[curTheme][color][style][hoverColor] = {
-      [style]: color,
+    dynamicMap[curTheme][value][style][hoverValue] = {
+      [style]: value,
     };
-    if (hoverColor)
+    if (hoverValue)
     {
-      dynamicMap[curTheme][color][style][hoverColor][':hover'] = {
-        [style]: hoverColor,
+      dynamicMap[curTheme][value][style][hoverValue][':hover'] = {
+        [style]: hoverValue,
       };
     }
   }
 
-  return dynamicMap[curTheme][color][style][hoverColor];
+  return dynamicMap[curTheme][value][style][hoverValue];
 }
 
 export function getCardColors(category: string | undefined, typeColor: string): string[]

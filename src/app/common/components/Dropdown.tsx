@@ -71,7 +71,7 @@ export interface Props
   className?: string;
   centerAlign?: boolean;
   optionsDisplayName?: Immutable.Map<any, string>; // maps value to display name
-  textColor?: string | ((index: number) => string);
+  textColor?: string | ((index: number) => string | undefined);
   width?: string;
   directionBias?: number; // bias for determining whether or not dropdown opens up or down
   unmountOnChange?: boolean;
