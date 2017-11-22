@@ -445,6 +445,7 @@ export enum ADVANCED
   Percentiles,
   PercentileRanks,
   Accuracy,
+  Name,
 }
 
 // The data that needs to be stored for each type of advanced field
@@ -452,9 +453,10 @@ export const ADVANCED_MAPPINGS =
   {
     [ADVANCED.Missing]: { missing: 0, ignoreMissing: true },
     [ADVANCED.Sigma]: { sigma: 2 },
-    [ADVANCED.Percentiles]: { percentiles: List([1, 2]) },
-    [ADVANCED.PercentileRanks]: { values: [] },
+    [ADVANCED.Percentiles]: { percentiles: List([1, 5, 25, 50, 75, 95, 99]) },
+    [ADVANCED.PercentileRanks]: { values: List([]) },
     [ADVANCED.Accuracy]: { compression: 100 },
+    [ADVANCED.Name]: { name: '' },
   };
 
 interface AggregationData
@@ -469,64 +471,64 @@ interface AggregationData
 export const AggregationTypes = Map<string, AggregationData>({
   ['average of']:
   {
-    elasticType: 'avg', advanced: List([ADVANCED.Missing]),
+    elasticType: 'avg', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
     acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   minimum:
   {
-    elasticType: 'min', advanced: List([ADVANCED.Missing]),
+    elasticType: 'min', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
     acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   maximum:
   {
-    elasticType: 'max', advanced: List([ADVANCED.Missing]),
+    elasticType: 'max', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
     acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   ['sum of']:
   {
-    elasticType: 'sum', advanced: List([ADVANCED.Missing]),
+    elasticType: 'sum', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
     acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   ['number of values of']:
   {
-    elasticType: 'value_count', advanced: List([ADVANCED.Missing]),
+    elasticType: 'value_count', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
     acceptedTypes: List([FieldType.Any]),
   },
   ['approx. number of values of']:
   {
-    elasticType: 'cardinality', advanced: List([ADVANCED.Missing]),
+    elasticType: 'cardinality', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
     acceptedTypes: List([FieldType.Any]),
   },
   ['geographic center of']:
   {
-    elasticType: 'geo_centroid', advanced: List([ADVANCED.Missing]),
+    elasticType: 'geo_centroid', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
     acceptedTypes: List([FieldType.Geopoint]),
   },
   ['geographic bounds of']:
   {
-    elasticType: 'geo_bounds', advanced: List([ADVANCED.Missing]),
+    elasticType: 'geo_bounds', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
     acceptedTypes: List([FieldType.Geopoint]),
   },
   ['percentiles of']:
   {
     elasticType: 'percentiles', advanced:
-    List([ADVANCED.Missing, ADVANCED.Percentiles, ADVANCED.Accuracy]),
+    List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Percentiles, ADVANCED.Accuracy]),
     acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   ['percentiles of values of']:
   {
     elasticType: 'percentile_ranks', advanced:
-    List([ADVANCED.Missing, ADVANCED.PercentileRanks, ADVANCED.Accuracy]),
+    List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.PercentileRanks, ADVANCED.Accuracy]),
     acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   ['basic statistics for']:
   {
-    elasticType: 'stats', advanced: List([ADVANCED.Missing]),
+    elasticType: 'stats', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
     acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
   ['full statistics for']:
   {
-    elasticType: 'extended_stats', advanced: List([ADVANCED.Missing, ADVANCED.Sigma]),
+    elasticType: 'extended_stats', advanced: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Sigma]),
     acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
 });

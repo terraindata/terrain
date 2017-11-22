@@ -132,18 +132,13 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     });
     BuilderActions.change(this.props.keyPath.push('advanced'), Map(advancedObj));
     BuilderActions.change(this.props.keyPath.push('elasticType'), AggregationTypes.get(type).elasticType);
-    BuilderActions.change(this.props.keyPath.push('name'), type + ' ' + this.props.aggregation.field);
+    BuilderActions.change(this.props.keyPath.push('advanced').push('name'), type + ' ' + this.props.aggregation.field);
   }
 
   public handleFieldChange(index)
   {
     const newField = this.state.fieldOptions.get(index);
-    BuilderActions.change(this.props.keyPath.push('name'), this.props.aggregation.type + ' ' + newField);
-  }
-
-  public handleNameChange(event)
-  {
-    BuilderActions.change(this.props.keyPath.push('name'), event.target.value);
+    BuilderActions.change(this.props.keyPath.push('advanced').push('name'), this.props.aggregation.type + ' ' + newField);
   }
 
   // This function returns a list of fields that can be used with a given aggregation type
@@ -251,17 +246,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     }
     const advanced = AggregationTypes.get(this.props.aggregation.type).advanced;
     return (
-      <div>
-        <div className='pf-aggregation-advanced-line'>
-          <span>Name:</span>
-          <BuilderTextbox
-            value={this.props.aggregation.name}
-            keyPath={this.props.keyPath.push('nane')}
-            language={'elastic'}
-            canEdit={this.props.pathfinderContext.canEdit}
-            placeholder={'value'}
-          />
-        </div>
+      <div className='pf-aggregation-advanced-wrapper'>
         {
           advanced.map((advancedType, i) =>
           {
