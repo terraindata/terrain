@@ -533,6 +533,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
           <ContainerDimensions>
             {({ width, height }) => (
               <VictoryChart
+                domain={chartDomain}
                 scale={config.bottomChart.scale}
                 padding={styles.bottomChart.padding}
                 theme={TerrainVictoryTheme}
