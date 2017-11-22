@@ -53,7 +53,7 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import Dropdown from 'app/common/components/Dropdown';
+import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
@@ -88,7 +88,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         canEdit={canEdit}
         onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
         pieces={List([
-          <Dropdown
+          <AdvancedDropdown
             options={/* TODO adapt dropdown */ source.dataSource.getChoiceOptions({
               type: 'fields',
               source,
@@ -97,7 +97,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             selectedIndex={ /* TODO */ 0}
             canEdit={pathfinderContext.canEdit}
           />,
-          <Dropdown
+          <AdvancedDropdown
             options={/* TODO adapt dropdown */ source.dataSource.getChoiceOptions({
               type: 'comparison',
               field: null, /* TODO field */
@@ -110,7 +110,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           // consider showing all options, even when a search text has been entered
           //  so that they can easily change it 
           // and different labels for user inputs, fields, etc.
-          <Autocomplete 
+          <Advanecdropdown 
             
           />
         ])}
