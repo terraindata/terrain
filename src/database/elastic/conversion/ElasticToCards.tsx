@@ -55,7 +55,7 @@ import Query from '../../../items/types/Query';
 import MapUtil from '../../../../src/app/util/MapUtil';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
-import { Card } from '../../../blocks/types/Card';
+import { Card, Cards } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
@@ -87,6 +87,13 @@ const UNIT_MAPPINGS = {
   'nautical miles': 'nmi',
 };
 
+export function ElasticValueInfoToCards(rootValueInfo: ESValueInfo, currentCards: Cards)
+{
+  const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'body');
+  const cards = BlockUtils.reconcileCards(currentCards, List([rootCard]));
+  return ESCardParser.parseAndUpdateCards(cards);
+}
+
 export default function ElasticToCards(
   query: Query,
   queryReady: (query: Query) => void,
@@ -102,9 +109,7 @@ export default function ElasticToCards(
     try
     {
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'body');
-      let cards = BlockUtils.reconcileCards(query.cards, List([rootCard]));
-      cards = ESCardParser.parseAndUpdateCards(cards);
+      const cards = ElasticValueInfoToCards(rootValueInfo, query.cards);
       return query
         .set('cards', cards)
         .set('cardsAndCodeInSync', true);
@@ -118,7 +123,7 @@ export default function ElasticToCards(
   }
 }
 
-const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
+export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
 {
   if (!valueInfo)
   {
