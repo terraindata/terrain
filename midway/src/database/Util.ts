@@ -64,7 +64,7 @@ export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MyS
       filename: dsnString,
     } as SQLiteConfig;
   }
-  else if (type === 'mysql' || type === 'postgres' || type === 'pg')
+  else if (type === 'mysql' || type === 'postgres')
   {
     const idx = dsnString.lastIndexOf('@');
     const h0 = dsnString.substr(0, idx);
@@ -120,7 +120,7 @@ export function makeDatabaseController(
     const config = DSNToConfig(type, dsnString) as MySQLConfig;
     return new MySQLController(config, 0, 'MySQL');
   }
-  else if (type === 'postgresql' || type === 'pg')
+  else if (type === 'postgres')
   {
     const config = DSNToConfig(type, dsnString) as PostgreSQLConfig;
     return new PostgreSQLController(config, 0, 'PostgreSQL');
