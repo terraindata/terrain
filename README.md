@@ -88,6 +88,8 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * `yarn` installs and updates dependencies
 * `yarn global add webpack-dev-server`
 * `yarn test-back-setup` - starts a local elastic instance
+    * NOTE: you need to re-run this every time you restart your computer
+    * NOTE: this will clear out any deployed variants/algorithms that you have
 * `yarn start` - starts the Midway server, now running at localhost:3000
 * `yarn run start-front` - starts the front-end in a Node-Midway compatible way. TODO: Make Midway automatically start the
                         dev front-end server on start (and kill it on end)
@@ -95,6 +97,8 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 * Default user login: `admin@terraindata.com` / `secret`
 * Install Open Sans on your machine: [https://www.fontsquirrel.com/fonts/open-sans] - helps things go faster because
   your browser won't have to fetch Open Sans on each load
+* To get the Analytics side running, run the `/sigint` directory. This can run a demo website at localhost:3001 if you pass `--demo`
+* To get Analytics dummy data, clone the `Docker` repo and run `analytics/convert.py`
 
 Whenever new packages are installed by other devs / on other branches, run `yarn add` to get the new package locally.
 

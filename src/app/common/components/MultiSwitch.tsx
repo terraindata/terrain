@@ -83,6 +83,23 @@ class MultiSwitch extends TerrainComponent<Props>
 
     const { options } = this.props;
 
+    const normalizedOptions = this.normalizeOptions(options);
+
+    this.state = {
+      options: normalizedOptions,
+    };
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    const { options } = nextProps;
+    const normalizedOptions = this.normalizeOptions(options);
+
+    this.setState({ options: normalizedOptions });
+  }
+
+  public normalizeOptions(options)
+  {
     const normalizedOptions = options.map((option) =>
     {
       if (typeof option === 'object')
@@ -95,9 +112,7 @@ class MultiSwitch extends TerrainComponent<Props>
       }
     });
 
-    this.state = {
-      options: normalizedOptions,
-    };
+    return normalizedOptions;
   }
 
   public optionIsOn(index: number): boolean

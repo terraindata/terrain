@@ -57,8 +57,8 @@ import Ajax from './../../util/Ajax';
 
 function calculateDateRange(api, dateRangeId: number, callback)
 {
-  let start = null;
-  let end = null;
+  let startDate = null;
+  let endDate = null;
 
   api.getServerTime(
     (serverTimeResponse) =>
@@ -67,40 +67,45 @@ function calculateDateRange(api, dateRangeId: number, callback)
       const serverTimeDate = new Date(serverTime);
       const serverTimeTimestamp = serverTimeDate.getTime();
 
-      end = serverTimeDate.toISOString(); // Today at current time
+      endDate = serverTimeDate; // Today at current time
       switch (dateRangeId)
       {
-        case 1: // Today
-          start = new Date(Date.UTC(
+        case 1:
+          // Today at 0:00 UTC
+          startDate = new Date(Date.UTC(
             serverTimeDate.getUTCFullYear(),
             serverTimeDate.getUTCMonth(),
             serverTimeDate.getUTCDate()));
-          start = start.toISOString(); // Today at 0:00 UTC
           break;
         case 2:
-          start = new Date(Date.UTC(
+          // 7 days since today
+          startDate = new Date(Date.UTC(
             serverTimeDate.getUTCFullYear(),
             serverTimeDate.getUTCMonth(),
-            serverTimeDate.getUTCDate()) - (7 * 86400000))
-            .toISOString(); // 7 days since today
+            serverTimeDate.getUTCDate()) - (7 * 86400000));
           break;
         case 3:
-          start = new Date(Date.UTC(
+          // 30 days since today
+          startDate = new Date(Date.UTC(
             serverTimeDate.getUTCFullYear(),
             serverTimeDate.getUTCMonth(),
-            serverTimeDate.getUTCDate()) - (30 * 86400000))
-            .toISOString(); // 7 days since today
+            serverTimeDate.getUTCDate()) - (30 * 86400000));
           break;
         default:
-          start = new Date(Date.UTC(
+          // Fetch today's analytics by default
+          startDate = new Date(Date.UTC(
             serverTimeDate.getUTCFullYear(),
             serverTimeDate.getUTCMonth(),
-            serverTimeDate.getUTCDate()))
-            .toISOString(); // Fetch today's analytics by default
+            serverTimeDate.getUTCDate()));
           break;
       }
 
-      callback({ start, end });
+      const start = startDate.toISOString();
+      const end = endDate.toISOString();
+      const startTimestamp = startDate.getTime();
+      const endTimestamp = endDate.getTime();
+
+      callback({ start, end, startTimestamp, endTimestamp });
     },
   );
 }
@@ -142,9 +147,15 @@ const Actions =
               aggregation = 'histogram';
             }
 
+            const variants = getState().get('library').variants;
+            const deployedVariantNames = variantIds.map((id) =>
+            {
+              return variants.get(id).deployedName;
+            });
+
             return api.getAnalytics(
               connectionId,
-              variantIds,
+              deployedVariantNames,
               start,
               end,
               metric,
@@ -156,6 +167,10 @@ const Actions =
                   type: ActionTypes.fetchSuccess,
                   payload: {
                     analytics: variantAnalytics,
+                    dateRangeDomain: {
+                      start: dateRange.startTimestamp,
+                      end: dateRange.endTimestamp,
+                    },
                   },
                 });
                 callback && callback(variantAnalytics);
@@ -215,6 +230,27 @@ const Actions =
         payload: { variantId },
       };
     },
+
+    fetchAvailableMetrics: (
+      callback?: (analyticsVariants: any) => void,
+    ) => (dispatch, getState, api) =>
+      {
+        dispatch({
+          type: ActionTypes.fetchAvailableMetricsStart,
+        });
+        return api.getAvailableMetrics(
+          (availableMetrics) =>
+          {
+            dispatch({
+              type: ActionTypes.fetchAvailableMetricsSuccess,
+              payload: {
+                availableMetrics,
+              },
+            });
+            callback && callback(availableMetrics);
+          },
+        );
+      },
   };
 
 export default Actions;

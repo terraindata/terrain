@@ -94,8 +94,10 @@ export interface Props
   variant: LibraryTypes.Variant;
   status: ItemStatus;
   defaultChecked: boolean;
+  deployedName: string;
   defaultVariant: LibraryTypes.Variant;
   onDefaultCheckedChange(defaultChecked: boolean);
+  onDeployedNameChange(deployedName: string);
   onDeploy();
   onCancelDeploy();
 }
@@ -104,18 +106,44 @@ class DeployModalColumn extends TerrainComponent<Props>
 {
   public state: {
     confirmChecked: boolean;
+    deployedName: string;
   } = {
     confirmChecked: false,
+    deployedName: '',
   };
+
+  public componentWillMount()
+  {
+    this.setState({
+      deployedName: this.props.deployedName,
+    });
+  }
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (nextProps.variant !== this.props.variant || nextProps.status !== this.props.status)
+    if (nextProps.variant !== this.props.variant ||
+      nextProps.status !== this.props.status ||
+      nextProps.deployedName !== this.props.deployedName)
     {
+      let nextDeployedName: string = nextProps.deployedName;
+      if (nextProps.variant.deployedName !== this.props.variant.deployedName)
+      {
+        nextDeployedName = nextProps.variant.deployedName;
+      }
+
       this.setState({
         confirmChecked: false,
+        deployedName: nextDeployedName,
       });
     }
+  }
+
+  public handleDeployedNameChange(e)
+  {
+    this.props.onDeployedNameChange(e.target.value);
+    this.setState({
+      deployedName: e.target.value,
+    });
   }
 
   public handleDefaultCheckedChange()
@@ -294,6 +322,17 @@ class DeployModalColumn extends TerrainComponent<Props>
             }
           </div>
         }
+        <div
+          className='deploy-modal-info deploy-modal-info-status'>
+          <div className='deploy-modal-info-row-lower deploy-modal-info-status-row'>
+            <span>
+              <label htmlFor='deploy-modal-variant-name'>
+                Deployed variant name:
+            </label>
+              <input type='text' value={this.props.deployedName} onChange={this.handleDeployedNameChange} />
+            </span>
+          </div>
+        </div>
         <div
           className={classNames({
             'deploy-modal-check-wrapper': true,

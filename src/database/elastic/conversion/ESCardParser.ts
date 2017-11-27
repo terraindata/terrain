@@ -323,6 +323,8 @@ export default class ESCardParser extends ESParser
         return this.parseESReferenceClause(block, blockPath);
       case ESClauseType.ESStringClause:
         return this.parseCardValue(block, blockPath);
+      case ESClauseType.ESScriptClause:
+        return this.parseESStructureClause(block, blockPath);
       case ESClauseType.ESStructureClause:
         return this.parseESStructureClause(block, blockPath);
       case ESClauseType.ESTypeClause:

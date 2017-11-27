@@ -51,8 +51,6 @@ import App from '../src/App';
 
 let server;
 
-/* tslint:disable:max-line-length */
-
 beforeAll(async (done) =>
 {
   try

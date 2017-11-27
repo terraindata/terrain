@@ -115,7 +115,7 @@ export class Events
   {
     const body = bodybuilder()
       .size(0)
-      .filter('term', 'variantid', variantid)
+      .filter('term', 'variantid.keyword', variantid)
       .filter('term', 'eventname', request.eventname)
       .filter('range', 'timestamp', {
         gte: request.start,
@@ -157,7 +157,7 @@ export class Events
       .size(0)
       // .orFilter('term', 'eventname', eventnames[0])
       // .orFilter('term', 'eventname', eventnames[1])
-      .filter('term', 'variantid', variantid)
+      .filter('term', 'variantid.keyword', variantid)
       .filter('range', 'timestamp', {
         gte: request.start,
         lte: request.end,
@@ -249,7 +249,7 @@ export class Events
   public generateSelectQuery(controller: DatabaseController, variantid: string, request: AggregationRequest): Elastic.SearchParams
   {
     let body = bodybuilder()
-      .filter('term', 'variantid', variantid)
+      .filter('term', 'variantid.keyword', variantid)
       .filter('term', 'eventname', request.eventname)
       .filter('range', 'timestamp', {
         gte: request.start,
@@ -271,21 +271,21 @@ export class Events
     return this.buildQuery(controller, body.build());
   }
 
-  public generateSelectEventsQuery(controller: DatabaseController, variantid?: number): Elastic.SearchParams
+  public generateSelectEventsQuery(controller: DatabaseController, variantid?: string): Elastic.SearchParams
   {
     let body = bodybuilder()
       .size(0)
-      .aggregation('terms', 'eventname');
+      .aggregation('terms', 'eventname.keyword');
 
     if (variantid !== undefined)
     {
-      body = body.filter('term', 'variantid', variantid);
+      body = body.filter('term', 'variantid.keyword', variantid);
     }
 
     return this.buildQuery(controller, body.build());
   }
 
-  public async getAllEvents(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
+  public async getSelect(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>((resolve, reject) =>
     {
@@ -299,7 +299,7 @@ export class Events
     });
   }
 
-  public async getEventsList(controller: DatabaseController, variantid?: number): Promise<object>
+  public async getDistinct(controller: DatabaseController, variantid?: string): Promise<object>
   {
     return new Promise<object>((resolve, reject) =>
     {
@@ -309,12 +309,12 @@ export class Events
         if (variantid !== undefined)
         {
           resolve({
-            [variantid]: response['aggregations']['agg_terms_eventname'].buckets,
+            [variantid]: response['aggregations']['agg_terms_eventname.keyword'].buckets,
           });
         }
         else
         {
-          resolve(response['aggregations']['agg_terms_eventname'].buckets);
+          resolve(response['aggregations']['agg_terms_eventname.keyword'].buckets);
         }
       }, reject);
     });
@@ -322,10 +322,10 @@ export class Events
 
   public async AggregationHandler(controller: DatabaseController, request: AggregationRequest): Promise<object[]>
   {
-    const variantids = request['variantid'].split(',');
     const promises: Array<Promise<any>> = [];
-    if (request['agg'] === 'histogram')
+    if (request['agg'] === 'histogram' || request['agg'] === 'count')
     {
+      const variantids = request['variantid'].split(',');
       if (request['interval'] === undefined)
       {
         throw new Error('Required parameter \"interval\" is missing');
@@ -338,6 +338,7 @@ export class Events
     }
     else if (request['agg'] === 'rate')
     {
+      const variantids = request['variantid'].split(',');
       const eventnames = request['eventname'].split(',');
       if (eventnames.length < 2)
       {
@@ -354,11 +355,27 @@ export class Events
         promises.push(this.getRate(controller as ElasticController, variantid, request));
       }
     }
+    else if (request['agg'] === 'distinct')
+    {
+      if (request['variantid'] !== undefined)
+      {
+        const variantids = request['variantid'].split(',');
+        for (const variantid of variantids)
+        {
+          promises.push(this.getDistinct(controller as ElasticController, variantid));
+        }
+      }
+      else
+      {
+        promises.push(this.getDistinct(controller as ElasticController));
+      }
+    }
     else if (request['agg'] === 'select')
     {
+      const variantids = request['variantid'].split(',');
       for (const variantid of variantids)
       {
-        promises.push(this.getAllEvents(controller as ElasticController, variantid, request));
+        promises.push(this.getSelect(controller as ElasticController, variantid, request));
       }
     }
     return Promise.all(promises);

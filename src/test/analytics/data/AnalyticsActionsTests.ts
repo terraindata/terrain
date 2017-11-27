@@ -47,6 +47,8 @@ import Actions from 'analytics/data/AnalyticsActions';
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import * as Immutable from 'immutable';
+import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import * as LibraryTypes from 'library/LibraryTypes';
 import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import { Ajax, createMockStore } from '../../helpers';
 
@@ -141,6 +143,39 @@ agg=histogram&field=%40timestamp`,
   ],
 };
 
+const availableMetricsResponse = [
+  {
+    database: 1,
+    events: 'impression',
+    id: 2,
+    label: 'Impressions',
+  },
+  {
+    database: 1,
+    events: 'click',
+    id: 3,
+    label: 'Clicks\n',
+  },
+  {
+    database: 1,
+    events: 'conversion',
+    id: 4,
+    label: 'Conversions',
+  },
+  {
+    database: 1,
+    events: 'click,impression',
+    id: 5,
+    label: 'Click Through Rate',
+  },
+  {
+    database: 1,
+    events: 'conversion,impression',
+    id: 6,
+    label: 'Conversion Rate',
+  },
+];
+
 const serverTimeResponse = { serverTime: '2015-06-06T00:00:00.000Z' };
 
 const mockStore = createMockStore();
@@ -162,7 +197,7 @@ describe('AnalyticsActions', () =>
     }),
   });
 
-  const variantId = 1;
+  const variantId = '1';
   const metric = 'impressions';
   const intervalId = 'day';
   const dateRangeId = 1;
@@ -170,7 +205,6 @@ describe('AnalyticsActions', () =>
 
   describe('#fetch', () =>
   {
-    const accessToken = 'valid-access-token';
     const start = new Date(2015, 5, 2);
     const end = new Date(2015, 5, 20);
 
@@ -201,11 +235,23 @@ describe('AnalyticsActions', () =>
           },
           {
             type: ActionTypes.fetchSuccess,
-            payload: { analytics: analyticsResponse },
+            payload: {
+              analytics: analyticsResponse,
+              dateRangeDomain: {
+                start: (new Date(serverTimeResponse.serverTime)).getTime(),
+                end: (new Date(serverTimeResponse.serverTime)).getTime(),
+              },
+            },
           },
         ];
 
-        const store = mockStore(Immutable.Map({ analytics, schema }));
+        const variant = LibraryTypes._Variant();
+        variant.set('deployedName', 'terrain_1');
+        const library: LibraryState = _LibraryState({
+          variants: Immutable.Map<number, LibraryTypes.Variant>({ 1: variant }),
+        });
+
+        const store = mockStore(Immutable.Map({ analytics, schema, library }));
 
         store.dispatch(
           Actions.fetch(
@@ -251,7 +297,12 @@ describe('AnalyticsActions', () =>
           },
         ];
 
-        const store = mockStore(Immutable.Map({ analytics, schema }));
+        const variant = LibraryTypes._Variant();
+        variant.set('deployedName', 'terrain_1');
+        const library: LibraryState = _LibraryState({
+          variants: Immutable.Map<number, LibraryTypes.Variant>({ 1: variant }),
+        });
+        const store = mockStore(Immutable.Map({ analytics, schema, library }));
 
         store.dispatch(
           Actions.fetch(
@@ -341,6 +392,40 @@ describe('AnalyticsActions', () =>
 
       store.dispatch(Actions.pinVariant(variantId));
       expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+
+  describe('#fetchAvailableMetrics', () =>
+  {
+    Ajax.getAvailableMetrics = (
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void,
+    ) => onLoad(availableMetricsResponse);
+
+    describe('when fetch is successful', () =>
+    {
+      it('should create a analytics.fetchAvailableMetricsSuccess action after the variant analytics have been fetched', (done) =>
+      {
+        const expectedActions = [
+          {
+            type: ActionTypes.fetchAvailableMetricsStart,
+          },
+          {
+            type: ActionTypes.fetchAvailableMetricsSuccess,
+            payload: { availableMetrics: availableMetricsResponse },
+          },
+        ];
+
+        const store = mockStore(Immutable.Map({ analytics }));
+
+        store.dispatch(Actions.fetchAvailableMetrics(
+          ((availableMetrics) =>
+          {
+            expect(store.getActions()).toEqual(expectedActions);
+            done();
+          }),
+        ));
+      });
     });
   });
 });

@@ -46,7 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands radix prefer-const no-console strict-boolean-expressions max-classes-per-file no-shadowed-variable max-line-length
 
-import { List, Map } from 'immutable';
+import { List, Map, Set } from 'immutable';
+import * as Immutable from 'immutable';
+
 import * as _ from 'lodash';
 import * as React from 'react';
 
@@ -512,17 +514,23 @@ export class ResultsManager extends TerrainComponent<Props>
       },
     );
 
-    let fields = List<string>([]);
-    if (hits.get(0))
+    // Looks at first 100 results to get fields
+    let fieldsSet = Set<string>([]);
+    if (hits && hits.size >= 0)
     {
-      fields = hits.get(0).fields.keySeq().toList();
+      let i = 0;
+      while (i < 100 && hits.get(i))
+      {
+        fieldsSet = fieldsSet.union(hits.get(i).fields.keySeq());
+        i++;
+      }
     }
 
     const loading = false;
 
     const changes: any = {
       hits,
-      fields,
+      fields: fieldsSet.toList(),
       hasError: false,
       loading,
       [isAllFields ? 'hasLoadedAllFields' : 'hasLoadedResults']: true,
@@ -538,7 +546,7 @@ export class ResultsManager extends TerrainComponent<Props>
       changes['count'] = hits.size;
     }
 
-    const filteredFields = List(_.filter(fields.toArray(), (val) => !(val.charAt(0) === '_')));
+    const filteredFields = List(_.filter(fieldsSet.toArray(), (val) => !(val.charAt(0) === '_')));
     const exportChanges: any = {
       filetype: 'csv',
       originalNames: filteredFields,

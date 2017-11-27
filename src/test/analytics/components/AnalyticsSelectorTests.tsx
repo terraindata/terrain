@@ -57,17 +57,31 @@ describe('AnalyticsSelector', () =>
     loaded: false,
     data: Immutable.Map({}),
     selectedMetric: [1],
+    availableMetrics: Immutable.List([
+      { events: 'impressions', label: 'Impressions' },
+    ]),
   });
 
+  const server1 = 'My ElasticSearch Instance';
+  const server2 = 'Zazzle ES 1';
   const servers = Immutable.Map({
-    'My ElasticSearch Instance': _Server({
-      name: 'My ElasticSearch Instance',
+    [server1]: _Server({
+      name: server1,
       connectionId: 1,
       isAnalytics: true,
       analyticsIndex: 'terrain-analytics',
       analyticsType: 'events',
     }),
+    [server2]: _Server({
+      name: server2,
+      connectionId: 2,
+      isAnalytics: false,
+    }),
   });
+
+  const analyticsActions = {
+    fetchAvailableMetrics: jest.fn(),
+  };
 
   const analyticsConnection = 'My ElasticSearch Instance';
 
@@ -83,6 +97,7 @@ describe('AnalyticsSelector', () =>
     analyticsComponent = shallow(
       <AnalyticsSelector
         analytics={analytics}
+        analyticsActions={analyticsActions}
         servers={servers}
         analyticsConnection={analyticsConnection}
         onMetricSelect={onMetricSelect}
@@ -97,12 +112,38 @@ describe('AnalyticsSelector', () =>
   {
     it('should have 3 MultiSwitch components', () =>
     {
+      const connectionDropdown = analyticsComponent.find('Dropdown');
       const multiswitchs = analyticsComponent.find('MultiSwitch');
 
+      expect(connectionDropdown).toHaveLength(1);
       expect(multiswitchs).toHaveLength(3);
       expect(multiswitchs.nodes[0].props.onChange).toEqual(onMetricSelect);
       expect(multiswitchs.nodes[1].props.onChange).toEqual(onIntervalSelect);
       expect(multiswitchs.nodes[2].props.onChange).toEqual(onDateRangeSelect);
+    });
+  });
+
+  describe('#getConnectionOptions', () =>
+  {
+    it('should return the list of servers with analytics', () =>
+    {
+      const connectionOptions = analyticsComponent.instance().getConnectionOptions();
+
+      expect(connectionOptions.count()).toEqual(1);
+      expect(connectionOptions.first()).toEqual(server1);
+    });
+  });
+
+  describe('#getMetricOptions', () =>
+  {
+    it('should return the list of available metrics', () =>
+    {
+      const { availableMetrics } = analytics;
+      const metricOptions = analyticsComponent.instance().getMetricOptions();
+
+      expect(metricOptions.count()).toEqual(1);
+      expect(metricOptions.first().value).toEqual(availableMetrics.first().events);
+      expect(metricOptions.first().label).toEqual(availableMetrics.first().label);
     });
   });
 });

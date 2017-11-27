@@ -55,6 +55,7 @@ const d3 = require('d3');
 // import * as d3 from 'd3';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+import TransformUtil, { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 import Util from '../../../util/Util';
 
 const xMargin = 45;
@@ -168,7 +169,7 @@ const TransformChart = {
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
-      state.canEdit, state.colors);
+      state.canEdit, state.domain, state.mode, state.colors);
 
     d3.select(el).select('.inner-svg').on('mousedown', () =>
     {
@@ -189,11 +190,33 @@ const TransformChart = {
       // Draw Point + menu on double click
       d3.select(el).select('.inner-svg').on('dblclick', function()
       {
-        const isvg = d3.select(el).select('.inner-svg');
-        state.onCreate(
-          scales.x.invert(d3.mouse(this)[0] + parseInt(isvg.attr('x'), 10)),
-          scales.realPointY.invert(d3.mouse(this)[1] + parseInt(isvg.attr('y'), 10)),
-        );
+        // Only allow point creation in linear mode (other modes have set # of points)
+        if (state.mode === 'linear')
+        {
+          const isvg = d3.select(el).select('.inner-svg');
+          state.onCreate(
+            scales.x.invert(d3.mouse(this)[0] + parseInt(isvg.attr('x'), 10)),
+            scales.realPointY.invert(d3.mouse(this)[1] + parseInt(isvg.attr('y'), 10)),
+          );
+        }
+        else
+        {
+          const popup = d3.select(el).select('.inner-svg').append('g')
+            .attr('class', 'popup');
+          const containerWidth = d3.select(el).select('.bg').node().getBBox().width;
+          // 195 is the width of the text, used to center it in the contianer
+          const x = (containerWidth - 195) / 2;
+          popup.append('text')
+            .attr('x', x > 0 ? x : 100)
+            .attr('y', 15)
+            .attr('fill', 'red')
+            .text('Cannot add points in this mode')
+            ;
+          setTimeout(() =>
+          {
+            d3.select(el).select('.popup').remove();
+          }, 1300);
+        }
         return false;
       });
 
@@ -233,12 +256,36 @@ const TransformChart = {
           currentObject &&
           (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) // delete/backspace key
           && !$('input').is(':focus')
+          && state.mode === 'linear'
         )
         {
           d3.event['preventDefault']();
           d3.event['stopPropagation']();
           d3.select('.transform-tooltip').remove();
           deletePoints(el, state.onDelete);
+        }
+        if (
+          currentObject &&
+          (d3.event['keyCode'] === 46 || d3.event['keyCode'] === 8) // delete/backspace key
+          && !$('input').is(':focus')
+          && state.mode !== 'linear'
+        )
+        {
+          const popup = d3.select(el).select('.inner-svg').append('g')
+            .attr('class', 'popup');
+          const containerWidth = d3.select(el).select('.bg').node().getBBox().width;
+          // 211 is the width of the text, used to center it in the container
+          const x = (containerWidth - 211) / 2;
+          popup.append('text')
+            .attr('x', x > 0 ? x : 100)
+            .attr('y', 15)
+            .attr('fill', 'red')
+            .text('Cannot delete points in this mode')
+            ;
+          setTimeout(() =>
+          {
+            d3.select(el).select('.popup').remove();
+          }, 1300);
         }
       });
     }
@@ -317,7 +364,8 @@ const TransformChart = {
 
     const width = scaleMax(scales.x) - scaleMin(scales.x);
     const height = scaleMin(scales.pointY) - scaleMax(scales.pointY);
-
+    const containerWidth = d3.select(el).select('.bg').node().getBBox().width;
+    const x = (containerWidth - 279) / 2;
     overlay.append('rect')
       .attr('x', 0)
       .attr('width', width)
@@ -327,7 +375,7 @@ const TransformChart = {
       .attr('opacity', 0.5);
 
     overlay.append('text')
-      .attr('x', 10)
+      .attr('x', x >= 0 ? x : 10)
       .attr('y', height / 2)
       .attr('text-anchor', 'start')
       .attr('fill', Colors().text1)
@@ -354,6 +402,8 @@ const TransformChart = {
 
     const width = scaleMax(scales.x) - scaleMin(scales.x);
     const height = scaleMin(scales.pointY) - scaleMax(scales.pointY);
+    const containerWidth = d3.select(el).select('.bg').node().getBBox().width;
+    const x = (containerWidth - 296) / 2;
 
     overlay.append('rect')
       .attr('x', 0)
@@ -364,7 +414,7 @@ const TransformChart = {
       .attr('opacity', 0.5);
 
     overlay.append('text')
-      .attr('x', 10)
+      .attr('x', x >= 0 ? x : 10)
       .attr('y', height / 2)
       .attr('text-anchor', 'start')
       .attr('fill', Colors().text1)
@@ -373,7 +423,6 @@ const TransformChart = {
     const self = this;
     overlay.on('mouseout', this._overlayMouseoutFactory(el, scales, self._drawNoPointsOverlay));
     overlay.on('mouseover', this._overlayMouseoverFactory(el));
-    // overlay.on('mouseleave', onMouseLeave(this, el, scales, onMouseEnter, onMouseLeave));
   },
 
   _drawAxes(el, scales, width, height, inputKey)
@@ -862,6 +911,38 @@ const TransformChart = {
     return linesPointsData;
   },
 
+  _drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domainMin, domainMax, getData)
+  {
+    const { ranges, outputs } = getData(100, pointsData, domainMin, domainMax);
+    let data = ranges.map((x, i) =>
+    {
+      return { x, y: outputs[i], id: i, selected: false };
+    });
+    data = this._getLinesData(data, scales, true);
+
+    const line = d3.svg.line()
+      .x((d) =>
+      {
+        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
+      })
+      .y((d) =>
+      {
+        return scales.realPointY(d['y']);
+      });
+
+    const lines = d3.select(el).select('.lines')
+      .attr('d', line(data))
+      .attr('class', canEdit ? 'lines' : 'lines lines-disabled');
+
+    d3.select(el).select('.lines-bg')
+      .attr('d', line(data));
+  },
+
+  _sigmoid(x, a, k, x0, L)
+  {
+    return L / (1 + Math.exp(-1 * k * (x - x0))) + a;
+  },
+
   _drawLines(el, scales, pointsData, onClick, onMove, onRelease, canEdit)
   {
     const lineFunction = d3.svg.line()
@@ -926,7 +1007,11 @@ const TransformChart = {
       {
         return scales.realX.invert(parseFloat(point.getAttribute('cx')));
       });
-      onMove(point.attr('_id'), newY, newX, pointValues, cx, d3.event['altKey']);
+      const pointScores = d3.select(el).selectAll('.point')[0].map((point: any) =>
+      {
+        return scales.realPointY.invert(parseFloat(point.getAttribute('cy')));
+      });
+      onMove(point.attr('_name'), point.attr('_id'), newY, newX, pointValues, pointScores, cx, d3.event['altKey']);
       drawCrossHairs(el, d3.mouse(this), scales, parseFloat(point.attr('cx')), newY, colors);
     };
 
@@ -1100,6 +1185,10 @@ const TransformChart = {
     {
       return scales.realX.invert(parseFloat(p.getAttribute('cx')));
     });
+    const pointScores = d3.select(el).selectAll('.point')[0].map((point: any) =>
+    {
+      return scales.realPointY.invert(parseFloat(point.getAttribute('cy')));
+    });
     const xValueNode: any = inputX.node();
     const yValueNode: any = inputY.node();
     const x = parseFloat(xValueNode.value) || 0;
@@ -1107,10 +1196,12 @@ const TransformChart = {
     const x_raw = parseFloat(inputX.attr('raw_value')) + (x - parseFloat(inputX.attr('value')));
     const y_raw = parseFloat(inputY.attr('raw_value')) + (y - parseFloat(inputY.attr('value')));
     onMove(
+      point.attr('_name'),
       point.attr('_id'),
       y_raw,
       x_raw,
       pointValues,
+      pointScores,
       scales.realX.invert(parseFloat(point.attr('cx'))),
       d3.event['altKey'],
     );
@@ -1443,7 +1534,7 @@ const TransformChart = {
     d3.event['stopPropagation']();
   },
 
-  _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors)
+  _drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain)
   {
     const g = d3.select(el).selectAll('.points');
 
@@ -1453,9 +1544,109 @@ const TransformChart = {
     point.enter()
       .append('circle');
 
+    const pointYValue = (d, i) =>
+    {
+      // constrain y values of normal points so that they remain on the line
+      if (mode === 'normal')
+      {
+        const average = pointsData[1].x;
+        const stdDev = i === 0 ? Math.abs(pointsData[1].x - pointsData[0].x)
+          : Math.abs(pointsData[2].x - pointsData[1].x);
+        const maxY = TransformUtil._normal(average, average, stdDev);
+        const scaleFactor = pointsData[1].y / maxY;
+        const y = TransformUtil._normal(d['x'], average, stdDev) * scaleFactor;
+        return scales.realPointY(y);
+      }
+      // Constrain all y values so that poitns remain on the sigmoid line
+      if (mode === 'sigmoid')
+      {
+        const a = pointsData[0].y;
+        const L = pointsData[3].y - pointsData[0].y;
+        if (i === 2)
+        {
+          return scales.realPointY(L / 2 + a);
+        }
+        if (i === 3 || i === 0)
+        {
+          const x0 = pointsData[2].x;
+          const x = pointsData[1].x;
+          const y = pointsData[1].y;
+          let k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+          if (k === 0)
+          {
+            k = 0.001;
+          }
+          const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
+            Math.log(L / (0.01) - 1) / (-1 * k) + x0;
+          if (xVal < domain[0])
+          {
+            return scales.realPointY(TransformUtil._sigmoid(domain[0], a, k, x0, L));
+          }
+          if (xVal > domain[1])
+          {
+            return scales.realPointY(TransformUtil._sigmoid(domain[1], a, k, x0, L));
+          }
+        }
+      }
+      return scales.realPointY(d['y']);
+    };
+
+    const pointXValue = (d, i) =>
+    {
+      // Constrain x values for sigmoid so that points remain on lines
+      if (mode === 'sigmoid' && (i === 3 || i === 0))
+      {
+        const L = pointsData[3].y - pointsData[0].y;
+        const x0 = pointsData[2].x;
+        const a = pointsData[0].y;
+        const x = pointsData[1].x;
+        const y = pointsData[1].y;
+        const k = (-1 * Math.log(L / (y - a) - 1)) / (x - x0);
+        const xVal = i === 3 ? Math.log(L / (L - 0.01) - 1) / (-1 * k) + x0 :
+          Math.log(L / (0.01) - 1) / (-1 * k) + x0;
+        return scales.realX(Util.valueMinMax(xVal, domain[0], domain[1]));
+      }
+      return scales.realX(d['x']);
+    };
+
+    const pointName = (d, i) =>
+    {
+      if (mode === 'normal')
+      {
+        switch (i)
+        {
+          case 0:
+            return 'Standard Deviation 1';
+          case 1:
+            return 'Average';
+          case 2:
+            return 'Standard Deviation 2';
+          default:
+            return '';
+        }
+      }
+      else if (mode === 'sigmoid')
+      {
+        switch (i)
+        {
+          case 0:
+            return 'a';
+          case 1:
+            return 'k';
+          case 2:
+            return 'x0';
+          case 3:
+            return 'L';
+          default:
+            return '';
+        }
+      }
+      return d['id'];
+    };
+
     point
-      .attr('cx', (d) => scales.realX(d['x']))
-      .attr('cy', (d) => scales.realPointY(d['y']))
+      .attr('cx', pointXValue)
+      .attr('cy', pointYValue)
       .attr('fill', '#fff')
       .attr('style', (d) => 'stroke: ' + (d['selected'] ? Colors().error : colors[0]))
       .attr('class', (d) =>
@@ -1464,14 +1655,22 @@ const TransformChart = {
       .attr('r', 10);
 
     point
-      .attr('_id', (d) => d['id']);
+      .attr('_id', (d) => d['id'])
+      .attr('_name', pointName);
 
     if (canEdit)
     {
       point.on('mousedown', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
       point.on('touchstart', this._mousedownFactory(el, onMove, onRelease, scales, onSelect, onPointMoveStart, this._drawCrossHairs, point, colors));
       point.on('mouseover', this._mouseoverFactory(el, scales, colors, this._drawToolTip));
-      point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, colors, this._drawMenu));
+      if (mode === 'linear')
+      {
+        point.on('contextmenu', this._rightClickFactory(el, onDelete, scales, colors, this._drawMenu));
+      }
+      else
+      {
+        point.on('contextmenu', null);
+      }
       point.on('click', this._mouseClickFactory(el, scales, onMove, onRelease, colors, this._editPointPosition, this._drawPointEditMenu));
       point.on('mouseout', this._mouseoutFactory(el));
       point.on('dblclick', this._doubleclickFactory(el));
@@ -1480,7 +1679,7 @@ const TransformChart = {
     point.exit().remove();
   },
 
-  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit, colors)
+  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit, domain, mode, colors)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
@@ -1496,8 +1695,43 @@ const TransformChart = {
     d3.select(el).select('.inner-svg').select('.overlay').remove();
     this._drawBars(el, scales, barsData, colors);
     this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
-    this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
-    this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors);
+    const numPoints = pointsData.length;
+    let curveFn;
+    if (mode === 'normal' && numPoints === NUM_CURVE_POINTS.normal)
+    {
+      curveFn = TransformUtil.getNormalData;
+    }
+    else if (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential
+      && Math.abs(pointsData[1].x - pointsData[0].x) > (domain.x[1] - domain.x[0]) / 900) // points can't be too close horiz.
+    {
+      curveFn = TransformUtil.getExponentialData;
+    }
+    else if (mode === 'logarithmic' && numPoints === NUM_CURVE_POINTS.logarithmic)
+    {
+      curveFn = TransformUtil.getLogarithmicData;
+    }
+    else if (mode === 'sigmoid' && numPoints === NUM_CURVE_POINTS.sigmoid)
+    {
+      curveFn = TransformUtil.getSigmoidData;
+    }
+
+    if (curveFn !== undefined)
+    {
+      this._drawParameterizedLines(el, scales, pointsData, onLineClick, onLineMove, onRelease, canEdit, domain.x[0], domain.x[1], curveFn);
+    }
+    else
+    {
+      this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
+    }
+
+    if (mode === 'linear'
+      || (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential)
+      || (mode === 'logarithmic' && numPoints === NUM_CURVE_POINTS.logarithmic)
+      || (mode === 'normal' && numPoints === NUM_CURVE_POINTS.normal)
+      || (mode === 'sigmoid' && numPoints === NUM_CURVE_POINTS.sigmoid))
+    {
+      this._drawPoints(el, scales, pointsData, onMove, onRelease, onSelect, onDelete, onPointMoveStart, canEdit, colors, mode, domain.x);
+    }
     if (!pointsData.length)
     {
       this._drawNoPointsOverlay(el, scales);
