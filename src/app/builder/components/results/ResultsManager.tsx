@@ -52,6 +52,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
+import { addBodyToQuery } from 'shared/database/elastic/ElasticUtil';
 import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
@@ -67,6 +68,7 @@ import Util from '../../../util/Util';
 import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
+
 
 export interface Props
 {
@@ -412,7 +414,7 @@ export class ResultsManager extends TerrainComponent<Props>
         },
       );
 
-      const searchQuery = '{ "body" : ' + eql + '}';
+      const searchQuery = JSON.stringify(addBodyToQuery(eql));
 
       this.setState({
         lastQuery: query,
