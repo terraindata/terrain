@@ -89,7 +89,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
     computedTooltips: this.getComputedTooltips(this.props),
     showOther: this.getShowOther(this.props),
   }
-  
+
   componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.options !== nextProps.options || this.props.value !== nextProps.value)
@@ -110,11 +110,11 @@ class AdvancedDropdown extends TerrainComponent<Props>
       }
       // Note: do not update showOther if only the value changed
       // (see potential bug scenario at the end of this file)
-      
+
       this.setState(newState);
     }
   }
-  
+
   public componentDidUpdate(prevProps: Props, prevState)
   {
     if (!prevState.showOther && this.state.showOther)
@@ -124,7 +124,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
       // Note: the reason we do it this way is that calling the onChange from
       // within the change handler led to some weird  
     }
-    
+
     if (prevState.showOther && !this.state.showOther)
     {
       // we switch away from other, need to reupdate the index, as it
@@ -135,11 +135,11 @@ class AdvancedDropdown extends TerrainComponent<Props>
       });
     }
   }
-  
+
   public render()
   {
     const { props, state } = this;
-    
+
     return (
       <div className='flex-container-center'>
         <Dropdown
@@ -156,7 +156,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
           wrapperTooltip={props.wrapperTooltip}
           placeholder={props.placeholder}
         />
-        
+
         <div
           className='transition overflow-hidden'
           style={getStyle('width', state.showOther ? props.textboxWidth || 150 : 0)}
@@ -164,7 +164,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
           <input
             type='text'
             value={props.value}
-            placeholder={this.props.textPlaceholder !== undefined ? 
+            placeholder={this.props.textPlaceholder !== undefined ?
               this.props.textPlaceholder : 'Custom value'}
             onChange={this.handleTextChange}
             className='transition box-size'
@@ -173,14 +173,14 @@ class AdvancedDropdown extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private getComputedOptions(props: Props): List<string | number | El>
   {
     return props.options.map(
       (option) => option.displayName,
     ).toList().push('Other');
   }
-  
+
   private getComputedIndex(props: Props): number
   {
     if (
@@ -193,18 +193,18 @@ class AdvancedDropdown extends TerrainComponent<Props>
 
     return props.options.findIndex((option) => option.value === props.value);
   }
-  
+
   private getComputedTooltips(props: Props): List<string | El>
   {
     return props.options.map(
       (option) => option.tooltipContent,
     ).toList().push("Enter a value that's not in this list.");
   }
-  
+
   private handleDropdownChange(index: number): void
   {
     const { options, onChange } = this.props;
-    
+
     if (index === options.size)
     {
       // other
@@ -221,7 +221,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
       onChange(options.get(index).value);
     }
   }
-  
+
   private handleTextChange(event): void
   {
     let { value } = event.target;
@@ -231,7 +231,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
     }
     this.props.onChange(value);
   }
-  
+
   private getColorForOption(index): string | undefined
   {
     const option = this.props.options.get(index);
@@ -241,7 +241,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
     }
     return undefined;
   }
-  
+
   // Note: only use this when the dropdown options change, to prevent bugs
   // Potential bug in using it elsewhere:
   // - you click "other"

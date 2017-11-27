@@ -125,7 +125,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     BuilderActions.change(List(['query', 'path', 'source']), source);
   }
-  
+
   private handleCountChange(value: string | number)
   {
     this.changeSource(

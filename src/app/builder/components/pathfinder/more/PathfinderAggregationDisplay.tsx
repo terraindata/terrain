@@ -64,7 +64,7 @@ export interface AdvancedAggregationDisplay
 export interface AdvancedAggregationItem
 {
   text?: string;
-  inputType?: 'single' | 'multi' | 'range' | 'boolean';
+  inputType?: 'single' | 'multi' | 'range' | 'boolean' | 'textbox';
   tooltipText?: string;
   component?: (...args) => El; // Some advanced items need to be custom built
   key: string;
@@ -130,6 +130,78 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       key: 'name',
       defaultValue: (fieldName: string, aggregationName: string) => fieldName + ' ' + aggregationName,
     },
+  },
+  [ADVANCED.Size]: {
+    title: 'Size',
+    onlyOne: false,
+    items:
+      {
+        text: 'Number of facets:',
+        inputType: 'single',
+        tooltipText: '',
+        key: 'size',
+      },
+  },
+  [ADVANCED.Ranges]: {
+    title: 'Ranges',
+    onlyOne: true,
+    items: [
+    {
+      text: 'Uniform range size:',
+      inputType: 'single',
+      tooltipText: '',
+      key: 'interval',
+    },
+    {
+      text: 'Custom ranges',
+      inputType: 'range',
+      tooltipText: '',
+      key: 'ranges',
+    }
+    ],
+  },
+  [ADVANCED.ExtendedRange]:
+  {
+    title: 'Bounds',
+    onlyOne: false,
+    items: [
+      {
+        text: 'Offset',
+        inputType: 'single',
+        tooltipText: '',
+        key: 'interval',
+      },
+      {
+        text: 'Minimum',
+        inputType: 'single',
+        key: 'min'
+      },
+      {
+        text: 'Maximum',
+        inputType: 'single',
+        key: 'max'
+      }
+    ],
+  },
+  [ADVANCED.MinDocCount]:
+  {
+    title: 'Min',
+    onlyOne: false,
+    items: {
+      text: 'min doc count',
+      inputType: 'single',
+      key: 'min_doc_count',
+    }
+  },
+  [ADVANCED.Order]:
+  {
+    title: 'Sort order',
+    onlyOne: false,
+    items: {
+      text: '',
+      inputType: 'single',
+      key: 'order'
+    }
   },
   [ADVANCED.Missing]: {
     title: PathfinderText.aggregation.missing.title,

@@ -110,8 +110,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           // consider showing all options, even when a search text has been entered
           //  so that they can easily change it 
           // and different labels for user inputs, fields, etc.
-          <Autocomplete 
-            
+          <Autocomplete
+
           />
         ])}
       >

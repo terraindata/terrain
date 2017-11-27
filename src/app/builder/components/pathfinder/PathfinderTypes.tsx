@@ -345,24 +345,24 @@ type ChoiceContext = {
   type: 'source',
   schemaState: SchemaState,
 } | {
-  type: 'transformFields',
-  source: Source,
-  schemaState: SchemaState,
-} | {
-  type: 'fields',
-  source: Source,
-  schemaState: SchemaState,
-} | {
-  type: 'comparison',
-  source: Source,
-  schemaState: SchemaState,
-  field: string,
-} | {
-  type: 'value',
-  source: Source,
-  schemaState: SchemaState,
-  field: string,
-};
+    type: 'transformFields',
+    source: Source,
+    schemaState: SchemaState,
+  } | {
+    type: 'fields',
+    source: Source,
+    schemaState: SchemaState,
+  } | {
+    type: 'comparison',
+    source: Source,
+    schemaState: SchemaState,
+    field: string,
+  } | {
+    type: 'value',
+    source: Source,
+    schemaState: SchemaState,
+    field: string,
+  };
 
 class ElasticDataSourceC extends DataSource
 {
@@ -446,6 +446,17 @@ export enum ADVANCED
   PercentileRanks,
   Accuracy,
   Name,
+  Ranges,
+  Format,
+  ExtendedRange,
+  MinDocCount,
+  Order,
+  Size,
+  Error,
+  Distance,
+  Origin,
+  Precision,
+  IncludeExclude,
 }
 
 // The data that needs to be stored for each type of advanced field
@@ -457,12 +468,23 @@ export const ADVANCED_MAPPINGS =
     [ADVANCED.PercentileRanks]: { values: List([]) },
     [ADVANCED.Accuracy]: { compression: 100 },
     [ADVANCED.Name]: { name: '' },
+    [ADVANCED.Ranges]: { uniform: true, interval: 10, ranges: List([]) },
+    [ADVANCED.Format]: { format: 'MM/dd/yyyy', timezone: '' },
+    [ADVANCED.ExtendedRange]: { offset: 0, min: '', max: '' },
+    [ADVANCED.MinDocCount]: { min_doc_count: 0 },
+    [ADVANCED.Order]: { order: 'asc' },
+    [ADVANCED.Size]: { size: 10 },
+    [ADVANCED.Error]: { show_term_doc_count_error: false },
+    [ADVANCED.Origin]: { origin: '' },
+    [ADVANCED.Distance]: { unit: 'meters', distance_type: 'arc' },
+    [ADVANCED.Precision]: { precision: 5 },
+    [ADVANCED.IncludeExclude]: { include: '', exclude: '' }
   };
 
 interface AggregationData
 {
   elasticType: string | List<string>; // Some (like facets) will have more than one elastic type
-  advanced: List<ADVANCED>; // Advanced settings that will appear in the expanded section
+  advanced: List<ADVANCED> | Map<string, List<ADVANCED>>; // Advanced settings that will appear in the expanded section
   acceptedTypes: List<FieldType>; // The types of fields that can be aggregated on
 }
 
@@ -531,4 +553,23 @@ export const AggregationTypes = Map<string, AggregationData>({
     elasticType: 'extended_stats', advanced: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Sigma]),
     acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
   },
+  ['facets for']:
+  {
+    elasticType: List(['histogram', 'range', 'date_histogram', 'date_range', 'terms',
+      'significant_terms', 'ip_range', 'geo_distance', 'geo_hash']), advanced:
+    Map({
+      histogram: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.ExtendedRange, ADVANCED.MinDocCount,
+      ADVANCED.Order]),
+      range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges]),
+      date_range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.Format]),
+      date_histogram: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.ExtendedRange, ADVANCED.MinDocCount,
+      ADVANCED.Order, ADVANCED.Format]),
+      ip_range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges]),
+      geo_distance: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.Origin, ADVANCED.Distance]),
+      geo_hash: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Size, ADVANCED.Precision]),
+      terms: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Size, ADVANCED.Order, ADVANCED.MinDocCount, ADVANCED.IncludeExclude,
+      ADVANCED.Order])
+    }),
+    acceptedTypes: List([FieldType.Any]),
+  }
 });

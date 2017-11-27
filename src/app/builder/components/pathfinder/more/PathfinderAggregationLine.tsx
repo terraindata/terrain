@@ -124,14 +124,20 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public handleTypeChange(index)
   {
     const type = this.options.get(index);
-    const advancedTypes = AggregationTypes.get(type).advanced;
+    const advancedTypes = this.getAdvancedOptions(type);
     let advancedObj = {};
     advancedTypes.forEach((advancedType) =>
     {
       advancedObj = _.extend({}, advancedObj, ADVANCED_MAPPINGS[advancedType]);
     });
     BuilderActions.change(this.props.keyPath.push('advanced'), Map(advancedObj));
-    BuilderActions.change(this.props.keyPath.push('elasticType'), AggregationTypes.get(type).elasticType);
+    // TODO TODO TODO
+    let newType = AggregationTypes.get(type).elasticType;
+    if (List.isList(newType))
+    {
+      newType = 'histogram';
+    }
+    BuilderActions.change(this.props.keyPath.push('elasticType'), newType);
     BuilderActions.change(this.props.keyPath.push('advanced').push('name'), type + ' ' + this.props.aggregation.field);
   }
 
@@ -139,6 +145,26 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   {
     const newField = this.state.fieldOptions.get(index);
     BuilderActions.change(this.props.keyPath.push('advanced').push('name'), this.props.aggregation.type + ' ' + newField);
+  }
+
+  // This function, given a type of aggregation, returns a list of the advanced settings for that
+  // aggreagtion type
+  public getAdvancedOptions(type)
+  {
+    let advancedTypes: any = AggregationTypes.get(type).advanced;
+    if (!List.isList(advancedTypes))
+    {
+      if (!this.props.aggregation.elasticType)
+      {
+        BuilderActions.change(this.props.keyPath.push('elasticType'), 'histogram');
+        advancedTypes = advancedTypes.get('histogram');
+      }
+      else
+      {
+        advancedTypes = advancedTypes.get(this.props.aggregation.elasticType);
+      }
+    }
+    return advancedTypes;
   }
 
   // This function returns a list of fields that can be used with a given aggregation type
@@ -244,7 +270,8 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     {
       return null;
     }
-    const advanced = AggregationTypes.get(this.props.aggregation.type).advanced;
+    const advanced = this.getAdvancedOptions(this.props.aggregation.type);
+    console.log(advanced);
     return (
       <div className='pf-aggregation-advanced-wrapper'>
         {
