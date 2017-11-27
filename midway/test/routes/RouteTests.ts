@@ -1038,8 +1038,8 @@ describe('File export templates route tests', () =>
           dbname: 'movies',
           templateId: 1,
           filetype: 'csv',
-          query: '{\"body\":{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
-          + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}}',
+          query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+          + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
         },
       })
       .expect(200)
