@@ -362,6 +362,7 @@ type ChoiceContext = {
   source: Source,
   schemaState: SchemaState,
   field: string,
+  method: string,
 };
 
 class ElasticDataSourceC extends DataSource
@@ -376,9 +377,8 @@ class ElasticDataSourceC extends DataSource
       return context.schemaState.tables.valueSeq().map((table) =>
       {
         return _ChoiceOption({
-          name: context.schemaState.databases.get(table.databaseId).name + ' / ' + table.name,
+          displayName: context.schemaState.databases.get(table.databaseId).name + ' / ' + table.name,
           value: table,
-          metaContent: null,
         });
       },
       ).toList();
@@ -391,7 +391,7 @@ class ElasticDataSourceC extends DataSource
         (value) =>
         {
           return _ChoiceOption({
-            name: value,
+            displayName: value,
             value,
           });
         },
@@ -405,11 +405,41 @@ class ElasticDataSourceC extends DataSource
         (value) =>
         {
           return _ChoiceOption({
-            name: value,
+            displayName: value,
             value,
           });
         },
       ).toList();
+    }
+    
+    if (context.type === 'comparison')
+    {
+      return List(ElasticComparisons.map((comp) => _ChoiceOption({
+        displayName: comp,
+        value: comp,
+      })));
+    }
+    
+    if (context.type === 'value')
+    {
+      return List([
+        _ChoiceOption({
+          displayName: 'a number',
+          value: 'number',
+        }),
+        _ChoiceOption({
+          displayName: 'text',
+          value: 'text',
+        }),
+        _ChoiceOption({
+          displayName: 'a date',
+          value: 'date',
+        }),
+        _ChoiceOption({
+          displayName: 'an input',
+          value: 'input',
+        }),
+      ]);
     }
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));
@@ -419,15 +449,20 @@ export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>
 export const _ElasticDataSource = (config?: { [key: string]: any }) =>
   New<ElasticDataSource>(new ElasticDataSourceC(config), config);
 
+// TODO
+const ElasticComparisons = ['equals', 'contains', 'does not equal', 'does not contain', 'is greater than', 'is less than', 'is greater than or equal to',
+        'is less than or equal to', 'comes before', 'comes after', 'starts before', 'starts after'];
+
 /**
  * Section: Classes representing parts of the view
  */
 
 class ChoiceOptionC extends BaseClass
 {
-  public name: string = '';
-  public metaContent: any = '';
   public value: any = null; // a value to distinguish it to the parser
+  public displayName: string | number | El = '';
+  public tooltipContent: string | El = null;
+  public color: string = null;
 }
 export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
 export const _ChoiceOption = (config?: { [key: string]: any }) =>

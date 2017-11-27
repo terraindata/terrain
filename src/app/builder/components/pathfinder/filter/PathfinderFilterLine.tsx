@@ -89,34 +89,47 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
         pieces={List([
           <AdvancedDropdown
-            options={/* TODO adapt dropdown */ source.dataSource.getChoiceOptions({
+            options={source.dataSource.getChoiceOptions({
               type: 'fields',
               source,
               schemaState: pathfinderContext.schemaState,
-            }).map((option) => option.name).toList()}
-            selectedIndex={ /* TODO */ 0}
+            })}
+            value={filterLine.field}
             canEdit={pathfinderContext.canEdit}
+            onChange={this._fn(this.handleChange, 'field')}
           />,
           <AdvancedDropdown
-            options={/* TODO adapt dropdown */ source.dataSource.getChoiceOptions({
+            options={source.dataSource.getChoiceOptions({
               type: 'comparison',
-              field: null, /* TODO field */
+              field: filterLine.field, /* TODO field */
               source,
               schemaState: pathfinderContext.schemaState,
-            }).map((option) => option.name).toList()}
-            selectedIndex={ /* TODO */ 0}
+            })}
+            value={filterLine.method}
             canEdit={pathfinderContext.canEdit}
+            onChange={this._fn(this.handleChange, 'method')}
           />,
-          // consider showing all options, even when a search text has been entered
-          //  so that they can easily change it 
-          // and different labels for user inputs, fields, etc.
-          <Advanecdropdown 
-            
+          <AdvancedDropdown 
+            options={source.dataSource.getChoiceOptions({
+              type: 'value',
+              field: filterLine.field, /* TODO field */
+              method: filterLine.method,
+              source,
+              schemaState: pathfinderContext.schemaState,
+            })}
+            value={filterLine.value}
+            canEdit={pathfinderContext.canEdit}
+            onChange={this._fn(this.handleChange, 'value')}
           />
         ])}
-      >
-      </PathfinderLine>
+      />
     );
+  }
+  
+  private handleChange(key, value)
+  {
+    console.log('change', key, value);
+    this.props.onChange(this.props.keyPath, this.props.filterLine.set(key, value));
   }
 
   private getPieces()
