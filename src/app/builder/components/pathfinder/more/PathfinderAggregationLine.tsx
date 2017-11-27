@@ -57,9 +57,6 @@ const { List, Map, Set } = Immutable;
 import ElasticBlockHelpers, { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
 import Dropdown from '../../../../common/components/Dropdown';
-import ScoreBar from '../../charts/ScoreBar';
-import TransformCard from '../../charts/TransformCard';
-import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderText from '../PathfinderText';
 import
@@ -221,30 +218,6 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     );
   }
 
-  public renderLine(key, text, text2, multiValue, i)
-  {
-    const { aggregation } = this.props;
-    const { advanced } = aggregation;
-    const { canEdit } = this.props.pathfinderContext;
-    return (
-      <div className='pf-aggregation-advanced-line' key={i}>
-        <span>{text}</span>
-        {
-          !multiValue ?
-            <BuilderTextbox
-              value={advanced.get(key)}
-              keyPath={this.props.keyPath.push(key)}
-              canEdit={canEdit}
-              placeholder={'value'}
-            />
-            :
-            null // TODO ADD IN MULTILPE INPUTS
-        }
-        <span>{text2}</span>
-      </div>
-    );
-  }
-
   // Given a type of advanced section to return, and the advanced
   // data from the aggregation return an PathfinderAdvancedLine with the
   // correct information
@@ -271,7 +244,6 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       return null;
     }
     const advanced = this.getAdvancedOptions(this.props.aggregation.type);
-    console.log(advanced);
     return (
       <div className='pf-aggregation-advanced-wrapper'>
         {

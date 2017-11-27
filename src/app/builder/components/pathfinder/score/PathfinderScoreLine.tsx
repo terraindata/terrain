@@ -63,7 +63,12 @@ import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
-
+import Menu from './../../../../common/components/Menu';
+const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
+const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
+const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIcon');
+const LogarithmicIcon = require('images/icon_logarithmic.svg?name=LogarithmicIcon');
+const NormalIcon = require('images/icon_normal.svg?name=NormalIcon');
 const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 
 export interface Props
@@ -110,6 +115,12 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     this.props.onValueChange('expanded', this.props.index, expanded);
   }
 
+  public handleTransformModeChange(index)
+  {
+    const options = ['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid'];
+    BuilderActions.change(this.props.keyPath.push('transformData').push('mode'), options[index]);
+  }
+
   public renderTransformChart()
   {
     const data = {
@@ -120,10 +131,51 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       static: {
         colors: ['#1eb4fa', 'rgb(60, 63, 65)'], // TODO
       },
+      mode: this.props.line.transformData.mode,
+      dataDomain: this.props.line.transformData.dataDomain,
     };
 
     return (
       <div className='pf-score-line-transform'>
+        <Menu
+          options={List([
+            {
+              text: 'freeform',
+              onClick: this.handleTransformModeChange,
+              selected: this.props.line.transformData.mode === 'linear',
+              icon: <LinearIcon />,
+              iconColor: Colors().active
+            },
+            {
+              text: 'logarithmic',
+              onClick: this.handleTransformModeChange,
+              selected: this.props.line.transformData.mode === 'logarithmic',
+              icon: <LogarithmicIcon />,
+              iconColor: Colors().active
+            },
+            {
+              text: 'exponential',
+              onClick: this.handleTransformModeChange,
+              selected: this.props.line.transformData.mode === 'exponential',
+              icon: <ExponentialIcon />,
+              iconColor: Colors().active
+            },
+            {
+              text: 'bell-curve',
+              onClick: this.handleTransformModeChange,
+              selected: this.props.line.transformData.mode === 'normal',
+              icon: <NormalIcon />,
+              iconColor: Colors().active
+            },
+            {
+              text: 's-curve',
+              onClick: this.handleTransformModeChange,
+              selected: this.props.line.transformData.mode === 'sigmoid',
+              icon: <SigmoidIcon />,
+              iconColor: Colors().active
+            }
+          ])}
+        />
         <TransformCard
           builderState={BuilderStore.getState()}
           canEdit={this.props.pathfinderContext.canEdit}
@@ -151,6 +203,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
             range={List([0, 1])}
             height={25}
             width={33}
+            mode={this.props.line.transformData.mode}
           />
         </div>
       </div>

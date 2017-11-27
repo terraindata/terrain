@@ -73,6 +73,7 @@ export interface Props
   range: List<number>;
   height: number;
   width: number;
+  mode: string;
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
@@ -110,6 +111,7 @@ class TransformChartPreviewWrapper extends TerrainComponent<Props>
       width: this.props.width,
       height: this.props.height,
       colors: ['#1eb4fa', 'rgb(60, 63, 65)'], // TODO
+      mode: this.props.mode,
     };
 
     return chartState;

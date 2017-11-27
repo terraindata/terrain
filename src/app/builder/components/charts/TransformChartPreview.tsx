@@ -56,6 +56,7 @@ const d3 = require('d3');
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import Util from '../../../util/Util';
+import TransformUtil, { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 
 const xMargin = 0;
 const yMargin = 0;
@@ -107,7 +108,7 @@ const TransformChartPreview = {
 
     const scales = this._scales(el, state.domain, state.width, state.height);
 
-    this._draw(el, scales, state.pointsData);
+    this._draw(el, scales, state.pointsData, state.mode, state.domain);
   },
 
   destroy(el)
@@ -124,6 +125,47 @@ const TransformChartPreview = {
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY));
+  },
+
+  _drawParameterizedLines(el, scales, pointsData, domainMin, domainMax, getData)
+  {
+    const { ranges, outputs } = getData(100, pointsData, domainMin, domainMax);
+    const data = ranges.map((x, i) =>
+    {
+      return { x, y: outputs[i], id: i, selected: false };
+    });
+    if (data.length)
+    {
+      const range = (scaleMax(scales.x) - scaleMin(scales.x));
+      data.unshift({
+        x: scaleMin(scales.x) - range,
+        y: data[0].y,
+        id: '*%*-first',
+        dontScale: true,
+      });
+      data.push({
+        x: scaleMax(scales.x) + range,
+        y: data[data.length - 1].y,
+        id: '*%*-last',
+        dontScale: true,
+      });
+    }
+    const line = d3.svg.line()
+      .x((d) =>
+      {
+        return d['dontScale'] ? d['x'] : scales.realX(d['x']);
+      })
+      .y((d) =>
+      {
+        return scales.realPointY(d['y']);
+      });
+
+    const lines = d3.select(el).select('.lines')
+      .attr('d', line(data))
+      .attr('class', 'lines');
+
+    d3.select(el).select('.lines-bg')
+      .attr('d', line(data));
   },
 
   _drawLines(el, scales, pointsData)
@@ -154,14 +196,41 @@ const TransformChartPreview = {
 
   },
 
-  _draw(el, scales, pointsData)
+  _draw(el, scales, pointsData, mode, domain)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realPointY));
 
     this._drawBg(el, scales);
-    this._drawLines(el, scales, pointsData);
+    let curveFn;
+    const numPoints = pointsData.length;
+    if (mode === 'normal' && numPoints === NUM_CURVE_POINTS.normal)
+    {
+      curveFn = TransformUtil.getNormalData;
+    }
+    else if (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential)
+    {
+      curveFn = TransformUtil.getExponentialData;
+    }
+    else if (mode === 'logarithmic' && numPoints === NUM_CURVE_POINTS.logarithmic)
+    {
+      curveFn = TransformUtil.getLogarithmicData;
+    }
+    else if (mode === 'sigmoid' && numPoints === NUM_CURVE_POINTS.sigmoid)
+    {
+      curveFn = TransformUtil.getSigmoidData;
+    }
+
+    if (curveFn !== undefined)
+    {
+      this._drawParameterizedLines(el, scales, pointsData, domain.x[0], domain.x[1], curveFn);
+    }
+    else
+    {
+      this._drawLines(el, scales, pointsData);
+    }
+
   },
 
   _scales(el, domain, stateWidth, stateHeight)

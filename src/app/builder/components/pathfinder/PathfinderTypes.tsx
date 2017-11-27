@@ -168,6 +168,9 @@ class TransformDataC extends BaseClass
 {
   public scorePoints: List<ScorePoint> = List([]);
   public domain: List<number> = List([0, 10]);
+  public dataDomain: List<number> = List([0, 10]);
+  public hasCustomDomain: boolean = false;
+  public mode: string = 'linear';
 }
 
 export type TransformData = TransformDataC & IRecord<TransformDataC>;

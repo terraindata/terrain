@@ -135,29 +135,29 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
     title: 'Size',
     onlyOne: false,
     items:
-      {
-        text: 'Number of facets:',
-        inputType: 'single',
-        tooltipText: '',
-        key: 'size',
-      },
+    {
+      text: 'Number of facets:',
+      inputType: 'single',
+      tooltipText: '',
+      key: 'size',
+    },
   },
   [ADVANCED.Ranges]: {
     title: 'Ranges',
     onlyOne: true,
     items: [
-    {
-      text: 'Uniform range size:',
-      inputType: 'single',
-      tooltipText: '',
-      key: 'interval',
-    },
-    {
-      text: 'Custom ranges',
-      inputType: 'range',
-      tooltipText: '',
-      key: 'ranges',
-    }
+      {
+        text: 'Uniform range size:',
+        inputType: 'single',
+        tooltipText: '',
+        key: 'interval',
+      },
+      {
+        text: 'Custom ranges',
+        inputType: 'range',
+        tooltipText: '',
+        key: 'ranges',
+      }
     ],
   },
   [ADVANCED.ExtendedRange]:
