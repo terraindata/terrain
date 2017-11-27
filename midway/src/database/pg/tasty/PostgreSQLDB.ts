@@ -94,13 +94,11 @@ export class PostgreSQLDB implements TastyDB
 
   public async schema(): Promise<TastySchema>
   {
-    // TODO: Implement me!
-    return undefined as any;
-    // const result = await this.execute(
-    //   ['SELECT table_schema, table_name, column_name, data_type ' +
-    //     'FROM information_schema.columns ' +
-    //     'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'PostgreSQL\', \'sys\');']);
-    // return TastySchema.fromPostgreSQLResultSet(result);
+    const result = await this.execute(
+      ['SELECT table_schema, table_name, column_name, data_type ' +
+        'FROM information_schema.columns ' +
+        'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'PostgreSQL\', \'sys\');']);
+    return TastySchema.fromSQLResultSet(result);
   }
 
   /**
