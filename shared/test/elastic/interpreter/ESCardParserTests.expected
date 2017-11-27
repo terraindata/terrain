@@ -4,5 +4,17 @@
   "simple query" : {
     "from" : 0,
     "size" : 10
-  }
+  },
+  "nested simple query" : {
+      "from" : 0,
+      "size" : 10,
+      "query" : {
+        "bool" : {
+          "must" : [
+            {"match" : {"_index" : "movies"}},
+            {"match" : {"_type" : "data"}}
+          ]
+        }
+      }
+    }
 }

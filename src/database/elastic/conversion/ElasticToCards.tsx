@@ -131,25 +131,7 @@ export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
   }
 
   const valueMap: { value?: any, cards?: List<Card> } = {};
-  if (isFilterCard(valueInfo))
-  {
-    let filters = [];
-    _.map(valueInfo.value, (value: any, key: string) =>
-    {
-      const fs = parseFilterBlock(key, value);
-      if (fs)
-      {
-        filters = filters.concat(fs);
-      }
-    });
-
-    return make(
-      Blocks, 'elasticFilter',
-      {
-        filters: List(filters),
-      }, true);
-  }
-  else if (isScoreCard(valueInfo))
+  if (isScoreCard(valueInfo))
   {
     const _scriptValueInfo = valueInfo.objectChildren._script.propertyValue;
     const scriptValueInfo = _scriptValueInfo && _scriptValueInfo.objectChildren.script.propertyValue;

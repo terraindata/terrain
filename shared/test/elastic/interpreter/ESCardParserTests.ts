@@ -60,7 +60,6 @@ import ESParserError from 'shareddatabase/elastic/parser/ESParserError';
 
 function getExpectedFile(): string
 {
-  console.log(__filename.split('.')[0] + '.expected');
   return __filename.split('.')[0] + '.expected';
 }
 
