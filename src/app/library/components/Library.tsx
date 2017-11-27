@@ -348,6 +348,7 @@ class Library extends TerrainComponent<any>
       selectedMetric,
       selectedInterval,
       selectedDateRange,
+      selectedDateRangeDomain,
       pinnedVariants,
     } = analytics;
 
@@ -509,6 +510,7 @@ class Library extends TerrainComponent<any>
                     legendTitle={selectedMetricObject !== undefined ?
                       selectedMetricObject.label : ''
                     }
+                    domain={selectedDateRangeDomain}
                   /> : (
                     <div className='library-analytics-error'>
                       <p>An error occurred while fetching the analytics data</p>

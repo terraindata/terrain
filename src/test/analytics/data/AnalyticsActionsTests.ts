@@ -235,7 +235,13 @@ describe('AnalyticsActions', () =>
           },
           {
             type: ActionTypes.fetchSuccess,
-            payload: { analytics: analyticsResponse },
+            payload: {
+              analytics: analyticsResponse,
+              dateRangeDomain: {
+                start: (new Date(serverTimeResponse.serverTime)).getTime(),
+                end: (new Date(serverTimeResponse.serverTime)).getTime(),
+              },
+            },
           },
         ];
 
