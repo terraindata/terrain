@@ -56,7 +56,7 @@ import PostgreSQLController from '../database/pg/PostgreSQLController';
 import SQLiteConfig from '../database/sqlite/SQLiteConfig';
 import SQLiteController from '../database/sqlite/SQLiteController';
 
-export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MySQLConfig | ElasticConfig | undefined
+export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MySQLConfig | ElasticConfig | PostgreSQLConfig | undefined
 {
   if (type === 'sqlite')
   {
@@ -66,9 +66,12 @@ export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MyS
   }
   else if (type === 'mysql' || type === 'postgres')
   {
-    const idx = dsnString.lastIndexOf('@');
-    const h0 = dsnString.substr(0, idx);
-    const h1 = dsnString.substr(idx + 1, dsnString.length - idx);
+    const idx0 = dsnString.lastIndexOf('@');
+    const idx1 = dsnString.lastIndexOf('/');
+    const end = idx1 > 0 ? idx1 : dsnString.length;
+    const h0 = dsnString.substr(0, idx0);
+    const h1 = dsnString.substr(idx0 + 1, end);
+    const h2 = (idx1 > 0) ? dsnString.substr(idx1 + 1, dsnString.length - idx1) : undefined;
     const q1 = h0.split(':');
     const q2 = h1.split(':');
 
@@ -81,13 +84,15 @@ export function DSNToConfig(type: string, dsnString: string): SQLiteConfig | MyS
     const password: string = q1[1];
     const host: string = q2[0];
     const port: number = parseInt(q2[1], 10);
+    const database: string = (h2 !== undefined && h2 !== '') ? h2 : 'terrain_midway';
 
     return {
       user,
       password,
       host,
       port,
-    } as MySQLConfig;
+      database,
+    };
   }
   else if (type === 'elasticsearch' || type === 'elastic')
   {
