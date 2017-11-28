@@ -69,7 +69,6 @@ import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
 
-
 export interface Props
 {
   query: Query;
