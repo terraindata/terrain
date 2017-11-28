@@ -57,7 +57,7 @@ export abstract class QueryHandler
 
   public async abstract handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>;
 
-  public async abstract handleJoin(request: QueryRequest): Promise<QueryResponse | Readable>;
+  public async abstract handleGroupJoin(request: QueryRequest): Promise<QueryResponse | Readable>;
 }
 
 export default QueryHandler;

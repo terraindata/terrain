@@ -61,7 +61,7 @@ import QueryHandler from '../../../app/query/QueryHandler';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
-import { joinHandler } from './ElasticJoinHandler';
+import { groupJoin } from '../join/ElasticGroupJoin';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -79,17 +79,16 @@ export default class ElasticQueryHandler extends QueryHandler
   public async handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>
   {
     const type = request.type;
-    let body = request.body;
 
     /* if the body is a string, parse it as JSON
      * NB: this is normally used to detect JSON errors, but could be used generally,
      * although it is less efficient than just sending the JSON.
      */
-    if (typeof body === 'string')
+    if (typeof request.body === 'string')
     {
       try
       {
-        body = this.getQueryBody(body);
+        request.body = this.getQueryBody(request.body);
       }
       catch (errors)
       {
@@ -103,16 +102,21 @@ export default class ElasticQueryHandler extends QueryHandler
       case 'search':
         if (request.streaming === true)
         {
-          return new ElasticsearchScrollStream(client.getDelegate(), body);
+          return new ElasticsearchScrollStream(client.getDelegate(), request.body);
+        }
+
+        if (request.body['groupJoin'] !== undefined)
+        {
+          return this.handleGroupJoin(request);
         }
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          client.search(body as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
+          client.search(request.body as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
         });
 
-      case 'join':
-        return this.handleJoin(request);
+      case 'groupJoin':
+        return this.handleGroupJoin(request);
 
       case 'deleteTemplate':
       case 'getTemplate':
@@ -125,7 +129,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          handler.call(client, body, this.makeQueryCallback(resolve, reject));
+          handler.call(client, request.body, this.makeQueryCallback(resolve, reject));
         });
 
       default:
@@ -135,22 +139,9 @@ export default class ElasticQueryHandler extends QueryHandler
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
-  public async handleJoin(request: QueryRequest): Promise<QueryResponse | Readable>
+  public async handleGroupJoin(request: QueryRequest): Promise<QueryResponse | Readable>
   {
-    let body = request.body;
-    if (typeof body === 'string')
-    {
-      try
-      {
-        body = this.getQueryBody(body);
-      }
-      catch (errors)
-      {
-        return new QueryResponse({}, errors);
-      }
-    }
-
-    return joinHandler(body);
+    return groupJoin(request);
   }
 
   private getQueryBody(bodyStr: string): object
