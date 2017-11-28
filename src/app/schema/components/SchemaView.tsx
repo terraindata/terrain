@@ -66,8 +66,9 @@ export interface Props
   showSearch: boolean;
   showResults: boolean;
   search?: string;
-  schema: SchemaTypes.SchemaState;
-  schemaActions: typeof SchemaActions;
+  // injected props
+  schema?: SchemaTypes.SchemaState;
+  schemaActions?: typeof SchemaActions;
 }
 
 const horizontalDivide = 50;
@@ -286,4 +287,4 @@ export default Util.createContainer(
   SchemaView,
   ['schema'],
   { schemaActions: SchemaActions },
-);
+) as typeof SchemaView;

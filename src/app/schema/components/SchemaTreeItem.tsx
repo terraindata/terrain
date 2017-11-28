@@ -68,10 +68,11 @@ export interface Props
   id: ID;
   type: string;
   search: string;
-
   inSearchResults?: boolean;
-  schema: SchemaTypes.SchemaState;
-  schemaActions: typeof SchemaActions;
+
+  // injected props
+  schema?: SchemaTypes.SchemaState;
+  schemaActions?: typeof SchemaActions;
 }
 
 class State
@@ -467,4 +468,4 @@ export default Util.createContainer(
   SchemaTreeItem,
   ['schema'],
   { schemaActions: SchemaActions },
-);
+) as typeof SchemaTreeItem;
