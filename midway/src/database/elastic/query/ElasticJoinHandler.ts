@@ -44,20 +44,26 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// import ElasticConfig from '../ElasticConfig';
+// import ElasticCluster from '../client/ElasticCluster';
+// import ElasticIndices from '../client/ElasticIndices';
+import clarinet = require('clarinet');
+import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
 import { Readable } from 'stream';
-import QueryRequest from '../../../../src/database/types/QueryRequest';
-import QueryResponse from '../../../../src/database/types/QueryResponse';
+import * as winston from 'winston';
 
-export abstract class QueryHandler
+import * as Elastic from 'elasticsearch';
+
+import QueryRequest from '../../../../../src/database/types/QueryRequest';
+import QueryResponse from '../../../../../src/database/types/QueryResponse';
+import QueryHandler from '../../../app/query/QueryHandler';
+import { QueryError } from '../../../error/QueryError';
+import ElasticClient from '../client/ElasticClient';
+import ElasticController from '../ElasticController';
+
+export async function joinHandler(request: QueryRequest): Promise<QueryResponse | Readable>
 {
-  constructor()
-  {
-    // do nothing
-  }
-
-  public async abstract handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>;
-
-  public async abstract handleJoin(request: QueryRequest): Promise<QueryResponse | Readable>;
+  throw new Error('Joins are not implemented yet.');
 }
 
-export default QueryHandler;
+export default joinHandler;

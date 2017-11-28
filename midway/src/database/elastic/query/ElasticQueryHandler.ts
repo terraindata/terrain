@@ -61,6 +61,7 @@ import QueryHandler from '../../../app/query/QueryHandler';
 import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
+import { joinHandler } from './ElasticJoinHandler';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -138,6 +139,9 @@ export default class ElasticQueryHandler extends QueryHandler
           client.search(body as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
         });
 
+      case 'join':
+        return this.handleJoin(request);
+
       case 'deleteTemplate':
       case 'getTemplate':
       case 'putTemplate':
@@ -157,6 +161,11 @@ export default class ElasticQueryHandler extends QueryHandler
     }
 
     throw new Error('Query type "' + type + '" is not currently supported.');
+  }
+
+  public async handleJoin(request: QueryRequest): Promise<QueryResponse | Readable>
+  {
+    return joinHandler(request);
   }
 
   private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
