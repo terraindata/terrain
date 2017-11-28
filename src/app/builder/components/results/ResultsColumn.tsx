@@ -103,7 +103,7 @@ class ResultsColumn extends TerrainComponent<Props>
     });
   }
 
-  public componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.resultsState.hits !== undefined && nextProps.resultsState.hits !== undefined &&
       !this.props.resultsState.hits.equals(nextProps.resultsState.hits) && this.state.selectedTab !== 0)

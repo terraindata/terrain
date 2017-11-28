@@ -125,7 +125,7 @@ class AnalyticsSelector extends TerrainComponent<Props>
     const metricOptions = this.getMetricOptions();
 
     return (
-      <div>
+      <div className='analytics-selector'>
         <Dropdown
           onChange={this.handleConnectionChange}
           options={connectionOptions}
@@ -134,7 +134,7 @@ class AnalyticsSelector extends TerrainComponent<Props>
           directionBias={90}
           selectedIndex={connectionOptions.indexOf(analyticsConnection)}
         />
-        <div className='analytics-selector'>
+        <div className='analytics-selector-filters'>
           <div className='analytics-selector-multiswitch'>
             <p>Metric</p>
             <MultiSwitch

@@ -200,7 +200,11 @@ class VariantsColumn extends TerrainComponent<Props>
     const { params, analytics: nextAnalytics } = nextProps;
     const { groupId, algorithmId } = params;
     const nextSelectedVariant = nextProps.selectedVariant;
-    const pinnedVariants = nextAnalytics.pinnedVariants.keySeq().toJS();
+    const pinnedVariants = nextAnalytics
+      .pinnedVariants
+      .filter((pinnedVariant) => pinnedVariant)
+      .keySeq()
+      .toJS();
 
     if (selectedVariant !== nextSelectedVariant ||
       (canPinItems && analytics.pinnedVariants !== nextAnalytics.pinnedVariants)

@@ -60,9 +60,9 @@ AnalyticsReducer[ActionTypes.fetchStart] =
   };
 
 AnalyticsReducer[ActionTypes.fetchSuccess] =
-  (state, action: Action<{ analytics: any }>) =>
+  (state, action: Action<{ analytics: any, dateRangeDomain: any }>) =>
   {
-    const { analytics } = action.payload;
+    const { analytics, dateRangeDomain } = action.payload;
     let nextState = state;
 
     Object.keys(analytics).forEach((variantId) =>
@@ -71,6 +71,7 @@ AnalyticsReducer[ActionTypes.fetchSuccess] =
       nextState = nextState
         .set('loaded', true)
         .setIn(['data', variantId], variantAnalytics)
+        .set('selectedDateRangeDomain', dateRangeDomain)
         .set('errors', []);
     });
 

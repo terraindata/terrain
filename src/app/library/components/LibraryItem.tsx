@@ -149,6 +149,7 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Rename',
         disabled: true,
+        tooltip: "Can't rename Live or Default Variants",
       },
     ]),
     duplicateRename:
@@ -171,6 +172,7 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Rename',
         disabled: true,
+        tooltip: "Can't rename Live or Default Variants",
       },
     ]),
     archiveRename:
@@ -193,6 +195,7 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Rename',
         disabled: true,
+        tooltip: "Can't rename Live or Default Variants",
       },
     ]),
     unarchiveRename:
@@ -219,6 +222,7 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Rename',
         disabled: true,
+        tooltip: "Can't rename Live or Default Variants",
       },
     ]),
     duplicateRenameArchive:

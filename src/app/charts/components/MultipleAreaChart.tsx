@@ -117,7 +117,6 @@ const styles = {
       height: height - 10,
       rx: 2,
       ry: 2,
-      width: 6,
       y: 5,
     }),
     axis: { grid: { strokeWidth: 0 }, ticks: { size: 0 } },
@@ -163,6 +162,7 @@ interface Props
   datasets: Immutable.Map<ID, Dataset>;
   xDataKey: string; // The key to get the value of x from the data
   yDataKey: string; // The key to get the value of y from the data
+  domain?: { start: number, end: number };
   onLegendClick?: (datasetId: ID) => void;
   legendTitle?: string;
 }
@@ -183,6 +183,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     yDataKey: 'y',
     onLegendClick: (datasetId) => { return; },
     legendTitle: '',
+    domain: { start: 0, end: 0 },
   };
 
   public state: State = {
@@ -450,7 +451,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
   public render()
   {
-    const { datasets, xDataKey, yDataKey } = this.props;
+    const { datasets, xDataKey, yDataKey, domain } = this.props;
 
     const data = this.renderData();
     const legend = this.renderLegend();
@@ -459,12 +460,15 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
     const VictoryZoomVoronoiContainer = createContainer('zoom', 'voronoi');
 
+    const chartDomain = { x: [domain.start, domain.end] };
+
     return (
       <div style={styles.wrapper}>
         <div style={styles.topChartWrapper}>
           <ContainerDimensions>
             {({ width, height }) => (
               <VictoryChart
+                domain={chartDomain}
                 domainPadding={config.topChart.domainPadding}
                 scale={config.topChart.scale}
                 theme={TerrainVictoryTheme}
@@ -528,13 +532,16 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
           <ContainerDimensions>
             {({ width, height }) => (
               <VictoryChart
+                domain={chartDomain}
                 scale={config.bottomChart.scale}
                 padding={styles.bottomChart.padding}
                 theme={TerrainVictoryTheme}
                 height={height}
                 width={width}
                 containerComponent={
-                  <VictoryBrushContainer responsive={false}
+                  <VictoryBrushContainer
+                    className='TerrainVictoryBrushContainer'
+                    responsive={false}
                     brushDimension='x'
                     brushDomain={this.state.brushDomain}
                     onBrushDomainChange={this.handleBrush}

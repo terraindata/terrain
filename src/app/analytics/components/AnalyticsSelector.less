@@ -3,14 +3,20 @@
 @br: 4px;
 
 .analytics-selector {
+  height: 100%;
+}
+
+.analytics-selector-filters {
   display: flex;
   orientation: row;
   justify-content: space-evenly;
+  height: ~"calc(100% - 33px)"; /* Substract 33px from the connection selector */
 }
 
 .analytics-selector-multiswitch {
   flex: 1;
-  margin: 10px;
+  margin: 0 10px;
+  overflow-y: auto;
 }
 
 .analytics-selector-multiswitch p {
