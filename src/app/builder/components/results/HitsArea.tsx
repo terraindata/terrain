@@ -168,9 +168,6 @@ class HitsArea extends TerrainComponent<Props>
         spotlightHits,
       });
     }
-    this.setState({
-      mapHeight: 0,
-    })
   }
 
   public handleCollapse()
@@ -576,12 +573,13 @@ class HitsArea extends TerrainComponent<Props>
         </InfiniteScroll>
       );
     }
+
     let mapHeight = Math.min(this.state.mapHeight, MAP_MAX_HEIGHT);
-    // if (mapHeight > 0)
-    // {
-    //   console.log("here");
-    //   mapHeight += 60;
-    // }
+    if (_.keys(this.locations).length === 0)
+    {
+      mapHeight = 0;
+    }
+
     return (
       <div
         className='results-area-results-wrapper'
