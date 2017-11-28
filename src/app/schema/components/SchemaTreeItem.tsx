@@ -68,10 +68,11 @@ export interface Props
   id: ID;
   type: string;
   search: string;
-
   inSearchResults?: boolean;
-  schema: SchemaTypes.SchemaState;
-  schemaActions: typeof SchemaActions;
+
+  // injected props
+  schema?: SchemaTypes.SchemaState;
+  schemaActions?: typeof SchemaActions;
 }
 
 class State
@@ -463,7 +464,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaTreeItem,
   ['schema'],
   { schemaActions: SchemaActions },

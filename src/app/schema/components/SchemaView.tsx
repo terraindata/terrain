@@ -66,8 +66,9 @@ export interface Props
   showSearch: boolean;
   showResults: boolean;
   search?: string;
-  schema: SchemaTypes.SchemaState;
-  schemaActions: typeof SchemaActions;
+  // injected props
+  schema?: SchemaTypes.SchemaState;
+  schemaActions?: typeof SchemaActions;
 }
 
 const horizontalDivide = 50;
@@ -282,7 +283,7 @@ const RESULTS_STYLE_COLUMN = {
   height: (100 - verticalDivide) + '%',
 };
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaView,
   ['schema'],
   { schemaActions: SchemaActions },
