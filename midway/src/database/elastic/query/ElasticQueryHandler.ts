@@ -89,38 +89,10 @@ export default class ElasticQueryHandler extends QueryHandler
     {
       try
       {
-        body = JSON.parse(body);
+        body = this.getQueryBody(body);
       }
-      catch (_e)
+      catch (errors)
       {
-        // absorb the error and retry using clarinet so we can get a good error message
-
-        const parser = clarinet.parser();
-
-        const errors: MidwayErrorItem[] = [];
-
-        parser.onerror =
-          (e) =>
-          {
-            const title: string = String(parser.line) + ':' + String(parser.column)
-              + ':' + String(parser.position) + ' ' + String(e.message);
-            errors.push({ status: -1, title, detail: '', source: {} });
-          };
-
-        try
-        {
-          parser.write(body).close();
-        }
-        catch (e)
-        {
-          // absorb
-        }
-
-        if (errors.length === 0)
-        {
-          errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
-        }
-
         return new QueryResponse({}, errors);
       }
     }
@@ -165,7 +137,60 @@ export default class ElasticQueryHandler extends QueryHandler
 
   public async handleJoin(request: QueryRequest): Promise<QueryResponse | Readable>
   {
-    return joinHandler(request);
+    let body = request.body;
+    if (typeof body === 'string')
+    {
+      try
+      {
+        body = this.getQueryBody(body);
+      }
+      catch (errors)
+      {
+        return new QueryResponse({}, errors);
+      }
+    }
+
+    return joinHandler(body);
+  }
+
+  private getQueryBody(bodyStr: string): object
+  {
+    let body: object = {};
+    try
+    {
+      body = JSON.parse(bodyStr);
+      return body;
+    }
+    catch (_e)
+    {
+      // absorb the error and retry using clarinet so we can get a good error message
+      const parser = clarinet.parser();
+      const errors: MidwayErrorItem[] = [];
+
+      parser.onerror =
+        (e) =>
+        {
+          const title: string = String(parser.line) + ':' + String(parser.column)
+            + ':' + String(parser.position) + ' ' + String(e.message);
+          errors.push({ status: -1, title, detail: '', source: {} });
+        };
+
+      try
+      {
+        parser.write(bodyStr).close();
+      }
+      catch (e)
+      {
+        // absorb
+      }
+
+      if (errors.length === 0)
+      {
+        errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
+      }
+
+      throw errors;
+    }
   }
 
   private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)

@@ -61,8 +61,12 @@ import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 
-export async function joinHandler(request: QueryRequest): Promise<QueryResponse | Readable>
+export async function joinHandler(query: object): Promise<QueryResponse | Readable>
 {
+  query['groupjoin'] = {
+    // make up a join query!
+  };
+
   throw new Error('Joins are not implemented yet.');
 }
 
