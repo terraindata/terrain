@@ -84,7 +84,7 @@ class SchemaStateC
   public columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>();
 }
 export type SchemaState = WithIRecord<SchemaStateC>;
-export const _SchemaState = makeConstructor<SchemaStateC>(SchemaStateC);
+export const _SchemaState = makeConstructor(SchemaStateC);
 
 export function serverId(serverName: string)
 {

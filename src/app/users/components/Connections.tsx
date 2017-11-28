@@ -85,7 +85,8 @@ export interface Props
   params?: any;
   history?: any;
   children?: any;
-  schema: SchemaState;
+  // injected props
+  schema?: SchemaState;
 }
 
 class Connections extends TerrainComponent<Props>
@@ -501,7 +502,7 @@ class Connections extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   Connections,
   ['schema'],
   {},
