@@ -321,8 +321,8 @@ class SchemaResults extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaResults,
   ['schema'],
   {},
-) as typeof SchemaResults;
+);
