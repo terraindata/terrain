@@ -686,6 +686,11 @@ const Util = {
       mapDispatchToProps,
     )(component);
   },
+
+  createTypedContainer<ComponentType>(component: ComponentType, stateToPropsKeys, dispatchToPropsMap): ComponentType
+  {
+    return Util.createContainer(component, stateToPropsKeys, dispatchToPropsMap);
+  },
 };
 
 export default Util;

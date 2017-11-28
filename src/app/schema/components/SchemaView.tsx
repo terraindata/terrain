@@ -283,8 +283,8 @@ const RESULTS_STYLE_COLUMN = {
   height: (100 - verticalDivide) + '%',
 };
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaView,
   ['schema'],
   { schemaActions: SchemaActions },
-) as typeof SchemaView;
+);

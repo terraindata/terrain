@@ -502,8 +502,8 @@ class Connections extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   Connections,
   ['schema'],
   {},
-) as typeof Connections;
+);

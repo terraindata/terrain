@@ -464,8 +464,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaTreeItem,
   ['schema'],
   { schemaActions: SchemaActions },
-) as typeof SchemaTreeItem;
+);
