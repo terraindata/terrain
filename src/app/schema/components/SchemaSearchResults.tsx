@@ -63,7 +63,8 @@ type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 export interface Props
 {
   search: string;
-  schema: SchemaState;
+  // injected props
+  schema?: SchemaState;
 }
 
 let INIT_SHOWING_COUNT: IMMap<string, number> = Immutable.Map<string, number>({});
@@ -292,4 +293,4 @@ export default Util.createContainer(
   SchemaSearchResults,
   ['schema'],
   {},
-);
+) as typeof SchemaSearchResults;

@@ -66,7 +66,8 @@ import { AllBackendsMap } from '../../../database/AllBackends';
 export interface Props
 {
   servers: SchemaTypes.ServerMap;
-  schema: SchemaTypes.SchemaState;
+  // injected props
+  schema?: SchemaTypes.SchemaState;
 }
 
 @Radium
@@ -324,4 +325,4 @@ export default Util.createContainer(
   SchemaResults,
   ['schema'],
   {},
-);
+) as typeof SchemaResults;
