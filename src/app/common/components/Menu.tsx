@@ -54,9 +54,9 @@ import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Menu.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { borderColor, Colors, fontColor } from '../../colors/Colors';
 import ColorsActions from '../../colors/data/ColorsActions';
-import { tooltip } from 'common/components/tooltip/Tooltips';
 
 const optionHeight = 30; // coordinate with Menu.less
 
@@ -223,18 +223,18 @@ export class Menu extends TerrainComponent<Props>
             onClick={this.toggleOpen}
           >
             {
-              options.map((option, index) => 
-                <div key={index}> 
-                {
-                  option.tooltip ? 
-                    tooltip(this.renderOption(option, index), {
-                      title: option.tooltip,
-                      position: 'right',
-                    }) 
-                  : 
-                  this.renderOption(option, index)
-                }
-                </div>
+              options.map((option, index) =>
+                <div key={index}>
+                  {
+                    option.tooltip ?
+                      tooltip(this.renderOption(option, index), {
+                        title: option.tooltip,
+                        position: 'right',
+                      })
+                      :
+                      this.renderOption(option, index)
+                  }
+                </div>,
               )
             }
           </div>
