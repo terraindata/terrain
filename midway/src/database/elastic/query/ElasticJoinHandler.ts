@@ -63,8 +63,31 @@ import ElasticController from '../ElasticController';
 
 export async function joinHandler(query: object): Promise<QueryResponse | Readable>
 {
+  // make up a join query!
   query['groupjoin'] = {
-    // make up a join query!
+    key: 'id',
+    query: {
+      bool: {
+        filter: [
+          {
+            term: {
+              _index: 'movies',
+            },
+          },
+          {
+            term: {
+              _type: 'data',
+            },
+          },
+        ],
+        must: [
+        ],
+        must_not: [
+        ],
+        should: [
+        ],
+      },
+    },
   };
 
   throw new Error('Joins are not implemented yet.');
