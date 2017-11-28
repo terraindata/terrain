@@ -117,7 +117,6 @@ const styles = {
       height: height - 10,
       rx: 2,
       ry: 2,
-      width: 6,
       y: 5,
     }),
     axis: { grid: { strokeWidth: 0 }, ticks: { size: 0 } },
@@ -540,7 +539,9 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                 height={height}
                 width={width}
                 containerComponent={
-                  <VictoryBrushContainer responsive={false}
+                  <VictoryBrushContainer
+                    className='TerrainVictoryBrushContainer'
+                    responsive={false}
                     brushDimension='x'
                     brushDomain={this.state.brushDomain}
                     onBrushDomainChange={this.handleBrush}
