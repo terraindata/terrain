@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
+import { addBodyToQuery } from '../../../../shared/database/elastic/ElasticUtil';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
@@ -231,11 +232,7 @@ export class Export
       {
         return reject(mapping);
       }
-
-      const qryObjQuery: object = qryObj['query'];
-      delete qryObj['query'];
-      qryObj['body'] = { query: qryObjQuery };
-      winston.info(qry);
+      qryObj = addBodyToQuery(qryObj, this.SCROLL_TIMEOUT);
 
       let rankCounter: number = 1;
       let writer: any;
@@ -261,7 +258,6 @@ export class Export
         writer.write('[');
       }
 
-      qryObj['scroll'] = this.SCROLL_TIMEOUT;
       let errMsg: string = '';
       let isFirstJSONObj: boolean = true;
 
@@ -282,7 +278,7 @@ export class Export
 
       elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
       {
-        if (resp.hits === undefined || resp.hits.total === 0)
+        if (resp === undefined || resp.hits === undefined || resp.hits.total === 0)
         {
           writer.end();
           errMsg = 'Nothing to export.';
