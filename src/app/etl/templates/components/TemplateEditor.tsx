@@ -85,7 +85,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
   }
 }
 
-export default Util.createTypedContainer(
+export default Util.createContainer(
   ETLExportDisplay,
   ['templateEditor'],
   { actions: TemplateEditorActions },
