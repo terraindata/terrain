@@ -47,19 +47,8 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import { FILE_TYPES } from 'etl/ETLTypes';
 import { makeConstructor, New, WithIRecord } from 'src/app/Classes';
-
-export enum FILE_TYPES
-{
-  JSON = 'json',
-  JSON_TYPE_OBJECT = 'json [type object]',
-  CSV = 'csv'
-}
-
-export enum LANGUAGES
-{
-  ELASTIC,
-}
 
 export enum ELASTIC_TYPES
 {
@@ -78,9 +67,16 @@ export enum ELASTIC_TYPES
   GEO_POINT = 'geo_point',
 }
 
+export enum TEMPLATE_TYPES
+{
+  EXPORT = 'export',
+  IMPORT = 'import',
+}
+
 class TemplateEditorStateC
 {
   public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
+  public isDirty: boolean = true;
   public originalPreviewData: any = ''; // figure out this type
   public previewData: any = '';
 }
@@ -91,7 +87,7 @@ interface TemplateBase
 {
   templateId: ID;
   templateName: string;
-  language: LANGUAGES;
+  type: TEMPLATE_TYPES;
   filetype: FILE_TYPES;
   rootField: TemplateField; // was column types
   transformations: List<object>;
@@ -103,11 +99,13 @@ interface TemplateBase
 
 interface ExportTemplateBase extends TemplateBase
 {
+  type: TEMPLATE_TYPES.EXPORT;
   rank: boolean;
 }
 
 interface ImportTemplateBase extends TemplateBase
 {
+  type: TEMPLATE_TYPES.IMPORT;
   primaryKeys: List<number>;
   primaryKeyDelimiter: string;
 }
@@ -116,9 +114,9 @@ class ExportTemplateC implements ExportTemplateBase
 {
   public templateId = -1;
   public templateName = '';
-  public language: LANGUAGES.ELASTIC;
+  public readonly type = TEMPLATE_TYPES.EXPORT;
   public filetype = FILE_TYPES.JSON;
-  public rootField = _TemplateField({isRoot: true});
+  public rootField = _TemplateField();
   public transformations = List([]);
   public objectKey = '';
   public dbid = -1;
@@ -133,9 +131,9 @@ class ImportTemplateC implements ImportTemplateBase
 {
   public templateId = -1;
   public templateName = '';
-  public language: LANGUAGES.ELASTIC;
+  public readonly type = TEMPLATE_TYPES.IMPORT;
   public filetype = FILE_TYPES.JSON;
-  public rootField = _TemplateField({isRoot: true});
+  public rootField = _TemplateField();
   public transformations = List([]);
   public objectKey = '';
   public dbid = -1;
@@ -147,9 +145,10 @@ class ImportTemplateC implements ImportTemplateBase
 export type ImportTemplate = WithIRecord<ImportTemplateC>;
 export const _ImportTemplate = makeConstructor<ImportTemplateC>(ImportTemplateC);
 
+export type ETLTemplate = ImportTemplate | ExportTemplate;
+
 class TemplateFieldC
 {
-  public isRoot: boolean = false;
   public isPrimaryKey: boolean = false; // import only
   public isAnalyzed: boolean = true; // import only
   public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
@@ -159,13 +158,9 @@ class TemplateFieldC
   public children: Immutable.Map<string, TemplateField> = Map({});
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
-type TemplateFieldSubset =
-{
-  [key in (keyof TemplateFieldC) | 'id']?: any;
-}
 export const _TemplateField = (cfg?: any) =>
 {
-  const config = cfg || {} as TemplateFieldSubset;
+  const config = cfg || {}
   config.type = config.type || ELASTIC_TYPES.TEXT;
   config.isAnalyzed = config.isAnalyzed || (config.type === ELASTIC_TYPES.TEXT);
   config.analyzer = config.analyzer || (config.type === ELASTIC_TYPES.TEXT ? 'standard' : null);

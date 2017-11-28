@@ -50,28 +50,43 @@ import * as React from 'react';
 import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import TemplateEditorField from 'etl/templates/components/TemplateEditorField';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { _ExportTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 
 import './TemplateEditor.less';
 
 export interface Props
 {
-  templateEditor: TemplateEditorState;
-  templateEditorActions: typeof TemplateEditorActions;
+  // below from container
+  templateEditor?: TemplateEditorState;
+  actions?: typeof TemplateEditorActions;
 }
 
 @Radium
 class ETLExportDisplay extends TerrainComponent<Props>
 {
+  public componentDidMount()
+  {
+    const template = _ExportTemplate({
+      templateId: 1,
+      templateName: 'Test Template',
+    });
+    this.props.actions({
+      actionType: 'loadTemplate',
+      template,
+    });
+  }
+
   public render()
   {
-    return <div> hey there </div>
+    const template: ETLTemplate = this.props.templateEditor.template;
+    return <TemplateEditorField field={template.rootField}/>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   ETLExportDisplay,
   ['templateEditor'],
-  { templateEditorActions: TemplateEditorActions },
+  { actions: TemplateEditorActions },
 );

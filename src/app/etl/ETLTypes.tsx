@@ -50,6 +50,13 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import { makeConstructor, WithIRecord } from '../Classes';
 
+export enum FILE_TYPES
+{
+  JSON = 'json',
+  JSON_TYPE_OBJECT = 'json [type object]',
+  CSV = 'csv'
+}
+
 // Store type
 class ETLStateC
 {

@@ -47,7 +47,7 @@ THE SOFTWARE.
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Query from 'src/items/types/Query';
 import Util from 'util/Util';
 
@@ -64,6 +64,7 @@ export interface Props
   query: Query;
   serverId: string | number;
   variantName: string;
+  // below from container
   etl: ETLState;
   etlActions: any;
   templateEditor: TemplateEditorState;
@@ -83,11 +84,11 @@ class ETLExportDisplay extends TerrainComponent<Props>
         <TemplateEditor/>
         <div>
           <div className='export-button'
-            style={{
-              color: Colors().import,
-              border: 'solid 1px ' + Colors().import,
-              background: Colors().bg3,
-            }}
+            style={[
+              fontColor(Colors().import),
+              borderColor(Colors().import),
+              backgroundColor(Colors().bg3),
+            ]}
           >
             Export
           </div>

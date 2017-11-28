@@ -47,7 +47,12 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
-import { _TemplateEditorState, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import {
+  _TemplateEditorState,
+  ETLTemplate,
+  TemplateEditorState
+} from 'etl/templates/TemplateTypes';
+
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 const { List, Map } = Immutable;
 
@@ -57,10 +62,17 @@ export interface TemplateEditorActionTypes
     actionType: 'setPreviewData';
     preview: any;
     originalNames?: any;
-  },
-  placeholder: {
-    actionType: 'placeholder';
-    foo: any;
+  };
+  loadTemplate: { // load a new template to edit / view
+    actionType: 'loadTemplate';
+    template: ETLTemplate;
+  };
+  saveTemplate: {
+    actionType: 'saveTemplate';
+  };
+  updateTemplate: { // edit the current template
+    actionType: 'updateTemplate';
+    template: ETLTemplate;
   }
 }
 
@@ -71,13 +83,20 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
     setPreviewData: (state, action) => {
       return state.set('previewData', action.payload.preview);
     },
-    placeholder: (state, action) => {
+    loadTemplate: (state, action) => {
+      return state.set('isDirty', false).set('template', action.payload.template);
+    },
+    saveTemplate: (state, action) => {
       return state;
     },
+    updateTemplate: (state, action) => {
+      return state;
+    }
   }
 }
 
 const ReduxInstance = new TemplateEditorActionsClass();
 export const TemplateEditorActions = ReduxInstance._actionsForExport();
 export const TemplateEditorReducers = ReduxInstance._reducersForExport(_TemplateEditorState);
-export declare type TemplateEditorActionType<K extends keyof TemplateEditorActionTypes> = GetType<K, TemplateEditorActionTypes>;
+export declare type TemplateEditorActionType<K extends keyof TemplateEditorActionTypes> =
+  GetType<K, TemplateEditorActionTypes>;
