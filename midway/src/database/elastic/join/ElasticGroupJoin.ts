@@ -61,6 +61,38 @@ import { QueryError } from '../../../error/QueryError';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 
+// {
+//   "groupJoin" : {
+//     "left" : {},
+//     "right" : {
+//       "term" : {"id" : "left.id"}
+//     }
+//   }
+// },
+
+// "groupJoin" : {
+//   "left" : {},
+//   "right" : {},
+//   "on" : ["left.id", "right.id"],
+// }
+
+// "groupJoin" : {
+//   "left" : {},
+//   "right" : {},
+//   "on" : {
+//     "equal": ["left.id", "right.id"]
+//   }
+// }
+
+// "groupJoin" : {
+//   "left" : {},
+//   "right" : {},
+//   "on" : [
+//     { "term":  { "right.id": "left.id" }},
+//     { "range": { "right.publishDate": { "gte": "left.date" }}}
+//   ],
+// }
+
 export async function groupJoin(request: QueryRequest): Promise<QueryResponse | Readable>
 {
   throw new Error('Joins are not implemented yet.');
