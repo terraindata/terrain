@@ -57,8 +57,10 @@ import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
+import SpecializedCreateCardTool from 'builder/components/cards/SpecializedCreateCardTool';
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import { ElasticBlocks } from './ElasticBlocks';
+import { ElasticElasticCards } from './ElasticElasticCards';
 
 const esFilterOperatorsMap = {
   '>': 'gt',
@@ -78,84 +80,74 @@ const esFilterOperatorsTooltips = {
   '≈': "The data's field must contain your specified value.",
 };
 
+class FilterUtils
+{
+  public static BoolQueryCard = ElasticElasticCards['eqlbool_query'];
+  public static filterRowToQueryCard(rootBlock: Block, block: Block, blockPath?: KeyPath)
+  {
+    let queryCard;
+    const templateField = String(block['field']) + ':string';
+
+    if (block['filterOp'] === '=')
+    {
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'term:term_query': {
+              [templateField]: block['value'],
+            },
+          },
+        });
+    } else if (block['filterOp'] === '≈')
+    {
+      // match
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'match:match': {
+              [templateField]: block['value'],
+            },
+          },
+        });
+    } else
+    {
+      // range
+      // match
+      const rangeField = String(block['field']) + ':range_value';
+      const rangeOp = String(esFilterOperatorsMap[block['filterOp']]) + ':base';
+      queryCard = BlockUtils.make(ElasticBlocks,
+        'eqlquery',
+        {
+          template: {
+            'range:range_query': {
+              [rangeField]: {
+                [rangeOp]: block['value'],
+              },
+            },
+          },
+        });
+    }
+    return queryCard;
+  }
+}
+
 export const elasticFilterBlock = _block(
   {
     field: '',
     value: '',
-    cards: Immutable.List([]),
     key: 'term',
     boolQuery: 'must',
     filterOp: '=',
-
     static: {
       language: 'elastic',
+      tql: null,
       // the shape of elasticFilterBlock is similar with the eqlquery card.
       clause: ESInterpreterDefaultConfig.getClause('query'),
       // this tql is same as tql of other clause cards.
-      tql: (block, tqlTranslationFn, tqlConfig) =>
-      {
-        const json: object = {};
-        block['cards'].map(
-          (card) =>
-          {
-            _.extend(json, {
-              [card['key']]: tqlTranslationFn(card, tqlConfig),
-            });
-          },
-        );
-        return json;
-      },
       removeOnCardRemove: true,
       // this is called before parsing/interpreting cards, so we have to update the cards fields.
-      updateCards: (rootBlock: Block, block: Block, blockPath?: KeyPath) =>
-      {
-        let queryCard;
-        const templateField = String(block['field']) + ':string';
-
-        if (block['filterOp'] === '=')
-        {
-          queryCard = BlockUtils.make(ElasticBlocks,
-            'eqlquery',
-            {
-              template: {
-                'term:term_query': {
-                  [templateField]: block['value'],
-                },
-              },
-            });
-        } else if (block['filterOp'] === '≈')
-        {
-          // match
-          queryCard = BlockUtils.make(ElasticBlocks,
-            'eqlquery',
-            {
-              template: {
-                'match:match': {
-                  [templateField]: block['value'],
-                },
-              },
-            });
-        } else
-        {
-          // range
-          // match
-          const rangeField = String(block['field']) + ':range_value';
-          const rangeOp = String(esFilterOperatorsMap[block['filterOp']]) + ':base';
-          queryCard = BlockUtils.make(ElasticBlocks,
-            'eqlquery',
-            {
-              template: {
-                'range:range_query': {
-                  [rangeField]: {
-                    [rangeOp]: block['value'],
-                  },
-                },
-              },
-            });
-        }
-        return block.set('cards', queryCard.cards);
-      },
-
       init: (blocksConfig, extraConfig?, skipTemplate?) =>
       {
         const config = {};
@@ -180,7 +172,9 @@ export const elasticFilter = _card({
   otherFilters: List(),
   filters: List(),
   cards: Immutable.List([]),
-
+  getChildOptions: FilterUtils.BoolQueryCard.getChildOptions,
+  childOptionClickHandler: FilterUtils.BoolQueryCard.childOptionClickHandler,
+  childrenHaveKeys: true,
   key: 'bool',
 
   static: {
@@ -192,21 +186,9 @@ export const elasticFilter = _card({
     colors: getCardColors('filter', Colors().builder.cards.structureClause),
     preview: '[filters.length] Filters',
     // this tql is same as tql of other clause cards.
-    tql: (block, tqlTranslationFn, tqlConfig) =>
-    {
-      const json: object = {};
-      block['cards'].map(
-        (card) =>
-        {
-          _.extend(json, {
-            [card['key']]: tqlTranslationFn(card, tqlConfig),
-          });
-        },
-      );
-      return json;
-    },
+    tql: FilterUtils.BoolQueryCard.static.tql,
     // this is called before parsing/interpreting cards, so we have to update the cards fields.
-    updateCards: (rootBlock: Block, block: Block, blockPath: KeyPath) =>
+    /*updateCards: (rootBlock: Block, block: Block, blockPath: KeyPath) =>
     {
       const indexFilters = [];
       const typeFilters = [];
@@ -272,12 +254,16 @@ export const elasticFilter = _card({
       }
       block = block.set('otherFilters', List(otherFilters));
       return block;
-    },
+    },*/
     // to init the card with a special set of filters, please pass the filters
     // with extraConfig.filters (see ElasticFilterCard.tsx::parseCardFromValueInfo)
-    init: (blocksConfig, extraConfig?, skiTemplate?) =>
+    init: (blocksConfig, extraConfig?, skipTemplate?) =>
     {
-      const indexFilters = [];
+      //const boolQueryCard = ElasticElasticCards['eqlbool_query'];
+      //console.assert(boolQueryCard);
+      const config = FilterUtils.BoolQueryCard.static.init(blocksConfig, extraConfig, skipTemplate);
+      return config;
+      /*const indexFilters = [];
       const typeFilters = [];
       const otherFilters = [];
       const boolCard = BlockUtils.make(blocksConfig,
@@ -336,7 +322,7 @@ export const elasticFilter = _card({
         typeFilters: List(typeFilters),
         otherFilters: List(otherFilters),
         cards: boolCard.cards,
-      };
+      };*/
     },
 
     display:
@@ -473,6 +459,18 @@ export const elasticFilter = _card({
             },
           ],
         },
+      },
+      {
+        displayType: DisplayType.CARDS,
+        key: 'cards',
+        hideCreateCardTool: true,
+      },
+      {
+        provideParentData: true, // need this to grey out the type dropdown
+        displayType: DisplayType.COMPONENT,
+        component: SpecializedCreateCardTool,
+        key: null,
+        // help: ManualConfig.help['score'],
       },
     ],
   },

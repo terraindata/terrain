@@ -53,6 +53,11 @@ const getCardVisitor: GetCardVisitor =
 export const ElasticElasticCards: { [type: string]: any } =
   getCardVisitor.elasticElasticCards;
 
+export const ElasticCustomCards: { [type: string]: string } =
+  {
+    eqlbool_query: 'elasticFilter',
+  };
+
 export const ElasticElasticCardDeckTypes: string[] =
   getCardVisitor.elasticElasticCardDeckTypes;
 

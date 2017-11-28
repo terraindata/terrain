@@ -60,6 +60,7 @@ import Blocks from '../blocks/ElasticBlocks';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+import { ElasticCustomCards } from '../blocks/ElasticElasticCards';
 import ESCardParser from './ESCardParser';
 
 const { make } = BlockUtils;
@@ -213,7 +214,7 @@ export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       true);
   }
 
-  const clauseCardType = 'eql' + valueInfo.clause.type;
+  let clauseCardType = 'eql' + valueInfo.clause.type;
   if (typeof valueInfo.value !== 'object')
   {
     valueMap.value = valueInfo.value;
@@ -239,6 +240,10 @@ export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         return card;
       },
     ));
+  }
+  if (ElasticCustomCards[clauseCardType])
+  {
+    clauseCardType = ElasticCustomCards[clauseCardType];
   }
   return make(Blocks, clauseCardType, valueMap, true);
 };
