@@ -187,7 +187,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
       >
         <span> {item.text}</span>
         {content}
-      </div>, {title: item.tooltipText, key: i});
+      </div>, { title: item.tooltipText, key: i });
   }
 
   public renderAdvancedItems(items, onlyOne, radioKey?)
@@ -217,7 +217,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           'pf-advanced-section-items': true,
           'pf-advanced-section-multiple-items': items.length,
         })}
-        >
+      >
         {
           items.length ?
             items.map((item, i) => this.renderAdvancedItem(item, i))
