@@ -58,6 +58,7 @@
       "^app/(.*)$": "<rootDir>/src/app/$1",
       "^builder/(.*)$": "<rootDir>/src/app/builder/$1",
       "^charts/(.*)$": "<rootDir>/src/app/charts/$1",
+      "^colors/(.*)$": "<rootDir>/src/app/colors/$1",
       "^common/(.*)$": "<rootDir>/src/app/common/$1",
       "^control/(.*)$": "<rootDir>/src/app/control/$1",
       "^database/(.*)$": "<rootDir>/src/database/$1",
