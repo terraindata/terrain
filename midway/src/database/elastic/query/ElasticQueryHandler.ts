@@ -177,6 +177,16 @@ export default class ElasticQueryHandler extends QueryHandler
     });
   }
 
+  /**
+   * Given an Elasticsearch query object @query, replace all occurences of @parentName
+   * with the values provided in the object @params.
+   *
+   * @private
+   * @param {Elastic.SearchParams} query
+   * @param {string} parentName
+   * @param {object} params
+   * @memberof ElasticQueryHandler
+   */
   private getSubstitutedQuery(query: Elastic.SearchParams, parentName: string, params: object)
   {
     const q = query;
@@ -207,6 +217,7 @@ export default class ElasticQueryHandler extends QueryHandler
             const newKey = this.getObjectValueByPath(path, params);
             q[newKey] = q[k];
             delete q[k];
+            k = newKey;
           }
         }
 
@@ -216,7 +227,8 @@ export default class ElasticQueryHandler extends QueryHandler
           const name = path.shift();
           if (name === parentName)
           {
-            const newVal = this.getObjectValueByPath(path, params);
+            v = this.getObjectValueByPath(path, params);
+            q[k] = v;
           }
         }
       }
