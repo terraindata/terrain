@@ -52,6 +52,11 @@ import * as winston from 'winston';
 
 import * as Elastic from 'elasticsearch';
 
+import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
+import ESParserError from '../../../../../shared/database/elastic/parser/ESParserError';
+import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryRequest from '../../../../../src/database/types/QueryRequest';
 import QueryResponse from '../../../../../src/database/types/QueryResponse';
@@ -145,6 +150,8 @@ export default class ElasticQueryHandler extends QueryHandler
   public async handleGroupJoin(request: QueryRequest): Promise<QueryResponse | Readable>
   {
     const parentQuery: Elastic.SearchParams = request.body as Elastic.SearchParams;
+    const childQuery = parentQuery['groupJoin'];
+    parentQuery['groupJoin'] = undefined;
 
     const client: ElasticClient = this.controller.getClient();
     const parentResults = await new Promise<QueryResponse>((resolve, reject) =>
@@ -152,17 +159,26 @@ export default class ElasticQueryHandler extends QueryHandler
       client.search(parentQuery, this.makeQueryCallback(resolve, reject));
     });
 
-    const childQuery = parentQuery['groupJoin'];
     const body: any[] = [];
     const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
     const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
+
+    const parser: ESJSONParser = new ESJSONParser(childQuery.query, true);
+    const valueInfo: ESValueInfo = parser.getValueInfo();
+
+    if (parser.hasError())
+    {
+      const errors: ESParserError[] = parser.getErrors();
+      throw errors;
+    }
 
     for (const r of parentResults.result.hits)
     {
       const header = {};
       body.push(header);
-      const query = this.getSubstitutedQuery(childQuery.query, '@parent', r);
-      body.push({ query });
+
+      const queryStr = ESParameterFiller.generate(valueInfo, { parent: r });
+      body.push({ query: this.getQueryBody(queryStr) });
     }
 
     return new Promise<QueryResponse>((resolve, reject) =>
@@ -175,74 +191,6 @@ export default class ElasticQueryHandler extends QueryHandler
         },
         this.makeQueryCallback(resolve, reject));
     });
-  }
-
-  /**
-   * Given an Elasticsearch query object @query, replace all occurences of @parentName
-   * with the values provided in the object @params.
-   *
-   * @private
-   * @param {Elastic.SearchParams} query
-   * @param {string} parentName
-   * @param {object} params
-   * @memberof ElasticQueryHandler
-   */
-  private getSubstitutedQuery(query: Elastic.SearchParams, parentName: string, params: object)
-  {
-    const q = query;
-    _.forOwn(q, (v, k) =>
-    {
-      if (_.isArray(v))
-      {
-        v.foreach((e) =>
-        {
-          if (_.isObject(e))
-          {
-            e = this.getSubstitutedQuery(e, parentName, params);
-          }
-        });
-      }
-      else if (_.isObject(v))
-      {
-        v = this.getSubstitutedQuery(v, parentName, params);
-      }
-      else
-      {
-        if (typeof k === 'string' && k.indexOf('@') >= 0 && k.indexOf('.') >= 0)
-        {
-          const path = k.split('.');
-          const name = path.shift();
-          if (name === parentName)
-          {
-            const newKey = this.getObjectValueByPath(path, params);
-            q[newKey] = q[k];
-            delete q[k];
-            k = newKey;
-          }
-        }
-
-        if (typeof v === 'string' && v.indexOf('.') >= 0)
-        {
-          const path = v.split('.');
-          const name = path.shift();
-          if (name === parentName)
-          {
-            v = this.getObjectValueByPath(path, params);
-            q[k] = v;
-          }
-        }
-      }
-    });
-  }
-
-  private getObjectValueByPath(path: string[], obj: object): any
-  {
-    let value = obj;
-    for (const p of path)
-    {
-      value = value[p];
-    }
-    return value;
   }
 
   private getQueryBody(bodyStr: string): object
