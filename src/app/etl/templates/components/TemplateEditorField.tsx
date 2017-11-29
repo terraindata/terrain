@@ -88,17 +88,31 @@ class TemplateEditorField extends TerrainComponent<Props>
   {
     const { field, keyPath } = this.props;
 
-    return field.children.map((value, key) => {
-      const newKeyPath = keyPath.push(key);
+    return field.children.map((value, index) => {
+      const newKeyPath = keyPath.push(index);
       return (
         <TemplateEditorField
           isRoot={false}
           keyPath={newKeyPath}
           field={value}
-          key={key}
+          key={index}
         />
       );
     }).toList();
+  }
+
+  public renderCreateNewFieldButton()
+  {
+    return (
+      <div className='new-field-button-spacer'>
+        <div className='create-new-template-field-button'
+          style={_.extend({}, buttonColors(), getStyle('cursor', 'pointer'))}
+          onClick={this.handleCreateNewField}
+        >
+          Add Field
+        </div>
+      </div>
+    );
   }
 
   public render()
@@ -110,14 +124,7 @@ class TemplateEditorField extends TerrainComponent<Props>
         {field.children.size > 0 &&
           <div className='template-editor-children-container'>
             {this.renderChildFields()}
-            <div className='new-field-button-spacer'>
-              <div className='create-new-template-field-button'
-                style={_.extend({}, buttonColors(), getStyle('cursor', 'pointer'))}
-                onClick={this.handleCreateNewField}
-              >
-                Add Field
-              </div>
-            </div>
+            {this.renderCreateNewFieldButton()}
           </div>
         }
       </div>
@@ -127,14 +134,33 @@ class TemplateEditorField extends TerrainComponent<Props>
   public handleCreateNewField()
   {
     const { field, keyPath, act } = this.props;
-    const newKeyPath = keyPath.push('children', 'new name');
-    const newField = _TemplateField({name: 'new name'})
+    const nextIndex = field.children.size;
+    const newKeyPath = keyPath.push('children', nextIndex);
+    const newField = _TemplateField({name: `new field ${nextIndex}`});
     act({
       actionType: 'createField',
       keyPath: newKeyPath,
       field: newField,
     });
+    this.editField('isPrimaryKey', false);
+  }
 
+  public handleFieldClicked()
+  {
+    const { field, keyPath, act } = this.props;
+    this.editField('isPrimaryKey', !field.isPrimaryKey);
+  }
+
+  // proxy to edit the field in the store
+  private editField<K extends keyof TemplateField>(key: K, value: TemplateField[K])
+  {
+    const { act, keyPath } = this.props;
+    act({
+      actionType: 'updateField',
+      sourceKeyPath: keyPath,
+      key,
+      value,
+    });
   }
 }
 

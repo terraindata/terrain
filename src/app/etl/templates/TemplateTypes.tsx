@@ -155,7 +155,7 @@ class TemplateFieldC
   public analyzer: string = '';
   public originalName: string = '';
   public name: string = '';
-  public children: Immutable.Map<string, TemplateField> = Map({});
+  public children: List<TemplateField> = List([]);
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
 export const _TemplateField = (cfg?: any) =>

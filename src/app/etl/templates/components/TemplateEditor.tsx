@@ -74,7 +74,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
       templateId: 1,
       templateName: 'Test Template',
     });
-    template = template.setIn(['rootField', 'children', 'field1'], _TemplateField({name: 'blahblah'}))
+    template = template.setIn(['rootField', 'children', 0], _TemplateField({name: 'blahblah'}))
     this.props.act({
       actionType: 'loadTemplate',
       template,
