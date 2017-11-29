@@ -44,11 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// import ElasticConfig from '../ElasticConfig';
-// import ElasticCluster from '../client/ElasticCluster';
-// import ElasticIndices from '../client/ElasticIndices';
 import clarinet = require('clarinet');
 import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
+import * as _ from 'lodash';
 import { Readable } from 'stream';
 import * as winston from 'winston';
 
@@ -59,9 +57,9 @@ import QueryRequest from '../../../../../src/database/types/QueryRequest';
 import QueryResponse from '../../../../../src/database/types/QueryResponse';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { QueryError } from '../../../error/QueryError';
+import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
-import { groupJoin } from '../join/ElasticGroupJoin';
 
 /**
  * Implements the QueryHandler interface for ElasticSearch
@@ -116,6 +114,11 @@ export default class ElasticQueryHandler extends QueryHandler
         });
 
       case 'groupJoin':
+        if (request.body['groupJoin'] === undefined)
+        {
+          request.type = 'search';
+          return this.handleQuery(request);
+        }
         return this.handleGroupJoin(request);
 
       case 'deleteTemplate':
@@ -141,7 +144,93 @@ export default class ElasticQueryHandler extends QueryHandler
 
   public async handleGroupJoin(request: QueryRequest): Promise<QueryResponse | Readable>
   {
-    return groupJoin(request);
+    const parentQuery: Elastic.SearchParams = request.body as Elastic.SearchParams;
+
+    const client: ElasticClient = this.controller.getClient();
+    const parentResults = await new Promise<QueryResponse>((resolve, reject) =>
+    {
+      client.search(parentQuery, this.makeQueryCallback(resolve, reject));
+    });
+
+    const childQuery = parentQuery['groupJoin'];
+    const body: any[] = [];
+    const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
+    const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
+
+    for (const r of parentResults.result.hits)
+    {
+      const header = {};
+      body.push(header);
+      const query = this.getSubstitutedQuery(childQuery.query, '@parent', r);
+      body.push({ query });
+    }
+
+    return new Promise<QueryResponse>((resolve, reject) =>
+    {
+      client.msearch(
+        {
+          body,
+          index,
+          type,
+        },
+        this.makeQueryCallback(resolve, reject));
+    });
+  }
+
+  private getSubstitutedQuery(query: Elastic.SearchParams, parentName: string, params: object)
+  {
+    const q = query;
+    _.forOwn(q, (v, k) =>
+    {
+      if (_.isArray(v))
+      {
+        v.foreach((e) =>
+        {
+          if (_.isObject(e))
+          {
+            e = this.getSubstitutedQuery(e, parentName, params);
+          }
+        });
+      }
+      else if (_.isObject(v))
+      {
+        v = this.getSubstitutedQuery(v, parentName, params);
+      }
+      else
+      {
+        if (typeof k === 'string' && k.indexOf('@') >= 0 && k.indexOf('.') >= 0)
+        {
+          const path = k.split('.');
+          const name = path.shift();
+          if (name === parentName)
+          {
+            const newKey = this.getObjectValueByPath(path, params);
+            q[newKey] = q[k];
+            delete q[k];
+          }
+        }
+
+        if (typeof v === 'string' && v.indexOf('.') >= 0)
+        {
+          const path = v.split('.');
+          const name = path.shift();
+          if (name === parentName)
+          {
+            const newVal = this.getObjectValueByPath(path, params);
+          }
+        }
+      }
+    });
+  }
+
+  private getObjectValueByPath(path: string[], obj: object): any
+  {
+    let value = obj;
+    for (const p of path)
+    {
+      value = value[p];
+    }
+    return value;
   }
 
   private getQueryBody(bodyStr: string): object
