@@ -54,11 +54,12 @@ import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
 import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
-import { _card } from '../../../blocks/types/Card';
+import { _card, Card } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
 import SpecializedCreateCardTool from 'builder/components/cards/SpecializedCreateCardTool';
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
+import ESCardParser from '../conversion/ESCardParser';
 import { ElasticBlocks } from './ElasticBlocks';
 import { ElasticElasticCards } from './ElasticElasticCards';
 
@@ -80,11 +81,136 @@ const esFilterOperatorsTooltips = {
   '≈': "The data's field must contain your specified value.",
 };
 
-class FilterUtils
+export class FilterUtils
 {
   public static BoolQueryCard = ElasticElasticCards['eqlbool_query'];
+
+  public static updateFilterRows(block: Block): Block
+  {
+    const cardTree = new ESCardParser(block);
+    if (cardTree.hasError())
+    {
+      return block;
+    }
+    const boolValueInfo = cardTree.getValueInfo();
+    const boolValue = boolValueInfo.value;
+    const filterBlocks = FilterUtils.extractFilterBlocks(boolValue);
+    const indexFilters = [];
+    const typeFilters = [];
+    const otherFilters = [];
+    filterBlocks.map((filterBlock) =>
+    {
+      switch (filterBlock.field)
+      {
+        case '_index':
+          indexFilters.push(filterBlock);
+          break;
+        case '_type':
+          typeFilters.push(filterBlock);
+          break;
+        default:
+          otherFilters.push(filterBlock);
+      }
+    });
+    block = block.set('indexFilters', List(indexFilters));
+    block = block.set('typeFilters', List(typeFilters));
+    block = block.set('otherFilters', List(otherFilters));
+    return block;
+  }
+
+  public static updateFilterBlocks(block: Block): Block
+  {
+    return block;
+  }
+
+  //  public static compareFilters(source: Block[], target: Block[])
+  //  {
+  //   return source.filter( (src: Block) =>
+  //    {
+  //      return target.filter( (dst: Block) =>
+  //        FilterUtils.sameFilters(src, dst)
+  //      ).length === 0
+  //    });
+  //  }
+  public static extractFilterBlocks(boolValue): Block[]
+  {
+    let filters = [];
+    for (const key of ['filter', 'must', 'should', 'must_not'])
+    {
+      if (boolValue[key] !== undefined)
+      {
+        const fs = FilterUtils.ParseFilterBlock(key, boolValue[key]);
+        if (fs)
+        {
+          filters = filters.concat(fs);
+        }
+      }
+    }
+    return filters;
+  }
+  public static ParseFilterBlock(boolQuery: string, filters: any): Block[]
+  {
+    if (typeof filters !== 'object')
+    {
+      return [];
+    }
+
+    if (!Array.isArray(filters))
+    {
+      return FilterUtils.ParseFilterBlock(boolQuery, [filters]);
+    }
+
+    let filterBlocks = [];
+    filters.forEach((obj: object) =>
+    {
+      let field;
+      let filterOp;
+      let value;
+
+      if (obj['range'] !== undefined)
+      {
+        field = Object.keys(obj['range'])[0];
+        const filterOps = Object.keys(obj['range'][field]);
+        filterOp = filterOps[0];
+        value = obj['range'][field][filterOp];
+        if (filterOps.length > 1)
+        {
+          delete obj['range'][field][filterOp];
+          filterBlocks = filterBlocks.concat(FilterUtils.ParseFilterBlock(boolQuery, [obj]));
+        }
+        filterOp = esFilterOperatorsMap[filterOp];
+      }
+      else if (obj['term'] !== undefined)
+      {
+        field = Object.keys(obj['term'])[0];
+        filterOp = '=';
+        value = obj['term'][field];
+      }
+      else if (obj['match'] !== undefined)
+      {
+        field = Object.keys(obj['match'])[0];
+        filterOp = '≈';
+        value = obj['match'][field];
+      }
+
+      if (field !== undefined)
+      {
+        filterBlocks.push(
+          BlockUtils.make(ElasticBlocks, 'elasticFilterBlock', {
+            field,
+            value,
+            boolQuery,
+            filterOp,
+          }, true),
+        );
+      }
+    });
+    return filterBlocks;
+  }
+
   public static filterRowToQueryCard(rootBlock: Block, block: Block, blockPath?: KeyPath)
   {
+    console.assert(block.type === 'elasticFilterBlock', 'Rows of the Elastic filter card must be elasticFilterBlock');
     let queryCard;
     const templateField = String(block['field']) + ':string';
 
@@ -131,6 +257,23 @@ class FilterUtils
     }
     return queryCard;
   }
+
+  public static diffFilterBlocks(filterRows, filterBlocks)
+  {
+    const ret = { newRows: [], newBlocks: [] };
+    filterRows.map();
+  }
+
+  public static sameFilterBlock(blockA, blockB): boolean
+  {
+    if (blockA.field === blockB.field &&
+      blockA.value === blockB.value &&
+      blockA.boolQuery === blockB.boolQuery)
+    {
+      return true;
+    }
+    return false;
+  }
 }
 
 export const elasticFilterBlock = _block(
@@ -170,7 +313,6 @@ export const elasticFilter = _card({
   indexFilters: List(),
   typeFilters: List(),
   otherFilters: List(),
-  filters: List(),
   cards: Immutable.List([]),
   getChildOptions: FilterUtils.BoolQueryCard.getChildOptions,
   childOptionClickHandler: FilterUtils.BoolQueryCard.childOptionClickHandler,
@@ -184,146 +326,23 @@ export const elasticFilter = _card({
     title: 'Filter',
     description: 'Terrain\'s custom card for filtering results in a human-readable way.',
     colors: getCardColors('filter', Colors().builder.cards.structureClause),
-    preview: '[filters.length] Filters',
+    preview: '[cards.size] Properties',
     // this tql is same as tql of other clause cards.
     tql: FilterUtils.BoolQueryCard.static.tql,
     // this is called before parsing/interpreting cards, so we have to update the cards fields.
-    /*updateCards: (rootBlock: Block, block: Block, blockPath: KeyPath) =>
+    updateCards: (rootBlock: Block, block: Block, blockPath: KeyPath) =>
     {
-      const indexFilters = [];
-      const typeFilters = [];
-      const otherFilters = [];
-      const filterCards = [];
-      const mustCards = [];
-      const shouldCards = [];
-      const mustNotCards = [];
-      const allFilters = block['indexFilters'].concat(block['typeFilters']).concat(block['otherFilters']);
-      allFilters.map((filterBlock) =>
+      const filterRows = block['indexFilters'].concat(block['typeFilters']).concat(block['otherFilters']);
+      if (filterRows.size === 0)
       {
-        const updatedBlock = filterBlock.static.updateCards(rootBlock, filterBlock);
-        switch (updatedBlock.field)
-        {
-          case '_index':
-
-            indexFilters.push(updatedBlock);
-            break;
-          case '_type':
-            typeFilters.push(updatedBlock);
-            break;
-          default:
-            otherFilters.push(updatedBlock);
-        }
-        switch (updatedBlock.boolQuery)
-        {
-          case 'must':
-            mustCards.push(updatedBlock);
-            break;
-          case 'must_not':
-            mustNotCards.push(updatedBlock);
-            break;
-          case 'should':
-            shouldCards.push(updatedBlock);
-            break;
-          case 'filter':
-            filterCards.push(updatedBlock);
-            break;
-          default:
-            console.log('Unknown block when updating ElasticFilter cards' + String(block.boolQuery));
-        }
-      });
-      block = block.setIn(['cards', 0, 'cards'], Immutable.List(filterCards));
-      block = block.setIn(['cards', 1, 'cards'], Immutable.List(mustCards));
-      block = block.setIn(['cards', 2, 'cards'], Immutable.List(mustNotCards));
-      block = block.setIn(['cards', 3, 'cards'], Immutable.List(shouldCards));
-      block = block.set('indexFilters', List(indexFilters));
-      if (indexFilters.length === 0)
-      {
-        block = block.set('currentIndex', '');
+        return FilterUtils.updateFilterRows(block);
       } else
       {
-        block = block.set('currentIndex', indexFilters[0].value);
+        return FilterUtils.updateFilterBlocks(block);
       }
-      block = block.set('typeFilters', List(typeFilters));
-
-      if (typeFilters.length === 0)
-      {
-        block = block.set('currentType', '');
-      } else
-      {
-        block = block.set('currentType', typeFilters[0].value);
-      }
-      block = block.set('otherFilters', List(otherFilters));
-      return block;
-    },*/
-    // to init the card with a special set of filters, please pass the filters
-    // with extraConfig.filters (see ElasticFilterCard.tsx::parseCardFromValueInfo)
-    init: (blocksConfig, extraConfig?, skipTemplate?) =>
-    {
-      //const boolQueryCard = ElasticElasticCards['eqlbool_query'];
-      //console.assert(boolQueryCard);
-      const config = FilterUtils.BoolQueryCard.static.init(blocksConfig, extraConfig, skipTemplate);
-      return config;
-      /*const indexFilters = [];
-      const typeFilters = [];
-      const otherFilters = [];
-      const boolCard = BlockUtils.make(blocksConfig,
-        'eqlbool_query',
-        {
-          key: 'bool',
-          template: {
-            'filter:query[]': null,
-            'must:query[]': null,
-            'must_not:query[]': null,
-            'should:query[]': null,
-          },
-        });
-
-      const filters = extraConfig.filters;
-      if (filters)
-      {
-        filters.map((block) =>
-        {
-          switch (block.field)
-          {
-            case '_index':
-              indexFilters.push(block);
-              break;
-            case '_type':
-              typeFilters.push(block);
-              break;
-            default:
-              otherFilters.push(block);
-          }
-        });
-      } else
-      {
-        const indexBlock = BlockUtils.make(blocksConfig,
-          'elasticFilterBlock',
-          {
-            field: '_index',
-            value: '',
-            boolQuery: 'filter',
-          });
-
-        const typeBlock = BlockUtils.make(blocksConfig,
-          'elasticFilterBlock',
-          {
-            field: '_type',
-            value: '',
-            boolQuery: 'filter',
-          });
-
-        indexFilters.push(indexBlock);
-        typeFilters.push(typeBlock);
-      }
-
-      return {
-        indexFilters: List(indexFilters),
-        typeFilters: List(typeFilters),
-        otherFilters: List(otherFilters),
-        cards: boolCard.cards,
-      };*/
     },
+
+    init: FilterUtils.BoolQueryCard.static.init,
 
     display:
     [

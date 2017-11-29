@@ -299,7 +299,10 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: {
           'query:query': {
-            'bool:elasticFilter': null,
+            'bool:elasticFilter': {
+              'filter:query[]': [{ 'term:term_query': { '_index:string': '' } }, { 'term:term_query': { '_type:string': '' } }],
+              'must:query[]': [{ 'term:term_query': { ' :string': '' } }],
+            },
           },
           'sort:elasticScore': null,
           'from:from': 0,
@@ -1698,7 +1701,6 @@ const EQLSpec: ESClause[] =
         name: 'bool',
         desc: 'Filters in and out documents meeting the given logical conditions.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
-        // template: { must: null, must_not: null, should: null, minimum_should_match: null },
         suggestions: ['must', 'must_not', 'filter', 'should', 'minimum_should_match'],
       }),
     new ESVariantClause('must',

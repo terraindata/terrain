@@ -296,63 +296,6 @@ const esFilterOperatorsMap = {
   match: '≈',
 };
 
-function parseFilterBlock(boolQuery: string, filters: any): Block[]
-{
-  if (typeof filters !== 'object')
-  {
-    return [];
-  }
-
-  if (!Array.isArray(filters))
-  {
-    return parseFilterBlock(boolQuery, [filters]);
-  }
-
-  let filterBlocks = [];
-  filters.forEach((obj: object) =>
-  {
-    let field;
-    let filterOp;
-    let value;
-
-    if (obj['range'] !== undefined)
-    {
-      field = Object.keys(obj['range'])[0];
-      const filterOps = Object.keys(obj['range'][field]);
-      filterOp = filterOps[0];
-      value = obj['range'][field][filterOp];
-      if (filterOps.length > 1)
-      {
-        delete obj['range'][field][filterOp];
-        filterBlocks = filterBlocks.concat(parseFilterBlock(boolQuery, [obj]));
-      }
-      filterOp = esFilterOperatorsMap[filterOp];
-    }
-    else if (obj['term'] !== undefined)
-    {
-      field = Object.keys(obj['term'])[0];
-      filterOp = '=';
-      value = obj['term'][field];
-    }
-    else if (obj['match'] !== undefined)
-    {
-      field = Object.keys(obj['match'])[0];
-      filterOp = '≈';
-      value = obj['match'][field];
-    }
-
-    filterBlocks.push(
-      make(Blocks, 'elasticFilterBlock', {
-        field,
-        value,
-        boolQuery,
-        filterOp,
-      }, true),
-    );
-  });
-  return filterBlocks;
-}
-
 function isScoreCard(valueInfo: ESValueInfo): boolean
 {
   const isScriptSort = (valueInfo.clause.clauseType === ESClauseType.ESStructureClause) &&
