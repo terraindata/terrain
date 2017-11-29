@@ -54,9 +54,6 @@ import * as Elastic from 'elasticsearch';
 
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
-import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
-import ESParserError from '../../../../../shared/database/elastic/parser/ESParserError';
-import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryRequest from '../../../../../src/database/types/QueryRequest';
 import QueryResponse from '../../../../../src/database/types/QueryResponse';
@@ -163,12 +160,12 @@ export default class ElasticQueryHandler extends QueryHandler
     const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
     const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
 
-    const parser: ESJSONParser = new ESJSONParser(childQuery.query, true);
-    const valueInfo: ESValueInfo = parser.getValueInfo();
+    const parser = new ESJSONParser(childQuery.query, true);
+    const valueInfo = parser.getValueInfo();
 
     if (parser.hasError())
     {
-      const errors: ESParserError[] = parser.getErrors();
+      const errors = parser.getErrors();
       throw errors;
     }
 

@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserError from 'shared/database/elastic/parser/ESParserError';
-import ESValueInfo from 'shared/database/elastic/parser/ESValueInfo';
+import ESParserError from './ESParserError';
+import ESValueInfo from './ESValueInfo';
 
 abstract class ESParser
 {
@@ -70,7 +70,7 @@ abstract class ESParser
 
   public getErrorMessages(): string[]
   {
-    const ret = [];
+    const ret: string[] = [];
     for (const e of this.errors)
     {
       ret.push(e.message);
