@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import LegendLabel from 'charts/components/custom/LegendLabel';
+import LegendSymbol from 'charts/components/custom/LegendSymbol';
 import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
@@ -127,6 +129,7 @@ const styles = {
       fill: 'rgba(255,255,255,0.75)',
       fontWeight: 'bold',
     },
+    pinStyle: { fill: 'rgba(255, 255, 255, 0.75)' },
     borderPadding: {
       left: 10,
       right: 10,
@@ -155,6 +158,7 @@ interface Dataset
   id: ID;
   label: string[];
   data: any[];
+  isPinned: boolean;
 }
 
 interface Props
@@ -342,6 +346,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
           name: ds.label,
           labels: labelsStyle,
           symbol: dataStyle,
+          isPinned: ds.isPinned,
         };
       });
 
@@ -350,13 +355,18 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         padding={0}
         titleOrientation={'left'}
         name='legend'
-        gutter={20}
+        gutter={23}
         data={data.toArray()}
+        dataComponent={<LegendSymbol
+          onPinClick={this.handleLegendClick}
+          pinStyle={styles.legend.pinStyle}
+        />}
         orientation={config.legend.orientation}
         style={{
           title: styles.legend.title,
         }}
         title={legendTitle}
+        labelComponent={<LegendLabel />}
       />
     );
   }
@@ -394,7 +404,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         mutation: (labelProps) =>
         {
           // Changes the VictoryLegend hover item text font size.
-          const newStyle = Object.assign({}, labelProps.style, { fontSize: 14 });
+          const newStyle = Object.assign({}, labelProps.style, { fill: 'rgba(255,255,255,1)' });
           return { style: newStyle };
         },
       },
@@ -493,18 +503,19 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                     }
                   />
                 }
-                events={[{
-                  // indicate, by name, the component that listens to the event
-                  childName: ['legend'],
-                  // { 'data', 'labels' }, indicates if the texts or the dots
-                  // of the legend items are the one that listens to the event.
-                  target: 'labels',
-                  eventHandlers: {
-                    onClick: this.handleLegendClick,
-                    onMouseOver: this.handleLegendMouseOver,
-                    onMouseOut: this.handleLegendMouseOut,
+                events={[
+                  {
+                    // indicate, by name, the component that listens to the event
+                    childName: ['legend'],
+                    // { 'data', 'labels' }, indicates if the texts or the dots
+                    // of the legend items are the one that listens to the event.
+                    target: 'labels',
+                    eventHandlers: {
+                      onMouseOver: this.handleLegendMouseOver,
+                      onMouseOut: this.handleLegendMouseOut,
+                    },
                   },
-                }]}
+                ]}
               >
                 <VictoryGroup
                   style={styles.topChart.areas}
