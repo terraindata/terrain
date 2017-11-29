@@ -251,9 +251,10 @@ export const _AggregationLine = (config?: { [key: string]: any }) =>
 class FilterLineC extends LineC
 {
   // Members for when it is a single line condition
-  public field: string = ''; // autocomplete
-  public method: string = ''; // autocomplete
-  public value: string | number = 0;
+  public field: string = null; // autocomplete
+  public method: string = null; // autocomplete
+  public valueType: ValueType = null;
+  public value: string | number = null;
 
   // Members for when it is a group of filter conditions
   public filterGroup: FilterGroup = null;
@@ -261,6 +262,8 @@ class FilterLineC extends LineC
 export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
   New<FilterLine>(new FilterLineC(config), config);
+
+export type ValueType = 'number' | 'text' | 'date' | 'input';
 
 export const sourceCountOptions = List([
   'all',
@@ -362,11 +365,14 @@ type ChoiceContext = {
     schemaState: SchemaState,
     field: string,
   } | {
-    type: 'value',
+    type: 'valueType',
     source: Source,
     schemaState: SchemaState,
     field: string,
     method: string,
+  } | {
+    type: 'input',
+    // TODO builder state
   };
 
 class ElasticDataSourceC extends DataSource
@@ -424,7 +430,7 @@ class ElasticDataSourceC extends DataSource
       })));
     }
     
-    if (context.type === 'value')
+    if (context.type === 'valueType')
     {
       return List([
         _ChoiceOption({
@@ -444,6 +450,11 @@ class ElasticDataSourceC extends DataSource
           value: 'input',
         }),
       ]);
+    }
+    
+    if (context.type === 'input')
+    {
+      
     }
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));

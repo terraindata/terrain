@@ -161,14 +161,18 @@ class AdvancedDropdown extends TerrainComponent<Props>
           className='transition overflow-hidden'
           style={getStyle('width', state.showOther ? props.textboxWidth || 150 : 0)}
         >
-          <input
-            type='text'
-            value={props.value}
-            placeholder={this.props.textPlaceholder !== undefined ?
-              this.props.textPlaceholder : 'Custom value'}
-            onChange={this.handleTextChange}
-            className='transition box-size'
-          />
+          {
+            state.showOther ? 
+              <input
+                type='text'
+                value={props.value}
+                placeholder={this.props.textPlaceholder !== undefined ?
+                  this.props.textPlaceholder : 'Custom value'}
+                onChange={this.handleTextChange}
+                className='transition box-size'
+              />
+            : null
+          }
         </div>
       </div>
     );

@@ -98,32 +98,86 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             canEdit={pathfinderContext.canEdit}
             onChange={this._fn(this.handleChange, 'field')}
           />,
-          <AdvancedDropdown
-            options={source.dataSource.getChoiceOptions({
-              type: 'comparison',
-              field: filterLine.field, /* TODO field */
-              source,
-              schemaState: pathfinderContext.schemaState,
-            })}
-            value={filterLine.method}
-            canEdit={pathfinderContext.canEdit}
-            onChange={this._fn(this.handleChange, 'method')}
-          />,
+          {
+            content:
+              <AdvancedDropdown
+                options={source.dataSource.getChoiceOptions({
+                  type: 'comparison',
+                  field: filterLine.field,
+                  source,
+                  schemaState: pathfinderContext.schemaState,
+                })}
+                value={filterLine.method}
+                canEdit={pathfinderContext.canEdit}
+                onChange={this._fn(this.handleChange, 'method')}
+              />,
+            visible: filterLine.field !== null,
+          },
+          {
+            content:
+              <AdvancedDropdown 
+                options={source.dataSource.getChoiceOptions({
+                  type: 'valueType',
+                  field: filterLine.field,
+                  method: filterLine.method,
+                  source,
+                  schemaState: pathfinderContext.schemaState,
+                })}
+                value={filterLine.valueType}
+                canEdit={pathfinderContext.canEdit}
+                onChange={this._fn(this.handleChange, 'valueType')}
+              />,
+            visible: filterLine.method !== null,
+          },
+          {
+            content:
+              this.renderValue(),
+            visible: filterLine.valueType !== null,
+          },
+        ])}
+      />
+    );
+  }
+  
+  private renderValue()
+  {
+    const { filterLine, pathfinderContext } = this.props;
+    
+    switch (filterLine.valueType)
+    {
+      case 'text':
+      case 'number':
+        return (
+          <Autocomplete
+            options={null}
+            value={filterLine.value}
+            onChange={this._fn(this.handleChange, 'value')}
+            disabled={!pathfinderContext.canEdit}
+          />
+        );
+        
+      case 'date':
+        return (
+          <div>Calendar here</div>
+        );
+      
+      case 'input':  
+        return (
           <AdvancedDropdown 
             options={source.dataSource.getChoiceOptions({
-              type: 'value',
-              field: filterLine.field, /* TODO field */
-              method: filterLine.method,
-              source,
-              schemaState: pathfinderContext.schemaState,
+              type: 'input',
             })}
             value={filterLine.value}
             canEdit={pathfinderContext.canEdit}
             onChange={this._fn(this.handleChange, 'value')}
           />
-        ])}
-      />
-    );
+        );
+      
+      case null:
+        return null;
+    }
+    
+    throw new Error('No value type handler for ' + filterLine.valueType);
   }
   
   private handleChange(key, value)
