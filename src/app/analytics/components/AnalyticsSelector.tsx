@@ -51,10 +51,12 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import { Server } from 'schema/SchemaTypes';
 import Ajax from 'util/Ajax';
+import './AnalyticsSelector.less';
 
 interface Props
 {
   analytics: AnalyticsState;
+  analyticsActions: any;
   servers: Immutable.Map<string, Server>;
   analyticsConnection?: string;
 
@@ -64,15 +66,9 @@ interface Props
   onConnectionChange: (value: string) => void;
 }
 
-const METRICS = Immutable.List([
-  { value: 'impression', label: 'Impressions' },
-  { value: 'click', label: 'Clicks' },
-  { value: 'conversion', label: 'Conversions' },
-  { value: 'click,impression', label: 'CTR' },
-  { value: 'conversion,impression', label: 'Conversion Rate' },
-]);
-
 const INTERVALS = Immutable.List([
+  { value: 'minute', label: 'Minute' },
+  { value: 'hour', label: 'Hourly' },
   { value: 'day', label: 'Daily' },
   { value: 'week', label: 'Weekly' },
   { value: 'month', label: 'Monthly' },
@@ -102,44 +98,74 @@ class AnalyticsSelector extends TerrainComponent<Props>
     return serversWithAnalytics.keySeq().toList();
   }
 
+  public getMetricOptions()
+  {
+    const { analytics } = this.props;
+    let metricOptions = Immutable.List([]);
+
+    analytics.availableMetrics.map((m) =>
+    {
+      metricOptions = metricOptions.push({ value: m.events, label: m.label });
+    });
+
+    return metricOptions;
+  }
+
+  public componentDidMount()
+  {
+    this.props.analyticsActions.fetchAvailableMetrics();
+  }
+
   public render()
   {
     const { analytics, servers, analyticsConnection } = this.props;
     const { selectedMetric, selectedInterval, selectedDateRange } = analytics;
 
-    const options = this.getConnectionOptions();
+    const connectionOptions = this.getConnectionOptions();
+    const metricOptions = this.getMetricOptions();
 
     return (
       <div>
         <Dropdown
           onChange={this.handleConnectionChange}
-          options={options}
+          options={connectionOptions}
           canEdit={true}
           className='bic-db-dropdown'
           directionBias={90}
-          selectedIndex={options.indexOf(analyticsConnection)}
+          selectedIndex={connectionOptions.indexOf(analyticsConnection)}
         />
-        <p>Metric</p>
-        <MultiSwitch
-          options={METRICS}
-          value={selectedMetric.toString()}
-          usesValues
-          onChange={this.props.onMetricSelect}
-        />
-        <p>Interval</p>
-        <MultiSwitch
-          options={INTERVALS}
-          value={selectedInterval}
-          usesValues
-          onChange={this.props.onIntervalSelect}
-        />
-        <p>Date Range</p>
-        <MultiSwitch
-          options={DATE_RANGES}
-          value={selectedDateRange.toString()}
-          usesValues
-          onChange={this.props.onDateRangeSelect}
-        />
+        <div className='analytics-selector'>
+          <div className='analytics-selector-multiswitch'>
+            <p>Metric</p>
+            <MultiSwitch
+              options={metricOptions}
+              value={selectedMetric.toString()}
+              usesValues
+              onChange={this.props.onMetricSelect}
+              small={true}
+            />
+          </div>
+          <div className='analytics-selector-multiswitch'>
+            <p>Interval</p>
+            <MultiSwitch
+              options={INTERVALS}
+              value={selectedInterval}
+              usesValues
+              onChange={this.props.onIntervalSelect}
+              small={true}
+            />
+          </div>
+          <div className='analytics-selector-multiswitch'>
+            <p>Date Range</p>
+            <MultiSwitch
+              options={DATE_RANGES}
+              value={selectedDateRange.toString()}
+              usesValues
+              onChange={this.props.onDateRangeSelect}
+              small={true}
+            />
+          </div>
+        </div>
       </div>
     );
   }

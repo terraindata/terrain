@@ -131,4 +131,29 @@ export class Events
         makePromiseCallback(resolve, reject));
     });
   }
+
+  public async storeBulk(events: EventConfig[]): Promise<void>
+  {
+    const command = {
+      index: {
+        _index: indexName,
+        _type: typeName,
+      },
+    };
+
+    const body: any[] = [];
+    for (const event of events)
+    {
+      body.push(command);
+      body.push(event);
+    }
+
+    return new Promise<void>((resolve, reject) =>
+    {
+      this.client.bulk({
+        body,
+      },
+        makePromiseCallback(resolve, reject));
+    });
+  }
 }

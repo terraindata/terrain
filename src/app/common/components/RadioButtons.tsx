@@ -47,6 +47,7 @@ import * as classNames from 'classnames';
 import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './RadioButtons.less';
+import BuilderActions from './../../builder/data/BuilderActions';
 
 export interface RadioButtonOption
 {
@@ -58,18 +59,31 @@ export interface Props
 {
   selected: string;
   options: List<RadioButtonOption>;
-  onSelectOption: (key: string, otherKeys?: string[]) => void;
+  onSelectOption?: (key?: string) => void;
+  keyPath?: KeyPath;
 }
 
 class RadioButtons extends TerrainComponent<Props>
 {
+
+  public handleSelectOption(option)
+  {
+    if (this.props.onSelectOption !== undefined)
+    {
+      this.props.onSelectOption(option);
+    }
+    if (this.props.keyPath !== undefined)
+    {
+      BuilderActions.change(this.props.keyPath, option);
+    }
+  }
 
   public renderOption(option: RadioButtonOption)
   {
     return (
       <div key={option.key} className='radio-button-option'>
         <div
-          onClick={this._fn(this.props.onSelectOption, option.key, this.props.options.map((o) => o.key))}
+          onClick={this._fn(this.handleSelectOption, option.key)}
           className={classNames({
             'radio-button': true,
             'radio-button-selected': option.key === this.props.selected,

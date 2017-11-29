@@ -53,6 +53,49 @@ body {
   height: 100%;
 }
 
+.link {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  .transition;
+  div {
+    .transition;
+  }
+  
+  &.link-with-svg, &.link-with-svg-180 {
+    padding-left: 20px;
+    position: relative;
+    
+    svg {
+      .transition;
+      position: absolute;
+      left: 3px;
+      top: 50%;
+      // margin-top: -50%;
+      -webkit-transform: translateY(-50%);
+      transform: translateY(-50%);
+      width: 12px;
+      // margin: 0px 6px;
+      fill: currentColor;
+    }
+    
+    &.link-with-svg-180 {
+      svg {
+        -webkit-transform: translateY(-50%) rotate(180deg);
+        transform: translateY(-50%) rotate(180deg);
+      }
+    }
+    
+    &:hover {
+      svg {
+        // width: 14px;
+        left: 0px;
+      }
+    }
+  }
+  
+}
+
 @top-bar-height: 36px;
 @icon-height: 24px;
 @icon-padding: calc((@top-bar-height - @icon-height) / 2);

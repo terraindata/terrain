@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 const { Map, List } = Immutable;
 import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
@@ -65,6 +66,7 @@ export const enum FieldType
   Text,
   Date,
   Geopoint,
+  Ip,
   Any,
 }
 
@@ -74,6 +76,7 @@ const FieldTypeMapping =
     [FieldType.Text]: ['text'],
     [FieldType.Date]: ['date'],
     [FieldType.Geopoint]: ['geo_point'],
+    [FieldType.Ip]: ['ip'],
     [FieldType.Any]: ['text',
       'long',
       'boolean',
@@ -183,7 +186,6 @@ export const ElasticBlockHelpers = {
   getFieldsOfType(schemaState, fieldType): List<string>
   {
     const state = BuilderStore.getState();
-    const cards = state.query.cards;
     const index = getIndex();
     const server = BuilderStore.getState().db.name;
 
@@ -226,6 +228,44 @@ export const ElasticBlockHelpers = {
     }
     return List(metaFields);
   },
+
+  // Given a field, return the fieldType (numerical, text, date, geopoint, ip)
+  getTypeOfField(schemaState, field): FieldType
+  {
+    const state = BuilderStore.getState();
+    const index = getIndex();
+    const server = BuilderStore.getState().db.name;
+
+    if (index !== null)
+    {
+      const indexId = state.db.name + '/' + String(index);
+      // 2. Need to get current type
+      const type = getType();
+      if (type !== null)
+      {
+        const typeId = state.db.name + '/' + String(index) + '.' + String(type);
+        const col = schemaState.columns.filter(
+          (column) => column.serverId === String(server) &&
+            column.databaseId === String(indexId) &&
+            column.tableId === String(typeId) &&
+            column.name === field,
+
+        ).toList().get(0);
+        const dataType = col.datatype;
+        let fieldType = 0;
+        _.keys(FieldTypeMapping).forEach((ft) =>
+        {
+          if (FieldTypeMapping[ft].indexOf(dataType) !== -1
+            && String(ft) !== String(FieldType.Any))
+          {
+            fieldType = ft;
+          }
+        });
+        return fieldType;
+      }
+    }
+    return undefined;
+  }
 };
 
 export function findCardType(name: string): Block | null

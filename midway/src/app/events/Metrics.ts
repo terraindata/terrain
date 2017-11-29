@@ -44,15 +44,59 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-class DeployVariant
+import * as winston from 'winston';
+
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
+import * as Util from '../Util';
+
+// CREATE TABLE metrics (id integer PRIMARY KEY, database integer NOT NULL, label text NOT NULL, events text NOT NULL)
+
+export interface MetricConfig
 {
-  /**
-   * @returns {string} the variant's live deployed name in ES
-   */
-  public static getVariantDeployedName(variant: object): string
+  id: number;
+  database: number;
+  label: string;
+  events: string;
+}
+
+export class Metrics
+{
+  private metricsTable: Tasty.Table;
+
+  constructor()
   {
-    return 'terrain_' + (variant['id'] as string);
+    this.metricsTable = new Tasty.Table(
+      'metrics',
+      ['id'],
+      [
+        'database',
+        'label',
+        'events',
+      ],
+    );
+  }
+
+  public async upsert(metric: MetricConfig): Promise<MetricConfig>
+  {
+    if (metric.database === undefined || metric.label === undefined || metric.events === undefined)
+    {
+      throw new Error('Database, label and events fields are required to create a metric');
+    }
+
+    const existingMetric = await this.select(['id'], { label: metric.label });
+    if (existingMetric.length !== 0)
+    {
+      throw new Error('Metric ' + String(metric.label) + ' already exists.');
+    }
+
+    return App.DB.upsert(this.metricsTable, metric) as Promise<MetricConfig>;
+  }
+
+  public async select(columns: string[], filter: object): Promise<MetricConfig[]>
+  {
+    return App.DB.select(this.metricsTable, columns, filter) as Promise<MetricConfig[]>;
   }
 }
 
-export default DeployVariant;
+export default Metrics;

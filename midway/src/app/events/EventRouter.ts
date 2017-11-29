@@ -53,66 +53,104 @@ import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Util from '../Util';
 import { Events } from './Events';
+import { Metrics } from './Metrics';
 
 export const events: Events = new Events();
+export const metrics: Metrics = new Metrics();
+
 const Router = new KoaRouter();
 
-// * eventname: the event name (view / impression, click / add-to-cart, transaction)
+// * eventname: the source event(s) to use for aggregation (view / impression, click / add-to-cart, transaction)
 // * variantid: list of variantids
 // * database: database (connection) id
 // * start: start time of the interval
 // * end: end time of the interval
 // * agg: supported aggregation operations are:
 //     `select` - returns all events between the specified interval
-//     `histogram` - returns a histogram of events between the specified interval
+//     `count` - returns a count (histogram) of events between the specified interval
+//     `distinct` - returns the (distinct) set of events in the database
 //     `rate` - returns a ratio of two events between the specified interval
 // * field (optional):
 //     list of fields to operate on. if unspecified, it returns or aggregates all fields in the event.
-// * interval (optional; required if `agg` is `histogram` or `rate`):
+// * interval (optional; required if `agg` is `count` or `rate`):
 //     the resolution of interval for aggregation operations.
 //     valid values are `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`;
 //     also supported are values such as `1.5h`, `90m` etc.
 //
 Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
+  const request = JSON.parse(JSON.stringify(ctx.request.query));
   Util.verifyParameters(
-    JSON.parse(JSON.stringify(ctx.request.query)),
-    ['database', 'start', 'end', 'eventname', 'variantid', 'agg'],
+    request,
+    ['database', 'agg'],
   );
-  winston.info('getting events for variant');
 
-  const database: DatabaseController | undefined = DatabaseRegistry.get(Number(ctx.request.query.database));
-  if (database === undefined)
+  if (ctx.request.query['agg'] !== 'distinct')
   {
-    throw new Error('Database "' + String(ctx.request.query.database) + '" does not exist or does not have analytics enabled.');
+    Util.verifyParameters(
+      request,
+      ['start', 'end', 'eventname', 'variantid'],
+    );
   }
 
-  const response: object[] = await events.AggregationHandler(database, ctx.request.query);
-  ctx.body = response.reduce((acc, x) =>
-  {
-    for (const key in x)
-    {
-      if (x.hasOwnProperty(key) !== undefined)
-      {
-        acc[key] = x[key];
-        return acc;
-      }
-    }
-  }, {});
-});
+  winston.info('computing aggregation on events');
 
-Router.get('/:databaseid/:variantid?', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting all events');
-  const databaseid = Number(ctx.params.databaseid);
-  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
-  if (database === undefined)
+  const databaseid = Number(request.database);
+  const db: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
+  if (db === undefined)
   {
     throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
 
-  const variantid = ctx.params.variantid !== undefined ? Number(ctx.params.variantid) : undefined;
-  ctx.body = await events.getEventsList(database, variantid);
+  const response: object[] = await events.AggregationHandler(db, request);
+  if (request['variantid'] !== undefined)
+  {
+    ctx.body = response.reduce((acc, x) =>
+    {
+      for (const key in x)
+      {
+        if (x.hasOwnProperty(key) !== undefined)
+        {
+          acc[key] = x[key];
+          return acc;
+        }
+      }
+    }, {});
+  }
+  else
+  {
+    ctx.body = response[0];
+  }
+});
+
+Router.get('/metrics/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  if (ctx.params.id === undefined)
+  {
+    winston.info('getting all metrics');
+    ctx.body = await metrics.select([], {});
+  }
+  else
+  {
+    winston.info('getting metric ID ' + String(ctx.params.id));
+    ctx.body = await metrics.select([], { id: ctx.params.id });
+  }
+});
+
+Router.post('/metrics', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('add or update event');
+  const request = ctx.request.body.body;
+  Util.verifyParameters(request, ['database', 'label', 'events']);
+
+  const databaseid = Number(request.database);
+  const db: DatabaseController | undefined = DatabaseRegistry.get(databaseid);
+  if (db === undefined)
+  {
+    throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
+  }
+
+  ctx.body = await metrics.upsert(request);
 });
 
 export default Router;

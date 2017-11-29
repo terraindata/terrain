@@ -82,7 +82,7 @@ export class Router
      */
     this.router.post('/', async (ctx, next) =>
     {
-      await this.storeBatchEvents(ctx.request);
+      await this.handleEvent(ctx.request);
       ctx.body = '';
     });
 
@@ -104,7 +104,7 @@ export class Router
      */
     this.router.get('/', async (ctx, next) =>
     {
-      await this.storeBatchEvents(ctx.request);
+      await this.handleEvent(ctx.request);
       ctx.body = '';
     });
 
@@ -152,15 +152,17 @@ export class Router
      * @apiName getDemoSearch
      * @apiGroup Demo
      *
-     * @apiParam {String} s ElasticSearch server to query
+     * @apiParam {String} s Elasticsearch server to query
      * @apiParam {String} q Title to search
-     * @apiParam {Number} p Page ID
+     * @apiParam {Number} p Page number
+     * @apiParam {Number} v Variant ID
      *
      * @apiParamExample {json} Request-Example:
      *     {
      *       "s": "http://localhost:9200",
      *       "q": "Star",
      *       "p": 0,
+     *       "v": 8,
      *     }
      * @apiSuccess {Object[]} results Results of the search query.
      */
@@ -189,7 +191,7 @@ export class Router
     }
   }
 
-  private async storeEvent(request: any, event: any)
+  private async prepareEvent(request: any, event: any): Promise<EventConfig>
   {
     let meta = event['meta'];
     try
@@ -226,20 +228,13 @@ export class Router
     const unexpectedFields = _.difference(Object.keys(event), Object.keys(ev).concat(['id', 'accessToken', 'batch']));
     if (unexpectedFields.length > 0)
     {
-      return this.logError('storing analytics event: unexpected fields encountered ' + JSON.stringify(unexpectedFields));
+      this.logError('storing analytics event: unexpected fields encountered ' + JSON.stringify(unexpectedFields));
     }
 
-    try
-    {
-      await this.events.store(ev);
-    }
-    catch (e)
-    {
-      return this.logError('storing analytics event: ' + JSON.stringify(e));
-    }
+    return ev;
   }
 
-  private async storeBatchEvents(request: any)
+  private async handleEvent(request: any)
   {
     if (request.body !== undefined && Object.keys(request.body).length > 0 &&
       request.query !== undefined && Object.keys(request.query).length > 0)
@@ -279,14 +274,22 @@ export class Router
         return this.logError('Expected batch parameter to be an array.');
       }
 
-      events.forEach((ev) => {
-        // non-blocking store
-        this.storeEvent(request, ev);
-      });
+      const promises: Array<Promise<EventConfig>> = [];
+      events.forEach((ev) => promises.push(this.prepareEvent(request, ev)));
+      const evs = await Promise.all(promises);
+      await this.events.storeBulk(evs);
     }
     else
     {
-      await this.storeEvent(request, event);
+      const ev = await this.prepareEvent(request, event);
+      try
+      {
+        await this.events.store(ev);
+      }
+      catch (e)
+      {
+        this.logError('storing analytics event: ' + JSON.stringify(e));
+      }
     }
   }
 

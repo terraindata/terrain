@@ -55,6 +55,7 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { _Format, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import ColorsActions from '../../../colors/data/ColorsActions';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -91,6 +92,11 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
   {
     super(props);
     this.state.config = props.config;
+  }
+
+  public componentWillMount()
+  {
+    ColorsActions.setStyle('.results-config-field-gear', { fill: Colors().iconColor });
   }
 
   public componentWillReceiveProps(nextProps: Props)

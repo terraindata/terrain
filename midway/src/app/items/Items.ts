@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import DeployVariant from '../../../../shared/deploy/DeployVariant';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
@@ -106,6 +105,20 @@ export class Items
     return this.select([], {});
   }
 
+  public parseDeployedName(variant: ItemConfig): string
+  {
+    if (variant.meta === undefined)
+    {
+      return '';
+    }
+    const meta = JSON.parse(variant.meta);
+    if (meta['deployedName'] === undefined)
+    {
+      return '';
+    }
+    return meta['deployedName'];
+  }
+
   public async getLiveVariants(ids: number[]): Promise<string[] | object[]>
   {
     return new Promise<string[] | object[]>(async (resolve, reject) =>
@@ -115,7 +128,7 @@ export class Items
         const items: ItemConfig[] = await this.select([], { type: 'VARIANT', status: 'LIVE' } as object);
         const liveItems: object[] = items.map((item) =>
         {
-          return { id: item.id, name: DeployVariant.getVariantDeployedName(item as ItemConfig) };
+          return { id: item.id, name: this.parseDeployedName(item as ItemConfig) };
         });
         return resolve(liveItems);
       }
@@ -124,7 +137,7 @@ export class Items
         const liveItems: string[] = await Promise.all(ids.map(async (id) =>
         {
           const items: ItemConfig[] = await this.select([], { id, type: 'VARIANT', status: 'LIVE' } as object);
-          return items.length !== 0 ? DeployVariant.getVariantDeployedName(items[0] as ItemConfig) as string : '' as string;
+          return items.length !== 0 ? this.parseDeployedName(items[0] as ItemConfig) as string : '' as string;
         }));
         return resolve(liveItems);
       }
@@ -144,7 +157,7 @@ export class Items
     });
   }
 
-  public async checkVariantInES(variantId?: number, dbid?: number): Promise<string>
+  public async checkVariantInES(variantId?: number, dbid?: number, deployedName?: string): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
@@ -156,7 +169,11 @@ export class Items
       {
         return reject('Must provide database id.');
       }
-      const liveScripts: string = await this._checkVariantInESHelper(variantId, dbid);
+      if (deployedName === undefined || deployedName === '')
+      {
+        return reject('Must provide deployed name.');
+      }
+      const liveScripts: string = await this._checkVariantInESHelper(variantId, dbid, deployedName);
       return resolve(liveScripts);
     });
   }
@@ -207,7 +224,7 @@ export class Items
     });
   }
 
-  private async _checkVariantInESHelper(variantId: number, dbid: number): Promise<string>
+  private async _checkVariantInESHelper(variantId: number, dbid: number, deployedName: string): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
@@ -225,25 +242,24 @@ export class Items
       {
         return resolve('Variant not found');
       }
-      const variantDeployedName: string = DeployVariant.getVariantDeployedName(items[0] as object);
 
       const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-      elasticClient.getScript({ id: variantDeployedName, lang: 'mustache' }, async function getState(err, resp)
+      elasticClient.getScript({ id: deployedName, lang: 'mustache' }, async function getState(err, resp)
       {
         if (items[0].type !== 'VARIANT')
         {
           return resolve('Item is not a Variant');
         }
-        if (resp['_id'] === variantDeployedName && resp['found'] === true && items[0].status === 'LIVE'
+        if (resp['_id'] === deployedName && resp['found'] === true && items[0].status === 'LIVE'
           && await this._verifyVariantScript(variantId, resp['_script']))
         {
-          return resolve('Variant is LIVE as ' + (variantDeployedName as string));
+          return resolve('Variant is LIVE as ' + (deployedName as string));
         }
-        else if (resp['_id'] === variantDeployedName && resp['found'] === true && items[0].status !== 'LIVE')
+        else if (resp['_id'] === deployedName && resp['found'] === true && items[0].status !== 'LIVE')
         {
           return resolve('Error: Variant found in ES instance but not LIVE');
         }
-        else if (resp['_id'] === variantDeployedName && resp['found'] === false && items[0].status === 'LIVE')
+        else if (resp['_id'] === deployedName && resp['found'] === false && items[0].status === 'LIVE')
         {
           return resolve('Error: LIVE Variant not found in ES instance');
         }

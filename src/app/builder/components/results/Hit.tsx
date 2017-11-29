@@ -61,8 +61,9 @@ import MapUtil from '../../../util/MapUtil';
 import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
 import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
+import { tooltip } from './../../../common/components/tooltip/Tooltips';
+import Util from './../../../util/Util';
 import { Hit } from './ResultTypes';
-
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -168,7 +169,8 @@ class HitComponent extends TerrainComponent<Props> {
       return null;
     }
     const color = this.state.isSpotlit ? this.state.spotlightColor : 'black';
-    const value = getResultValue(this.props.hit, field, this.props.resultsConfig, false, overrideFormat, this.props.locations, color);
+    const value = getResultValue(this.props.hit, field, this.props.resultsConfig,
+      false, this.props.expanded, overrideFormat, this.props.locations, color);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
     const showField = overrideFormat ? overrideFormat.showField : (!format || format.type === 'text' || format.showField);
     return (
@@ -214,7 +216,8 @@ class HitComponent extends TerrainComponent<Props> {
     }, function()
       {
         const spotlightData = this.props.hit.toJS();
-        spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig, this.props.locations, spotlightColor);
+        spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig,
+          this.props.expanded, this.props.locations, spotlightColor);
         spotlightData['color'] = spotlightColor;
         spotlightData['id'] = id;
         spotlightData['rank'] = this.props.index;
@@ -287,7 +290,7 @@ class HitComponent extends TerrainComponent<Props> {
       );
     }
     const color = this.state.isSpotlit ? this.state.spotlightColor : 'black';
-    const name = getResultName(hit, resultsConfig, this.props.locations, color);
+    const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
     const fields = getResultFields(hit, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
 
@@ -385,7 +388,8 @@ class HitComponent extends TerrainComponent<Props> {
     ));
   }
 }
-export function getResultValue(hit: Hit, field: string, config: ResultsConfig, isTitle: boolean,
+
+export function getResultValue(hit: Hit, field: string, config: ResultsConfig, isTitle: boolean, expanded: boolean,
   overrideFormat?: any, locations?: { [field: string]: any }, color?: string)
 {
   let value: any;
@@ -393,7 +397,7 @@ export function getResultValue(hit: Hit, field: string, config: ResultsConfig, i
   {
     value = hit.fields.get(field);
   }
-  return ResultFormatValue(field, value, config, isTitle, overrideFormat, locations, color);
+  return ResultFormatValue(field, value, config, isTitle, expanded, overrideFormat, locations, color);
 }
 
 export function resultsConfigHasFields(config: ResultsConfig): boolean
@@ -417,7 +421,7 @@ export function getResultFields(hit: Hit, config: ResultsConfig): string[]
   return fields;
 }
 
-export function getResultName(hit: Hit, config: ResultsConfig, locations?: { [field: string]: any }, color?: string)
+export function getResultName(hit: Hit, config: ResultsConfig, expanded: boolean, locations?: { [field: string]: any }, color?: string)
 {
   let nameField: string;
 
@@ -430,15 +434,16 @@ export function getResultName(hit: Hit, config: ResultsConfig, locations?: { [fi
     nameField = _.first(getResultFields(hit, config));
   }
 
-  return getResultValue(hit, nameField, config, true, null, locations, color);
+  return getResultValue(hit, nameField, config, true, expanded, null, locations, color);
 }
 
-export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean,
+export function ResultFormatValue(field: string, value: any, config: ResultsConfig, isTitle: boolean, expanded: boolean,
   overrideFormat?: any, locations?: { [field: string]: any }, color?: string): any
 {
   const format = config && config.enabled && config.formats && config.formats.get(field);
   const { showRaw } = overrideFormat || format || { showRaw: false };
   let italics = false;
+  let tooltipText = '';
   if (value === undefined)
   {
     value = 'undefined';
@@ -459,12 +464,21 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
     value = 'null';
     italics = true;
   }
+
   if ((format && format.type !== 'map') || !format)
   {
     if (List.isList(value))
     {
       value = JSON.stringify(value);
+      tooltipText = JSON.stringify(value, null, 2);
+      tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
     }
+  }
+  if (typeof value === 'object')
+  {
+    tooltipText = JSON.stringify(value, null, 2);
+    tooltipText = tooltipText.replace(/\"/g, '').replace(/\\/g, '').replace(/:/g, ': ').replace(/,/g, ', ');
+    value = JSON.stringify(value);
   }
 
   if (format && !isTitle)
@@ -531,6 +545,27 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
   {
     value = Math.floor((value as number) * 10000) / 10000;
     value = value.toLocaleString();
+  }
+  // Add in tooltip stuff here
+
+  if (tooltipText && !expanded)
+  {
+    return tooltip(<div>{value}</div>, {
+      html: <div style={{
+        width: 140,
+        height: 200,
+        overflowY: 'auto',
+        fontSize: '12px',
+        display: 'inline-block',
+        textAlign: 'left',
+
+      }}
+      >
+        {tooltipText}
+      </div>,
+      interactive: true,
+      position: 'right',
+    });
   }
 
   if (italics)

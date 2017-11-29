@@ -63,6 +63,8 @@ import RangesInput from 'app/common/components/RangesInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import { ADVANCED } from '../PathfinderTypes';
 import { AdvancedDisplays } from './PathfinderAggregationDisplay';
+import MapComponent from 'app/common/components/MapComponent';
+import Util from 'app/util/Util';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
@@ -73,6 +75,8 @@ export interface Props
   keyPath: KeyPath;
   canEdit: boolean;
   fieldName: string;
+  // When a radioKey is changed, call this function to update elasticType of parent aggregeation
+  onRadioChange?: (key: string) => void;
 }
 
 export class PathfinderAdvancedLine extends TerrainComponent<Props>
@@ -97,7 +101,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
     }
   }
 
-  public renderAdvancedItem(item, i?)
+  public renderAdvancedItem(item, i?, disabled?)
   {
     if (item.component !== undefined)
     {
@@ -120,9 +124,10 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         content =
           <BuilderTextbox
             value={this.props.advancedData.get(item.key)}
-            canEdit={this.props.canEdit}
+            canEdit={this.props.canEdit && !disabled}
             keyPath={this.props.keyPath.push(item.key)}
             language='elastic'
+            placeholder={item.placeholder}
           />;
         break;
       case 'multi':
@@ -131,8 +136,8 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
             items={this.props.advancedData.get(item.key)}
             keyPath={this.props.keyPath.push(item.key)}
             action={BuilderActions.change}
-            isNumber={true} // change ?
-            canEdit={this.props.canEdit}
+            isNumber={item.isNumber}
+            canEdit={this.props.canEdit && !disabled}
           />;
         break;
       case 'range':
@@ -141,76 +146,78 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
             ranges={this.props.advancedData.get(item.key)}
             keyPath={this.props.keyPath.push(item.key)}
             action={BuilderActions.change}
-            canEdit={this.props.canEdit}
+            canEdit={this.props.canEdit && !disabled}
           />;
         break;
-      case 'boolean':
+      case 'dropdown':
         content =
           <Dropdown
-            canEdit={this.props.canEdit}
+            canEdit={this.props.canEdit && !disabled}
             keyPath={this.props.keyPath.push(item.key)}
-            options={List(['true', 'false'])}
-            selectedIndex={this.props.advancedData.get(item.key) === 'true' ? 0 : 1}
-          />;
-        break;
-      case 'textbox':
+            options={item.options}
+            selectedIndex={item.options.indexOf(this.props.advancedData.get(item.key))}
+          />
+        break
+      case 'map':
         content =
-          <BuilderTextbox
-            value={this.props.advancedData.get(item.key)}
-            keyPath={this.props.keyPath.push('name')}
-            language={'elastic'}
-            canEdit={this.props.canEdit}
-            placeholder={'Name'}
-          />;
-        break;
+          <div className='pf-advanced-map'>
+            <MapComponent
+              address={this.props.advancedData.get(item.textKey)}
+              location={Util.asJS(this.props.advancedData.get(item.key))}
+              markLocation={true}
+              showSearchBar={true}
+              zoomControl={true}
+              keepAddressInSync={false}
+              geocoder='google'
+              keyPath={this.props.keyPath.push(item.key)}
+              textKeyPath={this.props.keyPath.push(item.textKey)}
+              hideSearchSettings={true}
+            />
+          </div>
       default:
     }
 
     return tooltip(
-      <div className='pf-advanced-section-item' key={i}>
+      <div
+        className={classNames({
+          'pf-advanced-section-item': true,
+          'pf-advanced-section-item-range': item.inputType === 'range',
+        })}
+        key={i}
+      >
         <span> {item.text}</span>
         {content}
-      </div>, item.tooltipText);
+      </div>, { title: item.tooltipText, key: i });
   }
 
-  public handleSelectedItemChange(key, otherKeys)
-  {
-    // remove the other key options from advanced
-    // add new key option to advanced
-    let advanced = this.props.advancedData;
-    otherKeys.forEach((keyToRemove) =>
-    {
-      advanced = advanced.delete(keyToRemove);
-    });
-    advanced = advanced.set(key, '');
-    BuilderActions.change(this.props.keyPath, advanced);
-  }
-
-  public renderAdvancedItems(items, onlyOne)
+  public renderAdvancedItems(items, onlyOne, radioKey?)
   {
     if (onlyOne)
     {
+      const selected = this.props.advancedData.get(radioKey);
       const options = List<RadioButtonOption>(items.map((item, i) =>
       {
         return {
           key: item.key,
-          display: this.renderAdvancedItem(item, i),
+          display: this.renderAdvancedItem(item, i, selected !== item.key),
         };
       }));
-      const selected = options.filter((opt) =>
-      {
-        return this.props.advancedData.get(opt.key) !== undefined;
-      }).get(0).key;
       return (
         <RadioButtons
           selected={selected}
           options={options}
-          onSelectOption={this.handleSelectedItemChange}
+          keyPath={this.props.keyPath.push(radioKey)}
+          onSelectOption={this.props.onRadioChange}
         />
       );
     }
     return (
-      <div className='pf-advanced-section-items'>
+      <div
+        className={classNames({
+          'pf-advanced-section-items': true,
+          'pf-advanced-section-multiple-items': items.length,
+        })}
+      >
         {
           items.length ?
             items.map((item, i) => this.renderAdvancedItem(item, i))
@@ -242,7 +249,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         </div>
         <FadeInOut
           open={this.state.expanded}
-          children={this.renderAdvancedItems(display.items, display.onlyOne)}
+          children={this.renderAdvancedItems(display.items, display.onlyOne, display.radioKey)}
         />
       </div>
     );

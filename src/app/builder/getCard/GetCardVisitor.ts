@@ -246,7 +246,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
   private variantClauseMapping: { [clauseType: string]: string[] } = {};
 
   private customCardTypesMap: { [elasticClauseType: string]: string[] } = {
-    sort_clause: ['elasticScore'],
+    body: ['elasticScore'],
     query: ['elasticFilter', 'elasticDistance'],
   };
 

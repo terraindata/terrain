@@ -232,6 +232,9 @@ export class Export
         return reject(mapping);
       }
 
+      const qryObjQuery: object = qryObj['query'];
+      delete qryObj['query'];
+      qryObj['body'] = { query: qryObjQuery };
       winston.info(qry);
 
       let rankCounter: number = 1;
@@ -261,6 +264,22 @@ export class Export
       qryObj['scroll'] = this.SCROLL_TIMEOUT;
       let errMsg: string = '';
       let isFirstJSONObj: boolean = true;
+
+      const originalMapping: object = {};
+      // generate original mapping if there were any renames
+      const allNames = Object.keys(exprt.columnTypes);
+      allNames.forEach((value, i) =>
+      {
+        originalMapping[value] = value;
+      });
+
+      const renameTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'rename');
+
+      renameTransformations.forEach((transformation) =>
+      {
+        originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
+      });
+
       elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
       {
         if (resp.hits === undefined || resp.hits.total === 0)
@@ -281,7 +300,7 @@ export class Export
         for (const doc of newDocs)
         {
           // verify schema mapping with documents and fix documents accordingly
-          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], mapping);
+          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
           if (typeof newDoc === 'string')
           {
             writer.end();

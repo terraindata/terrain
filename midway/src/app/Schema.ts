@@ -128,6 +128,11 @@ const appSchemaSQL: string[] = [
      name text NOT NULL,
      permissions integer,
      type text NOT NULL); `,
+  `CREATE TABLE IF NOT EXISTS metrics
+    (id integer PRIMARY KEY,
+     database integer NOT NULL,
+     label text NOT NULL,
+     events text NOT NULL); `,
 ];
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)

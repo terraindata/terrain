@@ -57,9 +57,6 @@ const { List, Map, Set } = Immutable;
 import ElasticBlockHelpers, { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
 import Dropdown from '../../../../common/components/Dropdown';
-import ScoreBar from '../../charts/ScoreBar';
-import TransformCard from '../../charts/TransformCard';
-import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderText from '../PathfinderText';
 import
@@ -70,6 +67,7 @@ import
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 import PathfinderAdvancedLine from './PathfinderAdvancedLine';
+import AdvancedDropdown from '../../../../common/components/AdvancedDropdown';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
@@ -108,7 +106,8 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (this.props.aggregation.type !== nextProps.aggregation.type)
+    if (this.props.aggregation.type !== nextProps.aggregation.type ||
+      this.props.pathfinderContext !== nextProps.pathfinderContext)
     {
       this.setState({
         fieldOptions: this.filterFieldOptions(nextProps.aggregation.type),
@@ -124,21 +123,98 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public handleTypeChange(index)
   {
     const type = this.options.get(index);
-    const advancedTypes = AggregationTypes.get(type).advanced;
+    let elasticType = AggregationTypes.get(type).elasticType;
+    if (List.isList(elasticType))
+    {
+      elasticType = this.getElasticType(type)
+    }
+    BuilderActions.change(this.props.keyPath.push('elasticType'), elasticType);
+    // Set advanced section of aggregation based on type and aggregation type
+    const advancedTypes = this.getAdvancedOptions(type, elasticType);
     let advancedObj = {};
     advancedTypes.forEach((advancedType) =>
     {
       advancedObj = _.extend({}, advancedObj, ADVANCED_MAPPINGS[advancedType]);
     });
     BuilderActions.change(this.props.keyPath.push('advanced'), Map(advancedObj));
-    BuilderActions.change(this.props.keyPath.push('elasticType'), AggregationTypes.get(type).elasticType);
-    BuilderActions.change(this.props.keyPath.push('advanced').push('name'), type + ' ' + this.props.aggregation.field);
+    BuilderActions.change(this.props.keyPath.push('advanced').push('name'),
+      type + ' ' + this.props.aggregation.field);
   }
 
-  public handleFieldChange(index)
+  // When the field changes, change the name as well as the elastic type (when facets are being used)
+  public handleFieldChange(newField)
   {
-    const newField = this.state.fieldOptions.get(index);
-    BuilderActions.change(this.props.keyPath.push('advanced').push('name'), this.props.aggregation.type + ' ' + newField);
+    BuilderActions.change(this.props.keyPath.push('field'), newField);
+    let elasticType = AggregationTypes.get(this.props.aggregation.type).elasticType;
+    if (List.isList(elasticType))
+    {
+      elasticType = this.getElasticType(this.props.aggregation.type, newField)
+    }
+    BuilderActions.change(this.props.keyPath.push('elasticType'), elasticType);
+
+    // Update the advanced section of the aggregation
+    const type = this.props.aggregation.type;
+    const advancedTypes = this.getAdvancedOptions(type, elasticType);
+    let advancedObj = {};
+    advancedTypes.forEach((advancedType) =>
+    {
+      advancedObj = _.extend({}, advancedObj, ADVANCED_MAPPINGS[advancedType]);
+    });
+    BuilderActions.change(this.props.keyPath.push('advanced'), Map(advancedObj));
+    BuilderActions.change(this.props.keyPath.push('advanced').push('name'),
+      type + ' ' + this.props.aggregation.field);
+  }
+
+  // This function, given a type of aggregation, returns a list of the advanced settings for that
+  // aggreagtion type
+  public getAdvancedOptions(type, elasticType)
+  {
+    let advancedTypes: any = AggregationTypes.get(type).advanced;
+    if (!List.isList(advancedTypes))
+    {
+      advancedTypes = advancedTypes.get(elasticType);
+    }
+    return advancedTypes;
+  }
+
+  // Given a type of aggregation, this function returns the correct elasticType based on
+  // the field type (text, number, geopoint...) as well as other advanced information
+  public getElasticType(type, overrideField?, overrideKey?)
+  {
+    const field = overrideField !== undefined ? overrideField : this.props.aggregation.field;
+    if (field === undefined || field === '')
+    {
+      return 'histogram';
+    }
+    // Get the type of field (using schema) and narrow down th options with fieldTypesToElasticTYpes
+    const fieldType: FieldType = ElasticBlockHelpers.getTypeOfField(this.props.pathfinderContext.schemaState, field);
+    const options = AggregationTypes.get(type).fieldTypesToElasticTypes.get(String(fieldType));
+    // From there choose the correct option based on the advanced features
+    // If intervalType = interval, use histograms (not ranges)
+    // Choose between terms and sig terms
+    // Choose between geohash and geodistance
+    const { advanced } = this.props.aggregation;
+    const key = overrideKey !== undefined ? overrideKey : advanced.get('rangeType');
+    switch (Number(fieldType))
+    {
+      case FieldType.Numerical:
+        if (key === 'interval')
+        {
+          return 'histogram';
+        }
+        return 'range';
+      case FieldType.Date:
+        if (key === 'interval')
+        {
+          return 'date_histogram';
+        }
+        return 'date_range';
+      case FieldType.Geopoint:
+        return key;
+      case FieldType.Text:
+      default:
+        return options.get(0);
+    }
   }
 
   // This function returns a list of fields that can be used with a given aggregation type
@@ -183,38 +259,19 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           onChange={this.handleTypeChange}
           canEdit={canEdit}
         />
-        <Dropdown
-          options={this.state.fieldOptions}
-          selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
-          keyPath={this.props.keyPath.push('field')}
-          canEdit={canEdit}
-          placeholder={'field'}
+        <AdvancedDropdown
+          value={this.props.aggregation.field}
+          options={List(this.state.fieldOptions.map((option) =>
+          {
+            return {
+              value: option,
+              displayName: option
+            }
+          }))}
           onChange={this.handleFieldChange}
+          canEdit={canEdit}
+          placeholder={'Field'}
         />
-      </div>
-    );
-  }
-
-  public renderLine(key, text, text2, multiValue, i)
-  {
-    const { aggregation } = this.props;
-    const { advanced } = aggregation;
-    const { canEdit } = this.props.pathfinderContext;
-    return (
-      <div className='pf-aggregation-advanced-line' key={i}>
-        <span>{text}</span>
-        {
-          !multiValue ?
-            <BuilderTextbox
-              value={advanced.get(key)}
-              keyPath={this.props.keyPath.push(key)}
-              canEdit={canEdit}
-              placeholder={'value'}
-            />
-            :
-            null // TODO ADD IN MULTILPE INPUTS
-        }
-        <span>{text2}</span>
       </div>
     );
   }
@@ -232,7 +289,21 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       canEdit={canEdit}
       advancedData={this.props.aggregation.advanced}
       fieldName={this.props.aggregation.field}
+      onRadioChange={this.handleAdvancedChange}
     />;
+  }
+
+  // When an advanced feature that affects elastic type changes, update the elasticType
+  public handleAdvancedChange(key)
+  {
+    const type = this.props.aggregation.type;
+    let elasticType = AggregationTypes.get(type).elasticType;
+    if (!List.isList(elasticType))
+    {
+      return;
+    }
+    elasticType = this.getElasticType(type, undefined, key);
+    BuilderActions.change(this.props.keyPath.push('elasticType'), elasticType);
   }
 
   // The advanced section allows the user to set more advanced things on their aggregation
@@ -244,7 +315,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     {
       return null;
     }
-    const advanced = AggregationTypes.get(this.props.aggregation.type).advanced;
+    const advanced = this.getAdvancedOptions(this.props.aggregation.type, this.props.aggregation.elasticType);
     return (
       <div className='pf-aggregation-advanced-wrapper'>
         {

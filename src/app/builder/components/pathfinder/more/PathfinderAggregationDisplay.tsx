@@ -59,16 +59,19 @@ export interface AdvancedAggregationDisplay
   // e.g. for percentiles, there are two ways of setting accuracy (compression and number of sig figs)
   // but only one can be used
   onlyOne?: boolean;
+  radioKey?: string; // Keeps track of which radio item is selected
 }
 
 export interface AdvancedAggregationItem
 {
   text?: string;
-  inputType?: 'single' | 'multi' | 'range' | 'boolean';
+  inputType?: 'single' | 'multi' | 'range' | 'dropdown' | 'map';
   tooltipText?: string;
   component?: (...args) => El; // Some advanced items need to be custom built
   key: string;
-  defaultValue?: (...args) => string;
+  placeholder?: string;
+  options?: List<string>;
+  isNumber?: boolean;
 }
 
 export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDisplay>({
@@ -85,6 +88,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
   [ADVANCED.Accuracy]: {
     title: PathfinderText.aggregation.accuracy.title,
     onlyOne: true,
+    radioKey: 'accuracyType',
     items: [
       {
         text: PathfinderText.aggregation.accuracy.text1,
@@ -108,6 +112,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       inputType: 'multi',
       tooltipText: PathfinderText.aggregation.percentile.tooltipText,
       key: 'percentiles',
+      isNumber: true,
     },
   },
   [ADVANCED.PercentileRanks]: {
@@ -118,6 +123,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       inputType: 'multi',
       tooltipText: PathfinderText.aggregation.percentileRanks.tooltipText,
       key: 'values',
+      isNumber: true,
     },
   },
   [ADVANCED.Name]: {
@@ -125,11 +131,204 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
     onlyOne: false,
     items: {
       text: '',
-      inputType: 'textbox',
+      inputType: 'single',
       tooltipText: '',
       key: 'name',
-      defaultValue: (fieldName: string, aggregationName: string) => fieldName + ' ' + aggregationName,
+      placeholder: 'Name',
     },
+  },
+  [ADVANCED.Size]: {
+    title: PathfinderText.aggregation.size.title,
+    onlyOne: false,
+    items:
+    {
+      text: PathfinderText.aggregation.size.text,
+      inputType: 'single',
+      tooltipText: PathfinderText.aggregation.size.tooltipText,
+      key: 'size',
+    },
+  },
+  [ADVANCED.Ranges]: {
+    title: PathfinderText.aggregation.ranges.title,
+    onlyOne: true,
+    radioKey: 'rangeType',
+    items: [
+      {
+        text: PathfinderText.aggregation.ranges.text1,
+        inputType: 'single',
+        tooltipText: PathfinderText.aggregation.ranges.tooltipText1,
+        key: 'interval',
+      },
+      {
+        text: PathfinderText.aggregation.ranges.text2,
+        inputType: 'range',
+        tooltipText: PathfinderText.aggregation.ranges.tooltipText2,
+        key: 'ranges',
+      }
+    ],
+  },
+  [ADVANCED.ExtendedRange]:
+  {
+    title: PathfinderText.aggregation.extendedRange.title,
+    onlyOne: false,
+    items: [
+      {
+        text: PathfinderText.aggregation.extendedRange.text1,
+        inputType: 'single',
+        tooltipText: PathfinderText.aggregation.extendedRange.tooltipText1,
+        key: 'interval',
+      },
+      {
+        text: PathfinderText.aggregation.extendedRange.text2,
+        inputType: 'single',
+        key: 'min',
+        tooltipText: PathfinderText.aggregation.extendedRange.tooltipText2,
+      },
+      {
+        text: PathfinderText.aggregation.extendedRange.text3,
+        inputType: 'single',
+        key: 'max',
+        tooltipText: PathfinderText.aggregation.extendedRange.tooltipText3,
+      }
+    ],
+  },
+  [ADVANCED.MinDocCount]:
+  {
+    title: PathfinderText.aggregation.minDocCount.title,
+    onlyOne: false,
+    items: {
+      text: PathfinderText.aggregation.minDocCount.text,
+      inputType: 'single',
+      key: 'min_doc_count',
+      tooltipText: PathfinderText.aggregation.minDocCount.tooltipText
+    }
+  },
+  [ADVANCED.Order]:
+  {
+    title: PathfinderText.aggregation.order.title,
+    onlyOne: false,
+    items: {
+      text: PathfinderText.aggregation.order.text,
+      options: List(['ascending', 'descending']),
+      inputType: 'dropdown',
+      key: 'order',
+      tooltipText: PathfinderText.aggregation.order.tooltipText,
+    }
+  },
+  [ADVANCED.Format]:
+  {
+    title: PathfinderText.aggregation.format.title,
+    onlyOne: false,
+    items: [
+      {
+        text: PathfinderText.aggregation.format.text1,
+        inputType: 'single',
+        key: 'format',
+        tooltipText: PathfinderText.aggregation.format.tooltipText1
+      },
+      {
+        text: PathfinderText.aggregation.format.text2,
+        inputType: 'single',
+        key: 'timezone',
+        tooltipText: PathfinderText.aggregation.format.tooltipText2,
+      }]
+  },
+  [ADVANCED.Error]:
+  {
+    title: PathfinderText.aggregation.error.title,
+    onlyOne: false,
+    items: {
+      text: PathfinderText.aggregation.error.text,
+      inputType: 'dropdown',
+      key: 'show_term_doc_count_error',
+      options: List(['true', 'false']),
+      tooltipText: PathfinderText.aggregation.error.tooltipText
+    }
+  },
+  [ADVANCED.Distance]:
+  {
+    title: PathfinderText.aggregation.distance.title,
+    onlyOne: false,
+    items: [
+      {
+        text: PathfinderText.aggregation.distance.text1,
+        inputType: 'dropdown',
+        key: 'unit',
+        options: List(['miles', 'yards', 'feet', 'inches', 'kilometers',
+          'meters', 'centimeters', 'millimeters', 'nautical miles']),
+        tooltipText: PathfinderText.aggregation.distance.tooltipText1,
+      },
+      {
+        text: PathfinderText.aggregation.distance.text2,
+        inputType: 'dropdown',
+        key: 'distance_type',
+        options: List(['arc', 'plane']),
+        tooltipText: PathfinderText.aggregation.distance.tooltipText2,
+      }
+    ]
+  },
+  [ADVANCED.Origin]:
+  {
+    title: PathfinderText.aggregation.origin.title,
+    onlyOne: false,
+    items: {
+      text: PathfinderText.aggregation.origin.text,
+      inputType: 'map',
+      key: 'origin',
+      textKey: 'origin_address',
+      tooltipText: PathfinderText.aggregation.origin.tooltipText
+    }
+  },
+  [ADVANCED.Precision]:
+  {
+    title: PathfinderText.aggregation.precision.title,
+    onlyOne: false,
+    items: {
+      text: PathfinderText.aggregation.precision.text,
+      inputType: 'single',
+      key: 'precision',
+      tooltipText: PathfinderText.aggregation.precision.tooltipText
+    }
+  },
+  [ADVANCED.IncludeExclude]:
+  {
+    title: PathfinderText.aggregation.includeExclude.title,
+    onlyOne: false,
+    items: [
+      {
+        text: PathfinderText.aggregation.includeExclude.text1,
+        inputType: 'multi',
+        key: 'include',
+        isNumber: false,
+        tooltipText: PathfinderText.aggregation.includeExclude.tooltipText1,
+      },
+      {
+        text: PathfinderText.aggregation.includeExclude.text2,
+        inputType: 'multi',
+        key: 'exclude',
+        isNumber: false,
+        tooltipText: PathfinderText.aggregation.includeExclude.tooltipText2,
+      }
+    ]
+  },
+  [ADVANCED.Type]:
+  {
+    title: PathfinderText.aggregation.type.title,
+    onlyOne: true,
+    radioKey: 'geoType',
+    items: [
+      {
+        text: PathfinderText.aggregation.type.text1,
+        inputType: '',
+        key: 'geo_distance',
+        tooltipText: PathfinderText.aggregation.type.tooltipText1
+      },
+      {
+        text: PathfinderText.aggregation.type.text2,
+        inputType: '',
+        key: 'geo_hash',
+        tooltipText: PathfinderText.aggregation.type.tooltipText2
+      }]
   },
   [ADVANCED.Missing]: {
     title: PathfinderText.aggregation.missing.title,
