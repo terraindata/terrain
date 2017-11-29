@@ -263,7 +263,7 @@ export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
   New<FilterLine>(new FilterLineC(config), config);
 
-export type ValueType = 'number' | 'text' | 'date' | 'input';
+export type ValueType = 'number' | 'text' | 'date' | 'input' | 'location';
 
 export const sourceCountOptions = List([
   'all',
@@ -449,12 +449,34 @@ class ElasticDataSourceC extends DataSource
           displayName: 'an input',
           value: 'input',
         }),
+        _ChoiceOption({
+          displayName: 'a location',
+          value: 'location',
+        }),
       ]);
     }
     
     if (context.type === 'input')
     {
-      
+      // TODO use current builder state
+      return List([
+        _ChoiceOption({
+          displayName: 'search term',
+          value: '@search',
+        }),
+        _ChoiceOption({
+          displayName: 'genre',
+          value: '@genre',
+        }),
+        _ChoiceOption({
+          displayName: 'user ID',
+          value: '@userid',
+        }),
+        _ChoiceOption({
+          displayName: 'user location',
+          value: '@userlocation',
+        }),
+      ]);
     }
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));

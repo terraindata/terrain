@@ -97,6 +97,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             value={filterLine.field}
             canEdit={pathfinderContext.canEdit}
             onChange={this._fn(this.handleChange, 'field')}
+            placeholder={'Choose field'}
           />,
           {
             content:
@@ -110,6 +111,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 value={filterLine.method}
                 canEdit={pathfinderContext.canEdit}
                 onChange={this._fn(this.handleChange, 'method')}
+                placeholder={'Choose method'}
               />,
             visible: filterLine.field !== null,
           },
@@ -126,6 +128,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 value={filterLine.valueType}
                 canEdit={pathfinderContext.canEdit}
                 onChange={this._fn(this.handleChange, 'valueType')}
+                placeholder={'Choose type'}
               />,
             visible: filterLine.method !== null,
           },
@@ -161,15 +164,21 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           <div>Calendar here</div>
         );
       
+      case 'location':
+        return (
+          <div>Map here</div>
+        );
+      
       case 'input':  
         return (
           <AdvancedDropdown 
-            options={source.dataSource.getChoiceOptions({
+            options={pathfinderContext.source.dataSource.getChoiceOptions({
               type: 'input',
             })}
             value={filterLine.value}
             canEdit={pathfinderContext.canEdit}
             onChange={this._fn(this.handleChange, 'value')}
+            placeholder={'Choose input'}
           />
         );
       

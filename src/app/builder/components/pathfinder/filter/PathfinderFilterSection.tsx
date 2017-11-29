@@ -103,9 +103,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   private handleFilterDelete(keyPath: KeyPath)
   {
     const parentKeyPath = keyPath.butLast().toList();
-    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(2).toList());
+    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(3).toList());
     const index = keyPath.last();
+    console.log(keyPath, parentKeyPath, parent, index);
     BuilderActions.change(parentKeyPath, parent.splice(index, 1));
+    // TODO consider 'removeIn' instead
   }
 
   private buildFilterTree(filterGroup: FilterGroup, entries: FilterEntry[], depth: number, keyPath: KeyPath): void

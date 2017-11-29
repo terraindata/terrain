@@ -54,7 +54,7 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../..
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import Dropdown from 'app/common/components/Dropdown';
+import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
 
 export interface Props
@@ -66,14 +66,19 @@ export interface Props
   onChange(keyPath: KeyPath, filterGroup: FilterGroup | FilterLine);
 }
 
-const filterDropdownOptions = List([
-  'all',
-  'any',
-  2,
-  3,
-  4,
-  5,
-]);
+const filterDropdownOptions = List(
+  [
+    'all',
+    'any',
+    2,
+    3,
+    4,
+    5,
+  ].map((v) => ({
+    displayName: v,
+    value: v,
+  }))
+);
 
 class PathfinderFilterGroup extends TerrainComponent<Props>
 {
@@ -101,9 +106,9 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
         <div
           className='pf-piece'
         >
-          <Dropdown
+          <AdvancedDropdown
             options={filterDropdownOptions}
-            selectedIndex={this.getDropdownSelectedIndex()}
+            value={filterGroup.minMatches}
             canEdit={canEdit}
             onChange={this.handleDropdownChange}
           />
@@ -120,27 +125,9 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
     );
   }
 
-  private handleDropdownChange(index: number)
+  private handleDropdownChange(value: number | string)
   {
-    let value = filterDropdownOptions[index];
-
-    if (value === 'any')
-    {
-      value = 1;
-    }
     this.props.onChange(this.props.keyPath, this.props.filterGroup.set('minMatches', value));
-  }
-
-  private getDropdownSelectedIndex(): number
-  {
-    const value = this.props.filterGroup.minMatches;
-
-    if (value === 1)
-    {
-      return filterDropdownOptions.indexOf('any');
-    }
-
-    return filterDropdownOptions.indexOf(value);
   }
 }
 
