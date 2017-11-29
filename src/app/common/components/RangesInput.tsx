@@ -69,7 +69,7 @@ export interface Props
   keyPath?: KeyPath;
   action?: (keyPath, items) => void;
   onChange?: (items) => void;
-  ranges: List<Range>;
+  ranges: List<any>;
 }
 
 class RangesInput extends TerrainComponent<Props>
@@ -110,21 +110,21 @@ class RangesInput extends TerrainComponent<Props>
               <div
                 key={index}
                 className='range-input-item'>
-                <span>Name </span>
+                <div>Name </div>
                 <BuilderTextbox
-                  value={range.name}
+                  value={range.get('name')}
                   keyPath={this.props.keyPath.push(index).push('name')}
                   canEdit={this.props.canEdit}
                 />
-                <span>:</span>
+                <div>:</div>
                 <BuilderTextbox
-                  value={range.from}
+                  value={range.get('from')}
                   keyPath={this.props.keyPath.push(index).push('from')}
                   canEdit={this.props.canEdit}
                 />
-                <span>-</span>
+                <div>-</div>
                 <BuilderTextbox
-                  value={range.to}
+                  value={range.get('to')}
                   keyPath={this.props.keyPath.push(index).push('to')}
                   canEdit={this.props.canEdit}
                 />
@@ -156,7 +156,7 @@ class RangesInput extends TerrainComponent<Props>
 
   public handleAddRange()
   {
-    const newRanges = this.props.ranges.push({ name: '', from: 0, to: 0 });
+    const newRanges = this.props.ranges.push(Map({ name: '', from: 0, to: 0 }));
     this.changeRanges(newRanges);
   }
 

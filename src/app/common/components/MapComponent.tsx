@@ -668,6 +668,7 @@ class MapComponent extends TerrainComponent<Props>
   public renderMap()
   {
     const { location, secondLocation, multiLocations } = this.props;
+    console.log(location);
     const address = this.props.address !== undefined && this.props.address !== '' ? this.props.address : this.state.address;
     const primaryMarkerColor = this.props.colorMarker ? Colors().builder.cards.categories.filter : 'black';
     // const secondColor;

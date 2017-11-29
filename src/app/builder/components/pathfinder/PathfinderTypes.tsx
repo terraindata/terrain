@@ -233,14 +233,15 @@ export const _AggregationLine = (config?: { [key: string]: any }) =>
   const advanced = {};
   _.keys(aggregation['advanced']).map((key) =>
   {
-    if (Array.isArray(aggregation['advanced'][key]))
-    {
-      advanced[key] = List(aggregation['advanced'][key]);
-    }
-    else
-    {
-      advanced[key] = aggregation['advanced'][key];
-    }
+    advanced[key] = Immutable.fromJS(aggregation['advanced'][key]);
+    // if (Array.isArray(aggregation['advanced'][key]))
+    // {
+    //   advanced[key] = List(aggregation['advanced'][key]);
+    // }
+    // else
+    // {
+    //   advanced[key] = aggregation['advanced'][key];
+    // }
   });
   aggregation = aggregation
     .set('advanced', Map(advanced));
@@ -460,6 +461,7 @@ export enum ADVANCED
   Origin,
   Precision,
   IncludeExclude,
+  Type,
 }
 
 // The data that needs to be stored for each type of advanced field
@@ -469,19 +471,20 @@ export const ADVANCED_MAPPINGS =
     [ADVANCED.Sigma]: { sigma: 2 },
     [ADVANCED.Percentiles]: { percentiles: List([1, 5, 25, 50, 75, 95, 99]) },
     [ADVANCED.PercentileRanks]: { values: List([]) },
-    [ADVANCED.Accuracy]: { compression: 100 },
+    [ADVANCED.Accuracy]: { accuracyType: 'compression', compression: 100, number_of_significant_value_digits: 3 },
     [ADVANCED.Name]: { name: '' },
-    [ADVANCED.Ranges]: { uniform: true, interval: 10, ranges: List([]) },
+    [ADVANCED.Ranges]: { rangeType: 'interval', interval: 10, ranges: List([]) },
     [ADVANCED.Format]: { format: 'MM/dd/yyyy', timezone: '' },
     [ADVANCED.ExtendedRange]: { offset: 0, min: '', max: '' },
     [ADVANCED.MinDocCount]: { min_doc_count: 0 },
     [ADVANCED.Order]: { order: 'asc' },
     [ADVANCED.Size]: { size: 10 },
-    [ADVANCED.Error]: { show_term_doc_count_error: false },
-    [ADVANCED.Origin]: { origin: '' },
+    [ADVANCED.Error]: { show_term_doc_count_error: 'false' },
+    [ADVANCED.Origin]: { origin: [30, 100], origin_address: '' },
     [ADVANCED.Distance]: { unit: 'meters', distance_type: 'arc' },
     [ADVANCED.Precision]: { precision: 5 },
-    [ADVANCED.IncludeExclude]: { include: '', exclude: '' }
+    [ADVANCED.IncludeExclude]: { include: List([]), exclude: List([]) },
+    [ADVANCED.Type]: { geoType: 'geo_distance' },
   };
 
 interface AggregationData
@@ -489,6 +492,7 @@ interface AggregationData
   elasticType: string | List<string>; // Some (like facets) will have more than one elastic type
   advanced: List<ADVANCED> | Map<string, List<ADVANCED>>; // Advanced settings that will appear in the expanded section
   acceptedTypes: List<FieldType>; // The types of fields that can be aggregated on
+  fieldTypesToElasticTypes?: Map<FieldType | string, List<string>>; // Maps the field type (text, number...) to elastic types
 }
 
 // Each human readable aggregation type is mapped to its elastic type (or types),
@@ -568,11 +572,18 @@ export const AggregationTypes = Map<string, AggregationData>({
       date_histogram: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.ExtendedRange, ADVANCED.MinDocCount,
       ADVANCED.Order, ADVANCED.Format]),
       ip_range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges]),
-      geo_distance: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.Origin, ADVANCED.Distance]),
-      geo_hash: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Size, ADVANCED.Precision]),
-      terms: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Size, ADVANCED.Order, ADVANCED.MinDocCount, ADVANCED.IncludeExclude,
+      geo_distance: List([ADVANCED.Name, ADVANCED.Type, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.Origin, ADVANCED.Distance]),
+      geo_hash: List([ADVANCED.Name, ADVANCED.Type, ADVANCED.Missing, ADVANCED.Size, ADVANCED.Precision]),
+      terms: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Size, ADVANCED.MinDocCount, ADVANCED.IncludeExclude,
       ADVANCED.Order])
     }),
     acceptedTypes: List([FieldType.Any]),
+    fieldTypesToElasticTypes: Map({
+      [FieldType.Numerical]: List(['histogram', 'range']),
+      [FieldType.Date]: List(['date_histogram', 'date_range']),
+      [FieldType.Geopoint]: List(['geo_distance', 'geo_hash']),
+      [FieldType.Text]: List(['terms', 'significant_terms']),
+      [FieldType.Ip]: List(['ip_range']),
+    })
   }
 });
