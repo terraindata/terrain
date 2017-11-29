@@ -157,8 +157,10 @@ export default class ElasticQueryHandler extends QueryHandler
     });
 
     const body: any[] = [];
-    const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
-    const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
+
+    // todo: optimization to avoid repeating index and type if they're the same
+    // const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
+    // const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
 
     const parser = new ESJSONParser(childQuery.query, true);
     const valueInfo = parser.getValueInfo();
@@ -183,8 +185,6 @@ export default class ElasticQueryHandler extends QueryHandler
       client.msearch(
         {
           body,
-          index,
-          type,
         },
         this.makeQueryCallback(resolve, reject));
     });
