@@ -63,7 +63,7 @@ const InfoIcon = require('./../../../images/icon_info.svg');
 export interface Props
 {
   value: string;
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
   options: List<string>;
   style?: React.CSSProperties;
 
