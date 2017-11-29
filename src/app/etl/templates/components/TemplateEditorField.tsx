@@ -45,36 +45,101 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 
-import './TemplateEditor.less';
+import './TemplateEditorField.less';
 
 export interface Props
 {
+  isRoot: boolean;
   keyPath: KeyPath;
   field: TemplateField;
   // below from container
-  templateEditor: TemplateEditorState;
-  templateEditorActions: typeof TemplateEditorActions;
+  templateEditor?: TemplateEditorState;
+  act?: typeof TemplateEditorActions;
 }
 
 @Radium
 class TemplateEditorField extends TerrainComponent<Props>
 {
+  public renderFieldSettings()
+  {
+    const { field } = this.props;
+    return (
+      <div className='template-editor-field'
+          style={[
+            backgroundColor(Colors().bg3),
+            borderColor(Colors().border1)
+          ]}
+      >
+        Name: {`[${field.name}]`}
+      </div>
+    );
+  }
+
+  public renderChildFields()
+  {
+    const { field, keyPath } = this.props;
+
+    return field.children.map((value, key) => {
+      const newKeyPath = keyPath.push(key);
+      return (
+        <TemplateEditorField
+          isRoot={false}
+          keyPath={newKeyPath}
+          field={value}
+          key={key}
+        />
+      );
+    }).toList();
+  }
+
   public render()
   {
-    return <div className='template-editor-field'> hey there </div>
+    const { field, isRoot, keyPath } = this.props;
+    return (
+      <div className='template-editor-field-container'>
+        {!isRoot && this.renderFieldSettings()}
+        {field.children.size > 0 &&
+          <div className='template-editor-children-container'>
+            {this.renderChildFields()}
+            <div className='new-field-button-spacer'>
+              <div className='create-new-template-field-button'
+                style={_.extend({}, buttonColors(), getStyle('cursor', 'pointer'))}
+                onClick={this.handleCreateNewField}
+              >
+                Add Field
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    );
+  }
+
+  public handleCreateNewField()
+  {
+    const { field, keyPath, act } = this.props;
+    const newKeyPath = keyPath.push('children', 'new name');
+    const newField = _TemplateField({name: 'new name'})
+    act({
+      actionType: 'createField',
+      keyPath: newKeyPath,
+      field: newField,
+    });
+
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   TemplateEditorField,
   ['templateEditor'],
-  { templateEditorActions: TemplateEditorActions },
+  { act: TemplateEditorActions },
 );

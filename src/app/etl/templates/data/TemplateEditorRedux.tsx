@@ -50,7 +50,8 @@ import * as _ from 'lodash';
 import {
   _TemplateEditorState,
   ETLTemplate,
-  TemplateEditorState
+  TemplateEditorState,
+  TemplateField,
 } from 'etl/templates/TemplateTypes';
 
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
@@ -73,7 +74,12 @@ export interface TemplateEditorActionTypes
   updateTemplate: { // edit the current template
     actionType: 'updateTemplate';
     template: ETLTemplate;
-  }
+  };
+  createField: {
+    actionType: 'createField';
+    keyPath: KeyPath;
+    field: TemplateField;
+  };
 }
 
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
@@ -91,7 +97,13 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
     },
     updateTemplate: (state, action) => {
       return state;
-    }
+    },
+    createField: (state, action) => {
+      const keyPath = List<string | number>(['template', 'rootField']).push(... action.payload.keyPath.toJS());
+      console.log(... action.payload.keyPath.toJS());
+      console.log(keyPath);
+      return state.setIn(keyPath, action.payload.field);
+    },
   }
 }
 

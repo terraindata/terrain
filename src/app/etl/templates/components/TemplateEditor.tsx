@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
@@ -52,15 +53,16 @@ import Util from 'util/Util';
 
 import TemplateEditorField from 'etl/templates/components/TemplateEditorField';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _ExportTemplate, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
-
+import { _ExportTemplate, _TemplateField, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import './TemplateEditor.less';
+
+const { List } = Immutable;
 
 export interface Props
 {
   // below from container
   templateEditor?: TemplateEditorState;
-  actions?: typeof TemplateEditorActions;
+  act?: typeof TemplateEditorActions;
 }
 
 @Radium
@@ -68,11 +70,12 @@ class ETLExportDisplay extends TerrainComponent<Props>
 {
   public componentDidMount()
   {
-    const template = _ExportTemplate({
+    let template = _ExportTemplate({
       templateId: 1,
       templateName: 'Test Template',
     });
-    this.props.actions({
+    template = template.setIn(['rootField', 'children', 'field1'], _TemplateField({name: 'blahblah'}))
+    this.props.act({
       actionType: 'loadTemplate',
       template,
     });
@@ -81,12 +84,21 @@ class ETLExportDisplay extends TerrainComponent<Props>
   public render()
   {
     const template: ETLTemplate = this.props.templateEditor.template;
-    return <TemplateEditorField field={template.rootField}/>
+
+    return (
+      <div className='template-editor-root-container'>
+        <TemplateEditorField
+          isRoot={true}
+          keyPath={List([])}
+          field={template.rootField}
+        />
+      </div>
+    );
   }
 }
 
 export default Util.createContainer(
   ETLExportDisplay,
   ['templateEditor'],
-  { actions: TemplateEditorActions },
+  { act: TemplateEditorActions },
 );

@@ -61,7 +61,6 @@ export enum FILE_TYPES
 class ETLStateC
 {
   public placeholder: number = 0;
-  // public currentTemplate: ImportTemplate | ExportTemplate = _ExportTemplate({});
 }
 export type ETLState = WithIRecord<ETLStateC>
 export const _ETLState = makeConstructor<ETLStateC>(ETLStateC);

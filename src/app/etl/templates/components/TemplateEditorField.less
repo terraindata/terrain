@@ -1,0 +1,31 @@
+@import "../../../common/Common.less";
+
+
+.template-editor-field-container {
+  display: flex;
+  flex-direction: column;
+
+  .template-editor-field {
+    padding: @half-spacing;
+    border: 1px solid;
+  }
+
+  .template-editor-children-container {
+    padding-left: @double-spacing;
+    display: flex;
+    flex-direction: column;
+
+    .new-field-button-spacer {
+      display: flex;
+      justify-content: center;
+
+      .create-new-template-field-button {
+        display: inline-block;
+        margin: @half-spacing 0px;
+        padding: @half-spacing;
+        border-radius: 3px;
+      }
+    }
+  }
+}
+
