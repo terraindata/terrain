@@ -189,6 +189,16 @@ class ElasticClient
     this.delegate.search(params, callback);
   }
 
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-msearch
+   */
+  public msearch<T>(params: Elastic.MSearchParams,
+    callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
+  {
+    this.log('msearch', params);
+    this.delegate.msearch(params, callback);
+  }
+
   public getDelegate(): Elastic.Client
   {
     return this.delegate;
