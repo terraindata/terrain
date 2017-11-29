@@ -729,6 +729,84 @@ describe('Query route tests', () =>
           fail(error);
         });
     });
+
+  test('Elastic groupJoin Query Result: POST /midway/v1/query', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          database: 1,
+          type: 'groupJoin',
+          body: {
+            from: 0,
+            size: 5,
+            body: {
+              query: {
+                bool: {
+                  filter: [
+                    {
+                      term: {
+                        _index: 'movies',
+                      },
+                    },
+                    {
+                      term: {
+                        _type: 'data',
+                      },
+                    },
+                  ],
+                  must: [
+                    { match: { status: 'Released' } },
+                    { match: { language: 'en' } },
+                  ],
+                  must_not: [
+                    { term: { budget: 0 } },
+                    { term: { revenue: 0 } },
+                  ],
+                },
+              },
+            },
+            groupJoin: {
+              query: `{
+                "from" : 0,
+                "size" : 5,
+                "query" : {
+                  "bool" : {
+                    "filter": [
+                      "term": {"movieid" : @parent.movieid}
+                    ],
+                    "must" : [
+                      {"match" : {"_index" : "movies"}},
+                      {"match" : {"_type" : "data"}}
+                    ]
+                  }
+                }
+              }`,
+            },
+          },
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        winston.info(response.text);
+        // expect(JSON.parse(response.text))
+        //   .toMatchObject({
+        //     result: {
+        //       timed_out: false,
+        //       _shards: { failed: 0 },
+        //       hits: { max_score: 0, hits: [] },
+        //     }, errors: [],
+        //   });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
+      });
+  });
 });
 
 describe('File import route tests', () =>
