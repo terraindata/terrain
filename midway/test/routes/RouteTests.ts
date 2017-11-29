@@ -744,6 +744,7 @@ describe('Query route tests', () =>
             from: 0,
             size: 5,
             body: {
+              _source: ['movieid', 'title'],
               query: {
                 bool: {
                   filter: [
@@ -770,7 +771,7 @@ describe('Query route tests', () =>
               },
             },
             groupJoin: {
-              query: `{
+              englishMovies: `{
                 "from" : 0,
                 "size" : 5,
                 "query" : {
