@@ -181,4 +181,40 @@ test('test generate template queries', () =>
         },
       },
     });
+
+  testGeneration(`
+    {
+      "query" : {
+          "bool" : {
+            "must" : [
+              {"match" : {"_index" : "movies"}},
+              {"match" : {"_type" : @data.type}}
+            ]
+          }
+        },
+        "from" : @data.params.from,
+        "size" : @data.params.size
+    }`,
+    {
+      data: {
+        type: 'data',
+        params: {
+          from: 0,
+          size: 10,
+        },
+      },
+    },
+
+    {
+      query: {
+        bool: {
+          must: [
+            { match: { _index: 'movies' } },
+            { match: { _type: 'data' } },
+          ],
+        },
+      },
+      from: 0,
+      size: 10,
+    });
 });
