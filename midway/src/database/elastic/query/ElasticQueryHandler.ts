@@ -150,19 +150,46 @@ export default class ElasticQueryHandler extends QueryHandler
     const childQuery = parentQuery['groupJoin'];
     parentQuery['groupJoin'] = undefined;
 
-    const client: ElasticClient = this.controller.getClient();
-    const parentResults = await new Promise<QueryResponse>((resolve, reject) =>
+    return new Promise<QueryResponse | Readable>(async (resolve, reject) =>
     {
-      client.search(parentQuery, this.makeQueryCallback(resolve, reject));
-    });
+      const client: ElasticClient = this.controller.getClient();
+      const parentResults = await new Promise<QueryResponse>((res, rej) =>
+      {
+        client.search(parentQuery, this.makeQueryCallback(res, rej));
+      });
 
+      const subQueries = Object.keys(childQuery);
+      const promises: Array<Promise<any>> = [];
+      for (const subQuery of subQueries)
+      {
+        promises.push(
+          this.handleGroupJoinSubQuery(subQuery, parentResults),
+        );
+      }
+
+      const subQueryResults = Promise.all(promises);
+      for (const r of parentResults.result.hits)
+      {
+        for (let i = 0; i < subQueries.length; ++i)
+        {
+          r[subQueries[i]] = subQueryResults[i];
+        }
+      }
+
+      const qb = this.makeQueryCallback(resolve, reject);
+      qb(null, parentResults);
+    });
+  }
+
+  private handleGroupJoinSubQuery(query: string, parentResults: any)
+  {
     const body: any[] = [];
 
     // todo: optimization to avoid repeating index and type if they're the same
     // const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
     // const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
 
-    const parser = new ESJSONParser(childQuery.query, true);
+    const parser = new ESJSONParser(query, true);
     const valueInfo = parser.getValueInfo();
 
     if (parser.hasError())
@@ -180,6 +207,7 @@ export default class ElasticQueryHandler extends QueryHandler
       body.push({ query: this.getQueryBody(queryStr) });
     }
 
+    const client: ElasticClient = this.controller.getClient();
     return new Promise<QueryResponse>((resolve, reject) =>
     {
       client.msearch(
@@ -232,7 +260,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
   private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
   {
-    return (error: Error, response: any) =>
+    return (error: Error | null, response: any) =>
     {
       if (error !== null && error !== undefined)
       {
