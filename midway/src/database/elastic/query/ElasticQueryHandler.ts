@@ -148,7 +148,7 @@ export default class ElasticQueryHandler extends QueryHandler
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
-  public async handleGroupJoin(request: QueryRequest): Promise<QueryResponse>
+  private async handleGroupJoin(request: QueryRequest): Promise<QueryResponse>
   {
     const parentQuery: Elastic.SearchParams = request.body as Elastic.SearchParams;
     winston.debug('inside handleGroupJoin ' + JSON.stringify(parentQuery, null, 2));
