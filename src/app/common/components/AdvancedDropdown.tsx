@@ -51,9 +51,9 @@ import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Dropdown from './Dropdown';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 
 export interface AdvancedDropdownOption
 {
@@ -61,7 +61,7 @@ export interface AdvancedDropdownOption
   displayName: string | number | El;
   color?: string;
   tooltipContent?: string | El;
-};
+}
 
 export interface Props
 {
@@ -88,13 +88,13 @@ class AdvancedDropdown extends TerrainComponent<Props>
     computedIndex: this.getComputedIndex(this.props),
     computedTooltips: this.getComputedTooltips(this.props),
     showOther: this.getShowOther(this.props),
-  }
+  };
 
   componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.options !== nextProps.options || this.props.value !== nextProps.value)
     {
-      let newState = {
+      const newState = {
         computedOptions: this.getComputedOptions(nextProps),
         computedIndex: this.getComputedIndex(nextProps),
         computedTooltips: this.getComputedTooltips(nextProps),
@@ -120,9 +120,9 @@ class AdvancedDropdown extends TerrainComponent<Props>
     if (!prevState.showOther && this.state.showOther)
     {
       // clicked other, invoke onChange to clear out value
-      this.props.onChange("");
+      this.props.onChange('');
       // Note: the reason we do it this way is that calling the onChange from
-      // within the change handler led to some weird  
+      // within the change handler led to some weird
     }
 
     if (prevState.showOther && !this.state.showOther)
@@ -225,7 +225,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
   private handleTextChange(event): void
   {
     let { value } = event.target;
-    if (this.props.textShouldBeNumber && !Number.isNaN(+value) && value !== "")
+    if (this.props.textShouldBeNumber && !Number.isNaN(+value) && value !== '')
     {
       value = +value;
     }
@@ -252,7 +252,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
   private getShowOther(props: Props): boolean
   {
     return !props.options.find(
-      (option) => option.value === props.value
+      (option) => option.value === props.value,
     ) && props.value !== null; // null value means show a blank w/ placeholder
   }
 }

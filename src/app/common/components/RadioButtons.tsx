@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as classNames from 'classnames';
 import * as React from 'react';
+import BuilderActions from './../../builder/data/BuilderActions';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './RadioButtons.less';
-import BuilderActions from './../../builder/data/BuilderActions';
 
 export interface RadioButtonOption
 {

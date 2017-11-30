@@ -77,6 +77,7 @@ export interface Props
   id?: ID;
   vertical?: boolean;
   openRight?: boolean; // menu will open to the right
+  title?: string;
 }
 
 @Radium
@@ -206,13 +207,22 @@ export class Menu extends TerrainComponent<Props>
           this.props.style ? this.props.style : null,
         ]}
       >
-        <div
-          className='menu-icon-wrapper'
-          onClick={this.toggleOpen}
-          style={fontColor(this.state.open ? Colors().active : Colors().iconColor, Colors().active)}
-        >
-          <MoreIcon className='menu-icon' />
-        </div>
+        {this.props.title !== undefined ?
+          <div
+            className='menu-icon-title'
+            onClick={this.toggleOpen}
+            style={fontColor(this.state.open ? Colors().active : Colors().iconColor, Colors().active)}
+          >
+            {this.props.title}
+          </div>
+          :
+          <div
+            className='menu-icon-wrapper'
+            onClick={this.toggleOpen}
+            style={fontColor(this.state.open ? Colors().active : Colors().iconColor, Colors().active)}
+          >
+            <MoreIcon className='menu-icon' />
+          </div>}
         {
           this.state.open &&
           <div

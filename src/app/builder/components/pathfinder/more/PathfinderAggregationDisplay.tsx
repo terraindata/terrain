@@ -164,7 +164,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         inputType: 'range',
         tooltipText: PathfinderText.aggregation.ranges.tooltipText2,
         key: 'ranges',
-      }
+      },
     ],
   },
   [ADVANCED.ExtendedRange]:
@@ -189,7 +189,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         inputType: 'single',
         key: 'max',
         tooltipText: PathfinderText.aggregation.extendedRange.tooltipText3,
-      }
+      },
     ],
   },
   [ADVANCED.MinDocCount]:
@@ -200,8 +200,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       text: PathfinderText.aggregation.minDocCount.text,
       inputType: 'single',
       key: 'min_doc_count',
-      tooltipText: PathfinderText.aggregation.minDocCount.tooltipText
-    }
+      tooltipText: PathfinderText.aggregation.minDocCount.tooltipText,
+    },
   },
   [ADVANCED.Order]:
   {
@@ -213,7 +213,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       inputType: 'dropdown',
       key: 'order',
       tooltipText: PathfinderText.aggregation.order.tooltipText,
-    }
+    },
   },
   [ADVANCED.Format]:
   {
@@ -224,14 +224,14 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         text: PathfinderText.aggregation.format.text1,
         inputType: 'single',
         key: 'format',
-        tooltipText: PathfinderText.aggregation.format.tooltipText1
+        tooltipText: PathfinderText.aggregation.format.tooltipText1,
       },
       {
         text: PathfinderText.aggregation.format.text2,
         inputType: 'single',
         key: 'timezone',
         tooltipText: PathfinderText.aggregation.format.tooltipText2,
-      }]
+      }],
   },
   [ADVANCED.Error]:
   {
@@ -242,8 +242,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       inputType: 'dropdown',
       key: 'show_term_doc_count_error',
       options: List(['true', 'false']),
-      tooltipText: PathfinderText.aggregation.error.tooltipText
-    }
+      tooltipText: PathfinderText.aggregation.error.tooltipText,
+    },
   },
   [ADVANCED.Distance]:
   {
@@ -264,8 +264,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         key: 'distance_type',
         options: List(['arc', 'plane']),
         tooltipText: PathfinderText.aggregation.distance.tooltipText2,
-      }
-    ]
+      },
+    ],
   },
   [ADVANCED.Origin]:
   {
@@ -276,8 +276,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       inputType: 'map',
       key: 'origin',
       textKey: 'origin_address',
-      tooltipText: PathfinderText.aggregation.origin.tooltipText
-    }
+      tooltipText: PathfinderText.aggregation.origin.tooltipText,
+    },
   },
   [ADVANCED.Precision]:
   {
@@ -287,8 +287,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       text: PathfinderText.aggregation.precision.text,
       inputType: 'single',
       key: 'precision',
-      tooltipText: PathfinderText.aggregation.precision.tooltipText
-    }
+      tooltipText: PathfinderText.aggregation.precision.tooltipText,
+    },
   },
   [ADVANCED.IncludeExclude]:
   {
@@ -308,8 +308,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         key: 'exclude',
         isNumber: false,
         tooltipText: PathfinderText.aggregation.includeExclude.tooltipText2,
-      }
-    ]
+      },
+    ],
   },
   [ADVANCED.Type]:
   {
@@ -321,14 +321,33 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         text: PathfinderText.aggregation.type.text1,
         inputType: '',
         key: 'geo_distance',
-        tooltipText: PathfinderText.aggregation.type.tooltipText1
+        tooltipText: PathfinderText.aggregation.type.tooltipText1,
       },
       {
         text: PathfinderText.aggregation.type.text2,
         inputType: '',
         key: 'geo_hash',
-        tooltipText: PathfinderText.aggregation.type.tooltipText2
-      }]
+        tooltipText: PathfinderText.aggregation.type.tooltipText2,
+      }],
+  },
+  [ADVANCED.TermsType]:
+  {
+    title: PathfinderText.aggregation.termsType.title,
+    onlyOne: true,
+    radioKey: 'termsType',
+    items: [
+      {
+        text: PathfinderText.aggregation.termsType.text1,
+        inputType: '',
+        key: 'terms',
+        tooltipText: PathfinderText.aggregation.termsType.tooltipText1,
+      },
+      {
+        text: PathfinderText.aggregation.termsType.text2,
+        inputType: '',
+        key: 'significant_terms',
+        tooltipText: PathfinderText.aggregation.termsType.tooltipText2,
+      }],
   },
   [ADVANCED.Missing]: {
     title: PathfinderText.aggregation.missing.title,

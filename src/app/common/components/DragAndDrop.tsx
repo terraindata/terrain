@@ -187,7 +187,7 @@ class DragAndDrop extends TerrainComponent<Props>
           onDragEnd={this.onDragEnd}
           onDragStart={this.onDragStart}
         >
-          <Droppable droppableId='droppable'>
+          <Droppable droppableId={'droppable_' + this.props.className}>
             {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}

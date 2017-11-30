@@ -187,7 +187,7 @@ export const PathfinderText = {
       text: 'Grid size',
       tooltipText: `This value determines how large the squares of the geo grid will be.
       A number between 1-12 is expected with 1 being the least precise. Alternatively,
-      an estimate of grid width (12mi) can be given.`
+      an estimate of grid width (12mi) can be given.`,
     },
     includeExclude: {
       title: 'Include / Exclude',
@@ -202,6 +202,13 @@ export const PathfinderText = {
       tooltipText1: 'Find facets for the geographic distance of each document to the origin point',
       text2: 'Geographic Grid',
       tooltipText2: 'Find the facets of a geographic grid (the number of documents that fall into each square in the grid)',
+    },
+    termsType: {
+      title: 'Type of Facets',
+      text1: 'Terms',
+      tooltipText1: 'A standard facet for a text field, returning the top values of the chosen field',
+      text2: 'Significant Terms',
+      tooltipText2: 'Significant terms will return interesting or unusal occurences of terms in a set',
     },
   },
 };

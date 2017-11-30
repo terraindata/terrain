@@ -61,9 +61,9 @@ import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
 import PathfinderLine from '../PathfinderLine';
 import { ChoiceOption, Path, PathfinderContext, Score, ScoreLine, Source } from '../PathfinderTypes';
+import Menu from './../../../../common/components/Menu';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
-import Menu from './../../../../common/components/Menu';
 const SigmoidIcon = require('images/icon_sigmoid.svg?name=SigmoidIcon');
 const LinearIcon = require('images/icon_linear.svg?name=LinearIcon');
 const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIcon');
@@ -144,36 +144,36 @@ class PathfinderScoreLine extends TerrainComponent<Props>
               onClick: this.handleTransformModeChange,
               selected: this.props.line.transformData.mode === 'linear',
               icon: <LinearIcon />,
-              iconColor: Colors().active
+              iconColor: Colors().active,
             },
             {
               text: 'logarithmic',
               onClick: this.handleTransformModeChange,
               selected: this.props.line.transformData.mode === 'logarithmic',
               icon: <LogarithmicIcon />,
-              iconColor: Colors().active
+              iconColor: Colors().active,
             },
             {
               text: 'exponential',
               onClick: this.handleTransformModeChange,
               selected: this.props.line.transformData.mode === 'exponential',
               icon: <ExponentialIcon />,
-              iconColor: Colors().active
+              iconColor: Colors().active,
             },
             {
               text: 'bell-curve',
               onClick: this.handleTransformModeChange,
               selected: this.props.line.transformData.mode === 'normal',
               icon: <NormalIcon />,
-              iconColor: Colors().active
+              iconColor: Colors().active,
             },
             {
               text: 's-curve',
               onClick: this.handleTransformModeChange,
               selected: this.props.line.transformData.mode === 'sigmoid',
               icon: <SigmoidIcon />,
-              iconColor: Colors().active
-            }
+              iconColor: Colors().active,
+            },
           ])}
         />
         <TransformCard

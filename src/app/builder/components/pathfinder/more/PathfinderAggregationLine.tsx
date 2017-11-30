@@ -55,23 +55,26 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } f
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map, Set } = Immutable;
 import ElasticBlockHelpers, { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { getIndex, getType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
+import AdvancedDropdown from '../../../../common/components/AdvancedDropdown';
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
 import Dropdown from '../../../../common/components/Dropdown';
+import Menu from '../../../../common/components/Menu';
+import RadioButtons from '../../../../common/components/RadioButtons';
+import Ajax from '../../../../util/Ajax';
+import PathfinderFilterSection from '../filter/PathfinderFilterSection';
+import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderText from '../PathfinderText';
 import
 {
-  ADVANCED_MAPPINGS, AggregationLine, AggregationTypes,
-  ChoiceOption, Path, PathfinderContext, Source,
+  _AggregationLine, _FilterGroup, _Sample, ADVANCED_MAPPINGS,
+  AggregationLine, AggregationTypes, ChoiceOption, Path, PathfinderContext, Source,
 } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 import PathfinderAdvancedLine from './PathfinderAdvancedLine';
-import AdvancedDropdown from '../../../../common/components/AdvancedDropdown';
-import Ajax from '../../../../util/Ajax';
-import { getIndex, getType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
-import AdvancedMenu from '../../../../common/components/AdvancedMenu';
-import RadioButtons from '../../../../common/components/RadioButtons';
+import PathfinderAggregationMoreSection from './PathfinderAggregationMoreSection';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
@@ -136,16 +139,20 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public handleFieldChange(newField)
   {
     BuilderActions.change(this.props.keyPath.push('field'), newField);
-    this.updateAggregation(this.props.aggregation.type, newField)
+    this.updateAggregation(this.props.aggregation.type, newField);
   }
 
   // Given a type and a field, update the elasticType, advanced section, and name of the aggregation
   public updateAggregation(type, field)
   {
+    if (!type)
+    {
+      return;
+    }
     let elasticType = AggregationTypes.get(type).elasticType;
     if (List.isList(elasticType))
     {
-      elasticType = this.getElasticType(this.props.aggregation.type, field)
+      elasticType = this.getElasticType(type, field);
     }
     BuilderActions.change(this.props.keyPath.push('elasticType'), elasticType);
 
@@ -184,7 +191,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
         {
           advancedObj = advancedObj.set(key, ADVANCED_MAPPINGS[advancedType][key]);
         }
-      })
+      });
     });
 
     // Remove any keys from the object that are not in keys
@@ -199,11 +206,12 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     // For the keys min, max, and interval (if they exist), auto-fill
     if (advancedObj.get('min') !== undefined)
     {      // TODO: Get database info from PathfinderContext.source
+      const source: 'm2' | 'm1' = 'm2';
       const db = {
         id: 1,
         name: '',
         type: 'string',
-        source: 'm2',
+        source,
       };
       const index: string = getIndex('');
       const type: string = getType('');
@@ -243,7 +251,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           BuilderActions.change(this.props.keyPath.push('advanced').push('interval'), interval);
         },
         (err) =>
-        { console.log(err) },
+        { /**/ },
       );
     }
     return advancedObj;
@@ -261,6 +269,10 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     // Get the type of field (using schema) and narrow down th options with fieldTypesToElasticTYpes
     const fieldType: FieldType = ElasticBlockHelpers.getTypeOfField(this.props.pathfinderContext.schemaState, field);
     const options = AggregationTypes.get(type).fieldTypesToElasticTypes.get(String(fieldType));
+    if (options === undefined)
+    {
+      return 'histogram'; // Meta fields (TODO)
+    }
     // From there choose the correct option based on the advanced features
     // If intervalType = interval, use histograms (not ranges)
     // Choose between terms and sig terms
@@ -288,10 +300,15 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       case FieldType.Geopoint:
         if (key !== 'geo_distance' && key !== 'geo_hash')
         {
-          return this.props.aggregation.advanced.get('geoType');
+          return this.props.aggregation.advanced.get('geoType') || 'geo_distnace';
         }
         return key;
       case FieldType.Text:
+        if (key !== 'terms' && key !== 'significant_terms')
+        {
+          return this.props.aggregation.advanced.get('termsType') || 'terms';
+        }
+        return key;
       default:
         return options.get(0);
     }
@@ -345,8 +362,8 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           {
             return {
               value: option,
-              displayName: option
-            }
+              displayName: option,
+            };
           }))}
           onChange={this.handleFieldChange}
           canEdit={canEdit}
@@ -382,34 +399,140 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     {
       return;
     }
-    // Want to change key if in a geo aggregation and radioKey is geoType
-    // Or if in a histogram/range aggeragtion and radioKey is rangeType
     elasticType = this.getElasticType(type, undefined, key);
     BuilderActions.change(this.props.keyPath.push('elasticType'), elasticType);
   }
 
-  public renderSampleMenu()
+  public addSampler(index, id)
   {
+    BuilderActions.change(this.props.keyPath.push('sampler'), _Sample());
+  }
+
+  public addFilters()
+  {
+    BuilderActions.change(this.props.keyPath.push('filters'), _FilterGroup());
+  }
+
+  public addNested()
+  {
+    BuilderActions.change(this.props.keyPath.push('nested'), List([]));
+  }
+
+  public renderSampleSection()
+  {
+    const { sampleType } = this.props.aggregation.sampler;
+    const { canEdit } = this.props.pathfinderContext;
+    let options = List([]);
+    if (this.props.pathfinderContext.source.dataSource.getChoiceOptions)
+    {
+      options = this.props.pathfinderContext.source.dataSource.getChoiceOptions({
+        type: 'fields',
+        source: this.props.pathfinderContext.source,
+        schemaState: this.props.pathfinderContext.schemaState,
+      })
+        .map((option) => option.name).toList();
+    }
     return (
       <div>
         <RadioButtons
-          selected='global'
+          selected={sampleType}
+          radioKey={'sampleType'}
+          keyPath={this.props.keyPath.push('sampler').push('sampleType')}
           options={List([
             {
               key: 'global',
-              display: <div>All results</div>
+              display: <div className='pf-aggregation-sampler-option'><span>All hits</span></div>,
             },
             {
               key: 'sampler',
-              display: <div>The top 10 results</div>
+              display:
+              <div className='pf-aggregation-sampler-option'>
+                <span>The top</span>
+                <BuilderTextbox
+                  value={this.props.aggregation.sampler.numSamples}
+                  keyPath={this.props.keyPath.push('sampler').push('numSamples')}
+                  canEdit={canEdit && sampleType === 'sampler'}
+                />
+                <span>hits</span>
+              </div>,
             },
             {
               key: 'diversified_sampler',
-              display: <div>The top 10 results with different names </div>
-            }
-          ])
-          }
-          radioKey='samplerType'
+              display:
+              <div className='pf-aggregation-sampler-option'>
+                <span>The top</span>
+                <BuilderTextbox
+                  value={this.props.aggregation.sampler.numSamples}
+                  keyPath={this.props.keyPath.push('sampler').push('numSamples')}
+                  canEdit={canEdit && sampleType === 'diversified_sampler'}
+                />
+                <span>hits with unique</span>
+                <Dropdown
+                  selectedIndex={options.indexOf(this.props.aggregation.sampler.diverseField)}
+                  options={options}
+                  keyPath={this.props.keyPath.push('sampler').push('diverseField')}
+                  canEdit={canEdit && sampleType === 'diversified_sampler'}
+                />
+              </div>,
+            },
+          ])}
+        />
+      </div>
+    );
+  }
+
+  public renderFilterSection()
+  {
+    return (
+      <PathfinderFilterSection
+        pathfinderContext={this.props.pathfinderContext}
+        filterGroup={this.props.aggregation.filters}
+        keyPath={this.props.keyPath.push('filters')}
+      />
+    );
+  }
+
+  public handleDeleteNestedLine(index)
+  {
+    BuilderActions.change(this.props.keyPath.push('nested'), this.props.aggregation.nested.delete(index));
+  }
+
+  public handleAddLine()
+  {
+    BuilderActions.change(this.props.keyPath.push('nested'), this.props.aggregation.nested.push(_AggregationLine()));
+  }
+
+  public getAggregationLines()
+  {
+    return (
+      <div>
+        {
+          this.props.aggregation.nested.map((agg, i) =>
+          {
+            return (
+              <PathfinderAggregationLine
+                pathfinderContext={this.props.pathfinderContext}
+                aggregation={agg}
+                keyPath={this.props.keyPath.push('nested').push(i)}
+                onDelete={this.handleDeleteNestedLine}
+                index={i}
+                key={i}
+              />
+            );
+          })}
+      </div>
+    );
+  }
+
+  public renderNestedAggregations()
+  {
+    return (
+      <div>
+        {this.getAggregationLines()}
+        <PathfinderCreateLine
+          canEdit={this.props.pathfinderContext.canEdit}
+          onCreate={this.handleAddLine}
+          text={PathfinderText.createAggregationLine}
         />
       </div>
     );
@@ -425,6 +548,28 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       return null;
     }
     const advanced = this.getAdvancedOptions(this.props.aggregation.type, this.props.aggregation.elasticType);
+    let moreOptions = List([]);
+    if (this.props.aggregation.sampler === undefined)
+    {
+      moreOptions = moreOptions.push({
+        text: 'Sample from...',
+        onClick: this.addSampler,
+      });
+    }
+    if (this.props.aggregation.filters === undefined)
+    {
+      moreOptions = moreOptions.push({
+        text: 'Filter by...',
+        onClick: this.addFilters,
+      });
+    }
+    if (this.props.aggregation.nested === undefined)
+    {
+      moreOptions = moreOptions.push({
+        text: 'Add nested...',
+        onClick: this.addNested,
+      });
+    }
     return (
       <div>
         <div className='pf-aggregation-advanced-wrapper'>
@@ -435,21 +580,39 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
             })
           }
         </div>
-        <AdvancedMenu
-          title='More...'
-          options={List([
-            {
-              text: 'Sample from',
-              expandedContent: this.renderSampleMenu()
-            },
-            {
-              text: 'Filter by',
-              expandedContent: <div>EXPANDED2</div>,
-            }
-          ])
+        <div>
+          {this.props.aggregation.sampler !== undefined &&
+            <PathfinderAggregationMoreSection
+              canEdit={this.props.pathfinderContext.canEdit}
+              content={this.renderSampleSection()}
+              title={'Sample From'}
+              keyPath={this.props.keyPath.push('sampler')}
+            />
           }
-          canEdit={this.props.pathfinderContext.canEdit}
-        />
+          {this.props.aggregation.filters !== undefined &&
+            <PathfinderAggregationMoreSection
+              canEdit={this.props.pathfinderContext.canEdit}
+              content={this.renderFilterSection()}
+              title={'Filter By'}
+              keyPath={this.props.keyPath.push('filters')}
+            />
+          }
+          {this.props.aggregation.nested !== undefined &&
+            <PathfinderAggregationMoreSection
+              canEdit={this.props.pathfinderContext.canEdit}
+              content={this.renderNestedAggregations()}
+              title={'Nested'}
+              keyPath={this.props.keyPath.push('nested')}
+            />
+          }
+        </div>
+        <div className='pf-aggregation-more-menu-wrapper'>
+          <Menu
+            options={moreOptions}
+            title='More...'
+            openRight={true}
+          />
+        </div>
       </div>
     );
   }

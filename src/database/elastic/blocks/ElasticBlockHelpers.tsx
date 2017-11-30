@@ -102,6 +102,12 @@ export const TransformableTypes =
     'float',
   ];
 
+const metaFields = ['_index', '_type', '_uid', '_id',
+  '_source', '_size',
+  '_all', '_field_names',
+  '_parent', '_routing',
+  '_meta'];
+
 export const ElasticBlockHelpers = {
   autocompleteMatches(schemaState, matchType: AutocompleteMatchType): List<string>
   {
@@ -120,12 +126,6 @@ export const ElasticBlockHelpers = {
         (db) => db.name,
       ).toList();
     }
-
-    const metaFields = ['_index', '_type', '_uid', '_id',
-      '_source', '_size',
-      '_all', '_field_names',
-      '_parent', '_routing',
-      '_meta'];
 
     if (index !== null)
     {
@@ -189,12 +189,6 @@ export const ElasticBlockHelpers = {
     const index = getIndex();
     const server = BuilderStore.getState().db.name;
 
-    const metaFields = ['_index', '_type', '_uid', '_id',
-      '_source', '_size',
-      '_all', '_field_names',
-      '_parent', '_routing',
-      '_meta'];
-
     if (index !== null)
     {
       const indexId = state.db.name + '/' + String(index);
@@ -230,8 +224,17 @@ export const ElasticBlockHelpers = {
   },
 
   // Given a field, return the fieldType (numerical, text, date, geopoint, ip)
+  // If the field is a metaField, return string / number accrodingly
   getTypeOfField(schemaState, field): FieldType
   {
+    if (metaFields.indexOf(field) !== -1)
+    {
+      if (field === '_score' || field === '_size')
+      {
+        return FieldType.Numerical;
+      }
+      return FieldType.Text;
+    }
     const state = BuilderStore.getState();
     const index = getIndex();
     const server = BuilderStore.getState().db.name;
@@ -244,6 +247,13 @@ export const ElasticBlockHelpers = {
       if (type !== null)
       {
         const typeId = state.db.name + '/' + String(index) + '.' + String(type);
+        const fields = schemaState.columns.filter(
+          (column) => column.serverId === String(server) &&
+            column.databaseId === String(indexId) &&
+            column.tableId === String(typeId),
+        ).map(
+          (column) => column.name,
+        ).toList();
         const col = schemaState.columns.filter(
           (column) => column.serverId === String(server) &&
             column.databaseId === String(indexId) &&
@@ -265,7 +275,7 @@ export const ElasticBlockHelpers = {
       }
     }
     return undefined;
-  }
+  },
 };
 
 export function findCardType(name: string): Block | null

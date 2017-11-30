@@ -46,84 +46,78 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
+import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
-import Autocomplete from 'app/common/components/Autocomplete';
-import Dropdown from 'app/common/components/Dropdown';
-import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
-import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import BuilderActions from 'app/builder/data/BuilderActions';
+import FadeInOut from 'app/common/components/FadeInOut';
+
+const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
+const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
 {
-  filterLine: FilterLine;
   canEdit: boolean;
-  depth: number;
+  title: string;
+  content: string | El;
   keyPath: KeyPath;
-  pathfinderContext: PathfinderContext;
-  onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine);
-  onDelete(keyPath: KeyPath);
 }
 
-class PathfinderFilterLine extends TerrainComponent<Props>
+export class PathfinderAdvancedLine extends TerrainComponent<Props>
 {
   public state: {
-
+    expanded: boolean;
   } = {
-
+    expanded: false,
   };
+
+  public handleDelete()
+  {
+    BuilderActions.change(this.props.keyPath, undefined);
+  }
 
   public render()
   {
-    const { filterLine, canEdit, pathfinderContext } = this.props;
-    const { source } = pathfinderContext;
     return (
-      <PathfinderLine
-        canDelete={true}
-        canDrag={true}
-        canEdit={canEdit}
-        onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
-        pieces={List([
-          <Dropdown
-            options={/* TODO adapt dropdown */ source.dataSource.getChoiceOptions({
-              type: 'fields',
-              source,
-              schemaState: pathfinderContext.schemaState,
-            }).map((option) => option.name).toList()}
-            selectedIndex={ /* TODO */ 0}
-            canEdit={pathfinderContext.canEdit}
-          />,
-          <Dropdown
-            options={/* TODO adapt dropdown */ source.dataSource.getChoiceOptions({
-              type: 'comparison',
-              field: null, /* TODO field */
-              source,
-              schemaState: pathfinderContext.schemaState,
-            }).map((option) => option.name).toList()}
-            selectedIndex={ /* TODO */ 0}
-            canEdit={pathfinderContext.canEdit}
-          />,
-          // consider showing all options, even when a search text has been entered
-          //  so that they can easily change it
-          // and different labels for user inputs, fields, etc.
-          // <Autocomplete
-
-          // />
-        ])}
+      <div
+        className='pf-aggregation-more-section'
+        style={_.extend({}, backgroundColor(Colors().bg2), borderColor(Colors().border1))}
       >
-      </PathfinderLine>
+        <div
+          className='pf-aggregation-more-section-title'
+          onClick={this._toggle('expanded')}
+        >
+          <div className={classNames({
+            'pf-aggregation-arrow': true,
+            'pf-aggregation-arrow-advanced': true,
+            'pf-aggregation-arrow-open': this.state.expanded,
+          })}
+          >
+            <ArrowIcon />
+          </div>
+          {this.props.title}
+          {
+            this.props.canEdit &&
+            <div
+              className='close'
+              onClick={this._fn(this.handleDelete)}
+            >
+              <RemoveIcon />
+            </div>
+          }
+        </div>
+        <FadeInOut
+          open={this.state.expanded}
+          children={<div className='pf-aggregation-more-section-content'>{this.props.content}</div>}
+        />
+      </div>
     );
-  }
 
-  private getPieces()
-  {
-    //
   }
-
 }
 
-export default PathfinderFilterLine;
+export default PathfinderAdvancedLine;

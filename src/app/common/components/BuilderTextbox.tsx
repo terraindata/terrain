@@ -240,7 +240,6 @@ class BuilderTextbox extends TerrainComponent<Props>
     // {
     //   value = +value;
     // }
-
     Actions.change(this.props.keyPath, value);
     this.props.onChange && this.props.onChange(value);
   }

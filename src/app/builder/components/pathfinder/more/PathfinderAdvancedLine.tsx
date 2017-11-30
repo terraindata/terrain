@@ -57,14 +57,14 @@ import BuilderActions from 'app/builder/data/BuilderActions';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import Dropdown from 'app/common/components/Dropdown';
 import FadeInOut from 'app/common/components/FadeInOut';
+import MapComponent from 'app/common/components/MapComponent';
 import MultiInput from 'app/common/components/MultiInput';
 import RadioButtons, { RadioButtonOption } from 'app/common/components/RadioButtons';
 import RangesInput from 'app/common/components/RangesInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
+import Util from 'app/util/Util';
 import { ADVANCED } from '../PathfinderTypes';
 import { AdvancedDisplays } from './PathfinderAggregationDisplay';
-import MapComponent from 'app/common/components/MapComponent';
-import Util from 'app/util/Util';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
@@ -156,8 +156,8 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
             keyPath={this.props.keyPath.push(item.key)}
             options={item.options}
             selectedIndex={item.options.indexOf(this.props.advancedData.get(item.key))}
-          />
-        break
+          />;
+        break;
       case 'map':
         content =
           <div className='pf-advanced-map'>
@@ -173,7 +173,8 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
               textKeyPath={this.props.keyPath.push(item.textKey)}
               hideSearchSettings={true}
             />
-          </div>
+          </div>;
+        break;
       default:
     }
 
@@ -185,7 +186,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         })}
         key={i}
       >
-        <span> {item.text}</span>
+        {item.text && <span> {item.text}</span>}
         {content}
       </div>, { title: item.tooltipText, key: i });
   }

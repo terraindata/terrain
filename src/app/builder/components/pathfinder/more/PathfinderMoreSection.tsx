@@ -68,6 +68,7 @@ export interface Props
   pathfinderContext: PathfinderContext;
   more: More;
   keyPath: KeyPath;
+  hideTitle?: boolean;
 }
 
 class PathfinderMoreSection extends TerrainComponent<Props>
@@ -135,10 +136,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       <div
         className='pf-section pf-more-section'
       >
-        <PathfinderSectionTitle
-          title={PathfinderText.moreSectionTitle}
-          text={PathfinderText.moreSectionSubtitle}
-        />
+        {!this.props.hideTitle &&
+          <PathfinderSectionTitle
+            title={PathfinderText.moreSectionTitle}
+            text={PathfinderText.moreSectionSubtitle}
+          />
+        }
         <DragAndDrop
           draggableItems={this.getAggregationLines()}
           onDrop={this.handleLinesReorder}
