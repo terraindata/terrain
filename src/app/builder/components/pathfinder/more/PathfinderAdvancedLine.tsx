@@ -76,7 +76,7 @@ export interface Props
   canEdit: boolean;
   fieldName: string;
   // When a radioKey is changed, call this function to update elasticType of parent aggregeation
-  onRadioChange?: (key: string) => void;
+  onRadioChange?: (key: string, radioKey?: string) => void;
 }
 
 export class PathfinderAdvancedLine extends TerrainComponent<Props>
@@ -208,6 +208,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           options={options}
           keyPath={this.props.keyPath.push(radioKey)}
           onSelectOption={this.props.onRadioChange}
+          radioKey={radioKey}
         />
       );
     }

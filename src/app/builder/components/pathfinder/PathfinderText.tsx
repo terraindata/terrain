@@ -147,7 +147,7 @@ export const PathfinderText = {
       tooltipText1: 'How much to offset the bars of the data from the lower bound',
       text2: 'Lower Bound',
       tooltipText2: 'The lower bound for values of the selected field',
-      text3: 'Upper Bounda',
+      text3: 'Upper Bound',
       tooltipText3: 'The upper bound for values of the selected field',
     },
     minDocCount: {

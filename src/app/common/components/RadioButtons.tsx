@@ -59,8 +59,9 @@ export interface Props
 {
   selected: string;
   options: List<RadioButtonOption>;
-  onSelectOption?: (key?: string) => void;
+  onSelectOption?: (key?: string, radioKey?: string) => void;
   keyPath?: KeyPath;
+  radioKey?: string;
 }
 
 class RadioButtons extends TerrainComponent<Props>
@@ -70,7 +71,7 @@ class RadioButtons extends TerrainComponent<Props>
   {
     if (this.props.onSelectOption !== undefined)
     {
-      this.props.onSelectOption(option);
+      this.props.onSelectOption(option, this.props.radioKey);
     }
     if (this.props.keyPath !== undefined)
     {

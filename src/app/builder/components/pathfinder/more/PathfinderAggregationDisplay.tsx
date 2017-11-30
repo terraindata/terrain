@@ -176,7 +176,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         text: PathfinderText.aggregation.extendedRange.text1,
         inputType: 'single',
         tooltipText: PathfinderText.aggregation.extendedRange.tooltipText1,
-        key: 'interval',
+        key: 'offset',
       },
       {
         text: PathfinderText.aggregation.extendedRange.text2,
