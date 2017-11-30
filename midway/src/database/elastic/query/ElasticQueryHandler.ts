@@ -48,6 +48,7 @@ import clarinet = require('clarinet');
 import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
 import * as _ from 'lodash';
 import { Readable } from 'stream';
+import * as util from 'util';
 import * as winston from 'winston';
 
 import * as Elastic from 'elasticsearch';
@@ -78,6 +79,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
   public async handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>
   {
+    console.log('handleQuery ' + JSON.stringify(request, null, 2));
     const type = request.type;
 
     /* if the body is a string, parse it as JSON
@@ -121,6 +123,8 @@ export default class ElasticQueryHandler extends QueryHandler
           request.type = 'search';
           return this.handleQuery(request);
         }
+
+        console.log('calling handleGroupJoin');
         return this.handleGroupJoin(request);
 
       case 'deleteTemplate':
@@ -144,13 +148,14 @@ export default class ElasticQueryHandler extends QueryHandler
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
-  public async handleGroupJoin(request: QueryRequest): Promise<QueryResponse | Readable>
+  public async handleGroupJoin(request: QueryRequest): Promise<QueryResponse>
   {
     const parentQuery: Elastic.SearchParams = request.body as Elastic.SearchParams;
+    console.log('inside handleGroupJoin ' + JSON.stringify(parentQuery, null, 2));
     const childQuery = parentQuery['groupJoin'];
     parentQuery['groupJoin'] = undefined;
 
-    return new Promise<QueryResponse | Readable>(async (resolve, reject) =>
+    return new Promise<QueryResponse>(async (resolve, reject) =>
     {
       const client: ElasticClient = this.controller.getClient();
       const parentResults = await new Promise<QueryResponse>((res, rej) =>
@@ -158,16 +163,26 @@ export default class ElasticQueryHandler extends QueryHandler
         client.search(parentQuery, this.makeQueryCallback(res, rej));
       });
 
+      console.log('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
+
       const subQueries = Object.keys(childQuery);
       const promises: Array<Promise<any>> = [];
       for (const subQuery of subQueries)
       {
-        promises.push(
-          this.handleGroupJoinSubQuery(subQuery, parentResults),
-        );
+        try
+        {
+          const promise = this.handleGroupJoinSubQuery(childQuery[subQuery], parentResults);
+          promises.push(promise);
+        }
+        catch (e)
+        {
+          reject(e);
+        }
       }
 
       const subQueryResults = Promise.all(promises);
+      console.log('subQueryResults for handleGroupJoin: ' + JSON.stringify(subQueryResults, null, 2));
+
       for (const r of parentResults.result.hits)
       {
         for (let i = 0; i < subQueries.length; ++i)
@@ -176,40 +191,57 @@ export default class ElasticQueryHandler extends QueryHandler
         }
       }
 
-      const qb = this.makeQueryCallback(resolve, reject);
-      qb(null, parentResults);
+      console.log('parentResults (annotated with subQueryResults): ' + JSON.stringify(parentResults.result));
+
+      if (parentResults.hasError())
+      {
+        reject(parentResults);
+      }
+      else
+      {
+        resolve(parentResults);
+      }
     });
   }
 
   private handleGroupJoinSubQuery(query: string, parentResults: any)
   {
-    const body: any[] = [];
-
-    // todo: optimization to avoid repeating index and type if they're the same
-    // const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
-    // const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
-
-    const parser = new ESJSONParser(query, true);
-    const valueInfo = parser.getValueInfo();
-
-    if (parser.hasError())
-    {
-      const errors = parser.getErrors();
-      throw errors;
-    }
-
-    for (const r of parentResults.result.hits)
-    {
-      const header = {};
-      body.push(header);
-
-      const queryStr = ESParameterFiller.generate(valueInfo, { parent: r });
-      body.push({ query: this.getQueryBody(queryStr) });
-    }
-
-    const client: ElasticClient = this.controller.getClient();
     return new Promise<QueryResponse>((resolve, reject) =>
     {
+      const body: any[] = [];
+
+      // todo: optimization to avoid repeating index and type if they're the same
+      // const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
+      // const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
+
+      console.log('subQuery: ' + query);
+
+      const parser = new ESJSONParser(query, true);
+      const valueInfo = parser.getValueInfo();
+
+      if (parser.hasError())
+      {
+        for (const e of parser.getErrors())
+        {
+          winston.error(util.inspect(e));
+        }
+        reject(parser.getErrors());
+      }
+
+      for (const r of parentResults.result.hits.hits)
+      {
+        console.log('parentObject ' + JSON.stringify(r._source, null, 2));
+        const header = {};
+        body.push(header);
+
+        const queryStr = ESParameterFiller.generate(valueInfo, { parent: r._source });
+        console.log('subQuery after parameters replaced: ' + queryStr);
+        body.push({ query: this.getQueryBody(queryStr) });
+      }
+
+      console.log('bulk msearch query: ' + JSON.stringify(body, null, 2));
+
+      const client: ElasticClient = this.controller.getClient();
       client.msearch(
         {
           body,
@@ -272,6 +304,14 @@ export default class ElasticQueryHandler extends QueryHandler
               QueryError.fromElasticQueryError(error).getMidwayErrors());
           resolve(res);
         }
+        else if (QueryError.isESParserError(error))
+        {
+          const res: QueryResponse =
+            new QueryResponse(
+              {},
+              QueryError.fromESParserError(error).getMidwayErrors());
+          resolve(res);
+        }
         else
         {
           reject(error); // this will be handled by RouteError.RouteErrorHandler
@@ -281,7 +321,7 @@ export default class ElasticQueryHandler extends QueryHandler
       {
         if (typeof response !== 'object')
         {
-          winston.error('The response from the Elastic Search is not an object, ' + JSON.stringify(response));
+          winston.error('The response from Elasticsearch is not an object, ' + JSON.stringify(response));
           response = { response };
         }
         const res: QueryResponse = new QueryResponse(response);
