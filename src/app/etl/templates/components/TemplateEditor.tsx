@@ -88,7 +88,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
     return (
       <div className='template-editor-root-container'>
         <TemplateEditorField
-          isRoot={true}
           keyPath={List([])}
           field={template.rootField}
         />

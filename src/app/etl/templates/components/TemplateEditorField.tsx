@@ -58,7 +58,6 @@ import './TemplateEditorField.less';
 
 export interface Props
 {
-  isRoot: boolean;
   keyPath: KeyPath;
   field: TemplateField;
   // below from container
@@ -67,32 +66,16 @@ export interface Props
 }
 
 @Radium
-class TemplateEditorField extends TerrainComponent<Props>
+class TemplateEditorFieldC extends TerrainComponent<Props>
 {
-  public renderFieldSettings()
-  {
-    const { field } = this.props;
-    return (
-      <div className='template-editor-field'
-          style={[
-            backgroundColor(Colors().bg3),
-            borderColor(Colors().border1)
-          ]}
-      >
-        Name: {`[${field.name}]`}
-      </div>
-    );
-  }
-
   public renderChildFields()
   {
     const { field, keyPath } = this.props;
 
     return field.children.map((value, index) => {
-      const newKeyPath = keyPath.push(index);
+      const newKeyPath = keyPath.push('children', index);
       return (
         <TemplateEditorField
-          isRoot={false}
           keyPath={newKeyPath}
           field={value}
           key={index}
@@ -115,13 +98,28 @@ class TemplateEditorField extends TerrainComponent<Props>
     );
   }
 
+  public renderFieldSettings()
+  {
+    const { field } = this.props;
+    return (
+      <div className='template-editor-field'
+        style={[
+          backgroundColor(Colors().bg3),
+          borderColor(Colors().border1)
+        ]}
+      >
+        Name: {`[${field.name}]`}
+      </div>
+    );
+  }
+
   public render()
   {
-    const { field, isRoot, keyPath } = this.props;
+    const { field, keyPath } = this.props;
     return (
       <div className='template-editor-field-container'>
-        {!isRoot && this.renderFieldSettings()}
-        {field.children.size > 0 &&
+        {!this.isRoot() && this.renderFieldSettings()}
+        {field.children.size >= 0 &&
           <div className='template-editor-children-container'>
             {this.renderChildFields()}
             {this.renderCreateNewFieldButton()}
@@ -133,39 +131,42 @@ class TemplateEditorField extends TerrainComponent<Props>
 
   public handleCreateNewField()
   {
-    const { field, keyPath, act } = this.props;
-    const nextIndex = field.children.size;
-    const newKeyPath = keyPath.push('children', nextIndex);
-    const newField = _TemplateField({name: `new field ${nextIndex}`});
+    const { keyPath, act } = this.props;
+    const newField = _TemplateField({name: `new field hello there`});
     act({
       actionType: 'createField',
-      keyPath: newKeyPath,
+      sourcePath: keyPath,
       field: newField,
     });
-    this.editField('isPrimaryKey', false);
   }
 
   public handleFieldClicked()
   {
     const { field, keyPath, act } = this.props;
-    this.editField('isPrimaryKey', !field.isPrimaryKey);
   }
 
-  // proxy to edit the field in the store
-  private editField<K extends keyof TemplateField>(key: K, value: TemplateField[K])
+  // helper to calling setIn() on the TemplateField in the store
+  private set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
   {
     const { act, keyPath } = this.props;
     act({
       actionType: 'updateField',
-      sourceKeyPath: keyPath,
+      sourcePath: keyPath,
       key,
       value,
     });
   }
+
+  private isRoot(): boolean
+  {
+    return this.props.keyPath.size === 0;
+  }
 }
 
-export default Util.createTypedContainer(
-  TemplateEditorField,
+const TemplateEditorField = Util.createTypedContainer(
+  TemplateEditorFieldC,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );
+
+export default TemplateEditorField;

@@ -77,12 +77,12 @@ export interface TemplateEditorActionTypes
   };
   createField: {
     actionType: 'createField';
-    keyPath: KeyPath;
-    field: TemplateField;
+    sourcePath: KeyPath;
+    field?: TemplateField;
   };
   updateField: {
     actionType: 'updateField';
-    sourceKeyPath: KeyPath;
+    sourcePath: KeyPath;
     key: string | number;
     value: any;
   };
@@ -105,12 +105,15 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       return state;
     },
     createField: (state, action) => {
-      const keyPath = List<string | number>(['template', 'rootField']).push(... action.payload.keyPath.toJS());
-      return state.setIn(keyPath, action.payload.field);
+      const fieldKeyPath = List<string | number>(['template', 'rootField'])
+        .push(... action.payload.sourcePath.toJS());
+      const creatingField: TemplateField = state.getIn(fieldKeyPath);
+      const nextIndex = creatingField.children.size;
+      return state.setIn(fieldKeyPath.push('children', nextIndex), action.payload.field);
     },
     updateField: (state, action) => {
       const keyPath = List<string | number>(['template', 'rootField'])
-        .push(... action.payload.sourceKeyPath.toJS(), action.payload.key);
+        .push(... action.payload.sourcePath.toJS(), action.payload.key);
       return state.setIn(keyPath, action.payload.value);
     },
   }
