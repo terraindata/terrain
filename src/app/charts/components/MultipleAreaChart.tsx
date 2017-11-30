@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import TerrainVictoryLabel from 'charts/components/victory-custom-components/TerrainVictoryLabel';
 import TerrainVictoryPin from 'charts/components/victory-custom-components/TerrainVictoryPin';
 import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
@@ -51,7 +50,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
-import { isEqual } from 'lodash';
+import { omit } from 'lodash';
 import ContainerDimensions from 'react-container-dimensions';
 import ColorManager from 'util/ColorManager';
 import Util from 'util/Util';
@@ -201,13 +200,14 @@ interface State
 
 const CustomLabel = (props) => {
   return (
-  <text x={props.x} y={props.y} style={props.style} >
-    <tspan style={{ fontWeight: 'bold' }}>{props.datum.value}</tspan>
-    <tspan dx={10} style={{ fill: 'white' }}>({props.datum.name})</tspan>
-  </text>
-)};
+    <text dy={5} x={props.x} y={props.y} style={props.style} >
+      <tspan style={{ fontWeight: 'bold' }}>{props.datum.value}</tspan>
+      <tspan dx={10} style={{ fill: 'white' }}>({props.datum.name})</tspan>
+    </text>
+  );
+};
 
-class CustomTooltip extends TerrainComponent<{xDataKey: string, datum?: any, text?: any}> {
+class CustomTooltip extends TerrainComponent<{style?: any, xDataKey: string, datum?: any, text?: any}> {
 
   public shouldComponentUpdate()
   {
@@ -225,7 +225,7 @@ class CustomTooltip extends TerrainComponent<{xDataKey: string, datum?: any, tex
         value: parsedText[1],
         name: parsedText[2],
         symbol: { fill: parsedText[3] },
-        labels: { fill: parsedText[3] },
+        labels: { ...omit(this.props.style[0], ['textAnchor']), fill: parsedText[3] },
       };
     });
 
@@ -234,10 +234,12 @@ class CustomTooltip extends TerrainComponent<{xDataKey: string, datum?: any, tex
     const dateString = date.toISOString();
     const title = Util.formatDate(dateString);
 
+    const labelComponent = <CustomLabel />;
+
     return (
       <VictoryLegend
+        theme={TerrainVictoryTheme}
         standalone={false}
-        containerComponent={<g />}
         x={10}
         y={50}
         padding={0}
@@ -247,7 +249,7 @@ class CustomTooltip extends TerrainComponent<{xDataKey: string, datum?: any, tex
         orientation={'vertical'}
         style={styles.topChart.tooltipLegend}
         title={title}
-        labelComponent={<CustomLabel />}
+        labelComponent={labelComponent}
       />
     );
   }
@@ -566,26 +568,6 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                   /> : null
                 }
                 {legend}
-                {activeData.length > 0 ?
-                  <VictoryLegend
-                    y={50}
-                    x={10}
-                    padding={0}
-                    borderPadding={styles.topChart.tooltipLegendBorderPadding}
-                    name="tooltip"
-                    gutter={20}
-                    data={activeData.map(p => ({
-                      name: p.name,
-                      value: p[yDataKey],
-                      symbol: { fill: this.getDatasetColor(p.id) },
-                      labels: { fill: this.getDatasetColor(p.id) },
-                    }))}
-                    orientation={'vertical'}
-                    style={styles.topChart.tooltipLegend}
-                    title={activeDataTitle}
-                    labelComponent={<CustomLabel yDataKey={yDataKey} />}
-                  /> : null
-                }
               </VictoryChart>
             )}
           </ContainerDimensions>
