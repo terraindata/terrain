@@ -739,7 +739,7 @@ describe('Query route tests', () =>
         accessToken: 'ImAnAdmin',
         body: {
           database: 1,
-          type: 'groupJoin',
+          type: 'search',
           body: {
             from: 0,
             size: 5,

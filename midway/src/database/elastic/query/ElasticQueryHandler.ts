@@ -102,30 +102,20 @@ export default class ElasticQueryHandler extends QueryHandler
     switch (type)
     {
       case 'search':
-        if (request.streaming === true)
-        {
-          return new ElasticsearchScrollStream(client.getDelegate(), request.body);
-        }
-
         if (request.body['groupJoin'] !== undefined)
         {
           return this.handleGroupJoin(request);
+        }
+
+        if (request.streaming === true)
+        {
+          return new ElasticsearchScrollStream(client.getDelegate(), request.body);
         }
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
           client.search(request.body as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
         });
-
-      case 'groupJoin':
-        if (request.body['groupJoin'] === undefined)
-        {
-          request.type = 'search';
-          return this.handleQuery(request);
-        }
-
-        winston.debug('calling handleGroupJoin');
-        return this.handleGroupJoin(request);
 
       case 'deleteTemplate':
       case 'getTemplate':
@@ -151,7 +141,6 @@ export default class ElasticQueryHandler extends QueryHandler
   private async handleGroupJoin(request: QueryRequest): Promise<QueryResponse>
   {
     const parentQuery: Elastic.SearchParams = request.body as Elastic.SearchParams;
-    winston.debug('inside handleGroupJoin ' + JSON.stringify(parentQuery, null, 2));
     const childQuery = parentQuery['groupJoin'];
     parentQuery['groupJoin'] = undefined;
 
