@@ -44,93 +44,48 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export default class TastySchema
+import * as pg from 'pg';
+import PostgreSQLConfig from '../PostgreSQLConfig';
+import PostgreSQLController from '../PostgreSQLController';
+
+/**
+ * An client which acts as a selective isomorphic wrapper around
+ * the postgres js API
+ */
+class PostgreSQLClient
 {
-  public static fromElasticTree(elasticTree: object): TastySchema
+  private controller: PostgreSQLController;
+  private config: PostgreSQLConfig;
+  private delegate: pg.Pool;
+
+  constructor(controller: PostgreSQLController, config: PostgreSQLConfig)
   {
-    const schema: TastySchema = new TastySchema();
-    Object.keys(elasticTree).map((db: string) =>
+    this.controller = controller;
+    this.config = config;
+    this.delegate = new pg.Pool(config);
+
+    this.delegate.on('acquire', (connection: pg.Client) =>
     {
-      schema.tree[db] = {};
-      Object.keys(elasticTree[db]['mappings']).map((mapping: string) =>
-      {
-        schema.tree[db][mapping] = {};
-        Object.keys(elasticTree[db]['mappings'][mapping]['properties']).map(
-          (field: string) =>
-          {
-            schema.tree[db][mapping][field] =
-              elasticTree[db]['mappings'][mapping]['properties'][field];
-          });
-      });
+      this.controller.log('PostgreSQLClient', 'Connection acquired ');
     });
-    return schema;
-  }
 
-  public static fromSQLResultSet(resultSet: any): TastySchema
-  {
-    const schema: TastySchema = new TastySchema();
-    resultSet.forEach((row) =>
+    this.delegate.on('remove' as any, (connection: pg.Client) =>
     {
-      if (schema.tree[row.table_schema] === undefined)
-      {
-        schema.tree[row.table_schema] = {};
-      }
-      if (schema.tree[row.table_schema][row.table_name] === undefined)
-      {
-        schema.tree[row.table_schema][row.table_name] = {};
-      }
-      schema.tree[row.table_schema][row.table_name][row.column_name] =
-        {
-          type: row.data_type,
-        };
+      this.controller.log('PostgreSQLClient', 'Connection released ');
     });
-    return schema;
   }
 
-  private tree: object;
-
-  constructor(tree: object = {})
+  public query(queryString: string, params?: any[], callback?: any): pg.Query
   {
-    this.tree = tree;
+    this.controller.log('PostgreSQLClient.query', queryString, params);
+    return this.delegate.query(queryString, params as any, callback);
   }
 
-  public toString(pretty: boolean = false): string
+  public end(callback: () => void): void
   {
-    return JSON.stringify(this.tree, null, pretty ? 2 : 0);
-  }
-
-  public databases(): object
-  {
-    return this.tree;
-  }
-
-  public databaseNames(): string[]
-  {
-    return Object.keys(this.tree);
-  }
-
-  public tables(database: string): object
-  {
-    return this.tree[database];
-  }
-
-  public tableNames(database: string): string[]
-  {
-    const treeDB: object = this.tree[database];
-    if (treeDB === undefined)
-    {
-      return [];
-    }
-    return Object.keys(treeDB);
-  }
-
-  public fields(database: string, table: string): object
-  {
-    return this.tree[database][table];
-  }
-
-  public fieldNames(database: string, table: string): string[]
-  {
-    return Object.keys(this.tree[database][table]);
+    this.controller.log('PostgreSQLClient.end');
+    return this.delegate.end(callback);
   }
 }
+
+export default PostgreSQLClient;
