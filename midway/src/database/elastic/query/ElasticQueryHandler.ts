@@ -79,7 +79,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
   public async handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>
   {
-    console.log('handleQuery ' + JSON.stringify(request, null, 2));
+    winston.debug('handleQuery ' + JSON.stringify(request, null, 2));
     const type = request.type;
 
     /* if the body is a string, parse it as JSON
@@ -124,7 +124,7 @@ export default class ElasticQueryHandler extends QueryHandler
           return this.handleQuery(request);
         }
 
-        console.log('calling handleGroupJoin');
+        winston.debug('calling handleGroupJoin');
         return this.handleGroupJoin(request);
 
       case 'deleteTemplate':
@@ -151,7 +151,7 @@ export default class ElasticQueryHandler extends QueryHandler
   public async handleGroupJoin(request: QueryRequest): Promise<QueryResponse>
   {
     const parentQuery: Elastic.SearchParams = request.body as Elastic.SearchParams;
-    console.log('inside handleGroupJoin ' + JSON.stringify(parentQuery, null, 2));
+    winston.debug('inside handleGroupJoin ' + JSON.stringify(parentQuery, null, 2));
     const childQuery = parentQuery['groupJoin'];
     parentQuery['groupJoin'] = undefined;
 
@@ -163,7 +163,7 @@ export default class ElasticQueryHandler extends QueryHandler
         client.search(parentQuery, this.makeQueryCallback(res, rej));
       });
 
-      console.log('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
+      winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
 
       const subQueries = Object.keys(childQuery);
       const promises: Array<Promise<any>> = [];
@@ -180,27 +180,23 @@ export default class ElasticQueryHandler extends QueryHandler
         }
       }
 
-      const subQueryResults = Promise.all(promises);
-      console.log('subQueryResults for handleGroupJoin: ' + JSON.stringify(subQueryResults, null, 2));
-
-      for (const r of parentResults.result.hits)
-      {
-        for (let i = 0; i < subQueries.length; ++i)
-        {
-          r[subQueries[i]] = subQueryResults[i];
-        }
-      }
-
-      console.log('parentResults (annotated with subQueryResults): ' + JSON.stringify(parentResults.result));
-
+      const subQueryResults = await Promise.all(promises);
+      winston.debug('subQueryResults for handleGroupJoin: ' + JSON.stringify(subQueryResults, null, 2));
       if (parentResults.hasError())
       {
         reject(parentResults);
       }
-      else
+
+      for (let i = 0; i < parentResults.result.hits.hits.length; ++i)
       {
-        resolve(parentResults);
+        for (let j = 0; j < subQueries.length; ++j)
+        {
+          parentResults.result.hits.hits[i][subQueries[j]] = subQueryResults[j].result.responses[i].hits.hits;
+        }
       }
+
+      winston.debug('parentResults (annotated with subQueryResults): ' + JSON.stringify(parentResults.result, null, 2));
+      resolve(parentResults);
     });
   }
 
@@ -214,32 +210,30 @@ export default class ElasticQueryHandler extends QueryHandler
       // const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
       // const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
 
-      console.log('subQuery: ' + query);
+      winston.debug('subQuery: ' + query);
 
       const parser = new ESJSONParser(query, true);
       const valueInfo = parser.getValueInfo();
 
       if (parser.hasError())
       {
-        for (const e of parser.getErrors())
+        const errors = parser.getErrors();
+        for (const e of errors)
         {
           winston.error(util.inspect(e));
         }
-        reject(parser.getErrors());
+        reject(errors[0]);
       }
 
       for (const r of parentResults.result.hits.hits)
       {
-        console.log('parentObject ' + JSON.stringify(r._source, null, 2));
+        winston.debug('parentObject ' + JSON.stringify(r._source, null, 2));
         const header = {};
         body.push(header);
 
         const queryStr = ESParameterFiller.generate(valueInfo, { parent: r._source });
-        console.log('subQuery after parameters replaced: ' + queryStr);
-        body.push({ query: this.getQueryBody(queryStr) });
+        body.push(this.getQueryBody(queryStr));
       }
-
-      console.log('bulk msearch query: ' + JSON.stringify(body, null, 2));
 
       const client: ElasticClient = this.controller.getClient();
       client.msearch(
