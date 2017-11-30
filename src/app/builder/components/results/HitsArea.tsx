@@ -574,11 +574,17 @@ class HitsArea extends TerrainComponent<Props>
         </InfiniteScroll>
       );
     }
-    const mapHeight = Math.min(this.state.mapHeight, MAP_MAX_HEIGHT);
+
+    let mapHeight = Math.min(this.state.mapHeight, MAP_MAX_HEIGHT);
+    if (_.keys(this.locations).length === 0)
+    {
+      mapHeight = 0;
+    }
+
     return (
       <div
         className='results-area-results-wrapper'
-        style={{ height: `calc(100% - ${mapHeight}px)` }}
+        style={{ height: `calc(100% - ${mapHeight}px - 60px)` }}
       >
         {
           hitsContent
