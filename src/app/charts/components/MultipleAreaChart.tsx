@@ -203,9 +203,55 @@ const CustomLabel = (props) => {
   return (
   <text x={props.x} y={props.y} style={props.style} >
     <tspan style={{ fontWeight: 'bold' }}>{props.datum.value}</tspan>
-    <tspan dx={20} style={{ fill: 'white' }}>({props.datum.name})</tspan>
+    <tspan dx={10} style={{ fill: 'white' }}>({props.datum.name})</tspan>
   </text>
 )};
+
+class CustomTooltip extends TerrainComponent<{xDataKey: string, datum?: any, text?: any}> {
+
+  public shouldComponentUpdate()
+  {
+    return true;
+  }
+
+  public render()
+  {
+    const { datum, text, xDataKey } = this.props;
+    const data = text.map(t =>
+    {
+      const parsedText = t.split('|');
+      return {
+        id: parsedText[0],
+        value: parsedText[1],
+        name: parsedText[2],
+        symbol: { fill: parsedText[3] },
+        labels: { fill: parsedText[3] },
+      };
+    });
+
+    const timestamp = datum[xDataKey];
+    const date = new Date(timestamp);
+    const dateString = date.toISOString();
+    const title = Util.formatDate(dateString);
+
+    return (
+      <VictoryLegend
+        standalone={false}
+        containerComponent={<g />}
+        x={10}
+        y={50}
+        padding={0}
+        borderPadding={styles.topChart.tooltipLegendBorderPadding}
+        gutter={20}
+        data={data}
+        orientation={'vertical'}
+        style={styles.topChart.tooltipLegend}
+        title={title}
+        labelComponent={<CustomLabel />}
+      />
+    );
+  }
+};
 
 export default class MultipleAreaChart extends TerrainComponent<Props> {
   public static defaultProps = {
@@ -277,60 +323,44 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
   public renderData()
   {
     const { datasets, xDataKey, yDataKey } = this.props;
-    const { visibleDatasets, highlightDataset } = this.state;
+    const { visibleDatasets } = this.state;
     const areas = [];
     const scatters = [];
     const lines = [];
-
-    let areaToHightlight = null;
-    let scatterToHightlight = null;
 
     datasets.forEach((ds, key) =>
     {
       if (visibleDatasets.includes(key) && ds.data.length > 0)
       {
-        if (key !== highlightDataset || highlightDataset === null)
-        {
-          const datasetColor = this.getDatasetColor(key);
-          areas.push(
-            <VictoryArea
-              key={key}
-              name={`area-${key}`}
-              style={{ data: { fill: datasetColor } }}
-              data={ds.data.map((d) => ({
-                ...d,
-                l: true,
-                id: ds.id,
-                name: ds.label,
-              }))}
-              interpolation={config.topChart.interpolation}
-              x={xDataKey}
-              y={yDataKey}
-            />,
-          );
-          scatters.push(
-            <VictoryScatter
-              key={key}
-              style={styles.topChart.scatters(datasetColor)}
-              data={ds.data}
-              size={(datum, active) => active ? 3 : 0}
-              x={xDataKey}
-              y={yDataKey}
-            />,
-          );
-        }
+        const datasetColor = this.getDatasetColor(key);
+        areas.push(
+          <VictoryArea
+            key={key}
+            name={`area-${key}`}
+            style={{ data: { fill: datasetColor } }}
+            data={ds.data.map((d) => ({
+              ...d,
+              l: true,
+              id: ds.id,
+              name: ds.label,
+            }))}
+            interpolation={config.topChart.interpolation}
+            x={xDataKey}
+            y={yDataKey}
+          />,
+        );
+        scatters.push(
+          <VictoryScatter
+            key={key}
+            style={styles.topChart.scatters(datasetColor)}
+            data={ds.data}
+            size={(datum, active) => active ? 3 : 0}
+            x={xDataKey}
+            y={yDataKey}
+          />,
+        );
       }
     });
-
-    if (areaToHightlight !== null)
-    {
-      areas.push(areaToHightlight);
-    }
-
-    if (scatterToHightlight !== null)
-    {
-      scatters.push(scatterToHightlight);
-    }
 
     return { areas, scatters };
   }
@@ -456,47 +486,6 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     ];
   }
 
-  public handleDataActivated(points, props) {
-    if (points.length > 0)
-    {
-      const xPoint = props.scale.x(points[0].x);
-      const yPoint = props.scale.y(points[0].y);
-      const yZeroPoint = props.scale.y(0);
-      const activeDataVerticalLine = {
-        x1: xPoint,
-        y1: styles.topChart.padding.top,
-        x2: xPoint,
-        y2: yZeroPoint,
-      };
-      this.setState(() => ({
-        activeDataTitle: this.formatDate(points[0].x),
-        activeData: points.filter(p => p.l),
-        activeDataVerticalLine,
-      }));
-    }
-
-    return points;
-  }
-
-  public handleDataDeactivated(points, props) {
-    if (!isEqual(points, props.activePoints))
-    {
-      this.setState(() => ({
-        activeData: [],
-      }));
-    }
-
-    return points;
-  }
-
-  public formatDate(timestamp)
-  {
-    const date = new Date(timestamp);
-    const dateString = date.toISOString();
-
-    return Util.formatDate(dateString);
-  }
-
   public render()
   {
     const { datasets, xDataKey, yDataKey, domain } = this.props;
@@ -533,10 +522,10 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                     responsive={false}
                     zoomDimension='x'
                     voronoiDimension='x'
+                    labels={d => d.l ? `${d.id}|${d.y}|${d.name}|${this.getDatasetColor(d.id)}` : null}
+                    labelComponent={<CustomTooltip xDataKey={xDataKey} />}
                     zoomDomain={this.state.zoomDomain}
                     onZoomDomainChange={this.handleZoom}
-                    onActivated={this.handleDataActivated}
-                    onDeactivated={this.handleDataDeactivated}
                   />
                 }
                 events={[
