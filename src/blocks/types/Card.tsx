@@ -96,6 +96,7 @@ export interface Card extends IRecord<Card>
   tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
   errors: List<string>;
   keyDisplayType: DisplayType;
+  hidden: boolean;
 
   // the following fields are excluded from the server save
   static: {
@@ -198,6 +199,7 @@ export const _card = (config: CardConfig) =>
     id: '',
     errors: Immutable.List([]),
     keyDisplayType: DisplayType.TEXT,
+    hidden: false,
     _isCard: true,
     _isBlock: true,
     closed: false,

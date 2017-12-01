@@ -119,34 +119,80 @@ export class FilterUtils
     return block;
   }
 
-  public static mergeRowsWithBlock(block: Block, rows: Block[]): Immutable.List<Block>
+  public static isNotFilterBlock(queryBlock: Block)
   {
-    let cards = block.cards.filter((queryBlock) =>
+    if (queryBlock.type !== 'eqlquery')
     {
-      if (queryBlock.type !== 'eqlquery')
-      {
-        return true;
-      }
-      if (queryBlock.cards.find((termBlock) =>
-      {
-        if ((termBlock.key === 'term' && termBlock.type === 'eqlterm_query') ||
-          (termBlock.key === 'range' && termBlock.type === 'eqlterm_range') ||
-          (termBlock.key === 'match' && termBlock.type === 'eqlterm_range'))
-        {
-          return true;
-        }
-        return false;
-      }) === undefined)
+      return true;
+    }
+    if (queryBlock.cards.find((termBlock) =>
+    {
+      if ((termBlock.key === 'term' && termBlock.type === 'eqlterm_query') ||
+        (termBlock.key === 'range' && termBlock.type === 'eqlterm_range') ||
+        (termBlock.key === 'match' && termBlock.type === 'eqlterm_range'))
       {
         return true;
       }
       return false;
-    });
+    }) === undefined)
+    {
+      return true;
+    }
+    return false;
+  }
+
+  public static mergeRowsWithBlock(block: Block, rows: Block[]): Immutable.List<Block>
+  {
+    let cards = block.cards.filter((queryBlock) => FilterUtils.isNotFilterBlock(queryBlock));
     rows.map((rowBlock) =>
     {
       cards = cards.push(FilterUtils.filterRowToQueryCard(rowBlock));
     });
     return cards;
+  }
+
+  public static hideFilterBlocks(block: Block): Block
+  {
+    console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
+    block.cards.map((filterBlock: Block, filterBlockIndex) =>
+    {
+      if (
+        filterBlock.key === 'filter' ||
+        filterBlock.key === 'must' ||
+        filterBlock.key === 'should' ||
+        filterBlock.key === 'must_not'
+      )
+      {
+        if (filterBlock.type === 'eqlquery')
+        {
+          if (FilterUtils.isNotFilterBlock(filterBlock) === false)
+          {
+            // hide filter blocks since they should appear as filter rows
+            if (filterBlock.hidden === false)
+            {
+              block = block.setIn(['cards', filterBlockIndex, 'hidden'], true);
+            }
+          }
+        } else if (filterBlock.type === 'eqlquery[]')
+        {
+          filterBlock.cards.map((queryBlock, index) =>
+          {
+            if (FilterUtils.isNotFilterBlock(queryBlock) === false)
+            {
+              // hide filter blocks since they should appear as filter rows
+              if (queryBlock.hidden === false)
+              {
+                block = block.setIn(['cards', filterBlockIndex, 'cards', index, 'hidden'], true);
+              }
+            }
+          });
+        } else
+        {
+          console.assert(false, 'The card ' + filterBlock.key + ' is ' + filterBlock.type);
+        }
+      }
+    });
+    return block;
   }
 
   public static updateFilterBlocks(block: Block): Block
@@ -173,6 +219,8 @@ export class FilterUtils
           break;
       }
     });
+    // regroup the filter rows first because a new other-filter row added into
+    // the index filter list or the type filter list
     for (const index in filterRowList)
     {
       if (filterRowList.hasOwnProperty(index))
@@ -429,6 +477,8 @@ export const elasticFilter = _card({
       {
         block = FilterUtils.updateFilterBlocks(block);
       }
+      block = FilterUtils.hideFilterBlocks(block);
+      // updating cached index and type
       if (block['indexFilters'].size > 0)
       {
         const indexField = block['indexFilters'].get(0).value;
