@@ -191,7 +191,9 @@ class Dropdown extends TerrainComponent<Props>
     }
 
     let tooltipProps: TooltipProps;
-    if (this.props.tooltips !== undefined && this.props.tooltips.get(index) !== undefined)
+    const { tooltips } = this.props;
+    if (tooltips !== undefined && tooltips.get(index) !== undefined
+      && tooltips.get(index) !== null)
     {
       if (typeof (this.props.tooltips.get(index)) === 'string')
       {

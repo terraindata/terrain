@@ -46,6 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression no-var-requires
 
+// TODO consider showing all options, even when a search text has been entered
+//  so that they can easily change it 
+// and different labels for user inputs, fields, etc.
+
 import './Autocomplete.less';
 
 import * as classNames from 'classnames';
@@ -62,7 +66,7 @@ const InfoIcon = require('./../../../images/icon_info.svg');
 
 export interface Props
 {
-  value: string;
+  value: string | number;
   onChange: (value: string) => void;
   options: List<string>;
   style?: React.CSSProperties;
@@ -100,11 +104,11 @@ class Autocomplete extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-    this.value = props.value;
+    this.value = String(props.value);
     this.state =
       {
         value: props.value === null || props.value === undefined
-          ? '' : props.value,
+          ? '' : String(props.value),
         open: false,
         selectedIndex: -1,
       };
@@ -112,7 +116,7 @@ class Autocomplete extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.value = this.props.value;
+    this.value = String(this.props.value);
     this.setState({
       value: this.props.value,
     });

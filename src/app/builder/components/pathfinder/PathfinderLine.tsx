@@ -135,20 +135,20 @@ export class PathfinderLine extends TerrainComponent<Props>
     return pieces.map((piece, index) =>
     {
       let content = piece as El;
-      let showing = true;
+      let visible = true;
 
-      if (piece['showing'] !== undefined && piece['content'] !== undefined)
+      if (piece['visible'] !== undefined && piece['content'] !== undefined)
       {
         // it is the interface version
         content = piece['content'] as El;
-        showing = piece['showing'] as boolean;
+        visible = piece['visible'] as boolean;
       }
-
+      console.log(content);
       return (
         <div
           className={classNames({
             'pf-piece': true,
-            'pf-piece-hidden': !showing,
+            'pf-piece-hidden': !visible,
           })}
           key={index}
         >

@@ -95,7 +95,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   } = {
     weight: this.props.line.weight,
     expanded: this.props.line.expanded,
-    fieldIndex: this.props.dropdownOptions.map((v) => v.name).toList().indexOf(this.props.line.field),
+    fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
   };
 
   public componentWillReceiveProps(nextProps)
@@ -103,7 +103,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     if (this.props.line !== nextProps.line)
     {
       this.setState({
-        fieldIndex: nextProps.dropdownOptions.map((v) => v.name).toList().indexOf(nextProps.line.field),
+        fieldIndex: nextProps.dropdownOptions.map((v) => v.displayName).toList().indexOf(nextProps.line.field),
         weight: nextProps.line.weight,
         expanded: nextProps.line.expanded,
       });
@@ -232,7 +232,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         />
         <span className='pf-score-line-text'>times</span>
         <Dropdown
-          options={this.props.dropdownOptions.map((v) => v.name).toList()}
+          options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
           selectedIndex={this.state.fieldIndex}
           canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('field')}

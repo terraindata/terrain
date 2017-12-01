@@ -326,7 +326,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
         type: 'fields',
         source,
         schemaState,
-      }).map((option) => option.name).toList();
+      }).map((option) => option.displayName).toList();
     }
     if ((type === undefined || type === '') || FieldType.Any in AggregationTypes.get(type).acceptedTypes)
     {
@@ -430,7 +430,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
         source: this.props.pathfinderContext.source,
         schemaState: this.props.pathfinderContext.schemaState,
       })
-        .map((option) => option.name).toList();
+        .map((option) => option.displayName).toList();
     }
     return (
       <div>
