@@ -55,6 +55,7 @@ import * as stream from 'stream';
 import * as winston from 'winston';
 
 import * as SharedElasticUtil from '../../../../shared/database/elastic/ElasticUtil';
+import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import { FieldTypes } from '../../../../shared/etl/FieldTypes';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
@@ -71,7 +72,7 @@ const importTemplates = new ImportTemplates();
 
 const fieldTypes = new FieldTypes();
 const TastyItems: Items = new Items();
-const typeParser: SharedUtil.CSVTypeParser = new SharedUtil.CSVTypeParser();
+const typeParser: CSVTypeParser = new CSVTypeParser();
 
 export interface ImportConfig extends TemplateBase
 {

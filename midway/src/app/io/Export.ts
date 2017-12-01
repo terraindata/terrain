@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
+import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
@@ -64,7 +65,7 @@ import { TemplateBase } from './templates/Templates';
 const exportTemplates = new ExportTemplates();
 
 const TastyItems: Items = new Items();
-const typeParser: SharedUtil.CSVTypeParser = new SharedUtil.CSVTypeParser();
+const typeParser: CSVTypeParser = new CSVTypeParser();
 
 export interface ExportConfig extends TemplateBase, ExportTemplateConfig
 {
