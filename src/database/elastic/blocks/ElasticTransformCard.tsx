@@ -197,7 +197,7 @@ export const elasticTransform = _card(
         }
         else if (block['mode'] === 'logarithmic' && block['scorePoints'].size === NUM_CURVE_POINTS.logarithmic)
         {
-          data = TransformUtil.getLogarithmicData(numPoints, block['scorePoints'].toJS());
+          data = TransformUtil.getLogarithmicData(numPoints, block['scorePoints'].toJS(), min, max);
         }
         else if (block['mode'] === 'sigmoid' && block['scorePoints'].size === NUM_CURVE_POINTS.sigmoid)
         {
