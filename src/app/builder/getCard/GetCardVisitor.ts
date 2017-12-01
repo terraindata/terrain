@@ -100,7 +100,7 @@ export const KEY_DISPLAY: Display =
     displayType: DisplayType.TEXT,
     key: 'key',
     autoDisabled: true, // TODO consider autocomplete for key?
-    className: 'card-muted-input card-elastic-key-input',
+    className: 'card-muted-input card-elastic-key-input builder-label-card-title-offset',
     component: ElasticKeyBuilderTextbox,
     style: {
       // maxWidth: 100,
@@ -116,8 +116,9 @@ export const STATIC_KEY_DISPLAY: Display =
       maxWidth: 300,
       width: 58,
       fontSize: 16,
+      marginLeft: 75,
     },
-    className: 'card-elastic-key-label',
+    className: 'card-elastic-key-label builder-label-card-title-offset',
   };
 
 /**
@@ -203,6 +204,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           // we should inline this display
           objStatic['display'] = {
             displayType: DisplayType.FLEX,
+            className: '',
             key: null,
             flex: [
               keyDisplay,

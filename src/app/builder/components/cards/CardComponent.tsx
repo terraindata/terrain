@@ -938,10 +938,7 @@ class _CardComponent extends TerrainComponent<Props>
             >
               <div
                 className='card-body'
-                style={{
-                  // shrink the width if the card does not have a title
-                  marginLeft: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
-                }}
+                
               >
                 {
                   content
