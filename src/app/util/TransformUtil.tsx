@@ -141,6 +141,14 @@ const TransformUtil = {
     const y1: number = pointsData[0].y || pointsData[0].score;
     let x2: number = pointsData[1].x || pointsData[1].value;
     const y2: number = pointsData[1].y || pointsData[1].score;
+    if (x >= x2)
+    {
+      return y2;
+    }
+    if (x <= x1)
+    {
+      return y1;
+    }
     if (y1 > y2)
     {
       const yMax = y1 + 0.05;
@@ -197,6 +205,14 @@ const TransformUtil = {
     const x2: number = pointsData[1].x || pointsData[1].value;
     let y2: number = pointsData[1].y || pointsData[1].score;
 
+    if (x >= x2)
+    {
+      return y2;
+    }
+    if (x <= x1)
+    {
+      return y1;
+    }
     const shift = y2 < y1 ? y2 - 0.001 : y1 - 0.001;
     y1 -= shift;
     y2 -= shift;
