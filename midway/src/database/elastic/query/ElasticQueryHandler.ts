@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import clarinet = require('clarinet');
 import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
 import * as _ from 'lodash';
 import { Readable } from 'stream';
@@ -55,6 +54,9 @@ import * as Elastic from 'elasticsearch';
 
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
+import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
+import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryRequest from '../../../../../src/database/types/QueryRequest';
 import QueryResponse from '../../../../../src/database/types/QueryResponse';
@@ -81,40 +83,39 @@ export default class ElasticQueryHandler extends QueryHandler
   {
     winston.debug('handleQuery ' + JSON.stringify(request, null, 2));
     const type = request.type;
-
-    /* if the body is a string, parse it as JSON
-     * NB: this is normally used to detect JSON errors, but could be used generally,
-     * although it is less efficient than just sending the JSON.
-     */
-    if (typeof request.body === 'string')
-    {
-      try
-      {
-        request.body = this.getQueryBody(request.body);
-      }
-      catch (errors)
-      {
-        return new QueryResponse({}, errors);
-      }
-    }
-
     const client: ElasticClient = this.controller.getClient();
     switch (type)
     {
       case 'search':
-        if (request.body['groupJoin'] !== undefined)
+        if (typeof request.body !== 'string')
         {
-          return this.handleGroupJoin(request);
+          throw new Error('Request body must be a string.');
+        }
+
+        let parser: any;
+        try
+        {
+          parser = this.getParsedQuery(request.body);
+        }
+        catch (errors)
+        {
+          return new QueryResponse({}, errors);
+        }
+
+        const body = parser.getValue();
+        if (body['groupJoin'] !== undefined)
+        {
+          return this.handleGroupJoin(parser, body);
         }
 
         if (request.streaming === true)
         {
-          return new ElasticsearchScrollStream(client.getDelegate(), request.body);
+          return new ElasticsearchScrollStream(client.getDelegate(), body);
         }
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          client.search(request.body as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
+          client.search(body as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
         });
 
       case 'deleteTemplate':
@@ -138,11 +139,11 @@ export default class ElasticQueryHandler extends QueryHandler
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
-  private async handleGroupJoin(request: QueryRequest): Promise<QueryResponse>
+  private async handleGroupJoin(parser: ESParser, body: object): Promise<QueryResponse>
   {
-    const parentQuery: Elastic.SearchParams = request.body as Elastic.SearchParams;
-    const childQuery = parentQuery['groupJoin'];
-    parentQuery['groupJoin'] = undefined;
+    const childQuery = body['groupJoin'];
+    body['groupJoin'] = undefined;
+    const parentQuery: Elastic.SearchParams = body;
 
     return new Promise<QueryResponse>(async (resolve, reject) =>
     {
@@ -154,14 +155,28 @@ export default class ElasticQueryHandler extends QueryHandler
 
       winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
 
+      const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
+      if (valueInfo === null)
+      {
+        throw new Error('Error finding groupJoin clause in the query');
+      }
+
       const subQueries = Object.keys(childQuery);
       const promises: Array<Promise<any>> = [];
       for (const subQuery of subQueries)
       {
         try
         {
-          const promise = this.handleGroupJoinSubQuery(childQuery[subQuery], parentResults);
-          promises.push(promise);
+          const vi = valueInfo.objectChildren[subQuery].propertyValue;
+          if (vi !== null)
+          {
+            promises.push(this.handleGroupJoinSubQuery(vi, parentResults));
+          }
+          else
+          {
+            throw new Error('Error finding subquery property');
+          }
+
         }
         catch (e)
         {
@@ -189,7 +204,7 @@ export default class ElasticQueryHandler extends QueryHandler
     });
   }
 
-  private handleGroupJoinSubQuery(query: string, parentResults: any)
+  private handleGroupJoinSubQuery(valueInfo: ESValueInfo, parentResults: any)
   {
     return new Promise<QueryResponse>((resolve, reject) =>
     {
@@ -199,21 +214,6 @@ export default class ElasticQueryHandler extends QueryHandler
       // const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
       // const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
 
-      winston.debug('subQuery: ' + query);
-
-      const parser = new ESJSONParser(query, true);
-      const valueInfo = parser.getValueInfo();
-
-      if (parser.hasError())
-      {
-        const errors = parser.getErrors();
-        for (const e of errors)
-        {
-          winston.error(util.inspect(e));
-        }
-        reject(errors[0]);
-      }
-
       for (const r of parentResults.result.hits.hits)
       {
         winston.debug('parentObject ' + JSON.stringify(r._source, null, 2));
@@ -221,7 +221,7 @@ export default class ElasticQueryHandler extends QueryHandler
         body.push(header);
 
         const queryStr = ESParameterFiller.generate(valueInfo, { parent: r._source });
-        body.push(this.getQueryBody(queryStr));
+        body.push(queryStr);
       }
 
       const client: ElasticClient = this.controller.getClient();
@@ -233,36 +233,24 @@ export default class ElasticQueryHandler extends QueryHandler
     });
   }
 
-  private getQueryBody(bodyStr: string): object
+  private getParsedQuery(bodyStr: string): ESParser
   {
-    let body: object = {};
-    try
+    const parser = new ESJSONParser(bodyStr, true);
+    const valueInfo = parser.getValueInfo();
+
+    if (parser.hasError())
     {
-      body = JSON.parse(bodyStr);
-      return body;
-    }
-    catch (_e)
-    {
-      // absorb the error and retry using clarinet so we can get a good error message
-      const parser = clarinet.parser();
+      const es = parser.getErrors();
       const errors: MidwayErrorItem[] = [];
 
-      parser.onerror =
-        (e) =>
-        {
-          const title: string = String(parser.line) + ':' + String(parser.column)
-            + ':' + String(parser.position) + ' ' + String(e.message);
-          errors.push({ status: -1, title, detail: '', source: {} });
-        };
-
-      try
+      es.forEach((e) =>
       {
-        parser.write(bodyStr).close();
-      }
-      catch (e)
-      {
-        // absorb
-      }
+        const row = (e.token !== null) ? e.token.row : 0;
+        const col = (e.token !== null) ? e.token.col : 0;
+        const pos = (e.token !== null) ? e.token.charNumber : 0;
+        const title: string = String(row) + ':' + String(col) + ':' + String(pos) + ' ' + String(e.message);
+        errors.push({ status: -1, title, detail: '', source: {} });
+      });
 
       if (errors.length === 0)
       {
@@ -271,6 +259,8 @@ export default class ElasticQueryHandler extends QueryHandler
 
       throw errors;
     }
+
+    return parser;
   }
 
   private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
