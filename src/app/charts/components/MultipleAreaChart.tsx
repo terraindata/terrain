@@ -49,14 +49,17 @@ import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as LibraryTypes from 'library/LibraryTypes';
-import * as React from 'react';
 import { omit } from 'lodash';
+import * as React from 'react';
 import ContainerDimensions from 'react-container-dimensions';
 import ColorManager from 'util/ColorManager';
 import Util from 'util/Util';
 import
 {
+  Border,
   createContainer,
+  Line,
+  Point,
   VictoryArea,
   VictoryAxis,
   VictoryBar,
@@ -68,7 +71,6 @@ import
   VictoryPortal,
   VictoryScatter,
   VictoryTooltip,
-  Line,
 } from 'victory';
 
 const styles = {
@@ -107,7 +109,7 @@ const styles = {
       },
     }),
     tooltipLegend: {
-      border: { stroke: "white", fill: 'black', fillOpacity: 0.4 },
+      border: { stroke: 'white', fill: 'black', fillOpacity: 0.4 },
       title: {
         fontSize: 15,
         fill: 'rgba(255,255,255,0.75)',
@@ -115,7 +117,7 @@ const styles = {
       },
     },
     tooltipLegendBorderPadding: { right: 30 },
-    activeDataVerticalLine: { stroke: 'rgba(0, 0, 0, .25)', strokeWidth: 1 },
+    activeDataVerticalLine: { stroke: 'rgba(0, 0, 0, .2)', strokeWidth: 1 },
   },
   bottomChart: {
     padding: { top: 0, bottom: 0, left: 0, right: 0 },
@@ -188,71 +190,79 @@ interface State
   visibleDatasets: List<ID>;
   highlightDataset: ID;
   datasetColors: any;
-  activeDataTitle: string;
-  activeData: Array<any>;
-  activeDataVerticalLine: {
-    x1: number;
-    y1: number;
-    x2: number;
-    y2: number;
-  }
 }
 
-const CustomLabel = (props) => {
+const CustomLabel = (props) =>
+{
   return (
     <text dy={5} x={props.x} y={props.y} style={props.style} >
       <tspan style={{ fontWeight: 'bold' }}>{props.datum.value}</tspan>
-      <tspan dx={10} style={{ fill: 'white' }}>({props.datum.name})</tspan>
+      <tspan dx={10} style={{ fill: 'white' }}>({props.datum.name})</tspan>
     </text>
   );
 };
 
-class CustomTooltip extends TerrainComponent<{style?: any, xDataKey: string, datum?: any, text?: any}> {
-
-  public shouldComponentUpdate()
+const CustomTooltip = (props) =>
+{
+  const { datum, text, xDataKey, style } = props;
+  const data = text.map((t) =>
   {
-    return true;
-  }
+    const parsedText = t.split('|');
+    return {
+      id: parsedText[0],
+      value: parsedText[1],
+      name: parsedText[2],
+      symbol: { fill: parsedText[3] },
+      labels: {
+        ...omit(style[0], ['textAnchor']),
+        fill: parsedText[3],
+      },
+    };
+  });
 
-  public render()
-  {
-    const { datum, text, xDataKey } = this.props;
-    const data = text.map(t =>
-    {
-      const parsedText = t.split('|');
-      return {
-        id: parsedText[0],
-        value: parsedText[1],
-        name: parsedText[2],
-        symbol: { fill: parsedText[3] },
-        labels: { ...omit(this.props.style[0], ['textAnchor']), fill: parsedText[3] },
-      };
-    });
+  const timestamp = datum[xDataKey];
+  const date = new Date(timestamp);
+  const dateString = date.toISOString();
+  const title = Util.formatDate(dateString);
 
-    const timestamp = datum[xDataKey];
-    const date = new Date(timestamp);
-    const dateString = date.toISOString();
-    const title = Util.formatDate(dateString);
+  const labelComponent = <CustomLabel />;
 
-    const labelComponent = <CustomLabel />;
+  return (
+    <VictoryLegend
+      theme={TerrainVictoryTheme}
+      standalone={false}
+      x={10}
+      y={50}
+      padding={0}
+      borderPadding={styles.topChart.tooltipLegendBorderPadding}
+      gutter={20}
+      data={data}
+      orientation={'vertical'}
+      style={styles.topChart.tooltipLegend}
+      title={title}
+      labelComponent={labelComponent}
+      borderComponent={<Border
+        // need to change this prop so the border re-renders
+        className={`custom-tooltip-label-${data.length}`}
+      />}
+    />
+  );
+};
 
-    return (
-      <VictoryLegend
-        theme={TerrainVictoryTheme}
-        standalone={false}
-        x={10}
-        y={50}
-        padding={0}
-        borderPadding={styles.topChart.tooltipLegendBorderPadding}
-        gutter={20}
-        data={data}
-        orientation={'vertical'}
-        style={styles.topChart.tooltipLegend}
-        title={title}
-        labelComponent={labelComponent}
+const CustomDataComponent = (props) =>
+{
+  return props.active ? (
+    <g>
+      <Line
+        style={styles.topChart.activeDataVerticalLine}
+        x1={props.x}
+        y1={0}
+        x2={props.x}
+        y2={props.chartHeight}
       />
-    );
-  }
+      <Point {...props} />
+    </g>
+  ) : null;
 };
 
 export default class MultipleAreaChart extends TerrainComponent<Props> {
@@ -271,9 +281,6 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     visibleDatasets: null,
     highlightDataset: null,
     datasetColors: {},
-    activeDataTitle: '',
-    activeData: [],
-    activeDataVerticalLine: null,
   };
 
   constructor(props)
@@ -322,13 +329,12 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     this.setState({ zoomDomain: domain });
   }
 
-  public renderData()
+  public renderData(chartHeight)
   {
     const { datasets, xDataKey, yDataKey } = this.props;
     const { visibleDatasets } = this.state;
     const areas = [];
     const scatters = [];
-    const lines = [];
 
     datasets.forEach((ds, key) =>
     {
@@ -359,6 +365,9 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
             size={(datum, active) => active ? 3 : 0}
             x={xDataKey}
             y={yDataKey}
+            dataComponent={<CustomDataComponent
+              chartHeight={chartHeight}
+            />}
           />,
         );
       }
@@ -491,85 +500,74 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
   public render()
   {
     const { datasets, xDataKey, yDataKey, domain } = this.props;
+    const { visibleDatasets } = this.state;
 
-    const data = this.renderData();
     const legend = this.renderLegend();
-
-    const {
-      visibleDatasets,
-      activeDataTitle,
-      activeData,
-      activeDataVerticalLine,
-    } = this.state;
-
     const VictoryZoomVoronoiContainer = createContainer('zoom', 'voronoi');
-
     const chartDomain = { x: [domain.start, domain.end] };
 
     return (
       <div style={styles.wrapper}>
         <div style={styles.topChartWrapper}>
           <ContainerDimensions>
-            {({ width, height }) => (
-              <VictoryChart
-                domain={chartDomain}
-                domainPadding={config.topChart.domainPadding}
-                scale={config.topChart.scale}
-                theme={TerrainVictoryTheme}
-                padding={styles.topChart.padding}
-                width={width}
-                height={height}
-                containerComponent={
-                  <VictoryZoomVoronoiContainer
-                    responsive={false}
-                    zoomDimension='x'
-                    voronoiDimension='x'
-                    labels={d => d.l ? `${d.id}|${d.y}|${d.name}|${this.getDatasetColor(d.id)}` : null}
-                    labelComponent={<CustomTooltip xDataKey={xDataKey} />}
-                    zoomDomain={this.state.zoomDomain}
-                    onZoomDomainChange={this.handleZoom}
-                  />
-                }
-                events={[
-                  {
-                    // indicate, by name, the component that listens to the event
-                    childName: ['legend'],
-                    // { 'data', 'labels' }, indicates if the texts or the dots
-                    // of the legend items are the one that listens to the event.
-                    target: 'labels',
-                    eventHandlers: {
-                      onMouseOver: this.handleLegendMouseOver,
-                      onMouseOut: this.handleLegendMouseOut,
+            {({ width, height }) =>
+            {
+              const data = this.renderData(height);
+              return (
+                <VictoryChart
+                  domain={chartDomain}
+                  domainPadding={config.topChart.domainPadding}
+                  scale={config.topChart.scale}
+                  theme={TerrainVictoryTheme}
+                  padding={styles.topChart.padding}
+                  width={width}
+                  height={height}
+                  containerComponent={
+                    <VictoryZoomVoronoiContainer
+                      responsive={false}
+                      zoomDimension='x'
+                      voronoiDimension='x'
+                      labels={d => d.l ? `${d.id}|${d.y}|${d.name}|${this.getDatasetColor(d.id)}` : null}
+                      labelComponent={<CustomTooltip xDataKey={xDataKey} />}
+                      zoomDomain={this.state.zoomDomain}
+                      onZoomDomainChange={this.handleZoom}
+                    />
+                  }
+                  events={[
+                    {
+                      // indicate, by name, the component that listens to the event
+                      childName: ['legend'],
+                      // { 'data', 'labels' }, indicates if the texts or the dots
+                      // of the legend items are the one that listens to the event.
+                      target: 'labels',
+                      eventHandlers: {
+                        onMouseOver: this.handleLegendMouseOver,
+                        onMouseOut: this.handleLegendMouseOut,
+                      },
                     },
-                  },
-                ]}
-              >
-                <VictoryGroup
-                  style={styles.topChart.areas}
+                  ]}
                 >
-                  {data.areas}
-                  {data.scatters}
-                </VictoryGroup>
-                <VictoryAxis
-                  offsetY={height - styles.topChart.padding.top}
-                  style={styles.topChart.axis}
-                  tickLabelComponent={<VictoryLabel dx={24} />}
-                />
-                <VictoryAxis
-                  dependentAxis
-                  offsetX={width}
-                  style={styles.topChart.axis}
-                  tickLabelComponent={<VictoryLabel dy={7} />}
-                />
-                {activeData.length > 0 ?
-                  <Line
-                    {...activeDataVerticalLine}
-                    style={styles.topChart.activeDataVerticalLine}
-                  /> : null
-                }
-                {legend}
-              </VictoryChart>
-            )}
+                  <VictoryGroup
+                    style={styles.topChart.areas}
+                  >
+                    {data.areas}
+                    {data.scatters}
+                  </VictoryGroup>
+                  <VictoryAxis
+                    offsetY={height - styles.topChart.padding.top}
+                    style={styles.topChart.axis}
+                    tickLabelComponent={<VictoryLabel dx={24} />}
+                  />
+                  <VictoryAxis
+                    dependentAxis
+                    offsetX={width}
+                    style={styles.topChart.axis}
+                    tickLabelComponent={<VictoryLabel dy={7} />}
+                  />
+                  {legend}
+                </VictoryChart>
+              );
+            }}
           </ContainerDimensions>
         </div>
         <div style={styles.bottomChartWrapper}>
