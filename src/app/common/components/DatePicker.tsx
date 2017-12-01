@@ -51,8 +51,8 @@ import './DatePicker.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as Immutable from 'immutable';
-import ReactDayPicker = require('react-day-picker');
-import { DateUtils } from 'react-day-picker';
+import DayPicker from 'react-day-picker';
+const DateUtils = DayPicker.DateUtils;
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import Dropdown from './Dropdown';
@@ -169,7 +169,7 @@ class DatePicker extends TerrainComponent<Props>
       <div
         className='date-picker'
       >
-        <ReactDayPicker
+        <DayPicker
           modifiers={modifiers}
           onDayClick={this.handleDayClick}
           initialMonth={date}
