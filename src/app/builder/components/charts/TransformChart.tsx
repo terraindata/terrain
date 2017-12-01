@@ -670,7 +670,6 @@ const TransformChart = {
       if (!offset)
       {
         return scales.realX(ys[getBucket(d)].x);
-
       }
       const shift = getTextOffset(d);
       return scales.realX(ys[getBucket(d)].x) - shift;
@@ -685,8 +684,8 @@ const TransformChart = {
       ;
 
     spotlight.select('.spotlight-rank')
-      .attr('y', (d) => getSpotlightY(d, true) + 4)
       .attr('x', (d) => getFinalX(d, true))
+      .attr('y', (d) => getSpotlightY(d, true) + 4)
       .attr('fill', '#fff')
       .attr('style', fontSize)
       .text((d) => d['rank'] + 1);
@@ -788,7 +787,7 @@ const TransformChart = {
         return '';
       });
 
-    spotlight.selectAll('.spotlight-tooltip, rect, .spotlight-rank')
+    spotlight.selectAll('.spotlight-tooltip, rect')
       .attr('transform', (d) =>
       {
         let rotate = '0';
@@ -811,8 +810,26 @@ const TransformChart = {
         {
           translateX = -1 * width - SPOTLIGHT_SIZE - 2 * SPOTLIGHT_PADDING;
         }
-
         return 'rotate(' + rotate + ')translate(' + translateX + ',' + translateY + ')';
+      });
+
+        spotlight.selectAll('.spotlight-rank')
+      .attr('transform', (d) =>
+      {
+        let rotate = '0';
+        let translateY = 0;
+
+        const bg = ys[getBucket(d)];
+        const x = scales.realX(bg['x']);
+        const y = bg['y'];
+        const offset = bg['offset'];
+
+        if (y - offset < 10)
+        {
+          translateY = 2 * (y - idToY[d['id']]);
+          rotate = '180,' + x + ',' + y;
+        }
+        return 'rotate(' + rotate + ')translate(0,' + translateY + ')';
       });
 
     spotlight.exit().remove();
