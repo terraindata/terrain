@@ -44,93 +44,50 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export default class TastySchema
+import * as Tasty from '../../tasty/Tasty';
+
+import QueryHandler from '../../app/query/QueryHandler';
+import DatabaseController from '../DatabaseController';
+import PostgreSQLClient from './client/PostgreSQLClient';
+import PostgreSQLConfig from './PostgreSQLConfig';
+import PostgreSQLDB from './tasty/PostgreSQLDB';
+
+/**
+ * The central controller for communicating with PostgreSQL.
+ */
+class PostgreSQLController extends DatabaseController
 {
-  public static fromElasticTree(elasticTree: object): TastySchema
+  private client: PostgreSQLClient;
+  private tasty: Tasty.Tasty;
+
+  constructor(config: PostgreSQLConfig, id: number, name: string)
   {
-    const schema: TastySchema = new TastySchema();
-    Object.keys(elasticTree).map((db: string) =>
-    {
-      schema.tree[db] = {};
-      Object.keys(elasticTree[db]['mappings']).map((mapping: string) =>
-      {
-        schema.tree[db][mapping] = {};
-        Object.keys(elasticTree[db]['mappings'][mapping]['properties']).map(
-          (field: string) =>
-          {
-            schema.tree[db][mapping][field] =
-              elasticTree[db]['mappings'][mapping]['properties'][field];
-          });
-      });
-    });
-    return schema;
+    super('PostgreSQLController', id, name);
+    this.client = new PostgreSQLClient(this, config);
+    this.tasty = new Tasty.Tasty(
+      this,
+      new PostgreSQLDB(this.client));
   }
 
-  public static fromSQLResultSet(resultSet: any): TastySchema
+  public getClient(): PostgreSQLClient
   {
-    const schema: TastySchema = new TastySchema();
-    resultSet.forEach((row) =>
-    {
-      if (schema.tree[row.table_schema] === undefined)
-      {
-        schema.tree[row.table_schema] = {};
-      }
-      if (schema.tree[row.table_schema][row.table_name] === undefined)
-      {
-        schema.tree[row.table_schema][row.table_name] = {};
-      }
-      schema.tree[row.table_schema][row.table_name][row.column_name] =
-        {
-          type: row.data_type,
-        };
-    });
-    return schema;
+    return this.client;
   }
 
-  private tree: object;
-
-  constructor(tree: object = {})
+  public getTasty(): Tasty.Tasty
   {
-    this.tree = tree;
+    return this.tasty;
   }
 
-  public toString(pretty: boolean = false): string
+  public getQueryHandler(): QueryHandler
   {
-    return JSON.stringify(this.tree, null, pretty ? 2 : 0);
+    throw new Error('No QueryHandler is currently implemented for PostgreSQL.');
   }
 
-  public databases(): object
+  public getAnalyticsDB(): object
   {
-    return this.tree;
-  }
-
-  public databaseNames(): string[]
-  {
-    return Object.keys(this.tree);
-  }
-
-  public tables(database: string): object
-  {
-    return this.tree[database];
-  }
-
-  public tableNames(database: string): string[]
-  {
-    const treeDB: object = this.tree[database];
-    if (treeDB === undefined)
-    {
-      return [];
-    }
-    return Object.keys(treeDB);
-  }
-
-  public fields(database: string, table: string): object
-  {
-    return this.tree[database][table];
-  }
-
-  public fieldNames(database: string, table: string): string[]
-  {
-    return Object.keys(this.tree[database][table]);
+    throw new Error('Analytics backend is currently not implemented for PostgreSQL.');
   }
 }
+
+export default PostgreSQLController;

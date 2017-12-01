@@ -1160,7 +1160,7 @@ describe('Credentials tests', () =>
         const resultAsArray: object[] = result as object[];
         expect(resultAsArray[0]).toMatchObject({
           createdBy: 1,
-          id: 1,
+          id: 2,
           meta: '',
           name: 'SFTP Test 1',
           type: 'sftp',
@@ -1188,6 +1188,14 @@ describe('Credentials tests', () =>
         expect(result).toMatchObject([{
           createdBy: 1,
           id: 1,
+          meta: '',
+          name: 'Local Filesystem Config',
+          permissions: 0,
+          type: 'local',
+        },
+        {
+          createdBy: 1,
+          id: 2,
           meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
           name: 'SFTP Test 1',
           permissions: 1,
