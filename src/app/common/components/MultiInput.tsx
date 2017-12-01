@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires
-import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
+import { backgroundColor, borderColor, Colors, getStyle } from 'app/colors/Colors';
 import ColorsActions from 'app/colors/data/ColorsActions';
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
@@ -105,6 +105,7 @@ class MultiInput extends TerrainComponent<Props>
                     <div
                       className='multi-input-item-delete'
                       onClick={this._fn(this.deleteItem, index)}
+                      style={getStyle('fill', Colors().iconColor)}
                     >
                       <RemoveIcon />
                     </div>

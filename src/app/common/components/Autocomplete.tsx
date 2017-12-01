@@ -86,6 +86,8 @@ export interface Props
 
   autoFocus?: boolean;
   moveCursorToEnd?: boolean;
+
+  onKeyDown?: (e) => void;
 }
 
 @Radium
@@ -217,6 +219,10 @@ class Autocomplete extends TerrainComponent<Props>
 
   public handleKeydown(event)
   {
+    if (this.props.onKeyDown)
+    {
+      this.props.onKeyDown(event);
+    }
     if (!this.props.options)
     {
       // still be able to hit enter when there are no options

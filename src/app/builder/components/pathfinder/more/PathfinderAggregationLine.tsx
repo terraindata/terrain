@@ -379,7 +379,6 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public renderAdvancedLine(type, i)
   {
     const { canEdit } = this.props.pathfinderContext;
-    console.log(this.filterFieldOptions(undefined));
     return <PathfinderAdvancedLine
       key={i}
       advancedType={type}
