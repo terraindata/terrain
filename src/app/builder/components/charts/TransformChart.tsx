@@ -813,7 +813,7 @@ const TransformChart = {
         return 'rotate(' + rotate + ')translate(' + translateX + ',' + translateY + ')';
       });
 
-        spotlight.selectAll('.spotlight-rank')
+    spotlight.selectAll('.spotlight-rank')
       .attr('transform', (d) =>
       {
         let rotate = '0';
