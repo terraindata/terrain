@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import ESParserError from '../../../shared/database/elastic/parser/ESParserError';
 import MidwayError from '../../../shared/error/MidwayError';
 
 export interface ElasticQueryError
@@ -60,11 +61,25 @@ export class QueryError extends MidwayError
     return (err as ElasticQueryError).response !== undefined;
   }
 
+  public static isESParserError(err: Error | ESParserError): err is ESParserError
+  {
+    return (err as ESParserError).token !== undefined;
+  }
+
   public static fromElasticQueryError(err: ElasticQueryError): QueryError
   {
     const status: number = (err.statusCode !== undefined) ? err.statusCode : 400;
     const title: string = (err.message !== undefined) ? err.message : 'The Elastic query has an error.';
     const detail: string = JSON.stringify(err.response);
+    const source: object = err;
+    return new QueryError(status, title, detail, source);
+  }
+
+  public static fromESParserError(err: ESParserError): QueryError
+  {
+    const status: number = 400;
+    const title: string = (err.message !== undefined) ? err.message : 'ES parsing error.';
+    const detail: string = JSON.stringify(err.token);
     const source: object = err;
     return new QueryError(status, title, detail, source);
   }

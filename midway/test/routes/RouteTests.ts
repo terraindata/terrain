@@ -500,7 +500,7 @@ describe('Query route tests', () =>
         body: {
           database: 1,
           type: 'search',
-          body: {
+          body: JSON.stringify({
             index: 'movies',
             type: 'data',
             from: 0,
@@ -508,7 +508,7 @@ describe('Query route tests', () =>
             body: {
               query: {},
             },
-          },
+          }),
         },
       })
       .expect(200)
@@ -540,7 +540,7 @@ describe('Query route tests', () =>
         body: {
           database: 1,
           type: 'search',
-          body: {
+          body: JSON.stringify({
             index: 'wrongindex',
             type: 'data',
             from: 0,
@@ -548,7 +548,7 @@ describe('Query route tests', () =>
             body: {
               query: {},
             },
-          },
+          }),
         },
       })
       .expect(200)
@@ -729,6 +729,86 @@ describe('Query route tests', () =>
           fail(error);
         });
     });
+
+  test('Elastic groupJoin Query Result: POST /midway/v1/query', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          database: 1,
+          type: 'search',
+          body: `{
+            "from": 0,
+            "size": 5,
+            "body": {
+              "_source": ["movieid", "title"],
+              "query": {
+                "bool": {
+                  "filter": [
+                    {
+                      "term": {
+                        "_index": "movies"
+                      }
+                    },
+                    {
+                      "term": {
+                        "_type": "data"
+                      }
+                    }
+                  ],
+                  "must": [
+                    { "match": { "status": "Released" } },
+                    { "match": { "language": "en" } }
+                  ],
+                  "must_not": [
+                    { "term": { "budget": 0 } },
+                    { "term": { "revenue": 0 } }
+                  ]
+                }
+              }
+            },
+            "groupJoin": {
+              "englishMovies": {
+                "from" : 0,
+                "size" : 5,
+                "_source": ["movieid", "overview"],
+                "query" : {
+                  "bool" : {
+                    "filter": [
+                      { "term": {"movieid" : @parent.movieid} }
+                    ],
+                    "must" : [
+                      { "match": {"_index" : "movies"} },
+                      { "match": {"_type" : "data"} }
+                    ]
+                  }
+                }
+              }
+            }
+          }`,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        winston.info(response.text);
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['errors'].length).toEqual(0);
+        expect(respData['result'].hits.hits.length).toEqual(5);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
+      });
+  });
 });
 
 describe('File import route tests', () =>
