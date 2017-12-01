@@ -508,7 +508,7 @@ const TransformChart = {
     bar.exit().remove();
   },
 
-  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData)
+  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domainMin, domainMax)
   {
     const g = d3.select(el).selectAll('.spotlights');
 
@@ -593,18 +593,24 @@ const TransformChart = {
         }
 
         let yVal = 0;
-        const first = pointsData[i - 1];
-        const second = pointsData[i];
-        if (first && second)
+        if (mode === 'linear')
         {
-          const distanceRatio = (x - first['x']) / (second['x'] - first['x']);
-          yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
+          const first = pointsData[i - 1];
+          const second = pointsData[i];
+          if (first && second)
+          {
+            const distanceRatio = (x - first['x']) / (second['x'] - first['x']);
+            yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
+          }
+          else
+          {
+            yVal = (first || second)['y'];
+          }
         }
         else
         {
-          yVal = (first || second)['y'];
+          yVal = pointFn(x, pointsData, domainMin, domainMax);
         }
-
         const y = scales.realPointY(yVal);
         if (text)
         {
@@ -1675,25 +1681,30 @@ const TransformChart = {
     }
     d3.select(el).select('.inner-svg').select('.overlay').remove();
     this._drawBars(el, scales, barsData, colors);
-    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
     const numPoints = pointsData.length;
     let curveFn;
+    let pointFn;
     if (mode === 'normal' && numPoints === NUM_CURVE_POINTS.normal)
     {
       curveFn = TransformUtil.getNormalData;
+      pointFn = TransformUtil.getNormalY;
     }
     else if (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential
       && Math.abs(pointsData[1].x - pointsData[0].x) > (domain.x[1] - domain.x[0]) / 900) // points can't be too close horiz.
     {
       curveFn = TransformUtil.getExponentialData;
+      pointFn = TransformUtil.getExponentialY;
     }
     else if (mode === 'logarithmic' && numPoints === NUM_CURVE_POINTS.logarithmic)
     {
       curveFn = TransformUtil.getLogarithmicData;
+      pointFn = TransformUtil.getLogarithmicY;
     }
     else if (mode === 'sigmoid' && numPoints === NUM_CURVE_POINTS.sigmoid)
     {
       curveFn = TransformUtil.getSigmoidData;
+      pointFn = TransformUtil.getSigmoidY;
+
     }
 
     if (curveFn !== undefined)
@@ -1704,6 +1715,7 @@ const TransformChart = {
     {
       this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
+    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domain.x[0], domain.x[1]);
 
     if (mode === 'linear'
       || (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential)
