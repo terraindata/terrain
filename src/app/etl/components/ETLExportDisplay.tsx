@@ -81,7 +81,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
         className='etl-export-display-wrapper'
         style={[backgroundColor(Colors().bg1), fontColor(Colors().text1)]}
       >
-        <TemplateEditor/>
+        <TemplateEditor />
         <div>
           <div className='export-button'
             style={[

@@ -51,6 +51,7 @@ import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import ExpandableView from 'common/components/ExpandableView';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 
@@ -68,18 +69,26 @@ export interface Props
 @Radium
 class TemplateEditorFieldC extends TerrainComponent<Props>
 {
+  public state: {
+    expandableViewOpen: boolean;
+  } = {
+    expandableViewOpen: true,
+  };
+
   public renderChildFields()
   {
     const { field, keyPath } = this.props;
 
-    return field.children.map((value, index) => {
+    return field.children.map((value, index) =>
+    {
       const newKeyPath = keyPath.push('children', index);
       return (
-        <TemplateEditorField
-          keyPath={newKeyPath}
-          field={value}
-          key={index}
-        />
+        <div className='subfield-spacer' key={index}>
+          <TemplateEditorField
+            keyPath={newKeyPath}
+            field={value}
+          />
+        </div>
       );
     }).toList();
   }
@@ -116,23 +125,41 @@ class TemplateEditorFieldC extends TerrainComponent<Props>
   public render()
   {
     const { field, keyPath } = this.props;
-    return (
-      <div className='template-editor-field-container'>
-        {!this.isRoot() && this.renderFieldSettings()}
-        {field.children.size >= 0 &&
-          <div className='template-editor-children-container'>
-            {this.renderChildFields()}
-            {this.renderCreateNewFieldButton()}
-          </div>
-        }
-      </div>
-    );
+
+    const children = (this.isRoot() || field.children.size >= 0) ? (
+      <div className='template-editor-children-container'>
+        {this.renderChildFields()}
+        {this.renderCreateNewFieldButton()}
+      </div>) : undefined;
+
+    if (this.isRoot())
+    {
+      return children;
+    }
+    else
+    {
+      return (
+        <ExpandableView
+          content={this.renderFieldSettings()}
+          open={this.state.expandableViewOpen}
+          onToggle={this.handleExpandArrowClicked}
+          children={children}
+        />
+      );
+    }
+  }
+
+  public handleExpandArrowClicked()
+  {
+    this.setState({
+      expandableViewOpen: !this.state.expandableViewOpen,
+    });
   }
 
   public handleCreateNewField()
   {
     const { keyPath, act } = this.props;
-    const newField = _TemplateField({name: `new field hello there`});
+    const newField = _TemplateField({ name: `new field hello there` });
     act({
       actionType: 'createField',
       sourcePath: keyPath,

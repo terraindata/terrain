@@ -57,8 +57,8 @@ const $ = (type: string, payload: any) =>
 const ETLActions =
   {
     placeholder:
-      (value) =>
-        $(ActionTypes.placeholder, { value })
+    (value) =>
+      $(ActionTypes.placeholder, { value })
   };
 
 export default ETLActions;

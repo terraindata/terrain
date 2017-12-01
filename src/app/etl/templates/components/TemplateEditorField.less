@@ -1,32 +1,29 @@
 @import "../../../common/Common.less";
 
+@item-spacing: @half-spacing 0px 0px 0px;
 
-.template-editor-field-container {
+.template-editor-field {
+  padding: @half-spacing;
+  border: 1px solid;
+}
+
+.template-editor-children-container {
   display: flex;
   flex-direction: column;
-  margin-top: @half-spacing;
 
-  .template-editor-field {
-    padding: @half-spacing;
-    border: 1px solid;
+  .subfield-spacer {
+    padding: @item-spacing;
   }
 
-  .template-editor-children-container {
-    padding-left: @double-spacing;
+  .new-field-button-spacer {
+    padding: @item-spacing;
     display: flex;
-    flex-direction: column;
+    justify-content: flex-start;
 
-    .new-field-button-spacer {
-      display: flex;
-      justify-content: center;
-
-      .create-new-template-field-button {
-        display: inline-block;
-        margin: @half-spacing 0px;
-        padding: @half-spacing;
-        border-radius: 3px;
-      }
+    .create-new-template-field-button {
+      display: inline-block;
+      padding: @half-spacing;
+      border-radius: 3px;
     }
   }
 }
-

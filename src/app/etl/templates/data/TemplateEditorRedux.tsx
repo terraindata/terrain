@@ -47,7 +47,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
-import {
+import
+{
   _TemplateEditorState,
   ETLTemplate,
   TemplateEditorState,
@@ -92,29 +93,38 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
 {
   public reducers: ConstrainedMap<TemplateEditorActionTypes, TemplateEditorState> =
   {
-    setPreviewData: (state, action) => {
+    setPreviewData: (state, action) =>
+    {
       return state.set('previewData', action.payload.preview);
     },
-    loadTemplate: (state, action) => {
-      return state.set('isDirty', false).set('template', action.payload.template);
+    loadTemplate: (state, action) =>
+    {
+      return state.set('isDirty', false).
+        set('template', action.payload.template);
     },
-    saveTemplate: (state, action) => { // todo
+    saveTemplate: (state, action) =>
+    { // todo
       return state;
     },
-    updateTemplate: (state, action) => { // todo
+    updateTemplate: (state, action) =>
+    { // todo
       return state;
     },
-    createField: (state, action) => {
+    createField: (state, action) =>
+    {
       const fieldKeyPath = List<string | number>(['template', 'rootField'])
-        .push(... action.payload.sourcePath.toJS());
+        .push(...action.payload.sourcePath.toJS());
       const creatingField: TemplateField = state.getIn(fieldKeyPath);
       const nextIndex = creatingField.children.size;
-      return state.setIn(fieldKeyPath.push('children', nextIndex), action.payload.field);
+      return state.set('isDirty', true).
+        setIn(fieldKeyPath.push('children', nextIndex), action.payload.field);
     },
-    updateField: (state, action) => {
+    updateField: (state, action) =>
+    {
       const keyPath = List<string | number>(['template', 'rootField'])
-        .push(... action.payload.sourcePath.toJS(), action.payload.key);
-      return state.setIn(keyPath, action.payload.value);
+        .push(...action.payload.sourcePath.toJS(), action.payload.key);
+      return state.set('isDirty', true).
+        setIn(keyPath, action.payload.value);
     },
   }
 }

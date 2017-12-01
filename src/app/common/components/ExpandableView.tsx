@@ -44,60 +44,74 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires
+
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
-import Util from 'util/Util';
 
-import TemplateEditorField from 'etl/templates/components/TemplateEditorField';
-import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _ExportTemplate, _TemplateField, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
-import './TemplateEditor.less';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import './ExpandableView.less';
 
-const { List } = Immutable;
+const ArrowIcon = require('images/icon_arrow.svg');
 
 export interface Props
 {
-  // below from container
-  templateEditor?: TemplateEditorState;
-  act?: typeof TemplateEditorActions;
+  content: any;
+  open: boolean;
+  onToggle: () => void;
+  unmountOnClose?: boolean;
+  children?: any;
 }
 
-@Radium
-class ETLExportDisplay extends TerrainComponent<Props>
-{
-  public componentDidMount()
-  {
-    let template = _ExportTemplate({
-      templateId: 1,
-      templateName: 'Test Template',
-    });
-    template = template.setIn(['rootField', 'children', 0], _TemplateField({ name: 'blahblah' }))
-    this.props.act({
-      actionType: 'loadTemplate',
-      template,
-    });
-  }
+const arrowSize = 12;
+const arrowPadding = 6;
+const containerLeftPadding = arrowPadding + arrowSize / 2;
+const containerLeftMargin = containerLeftPadding - 1;
 
+class ExpandableView extends TerrainComponent<Props>
+{
   public render()
   {
-    const template: ETLTemplate = this.props.templateEditor.template;
-
     return (
-      <div className='template-editor-root-container'>
-        <TemplateEditorField
-          keyPath={List([])}
-          field={template.rootField}
-        />
+      <div className={classNames({
+        'expandable-view-container': true,
+      })}
+      >
+        <div className='expandable-view-content-row' style={fontColor('#fff')}>
+          <ArrowIcon
+            className={classNames({
+              'expandable-view-arrow-icon': true,
+              'expandable-view-open': this.props.open
+            })}
+            onClick={this.props.onToggle}
+            style={{
+              width: arrowSize,
+              height: arrowSize,
+              padding: `0px ${arrowPadding}px`,
+            }}
+          />
+          <div className='expandable-view-content'>
+            {this.props.content}
+          </div>
+        </div>
+        <div
+          className={classNames({
+            'expandable-view-children-container': true,
+            'expandable-view-open': this.props.open,
+          })}
+          style={{
+            marginLeft: containerLeftMargin,
+            paddingLeft: containerLeftPadding,
+            borderColor: Colors().active,
+          }}
+        >
+          {this.props.children}
+        </div>
       </div>
     );
   }
 }
-
-export default Util.createContainer(
-  ETLExportDisplay,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
-);
+export default ExpandableView;

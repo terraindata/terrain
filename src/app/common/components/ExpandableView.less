@@ -1,0 +1,46 @@
+@import "../Common.less";
+
+.expandable-view-container {
+
+  .expandable-view-content-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .expandable-view-arrow-icon {
+    position: relative;
+    padding: 0px @half-spacing;
+    fill: currentColor;
+    flex-grow: 0;
+    transform: rotate(90deg);
+    &.expandable-view-open {
+      transform: rotate(180deg);
+    }
+  }
+
+  .expandable-view-content {
+    flex-grow: 1;
+  }
+
+  .expandable-view-children-container {
+    padding-left: @half-spacing;
+    max-height: 0px;
+    overflow: hidden;
+    &.expandable-view-open {
+      border-left: 1px solid;
+      max-height: none;
+    }
+  }
+  
+  // &.expandable-view-open {
+  //   .expandable-view-arrow-icon {
+  //     transform: rotate(180deg);
+  //   }
+    
+  //   .expandable-view-children-container {
+  //     border-left: 1px solid;
+  //     max-height: none;
+  //   }
+  // }
+}
