@@ -157,7 +157,9 @@ export const PathfinderText = {
     },
     order: {
       title: 'Sort order',
-      text: 'Sort by',
+      text1: 'Sort facets by',
+      text2: 'in ',
+      text3: 'order',
       tooltipText: 'How to order the facets',
     },
     size: {

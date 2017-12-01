@@ -77,6 +77,7 @@ export interface Props
   fieldName: string;
   // When a radioKey is changed, call this function to update elasticType of parent aggregeation
   onRadioChange?: (key: string, radioKey?: string) => void;
+  fields: List<string>;
 }
 
 export class PathfinderAdvancedLine extends TerrainComponent<Props>
@@ -150,12 +151,13 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           />;
         break;
       case 'dropdown':
+        const options = item.fieldOptions ? this.props.fields : item.options
         content =
           <Dropdown
             canEdit={this.props.canEdit && !disabled}
             keyPath={this.props.keyPath.push(item.key)}
-            options={item.options}
-            selectedIndex={item.options.indexOf(this.props.advancedData.get(item.key))}
+            options={options}
+            selectedIndex={options.indexOf(this.props.advancedData.get(item.key))}
           />;
         break;
       case 'map':
@@ -183,6 +185,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         className={classNames({
           'pf-advanced-section-item': true,
           'pf-advanced-section-item-range': item.inputType === 'range',
+          'pf-advanced-section-item-first': i === 0,
         })}
         key={i}
       >
@@ -191,7 +194,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
       </div>, { title: item.tooltipText, key: i });
   }
 
-  public renderAdvancedItems(items, onlyOne, radioKey?)
+  public renderAdvancedItems(items, onlyOne, radioKey?, inline?)
   {
     if (onlyOne)
     {
@@ -217,7 +220,8 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
       <div
         className={classNames({
           'pf-advanced-section-items': true,
-          'pf-advanced-section-multiple-items': items.length,
+          'pf-advanced-section-multiple-items': items.length && !inline,
+          'pf-advanced-section-multiple-inline': items.length && inline,
         })}
       >
         {
@@ -251,7 +255,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         </div>
         <FadeInOut
           open={this.state.expanded}
-          children={this.renderAdvancedItems(display.items, display.onlyOne, display.radioKey)}
+          children={this.renderAdvancedItems(display.items, display.onlyOne, display.radioKey, display.inline)}
         />
       </div>
     );

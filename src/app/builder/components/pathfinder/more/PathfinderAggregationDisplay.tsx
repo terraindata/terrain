@@ -54,7 +54,8 @@ export interface AdvancedAggregationDisplay
 {
   title: string;
   items: AdvancedAggregationItem | AdvancedAggregationItem[];
-
+  // Display items on the same line
+  inline: boolean;
   // This is for groups of items where only one can be active at a time
   // e.g. for percentiles, there are two ways of setting accuracy (compression and number of sig figs)
   // but only one can be used
@@ -72,6 +73,7 @@ export interface AdvancedAggregationItem
   placeholder?: string;
   options?: List<string>;
   isNumber?: boolean;
+  fieldOptions?: boolean; // Use the fields a options
 }
 
 export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDisplay>({
@@ -207,13 +209,27 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
   {
     title: PathfinderText.aggregation.order.title,
     onlyOne: false,
-    items: {
-      text: PathfinderText.aggregation.order.text,
+    inline: true,
+    items: [
+    {
+      text: PathfinderText.aggregation.order.text1,
+      fieldOptions: true,
+      key: 'sortField',
+      inputType: 'dropdown',
+      tooltipText: PathfinderText.aggregation.order.tooltipText,
+    },
+    {
+      text: PathfinderText.aggregation.order.text2,
       options: List(['ascending', 'descending']),
       inputType: 'dropdown',
       key: 'order',
-      tooltipText: PathfinderText.aggregation.order.tooltipText,
     },
+    {
+      text: PathfinderText.aggregation.order.text3,
+      inputType: '',
+      key: '',
+    }
+],
   },
   [ADVANCED.Format]:
   {

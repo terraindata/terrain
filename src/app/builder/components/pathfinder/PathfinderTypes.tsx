@@ -336,8 +336,11 @@ class SourceC extends BaseClass
   public start: number = 0;
 }
 export type Source = SourceC & IRecord<SourceC>;
-export const _Source = (config?: { [key: string]: any }) =>
-  New<Source>(new SourceC(config), config);
+export const _Source = (config?: { [key: string]: any }) => {
+  let source = New<Source>(new SourceC(config), config);
+  source = source.set('dataSource', _ElasticDataSource(source['dataSource']));
+  return source
+}
 
 abstract class DataSource extends BaseClass
 {
@@ -478,8 +481,12 @@ class ElasticDataSourceC extends DataSource
   }
 }
 export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>;
-export const _ElasticDataSource = (config?: { [key: string]: any }) =>
-  New<ElasticDataSource>(new ElasticDataSourceC(config), config);
+export const _ElasticDataSource = (config?: { [key: string]: any }) => {
+  let elasticSource = New<ElasticDataSource>(new ElasticDataSourceC(config), config);
+  elasticSource = elasticSource.set('indexes', List(elasticSource['indexes']));
+  elasticSource = elasticSource.set('types', List(elasticSource)['types']);
+  return elasticSource;
+}
 
 // TODO
 const ElasticComparisons = ['equals', 'contains', 'does not equal', 'does not contain', 'is greater than', 'is less than', 'is greater than or equal to',
@@ -541,7 +548,7 @@ export const ADVANCED_MAPPINGS =
     [ADVANCED.Format]: { format: 'MM/dd/yyyy', timezone: '' },
     [ADVANCED.ExtendedRange]: { offset: 0, min: '', max: '' },
     [ADVANCED.MinDocCount]: { min_doc_count: 0 },
-    [ADVANCED.Order]: { order: 'asc' },
+    [ADVANCED.Order]: { order: 'ascending' },
     [ADVANCED.Size]: { size: 10 },
     [ADVANCED.Error]: { show_term_doc_count_error: 'false' },
     [ADVANCED.Origin]: { origin: [30, 100], origin_address: '' },

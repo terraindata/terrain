@@ -316,7 +316,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
 
   // This function returns a list of fields that can be used with a given aggregation type
   // (e.g. average aggregations can only be used on numerical or date fields, not text fields)
-  public filterFieldOptions(type)
+  public filterFieldOptions(type): List<string>
   {
     const { schemaState, source } = this.props.pathfinderContext;
     let allFieldOptions = List([]);
@@ -330,7 +330,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     }
     if ((type === undefined || type === '') || FieldType.Any in AggregationTypes.get(type).acceptedTypes)
     {
-      return allFieldOptions.sort();
+      return allFieldOptions.sort().toList();
     }
     let filteredOptions = Set([]);
     const acceptedTypes = AggregationTypes.get(type).acceptedTypes;
@@ -338,7 +338,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     {
       filteredOptions = filteredOptions.union(ElasticBlockHelpers.getFieldsOfType(schemaState, fieldType).toSet());
     });
-    return filteredOptions.toList().sort();
+    return filteredOptions.sort().toList();
   }
 
   public renderInnerLine()
@@ -379,6 +379,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public renderAdvancedLine(type, i)
   {
     const { canEdit } = this.props.pathfinderContext;
+    console.log(this.filterFieldOptions(undefined));
     return <PathfinderAdvancedLine
       key={i}
       advancedType={type}
@@ -387,6 +388,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       advancedData={this.props.aggregation.advanced}
       fieldName={this.props.aggregation.field}
       onRadioChange={this.handleAdvancedChange}
+      fields={this.filterFieldOptions(undefined)}
     />;
   }
 
@@ -422,16 +424,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   {
     const { sampleType } = this.props.aggregation.sampler;
     const { canEdit } = this.props.pathfinderContext;
-    let options = List([]);
-    if (this.props.pathfinderContext.source.dataSource.getChoiceOptions)
-    {
-      options = this.props.pathfinderContext.source.dataSource.getChoiceOptions({
-        type: 'fields',
-        source: this.props.pathfinderContext.source,
-        schemaState: this.props.pathfinderContext.schemaState,
-      })
-        .map((option) => option.displayName).toList();
-    }
+    const options = this.filterFieldOptions(undefined); // Will return all options if type = undefined
     return (
       <div>
         <RadioButtons
