@@ -156,10 +156,30 @@ export class FilterUtils
     const boolValueInfo = cardTree.getValueInfo();
     const filterRows = block['indexFilters'].concat(block['typeFilters']).concat(block['otherFilters']);
     const filterRowMap = { filter: [], must: [], should: [], must_not: [] };
+    const filterRowList = { indexFilters: [], typeFilters: [], otherFilters: [] };
     filterRows.map((row: Block) =>
     {
       filterRowMap[row.boolQuery].push(row);
+      switch (row.field)
+      {
+        case '_index':
+          filterRowList.indexFilters.push(row);
+          break;
+        case '_type':
+          filterRowList.typeFilters.push(row);
+          break;
+        default:
+          filterRowList.otherFilters.push(row);
+          break;
+      }
     });
+    for (const index in filterRowList)
+    {
+      if (filterRowList.hasOwnProperty(index))
+      {
+        block = block.set(index, Immutable.List(filterRowList[index]));
+      }
+    }
     for (const boolOp of ['filter', 'must', 'should', 'must_not'])
     {
       if (boolValueInfo.objectChildren[boolOp] === undefined)

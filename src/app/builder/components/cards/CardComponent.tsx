@@ -938,7 +938,7 @@ class _CardComponent extends TerrainComponent<Props>
             >
               <div
                 className='card-body'
-                
+
               >
                 {
                   content
