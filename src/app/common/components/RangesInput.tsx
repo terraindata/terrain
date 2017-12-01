@@ -168,8 +168,6 @@ class RangesInput extends TerrainComponent<Props>
   {
     const newRanges = this.props.ranges.push(Map({ name: '', from: 0, to: 0 }));
     this.changeRanges(newRanges);
-    // Focus on new range
-    const index = newRanges.size - 1;
   }
 
   public renderCreateRange()

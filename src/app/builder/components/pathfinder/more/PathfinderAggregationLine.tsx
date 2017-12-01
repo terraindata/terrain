@@ -205,13 +205,13 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
 
     // For the keys min, max, and interval (if they exist), auto-fill
     if (advancedObj.get('min') !== undefined)
-    {      // TODO: Get database info from PathfinderContext.source
-      const source: 'm2' | 'm1' = 'm2';
-      const db = {
-        id: 1,
-        name: '',
-        type: 'string',
-        source,
+    {
+      const db = BuilderStore.getState().db;
+      const backend = {
+        id: db.id,
+        name: db.name,
+        type: db.type,
+        source: db.source,
       };
       const index: string = getIndex('');
       const type: string = getType('');
@@ -240,7 +240,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
 
       Ajax.query(
         JSON.stringify(domainQuery),
-        db,
+        backend,
         (resp) =>
         {
           const min = resp.result.aggregations.minimum.value;
@@ -269,9 +269,14 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     // Get the type of field (using schema) and narrow down th options with fieldTypesToElasticTYpes
     const fieldType: FieldType = ElasticBlockHelpers.getTypeOfField(this.props.pathfinderContext.schemaState, field);
     const options = AggregationTypes.get(type).fieldTypesToElasticTypes.get(String(fieldType));
+    // If there are no options, it is a meta-field
     if (options === undefined)
     {
-      return 'histogram'; // Meta fields (TODO)
+      if (field === '_score' || field === '_size')
+      {
+        return (this.props.aggregation.advanced.get('rangeType') === 'ranges') ? 'range' : 'histogram';
+      }
+      return 'terms';
     }
     // From there choose the correct option based on the advanced features
     // If intervalType = interval, use histograms (not ranges)
@@ -402,6 +407,13 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     }
     elasticType = this.getElasticType(type, undefined, key);
     BuilderActions.change(this.props.keyPath.push('elasticType'), elasticType);
+    // If switching from ranges to uniform interval, auto-fill the interval values
+    if (radioKey === 'rangeType' && key === 'interval')
+    {
+      const advancedTypes = this.getAdvancedOptions(this.props.aggregation.type, elasticType)
+      BuilderActions.change(this.props.keyPath.push('advanced'),
+        this.createAdvancedObject(advancedTypes, this.props.aggregation.field)));
+    }
   }
 
   public addSampler(index, id)

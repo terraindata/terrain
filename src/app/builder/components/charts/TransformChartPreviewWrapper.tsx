@@ -52,6 +52,7 @@ const { List, Map } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
+import Colors from 'app/colors/Colors';
 
 interface ScorePoint
 {
@@ -110,7 +111,7 @@ class TransformChartPreviewWrapper extends TerrainComponent<Props>
       },
       width: this.props.width,
       height: this.props.height,
-      colors: ['#1eb4fa', 'rgb(60, 63, 65)'], // TODO
+      colors: [Colors().builder.cards.categories.score, Colors().bg3],
       mode: this.props.mode,
     };
 

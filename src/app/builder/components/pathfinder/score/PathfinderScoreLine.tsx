@@ -129,7 +129,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
       hasCustomDomain: false,
       scorePoints: this.props.line.transformData.scorePoints,
       static: {
-        colors: ['#1eb4fa', 'rgb(60, 63, 65)'], // TODO
+        colors: [Colors().builder.cards.categories.score, Colors().bg3],
       },
       mode: this.props.line.transformData.mode,
       dataDomain: this.props.line.transformData.dataDomain,
