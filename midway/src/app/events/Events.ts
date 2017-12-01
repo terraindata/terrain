@@ -115,7 +115,7 @@ export class Events
   {
     const body = bodybuilder()
       .size(0)
-      .filter('term', 'variantid', variantid)
+      .filter('term', 'variantid.keyword', variantid)
       .filter('term', 'eventname', request.eventname)
       .filter('range', 'timestamp', {
         gte: request.start,
@@ -157,7 +157,7 @@ export class Events
       .size(0)
       // .orFilter('term', 'eventname', eventnames[0])
       // .orFilter('term', 'eventname', eventnames[1])
-      .filter('term', 'variantid', variantid)
+      .filter('term', 'variantid.keyword', variantid)
       .filter('range', 'timestamp', {
         gte: request.start,
         lte: request.end,
@@ -249,7 +249,7 @@ export class Events
   public generateSelectQuery(controller: DatabaseController, variantid: string, request: AggregationRequest): Elastic.SearchParams
   {
     let body = bodybuilder()
-      .filter('term', 'variantid', variantid)
+      .filter('term', 'variantid.keyword', variantid)
       .filter('term', 'eventname', request.eventname)
       .filter('range', 'timestamp', {
         gte: request.start,
@@ -279,7 +279,7 @@ export class Events
 
     if (variantid !== undefined)
     {
-      body = body.filter('term', 'variantid', variantid);
+      body = body.filter('term', 'variantid.keyword', variantid);
     }
 
     return this.buildQuery(controller, body.build());

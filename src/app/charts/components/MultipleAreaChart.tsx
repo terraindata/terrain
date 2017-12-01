@@ -82,6 +82,16 @@ const styles = {
     height: '10%',
   },
   topChart: {
+    axis: {
+      tickLabels: {
+        fill: 'rgba(255,255,255,0.75)',
+        fontWeight: 'bold',
+        padding: 2,
+      },
+      ticks: {
+        size: 0,
+      },
+    },
     padding: { top: 25, bottom: 0, left: 0, right: 0 },
     areas: { data: { strokeWidth: 2, fillOpacity: 0.4 } },
     scatters: (fill) => ({
@@ -99,6 +109,17 @@ const styles = {
   bottomChart: {
     padding: { top: 0, bottom: 0, left: 0, right: 0 },
     bars: (fill) => ({ data: { fill, fillOpacity: 0.4, width: 10 } }),
+    brush: { stroke: 'transparent', fill: 'white', fillOpacity: 0.1 },
+    brushHandle: (height) => ({
+      stroke: 1,
+      fill: 'grey',
+      fillOpacity: 1,
+      height: height - 10,
+      rx: 2,
+      ry: 2,
+      y: 5,
+    }),
+    axis: { grid: { strokeWidth: 0 }, ticks: { size: 0 } },
   },
   legend: {
     title: {
@@ -118,6 +139,7 @@ const config = {
     scale: { x: 'time', y: 'linear' },
     interpolation: 'monotoneX',
     animate: { duration: 500 },
+    domainPadding: { y: [0, 30] },
   },
   bottomChart: {
     scale: { x: 'time' },
@@ -140,6 +162,7 @@ interface Props
   datasets: Immutable.Map<ID, Dataset>;
   xDataKey: string; // The key to get the value of x from the data
   yDataKey: string; // The key to get the value of y from the data
+  domain?: { start: number, end: number };
   onLegendClick?: (datasetId: ID) => void;
   legendTitle?: string;
 }
@@ -159,7 +182,8 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
     xDataKey: 'x',
     yDataKey: 'y',
     onLegendClick: (datasetId) => { return; },
-    legendTitle: 'CTR',
+    legendTitle: '',
+    domain: { start: 0, end: 0 },
   };
 
   public state: State = {
@@ -427,7 +451,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
   public render()
   {
-    const { datasets, xDataKey, yDataKey } = this.props;
+    const { datasets, xDataKey, yDataKey, domain } = this.props;
 
     const data = this.renderData();
     const legend = this.renderLegend();
@@ -436,13 +460,16 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
     const VictoryZoomVoronoiContainer = createContainer('zoom', 'voronoi');
 
+    const chartDomain = { x: [domain.start, domain.end] };
+
     return (
       <div style={styles.wrapper}>
         <div style={styles.topChartWrapper}>
           <ContainerDimensions>
             {({ width, height }) => (
               <VictoryChart
-                domainPadding={{ y: [0, 30] }}
+                domain={chartDomain}
+                domainPadding={config.topChart.domainPadding}
                 scale={config.topChart.scale}
                 theme={TerrainVictoryTheme}
                 padding={styles.topChart.padding}
@@ -487,13 +514,13 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                 </VictoryGroup>
                 <VictoryAxis
                   offsetY={height - styles.topChart.padding.top}
-                  style={{ tickLabels: { fill: 'rgba(255,255,255,0.75)', fontWeight: 'bold', padding: 2 } }}
+                  style={styles.topChart.axis}
                   tickLabelComponent={<VictoryLabel dx={24} />}
                 />
                 <VictoryAxis
                   dependentAxis
                   offsetX={width}
-                  style={{ tickLabels: { fill: 'rgba(255,255,255,0.75)', fontWeight: 'bold', padding: 2 } }}
+                  style={styles.topChart.axis}
                   tickLabelComponent={<VictoryLabel dy={7} />}
                 />
                 {legend}
@@ -505,36 +532,27 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
           <ContainerDimensions>
             {({ width, height }) => (
               <VictoryChart
+                domain={chartDomain}
                 scale={config.bottomChart.scale}
                 padding={styles.bottomChart.padding}
                 theme={TerrainVictoryTheme}
                 height={height}
                 width={width}
                 containerComponent={
-                  <VictoryBrushContainer responsive={false}
+                  <VictoryBrushContainer
+                    className='TerrainVictoryBrushContainer'
+                    responsive={false}
                     brushDimension='x'
                     brushDomain={this.state.brushDomain}
                     onBrushDomainChange={this.handleBrush}
-                    brushStyle={{ stroke: 'transparent', fill: 'white', fillOpacity: 0.1 }}
-                    handleStyle={{
-                      stroke: 1,
-                      fill: 'grey',
-                      fillOpacity: 1,
-                      height: height - 10,
-                      rx: 2,
-                      ry: 2,
-                      width: 6,
-                      y: 5,
-                    }}
+                    brushStyle={styles.bottomChart.brush}
+                    handleStyle={styles.bottomChart.brushHandle(height)}
                   />
                 }
               >
                 <VictoryAxis
                   offsetY={height}
-                  style={{
-                    grid: { strokeWidth: 0 },
-                    ticks: { size: 0 },
-                  }}
+                  style={styles.bottomChart.axis}
                 />
                 <VictoryGroup offset={15}>
                   {datasets.map((d) => (<VictoryBar

@@ -70,7 +70,13 @@ export default class ESParameterFiller
     return ESParameterSubstituter.generate(source,
       (param: string): string =>
       {
-        const value: any = params[param];
+        const ps = param.split('.');
+        let value = params;
+        for (const p of ps)
+        {
+          value = value[p];
+        }
+
         if (value === undefined)
         {
           throw new Error('Undefined parameter ' + param + '.');

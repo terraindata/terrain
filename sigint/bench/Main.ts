@@ -44,15 +44,57 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-class DeployVariant
+import winston = require('winston');
+
+import App from '../src/App';
+import * as Benchmark from './Benchmark';
+
+let host = 'http://127.0.0.1:43002';
+
+const db = 'http://127.0.0.1:9200';
+
+export async function startServer()
 {
-  /**
-   * @returns {string} the variant's live deployed name in ES
-   */
-  public static getVariantDeployedName(variant: object): string
+  try
   {
-    return 'terrain_' + (variant['id'] as string);
+    const options =
+      {
+        debug: false,
+        db,
+        port: 43002,
+      };
+
+    const app = new App(options);
+    return app.start();
+  }
+  catch (e)
+  {
+    throw new Error('starting event server sigint: ' + String(e));
   }
 }
 
-export default DeployVariant;
+(async () =>
+{
+  if (process.argv.length > 2)
+  {
+    host = process.argv[2];
+    winston.info('Using specified server address: ' + host);
+  }
+  else
+  {
+    // if no host was specified, start a local server
+    // tslint:disable-next-line:no-floating-promises
+    startServer();
+  }
+
+  Benchmark.generateBenchmarkData();
+
+  const s1 = await Benchmark.runBenchmark(host);
+  winston.info(JSON.stringify(s1));
+
+  const s2 = await Benchmark.runBatchBenchmark(host);
+  winston.info(JSON.stringify(s2));
+
+  // TODO: shutdown server gracefully
+  process.exit(0);
+})();

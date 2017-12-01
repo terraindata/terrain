@@ -96,7 +96,6 @@ class SchemaResults extends TerrainComponent<Props>
       this.setState({
         initialized: true,
       });
-      return;
     }
     const { selectedId } = storeState;
     // TODO change if store changes
@@ -125,24 +124,96 @@ class SchemaResults extends TerrainComponent<Props>
         switch (selectedItem.type)
         {
           case 'server':
-            queryString = '{ "index": "", "type": "", "from": 0, "size": 1000 }';
+            queryString = '{' +
+              '  "query": {' +
+              '    "bool": {}' +
+              '  },' +
+              '  "from": 0,' +
+              '  "size": 1000' +
+              '}';
             break;
           case 'database':
-            queryString = '{ "index": "' + selectedItem['name'] + '", "type": "", "from": 0, "size": 1000 }';
+            queryString = '{' +
+              '  "query": {' +
+              '    "bool": {' +
+              '      "filter": [' +
+              '        {' +
+              '          "term": {' +
+              '            "_index": "' + selectedItem['name'] + '"' +
+              '          }' +
+              '        }' +
+              '      ]' +
+              '    }' +
+              '  },' +
+              '  "from": 0,' +
+              '  "size": 1000' +
+              '}';
             break;
           case 'table':
-            queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
-              + '", "type": "' + selectedItem['name'] + '", "from": 0, "size": 1000 }';
+            queryString = '{' +
+              '  "query": {' +
+              '    "bool": {' +
+              '      "filter": [' +
+              '        {' +
+              '          "term": {' +
+              '            "_index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '') + '"' +
+              '          }' +
+              '        },' +
+              '        {' +
+              '          "term": {' +
+              '            "_type": "' + selectedItem['name'] + '"' +
+              '          }' +
+              '        }' +
+              '      ]' +
+              '    }' +
+              '  },' +
+              '  "from": 0,' +
+              '  "size": 1000' +
+              '}';
             break;
           case 'column':
-            queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
-              + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '",'
-              + '"from": 0, "size": 1000 }';
+            queryString = '{' +
+              '  "query": {' +
+              '    "bool": {' +
+              '      "filter": [' +
+              '        {' +
+              '          "term": {' +
+              '            "_index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '') + '"' +
+              '          }' +
+              '        },' +
+              '        {' +
+              '          "term": {' +
+              '            "_type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '"' +
+              '          }' +
+              '        }' +
+              '      ]' +
+              '    }' +
+              '  },' +
+              '  "from": 0,' +
+              '  "size": 1000' +
+              '}';
             break;
           case 'fieldProperty':
-            queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
-              + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '",'
-              + '"from": 0, "size": 1000 }';
+            queryString = '{' +
+              '  "query": {' +
+              '    "bool": {' +
+              '      "filter": [' +
+              '        {' +
+              '          "term": {' +
+              '            "_index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '') + '"' +
+              '          }' +
+              '        },' +
+              '        {' +
+              '          "term": {' +
+              '            "_type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '"' +
+              '          }' +
+              '        }' +
+              '      ]' +
+              '    }' +
+              '  },' +
+              '  "from": 0,' +
+              '  "size": 1000' +
+              '}';
             break;
         }
 
@@ -214,7 +285,6 @@ class SchemaResults extends TerrainComponent<Props>
           this.showsResults(this.state.selectedItem) ?
             <div
               style={{
-                marginLeft: 12,
                 paddingRight: 6,
                 boxSizing: 'border-box',
               }}
@@ -230,6 +300,7 @@ class SchemaResults extends TerrainComponent<Props>
                 showExport={false}
                 showCustomizeView={false}
                 allowSpotlights={false}
+                ignoreEmptyCards={true}
               />
             </div>
             :

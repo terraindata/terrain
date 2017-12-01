@@ -60,9 +60,9 @@ AnalyticsReducer[ActionTypes.fetchStart] =
   };
 
 AnalyticsReducer[ActionTypes.fetchSuccess] =
-  (state, action: Action<{ analytics: any }>) =>
+  (state, action: Action<{ analytics: any, dateRangeDomain: any }>) =>
   {
-    const { analytics } = action.payload;
+    const { analytics, dateRangeDomain } = action.payload;
     let nextState = state;
 
     Object.keys(analytics).forEach((variantId) =>
@@ -70,7 +70,8 @@ AnalyticsReducer[ActionTypes.fetchSuccess] =
       const variantAnalytics = analytics[variantId];
       nextState = nextState
         .set('loaded', true)
-        .setIn(['data', parseInt(variantId, 10)], variantAnalytics)
+        .setIn(['data', variantId], variantAnalytics)
+        .set('selectedDateRangeDomain', dateRangeDomain)
         .set('errors', []);
     });
 
@@ -123,6 +124,17 @@ AnalyticsReducer[ActionTypes.pinVariant] =
     const isVariantPinned = state.getIn(['pinnedVariants', variantId], false);
 
     return state.setIn(['pinnedVariants', variantId], !isVariantPinned);
+  };
+
+AnalyticsReducer[ActionTypes.fetchAvailableMetricsSuccess] =
+  (state, action: Action<{ availableMetrics: any[] }>) =>
+  {
+    const { availableMetrics } = action.payload;
+
+    return state.set(
+      'availableMetrics',
+      state.availableMetrics.clear().concat(availableMetrics),
+    );
   };
 
 const AnalyticsReducerWrapper = (state: AnalyticsState = _AnalyticsState(), action) =>

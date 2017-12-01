@@ -44,63 +44,48 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import benchrest = require('bench-rest');
-import winston = require('winston');
+import * as pg from 'pg';
+import PostgreSQLConfig from '../PostgreSQLConfig';
+import PostgreSQLController from '../PostgreSQLController';
 
-import App from '../src/App';
-
-const db = 'http://127.0.0.1:9200';
-const host = 'http://127.0.0.1:43002';
-let server;
-
-export async function startServer()
+/**
+ * An client which acts as a selective isomorphic wrapper around
+ * the postgres js API
+ */
+class PostgreSQLClient
 {
-  try
-  {
-    const options =
-      {
-        debug: true,
-        db,
-        port: 43002,
-      };
+  private controller: PostgreSQLController;
+  private config: PostgreSQLConfig;
+  private delegate: pg.Pool;
 
-    const app = new App(options);
-    server = await app.start();
-  }
-  catch (e)
+  constructor(controller: PostgreSQLController, config: PostgreSQLConfig)
   {
-    throw new Error('starting event server sigint: ' + String(e));
+    this.controller = controller;
+    this.config = config;
+    this.delegate = new pg.Pool(config);
+
+    this.delegate.on('acquire', (connection: pg.Client) =>
+    {
+      this.controller.log('PostgreSQLClient', 'Connection acquired ');
+    });
+
+    this.delegate.on('remove' as any, (connection: pg.Client) =>
+    {
+      this.controller.log('PostgreSQLClient', 'Connection released ');
+    });
+  }
+
+  public query(queryString: string, params?: any[], callback?: any): pg.Query
+  {
+    this.controller.log('PostgreSQLClient.query', queryString, params);
+    return this.delegate.query(queryString, params as any, callback);
+  }
+
+  public end(callback: () => void): void
+  {
+    this.controller.log('PostgreSQLClient.end');
+    return this.delegate.end(callback);
   }
 }
 
-export const flow = {
-  main: [
-    {
-      post: host + '/v1', json: {
-        eventname: 'click',
-        variantid: '#{INDEX}',
-        visitorid: '#{INDEX}',
-      },
-    },
-    { get: host + '/v1?eventname=click&variantid=#{INDEX}&visitorid=#{INDEX}' },
-  ],
-};
-
-const runOptions = {
-  limit: 20,
-  prealloc: 1000,
-  iterations: 1000,
-};
-
-// tslint:disable-next-line:no-floating-promises
-startServer();
-benchrest(flow, runOptions)
-  .on('error', (err, ctx) => winston.error('Failed in %s with err: ', ctx, err))
-  .on('progress', (stats, percent, concurrent, ips) => winston.info('Progress: %s complete', percent))
-  .on('end', (stats, errorCount) =>
-  {
-    winston.info('error count: ', errorCount);
-    winston.info('stats', stats);
-    // TODO: teardown server here
-    process.exit();
-  });
+export default PostgreSQLClient;

@@ -51,7 +51,8 @@ THE SOFTWARE.
   It is used by the TransformChart to draw lines and the Elastic Transform Card to pass data into the PWL script
 
   Logarithmic:
-    Two different functions are used for growth versus decay to get the desired shape of the curve
+    Two different functions are used for growth versus decay to get the desired shape of the curve.
+    For growth the curve is shifted so that x is small (relative to range) and then shifted back, to maximize curviness!
 
   Exponential:
     The curve is shifted down so that the lower point is at 0, the curve is built and then it is shifted back up
@@ -83,22 +84,23 @@ export const NUM_CURVE_POINTS = {
 
 const TransformUtil = {
 
-  getLogarithmicData(numPoints, pointsData, domainMin?, domainMax?)
+  getLogarithmicData(numPoints, pointsData, domainMin, domainMax)
   {
-    const x1: number = pointsData[0].x || pointsData[0].value;
+    let x1: number = pointsData[0].x || pointsData[0].value;
     const y1: number = pointsData[0].y || pointsData[0].score;
-    const x2: number = pointsData[1].x || pointsData[1].value;
+    let x2: number = pointsData[1].x || pointsData[1].value;
     const y2: number = pointsData[1].y || pointsData[1].score;
 
     const ranges = [];
     const outputs = [];
-    const stepSize = Math.abs(pointsData[1].x - pointsData[0].x) * (1 / numPoints);
-    if (pointsData[0].y > pointsData[1].y)
+    const stepSize = Math.abs(x2 - x1) * (1 / numPoints);
+    // Decay
+    if (y1 > y2)
     {
       const yMax = y1 + 0.05;
       const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
       const b = x2 - Math.log(yMax - y2) / k;
-      let x = pointsData[0].x;
+      let x = x1;
       for (let i = 0; i <= numPoints; i++)
       {
         const y = -1 * Math.exp(k * (x - b)) + yMax;
@@ -107,15 +109,19 @@ const TransformUtil = {
         x += stepSize;
       }
     }
+    // Growth
     else
     {
+      const shift = x1 - 0.005 * (domainMax - domainMin);
+      x1 = x1 - shift;
+      x2 = x2 - shift;
       const a: number = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / (1 - Math.log(x1) / Math.log(x2));
       const b: number = (y2 - a) / Math.log(x2);
-      let x = pointsData[0].x;
+      let x = x1;
       for (let i = 0; i <= numPoints; i++)
       {
         const y = TransformUtil._logarithmic(x, a, b);
-        ranges.push(x);
+        ranges.push(x + shift);
         outputs.push(y);
         x += stepSize;
       }

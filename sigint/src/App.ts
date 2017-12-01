@@ -86,7 +86,7 @@ class App
     // first, load config from a config file, if one is specified
     config = Config.loadConfigFromFile(config);
 
-    winston.debug('Using configuration: ' + JSON.stringify(config));
+    winston.info('Using configuration: ' + JSON.stringify(config));
     this.config = config;
     CFG = this.config;
 

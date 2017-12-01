@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
+import { addBodyToQuery } from '../../../../shared/database/elastic/ElasticUtil';
 import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
@@ -232,8 +233,7 @@ export class Export
       {
         return reject(mapping);
       }
-
-      winston.info(qry);
+      qryObj = addBodyToQuery(qryObj, this.SCROLL_TIMEOUT);
 
       let rankCounter: number = 1;
       let writer: any;
@@ -259,12 +259,27 @@ export class Export
         writer.write('[');
       }
 
-      qryObj['scroll'] = this.SCROLL_TIMEOUT;
       let errMsg: string = '';
       let isFirstJSONObj: boolean = true;
+
+      const originalMapping: object = {};
+      // generate original mapping if there were any renames
+      const allNames = Object.keys(exprt.columnTypes);
+      allNames.forEach((value, i) =>
+      {
+        originalMapping[value] = value;
+      });
+
+      const renameTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'rename');
+
+      renameTransformations.forEach((transformation) =>
+      {
+        originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
+      });
+
       elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
       {
-        if (resp.hits === undefined || resp.hits.total === 0)
+        if (resp === undefined || resp.hits === undefined || resp.hits.total === 0)
         {
           writer.end();
           errMsg = 'Nothing to export.';
@@ -282,7 +297,7 @@ export class Export
         for (const doc of newDocs)
         {
           // verify schema mapping with documents and fix documents accordingly
-          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], mapping);
+          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
           if (typeof newDoc === 'string')
           {
             writer.end();

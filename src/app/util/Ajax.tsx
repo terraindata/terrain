@@ -492,6 +492,7 @@ export const Ajax =
     getVariantStatus(
       variantId: ID,
       dbid: number,
+      deployedName: string,
       onLoad: (resp: object) => void,
       onError?: (resp: any) => void,
     )
@@ -523,7 +524,7 @@ export const Ajax =
           }
         },
         {
-          onError, urlArgs: { dbid },
+          onError, urlArgs: { dbid, deployedName },
         },
       );
       return;
@@ -1388,6 +1389,29 @@ export const Ajax =
       return Ajax.req(
         'get',
         'time',
+        {},
+        (response: any) =>
+        {
+          try
+          {
+            onLoad(response);
+          }
+          catch (e)
+          {
+            onError && onError(response as any);
+          }
+        },
+        { onError });
+    },
+
+    getAvailableMetrics(
+      onLoad: (response: any) => void,
+      onError?: (ev: Event) => void,
+    )
+    {
+      return Ajax.req(
+        'get',
+        'events/metrics',
         {},
         (response: any) =>
         {

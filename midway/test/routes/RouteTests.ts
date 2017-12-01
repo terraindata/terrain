@@ -1055,8 +1055,8 @@ describe('File export templates route tests', () =>
           dbname: 'movies',
           templateId: 1,
           filetype: 'csv',
-          query: '{\"body\":{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
-          + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}}',
+          query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+          + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
         },
       })
       .expect(200)
@@ -1097,7 +1097,7 @@ describe('Credentials tests', () =>
         const resultAsArray: object[] = result as object[];
         expect(resultAsArray[0]).toMatchObject({
           createdBy: 1,
-          id: 1,
+          id: 2,
           meta: '',
           name: 'SFTP Test 1',
           type: 'sftp',
@@ -1125,6 +1125,14 @@ describe('Credentials tests', () =>
         expect(result).toMatchObject([{
           createdBy: 1,
           id: 1,
+          meta: '',
+          name: 'Local Filesystem Config',
+          permissions: 0,
+          type: 'local',
+        },
+        {
+          createdBy: 1,
+          id: 2,
           meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
           name: 'SFTP Test 1',
           permissions: 1,
@@ -1176,9 +1184,9 @@ describe('Analytics route tests', () =>
         accessToken: 'ImAnAdmin',
         database: 1,
         start: new Date(2017, 10, 6, 7, 24, 4),
-        end: new Date(2017, 10, 6, 7, 26, 4),
+        end: new Date(2017, 10, 6, 7, 32, 4),
         eventname: 'impression',
-        variantid: 5,
+        variantid: 'terrain_5',
         agg: 'select',
       })
       .expect(200)
@@ -1190,7 +1198,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['5'].length).toEqual(3);
+        expect(respData['terrain_5'].length).toEqual(2);
       });
   });
 
@@ -1203,9 +1211,9 @@ describe('Analytics route tests', () =>
         accessToken: 'ImAnAdmin',
         database: 1,
         start: new Date(2017, 10, 6, 7, 24, 4),
-        end: new Date(2017, 10, 6, 7, 28, 4),
+        end: new Date(2017, 10, 6, 7, 32, 4),
         eventname: 'impression',
-        variantid: 5,
+        variantid: 'terrain_5',
         agg: 'histogram',
         interval: 'minute',
       })
@@ -1218,7 +1226,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['5'].length).toEqual(3);
+        expect(respData['terrain_5'].length).toEqual(6);
       });
   });
 
@@ -1233,7 +1241,7 @@ describe('Analytics route tests', () =>
         start: new Date(2017, 10, 6, 7, 24, 4),
         end: new Date(2017, 10, 6, 10, 24, 4),
         eventname: 'click,impression',
-        variantid: 5,
+        variantid: 'terrain_5',
         agg: 'rate',
         interval: 'hour',
       })
@@ -1246,7 +1254,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['5'].length).toEqual(4);
+        expect(respData['terrain_5'].length).toEqual(4);
       });
   });
 

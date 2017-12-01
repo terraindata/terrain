@@ -54,6 +54,7 @@ import * as React from 'react';
 import { browserHistory } from 'react-router';
 
 import { getIndex, getType } from 'database/elastic/blocks/ElasticBlockHelpers';
+import { addBodyToQuery } from 'shared/database/elastic/ElasticUtil';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
@@ -213,7 +214,7 @@ class FileImportPreview extends TerrainComponent<Props>
       Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      const parsedQuery = JSON.parse(stringQuery);
+      const parsedQuery = addBodyToQuery(stringQuery);
       Actions.fetchTypesFromQuery(this.props.serverId, parsedQuery);
     } // Parse the TQL and set the filters so that when we fetch we get the right templates.
 

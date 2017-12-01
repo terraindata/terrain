@@ -208,7 +208,7 @@ class Library extends TerrainComponent<any>
       })
       .map((variant) =>
       {
-        return { id: variant.id, label: variant.name, data: this.getData(variant.id) };
+        return { id: variant.id, label: variant.name, data: this.getData(variant.deployedName) };
       });
 
     return datasets.toMap();
@@ -348,6 +348,7 @@ class Library extends TerrainComponent<any>
       selectedMetric,
       selectedInterval,
       selectedDateRange,
+      selectedDateRangeDomain,
       pinnedVariants,
     } = analytics;
 
@@ -422,6 +423,11 @@ class Library extends TerrainComponent<any>
         label: algorithm.name,
         path: `/${basePath}/${groupId}`,
       } : null;
+
+    const selectedMetricObject = analytics.availableMetrics.find((metric) =>
+    {
+      return metric.events === selectedMetric;
+    });
 
     return (
       <div className='library library-layout-horizontal'>
@@ -501,6 +507,10 @@ class Library extends TerrainComponent<any>
                     xDataKey={'key'}
                     yDataKey={'doc_count'}
                     onLegendClick={this.handleLegendClick}
+                    legendTitle={selectedMetricObject !== undefined ?
+                      selectedMetricObject.label : ''
+                    }
+                    domain={selectedDateRangeDomain}
                   /> : (
                     <div className='library-analytics-error'>
                       <p>An error occurred while fetching the analytics data</p>
@@ -518,6 +528,7 @@ class Library extends TerrainComponent<any>
             <div className='library-analytics-selector-wrapper'>
               <AnalyticsSelector
                 analytics={analytics}
+                analyticsActions={this.props.analyticsActions}
                 servers={schema.servers}
                 analyticsConnection={analytics.selectedAnalyticsConnection}
                 onMetricSelect={this.handleMetricRadioButtonClick}
