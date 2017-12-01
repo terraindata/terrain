@@ -67,7 +67,7 @@ export interface Props
   keyPath: KeyPath;
 }
 
-export class PathfinderAdvancedLine extends TerrainComponent<Props>
+export class PathfinderAggregationMoreSection extends TerrainComponent<Props>
 {
   public state: {
     expanded: boolean;
@@ -120,4 +120,4 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
   }
 }
 
-export default PathfinderAdvancedLine;
+export default PathfinderAggregationMoreSection;

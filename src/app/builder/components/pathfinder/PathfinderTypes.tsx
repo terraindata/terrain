@@ -227,6 +227,7 @@ class AggregationLineC extends BaseClass
   public sampler: Sample = undefined;
   public filters: FilterGroup = undefined;
   public nested: List<AggregationLine> = undefined;
+  public scripts: List<Script> = undefined;
 }
 
 export type AggregationLine = AggregationLineC & IRecord<AggregationLineC>;
@@ -250,6 +251,10 @@ export const _AggregationLine = (config?: { [key: string]: any }) =>
   {
     aggregation = aggregation.set('nested', List(aggregation['nested'].map((agg) => _AggregationLine(agg))));
   }
+  if (aggregation['scripts'] !== undefined)
+  {
+    aggregation = aggregation.set('scripts', List(aggregation['scripts'].map((script) => _Script(script))));
+  }
   aggregation = aggregation
     .set('advanced', Map(advanced));
   return aggregation;
@@ -264,6 +269,15 @@ class SampleC extends BaseClass
 export type Sample = SampleC & IRecord<SampleC>;
 export const _Sample = (config?: { [key: string]: any }) =>
   New<Sample>(new SampleC(config), config);
+
+class ScriptC extends BaseClass
+{
+  public id: string = '';
+  public script: string = '';
+}
+export type Script = ScriptC & IRecord<ScriptC>;
+export const _Script = (config?: { [key: string]: any }) =>
+  New<Script>(new ScriptC(config), config);
 
 class FilterLineC extends LineC
 {
