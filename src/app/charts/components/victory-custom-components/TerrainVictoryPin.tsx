@@ -44,22 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires
-import Colors from 'colors/Colors';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as React from 'react';
 import ColorManager from 'util/ColorManager';
-import { Point,  VictoryLabel } from 'victory';
+import { Point, VictoryLabel } from 'victory';
+import Colors from '../../../colors/Colors';
 
 const PinIcon = require('images/icon_pin.svg?name=PinIcon');
 
-interface LegendSymbolProps {
+interface TerrainVictoryPinProps
+{
   pinStyle: any;
   onPinClick: (e, props) => void;
   x?: number;
   datum?: any;
 }
 
-export default class LegendSymbol extends TerrainComponent<LegendSymbolProps> {
+export default class TerrainVictoryPin extends TerrainComponent<TerrainVictoryPinProps> {
   public state = {
     pinStyle: this.props.pinStyle,
   };

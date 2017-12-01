@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import LegendLabel from 'charts/components/custom/LegendLabel';
-import LegendSymbol from 'charts/components/custom/LegendSymbol';
+import TerrainVictoryLabel from 'charts/components/victory-custom-components/TerrainVictoryLabel';
+import TerrainVictoryPin from 'charts/components/victory-custom-components/TerrainVictoryPin';
 import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
@@ -357,7 +357,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         name='legend'
         gutter={23}
         data={data.toArray()}
-        dataComponent={<LegendSymbol
+        dataComponent={<TerrainVictoryPin
           onPinClick={this.handleLegendClick}
           pinStyle={styles.legend.pinStyle}
         />}
@@ -366,7 +366,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
           title: styles.legend.title,
         }}
         title={legendTitle}
-        labelComponent={<LegendLabel />}
+        labelComponent={<TerrainVictoryLabel />}
       />
     );
   }

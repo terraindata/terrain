@@ -46,13 +46,14 @@ THE SOFTWARE.
 import * as React from 'react';
 import { VictoryLabel } from 'victory';
 
-interface Props {
+interface Props
+{
   datum?: any;
 }
 
-const LegendLabel = (props: Props) => (
+const TerrainVictoryLabel = (props: Props) => (
   props.datum.isPinned ?
     <VictoryLabel dx='10' {...props} /> : <VictoryLabel {...props} />
 );
 
-export default LegendLabel;
+export default TerrainVictoryLabel;
