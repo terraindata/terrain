@@ -18,7 +18,6 @@
             "analytics/*": ["app/analytics/*"],
             "builder/*": ["app/builder/*"],
             "charts/*": ["app/charts/*"],
-            "colors/*": ["app/colors/*"],
             "common/*": ["app/common/*"],
             "deploy/*": ["app/deploy/*"],
             "fileimport/*": ["app/fileimport/*"],
@@ -30,7 +29,6 @@
             "users/*": ["app/users/*"],
             "util/*": ["app/util/*"],
             "x/*": ["app/x/*"],
-            "colors/*": ["app/colors*"]
         },
         "experimentalDecorators": true,
         "allowJs": true,
