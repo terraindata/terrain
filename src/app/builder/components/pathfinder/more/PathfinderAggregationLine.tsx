@@ -48,10 +48,8 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map, Set } = Immutable;
 import ElasticBlockHelpers, { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
@@ -61,10 +59,7 @@ import Dropdown from '../../../../common/components/Dropdown';
 import Ajax from '../../../../util/Ajax';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderText from '../PathfinderText';
-import
-{
-  _AggregationLine, ADVANCED_MAPPINGS, AggregationLine, AggregationTypes, ChoiceOption, Path, PathfinderContext,
-} from '../PathfinderTypes';
+import {ADVANCED_MAPPINGS, AggregationLine, AggregationTypes, PathfinderContext} from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 import PathfinderAdvancedLine from './PathfinderAdvancedLine';

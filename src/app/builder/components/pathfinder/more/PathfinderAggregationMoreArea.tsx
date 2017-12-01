@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -55,7 +54,7 @@ import * as React from 'react';
 const { List, Map } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import FadeInOut from 'app/common/components/FadeInOut';
-import { AggregationLine, _AggregationLine, _FilterGroup, PathfinderContext, _Sample, _Script } from 'app/builder/components/pathfinder/PathfinderTypes';
+import { _AggregationLine, AggregationLine, _FilterGroup, PathfinderContext, _Sample, _Script } from 'app/builder/components/pathfinder/PathfinderTypes';
 import PathfinderFilterSection from 'app/builder/components/pathfinder/filter/PathfinderFilterSection';
 import Dropdown from 'app/common/components/Dropdown';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
@@ -95,7 +94,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
     BuilderActions.change(this.props.keyPath.push('nested'), List([]));
   }
 
-  public addScript()
+  public addScripts()
   {
     BuilderActions.change(this.props.keyPath.push('scripts'), List([]));
   }
@@ -175,7 +174,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
     BuilderActions.change(this.props.keyPath.push('nested'), this.props.aggregation.nested.push(_AggregationLine()));
   }
 
-  public getAggregationLines()
+  public renderNestedAggregations()
   {
     return (
       <div>
@@ -192,17 +191,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                 key={i}
               />
             );
-          })}
-      </div>
-    );
-  }
-
-  public renderNestedAggregations()
-  {
-    return (
-      <div>
-        {this.getAggregationLines()}
-        <PathfinderCreateLine
+          })}        <PathfinderCreateLine
           canEdit={this.props.pathfinderContext.canEdit}
           onCreate={this.handleAddLine}
           text={PathfinderText.createAggregationLine}
@@ -324,7 +313,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
     {
       moreOptions = moreOptions.push({
         text: 'Add script...',
-        onClick: this.addScript,
+        onClick: this.addScripts,
       })
     }
     return (

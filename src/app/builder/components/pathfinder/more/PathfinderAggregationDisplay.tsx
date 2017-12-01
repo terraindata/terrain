@@ -73,7 +73,7 @@ export interface AdvancedAggregationItem
   placeholder?: string;
   options?: List<string>;
   isNumber?: boolean;
-  fieldOptions?: boolean; // Use the fields a options
+  fieldOptions?: boolean; // Use the fields as options
 }
 
 export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDisplay>({

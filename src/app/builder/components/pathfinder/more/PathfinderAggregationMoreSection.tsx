@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
+import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';

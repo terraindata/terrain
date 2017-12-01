@@ -48,11 +48,10 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
+import { Colors, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
+const { List } = Immutable;
 import ColorsActions from 'app/colors/data/ColorsActions';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
@@ -73,13 +72,7 @@ export interface Props
 
 class PathfinderMoreSection extends TerrainComponent<Props>
 {
-  public state: {
-
-  } = {
-
-  };
-
-  public componentWillMount()
+public componentWillMount()
   {
     ColorsActions.setStyle('.pf-line-wrapper .expand', getStyle('fill', Colors().iconColor));
     ColorsActions.setStyle('.pf-aggregation-arrow-open', { fill: Colors().active + ' !important' });
