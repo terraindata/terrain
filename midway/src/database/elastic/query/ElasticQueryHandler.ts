@@ -73,7 +73,7 @@ export default class ElasticQueryHandler extends QueryHandler
 {
   private controller: ElasticController;
 
-  private GROUP_JOIN_MSEARCH_MAX = 10;
+  private GROUP_JOIN_MSEARCH_MAX = 1000;
 
   constructor(controller: ElasticController)
   {
@@ -203,7 +203,6 @@ export default class ElasticQueryHandler extends QueryHandler
     const promises: Array<Promise<any>> = [];
     for (let i = 0, chunkSize = this.GROUP_JOIN_MSEARCH_MAX; i < hits.length; i += chunkSize)
     {
-      console.log('Adding chunk ' + i + ' to promises...');
       if (i + chunkSize > hits.length)
       {
         chunkSize = hits.length - i;
@@ -213,19 +212,19 @@ export default class ElasticQueryHandler extends QueryHandler
       // const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
       // const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
 
-      const body: any[] = [];
-      for (let j = i; j < chunkSize; ++j)
-      {
-        winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
-        const header = {};
-        body.push(header);
-
-        const queryStr = ESParameterFiller.generate(valueInfo, { parent: hits[j]._source });
-        body.push(queryStr);
-      }
-
       promises.push(new Promise((resolve, reject) =>
       {
+        const body: any[] = [];
+        for (let j = i; j < i + chunkSize; ++j)
+        {
+          winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
+          const header = {};
+          body.push(header);
+
+          const queryStr = ESParameterFiller.generate(valueInfo, { parent: hits[j]._source });
+          body.push(queryStr);
+        }
+
         const client: ElasticClient = this.controller.getClient();
         client.msearch(
           {
@@ -233,20 +232,20 @@ export default class ElasticQueryHandler extends QueryHandler
           },
           (error: Error | null, response: any) =>
           {
-            if (error)
+            if (error !== null && error !== undefined)
             {
               return reject(error);
             }
 
-      //       for (let j = 0; j < chunkSize; ++j)
-      //       {
-      //         // hits[i + j][subQuery] = response.responses[j].hits.hits;
-      //       }
+            for (let j = 0; j < chunkSize; ++j)
+            {
+              hits[i + j][subQuery] = response.responses[j].hits.hits;
+            }
             resolve();
           });
       }));
     }
-    await Promise.all(promises);
+    return Promise.all(promises);
   }
 
   private getParsedQuery(bodyStr: string): ESParser
