@@ -742,7 +742,7 @@ describe('Query route tests', () =>
           type: 'search',
           body: `{
             "from": 0,
-            "size": 5,
+            "size": 15,
             "body": {
               "_source": ["movieid", "title"],
               "query": {
@@ -773,7 +773,7 @@ describe('Query route tests', () =>
             "groupJoin": {
               "englishMovies": {
                 "from" : 0,
-                "size" : 5,
+                "size" : 15,
                 "_source": ["movieid", "overview"],
                 "query" : {
                   "bool" : {
