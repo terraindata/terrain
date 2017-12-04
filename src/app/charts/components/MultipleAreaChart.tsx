@@ -43,14 +43,14 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import TerrainVictoryLabel from 'charts/components/victory-custom-components/TerrainVictoryLabel';
-import TerrainVictoryPin from 'charts/components/victory-custom-components/TerrainVictoryPin';
+import TVictoryLabel from 'charts/components/victory-custom/TVictoryLabel';
+import TVictoryLinePoint from 'charts/components/victory-custom/TVictoryLinePoint';
+import TVictoryPin from 'charts/components/victory-custom/TVictoryPin';
+import TVictoryTooltip from 'charts/components/victory-custom/TVictoryTooltip';
 import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as LibraryTypes from 'library/LibraryTypes';
-import { omit } from 'lodash';
-import * as moment from 'moment';
 import * as React from 'react';
 import ContainerDimensions from 'react-container-dimensions';
 import ColorManager from 'util/ColorManager';
@@ -198,78 +198,6 @@ interface State
   datasetColors: any;
 }
 
-const CustomLabel = (props) =>
-{
-  return (
-    <text dy={5} x={props.x} y={props.y} style={props.style} >
-      <tspan style={{ fontWeight: 'bold' }}>{props.datum.value}</tspan>
-      <tspan dx={10} style={{ fill: 'white' }}>{props.datum.name}</tspan>
-    </text>
-  );
-};
-
-const CustomTooltip = (props) =>
-{
-  const { datum, text, xDataKey, style, dateFormat } = props;
-  const data = text.map((t) =>
-  {
-    const parsedText = t.split('|');
-    return {
-      id: parsedText[0],
-      value: parsedText[1],
-      name: parsedText[2],
-      symbol: { fill: parsedText[3] },
-      labels: {
-        ...omit(style[0], ['textAnchor']),
-        fill: parsedText[3],
-      },
-    };
-  });
-
-  const timestamp = datum[xDataKey];
-  const date = moment(timestamp);
-  const title = date.format(dateFormat);
-
-  const labelComponent = <CustomLabel />;
-
-  return (
-    <VictoryLegend
-      theme={TerrainVictoryTheme}
-      standalone={false}
-      x={10}
-      y={50}
-      padding={0}
-      borderPadding={styles.topChart.tooltipLegendBorderPadding}
-      gutter={20}
-      data={data}
-      orientation={'vertical'}
-      style={styles.topChart.tooltipLegend}
-      title={title}
-      labelComponent={labelComponent}
-      borderComponent={<Border
-        // need to change this prop so the border re-renders
-        className={`custom-tooltip-label-${data.length}`}
-      />}
-    />
-  );
-};
-
-const CustomDataComponent = (props) =>
-{
-  return props.active ? (
-    <g>
-      <Line
-        style={styles.topChart.activeDataVerticalLine}
-        x1={props.x}
-        y1={0}
-        x2={props.x}
-        y2={props.chartHeight}
-      />
-      <Point {...props} />
-    </g>
-  ) : null;
-};
-
 export default class MultipleAreaChart extends TerrainComponent<Props> {
   public static defaultProps: Partial<Props> = {
     datasets: Immutable.Map({}),
@@ -371,8 +299,9 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
             size={(datum, active) => active ? 3 : 0}
             x={xDataKey}
             y={yDataKey}
-            dataComponent={<CustomDataComponent
+            dataComponent={<TVictoryLinePoint
               chartHeight={chartHeight}
+              lineStyle={styles.topChart.activeDataVerticalLine}
             />}
           />,
         );
@@ -409,7 +338,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
         name='legend'
         gutter={23}
         data={data.toArray()}
-        dataComponent={<TerrainVictoryPin
+        dataComponent={<TVictoryPin
           onPinClick={this.handleLegendClick}
           pinStyle={styles.legend.pinStyle}
         />}
@@ -418,7 +347,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
           title: styles.legend.title,
         }}
         title={legendTitle}
-        labelComponent={<TerrainVictoryLabel />}
+        labelComponent={<TVictoryLabel />}
       />
     );
   }
@@ -510,7 +439,7 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
     const legend = this.renderLegend();
     const VictoryZoomVoronoiContainer = createContainer('zoom', 'voronoi');
-    const chartDomain = { x: [domain.start, ``domain.end] };
+    const chartDomain = { x: [domain.start, domain.end] };
 
     return (
       <div style={styles.wrapper}>
@@ -534,10 +463,12 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                       downsample={5}
                       zoomDimension='x'
                       voronoiDimension='x'
-                      labels={d => d.l ? `${d.id}|${d.y}|${d.name}|${this.getDatasetColor(d.id)}` : null}
-                      labelComponent={<CustomTooltip
+                      labels={(d) => d.l ? `${d.id}|${d.y}|${d.name}|${this.getDatasetColor(d.id)}` : null}
+                      labelComponent={<TVictoryTooltip
                         xDataKey={xDataKey}
                         dateFormat={dateFormat}
+                        borderPadding={styles.topChart.tooltipLegendBorderPadding}
+                        tooltipStyle={styles.topChart.tooltipLegend}
                       />}
                       zoomDomain={this.state.zoomDomain}
                       onZoomDomainChange={this.handleZoom}
