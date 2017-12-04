@@ -265,7 +265,7 @@ class FileImport extends TerrainComponent<any>
       }
       const colHeaderSet: Set<string> = new Set();
       const duplicateHeaderSet: Set<string> = new Set();
-      _.map(columnHeaders[0], (colHeader) =>
+      _.map(columnHeaders[0] as string[], (colHeader) =>
       {
         if (colHeaderSet.has(colHeader))
         {
@@ -329,9 +329,9 @@ class FileImport extends TerrainComponent<any>
           columnNames = Array.from(columnNamesSet);
           break;
         case 'csv':
-          columnNames = _.map(items[0], (value, index) =>
+          columnNames = _.map(items[0] as any, (value, index) =>
             !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
-          );
+          ) as string[];
           break;
         default:
       }
