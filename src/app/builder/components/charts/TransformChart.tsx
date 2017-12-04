@@ -83,7 +83,7 @@ const TransformChart = {
 
     svg.append('rect')
       .attr('class', 'bg')
-      .attr('fill', '#fff');
+      .attr('fill', Colors().transformChartBg);
 
     svg.append('g')
       .attr('class', 'yLeftAxis');
@@ -1651,7 +1651,7 @@ const TransformChart = {
     point
       .attr('cx', pointXValue)
       .attr('cy', pointYValue)
-      .attr('fill', '#fff')
+      .attr('fill', Colors().transformChartBg)
       .attr('style', (d) => 'stroke: ' + (d['selected'] ? Colors().error : colors[0]))
       .attr('class', (d) =>
         'point' + (d['selected'] ? ' point-selected' : '')

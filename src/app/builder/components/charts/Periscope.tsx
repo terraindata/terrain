@@ -140,7 +140,7 @@ const Periscope = {
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
-      .attr('fill', '#fff');
+      .attr('fill', Colors().transformChartBg);
   },
 
   _drawAxes(el, scales)
@@ -246,12 +246,12 @@ const Periscope = {
       .append('circle')
       .attr('class', 'handle')
       .attr('style', 'stroke: ' + Colors().altHighlight)
-      .attr('fill', '#fff');
+      .attr('fill', Colors().transformChartBg);
 
     handle
       .attr('cx', (d) => scales.x(d))
       .attr('cy', scaleMin(scales.barY))
-      .attr('fill', '#fff')
+      .attr('fill', Colors().transformChartBg)
       .attr('style', 'stroke: ' + Colors().altHighlight)
       .attr('stroke-width', '3px')
       .attr('r', 10);
