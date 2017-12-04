@@ -56,7 +56,6 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
 
 export interface ScorePoint
 {
@@ -175,7 +174,7 @@ class TransformCardChart extends TerrainComponent<Props>
   public debouncedUpdatePoints: any = (points, lastUpdateConcrete) =>
   {
     this.props.updatePoints(points, lastUpdateConcrete);
-  }
+  };
 
   public updatePoints(points: ScorePoints, isConcrete?: boolean)
   {
@@ -210,17 +209,11 @@ class TransformCardChart extends TerrainComponent<Props>
     });
   }
 
-  public sortNumber(a, b)
-  {
-    return a - b;
-  }
-
   public onPointMove(pointName, pointId, newScore, newValue, pointValues, pointScores, cx, altKey)
   {
     const scoreDiff = this.state.initialScore - newScore;
     const valueDiff = this.state.initialValue - newValue;
-    pointValues.sort(this.sortNumber);
-    const pointIndex = this.state.pointsCache.findIndex((scorePoint) => scorePoint.id === pointId);
+    pointValues.sort((a, b) => a - b);
     let min: number;
     let max: number;
     let points;
@@ -440,7 +433,6 @@ class TransformCardChart extends TerrainComponent<Props>
 
     const domainPadding = 0.05 * (this.props.domain.get(1) - this.props.domain.get(0));
     const currDomain = this.props.domain.get(1) - this.props.domain.get(0) - 2 * domainPadding;
-    const scaleFactor = currDomain / pointsDomain;
     const points = this.state.pointsCache.map((point) =>
     {
       const newValue = (currDomain) * (point.value - pointsMin) / (pointsDomain) + this.props.domain.get(0) + domainPadding;
@@ -570,13 +562,13 @@ class TransformCardChart extends TerrainComponent<Props>
     }
 
     const spotlights = overrideState.spotlights || this.props.spotlights || [];
-    _.map(spotlights, (spotlight) =>
+    _.map(spotlights, (spotlight: any) =>
     {
-      spotlight.id = spotlight.id.replace(/\.|#/g, '-');
-      spotlight.primaryKey = spotlight.primaryKey.replace(/\.|#/g, '-');
+      spotlight.id = spotlight.id.replace(/[.#]/g, '-');
+      spotlight.primaryKey = spotlight.primaryKey.replace(/[.#]/g, '-');
     },
     );
-    const chartState = {
+    return {
       barsData: (overrideState.bars || this.props.bars).toJS(),
       pointsData: points.toJS(),
       domain: {
@@ -600,8 +592,6 @@ class TransformCardChart extends TerrainComponent<Props>
       contextOptions: this.getContextOptions(),
       mode,
     };
-
-    return chartState;
   }
 
   public componentWillUnmount()
@@ -636,7 +626,7 @@ class TransformCardChart extends TerrainComponent<Props>
         else
         {
           const min = OFFSET_FACTOR * (this.props.domain.get(1) - this.props.domain.get(0));
-          points = nextProps.points.map((point, i) =>
+          points = nextProps.points.map((point) =>
           {
             if (nextProps.mode === 'exponential' || nextProps.mode === 'logarithmic')
             {

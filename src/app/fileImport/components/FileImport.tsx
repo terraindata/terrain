@@ -340,7 +340,7 @@ class FileImport extends TerrainComponent<any>
         filetype === 'json' || (filetype === 'csv' && hasCsvHeader) ?
           columnNames
           :
-          _.range(columnNames.length);
+          _.range(columnNames.length).map((num) => num.toString());
 
       let previewColumns;
       switch (filetype)

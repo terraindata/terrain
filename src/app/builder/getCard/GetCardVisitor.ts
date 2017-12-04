@@ -536,7 +536,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
                 (templateValue, templateKey) =>
                 {
                   //              console.log(templateKey + ":" + templateValue);
-                  const cardKeyType = templateKey.split(':');
+                  const cardKeyType = templateKey.toString().split(':');
                   let cardTypeName = cardKeyType[1];
                   if (!cardTypeName.startsWith('elastic'))
                   {
@@ -738,7 +738,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             (templateValue, templateKey) =>
             {
               //              console.log(templateKey + ":" + templateValue);
-              const cardKeyType = templateKey.split(':');
+              const cardKeyType = templateKey.toString().split(':');
               let cardTypeName = cardKeyType[1];
               if (!cardTypeName.startsWith('elastic'))
               {

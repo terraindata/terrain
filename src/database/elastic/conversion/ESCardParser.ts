@@ -146,9 +146,9 @@ export default class ESCardParser extends ESParser
   {
     const display = _.extend({}, _.cloneDeep(STATIC_KEY_DISPLAY), { label: key });
     // if the key is too long, we have to increase the size
-    if (key.length * display.style.fontSize > display.style.width)
+    if (key.length * (display.style.fontSize as number) > display.style.width)
     {
-      display.style.width = key.length * display.style.fontSize;
+      display.style.width = key.length * (display.style.fontSize as number);
     }
     return display;
   }

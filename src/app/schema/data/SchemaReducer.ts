@@ -44,12 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import { _SchemaState } from 'schema/SchemaTypes';
-import Ajax from 'util/Ajax';
-import AjaxM1 from 'util/AjaxM1';
-import BackendInstance from '../../../database/types/BackendInstance';
 import * as SchemaTypes from '../SchemaTypes';
 import SchemaActionTypes from './SchemaActionTypes';
 
@@ -79,7 +74,7 @@ SchemaReducer[SchemaActionTypes.setServer] =
     action: Action<SchemaTypes.SetServerActionPayload>,
   ) =>
   {
-    const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
+    const { server, databases, tables, columns, indexes, fieldProperties } = action.payload;
 
     if (state.servers.size === state.serverCount - 1)
     {
@@ -93,8 +88,6 @@ SchemaReducer[SchemaActionTypes.setServer] =
       .set('columns', state.columns.merge(columns))
       .set('indexes', state.indexes.merge(indexes))
       .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
-    // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
-    // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
   };
 
 SchemaReducer[SchemaActionTypes.addDbToServer] =
@@ -103,7 +96,7 @@ SchemaReducer[SchemaActionTypes.addDbToServer] =
     action: Action<SchemaTypes.AddDbToServerActionPayload>,
   ) =>
   {
-    const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
+    const { server, databases, tables, columns, indexes, fieldProperties } = action.payload;
 
     let newServer = server;
     if (state.servers.get(server.id) !== undefined)
@@ -120,8 +113,6 @@ SchemaReducer[SchemaActionTypes.addDbToServer] =
       .set('columns', state.columns.merge(columns))
       .set('indexes', state.indexes.merge(indexes))
       .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
-    // .set('tableNamesByDb', state.tableNamesByDb.set(database.name, tableNames))
-    // .set('columnNamesByDb', state.columnNamesByDb.set(database.name, columnNames));
   };
 
 SchemaReducer[SchemaActionTypes.selectId] =

@@ -218,7 +218,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       index,
       this.state.duplicateAlgorithmTextboxValue,
       dbs.get(dbIndex),
-      this.props.groups.get(parseFloat(groupId)).id,
+      this.props.groups.get(parseFloat(groupId.toString())).id,
     );
     this.setState({
       duplicatingAlgorithm: false,
@@ -634,7 +634,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public renderGroupDropdown()
   {
     const groupKeys = _.keys(this.props.groups.toJS());
-    const values = groupKeys.map((key) => parseFloat(key)).sort();
+    const values: string[] = groupKeys.map((key) => parseFloat(key)).sort().map((key) => key.toString());
     let groupNames = Immutable.Map<number, string>({});
     groupKeys.forEach((key) =>
     {

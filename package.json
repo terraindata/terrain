@@ -191,6 +191,7 @@
     "@types/koa-passport": "^2.0.4",
     "@types/koa-router": "^7.0.22",
     "@types/koa-send": "^3.3.0",
+    "@types/lodash": "^4.14.86",
     "@types/mysql": "0.0.31",
     "@types/node": "^8.0.12",
     "@types/node-schedule": "^1.2.0",

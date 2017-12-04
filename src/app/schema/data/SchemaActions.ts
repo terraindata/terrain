@@ -45,9 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
-
-import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import SchemaActionTypes from 'schema/data/SchemaActionTypes';
 import * as SchemaParser from 'schema/data/SchemaParser';

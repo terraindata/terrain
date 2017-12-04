@@ -100,6 +100,7 @@ class SchemaView extends TerrainComponent<Props>
     const { highlightedIndex } = this.state;
     let offset: number = 0;
 
+    // noinspection FallThroughInSwitchStatementJS
     switch (event.keyCode)
     {
       case 38:

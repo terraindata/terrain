@@ -249,8 +249,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
     if (time - this.lastHeaderClickTime > 1000)
     {
       this.lastHeaderClickTime = time;
-      const { schema, type, id } = this.props;
-      const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
+      // const { schema, type, id } = this.props;
+      // const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
       const { isSelected } = this.state;
       if (!isSelected)
       {

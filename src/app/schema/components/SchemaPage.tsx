@@ -50,7 +50,6 @@ import * as React from 'react';
 import TerrainComponent from './../../common/components/TerrainComponent';
 const HTML5Backend = require('react-dnd-html5-backend');
 import { DragDropContext } from 'react-dnd';
-const { browserHistory } = require('react-router');
 
 import SchemaView from './SchemaView';
 
