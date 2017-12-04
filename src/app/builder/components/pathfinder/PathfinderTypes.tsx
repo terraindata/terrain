@@ -552,7 +552,7 @@ export enum ADVANCED
 // The data that needs to be stored for each type of advanced field
 export const ADVANCED_MAPPINGS =
   {
-    [ADVANCED.Missing]: { missing: 0, ignoreMissing: true },
+    [ADVANCED.Missing]: {},
     [ADVANCED.Sigma]: { sigma: 2 },
     [ADVANCED.Percentiles]: { percentiles: List([1, 5, 25, 50, 75, 95, 99]) },
     [ADVANCED.PercentileRanks]: { values: List([]) },

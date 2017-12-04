@@ -107,13 +107,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
     {
       return (
         <div key={i} className='pf-advanced-section-item'>
-          {item.component(
-            this.props.fieldName,
-            this.props.keyPath.push(item.key),
-            this.handleMissingChange,
-            this.props.canEdit,
-            this.props.advancedData.get(item.key) !== undefined,
-            this.props.advancedData.get(item.key))}
+          {item.component(this.props, item, this.handleMissingChange)}
         </div>
       );
     }

@@ -369,8 +369,12 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
     title: PathfinderText.aggregation.missing.title,
     onlyOne: false,
     items: {
-      component: (fieldName: string, keyPath: KeyPath, onChange, canEdit: boolean, replace: boolean, value?: any) =>
+      component: (props: any, item: AdvancedAggregationItem, onChange: (index: number) => void) =>
       {
+        const {fieldName, keyPath, canEdit, advancedData} = props;
+        const { key } = item;
+        const replace = advancedData.get(key) !== undefined;
+        const value = advancedData.get(key);
         return (
           <div className='pf-aggregation-missing'>
             <span>{PathfinderText.aggregation.missing.text} {fieldName}, </span>
@@ -387,7 +391,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
               replace ?
                 <BuilderTextbox
                   value={value}
-                  keyPath={keyPath}
+                  keyPath={keyPath.push(key)}
                   canEdit={canEdit}
                 />
                 : null
