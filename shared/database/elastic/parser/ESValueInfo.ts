@@ -174,7 +174,7 @@ export default class ESValueInfo
   }
 
   public recursivelyVisit(beforeRec: (element: ESValueInfo) => boolean,
-    afterRec: (element: ESValueInfo) => void = null): void
+    afterRec: ((element: ESValueInfo) => void) | null = null): void
   {
     if (!beforeRec(this))
     {

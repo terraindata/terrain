@@ -66,7 +66,7 @@ export default class TastySchema
     return schema;
   }
 
-  public static fromMySQLResultSet(resultSet: any): TastySchema
+  public static fromSQLResultSet(resultSet: any): TastySchema
   {
     const schema: TastySchema = new TastySchema();
     resultSet.forEach((row) =>

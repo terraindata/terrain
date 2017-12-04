@@ -44,21 +44,25 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// import ElasticConfig from '../ElasticConfig';
-// import ElasticCluster from '../client/ElasticCluster';
-// import ElasticIndices from '../client/ElasticIndices';
-import clarinet = require('clarinet');
 import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
+import * as _ from 'lodash';
 import { Readable } from 'stream';
+import * as util from 'util';
 import * as winston from 'winston';
 
 import * as Elastic from 'elasticsearch';
 
+import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
+import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
+import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryRequest from '../../../../../src/database/types/QueryRequest';
 import QueryResponse from '../../../../../src/database/types/QueryResponse';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { QueryError } from '../../../error/QueryError';
+import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 
@@ -77,57 +81,33 @@ export default class ElasticQueryHandler extends QueryHandler
 
   public async handleQuery(request: QueryRequest): Promise<QueryResponse | Readable>
   {
+    winston.debug('handleQuery ' + JSON.stringify(request, null, 2));
     const type = request.type;
-    let body = request.body;
-
-    /* if the body is a string, parse it as JSON
-     * NB: this is normally used to detect JSON errors, but could be used generally,
-     * although it is less efficient than just sending the JSON.
-     */
-    if (typeof body === 'string')
-    {
-      try
-      {
-        body = JSON.parse(body);
-      }
-      catch (_e)
-      {
-        // absorb the error and retry using clarinet so we can get a good error message
-
-        const parser = clarinet.parser();
-
-        const errors: MidwayErrorItem[] = [];
-
-        parser.onerror =
-          (e) =>
-          {
-            const title: string = String(parser.line) + ':' + String(parser.column)
-              + ':' + String(parser.position) + ' ' + String(e.message);
-            errors.push({ status: -1, title, detail: '', source: {} });
-          };
-
-        try
-        {
-          parser.write(body).close();
-        }
-        catch (e)
-        {
-          // absorb
-        }
-
-        if (errors.length === 0)
-        {
-          errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
-        }
-
-        return new QueryResponse({}, errors);
-      }
-    }
-
     const client: ElasticClient = this.controller.getClient();
     switch (type)
     {
       case 'search':
+        if (typeof request.body !== 'string')
+        {
+          throw new Error('Request body must be a string.');
+        }
+
+        let parser: any;
+        try
+        {
+          parser = this.getParsedQuery(request.body);
+        }
+        catch (errors)
+        {
+          return new QueryResponse({}, errors);
+        }
+
+        const body = parser.getValue();
+        if (body['groupJoin'] !== undefined)
+        {
+          return this.handleGroupJoin(parser, body);
+        }
+
         if (request.streaming === true)
         {
           return new ElasticsearchScrollStream(client.getDelegate(), body);
@@ -149,7 +129,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          handler.call(client, body, this.makeQueryCallback(resolve, reject));
+          handler.call(client, request.body, this.makeQueryCallback(resolve, reject));
         });
 
       default:
@@ -159,9 +139,133 @@ export default class ElasticQueryHandler extends QueryHandler
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
+  private async handleGroupJoin(parser: ESParser, body: object): Promise<QueryResponse>
+  {
+    const childQuery = body['groupJoin'];
+    body['groupJoin'] = undefined;
+    const parentQuery: Elastic.SearchParams = body;
+
+    return new Promise<QueryResponse>(async (resolve, reject) =>
+    {
+      const client: ElasticClient = this.controller.getClient();
+      const parentResults = await new Promise<QueryResponse>((res, rej) =>
+      {
+        client.search(parentQuery, this.makeQueryCallback(res, rej));
+      });
+
+      winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
+
+      const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
+      if (valueInfo === null)
+      {
+        throw new Error('Error finding groupJoin clause in the query');
+      }
+
+      const subQueries = Object.keys(childQuery);
+      const promises: Array<Promise<any>> = [];
+      for (const subQuery of subQueries)
+      {
+        try
+        {
+          const vi = valueInfo.objectChildren[subQuery].propertyValue;
+          if (vi !== null)
+          {
+            promises.push(this.handleGroupJoinSubQuery(vi, parentResults));
+          }
+          else
+          {
+            throw new Error('Error finding subquery property');
+          }
+
+        }
+        catch (e)
+        {
+          reject(e);
+        }
+      }
+
+      const subQueryResults = await Promise.all(promises);
+      winston.debug('subQueryResults for handleGroupJoin: ' + JSON.stringify(subQueryResults, null, 2));
+      if (parentResults.hasError())
+      {
+        reject(parentResults);
+      }
+
+      for (let i = 0; i < parentResults.result.hits.hits.length; ++i)
+      {
+        for (let j = 0; j < subQueries.length; ++j)
+        {
+          parentResults.result.hits.hits[i][subQueries[j]] = subQueryResults[j].result.responses[i].hits.hits;
+        }
+      }
+
+      winston.debug('parentResults (annotated with subQueryResults): ' + JSON.stringify(parentResults.result, null, 2));
+      resolve(parentResults);
+    });
+  }
+
+  private handleGroupJoinSubQuery(valueInfo: ESValueInfo, parentResults: any)
+  {
+    return new Promise<QueryResponse>((resolve, reject) =>
+    {
+      const body: any[] = [];
+
+      // todo: optimization to avoid repeating index and type if they're the same
+      // const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
+      // const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
+
+      for (const r of parentResults.result.hits.hits)
+      {
+        winston.debug('parentObject ' + JSON.stringify(r._source, null, 2));
+        const header = {};
+        body.push(header);
+
+        const queryStr = ESParameterFiller.generate(valueInfo, { parent: r._source });
+        body.push(queryStr);
+      }
+
+      const client: ElasticClient = this.controller.getClient();
+      client.msearch(
+        {
+          body,
+        },
+        this.makeQueryCallback(resolve, reject));
+    });
+  }
+
+  private getParsedQuery(bodyStr: string): ESParser
+  {
+    const parser = new ESJSONParser(bodyStr, true);
+    const valueInfo = parser.getValueInfo();
+
+    if (parser.hasError())
+    {
+      const es = parser.getErrors();
+      const errors: MidwayErrorItem[] = [];
+
+      es.forEach((e) =>
+      {
+        const row = (e.token !== null) ? e.token.row : 0;
+        const col = (e.token !== null) ? e.token.col : 0;
+        const pos = (e.token !== null) ? e.token.charNumber : 0;
+        const title: string = String(row) + ':' + String(col) + ':' + String(pos) + ' ' + String(e.message);
+        errors.push({ status: -1, title, detail: '', source: {} });
+      });
+
+      if (errors.length === 0)
+      {
+        errors.push({ status: -1, title: '0:0:0 Syntax Error', detail: '', source: {} });
+      }
+
+      throw errors;
+    }
+
+    return parser;
+  }
+
   private makeQueryCallback(resolve: (any) => void, reject: (Error) => void)
   {
-    return (error: Error, response: any) =>
+    return (error: Error | null, response: any) =>
     {
       if (error !== null && error !== undefined)
       {
@@ -173,6 +277,14 @@ export default class ElasticQueryHandler extends QueryHandler
               QueryError.fromElasticQueryError(error).getMidwayErrors());
           resolve(res);
         }
+        else if (QueryError.isESParserError(error))
+        {
+          const res: QueryResponse =
+            new QueryResponse(
+              {},
+              QueryError.fromESParserError(error).getMidwayErrors());
+          resolve(res);
+        }
         else
         {
           reject(error); // this will be handled by RouteError.RouteErrorHandler
@@ -182,7 +294,7 @@ export default class ElasticQueryHandler extends QueryHandler
       {
         if (typeof response !== 'object')
         {
-          winston.error('The response from the Elastic Search is not an object, ' + JSON.stringify(response));
+          winston.error('The response from Elasticsearch is not an object, ' + JSON.stringify(response));
           response = { response };
         }
         const res: QueryResponse = new QueryResponse(response);

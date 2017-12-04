@@ -500,7 +500,7 @@ describe('Query route tests', () =>
         body: {
           database: 1,
           type: 'search',
-          body: {
+          body: JSON.stringify({
             index: 'movies',
             type: 'data',
             from: 0,
@@ -508,7 +508,7 @@ describe('Query route tests', () =>
             body: {
               query: {},
             },
-          },
+          }),
         },
       })
       .expect(200)
@@ -540,7 +540,7 @@ describe('Query route tests', () =>
         body: {
           database: 1,
           type: 'search',
-          body: {
+          body: JSON.stringify({
             index: 'wrongindex',
             type: 'data',
             from: 0,
@@ -548,7 +548,7 @@ describe('Query route tests', () =>
             body: {
               query: {},
             },
-          },
+          }),
         },
       })
       .expect(200)
@@ -729,6 +729,86 @@ describe('Query route tests', () =>
           fail(error);
         });
     });
+
+  test('Elastic groupJoin Query Result: POST /midway/v1/query', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/query/')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          database: 1,
+          type: 'search',
+          body: `{
+            "from": 0,
+            "size": 5,
+            "body": {
+              "_source": ["movieid", "title"],
+              "query": {
+                "bool": {
+                  "filter": [
+                    {
+                      "term": {
+                        "_index": "movies"
+                      }
+                    },
+                    {
+                      "term": {
+                        "_type": "data"
+                      }
+                    }
+                  ],
+                  "must": [
+                    { "match": { "status": "Released" } },
+                    { "match": { "language": "en" } }
+                  ],
+                  "must_not": [
+                    { "term": { "budget": 0 } },
+                    { "term": { "revenue": 0 } }
+                  ]
+                }
+              }
+            },
+            "groupJoin": {
+              "englishMovies": {
+                "from" : 0,
+                "size" : 5,
+                "_source": ["movieid", "overview"],
+                "query" : {
+                  "bool" : {
+                    "filter": [
+                      { "term": {"movieid" : @parent.movieid} }
+                    ],
+                    "must" : [
+                      { "match": {"_index" : "movies"} },
+                      { "match": {"_type" : "data"} }
+                    ]
+                  }
+                }
+              }
+            }
+          }`,
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        winston.info(response.text);
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('GET /schema request returned empty response body');
+        }
+        const respData = JSON.parse(response.text);
+        expect(respData['errors'].length).toEqual(0);
+        expect(respData['result'].hits.hits.length).toEqual(5);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
+      });
+  });
 });
 
 describe('File import route tests', () =>
@@ -804,9 +884,9 @@ describe('File import route tests', () =>
       .field('accessToken', 'ImAnAdmin')
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
-        column1: { type: 'text' },
-        column3: { type: 'boolean' },
-        column4: { type: 'date' },
+        col1: { type: 'text' },
+        col3: { type: 'boolean' },
+        col4: { type: 'date' },
       }))
       .field('dbid', '1')
       .field('dbname', 'test_elastic_db')
@@ -817,7 +897,23 @@ describe('File import route tests', () =>
       .field('originalNames', JSON.stringify(['pkey', 'column1', 'column2', 'column3', 'column4']))
       .field('primaryKeys', JSON.stringify(['pkey']))
       .field('tablename', 'fileImportTestTable')
-      .field('transformations', JSON.stringify([]))
+      .field('transformations', JSON.stringify([
+        {
+          name: 'rename',
+          colName: 'column1',
+          args: { newName: 'col1' },
+        },
+        {
+          name: 'rename',
+          colName: 'column3',
+          args: { newName: 'col3' },
+        },
+        {
+          name: 'rename',
+          colName: 'column4',
+          args: { newName: 'col4' },
+        },
+      ]))
       .field('update', 'false')
       .expect(200)
       .then(async (response) =>
@@ -840,16 +936,16 @@ describe('File import route tests', () =>
           expect(result['hits']['hits'][0]['_source'])
             .toMatchObject({
               pkey: 3,
-              column1: 'hi',
-              column3: false,
-              column4: new Date(Date.parse('1970-01-01')).toISOString(),
+              col1: 'hi',
+              col3: false,
+              col4: new Date(Date.parse('1970-01-01')).toISOString(),
             });
           expect(result['hits']['hits'][1]['_source'])
             .toMatchObject({
               pkey: 2,
-              column1: 'bye',
-              column3: null,
-              column4: null,
+              col1: 'bye',
+              col3: null,
+              col4: null,
             });
         }
         catch (e)
@@ -871,6 +967,7 @@ describe('File import route tests', () =>
       .field('columnTypes', JSON.stringify({
         pkey: { type: 'long' },
         col1: { type: 'text' },
+        col2: { type: 'text' },
         col3: { type: 'boolean' },
         col4: { type: 'date' },
       }))
@@ -921,8 +1018,8 @@ describe('File export templates route tests', () =>
           columnTypes:
           {
             pkey: { type: 'long' },
-            column1: { type: 'text' },
-            column2: { type: 'text' },
+            column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
           },
           primaryKeys: ['pkey'],
           transformations: [],
@@ -947,8 +1044,8 @@ describe('File export templates route tests', () =>
             columnTypes:
             {
               pkey: { type: 'long' },
-              column1: { type: 'text' },
-              column2: { type: 'text' },
+              column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
             },
             primaryKeys: ['pkey'],
             transformations: [],
@@ -987,8 +1084,8 @@ describe('File export templates route tests', () =>
           columnTypes:
           {
             pkey: { type: 'long' },
-            column1: { type: 'text' },
-            column2: { type: 'text' },
+            column1: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            column2: { type: 'text', index: 'analyzed', analyzer: 'standard' },
           },
           primaryKeys: ['pkey'],
           transformations: [],
@@ -1080,7 +1177,7 @@ describe('Credentials tests', () =>
         const resultAsArray: object[] = result as object[];
         expect(resultAsArray[0]).toMatchObject({
           createdBy: 1,
-          id: 1,
+          id: 2,
           meta: '',
           name: 'SFTP Test 1',
           type: 'sftp',
@@ -1108,6 +1205,14 @@ describe('Credentials tests', () =>
         expect(result).toMatchObject([{
           createdBy: 1,
           id: 1,
+          meta: '',
+          name: 'Local Filesystem Config',
+          permissions: 0,
+          type: 'local',
+        },
+        {
+          createdBy: 1,
+          id: 2,
           meta: '"{\"host\":\"10.1.1.103\", \"port\":22, \"username\":\"testuser\", \"password\":\"Terrain123!\"}"',
           name: 'SFTP Test 1',
           permissions: 1,

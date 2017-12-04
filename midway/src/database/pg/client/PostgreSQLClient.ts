@@ -44,50 +44,48 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParserError from '../../../shared/database/elastic/parser/ESParserError';
-import MidwayError from '../../../shared/error/MidwayError';
+import * as pg from 'pg';
+import PostgreSQLConfig from '../PostgreSQLConfig';
+import PostgreSQLController from '../PostgreSQLController';
 
-export interface ElasticQueryError
+/**
+ * An client which acts as a selective isomorphic wrapper around
+ * the postgres js API
+ */
+class PostgreSQLClient
 {
-  statusCode?: number;
-  message?: string;
-  response: string;
+  private controller: PostgreSQLController;
+  private config: PostgreSQLConfig;
+  private delegate: pg.Pool;
+
+  constructor(controller: PostgreSQLController, config: PostgreSQLConfig)
+  {
+    this.controller = controller;
+    this.config = config;
+    this.delegate = new pg.Pool(config);
+
+    this.delegate.on('acquire', (connection: pg.Client) =>
+    {
+      this.controller.log('PostgreSQLClient', 'Connection acquired ');
+    });
+
+    this.delegate.on('remove' as any, (connection: pg.Client) =>
+    {
+      this.controller.log('PostgreSQLClient', 'Connection released ');
+    });
+  }
+
+  public query(queryString: string, params?: any[], callback?: any): pg.Query
+  {
+    this.controller.log('PostgreSQLClient.query', queryString, params);
+    return this.delegate.query(queryString, params as any, callback);
+  }
+
+  public end(callback: () => void): void
+  {
+    this.controller.log('PostgreSQLClient.end');
+    return this.delegate.end(callback);
+  }
 }
 
-export class QueryError extends MidwayError
-{
-  public static isElasticQueryError(err: Error | ElasticQueryError): err is ElasticQueryError
-  {
-    return (err as ElasticQueryError).response !== undefined;
-  }
-
-  public static isESParserError(err: Error | ESParserError): err is ESParserError
-  {
-    return (err as ESParserError).token !== undefined;
-  }
-
-  public static fromElasticQueryError(err: ElasticQueryError): QueryError
-  {
-    const status: number = (err.statusCode !== undefined) ? err.statusCode : 400;
-    const title: string = (err.message !== undefined) ? err.message : 'The Elastic query has an error.';
-    const detail: string = JSON.stringify(err.response);
-    const source: object = err;
-    return new QueryError(status, title, detail, source);
-  }
-
-  public static fromESParserError(err: ESParserError): QueryError
-  {
-    const status: number = 400;
-    const title: string = (err.message !== undefined) ? err.message : 'ES parsing error.';
-    const detail: string = JSON.stringify(err.token);
-    const source: object = err;
-    return new QueryError(status, title, detail, source);
-  }
-
-  public constructor(status: number, title: string, detail: string, source: object)
-  {
-    super(status, title, detail, source);
-  }
-}
-
-export default QueryError;
+export default PostgreSQLClient;

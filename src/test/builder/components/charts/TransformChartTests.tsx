@@ -157,4 +157,43 @@ describe('TransformCardChart', () =>
       expect(chartComponent.state().pointsCache.toJS()).toHaveLength(2);
     });
   });
+
+  describe('#pointsInOrder', () =>
+  {
+    it('should have all the points in order by value for non-linear modes', () =>
+    {
+      chartComponent.instance().getChartState({ mode: 'normal' });
+      let points = chartComponent.state().pointsCache.toJS();
+      let inOrder = true;
+      if (points[0].value > points[1].value || points[1].value > points[2].value)
+      {
+        inOrder = false;
+      }
+      expect(inOrder);
+      chartComponent.instance().getChartState({ mode: 'sigmoid' });
+      points = chartComponent.state().pointsCache.toJS();
+      inOrder = true;
+      if (points[0].value > points[1].value || points[1].value > points[2].value || points[2].value > points[3].value)
+      {
+        inOrder = false;
+      }
+      expect(inOrder);
+      chartComponent.instance().getChartState({ mode: 'logarithmic' });
+      points = chartComponent.state().pointsCache.toJS();
+      inOrder = true;
+      if (points[0].value > points[1].value)
+      {
+        inOrder = false;
+      }
+      expect(inOrder);
+      chartComponent.instance().getChartState({ mode: 'exponential' });
+      points = chartComponent.state().pointsCache.toJS();
+      inOrder = true;
+      if (points[0].value > points[1].value)
+      {
+        inOrder = false;
+      }
+      expect(inOrder);
+    });
+  });
 });

@@ -43,51 +43,65 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as React from 'react';
+import ColorManager from 'util/ColorManager';
+import { Point, VictoryLabel } from 'victory';
+import Colors from '../../../colors/Colors';
 
-import ESParserError from '../../../shared/database/elastic/parser/ESParserError';
-import MidwayError from '../../../shared/error/MidwayError';
+const PinIcon = require('images/icon_pin.svg?name=PinIcon');
 
-export interface ElasticQueryError
+interface TerrainVictoryPinProps
 {
-  statusCode?: number;
-  message?: string;
-  response: string;
+  pinStyle: any;
+  onPinClick: (e, props) => void;
+  x?: number;
+  datum?: any;
 }
 
-export class QueryError extends MidwayError
-{
-  public static isElasticQueryError(err: Error | ElasticQueryError): err is ElasticQueryError
+export default class TerrainVictoryPin extends TerrainComponent<TerrainVictoryPinProps> {
+  public state = {
+    pinStyle: this.props.pinStyle,
+  };
+
+  public handlePinMouseOver(e)
   {
-    return (err as ElasticQueryError).response !== undefined;
+    this.setState((state) =>
+      ({
+        pinStyle: Object.assign({}, state.pinStyle, { fill: Colors().error }),
+      }),
+    );
   }
 
-  public static isESParserError(err: Error | ESParserError): err is ESParserError
+  public handlePinMouseOut()
   {
-    return (err as ESParserError).token !== undefined;
+    this.setState((state, props) =>
+      ({
+        pinStyle: props.pinStyle,
+      }),
+    );
   }
 
-  public static fromElasticQueryError(err: ElasticQueryError): QueryError
+  public render()
   {
-    const status: number = (err.statusCode !== undefined) ? err.statusCode : 400;
-    const title: string = (err.message !== undefined) ? err.message : 'The Elastic query has an error.';
-    const detail: string = JSON.stringify(err.response);
-    const source: object = err;
-    return new QueryError(status, title, detail, source);
-  }
+    const { datum } = this.props;
 
-  public static fromESParserError(err: ESParserError): QueryError
-  {
-    const status: number = 400;
-    const title: string = (err.message !== undefined) ? err.message : 'ES parsing error.';
-    const detail: string = JSON.stringify(err.token);
-    const source: object = err;
-    return new QueryError(status, title, detail, source);
-  }
-
-  public constructor(status: number, title: string, detail: string, source: object)
-  {
-    super(status, title, detail, source);
+    return datum.isPinned ? (
+      <svg x='10'>
+        <svg
+          style={this.state.pinStyle}
+          onClick={(e) => this.props.onPinClick(e, this.props)}
+          onMouseOver={this.handlePinMouseOver}
+          onMouseOut={this.handlePinMouseOut}
+          width='10'
+          x={this.props.x - 25}
+          y='5'
+        >
+          <PinIcon />
+        </svg>
+        <Point {...this.props} />
+      </svg>
+    ) : <Point {...this.props} />;
   }
 }
-
-export default QueryError;

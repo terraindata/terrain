@@ -60,6 +60,7 @@ import * as Tasty from '../tasty/Tasty';
 import './auth/Passport';
 import { CmdLineArgs } from './CmdLineArgs';
 import * as Config from './Config';
+import { credentials } from './credentials/CredentialRouter';
 import { databases } from './database/DatabaseRouter';
 import { events } from './events/EventRouter';
 import './Logging';
@@ -151,6 +152,9 @@ class App
 
     // create a default seed user
     await users.initializeDefaultUser();
+
+    // add local filesystem credential config
+    await credentials.initializeLocalFilesystemCredential();
 
     // connect to configured databases
     const dbs = await databases.select(['id'], {});

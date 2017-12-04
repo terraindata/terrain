@@ -43,51 +43,17 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as React from 'react';
+import { VictoryLabel } from 'victory';
 
-import ESParserError from '../../../shared/database/elastic/parser/ESParserError';
-import MidwayError from '../../../shared/error/MidwayError';
-
-export interface ElasticQueryError
+interface Props
 {
-  statusCode?: number;
-  message?: string;
-  response: string;
+  datum?: any;
 }
 
-export class QueryError extends MidwayError
-{
-  public static isElasticQueryError(err: Error | ElasticQueryError): err is ElasticQueryError
-  {
-    return (err as ElasticQueryError).response !== undefined;
-  }
+const TerrainVictoryLabel = (props: Props) => (
+  props.datum.isPinned ?
+    <VictoryLabel dx='10' {...props} /> : <VictoryLabel {...props} />
+);
 
-  public static isESParserError(err: Error | ESParserError): err is ESParserError
-  {
-    return (err as ESParserError).token !== undefined;
-  }
-
-  public static fromElasticQueryError(err: ElasticQueryError): QueryError
-  {
-    const status: number = (err.statusCode !== undefined) ? err.statusCode : 400;
-    const title: string = (err.message !== undefined) ? err.message : 'The Elastic query has an error.';
-    const detail: string = JSON.stringify(err.response);
-    const source: object = err;
-    return new QueryError(status, title, detail, source);
-  }
-
-  public static fromESParserError(err: ESParserError): QueryError
-  {
-    const status: number = 400;
-    const title: string = (err.message !== undefined) ? err.message : 'ES parsing error.';
-    const detail: string = JSON.stringify(err.token);
-    const source: object = err;
-    return new QueryError(status, title, detail, source);
-  }
-
-  public constructor(status: number, title: string, detail: string, source: object)
-  {
-    super(status, title, detail, source);
-  }
-}
-
-export default QueryError;
+export default TerrainVictoryLabel;

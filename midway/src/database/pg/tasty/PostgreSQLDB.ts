@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as mysql from 'mysql';
+import * as pg from 'pg';
 
 import SQLGenerator from '../../../tasty/SQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
@@ -53,19 +53,19 @@ import TastyQuery from '../../../tasty/TastyQuery';
 import TastySchema from '../../../tasty/TastySchema';
 import TastyTable from '../../../tasty/TastyTable';
 import { makePromiseCallback } from '../../../tasty/Utils';
-import MySQLClient from '../client/MySQLClient';
+import PostgreSQLClient from '../client/PostgreSQLClient';
 
-export class MySQLDB implements TastyDB
+export class PostgreSQLDB implements TastyDB
 {
-  private client: MySQLClient;
+  private client: PostgreSQLClient;
 
-  constructor(client: MySQLClient)
+  constructor(client: PostgreSQLClient)
   {
     this.client = client;
   }
 
   /**
-   * Generates MySQL queries from TastyQuery objects.
+   * Generates PostgreSQL queries from TastyQuery objects.
    */
   public generateQuery(query: TastyQuery, placeholder: boolean): [string[], any[][]]
   {
@@ -97,7 +97,7 @@ export class MySQLDB implements TastyDB
     const result = await this.execute(
       ['SELECT table_schema, table_name, column_name, data_type ' +
         'FROM information_schema.columns ' +
-        'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'mysql\', \'sys\');']);
+        'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'PostgreSQL\', \'sys\');']);
     return TastySchema.fromSQLResultSet(result);
   }
 
@@ -158,7 +158,7 @@ export class MySQLDB implements TastyDB
   {
     return new Promise<void>((resolve, reject) =>
     {
-      this.client.end(makePromiseCallback(resolve, reject));
+      this.client.end(() => resolve());
     });
   }
 
@@ -171,14 +171,6 @@ export class MySQLDB implements TastyDB
   {
     throw new Error('update() is currently only supported for Elastic databases.');
   }
-
-  private async getConnection(): Promise<mysql.IConnection>
-  {
-    return new Promise<mysql.IConnection>((resolve, reject) =>
-    {
-      this.client.getConnection(makePromiseCallback(resolve, reject));
-    });
-  }
 }
 
-export default MySQLDB;
+export default PostgreSQLDB;
