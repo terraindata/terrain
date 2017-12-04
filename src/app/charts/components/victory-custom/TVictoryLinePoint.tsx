@@ -44,16 +44,30 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
-import { VictoryLabel } from 'victory';
+import { Line, Point } from 'victory';
 
-interface Props
+interface TVictoryLinePointProps
 {
-  datum?: any;
+  chartHeight: number;
+  lineStyle: any;
+  x?: number;
+  active?: boolean;
 }
 
-const TerrainVictoryLabel = (props: Props) => (
-  props.datum.isPinned ?
-    <VictoryLabel dx='10' {...props} /> : <VictoryLabel {...props} />
-);
+const TVictoryLinePoint = (props: TVictoryLinePointProps) =>
+{
+  return props.active ? (
+    <g>
+      <Line
+        lineStyle={props.lineStyle}
+        x1={props.x}
+        y1={0}
+        x2={props.x}
+        y2={props.chartHeight}
+      />
+      <Point {...props} />
+    </g>
+  ) : null;
+};
 
-export default TerrainVictoryLabel;
+export default TVictoryLinePoint;
