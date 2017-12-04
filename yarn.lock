@@ -2453,6 +2453,10 @@ cssom@0.3.x, "cssom@>= 0.3.2 < 0.4.0":
   dependencies:
     cssom "0.3.x"
 
+csv-string@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/csv-string/-/csv-string-2.3.2.tgz#7ee58bd957a04de3f9935b7ea1ab29180156894c"
+
 csv-write-stream@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/csv-write-stream/-/csv-write-stream-2.0.0.tgz#fc2da21a48d6ea5f8c17fde39cfb911e4f0292b0"

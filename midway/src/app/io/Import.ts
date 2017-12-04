@@ -47,14 +47,16 @@ THE SOFTWARE.
 import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
+import { json } from 'd3-request';
 import * as csv from 'fast-csv';
 import * as _ from 'lodash';
 import * as promiseQueue from 'promise-queue';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { json } from 'd3-request';
 import * as SharedElasticUtil from '../../../../shared/database/elastic/ElasticUtil';
+import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
+import { FieldTypes } from '../../../../shared/etl/FieldTypes';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
@@ -68,8 +70,9 @@ import { TemplateBase } from './templates/Templates';
 
 const importTemplates = new ImportTemplates();
 
+const fieldTypes = new FieldTypes();
 const TastyItems: Items = new Items();
-const typeParser: SharedUtil.CSVTypeParser = new SharedUtil.CSVTypeParser();
+const typeParser: CSVTypeParser = new CSVTypeParser();
 
 export interface ImportConfig extends TemplateBase
 {
@@ -87,6 +90,7 @@ export class Import
   private COMPATIBLE_TYPES: object =
   {
     text: new Set(['text']),
+    keyword: new Set(['keyword']),
     byte: new Set(['text', 'byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']),
     short: new Set(['text', 'short', 'integer', 'long', 'float', 'double']),
     integer: new Set(['text', 'integer', 'long', 'double']),
@@ -96,9 +100,8 @@ export class Import
     double: new Set(['text', 'double']),
     boolean: new Set(['text', 'boolean']),
     date: new Set(['text', 'date']),
+    nested: new Set(['nested']),
     geo_point: new Set(['array', 'geo_point']),
-    // object: new Set(['object', 'nested']),
-    // nested: new Set(['nested']),
   };
   private MAX_ACTIVE_READS: number = 3;
   private MAX_ALLOWED_QUEUE_SIZE: number = 3;
@@ -237,7 +240,7 @@ export class Import
       {
         return reject(configError);
       }
-      const expectedMapping: object = this._getMappingForSchema(imprtConf);
+      const expectedMapping: object = await this._getMappingForSchema(imprtConf);
       const mappingForSchema: object | string =
         this._checkMappingAgainstSchema(expectedMapping, await database.getTasty().schema(), imprtConf.dbname);
       if (typeof mappingForSchema === 'string')
@@ -589,7 +592,7 @@ export class Import
       {
         if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
         {
-          return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj);
+          return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj) + ', expected: ' + targetKeys;
         }
         for (const key of Object.keys(obj))
         {
@@ -759,6 +762,29 @@ export class Import
           }
         }
         break;
+      case 'nested':
+        if (item[field] === '')
+        {
+          item[field] = null;
+        }
+        else
+        {
+          try
+          {
+            if (typeof item[field] === 'object')
+            {
+              item[field] = JSON.parse(item[field]);
+            }
+          } catch (e)
+          {
+            return false;
+          }
+          if (Array.isArray(item[field]))
+          {
+            return false;
+          }
+        }
+        break;
       default:  // "text" case, leave as string
     }
     return true;
@@ -867,15 +893,9 @@ export class Import
   }
 
   /* converts type specification from ImportConfig into ES mapping format (ready to insert using ElasticDB.putMapping()) */
-  private _getMappingForSchema(imprt: ImportConfig): object
+  private async _getMappingForSchema(imprt: ImportConfig): Promise<object>
   {
-    // create mapping containing new fields
-    const mapping: object = {};
-    Object.keys(imprt.columnTypes).forEach((val) =>
-    {
-      mapping[val] = this._getESType(imprt.columnTypes[val]);
-    });
-    return this._getMappingForSchemaHelper(mapping);
+    return fieldTypes.getESMappingFromDocument(imprt.columnTypes);
   }
 
   /* recursive helper function for _getMappingForSchema(...)
@@ -893,12 +913,15 @@ export class Import
           body[key] = { type: mapping[key]['type'] };
           if (mapping[key]['type'] === 'text' && mapping[key]['index'] === 'not_analyzed')
           {
+            body[key]['index'] = true;
             body[key]['type'] = 'keyword';
             body[key]['fields'] = { keyword: { type: 'keyword', ignore_above: 256, index: false } };
           }
           else if (mapping[key]['type'] === 'text' && mapping[key]['index'] === 'analyzed')
           {
-            body[key]['fields'] = { keyword: { type: 'text', index: true, analyzer: mapping[key]['analyzer'] } };
+            body[key]['index'] = true;
+            body[key]['analyzer'] = mapping[key]['analyzer'];
+            body[key]['fields'] = { keyword: { type: 'keyword', index: true, analyzer: mapping[key]['analyzer'] } };
           }
         }
         else if (typeof mapping[key]['type'] === 'object')
@@ -961,6 +984,10 @@ export class Import
   {
     const thisType: string = SharedUtil.getType(item);
     if (thisType === 'null')
+    {
+      return true;
+    }
+    if (thisType === 'object' && typeObj['type'] === 'nested')
     {
       return true;
     }
@@ -1227,35 +1254,124 @@ export class Import
               return thisReject('Failed to apply transforms: ' + String(e));
             }
             // only include the specified columns ; NOTE: unclear if faster to copy everything over or delete the unused ones
-            const trimmedItem: object = {};
-            for (const name of Object.keys(imprt.columnTypes))
+            const specifiedColumnItem: object = {};
+            Object.keys(imprt.columnTypes).forEach((name) =>
             {
-              if (imprt.columnTypes.hasOwnProperty(name))
-              {
-                if (typeof item[name] === 'string')
-                {
-                  trimmedItem[name] = item[name].replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-                }
-                else
-                {
-                  trimmedItem[name] = item[name];
-                }
-              }
-            }
+              specifiedColumnItem[name] = item[name];
+            });
+
             if (dontCheck !== true)
             {
-              const typeError: string = this._checkTypes(trimmedItem, imprt);
+              const typeError: string = this._checkTypes(specifiedColumnItem, imprt);
               if (typeError !== '')
               {
                 return thisReject(typeError);
               }
             }
+            const trimmedItem: object = this._convertDateToESDateAndTrim(specifiedColumnItem, imprt.columnTypes);
             transformedItems.push(trimmedItem);
           }
           thisResolve(transformedItems);
         }));
     }
     return Promise.all(promises);
+  }
+
+  private _convertDateToESDateAndTrim(fieldObj: object, fieldTypesObj: object): object
+  {
+    const convertDateAndTrim =
+      {
+        double: (self, node, typeObj) => node,
+        float: (self, node, typeObj) => node,
+        long: (self, node, typeObj) => node,
+        boolean: (self, node, typeObj) => node,
+        null: (self, node, typeObj) => node,
+        short: (self, node, typeObj) => node,
+        byte: (self, node, typeObj) => node,
+        integer: (self, node, typeObj) => node,
+        half_float: (self, node, typeObj) => node,
+        date: (self, node, typeObj) =>
+        {
+          if (node !== null)
+          {
+            const isMMDDYYYYFormat = new RegExp(/^((0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4}))$/);
+            if (isMMDDYYYYFormat.test(node))
+            {
+              try
+              {
+                const splitDate: string[] = node.split('/');
+                node = new Date(Date.parse([splitDate[2], splitDate[0], splitDate[1]].join('-'))).toISOString();
+              }
+              catch (e)
+              {
+                // do nothing
+              }
+            }
+            else
+            {
+              node = new Date(Date.parse(node)).toISOString();
+            }
+          }
+          return node;
+        },
+        text: (self, node, typeObj) =>
+        {
+          if (node !== null)
+          {
+            node = node.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+          }
+          return node;
+        },
+        keyword: (self, node, typeObj) =>
+        {
+          if (node !== null)
+          {
+            node = node.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+          }
+          return node;
+        },
+        array: (self, node, typeObj) =>
+        {
+          if (node !== null)
+          {
+            for (const ind in node)
+            {
+              if (node.hasOwnProperty(ind))
+              {
+                node[ind] = visit(self, node[ind], typeObj['innerType']);
+              }
+            }
+          }
+          return node;
+        },
+        nested: (self, node, typeObj) =>
+        {
+          if (node !== null)
+          {
+            for (const key in node)
+            {
+              if (node.hasOwnProperty(key))
+              {
+                node[key] = visit(self, node[key], typeObj['innerType'][key]);
+              }
+            }
+          }
+          return node;
+        },
+      };
+
+    function visit(visitor, obj, typeObj)
+    {
+      return visitor[typeObj['type']](visitor, obj, typeObj);
+    }
+
+    const returnObj: object = {};
+    Object.keys(fieldTypesObj).forEach((key) =>
+    {
+      returnObj[key] = visit(convertDateAndTrim, fieldObj[key], fieldTypesObj[key]);
+    });
+
+    return returnObj;
   }
 
   /* returns an error message if there are any; else returns empty string */
@@ -1351,13 +1467,14 @@ export class Import
         else
         {
           thisChunk = this.nextChunk + chunk;
-          let left: number = 0;
-          let right: number = 0;
+          let openBraces: number = 0;
+          let openBrackets: number = 0;
           let match: number = 0;
           let previousMatch: boolean = true;
+          let quotemarkCounter: number = 0;
           for (let i = 0; i < thisChunk.length; i++)
           {
-            if (left === right)
+            if (openBraces === 0 && openBrackets === 0 && quotemarkCounter % 2 === 0)
             {
               if (!previousMatch)
               {
@@ -1369,13 +1486,29 @@ export class Import
             {
               previousMatch = false;
             }
-            if (thisChunk.charAt(i) === '{')
+            if (quotemarkCounter % 2 === 0 && thisChunk.charAt(i) === '"' && i > 0 && thisChunk.charAt(i - 1) !== '\\') // entering str
             {
-              left++;
+              quotemarkCounter++;
             }
-            else if (thisChunk.charAt(i) === '}')
+            else if (quotemarkCounter % 2 !== 0 && thisChunk.charAt(i) === '"' && i > 0 && thisChunk.charAt(i - 1) !== '\\') // leaving str
             {
-              right++;
+              quotemarkCounter--;
+            }
+            else if (thisChunk.charAt(i) === '{' && quotemarkCounter % 2 === 0)
+            {
+              openBraces++;
+            }
+            else if (thisChunk.charAt(i) === '}' && quotemarkCounter % 2 === 0)
+            {
+              openBraces--;
+            }
+            else if (thisChunk.charAt(i) === '[' && quotemarkCounter % 2 === 0)
+            {
+              openBrackets++;
+            }
+            else if (thisChunk.charAt(i) === ']' && quotemarkCounter % 2 === 0)
+            {
+              openBrackets--;
             }
           }
           this.nextChunk = thisChunk.substring(match, thisChunk.length);

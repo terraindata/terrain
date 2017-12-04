@@ -48,11 +48,20 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
+import { FieldTypes } from '../../../../../shared/etl/FieldTypes';
+import { Permissions } from '../../permissions/Permissions';
+import { UserConfig } from '../../users/Users';
 import * as Util from '../../Util';
+
+import { Import } from '../Import';
 import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 
-const Router = new KoaRouter();
+export const fieldTypes = new FieldTypes();
 export const importTemplates = new ImportTemplates();
+
+const Router = new KoaRouter();
+const imprt: Import = new Import();
+const perm: Permissions = new Permissions();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
@@ -112,6 +121,27 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
     throw new Error('Invalid parameter template ID');
   }
   ctx.body = await importTemplates.upsert(ctx.state.user, template);
+});
+
+Router.post('/fieldTypes', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await fieldTypes.getFullTypeFromDocument(ctx.request.body.body);
+});
+
+Router.post('/fieldTypesFile', async (ctx, next) =>
+{
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  await perm.ImportPermissions.verifyDefaultRoute(authStream['user'] as UserConfig, authStream['fields']);
+
+  ctx.body = await fieldTypes.getFieldTypesFromMySQLFormatStream(authStream['files'], authStream['fields']);
+});
+
+Router.post('/jsonify', async (ctx, next) =>
+{
+  const authStream: object = await Util.authenticateStream(ctx.req);
+  await perm.ImportPermissions.verifyDefaultRoute(authStream['user'] as UserConfig, authStream['fields']);
+
+  ctx.body = await fieldTypes.getJSONFromMySQLFormatStream(authStream['files'], authStream['fields']);
 });
 
 Router.post('/updateAccessToken', passport.authenticate('access-token-local'), async (ctx, next) =>

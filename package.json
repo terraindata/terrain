@@ -100,6 +100,7 @@
     "command-line-usage": "^4.0.1",
     "create-react-class": "^15.6.0",
     "cronstrue": "^0.10.10",
+    "csv-string": "^2.3.2",
     "d3": "^3.5.14",
     "date-format": "^1.1.0",
     "deep-equal": "^1.0.1",
