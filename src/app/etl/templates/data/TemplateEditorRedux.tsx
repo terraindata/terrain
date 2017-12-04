@@ -47,8 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
-import
-{
+import {
   _TemplateEditorState,
   ETLTemplate,
   TemplateEditorState,

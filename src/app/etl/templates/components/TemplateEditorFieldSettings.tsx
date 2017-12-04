@@ -51,12 +51,15 @@ import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import ExpandableView from 'common/components/ExpandableView';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+
+import Autocomplete from 'common/components/Autocomplete';
+import CheckBox from 'common/components/CheckBox';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 
 import './TemplateEditorField.less';
-import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
 export interface Props
 {
@@ -68,119 +71,78 @@ export interface Props
   act?: typeof TemplateEditorActions;
 }
 
+const emptyOptions = List([]);
+
 @Radium
-class TemplateEditorFieldC extends TerrainComponent<Props>
+class TemplateEditorFieldSettings extends TerrainComponent<Props>
 {
-  public state: {
-    expandableViewOpen: boolean;
-  } = {
-    expandableViewOpen: true,
-  };
-
-  public renderChildFields()
+  constructor(props)
   {
-    const { field, keyPath, canEdit } = this.props;
-
-    return field.children.map((value, index) =>
-    {
-      const newKeyPath = keyPath.push('children', index);
-      return (
-        <div className='subfield-spacer' key={index}>
-          <TemplateEditorField
-            keyPath={newKeyPath}
-            field={value}
-            canEdit={field.isIncluded && canEdit}
-          />
-        </div>
-      );
-    }).toList();
+    super(props);
+    this.setFactory = _.memoize(this.setFactory);
   }
 
-  public renderCreateNewFieldButton()
+  public render()
   {
+    const { field, canEdit } = this.props;
     return (
-      <div className='new-field-button-spacer'>
-        <div className='create-new-template-field-button'
-          style={_.extend({}, buttonColors(), getStyle('cursor', 'pointer'))}
-          onClick={this.handleCreateNewField}
+      <div className='template-editor-field-row'>
+        <CheckBox checked={field.isIncluded} onChange={this.handleIncludeCheckboxClicked}/>
+        <div className='template-editor-field-settings'
+          style={[
+            backgroundColor(Colors().bg3),
+            borderColor(Colors().border1)
+          ]}
         >
-          Add Field
+          <Autocomplete
+            value={field.name}
+            onChange={this.setFactory('name', 'target', 'value')}
+            disabled={!field.isIncluded || !canEdit}
+            options={emptyOptions}
+          />
         </div>
       </div>
     );
   }
 
-  public render()
+  public handleIncludeCheckboxClicked()
   {
-    const { field, keyPath, canEdit } = this.props;
-
-    const settings = (
-      <TemplateEditorFieldSettings
-        keyPath={keyPath}
-        field={field}
-        canEdit={field.isIncluded && canEdit}
-      />
-    );
-
-    const children = (this.isRoot() || field.children.size >= 0) ? (
-      <div className='template-editor-children-container'>
-        {this.renderChildFields()}
-        {this.renderCreateNewFieldButton()}
-      </div>) : undefined;
-
-    if (this.isRoot())
-    {
-      return children;
-    }
-    else
-    {
-      const childrenStyle = (canEdit === true && field.isIncluded === false) ?
-        getStyle('opacity', '0.7') : {};
-      return (
-        <ExpandableView
-          content={settings}
-          open={this.state.expandableViewOpen}
-          onToggle={this.handleExpandArrowClicked}
-          children={children}
-          style={childrenStyle}
-        />
-      );
-    }
+    this.set('isIncluded', !this.props.field.isIncluded)
   }
 
-  public handleExpandArrowClicked()
+  // helper to calling setIn() on the TemplateField in the store
+  private set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
   {
-    this.setState({
-      expandableViewOpen: !this.state.expandableViewOpen,
-    });
-  }
-
-  public handleCreateNewField()
-  {
-    const { keyPath, act } = this.props;
-    const newField = _TemplateField({ name: `new field hello there` });
+    const { act, keyPath } = this.props;
     act({
-      actionType: 'createField',
+      actionType: 'updateField',
       sourcePath: keyPath,
-      field: newField,
+      key,
+      value,
     });
-  }
-
-  public handleFieldClicked()
-  {
-    const { field, keyPath, act } = this.props;
   }
 
   private isRoot(): boolean
   {
     return this.props.keyPath.size === 0;
   }
+
+  // similar to setStateWrapper
+  private setFactory<K extends keyof TemplateField>(key: K, ...path: string[])
+  {
+    return (val) =>
+    {
+      for (const property of path)
+      {
+        val = val[property];
+      }
+      this.set(key, val);
+    };
+  }
 }
 
-const TemplateEditorField = Util.createTypedContainer(
-  TemplateEditorFieldC,
+export default Util.createTypedContainer(
+  TemplateEditorFieldSettings,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );
-
-export default TemplateEditorField;

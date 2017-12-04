@@ -62,6 +62,7 @@ export interface Props
   content: any;
   open: boolean;
   onToggle: () => void;
+  style?: any
   unmountOnClose?: boolean;
   children?: any;
 }
@@ -79,6 +80,7 @@ class ExpandableView extends TerrainComponent<Props>
       <div className={classNames({
         'expandable-view-container': true,
       })}
+        style={this.props.style || {}}
       >
         <div className='expandable-view-content-row' style={fontColor('#fff')}>
           <ArrowIcon

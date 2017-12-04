@@ -90,6 +90,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
         <TemplateEditorField
           keyPath={List([])}
           field={template.rootField}
+          canEdit={true}
         />
       </div>
     );

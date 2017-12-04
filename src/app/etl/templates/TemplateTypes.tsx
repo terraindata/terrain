@@ -151,6 +151,7 @@ class TemplateFieldC
 {
   public isPrimaryKey: boolean = false; // import only
   public isAnalyzed: boolean = true; // import only
+  public isIncluded: boolean = true;
   public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
   public analyzer: string = '';
   public originalName: string = '';
