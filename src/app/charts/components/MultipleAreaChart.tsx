@@ -50,6 +50,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as LibraryTypes from 'library/LibraryTypes';
 import { omit } from 'lodash';
+import * as moment from 'moment';
 import * as React from 'react';
 import ContainerDimensions from 'react-container-dimensions';
 import ColorManager from 'util/ColorManager';
@@ -109,7 +110,11 @@ const styles = {
       },
     }),
     tooltipLegend: {
-      border: { stroke: 'white', fill: 'black', fillOpacity: 0.4 },
+      border: {
+        stroke: 'rgba(255,255,255,0.25)',
+        fill: 'black',
+        fillOpacity: 0.4,
+      },
       title: {
         fontSize: 15,
         fill: 'rgba(255,255,255,0.75)',
@@ -178,6 +183,7 @@ interface Props
   datasets: Immutable.Map<ID, Dataset>;
   xDataKey: string; // The key to get the value of x from the data
   yDataKey: string; // The key to get the value of y from the data
+  dateFormat: string;
   domain?: { start: number, end: number };
   onLegendClick?: (datasetId: ID) => void;
   legendTitle?: string;
@@ -197,14 +203,14 @@ const CustomLabel = (props) =>
   return (
     <text dy={5} x={props.x} y={props.y} style={props.style} >
       <tspan style={{ fontWeight: 'bold' }}>{props.datum.value}</tspan>
-      <tspan dx={10} style={{ fill: 'white' }}>({props.datum.name})</tspan>
+      <tspan dx={10} style={{ fill: 'white' }}>{props.datum.name}</tspan>
     </text>
   );
 };
 
 const CustomTooltip = (props) =>
 {
-  const { datum, text, xDataKey, style } = props;
+  const { datum, text, xDataKey, style, dateFormat } = props;
   const data = text.map((t) =>
   {
     const parsedText = t.split('|');
@@ -221,9 +227,8 @@ const CustomTooltip = (props) =>
   });
 
   const timestamp = datum[xDataKey];
-  const date = new Date(timestamp);
-  const dateString = date.toISOString();
-  const title = Util.formatDate(dateString);
+  const date = moment(timestamp);
+  const title = date.format(dateFormat);
 
   const labelComponent = <CustomLabel />;
 
@@ -266,10 +271,11 @@ const CustomDataComponent = (props) =>
 };
 
 export default class MultipleAreaChart extends TerrainComponent<Props> {
-  public static defaultProps = {
-    datasets: [],
+  public static defaultProps: Partial<Props> = {
+    datasets: Immutable.Map({}),
     xDataKey: 'x',
     yDataKey: 'y',
+    dateFormat: 'MM/DD/YYYY',
     onLegendClick: (datasetId) => { return; },
     legendTitle: '',
     domain: { start: 0, end: 0 },
@@ -499,12 +505,12 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
   public render()
   {
-    const { datasets, xDataKey, yDataKey, domain } = this.props;
+    const { datasets, xDataKey, yDataKey, domain, dateFormat } = this.props;
     const { visibleDatasets } = this.state;
 
     const legend = this.renderLegend();
     const VictoryZoomVoronoiContainer = createContainer('zoom', 'voronoi');
-    const chartDomain = { x: [domain.start, domain.end] };
+    const chartDomain = { x: [domain.start, ``domain.end] };
 
     return (
       <div style={styles.wrapper}>
@@ -525,10 +531,14 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                   containerComponent={
                     <VictoryZoomVoronoiContainer
                       responsive={false}
+                      downsample={5}
                       zoomDimension='x'
                       voronoiDimension='x'
                       labels={d => d.l ? `${d.id}|${d.y}|${d.name}|${this.getDatasetColor(d.id)}` : null}
-                      labelComponent={<CustomTooltip xDataKey={xDataKey} />}
+                      labelComponent={<CustomTooltip
+                        xDataKey={xDataKey}
+                        dateFormat={dateFormat}
+                      />}
                       zoomDomain={this.state.zoomDomain}
                       onZoomDomainChange={this.handleZoom}
                     />
