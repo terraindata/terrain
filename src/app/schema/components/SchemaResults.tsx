@@ -130,7 +130,7 @@ class SchemaResults extends TerrainComponent<Props>
                 .rawOption('query', { bool: {} })
                 .from(0)
                 .size(1000)
-                .build()
+                .build(),
             );
             break;
           case 'database':
@@ -139,7 +139,7 @@ class SchemaResults extends TerrainComponent<Props>
                 .filter('term', '_index', selectedItem['name'])
                 .from(0)
                 .size(1000)
-                .build()
+                .build(),
             );
             break;
           case 'table':
@@ -149,7 +149,7 @@ class SchemaResults extends TerrainComponent<Props>
                 .filter('term', '_type', selectedItem['name'])
                 .from(0)
                 .size(1000)
-                .build()
+                .build(),
             );
             break;
           case 'column':
@@ -160,7 +160,7 @@ class SchemaResults extends TerrainComponent<Props>
                 .filter('term', '_type', selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', ''))
                 .from(0)
                 .size(1000)
-                .build()
+                .build(),
             );
             break;
         }

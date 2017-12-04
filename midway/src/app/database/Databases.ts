@@ -51,6 +51,7 @@ import DatabaseController from '../../database/DatabaseController';
 import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Scripts from '../../scripts/Scripts';
+import { metrics } from '../events/EventRouter';
 import { UserConfig } from '../users/UserRouter';
 import * as Util from '../Util';
 
@@ -164,6 +165,12 @@ export class Databases
 
     // try to provision built-in scripts to the connected database
     await Scripts.provisionScripts(controller);
+
+    // pre-populate the database with pre-defined metrics
+    if (db.isAnalytics)
+    {
+      await metrics.initialize(db.id);
+    }
 
     return this.upsert(user, { id, status: 'CONNECTED' } as DatabaseConfig);
   }
