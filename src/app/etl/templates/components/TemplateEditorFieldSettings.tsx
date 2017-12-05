@@ -85,15 +85,18 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
   public render()
   {
     const { field, canEdit } = this.props;
-    const disableUI = !field.isIncluded || !canEdit;
+    const inputDisabled = this.inputDisabled();
     const disableCheckbox = !canEdit; // only disable checkbox if it is disabled from a parent
     return (
       <div className='template-editor-field-row'>
-        <CheckBox
-          checked={field.isIncluded}
-          onChange={this.handleIncludeCheckboxClicked}
-          disabled={disableCheckbox}
-        />
+        <div className='include-field-checkbox-spacer'>
+          <CheckBox
+            className={'checkbox-large'}
+            checked={field.isIncluded}
+            onChange={this.handleIncludeCheckboxClicked}
+            disabled={disableCheckbox}
+          />
+        </div>
         <div className='template-editor-field-settings'
           style={[
             backgroundColor(Colors().bg3),
@@ -103,7 +106,7 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
           <Autocomplete
             value={field.name}
             onChange={this.setFactory('name', 'target', 'value')}
-            disabled={disableUI}
+            disabled={inputDisabled}
             options={emptyOptions}
           />
         </div>
@@ -131,6 +134,11 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
   private isRoot(): boolean
   {
     return this.props.keyPath.size === 0;
+  }
+
+  private inputDisabled(): boolean
+  {
+    return !this.props.field.isIncluded || !this.props.canEdit;
   }
 
   // similar to setStateWrapper

@@ -5,14 +5,24 @@
 .template-editor-field-row {
   display: flex;
   align-items: center;
+
+  .include-field-checkbox-spacer {
+    padding-left: @half-spacing;
+    .checkbox-large {
+      transform: scale(1.25);
+    }
+  }
+
+
+  .template-editor-field-settings {
+    .transition;
+    padding: @half-spacing;
+    border: 1px solid;
+    flex-grow: 1;
+  }
 }
 
-.template-editor-field-settings {
-  .transition;
-  padding: @half-spacing;
-  border: 1px solid;
-  flex-grow: 1;
-}
+
 
 .template-editor-children-container {
   display: flex;
