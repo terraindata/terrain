@@ -160,7 +160,7 @@ class Modal extends TerrainComponent<Props>
                 content: getStyle('boxShadow', `0px 0px 5px 2px ${Colors().boxShadow}`),
               }
             }
-            className={'modal-content-positioning-wrapper'}
+            className={'dead-center-flex-wrapper'}
           >
             <div className={classNames({
               'modal-content': true,
