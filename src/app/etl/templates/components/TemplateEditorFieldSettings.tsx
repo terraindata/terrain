@@ -71,11 +71,15 @@ export interface Props
   act?: typeof TemplateEditorActions;
 }
 
-const emptyOptions = List([]);
-
 @Radium
 class TemplateEditorFieldSettings extends TerrainComponent<Props>
 {
+  public state: {
+    originalNameOpen: boolean;
+  } = {
+    originalNameOpen: false,
+  }
+
   constructor(props)
   {
     super(props);
@@ -87,6 +91,34 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
     const { field, canEdit } = this.props;
     const inputDisabled = this.inputDisabled();
     const disableCheckbox = !canEdit; // only disable checkbox if it is disabled from a parent
+
+    const inputFieldName =
+      <Autocomplete
+        value={field.name}
+        onChange={this.setFactory('name')}
+        disabled={inputDisabled}
+        options={emptyOptions}
+      />;
+
+    const inputOriginalName = this.state.originalNameOpen ?
+      <div className='tef-layout-autocomplete-spacer'>
+        <Autocomplete
+          value={field.originalName}
+          onChange={this.setFactory('originalName')}
+          disabled={inputDisabled}
+          options={emptyOptions}
+          onFocus={this.enableOriginalNameInput}
+          onBlur={this.disableOriginalNameInput}
+        />
+      </div>
+      :
+      <div
+        onClick={this.enableOriginalNameInput}
+        className='tef-layout-label tef-center small-text'
+      >
+        &nbsp;{field.originalName}
+      </div>
+
     return (
       <div className='template-editor-field-row'>
         <div className='include-field-checkbox-spacer'>
@@ -103,15 +135,33 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
             borderColor(Colors().border1)
           ]}
         >
-          <Autocomplete
-            value={field.name}
-            onChange={this.setFactory('name')}
-            disabled={inputDisabled}
-            options={emptyOptions}
-          />
+          <div className='tef-layout-row'>
+            <div className='tef-layout-label'> Field Name </div>
+            <div className='tef-layout-autocomplete-spacer'> {inputFieldName} </div>
+            <div className='tef-layout-row' style={originalNameLabelStyle}>
+              <div className='tef-layout-label tef-left small-text'> (from </div>
+              {inputOriginalName}
+              <div className='tef-layout-label tef-right small-text'> ) </div>
+            </div>
+          </div>
+
         </div>
       </div>
     );
+  }
+
+  public enableOriginalNameInput()
+  {
+    this.setState({
+      originalNameOpen: true,
+    });
+  }
+
+  public disableOriginalNameInput()
+  {
+    this.setState({
+      originalNameOpen: false,
+    })
   }
 
   public handleIncludeCheckboxClicked()
@@ -154,6 +204,12 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
     };
   }
 }
+
+const originalNameLabelStyle = [
+  fontColor(Colors().text3),
+]
+
+const emptyOptions = List([]);
 
 export default Util.createTypedContainer(
   TemplateEditorFieldSettings,

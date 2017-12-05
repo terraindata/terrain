@@ -69,7 +69,7 @@ export interface Props
 }
 
 @Radium
-class TemplateEditorFieldC extends TerrainComponent<Props>
+class TemplateEditorFieldNodeC extends TerrainComponent<Props>
 {
   public state: {
     expandableViewOpen: boolean;
@@ -86,7 +86,7 @@ class TemplateEditorFieldC extends TerrainComponent<Props>
       const newKeyPath = keyPath.push('children', index);
       return (
         <div className='subfield-spacer' key={index}>
-          <TemplateEditorField
+          <TemplateEditorFieldNode
             keyPath={newKeyPath}
             field={value}
             canEdit={field.isIncluded && canEdit}
@@ -177,10 +177,10 @@ class TemplateEditorFieldC extends TerrainComponent<Props>
   }
 }
 
-const TemplateEditorField = Util.createTypedContainer(
-  TemplateEditorFieldC,
+const TemplateEditorFieldNode = Util.createTypedContainer(
+  TemplateEditorFieldNodeC,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );
 
-export default TemplateEditorField;
+export default TemplateEditorFieldNode;

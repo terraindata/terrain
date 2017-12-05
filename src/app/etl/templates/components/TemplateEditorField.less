@@ -2,6 +2,38 @@
 
 @item-spacing: @half-spacing 0px 0px 0px;
 
+.tef-layout-row {
+  display: flex;
+}
+
+.tef-layout-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.tef-layout-padded {
+  padding: @half-spacing;
+}
+
+.tef-layout-autocomplete-spacer {
+  padding: 0px @half-spacing;
+}
+
+.tef-layout-label {
+  padding: @half-spacing;
+  &.tef-right {
+    padding-left: 0px;
+  }
+  &.tef-left {
+    padding-right: 0px;
+  }
+  &.tef-center {
+    padding-right: 0px;
+    padding-left: 0px;
+  }
+}
+
+
 .template-editor-field-row {
   display: flex;
   align-items: center;
@@ -18,8 +50,6 @@
     flex-grow: 1;
   }
 }
-
-
 
 .template-editor-children-container {
   display: flex;

@@ -51,7 +51,7 @@ import * as React from 'react';
 import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import TemplateEditorField from 'etl/templates/components/TemplateEditorField';
+import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _ExportTemplate, _TemplateField, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import './TemplateEditor.less';
@@ -87,7 +87,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
     return (
       <div className='template-editor-root-container'>
-        <TemplateEditorField
+        <TemplateEditorFieldNode
           keyPath={List([])}
           field={template.rootField}
           canEdit={true}
