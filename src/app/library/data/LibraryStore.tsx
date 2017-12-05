@@ -49,7 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as Redux from 'redux';
 import thunk from 'redux-thunk';
-
+import * as _ from 'lodash';
 import BackendInstance from '../../../database/types/BackendInstance';
 import * as LibraryTypes from './../LibraryTypes';
 
@@ -90,12 +90,21 @@ const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
 export const _LibraryState = (config?: any) =>
 {
+  console.log(config);
+  console.log(config['modelId']);
+  console.log(config['groups']);
   if (config && !config['modelId'])
   {
     config['modelId'] = 2;
     if (!config['categories'])
     {
-      config['categories'] = config['groups'];
+      config['categories'] = Immutable.Map({});
+      _.keys(config['groups']).forEach((key) => {
+        console.log(key);
+        config['categories'] = config['categories'].set(key, LibraryTypes._Category(config['groups'].get(key)));
+        console.log(config['categories']);
+        console.log(config['groups'].get(key));
+      });
 
     }
     if (!config['categoriesOrder'])

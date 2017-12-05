@@ -186,10 +186,6 @@ class CategoriesColumn extends TerrainComponent<Props>
       },
 
     );
-    console.log(category.id);
-    console.log(params);
-    console.log(params.categoryId);
-    console.log(+category.id === +params.categoryId);
     // onDuplicate={this.handleDuplicate}
     return (
       <LibraryItem
