@@ -418,7 +418,10 @@ class Autocomplete extends TerrainComponent<Props>
   // }
 }
 
-const DISABLED_STYLE = backgroundColor(Colors().darkerHighlight, Colors().highlight);
+const DISABLED_STYLE = _.extend({},
+  backgroundColor(Colors().darkerHighlight, Colors().highlight),
+  borderColor(Colors().inputBorder, Colors().inputBorder),
+);
 
 const ENABLED_STYLE = {
   ':focus': borderColor(Colors().active),
