@@ -582,7 +582,6 @@ class GroupsColumn extends TerrainComponent<Props>
     const ids = this.props.groupsOrder.filter((id) => groups.get(id) && groups.get(id).status === status);
     const { me, roles } = this.state;
     const canCreate = true; // me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
-
     return (
       <LibraryItemCategory
         status={status}
@@ -724,7 +723,6 @@ class GroupsColumn extends TerrainComponent<Props>
   public render()
   {
     const { groups, groupsOrder, categoryId, referrer } = this.props;
-
     return (
       <LibraryColumn
         index={2}

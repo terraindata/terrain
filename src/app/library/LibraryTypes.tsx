@@ -197,6 +197,12 @@ export const _Category = (config: any = {}) =>
     // from 0 and 1 to 2
     // TODO
   }
+  // 2 --> 3
+  if (config && (!config.modelVersion || config.modelVersion < 3))
+  {
+    config['groupsOrder'] = config['algorithmsOrder'];
+    config['modelVersion'] = 3;
+  }
 
   config = config || {};
   config.userIds = List(config.userIds || []);

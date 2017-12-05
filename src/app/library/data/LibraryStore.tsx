@@ -90,40 +90,37 @@ const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
 export const _LibraryState = (config?: any) =>
 {
+  // if (config && !config['modelId'])
+  // {
+  //   config['modelId'] = 1;
+  //   if (!config['categories'])
+  //   {
+  //     config['categories'] = Immutable.Map({});
+  //     _.keys(config['groups']).forEach((key) =>
+  //     {
+  //       config['categories'] = config['categories'].set(key, LibraryTypes._Category(config['groups'].get(key)));
+  //     });
 
-  if (config && !config['modelId'])
-  {
-    console.log(config);
-    config['modelId'] = 1;
-    if (!config['categories'])
-    {
-      config['categories'] = Immutable.Map({});
-      _.keys(config['groups']).forEach((key) =>
-      {
-        config['categories'] = config['categories'].set(key, LibraryTypes._Category(config['groups'].get(key)));
-      });
-
-    }
-    if (!config['categoriesOrder'])
-    {
-      config['categoriesOrder'] = config['groupsOrder'];
-    }
-    if (!config['prevCategories'])
-    {
-      config['prevCategories'] = config['prevGroups'];
-    }
-  }
-  if (config && config['modelId'] < 2)
-  {
-    config['modelId'] = 2;
-    config['groups'] = Immutable.Map({});
-    _.keys(config['algorithms']).forEach((key) =>
-    {
-      config['groups'] = config['groups'].set(key, LibraryTypes._Group(config['algorithms'].get(key)));
-    });
-    config['prevGroups'] = config['prevAlgorithms'];
-  }
-  console.log(config);
+  //   }
+  //   if (!config['categoriesOrder'])
+  //   {
+  //     config['categoriesOrder'] = config['groupsOrder'];
+  //   }
+  //   if (!config['prevCategories'])
+  //   {
+  //     config['prevCategories'] = config['prevGroups'];
+  //   }
+  // }
+  // if (config && config['modelId'] < 2)
+  // {
+  //   config['modelId'] = 2;
+  //   config['groups'] = Immutable.Map({});
+  //   _.keys(config['algorithms']).forEach((key) =>
+  //   {
+  //     config['groups'] = config['groups'].set(key, LibraryTypes._Group(config['algorithms'].get(key)));
+  //   });
+  //   config['prevGroups'] = config['prevAlgorithms'];
+  // }
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
 };
 

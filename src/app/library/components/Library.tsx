@@ -370,11 +370,9 @@ class Library extends TerrainComponent<any>
       if (category !== undefined)
       {
         groupsOrder = category.groupsOrder;
-
         if (groupId !== null)
         {
           group = groups.get(groupId);
-
           if (group !== undefined)
           {
             variantsOrder = group.variantsOrder;

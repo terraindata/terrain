@@ -382,7 +382,6 @@ export const Ajax =
               QUERY: Immutable.Map<number, Query>({}),
             };
           const categoriesOrder = [];
-
           items.map(
             (itemObj) =>
             {
@@ -406,11 +405,9 @@ export const Ajax =
               }
             },
           );
-
           mapping.GROUP = mapping.GROUP.map(
             (cat) => cat.set('categoryId', cat.parent),
           ).toMap();
-
           mapping.VARIANT = mapping.VARIANT.map(
             (v) =>
             {

@@ -288,7 +288,6 @@ function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
 const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =>
 {
   const versioning = action.payload !== undefined ? action.payload.versioning : false;
-
   let nextState = state;
   if (LibraryReducers[action.type])
   {
