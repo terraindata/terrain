@@ -90,8 +90,12 @@ const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
 export const _LibraryState = (config?: any) =>
 {
+  console.log('CREATE LIBRARY STATE');
+  console.log(config);
+
   if (config && !config['modelId'])
   {
+    console.log(config);
     config['modelId'] = 2;
     if (!config['categories'])
     {
@@ -107,9 +111,11 @@ export const _LibraryState = (config?: any) =>
     }
     if (!config['prevCategories'])
     {
+      console.log('here');
       config['prevCategories'] = config['prevGroups'];
     }
   }
+  console.log(config);
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
 };
 

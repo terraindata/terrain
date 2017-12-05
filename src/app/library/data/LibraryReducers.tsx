@@ -222,13 +222,17 @@ LibraryReducers[ActionTypes.variants.move] =
 
 LibraryReducers[ActionTypes.loadState] =
   (state, action) =>
-    action.payload.state
+{
+  console.log('HERE');
+  console.log(action.payload.state);
+  return action.payload.state
       .set('loaded', true)
       .set('loading', false)
       .set('prevCategories', action.payload.state.categories)
       .set('prevAlgorithms', action.payload.state.algorithms)
       .set('prevVariants', action.payload.state.variants)
   ;
+}
 
 LibraryReducers[ActionTypes.setDbs] =
   (state, action) =>
@@ -285,6 +289,7 @@ function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
 
 const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =>
 {
+  console.log(state);
   const versioning = action.payload !== undefined ? action.payload.versioning : false;
 
   let nextState = state;
@@ -295,16 +300,17 @@ const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =
 
   if (versioning === true && CleanLibraryActionTypes.indexOf(action.type) === -1)
   {
+    console.log('HERE');
     // save the new state
     saveStateOf(nextState.categories, nextState.prevCategories);
     saveStateOf(nextState.algorithms, nextState.prevAlgorithms);
     saveStateOf(nextState.variants, nextState.prevVariants);
   }
-
   nextState = nextState
     .set('prevCategories', nextState.categories)
     .set('prevAlgorithms', nextState.algorithms)
     .set('prevVariants', nextState.variants);
+  console.log(nextState);
 
   return nextState;
 };
