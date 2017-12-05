@@ -60,9 +60,10 @@ export interface Props
   checked: boolean;
   onChange: () => void;
   className?: string;
-
+  disabled?: boolean;
   label?: string;
   color?: string;
+  large?: boolean;
 }
 
 class CheckBox extends TerrainComponent<Props>
@@ -70,7 +71,15 @@ class CheckBox extends TerrainComponent<Props>
   public render()
   {
     const { color, label } = this.props;
-    let style = this.props.checked ? CHECKED_STYLE : UNCHECKED_STYLE;
+    let style;
+    if (this.props.disabled)
+    {
+      style = this.props.checked ? CHECKED_DISABLED_STYLE : UNCHECKED_DISABLED_STYLE;
+    }
+    else
+    {
+      style = this.props.checked ? CHECKED_STYLE : UNCHECKED_STYLE;
+    }
 
     if (this.props.color !== undefined)
     {
@@ -84,11 +93,13 @@ class CheckBox extends TerrainComponent<Props>
       <div
         className={classNames({
           'checkbox': true,
+          'checkbox-disabled': this.props.disabled,
           'checkbox-checked': this.props.checked,
+          'checkbox-large': this.props.large,
           [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
         })}
         style={style}
-        onClick={this.props.onChange}
+        onClick={this.props.disabled ? disabledHandler : this.props.onChange}
       >
         <div className='checkbox-veil'>
           <CheckMark className='check-mark-icon' />
@@ -116,12 +127,22 @@ class CheckBox extends TerrainComponent<Props>
   }
 }
 
+const disabledHandler = () => { /* do nothing */ };
 const CHECKED_STYLE = _.extend({},
   borderColor(Colors().active),
   getStyle('fill', Colors().active),
 );
 
 const UNCHECKED_STYLE = _.extend({},
+  borderColor(Colors().border2),
+);
+
+const CHECKED_DISABLED_STYLE = _.extend({},
+  borderColor(Colors().border2),
+  getStyle('fill', Colors().border2),
+);
+
+const UNCHECKED_DISABLED_STYLE = _.extend({},
   borderColor(Colors().border2),
 );
 

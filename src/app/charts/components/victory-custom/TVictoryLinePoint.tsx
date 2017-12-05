@@ -59,7 +59,7 @@ const TVictoryLinePoint = (props: TVictoryLinePointProps) =>
   return props.active ? (
     <g>
       <Line
-        lineStyle={props.lineStyle}
+        style={props.lineStyle}
         x1={props.x}
         y1={0}
         x2={props.x}

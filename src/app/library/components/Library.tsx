@@ -199,11 +199,13 @@ class Library extends TerrainComponent<any>
       })
       .map((variant) =>
       {
+        const data = this.getData(variant.deployedName);
         return {
           id: variant.id,
           label: variant.name,
-          data: this.getData(variant.deployedName),
+          data,
           isPinned: analytics.pinnedVariants.get(variant.id, false),
+          hasData: data.length > 0,
         };
       });
 
