@@ -118,7 +118,7 @@ class TemplateEditorFieldC extends TerrainComponent<Props>
       <TemplateEditorFieldSettings
         keyPath={keyPath}
         field={field}
-        canEdit={field.isIncluded && canEdit}
+        canEdit={canEdit}
       />
     );
 
