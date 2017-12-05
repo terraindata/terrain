@@ -150,12 +150,12 @@ export default class ElasticQueryHandler extends QueryHandler
 
     return new Promise<QueryResponse>(async (resolve, reject) =>
     {
-
+      let parentResults;
       const client: ElasticClient = this.controller.getClient();
-
-      if (parentQuery['size'] < this.GROUP_JOIN_SEARCH_THRESHOLD)
+      const size = (parentQuery !== undefined && parentQuery.size !== undefined) ? parentQuery.size : 0;
+      if (size < this.GROUP_JOIN_SEARCH_THRESHOLD)
       {
-        const parentResults = await new Promise<QueryResponse>((res, rej) =>
+        parentResults = await new Promise<QueryResponse>((res, rej) =>
         {
           client.search(parentQuery, this.makeQueryCallback(res, rej));
         });
@@ -165,6 +165,7 @@ export default class ElasticQueryHandler extends QueryHandler
       else
       {
         // todo: perform scrolled query here
+        throw new Error('Not implemented');
       }
 
       const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
