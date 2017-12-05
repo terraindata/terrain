@@ -43,92 +43,65 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as React from 'react';
+import ColorManager from 'util/ColorManager';
+import { Point, VictoryLabel } from 'victory';
+import Colors from '../../../colors/Colors';
 
-import * as winston from 'winston';
+const PinIcon = require('images/icon_pin.svg?name=PinIcon');
 
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
-import * as Util from '../Util';
-
-// CREATE TABLE metrics (id integer PRIMARY KEY, database integer NOT NULL, label text NOT NULL, events text NOT NULL)
-
-export interface MetricConfig
+interface TerrainVictoryPinProps
 {
-  id?: number;
-  database: number;
-  label: string;
-  events: string;
+  pinStyle: any;
+  onPinClick: (e, props) => void;
+  x?: number;
+  datum?: any;
 }
 
-export class Metrics
-{
-  private metricsTable: Tasty.Table;
+export default class TerrainVictoryPin extends TerrainComponent<TerrainVictoryPinProps> {
+  public state = {
+    pinStyle: this.props.pinStyle,
+  };
 
-  constructor()
+  public handlePinMouseOver(e)
   {
-    this.metricsTable = new Tasty.Table(
-      'metrics',
-      ['id'],
-      [
-        'database',
-        'label',
-        'events',
-      ],
+    this.setState((state) =>
+      ({
+        pinStyle: Object.assign({}, state.pinStyle, { fill: Colors().error }),
+      }),
     );
   }
 
-  public async initialize(database: number): Promise<any>
+  public handlePinMouseOut()
   {
-    const predefinedMetrics: MetricConfig[] = [
-      {
-        database,
-        label: 'Impressions',
-        events: 'impression',
-      },
-      {
-        database,
-        label: 'Clicks',
-        events: 'click',
-      },
-      {
-        database,
-        label: 'Conversions',
-        events: 'conversion',
-      },
-      {
-        database,
-        label: 'Click-Through Rate',
-        events: 'click,impression',
-      },
-      {
-        database,
-        label: 'Conversion Rate',
-        events: 'conversion,impression',
-      },
-    ];
-    predefinedMetrics.map((m) => this.upsert(m));
+    this.setState((state, props) =>
+      ({
+        pinStyle: props.pinStyle,
+      }),
+    );
   }
 
-  public async upsert(metric: MetricConfig): Promise<MetricConfig>
+  public render()
   {
-    if (metric.database === undefined || metric.label === undefined || metric.events === undefined)
-    {
-      throw new Error('Database, label and events fields are required to create a metric');
-    }
+    const { datum } = this.props;
 
-    const existingMetric = await this.select(['id'], { label: metric.label });
-    if (existingMetric.length !== 0)
-    {
-      throw new Error('Metric ' + String(metric.label) + ' already exists.');
-    }
-
-    return App.DB.upsert(this.metricsTable, metric) as Promise<MetricConfig>;
-  }
-
-  public async select(columns: string[], filter: object): Promise<MetricConfig[]>
-  {
-    return App.DB.select(this.metricsTable, columns, filter) as Promise<MetricConfig[]>;
+    return datum.isPinned ? (
+      <svg x='10'>
+        <svg
+          style={this.state.pinStyle}
+          onClick={(e) => this.props.onPinClick(e, this.props)}
+          onMouseOver={this.handlePinMouseOver}
+          onMouseOut={this.handlePinMouseOut}
+          width='10'
+          x={this.props.x - 25}
+          y='5'
+        >
+          <PinIcon />
+        </svg>
+        <Point {...this.props} />
+      </svg>
+    ) : <Point {...this.props} />;
   }
 }
-
-export default Metrics;

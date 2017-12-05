@@ -43,92 +43,31 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as React from 'react';
+import { Line, Point } from 'victory';
 
-import * as winston from 'winston';
-
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
-import * as Util from '../Util';
-
-// CREATE TABLE metrics (id integer PRIMARY KEY, database integer NOT NULL, label text NOT NULL, events text NOT NULL)
-
-export interface MetricConfig
+interface TVictoryLinePointProps
 {
-  id?: number;
-  database: number;
-  label: string;
-  events: string;
+  chartHeight: number;
+  lineStyle: any;
+  x?: number;
+  active?: boolean;
 }
 
-export class Metrics
+const TVictoryLinePoint = (props: TVictoryLinePointProps) =>
 {
-  private metricsTable: Tasty.Table;
+  return props.active ? (
+    <g>
+      <Line
+        lineStyle={props.lineStyle}
+        x1={props.x}
+        y1={0}
+        x2={props.x}
+        y2={props.chartHeight}
+      />
+      <Point {...props} />
+    </g>
+  ) : null;
+};
 
-  constructor()
-  {
-    this.metricsTable = new Tasty.Table(
-      'metrics',
-      ['id'],
-      [
-        'database',
-        'label',
-        'events',
-      ],
-    );
-  }
-
-  public async initialize(database: number): Promise<any>
-  {
-    const predefinedMetrics: MetricConfig[] = [
-      {
-        database,
-        label: 'Impressions',
-        events: 'impression',
-      },
-      {
-        database,
-        label: 'Clicks',
-        events: 'click',
-      },
-      {
-        database,
-        label: 'Conversions',
-        events: 'conversion',
-      },
-      {
-        database,
-        label: 'Click-Through Rate',
-        events: 'click,impression',
-      },
-      {
-        database,
-        label: 'Conversion Rate',
-        events: 'conversion,impression',
-      },
-    ];
-    predefinedMetrics.map((m) => this.upsert(m));
-  }
-
-  public async upsert(metric: MetricConfig): Promise<MetricConfig>
-  {
-    if (metric.database === undefined || metric.label === undefined || metric.events === undefined)
-    {
-      throw new Error('Database, label and events fields are required to create a metric');
-    }
-
-    const existingMetric = await this.select(['id'], { label: metric.label });
-    if (existingMetric.length !== 0)
-    {
-      throw new Error('Metric ' + String(metric.label) + ' already exists.');
-    }
-
-    return App.DB.upsert(this.metricsTable, metric) as Promise<MetricConfig>;
-  }
-
-  public async select(columns: string[], filter: object): Promise<MetricConfig[]>
-  {
-    return App.DB.select(this.metricsTable, columns, filter) as Promise<MetricConfig[]>;
-  }
-}
-
-export default Metrics;
+export default TVictoryLinePoint;

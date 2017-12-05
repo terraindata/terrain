@@ -138,6 +138,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
   $scope.checkout = function()
   {
     TerrainAnalytics.logEventImmediately('conversion', $scope.variantID, {purchasedIDs: $scope.cart.map((m) => m._id)});
+    $scope.emptyCart();
   }
 
   $scope.cardLoad = function(result)

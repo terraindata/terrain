@@ -43,92 +43,85 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
+import { omit } from 'lodash';
+import * as moment from 'moment';
+import * as React from 'react';
+import { Border, VictoryLegend } from 'victory';
 
-import * as winston from 'winston';
-
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
-import * as Util from '../Util';
-
-// CREATE TABLE metrics (id integer PRIMARY KEY, database integer NOT NULL, label text NOT NULL, events text NOT NULL)
-
-export interface MetricConfig
+const CustomLabel = (props) =>
 {
-  id?: number;
-  database: number;
-  label: string;
-  events: string;
+  return (
+    <text dy={5} x={props.x} y={props.y} style={props.style} >
+      <tspan style={{ fontWeight: 'bold' }}>{props.datum.value}</tspan>
+      <tspan dx={10} style={{ fill: 'white' }}>{props.datum.name}</tspan>
+    </text>
+  );
+};
+
+interface TVictoryTooltipProps
+{
+  xDataKey: string;
+  dateFormat: string;
+  tooltipStyle: any;
+  datum?: any;
+  text?: any;
+  style?: any;
+  borderPadding?: any;
 }
 
-export class Metrics
+const TVictoryTooltip = (props: TVictoryTooltipProps) =>
 {
-  private metricsTable: Tasty.Table;
-
-  constructor()
+  const {
+    datum,
+    text,
+    xDataKey,
+    style,
+    dateFormat,
+    borderPadding,
+    tooltipStyle,
+  } = props;
+  const data = text.map((t) =>
   {
-    this.metricsTable = new Tasty.Table(
-      'metrics',
-      ['id'],
-      [
-        'database',
-        'label',
-        'events',
-      ],
-    );
-  }
-
-  public async initialize(database: number): Promise<any>
-  {
-    const predefinedMetrics: MetricConfig[] = [
-      {
-        database,
-        label: 'Impressions',
-        events: 'impression',
+    const parsedText = t.split('|');
+    return {
+      id: parsedText[0],
+      value: parsedText[1],
+      name: parsedText[2],
+      symbol: { fill: parsedText[3] },
+      labels: {
+        ...omit(style[0], ['textAnchor']),
+        fill: parsedText[3],
       },
-      {
-        database,
-        label: 'Clicks',
-        events: 'click',
-      },
-      {
-        database,
-        label: 'Conversions',
-        events: 'conversion',
-      },
-      {
-        database,
-        label: 'Click-Through Rate',
-        events: 'click,impression',
-      },
-      {
-        database,
-        label: 'Conversion Rate',
-        events: 'conversion,impression',
-      },
-    ];
-    predefinedMetrics.map((m) => this.upsert(m));
-  }
+    };
+  });
 
-  public async upsert(metric: MetricConfig): Promise<MetricConfig>
-  {
-    if (metric.database === undefined || metric.label === undefined || metric.events === undefined)
-    {
-      throw new Error('Database, label and events fields are required to create a metric');
-    }
+  const timestamp = datum[xDataKey];
+  const date = moment(timestamp);
+  const title = date.format(dateFormat);
 
-    const existingMetric = await this.select(['id'], { label: metric.label });
-    if (existingMetric.length !== 0)
-    {
-      throw new Error('Metric ' + String(metric.label) + ' already exists.');
-    }
+  const labelComponent = <CustomLabel />;
 
-    return App.DB.upsert(this.metricsTable, metric) as Promise<MetricConfig>;
-  }
+  return (
+    <VictoryLegend
+      theme={TerrainVictoryTheme}
+      standalone={false}
+      x={10}
+      y={50}
+      padding={0}
+      borderPadding={borderPadding}
+      gutter={20}
+      data={data}
+      orientation={'vertical'}
+      style={tooltipStyle}
+      title={title}
+      labelComponent={labelComponent}
+      borderComponent={<Border
+        // need to change this prop so the border re-renders
+        className={`custom-tooltip-label-${data.length}`}
+      />}
+    />
+  );
+};
 
-  public async select(columns: string[], filter: object): Promise<MetricConfig[]>
-  {
-    return App.DB.select(this.metricsTable, columns, filter) as Promise<MetricConfig[]>;
-  }
-}
-
-export default Metrics;
+export default TVictoryTooltip;

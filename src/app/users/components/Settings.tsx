@@ -48,22 +48,26 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import * as React from 'react';
+
+import CheckBox from 'common/components/CheckBox';
+import Dropdown from 'common/components/Dropdown';
+import { notificationManager } from 'common/components/InAppNotification';
+import Modal from 'common/components/Modal';
+import Switch from 'common/components/Switch';
+import TerrainComponent from 'common/components/TerrainComponent';
 import { MidwayError } from 'shared/error/MidwayError';
+import AuthStore from '../../auth/data/AuthStore';
+import { Colors, Themes, ThemesArray } from '../../colors/Colors';
+import Ajax from '../../util/Ajax';
+import TerrainTools from '../../util/TerrainTools';
+import Actions from '../data/UserActions';
+import Store from '../data/UserStore';
 import * as UserTypes from '../UserTypes';
-import AuthStore from './../../auth/data/AuthStore';
-import { Colors, Themes, ThemesArray } from './../../colors/Colors';
-import CheckBox from './../../common/components/CheckBox';
-import Dropdown from './../../common/components/Dropdown';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import Ajax from './../../util/Ajax';
-import Actions from './../data/UserActions';
-import Store from './../data/UserStore';
 import AccountEntry from './AccountEntry';
+import PasswordStrengthInput from './PasswordStrengthInput';
+
 import './Settings.less';
 type User = UserTypes.User;
-import { notificationManager } from './../../common/components/InAppNotification';
-import Modal from './../../common/components/Modal';
-import PasswordStrengthInput from './PasswordStrengthInput';
 
 const Select = require('react-select');
 const TimeZones = require('./timezones.json');
@@ -98,6 +102,7 @@ class Settings extends TerrainComponent<Props>
       modalOpen: false,
       modalMessage: '',
       errorModal: false,
+      analyticsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS)),
     };
 
     this.cancelSubscription =
@@ -458,8 +463,42 @@ class Settings extends TerrainComponent<Props>
     }
   }
 
+  public handleAnalyticsSwitch(selected)
+  {
+    this.setState((state) =>
+    {
+      return { analyticsEnabled: selected };
+    });
+
+    if (TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS))
+    {
+      TerrainTools.deactivate(TerrainTools.ANALYTICS);
+    }
+    else
+    {
+      TerrainTools.activate(TerrainTools.ANALYTICS);
+    }
+  }
+
   public renderTerrainSettingsContent()
   {
+    const terrainSettingsAnalyticsContent = TerrainTools.isAdmin() ? (
+      <div>
+        <div className='settings-field-title'>
+          Analytics Support (EXPERIMENTAL)
+        </div>
+        <div className='settings-row'>
+          <Switch
+            medium={true}
+            first='On'
+            second='Off'
+            selected={this.state.analyticsEnabled}
+            onChange={this.handleAnalyticsSwitch}
+          />
+        </div>
+      </div>
+    ) : undefined;
+
     return (
       <div>
         <div className='settings-field-title'>
@@ -474,6 +513,8 @@ class Settings extends TerrainComponent<Props>
             className='settings-theme-dropdown'
           />
         </div>
+        <br />
+        {terrainSettingsAnalyticsContent}
       </div>
     );
   }

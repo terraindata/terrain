@@ -73,11 +73,6 @@ export interface Props
   singleColumn?: boolean;
 }
 
-export interface State
-{
-  libraryState: LibraryState;
-}
-
 class Library extends TerrainComponent<any>
 {
   // Give names to each of the library columns
@@ -95,10 +90,6 @@ class Library extends TerrainComponent<any>
   };
 
   public cancelSubscription = null;
-
-  public state: State = {
-    libraryState: null,
-  };
 
   public componentWillMount()
   {
@@ -208,7 +199,12 @@ class Library extends TerrainComponent<any>
       })
       .map((variant) =>
       {
-        return { id: variant.id, label: variant.name, data: this.getData(variant.deployedName) };
+        return {
+          id: variant.id,
+          label: variant.name,
+          data: this.getData(variant.deployedName),
+          isPinned: analytics.pinnedVariants.get(variant.id, false),
+        };
       });
 
     return datasets.toMap();
@@ -511,6 +507,10 @@ class Library extends TerrainComponent<any>
                       selectedMetricObject.label : ''
                     }
                     domain={selectedDateRangeDomain}
+                    dateFormat={
+                      analytics.selectedInterval === 'hour' ?
+                        'MM/DD/YYYY ha' : 'MM/DD/YYYY'
+                    }
                   /> : (
                     <div className='library-analytics-error'>
                       <p>An error occurred while fetching the analytics data</p>
