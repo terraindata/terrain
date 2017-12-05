@@ -124,7 +124,7 @@ class DeployModal extends TerrainComponent<Props>
 
     const state = LibraryStore.getState();
     const category = state.getIn(['categories', variant.categoryId]) as LibraryTypes.Category;
-    const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
+    const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
 
     const { changingStatusTo } = this.state;
 
@@ -230,7 +230,7 @@ class DeployModal extends TerrainComponent<Props>
     {
       const libraryState = LibraryStore.getState();
       defaultVariant = libraryState.variants.find(
-        (v) => v.algorithmId === changingStatusOf.algorithmId && v.status === 'DEFAULT',
+        (v) => v.groupId === changingStatusOf.groupId && v.status === 'DEFAULT',
       );
     }
 

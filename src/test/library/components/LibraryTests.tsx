@@ -57,12 +57,12 @@ import { ItemType } from '../../../items/types/Item';
 describe('Library', () =>
 {
   const categoryId = 1;
-  const algorithmId = 2;
+  const groupId = 2;
   const variantId = 3;
 
   let library: LibraryState = _LibraryState({
     categories: Immutable.Map<number, LibraryTypes.Category>({}),
-    algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({}),
+    groups: Immutable.Map<number, LibraryTypes.Group>({}),
     variants: Immutable.Map<number, LibraryTypes.Variant>({}),
   });
 
@@ -70,7 +70,7 @@ describe('Library', () =>
     type: ItemType.Category,
     id: categoryId,
     name: 'Category 1',
-    algorithmsOrder: Immutable.List<number>([2]),
+    groupsOrder: Immutable.List<number>([2]),
     lastEdited: '',
     lastUserId: '',
     userIds: Immutable.List([]),
@@ -78,9 +78,9 @@ describe('Library', () =>
     parent: 0,
   })));
 
-  library = library.set('algorithms', library.algorithms.set(algorithmId, LibraryTypes._Algorithm({
-    id: algorithmId,
-    name: 'Algorithm 1',
+  library = library.set('groups', library.groups.set(groupId, LibraryTypes._Group({
+    id: groupId,
+    name: 'Group 1',
     variantsOrder: Immutable.List<number>([3]),
     lastEdited: '',
     lastUserId: '',
@@ -142,7 +142,7 @@ describe('Library', () =>
       it('should have 3 columns', () =>
       {
         expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
-        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
         expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
         expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(0);
@@ -160,7 +160,7 @@ describe('Library', () =>
         });
 
         expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
-        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
         expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
         expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
@@ -181,7 +181,7 @@ describe('Library', () =>
         });
 
         expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
-        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
         expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
         expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
@@ -209,7 +209,7 @@ describe('Library', () =>
     it('should have 4 columns', () =>
     {
       expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
-      expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+      expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
       expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
       expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(1);
     });
@@ -233,19 +233,19 @@ describe('Library', () =>
 
     describe('and the active column is null', () =>
     {
-      describe('and the URL has no categoryId, algorithmId or variantId specified', () =>
+      describe('and the URL has no categoryId, groupId or variantId specified', () =>
       {
         it('should only display the categories column by default', () =>
         {
           expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
-          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(0);
+          expect(libraryComponent.find('GroupsColumn')).toHaveLength(0);
           expect(libraryComponent.find('VariantsColumn')).toHaveLength(0);
         });
       });
 
-      describe('and the URL has a categoryId, and no algorithmId or variantId specified', () =>
+      describe('and the URL has a categoryId, and no groupId or variantId specified', () =>
       {
-        it('should only display the algorithms column', () =>
+        it('should only display the groups column', () =>
         {
           libraryComponent = shallow(
             <Library
@@ -258,12 +258,12 @@ describe('Library', () =>
             />,
           );
           expect(libraryComponent.find('CategoriesColumn')).toHaveLength(0);
-          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+          expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
           expect(libraryComponent.find('VariantsColumn')).toHaveLength(0);
         });
       });
 
-      describe('and the URL has a categoryId and algorithmId but no variantId specified', () =>
+      describe('and the URL has a categoryId and groupId but no variantId specified', () =>
       {
         it('should only display the variants column', () =>
         {
@@ -274,18 +274,18 @@ describe('Library', () =>
               analyticsActions={analyticsActions}
               schema={schema}
               singleColumn={true}
-              router={{ params: { categoryId, algorithmId } }}
+              router={{ params: { categoryId, groupId } }}
             />,
           );
           expect(libraryComponent.find('CategoriesColumn')).toHaveLength(0);
-          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(0);
+          expect(libraryComponent.find('GroupsColumn')).toHaveLength(0);
           expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         });
       });
 
-      describe('and the URL has a categoryId, an algorithmId and a variantId specified', () =>
+      describe('and the URL has a categoryId, an groupId and a variantId specified', () =>
       {
-        it('should only display the algorithms column', () =>
+        it('should only display the groups column', () =>
         {
           libraryComponent = shallow(
             <Library
@@ -294,11 +294,11 @@ describe('Library', () =>
               analyticsActions={analyticsActions}
               schema={schema}
               singleColumn={true}
-              router={{ params: { categoryId, algorithmId, variantId: variantId.toString() } }}
+              router={{ params: { categoryId, groupId, variantId: variantId.toString() } }}
             />,
           );
           expect(libraryComponent.find('CategoriesColumn')).toHaveLength(0);
-          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(0);
+          expect(libraryComponent.find('GroupsColumn')).toHaveLength(0);
           expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         });
       });

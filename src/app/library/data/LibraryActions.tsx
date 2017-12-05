@@ -57,7 +57,7 @@ import Store from './LibraryStore';
 import { _LibraryState, LibraryState, LibraryStore } from './LibraryStore';
 
 type Category = LibraryTypes.Category;
-type Algorithm = LibraryTypes.Algorithm;
+type Group = LibraryTypes.Group;
 type Variant = LibraryTypes.Variant;
 
 import Ajax from './../../util/Ajax';
@@ -108,28 +108,28 @@ const Actions =
       //     $(ActionTypes.categories.duplicate, { category, index }),
     },
 
-    algorithms:
+    groups:
     {
       create:
       (
         categoryId: ID,
-        algorithm = LibraryTypes._Algorithm(),
+        group = LibraryTypes._Group(),
         idCallback?: (id: ID) => void,
       ) => (dispatch) =>
         {
           const category = LibraryStore.getState().categories.get(categoryId);
-          algorithm = algorithm
+          group = group
             .set('parent', categoryId)
             .set('categoryId', categoryId);
 
           Ajax.saveItem(
-            algorithm,
+            group,
             (response) =>
             {
               // on load
               const id = response.id; // ??
-              dispatch($(ActionTypes.algorithms.create, {
-                algorithm: algorithm.set('id', id),
+              dispatch($(ActionTypes.groups.create, {
+                group: group.set('id', id),
               }));
               idCallback && idCallback(id);
             },
@@ -141,32 +141,32 @@ const Actions =
         categoryId: ID,
         name: string,
         db: BackendInstance,
-        onCreate?: (algorithmId) => void,
+        onCreate?: (groupId) => void,
       ) => (dispatch) =>
         {
           const category = LibraryStore.getState().categories.get(categoryId);
-          const algorithm = LibraryTypes._Algorithm()
+          const group = LibraryTypes._Group()
             .set('name', name)
             .set('db', db)
             .set('language', category.defaultLanguage);
-          dispatch(Actions.algorithms.create(categoryId, algorithm, onCreate));
+          dispatch(Actions.groups.create(categoryId, group, onCreate));
         },
 
       change:
-      (algorithm: Algorithm) =>
-        $(ActionTypes.algorithms.change, { algorithm }),
+      (group: Group) =>
+        $(ActionTypes.groups.change, { group }),
 
       move:
-      (algorithm: Algorithm, index: number, categoryId: ID) =>
-        $(ActionTypes.algorithms.move, { categoryId, index, algorithm }),
+      (group: Group, index: number, categoryId: ID) =>
+        $(ActionTypes.groups.move, { categoryId, index, group }),
 
       duplicate:
-      (algorithm: Algorithm, index: number, name: string, db: BackendInstance, categoryId?: ID) => (dispatch) =>
+      (group: Group, index: number, name: string, db: BackendInstance, categoryId?: ID) => (dispatch) =>
       {
-        const { variantsOrder } = algorithm;
+        const { variantsOrder } = group;
 
-        categoryId = categoryId || algorithm.categoryId;
-        algorithm = algorithm
+        categoryId = categoryId || group.categoryId;
+        group = group
           .set('parent', categoryId)
           .set('categoryId', categoryId)
           .set('id', -1)
@@ -174,17 +174,17 @@ const Actions =
           .set('db', db)
           .set('variantsOrder', Immutable.List([]));
 
-        dispatch(Actions.algorithms.create(
-          algorithm.categoryId,
-          algorithm,
-          (algorithmId: ID) =>
+        dispatch(Actions.groups.create(
+          group.categoryId,
+          group,
+          (groupId: ID) =>
           {
             const variants = LibraryStore.getState().variants;
             variantsOrder.map(
               (variantId, index) =>
               {
                 const variant = variants.get(variantId);
-                setTimeout(() => dispatch(Actions.variants.duplicate(variant, index, null, categoryId, algorithmId, db)), index * 200);
+                setTimeout(() => dispatch(Actions.variants.duplicate(variant, index, null, categoryId, groupId, db)), index * 200);
               },
             );
           },
@@ -197,18 +197,18 @@ const Actions =
       create:
       (
         categoryId: ID,
-        algorithmId: ID,
+        groupId: ID,
         variant = LibraryTypes._Variant(),
         responseHandler?: (response, variant) => any,
       ) => (dispatch) =>
         {
-          const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
+          const group = LibraryStore.getState().groups.get(groupId);
           variant = variant
-            .set('parent', algorithmId)
-            .set('algorithmId', algorithmId)
+            .set('parent', groupId)
+            .set('groupId', groupId)
             .set('categoryId', categoryId)
-            .set('db', algorithm && algorithm.db)
-            .set('language', algorithm && algorithm.language);
+            .set('db', group && group.db)
+            .set('language', group && group.language);
 
           Ajax.saveItem(
             variant,
@@ -231,33 +231,33 @@ const Actions =
         $(ActionTypes.variants.change, { variant }),
 
       move:
-      (variant: Variant, index: number, categoryId: ID, algorithmId: ID) => (dispatch) =>
+      (variant: Variant, index: number, categoryId: ID, groupId: ID) => (dispatch) =>
       {
-        const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
-        variant = variant.set('db', algorithm.db).set('language', algorithm.language);
-        return dispatch($(ActionTypes.variants.move, { variant, index, categoryId, algorithmId }));
+        const group = LibraryStore.getState().groups.get(groupId);
+        variant = variant.set('db', group.db).set('language', group.language);
+        return dispatch($(ActionTypes.variants.move, { variant, index, categoryId, groupId }));
       },
 
       duplicate:
-      (variant: Variant, index: number, name?: string, categoryId?: ID, algorithmId?: ID, db?: BackendInstance) => (dispatch) =>
+      (variant: Variant, index: number, name?: string, categoryId?: ID, groupId?: ID, db?: BackendInstance) => (dispatch) =>
       {
         categoryId = categoryId || variant.categoryId;
-        algorithmId = algorithmId || variant.algorithmId;
-        const algorithm = LibraryStore.getState().algorithms.get(algorithmId);
-        db = db || algorithm.db;
+        groupId = groupId || variant.groupId;
+        const group = LibraryStore.getState().groups.get(groupId);
+        db = db || group.db;
         name = name || Util.duplicateNameFor(variant.name);
         let newVariant = variant
           .set('id', -1)
-          .set('parent', algorithmId)
-          .set('algorithmId', algorithmId)
+          .set('parent', groupId)
+          .set('groupId', groupId)
           .set('categoryId', categoryId)
           .set('name', name)
           .set('status', ItemStatus.Build)
           .set('db', db)
-          .set('language', algorithm.language);
+          .set('language', group.language);
         newVariant = LibraryTypes.touchVariant(newVariant);
 
-        dispatch(Actions.variants.create(categoryId, algorithmId, newVariant));
+        dispatch(Actions.variants.create(categoryId, groupId, newVariant));
       },
 
       duplicateAs:
@@ -267,14 +267,14 @@ const Actions =
           variantName = variantName || Util.duplicateNameFor(variant.name);
           let newVariant = variant
             .set('id', -1)
-            .set('parent', variant.algorithmId)
-            .set('algorithmId', variant.algorithmId)
+            .set('parent', variant.groupId)
+            .set('groupId', variant.groupId)
             .set('categoryId', variant.categoryId)
             .set('name', variantName)
             .set('status', ItemStatus.Build);
           newVariant = LibraryTypes.touchVariant(newVariant);
 
-          dispatch(Actions.variants.create(variant.categoryId, variant.algorithmId, newVariant, responseHandler));
+          dispatch(Actions.variants.create(variant.categoryId, variant.groupId, newVariant, responseHandler));
         },
 
       deploy:
@@ -349,11 +349,11 @@ const Actions =
     {
       return (dispatch) =>
       {
-        Ajax.getItems((categories, algorithms, variants, categoriesOrder) =>
+        Ajax.getItems((categories, groups, variants, categoriesOrder) =>
         {
           dispatch(Actions.loadState(_LibraryState({
             categories,
-            algorithms,
+            groups,
             variants,
             categoriesOrder,
             loading: false,

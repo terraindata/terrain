@@ -67,12 +67,12 @@ import './LibraryInfoColumn.less';
 import LibraryInfoUser from './LibraryInfoUser';
 import LibraryVariantInfo from './LibraryVariantInfo';
 
-const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
+const GroupIcon = require('./../../../images/icon_badgeAlgorithm.svg');
 const CategoryIcon = require('./../../../images/icon_badgeGroup.svg');
 const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
 type Category = LibraryTypes.Category;
-type Algorithm = LibraryTypes.Algorithm;
+type Group = LibraryTypes.Group;
 type Variant = LibraryTypes.Variant;
 
 type Role = RoleTypes.Role;
@@ -84,10 +84,10 @@ export interface Props
 {
   dbs: List<BackendInstance>;
   category: Category;
-  algorithm: Algorithm;
+  group: Group;
   variant: Variant;
   categoryActions: any;
-  algorithmActions: any;
+  groupActions: any;
   variantActions: any;
   libraryActions: any;
   roleActions: any;
@@ -147,19 +147,19 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     );
   }
 
-  public handleAlgorithmDbChange(dbIndex: number)
+  public handleGroupDbChange(dbIndex: number)
   {
     const dbs = this.getSortedDatabases(this.props.dbs);
-    this.props.algorithmActions.change(this.props.algorithm.set('db', dbs.get(dbIndex)) as Algorithm);
+    this.props.groupActions.change(this.props.group.set('db', dbs.get(dbIndex)) as Group);
   }
 
-  public renderAlgorithm(isSuperUser, isBuilder)
+  public renderGroup(isSuperUser, isBuilder)
   {
-    if (!this.props.algorithm || this.props.variant)
+    if (!this.props.group || this.props.variant)
     {
       return null;
     }
-    const db = this.props.algorithm.db;
+    const db = this.props.group.db;
     return (
       <div className='library-info-line'>
         <div className='library-info-table'>
@@ -249,7 +249,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
   public renderCategory(isSuperUser, isBuilder)
   {
     const { category } = this.props;
-    if (!category || this.props.algorithm || this.props.variant)
+    if (!category || this.props.group || this.props.variant)
     {
       return null;
     }
@@ -289,8 +289,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public render()
   {
-    const item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Category =
-      this.props.variant || this.props.algorithm || this.props.category;
+    const item: LibraryTypes.Variant | LibraryTypes.Group | LibraryTypes.Category =
+      this.props.variant || this.props.group || this.props.category;
 
     let categoryId: ID;
     let opacity: number;
@@ -303,10 +303,10 @@ class LibraryInfoColumn extends TerrainComponent<Props>
         opacity = 1;
         icon = <CategoryIcon />;
         break;
-      case 'ALGORITHM':
+      case 'GROUP':
         categoryId = item['categoryId'];
         opacity = 0.75;
-        icon = <AlgorithmIcon />;
+        icon = <GroupIcon />;
         break;
       case 'VARIANT':
         categoryId = item['categoryId'];
@@ -358,7 +358,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
                 this.renderVariant(isSuperUser, isBuilder)
               }
               {
-                this.renderAlgorithm(isSuperUser, isBuilder)
+                this.renderGroup(isSuperUser, isBuilder)
               }
               {
                 this.renderCategory(isSuperUser, isBuilder)

@@ -47,9 +47,9 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Redux from 'redux';
 import thunk from 'redux-thunk';
-import * as _ from 'lodash';
 import BackendInstance from '../../../database/types/BackendInstance';
 import * as LibraryTypes from './../LibraryTypes';
 
@@ -57,7 +57,7 @@ import { ItemStatus } from '../../../items/types/Item';
 import Util from './../../util/Util';
 
 type Category = LibraryTypes.Category;
-type Algorithm = LibraryTypes.Algorithm;
+type Group = LibraryTypes.Group;
 type Variant = LibraryTypes.Variant;
 
 class LibraryStateC
@@ -68,13 +68,13 @@ class LibraryStateC
   public dbsLoaded: boolean = false;
 
   public categories: IMMap<ID, Category> = Immutable.Map({});
-  public algorithms: IMMap<ID, Algorithm> = null;
+  public groups: IMMap<ID, Group> = null;
   public variants: IMMap<ID, Variant> = null;
   public selectedVariant: ID = null;
 
   // these are set these on initial load
   public prevCategories: IMMap<ID, Category> = null;
-  public prevAlgorithms: IMMap<ID, Algorithm> = null;
+  public prevGroups: IMMap<ID, Group> = null;
   public prevVariants: IMMap<ID, Variant> = null;
 
   public categoriesOrder: List<ID> = Immutable.List([]);
@@ -93,11 +93,12 @@ export const _LibraryState = (config?: any) =>
 
   if (config && !config['modelId'])
   {
-    config['modelId'] = 2;
+    config['modelId'] = 1;
     if (!config['categories'])
     {
       config['categories'] = Immutable.Map({});
-      _.keys(config['groups']).forEach((key) => {
+      _.keys(config['groups']).forEach((key) =>
+      {
         config['categories'] = config['categories'].set(key, LibraryTypes._Category(config['groups'].get(key)));
       });
 
@@ -110,6 +111,16 @@ export const _LibraryState = (config?: any) =>
     {
       config['prevCategories'] = config['prevGroups'];
     }
+  }
+  if (config && config['modeId'] < 2)
+  {
+    config['modelId'] = 2;
+    config['groups'] = Immutable.Map({});
+    _.keys(config['algorithms']).forEach((key) =>
+    {
+      config['groups'] = config['groups'].set(key, LibraryTypes._Group(config['algorithms'].get(key)));
+    });
+    config['prevGroups'] = config['prevAlgorithms'];
   }
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
 };

@@ -56,11 +56,11 @@ import configureStore from 'redux-mock-store';
 describe('VariantsColumn', () =>
 {
   const categoryId = 1;
-  const algId = 2;
+  const groupId = 2;
   const variantId = 3;
   let library = _LibraryState({
     categories: Immutable.Map<number, LibraryTypes.Category>({}),
-    algorithms: Immutable.Map<number, LibraryTypes.Category>({}),
+    groups: Immutable.Map<number, LibraryTypes.Category>({}),
     variants: Immutable.Map<number, LibraryTypes.Variant>({}),
   });
 
@@ -69,9 +69,9 @@ describe('VariantsColumn', () =>
       id: categoryId,
       name: 'Category 1',
     }))
-    .setIn(['algorithms', algId], LibraryTypes._Algorithm({
-      id: algId,
-      name: 'Algorithm 1',
+    .setIn(['groups', groupId], LibraryTypes._Group({
+      id: groupId,
+      name: 'Group 1',
     }))
     .setIn(['variants', variantId], LibraryTypes._Variant({
       id: variantId,
@@ -99,10 +99,10 @@ describe('VariantsColumn', () =>
       <VariantsColumn
         basePath={'/library'}
         variants={library.variants}
-        variantsOrder={library.algorithms.get(algId).variantsOrder}
+        variantsOrder={library.groups.get(groupId).variantsOrder}
         categoryId={categoryId}
-        algorithmId={algId}
-        algorithms={library.algorithms}
+        groupId={groupId}
+        groups={library.groups}
         selectedVariant={selectedVariant}
         analytics={analytics}
         analyticsActions={analyticsActions}
@@ -134,10 +134,10 @@ describe('VariantsColumn', () =>
           <VariantsColumn
             basePath={'/library'}
             variants={library.variants}
-            variantsOrder={library.algorithms.get(algId).variantsOrder}
+            variantsOrder={library.groups.get(groupId).variantsOrder}
             categoryId={categoryId}
-            algorithmId={algId}
-            algorithms={library.algorithms}
+            groupId={groupId}
+            groups={library.groups}
             selectedVariant={selectedVariant}
             analytics={analytics}
             analyticsActions={analyticsActions}

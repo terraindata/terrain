@@ -51,17 +51,17 @@ const { List, Map } = Immutable;
 import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
 import { _Query, Query, queryForSave } from '../../items/types/Query';
 
-export type LibraryItem = Category | Variant | Algorithm;
+export type LibraryItem = Category | Variant | Group;
 // TODO MOD refactor
 
 class VariantC extends ItemC
 {
   public type = ItemType.Variant;
 
-  public algorithmId: number = -1;
+  public groupId: number = -1;
   public categoryId: number = -1;
 
-  public excludeFields: string[] = ['dbFields', 'excludeFields', 'algorithmId', 'categoryId'];
+  public excludeFields: string[] = ['dbFields', 'excludeFields', 'groupId', 'categoryId'];
   // TODO try super or prototype
 
   public lastEdited: string = '';
@@ -133,9 +133,9 @@ export function variantForSave(v: Variant): Variant
   return v.set('query', queryForSave(v.query));
 }
 
-class AlgorithmC extends ItemC
+class GroupC extends ItemC
 {
-  public type = ItemType.Algorithm;
+  public type = ItemType.Group;
 
   public categoryId = -1;
 
@@ -147,9 +147,9 @@ class AlgorithmC extends ItemC
 
   public excludeFields = ['dbFields', 'excludeFields', 'categoryId'];
 }
-const Algorithm_Record = Immutable.Record(new AlgorithmC());
-export interface Algorithm extends AlgorithmC, IRecord<Algorithm> { }
-export const _Algorithm = (config?: any) =>
+const Group_Record = Immutable.Record(new GroupC());
+export interface Group extends GroupC, IRecord<Group> { }
+export const _Group = (config?: any) =>
 {
   if (config && (!config.modelVersion || config.modelVersion === 1))
   {
@@ -160,7 +160,7 @@ export const _Algorithm = (config?: any) =>
 
   config = config || {};
   config.variantsOrder = List(config.variantsOrder || []);
-  return new Algorithm_Record(config) as any as Algorithm;
+  return new Group_Record(config) as any as Group;
 };
 
 export const categoryColors =
@@ -184,7 +184,7 @@ class CategoryC extends ItemC
   public lastEdited = '';
   public lastUserId = '';
   public userIds = List([]);
-  public algorithmsOrder = List([]);
+  public groupsOrder = List([]);
   public defaultLanguage = 'elastic';
 }
 const Category_Record = Immutable.Record(new CategoryC());
@@ -199,7 +199,7 @@ export const _Category = (config: any = {}) =>
 
   config = config || {};
   config.userIds = List(config.userIds || []);
-  config.algorithmsOrder = List(config.algorithmsOrder || []);
+  config.groupsOrder = List(config.groupsOrder || []);
   return new Category_Record(config) as any as Category;
 };
 
@@ -247,6 +247,6 @@ export const typeToConstructor: {
   {
     [ItemType.Query]: _Query,
     [ItemType.Variant]: _Variant,
-    [ItemType.Algorithm]: _Algorithm,
+    [ItemType.Group]: _Group,
     [ItemType.Category]: _Category,
   };

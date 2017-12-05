@@ -361,9 +361,9 @@ export const Ajax =
         },
       );
     },
-    // TODO TODO TODO 
+    // TODO TODO TODO
     getItems(onLoad: (categories: IMMap<number, LibraryTypes.Category>,
-      algorithms: IMMap<number, LibraryTypes.Algorithm>,
+      groups: IMMap<number, LibraryTypes.Group>,
       variants: IMMap<number, LibraryTypes.Variant>,
       categoriesOrder: IMList<number, any>) => void,
       onError?: (ev: Event) => void)
@@ -377,7 +377,7 @@ export const Ajax =
           const mapping =
             {
               VARIANT: Immutable.Map<number, LibraryTypes.Variant>({}) as any,
-              ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}),
+              GROUP: Immutable.Map<number, LibraryTypes.Group>({}),
               CATEGORY: Immutable.Map<number, LibraryTypes.Category>({}),
               QUERY: Immutable.Map<number, Query>({}),
             };
@@ -386,31 +386,37 @@ export const Ajax =
           items.map(
             (itemObj) =>
             {
-              if (itemObj['type'] === 'GROUP')
+              console.log(itemObj);
+              const metaObj = JSON.parse(itemObj['meta']);
+              if (itemObj['type'] === 'GROUP' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 2))
               {
                 itemObj['type'] = 'CATEGORY';
+              }
+              if (itemObj['type'] === 'ALGORITHM' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+              {
+                itemObj['type'] = 'GROUP';
               }
               const item = LibraryTypes.typeToConstructor[itemObj['type']](
                 responseToRecordConfig(itemObj),
               );
               mapping[item.type] = mapping[item.type].set(item.id, item);
               // Category or Group TODO TODO
-              if (item.type !== ItemType.Algorithm && item.type !== ItemType.Variant && item.type !== ItemType.Query)
+              if (item.type === ItemType.Category)
               {
                 categoriesOrder.push(item.id);
               }
             },
           );
 
-          mapping.ALGORITHM = mapping.ALGORITHM.map(
-            (alg) => alg.set('categoryId', alg.parent),
+          mapping.GROUP = mapping.GROUP.map(
+            (cat) => cat.set('categoryId', cat.parent),
           ).toMap();
 
           mapping.VARIANT = mapping.VARIANT.map(
             (v) =>
             {
-              v = v.set('algorithmId', v.parent);
-              const alg = mapping.ALGORITHM.get(v.algorithmId);
+              v = v.set('groupId', v.parent);
+              const alg = mapping.GROUP.get(v.groupId);
               if (alg)
               {
                 v = v.set('categoryId', alg.categoryId);
@@ -421,7 +427,7 @@ export const Ajax =
 
           onLoad(
             mapping.CATEGORY,
-            mapping.ALGORITHM,
+            mapping.GROUP,
             mapping.VARIANT,
             Immutable.List(categoriesOrder),
           );

@@ -71,14 +71,14 @@ import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 
-import './AlgorithmsColumn.less';
+import './GroupsColumn.less';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
 
-const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
+const GroupIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
 type Category = LibraryTypes.Category;
-type Algorithm = LibraryTypes.Algorithm;
+type Group = LibraryTypes.Group;
 type Variant = LibraryTypes.Variant;
 
 export interface Props
@@ -86,17 +86,17 @@ export interface Props
   basePath: string;
   dbs: List<BackendInstance>;
   categories: Immutable.Map<ID, Category>;
-  algorithms: Immutable.Map<ID, Algorithm>;
+  groups: Immutable.Map<ID, Group>;
   variants: Immutable.Map<ID, Variant>;
-  algorithmsOrder: Immutable.List<ID>;
+  groupsOrder: Immutable.List<ID>;
   categoryId: ID;
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
-  algorithmActions: any;
+  groupActions: any;
   referrer?: { label: string, path: string };
 }
 
-class AlgorithmsColumn extends TerrainComponent<Props>
+class GroupsColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,
@@ -105,13 +105,13 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     lastMoved: string;
     draggingItemIndex: number;
     draggingOverIndex: number;
-    creatingNewAlgorithm: boolean;
-    newAlgorithmTextboxValue: string;
-    newAlgorithmDbIndex: number;
-    duplicatingAlgorithm: boolean;
-    duplicateAlgorithmTextboxValue: string;
-    duplicateAlgorithmId: ID;
-    duplicateAlgorithmCategoryIndex: number;
+    creatingNewGroup: boolean;
+    newGroupTextboxValue: string;
+    newGroupDbIndex: number;
+    duplicatingGroup: boolean;
+    duplicateGroupTextboxValue: string;
+    duplicateGroupId: ID;
+    duplicateGroupCategoryIndex: number;
   } = {
     rendered: false,
     me: null,
@@ -119,13 +119,13 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     lastMoved: '',
     draggingItemIndex: -1,
     draggingOverIndex: -1,
-    creatingNewAlgorithm: false,
-    newAlgorithmTextboxValue: '',
-    newAlgorithmDbIndex: -1,
-    duplicatingAlgorithm: false,
-    duplicateAlgorithmTextboxValue: '',
-    duplicateAlgorithmId: '',
-    duplicateAlgorithmCategoryIndex: 0,
+    creatingNewGroup: false,
+    newGroupTextboxValue: '',
+    newGroupDbIndex: -1,
+    duplicatingGroup: false,
+    duplicateGroupTextboxValue: '',
+    duplicateGroupId: '',
+    duplicateGroupCategoryIndex: 0,
   };
 
   constructor(props)
@@ -179,15 +179,15 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     return Util.sortDatabases(dbs);
   }
 
-  public getNewAlgorithmIndex(): number
+  public getNewGroupIndex(): number
   {
     const { categories } = this.props;
     const dbs = this.getSortedDatabases(this.props.dbs);
     const category = categories.get(this.props.categoryId);
 
-    if (this.state.newAlgorithmDbIndex !== -1)
+    if (this.state.newGroupDbIndex !== -1)
     {
-      return this.state.newAlgorithmDbIndex;
+      return this.state.newGroupDbIndex;
     }
     else
     {
@@ -195,48 +195,48 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     }
   }
 
-  public handleAlgorithmDuplicateClose()
+  public handleGroupDuplicateClose()
   {
     this.setState({
-      duplicatingAlgorithm: false,
-      duplicateAlgorithmTextboxValue: '',
+      duplicatingGroup: false,
+      duplicateGroupTextboxValue: '',
     });
   }
 
-  public handleAlgorithmDuplicateConfirm()
+  public handleGroupDuplicateConfirm()
   {
     const categoryKeys = _.keys(this.props.categories.toJS());
     const categoryId = categoryKeys
       .map((key) => parseFloat(key))
-      .sort()[this.state.duplicateAlgorithmCategoryIndex];
-    const id = this.state.duplicateAlgorithmId;
-    const index = this.props.algorithmsOrder.findIndex((iid) => iid === id);
+      .sort()[this.state.duplicateGroupCategoryIndex];
+    const id = this.state.duplicateGroupId;
+    const index = this.props.groupsOrder.findIndex((iid) => iid === id);
     const dbs = this.getSortedDatabases(this.props.dbs);
-    const dbIndex = this.getNewAlgorithmIndex();
-    this.props.algorithmActions.duplicate(
-      this.props.algorithms.get(id),
+    const dbIndex = this.getNewGroupIndex();
+    this.props.groupActions.duplicate(
+      this.props.groups.get(id),
       index,
-      this.state.duplicateAlgorithmTextboxValue,
+      this.state.duplicateGroupTextboxValue,
       dbs.get(dbIndex),
       this.props.categories.get(parseFloat(categoryId)).id,
     );
     this.setState({
-      duplicatingAlgorithm: false,
-      duplicateAlgorithmTextboxValue: '',
+      duplicatingGroup: false,
+      duplicateGroupTextboxValue: '',
     });
   }
 
-  public handleDuplicateAlgorithmTextboxChange(value)
+  public handleDuplicateGroupTextboxChange(value)
   {
     this.setState({
-      duplicateAlgorithmTextboxValue: value,
+      duplicateGroupTextboxValue: value,
     });
   }
 
-  public handleDuplicateAlgorithmCategoryChange(value)
+  public handleDuplicateGroupCategoryChange(value)
   {
     this.setState({
-      duplicateAlgorithmCategoryIndex: value,
+      duplicateGroupCategoryIndex: value,
     });
   }
 
@@ -245,20 +245,20 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     const dbs = this.getSortedDatabases(this.props.dbs);
     const options = dbs ? dbs.filter((db) => db.type === 'elastic').map((db) => db.name + ` (${db.type})`).toList() : [];
     let selected;
-    const algorithm = this.props.algorithms.get(id);
-    if (algorithm !== undefined)
+    const group = this.props.groups.get(id);
+    if (group !== undefined)
     {
-      selected = algorithm.db.name + ` (${algorithm.db.type})`;
+      selected = group.db.name + ` (${group.db.type})`;
     }
 
     const categoryNames = this.getSortedCategoryNames();
-    const currCategoryName = this.props.categories.get(algorithm.categoryId).name;
+    const currCategoryName = this.props.categories.get(group.categoryId).name;
     this.setState({
-      duplicateAlgorithmId: id,
-      duplicateAlgorithmTextboxValue: Util.duplicateNameFor(this.props.algorithms.get(id).name),
-      duplicatingAlgorithm: true,
-      newAlgorithmDbIndex: options.indexOf(selected),
-      duplicateAlgorithmCategoryIndex: categoryNames.indexOf(currCategoryName),
+      duplicateGroupId: id,
+      duplicateGroupTextboxValue: Util.duplicateNameFor(this.props.groups.get(id).name),
+      duplicatingGroup: true,
+      newGroupDbIndex: options.indexOf(selected),
+      duplicateGroupCategoryIndex: categoryNames.indexOf(currCategoryName),
     });
   }
 
@@ -275,93 +275,93 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleArchive(id: ID)
   {
-    this.props.algorithmActions.change(
-      this.props.algorithms.get(id)
-        .set('status', ItemStatus.Archive) as Algorithm,
+    this.props.groupActions.change(
+      this.props.groups.get(id)
+        .set('status', ItemStatus.Archive) as Group,
     );
   }
 
   public handleUnarchive(id: ID)
   {
-    this.props.algorithmActions.change(
-      this.props.algorithms.get(id)
-        .set('status', ItemStatus.Build) as Algorithm,
+    this.props.groupActions.change(
+      this.props.groups.get(id)
+        .set('status', ItemStatus.Build) as Group,
     );
   }
 
   public handleCreate()
   {
-    this.props.algorithmActions.create(this.props.categoryId);
+    this.props.groupActions.create(this.props.categoryId);
   }
 
   public handleNameChange(id: ID, name: string)
   {
-    this.props.algorithmActions.change(
-      this.props.algorithms.get(id)
-        .set('name', name) as Algorithm,
+    this.props.groupActions.change(
+      this.props.groups.get(id)
+        .set('name', name) as Group,
     );
   }
 
-  public handleNewAlgorithmModalOpen()
+  public handleNewGroupModalOpen()
   {
-    let index = this.getNewAlgorithmIndex();
+    let index = this.getNewGroupIndex();
     if (index === -1)
     {
       index = 0;
     }
     this.setState({
-      creatingNewAlgorithm: true,
-      newAlgorithmDbIndex: index,
-      newAlgorithmTextboxValue: '',
+      creatingNewGroup: true,
+      newGroupDbIndex: index,
+      newGroupTextboxValue: '',
     });
   }
 
-  public handleNewAlgorithmModalClose()
+  public handleNewGroupModalClose()
   {
     this.setState({
-      creatingNewAlgorithm: false,
-      newAlgorithmDbIndex: -1,
+      creatingNewGroup: false,
+      newGroupDbIndex: -1,
     });
   }
 
-  public handleNewAlgorithmTextboxChange(value)
+  public handleNewGroupTextboxChange(value)
   {
     this.setState({
-      newAlgorithmTextboxValue: value,
+      newGroupTextboxValue: value,
     });
   }
 
-  public handleNewAlgorithmDbChange(dbIndex: number)
+  public handleNewGroupDbChange(dbIndex: number)
   {
     this.setState({
-      newAlgorithmDbIndex: dbIndex,
+      newGroupDbIndex: dbIndex,
     });
   }
 
-  public handleNewAlgorithmCreated(algorithmId)
+  public handleNewGroupCreated(groupId)
   {
-    const { algorithms } = this.props;
-    const categoryId = algorithms.get(algorithmId).categoryId;
-    browserHistory.push(`/library/${categoryId}/${algorithmId}`);
+    const { groups } = this.props;
+    const categoryId = groups.get(groupId).categoryId;
+    browserHistory.push(`/library/${categoryId}/${groupId}`);
   }
 
-  public handleNewAlgorithmCreate()
+  public handleNewGroupCreate()
   {
     const dbs = this.getSortedDatabases(this.props.dbs);
-    const index = this.getNewAlgorithmIndex();
+    const index = this.getNewGroupIndex();
 
-    this.props.algorithmActions.createAs(
+    this.props.groupActions.createAs(
       this.props.categoryId,
-      this.state.newAlgorithmTextboxValue,
+      this.state.newGroupTextboxValue,
       dbs.get(index),
-      this.handleNewAlgorithmCreated,
+      this.handleNewGroupCreated,
     );
   }
 
   public handleHover(index: number, type: string, id: ID)
   {
-    const itemIndex = this.props.algorithmsOrder.indexOf(id);
-    if (type === 'algorithm'
+    const itemIndex = this.props.groupsOrder.indexOf(id);
+    if (type === 'group'
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
       this.setState({
@@ -379,25 +379,25 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       case 'category':
         if (shiftKey)
         {
-          this.props.algorithmActions.duplicate(
-            this.props.algorithms.get(id),
+          this.props.groupActions.duplicate(
+            this.props.groups.get(id),
             0,
             targetItem.id,
           );
         }
         else
         {
-          this.props.algorithmActions.move(
-            this.props.algorithms.get(id),
+          this.props.groupActions.move(
+            this.props.groups.get(id),
             0,
             targetItem.id,
           );
         }
         break;
-      case 'algorithm':
-        this.props.algorithmActions.move(
-          this.props.algorithms.get(id),
-          this.props.algorithmsOrder.indexOf(targetItem.id),
+      case 'group':
+        this.props.groupActions.move(
+          this.props.groups.get(id),
+          this.props.groupsOrder.indexOf(targetItem.id),
           this.props.categoryId,
         );
         break;
@@ -415,11 +415,11 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
-  public renderAlgorithm(id: ID, fadeIndex: number)
+  public renderGroup(id: ID, fadeIndex: number)
   {
     const { params, basePath } = this.props;
-    const algorithm = this.props.algorithms.get(id);
-    const index = this.props.algorithmsOrder.indexOf(id);
+    const group = this.props.groups.get(id);
+    const index = this.props.groupsOrder.indexOf(id);
     const scores = {
       [ItemStatus.Archive]:
       {
@@ -455,7 +455,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
     const variants = this.props.variants.filter(
       (v: Variant) =>
-        v.algorithmId === id,
+        v.groupId === id,
     );
 
     variants.map(
@@ -470,12 +470,12 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
     // scores.splice(0, 1); // remove Archived count
     const { me, roles } = this.state;
-    const canArchive = (algorithm.status !== ItemStatus.Archive); // me && roles && roles.getIn([algorithm.categoryId, me.id, 'admin']);
+    const canArchive = (group.status !== ItemStatus.Archive); // me && roles && roles.getIn([group.categoryId, me.id, 'admin']);
     const canDuplicate = true;
     const canRename = (scores[ItemStatus.Live].score === 0 && scores[ItemStatus.Default].score === 0);
-    const canDrag = true; // me && roles && roles.getIn([algorithm.categoryId, me.id, 'admin']);
-    const canEdit = canDrag; // ||me && roles && roles.getIn([algorithm.categoryId, me.id, 'admin']);
-    // (me && roles && roles.getIn([algorithm.categoryId, me.id, 'builder']));
+    const canDrag = true; // me && roles && roles.getIn([group.categoryId, me.id, 'admin']);
+    const canEdit = canDrag; // ||me && roles && roles.getIn([group.categoryId, me.id, 'admin']);
+    // (me && roles && roles.getIn([group.categoryId, me.id, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
       (lastTouched: Variant, v: Variant) =>
@@ -517,30 +517,30 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         fadeIndex={fadeIndex}
         draggingItemIndex={this.state.draggingItemIndex}
         draggingOverIndex={this.state.draggingOverIndex}
-        name={algorithm.name}
-        icon={<AlgorithmIcon />}
+        name={group.name}
+        icon={<GroupIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
-        key={algorithm.id}
-        to={`/${basePath}/${this.props.categoryId}/${algorithm.id}`}
+        key={group.id}
+        to={`/${basePath}/${this.props.categoryId}/${group.id}`}
         className='library-item-lighter'
         id={id}
         onNameChange={this.handleNameChange}
-        type='algorithm'
+        type='group'
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         onDragFinish={this.handleDragFinish}
-        item={algorithm}
+        item={group}
         canEdit={canEdit}
         canDrag={canDrag}
         canCreate={canDrag}
         canArchive={canArchive}
         canDuplicate={canDuplicate}
         canRename={canRename}
-        isSelected={+algorithm.id === +params.algorithmId}
+        isSelected={+group.id === +params.groupId}
         isFocused={this.props.isFocused}
-        canUnarchive={algorithm.status === ItemStatus.Archive}
+        canUnarchive={group.status === ItemStatus.Archive}
         onUnarchive={this.handleUnarchive}
       >
         <div className='flex-container'>
@@ -569,17 +569,17 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleCategoryHover(statusString: string, id: ID)
   {
-    const a = this.props.algorithms.get(id);
+    const a = this.props.groups.get(id);
     if (a.status !== statusString && statusString !== undefined)
     {
-      this.props.algorithmActions.change(a.set('status', statusString) as Algorithm);
+      this.props.groupActions.change(a.set('status', statusString) as Group);
     }
   }
 
   public renderCategory(status: ItemStatus)
   {
-    const { algorithms } = this.props;
-    const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
+    const { groups } = this.props;
+    const ids = this.props.groupsOrder.filter((id) => groups.get(id) && groups.get(id).status === status);
     const { me, roles } = this.state;
     const canCreate = true; // me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
 
@@ -588,11 +588,11 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         status={status}
         key={status}
         onHover={this.handleCategoryHover}
-        type='algorithm'
+        type='group'
         titleHidden={status === ItemStatus.Build}
       >
         {
-          ids.map(this.renderAlgorithm)
+          ids.map(this.renderGroup)
         }
         {
           ids.size === 0 && <div className='library-category-none'>None</div>
@@ -600,9 +600,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         {
           status === ItemStatus.Build && canCreate &&
           tooltip(
-            <CreateLine onClick={this.handleNewAlgorithmModalOpen} open={false} />,
+            <CreateLine onClick={this.handleNewGroupModalOpen} open={false} />,
             {
-              title: 'Create a New Algorithm',
+              title: 'Create a New Group',
               position: 'top',
             },
           )
@@ -616,12 +616,12 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     const dbs = this.getSortedDatabases(this.props.dbs);
     const options = dbs ? dbs.filter((db) => db.type === 'elastic').map((db) => db.name + ` (${db.type})`).toList() : [];
     return (
-      <div className='new-algorithm-modal-child'>
+      <div className='new-group-modal-child'>
         <div className='database-dropdown-wrapper'>
           <Dropdown
-            selectedIndex={this.state.newAlgorithmDbIndex}
+            selectedIndex={this.state.newGroupDbIndex}
             options={options}
-            onChange={this.handleNewAlgorithmDbChange}
+            onChange={this.handleNewGroupDbChange}
             canEdit={true}
             directionBias={90}
             className='bic-db-dropdown'
@@ -641,14 +641,14 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       categoryNames = categoryNames.set(parseFloat(key), this.props.categories.get(parseFloat(key)).name);
     });
     return (
-      <div className='new-algorithm-modal-child'>
+      <div className='new-group-modal-child'>
         <div className='database-dropdown-wrapper'>
-          <div className='duplicate-algorithm-child-message'>Please select a category for the duplicate algorithm.</div>
+          <div className='duplicate-group-child-message'>Please select a category for the duplicate group.</div>
           <Dropdown
-            selectedIndex={this.state.duplicateAlgorithmCategoryIndex}
+            selectedIndex={this.state.duplicateGroupCategoryIndex}
             options={Immutable.List(values)}
             optionsDisplayName={categoryNames}
-            onChange={this.handleDuplicateAlgorithmCategoryChange}
+            onChange={this.handleDuplicateGroupCategoryChange}
             canEdit={true}
             directionBias={90}
             className={'bic-db-dropdown'}
@@ -668,79 +668,79 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
-  public renderDuplicateAlgorithmModal()
+  public renderDuplicateGroupModal()
   {
     const dbs = this.getSortedDatabases(this.props.dbs);
-    const algorithm = this.props.algorithms.get(this.state.duplicateAlgorithmId);
+    const group = this.props.groups.get(this.state.duplicateGroupId);
     return (<Modal
-      open={this.state.duplicatingAlgorithm}
+      open={this.state.duplicatingGroup}
       showTextbox={true}
       confirm={true}
-      onClose={this.handleAlgorithmDuplicateClose}
-      onConfirm={this.handleAlgorithmDuplicateConfirm}
-      onTextboxValueChange={this.handleDuplicateAlgorithmTextboxChange}
-      textboxValue={this.state.duplicateAlgorithmTextboxValue}
-      title='Duplicate Algorithm'
+      onClose={this.handleGroupDuplicateClose}
+      onConfirm={this.handleGroupDuplicateConfirm}
+      onTextboxValueChange={this.handleDuplicateGroupTextboxChange}
+      textboxValue={this.state.duplicateGroupTextboxValue}
+      title='Duplicate Group'
       confirmButtonText='Duplicate'
-      message='What would you like to name the duplicate algorithm?'
-      textboxPlaceholderValue='Algorithm Name'
+      message='What would you like to name the duplicate group?'
+      textboxPlaceholderValue='Group Name'
       children={this.renderDuplicateDropdowns()}
-      childrenMessage='Please select a database for the duplicate algorithm.'
+      childrenMessage='Please select a database for the duplicate group.'
       allowOverflow={true}
-      inputClassName='duplicate-algorithm-modal-input'
+      inputClassName='duplicate-group-modal-input'
     />);
   }
 
-  public renderCreateAlgorithmModal()
+  public renderCreateGroupModal()
   {
     const dbs = this.getSortedDatabases(this.props.dbs);
-    const canCreateAlgorithm: boolean = dbs && dbs.size > 0;
+    const canCreateGroup: boolean = dbs && dbs.size > 0;
 
-    return canCreateAlgorithm ?
+    return canCreateGroup ?
       (<Modal
-        open={this.state.creatingNewAlgorithm}
+        open={this.state.creatingNewGroup}
         showTextbox={true}
         confirm={true}
-        onClose={this.handleNewAlgorithmModalClose}
-        onConfirm={this.handleNewAlgorithmCreate}
-        onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
-        title='New Algorithm'
+        onClose={this.handleNewGroupModalClose}
+        onConfirm={this.handleNewGroupCreate}
+        onTextboxValueChange={this.handleNewGroupTextboxChange}
+        title='New Group'
         confirmButtonText='Create'
-        message='What would you like to name the algorithm?'
-        textboxPlaceholderValue='Algorithm Name'
+        message='What would you like to name the group?'
+        textboxPlaceholderValue='Group Name'
         children={this.renderDatabaseDropdown()}
         childrenMessage='Please select a database'
         allowOverflow={true}
       />) :
       (<Modal
-        open={this.state.creatingNewAlgorithm}
-        onClose={this.handleNewAlgorithmModalClose}
-        onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
-        title='Cannot Create New Algorithm'
+        open={this.state.creatingNewGroup}
+        onClose={this.handleNewGroupModalClose}
+        onTextboxValueChange={this.handleNewGroupTextboxChange}
+        title='Cannot Create New Group'
         message='No databases available'
       />);
   }
 
   public render()
   {
-    const { algorithms, algorithmsOrder, categoryId, referrer } = this.props;
+    const { groups, groupsOrder, categoryId, referrer } = this.props;
 
     return (
       <LibraryColumn
         index={2}
-        title='Algorithms'
+        title='Groups'
         referrer={referrer}
       >
         {
-          this.renderCreateAlgorithmModal()
+          this.renderCreateGroupModal()
         }
         {
-          this.renderDuplicateAlgorithmModal()
+          this.renderDuplicateGroupModal()
         }
         {
-          algorithmsOrder ?
+          groupsOrder ?
             (
-              algorithmsOrder.size ?
+              groupsOrder.size ?
                 (
                   <div>
                     {
@@ -753,12 +753,12 @@ class AlgorithmsColumn extends TerrainComponent<Props>
                 )
                 :
                 <InfoArea
-                  large='No algorithms created, yet.'
+                  large='No groups created, yet.'
                   button={
                     Util.haveRole(categoryId, 'admin', UserStore, RolesStore)
-                      ? 'Create a algorithm' : null
+                      ? 'Create a group' : null
                   }
-                  onClick={this.handleNewAlgorithmModalOpen}
+                  onClick={this.handleNewGroupModalOpen}
                 />
             )
             : null
@@ -768,4 +768,4 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   }
 }
 
-export default AlgorithmsColumn;
+export default GroupsColumn;

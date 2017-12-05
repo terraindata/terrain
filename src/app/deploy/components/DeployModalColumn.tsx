@@ -59,7 +59,7 @@ import CheckBox from './../../common/components/CheckBox';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 const CategoryIcon = require('./../../../images/icon_badgeGroup.svg');
-const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
+const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
 const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
 const TEXT =
@@ -75,7 +75,7 @@ const TEXT =
     default:
     {
       main: 'You are deploying the following variant to Live. The variant query will be pushed to the database servers.',
-      confirm: 'I approve of deploying this query to Live for this variant, and making it the Default for this algorithm.',
+      confirm: 'I approve of deploying this query to Live for this variant, and making it the Default for this group.',
       button: 'Deploy to Live and Make Default',
       cancelButton: 'Cancel and Do Not Deploy',
     },
@@ -179,7 +179,7 @@ class DeployModalColumn extends TerrainComponent<Props>
     const { variant, status } = this.props;
     const state = LibraryStore.getState();
     const category = state.getIn(['categories', variant.categoryId]) as LibraryTypes.Category;
-    const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
+    const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
 
     // let title = 'Deploy "' + name + '" to Live';
     // if(changingStatusTo !== ItemStatus.Live)
@@ -214,12 +214,12 @@ class DeployModalColumn extends TerrainComponent<Props>
             </div>
           </div>
           <div className='deploy-modal-info-row'>
-            <AlgorithmIcon
+            <GroupIcon
               className='deploy-modal-info-icon'
             />
             <div className='deploy-modal-info-name'>
               {
-                algorithm.name
+                group.name
               }
             </div>
           </div>
@@ -297,7 +297,7 @@ class DeployModalColumn extends TerrainComponent<Props>
               <label
                 htmlFor='deploy-modal-default-check'
               >
-                Make default for algorithm <b>{algorithm.name}</b>
+                Make default for group <b>{group.name}</b>
               </label>
             </div>
             {
@@ -305,7 +305,7 @@ class DeployModalColumn extends TerrainComponent<Props>
               <div
                 className='info'
               >
-                <b>{variant.name}</b> will be served for any requests to algorithm <b>{algorithm.name}.</b> &nbsp;
+                <b>{variant.name}</b> will be served for any requests to group <b>{group.name}.</b> &nbsp;
                     {
                   this.props.defaultVariant
                     ?
@@ -315,7 +315,7 @@ class DeployModalColumn extends TerrainComponent<Props>
                         </span>
                     :
                     <span>
-                      There is not currently a default variant for algorithm <b>{algorithm.name}</b>.
+                      There is not currently a default variant for group <b>{group.name}</b>.
                         </span>
                 }
               </div>

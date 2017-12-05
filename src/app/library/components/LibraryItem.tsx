@@ -99,7 +99,7 @@ export interface Props
 
   // partially-optional. need to be provided if available.
   categoryId?: ID;
-  algorithmId?: ID;
+  groupId?: ID;
   variantId?: ID;
 
   // optional

@@ -64,7 +64,7 @@ const { List } = Immutable;
 export interface Props
 {
   libraryState: LibraryState;
-  ids: List<number>; // [category id, algorithm id, variant id]
+  ids: List<number>; // [category id, group id, variant id]
   onChangeSelection: (ids: List<number>) => void;
   dropdownWidth: string;
 }
@@ -77,7 +77,7 @@ class VariantSelector extends TerrainComponent<Props>
   {
     super(props);
     this.getAvailableCategories = memoizeOne(this.getAvailableCategories);
-    this.getAvailableAlgorithms = memoizeOne(this.getAvailableAlgorithms);
+    this.getAvailableGroups = memoizeOne(this.getAvailableGroups);
     this.getAvailableVariants = memoizeOne(this.getAvailableVariants);
   }
 
@@ -93,11 +93,11 @@ class VariantSelector extends TerrainComponent<Props>
     this.props.onChangeSelection(List([id as number, -1, -1]));
   }
 
-  public handleAlgorithmChange(index, event)
+  public handleGroupChange(index, event)
   {
-    const [algorithms, algorithmNames, algorithmIndex] =
-      this.getAvailableAlgorithms(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
-    const id = algorithms.get(index).id;
+    const [groups, groupNames, groupIndex] =
+      this.getAvailableGroups(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
+    const id = groups.get(index).id;
     if (id === this.props.ids.get(1)) // nothing changed
     {
       return;
@@ -124,18 +124,18 @@ class VariantSelector extends TerrainComponent<Props>
     return [items, this.itemsToText(items), index];
   }
 
-  public getAvailableAlgorithms(libraryState: LibraryState, categoryId: ID, algorithmId: ID): AvailableItemsType
+  public getAvailableGroups(libraryState: LibraryState, categoryId: ID, groupId: ID): AvailableItemsType
   {
-    const items = libraryState.algorithms.filter(
+    const items = libraryState.groups.filter(
       (v, k) => v.categoryId === categoryId,
     ).toList();
-    const index = items.findIndex((v, i) => v.id === algorithmId);
+    const index = items.findIndex((v, i) => v.id === groupId);
     return [items, this.itemsToText(items), index];
   }
 
-  public getAvailableVariants(libraryState: LibraryState, algorithmId: ID, variantId: ID): AvailableItemsType
+  public getAvailableVariants(libraryState: LibraryState, groupId: ID, variantId: ID): AvailableItemsType
   {
-    const items = libraryState.variants.filter((v, k) => v.algorithmId === algorithmId).toList();
+    const items = libraryState.variants.filter((v, k) => v.groupId === groupId).toList();
     const index = items.findIndex((v, i) => v.id === variantId);
     return [items, this.itemsToText(items), index];
   }
@@ -149,8 +149,8 @@ class VariantSelector extends TerrainComponent<Props>
   {
     const [categories, categoryNames, categoryIndex] =
       this.getAvailableCategories(this.props.libraryState, this.props.ids.get(0));
-    const [algorithms, algorithmNames, algorithmIndex] =
-      this.getAvailableAlgorithms(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
+    const [groups, groupNames, groupIndex] =
+      this.getAvailableGroups(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
     const [variants, variantNames, variantIndex] =
       this.getAvailableVariants(this.props.libraryState, this.props.ids.get(1), this.props.ids.get(2));
 
@@ -173,14 +173,14 @@ class VariantSelector extends TerrainComponent<Props>
         </div>
         <div className='variant-selector-column'>
           <div className='variant-selector-label'>
-            Algorithm
+            Group
           </div>
           <div className='variant-selector-input'>
             <Dropdown
-              options={algorithmNames.size !== 0 ? algorithmNames : undefined}
-              selectedIndex={algorithmIndex}
+              options={groupNames.size !== 0 ? groupNames : undefined}
+              selectedIndex={groupIndex}
               canEdit={true}
-              onChange={this.handleAlgorithmChange}
+              onChange={this.handleGroupChange}
               openDown={true}
               width={this.props.dropdownWidth}
             />

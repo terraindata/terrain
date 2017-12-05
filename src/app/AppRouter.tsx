@@ -96,7 +96,7 @@ class AppRouter extends TerrainComponent<{}> {
             <IndexRoute component={libraryLibrary} />
             <Route path=':categoryId' component={libraryLibrary}>
               <IndexRoute component={libraryLibrary} />
-              <Route path=':algorithmId' component={libraryLibrary}>
+              <Route path=':groupId' component={libraryLibrary}>
                 <IndexRoute component={libraryLibrary} />
                 <Route path=':variantId' component={libraryLibrary}>
                   <IndexRoute component={libraryLibrary} />
@@ -141,7 +141,7 @@ class AppRouter extends TerrainComponent<{}> {
             <IndexRoute component={analyticsLibrary} />
             <Route path=':categoryId' component={analyticsLibrary}>
               <IndexRoute component={analyticsLibrary} />
-              <Route path=':algorithmId' component={analyticsLibrary}>
+              <Route path=':groupId' component={analyticsLibrary}>
                 <IndexRoute component={analyticsLibrary} />
                 <Route path=':variantId' component={analyticsLibrary}>
                   <IndexRoute component={analyticsLibrary} />

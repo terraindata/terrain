@@ -79,7 +79,7 @@ import StatusDropdown from './StatusDropdown';
 const VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
 
 type Variant = LibraryTypes.Variant;
-type Algorithm = LibraryTypes.Algorithm;
+type Group = LibraryTypes.Group;
 
 export interface Props
 {
@@ -88,8 +88,8 @@ export interface Props
   selectedVariant: ID;
   variantsOrder: Immutable.List<ID>;
   categoryId: ID;
-  algorithmId: ID;
-  algorithms: Immutable.Map<ID, Algorithm>;
+  groupId: ID;
+  groups: Immutable.Map<ID, Group>;
   canPinItems: boolean;
   params?: any;
   variantActions?: any;
@@ -111,7 +111,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
     duplicatingVariant: boolean;
     duplicateVariantTextboxValue: string;
-    duplicateVariantAlgorithmIndex: number;
+    duplicateVariantGroupIndex: number;
     duplicateVariantId: ID;
   } = {
     rendered: false,
@@ -123,7 +123,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
     duplicatingVariant: false,
     duplicateVariantTextboxValue: '',
-    duplicateVariantAlgorithmIndex: 0,
+    duplicateVariantGroupIndex: 0,
     duplicateVariantId: undefined,
   };
 
@@ -189,7 +189,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (nextProps.algorithmId !== this.props.algorithmId)
+    if (nextProps.groupId !== this.props.groupId)
     {
       this.setState({
         rendered: false,
@@ -198,7 +198,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
     const { canPinItems, selectedVariant, basePath, analytics } = this.props;
     const { params, analytics: nextAnalytics } = nextProps;
-    const { categoryId, algorithmId } = params;
+    const { categoryId, groupId } = params;
     const nextSelectedVariant = nextProps.selectedVariant;
     const pinnedVariants = nextAnalytics
       .pinnedVariants
@@ -214,12 +214,12 @@ class VariantsColumn extends TerrainComponent<Props>
       if (nextSelectedVariant !== null && nextSelectedVariant !== undefined)
       {
         browserHistory
-          .replace(`/${basePath}/${categoryId}/${algorithmId}/${nextSelectedVariant}${pinnedParams}`);
+          .replace(`/${basePath}/${categoryId}/${groupId}/${nextSelectedVariant}${pinnedParams}`);
       }
       else
       {
         browserHistory
-          .replace(`/${basePath}/${categoryId}/${algorithmId}${pinnedParams}`);
+          .replace(`/${basePath}/${categoryId}/${groupId}${pinnedParams}`);
       }
     }
   }
@@ -227,18 +227,18 @@ class VariantsColumn extends TerrainComponent<Props>
   public handleDuplicateModalConfirm()
   {
     const id = this.state.duplicateVariantId;
-    const sorted = this.getSortedAlgorithms();
-    const algorithmIds = [];
+    const sorted = this.getSortedGroups();
+    const groupIds = [];
     sorted.map((value) =>
     {
-      algorithmIds.push(value.id);
+      groupIds.push(value.id);
     });
     this.props.variantActions.duplicate(
       this.props.variants.get(id),
       this.props.variantsOrder.findIndex((iid) => iid === id),
       this.state.duplicateVariantTextboxValue,
       null,
-      algorithmIds[this.state.duplicateVariantAlgorithmIndex],
+      groupIds[this.state.duplicateVariantGroupIndex],
     );
     this.setState({
       duplicatingVariant: false,
@@ -252,33 +252,33 @@ class VariantsColumn extends TerrainComponent<Props>
     });
   }
 
-  public getSortedAlgorithms()
+  public getSortedGroups()
   {
-    const filtered = this.props.algorithms.filter((value) => value.categoryId === this.props.categoryId);
-    const sorted = filtered.sortBy((algorithm) => algorithm.id);
+    const filtered = this.props.groups.filter((value) => value.categoryId === this.props.categoryId);
+    const sorted = filtered.sortBy((group) => group.id);
     return sorted;
   }
 
   public handleDuplicate(id: ID)
   {
-    const sorted = this.getSortedAlgorithms();
-    const algorithmIds = [];
+    const sorted = this.getSortedGroups();
+    const groupIds = [];
     sorted.map((value) =>
     {
-      algorithmIds.push(value.id);
+      groupIds.push(value.id);
     });
     this.setState({
       duplicatingVariant: true,
       duplicateVariantId: id,
-      duplicateVariantAlgorithmIndex: algorithmIds.indexOf(this.props.algorithmId),  // get index,
+      duplicateVariantGroupIndex: groupIds.indexOf(this.props.groupId),  // get index,
       duplicateVariantTextboxValue: Util.duplicateNameFor(this.props.variants.get(id).name),
     });
   }
 
-  public handleVariantAlgorithmIndexChange(index)
+  public handleVariantGroupIndexChange(index)
   {
     this.setState({
-      duplicateVariantAlgorithmIndex: index,
+      duplicateVariantGroupIndex: index,
     });
   }
 
@@ -307,7 +307,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleCreate()
   {
-    this.props.variantActions.create(this.props.categoryId, this.props.algorithmId);
+    this.props.variantActions.create(this.props.categoryId, this.props.groupId);
   }
 
   public handleNameChange(id: ID, name: string)
@@ -349,7 +349,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
       // var target = this.props.variants.get(this.props.variantsOrder.get(index));
       // this.props.variantActions.move(this.props.variants.get(id).set('status', target.status) as Variant,
-      //   index, this.props.categoryId, this.props.algorithmId);
+      //   index, this.props.categoryId, this.props.groupId);
     }
   }
 
@@ -360,14 +360,14 @@ class VariantsColumn extends TerrainComponent<Props>
       case 'category':
         // move this one to the new category
         // and create a new category
-        // Actions.algorithms.move(this.props.algorithms.get(id), undefined, targetItem.id);
+        // Actions.groups.move(this.props.groups.get(id), undefined, targetItem.id);
         break;
-      case 'algorithm':
-        const algorithmName = targetItem.name || 'Untitled';
+      case 'group':
+        const groupName = targetItem.name || 'Untitled';
         const vrntName = this.props.variants.get(id).name || 'Untitled';
         notificationManager.addNotification(
           'Moved',
-          '"' + vrntName + '" was moved to algorithm "' + algorithmName + '"',
+          '"' + vrntName + '" was moved to group "' + groupName + '"',
           'info',
           5,
         );
@@ -385,7 +385,7 @@ class VariantsColumn extends TerrainComponent<Props>
           this.props.variants.get(id),
           this.props.variantsOrder.indexOf(targetItem.id),
           this.props.categoryId,
-          this.props.algorithmId,
+          this.props.groupId,
         );
         break;
     }
@@ -406,7 +406,7 @@ class VariantsColumn extends TerrainComponent<Props>
       selectedVariant,
       basePath,
       categoryId,
-      algorithmId,
+      groupId,
       analytics,
     } = this.props;
 
@@ -452,15 +452,15 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public renderDuplicateDropdown()
   {
-    const sorted = this.getSortedAlgorithms();
-    const algorithmNames = sorted.map((value) => value.name);
+    const sorted = this.getSortedGroups();
+    const groupNames = sorted.map((value) => value.name);
     return (
-      <div className='new-algorithm-modal-child'>
+      <div className='new-group-modal-child'>
         <div className='database-dropdown-wrapper'>
           <Dropdown
-            selectedIndex={this.state.duplicateVariantAlgorithmIndex}
-            options={algorithmNames.toList()}
-            onChange={this.handleVariantAlgorithmIndexChange}
+            selectedIndex={this.state.duplicateVariantGroupIndex}
+            options={groupNames.toList()}
+            onChange={this.handleVariantGroupIndexChange}
             canEdit={true}
             directionBias={90}
             className={'bic-db-dropdown'}
@@ -485,9 +485,9 @@ class VariantsColumn extends TerrainComponent<Props>
       message='What would you like to name the duplicate variant?'
       textboxPlaceholderValue='Varaint Name'
       children={this.renderDuplicateDropdown()}
-      childrenMessage='Please select an algorithm for the duplicate variant.'
+      childrenMessage='Please select an group for the duplicate variant.'
       allowOverflow={true}
-      inputClassName='duplicate-algorithm-modal-input'
+      inputClassName='duplicate-group-modal-input'
     />);
   }
 
@@ -545,7 +545,7 @@ class VariantsColumn extends TerrainComponent<Props>
         isPinned={isPinned}
         onPin={this.handlePinVariant}
         key={variant.id}
-        to={`/${basePath}/${this.props.categoryId}/${this.props.algorithmId}/${id}`}
+        to={`/${basePath}/${this.props.categoryId}/${this.props.groupId}/${id}`}
         className='library-item-lightest'
         id={id}
         type='variant'

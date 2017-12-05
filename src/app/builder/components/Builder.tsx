@@ -456,12 +456,12 @@ class Builder extends TerrainComponent<Props>
       //   {
       //     text: 'Duplicate',
       //     icon: <DuplicateIcon />,
-      //     onClick: this.duplicateAlgorithm,
+      //     onClick: this.duplicateGroup,
       //   },
       //   {
       //     text: 'Open',
       //     icon: <OpenIcon />,
-      //     onClick: this.loadAlgorithm,
+      //     onClick: this.loadGroup,
       //   },
     ]);
   }
@@ -892,7 +892,7 @@ class Builder extends TerrainComponent<Props>
     const variant = this.getVariant();
     const query = this.getQuery();
     const variantIdentifier = variant === undefined ? '' :
-      `${variant.categoryId},${variant.algorithmId},${variant.id}`;
+      `${variant.categoryId},${variant.groupId},${variant.id}`;
 
     return (
       <div

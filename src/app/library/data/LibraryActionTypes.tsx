@@ -58,7 +58,7 @@ export let LibraryActionTypes =
       // duplicate,
     },
 
-    algorithms:
+    groups:
     {
       create, change, move,
     },
