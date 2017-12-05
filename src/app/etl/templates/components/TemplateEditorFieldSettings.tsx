@@ -105,7 +105,7 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
         >
           <Autocomplete
             value={field.name}
-            onChange={this.setFactory('name', 'target', 'value')}
+            onChange={this.setFactory('name')}
             disabled={inputDisabled}
             options={emptyOptions}
           />
