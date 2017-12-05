@@ -106,7 +106,7 @@ const Periscope = {
       fill: ${Colors().text2} !important;
     }
     .periscope .handle {
-      stroke: rgba(210,215,219,0.75) !important;
+      stroke: ${Colors().altHighlight} !important;
     }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
@@ -153,7 +153,7 @@ const Periscope = {
       .orient('bottom');
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
-      .attr('style', 'stroke: ' + '#fff')
+      .attr('style', 'stroke: ' + Colors().transformChartBg)
       .call(bottomAxis);
   },
 
