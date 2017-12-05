@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
-import { omit } from 'lodash';
+import { omit, random, round } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import { Border, VictoryLegend } from 'victory';
@@ -53,8 +53,8 @@ const CustomLabel = (props) =>
 {
   return (
     <text dy={5} x={props.x} y={props.y} style={props.style} >
-      <tspan style={{ fontWeight: 'bold' }}>{props.datum.value}</tspan>
-      <tspan dx={10} style={{ fill: 'white' }}>{props.datum.name}</tspan>
+      <tspan style={{ fontWeight: 'bold' }}>{round(props.datum.value, 3)}</tspan>
+      <tspan dx={10} style={{ fill: 'white' }}>{props.datum.reference}</tspan>
     </text>
   );
 };
@@ -67,7 +67,6 @@ interface TVictoryTooltipProps
   datum?: any;
   text?: any;
   style?: any;
-  borderPadding?: any;
 }
 
 const TVictoryTooltip = (props: TVictoryTooltipProps) =>
@@ -78,16 +77,20 @@ const TVictoryTooltip = (props: TVictoryTooltipProps) =>
     xDataKey,
     style,
     dateFormat,
-    borderPadding,
     tooltipStyle,
   } = props;
+
   const data = text.map((t) =>
   {
     const parsedText = t.split('|');
+    const value = round(parsedText[1], 3);
     return {
       id: parsedText[0],
-      value: parsedText[1],
-      name: parsedText[2],
+      value,
+      // set the full label text in the 'name' key so the legend border width
+      // is correctly calculated
+      name: `${value} ${parsedText[2]}`,
+      reference: parsedText[2],
       symbol: { fill: parsedText[3] },
       labels: {
         ...omit(style[0], ['textAnchor']),
@@ -109,7 +112,6 @@ const TVictoryTooltip = (props: TVictoryTooltipProps) =>
       x={10}
       y={50}
       padding={0}
-      borderPadding={borderPadding}
       gutter={20}
       data={data}
       orientation={'vertical'}
@@ -118,7 +120,7 @@ const TVictoryTooltip = (props: TVictoryTooltipProps) =>
       labelComponent={labelComponent}
       borderComponent={<Border
         // need to change this prop so the border re-renders
-        className={`custom-tooltip-label-${data.length}`}
+        className={`custom-tooltip-label-${random(0, 100)}`}
       />}
     />
   );
