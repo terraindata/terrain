@@ -73,7 +73,8 @@ export default class ElasticQueryHandler extends QueryHandler
 {
   private controller: ElasticController;
 
-  private GROUP_JOIN_MSEARCH_MAX = 1000;
+  private GROUP_JOIN_SEARCH_THRESHOLD = 10000;
+  private GROUP_JOIN_MSEARCH_THRESHOLD = 1000;
 
   constructor(controller: ElasticController)
   {
@@ -149,13 +150,22 @@ export default class ElasticQueryHandler extends QueryHandler
 
     return new Promise<QueryResponse>(async (resolve, reject) =>
     {
-      const client: ElasticClient = this.controller.getClient();
-      const parentResults = await new Promise<QueryResponse>((res, rej) =>
-      {
-        client.search(parentQuery, this.makeQueryCallback(res, rej));
-      });
 
-      winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
+      const client: ElasticClient = this.controller.getClient();
+
+      if (parentQuery['size'] < this.GROUP_JOIN_SEARCH_THRESHOLD)
+      {
+        const parentResults = await new Promise<QueryResponse>((res, rej) =>
+        {
+          client.search(parentQuery, this.makeQueryCallback(res, rej));
+        });
+
+        winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
+      }
+      else
+      {
+        // todo: perform scrolled query here
+      }
 
       const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
       if (valueInfo === null)
@@ -201,7 +211,7 @@ export default class ElasticQueryHandler extends QueryHandler
   {
     const hits = parentResults.result.hits.hits;
     const promises: Array<Promise<any>> = [];
-    for (let i = 0, chunkSize = this.GROUP_JOIN_MSEARCH_MAX; i < hits.length; i += chunkSize)
+    for (let i = 0, chunkSize = this.GROUP_JOIN_MSEARCH_THRESHOLD; i < hits.length; i += chunkSize)
     {
       if (i + chunkSize > hits.length)
       {
