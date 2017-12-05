@@ -63,6 +63,7 @@ export interface Props
   disabled?: boolean;
   label?: string;
   color?: string;
+  large?: boolean;
 }
 
 class CheckBox extends TerrainComponent<Props>
@@ -94,6 +95,7 @@ class CheckBox extends TerrainComponent<Props>
           'checkbox': true,
           'checkbox-disabled': this.props.disabled,
           'checkbox-checked': this.props.checked,
+          'checkbox-large': this.props.large,
           [this.props.className]: (this.props.className !== '' && this.props.className !== undefined),
         })}
         style={style}
