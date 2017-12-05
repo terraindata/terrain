@@ -289,7 +289,6 @@ function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
 
 const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =>
 {
-  console.log(state);
   const versioning = action.payload !== undefined ? action.payload.versioning : false;
 
   let nextState = state;
@@ -300,7 +299,6 @@ const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =
 
   if (versioning === true && CleanLibraryActionTypes.indexOf(action.type) === -1)
   {
-    console.log('HERE');
     // save the new state
     saveStateOf(nextState.categories, nextState.prevCategories);
     saveStateOf(nextState.algorithms, nextState.prevAlgorithms);
@@ -310,7 +308,6 @@ const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =
     .set('prevCategories', nextState.categories)
     .set('prevAlgorithms', nextState.algorithms)
     .set('prevVariants', nextState.variants);
-  console.log(nextState);
 
   return nextState;
 };

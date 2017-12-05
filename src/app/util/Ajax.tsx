@@ -390,8 +390,6 @@ export const Ajax =
               {
                 itemObj['type'] = 'CATEGORY';
               }
-              console.log(LibraryTypes.typeToConstructor);
-              console.log(itemObj);
               const item = LibraryTypes.typeToConstructor[itemObj['type']](
                 responseToRecordConfig(itemObj),
               );
