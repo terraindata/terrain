@@ -84,6 +84,7 @@ describe('MultipleAreaChart', () =>
         xDataKey={'xaxis'}
         yDataKey={'yaxis'}
         onLegendClick={handleLegendClick}
+        dateFormat={'MM/DD/YYYY'}
       />,
     );
   });

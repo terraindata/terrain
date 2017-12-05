@@ -84,7 +84,7 @@ export class Events
     });
 
     this.client.ping({
-      requestTimeout: 100,
+      requestTimeout: 500,
     }, (err) =>
       {
         if (err !== null && err !== undefined)

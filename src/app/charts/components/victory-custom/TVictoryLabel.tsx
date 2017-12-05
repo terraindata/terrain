@@ -51,9 +51,9 @@ interface Props
   datum?: any;
 }
 
-const TerrainVictoryLabel = (props: Props) => (
+const TVictoryLabel = (props: Props) => (
   props.datum.isPinned ?
     <VictoryLabel dx='10' {...props} /> : <VictoryLabel {...props} />
 );
 
-export default TerrainVictoryLabel;
+export default TVictoryLabel;
