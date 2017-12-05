@@ -91,10 +91,10 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
       <div className='template-editor-field-row'>
         <div className='include-field-checkbox-spacer'>
           <CheckBox
-            className={'checkbox-large'}
             checked={field.isIncluded}
             onChange={this.handleIncludeCheckboxClicked}
             disabled={disableCheckbox}
+            large={true}
           />
         </div>
         <div className='template-editor-field-settings'
