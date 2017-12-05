@@ -356,6 +356,7 @@ class Autocomplete extends TerrainComponent<Props>
           onKeyDown={this.handleKeydown}
           disabled={this.props.disabled}
           placeholder={this.props.placeholder}
+          autoFocus={this.props.autoFocus}
         />
         {
           this.props.help &&
