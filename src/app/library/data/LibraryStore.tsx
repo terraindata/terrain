@@ -91,8 +91,11 @@ export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
 export const _LibraryState = (config?: any) =>
 {
   console.log(config);
-  console.log(config['modelId']);
-  console.log(config['groups']);
+  if (config)
+  {
+    console.log(config['modelId']);
+    console.log(config['groups']);
+  }
   if (config && !config['modelId'])
   {
     config['modelId'] = 2;
