@@ -386,9 +386,8 @@ export const Ajax =
           items.map(
             (itemObj) =>
             {
-              console.log(itemObj);
               const metaObj = JSON.parse(itemObj['meta']);
-              if (itemObj['type'] === 'GROUP' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 2))
+              if (itemObj['type'] === 'GROUP' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
               {
                 itemObj['type'] = 'CATEGORY';
               }

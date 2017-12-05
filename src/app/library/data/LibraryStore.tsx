@@ -84,7 +84,7 @@ class LibraryStateC
   public changingStatusTo: ItemStatus = 'BUILD';
 
   // Keep track of versioning
-  public modelId: number = 0;
+  public modelId: number = 3;
 }
 const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
@@ -93,6 +93,7 @@ export const _LibraryState = (config?: any) =>
 
   if (config && !config['modelId'])
   {
+    console.log(config);
     config['modelId'] = 1;
     if (!config['categories'])
     {
@@ -112,7 +113,7 @@ export const _LibraryState = (config?: any) =>
       config['prevCategories'] = config['prevGroups'];
     }
   }
-  if (config && config['modeId'] < 2)
+  if (config && config['modelId'] < 2)
   {
     config['modelId'] = 2;
     config['groups'] = Immutable.Map({});
@@ -122,6 +123,7 @@ export const _LibraryState = (config?: any) =>
     });
     config['prevGroups'] = config['prevAlgorithms'];
   }
+  console.log(config);
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
 };
 

@@ -157,6 +157,7 @@ export const _Group = (config?: any) =>
     config.modelVersion = 2;
     config.categoryId = config.groupId;
   }
+  // from 2 to 3
 
   config = config || {};
   config.variantsOrder = List(config.variantsOrder || []);
