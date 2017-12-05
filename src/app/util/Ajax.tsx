@@ -375,6 +375,7 @@ export const Ajax =
         {},
         (items: object[]) =>
         {
+          console.log(items);
           const mapping =
             {
               VARIANT: Immutable.Map<number, LibraryTypes.Variant>({}) as any,

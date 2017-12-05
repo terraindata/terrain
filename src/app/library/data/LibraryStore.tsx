@@ -91,11 +91,6 @@ export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
 export const _LibraryState = (config?: any) =>
 {
   console.log(config);
-  if (config)
-  {
-    console.log(config['modelId']);
-    console.log(config['groups']);
-  }
   if (config && !config['modelId'])
   {
     config['modelId'] = 2;
@@ -103,10 +98,7 @@ export const _LibraryState = (config?: any) =>
     {
       config['categories'] = Immutable.Map({});
       _.keys(config['groups']).forEach((key) => {
-        console.log(key);
         config['categories'] = config['categories'].set(key, LibraryTypes._Category(config['groups'].get(key)));
-        console.log(config['categories']);
-        console.log(config['groups'].get(key));
       });
 
     }
