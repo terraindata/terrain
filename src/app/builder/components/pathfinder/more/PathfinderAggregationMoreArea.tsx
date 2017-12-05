@@ -52,18 +52,22 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 const { List, Map } = Immutable;
-import BuilderActions from 'app/builder/data/BuilderActions';
-import FadeInOut from 'app/common/components/FadeInOut';
-import { _AggregationLine, AggregationLine, _FilterGroup, PathfinderContext, _Sample, _Script } from 'app/builder/components/pathfinder/PathfinderTypes';
 import PathfinderFilterSection from 'app/builder/components/pathfinder/filter/PathfinderFilterSection';
-import Dropdown from 'app/common/components/Dropdown';
-import BuilderTextbox from 'app/common/components/BuilderTextbox';
-import RadioButtons from 'app/common/components/RadioButtons';
 import PathfinderAggregationLine from 'app/builder/components/pathfinder/more/PathfinderAggregationLine';
-import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
 import PathfinderAggregationMoreSection from 'app/builder/components/pathfinder/more/PathfinderAggregationMoreSection';
+import PathfinderCreateLine from 'app/builder/components/pathfinder/PathfinderCreateLine';
+import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
+import
+{
+  _AggregationLine, _FilterGroup, _Sample, _Script,
+  AggregationLine, PathfinderContext
+} from 'app/builder/components/pathfinder/PathfinderTypes';
+import BuilderActions from 'app/builder/data/BuilderActions';
+import BuilderTextbox from 'app/common/components/BuilderTextbox';
+import Dropdown from 'app/common/components/Dropdown';
+import FadeInOut from 'app/common/components/FadeInOut';
 import Menu from 'app/common/components/Menu';
+import RadioButtons from 'app/common/components/RadioButtons';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
@@ -203,7 +207,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
   public handleAddScript()
   {
     BuilderActions.change(this.props.keyPath.push('scripts'),
-      this.props.aggregation.scripts.push(_Script()))
+      this.props.aggregation.scripts.push(_Script()));
   }
 
   public renderScripts()
@@ -213,25 +217,25 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
         {
           this.props.aggregation.scripts.map((script, i) =>
           {
-             return (
-               <div key={i} className='pf-aggregation-script-item'>
-                 <div className='pf-aggregation-script-title'>
-                   <span>Name</span>
-                   <BuilderTextbox
-                     value={script.id}
-                     canEdit={this.props.pathfinderContext.canEdit}
-                     keyPath={this.props.keyPath.push('scripts').push(i).push('id')}
-                     placeholder={'Script Name'}
-                   />
-                 </div>
-                 <BuilderTextbox
-                   value={script.script}
-                   keyPath={this.props.keyPath.push('scripts').push(i).push('script')}
-                   canEdit={this.props.pathfinderContext.canEdit}
-                   textarea={true}
-                 />
-               </div>
-              )
+            return (
+              <div key={i} className='pf-aggregation-script-item'>
+                <div className='pf-aggregation-script-title'>
+                  <span>Name</span>
+                  <BuilderTextbox
+                    value={script.id}
+                    canEdit={this.props.pathfinderContext.canEdit}
+                    keyPath={this.props.keyPath.push('scripts').push(i).push('id')}
+                    placeholder={'Script Name'}
+                  />
+                </div>
+                <BuilderTextbox
+                  value={script.script}
+                  keyPath={this.props.keyPath.push('scripts').push(i).push('script')}
+                  canEdit={this.props.pathfinderContext.canEdit}
+                  textarea={true}
+                />
+              </div>
+            );
           })
         }
         <PathfinderCreateLine
@@ -314,25 +318,25 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
       moreOptions = moreOptions.push({
         text: 'Add script...',
         onClick: this.addScripts,
-      })
+      });
     }
     return (
-     <div className='pf-aggregation-more-menu-wrapper'>
+      <div className='pf-aggregation-more-menu-wrapper'>
         <Menu
           options={moreOptions}
           title='More...'
           openRight={true}
         />
       </div>
-    )
+    );
   }
 
   public render()
   {
     return (
       <div>
-      {this.renderMoreAdvancedSections()}
-      {this.renderMoreMenu()}
+        {this.renderMoreAdvancedSections()}
+        {this.renderMoreMenu()}
       </div>
     );
   }

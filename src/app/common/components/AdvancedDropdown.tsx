@@ -162,7 +162,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
           style={getStyle('width', state.showOther ? props.textboxWidth || 150 : 0)}
         >
           {
-            state.showOther ? 
+            state.showOther ?
               <input
                 type='text'
                 value={props.value}
@@ -171,7 +171,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
                 onChange={this.handleTextChange}
                 className='transition box-size'
               />
-            : null
+              : null
           }
         </div>
       </div>

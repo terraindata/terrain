@@ -211,25 +211,25 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
     onlyOne: false,
     inline: true,
     items: [
-    {
-      text: PathfinderText.aggregation.order.text1,
-      fieldOptions: true,
-      key: 'sortField',
-      inputType: 'dropdown',
-      tooltipText: PathfinderText.aggregation.order.tooltipText,
-    },
-    {
-      text: PathfinderText.aggregation.order.text2,
-      options: List(['ascending', 'descending']),
-      inputType: 'dropdown',
-      key: 'order',
-    },
-    {
-      text: PathfinderText.aggregation.order.text3,
-      inputType: '',
-      key: '',
-    }
-],
+      {
+        text: PathfinderText.aggregation.order.text1,
+        fieldOptions: true,
+        key: 'sortField',
+        inputType: 'dropdown',
+        tooltipText: PathfinderText.aggregation.order.tooltipText,
+      },
+      {
+        text: PathfinderText.aggregation.order.text2,
+        options: List(['ascending', 'descending']),
+        inputType: 'dropdown',
+        key: 'order',
+      },
+      {
+        text: PathfinderText.aggregation.order.text3,
+        inputType: '',
+        key: '',
+      },
+    ],
   },
   [ADVANCED.Format]:
   {
@@ -371,7 +371,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
     items: {
       component: (props: any, item: AdvancedAggregationItem, onChange: (index: number) => void) =>
       {
-        const {fieldName, keyPath, canEdit, advancedData} = props;
+        const { fieldName, keyPath, canEdit, advancedData } = props;
         const { key } = item;
         const replace = advancedData.get(key) !== undefined;
         const value = advancedData.get(key);

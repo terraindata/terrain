@@ -350,11 +350,12 @@ class SourceC extends BaseClass
   public start: number = 0;
 }
 export type Source = SourceC & IRecord<SourceC>;
-export const _Source = (config?: { [key: string]: any }) => {
+export const _Source = (config?: { [key: string]: any }) =>
+{
   let source = New<Source>(new SourceC(config), config);
   source = source.set('dataSource', _ElasticDataSource(source['dataSource']));
-  return source
-}
+  return source;
+};
 
 abstract class DataSource extends BaseClass
 {
@@ -383,9 +384,9 @@ export const _PathfinderContext = (config?: { [key: string]: any }) =>
 // This type union shows what contexts and parameters are allowable
 //  for autocompletes and dropdowns
 type ChoiceContext = {
-    type: 'source',
-    schemaState: SchemaState,
-  } | {
+  type: 'source',
+  schemaState: SchemaState,
+} | {
     type: 'transformFields',
     source: Source,
     schemaState: SchemaState,
@@ -455,7 +456,7 @@ class ElasticDataSourceC extends DataSource
         },
       ).toList();
     }
-    
+
     if (context.type === 'comparison')
     {
       return List(ElasticComparisons.map((comp) => _ChoiceOption({
@@ -463,7 +464,7 @@ class ElasticDataSourceC extends DataSource
         value: comp,
       })));
     }
-    
+
     if (context.type === 'valueType')
     {
       return List([
@@ -485,26 +486,28 @@ class ElasticDataSourceC extends DataSource
         }),
       ]);
     }
-    
+
     if (context.type === 'input')
     {
-      
+      //
     }
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));
   }
 }
 export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>;
-export const _ElasticDataSource = (config?: { [key: string]: any }) => {
+export const _ElasticDataSource = (config?: { [key: string]: any }) =>
+{
   let elasticSource = New<ElasticDataSource>(new ElasticDataSourceC(config), config);
   elasticSource = elasticSource.set('indexes', List(elasticSource['indexes']));
   elasticSource = elasticSource.set('types', List(elasticSource)['types']);
   return elasticSource;
-}
+};
 
 // TODO
-const ElasticComparisons = ['equals', 'contains', 'does not equal', 'does not contain', 'is greater than', 'is less than', 'is greater than or equal to',
-        'is less than or equal to', 'comes before', 'comes after', 'starts before', 'starts after'];
+const ElasticComparisons = ['equals', 'contains', 'does not equal', 'does not contain', 'is greater than',
+  'is less than', 'is greater than or equal to', 'is less than or equal to', 'comes before', 'comes after',
+  'starts before', 'starts after'];
 
 /**
  * Section: Classes representing parts of the view

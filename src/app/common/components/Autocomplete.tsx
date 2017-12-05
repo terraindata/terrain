@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression no-var-requires
 
 // TODO consider showing all options, even when a search text has been entered
-//  so that they can easily change it 
+//  so that they can easily change it
 // and different labels for user inputs, fields, etc.
 
 import './Autocomplete.less';

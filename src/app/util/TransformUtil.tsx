@@ -161,6 +161,7 @@ const TransformUtil = {
 
   getNormalData(numPoints, pointsData, domainMin, domainMax)
   {
+    console.log(pointsData);
     const average = pointsData[1].x || pointsData[1].value;
     const rightPoint = pointsData[0].x || pointsData[0].value;
     const leftPoint = pointsData[2].x || pointsData[2].value;
@@ -176,7 +177,8 @@ const TransformUtil = {
     maxY = TransformUtil._normal(average, average, stdDev);
     scaleFactor = averageHeight / maxY;
     const right = TransformUtil._getNormalDataSubset(average, stdDev, average, domainMax, scaleFactor, Math.floor(numPoints / 2));
-
+    console.log(left.xData.concat(right.xData));
+    console.log(left.yData.concat(right.yData));
     return { ranges: left.xData.concat(right.xData), outputs: left.yData.concat(right.yData) };
   },
 
@@ -213,7 +215,7 @@ const TransformUtil = {
     const ranges = [];
     const outputs = [];
     const stepSize: number = (domainMax - domainMin) * (1 / numPoints);
-    for (let i = (domainMin - stepSize); i < (domainMax + stepSize); i += stepSize)
+    for (let i = domainMin; i <= domainMax; i += stepSize)
     {
       const y = TransformUtil._sigmoid(i, a, k, x0, L);
       ranges.push(i);

@@ -101,38 +101,38 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           />,
           {
             content:
-              <AdvancedDropdown
-                options={source.dataSource.getChoiceOptions({
-                  type: 'comparison',
-                  field: filterLine.field,
-                  source,
-                  schemaState: pathfinderContext.schemaState,
-                })}
-                value={filterLine.method}
-                canEdit={pathfinderContext.canEdit}
-                onChange={this._fn(this.handleChange, 'method')}
-              />,
+            <AdvancedDropdown
+              options={source.dataSource.getChoiceOptions({
+                type: 'comparison',
+                field: filterLine.field,
+                source,
+                schemaState: pathfinderContext.schemaState,
+              })}
+              value={filterLine.method}
+              canEdit={pathfinderContext.canEdit}
+              onChange={this._fn(this.handleChange, 'method')}
+            />,
             visible: filterLine.field !== null,
           },
           {
             content:
-              <AdvancedDropdown
-                options={source.dataSource.getChoiceOptions({
-                  type: 'valueType',
-                  field: filterLine.field,
-                  method: filterLine.method,
-                  source,
-                  schemaState: pathfinderContext.schemaState,
-                })}
-                value={filterLine.valueType}
-                canEdit={pathfinderContext.canEdit}
-                onChange={this._fn(this.handleChange, 'valueType')}
-              />,
+            <AdvancedDropdown
+              options={source.dataSource.getChoiceOptions({
+                type: 'valueType',
+                field: filterLine.field,
+                method: filterLine.method,
+                source,
+                schemaState: pathfinderContext.schemaState,
+              })}
+              value={filterLine.valueType}
+              canEdit={pathfinderContext.canEdit}
+              onChange={this._fn(this.handleChange, 'valueType')}
+            />,
             visible: filterLine.method !== null,
           },
           {
             content:
-              this.renderValue(),
+            this.renderValue(),
             visible: filterLine.valueType !== null,
           },
         ])}
@@ -176,14 +176,13 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
       case null:
         return null;
+      default:
+        throw new Error('No value type handler for ' + filterLine.valueType);
     }
-
-    throw new Error('No value type handler for ' + filterLine.valueType);
   }
 
   private handleChange(key, value)
   {
-    console.log('change', key, value);
     this.props.onChange(this.props.keyPath, this.props.filterLine.set(key, value));
   }
 

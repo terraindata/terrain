@@ -144,7 +144,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           />;
         break;
       case 'dropdown':
-        const options = item.fieldOptions ? this.props.fields : item.options
+        const options = item.fieldOptions ? this.props.fields : item.options;
         content =
           <Dropdown
             canEdit={this.props.canEdit && !disabled}

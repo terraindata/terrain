@@ -102,7 +102,7 @@ class RangesInput extends TerrainComponent<Props>
   {
     if (e.keyCode === 13 && this.props.canEdit)
     {
-        this.handleAddRange();
+      this.handleAddRange();
     }
   }
 

@@ -143,7 +143,6 @@ export class PathfinderLine extends TerrainComponent<Props>
         content = piece['content'] as El;
         visible = piece['visible'] as boolean;
       }
-      console.log(content);
       return (
         <div
           className={classNames({

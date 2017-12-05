@@ -72,7 +72,7 @@ export interface Props
 
 class PathfinderMoreSection extends TerrainComponent<Props>
 {
-public componentWillMount()
+  public componentWillMount()
   {
     ColorsActions.setStyle('.pf-line-wrapper .expand', getStyle('fill', Colors().iconColor));
     ColorsActions.setStyle('.pf-aggregation-arrow-open', { fill: Colors().active + ' !important' });

@@ -49,10 +49,10 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import Colors from 'app/colors/Colors';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Colors from 'app/colors/Colors';
 
 interface ScorePoint
 {

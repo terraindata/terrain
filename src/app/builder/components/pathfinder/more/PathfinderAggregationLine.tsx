@@ -59,7 +59,7 @@ import Dropdown from '../../../../common/components/Dropdown';
 import Ajax from '../../../../util/Ajax';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderText from '../PathfinderText';
-import {ADVANCED_MAPPINGS, AggregationLine, AggregationTypes, PathfinderContext} from '../PathfinderTypes';
+import { ADVANCED_MAPPINGS, AggregationLine, AggregationTypes, PathfinderContext } from '../PathfinderTypes';
 import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 import PathfinderAdvancedLine from './PathfinderAdvancedLine';
@@ -146,8 +146,6 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
 
     // Update the advanced section of the aggregation
     const advancedTypes = this.getAdvancedOptions(type, elasticType);
-    console.log(type);
-    console.log(elasticType);
     const advancedObj = this.createAdvancedObject(advancedTypes, field);
     BuilderActions.change(this.props.keyPath.push('advanced'), Map(advancedObj));
     BuilderActions.change(this.props.keyPath.push('advanced').push('name'), type + ' ' + field);
@@ -158,7 +156,6 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public getAdvancedOptions(type, elasticType)
   {
     let advancedTypes: any = AggregationTypes.get(type).advanced;
-    console.log(advancedTypes);
     // If the advancedTypes are a map (of elasticType: advancedTypes list), select the correct list
     if (!List.isList(advancedTypes))
     {
@@ -198,7 +195,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     // For the keys min, max, and interval (if they exist), auto-fill by running an aggregation query
     if (advancedObj.get('min') !== undefined)
     {
-      const {db} = BuilderStore.getState();
+      const { db } = BuilderStore.getState();
       const backend = {
         id: db.id,
         name: db.name,
@@ -404,9 +401,9 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     // If switching from ranges to uniform interval, auto-fill the interval values
     if (radioKey === 'rangeType' && key === 'interval')
     {
-      const advancedTypes = this.getAdvancedOptions(this.props.aggregation.type, elasticType)
+      const advancedTypes = this.getAdvancedOptions(this.props.aggregation.type, elasticType);
       BuilderActions.change(this.props.keyPath.push('advanced'),
-        this.createAdvancedObject(advancedTypes, this.props.aggregation.field)));
+        this.createAdvancedObject(advancedTypes, this.props.aggregation.field));
     }
   }
 
