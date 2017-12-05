@@ -67,7 +67,7 @@ class LibraryStateC
   public dbs: List<BackendInstance> = Immutable.List([]);
   public dbsLoaded: boolean = false;
 
-  public categories: IMMap<ID, Category> = null;
+  public categories: IMMap<ID, Category> = Immutable.Map({});
   public algorithms: IMMap<ID, Algorithm> = null;
   public variants: IMMap<ID, Variant> = null;
   public selectedVariant: ID = null;
@@ -90,27 +90,26 @@ const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
 export const _LibraryState = (config?: any) =>
 {
-  console.log(config);
-  // if (config && !config['modelId'])
-  // {
-  //   config['modelId'] = 2;
-  //   if (!config['categories'])
-  //   {
-  //     config['categories'] = Immutable.Map({});
-  //     _.keys(config['groups']).forEach((key) => {
-  //       config['categories'] = config['categories'].set(key, LibraryTypes._Category(config['groups'].get(key)));
-  //     });
+  if (config && !config['modelId'])
+  {
+    config['modelId'] = 2;
+    if (!config['categories'])
+    {
+      config['categories'] = Immutable.Map({});
+      _.keys(config['groups']).forEach((key) => {
+        config['categories'] = config['categories'].set(key, LibraryTypes._Category(config['groups'].get(key)));
+      });
 
-  //   }
-  //   if (!config['categoriesOrder'])
-  //   {
-  //     config['categoriesOrder'] = config['groupsOrder'];
-  //   }
-  //   if (!config['prevCategories'])
-  //   {
-  //     config['prevCategories'] = config['prevGroups'];
-  //   }
-  // }
+    }
+    if (!config['categoriesOrder'])
+    {
+      config['categoriesOrder'] = config['groupsOrder'];
+    }
+    if (!config['prevCategories'])
+    {
+      config['prevCategories'] = config['prevGroups'];
+    }
+  }
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
 };
 
