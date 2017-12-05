@@ -43,96 +43,31 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as React from 'react';
+import { Line, Point } from 'victory';
 
-import * as Elastic from 'elasticsearch';
-import * as fs from 'fs';
-import * as winston from 'winston';
-
-import { makePromiseCallback } from './Util';
-
-export const index = 'movies';
-export const type = 'data';
-
-export interface Request
+interface TVictoryLinePointProps
 {
-  s: string; // server address
-  q: string; // query string
-  p: string; // page number
-  v: string; // variant id
+  chartHeight: number;
+  lineStyle: any;
+  x?: number;
+  active?: boolean;
 }
 
-export async function search(req: Request): Promise<object[]>
+const TVictoryLinePoint = (props: TVictoryLinePointProps) =>
 {
-  const client = new Elastic.Client({
-    host: req.s,
-  });
+  return props.active ? (
+    <g>
+      <Line
+        style={props.lineStyle}
+        x1={props.x}
+        y1={0}
+        x2={props.x}
+        y2={props.chartHeight}
+      />
+      <Point {...props} />
+    </g>
+  ) : null;
+};
 
-  try
-  {
-    await new Promise((resolve, reject) =>
-    {
-      client.ping({
-        requestTimeout: 500,
-      }, makePromiseCallback(resolve, reject));
-    });
-  }
-  catch (e)
-  {
-    winston.error('creating ES client for host: ' + String(req.s) + ': ' + String(e));
-    return [];
-  }
-
-  try
-  {
-    const resp: any = await new Promise((resolve, reject) =>
-    {
-      const from = Number(req.p) * 30;
-      const size = 30;
-
-      if (req.v === undefined || req.v === 'MovieDemoAlgorithm')
-      {
-        winston.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
-        client.search({
-          index,
-          type,
-          from,
-          size,
-          body: {
-            query: {
-              prefix: {
-                'title.keyword': req.q,
-              },
-            },
-          },
-        }, makePromiseCallback(resolve, reject));
-      }
-      else
-      {
-        winston.info('Calling Terrain variant: ' + req.v +
-          '(from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
-        client.searchTemplate({
-          body: {
-            id: req.v,
-            params: {
-              from: (Number(req.p) * 30),
-              size: 30,
-              title: '\"' + req.q + '\"',
-            },
-          },
-        } as any, makePromiseCallback(resolve, reject));
-      }
-    });
-
-    if (resp.hits.hits === undefined)
-    {
-      return [];
-    }
-
-    return resp.hits.hits.map((m) => Object.assign({}, m._source, { _id: m._id }));
-  }
-  catch (e)
-  {
-    winston.error('querying ES: ' + String(req.q) + ': ' + String(e));
-    return [];
-  }
-}
+export default TVictoryLinePoint;

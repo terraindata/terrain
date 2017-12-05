@@ -43,96 +43,87 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
+import { omit, random, round } from 'lodash';
+import * as moment from 'moment';
+import * as React from 'react';
+import { Border, VictoryLegend } from 'victory';
 
-import * as Elastic from 'elasticsearch';
-import * as fs from 'fs';
-import * as winston from 'winston';
-
-import { makePromiseCallback } from './Util';
-
-export const index = 'movies';
-export const type = 'data';
-
-export interface Request
+const CustomLabel = (props) =>
 {
-  s: string; // server address
-  q: string; // query string
-  p: string; // page number
-  v: string; // variant id
+  return (
+    <text dy={5} x={props.x} y={props.y} style={props.style} >
+      <tspan style={{ fontWeight: 'bold' }}>{round(props.datum.value, 3)}</tspan>
+      <tspan dx={10} style={{ fill: 'white' }}>{props.datum.reference}</tspan>
+    </text>
+  );
+};
+
+interface TVictoryTooltipProps
+{
+  xDataKey: string;
+  dateFormat: string;
+  tooltipStyle: any;
+  datum?: any;
+  text?: any;
+  style?: any;
 }
 
-export async function search(req: Request): Promise<object[]>
+const TVictoryTooltip = (props: TVictoryTooltipProps) =>
 {
-  const client = new Elastic.Client({
-    host: req.s,
+  const {
+    datum,
+    text,
+    xDataKey,
+    style,
+    dateFormat,
+    tooltipStyle,
+  } = props;
+
+  const data = text.map((t) =>
+  {
+    const parsedText = t.split('|');
+    const value = round(parsedText[1], 3);
+    return {
+      id: parsedText[0],
+      value,
+      // set the full label text in the 'name' key so the legend border width
+      // is correctly calculated
+      name: `${value} ${parsedText[2]}`,
+      reference: parsedText[2],
+      symbol: { fill: parsedText[3] },
+      labels: {
+        ...omit(style[0], ['textAnchor']),
+        fill: parsedText[3],
+      },
+    };
   });
 
-  try
-  {
-    await new Promise((resolve, reject) =>
-    {
-      client.ping({
-        requestTimeout: 500,
-      }, makePromiseCallback(resolve, reject));
-    });
-  }
-  catch (e)
-  {
-    winston.error('creating ES client for host: ' + String(req.s) + ': ' + String(e));
-    return [];
-  }
+  const timestamp = datum[xDataKey];
+  const date = moment(timestamp);
+  const title = date.format(dateFormat);
 
-  try
-  {
-    const resp: any = await new Promise((resolve, reject) =>
-    {
-      const from = Number(req.p) * 30;
-      const size = 30;
+  const labelComponent = <CustomLabel />;
 
-      if (req.v === undefined || req.v === 'MovieDemoAlgorithm')
-      {
-        winston.info('Calling ES query: (from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
-        client.search({
-          index,
-          type,
-          from,
-          size,
-          body: {
-            query: {
-              prefix: {
-                'title.keyword': req.q,
-              },
-            },
-          },
-        }, makePromiseCallback(resolve, reject));
-      }
-      else
-      {
-        winston.info('Calling Terrain variant: ' + req.v +
-          '(from: ' + String(from) + ', size: ' + String(size) + ', title: ' + req.q + ')');
-        client.searchTemplate({
-          body: {
-            id: req.v,
-            params: {
-              from: (Number(req.p) * 30),
-              size: 30,
-              title: '\"' + req.q + '\"',
-            },
-          },
-        } as any, makePromiseCallback(resolve, reject));
-      }
-    });
+  return (
+    <VictoryLegend
+      theme={TerrainVictoryTheme}
+      standalone={false}
+      x={10}
+      y={50}
+      padding={0}
+      gutter={20}
+      data={data}
+      orientation={'vertical'}
+      style={tooltipStyle}
+      title={title}
+      labelComponent={labelComponent}
+      borderComponent={<Border
+        // need to change this prop so the border re-renders
+        className={`custom-tooltip-label-${random(0, 100)}`}
+      />}
+    />
+  );
+};
 
-    if (resp.hits.hits === undefined)
-    {
-      return [];
-    }
-
-    return resp.hits.hits.map((m) => Object.assign({}, m._source, { _id: m._id }));
-  }
-  catch (e)
-  {
-    winston.error('querying ES: ' + String(req.q) + ': ' + String(e));
-    return [];
-  }
-}
+export default TVictoryTooltip;
