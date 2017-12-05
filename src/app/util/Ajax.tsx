@@ -97,7 +97,6 @@ export const Ajax =
           body,
         };
       }
-
       return Ajax._reqGeneric(
         method,
         '/midway/v1/' + url,
@@ -362,7 +361,7 @@ export const Ajax =
         },
       );
     },
-
+    // TODO TODO TODO 
     getItems(onLoad: (categories: IMMap<number, LibraryTypes.Category>,
       algorithms: IMMap<number, LibraryTypes.Algorithm>,
       variants: IMMap<number, LibraryTypes.Variant>,
@@ -375,7 +374,6 @@ export const Ajax =
         {},
         (items: object[]) =>
         {
-          console.log(items);
           const mapping =
             {
               VARIANT: Immutable.Map<number, LibraryTypes.Variant>({}) as any,
@@ -388,11 +386,16 @@ export const Ajax =
           items.map(
             (itemObj) =>
             {
+              if (itemObj['type'] === 'GROUP')
+              {
+                itemObj['type'] = 'CATEGORY';
+              }
               const item = LibraryTypes.typeToConstructor[itemObj['type']](
                 responseToRecordConfig(itemObj),
               );
               mapping[item.type] = mapping[item.type].set(item.id, item);
-              if (item.type === ItemType.Category)
+              // Category or Group TODO TODO
+              if (item.type !== ItemType.Algorithm && item.type !== ItemType.Variant && item.type !== ItemType.Query)
               {
                 categoriesOrder.push(item.id);
               }
@@ -426,7 +429,7 @@ export const Ajax =
         {
           onError,
           urlArgs: {
-            type: 'CATEGORY,ALGORITHM,VARIANT',
+            type: 'CATEGORY,ALGORITHM,VARIANT,GROUP',
           },
         },
       );
