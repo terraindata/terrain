@@ -69,7 +69,7 @@ function mapDispatchToProps(dispatch)
 {
   return {
     analyticsActions: bindActionCreators(AnalyticsActions, dispatch),
-    libraryGroupActions: bindActionCreators(LibraryActions.groups, dispatch),
+    libraryCategoryActions: bindActionCreators(LibraryActions.categories, dispatch),
     libraryAlgorithmActions: bindActionCreators(LibraryActions.algorithms, dispatch),
     libraryVariantActions: bindActionCreators(LibraryActions.variants, dispatch),
     libraryActions: bindActionCreators(

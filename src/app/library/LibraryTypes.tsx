@@ -51,7 +51,7 @@ const { List, Map } = Immutable;
 import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
 import { _Query, Query, queryForSave } from '../../items/types/Query';
 
-export type LibraryItem = Group | Variant | Algorithm;
+export type LibraryItem = Category | Variant | Algorithm;
 // TODO MOD refactor
 
 class VariantC extends ItemC
@@ -59,9 +59,9 @@ class VariantC extends ItemC
   public type = ItemType.Variant;
 
   public algorithmId: number = -1;
-  public groupId: number = -1;
+  public categoryId: number = -1;
 
-  public excludeFields: string[] = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
+  public excludeFields: string[] = ['dbFields', 'excludeFields', 'algorithmId', 'categoryId'];
   // TODO try super or prototype
 
   public lastEdited: string = '';
@@ -99,7 +99,8 @@ export const _Variant = (config?: any) =>
   if (config && config.modelVersion === 1)
   {
     // from 1 to 2
-    // TODO if necessary
+    config.modelVersion = 2;
+    config.categoryId = config.groupId;
   }
 
   config = config || {};
@@ -136,7 +137,7 @@ class AlgorithmC extends ItemC
 {
   public type = ItemType.Algorithm;
 
-  public groupId = -1;
+  public categoryId = -1;
 
   public lastEdited = '';
   public lastUsername = '';
@@ -144,7 +145,7 @@ class AlgorithmC extends ItemC
   public variantsOrder = List([]);
   public language = 'elastic';
 
-  public excludeFields = ['dbFields', 'excludeFields', 'groupId'];
+  public excludeFields = ['dbFields', 'excludeFields', 'categoryId'];
 }
 const Algorithm_Record = Immutable.Record(new AlgorithmC());
 export interface Algorithm extends AlgorithmC, IRecord<Algorithm> { }
@@ -153,7 +154,8 @@ export const _Algorithm = (config?: any) =>
   if (config && (!config.modelVersion || config.modelVersion === 1))
   {
     // from 0 and 1 to 2
-    // TODO
+    config.modelVersion = 2;
+    config.categoryId = config.groupId;
   }
 
   config = config || {};
@@ -161,7 +163,7 @@ export const _Algorithm = (config?: any) =>
   return new Algorithm_Record(config) as any as Algorithm;
 };
 
-export const groupColors =
+export const categoryColors =
   [
     '#00A7F7',
     '#00BCD6',
@@ -175,9 +177,9 @@ export const groupColors =
     '#5F7D8C',
   ];
 
-class GroupC extends ItemC
+class CategoryC extends ItemC
 {
-  public type = ItemType.Group;
+  public type = ItemType.Category;
 
   public lastEdited = '';
   public lastUserId = '';
@@ -185,9 +187,9 @@ class GroupC extends ItemC
   public algorithmsOrder = List([]);
   public defaultLanguage = 'elastic';
 }
-const Group_Record = Immutable.Record(new GroupC());
-export interface Group extends GroupC, IRecord<Group> { }
-export const _Group = (config: any = {}) =>
+const Category_Record = Immutable.Record(new CategoryC());
+export interface Category extends CategoryC, IRecord<Category> { }
+export const _Category = (config: any = {}) =>
 {
   if (config && (!config.modelVersion || config.modelVersion === 1))
   {
@@ -198,7 +200,7 @@ export const _Group = (config: any = {}) =>
   config = config || {};
   config.userIds = List(config.userIds || []);
   config.algorithmsOrder = List(config.algorithmsOrder || []);
-  return new Group_Record(config) as any as Group;
+  return new Category_Record(config) as any as Category;
 };
 
 export function nameForStatus(status: ItemStatus): string
@@ -246,5 +248,5 @@ export const typeToConstructor: {
     [ItemType.Query]: _Query,
     [ItemType.Variant]: _Variant,
     [ItemType.Algorithm]: _Algorithm,
-    [ItemType.Group]: _Group,
+    [ItemType.Category]: _Category,
   };

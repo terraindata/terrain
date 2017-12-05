@@ -363,10 +363,10 @@ export const Ajax =
       );
     },
 
-    getItems(onLoad: (groups: IMMap<number, LibraryTypes.Group>,
+    getItems(onLoad: (categories: IMMap<number, LibraryTypes.Category>,
       algorithms: IMMap<number, LibraryTypes.Algorithm>,
       variants: IMMap<number, LibraryTypes.Variant>,
-      groupsOrder: IMList<number, any>) => void,
+      categoriesOrder: IMList<number, any>) => void,
       onError?: (ev: Event) => void)
     {
       return Ajax.req(
@@ -379,10 +379,10 @@ export const Ajax =
             {
               VARIANT: Immutable.Map<number, LibraryTypes.Variant>({}) as any,
               ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}),
-              GROUP: Immutable.Map<number, LibraryTypes.Group>({}),
+              CATEGORY: Immutable.Map<number, LibraryTypes.Category>({}),
               QUERY: Immutable.Map<number, Query>({}),
             };
-          const groupsOrder = [];
+          const categoriesOrder = [];
 
           items.map(
             (itemObj) =>
@@ -391,15 +391,15 @@ export const Ajax =
                 responseToRecordConfig(itemObj),
               );
               mapping[item.type] = mapping[item.type].set(item.id, item);
-              if (item.type === ItemType.Group)
+              if (item.type === ItemType.Category)
               {
-                groupsOrder.push(item.id);
+                categoriesOrder.push(item.id);
               }
             },
           );
 
           mapping.ALGORITHM = mapping.ALGORITHM.map(
-            (alg) => alg.set('groupId', alg.parent),
+            (alg) => alg.set('categoryId', alg.parent),
           ).toMap();
 
           mapping.VARIANT = mapping.VARIANT.map(
@@ -409,23 +409,23 @@ export const Ajax =
               const alg = mapping.ALGORITHM.get(v.algorithmId);
               if (alg)
               {
-                v = v.set('groupId', alg.groupId);
+                v = v.set('categoryId', alg.categoryId);
               }
               return v;
             },
           ).toMap();
 
           onLoad(
-            mapping.GROUP,
+            mapping.CATEGORY,
             mapping.ALGORITHM,
             mapping.VARIANT,
-            Immutable.List(groupsOrder),
+            Immutable.List(categoriesOrder),
           );
         },
         {
           onError,
           urlArgs: {
-            type: 'GROUP,ALGORITHM,VARIANT',
+            type: 'CATEGORY,ALGORITHM,VARIANT',
           },
         },
       );

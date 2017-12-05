@@ -56,36 +56,36 @@ const mockStore = createMockStore();
 
 describe('LibraryActions', () =>
 {
-  describe('#groups.create', () =>
+  describe('#categories.create', () =>
   {
     const library: LibraryState = _LibraryState({
-      groups: Immutable.Map<number, LibraryTypes.Group>({}),
+      categories: Immutable.Map<number, LibraryTypes.Category>({}),
       variants: Immutable.Map<number, LibraryTypes.Variant>({}),
     });
 
-    const group = LibraryTypes._Group();
-    const groupId = 1;
-    const groupName = 'Test Group';
-    group.set('name', groupName);
+    const category = LibraryTypes._Category();
+    const categoryId = 1;
+    const categoryName = 'Test Category';
+    category.set('name', categoryName);
 
-    it('should create a groups.create action after the new group has been created', (done) =>
+    it('should create a categories.create action after the new category has been created', (done) =>
     {
       Ajax.saveItem = (
         item: any,
         onLoad?: (resp: any) => void,
         onError?: (ev: Event) => void,
-      ) => onLoad({ id: groupId });
+      ) => onLoad({ id: categoryId });
 
       const expectedActions = [
         {
-          type: ActionTypes.groups.create,
-          payload: { group: group.set('id', groupId), versioning: true },
+          type: ActionTypes.categories.create,
+          payload: { category: category.set('id', categoryId), versioning: true },
         },
       ];
 
       const store = mockStore({ library });
 
-      store.dispatch(Actions.groups.create(group, (id) =>
+      store.dispatch(Actions.categories.create(category, (id) =>
       {
         expect(store.getActions()).toEqual(expectedActions);
         done();

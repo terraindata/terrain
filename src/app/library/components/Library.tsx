@@ -57,7 +57,7 @@ import RolesActions from './../../roles/data/RolesActions';
 import { LibraryState } from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
-import GroupsColumn from './GroupsColumn';
+import CategoriesColumn from './CategoriesColumn';
 import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
 import VariantsColumn from './VariantsColumn';
@@ -76,7 +76,7 @@ export interface Props
 class Library extends TerrainComponent<any>
 {
   // Give names to each of the library columns
-  public static GROUPS_COLUMN = 'groups';
+  public static CATEGORIES__COLUMN = 'categories';
   public static ALGORITHMS_COLUMN = 'algorithms';
   public static VARIANTS_COLUMN = 'variants';
 
@@ -121,7 +121,7 @@ class Library extends TerrainComponent<any>
       }
     }
 
-    if ((!this.props.params || !this.props.params.groupId))
+    if ((!this.props.params || !this.props.params.categoryId))
     {
       // no path given, redirect to last library path
       const path = this.getLastPath();
@@ -300,20 +300,20 @@ class Library extends TerrainComponent<any>
   {
     const { singleColumn, router } = this.props;
     const params = router !== undefined && router.params !== undefined ? router.params : {};
-    const { groupId, algorithmId, variantId } = params;
+    const { categoryId, algorithmId, variantId } = params;
 
     return !singleColumn ||
-      (groupId === undefined &&
+      (categoryId === undefined &&
         algorithmId === undefined &&
         variantId === undefined &&
-        columnName === Library.GROUPS_COLUMN
+        columnName === Library.CATEGORIES__COLUMN
       ) ||
-      (groupId !== undefined &&
+      (categoryId !== undefined &&
         algorithmId === undefined &&
         variantId === undefined &&
         columnName === Library.ALGORITHMS_COLUMN
       ) ||
-      (groupId !== undefined &&
+      (categoryId !== undefined &&
         algorithmId !== undefined &&
         columnName === Library.VARIANTS_COLUMN
       );
@@ -333,11 +333,11 @@ class Library extends TerrainComponent<any>
 
     const {
       dbs,
-      groups,
+      categories,
       algorithms,
       variants,
       selectedVariant,
-      groupsOrder,
+      categoriesOrder,
     } = libraryState;
 
     const {
@@ -353,23 +353,23 @@ class Library extends TerrainComponent<any>
 
     const datasets = this.getDatasets();
 
-    const groupId = params.groupId ? +params.groupId : null;
+    const categoryId = params.categoryId ? +params.categoryId : null;
     const algorithmId = params.algorithmId ? +params.algorithmId : null;
     const variantIds = params.variantId ? params.variantId.split(',') : null;
 
-    let group: LibraryTypes.Group;
+    let category: LibraryTypes.Category;
     let algorithm: LibraryTypes.Algorithm;
     let variant: LibraryTypes.Variant;
     let algorithmsOrder: List<ID>;
     let variantsOrder: List<ID>;
 
-    if (groupId !== null)
+    if (categoryId !== null)
     {
-      group = groups.get(groupId);
+      category = categories.get(categoryId);
 
-      if (group !== undefined)
+      if (category !== undefined)
       {
-        algorithmsOrder = group.algorithmsOrder;
+        algorithmsOrder = category.algorithmsOrder;
 
         if (algorithmId !== null)
         {
@@ -383,7 +383,7 @@ class Library extends TerrainComponent<any>
             {
               if (variantIds.length === 0)
               {
-                browserHistory.replace(`/${basePath}/${groupId}/${algorithmId}`);
+                browserHistory.replace(`/${basePath}/${categoryId}/${algorithmId}`);
               } else if (variantIds.length === 1)
               {
                 variant = variants.get(+variantIds[0]);
@@ -392,13 +392,13 @@ class Library extends TerrainComponent<any>
           } else
           {
             // !algorithm
-            browserHistory.replace(`/${basePath}/${groupId}`);
+            browserHistory.replace(`/${basePath}/${categoryId}`);
           }
         }
       }
       else
       {
-        // !group
+        // !category
         browserHistory.replace(`/${basePath}`);
       }
     }
@@ -408,16 +408,16 @@ class Library extends TerrainComponent<any>
       this.setLastPath();
     }
 
-    const algorithmsReferrer = singleColumn && group !== undefined ?
+    const algorithmsReferrer = singleColumn && category !== undefined ?
       {
-        label: group.name,
+        label: category.name,
         path: `/${basePath}`,
       } : null;
 
     const variantsReferrer = singleColumn && algorithm !== undefined ?
       {
         label: algorithm.name,
-        path: `/${basePath}/${groupId}`,
+        path: `/${basePath}/${categoryId}`,
       } : null;
 
     const selectedMetricObject = analytics.availableMetrics.find((metric) =>
@@ -428,14 +428,14 @@ class Library extends TerrainComponent<any>
     return (
       <div className='library library-layout-horizontal'>
         <div className='library-top'>
-          {this.isColumnVisible(Library.GROUPS_COLUMN) ?
-            <GroupsColumn
+          {this.isColumnVisible(Library.CATEGORIES__COLUMN) ?
+            <CategoriesColumn
               {...{
-                groups,
-                groupsOrder,
+                categories,
+                categoriesOrder,
                 params,
                 basePath,
-                groupActions: this.props.libraryGroupActions,
+                categoryActions: this.props.libraryCategoryActions,
                 variants,
               }}
               isFocused={algorithm === undefined}
@@ -445,11 +445,11 @@ class Library extends TerrainComponent<any>
             <AlgorithmsColumn
               {...{
                 dbs,
-                groups,
+                categories,
                 algorithms,
                 variants,
                 algorithmsOrder,
-                groupId,
+                categoryId,
                 params,
                 basePath,
                 algorithmActions: this.props.libraryAlgorithmActions,
@@ -464,7 +464,7 @@ class Library extends TerrainComponent<any>
                 variants,
                 selectedVariant,
                 variantsOrder,
-                groupId,
+                categoryId,
                 algorithmId,
                 params,
                 canPinItems: canPinVariants,
@@ -482,10 +482,10 @@ class Library extends TerrainComponent<any>
             <LibraryInfoColumn
               {...{
                 dbs,
-                group,
+                category,
                 algorithm,
                 variant,
-                groupActions: this.props.libraryGroupActions,
+                categoryActions: this.props.libraryCategoryActions,
                 algorithmActions: this.props.libraryAlgorithmActions,
                 variantActions: this.props.libraryVariantActions,
                 libraryActions: this.props.libraryActions,

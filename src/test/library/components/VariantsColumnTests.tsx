@@ -55,19 +55,19 @@ import configureStore from 'redux-mock-store';
 
 describe('VariantsColumn', () =>
 {
-  const groupId = 1;
+  const categoryId = 1;
   const algId = 2;
   const variantId = 3;
   let library = _LibraryState({
-    groups: Immutable.Map<number, LibraryTypes.Group>({}),
-    algorithms: Immutable.Map<number, LibraryTypes.Group>({}),
+    categories: Immutable.Map<number, LibraryTypes.Category>({}),
+    algorithms: Immutable.Map<number, LibraryTypes.Category>({}),
     variants: Immutable.Map<number, LibraryTypes.Variant>({}),
   });
 
   library = library
-    .setIn(['groups', groupId], LibraryTypes._Group({
-      id: groupId,
-      name: 'Group 1',
+    .setIn(['categories', categoryId], LibraryTypes._Category({
+      id: categoryId,
+      name: 'Category 1',
     }))
     .setIn(['algorithms', algId], LibraryTypes._Algorithm({
       id: algId,
@@ -100,14 +100,14 @@ describe('VariantsColumn', () =>
         basePath={'/library'}
         variants={library.variants}
         variantsOrder={library.algorithms.get(algId).variantsOrder}
-        groupId={groupId}
+        categoryId={categoryId}
         algorithmId={algId}
         algorithms={library.algorithms}
         selectedVariant={selectedVariant}
         analytics={analytics}
         analyticsActions={analyticsActions}
         canPinItems={false}
-        router={{ params: { groupId: '1' }, location: { query: '' } }}
+        router={{ params: { categoryId: '1' }, location: { query: '' } }}
       />,
     );
   });
@@ -135,14 +135,14 @@ describe('VariantsColumn', () =>
             basePath={'/library'}
             variants={library.variants}
             variantsOrder={library.algorithms.get(algId).variantsOrder}
-            groupId={groupId}
+            categoryId={categoryId}
             algorithmId={algId}
             algorithms={library.algorithms}
             selectedVariant={selectedVariant}
             analytics={analytics}
             analyticsActions={analyticsActions}
             canPinItems={true}
-            router={{ params: { groupId: '1' }, location: { query: '' } }}
+            router={{ params: { categoryId: '1' }, location: { query: '' } }}
           />,
         );
 

@@ -52,17 +52,17 @@ THE SOFTWARE.
 import { BaseClass } from '../../app/Classes';
 import BackendInstance from '../../database/types/BackendInstance';
 
-export type ItemType = 'QUERY' | 'VARIANT' | 'ALGORITHM' | 'GROUP';
+export type ItemType = 'QUERY' | 'VARIANT' | 'ALGORITHM' | 'CATEGORY';
 export const ItemType: {
   Query: ItemType;
   Variant: ItemType;
   Algorithm: ItemType;
-  Group: ItemType;
+  Category: ItemType;
 } = {
     Query: 'QUERY',
     Variant: 'VARIANT',
     Algorithm: 'ALGORITHM',
-    Group: 'GROUP',
+    Category: 'CATEGORY',
   };
 
 export type ItemStatus = 'ARCHIVE' | 'BUILD' | 'APPROVE' | 'LIVE' | 'DEFAULT';

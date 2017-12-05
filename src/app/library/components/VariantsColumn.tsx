@@ -87,7 +87,7 @@ export interface Props
   variants: Immutable.Map<ID, Variant>;
   selectedVariant: ID;
   variantsOrder: Immutable.List<ID>;
-  groupId: ID;
+  categoryId: ID;
   algorithmId: ID;
   algorithms: Immutable.Map<ID, Algorithm>;
   canPinItems: boolean;
@@ -198,7 +198,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
     const { canPinItems, selectedVariant, basePath, analytics } = this.props;
     const { params, analytics: nextAnalytics } = nextProps;
-    const { groupId, algorithmId } = params;
+    const { categoryId, algorithmId } = params;
     const nextSelectedVariant = nextProps.selectedVariant;
     const pinnedVariants = nextAnalytics
       .pinnedVariants
@@ -214,12 +214,12 @@ class VariantsColumn extends TerrainComponent<Props>
       if (nextSelectedVariant !== null && nextSelectedVariant !== undefined)
       {
         browserHistory
-          .replace(`/${basePath}/${groupId}/${algorithmId}/${nextSelectedVariant}${pinnedParams}`);
+          .replace(`/${basePath}/${categoryId}/${algorithmId}/${nextSelectedVariant}${pinnedParams}`);
       }
       else
       {
         browserHistory
-          .replace(`/${basePath}/${groupId}/${algorithmId}${pinnedParams}`);
+          .replace(`/${basePath}/${categoryId}/${algorithmId}${pinnedParams}`);
       }
     }
   }
@@ -254,7 +254,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public getSortedAlgorithms()
   {
-    const filtered = this.props.algorithms.filter((value) => value.groupId === this.props.groupId);
+    const filtered = this.props.algorithms.filter((value) => value.categoryId === this.props.categoryId);
     const sorted = filtered.sortBy((algorithm) => algorithm.id);
     return sorted;
   }
@@ -307,7 +307,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleCreate()
   {
-    this.props.variantActions.create(this.props.groupId, this.props.algorithmId);
+    this.props.variantActions.create(this.props.categoryId, this.props.algorithmId);
   }
 
   public handleNameChange(id: ID, name: string)
@@ -349,7 +349,7 @@ class VariantsColumn extends TerrainComponent<Props>
 
       // var target = this.props.variants.get(this.props.variantsOrder.get(index));
       // this.props.variantActions.move(this.props.variants.get(id).set('status', target.status) as Variant,
-      //   index, this.props.groupId, this.props.algorithmId);
+      //   index, this.props.categoryId, this.props.algorithmId);
     }
   }
 
@@ -357,9 +357,9 @@ class VariantsColumn extends TerrainComponent<Props>
   {
     switch (targetType)
     {
-      case 'group':
-        // move this one to the new group
-        // and create a new group
+      case 'category':
+        // move this one to the new category
+        // and create a new category
         // Actions.algorithms.move(this.props.algorithms.get(id), undefined, targetItem.id);
         break;
       case 'algorithm':
@@ -373,18 +373,18 @@ class VariantsColumn extends TerrainComponent<Props>
         );
         if (shiftKey)
         {
-          this.props.variantActions.duplicate(this.props.variants.get(id), 0, targetItem.groupId, targetItem.id);
+          this.props.variantActions.duplicate(this.props.variants.get(id), 0, targetItem.categoryId, targetItem.id);
         }
         else
         {
-          this.props.variantActions.move(this.props.variants.get(id), 0, targetItem.groupId, targetItem.id);
+          this.props.variantActions.move(this.props.variants.get(id), 0, targetItem.categoryId, targetItem.id);
         }
         break;
       case 'variant':
         this.props.variantActions.move(
           this.props.variants.get(id),
           this.props.variantsOrder.indexOf(targetItem.id),
-          this.props.groupId,
+          this.props.categoryId,
           this.props.algorithmId,
         );
         break;
@@ -405,7 +405,7 @@ class VariantsColumn extends TerrainComponent<Props>
       canPinItems,
       selectedVariant,
       basePath,
-      groupId,
+      categoryId,
       algorithmId,
       analytics,
     } = this.props;
@@ -507,21 +507,21 @@ class VariantsColumn extends TerrainComponent<Props>
 
     // if (me && roles)
     // {
-    //   canEdit = roles.getIn([this.props.groupId, me.id, 'builder'])
-    //     || roles.getIn([this.props.groupId, me.id, 'admin']);
+    //   canEdit = roles.getIn([this.props.categoryId, me.id, 'builder'])
+    //     || roles.getIn([this.props.categoryId, me.id, 'admin']);
     //   canDrag = canEdit &&
     //     (variant.status !== ItemStatus.Live ||
-    //       roles.getIn([this.props.groupId, me.id, 'admin']));
+    //       roles.getIn([this.props.categoryId, me.id, 'admin']));
     // }
 
     // let role = 'Viewer';
-    // if (roles && roles.getIn([this.props.groupId, variant.lastUserId]))
+    // if (roles && roles.getIn([this.props.categoryId, variant.lastUserId]))
     // {
-    //   if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).admin)
+    //   if (roles && roles.getIn([this.props.categoryId, variant.lastUserId]).admin)
     //   {
     //     role = 'Admin';
     //   }
-    //   else if (roles && roles.getIn([this.props.groupId, variant.lastUserId]).builder)
+    //   else if (roles && roles.getIn([this.props.categoryId, variant.lastUserId]).builder)
     //   {
     //     role = 'Builder';
     //   }
@@ -545,7 +545,7 @@ class VariantsColumn extends TerrainComponent<Props>
         isPinned={isPinned}
         onPin={this.handlePinVariant}
         key={variant.id}
-        to={`/${basePath}/${this.props.groupId}/${this.props.algorithmId}/${id}`}
+        to={`/${basePath}/${this.props.categoryId}/${this.props.algorithmId}/${id}`}
         className='library-item-lightest'
         id={id}
         type='variant'
@@ -623,11 +623,11 @@ class VariantsColumn extends TerrainComponent<Props>
   public renderVariants(archived?: boolean)
   {
     const { me, roles } = this.state;
-    const canMakeLive = me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
+    const canMakeLive = me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
     const canCreate = true; // canMakeLive;
     // TODO maybe on the new middle tier, builders can create variants
     //  || (
-    //   me && roles && roles.getIn([this.props.groupId, me.id, 'builder'])
+    //   me && roles && roles.getIn([this.props.categoryId, me.id, 'builder'])
     // );
 
     let fadeIndex = 0;
@@ -692,8 +692,8 @@ class VariantsColumn extends TerrainComponent<Props>
                 <InfoArea
                   large='No variants created, yet.'
                   button={
-                    Util.haveRole(this.props.groupId, 'builder', UserStore, RolesStore) ||
-                      Util.haveRole(this.props.groupId, 'admin', UserStore, RolesStore)
+                    Util.haveRole(this.props.categoryId, 'builder', UserStore, RolesStore) ||
+                      Util.haveRole(this.props.categoryId, 'admin', UserStore, RolesStore)
                       ? 'Create a variant' : null
                   }
                   onClick={this.handleCreate}

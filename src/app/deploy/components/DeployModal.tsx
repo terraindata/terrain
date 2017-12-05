@@ -123,7 +123,7 @@ class DeployModal extends TerrainComponent<Props>
     const variant = this.state.changingStatusOf;
 
     const state = LibraryStore.getState();
-    const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
+    const category = state.getIn(['categories', variant.categoryId]) as LibraryTypes.Category;
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
 
     const { changingStatusTo } = this.state;

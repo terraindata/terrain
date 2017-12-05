@@ -52,7 +52,7 @@ const duplicate = '';
 
 export let LibraryActionTypes =
   {
-    groups:
+    categories:
     {
       create, change, move,
       // duplicate,

@@ -84,9 +84,9 @@ class StatusDropdown extends TerrainComponent<Props>
       {
         const currentUser = userState.get('currentUser');
         const isSuperUser = currentUser === undefined ? false : currentUser.isSuperUser;
-        // Util.haveRole(this.props.variant.groupId, 'admin', UserStore, RolesStore);
+        // Util.haveRole(this.props.variant.categoryId, 'admin', UserStore, RolesStore);
         const isBuilder = true;
-        // Util.haveRole(this.props.variant.groupId, 'builder', UserStore, RolesStore);
+        // Util.haveRole(this.props.variant.categoryId, 'builder', UserStore, RolesStore);
         if (isSuperUser !== this.state.isSuperUser || isBuilder !== this.state.isBuilder)
         {
           this.setState({
@@ -170,11 +170,11 @@ class StatusDropdown extends TerrainComponent<Props>
     {
       if (!this.state.isBuilder)
       {
-        tooltipText = "You aren't a Builder in this group,<br />so you can't edit this Variant's status.";
+        tooltipText = "You aren't a Builder in this category,<br />so you can't edit this Variant's status.";
       }
       else if (!this.state.isSuperUser)
       {
-        tooltipText = "This Variant is Live and you aren't<br />an Admin in this Group, so you<br />can't edit its status.";
+        tooltipText = "This Variant is Live and you aren't<br />an Admin in this Category, so you<br />can't edit its status.";
       }
     }
     else

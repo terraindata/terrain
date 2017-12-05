@@ -58,7 +58,7 @@ import Util from '../../util/Util';
 import CheckBox from './../../common/components/CheckBox';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
-const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
+const CategoryIcon = require('./../../../images/icon_badgeGroup.svg');
 const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
 const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
@@ -178,7 +178,7 @@ class DeployModalColumn extends TerrainComponent<Props>
   {
     const { variant, status } = this.props;
     const state = LibraryStore.getState();
-    const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
+    const category = state.getIn(['categories', variant.categoryId]) as LibraryTypes.Category;
     const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
 
     // let title = 'Deploy "' + name + '" to Live';
@@ -204,12 +204,12 @@ class DeployModalColumn extends TerrainComponent<Props>
         </div>
         <div className='deploy-modal-info'>
           <div className='deploy-modal-info-row'>
-            <GroupIcon
+            <CategoryIcon
               className='deploy-modal-info-icon'
             />
             <div className='deploy-modal-info-name'>
               {
-                group.name
+                category.name
               }
             </div>
           </div>

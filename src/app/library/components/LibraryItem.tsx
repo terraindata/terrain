@@ -98,7 +98,7 @@ export interface Props
   draggingOverIndex: number;
 
   // partially-optional. need to be provided if available.
-  groupId?: ID;
+  categoryId?: ID;
   algorithmId?: ID;
   variantId?: ID;
 
@@ -457,7 +457,6 @@ class LibraryItem extends TerrainComponent<Props>
         shiftedDown = true;
       }
     }
-
     return connectDropTarget((
       <div
         className={classNames({

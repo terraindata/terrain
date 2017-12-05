@@ -150,15 +150,15 @@ class VariantVersions extends TerrainComponent<Props>
     const isCurrent = i === 0;
 
     const { roles } = this.state;
-    const groupId = this.props.variant.groupId;
+    const categoryId = this.props.variant.categoryId;
     let role = 'Viewer';
-    if (roles && roles.getIn([groupId, version.userId]))
+    if (roles && roles.getIn([categoryId, version.userId]))
     {
-      if (roles && roles.getIn([groupId, version.userId]).admin)
+      if (roles && roles.getIn([categoryId, version.userId]).admin)
       {
         role = 'Admin';
       }
-      else if (roles && roles.getIn([groupId, version.userId]).builder)
+      else if (roles && roles.getIn([categoryId, version.userId]).builder)
       {
         role = 'Builder';
       }

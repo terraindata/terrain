@@ -535,8 +535,8 @@ class Builder extends TerrainComponent<Props>
         return false;
       }
       if (
-        !Util.haveRole(variant.groupId, 'builder', UserStore, RolesStore)
-        && !Util.haveRole(variant.groupId, 'admin', UserStore, RolesStore)
+        !Util.haveRole(variant.categoryId, 'builder', UserStore, RolesStore)
+        && !Util.haveRole(variant.categoryId, 'admin', UserStore, RolesStore)
       )
       {
         // not auth
@@ -892,7 +892,7 @@ class Builder extends TerrainComponent<Props>
     const variant = this.getVariant();
     const query = this.getQuery();
     const variantIdentifier = variant === undefined ? '' :
-      `${variant.groupId},${variant.algorithmId},${variant.id}`;
+      `${variant.categoryId},${variant.algorithmId},${variant.id}`;
 
     return (
       <div

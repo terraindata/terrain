@@ -94,7 +94,7 @@ class AppRouter extends TerrainComponent<{}> {
 
           <Route path='/library' onEnter={this.libraryOnEnter}>
             <IndexRoute component={libraryLibrary} />
-            <Route path=':groupId' component={libraryLibrary}>
+            <Route path=':categoryId' component={libraryLibrary}>
               <IndexRoute component={libraryLibrary} />
               <Route path=':algorithmId' component={libraryLibrary}>
                 <IndexRoute component={libraryLibrary} />
@@ -139,7 +139,7 @@ class AppRouter extends TerrainComponent<{}> {
           <Route path='/import' component={FileImport} />
           <Route path='/analytics' onEnter={this.libraryOnEnter}>
             <IndexRoute component={analyticsLibrary} />
-            <Route path=':groupId' component={analyticsLibrary}>
+            <Route path=':categoryId' component={analyticsLibrary}>
               <IndexRoute component={analyticsLibrary} />
               <Route path=':algorithmId' component={analyticsLibrary}>
                 <IndexRoute component={analyticsLibrary} />

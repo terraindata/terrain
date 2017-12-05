@@ -77,7 +77,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 
 const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
 
-type Group = LibraryTypes.Group;
+type Category = LibraryTypes.Category;
 type Algorithm = LibraryTypes.Algorithm;
 type Variant = LibraryTypes.Variant;
 
@@ -85,11 +85,11 @@ export interface Props
 {
   basePath: string;
   dbs: List<BackendInstance>;
-  groups: Immutable.Map<ID, Group>;
+  categories: Immutable.Map<ID, Category>;
   algorithms: Immutable.Map<ID, Algorithm>;
   variants: Immutable.Map<ID, Variant>;
   algorithmsOrder: Immutable.List<ID>;
-  groupId: ID;
+  categoryId: ID;
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
   algorithmActions: any;
@@ -111,7 +111,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     duplicatingAlgorithm: boolean;
     duplicateAlgorithmTextboxValue: string;
     duplicateAlgorithmId: ID;
-    duplicateAlgorithmGroupIndex: number;
+    duplicateAlgorithmCategoryIndex: number;
   } = {
     rendered: false,
     me: null,
@@ -125,7 +125,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     duplicatingAlgorithm: false,
     duplicateAlgorithmTextboxValue: '',
     duplicateAlgorithmId: '',
-    duplicateAlgorithmGroupIndex: 0,
+    duplicateAlgorithmCategoryIndex: 0,
   };
 
   constructor(props)
@@ -166,7 +166,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (nextProps.groupId !== this.props.groupId)
+    if (nextProps.categoryId !== this.props.categoryId)
     {
       this.setState({
         rendered: false,
@@ -181,9 +181,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public getNewAlgorithmIndex(): number
   {
-    const { groups } = this.props;
+    const { categories } = this.props;
     const dbs = this.getSortedDatabases(this.props.dbs);
-    const group = groups.get(this.props.groupId);
+    const category = categories.get(this.props.categoryId);
 
     if (this.state.newAlgorithmDbIndex !== -1)
     {
@@ -191,7 +191,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     }
     else
     {
-      return dbs && group.db && dbs.findIndex((db) => db.id === group.db.id);
+      return dbs && category.db && dbs.findIndex((db) => db.id === category.db.id);
     }
   }
 
@@ -205,10 +205,10 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleAlgorithmDuplicateConfirm()
   {
-    const groupKeys = _.keys(this.props.groups.toJS());
-    const groupId = groupKeys
+    const categoryKeys = _.keys(this.props.categories.toJS());
+    const categoryId = categoryKeys
       .map((key) => parseFloat(key))
-      .sort()[this.state.duplicateAlgorithmGroupIndex];
+      .sort()[this.state.duplicateAlgorithmCategoryIndex];
     const id = this.state.duplicateAlgorithmId;
     const index = this.props.algorithmsOrder.findIndex((iid) => iid === id);
     const dbs = this.getSortedDatabases(this.props.dbs);
@@ -218,7 +218,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       index,
       this.state.duplicateAlgorithmTextboxValue,
       dbs.get(dbIndex),
-      this.props.groups.get(parseFloat(groupId)).id,
+      this.props.categories.get(parseFloat(categoryId)).id,
     );
     this.setState({
       duplicatingAlgorithm: false,
@@ -233,10 +233,10 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleDuplicateAlgorithmGroupChange(value)
+  public handleDuplicateAlgorithmCategoryChange(value)
   {
     this.setState({
-      duplicateAlgorithmGroupIndex: value,
+      duplicateAlgorithmCategoryIndex: value,
     });
   }
 
@@ -251,26 +251,26 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       selected = algorithm.db.name + ` (${algorithm.db.type})`;
     }
 
-    const groupNames = this.getSortedGroupNames();
-    const currGroupName = this.props.groups.get(algorithm.groupId).name;
+    const categoryNames = this.getSortedCategoryNames();
+    const currCategoryName = this.props.categories.get(algorithm.categoryId).name;
     this.setState({
       duplicateAlgorithmId: id,
       duplicateAlgorithmTextboxValue: Util.duplicateNameFor(this.props.algorithms.get(id).name),
       duplicatingAlgorithm: true,
       newAlgorithmDbIndex: options.indexOf(selected),
-      duplicateAlgorithmGroupIndex: groupNames.indexOf(currGroupName),
+      duplicateAlgorithmCategoryIndex: categoryNames.indexOf(currCategoryName),
     });
   }
 
-  public getSortedGroupNames()
+  public getSortedCategoryNames()
   {
-    const groupNames = [];
-    const sorted = this.props.groups.sortBy((group) => group.id);
+    const categoryNames = [];
+    const sorted = this.props.categories.sortBy((category) => category.id);
     sorted.map((value) =>
     {
-      groupNames.push(value.name);
+      categoryNames.push(value.name);
     });
-    return groupNames;
+    return categoryNames;
   }
 
   public handleArchive(id: ID)
@@ -291,7 +291,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleCreate()
   {
-    this.props.algorithmActions.create(this.props.groupId);
+    this.props.algorithmActions.create(this.props.categoryId);
   }
 
   public handleNameChange(id: ID, name: string)
@@ -341,8 +341,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   public handleNewAlgorithmCreated(algorithmId)
   {
     const { algorithms } = this.props;
-    const groupId = algorithms.get(algorithmId).groupId;
-    browserHistory.push(`/library/${groupId}/${algorithmId}`);
+    const categoryId = algorithms.get(algorithmId).categoryId;
+    browserHistory.push(`/library/${categoryId}/${algorithmId}`);
   }
 
   public handleNewAlgorithmCreate()
@@ -351,7 +351,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     const index = this.getNewAlgorithmIndex();
 
     this.props.algorithmActions.createAs(
-      this.props.groupId,
+      this.props.categoryId,
       this.state.newAlgorithmTextboxValue,
       dbs.get(index),
       this.handleNewAlgorithmCreated,
@@ -376,7 +376,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   {
     switch (targetType)
     {
-      case 'group':
+      case 'category':
         if (shiftKey)
         {
           this.props.algorithmActions.duplicate(
@@ -398,7 +398,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         this.props.algorithmActions.move(
           this.props.algorithms.get(id),
           this.props.algorithmsOrder.indexOf(targetItem.id),
-          this.props.groupId,
+          this.props.categoryId,
         );
         break;
       case 'variant':
@@ -470,12 +470,12 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
     // scores.splice(0, 1); // remove Archived count
     const { me, roles } = this.state;
-    const canArchive = (algorithm.status !== ItemStatus.Archive); // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
+    const canArchive = (algorithm.status !== ItemStatus.Archive); // me && roles && roles.getIn([algorithm.categoryId, me.id, 'admin']);
     const canDuplicate = true;
     const canRename = (scores[ItemStatus.Live].score === 0 && scores[ItemStatus.Default].score === 0);
-    const canDrag = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
-    const canEdit = canDrag; // ||me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
-    // (me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
+    const canDrag = true; // me && roles && roles.getIn([algorithm.categoryId, me.id, 'admin']);
+    const canEdit = canDrag; // ||me && roles && roles.getIn([algorithm.categoryId, me.id, 'admin']);
+    // (me && roles && roles.getIn([algorithm.categoryId, me.id, 'builder']));
 
     const lastTouched: Variant = variants.reduce(
       (lastTouched: Variant, v: Variant) =>
@@ -500,13 +500,13 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     }
 
     let role = 'Viewer';
-    if (roles && roles.getIn([this.props.groupId, userId]))
+    if (roles && roles.getIn([this.props.categoryId, userId]))
     {
-      if (roles && roles.getIn([this.props.groupId, userId]).admin)
+      if (roles && roles.getIn([this.props.categoryId, userId]).admin)
       {
         role = 'Admin';
       }
-      else if (roles && roles.getIn([this.props.groupId, userId]).builder)
+      else if (roles && roles.getIn([this.props.categoryId, userId]).builder)
       {
         role = 'Builder';
       }
@@ -522,7 +522,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
         key={algorithm.id}
-        to={`/${basePath}/${this.props.groupId}/${algorithm.id}`}
+        to={`/${basePath}/${this.props.categoryId}/${algorithm.id}`}
         className='library-item-lighter'
         id={id}
         onNameChange={this.handleNameChange}
@@ -581,7 +581,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     const { algorithms } = this.props;
     const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
     const { me, roles } = this.state;
-    const canCreate = true; // me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
+    const canCreate = true; // me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
 
     return (
       <LibraryItemCategory
@@ -631,24 +631,24 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
-  public renderGroupDropdown()
+  public renderCategoryDropdown()
   {
-    const groupKeys = _.keys(this.props.groups.toJS());
-    const values = groupKeys.map((key) => parseFloat(key)).sort();
-    let groupNames = Immutable.Map<number, string>({});
-    groupKeys.forEach((key) =>
+    const categoryKeys = _.keys(this.props.categories.toJS());
+    const values = categoryKeys.map((key) => parseFloat(key)).sort();
+    let categoryNames = Immutable.Map<number, string>({});
+    categoryKeys.forEach((key) =>
     {
-      groupNames = groupNames.set(parseFloat(key), this.props.groups.get(parseFloat(key)).name);
+      categoryNames = categoryNames.set(parseFloat(key), this.props.categories.get(parseFloat(key)).name);
     });
     return (
       <div className='new-algorithm-modal-child'>
         <div className='database-dropdown-wrapper'>
-          <div className='duplicate-algorithm-child-message'>Please select a group for the duplicate algorithm.</div>
+          <div className='duplicate-algorithm-child-message'>Please select a category for the duplicate algorithm.</div>
           <Dropdown
-            selectedIndex={this.state.duplicateAlgorithmGroupIndex}
+            selectedIndex={this.state.duplicateAlgorithmCategoryIndex}
             options={Immutable.List(values)}
-            optionsDisplayName={groupNames}
-            onChange={this.handleDuplicateAlgorithmGroupChange}
+            optionsDisplayName={categoryNames}
+            onChange={this.handleDuplicateAlgorithmCategoryChange}
             canEdit={true}
             directionBias={90}
             className={'bic-db-dropdown'}
@@ -663,7 +663,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     return (
       <div>
         {this.renderDatabaseDropdown()}
-        {this.renderGroupDropdown()}
+        {this.renderCategoryDropdown()}
       </div>
     );
   }
@@ -723,7 +723,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public render()
   {
-    const { algorithms, algorithmsOrder, groupId, referrer } = this.props;
+    const { algorithms, algorithmsOrder, categoryId, referrer } = this.props;
 
     return (
       <LibraryColumn
@@ -755,7 +755,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
                 <InfoArea
                   large='No algorithms created, yet.'
                   button={
-                    Util.haveRole(groupId, 'admin', UserStore, RolesStore)
+                    Util.haveRole(categoryId, 'admin', UserStore, RolesStore)
                       ? 'Create a algorithm' : null
                   }
                   onClick={this.handleNewAlgorithmModalOpen}

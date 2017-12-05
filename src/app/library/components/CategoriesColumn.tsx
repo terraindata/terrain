@@ -62,23 +62,23 @@ import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
-const GroupIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
+const CategoryIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
-type Group = LibraryTypes.Group;
+type Category = LibraryTypes.Category;
 type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
   basePath: string;
-  groups: Immutable.Map<ID, Group>;
-  groupsOrder: Immutable.List<ID>;
+  categories: Immutable.Map<ID, Category>;
+  categoriesOrder: Immutable.List<ID>;
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
-  groupActions: any;
+  categoryActions: any;
   variants: Immutable.Map<ID, Variant>;
 }
 
-class GroupsColumn extends TerrainComponent<Props>
+class CategoriesColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,
@@ -110,46 +110,46 @@ class GroupsColumn extends TerrainComponent<Props>
 
   // handleDuplicate(id: ID)
   // {
-  //   Actions.groups.duplicate(this.props.groups.find(g => g.id === id),
-  //     this.props.groupsOrder.findIndex(iid => iid === id));
+  //   Actions.categories.duplicate(this.props.categories.find(g => g.id === id),
+  //     this.props.categoriesOrder.findIndex(iid => iid === id));
   // }
 
   public handleArchive(id: ID)
   {
-    this.props.groupActions.change(this.props.groups.find((g) => g.id === id)
-      .set('status', ItemStatus.Archive) as Group);
+    this.props.categoryActions.change(this.props.categories.find((g) => g.id === id)
+      .set('status', ItemStatus.Archive) as Category);
   }
 
   public handleUnarchive(id: ID)
   {
-    this.props.groupActions.change(this.props.groups.find((g) => g.id === id)
-      .set('status', ItemStatus.Build) as Group);
+    this.props.categoryActions.change(this.props.categories.find((g) => g.id === id)
+      .set('status', ItemStatus.Build) as Category);
   }
 
   public handleNameChange(id: ID, name: string)
   {
-    this.props.groupActions.change(
-      this.props.groups.get(id)
-        .set('name', name) as Group,
+    this.props.categoryActions.change(
+      this.props.categories.get(id)
+        .set('name', name) as Category,
     );
   }
 
   public handleCreate()
   {
-    this.props.groupActions.create();
+    this.props.categoryActions.create();
   }
 
   public handleHover(index: number, type: string, id: ID)
   {
-    const itemIndex = this.props.groupsOrder.findIndex((v) => v === id);
-    if (type === 'group' && itemIndex !== index
+    const itemIndex = this.props.categoriesOrder.findIndex((v) => v === id);
+    if (type === 'category' && itemIndex !== index
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
       this.setState({
         lastMoved: index + ' ' + itemIndex,
       });
-      const target = this.props.groups.get(this.props.groupsOrder.get(index));
-      this.props.groupActions.move(this.props.groups.get(id).set('status', target.status) as Group, index);
+      const target = this.props.categories.get(this.props.categoriesOrder.get(index));
+      this.props.categoryActions.move(this.props.categories.get(id).set('status', target.status) as Category, index);
     }
   }
 
@@ -163,14 +163,14 @@ class GroupsColumn extends TerrainComponent<Props>
 
   }
 
-  public renderGroup(id: ID, index: number)
+  public renderCategory(id: ID, index: number)
   {
     const { basePath } = this.props;
-    const group = this.props.groups.get(id);
+    const category = this.props.categories.get(id);
     const { params } = this.props;
     const { me, roles } = this.state;
-    const groupRoles = roles && roles.get(id);
-    const canCreate = (me && groupRoles && groupRoles.getIn([me.id, 'admin']));
+    const categoryRoles = roles && roles.get(id);
+    const canCreate = (me && categoryRoles && categoryRoles.getIn([me.id, 'admin']));
     const canEdit = canCreate || (me && me.isSuperUser);
     const canDrag = false;
 
@@ -178,7 +178,7 @@ class GroupsColumn extends TerrainComponent<Props>
     canRename = this.props.variants.every(
       (v: Variant) =>
       {
-        if (id === v.groupId)
+        if (id === v.categoryId)
         {
           return !(v.status === ItemStatus.Live || v.status === ItemStatus.Default);
         }
@@ -186,50 +186,53 @@ class GroupsColumn extends TerrainComponent<Props>
       },
 
     );
-
+    console.log(category.id);
+    console.log(params);
+    console.log(params.categoryId);
+    console.log(+category.id === +params.categoryId);
     // onDuplicate={this.handleDuplicate}
     return (
       <LibraryItem
         index={index}
         fadeIndex={index}
-        name={group.name}
+        name={category.name}
         id={id}
-        icon={<GroupIcon />}
+        icon={<CategoryIcon />}
         onArchive={this.handleArchive}
-        key={group.id}
-        to={`/${basePath}/${group.id}`}
+        key={category.id}
+        to={`/${basePath}/${category.id}`}
         onNameChange={this.handleNameChange}
-        type='group'
+        type='category'
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         onDragFinish={this.handleDragFinish}
-        item={group}
+        item={category}
         canEdit={canEdit || canDrag}
         canDrag={canDrag}
-        canArchive={(canEdit || canDrag) && group.status !== ItemStatus.Archive}
+        canArchive={(canEdit || canDrag) && category.status !== ItemStatus.Archive}
         canDuplicate={false}
-        canUnarchive={group.status === ItemStatus.Archive}
+        canUnarchive={category.status === ItemStatus.Archive}
         canRename={canRename}
         onUnarchive={this.handleUnarchive}
         canCreate={canCreate}
-        isSelected={+group.id === +params.groupId}
+        isSelected={+category.id === +params.categoryId}
         isFocused={this.props.isFocused}
       >
-        <div className='group-library-info-wrapper'>
+        <div className='category-library-info-wrapper'>
           {
-            groupRoles && me && (groupRoles.getIn([me.id, 'builder']) || groupRoles.getIn([me.id, 'admin'])) &&
+            categoryRoles && me && (categoryRoles.getIn([me.id, 'builder']) || categoryRoles.getIn([me.id, 'admin'])) &&
             <UserThumbnail
               userId={me.id}
               medium={true}
               extra={
-                groupRoles.getIn([me.id, 'admin']) ? 'Admin' :
-                  (groupRoles.getIn([me.id, 'builder']) ? 'Builder' : 'Viewer')
+                categoryRoles.getIn([me.id, 'admin']) ? 'Admin' :
+                  (categoryRoles.getIn([me.id, 'builder']) ? 'Builder' : 'Viewer')
               }
             />
           }
           {
-            groupRoles && groupRoles.toArray()
+            categoryRoles && categoryRoles.toArray()
               .filter((role) => role.builder || role.admin)
               .map(
               (role, index) =>
@@ -239,8 +242,8 @@ class GroupsColumn extends TerrainComponent<Props>
                     key={role.userId}
                     medium={true}
                     extra={
-                      groupRoles.getIn([role.userId, 'admin']) ? 'Admin' :
-                        (groupRoles.getIn([role.userId, 'builder']) ? 'Builder' : 'Viewer')
+                      categoryRoles.getIn([role.userId, 'admin']) ? 'Admin' :
+                        (categoryRoles.getIn([role.userId, 'builder']) ? 'Builder' : 'Viewer')
                     }
                   />,
             )
@@ -252,17 +255,17 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public handleCategoryHover(statusString: string, id: ID)
   {
-    const g = this.props.groups.get(id);
+    const g = this.props.categories.get(id);
     const status = ItemStatus[statusString];
     if (g.status !== status)
     {
-      this.props.groupActions.change(g.set('status', status) as Group);
+      this.props.categoryActions.change(g.set('status', status) as Category);
     }
   }
 
-  public renderCategory(status: ItemStatus)
+  public renderStatusGroup(status: ItemStatus)
   {
-    const ids = this.props.groupsOrder.filter((id) => this.props.groups.get(id).status === status);
+    const ids = this.props.categoriesOrder.filter((id) => this.props.categories.get(id).status === status);
     const canCreate = this.state.me && this.state.me.isSuperUser;
 
     return (
@@ -270,11 +273,11 @@ class GroupsColumn extends TerrainComponent<Props>
         status={status}
         key={status}
         onHover={this.handleCategoryHover}
-        type='group'
+        type='category'
         titleHidden={status === ItemStatus.Build}
       >
         {
-          ids.map(this.renderGroup)
+          ids.map(this.renderCategory)
         }
         {
           ids.size === 0 && <div className='library-category-none'>None</div>
@@ -284,7 +287,7 @@ class GroupsColumn extends TerrainComponent<Props>
           tooltip(
             <CreateLine onClick={this.handleCreate} open={false} />,
             {
-              title: 'Create a New Group',
+              title: 'Create a New Category',
               position: 'top',
             },
           )
@@ -298,20 +301,20 @@ class GroupsColumn extends TerrainComponent<Props>
     return (
       <LibraryColumn
         index={1}
-        title='Groups'
+        title='Categories'
       >
         {
-          this.props.groups.size ?
+          this.props.categories.size ?
             (
               <div>
-                {this.renderCategory(ItemStatus.Build)}
-                {this.renderCategory(ItemStatus.Archive)}
+                {this.renderStatusGroup(ItemStatus.Build)}
+                {this.renderStatusGroup(ItemStatus.Archive)}
               </div>
             )
             :
             <InfoArea
-              large='No groups created, yet.'
-              button='Create a group'
+              large='No categories created, yet.'
+              button='Create a category'
               onClick={this.handleCreate}
             />
         }
@@ -320,4 +323,4 @@ class GroupsColumn extends TerrainComponent<Props>
   }
 }
 
-export default GroupsColumn;
+export default CategoriesColumn;
