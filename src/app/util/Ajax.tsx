@@ -454,7 +454,21 @@ export const Ajax =
         {
           if (response && response[0])
           {
-            const item = LibraryTypes.typeToConstructor[response[0]['type']](responseToRecordConfig(response[0]));
+            const itemObj = response[0];
+            const metaObj = JSON.parse(itemObj['meta']);
+            if (itemObj['type'] === 'GROUP' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+            {
+              itemObj['type'] = 'CATEGORY';
+            }
+            if (itemObj['type'] === 'ALGORITHM' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+            {
+              itemObj['type'] = 'GROUP';
+            }
+            if (itemObj['type'] === 'VARIANT' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+            {
+              itemObj['type'] = 'ALGORITHM';
+            }
+            const item = LibraryTypes.typeToConstructor[itemObj['type']](responseToRecordConfig(itemObj));
             onLoad(item);
           }
           else
