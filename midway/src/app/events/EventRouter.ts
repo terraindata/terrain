@@ -101,7 +101,6 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
   {
     throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
-
   const response: object[] = await events.AggregationHandler(db, request);
   if (request['algorithmid'] !== undefined)
   {

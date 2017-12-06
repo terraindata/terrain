@@ -1306,7 +1306,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(4);
+        expect(respData['terrain_5'].length).toEqual(2);
       });
   });
 
