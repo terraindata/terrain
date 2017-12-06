@@ -73,7 +73,7 @@ beforeAll(async (done) =>
     const db = new sqlite3.Database(testDBName);
     const options =
       {
-        debug: false,
+        debug: true,
         db: 'sqlite',
         dsn: testDBName,
         port: 43001,
@@ -791,7 +791,7 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        // winston.info(response.text);
+        winston.info(response.text);
         expect(response.text).not.toBe('');
         if (response.text === '')
         {
