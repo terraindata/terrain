@@ -122,11 +122,11 @@ const Actions =
   {
     fetch: (
       connectionName: string,
-      variantIds: ID[],
+      algorithmIds: ID[],
       metric,
       intervalId,
       dateRangeId,
-      callback?: (analyticsVariants: any) => void,
+      callback?: (analyticsAlgorithms: any) => void,
       errorCallback?: (response) => void,
     ) => (dispatch, getState, api) =>
       {
@@ -155,33 +155,33 @@ const Actions =
               aggregation = 'histogram';
             }
 
-            const variants = getState().get('library').variants;
-            const deployedVariantNames = variantIds.map((id) =>
+            const algorithms = getState().get('library').algorithms;
+            const deployedAlgorithmNames = algorithmIds.map((id) =>
             {
-              return variants.get(id).deployedName;
+              return algorithms.get(id).deployedName;
             });
 
             return api.getAnalytics(
               connectionId,
-              deployedVariantNames,
+              deployedAlgorithmNames,
               start,
               end,
               metric,
               intervalId,
               aggregation,
-              (variantAnalytics) =>
+              (algorithmAnalytics) =>
               {
                 dispatch({
                   type: ActionTypes.fetchSuccess,
                   payload: {
-                    analytics: variantAnalytics,
+                    analytics: algorithmAnalytics,
                     dateRangeDomain: {
                       start: dateRange.startTimestamp,
                       end: dateRange.endTimestamp,
                     },
                   },
                 });
-                callback && callback(variantAnalytics);
+                callback && callback(algorithmAnalytics);
               },
               (errorResponse) =>
               {
@@ -231,16 +231,16 @@ const Actions =
       };
     },
 
-    pinVariant: (variantId) =>
+    pinAlgorithm: (algorithmId) =>
     {
       return {
-        type: ActionTypes.pinVariant,
-        payload: { variantId },
+        type: ActionTypes.pinAlgorithm,
+        payload: { algorithmId },
       };
     },
 
     fetchAvailableMetrics: (
-      callback?: (analyticsVariants: any) => void,
+      callback?: (analyticsAlgorithms: any) => void,
     ) => (dispatch, getState, api) =>
       {
         dispatch({

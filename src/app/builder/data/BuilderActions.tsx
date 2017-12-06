@@ -109,8 +109,8 @@ const BuilderActions =
 
     // fetches the query from the server
     fetchQuery:
-    (variantId: ID, handleNoVariant: (variantId: ID) => void, db: BackendInstance) =>
-      $(ActionTypes.fetchQuery, { variantId, handleNoVariant, db }),
+    (algorithmId: ID, handleNoAlgorithm: (algorithmId: ID) => void, db: BackendInstance) =>
+      $(ActionTypes.fetchQuery, { algorithmId, handleNoAlgorithm, db }),
 
     // load query from server into state
     queryLoaded:

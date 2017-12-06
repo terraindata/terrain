@@ -54,12 +54,12 @@ import { ItemType } from '../../../items/types/Item';
 describe('MultipleAreaChart', () =>
 {
   let chartComponent = null;
-  const variantId = 1;
-  const variantName = 'Bargain Shopper';
+  const algorithmId = 1;
+  const algorithmName = 'Bargain Shopper';
   const datasets = Immutable.Map<ID, any>({
-    [variantId]: {
-      id: variantId,
-      label: variantName,
+    [algorithmId]: {
+      id: algorithmId,
+      label: algorithmName,
       data: [
         { time: new Date(2017, 8, 1, 0, 0, 0), value: 1 },
         { time: new Date(2017, 8, 2, 0, 0, 0), value: 2 },
@@ -117,7 +117,7 @@ describe('MultipleAreaChart', () =>
       const nextDatasets = Immutable.Map<ID, any>({
         3: {
           id: 3,
-          label: 'Variant 3',
+          label: 'Algorithm 3',
           data: [
             { time: new Date(2017, 8, 1, 0, 0, 0), value: 10 },
             { time: new Date(2017, 8, 2, 0, 0, 0), value: 12 },
@@ -125,7 +125,7 @@ describe('MultipleAreaChart', () =>
         },
         4: {
           id: 4,
-          label: 'Variant 4',
+          label: 'Algorithm 4',
           data: [
             { time: new Date(2017, 8, 1, 0, 0, 0), value: 15 },
             { time: new Date(2017, 8, 2, 0, 0, 0), value: 14 },

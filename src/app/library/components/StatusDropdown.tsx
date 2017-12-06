@@ -64,9 +64,9 @@ const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 
 export interface Props
 {
-  variant: LibraryTypes.Variant;
+  algorithm: LibraryTypes.Algorithm;
   noBorder?: boolean;
-  variantActions: any;
+  algorithmActions: any;
   tooltips?: List<any>;
 }
 
@@ -84,9 +84,9 @@ class StatusDropdown extends TerrainComponent<Props>
       {
         const currentUser = userState.get('currentUser');
         const isSuperUser = currentUser === undefined ? false : currentUser.isSuperUser;
-        // Util.haveRole(this.props.variant.groupId, 'admin', UserStore, RolesStore);
+        // Util.haveRole(this.props.algorithm.categoryId, 'admin', UserStore, RolesStore);
         const isBuilder = true;
-        // Util.haveRole(this.props.variant.groupId, 'builder', UserStore, RolesStore);
+        // Util.haveRole(this.props.algorithm.categoryId, 'builder', UserStore, RolesStore);
         if (isSuperUser !== this.state.isSuperUser || isBuilder !== this.state.isBuilder)
         {
           this.setState({
@@ -102,23 +102,23 @@ class StatusDropdown extends TerrainComponent<Props>
   public handleChange(index: number)
   {
     const status = this.getOrder()[index];
-    this.props.variantActions.status(this.props.variant, status as Status, false);
+    this.props.algorithmActions.status(this.props.algorithm, status as Status, false);
   }
 
   public canEdit(): boolean
   {
-    const { variant } = this.props;
+    const { algorithm } = this.props;
     return this.state.isSuperUser ||
-      (this.state.isBuilder && variant.status !== Status.Live && variant.status !== Status.Default);
+      (this.state.isBuilder && algorithm.status !== Status.Live && algorithm.status !== Status.Default);
   }
 
   public getOptions(): List<string> // List<El>
   {
-    const { variant } = this.props;
+    const { algorithm } = this.props;
 
     if (!this.canEdit())
     {
-      return LockedOptions[variant.status];
+      return LockedOptions[algorithm.status];
     }
 
     if (this.state.isSuperUser)
@@ -156,30 +156,30 @@ class StatusDropdown extends TerrainComponent<Props>
       return 0;
     }
 
-    const { status } = this.props.variant;
+    const { status } = this.props.algorithm;
 
     return this.getOrder().indexOf(status);
   }
 
   public render()
   {
-    const { variant } = this.props;
+    const { algorithm } = this.props;
 
     let tooltipText = '';
     if (!this.canEdit())
     {
       if (!this.state.isBuilder)
       {
-        tooltipText = "You aren't a Builder in this group,<br />so you can't edit this Variant's status.";
+        tooltipText = "You aren't a Builder in this category,<br />so you can't edit this Algorithm's status.";
       }
       else if (!this.state.isSuperUser)
       {
-        tooltipText = "This Variant is Live and you aren't<br />an Admin in this Group, so you<br />can't edit its status.";
+        tooltipText = "This Algorithm is Live and you aren't<br />an Admin in this Category, so you<br />can't edit its status.";
       }
     }
     else
     {
-      tooltipText = 'Click to change the Variant\'s status, e.g. to Deploy or Archive';
+      tooltipText = 'Click to change the Algorithm\'s status, e.g. to Deploy or Archive';
     }
 
     return (

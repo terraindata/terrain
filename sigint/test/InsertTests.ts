@@ -80,7 +80,7 @@ describe('Event insertion tests', () =>
       .get('/v1/')
       .query({
         eventname: 'impression',
-        variantid: 111,
+        algorithmid: 111,
         visitorid: 123456,
       })
       .expect(200)
@@ -96,7 +96,7 @@ describe('Event insertion tests', () =>
       .post('/v1/')
       .send({
         eventname: 'click',
-        variantid: 111,
+        algorithmid: 111,
         visitorid: 123456,
       })
       .expect(200)

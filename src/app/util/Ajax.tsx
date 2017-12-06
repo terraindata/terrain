@@ -97,7 +97,6 @@ export const Ajax =
           body,
         };
       }
-
       return Ajax._reqGeneric(
         method,
         '/midway/v1/' + url,
@@ -362,11 +361,10 @@ export const Ajax =
         },
       );
     },
-
-    getItems(onLoad: (groups: IMMap<number, LibraryTypes.Group>,
+    getItems(onLoad: (categories: IMMap<number, LibraryTypes.Category>,
+      groups: IMMap<number, LibraryTypes.Group>,
       algorithms: IMMap<number, LibraryTypes.Algorithm>,
-      variants: IMMap<number, LibraryTypes.Variant>,
-      groupsOrder: IMList<number, any>) => void,
+      categoriesOrder: IMList<number, any>) => void,
       onError?: (ev: Event) => void)
     {
       return Ajax.req(
@@ -377,55 +375,66 @@ export const Ajax =
         {
           const mapping =
             {
-              VARIANT: Immutable.Map<number, LibraryTypes.Variant>({}) as any,
-              ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}),
+              ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}) as any,
               GROUP: Immutable.Map<number, LibraryTypes.Group>({}),
+              CATEGORY: Immutable.Map<number, LibraryTypes.Category>({}),
               QUERY: Immutable.Map<number, Query>({}),
             };
-          const groupsOrder = [];
-
+          const categoriesOrder = [];
           items.map(
             (itemObj) =>
             {
+              const metaObj = JSON.parse(itemObj['meta']);
+              if (itemObj['type'] === 'GROUP' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+              {
+                itemObj['type'] = 'CATEGORY';
+              }
+              if (itemObj['type'] === 'ALGORITHM' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+              {
+                itemObj['type'] = 'GROUP';
+              }
+              if (itemObj['type'] === 'VARIANT' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+              {
+                itemObj['type'] = 'ALGORITHM';
+              }
               const item = LibraryTypes.typeToConstructor[itemObj['type']](
                 responseToRecordConfig(itemObj),
               );
               mapping[item.type] = mapping[item.type].set(item.id, item);
-              if (item.type === ItemType.Group)
+              // Category or Group TODO TODO
+              if (item.type === ItemType.Category)
               {
-                groupsOrder.push(item.id);
+                categoriesOrder.push(item.id);
               }
             },
           );
-
-          mapping.ALGORITHM = mapping.ALGORITHM.map(
-            (alg) => alg.set('groupId', alg.parent),
+          mapping.GROUP = mapping.GROUP.map(
+            (cat) => cat.set('categoryId', cat.parent),
           ).toMap();
-
-          mapping.VARIANT = mapping.VARIANT.map(
+          mapping.ALGORITHM = mapping.ALGORITHM.map(
             (v) =>
             {
-              v = v.set('algorithmId', v.parent);
-              const alg = mapping.ALGORITHM.get(v.algorithmId);
+              v = v.set('groupId', v.parent);
+              const alg = mapping.GROUP.get(v.groupId);
               if (alg)
               {
-                v = v.set('groupId', alg.groupId);
+                v = v.set('categoryId', alg.categoryId);
               }
               return v;
             },
           ).toMap();
 
           onLoad(
+            mapping.CATEGORY,
             mapping.GROUP,
             mapping.ALGORITHM,
-            mapping.VARIANT,
-            Immutable.List(groupsOrder),
+            Immutable.List(categoriesOrder),
           );
         },
         {
           onError,
           urlArgs: {
-            type: 'GROUP,ALGORITHM,VARIANT',
+            type: 'CATEGORY,ALGORITHM,VARIANT,GROUP', // Still have variant to retrieve old items
           },
         },
       );
@@ -444,7 +453,21 @@ export const Ajax =
         {
           if (response && response[0])
           {
-            const item = LibraryTypes.typeToConstructor[response[0]['type']](responseToRecordConfig(response[0]));
+            const itemObj = response[0];
+            const metaObj = JSON.parse(itemObj['meta']);
+            if (itemObj['type'] === 'GROUP' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+            {
+              itemObj['type'] = 'CATEGORY';
+            }
+            if (itemObj['type'] === 'ALGORITHM' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+            {
+              itemObj['type'] = 'GROUP';
+            }
+            if (itemObj['type'] === 'VARIANT' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+            {
+              itemObj['type'] = 'ALGORITHM';
+            }
+            const item = LibraryTypes.typeToConstructor[itemObj['type']](responseToRecordConfig(itemObj));
             onLoad(item);
           }
           else
@@ -457,15 +480,15 @@ export const Ajax =
         });
     },
 
-    getVariant(variantId: ID,
-      onLoad: (variant: LibraryTypes.Variant) => void)
+    getAlgorithm(algorithmId: ID,
+      onLoad: (algorithm: LibraryTypes.Algorithm) => void)
     {
       return Ajax.getItem(
-        'VARIANT',
-        variantId,
-        (variantItem: Item) =>
+        'ALGORITHM',
+        algorithmId,
+        (algorithmItem: Item) =>
         {
-          onLoad(variantItem as LibraryTypes.Variant);
+          onLoad(algorithmItem as LibraryTypes.Algorithm);
         },
         (error) =>
         {
@@ -477,20 +500,20 @@ export const Ajax =
       );
       // }
       // TODO
-      // if (variantId.indexOf('@') === -1)
+      // if (algorithmId.indexOf('@') === -1)
       // {
       // else
       // {
       //   // TODO
-      //   // return Ajax.getVariantVersion(
-      //   //   variantId,
+      //   // return Ajax.getAlgorithmVersion(
+      //   //   algorithmId,
       //   //   onLoad,
       //   // );
       // }
     },
 
-    getVariantStatus(
-      variantId: ID,
+    getAlgorithmStatus(
+      algorithmId: ID,
       dbid: number,
       deployedName: string,
       onLoad: (resp: object) => void,
@@ -503,7 +526,7 @@ export const Ajax =
       };
       Ajax.req(
         'get',
-        'items/live/' + variantId,
+        'items/live/' + algorithmId,
         {},
         (response: object) =>
         {
@@ -572,7 +595,7 @@ export const Ajax =
       //     if (version)
       //     {
       //       const data = JSON.parse(version.data);
-      //       Ajax.getVariant(originalId, (v: LibraryTypes.Variant) =>
+      //       Ajax.getAlgorithm(originalId, (v: LibraryTypes.Algorithm) =>
       //       {
       //         if (v)
       //         {
@@ -582,7 +605,7 @@ export const Ajax =
       //           data['objectId'] = v.objectId;
       //           data['objectType'] = v.objectType;
 
-      //           onLoad(LibraryTypes._Variant(data));
+      //           onLoad(LibraryTypes._Algorithm(data));
       //         }
       //         else
       //         {
@@ -599,18 +622,18 @@ export const Ajax =
       // );
     },
 
-    getQuery(variantId: ID,
-      onLoad: (query: Query, variant: LibraryTypes.Variant) => void)
+    getQuery(algorithmId: ID,
+      onLoad: (query: Query, algorithm: LibraryTypes.Algorithm) => void)
     {
-      if (!variantId)
+      if (!algorithmId)
       {
         return;
       }
 
-      // TODO change if we store queries separate from variants
-      return Ajax.getVariant(
-        variantId,
-        (v: LibraryTypes.Variant) =>
+      // TODO change if we store queries separate from algorithms
+      return Ajax.getAlgorithm(
+        algorithmId,
+        (v: LibraryTypes.Algorithm) =>
         {
           if (!v || !v.query)
           {
@@ -627,9 +650,9 @@ export const Ajax =
     saveItem(item: Item,
       onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
     {
-      if (item.type === ItemType.Variant)
+      if (item.type === ItemType.Algorithm)
       {
-        item = LibraryTypes.variantForSave(item as LibraryTypes.Variant);
+        item = LibraryTypes.algorithmForSave(item as LibraryTypes.Algorithm);
       }
       const itemData = recordForSave(item);
       const id = itemData['id'];
@@ -1343,7 +1366,7 @@ export const Ajax =
 
     getAnalytics(
       connectionId: number,
-      variantIds: ID[],
+      algorithmIds: ID[],
       start: Date,
       end: Date,
       metric: string,
@@ -1353,7 +1376,7 @@ export const Ajax =
       onError?: (error: any) => void)
     {
       const args = {
-        variantid: variantIds.join(','),
+        algorithmid: algorithmIds.join(','),
         start,
         end,
         eventname: metric,

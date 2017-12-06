@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 /*
  *  SyntaxHighlighter should be stateless across highlight calls because there may be
- *  bugs that result from switching tabs of different variants.
+ *  bugs that result from switching tabs of different algorithms.
  */
 abstract class SyntaxHighlighter
 {

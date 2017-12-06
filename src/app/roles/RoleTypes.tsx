@@ -47,22 +47,22 @@ import * as Immutable from 'immutable';
 
 const _Role = Immutable.Record(
   {
-    groupId: '',
+    categoryId: '',
     userId: '',
     admin: false,
     builder: false,
   });
 export class Role extends _Role
 {
-  public groupId: ID;
+  public categoryId: ID;
   public userId: string;
   public admin: boolean;
   public builder: boolean;
 }
 // { { userId: Role }
-export type GroupRoleMap = Immutable.Map<ID, Role>;
-// { groupId: { userId: Role }}
-export type RoleMap = Immutable.Map<ID, GroupRoleMap>;
+export type CategoryRoleMap = Immutable.Map<ID, Role>;
+// { categoryId: { userId: Role }}
+export type RoleMap = Immutable.Map<ID, CategoryRoleMap>;
 
 // if
-// roles.getIn([groupId, userId])
+// roles.getIn([categoryId, userId])
