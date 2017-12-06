@@ -47,7 +47,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
-import {
+import
+{
   _TemplateEditorState,
   ETLTemplate,
   TemplateEditorState,
@@ -68,13 +69,6 @@ export interface TemplateEditorActionTypes
     actionType: 'loadTemplate';
     template: ETLTemplate;
   };
-  saveTemplate: {
-    actionType: 'saveTemplate';
-  };
-  updateTemplate: { // edit the current template
-    actionType: 'updateTemplate';
-    template: ETLTemplate;
-  };
   createField: {
     actionType: 'createField';
     sourcePath: KeyPath;
@@ -86,6 +80,10 @@ export interface TemplateEditorActionTypes
     key: string | number;
     value: any;
   };
+  deleteField: {
+    actionType: 'deleteField';
+    sourcePath: KeyPath;
+  }
 }
 
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
@@ -100,14 +98,6 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
     {
       return state.set('isDirty', false).
         set('template', action.payload.template);
-    },
-    saveTemplate: (state, action) =>
-    { // todo
-      return state;
-    },
-    updateTemplate: (state, action) =>
-    { // todo
-      return state;
     },
     createField: (state, action) =>
     {
@@ -125,6 +115,12 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       return state.set('isDirty', true).
         setIn(keyPath, action.payload.value);
     },
+    deleteField: (state, action) =>
+    {
+      const fieldKeyPath = List<string | number>(['template', 'rootField'])
+        .push(...action.payload.sourcePath.toJS());
+      return state.deleteIn(fieldKeyPath);
+    }
   }
 }
 

@@ -114,7 +114,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
           onClick={this._noopIfDisabled(this.handleCreateNewField)}
           style={buttonStyle}
         >
-          <AddIcon className='template-editor-add-icon'/>
+          <AddIcon className='template-editor-add-icon' />
           Add Field
         </div>
       </div>

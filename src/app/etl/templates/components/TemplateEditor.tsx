@@ -77,7 +77,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
     template = template.setIn(['rootField', 'children', 0], _TemplateField({ name: 'field 1' }));
     template = template.setIn(['rootField', 'children', 1], _TemplateField({ name: 'field 2' }));
     template = template.setIn(['rootField', 'children', 1, 'children', 0], _TemplateField({ name: 'nested field' }));
-    template = template.setIn(['rootField', 'children', 1, 'children', 1], _TemplateField({ name: ' another nested field' }));
+    template = template.setIn(['rootField', 'children', 1, 'children', 1], _TemplateField({ name: 'another nested field' }));
 
     this.props.act({
       actionType: 'loadTemplate',

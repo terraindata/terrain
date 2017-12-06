@@ -46,6 +46,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
@@ -56,8 +57,9 @@ const { List, Map } = Immutable;
 
 import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
+import { Menu, MenuOption } from 'common/components/Menu';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { _TemplateField, TEMPLATE_TYPES, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 
@@ -78,6 +80,31 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     originalNameOpen: boolean;
   } = {
     originalNameOpen: false,
+  }
+
+  constructor(props)
+  {
+    super(props);
+    this._getContextMenuOptions = memoizeOne(this._getContextMenuOptions);
+  }
+
+  public _getContextMenuOptions(isExport: boolean): List<MenuOption>
+  {
+    return List([
+      {
+        text: 'duplicate field*',
+        onClick: () => 0,
+      },
+      {
+        text: 'remove field',
+        onClick: this._deleteSelf.bind(this),
+      },
+    ]);
+  }
+
+  public getContextMenuOptions(): List<MenuOption>
+  {
+    return this._getContextMenuOptions(this._isExport());
   }
 
   public render()
@@ -112,6 +139,23 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         &nbsp;{field.originalName}
       </div>
 
+    const fieldNameSection = (
+      <div className='tef-layout-content-row'>
+        <div className='tef-layout-label'> Name </div>
+        <div className='tef-layout-autocomplete-spacer'> {inputFieldName} </div>
+        <div
+          className='template-editor-field-label-group'
+          style={originalNameLabelStyle}
+          onClick={this._noopIfDisabled(this.enableOriginalNameInput)}
+          key={this.state.originalNameOpen ? 'autocomplete' : 'label'}
+        >
+          <div className='tef-layout-label tef-left normal-text'> (from </div>
+          {inputOriginalName}
+          <div className='tef-layout-label tef-right normal-text'> ) </div>
+        </div>
+      </div>
+    );
+
     return (
       <div className='template-editor-field-row'>
         <div className='include-field-checkbox-spacer'>
@@ -125,27 +169,22 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         <div className={classNames({
           'template-editor-field-settings': true,
           'template-editor-field-input-disabled': inputDisabled,
-          })}
+        })}
           style={[
             backgroundColor(Colors().bg3),
             borderColor(Colors().border1)
           ]}
         >
-          <div className='tef-layout-row tef-layout-padded'>
-            <div className='tef-layout-label'> Name </div>
-            <div className='tef-layout-autocomplete-spacer'> {inputFieldName} </div>
-            <div
-              className='template-editor-field-label-group'
-              style={originalNameLabelStyle}
-              onClick={this._noopIfDisabled(this.enableOriginalNameInput)}
-              key={this.state.originalNameOpen ? 'autocomplete' : 'label'}
-            >
-              <div className='tef-layout-label tef-left normal-text'> (from </div>
-              {inputOriginalName}
-              <div className='tef-layout-label tef-right normal-text'> ) </div>
+          <div className='tef-layout-row'>
+            {fieldNameSection}
+            <div className='tef-layout-padded'>
+              <div className='tef-menu-wrapper-positioning'>
+                <Menu
+                  options={this.getContextMenuOptions()}
+                />
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     );

@@ -26,10 +26,12 @@
   .expandable-view-children-container {
     padding-left: @half-spacing;
     max-height: 0px;
-    overflow: hidden;
+    overflow: visible;
+    display: none;
     &.expandable-view-open {
       border-left: 1px solid;
       max-height: none;
+      display: block;
     }
   }
   

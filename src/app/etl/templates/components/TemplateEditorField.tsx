@@ -54,7 +54,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { _TemplateField, TEMPLATE_TYPES, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 
 /*
  *  This class defines a base class with useful functions that are used by components
@@ -89,6 +89,21 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
       key,
       value,
     });
+  }
+
+  protected _deleteSelf()
+  {
+    const { act, keyPath } = this.props;
+    act({
+      actionType: 'deleteField',
+      sourcePath: keyPath,
+    });
+  }
+
+  protected _isExport(): boolean
+  {
+    return this.props.templateEditor.template !== undefined &&
+      this.props.templateEditor.template.type === TEMPLATE_TYPES.EXPORT;
   }
 
   protected _isRoot(): boolean
