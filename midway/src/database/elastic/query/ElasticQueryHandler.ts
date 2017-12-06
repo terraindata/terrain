@@ -145,7 +145,11 @@ export default class ElasticQueryHandler extends QueryHandler
   {
     const childQuery = body['groupJoin'];
     body['groupJoin'] = undefined;
-    const parentQuery: Elastic.SearchParams = body;
+    const parentQuery: Elastic.SearchParams | undefined = body;
+    if (parentQuery === undefined)
+    {
+      throw new Error('Expecting body parameter in the groupJoin query');
+    }
 
     const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
     if (valueInfo === null)
@@ -158,7 +162,7 @@ export default class ElasticQueryHandler extends QueryHandler
       const client: ElasticClient = this.controller.getClient();
       const parentResults = await new Promise<QueryResponse>((res, rej) =>
       {
-        let allResponse = null;
+        let allResponse: any | null = null;
         const getMoreUntilDone = async (error: any, response: any) =>
         {
           if (error !== null && error !== undefined)
@@ -179,8 +183,12 @@ export default class ElasticQueryHandler extends QueryHandler
           }
 
           let size = response.hits.total;
-          if (parentQuery['size'] !== undefined && parentQuery['size'] < size) {
-            size = parentQuery['size'];
+          if (parentQuery['size'] !== undefined)
+          {
+            if (parentQuery['size'] as any < size)
+            {
+              size = parentQuery['size'];
+            }
           }
 
           if (response.hits.hits.length > 0 && size > response.hits.hits.length)
@@ -189,7 +197,7 @@ export default class ElasticQueryHandler extends QueryHandler
             client.scroll({
               scrollId: response._scroll_id,
               scroll,
-            }, getMoreUntilDone);
+            } as Elastic.ScrollParams, getMoreUntilDone);
           }
           else
           {
