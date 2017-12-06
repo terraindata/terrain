@@ -67,7 +67,7 @@ class LibraryStateC
   public dbs: List<BackendInstance> = Immutable.List([]);
   public dbsLoaded: boolean = false;
 
-  public categories: IMMap<ID, Category> = Immutable.Map({});
+  public categories: IMMap<ID, Category> = null;
   public groups: IMMap<ID, Group> = null;
   public algorithms: IMMap<ID, Algorithm> = null;
   public selectedAlgorithm: ID = null;
