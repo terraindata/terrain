@@ -246,9 +246,25 @@ export class Items
       const elasticClient: ElasticClient = database.getClient() as ElasticClient;
       elasticClient.getScript({ id: deployedName, lang: 'mustache' }, async function getState(err, resp)
       {
+        if (items[0]['meta'] !== undefined)
+        {
+          const metaObj = JSON.parse(String(items[0]['meta']));
+          if (metaObj['modelVersion'] < 3 && items[0].type === 'GROUP')
+          {
+            items[0].type = 'CATEGORY';
+          }
+          if (metaObj['modelVersion'] < 3 && items[0].type === 'ALGORITHM')
+          {
+            items[0].type = 'GROUP';
+          }
+          if (metaObj['modelVersion'] < 3 && items[0].type === 'VARIANT')
+          {
+            items[0].type = 'ALGORITHM';
+          }
+        }
         if (items[0].type !== 'ALGORITHM')
         {
-          return resolve('Item is not a Algorithm');
+          return resolve('Item is not an Algorithm');
         }
         if (resp['_id'] === deployedName && resp['found'] === true && items[0].status === 'LIVE'
           && await this._verifyAlgorithmScript(algorithmId, resp['_script']))

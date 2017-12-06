@@ -186,7 +186,11 @@ export class Export
       //   Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
       // } // Parse the TQL and set the filters so that when we fetch we get the right templates.
 
-      // get query data from algorithmId or query
+      // get query data from algorithmId or query (or variant Id if necessary)
+      if ((exprt as any).variantId !== undefined && exprt.algorithmId === undefined)
+      {
+        exprt.algorithmId = (exprt as any).variantId;
+      }
       if (exprt.algorithmId !== undefined && exprt.query === undefined)
       {
         const algorithms: ItemConfig[] = await TastyItems.get(exprt.algorithmId);
