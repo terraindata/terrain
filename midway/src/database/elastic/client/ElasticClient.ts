@@ -180,6 +180,16 @@ class ElasticClient
   }
 
   /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-clearscroll
+   */
+  public clearScroll<T>(params: Elastic.ClearScrollParams,
+    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+  {
+    this.log('clearScroll', params);
+    this.delegate.clearScroll(params, callback);
+  }
+
+  /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
    */
   public search<T>(params: Elastic.SearchParams,

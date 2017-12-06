@@ -73,7 +73,7 @@ beforeAll(async (done) =>
     const db = new sqlite3.Database(testDBName);
     const options =
       {
-        debug: true,
+        debug: false,
         db: 'sqlite',
         dsn: testDBName,
         port: 43001,
@@ -741,8 +741,7 @@ describe('Query route tests', () =>
           database: 1,
           type: 'search',
           body: `{
-            "from": 0,
-            "size": 5,
+            "scroll": "60s",
             "body": {
               "_source": ["movieid", "title"],
               "query": {
@@ -772,8 +771,6 @@ describe('Query route tests', () =>
             },
             "groupJoin": {
               "englishMovies": {
-                "from" : 0,
-                "size" : 5,
                 "_source": ["movieid", "overview"],
                 "query" : {
                   "bool" : {
@@ -794,7 +791,7 @@ describe('Query route tests', () =>
       .expect(200)
       .then((response) =>
       {
-        winston.info(response.text);
+        // winston.info(response.text);
         expect(response.text).not.toBe('');
         if (response.text === '')
         {
