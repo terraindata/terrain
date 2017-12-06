@@ -51,17 +51,17 @@ const { List, Map } = Immutable;
 import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
 import { _Query, Query, queryForSave } from '../../items/types/Query';
 
-export type LibraryItem = Group | Variant | Algorithm;
+export type LibraryItem = Category | Algorithm | Group;
 // TODO MOD refactor
 
-class VariantC extends ItemC
+class AlgorithmC extends ItemC
 {
-  public type = ItemType.Variant;
+  public type = ItemType.Algorithm;
 
-  public algorithmId: number = -1;
   public groupId: number = -1;
+  public categoryId: number = -1;
 
-  public excludeFields: string[] = ['dbFields', 'excludeFields', 'algorithmId', 'groupId'];
+  public excludeFields: string[] = ['dbFields', 'excludeFields', 'groupId', 'categoryId'];
   // TODO try super or prototype
 
   public lastEdited: string = '';
@@ -69,17 +69,17 @@ class VariantC extends ItemC
   public version: boolean = false;
   public language: string = 'elastic';
   public deployedName: string = '';
-
+  public modelVersion = 3;
   // don't use this!
-  // TODO remove when variants can be saved without queries
+  // TODO remove when algorithms can be saved without queries
   public query: Query = null;
 }
-export interface Variant extends VariantC, IRecord<Variant> { }
-const Variant_Record = Immutable.Record(new VariantC());
-export const _Variant = (config?: any) =>
+export interface Algorithm extends AlgorithmC, IRecord<Algorithm> { }
+const Algorithm_Record = Immutable.Record(new AlgorithmC());
+export const _Algorithm = (config?: any) =>
 {
   // NOTE: we do not want a default value for the config param because
-  //  we want to know the difference between creating a new variant with
+  //  we want to know the difference between creating a new algorithm with
   //  no params vs. an old version with no modelVersion param
   if (config && !config.modelVersion)
   {
@@ -91,7 +91,7 @@ export const _Variant = (config?: any) =>
       resultsConfig: config.resultsConfig,
       tql: config.tql,
       deckOpen: config.deckOpen,
-      variantId: config.id,
+      algorithmId: config.id,
       language: 'mysql',
     };
   }
@@ -99,7 +99,14 @@ export const _Variant = (config?: any) =>
   if (config && config.modelVersion === 1)
   {
     // from 1 to 2
-    // TODO if necessary
+    config.modelVersion = 2;
+    config.categoryId = config.groupId;
+  }
+
+  if (config && (config.modelVersion < 3))
+  {
+    config.modelVersion = 3;
+    config.groupId = config.algorithmId;
   }
 
   config = config || {};
@@ -111,15 +118,15 @@ export const _Variant = (config?: any) =>
 
   config.deployedName = config.deployedName || (config.id ? 'terrain_' + String(config.id) : '');
 
-  let v = new Variant_Record(config) as any as Variant;
+  let v = new Algorithm_Record(config) as any as Algorithm;
   if (!config || !config.lastUserId || !config.lastEdited)
   {
-    v = touchVariant(v);
+    v = touchAlgorithm(v);
   }
   return v;
 };
 
-export function touchVariant(v: Variant): Variant
+export function touchAlgorithm(v: Algorithm): Algorithm
 {
   return v
     .set('lastEdited', new Date())
@@ -127,41 +134,49 @@ export function touchVariant(v: Variant): Variant
     ;
 }
 
-export function variantForSave(v: Variant): Variant
+export function algorithmForSave(v: Algorithm): Algorithm
 {
   return v.set('query', queryForSave(v.query));
 }
 
-class AlgorithmC extends ItemC
+class GroupC extends ItemC
 {
-  public type = ItemType.Algorithm;
+  public type = ItemType.Group;
 
-  public groupId = -1;
+  public categoryId = -1;
 
   public lastEdited = '';
   public lastUsername = '';
 
-  public variantsOrder = List([]);
+  public algorithmsOrder = List([]);
   public language = 'elastic';
 
-  public excludeFields = ['dbFields', 'excludeFields', 'groupId'];
+  public excludeFields = ['dbFields', 'excludeFields', 'categoryId'];
+  public modelVersion = 3;
 }
-const Algorithm_Record = Immutable.Record(new AlgorithmC());
-export interface Algorithm extends AlgorithmC, IRecord<Algorithm> { }
-export const _Algorithm = (config?: any) =>
+const Group_Record = Immutable.Record(new GroupC());
+export interface Group extends GroupC, IRecord<Group> { }
+export const _Group = (config?: any) =>
 {
   if (config && (!config.modelVersion || config.modelVersion === 1))
   {
     // from 0 and 1 to 2
-    // TODO
+    config.modelVersion = 2;
+    config.categoryId = config.groupId;
   }
+  if (config && (!config.modelVersion || config.modelVersion < 3))
+  {
+    config.modelVersion = 3;
+    config.algorithmsOrder = config.variantsOrder;
+  }
+  // from 2 to 3
 
   config = config || {};
-  config.variantsOrder = List(config.variantsOrder || []);
-  return new Algorithm_Record(config) as any as Algorithm;
+  config.algorithmsOrder = List(config.algorithmsOrder || []);
+  return new Group_Record(config) as any as Group;
 };
 
-export const groupColors =
+export const categoryColors =
   [
     '#00A7F7',
     '#00BCD6',
@@ -175,30 +190,37 @@ export const groupColors =
     '#5F7D8C',
   ];
 
-class GroupC extends ItemC
+class CategoryC extends ItemC
 {
-  public type = ItemType.Group;
+  public type = ItemType.Category;
 
   public lastEdited = '';
   public lastUserId = '';
   public userIds = List([]);
-  public algorithmsOrder = List([]);
+  public groupsOrder = List([]);
   public defaultLanguage = 'elastic';
+  public modelVersion = 3;
 }
-const Group_Record = Immutable.Record(new GroupC());
-export interface Group extends GroupC, IRecord<Group> { }
-export const _Group = (config: any = {}) =>
+const Category_Record = Immutable.Record(new CategoryC());
+export interface Category extends CategoryC, IRecord<Category> { }
+export const _Category = (config: any = {}) =>
 {
   if (config && (!config.modelVersion || config.modelVersion === 1))
   {
     // from 0 and 1 to 2
     // TODO
   }
+  // 2 --> 3
+  if (config && (!config.modelVersion || config.modelVersion < 3))
+  {
+    config['groupsOrder'] = config['algorithmsOrder'];
+    config['modelVersion'] = 3;
+  }
 
   config = config || {};
   config.userIds = List(config.userIds || []);
-  config.algorithmsOrder = List(config.algorithmsOrder || []);
-  return new Group_Record(config) as any as Group;
+  config.groupsOrder = List(config.groupsOrder || []);
+  return new Category_Record(config) as any as Category;
 };
 
 export function nameForStatus(status: ItemStatus): string
@@ -244,7 +266,7 @@ export const typeToConstructor: {
 } =
   {
     [ItemType.Query]: _Query,
-    [ItemType.Variant]: _Variant,
     [ItemType.Algorithm]: _Algorithm,
     [ItemType.Group]: _Group,
+    [ItemType.Category]: _Category,
   };

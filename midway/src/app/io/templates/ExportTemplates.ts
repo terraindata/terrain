@@ -60,7 +60,7 @@ export interface ExportTemplateConfig extends TemplateBase
   query?: string;
   rank?: boolean;
   templateId?: number;
-  variantId?: number;
+  algorithmId?: number;
 }
 
 export interface ExportTemplateBaseStringified extends TemplateBaseStringified

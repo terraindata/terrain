@@ -59,7 +59,7 @@ import * as Util from '../Util';
 
 export interface AggregationRequest
 {
-  variantid: string;
+  algorithmid: string;
   eventname: string;
   start: string;
   end: string;
@@ -71,7 +71,7 @@ export interface AggregationRequest
 export interface EventConfig
 {
   eventname: string;
-  variantid: number | string;
+  algorithmid: number | string;
   visitorid: number | string;
   timestamp: Date | string;
   source: {
@@ -94,7 +94,7 @@ export class Events
       [],
       [
         'eventname',
-        'variantid',
+        'algorithmid',
         'visitorid',
         'source',
         'timestamp',
@@ -111,11 +111,11 @@ export class Events
     return controller.getTasty().upsert(this.eventTable, event) as Promise<EventConfig>;
   }
 
-  public generateHistogramQuery(controller: DatabaseController, variantid: string, request: AggregationRequest): Elastic.SearchParams
+  public generateHistogramQuery(controller: DatabaseController, algorithmid: string, request: AggregationRequest): Elastic.SearchParams
   {
     const body = bodybuilder()
       .size(0)
-      .filter('term', 'variantid.keyword', variantid)
+      .filter('term', 'algorithmid.keyword', algorithmid)
       .filter('term', 'eventname', request.eventname)
       .filter('range', 'timestamp', {
         gte: request.start,
@@ -132,21 +132,21 @@ export class Events
     return this.buildQuery(controller, body.build());
   }
 
-  public async getHistogram(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
+  public async getHistogram(controller: ElasticController, algorithmid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
-      const query = this.generateHistogramQuery(controller, variantid, request);
+      const query = this.generateHistogramQuery(controller, algorithmid, request);
       this.runQuery(controller, query, (response) =>
       {
         resolve({
-          [variantid]: response['aggregations'][request.agg].buckets,
+          [algorithmid]: response['aggregations'][request.agg].buckets,
         });
       }, reject);
     });
   }
 
-  public generateRateQuery(controller: DatabaseController, variantid: string, request: AggregationRequest): Elastic.SearchParams
+  public generateRateQuery(controller: DatabaseController, algorithmid: string, request: AggregationRequest): Elastic.SearchParams
   {
     const eventnames: string[] = request.eventname.split(',');
     const numerator = request.agg + '_' + eventnames[0];
@@ -157,7 +157,7 @@ export class Events
       .size(0)
       // .orFilter('term', 'eventname', eventnames[0])
       // .orFilter('term', 'eventname', eventnames[1])
-      .filter('term', 'variantid.keyword', variantid)
+      .filter('term', 'algorithmid.keyword', algorithmid)
       .filter('range', 'timestamp', {
         gte: request.start,
         lte: request.end,
@@ -216,7 +216,7 @@ export class Events
     return this.buildQuery(controller, body.build());
   }
 
-  public async getRate(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
+  public async getRate(controller: ElasticController, algorithmid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>(async (resolve, reject) =>
     {
@@ -225,11 +225,11 @@ export class Events
       const denominator = request.agg + '_' + eventnames[1];
       const rate = request.agg + '_' + eventnames[0] + '_' + eventnames[1];
 
-      const query = this.generateRateQuery(controller, variantid, request);
+      const query = this.generateRateQuery(controller, algorithmid, request);
       this.runQuery(controller, query, (response) =>
       {
         resolve({
-          [variantid]: response['aggregations'].histogram.buckets.map(
+          [algorithmid]: response['aggregations'].histogram.buckets.map(
             (obj) =>
             {
               delete obj[numerator];
@@ -246,10 +246,10 @@ export class Events
     });
   }
 
-  public generateSelectQuery(controller: DatabaseController, variantid: string, request: AggregationRequest): Elastic.SearchParams
+  public generateSelectQuery(controller: DatabaseController, algorithmid: string, request: AggregationRequest): Elastic.SearchParams
   {
     let body = bodybuilder()
-      .filter('term', 'variantid.keyword', variantid)
+      .filter('term', 'algorithmid.keyword', algorithmid)
       .filter('term', 'eventname', request.eventname)
       .filter('range', 'timestamp', {
         gte: request.start,
@@ -271,45 +271,45 @@ export class Events
     return this.buildQuery(controller, body.build());
   }
 
-  public generateSelectEventsQuery(controller: DatabaseController, variantid?: string): Elastic.SearchParams
+  public generateSelectEventsQuery(controller: DatabaseController, algorithmid?: string): Elastic.SearchParams
   {
     let body = bodybuilder()
       .size(0)
       .aggregation('terms', 'eventname.keyword');
 
-    if (variantid !== undefined)
+    if (algorithmid !== undefined)
     {
-      body = body.filter('term', 'variantid.keyword', variantid);
+      body = body.filter('term', 'algorithmid.keyword', algorithmid);
     }
 
     return this.buildQuery(controller, body.build());
   }
 
-  public async getSelect(controller: ElasticController, variantid: string, request: AggregationRequest): Promise<object>
+  public async getSelect(controller: ElasticController, algorithmid: string, request: AggregationRequest): Promise<object>
   {
     return new Promise<object>((resolve, reject) =>
     {
-      const query = this.generateSelectQuery(controller, variantid, request);
+      const query = this.generateSelectQuery(controller, algorithmid, request);
       this.runQuery(controller, query, (response) =>
       {
         resolve({
-          [variantid]: response['hits'].hits.map((e) => e['_source']),
+          [algorithmid]: response['hits'].hits.map((e) => e['_source']),
         });
       }, reject);
     });
   }
 
-  public async getDistinct(controller: DatabaseController, variantid?: string): Promise<object>
+  public async getDistinct(controller: DatabaseController, algorithmid?: string): Promise<object>
   {
     return new Promise<object>((resolve, reject) =>
     {
-      const query = this.generateSelectEventsQuery(controller, variantid);
+      const query = this.generateSelectEventsQuery(controller, algorithmid);
       this.runQuery(controller as ElasticController, query, (response) =>
       {
-        if (variantid !== undefined)
+        if (algorithmid !== undefined)
         {
           resolve({
-            [variantid]: response['aggregations']['agg_terms_eventname.keyword'].buckets,
+            [algorithmid]: response['aggregations']['agg_terms_eventname.keyword'].buckets,
           });
         }
         else
@@ -325,20 +325,20 @@ export class Events
     const promises: Array<Promise<any>> = [];
     if (request['agg'] === 'histogram' || request['agg'] === 'count')
     {
-      const variantids = request['variantid'].split(',');
+      const algorithmids = request['algorithmid'].split(',');
       if (request['interval'] === undefined)
       {
         throw new Error('Required parameter \"interval\" is missing');
       }
 
-      for (const variantid of variantids)
+      for (const algorithmid of algorithmids)
       {
-        promises.push(this.getHistogram(controller as ElasticController, variantid, request));
+        promises.push(this.getHistogram(controller as ElasticController, algorithmid, request));
       }
     }
     else if (request['agg'] === 'rate')
     {
-      const variantids = request['variantid'].split(',');
+      const algorithmids = request['algorithmid'].split(',');
       const eventnames = request['eventname'].split(',');
       if (eventnames.length < 2)
       {
@@ -350,19 +350,19 @@ export class Events
         throw new Error('Required parameter \"interval\" is missing');
       }
 
-      for (const variantid of variantids)
+      for (const algorithmid of algorithmids)
       {
-        promises.push(this.getRate(controller as ElasticController, variantid, request));
+        promises.push(this.getRate(controller as ElasticController, algorithmid, request));
       }
     }
     else if (request['agg'] === 'distinct')
     {
-      if (request['variantid'] !== undefined)
+      if (request['algorithmid'] !== undefined)
       {
-        const variantids = request['variantid'].split(',');
-        for (const variantid of variantids)
+        const algorithmids = request['algorithmid'].split(',');
+        for (const algorithmid of algorithmids)
         {
-          promises.push(this.getDistinct(controller as ElasticController, variantid));
+          promises.push(this.getDistinct(controller as ElasticController, algorithmid));
         }
       }
       else
@@ -372,10 +372,10 @@ export class Events
     }
     else if (request['agg'] === 'select')
     {
-      const variantids = request['variantid'].split(',');
-      for (const variantid of variantids)
+      const algorithmids = request['algorithmid'].split(',');
+      for (const algorithmid of algorithmids)
       {
-        promises.push(this.getSelect(controller as ElasticController, variantid, request));
+        promises.push(this.getSelect(controller as ElasticController, algorithmid, request));
       }
     }
     return Promise.all(promises);

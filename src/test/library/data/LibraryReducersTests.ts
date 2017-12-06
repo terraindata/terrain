@@ -52,12 +52,12 @@ import * as LibraryTypes from 'library/LibraryTypes';
 describe('LibraryReducers', () =>
 {
   let library: LibraryState = _LibraryState({});
-  let group = LibraryTypes._Group();
-  const groupId = 1;
-  const groupName = 'Test Group';
-  group = group
-    .set('id', groupId)
-    .set('name', groupName);
+  let category = LibraryTypes._Category();
+  const categoryId = 1;
+  const categoryName = 'Test Category';
+  category = category
+    .set('id', categoryId)
+    .set('name', categoryName);
 
   beforeEach(() =>
   {
@@ -69,24 +69,24 @@ describe('LibraryReducers', () =>
     expect(reducer(undefined, {})).toEqual(library);
   });
 
-  describe('#groups.create', () =>
+  describe('#categories.create', () =>
   {
-    it('should handle groups.create', () =>
+    it('should handle categories.create', () =>
     {
       library = library.set(
-        'groups',
-        Immutable.Map<number, LibraryTypes.Group>({}),
+        'categories',
+        Immutable.Map<number, LibraryTypes.Category>({}),
       );
 
       const nextState = reducer(library, {
-        type: ActionTypes.groups.create,
-        payload: { group },
+        type: ActionTypes.categories.create,
+        payload: { category },
       });
 
       expect(
-        nextState.groups,
+        nextState.categories,
       ).toEqual(
-        library.groups.set(groupId, group),
+        library.categories.set(categoryId, category),
       );
     });
   });
