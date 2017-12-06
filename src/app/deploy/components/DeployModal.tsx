@@ -134,7 +134,6 @@ class DeployModal extends TerrainComponent<Props>
       const tql = algorithm ? algorithm.query.tql : '';
       const parser: ESJSONParser = new ESJSONParser(tql);
       const valueInfo: ESValueInfo = parser.getValueInfo();
-      console.log(parser.getErrors());
       if (parser.getErrors().length > 0)
       {
         this.setState({
