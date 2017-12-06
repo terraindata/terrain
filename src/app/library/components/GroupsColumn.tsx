@@ -79,7 +79,7 @@ const GroupIcon = require('./../../../images/icon_algorithm_16x13.svg?name=Algor
 
 type Category = LibraryTypes.Category;
 type Group = LibraryTypes.Group;
-type Variant = LibraryTypes.Variant;
+type Algorithm = LibraryTypes.Algorithm;
 
 export interface Props
 {
@@ -87,7 +87,7 @@ export interface Props
   dbs: List<BackendInstance>;
   categories: Immutable.Map<ID, Category>;
   groups: Immutable.Map<ID, Group>;
-  variants: Immutable.Map<ID, Variant>;
+  algorithms: Immutable.Map<ID, Algorithm>;
   groupsOrder: Immutable.List<ID>;
   categoryId: ID;
   params: any;
@@ -401,7 +401,7 @@ class GroupsColumn extends TerrainComponent<Props>
           this.props.categoryId,
         );
         break;
-      case 'variant':
+      case 'algorithm':
         // no good
         break;
     }
@@ -425,41 +425,41 @@ class GroupsColumn extends TerrainComponent<Props>
       {
         score: 0,
         color: LibraryTypes.colorForStatus(ItemStatus.Archive),
-        name: 'Variants in Archived Status',
+        name: 'Algorithms in Archived Status',
       },
       [ItemStatus.Build]:
       {
         score: 0,
         color: LibraryTypes.colorForStatus(ItemStatus.Build),
-        name: 'Variants in Build Status',
+        name: 'Algorithms in Build Status',
       },
       [ItemStatus.Approve]:
       {
         score: 0,
         color: LibraryTypes.colorForStatus(ItemStatus.Approve),
-        name: 'Variants in Approve Status',
+        name: 'Algorithms in Approve Status',
       },
       [ItemStatus.Live]:
       {
         score: 0,
         color: LibraryTypes.colorForStatus(ItemStatus.Live),
-        name: 'Variants in Live Status',
+        name: 'Algorithms in Live Status',
       },
       [ItemStatus.Default]:
       {
         score: 0,
         color: LibraryTypes.colorForStatus(ItemStatus.Default),
-        name: 'Variants in Default Status',
+        name: 'Algorithms in Default Status',
       },
     };
 
-    const variants = this.props.variants.filter(
-      (v: Variant) =>
+    const algorithms = this.props.algorithms.filter(
+      (v: Algorithm) =>
         v.groupId === id,
     );
 
-    variants.map(
-      (v: Variant) =>
+    algorithms.map(
+      (v: Algorithm) =>
       {
         if (v.status !== undefined)
         {
@@ -477,8 +477,8 @@ class GroupsColumn extends TerrainComponent<Props>
     const canEdit = canDrag; // ||me && roles && roles.getIn([group.categoryId, me.id, 'admin']);
     // (me && roles && roles.getIn([group.categoryId, me.id, 'builder']));
 
-    const lastTouched: Variant = variants.reduce(
-      (lastTouched: Variant, v: Variant) =>
+    const lastTouched: Algorithm = algorithms.reduce(
+      (lastTouched: Algorithm, v: Algorithm) =>
       {
         const date = new Date(v.lastEdited);
         const lastTouchedDate = new Date(lastTouched && lastTouched.lastEdited);
@@ -492,7 +492,7 @@ class GroupsColumn extends TerrainComponent<Props>
     );
 
     let date: string;
-    let userId: string | number = 'There are no variants';
+    let userId: string | number = 'There are no algorithms';
     if (lastTouched)
     {
       date = lastTouched.lastEdited;
@@ -557,7 +557,7 @@ class GroupsColumn extends TerrainComponent<Props>
               style={fontColor(Colors().text1)}
             >
               {
-                date === undefined ? 'There are no variants' :
+                date === undefined ? 'There are no algorithms' :
                   'Most Recent Change: ' + Util.formatDate(date)
               }
             </div>

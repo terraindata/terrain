@@ -65,7 +65,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 const CategoryIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
 
 type Category = LibraryTypes.Category;
-type Variant = LibraryTypes.Variant;
+type Algorithm = LibraryTypes.Algorithm;
 
 export interface Props
 {
@@ -75,7 +75,7 @@ export interface Props
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
   categoryActions: any;
-  variants: Immutable.Map<ID, Variant>;
+  algorithms: Immutable.Map<ID, Algorithm>;
 }
 
 class CategoriesColumn extends TerrainComponent<Props>
@@ -175,8 +175,8 @@ class CategoriesColumn extends TerrainComponent<Props>
     const canDrag = false;
 
     let canRename = true;
-    canRename = this.props.variants.every(
-      (v: Variant) =>
+    canRename = this.props.algorithms.every(
+      (v: Algorithm) =>
       {
         if (id === v.categoryId)
         {

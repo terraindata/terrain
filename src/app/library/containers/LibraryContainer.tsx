@@ -71,7 +71,7 @@ function mapDispatchToProps(dispatch)
     analyticsActions: bindActionCreators(AnalyticsActions, dispatch),
     libraryCategoryActions: bindActionCreators(LibraryActions.categories, dispatch),
     libraryGroupActions: bindActionCreators(LibraryActions.groups, dispatch),
-    libraryVariantActions: bindActionCreators(LibraryActions.variants, dispatch),
+    libraryAlgorithmActions: bindActionCreators(LibraryActions.algorithms, dispatch),
     libraryActions: bindActionCreators(
       _.pick(
         LibraryActions,

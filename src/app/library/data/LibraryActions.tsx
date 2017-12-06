@@ -58,7 +58,7 @@ import { _LibraryState, LibraryState, LibraryStore } from './LibraryStore';
 
 type Category = LibraryTypes.Category;
 type Group = LibraryTypes.Group;
-type Variant = LibraryTypes.Variant;
+type Algorithm = LibraryTypes.Algorithm;
 
 import Ajax from './../../util/Ajax';
 
@@ -163,7 +163,7 @@ const Actions =
       duplicate:
       (group: Group, index: number, name: string, db: BackendInstance, categoryId?: ID) => (dispatch) =>
       {
-        const { variantsOrder } = group;
+        const { algorithmsOrder } = group;
 
         categoryId = categoryId || group.categoryId;
         group = group
@@ -172,19 +172,19 @@ const Actions =
           .set('id', -1)
           .set('name', name)
           .set('db', db)
-          .set('variantsOrder', Immutable.List([]));
+          .set('algorithmsOrder', Immutable.List([]));
 
         dispatch(Actions.groups.create(
           group.categoryId,
           group,
           (groupId: ID) =>
           {
-            const variants = LibraryStore.getState().variants;
-            variantsOrder.map(
-              (variantId, index) =>
+            const algorithms = LibraryStore.getState().algorithms;
+            algorithmsOrder.map(
+              (algorithmId, index) =>
               {
-                const variant = variants.get(variantId);
-                setTimeout(() => dispatch(Actions.variants.duplicate(variant, index, null, categoryId, groupId, db)), index * 200);
+                const algorithm = algorithms.get(algorithmId);
+                setTimeout(() => dispatch(Actions.algorithms.duplicate(algorithm, index, null, categoryId, groupId, db)), index * 200);
               },
             );
           },
@@ -192,18 +192,18 @@ const Actions =
       },
     },
 
-    variants:
+    algorithms:
     {
       create:
       (
         categoryId: ID,
         groupId: ID,
-        variant = LibraryTypes._Variant(),
-        responseHandler?: (response, variant) => any,
+        algorithm = LibraryTypes._Algorithm(),
+        responseHandler?: (response, algorithm) => any,
       ) => (dispatch) =>
         {
           const group = LibraryStore.getState().groups.get(groupId);
-          variant = variant
+          algorithm = algorithm
             .set('parent', groupId)
             .set('groupId', groupId)
             .set('categoryId', categoryId)
@@ -211,42 +211,42 @@ const Actions =
             .set('language', group && group.language);
 
           Ajax.saveItem(
-            variant,
+            algorithm,
             (response) =>
             {
               // on load
               const id = response.id; // ??
-              dispatch($(ActionTypes.variants.create, {
-                variant: variant
+              dispatch($(ActionTypes.algorithms.create, {
+                algorithm: algorithm
                   .set('id', id)
-                  .set('deployedName', variant.deployedName || 'terrain_' + String(id)),
+                  .set('deployedName', algorithm.deployedName || 'terrain_' + String(id)),
               }));
-              responseHandler && responseHandler(response, variant);
+              responseHandler && responseHandler(response, algorithm);
             },
           );
         },
 
       change:
-      (variant: Variant) =>
-        $(ActionTypes.variants.change, { variant }),
+      (algorithm: Algorithm) =>
+        $(ActionTypes.algorithms.change, { algorithm }),
 
       move:
-      (variant: Variant, index: number, categoryId: ID, groupId: ID) => (dispatch) =>
+      (algorithm: Algorithm, index: number, categoryId: ID, groupId: ID) => (dispatch) =>
       {
         const group = LibraryStore.getState().groups.get(groupId);
-        variant = variant.set('db', group.db).set('language', group.language);
-        return dispatch($(ActionTypes.variants.move, { variant, index, categoryId, groupId }));
+        algorithm = algorithm.set('db', group.db).set('language', group.language);
+        return dispatch($(ActionTypes.algorithms.move, { algorithm, index, categoryId, groupId }));
       },
 
       duplicate:
-      (variant: Variant, index: number, name?: string, categoryId?: ID, groupId?: ID, db?: BackendInstance) => (dispatch) =>
+      (algorithm: Algorithm, index: number, name?: string, categoryId?: ID, groupId?: ID, db?: BackendInstance) => (dispatch) =>
       {
-        categoryId = categoryId || variant.categoryId;
-        groupId = groupId || variant.groupId;
+        categoryId = categoryId || algorithm.categoryId;
+        groupId = groupId || algorithm.groupId;
         const group = LibraryStore.getState().groups.get(groupId);
         db = db || group.db;
-        name = name || Util.duplicateNameFor(variant.name);
-        let newVariant = variant
+        name = name || Util.duplicateNameFor(algorithm.name);
+        let newAlgorithm = algorithm
           .set('id', -1)
           .set('parent', groupId)
           .set('groupId', groupId)
@@ -255,84 +255,84 @@ const Actions =
           .set('status', ItemStatus.Build)
           .set('db', db)
           .set('language', group.language);
-        newVariant = LibraryTypes.touchVariant(newVariant);
+        newAlgorithm = LibraryTypes.touchAlgorithm(newAlgorithm);
 
-        dispatch(Actions.variants.create(categoryId, groupId, newVariant));
+        dispatch(Actions.algorithms.create(categoryId, groupId, newAlgorithm));
       },
 
       duplicateAs:
-      (variant: Variant, index: number, variantName?: string, responseHandler?: (response, variant) => any) =>
+      (algorithm: Algorithm, index: number, algorithmName?: string, responseHandler?: (response, algorithm) => any) =>
         (dispatch) =>
         {
-          variantName = variantName || Util.duplicateNameFor(variant.name);
-          let newVariant = variant
+          algorithmName = algorithmName || Util.duplicateNameFor(algorithm.name);
+          let newAlgorithm = algorithm
             .set('id', -1)
-            .set('parent', variant.groupId)
-            .set('groupId', variant.groupId)
-            .set('categoryId', variant.categoryId)
-            .set('name', variantName)
+            .set('parent', algorithm.groupId)
+            .set('groupId', algorithm.groupId)
+            .set('categoryId', algorithm.categoryId)
+            .set('name', algorithmName)
             .set('status', ItemStatus.Build);
-          newVariant = LibraryTypes.touchVariant(newVariant);
+          newAlgorithm = LibraryTypes.touchAlgorithm(newAlgorithm);
 
-          dispatch(Actions.variants.create(variant.categoryId, variant.groupId, newVariant, responseHandler));
+          dispatch(Actions.algorithms.create(algorithm.categoryId, algorithm.groupId, newAlgorithm, responseHandler));
         },
 
       deploy:
-      (variant: Variant, op: string, templateBody: object, toStatus: ItemStatus, deployedName: string) => (dispatch) =>
+      (algorithm: Algorithm, op: string, templateBody: object, toStatus: ItemStatus, deployedName: string) => (dispatch) =>
       {
-        if (variant.deployedName !== deployedName)
+        if (algorithm.deployedName !== deployedName)
         {
-          variant = variant.set('deployedName', deployedName);
-          dispatch(Actions.variants.change(variant));
+          algorithm = algorithm.set('deployedName', deployedName);
+          dispatch(Actions.algorithms.change(algorithm));
         }
 
         Ajax.deployQuery(
           op,
           templateBody,
-          variant.db,
+          algorithm.db,
           (response) =>
           {
             // on load
-            dispatch(Actions.variants.status(variant, toStatus, true));
+            dispatch(Actions.algorithms.status(algorithm, toStatus, true));
           },
         );
       },
 
       status:
-      (variant: Variant, status: ItemStatus, confirmed?: boolean) =>
-        $(ActionTypes.variants.status, { variant, status, confirmed }),
+      (algorithm: Algorithm, status: ItemStatus, confirmed?: boolean) =>
+        $(ActionTypes.algorithms.status, { algorithm, status, confirmed }),
 
       fetchVersion:
-      (variantId: string, onNoVersion: (variantId: string) => void) =>
+      (algorithmId: string, onNoVersion: (algorithmId: string) => void) =>
       {
         // TODO
-        // Ajax.getVariantVersion(variantId, (variantVersion: LibraryTypes.Variant) =>
+        // Ajax.getAlgorithmVersion(algorithmId, (algorithmVersion: LibraryTypes.Algorithm) =>
         // {
-        //   if (!variantVersion)
+        //   if (!algorithmVersion)
         //   {
-        //     onNoVersion(variantId);
+        //     onNoVersion(algorithmId);
         //   }
         //   else
         //   {
-        //     Actions.variants.loadVersion(variantId, variantVersion);
+        //     Actions.algorithms.loadVersion(algorithmId, algorithmVersion);
         //   }
         // });
       },
 
       loadVersion:
-      (variantId: string, variantVersion: LibraryTypes.Variant) =>
-        $(ActionTypes.variants.loadVersion, { variantId, variantVersion }),
+      (algorithmId: string, algorithmVersion: LibraryTypes.Algorithm) =>
+        $(ActionTypes.algorithms.loadVersion, { algorithmId, algorithmVersion }),
 
       select:
-      (variantId: string) =>
-        $(ActionTypes.variants.select, { variantId }),
+      (algorithmId: string) =>
+        $(ActionTypes.algorithms.select, { algorithmId }),
 
       unselect:
-      (variantId: string) =>
-        $(ActionTypes.variants.unselect, { variantId }),
+      (algorithmId: string) =>
+        $(ActionTypes.algorithms.unselect, { algorithmId }),
 
       unselectAll:
-      () => $(ActionTypes.variants.unselectAll, {}),
+      () => $(ActionTypes.algorithms.unselectAll, {}),
     },
 
     loadState:
@@ -349,12 +349,12 @@ const Actions =
     {
       return (dispatch) =>
       {
-        Ajax.getItems((categories, groups, variants, categoriesOrder) =>
+        Ajax.getItems((categories, groups, algorithms, categoriesOrder) =>
         {
           dispatch(Actions.loadState(_LibraryState({
             categories,
             groups,
-            variants,
+            algorithms,
             categoriesOrder,
             loading: false,
           })));

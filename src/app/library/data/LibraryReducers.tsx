@@ -59,8 +59,8 @@ const removeItem = (state: LibraryState, id: ID, parentKeyPath: Array<string | I
       order.filter((value) => value !== id),
   );
 
-const removeVariant = (state: LibraryState, variant) =>
-  removeItem(state, variant.id, ['groups', variant.groupId], 'variants');
+const removeAlgorithm = (state: LibraryState, algorithm) =>
+  removeItem(state, algorithm.id, ['groups', algorithm.groupId], 'algorithms');
 const removeGroup = (state: LibraryState, group) =>
   removeItem(state, group.id, ['categories', group.categoryId], 'groups');
 const removeCategory = (state: LibraryState, category) =>
@@ -75,8 +75,8 @@ const addItem = (state: LibraryState, item, parentKeyPath: Array<string | ID>, t
 };
 
 // assumes the objec'ts `categoryId` and `groupId` keys are set
-const addVariant = (state: LibraryState, variant, index?: number) =>
-  addItem(state, variant, ['groups', variant.groupId], 'variants', index);
+const addAlgorithm = (state: LibraryState, algorithm, index?: number) =>
+  addItem(state, algorithm, ['groups', algorithm.groupId], 'algorithms', index);
 const addGroup = (state: LibraryState, group, index?: number) =>
   addItem(state, group, ['categories', group.categoryId], 'groups', index);
 const addCategory = (state: LibraryState, category, index?: number) =>
@@ -120,15 +120,15 @@ LibraryReducers[ActionTypes.groups.move] =
     const { group, categoryId } = action.payload;
     if (categoryId !== group.categoryId)
     {
-      state = state.update('variants',
-        (variants) => variants.map(
-          (variant: LibraryTypes.Variant) =>
+      state = state.update('algorithms',
+        (algorithms) => algorithms.map(
+          (algorithm: LibraryTypes.Algorithm) =>
           {
-            if (variant.groupId === group.id)
+            if (algorithm.groupId === group.id)
             {
-              return variant.set('categoryId', categoryId);
+              return algorithm.set('categoryId', categoryId);
             }
-            return variant;
+            return algorithm;
           },
         ),
       );
@@ -141,57 +141,57 @@ LibraryReducers[ActionTypes.groups.move] =
     );
   };
 
-LibraryReducers[ActionTypes.variants.create] =
+LibraryReducers[ActionTypes.algorithms.create] =
   (state, action: Action<{
-    variant: LibraryTypes.Variant,
+    algorithm: LibraryTypes.Algorithm,
   }>) =>
-    addVariant(
+    addAlgorithm(
       state,
-      action.payload.variant,
+      action.payload.algorithm,
     );
 
-LibraryReducers[ActionTypes.variants.change] =
+LibraryReducers[ActionTypes.algorithms.change] =
   (state, action) =>
   {
     return state.setIn(
-      ['variants', action.payload.variant.id],
-      action.payload.variant,
+      ['algorithms', action.payload.algorithm.id],
+      action.payload.algorithm,
     );
   };
 
-LibraryReducers[ActionTypes.variants.status] =
+LibraryReducers[ActionTypes.algorithms.status] =
   (state, action) =>
   {
-    const { variant, status, confirmed } = action.payload;
+    const { algorithm, status, confirmed } = action.payload;
 
-    if (variant === null)
+    if (algorithm === null)
     {
       return state.set('changingStatus', false);
     }
 
     if (
       !confirmed &&
-      (status === ItemStatus.Live || variant.status === ItemStatus.Live
-        || status === ItemStatus.Default || variant.status === ItemStatus.Default)
+      (status === ItemStatus.Live || algorithm.status === ItemStatus.Live
+        || status === ItemStatus.Default || algorithm.status === ItemStatus.Default)
     )
     {
       return state
         .set('changingStatus', true)
-        .set('changingStatusOf', variant)
+        .set('changingStatusOf', algorithm)
         .set('changingStatusTo', status)
         ;
     }
 
     if (status === 'DEFAULT')
     {
-      // remove any currently default variants
+      // remove any currently default algorithms
       state = state.updateIn(
-        ['variants'],
-        (variants) =>
-          variants.map(
-            (v: LibraryTypes.Variant) =>
+        ['algorithms'],
+        (algorithms) =>
+          algorithms.map(
+            (v: LibraryTypes.Algorithm) =>
             {
-              if (v.groupId === variant.groupId && v.status === 'DEFAULT')
+              if (v.groupId === algorithm.groupId && v.status === 'DEFAULT')
               {
                 return v.set('status', 'LIVE');
               }
@@ -203,17 +203,17 @@ LibraryReducers[ActionTypes.variants.status] =
 
     return state
       .updateIn(
-      ['variants', variant.id],
+      ['algorithms', algorithm.id],
       (v) => v.set('status', status),
     )
       .set('changingStatus', false);
   };
 
-LibraryReducers[ActionTypes.variants.move] =
+LibraryReducers[ActionTypes.algorithms.move] =
   (state, action) =>
-    addVariant(
-      removeVariant(state, action.payload.variant),
-      action.payload.variant
+    addAlgorithm(
+      removeAlgorithm(state, action.payload.algorithm),
+      action.payload.algorithm
         .set('categoryId', action.payload.categoryId)
         .set('groupId', action.payload.groupId)
         .set('parent', action.payload.groupId),
@@ -228,7 +228,7 @@ LibraryReducers[ActionTypes.loadState] =
       .set('loading', false)
       .set('prevCategories', action.payload.state.categories)
       .set('prevGroups', action.payload.state.groups)
-      .set('prevVariants', action.payload.state.variants)
+      .set('prevAlgorithms', action.payload.state.algorithms)
       ;
   };
 
@@ -237,36 +237,36 @@ LibraryReducers[ActionTypes.setDbs] =
     state.set('dbs', action.payload.dbs)
       .set('dbsLoaded', action.payload.dbLoadFinished);
 
-LibraryReducers[ActionTypes.variants.loadVersion] =
+LibraryReducers[ActionTypes.algorithms.loadVersion] =
   (
     state: LibraryState,
     action: Action<{
-      variantId: string,
-      variantVersion: LibraryTypes.Variant,
+      algorithmId: string,
+      algorithmVersion: LibraryTypes.Algorithm,
     }>,
   ) =>
-    state.setIn(['variants', action.payload.variantId], action.payload.variantVersion);
+    state.setIn(['algorithms', action.payload.algorithmId], action.payload.algorithmVersion);
 
-LibraryReducers[ActionTypes.variants.select] =
+LibraryReducers[ActionTypes.algorithms.select] =
   (
     state: LibraryState,
     action: Action<{
-      variantId: string,
+      algorithmId: string,
     }>,
   ) =>
   {
-    return state.set('selectedVariant', parseInt(action.payload.variantId, 10));
+    return state.set('selectedAlgorithm', parseInt(action.payload.algorithmId, 10));
   };
 
-LibraryReducers[ActionTypes.variants.unselect] =
+LibraryReducers[ActionTypes.algorithms.unselect] =
   (
     state: LibraryState,
     action: Action<{
-      variantId: string,
+      algorithmId: string,
     }>,
   ) =>
   {
-    return state.set('selectedVariant', null);
+    return state.set('selectedAlgorithm', null);
   };
 
 function saveStateOf(current: IMMap<ID, any>, previous: IMMap<ID, any>)
@@ -299,12 +299,12 @@ const LibraryReducersWrapper = (state: LibraryState = _LibraryState(), action) =
     // save the new state
     saveStateOf(nextState.categories, nextState.prevCategories);
     saveStateOf(nextState.groups, nextState.prevGroups);
-    saveStateOf(nextState.variants, nextState.prevVariants);
+    saveStateOf(nextState.algorithms, nextState.prevAlgorithms);
   }
   nextState = nextState
     .set('prevCategories', nextState.categories)
     .set('prevGroups', nextState.groups)
-    .set('prevVariants', nextState.variants);
+    .set('prevAlgorithms', nextState.algorithms);
 
   return nextState;
 };

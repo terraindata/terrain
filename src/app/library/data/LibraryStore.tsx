@@ -58,7 +58,7 @@ import Util from './../../util/Util';
 
 type Category = LibraryTypes.Category;
 type Group = LibraryTypes.Group;
-type Variant = LibraryTypes.Variant;
+type Algorithm = LibraryTypes.Algorithm;
 
 class LibraryStateC
 {
@@ -69,18 +69,18 @@ class LibraryStateC
 
   public categories: IMMap<ID, Category> = Immutable.Map({});
   public groups: IMMap<ID, Group> = null;
-  public variants: IMMap<ID, Variant> = null;
-  public selectedVariant: ID = null;
+  public algorithms: IMMap<ID, Algorithm> = null;
+  public selectedAlgorithm: ID = null;
 
   // these are set these on initial load
   public prevCategories: IMMap<ID, Category> = null;
   public prevGroups: IMMap<ID, Group> = null;
-  public prevVariants: IMMap<ID, Variant> = null;
+  public prevAlgorithms: IMMap<ID, Algorithm> = null;
 
   public categoriesOrder: List<ID> = Immutable.List([]);
 
   public changingStatus: boolean = false;
-  public changingStatusOf: LibraryTypes.Variant = null;
+  public changingStatusOf: LibraryTypes.Algorithm = null;
   public changingStatusTo: ItemStatus = 'BUILD';
 
   // Keep track of versioning

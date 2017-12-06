@@ -76,30 +76,30 @@ import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
 import StatusDropdown from './StatusDropdown';
 
-const VariantIcon = require('./../../../images/icon_variant_15x17.svg?name=VariantIcon');
+const AlgorithmIcon = require('./../../../images/icon_variant_15x17.svg?name=AlgorithmIcon');
 
-type Variant = LibraryTypes.Variant;
+type Algorithm = LibraryTypes.Algorithm;
 type Group = LibraryTypes.Group;
 
 export interface Props
 {
   basePath: string;
-  variants: Immutable.Map<ID, Variant>;
-  selectedVariant: ID;
-  variantsOrder: Immutable.List<ID>;
+  algorithms: Immutable.Map<ID, Algorithm>;
+  selectedAlgorithm: ID;
+  algorithmsOrder: Immutable.List<ID>;
   categoryId: ID;
   groupId: ID;
   groups: Immutable.Map<ID, Group>;
   canPinItems: boolean;
   params?: any;
-  variantActions?: any;
+  algorithmActions?: any;
   analytics: any;
   analyticsActions?: any;
   router?: any;
   referrer?: { label: string, path: string };
 }
 
-class VariantsColumn extends TerrainComponent<Props>
+class AlgorithmsColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,
@@ -109,10 +109,10 @@ class VariantsColumn extends TerrainComponent<Props>
     draggingItemIndex: number;
     draggingOverIndex: number;
 
-    duplicatingVariant: boolean;
-    duplicateVariantTextboxValue: string;
-    duplicateVariantGroupIndex: number;
-    duplicateVariantId: ID;
+    duplicatingAlgorithm: boolean;
+    duplicateAlgorithmTextboxValue: string;
+    duplicateAlgorithmGroupIndex: number;
+    duplicateAlgorithmId: ID;
   } = {
     rendered: false,
     lastMoved: null,
@@ -121,42 +121,42 @@ class VariantsColumn extends TerrainComponent<Props>
     draggingItemIndex: -1,
     draggingOverIndex: -1,
 
-    duplicatingVariant: false,
-    duplicateVariantTextboxValue: '',
-    duplicateVariantGroupIndex: 0,
-    duplicateVariantId: undefined,
+    duplicatingAlgorithm: false,
+    duplicateAlgorithmTextboxValue: '',
+    duplicateAlgorithmGroupIndex: 0,
+    duplicateAlgorithmId: undefined,
   };
 
   public componentWillMount()
   {
     const { canPinItems, router, analytics } = this.props;
     const { params, location } = router;
-    const variantIds = [];
+    const algorithmIds = [];
 
-    if (params && params.variantId !== null && params.variantId !== undefined)
+    if (params && params.algorithmId !== null && params.algorithmId !== undefined)
     {
-      this.props.variantActions.select(params.variantId);
-      variantIds.push(params.variantId);
+      this.props.algorithmActions.select(params.algorithmId);
+      algorithmIds.push(params.algorithmId);
     }
 
     if (canPinItems && location.query && location.query.pinned !== undefined)
     {
-      const pinnedVariantIds = location.query.pinned.split(',');
+      const pinnedAlgorithmIds = location.query.pinned.split(',');
 
-      pinnedVariantIds.forEach((id) =>
+      pinnedAlgorithmIds.forEach((id) =>
       {
         const numericId = parseInt(id, 10);
 
-        this.props.analyticsActions.pinVariant(numericId);
-        variantIds.push(numericId);
+        this.props.analyticsActions.pinAlgorithm(numericId);
+        algorithmIds.push(numericId);
       });
     }
 
-    if (variantIds.length > 0)
+    if (algorithmIds.length > 0)
     {
       this.props.analyticsActions.fetch(
         analytics.selectedAnalyticsConnection,
-        uniq(variantIds),
+        uniq(algorithmIds),
         analytics.selectedMetric,
         analytics.selectedInterval,
         analytics.selectedDateRange,
@@ -196,25 +196,25 @@ class VariantsColumn extends TerrainComponent<Props>
       });
     }
 
-    const { canPinItems, selectedVariant, basePath, analytics } = this.props;
+    const { canPinItems, selectedAlgorithm, basePath, analytics } = this.props;
     const { params, analytics: nextAnalytics } = nextProps;
     const { categoryId, groupId } = params;
-    const nextSelectedVariant = nextProps.selectedVariant;
-    const pinnedVariants = nextAnalytics
-      .pinnedVariants
-      .filter((pinnedVariant) => pinnedVariant)
+    const nextSelectedAlgorithm = nextProps.selectedAlgorithm;
+    const pinnedAlgorithms = nextAnalytics
+      .pinnedAlgorithms
+      .filter((pinnedAlgorithm) => pinnedAlgorithm)
       .keySeq()
       .toJS();
 
-    if (selectedVariant !== nextSelectedVariant ||
-      (canPinItems && analytics.pinnedVariants !== nextAnalytics.pinnedVariants)
+    if (selectedAlgorithm !== nextSelectedAlgorithm ||
+      (canPinItems && analytics.pinnedAlgorithms !== nextAnalytics.pinnedAlgorithms)
     )
     {
-      const pinnedParams = canPinItems && pinnedVariants.length > 0 ? `/?pinned=${pinnedVariants.join(',')}` : '';
-      if (nextSelectedVariant !== null && nextSelectedVariant !== undefined)
+      const pinnedParams = canPinItems && pinnedAlgorithms.length > 0 ? `/?pinned=${pinnedAlgorithms.join(',')}` : '';
+      if (nextSelectedAlgorithm !== null && nextSelectedAlgorithm !== undefined)
       {
         browserHistory
-          .replace(`/${basePath}/${categoryId}/${groupId}/${nextSelectedVariant}${pinnedParams}`);
+          .replace(`/${basePath}/${categoryId}/${groupId}/${nextSelectedAlgorithm}${pinnedParams}`);
       }
       else
       {
@@ -226,29 +226,29 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleDuplicateModalConfirm()
   {
-    const id = this.state.duplicateVariantId;
+    const id = this.state.duplicateAlgorithmId;
     const sorted = this.getSortedGroups();
     const groupIds = [];
     sorted.map((value) =>
     {
       groupIds.push(value.id);
     });
-    this.props.variantActions.duplicate(
-      this.props.variants.get(id),
-      this.props.variantsOrder.findIndex((iid) => iid === id),
-      this.state.duplicateVariantTextboxValue,
+    this.props.algorithmActions.duplicate(
+      this.props.algorithms.get(id),
+      this.props.algorithmsOrder.findIndex((iid) => iid === id),
+      this.state.duplicateAlgorithmTextboxValue,
       null,
-      groupIds[this.state.duplicateVariantGroupIndex],
+      groupIds[this.state.duplicateAlgorithmGroupIndex],
     );
     this.setState({
-      duplicatingVariant: false,
+      duplicatingAlgorithm: false,
     });
   }
 
   public handleDuplicateModalClose()
   {
     this.setState({
-      duplicatingVariant: false,
+      duplicatingAlgorithm: false,
     });
   }
 
@@ -268,53 +268,53 @@ class VariantsColumn extends TerrainComponent<Props>
       groupIds.push(value.id);
     });
     this.setState({
-      duplicatingVariant: true,
-      duplicateVariantId: id,
-      duplicateVariantGroupIndex: groupIds.indexOf(this.props.groupId),  // get index,
-      duplicateVariantTextboxValue: Util.duplicateNameFor(this.props.variants.get(id).name),
+      duplicatingAlgorithm: true,
+      duplicateAlgorithmId: id,
+      duplicateAlgorithmGroupIndex: groupIds.indexOf(this.props.groupId),  // get index,
+      duplicateAlgorithmTextboxValue: Util.duplicateNameFor(this.props.algorithms.get(id).name),
     });
   }
 
-  public handleVariantGroupIndexChange(index)
+  public handleAlgorithmGroupIndexChange(index)
   {
     this.setState({
-      duplicateVariantGroupIndex: index,
+      duplicateAlgorithmGroupIndex: index,
     });
   }
 
   public handleDuplicateTextboxChange(value)
   {
     this.setState({
-      duplicateVariantTextboxValue: value,
+      duplicateAlgorithmTextboxValue: value,
     });
   }
 
   public handleArchive(id: ID)
   {
-    this.props.variantActions.change(
-      this.props.variants.get(id)
-        .set('status', ItemStatus.Archive) as Variant,
+    this.props.algorithmActions.change(
+      this.props.algorithms.get(id)
+        .set('status', ItemStatus.Archive) as Algorithm,
     );
   }
 
   public handleUnarchive(id: ID)
   {
-    this.props.variantActions.change(
-      this.props.variants.get(id)
-        .set('status', ItemStatus.Build) as Variant,
+    this.props.algorithmActions.change(
+      this.props.algorithms.get(id)
+        .set('status', ItemStatus.Build) as Algorithm,
     );
   }
 
   public handleCreate()
   {
-    this.props.variantActions.create(this.props.categoryId, this.props.groupId);
+    this.props.algorithmActions.create(this.props.categoryId, this.props.groupId);
   }
 
   public handleNameChange(id: ID, name: string)
   {
-    if (this.props.variants.get(id).name !== name)
+    if (this.props.algorithms.get(id).name !== name)
     {
-      const oldName = this.props.variants.get(id).name;
+      const oldName = this.props.algorithms.get(id).name;
       let message = '"' + oldName + '" is now "' + name + '"';
       if (!oldName)
       {
@@ -329,16 +329,16 @@ class VariantsColumn extends TerrainComponent<Props>
       );
     }
 
-    this.props.variantActions.change(
-      this.props.variants.get(id)
-        .set('name', name) as Variant,
+    this.props.algorithmActions.change(
+      this.props.algorithms.get(id)
+        .set('name', name) as Algorithm,
     );
   }
 
   public handleHover(index: number, type: string, id: ID)
   {
-    const itemIndex = this.props.variantsOrder.findIndex((v) => v === id);
-    if (type === 'variant'
+    const itemIndex = this.props.algorithmsOrder.findIndex((v) => v === id);
+    if (type === 'algorithm'
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
       this.setState({
@@ -347,8 +347,8 @@ class VariantsColumn extends TerrainComponent<Props>
         draggingOverIndex: index,
       });
 
-      // var target = this.props.variants.get(this.props.variantsOrder.get(index));
-      // this.props.variantActions.move(this.props.variants.get(id).set('status', target.status) as Variant,
+      // var target = this.props.algorithms.get(this.props.algorithmsOrder.get(index));
+      // this.props.algorithmActions.move(this.props.algorithms.get(id).set('status', target.status) as Algorithm,
       //   index, this.props.categoryId, this.props.groupId);
     }
   }
@@ -364,7 +364,7 @@ class VariantsColumn extends TerrainComponent<Props>
         break;
       case 'group':
         const groupName = targetItem.name || 'Untitled';
-        const vrntName = this.props.variants.get(id).name || 'Untitled';
+        const vrntName = this.props.algorithms.get(id).name || 'Untitled';
         notificationManager.addNotification(
           'Moved',
           '"' + vrntName + '" was moved to group "' + groupName + '"',
@@ -373,17 +373,17 @@ class VariantsColumn extends TerrainComponent<Props>
         );
         if (shiftKey)
         {
-          this.props.variantActions.duplicate(this.props.variants.get(id), 0, targetItem.categoryId, targetItem.id);
+          this.props.algorithmActions.duplicate(this.props.algorithms.get(id), 0, targetItem.categoryId, targetItem.id);
         }
         else
         {
-          this.props.variantActions.move(this.props.variants.get(id), 0, targetItem.categoryId, targetItem.id);
+          this.props.algorithmActions.move(this.props.algorithms.get(id), 0, targetItem.categoryId, targetItem.id);
         }
         break;
-      case 'variant':
-        this.props.variantActions.move(
-          this.props.variants.get(id),
-          this.props.variantsOrder.indexOf(targetItem.id),
+      case 'algorithm':
+        this.props.algorithmActions.move(
+          this.props.algorithms.get(id),
+          this.props.algorithmsOrder.indexOf(targetItem.id),
           this.props.categoryId,
           this.props.groupId,
         );
@@ -403,19 +403,19 @@ class VariantsColumn extends TerrainComponent<Props>
   {
     const {
       canPinItems,
-      selectedVariant,
+      selectedAlgorithm,
       basePath,
       categoryId,
       groupId,
       analytics,
     } = this.props;
 
-    if (selectedVariant === id)
+    if (selectedAlgorithm === id)
     {
-      this.props.variantActions.unselect(id);
+      this.props.algorithmActions.unselect(id);
     } else
     {
-      this.props.variantActions.select(id);
+      this.props.algorithmActions.select(id);
       this.props.analyticsActions.fetch(
         analytics.selectedAnalyticsConnection,
         [id],
@@ -436,14 +436,14 @@ class VariantsColumn extends TerrainComponent<Props>
     }
   }
 
-  public handlePinVariant(variantId)
+  public handlePinAlgorithm(algorithmId)
   {
     const { analytics } = this.props;
 
-    this.props.analyticsActions.pinVariant(variantId);
+    this.props.analyticsActions.pinAlgorithm(algorithmId);
     this.props.analyticsActions.fetch(
       analytics.selectedAnalyticsConnection,
-      [variantId],
+      [algorithmId],
       analytics.selectedMetric,
       analytics.selectedInterval,
       analytics.selectedDateRange,
@@ -458,9 +458,9 @@ class VariantsColumn extends TerrainComponent<Props>
       <div className='new-group-modal-child'>
         <div className='database-dropdown-wrapper'>
           <Dropdown
-            selectedIndex={this.state.duplicateVariantGroupIndex}
+            selectedIndex={this.state.duplicateAlgorithmGroupIndex}
             options={groupNames.toList()}
-            onChange={this.handleVariantGroupIndexChange}
+            onChange={this.handleAlgorithmGroupIndexChange}
             canEdit={true}
             directionBias={90}
             className={'bic-db-dropdown'}
@@ -473,55 +473,55 @@ class VariantsColumn extends TerrainComponent<Props>
   public renderDuplicateModal()
   {
     return (<Modal
-      open={this.state.duplicatingVariant}
+      open={this.state.duplicatingAlgorithm}
       showTextbox={true}
       confirm={true}
       onClose={this.handleDuplicateModalClose}
       onConfirm={this.handleDuplicateModalConfirm}
       onTextboxValueChange={this.handleDuplicateTextboxChange}
-      textboxValue={this.state.duplicateVariantTextboxValue}
-      title='Duplicate Variant'
+      textboxValue={this.state.duplicateAlgorithmTextboxValue}
+      title='Duplicate Algorithm'
       confirmButtonText='Duplicate'
-      message='What would you like to name the duplicate variant?'
+      message='What would you like to name the duplicate algorithm?'
       textboxPlaceholderValue='Varaint Name'
       children={this.renderDuplicateDropdown()}
-      childrenMessage='Please select an group for the duplicate variant.'
+      childrenMessage='Please select an group for the duplicate algorithm.'
       allowOverflow={true}
       inputClassName='duplicate-group-modal-input'
     />);
   }
 
-  public renderVariant(id: ID, fadeIndex: number)
+  public renderAlgorithm(id: ID, fadeIndex: number)
   {
     const { canPinItems, params, basePath, analytics } = this.props;
-    const currentVariantId = params.variantId;
-    const variant = this.props.variants.get(id);
-    const index = this.props.variantsOrder.indexOf(id);
+    const currentAlgorithmId = params.algorithmId;
+    const algorithm = this.props.algorithms.get(id);
+    const index = this.props.algorithmsOrder.indexOf(id);
     const { me, roles } = this.state;
     let canEdit: boolean;
     let canDrag: boolean;
     canEdit = true;
     canDrag = true;
-    const isSelected = currentVariantId === variant.id.toString();
-    const isPinned = analytics.pinnedVariants.get(variant.id, false);
+    const isSelected = currentAlgorithmId === algorithm.id.toString();
+    const isPinned = analytics.pinnedAlgorithms.get(algorithm.id, false);
 
     // if (me && roles)
     // {
     //   canEdit = roles.getIn([this.props.categoryId, me.id, 'builder'])
     //     || roles.getIn([this.props.categoryId, me.id, 'admin']);
     //   canDrag = canEdit &&
-    //     (variant.status !== ItemStatus.Live ||
+    //     (algorithm.status !== ItemStatus.Live ||
     //       roles.getIn([this.props.categoryId, me.id, 'admin']));
     // }
 
     // let role = 'Viewer';
-    // if (roles && roles.getIn([this.props.categoryId, variant.lastUserId]))
+    // if (roles && roles.getIn([this.props.categoryId, algorithm.lastUserId]))
     // {
-    //   if (roles && roles.getIn([this.props.categoryId, variant.lastUserId]).admin)
+    //   if (roles && roles.getIn([this.props.categoryId, algorithm.lastUserId]).admin)
     //   {
     //     role = 'Admin';
     //   }
-    //   else if (roles && roles.getIn([this.props.categoryId, variant.lastUserId]).builder)
+    //   else if (roles && roles.getIn([this.props.categoryId, algorithm.lastUserId]).builder)
     //   {
     //     role = 'Builder';
     //   }
@@ -532,56 +532,56 @@ class VariantsColumn extends TerrainComponent<Props>
         fadeIndex={fadeIndex}
         draggingItemIndex={this.state.draggingItemIndex}
         draggingOverIndex={this.state.draggingOverIndex}
-        name={variant.name}
-        icon={<VariantIcon />}
+        name={algorithm.name}
+        icon={<AlgorithmIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
         onUnarchive={this.handleUnarchive}
-        canArchive={canDrag && variant.status !== ItemStatus.Archive}
+        canArchive={canDrag && algorithm.status !== ItemStatus.Archive}
         canDuplicate={canEdit}
-        canUnarchive={variant.status === ItemStatus.Archive}
-        canRename={variant.status !== ItemStatus.Live && variant.status !== ItemStatus.Default}
+        canUnarchive={algorithm.status === ItemStatus.Archive}
+        canRename={algorithm.status !== ItemStatus.Live && algorithm.status !== ItemStatus.Default}
         canPin={canPinItems}
         isPinned={isPinned}
-        onPin={this.handlePinVariant}
-        key={variant.id}
+        onPin={this.handlePinAlgorithm}
+        key={algorithm.id}
         to={`/${basePath}/${this.props.categoryId}/${this.props.groupId}/${id}`}
         className='library-item-lightest'
         id={id}
-        type='variant'
+        type='algorithm'
         onNameChange={this.handleNameChange}
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         onDragFinish={this.handleDragFinish}
-        item={variant}
+        item={algorithm}
         onDoubleClick={this.handleDoubleClick}
         canEdit={canDrag}
         canDrag={canDrag}
         canCreate={canDrag}
-        isStarred={variant.status === 'DEFAULT'}
+        isStarred={algorithm.status === 'DEFAULT'}
         onSelect={this.handleItemSelect}
         isSelected={isSelected}
         isFocused={true}
       >
         <div className='flex-container'>
           <UserThumbnail
-            userId={variant.lastUserId}
+            userId={algorithm.lastUserId}
             medium={true}
           />
 
           <div className='flex-grow'>
             <StatusDropdown
-              variant={variant}
+              algorithm={algorithm}
               noBorder={true}
-              variantActions={this.props.variantActions}
+              algorithmActions={this.props.algorithmActions}
             />
             <div
               className='library-item-line'
               style={fontColor(Colors().text1)}
             >
               {
-                'Changed ' + Util.formatDate(variant.lastEdited)
+                'Changed ' + Util.formatDate(algorithm.lastEdited)
               }
             </div>
           </div>
@@ -597,35 +597,35 @@ class VariantsColumn extends TerrainComponent<Props>
 
   public handleItemDrop(toStatus: string, id: ID)
   {
-    const v = this.props.variants.get(id);
+    const v = this.props.algorithms.get(id);
     if (v.status === ItemStatus.Archive && toStatus === ItemStatus.Build)
     {
-      this.props.variantActions.change(v.set('status', ItemStatus.Build) as Variant);
+      this.props.algorithmActions.change(v.set('status', ItemStatus.Build) as Algorithm);
       return;
     }
     else if (v.status === ItemStatus.Build && toStatus === ItemStatus.Archive)
     {
-      this.props.variantActions.change(v.set('status', ItemStatus.Archive) as Variant);
+      this.props.algorithmActions.change(v.set('status', ItemStatus.Archive) as Algorithm);
       return;
     }
     else if (toStatus === ItemStatus.Archive && (v.status === ItemStatus.Live || v.status === ItemStatus.Default))
     {
-      this.props.variantActions.status(v, ItemStatus.Archive, false);
+      this.props.algorithmActions.status(v, ItemStatus.Archive, false);
       return;
     }
   }
 
   public hasStatus(id: ID, status: ItemStatus)
   {
-    return this.props.variants.getIn([id, 'status']) === status;
+    return this.props.algorithms.getIn([id, 'status']) === status;
   }
 
-  public renderVariants(archived?: boolean)
+  public renderAlgorithms(archived?: boolean)
   {
     const { me, roles } = this.state;
     const canMakeLive = me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
     const canCreate = true; // canMakeLive;
-    // TODO maybe on the new middle tier, builders can create variants
+    // TODO maybe on the new middle tier, builders can create algorithms
     //  || (
     //   me && roles && roles.getIn([this.props.categoryId, me.id, 'builder'])
     // );
@@ -636,20 +636,20 @@ class VariantsColumn extends TerrainComponent<Props>
       <LibraryItemCategory
         status={archived ? ItemStatus.Archive : ItemStatus.Build}
         key={archived ? '1' : '0'}
-        type='variant'
+        type='algorithm'
         onHover={this.handleItemStatusHover}
         onDrop={this.handleItemDrop}
         titleHidden={!archived}
       >
         {
-          this.props.variantsOrder.map((id, index) =>
-            this.props.variants.get(id) &&
+          this.props.algorithmsOrder.map((id, index) =>
+            this.props.algorithms.get(id) &&
             (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
-            && this.renderVariant(id, fadeIndex++),
+            && this.renderAlgorithm(id, fadeIndex++),
           )
         }
         {
-          this.props.variantsOrder.some((id) => archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
+          this.props.algorithmsOrder.some((id) => archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
             ? null
             : <div className='library-category-none'>None</div>
         }
@@ -658,7 +658,7 @@ class VariantsColumn extends TerrainComponent<Props>
           tooltip(
             <CreateLine onClick={this.handleCreate} open={false} />,
             {
-              title: 'Create a New Variant',
+              title: 'Create a New Algorithm',
               position: 'top',
             },
           )
@@ -674,27 +674,27 @@ class VariantsColumn extends TerrainComponent<Props>
     return (
       <LibraryColumn
         index={3}
-        title='Variants'
+        title='Algorithms'
         referrer={referrer}
       >
         {this.renderDuplicateModal()}
         {
-          this.props.variantsOrder ?
+          this.props.algorithmsOrder ?
             (
-              this.props.variantsOrder.size ?
+              this.props.algorithmsOrder.size ?
                 (
                   <div>
-                    {this.renderVariants()}
-                    {this.renderVariants(true)}
+                    {this.renderAlgorithms()}
+                    {this.renderAlgorithms(true)}
                   </div>
                 )
                 :
                 <InfoArea
-                  large='No variants created, yet.'
+                  large='No algorithms created, yet.'
                   button={
                     Util.haveRole(this.props.categoryId, 'builder', UserStore, RolesStore) ||
                       Util.haveRole(this.props.categoryId, 'admin', UserStore, RolesStore)
-                      ? 'Create a variant' : null
+                      ? 'Create a algorithm' : null
                   }
                   onClick={this.handleCreate}
                 />
@@ -706,4 +706,4 @@ class VariantsColumn extends TerrainComponent<Props>
   }
 }
 
-export default VariantsColumn;
+export default AlgorithmsColumn;

@@ -59,31 +59,31 @@ import CheckBox from './../../common/components/CheckBox';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 const CategoryIcon = require('./../../../images/icon_badgeGroup.svg');
-const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
-const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
+const GroupIcon = require('./../../../images/icon_badgeAlgorithm.svg');
+const AlgorithmIcon = require('./../../../images/icon_badgeVariant.svg');
 
 const TEXT =
   {
     live:
     {
-      main: 'You are deploying the following variant to Live. The variant query will be pushed to the database servers.',
-      confirm: 'I approve of deploying this query to Live for this variant.',
+      main: 'You are deploying the following algorithm to Live. The algorithm query will be pushed to the database servers.',
+      confirm: 'I approve of deploying this query to Live for this algorithm.',
       button: 'Deploy to Live',
       cancelButton: 'Cancel and Do Not Deploy',
     },
 
     default:
     {
-      main: 'You are deploying the following variant to Live. The variant query will be pushed to the database servers.',
-      confirm: 'I approve of deploying this query to Live for this variant, and making it the Default for this group.',
+      main: 'You are deploying the following algorithm to Live. The algorithm query will be pushed to the database servers.',
+      confirm: 'I approve of deploying this query to Live for this algorithm, and making it the Default for this group.',
       button: 'Deploy to Live and Make Default',
       cancelButton: 'Cancel and Do Not Deploy',
     },
 
     notLive:
     {
-      main: 'You are removing the following variant from Live. The variant query will be removed from the database servers.',
-      confirm: 'I approve of removing this query from Live for this variant.',
+      main: 'You are removing the following algorithm from Live. The algorithm query will be removed from the database servers.',
+      confirm: 'I approve of removing this query from Live for this algorithm.',
       button: 'Remove from Live',
       cancelButton: 'Cancel and Do Not Remove',
     },
@@ -91,11 +91,11 @@ const TEXT =
 
 export interface Props
 {
-  variant: LibraryTypes.Variant;
+  algorithm: LibraryTypes.Algorithm;
   status: ItemStatus;
   defaultChecked: boolean;
   deployedName: string;
-  defaultVariant: LibraryTypes.Variant;
+  defaultAlgorithm: LibraryTypes.Algorithm;
   onDefaultCheckedChange(defaultChecked: boolean);
   onDeployedNameChange(deployedName: string);
   onDeploy();
@@ -121,14 +121,14 @@ class DeployModalColumn extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (nextProps.variant !== this.props.variant ||
+    if (nextProps.algorithm !== this.props.algorithm ||
       nextProps.status !== this.props.status ||
       nextProps.deployedName !== this.props.deployedName)
     {
       let nextDeployedName: string = nextProps.deployedName;
-      if (nextProps.variant.deployedName !== this.props.variant.deployedName)
+      if (nextProps.algorithm.deployedName !== this.props.algorithm.deployedName)
       {
-        nextDeployedName = nextProps.variant.deployedName;
+        nextDeployedName = nextProps.algorithm.deployedName;
       }
 
       this.setState({
@@ -176,10 +176,10 @@ class DeployModalColumn extends TerrainComponent<Props>
 
   public render()
   {
-    const { variant, status } = this.props;
+    const { algorithm, status } = this.props;
     const state = LibraryStore.getState();
-    const category = state.getIn(['categories', variant.categoryId]) as LibraryTypes.Category;
-    const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
+    const category = state.getIn(['categories', algorithm.categoryId]) as LibraryTypes.Category;
+    const group = state.getIn(['groups', algorithm.groupId]) as LibraryTypes.Group;
 
     // let title = 'Deploy "' + name + '" to Live';
     // if(changingStatusTo !== ItemStatus.Live)
@@ -224,19 +224,19 @@ class DeployModalColumn extends TerrainComponent<Props>
             </div>
           </div>
           <div className='deploy-modal-info-row'>
-            <VariantIcon
+            <AlgorithmIcon
               className='deploy-modal-info-icon'
             />
             <div className='deploy-modal-info-name'>
               {
-                variant.name
+                algorithm.name
               }
             </div>
           </div>
           <div className='deploy-modal-info-row-lower'>
             <span className='deploy-modal-info-bold'>
               <UserThumbnail
-                userId={variant.lastUserId}
+                userId={algorithm.lastUserId}
                 showName={true}
               />
             </span>
@@ -247,7 +247,7 @@ class DeployModalColumn extends TerrainComponent<Props>
             </span>
             <span className='deploy-modal-info-bold'>
               {
-                Util.formatDate(variant.lastEdited)
+                Util.formatDate(algorithm.lastEdited)
               }
             </span>
           </div>
@@ -262,7 +262,7 @@ class DeployModalColumn extends TerrainComponent<Props>
               className='deploy-modal-info-bold'
             >
               {
-                variant.status
+                algorithm.status
               }
             </span>
           </div>
@@ -305,17 +305,17 @@ class DeployModalColumn extends TerrainComponent<Props>
               <div
                 className='info'
               >
-                <b>{variant.name}</b> will be served for any requests to group <b>{group.name}.</b> &nbsp;
+                <b>{algorithm.name}</b> will be served for any requests to group <b>{group.name}.</b> &nbsp;
                     {
-                  this.props.defaultVariant
+                  this.props.defaultAlgorithm
                     ?
                     <span>
-                      This will replace the current default variant <b>{this.props.defaultVariant.name}</b>,
+                      This will replace the current default algorithm <b>{this.props.defaultAlgorithm.name}</b>,
                           which will remain Live.
                         </span>
                     :
                     <span>
-                      There is not currently a default variant for group <b>{group.name}</b>.
+                      There is not currently a default algorithm for group <b>{group.name}</b>.
                         </span>
                 }
               </div>
@@ -326,8 +326,8 @@ class DeployModalColumn extends TerrainComponent<Props>
           className='deploy-modal-info deploy-modal-info-status'>
           <div className='deploy-modal-info-row-lower deploy-modal-info-status-row'>
             <span>
-              <label htmlFor='deploy-modal-variant-name'>
-                Deployed variant name:
+              <label htmlFor='deploy-modal-algorithm-name'>
+                Deployed algorithm name:
             </label>
               <input type='text' value={this.props.deployedName} onChange={this.handleDeployedNameChange} />
             </span>

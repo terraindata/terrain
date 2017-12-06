@@ -46,22 +46,22 @@ THE SOFTWARE.
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import VariantsColumn from 'library/components/VariantsColumn';
+import AlgorithmsColumn from 'library/components/AlgorithmsColumn';
 import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import configureStore from 'redux-mock-store';
 
-describe('VariantsColumn', () =>
+describe('AlgorithmsColumn', () =>
 {
   const categoryId = 1;
   const groupId = 2;
-  const variantId = 3;
+  const algorithmId = 3;
   let library = _LibraryState({
     categories: Immutable.Map<number, LibraryTypes.Category>({}),
     groups: Immutable.Map<number, LibraryTypes.Category>({}),
-    variants: Immutable.Map<number, LibraryTypes.Variant>({}),
+    algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({}),
   });
 
   library = library
@@ -73,9 +73,9 @@ describe('VariantsColumn', () =>
       id: groupId,
       name: 'Group 1',
     }))
-    .setIn(['variants', variantId], LibraryTypes._Variant({
-      id: variantId,
-      name: 'Variant 1',
+    .setIn(['algorithms', algorithmId], LibraryTypes._Algorithm({
+      id: algorithmId,
+      name: 'Algorithm 1',
     }));
 
   const analytics: AnalyticsState = _AnalyticsState({
@@ -89,21 +89,21 @@ describe('VariantsColumn', () =>
     fetch: () => { return; },
   };
 
-  const selectedVariant = 3;
+  const selectedAlgorithm = 3;
 
-  let variantsColumnComponent = null;
+  let algorithmsColumnComponent = null;
 
   beforeEach(() =>
   {
-    variantsColumnComponent = shallow(
-      <VariantsColumn
+    algorithmsColumnComponent = shallow(
+      <AlgorithmsColumn
         basePath={'/library'}
-        variants={library.variants}
-        variantsOrder={library.groups.get(groupId).variantsOrder}
+        algorithms={library.algorithms}
+        algorithmsOrder={library.groups.get(groupId).algorithmsOrder}
         categoryId={categoryId}
         groupId={groupId}
         groups={library.groups}
-        selectedVariant={selectedVariant}
+        selectedAlgorithm={selectedAlgorithm}
         analytics={analytics}
         analyticsActions={analyticsActions}
         canPinItems={false}
@@ -119,10 +119,10 @@ describe('VariantsColumn', () =>
       it('should redirect to the builder', () =>
       {
         browserHistory.push = jest.fn();
-        variantsColumnComponent.instance().handleDoubleClick(variantId);
+        algorithmsColumnComponent.instance().handleDoubleClick(algorithmId);
 
         expect(browserHistory.push).toHaveBeenCalledTimes(1);
-        expect(browserHistory.push).toHaveBeenCalledWith(`/builder/?o=${variantId}`);
+        expect(browserHistory.push).toHaveBeenCalledWith(`/builder/?o=${algorithmId}`);
       });
     });
 
@@ -130,15 +130,15 @@ describe('VariantsColumn', () =>
     {
       it('should NOT redirect to the builder', () =>
       {
-        variantsColumnComponent = shallow(
-          <VariantsColumn
+        algorithmsColumnComponent = shallow(
+          <AlgorithmsColumn
             basePath={'/library'}
-            variants={library.variants}
-            variantsOrder={library.groups.get(groupId).variantsOrder}
+            algorithms={library.algorithms}
+            algorithmsOrder={library.groups.get(groupId).algorithmsOrder}
             categoryId={categoryId}
             groupId={groupId}
             groups={library.groups}
-            selectedVariant={selectedVariant}
+            selectedAlgorithm={selectedAlgorithm}
             analytics={analytics}
             analyticsActions={analyticsActions}
             canPinItems={true}
@@ -147,7 +147,7 @@ describe('VariantsColumn', () =>
         );
 
         browserHistory.push = jest.fn();
-        variantsColumnComponent.instance().handleDoubleClick(variantId);
+        algorithmsColumnComponent.instance().handleDoubleClick(algorithmId);
 
         expect(browserHistory.push).not.toHaveBeenCalled();
       });

@@ -63,7 +63,7 @@ export let LibraryActionTypes =
       create, change, move,
     },
 
-    variants:
+    algorithms:
     {
       create, change, move,
       status: '',
@@ -84,11 +84,11 @@ export const CleanLibraryActionTypes = // not dirty
   [
     LibraryActionTypes.loadState,
     LibraryActionTypes.setDbs,
-    LibraryActionTypes.variants.fetchVersion,
-    LibraryActionTypes.variants.loadVersion,
-    LibraryActionTypes.variants.select,
-    LibraryActionTypes.variants.unselect,
-    LibraryActionTypes.variants.unselectAll,
+    LibraryActionTypes.algorithms.fetchVersion,
+    LibraryActionTypes.algorithms.loadVersion,
+    LibraryActionTypes.algorithms.select,
+    LibraryActionTypes.algorithms.unselect,
+    LibraryActionTypes.algorithms.unselectAll,
   ];
 
 export default LibraryActionTypes;

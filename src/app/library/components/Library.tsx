@@ -56,11 +56,11 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
 import { LibraryState } from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
+import AlgorithmsColumn from './AlgorithmsColumn';
 import CategoriesColumn from './CategoriesColumn';
 import GroupsColumn from './GroupsColumn';
 import './Library.less';
 import LibraryInfoColumn from './LibraryInfoColumn';
-import VariantsColumn from './VariantsColumn';
 
 export interface Props
 {
@@ -68,7 +68,7 @@ export interface Props
   location?: any;
   router?: any;
   route?: any;
-  canPinVariants?: boolean;
+  canPinAlgorithms?: boolean;
   basePath: string;
   singleColumn?: boolean;
 }
@@ -78,14 +78,14 @@ class Library extends TerrainComponent<any>
   // Give names to each of the library columns
   public static CATEGORIES__COLUMN = 'categories';
   public static GROUPS_COLUMN = 'groups';
-  public static VARIANTS_COLUMN = 'variants';
+  public static ALGORITHMS_COLUMN = 'algorithms';
 
   public static defaultProps: Partial<Props> = {
     params: {},
     location: {},
     router: {},
     route: {},
-    canPinVariants: false,
+    canPinAlgorithms: false,
     singleColumn: false,
   };
 
@@ -147,7 +147,7 @@ class Library extends TerrainComponent<any>
       selectedMetric,
       selectedInterval,
       selectedDateRange,
-      pinnedVariants,
+      pinnedAlgorithms,
     } = analytics;
 
     const {
@@ -155,14 +155,14 @@ class Library extends TerrainComponent<any>
       selectedMetric: nextSelectedMetric,
       selectedInterval: nextSelectedInterval,
       selectedDateRange: nextSelectedDateRange,
-      pinnedVariants: nextPinnedVariants,
+      pinnedAlgorithms: nextPinnedAlgorithms,
     } = nextAnalytics;
 
     const analyticsFilterChanged = (selectedMetric !== nextSelectedMetric) ||
       (selectedAnalyticsConnection !== nextSelectedAnalyticsConnection) ||
       (selectedInterval !== nextSelectedInterval) ||
       (selectedDateRange !== nextSelectedDateRange) ||
-      (pinnedVariants !== nextPinnedVariants);
+      (pinnedAlgorithms !== nextPinnedAlgorithms);
 
     if (analyticsFilterChanged)
     {
@@ -170,14 +170,14 @@ class Library extends TerrainComponent<any>
     }
   }
 
-  public getData(variantId: ID)
+  public getData(algorithmId: ID)
   {
     const { analytics } = this.props;
 
-    // Remove when analytics mock up have valid variant ids.
+    // Remove when analytics mock up have valid algorithm ids.
     let data = [];
 
-    const analyticsData = analytics.data.get(variantId);
+    const analyticsData = analytics.data.get(algorithmId);
     if (analyticsData !== undefined)
     {
       data = analyticsData;
@@ -189,21 +189,21 @@ class Library extends TerrainComponent<any>
   public getDatasets()
   {
     const { library: libraryState, analytics } = this.props;
-    const { variants, selectedVariant } = libraryState;
+    const { algorithms, selectedAlgorithm } = libraryState;
 
-    const datasets = variants
-      .filter((variant) =>
+    const datasets = algorithms
+      .filter((algorithm) =>
       {
-        return selectedVariant === variant.id ||
-          analytics.pinnedVariants.get(variant.id, false);
+        return selectedAlgorithm === algorithm.id ||
+          analytics.pinnedAlgorithms.get(algorithm.id, false);
       })
-      .map((variant) =>
+      .map((algorithm) =>
       {
         return {
-          id: variant.id,
-          label: variant.name,
-          data: this.getData(variant.deployedName),
-          isPinned: analytics.pinnedVariants.get(variant.id, false),
+          id: algorithm.id,
+          label: algorithm.name,
+          data: this.getData(algorithm.deployedName),
+          isPinned: analytics.pinnedAlgorithms.get(algorithm.id, false),
         };
       });
 
@@ -230,20 +230,20 @@ class Library extends TerrainComponent<any>
   public fetchAnalytics(props)
   {
     const { analytics, library } = props;
-    const { selectedVariant } = library;
-    const { pinnedVariants } = analytics;
+    const { selectedAlgorithm } = library;
+    const { pinnedAlgorithms } = analytics;
 
-    const variantIds = pinnedVariants.keySeq().toJS();
-    if (selectedVariant !== null && selectedVariant !== undefined)
+    const algorithmIds = pinnedAlgorithms.keySeq().toJS();
+    if (selectedAlgorithm !== null && selectedAlgorithm !== undefined)
     {
-      variantIds.push(selectedVariant);
+      algorithmIds.push(selectedAlgorithm);
     }
 
-    if (variantIds.length > 0)
+    if (algorithmIds.length > 0)
     {
       this.props.analyticsActions.fetch(
         analytics.selectedAnalyticsConnection,
-        variantIds,
+        algorithmIds,
         analytics.selectedMetric,
         analytics.selectedInterval,
         analytics.selectedDateRange,
@@ -293,29 +293,29 @@ class Library extends TerrainComponent<any>
 
   public handleLegendClick(datasetId)
   {
-    this.props.analyticsActions.pinVariant(datasetId);
+    this.props.analyticsActions.pinAlgorithm(datasetId);
   }
 
   public isColumnVisible(columnName)
   {
     const { singleColumn, router } = this.props;
     const params = router !== undefined && router.params !== undefined ? router.params : {};
-    const { categoryId, groupId, variantId } = params;
+    const { categoryId, groupId, algorithmId } = params;
 
     return !singleColumn ||
       (categoryId === undefined &&
         groupId === undefined &&
-        variantId === undefined &&
+        algorithmId === undefined &&
         columnName === Library.CATEGORIES__COLUMN
       ) ||
       (categoryId !== undefined &&
         groupId === undefined &&
-        variantId === undefined &&
+        algorithmId === undefined &&
         columnName === Library.GROUPS_COLUMN
       ) ||
       (categoryId !== undefined &&
         groupId !== undefined &&
-        columnName === Library.VARIANTS_COLUMN
+        columnName === Library.ALGORITHMS_COLUMN
       );
   }
 
@@ -327,7 +327,7 @@ class Library extends TerrainComponent<any>
       schema,
       router,
       basePath,
-      canPinVariants,
+      canPinAlgorithms,
       singleColumn,
     } = this.props;
 
@@ -335,8 +335,8 @@ class Library extends TerrainComponent<any>
       dbs,
       categories,
       groups,
-      variants,
-      selectedVariant,
+      algorithms,
+      selectedAlgorithm,
       categoriesOrder,
     } = libraryState;
 
@@ -345,23 +345,23 @@ class Library extends TerrainComponent<any>
       selectedInterval,
       selectedDateRange,
       selectedDateRangeDomain,
-      pinnedVariants,
+      pinnedAlgorithms,
     } = analytics;
 
-    const hasPinnedVariants = pinnedVariants.valueSeq().includes(true);
+    const hasPinnedAlgorithms = pinnedAlgorithms.valueSeq().includes(true);
     const { params } = router;
 
     const datasets = this.getDatasets();
 
     const categoryId = params.categoryId ? +params.categoryId : null;
     const groupId = params.groupId ? +params.groupId : null;
-    const variantIds = params.variantId ? params.variantId.split(',') : null;
+    const algorithmIds = params.algorithmId ? params.algorithmId.split(',') : null;
 
     let category: LibraryTypes.Category;
     let group: LibraryTypes.Group;
-    let variant: LibraryTypes.Variant;
+    let algorithm: LibraryTypes.Algorithm;
     let groupsOrder: List<ID>;
-    let variantsOrder: List<ID>;
+    let algorithmsOrder: List<ID>;
 
     if (categoryId !== null)
     {
@@ -375,16 +375,16 @@ class Library extends TerrainComponent<any>
           group = groups.get(groupId);
           if (group !== undefined)
           {
-            variantsOrder = group.variantsOrder;
+            algorithmsOrder = group.algorithmsOrder;
 
-            if (variantIds !== null)
+            if (algorithmIds !== null)
             {
-              if (variantIds.length === 0)
+              if (algorithmIds.length === 0)
               {
                 browserHistory.replace(`/${basePath}/${categoryId}/${groupId}`);
-              } else if (variantIds.length === 1)
+              } else if (algorithmIds.length === 1)
               {
-                variant = variants.get(+variantIds[0]);
+                algorithm = algorithms.get(+algorithmIds[0]);
               }
             }
           } else
@@ -412,7 +412,7 @@ class Library extends TerrainComponent<any>
         path: `/${basePath}`,
       } : null;
 
-    const variantsReferrer = singleColumn && group !== undefined ?
+    const algorithmsReferrer = singleColumn && group !== undefined ?
       {
         label: group.name,
         path: `/${basePath}/${categoryId}`,
@@ -434,7 +434,7 @@ class Library extends TerrainComponent<any>
                 params,
                 basePath,
                 categoryActions: this.props.libraryCategoryActions,
-                variants,
+                algorithms,
               }}
               isFocused={group === undefined}
             /> : null
@@ -445,7 +445,7 @@ class Library extends TerrainComponent<any>
                 dbs,
                 categories,
                 groups,
-                variants,
+                algorithms,
                 groupsOrder,
                 categoryId,
                 params,
@@ -453,45 +453,45 @@ class Library extends TerrainComponent<any>
                 groupActions: this.props.libraryGroupActions,
                 referrer: groupsReferrer,
               }}
-              isFocused={variantIds === null}
+              isFocused={algorithmIds === null}
             /> : null
           }
-          {this.isColumnVisible(Library.VARIANTS_COLUMN) ?
-            <VariantsColumn
+          {this.isColumnVisible(Library.ALGORITHMS_COLUMN) ?
+            <AlgorithmsColumn
               {...{
-                variants,
-                selectedVariant,
-                variantsOrder,
+                algorithms,
+                selectedAlgorithm,
+                algorithmsOrder,
                 categoryId,
                 groupId,
                 params,
-                canPinItems: canPinVariants,
+                canPinItems: canPinAlgorithms,
                 basePath,
                 router,
-                variantActions: this.props.libraryVariantActions,
+                algorithmActions: this.props.libraryAlgorithmActions,
                 analytics,
                 analyticsActions: this.props.analyticsActions,
                 groups,
-                referrer: variantsReferrer,
+                referrer: algorithmsReferrer,
               }}
             /> : null
           }
-          {!canPinVariants ?
+          {!canPinAlgorithms ?
             <LibraryInfoColumn
               {...{
                 dbs,
                 category,
                 group,
-                variant,
+                algorithm,
                 categoryActions: this.props.libraryCategoryActions,
                 groupActions: this.props.libraryGroupActions,
-                variantActions: this.props.libraryVariantActions,
+                algorithmActions: this.props.libraryAlgorithmActions,
                 libraryActions: this.props.libraryActions,
                 roleActions: this.props.roleActions,
               }}
             /> : null}
         </div>
-        {canPinVariants && (selectedVariant !== null || hasPinnedVariants) ?
+        {canPinAlgorithms && (selectedAlgorithm !== null || hasPinnedAlgorithms) ?
           <div className='library-bottom'>
             <div className='library-analytics-chart-wrapper'>
               {analytics.loaded ?

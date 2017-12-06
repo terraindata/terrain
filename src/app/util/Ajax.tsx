@@ -364,7 +364,7 @@ export const Ajax =
     // TODO TODO TODO
     getItems(onLoad: (categories: IMMap<number, LibraryTypes.Category>,
       groups: IMMap<number, LibraryTypes.Group>,
-      variants: IMMap<number, LibraryTypes.Variant>,
+      algorithms: IMMap<number, LibraryTypes.Algorithm>,
       categoriesOrder: IMList<number, any>) => void,
       onError?: (ev: Event) => void)
     {
@@ -376,7 +376,7 @@ export const Ajax =
         {
           const mapping =
             {
-              VARIANT: Immutable.Map<number, LibraryTypes.Variant>({}) as any,
+              ALGORITHM: Immutable.Map<number, LibraryTypes.Algorithm>({}) as any,
               GROUP: Immutable.Map<number, LibraryTypes.Group>({}),
               CATEGORY: Immutable.Map<number, LibraryTypes.Category>({}),
               QUERY: Immutable.Map<number, Query>({}),
@@ -394,6 +394,10 @@ export const Ajax =
               {
                 itemObj['type'] = 'GROUP';
               }
+              if (itemObj['type'] === 'VARIANT' && (!metaObj['modelVersion'] || metaObj['modelVersion'] < 3))
+              {
+                itemObj['type'] = 'ALGORITHM';
+              }
               const item = LibraryTypes.typeToConstructor[itemObj['type']](
                 responseToRecordConfig(itemObj),
               );
@@ -408,7 +412,7 @@ export const Ajax =
           mapping.GROUP = mapping.GROUP.map(
             (cat) => cat.set('categoryId', cat.parent),
           ).toMap();
-          mapping.VARIANT = mapping.VARIANT.map(
+          mapping.ALGORITHM = mapping.ALGORITHM.map(
             (v) =>
             {
               v = v.set('groupId', v.parent);
@@ -424,14 +428,14 @@ export const Ajax =
           onLoad(
             mapping.CATEGORY,
             mapping.GROUP,
-            mapping.VARIANT,
+            mapping.ALGORITHM,
             Immutable.List(categoriesOrder),
           );
         },
         {
           onError,
           urlArgs: {
-            type: 'CATEGORY,ALGORITHM,VARIANT,GROUP',
+            type: 'CATEGORY,ALGORITHM,VARIANT,GROUP', // Still have variant to retrieve old items
           },
         },
       );
@@ -463,15 +467,15 @@ export const Ajax =
         });
     },
 
-    getVariant(variantId: ID,
-      onLoad: (variant: LibraryTypes.Variant) => void)
+    getAlgorithm(algorithmId: ID,
+      onLoad: (algorithm: LibraryTypes.Algorithm) => void)
     {
       return Ajax.getItem(
-        'VARIANT',
-        variantId,
-        (variantItem: Item) =>
+        'ALGORITHM',
+        algorithmId,
+        (algorithmItem: Item) =>
         {
-          onLoad(variantItem as LibraryTypes.Variant);
+          onLoad(algorithmItem as LibraryTypes.Algorithm);
         },
         (error) =>
         {
@@ -483,20 +487,20 @@ export const Ajax =
       );
       // }
       // TODO
-      // if (variantId.indexOf('@') === -1)
+      // if (algorithmId.indexOf('@') === -1)
       // {
       // else
       // {
       //   // TODO
-      //   // return Ajax.getVariantVersion(
-      //   //   variantId,
+      //   // return Ajax.getAlgorithmVersion(
+      //   //   algorithmId,
       //   //   onLoad,
       //   // );
       // }
     },
 
-    getVariantStatus(
-      variantId: ID,
+    getAlgorithmStatus(
+      algorithmId: ID,
       dbid: number,
       deployedName: string,
       onLoad: (resp: object) => void,
@@ -509,7 +513,7 @@ export const Ajax =
       };
       Ajax.req(
         'get',
-        'items/live/' + variantId,
+        'items/live/' + algorithmId,
         {},
         (response: object) =>
         {
@@ -578,7 +582,7 @@ export const Ajax =
       //     if (version)
       //     {
       //       const data = JSON.parse(version.data);
-      //       Ajax.getVariant(originalId, (v: LibraryTypes.Variant) =>
+      //       Ajax.getAlgorithm(originalId, (v: LibraryTypes.Algorithm) =>
       //       {
       //         if (v)
       //         {
@@ -588,7 +592,7 @@ export const Ajax =
       //           data['objectId'] = v.objectId;
       //           data['objectType'] = v.objectType;
 
-      //           onLoad(LibraryTypes._Variant(data));
+      //           onLoad(LibraryTypes._Algorithm(data));
       //         }
       //         else
       //         {
@@ -605,18 +609,18 @@ export const Ajax =
       // );
     },
 
-    getQuery(variantId: ID,
-      onLoad: (query: Query, variant: LibraryTypes.Variant) => void)
+    getQuery(algorithmId: ID,
+      onLoad: (query: Query, algorithm: LibraryTypes.Algorithm) => void)
     {
-      if (!variantId)
+      if (!algorithmId)
       {
         return;
       }
 
-      // TODO change if we store queries separate from variants
-      return Ajax.getVariant(
-        variantId,
-        (v: LibraryTypes.Variant) =>
+      // TODO change if we store queries separate from algorithms
+      return Ajax.getAlgorithm(
+        algorithmId,
+        (v: LibraryTypes.Algorithm) =>
         {
           if (!v || !v.query)
           {
@@ -633,9 +637,9 @@ export const Ajax =
     saveItem(item: Item,
       onLoad?: (resp: any) => void, onError?: (ev: Event) => void)
     {
-      if (item.type === ItemType.Variant)
+      if (item.type === ItemType.Algorithm)
       {
-        item = LibraryTypes.variantForSave(item as LibraryTypes.Variant);
+        item = LibraryTypes.algorithmForSave(item as LibraryTypes.Algorithm);
       }
       const itemData = recordForSave(item);
       const id = itemData['id'];
@@ -1349,7 +1353,7 @@ export const Ajax =
 
     getAnalytics(
       connectionId: number,
-      variantIds: ID[],
+      algorithmIds: ID[],
       start: Date,
       end: Date,
       metric: string,
@@ -1359,7 +1363,7 @@ export const Ajax =
       onError?: (error: any) => void)
     {
       const args = {
-        variantid: variantIds.join(','),
+        algorithmid: algorithmIds.join(','),
         start,
         end,
         eventname: metric,

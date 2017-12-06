@@ -70,7 +70,7 @@ import X from './x/components/X';
 class AppRouter extends TerrainComponent<{}> {
   public libraryOnEnter()
   {
-    LibraryActions.variants.unselectAll();
+    LibraryActions.algorithms.unselectAll();
   }
 
   public render()
@@ -78,7 +78,7 @@ class AppRouter extends TerrainComponent<{}> {
     const libraryLibrary = (props) => <Library basePath={'library'} {...props} />;
     const analyticsLibrary = (props) => (<Library
       basePath={'analytics'}
-      canPinVariants={true}
+      canPinAlgorithms={true}
       singleColumn={true}
       {...props}
     />);
@@ -98,7 +98,7 @@ class AppRouter extends TerrainComponent<{}> {
               <IndexRoute component={libraryLibrary} />
               <Route path=':groupId' component={libraryLibrary}>
                 <IndexRoute component={libraryLibrary} />
-                <Route path=':variantId' component={libraryLibrary}>
+                <Route path=':algorithmId' component={libraryLibrary}>
                   <IndexRoute component={libraryLibrary} />
                 </Route>
               </Route>
@@ -143,7 +143,7 @@ class AppRouter extends TerrainComponent<{}> {
               <IndexRoute component={analyticsLibrary} />
               <Route path=':groupId' component={analyticsLibrary}>
                 <IndexRoute component={analyticsLibrary} />
-                <Route path=':variantId' component={analyticsLibrary}>
+                <Route path=':algorithmId' component={analyticsLibrary}>
                   <IndexRoute component={analyticsLibrary} />
                 </Route>
               </Route>
