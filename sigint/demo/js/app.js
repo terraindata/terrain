@@ -52,7 +52,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
   $scope.page = $location.search().p;
   $scope.searchTerm = $location.search().q;
   $scope.esServer = $location.search().s;
-  $scope.variantID = $location.search().v;
+  $scope.algorithmID = $location.search().v;
   $scope.results = [];
   $scope.cart = [];
   $scope.busy = false;
@@ -61,10 +61,10 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
   if ($scope.page === undefined) $scope.page = 0;
   if ($scope.searchTerm === undefined) $scope.searchTerm = '';
   if ($scope.esServer === undefined) $scope.esServer = 'http://localhost:9200';
-  if ($scope.variantID === undefined) $scope.variantID = 'MovieDemoAlgorithm';
+  if ($scope.algorithmID === undefined) $scope.algorithmID = 'MovieDemoAlgorithm';
 
   $scope.$watch('$viewContentLoaded', function () {
-    TerrainAnalytics.logEvent('impression', $scope.variantID, {itemName: 'home', itemType: 'page'});
+    TerrainAnalytics.logEvent('impression', $scope.algorithmID, {itemName: 'home', itemType: 'page'});
   });
 
   $scope.search = function()
@@ -76,13 +76,13 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 
     if ($scope.searchTerm === undefined) $scope.searchTerm = '';
     if ($scope.esServer === undefined) $scope.esServer = 'http://localhost:9200';
-    if ($scope.variantID === undefined) $scope.variantID = 'MovieDemoAlgorithm';
+    if ($scope.algorithmID === undefined) $scope.algorithmID = 'MovieDemoAlgorithm';
 
     $location.search({
       'q': $scope.searchTerm,
       's': $scope.esServer,
       'p': $scope.page,
-      'v': $scope.variantID,
+      'v': $scope.algorithmID,
     });
     $scope.loadMore();
   };
@@ -93,7 +93,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
     if ($scope.done) return;
     $scope.busy = true;
 
-    $http.get('/demo/search?s=' + encodeURIComponent($scope.esServer) + '&q=' + $scope.searchTerm + '&p=' + $scope.page++ + '&v=' + $scope.variantID)
+    $http.get('/demo/search?s=' + encodeURIComponent($scope.esServer) + '&q=' + $scope.searchTerm + '&p=' + $scope.page++ + '&v=' + $scope.algorithmID)
     .then((response) =>
     {
       if (response.status === 200)
@@ -116,7 +116,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
   {
     $scope.cart.push(item);
     $scope.cartItems++;
-    TerrainAnalytics.logEvent('click', $scope.variantID, {addedIDs: $scope.cart.map((m) => m._id)});
+    TerrainAnalytics.logEvent('click', $scope.algorithmID, {addedIDs: $scope.cart.map((m) => m._id)});
   }
 
   $scope.removeItem = function(item)
@@ -137,13 +137,13 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 
   $scope.checkout = function()
   {
-    TerrainAnalytics.logEventImmediately('conversion', $scope.variantID, {purchasedIDs: $scope.cart.map((m) => m._id)});
+    TerrainAnalytics.logEventImmediately('conversion', $scope.algorithmID, {purchasedIDs: $scope.cart.map((m) => m._id)});
     $scope.emptyCart();
   }
 
   $scope.cardLoad = function(result)
   {
-    setTimeout(TerrainAnalytics.logEvent('impression', $scope.variantID, {itemName: result.movieid, itemType: 'movie'}),1);
+    setTimeout(TerrainAnalytics.logEvent('impression', $scope.algorithmID, {itemName: result.movieid, itemType: 'movie'}),1);
   }
 
   $scope.doneLoading = function()
@@ -153,7 +153,7 @@ terrainSearch.controller('searchCtrl', function($scope, $location, $http)
 
   $scope.cardDisplay = function(result)
   {
-    setTimeout(TerrainAnalytics.logEvent('impression', $scope.variantID, {itemName: result.movieid, itemType: 'movieDetail'}),1);
+    setTimeout(TerrainAnalytics.logEvent('impression', $scope.algorithmID, {itemName: result.movieid, itemType: 'movieDetail'}),1);
   }
 
   $scope.loadMore();

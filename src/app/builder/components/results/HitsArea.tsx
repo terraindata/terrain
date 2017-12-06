@@ -91,7 +91,7 @@ export interface Props
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
-  variantName: string;
+  algorithmName: string;
   showExport: boolean;
   showCustomizeView: boolean;
   allowSpotlights: boolean;
@@ -607,7 +607,7 @@ class HitsArea extends TerrainComponent<Props>
       false,
       {
         streaming: true,
-        streamingTo: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.json',
+        streamingTo: this.props.algorithmName + ' on ' + moment().format('MM/DD/YY') + '.json',
       },
     );
 
@@ -639,7 +639,7 @@ column if you have customized the results view.');
         false,
         {
           csv: true,
-          csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
+          csvName: this.props.algorithmName + ' on ' + moment().format('MM/DD/YY') + '.csv',
         },
       );
 
@@ -793,7 +793,7 @@ column if you have customized the results view.');
           query={this.props.query}
           inputs={this.props.query.inputs}
           serverId={Number(this.props.db.id)}
-          variantName={this.props.variantName}
+          algorithmName={this.props.algorithmName}
         />
       </div>;
 

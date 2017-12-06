@@ -62,18 +62,18 @@ import Ajax from './../../util/Ajax';
 import ColorManager from './../../util/ColorManager';
 import Util from './../../util/Util';
 import * as LibraryTypes from './../LibraryTypes';
+import LibraryAlgorithmInfo from './LibraryAlgorithmInfo';
 import LibraryColumn from './LibraryColumn';
 import './LibraryInfoColumn.less';
 import LibraryInfoUser from './LibraryInfoUser';
-import LibraryVariantInfo from './LibraryVariantInfo';
 
+const GroupIcon = require('./../../../images/icon_badgeAlgorithm.svg');
+const CategoryIcon = require('./../../../images/icon_badgeGroup.svg');
 const AlgorithmIcon = require('./../../../images/icon_badgeAlgorithm.svg');
-const GroupIcon = require('./../../../images/icon_badgeGroup.svg');
-const VariantIcon = require('./../../../images/icon_badgeVariant.svg');
 
+type Category = LibraryTypes.Category;
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
-type Variant = LibraryTypes.Variant;
 
 type Role = RoleTypes.Role;
 type RoleMap = RoleTypes.RoleMap;
@@ -83,12 +83,12 @@ type UserMap = UserTypes.UserMap;
 export interface Props
 {
   dbs: List<BackendInstance>;
+  category: Category;
   group: Group;
   algorithm: Algorithm;
-  variant: Variant;
+  categoryActions: any;
   groupActions: any;
   algorithmActions: any;
-  variantActions: any;
   libraryActions: any;
   roleActions: any;
 }
@@ -135,31 +135,31 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     return Util.sortDatabases(dbs);
   }
 
-  public renderVariant(isSuperUser, isBuilder)
+  public renderAlgorithm(isSuperUser, isBuilder)
   {
     return (
-      <LibraryVariantInfo
-        variant={this.props.variant}
+      <LibraryAlgorithmInfo
+        algorithm={this.props.algorithm}
         isSuperUser={isSuperUser}
         isBuilder={isBuilder}
-        variantActions={this.props.variantActions}
+        algorithmActions={this.props.algorithmActions}
       />
     );
   }
 
-  public handleAlgorithmDbChange(dbIndex: number)
+  public handleGroupDbChange(dbIndex: number)
   {
     const dbs = this.getSortedDatabases(this.props.dbs);
-    this.props.algorithmActions.change(this.props.algorithm.set('db', dbs.get(dbIndex)) as Algorithm);
+    this.props.groupActions.change(this.props.group.set('db', dbs.get(dbIndex)) as Group);
   }
 
-  public renderAlgorithm(isSuperUser, isBuilder)
+  public renderGroup(isSuperUser, isBuilder)
   {
-    if (!this.props.algorithm || this.props.variant)
+    if (!this.props.group || this.props.algorithm)
     {
       return null;
     }
-    const db = this.props.algorithm.db;
+    const db = this.props.group.db;
     return (
       <div className='library-info-line'>
         <div className='library-info-table'>
@@ -187,31 +187,31 @@ class LibraryInfoColumn extends TerrainComponent<Props>
   public renderUser(user: User): JSX.Element
   {
     const { roles } = this.state;
-    const groupRoles = roles && roles.get(this.props.group.id);
+    const categoryRoles = roles && roles.get(this.props.category.id);
     if (!user || user.isDisabled)
     {
       return null;
     }
     return <LibraryInfoUser
       user={user}
-      groupRoles={groupRoles}
+      categoryRoles={categoryRoles}
       me={this.state.me}
-      groupId={this.props.group.id}
+      categoryId={this.props.category.id}
       key={user.id}
       roleActions={this.props.roleActions}
     />;
   }
 
-  public renderGroupRoles(): JSX.Element | JSX.Element[]
+  public renderCategoryRoles(): JSX.Element | JSX.Element[]
   {
     const { me, users, roles } = this.state;
-    const groupRoles = roles && roles.get(this.props.group.id);
-    if (!me || !groupRoles || !users)
+    const categoryRoles = roles && roles.get(this.props.category.id);
+    if (!me || !categoryRoles || !users)
     {
       return null;
     }
 
-    return groupRoles.toArray().map((role: Role) =>
+    return categoryRoles.toArray().map((role: Role) =>
     {
       if (role.userId === me.id)
       {
@@ -224,7 +224,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
   public renderRemainingUsers()
   {
     const { me, roles, users } = this.state;
-    const groupRoles = roles && roles.get(this.props.group.id);
+    const categoryRoles = roles && roles.get(this.props.category.id);
     if (!me || !users)
     {
       return null;
@@ -232,7 +232,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
     return users.toArray().map((user: User) =>
     {
-      if (user.id === me.id || (groupRoles && groupRoles.get(user.id)))
+      if (user.id === me.id || (categoryRoles && categoryRoles.get(user.id)))
       {
         return null; // current user and existing roles are rendered at top
       }
@@ -240,23 +240,23 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleGroupDbChange(dbIndex: number)
+  public handleCategoryDbChange(dbIndex: number)
   {
     const dbs = this.getSortedDatabases(this.props.dbs);
-    this.props.groupActions.change(this.props.group.set('db', dbs.get(dbIndex)) as Group);
+    this.props.categoryActions.change(this.props.category.set('db', dbs.get(dbIndex)) as Category);
   }
 
-  public renderGroup(isSuperUser, isBuilder)
+  public renderCategory(isSuperUser, isBuilder)
   {
-    const { group } = this.props;
-    if (!group || this.props.algorithm || this.props.variant)
+    const { category } = this.props;
+    if (!category || this.props.group || this.props.algorithm)
     {
       return null;
     }
 
     // let users: UserTypes.UserMap = UserStore.getState().get('users');
     // let me: UserTypes.User = UserStore.getState().get('currentUser');
-    // let groupRoles: GroupRoleMap = RolesStore.getState().getIn(['roles', group.id]);
+    // let categoryRoles: CategoryRoleMap = RolesStore.getState().getIn(['roles', category.id]);
 
     const isSysAdmin = this.state.me && this.state.me.isSuperUser;
     const dbs = this.getSortedDatabases(this.props.dbs);
@@ -268,10 +268,10 @@ class LibraryInfoColumn extends TerrainComponent<Props>
           </div>
           <Dropdown
             selectedIndex={dbs && dbs.findIndex(
-              (db) => db.id === this.props.group.db.id,
+              (db) => db.id === this.props.category.db.id,
             )}
             options={dbs.map((db) => String(db.name) + ` (${db.type})`).toList()}
-            onChange={this.handleGroupDbChange}
+            onChange={this.handleCategoryDbChange}
             canEdit={isBuilder || isSuperUser}
             className='bic-db-dropdown'
           />
@@ -280,45 +280,45 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     );
   }
 
-  // Group permissions (hidden until reconnected)
+  // Category permissions (hidden until reconnected)
   // <div className='library-info-users'>
   //   {this.renderUser(this.state.me)}
-  //   {this.renderGroupRoles()}
+  //   {this.renderCategoryRoles()}
   //   {this.renderRemainingUsers()}
   // </div>
 
   public render()
   {
-    const item: LibraryTypes.Variant | LibraryTypes.Algorithm | LibraryTypes.Group =
-      this.props.variant || this.props.algorithm || this.props.group;
+    const item: LibraryTypes.Algorithm | LibraryTypes.Group | LibraryTypes.Category =
+      this.props.algorithm || this.props.group || this.props.category;
 
-    let groupId: ID;
+    let categoryId: ID;
     let opacity: number;
     let icon: any;
 
     switch (item && item.type)
     {
-      case 'GROUP':
-        groupId = item.id;
+      case 'CATEGORY':
+        categoryId = item.id;
         opacity = 1;
+        icon = <CategoryIcon />;
+        break;
+      case 'GROUP':
+        categoryId = item['categoryId'];
+        opacity = 0.75;
         icon = <GroupIcon />;
         break;
       case 'ALGORITHM':
-        groupId = item['groupId'];
-        opacity = 0.75;
-        icon = <AlgorithmIcon />;
-        break;
-      case 'VARIANT':
-        groupId = item['groupId'];
+        categoryId = item['categoryId'];
         opacity = 0.5;
-        icon = <VariantIcon />;
+        icon = <AlgorithmIcon />;
         break;
       default:
         break;
     }
 
-    const isSuperUser = Util.haveRole(groupId, 'admin', UserStore, RolesStore);
-    const isBuilder = Util.haveRole(groupId, 'builder', UserStore, RolesStore);
+    const isSuperUser = Util.haveRole(categoryId, 'admin', UserStore, RolesStore);
+    const isBuilder = Util.haveRole(categoryId, 'builder', UserStore, RolesStore);
 
     return (
       <LibraryColumn
@@ -337,7 +337,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
                 <style
                   dangerouslySetInnerHTML={{
                     __html: '.library-info-image #Color { \
-                    fill: ' + ColorManager.colorForKey(groupId) + ' !important; \
+                    fill: ' + ColorManager.colorForKey(categoryId) + ' !important; \
                   }'}}
                 />
                 {
@@ -355,13 +355,13 @@ class LibraryInfoColumn extends TerrainComponent<Props>
                 }
               </div>
               {
-                this.renderVariant(isSuperUser, isBuilder)
-              }
-              {
                 this.renderAlgorithm(isSuperUser, isBuilder)
               }
               {
                 this.renderGroup(isSuperUser, isBuilder)
+              }
+              {
+                this.renderCategory(isSuperUser, isBuilder)
               }
             </div>
             :
@@ -370,7 +370,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
               style={backgroundColor(Colors().bg3)}
             >
               <InfoArea
-                large='Select a Group'
+                large='Select a Category'
               />
             </div>
 

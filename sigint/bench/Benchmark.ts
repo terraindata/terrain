@@ -54,13 +54,13 @@ const batchRequests: any[] = [];
 export function generateBenchmarkData()
 {
   const visitors = ['2329090446', '2329090447', '2329090448', '2329090449'];
-  const variants = ['125', '126', '225', '240'];
+  const algorithms = ['125', '126', '225', '240'];
 
   for (let i = 0; i < batchSize; i++)
   {
     batchRequests.push({
       eventname: 'view',
-      variantid: variants[Math.floor(Math.random() * variants.length)],
+      algorithmid: algorithms[Math.floor(Math.random() * algorithms.length)],
       visitorid: visitors[Math.floor(Math.random() * visitors.length)],
     });
   }
@@ -76,7 +76,7 @@ export async function runBenchmark(host: string)
         {
           all.requestOptions.uri = host + '/v1?'
             + 'eventname=' + String(batchRequests[all.env.index % batchSize].eventname)
-            + '&variantid=' + String(batchRequests[all.env.index % batchSize].variantid)
+            + '&algorithmid=' + String(batchRequests[all.env.index % batchSize].algorithmid)
             + '&visitorid=' + String(batchRequests[all.env.index % batchSize].visitorid);
           return all;
         }],

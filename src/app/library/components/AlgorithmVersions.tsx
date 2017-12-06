@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions no-unused-expression
 
 import * as Radium from 'radium';
-import './VariantVersions.less';
+import './AlgorithmVersions.less';
 const classNames = require('classnames');
 import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
@@ -64,19 +64,19 @@ import { browserHistory } from 'react-router';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
 
-type Variant = LibraryTypes.Variant;
+type Algorithm = LibraryTypes.Algorithm;
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 
 export interface Props
 {
-  variant: Variant;
+  algorithm: Algorithm;
 }
 
-const MAX_RENDERED_VARIANTS = 100;
+const MAX_RENDERED_ALGORITHMS = 100;
 
 @Radium
-class VariantVersions extends TerrainComponent<Props>
+class AlgorithmVersions extends TerrainComponent<Props>
 {
   public state: {
     users: UserMap,
@@ -105,9 +105,9 @@ class VariantVersions extends TerrainComponent<Props>
       });
   }
 
-  public fetchVariants(props)
+  public fetchAlgorithms(props)
   {
-    this.xhr = Ajax.getVersions(props.variant.id, (versions) =>
+    this.xhr = Ajax.getVersions(props.algorithm.id, (versions) =>
     {
       if (versions)
       {
@@ -121,7 +121,7 @@ class VariantVersions extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.fetchVariants(this.props);
+    this.fetchAlgorithms(this.props);
   }
 
   public componentWillUnmount()
@@ -132,12 +132,12 @@ class VariantVersions extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    this.fetchVariants(nextProps);
+    this.fetchAlgorithms(nextProps);
   }
 
   public showVersion(versionID, i)
   {
-    let url = '/builder/?o=' + this.props.variant.id;
+    let url = '/builder/?o=' + this.props.algorithm.id;
     if (i !== 0)
     {
       url += '@' + versionID;
@@ -150,15 +150,15 @@ class VariantVersions extends TerrainComponent<Props>
     const isCurrent = i === 0;
 
     const { roles } = this.state;
-    const groupId = this.props.variant.groupId;
+    const categoryId = this.props.algorithm.categoryId;
     let role = 'Viewer';
-    if (roles && roles.getIn([groupId, version.userId]))
+    if (roles && roles.getIn([categoryId, version.userId]))
     {
-      if (roles && roles.getIn([groupId, version.userId]).admin)
+      if (roles && roles.getIn([categoryId, version.userId]).admin)
       {
         role = 'Admin';
       }
-      else if (roles && roles.getIn([groupId, version.userId]).builder)
+      else if (roles && roles.getIn([categoryId, version.userId]).builder)
       {
         role = 'Builder';
       }
@@ -216,7 +216,7 @@ class VariantVersions extends TerrainComponent<Props>
             :
             <div className='versions-table'>
               {
-                this.state.versions.slice(0, MAX_RENDERED_VARIANTS).map(this.renderVersion)
+                this.state.versions.slice(0, MAX_RENDERED_ALGORITHMS).map(this.renderVersion)
               }
             </div>
         }
@@ -237,4 +237,4 @@ const ACTIVE_VERSION_STYLE = [
   fontColor(Colors().text1, Colors().text1),
 ];
 
-export default VariantVersions;
+export default AlgorithmVersions;

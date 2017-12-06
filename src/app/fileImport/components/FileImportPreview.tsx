@@ -117,7 +117,7 @@ export interface Props
   route?: any;
 
   // export only
-  variantName?: string;
+  algorithmName?: string;
 }
 @Radium
 class FileImportPreview extends TerrainComponent<Props>
@@ -646,7 +646,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public handleFileExportSuccess()
   {
-    const filename = this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype;
+    const filename = this.props.algorithmName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype;
     notificationManager.addNotification('Data Exported', 'Exported data to ' + filename, 'info', 4);
   }
 
@@ -673,7 +673,7 @@ class FileImportPreview extends TerrainComponent<Props>
         this.props.serverId,
         this.props.exportRank,
         this.state.typeObjectKey,
-        this.props.variantName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,
+        this.props.algorithmName + '_' + String(moment().format('MM-DD-YY')) + '.' + this.props.filetype,
         this.handleFileExportSuccess,
         this.handleFileExportError,
       );
