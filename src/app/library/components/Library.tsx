@@ -199,11 +199,13 @@ class Library extends TerrainComponent<any>
       })
       .map((algorithm) =>
       {
+        const data = this.getData(algorithm.deployedName);
         return {
           id: algorithm.id,
           label: algorithm.name,
-          data: this.getData(algorithm.deployedName),
+          data,
           isPinned: analytics.pinnedAlgorithms.get(algorithm.id, false),
+          hasData: data.length > 0,
         };
       });
 

@@ -121,7 +121,6 @@ const styles = {
         fontWeight: 'bold',
       },
     },
-    tooltipLegendBorderPadding: { right: 30 },
     activeDataVerticalLine: { stroke: 'rgba(0, 0, 0, .2)', strokeWidth: 1 },
   },
   bottomChart: {
@@ -176,6 +175,7 @@ interface Dataset
   label: string[];
   data: any[];
   isPinned: boolean;
+  hasData: boolean;
 }
 
 interface Props
@@ -324,19 +324,21 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
 
         return {
           id: ds.id,
-          name: ds.label,
+          name: ds.hasData ? ds.label : `${ds.label} (no data)`,
           labels: labelsStyle,
           symbol: dataStyle,
           isPinned: ds.isPinned,
+          hasData: ds.hasData,
         };
       });
 
     return (
       <VictoryLegend
         padding={0}
+        itemsPerRow={4}
         titleOrientation={'left'}
         name='legend'
-        gutter={23}
+        gutter={20}
         data={data.toArray()}
         dataComponent={<TVictoryPin
           onPinClick={this.handleLegendClick}
@@ -467,7 +469,6 @@ export default class MultipleAreaChart extends TerrainComponent<Props> {
                       labelComponent={<TVictoryTooltip
                         xDataKey={xDataKey}
                         dateFormat={dateFormat}
-                        borderPadding={styles.topChart.tooltipLegendBorderPadding}
                         tooltipStyle={styles.topChart.tooltipLegend}
                       />}
                       zoomDomain={this.state.zoomDomain}

@@ -1263,8 +1263,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 10, 6, 7, 24, 4),
-        end: new Date(2017, 10, 6, 7, 32, 4),
+        start: new Date(2017, 11, 16, 7, 24, 4),
+        end: new Date(2017, 11, 16, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'terrain_5',
         agg: 'select',
@@ -1290,8 +1290,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 10, 6, 7, 24, 4),
-        end: new Date(2017, 10, 6, 7, 32, 4),
+        start: new Date(2017, 11, 16, 7, 24, 4),
+        end: new Date(2017, 11, 16, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'terrain_5',
         agg: 'histogram',
@@ -1306,7 +1306,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(6);
+        expect(respData['terrain_5'].length).toEqual(4);
       });
   });
 
@@ -1318,8 +1318,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 10, 6, 7, 24, 4),
-        end: new Date(2017, 10, 6, 10, 24, 4),
+        start: new Date(2017, 11, 16, 7, 24, 4),
+        end: new Date(2017, 11, 16, 10, 24, 4),
         eventname: 'click,impression',
         algorithmid: 'terrain_5',
         agg: 'rate',
