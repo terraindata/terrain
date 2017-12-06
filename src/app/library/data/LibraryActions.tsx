@@ -254,6 +254,7 @@ const Actions =
           .set('name', name)
           .set('status', ItemStatus.Build)
           .set('db', db)
+          .set('deployedName', '')
           .set('language', group.language);
         newAlgorithm = LibraryTypes.touchAlgorithm(newAlgorithm);
 
