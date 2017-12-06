@@ -71,13 +71,13 @@ function calculateDateRange(api, dateRangeId: number, callback)
       switch (dateRangeId)
       {
         case 1:
-        // Today at 0:00 UTC
-        startDate = new Date(Date.UTC(
-          serverTimeDate.getUTCFullYear(),
-          serverTimeDate.getUTCMonth(),
-          serverTimeDate.getUTCDate(),
-          serverTimeDate.getUTCHours() - 1));
-        break;
+          // Today at 0:00 UTC
+          startDate = new Date(Date.UTC(
+            serverTimeDate.getUTCFullYear(),
+            serverTimeDate.getUTCMonth(),
+            serverTimeDate.getUTCDate(),
+            serverTimeDate.getUTCHours() - 1));
+          break;
         case 2:
           // Today at 0:00 UTC
           startDate = new Date(Date.UTC(
