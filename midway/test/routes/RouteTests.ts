@@ -741,7 +741,7 @@ describe('Query route tests', () =>
           database: 1,
           type: 'search',
           body: `{
-            "scroll": "60s",
+            "size": 5,
             "body": {
               "_source": ["movieid", "title"],
               "query": {

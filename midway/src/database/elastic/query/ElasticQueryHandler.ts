@@ -167,21 +167,23 @@ export default class ElasticQueryHandler extends QueryHandler
           }
 
           // winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(response, null, 2));
+          await this.handleGroupJoinSubQueries(valueInfo, childQuery, response);
+
           if (allResponse === null)
           {
             allResponse = response;
           }
-
-          await this.handleGroupJoinSubQueries(valueInfo, childQuery, allResponse);
+          else
+          {
+            allResponse.hits.hits = allResponse.hits.hits.concat(response.hits.hits);
+          }
 
           let size = response.hits.total;
           if (parentQuery['size'] !== undefined && parentQuery['size'] < size) {
             size = parentQuery['size'];
           }
 
-          console.log(size);
-          console.log(response.hits.hits.length);
-          if (size > response.hits.hits.length)
+          if (response.hits.hits.length > 0 && size > response.hits.hits.length)
           {
             const scroll = (parentQuery['scroll'] !== undefined) ? parentQuery['scroll'] : '60s';
             client.scroll({
@@ -194,7 +196,7 @@ export default class ElasticQueryHandler extends QueryHandler
             client.clearScroll({
               scrollId: response._scroll_id,
             }, (_err, _resp) => { return; });
-            return this.makeQueryCallback(res, rej)(error, response);
+            return this.makeQueryCallback(res, rej)(error, allResponse);
           }
         };
 
