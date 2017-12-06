@@ -69,7 +69,7 @@ class AlgorithmC extends ItemC
   public version: boolean = false;
   public language: string = 'elastic';
   public deployedName: string = '';
-
+  public modelVersion = 3;
   // don't use this!
   // TODO remove when algorithms can be saved without queries
   public query: Query = null;
@@ -102,6 +102,7 @@ export const _Algorithm = (config?: any) =>
     config.modelVersion = 2;
     config.categoryId = config.groupId;
   }
+
   if (config && (config.modelVersion < 3))
   {
     config.modelVersion = 3;
@@ -151,6 +152,7 @@ class GroupC extends ItemC
   public language = 'elastic';
 
   public excludeFields = ['dbFields', 'excludeFields', 'categoryId'];
+  public modelVersion = 3;
 }
 const Group_Record = Immutable.Record(new GroupC());
 export interface Group extends GroupC, IRecord<Group> { }
@@ -164,7 +166,7 @@ export const _Group = (config?: any) =>
   }
   if (config && (!config.modelVersion || config.modelVersion < 3))
   {
-    config.modelVerseion = 3;
+    config.modelVersion = 3;
     config.algorithmsOrder = config.variantsOrder;
   }
   // from 2 to 3
@@ -197,6 +199,7 @@ class CategoryC extends ItemC
   public userIds = List([]);
   public groupsOrder = List([]);
   public defaultLanguage = 'elastic';
+  public modelVersion = 3;
 }
 const Category_Record = Immutable.Record(new CategoryC());
 export interface Category extends CategoryC, IRecord<Category> { }
