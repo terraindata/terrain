@@ -200,7 +200,7 @@ describe('AnalyticsActions', () =>
   const variantId = '1';
   const metric = 'impressions';
   const intervalId = 'day';
-  const dateRangeId = 1;
+  const dateRangeId = 2;
   const connectionName = 'My ElasticSearch Instance';
 
   describe('#fetch', () =>
