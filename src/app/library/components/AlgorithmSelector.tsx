@@ -56,7 +56,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import { LibraryState } from 'library/data/LibraryStore';
 import { LibraryItem } from 'library/LibraryTypes';
 
-import './VariantSelector.less';
+import './AlgorithmSelector.less';
 
 const Color = require('color');
 const { List } = Immutable;
@@ -64,28 +64,28 @@ const { List } = Immutable;
 export interface Props
 {
   libraryState: LibraryState;
-  ids: List<number>; // [group id, algorithm id, variant id]
+  ids: List<number>; // [category id, group id, algorithm id]
   onChangeSelection: (ids: List<number>) => void;
   dropdownWidth: string;
 }
 
 type AvailableItemsType = [List<LibraryItem>, List<string>, number];
 
-class VariantSelector extends TerrainComponent<Props>
+class AlgorithmSelector extends TerrainComponent<Props>
 {
   public constructor(props)
   {
     super(props);
+    this.getAvailableCategories = memoizeOne(this.getAvailableCategories);
     this.getAvailableGroups = memoizeOne(this.getAvailableGroups);
     this.getAvailableAlgorithms = memoizeOne(this.getAvailableAlgorithms);
-    this.getAvailableVariants = memoizeOne(this.getAvailableVariants);
   }
 
-  public handleGroupChange(index, event)
+  public handleCategoryChange(index, event)
   {
-    const [groups, groupNames, groupIndex] =
-      this.getAvailableGroups(this.props.libraryState, this.props.ids.get(0));
-    const id = groups.get(index).id;
+    const [categories, categoryNames, categoryIndex] =
+      this.getAvailableCategories(this.props.libraryState, this.props.ids.get(0));
+    const id = categories.get(index).id;
     if (id === this.props.ids.get(0)) // nothing changed
     {
       return;
@@ -93,11 +93,11 @@ class VariantSelector extends TerrainComponent<Props>
     this.props.onChangeSelection(List([id as number, -1, -1]));
   }
 
-  public handleAlgorithmChange(index, event)
+  public handleGroupChange(index, event)
   {
-    const [algorithms, algorithmNames, algorithmIndex] =
-      this.getAvailableAlgorithms(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
-    const id = algorithms.get(index).id;
+    const [groups, groupNames, groupIndex] =
+      this.getAvailableGroups(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
+    const id = groups.get(index).id;
     if (id === this.props.ids.get(1)) // nothing changed
     {
       return;
@@ -105,11 +105,11 @@ class VariantSelector extends TerrainComponent<Props>
     this.props.onChangeSelection(List([this.props.ids.get(0), id as number, -1]));
   }
 
-  public handleVariantChange(index, event)
+  public handleAlgorithmChange(index, event)
   {
-    const [variants, variantNames, variantIndex] =
-      this.getAvailableVariants(this.props.libraryState, this.props.ids.get(1), this.props.ids.get(2));
-    const id = variants.get(index).id;
+    const [algorithms, algorithmNames, algorithmIndex] =
+      this.getAvailableAlgorithms(this.props.libraryState, this.props.ids.get(1), this.props.ids.get(2));
+    const id = algorithms.get(index).id;
     if (id === this.props.ids.get(2)) // nothing changed
     {
       return;
@@ -117,26 +117,26 @@ class VariantSelector extends TerrainComponent<Props>
     this.props.onChangeSelection(List([this.props.ids.get(0), this.props.ids.get(1), id as number]));
   }
 
-  public getAvailableGroups(libraryState: LibraryState, groupId: ID): AvailableItemsType
+  public getAvailableCategories(libraryState: LibraryState, categoryId: ID): AvailableItemsType
   {
-    const items = libraryState.groups.toList();
+    const items = libraryState.categories.toList();
+    const index = items.findIndex((v, i) => v.id === categoryId);
+    return [items, this.itemsToText(items), index];
+  }
+
+  public getAvailableGroups(libraryState: LibraryState, categoryId: ID, groupId: ID): AvailableItemsType
+  {
+    const items = libraryState.groups.filter(
+      (v, k) => v.categoryId === categoryId,
+    ).toList();
     const index = items.findIndex((v, i) => v.id === groupId);
     return [items, this.itemsToText(items), index];
   }
 
   public getAvailableAlgorithms(libraryState: LibraryState, groupId: ID, algorithmId: ID): AvailableItemsType
   {
-    const items = libraryState.algorithms.filter(
-      (v, k) => v.groupId === groupId,
-    ).toList();
+    const items = libraryState.algorithms.filter((v, k) => v.groupId === groupId).toList();
     const index = items.findIndex((v, i) => v.id === algorithmId);
-    return [items, this.itemsToText(items), index];
-  }
-
-  public getAvailableVariants(libraryState: LibraryState, algorithmId: ID, variantId: ID): AvailableItemsType
-  {
-    const items = libraryState.variants.filter((v, k) => v.algorithmId === algorithmId).toList();
-    const index = items.findIndex((v, i) => v.id === variantId);
     return [items, this.itemsToText(items), index];
   }
 
@@ -147,20 +147,35 @@ class VariantSelector extends TerrainComponent<Props>
 
   public render()
   {
+    const [categories, categoryNames, categoryIndex] =
+      this.getAvailableCategories(this.props.libraryState, this.props.ids.get(0));
     const [groups, groupNames, groupIndex] =
-      this.getAvailableGroups(this.props.libraryState, this.props.ids.get(0));
+      this.getAvailableGroups(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
     const [algorithms, algorithmNames, algorithmIndex] =
-      this.getAvailableAlgorithms(this.props.libraryState, this.props.ids.get(0), this.props.ids.get(1));
-    const [variants, variantNames, variantIndex] =
-      this.getAvailableVariants(this.props.libraryState, this.props.ids.get(1), this.props.ids.get(2));
+      this.getAvailableAlgorithms(this.props.libraryState, this.props.ids.get(1), this.props.ids.get(2));
 
     return (
-      <div className='variant-selector-wrapper'>
-        <div className='variant-selector-column'>
-          <div className='variant-selector-label'>
+      <div className='algorithm-selector-wrapper'>
+        <div className='algorithm-selector-column'>
+          <div className='algorithm-selector-label'>
+            Category
+          </div>
+          <div className='algorithm-selector-input'>
+            <Dropdown
+              options={categoryNames.size !== 0 ? categoryNames : undefined}
+              selectedIndex={categoryIndex}
+              canEdit={true}
+              onChange={this.handleCategoryChange}
+              openDown={true}
+              width={this.props.dropdownWidth}
+            />
+          </div>
+        </div>
+        <div className='algorithm-selector-column'>
+          <div className='algorithm-selector-label'>
             Group
           </div>
-          <div className='variant-selector-input'>
+          <div className='algorithm-selector-input'>
             <Dropdown
               options={groupNames.size !== 0 ? groupNames : undefined}
               selectedIndex={groupIndex}
@@ -171,31 +186,16 @@ class VariantSelector extends TerrainComponent<Props>
             />
           </div>
         </div>
-        <div className='variant-selector-column'>
-          <div className='variant-selector-label'>
+        <div className='algorithm-selector-column'>
+          <div className='algorithm-selector-label'>
             Algorithm
           </div>
-          <div className='variant-selector-input'>
+          <div className='algorithm-selector-input'>
             <Dropdown
               options={algorithmNames.size !== 0 ? algorithmNames : undefined}
               selectedIndex={algorithmIndex}
               canEdit={true}
               onChange={this.handleAlgorithmChange}
-              openDown={true}
-              width={this.props.dropdownWidth}
-            />
-          </div>
-        </div>
-        <div className='variant-selector-column'>
-          <div className='variant-selector-label'>
-            Variant
-          </div>
-          <div className='variant-selector-input'>
-            <Dropdown
-              options={variantNames.size !== 0 ? variantNames : undefined}
-              selectedIndex={variantIndex}
-              canEdit={true}
-              onChange={this.handleVariantChange}
               openDown={true}
               width={this.props.dropdownWidth}
             />
@@ -207,4 +207,4 @@ class VariantSelector extends TerrainComponent<Props>
   }
 }
 
-export default VariantSelector;
+export default AlgorithmSelector;

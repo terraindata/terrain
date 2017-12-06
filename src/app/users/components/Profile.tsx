@@ -163,7 +163,7 @@ class Profile extends TerrainComponent<Props>
         'Are you sure you want to revoke this user\'s administrative privileges?'
         :
         'Are you sure you want to make this user a system-level administrator? \
-The user will be able to create new user accounts, create new groups, \
+The user will be able to create new user accounts, create new categories, \
 disable existing users, add new system administrators, and revoke \
 any existing system administrator privileges, including your own. \
 (You can revoke their administator privileges later, as long as you \

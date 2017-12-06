@@ -67,19 +67,19 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     [ActionTypes.fetchQuery]: (state: BuilderState,
       action: {
         payload?: {
-          variantId: ID,
-          handleNoVariant: (id: ID) => void,
+          algorithmId: ID,
+          handleNoAlgorithm: (id: ID) => void,
           db: BackendInstance,
         },
       }) =>
     {
-      const { variantId, handleNoVariant } = action.payload;
+      const { algorithmId, handleNoAlgorithm } = action.payload;
 
       if (state.loadingXhr)
       {
-        if (variantId === state.loadingVariantId)
+        if (algorithmId === state.loadingAlgorithmId)
         {
-          // still loading the same variant
+          // still loading the same algorithm
           return state;
         }
 
@@ -88,7 +88,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       }
 
       const xhr: XMLHttpRequest = Ajax.getQuery(
-        variantId,
+        algorithmId,
         (query: Query) =>
         {
           if (query)
@@ -97,8 +97,8 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           }
           else
           {
-            handleNoVariant &&
-              handleNoVariant(variantId);
+            handleNoAlgorithm &&
+              handleNoAlgorithm(algorithmId);
           }
         },
       );
@@ -106,7 +106,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state
         .set('loading', true)
         .set('loadingXhr', xhr)
-        .set('loadingVariantId', variantId)
+        .set('loadingAlgorithmId', algorithmId)
         ;
     },
 
@@ -130,7 +130,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         .set('query', query)
         .set('loading', false)
         .set('loadingXhr', null)
-        .set('loadingVariantId', '')
+        .set('loadingAlgorithmId', '')
         .set('isDirty', false)
         .set('pastQueries', Immutable.List([]))
         .set('nextQueries', Immutable.List([]))

@@ -76,6 +76,7 @@ module.exports =
             app: path.resolve(__dirname, 'src/app'),
             builder: path.resolve(__dirname, 'src/app/builder'),
             charts: path.resolve(__dirname, 'src/app/charts'),
+            colors: path.resolve(__dirname, 'src/app/colors'),
             common: path.resolve(__dirname, 'src/app/common'),
             control: path.resolve(__dirname, 'src/app/control'),
             database: path.resolve(__dirname, 'src/database'),

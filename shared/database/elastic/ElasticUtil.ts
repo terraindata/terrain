@@ -95,3 +95,20 @@ export function isValidFieldName(name: string): string
   }
   return '';
 }
+
+/* wraps query with body property and adds scroll if specified */
+export function addBodyToQuery(qryObj: string | object, scroll?: string): object
+{
+  if (typeof qryObj === 'string')
+  {
+    qryObj = JSON.parse(qryObj);
+  }
+  qryObj = {
+    body: qryObj,
+  };
+  if (scroll !== undefined)
+  {
+    qryObj['scroll'] = scroll;
+  }
+  return qryObj;
+}

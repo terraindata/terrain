@@ -63,7 +63,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
-import VariantSelector from 'library/components/VariantSelector';
+import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryStore } from 'library/data/LibraryStore';
 
 import ControlActions from '../../data/ControlActions';
@@ -101,7 +101,7 @@ export interface ScheduleArgs
   fileType: string;
   filename: string;
   objectKey?: string;
-  variantId?: ID;
+  algorithmId?: ID;
   credentialId: ID;
   cronArgs: string[];
 }
@@ -117,7 +117,7 @@ enum FileTypes // TODO make this more type robust to track FileImportTypes.FILE_
 
 export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidationData
 {
-  const { scheduleName, cronArgs, filename, fileType, objectKey, credentialId, template, variantId } = args;
+  const { scheduleName, cronArgs, filename, fileType, objectKey, credentialId, template, algorithmId } = args;
 
   const errors = [];
   const requests = [];
@@ -142,9 +142,9 @@ export function validateScheduleSettings(args: ScheduleArgs): ScheduleValidation
 
   if (template.export)
   {
-    if (variantId === -1 || variantId === undefined)
+    if (algorithmId === -1 || algorithmId === undefined)
     {
-      requests.push('Please Select a Variant');
+      requests.push('Please Select a Algorithm');
     }
     if (fileType === fileTypeOptions.get(FileTypes.JSON_TYPE_OBJECT) && (objectKey === undefined || objectKey === ''))
     {
@@ -299,7 +299,7 @@ class TransportScheduler extends TerrainComponent<Props>
       fileType: fileTypeOptions.get(this.state.fileTypeIndex),
       filename: this.state.filenameValue,
       objectKey: template.objectKey ? template.objectKey : this.state.objectKeyValue,
-      variantId: this.state.selectedIds.get(2),
+      algorithmId: this.state.selectedIds.get(2),
       credentialId: credential && credential.id,
       cronArgs: [this.state.cronParam0, this.state.cronParam1, this.state.cronParam2, this.state.cronParam3, this.state.cronParam4],
     };
@@ -315,7 +315,7 @@ class TransportScheduler extends TerrainComponent<Props>
       };
       if (template.export)
       {
-        paramsJob['variantId'] = args.variantId;
+        paramsJob['algorithmId'] = args.algorithmId;
       }
       if (args.fileType === fileTypeOptions.get(FileTypes.JSON_TYPE_OBJECT))
       {
@@ -489,7 +489,7 @@ class TransportScheduler extends TerrainComponent<Props>
   }
 
   /*
-   *  Filename and filetype, Variant Selection (if export)
+   *  Filename and filetype, Algorithm Selection (if export)
    */
   public renderImportExportOptions(template: Template)
   {
@@ -503,7 +503,7 @@ class TransportScheduler extends TerrainComponent<Props>
       <div>
         {
           !!template.export &&
-          <VariantSelector
+          <AlgorithmSelector
             libraryState={LibraryStore.getState()}
             onChangeSelection={this._setStateWrapperPath('selectedIds')}
             ids={this.state.selectedIds}
@@ -602,7 +602,7 @@ class TransportScheduler extends TerrainComponent<Props>
       fileType: fileTypeOptions.get(this.state.fileTypeIndex),
       filename: this.state.filenameValue,
       objectKey: template.objectKey ? template.objectKey : this.state.objectKeyValue,
-      variantId: this.state.selectedIds.get(2),
+      algorithmId: this.state.selectedIds.get(2),
       credentialId: credential && credential.id,
       cronArgs: [this.state.cronParam0, this.state.cronParam1, this.state.cronParam2, this.state.cronParam3, this.state.cronParam4],
     });

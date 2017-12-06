@@ -89,12 +89,12 @@ Router.get('/live', passport.authenticate('access-token-local'), async (ctx, nex
       return parsed;
     });
   }
-  ctx.body = JSON.stringify(await items.getLiveVariants(typeArr));
+  ctx.body = JSON.stringify(await items.getLiveAlgorithms(typeArr));
 });
 
 Router.get('/live/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const status: string = await items.checkVariantInES(
+  const status: string = await items.checkAlgorithmInES(
     ctx.params.id,
     parseInt(ctx.query.dbid as string, 10),
     String(ctx.query.deployedName),
@@ -105,7 +105,7 @@ Router.get('/live/:id', passport.authenticate('access-token-local'), async (ctx,
 Router.get('/status/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('getting status from DB ID ' + String(ctx.params.id));
-  ctx.body = await items.checkStatusVariants(parseInt(ctx.params.id, 10));
+  ctx.body = await items.checkStatusAlgorithms(parseInt(ctx.params.id, 10));
 });
 
 Router.get('/:id', passport.authenticate('access-token-local'), async (ctx, next) =>

@@ -60,7 +60,7 @@ const users = new Users();
 export const credentials: Credentials = new Credentials();
 export const scheduler: Scheduler = new Scheduler();
 
-const allowedTypes: string[] = ['http', 'sftp'];
+const allowedTypes: string[] = ['http', 'sftp', 'local'];
 
 // Get connections from credentials table, requires type=<one of allowedTypes>
 Router.get('/connections', passport.authenticate('access-token-local'), async (ctx, next) =>

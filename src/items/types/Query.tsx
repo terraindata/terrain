@@ -57,7 +57,7 @@ import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';
 
 // A query can be viewed and edited in the Builder
-// currently, only Variants have Queries, 1:1, but that may change
+// currently, only Algorithms have Queries, 1:1, but that may change
 class QueryC
 {
   type: 'QUERY' = 'QUERY';
@@ -68,7 +68,7 @@ class QueryC
   language: 'elastic' | 'mysql' = 'elastic';
 
   id: ID = -1;
-  variantId: number = -1;
+  algorithmId: number = -1;
 
   // TODO change?
   db: {
@@ -98,7 +98,7 @@ class QueryC
   excludeFields = ['dbFields', 'excludeFields'];
 
   //modelVersion = CurrentQueryModelVersion; // 2 is for the first version of Node midway
-  modelVersion = 2;
+  modelVersion = 3;
 
   // what order the cards are in the tuning column
   tuningOrder: List<string> = List([]);
@@ -120,6 +120,11 @@ export const _Query = (config?: object) =>
   config['tuningOrder'] = List<string>(config['tuningOrder']);
   config['aggregationList'] = Map<string, Aggregation>(config['aggregationList']);
   config['path'] = _Path(config['path']);
+  if (config && (!config['modelVersion'] || config['modelVersion'] < 3))
+  {
+    config['modelVersion'] = 3;
+    config['algorithmId'] = config['variantId'];
+  }
   const query = new Query_Record(config) as any as Query;
   return query;
 };

@@ -56,14 +56,14 @@ import UserThumbnail from './../../users/components/UserThumbnail';
 import * as UserTypes from './../../users/UserTypes';
 import './LibraryInfoColumn.less';
 
-type GroupRoleMap = RoleTypes.GroupRoleMap;
+type CategoryRoleMap = RoleTypes.CategoryRoleMap;
 type User = UserTypes.User;
 interface LibraryInfoUserProps
 {
   me: User;
   user: User;
-  groupRoles: GroupRoleMap;
-  groupId: ID;
+  categoryRoles: CategoryRoleMap;
+  categoryId: ID;
   roleActions: any;
 }
 
@@ -71,11 +71,11 @@ class LibraryInfoUser extends TerrainComponent<LibraryInfoUserProps>
 {
   public changeRole(newRole: string)
   {
-    const { user, groupRoles } = this.props;
-    let role = groupRoles && groupRoles.get(user.id);
+    const { user, categoryRoles } = this.props;
+    let role = categoryRoles && categoryRoles.get(user.id);
     if (!role)
     {
-      role = new RoleTypes.Role({ groupId: this.props.groupId, userId: user.id });
+      role = new RoleTypes.Role({ categoryId: this.props.categoryId, userId: user.id });
     }
 
     this.props.roleActions.change(
@@ -100,7 +100,7 @@ class LibraryInfoUser extends TerrainComponent<LibraryInfoUserProps>
 
   public render()
   {
-    const { me, user, groupRoles } = this.props;
+    const { me, user, categoryRoles } = this.props;
     if (!user)
     {
       return null;
@@ -108,14 +108,14 @@ class LibraryInfoUser extends TerrainComponent<LibraryInfoUserProps>
 
     // TODO re-enable roles
 
-    // const gr = groupRoles && groupRoles.get(user.id);
+    // const gr = categoryRoles && categoryRoles.get(user.id);
     // const isSuperUser = gr && gr.isSuperUser;
     // const isBuilder = gr && gr.builder && !isSuperUser;
     // const isViewer = !isSuperUser && !isBuilder;
     // const roleText = isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
 
     // const imSysAdmin = me.isSuperUser;
-    // const imGroupAdmin = groupRoles && groupRoles.get(me.id) && groupRoles.get(me.id).admin;
+    // const isCategoryAdmin = categoryRoles && categoryRoles.get(me.id) && categoryRoles.get(me.id).admin;
 
     const isSuperUser = user.isSuperUser;
     const isBuilder = !user.isSuperUser;
@@ -123,7 +123,7 @@ class LibraryInfoUser extends TerrainComponent<LibraryInfoUserProps>
     const roleText = user.isSuperUser ? 'Admin' : (isBuilder ? 'Builder' : 'Viewer');
 
     const imSysAdmin = me.isSuperUser;
-    const imGroupAdmin = me.isSuperUser;
+    const isCategoryAdmin = me.isSuperUser;
 
     // TODO
     const menuOptions =
@@ -157,7 +157,7 @@ class LibraryInfoUser extends TerrainComponent<LibraryInfoUserProps>
             roleText
           }
         </div>
-        {(imGroupAdmin || imSysAdmin) ? <Menu options={menuOptions} small={true} /> : null}
+        {(isCategoryAdmin || imSysAdmin) ? <Menu options={menuOptions} small={true} /> : null}
       </div>
     );
   }

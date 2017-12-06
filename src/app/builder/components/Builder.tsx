@@ -70,7 +70,7 @@ import UserStore from '../../users/data/UserStore';
 import Util from './../../util/Util';
 import Actions from './../data/BuilderActions';
 import { BuilderState, BuilderStore } from './../data/BuilderStore';
-type Variant = LibraryTypes.Variant;
+type Algorithm = LibraryTypes.Algorithm;
 
 // Components
 import { tooltip } from 'common/components/tooltip/Tooltips';
@@ -105,7 +105,7 @@ class Builder extends TerrainComponent<Props>
   public state: {
     exportState: FileImportTypes.FileImportState,
     builderState: BuilderState,
-    variants: IMMap<ID, Variant>,
+    algorithms: IMMap<ID, Algorithm>,
 
     colKeys: List<number>;
     noColumnAnimation: boolean;
@@ -117,7 +117,7 @@ class Builder extends TerrainComponent<Props>
     nextLocation: any;
     tabActions: List<TabAction>;
 
-    nonexistentVariantIds: List<ID>;
+    nonexistentAlgorithmIds: List<ID>;
 
     navigationException: boolean; // does Builder need to allow navigation w/o confirm dialog?
 
@@ -128,7 +128,7 @@ class Builder extends TerrainComponent<Props>
   } = {
     exportState: FileImportStore.getState(),
     builderState: BuilderStore.getState(),
-    variants: LibraryStore.getState().variants,
+    algorithms: LibraryStore.getState().algorithms,
 
     colKeys: null,
     noColumnAnimation: false,
@@ -140,7 +140,7 @@ class Builder extends TerrainComponent<Props>
     nextLocation: null,
     tabActions: this.getTabActions(BuilderStore.getState()),
 
-    nonexistentVariantIds: List([]),
+    nonexistentAlgorithmIds: List([]),
 
     navigationException: false,
 
@@ -174,8 +174,8 @@ class Builder extends TerrainComponent<Props>
     });
 
     this._subscribe(LibraryStore, {
-      stateKey: 'variants',
-      storeKeyPath: ['variants'],
+      stateKey: 'algorithms',
+      storeKeyPath: ['algorithms'],
     });
 
     this._subscribe(FileImportStore, {
@@ -236,7 +236,7 @@ class Builder extends TerrainComponent<Props>
 
       if (this.shouldSave())
       {
-        const msg = 'You have unsaved changes to this Variant. If you leave, they will be lost. Are you sure you want to leave?';
+        const msg = 'You have unsaved changes to this Algorithm. If you leave, they will be lost. Are you sure you want to leave?';
         e && (e.returnValue = msg);
         return msg;
       }
@@ -273,7 +273,7 @@ class Builder extends TerrainComponent<Props>
         const config = pieces[2].split(',');
         if (config.indexOf('!' + this.getSelectedId()) !== -1)
         {
-          // current opened variant is still open, move along.
+          // current opened algorithm is still open, move along.
           // TODO
           return true;
           // note: don't currently return true because that resets unsaved changes in open v
@@ -352,31 +352,31 @@ class Builder extends TerrainComponent<Props>
     localStorage.setItem('config', newConfig || '');
 
     const pieces = newConfig.split(',');
-    let variantId = pieces.find(
+    let algorithmId = pieces.find(
       (piece) => piece.indexOf('!') === 0,
     );
-    if (variantId)
+    if (algorithmId)
     {
-      variantId = variantId.substr(1); // trim '!'
+      algorithmId = algorithmId.substr(1); // trim '!'
     }
-    if (newConfig && (props === this.props || variantId !== this.getSelectedId(this.props)))
+    if (newConfig && (props === this.props || algorithmId !== this.getSelectedId(this.props)))
     {
-      const variant = this.state.variants.get(+variantId);
+      const algorithm = this.state.algorithms.get(+algorithmId);
       // need to fetch data for new query
-      Actions.fetchQuery(variantId, this.handleNoVariant, variant && variant.db);
+      Actions.fetchQuery(algorithmId, this.handleNoAlgorithm, algorithm && algorithm.db);
     }
   }
 
-  public handleNoVariant(variantId: ID)
+  public handleNoAlgorithm(algorithmId: ID)
   {
-    if (this.props.params.config && this.state.nonexistentVariantIds.indexOf(variantId) === -1)
+    if (this.props.params.config && this.state.nonexistentAlgorithmIds.indexOf(algorithmId) === -1)
     {
       this.setState({
-        nonexistentVariantIds: this.state.nonexistentVariantIds.push(variantId),
+        nonexistentAlgorithmIds: this.state.nonexistentAlgorithmIds.push(algorithmId),
       });
       const newConfigArr = localStorage['config']
         .split(',')
-        .filter((id) => id !== variantId && id !== '!' + variantId);
+        .filter((id) => id !== algorithmId && id !== '!' + algorithmId);
       if (newConfigArr.length && !newConfigArr.some((c) => c.substr(0, 1) === '!'))
       {
         newConfigArr[0] = '!' + newConfigArr[0];
@@ -405,25 +405,25 @@ class Builder extends TerrainComponent<Props>
     return this.state.builderState.query; // || this.loadingQuery;
   }
 
-  public getVariant(props?: Props): LibraryTypes.Variant
+  public getAlgorithm(props?: Props): LibraryTypes.Algorithm
   {
     if (!this.state)
     {
       return null;
     }
 
-    const variantId = this.getSelectedId(props);
-    const variant = this.state.variants &&
-      this.state.variants.get(+variantId);
-    if (variantId && !variant)
+    const algorithmId = this.getSelectedId(props);
+    const algorithm = this.state.algorithms &&
+      this.state.algorithms.get(+algorithmId);
+    if (algorithmId && !algorithm)
     {
-      LibraryActions.variants.fetchVersion(variantId, () =>
+      LibraryActions.algorithms.fetchVersion(algorithmId, () =>
       {
         // no version available
-        this.handleNoVariant(variantId);
+        this.handleNoAlgorithm(algorithmId);
       });
     }
-    return variant; // || this.loadingVariant;
+    return algorithm; // || this.loadingAlgorithm;
   }
 
   public getTabActions(builderState: BuilderState): List<TabAction>
@@ -456,12 +456,12 @@ class Builder extends TerrainComponent<Props>
       //   {
       //     text: 'Duplicate',
       //     icon: <DuplicateIcon />,
-      //     onClick: this.duplicateAlgorithm,
+      //     onClick: this.duplicateGroup,
       //   },
       //   {
       //     text: 'Open',
       //     icon: <OpenIcon />,
-      //     onClick: this.loadAlgorithm,
+      //     onClick: this.loadGroup,
       //   },
     ]);
   }
@@ -478,9 +478,9 @@ class Builder extends TerrainComponent<Props>
 
   public onSave()
   {
-    if (this.getVariant().version)
+    if (this.getAlgorithm().version)
     {
-      if (!confirm('You are editing an old version of the Variant. Saving will replace the current contents of the Variant. Are you sure you want to save?'))
+      if (!confirm('You are editing an old version of the Algorithm. Saving will replace the current contents of the Algorithm. Are you sure you want to save?'))
       {
         return;
       }
@@ -491,27 +491,27 @@ class Builder extends TerrainComponent<Props>
   public onSaveAs()
   {
     this.setState({
-      saveAsTextboxValue: Util.duplicateNameFor(this.getVariant().name),
+      saveAsTextboxValue: Util.duplicateNameFor(this.getAlgorithm().name),
       savingAs: true,
     });
   }
 
-  public onSaveSuccess(variant: Variant)
+  public onSaveSuccess(algorithm: Algorithm)
   {
     notificationManager.addNotification(
       'Saved',
-      variant.name,
+      algorithm.name,
       'info',
       4,
     );
   }
 
-  public onSaveError(variant: Variant)
+  public onSaveError(algorithm: Algorithm)
   {
     Actions.save(false);
     notificationManager.addNotification(
       'Error Saving',
-      '"' + variant.name + '" failed to save.',
+      '"' + algorithm.name + '" failed to save.',
       'error',
       0,
     );
@@ -527,16 +527,16 @@ class Builder extends TerrainComponent<Props>
 
   public shouldSave(overrideState?: BuilderState): boolean
   {
-    const variant = this.getVariant();
-    if (variant)
+    const algorithm = this.getAlgorithm();
+    if (algorithm)
     {
-      if (variant.status === ItemStatus.Live || variant.status === ItemStatus.Approve)
+      if (algorithm.status === ItemStatus.Live || algorithm.status === ItemStatus.Approve)
       {
         return false;
       }
       if (
-        !Util.haveRole(variant.groupId, 'builder', UserStore, RolesStore)
-        && !Util.haveRole(variant.groupId, 'admin', UserStore, RolesStore)
+        !Util.haveRole(algorithm.categoryId, 'builder', UserStore, RolesStore)
+        && !Util.haveRole(algorithm.categoryId, 'admin', UserStore, RolesStore)
       )
       {
         // not auth
@@ -549,34 +549,34 @@ class Builder extends TerrainComponent<Props>
 
   public save()
   {
-    let variant = LibraryTypes.touchVariant(this.getVariant());
+    let algorithm = LibraryTypes.touchAlgorithm(this.getAlgorithm());
     if (this.shouldSave())
     {
-      variant = variant.set('query', this.getQuery());
+      algorithm = algorithm.set('query', this.getQuery());
       this.setState({
         saving: true,
       });
 
-      // TODO remove if queries/variants model changes
-      TerrainStore.dispatch(LibraryActions.variants.change(variant));
-      this.onSaveSuccess(variant);
+      // TODO remove if queries/algorithms model changes
+      TerrainStore.dispatch(LibraryActions.algorithms.change(algorithm));
+      this.onSaveSuccess(algorithm);
       Actions.save(); // register that we are saving
 
       let configArr = window.location.pathname.split('/')[2].split(',');
-      let currentVariant;
+      let currentAlgorithm;
       configArr = configArr.map((tab) =>
       {
         if (tab.substr(0, 1) === '!')
         {
-          currentVariant = tab.substr(1).split('@')[0];
-          return '!' + currentVariant;
+          currentAlgorithm = tab.substr(1).split('@')[0];
+          return '!' + currentAlgorithm;
         }
         return tab;
       },
       );
       for (let i = 0; i < configArr.length; i++)
       {
-        if (configArr[i] === currentVariant)
+        if (configArr[i] === currentAlgorithm)
         {
           configArr.splice(i, 1);
         }
@@ -610,30 +610,30 @@ class Builder extends TerrainComponent<Props>
 
   public canEdit(): boolean
   {
-    const variant = this.getVariant();
-    return variant && (variant.status === ItemStatus.Build
-      && Util.canEdit(variant, UserStore, RolesStore));
+    const algorithm = this.getAlgorithm();
+    return algorithm && (algorithm.status === ItemStatus.Build
+      && Util.canEdit(algorithm, UserStore, RolesStore));
   }
 
   public cantEditReason(): string
   {
-    const variant = this.getVariant();
-    if (!variant || this.canEdit())
+    const algorithm = this.getAlgorithm();
+    if (!algorithm || this.canEdit())
     {
       return '';
     }
-    if (variant.status !== ItemStatus.Build)
+    if (algorithm.status !== ItemStatus.Build)
     {
-      return 'This Variant is not in Build status';
+      return 'This Algorithm is not in Build status';
     }
-    return 'You are not authorized to edit this Variant';
+    return 'You are not authorized to edit this Algorithm';
   }
 
   public getColumn(index)
   {
     const key = this.state.colKeys.get(index);
     const query = this.getQuery();
-    const variant = this.getVariant();
+    const algorithm = this.getAlgorithm();
 
     return {
       minWidth: 316,
@@ -645,7 +645,7 @@ class Builder extends TerrainComponent<Props>
         exportState={this.state.exportState}
         index={index}
         colKey={key}
-        variant={variant}
+        algorithm={algorithm}
         onAddColumn={this.handleAddColumn}
         onAddManualColumn={this.handleAddManualColumn}
         onCloseColumn={this.handleCloseColumn}
@@ -762,7 +762,7 @@ class Builder extends TerrainComponent<Props>
 
   public revertVersion()
   {
-    if (confirm('Are you sure you want to revert? Reverting Resets the Variant’s contents to this version. You can always undo the revert, and reverting does not lose any of the Variant’s history.'))
+    if (confirm('Are you sure you want to revert? Reverting Resets the Algorithm’s contents to this version. You can always undo the revert, and reverting does not lose any of the Algorithm’s history.'))
     {
       this.save();
     }
@@ -770,11 +770,11 @@ class Builder extends TerrainComponent<Props>
 
   public renderVersionToolbar()
   {
-    const variant = this.getVariant();
+    const algorithm = this.getAlgorithm();
 
-    if (variant && variant.version)
+    if (algorithm && algorithm.version)
     {
-      const lastEdited = Util.formatDate(variant.lastEdited);
+      const lastEdited = Util.formatDate(algorithm.lastEdited);
 
       return (
         <div className='builder-revert-toolbar'>
@@ -791,7 +791,7 @@ class Builder extends TerrainComponent<Props>
               >
                 Revert to this version
               </div>,
-              "Resets the Variant's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Variant's history.",
+              "Resets the Algorithm's contents to this version.\nYou can always undo the revert. Reverting\ndoes not lose any of the Algorithm's history.",
             )
           }
         </div>
@@ -840,21 +840,21 @@ class Builder extends TerrainComponent<Props>
 
   public handleModalSaveAs()
   {
-    let variant = LibraryTypes.touchVariant(this.getVariant());
-    variant = variant.set('query', this.getQuery());
-    TerrainStore.dispatch(LibraryActions.variants.duplicateAs(variant, variant.get('index'), this.state.saveAsTextboxValue,
-      (response, newVariant) =>
+    let algorithm = LibraryTypes.touchAlgorithm(this.getAlgorithm());
+    algorithm = algorithm.set('query', this.getQuery());
+    TerrainStore.dispatch(LibraryActions.algorithms.duplicateAs(algorithm, algorithm.get('index'), this.state.saveAsTextboxValue,
+      (response, newAlgorithm) =>
       {
-        this.onSaveSuccess(newVariant);
+        this.onSaveSuccess(newAlgorithm);
         Actions.save();
 
         let configArr = window.location.pathname.split('/')[2].split(',');
-        let currentVariant;
+        let currentAlgorithm;
         configArr = configArr.map((tab) =>
         {
           if (tab.substr(0, 1) === '!')
           {
-            currentVariant = tab.substr(1).split('@')[0];
+            currentAlgorithm = tab.substr(1).split('@')[0];
             return '!' + response.id.toString();
           }
           return tab;
@@ -862,7 +862,7 @@ class Builder extends TerrainComponent<Props>
         );
         for (let i = 0; i < configArr.length; i++)
         {
-          if (configArr[i] === currentVariant)
+          if (configArr[i] === currentAlgorithm)
           {
             configArr.splice(i, 1);
           }
@@ -890,10 +890,10 @@ class Builder extends TerrainComponent<Props>
   public render()
   {
     const config = this.props.params.config;
-    const variant = this.getVariant();
+    const algorithm = this.getAlgorithm();
     const query = this.getQuery();
-    const variantIdentifier = variant === undefined ? '' :
-      `${variant.groupId},${variant.algorithmId},${variant.id}`;
+    const algorithmIdentifier = algorithm === undefined ? '' :
+      `${algorithm.categoryId},${algorithm.groupId},${algorithm.id}`;
 
     return (
       <div
@@ -906,7 +906,7 @@ class Builder extends TerrainComponent<Props>
         {
           !config || !config.length ?
             <InfoArea
-              large='No variants open'
+              large='No algorithms open'
               small='You can open one in the Library'
               button='Go to the Library'
               onClick={this.goToLibrary}
@@ -917,7 +917,7 @@ class Builder extends TerrainComponent<Props>
                 actions={this.state.tabActions}
                 config={config}
                 ref='tabs'
-                onNoVariant={this.handleNoVariant}
+                onNoAlgorithm={this.handleNoAlgorithm}
               />
               <div className='tabs-content'>
                 {
@@ -929,7 +929,7 @@ class Builder extends TerrainComponent<Props>
         }
         <Modal
           open={this.state.leaving}
-          message={'Save changes' + (variant ? ' to ' + variant.name : '') + ' before leaving?'}
+          message={'Save changes' + (algorithm ? ' to ' + algorithm.name : '') + ' before leaving?'}
           title='Unsaved Changes'
           confirmButtonText='Save'
           confirm={true}
@@ -946,14 +946,14 @@ class Builder extends TerrainComponent<Props>
           onClose={this.handleModalSaveAsCancel}
           onConfirm={this.handleModalSaveAs}
           initialTextboxValue={this.state.saveAsTextboxValue}
-          textboxPlaceholderValue={'Variant Name'}
-          message={'What would you like to name the copy of the variant?'}
+          textboxPlaceholderValue={'Algorithm Name'}
+          message={'What would you like to name the copy of the algorithm?'}
           showTextbox={true}
           onTextboxValueChange={this.handleSaveAsTextboxChange}
         />
         <ResultsManager
           query={query}
-          variantPath={variantIdentifier}
+          algorithmPath={algorithmIdentifier}
           resultsState={this.state.builderState.resultsState}
           db={this.state.builderState.db}
           onResultsStateChange={Actions.results}

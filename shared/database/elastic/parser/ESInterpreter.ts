@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParser from 'shared/database/elastic/parser/ESParser';
 import ESClause from './clauses/ESClause';
 import EQLConfig from './EQLConfig';
 import ESJSONParser from './ESJSONParser';
+import ESParser from './ESParser';
 import ESParserError from './ESParserError';
 import ESValueInfo from './ESValueInfo';
 
@@ -61,7 +61,7 @@ export default class ESInterpreter
 {
   public config: EQLConfig; // query language description
   public params: { [name: string]: null | ESClause }; // input parameter clause types
-  public parser: ESParser; // source parser
+  public parser: ESParser | null; // source parser
   public rootValueInfo: ESValueInfo;
   public errors: ESParserError[];
 
@@ -139,9 +139,9 @@ export default class ESInterpreter
     }
   }
 
-  public accumulateError(info: ESValueInfo, message: string, isWarning: boolean = false): void
+  public accumulateError(info: ESValueInfo | null, message: string, isWarning: boolean = false): void
   {
-    let token = null;
+    let token: any = null;
     if (info !== null && info !== undefined && info.tokens.length > 0)
     {
       token = info.tokens[0];

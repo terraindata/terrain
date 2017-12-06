@@ -99,6 +99,7 @@ class Autocomplete extends TerrainComponent<Props>
     value: string;
     open: boolean;
     selectedIndex: number;
+    hoveredIndex: number;
   };
 
   public blurValue: string = '';
@@ -113,6 +114,7 @@ class Autocomplete extends TerrainComponent<Props>
           ? '' : String(props.value),
         open: false,
         selectedIndex: -1,
+        hoveredIndex: -1,
       };
   }
 
@@ -254,11 +256,16 @@ class Autocomplete extends TerrainComponent<Props>
       case 13:
       case 9:
         // enter or tab
-        let value = visibleOptions.get(this.state.selectedIndex);
-        if (!value || this.state.selectedIndex === -1)
+        let value = event.target.value;
+        if (this.state.selectedIndex !== -1)
         {
-          value = event.target.value;
+          value = visibleOptions.get(this.state.selectedIndex);
         }
+        else if (this.state.hoveredIndex !== -1)
+        {
+          value = visibleOptions.get(this.state.hoveredIndex);
+        }
+
         this.setState({
           open: false,
           selectedIndex: -1,
@@ -301,6 +308,20 @@ class Autocomplete extends TerrainComponent<Props>
       || haystack.indexOf('.' + needle) !== -1;
   }
 
+  public mouseOverOption(index)
+  {
+    this.setState({
+      hoveredIndex: index,
+    });
+  }
+
+  public mouseLeaveOption(value)
+  {
+    this.setState({
+      hoveredIndex: -1,
+    });
+  }
+
   public renderOption(option: string, index: number)
   {
     let first = option;
@@ -322,6 +343,8 @@ class Autocomplete extends TerrainComponent<Props>
           'ac-option-selected': index === this.state.selectedIndex,
         })}
         onMouseDown={this._fn(this.handleSelect, option)}
+        onMouseEnter={this._fn(this.mouseOverOption, index)}
+        onMouseLeave={this.mouseLeaveOption}
         data-value={option}
         key={option}
         ref={'opt' + index}
