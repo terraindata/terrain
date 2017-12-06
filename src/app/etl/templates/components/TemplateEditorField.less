@@ -42,12 +42,22 @@
     padding-left: @quarter-spacing;
   }
 
-
   .template-editor-field-settings {
     .transition;
-    padding: @half-spacing;
     border: 1px solid;
     flex-grow: 1;
+  }
+
+  .template-editor-field-label-group {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .template-editor-field-input-disabled {
+    .template-editor-field-label-group {
+      cursor: default;
+    }
   }
 }
 

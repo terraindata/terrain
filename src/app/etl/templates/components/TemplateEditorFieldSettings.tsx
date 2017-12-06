@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -109,13 +109,12 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
           options={emptyOptions}
           onFocus={this.enableOriginalNameInput}
           onBlur={this.disableOriginalNameInput}
+          autoFocus={true}
+          style={originalNameAutocompleteStyle}
         />
       </div>
       :
-      <div
-        onClick={this.enableOriginalNameInput}
-        className='tef-layout-label tef-center small-text'
-      >
+      <div className='tef-layout-label tef-center normal-text'>
         &nbsp;{field.originalName}
       </div>
 
@@ -129,19 +128,27 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
             large={true}
           />
         </div>
-        <div className='template-editor-field-settings'
+        <div className={classNames({
+          'template-editor-field-settings': true,
+          'template-editor-field-input-disabled': inputDisabled,
+          })}
           style={[
             backgroundColor(Colors().bg3),
             borderColor(Colors().border1)
           ]}
         >
-          <div className='tef-layout-row'>
+          <div className='tef-layout-row tef-layout-padded'>
             <div className='tef-layout-label'> Field Name </div>
             <div className='tef-layout-autocomplete-spacer'> {inputFieldName} </div>
-            <div className='tef-layout-row' style={originalNameLabelStyle}>
-              <div className='tef-layout-label tef-left small-text'> (from </div>
+            <div
+              className='template-editor-field-label-group'
+              style={originalNameLabelStyle}
+              onClick={this.state.originalNameOpen ? undefined : this.enableOriginalNameInput}
+              key={this.state.originalNameOpen ? 'autocomplete' : 'label'}
+            >
+              <div className='tef-layout-label tef-left normal-text'> (from </div>
               {inputOriginalName}
-              <div className='tef-layout-label tef-right small-text'> ) </div>
+              <div className='tef-layout-label tef-right normal-text'> ) </div>
             </div>
           </div>
 
@@ -152,9 +159,13 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
 
   public enableOriginalNameInput()
   {
-    this.setState({
-      originalNameOpen: true,
-    });
+    if (!this.inputDisabled())
+    {
+      this.setState({
+        originalNameOpen: true,
+      });
+    }
+
   }
 
   public disableOriginalNameInput()
@@ -207,6 +218,10 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
 
 const originalNameLabelStyle = [
   fontColor(Colors().text3),
+]
+
+const originalNameAutocompleteStyle = [
+  getStyle('width', '120px')
 ]
 
 const emptyOptions = List([]);
