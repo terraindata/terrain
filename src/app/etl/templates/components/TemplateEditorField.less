@@ -56,7 +56,7 @@
 
   .template-editor-field-input-disabled {
     .template-editor-field-label-group {
-      cursor: default;
+      cursor: auto;
     }
   }
 }
@@ -70,14 +70,25 @@
   }
 
   .new-field-button-spacer {
-    padding: @item-spacing;
     display: flex;
     justify-content: flex-start;
 
     .create-new-template-field-button {
-      display: inline-block;
+      display: flex;
+      align-items: center;
       padding: @half-spacing;
       border-radius: 3px;
+      cursor: pointer;
+
+      &.template-editor-field-input-disabled {
+        cursor: auto;
+      }
+
+      .template-editor-add-icon {
+        fill: currentColor;
+        width: 12px;
+        margin-right: 16px;
+      }
     }
   }
 }

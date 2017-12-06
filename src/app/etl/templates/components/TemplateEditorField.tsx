@@ -43,66 +43,80 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
-import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _ExportTemplate, _TemplateField, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
-import './TemplateEditor.less';
+import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 
-const { List } = Immutable;
+/*
+ *  This class defines a base class with useful functions that are used by components
+ *  that act as both a View and a Controller into a TemplateEditorField
+ */
 
-export interface Props
+export interface TemplateEditorFieldProps
 {
+  keyPath: KeyPath;
+  field: TemplateField;
+  canEdit: boolean;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
 }
 
-@Radium
-class ETLExportDisplay extends TerrainComponent<Props>
+export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
 {
-  public componentDidMount()
+  constructor(props)
   {
-    let template = _ExportTemplate({
-      templateId: 1,
-      templateName: 'Test Template',
-    });
-    template = template.setIn(['rootField', 'children', 0], _TemplateField({ name: 'field 1' }));
-    template = template.setIn(['rootField', 'children', 1], _TemplateField({ name: 'field 2' }));
-    template = template.setIn(['rootField', 'children', 1, 'children', 0], _TemplateField({ name: 'nested field' }));
-    template = template.setIn(['rootField', 'children', 1, 'children', 1], _TemplateField({ name: ' another nested field' }));
+    super(props);
+    this._setFactory = _.memoize(this._setFactory);
+  }
 
-    this.props.act({
-      actionType: 'loadTemplate',
-      template,
+  // helper to calling setIn() on the TemplateField in the store
+  protected _set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
+  {
+    const { act, keyPath } = this.props;
+    act({
+      actionType: 'updateField',
+      sourcePath: keyPath,
+      key,
+      value,
     });
   }
 
-  public render()
+  protected _isRoot(): boolean
   {
-    const template: ETLTemplate = this.props.templateEditor.template;
+    return this.props.keyPath.size === 0;
+  }
 
-    return (
-      <div className='template-editor-root-container'>
-        <TemplateEditorFieldNode
-          keyPath={List([])}
-          field={template.rootField}
-          canEdit={true}
-        />
-      </div>
-    );
+  protected _inputDisabled(): boolean
+  {
+    return !this.props.field.isIncluded || !this.props.canEdit;
+  }
+
+  // for event handlers that should be disabled if input is disabled
+  protected _noopIfDisabled<F>(fn: F): F | undefined
+  {
+    return this._inputDisabled() ? undefined : fn;
+  }
+
+  // similar to setStateWrapper
+  protected _setFactory<K extends keyof TemplateField>(key: K, ...path: string[])
+  {
+    return (val) =>
+    {
+      for (const property of path)
+      {
+        val = val[property];
+      }
+      this._set(key, val);
+    };
   }
 }
-
-export default Util.createContainer(
-  ETLExportDisplay,
-  ['templateEditor'],
-  { act: TemplateEditorActions },
-);

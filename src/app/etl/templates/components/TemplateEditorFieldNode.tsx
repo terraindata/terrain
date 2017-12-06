@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires
+import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
@@ -54,11 +56,12 @@ import Util from 'util/Util';
 import ExpandableView from 'common/components/ExpandableView';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-
+import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
+const AddIcon = require('images/icon_add.svg');
 
-export interface Props
+export interface Props extends TemplateEditorFieldProps
 {
   keyPath: KeyPath;
   field: TemplateField;
@@ -69,7 +72,7 @@ export interface Props
 }
 
 @Radium
-class TemplateEditorFieldNodeC extends TerrainComponent<Props>
+class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 {
   public state: {
     expandableViewOpen: boolean;
@@ -98,12 +101,20 @@ class TemplateEditorFieldNodeC extends TerrainComponent<Props>
 
   public renderCreateNewFieldButton()
   {
+    const buttonStyle = this._inputDisabled() ?
+      fontColor(Colors().text3, Colors().text3) :
+      fontColor(Colors().text3, Colors().text2);
     return (
       <div className='new-field-button-spacer'>
-        <div className='create-new-template-field-button'
-          style={_.extend({}, buttonColors(), getStyle('cursor', 'pointer'))}
-          onClick={this.handleCreateNewField}
+        <div
+          className={classNames({
+            'create-new-template-field-button': true,
+            'template-editor-field-input-disabled': this._inputDisabled(),
+          })}
+          onClick={this._noopIfDisabled(this.handleCreateNewField)}
+          style={buttonStyle}
         >
+          <AddIcon className='template-editor-add-icon'/>
           Add Field
         </div>
       </div>
@@ -122,13 +133,13 @@ class TemplateEditorFieldNodeC extends TerrainComponent<Props>
       />
     );
 
-    const children = (this.isRoot() || field.children.size >= 0) ? (
+    const children = (this._isRoot() || field.children.size >= 0) ? (
       <div className='template-editor-children-container'>
         {this.renderChildFields()}
         {this.renderCreateNewFieldButton()}
       </div>) : undefined;
 
-    if (this.isRoot())
+    if (this._isRoot())
     {
       return children;
     }
@@ -169,11 +180,6 @@ class TemplateEditorFieldNodeC extends TerrainComponent<Props>
   public handleFieldClicked()
   {
     const { field, keyPath, act } = this.props;
-  }
-
-  private isRoot(): boolean
-  {
-    return this.props.keyPath.size === 0;
   }
 }
 

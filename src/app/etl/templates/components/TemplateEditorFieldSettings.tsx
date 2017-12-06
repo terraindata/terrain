@@ -58,10 +58,10 @@ import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-
+import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 
-export interface Props
+export interface Props extends TemplateEditorFieldProps
 {
   keyPath: KeyPath;
   field: TemplateField;
@@ -72,7 +72,7 @@ export interface Props
 }
 
 @Radium
-class TemplateEditorFieldSettings extends TerrainComponent<Props>
+class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 {
   public state: {
     originalNameOpen: boolean;
@@ -80,22 +80,16 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
     originalNameOpen: false,
   }
 
-  constructor(props)
-  {
-    super(props);
-    this.setFactory = _.memoize(this.setFactory);
-  }
-
   public render()
   {
     const { field, canEdit } = this.props;
-    const inputDisabled = this.inputDisabled();
+    const inputDisabled = this._inputDisabled();
     const disableCheckbox = !canEdit; // only disable checkbox if it is disabled from a parent
 
     const inputFieldName =
       <Autocomplete
         value={field.name}
-        onChange={this.setFactory('name')}
+        onChange={this._setFactory('name')}
         disabled={inputDisabled}
         options={emptyOptions}
       />;
@@ -104,7 +98,7 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
       <div className='tef-layout-autocomplete-spacer'>
         <Autocomplete
           value={field.originalName}
-          onChange={this.setFactory('originalName')}
+          onChange={this._setFactory('originalName')}
           disabled={inputDisabled}
           options={emptyOptions}
           onFocus={this.enableOriginalNameInput}
@@ -138,12 +132,12 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
           ]}
         >
           <div className='tef-layout-row tef-layout-padded'>
-            <div className='tef-layout-label'> Field Name </div>
+            <div className='tef-layout-label'> Name </div>
             <div className='tef-layout-autocomplete-spacer'> {inputFieldName} </div>
             <div
               className='template-editor-field-label-group'
               style={originalNameLabelStyle}
-              onClick={this.state.originalNameOpen ? undefined : this.enableOriginalNameInput}
+              onClick={this._noopIfDisabled(this.enableOriginalNameInput)}
               key={this.state.originalNameOpen ? 'autocomplete' : 'label'}
             >
               <div className='tef-layout-label tef-left normal-text'> (from </div>
@@ -159,13 +153,9 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
 
   public enableOriginalNameInput()
   {
-    if (!this.inputDisabled())
-    {
-      this.setState({
-        originalNameOpen: true,
-      });
-    }
-
+    this.setState({
+      originalNameOpen: true,
+    });
   }
 
   public disableOriginalNameInput()
@@ -177,52 +167,18 @@ class TemplateEditorFieldSettings extends TerrainComponent<Props>
 
   public handleIncludeCheckboxClicked()
   {
-    this.set('isIncluded', !this.props.field.isIncluded)
+    this._set('isIncluded', !this.props.field.isIncluded)
   }
 
-  // helper to calling setIn() on the TemplateField in the store
-  private set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
-  {
-    const { act, keyPath } = this.props;
-    act({
-      actionType: 'updateField',
-      sourcePath: keyPath,
-      key,
-      value,
-    });
-  }
-
-  private isRoot(): boolean
-  {
-    return this.props.keyPath.size === 0;
-  }
-
-  private inputDisabled(): boolean
-  {
-    return !this.props.field.isIncluded || !this.props.canEdit;
-  }
-
-  // similar to setStateWrapper
-  private setFactory<K extends keyof TemplateField>(key: K, ...path: string[])
-  {
-    return (val) =>
-    {
-      for (const property of path)
-      {
-        val = val[property];
-      }
-      this.set(key, val);
-    };
-  }
 }
 
 const originalNameLabelStyle = [
   fontColor(Colors().text3),
-]
+];
 
 const originalNameAutocompleteStyle = [
-  getStyle('width', '120px')
-]
+  getStyle('width', '160px')
+];
 
 const emptyOptions = List([]);
 
