@@ -53,7 +53,7 @@ import * as _ from 'lodash';
 import { Colors, getCardColors } from '../../../app/colors/Colors';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { DisplayType } from '../../../blocks/displays/Display';
-import { _block, Block, TQLTranslationFn } from '../../../blocks/types/Block';
+import { _block, Block, BlockConfig, TQLTranslationFn } from '../../../blocks/types/Block';
 import { _card, Card } from '../../../blocks/types/Card';
 import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/elastic/blocks/ElasticBlockHelpers';
 
@@ -84,6 +84,14 @@ const esFilterOperatorsTooltips = {
 export class FilterUtils
 {
   public static BoolQueryCard = ElasticElasticCards['eqlbool_query'];
+
+  // custom make for the filter card
+  public static makeCustomFilterCard(blocksConfig: { [type: string]: BlockConfig },
+    blockType: string, extraConfig?: { [key: string]: any }, skipTemplate?: boolean)
+  {
+    console.assert(blockType === 'eqlbool_query', 'Unrecognized block type ' + blockType);
+    return BlockUtils.make(blocksConfig, 'elasticFilter', extraConfig, skipTemplate);
+  }
 
   public static updateFilterRows(block: Block): Block
   {
@@ -141,7 +149,7 @@ export class FilterUtils
     return false;
   }
 
-  public static mergeRowsWithBlock(block: Block, rows: Block[]): Immutable.List<Block>
+  public static insertRowsToBlock(block: Block, rows: Block[]): Immutable.List<Block>
   {
     let cards = block.cards.filter((queryBlock) => FilterUtils.isNotFilterBlock(queryBlock));
     rows.map((rowBlock) =>
@@ -150,6 +158,17 @@ export class FilterUtils
     });
     return cards;
   }
+
+  // If CCT adds another card with name filter/must/should/must_not and we have rows
+  // that have the same name, we can get two cards with the same name, so we have to merge
+  // these two cards to a same card.
+  //  public static mergeFilterCards(block: Block)
+  //  {
+  //    for (const key of ['filter', 'must', 'should', 'must_not'])
+  //    {
+
+  //    }
+  //  }
 
   public static hideFilterBlocks(block: Block): Block
   {
@@ -240,7 +259,7 @@ export class FilterUtils
               key: boolOp,
             },
             true);
-          opCard = opCard.set('cards', FilterUtils.mergeRowsWithBlock(opCard, filterRowMap[boolOp]));
+          opCard = opCard.set('cards', FilterUtils.insertRowsToBlock(opCard, filterRowMap[boolOp]));
           block = block.set('cards', block.cards.push(opCard));
         }
       } else
@@ -255,13 +274,13 @@ export class FilterUtils
               cards: Immutable.List([currentQueryCard]),
             },
             true);
-          opCard = opCard.set('cards', FilterUtils.mergeRowsWithBlock(opCard, filterRowMap[boolOp]));
+          opCard = opCard.set('cards', FilterUtils.insertRowsToBlock(opCard, filterRowMap[boolOp]));
           block = block.setIn(opValueInfo.cardPath, opCard);
         } else
         {
           console.assert(opValueInfo.card.type === 'eqlquery[]');
           let opCard = opValueInfo.card;
-          opCard = opCard.set('cards', FilterUtils.mergeRowsWithBlock(opCard, filterRowMap[boolOp]));
+          opCard = opCard.set('cards', FilterUtils.insertRowsToBlock(opCard, filterRowMap[boolOp]));
           block = block.setIn(opValueInfo.cardPath, opCard);
         }
       }

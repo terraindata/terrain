@@ -46,17 +46,13 @@ THE SOFTWARE.
 
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
 import GetCardVisitor from '../../../app/builder/getCard/GetCardVisitor';
+import { FilterUtils } from './ElasticFilterCard';
 
 const getCardVisitor: GetCardVisitor =
   new GetCardVisitor(ESInterpreterDefaultConfig);
 
 export const ElasticElasticCards: { [type: string]: any } =
   getCardVisitor.elasticElasticCards;
-
-export const ElasticCustomCards: { [type: string]: string } =
-  {
-    eqlbool_query: 'elasticFilter',
-  };
 
 export const ElasticElasticCardDeckTypes: string[] =
   getCardVisitor.elasticElasticCardDeckTypes;

@@ -60,7 +60,7 @@ import Blocks from '../blocks/ElasticBlocks';
 
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
-import { ElasticCustomCards } from '../blocks/ElasticElasticCards';
+import { FilterUtils } from '../blocks/ElasticFilterCard';
 import ESCardParser from './ESCardParser';
 
 const { make } = BlockUtils;
@@ -94,6 +94,11 @@ export function ElasticValueInfoToCards(rootValueInfo: ESValueInfo, currentCards
   const cards = BlockUtils.reconcileCards(currentCards, List([rootCard]));
   return ESCardParser.parseAndUpdateCards(cards);
 }
+
+export const ElasticCustomCards: { [type: string]: any } =
+  {
+    eqlbool_query: FilterUtils.makeCustomFilterCard,
+  };
 
 export default function ElasticToCards(
   query: Query,
@@ -214,7 +219,7 @@ export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       true);
   }
 
-  let clauseCardType = 'eql' + valueInfo.clause.type;
+  const clauseCardType = 'eql' + valueInfo.clause.type;
   if (typeof valueInfo.value !== 'object')
   {
     valueMap.value = valueInfo.value;
@@ -243,9 +248,11 @@ export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
   }
   if (ElasticCustomCards[clauseCardType])
   {
-    clauseCardType = ElasticCustomCards[clauseCardType];
+    return ElasticCustomCards[clauseCardType](Blocks, clauseCardType, valueMap, true);
+  } else
+  {
+    return make(Blocks, clauseCardType, valueMap, true);
   }
-  return make(Blocks, clauseCardType, valueMap, true);
 };
 
 function isDistanceCard(valueInfo: ESValueInfo): boolean
