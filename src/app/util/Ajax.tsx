@@ -361,7 +361,6 @@ export const Ajax =
         },
       );
     },
-    // TODO TODO TODO
     getItems(onLoad: (categories: IMMap<number, LibraryTypes.Category>,
       groups: IMMap<number, LibraryTypes.Group>,
       algorithms: IMMap<number, LibraryTypes.Algorithm>,
