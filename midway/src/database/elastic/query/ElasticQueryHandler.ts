@@ -158,16 +158,21 @@ export default class ElasticQueryHandler extends QueryHandler
       const client: ElasticClient = this.controller.getClient();
       const parentResults = await new Promise<QueryResponse>((res, rej) =>
       {
-        let allResponse = {};
+        let allResponse = null;
         const getMoreUntilDone = async (error: any, response: any) =>
         {
           if (error !== null && error !== undefined)
           {
-            return this.makeQueryCallback(res, rej)(error, response);
+            return this.makeQueryCallback(res, rej)(error, allResponse);
           }
 
           // winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(response, null, 2));
-          await this.handleGroupJoinSubQueries(valueInfo, childQuery, response);
+          if (allResponse === null)
+          {
+            allResponse = response;
+          }
+
+          await this.handleGroupJoinSubQueries(valueInfo, childQuery, allResponse);
 
           let size = response.hits.total;
           if (parentQuery['size'] !== undefined && parentQuery['size'] < size) {
@@ -176,7 +181,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
           console.log(size);
           console.log(response.hits.hits.length);
-          if (response.hits.hits.length > 0 && size > response.hits.hits.length)
+          if (size > response.hits.hits.length)
           {
             const scroll = (parentQuery['scroll'] !== undefined) ? parentQuery['scroll'] : '60s';
             client.scroll({
