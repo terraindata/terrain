@@ -56,6 +56,7 @@ import QueryResponse from '../../../../src/database/types/QueryResponse';
 import { QueryHandler } from './QueryHandler';
 
 import DatabaseController from '../../database/DatabaseController';
+import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 
 const QueryRouter = new KoaRouter();
@@ -115,6 +116,35 @@ QueryRouter.post(
       ctx.body = result;
       ctx.status = 200;
     }
+  });
+
+  QueryRouter.post('/template', passport.authenticate('access-token-local'), async (ctx, next) =>
+  {
+    const database: DatabaseController | undefined = DatabaseRegistry.get(ctx.request.body.body.dbid);
+    const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+    const params: any =
+      {
+        // id: ctx.request.body.body.id,
+        index: 'movies',
+        type: 'data',
+        body:
+        {
+          id: ctx.request.body.body.id,
+          // source: ctx.request.body.body.source,
+          params: ctx.request.body.body.params,
+        },
+        explain: ctx.request.body.body.explain !== undefined ? true : false,
+      };
+    if (ctx.request.body.body.source === undefined)
+    {
+      delete params['body']['source'];
+    }
+    console.log(params);
+    ctx.body = await new Promise<any>(async (resolve, reject) =>
+      {
+        // elasticClient.renderSearchTemplate({ id: ctx.request.body.body.id, body: ctx.request.body.body.params }, Util.makePromiseCallback(resolve, reject));
+        elasticClient.searchTemplate(params, Util.makePromiseCallback(resolve, reject));
+      });
   });
 
 export default QueryRouter;

@@ -199,6 +199,23 @@ class ElasticClient
     this.delegate.msearch(params, callback);
   }
 
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-rendersearchtemplate
+   */
+  public renderSearchTemplate<T>(params: Elastic.RenderSearchTemplateParams,
+    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+  {
+    this.log('renderSearchTemplate', params);
+    this.delegate.renderSearchTemplate(params, callback);
+  }
+
+  public searchTemplate<T>(params: Elastic.SearchTemplateParams,
+    callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
+  {
+    this.log('searchTemplate', params);
+    this.delegate.searchTemplate(params, callback);
+  }
+
   public getDelegate(): Elastic.Client
   {
     return this.delegate;
