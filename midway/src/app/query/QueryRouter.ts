@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
@@ -118,33 +119,55 @@ QueryRouter.post(
     }
   });
 
-  QueryRouter.post('/template', passport.authenticate('access-token-local'), async (ctx, next) =>
+QueryRouter.post('/template', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  // parse ctx.request.body.body as an Array
+  const reqArr: object[] = ctx.request.body.body as object[];
+  const bodyArr: object[] = [];
+  const indexSet: Set<string> = new Set();
+  const typeSet: Set<string> = new Set();
+  let dbid: number = -1;
+  reqArr.forEach((elem) =>
   {
-    const database: DatabaseController | undefined = DatabaseRegistry.get(ctx.request.body.body.dbid);
-    const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-    const params: any =
-      {
-        // id: ctx.request.body.body.id,
-        index: 'movies',
-        type: 'data',
-        body:
-        {
-          id: ctx.request.body.body.id,
-          // source: ctx.request.body.body.source,
-          params: ctx.request.body.body.params,
-        },
-        explain: ctx.request.body.body.explain !== undefined ? true : false,
-      };
-    if (ctx.request.body.body.source === undefined)
+    // get index and types, if any and add them to the Set
+    if (elem['index'] !== undefined)
     {
-      delete params['body']['source'];
+      indexSet.add(elem['index']);
     }
-    console.log(params);
-    ctx.body = await new Promise<any>(async (resolve, reject) =>
-      {
-        // elasticClient.renderSearchTemplate({ id: ctx.request.body.body.id, body: ctx.request.body.body.params }, Util.makePromiseCallback(resolve, reject));
-        elasticClient.searchTemplate(params, Util.makePromiseCallback(resolve, reject));
-      });
+    if (elem['type'] !== undefined)
+    {
+      typeSet.add(elem['type']);
+    }
+    if (elem['dbid'] !== undefined && typeof elem['dbid'] === 'number')
+    {
+      dbid = elem['dbid'];
+    }
+    const bodyObj: object = {};
+    const headerObj: object = {};
+    if (elem['id'] !== undefined && typeof elem['id'] === 'string' && elem['params'] !== undefined && typeof elem['params'] === 'object'
+      && elem['explain'] !== undefined && typeof elem['explain'] === 'boolean')
+    {
+      bodyObj['id'] = elem['id'];
+      bodyObj['params'] = elem['params'];
+      headerObj['index'] = elem['index'];
+      headerObj['type'] = elem['type'];
+      bodyArr.push(headerObj);
+      bodyArr.push(bodyObj);
+    }
+
   });
+  const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+  const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+  const params: any =
+    {
+      index: [...indexSet],
+      type: [...typeSet],
+      body: bodyArr,
+    };
+  ctx.body = await new Promise<any>(async (resolve, reject) =>
+  {
+    elasticClient.msearchTemplate(params, Util.makePromiseCallback(resolve, reject));
+  });
+});
 
 export default QueryRouter;
