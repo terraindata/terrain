@@ -153,7 +153,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 
     const fieldNameSection = (
       <div className='tef-layout-content-row tef-layout-no-padding-bottom'>
-        <div className='tef-layout-label'> Name </div>
+        <div className='tef-layout-label tef-special-first-label'> Name </div>
         <div className='tef-layout-autocomplete-spacer'> {inputFieldName} </div>
         <div
           className='template-editor-field-label-group'
@@ -186,7 +186,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     )
     return (
       <div className='tef-layout-content-row'>
-        <div className='tef-layout-label'> Type </div>
+        <div className='tef-layout-label tef-special-first-label'> Type </div>
         <div className='tef-layout-dropdown-spacer'> {fieldTypeDropdown} </div>
         <div className='tef-layout-label'>  Analyzed </div>
         <div className='tef-layout-dropdown-spacer'> {fieldTypeDropdown} </div>

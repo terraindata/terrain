@@ -115,7 +115,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
           style={buttonStyle}
         >
           <AddIcon className='template-editor-add-icon' />
-          Add Field
+          <div> Add Field </div>
         </div>
       </div>
     );

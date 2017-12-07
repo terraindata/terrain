@@ -97,7 +97,15 @@ class ExpandableView extends TerrainComponent<Props>
                 padding: `0px ${arrowPadding}px`,
               }}
             />
-            <div className='expandable-view-arrow-spacer-bottom'/>
+            <div
+              className={classNames({
+                'expandable-view-arrow-spacer-bottom': true,
+                'expandable-view-open': this.props.open
+                })}
+              style={{
+                borderColor: Colors().active,
+              }}
+            />
           </div>
           <div className='expandable-view-content'>
             {this.props.content}
