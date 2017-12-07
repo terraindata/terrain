@@ -72,7 +72,7 @@ import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
 export interface Props
 {
   query: Query;
-  variantPath?: string;
+  algorithmPath?: string;
   resultsState: ResultsState;
   db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
@@ -206,7 +206,7 @@ export class ResultsManager extends TerrainComponent<Props>
       }
     }
 
-    if (this.props.variantPath !== undefined && (this.props.variantPath !== nextProps.variantPath))
+    if (this.props.algorithmPath !== undefined && (this.props.algorithmPath !== nextProps.algorithmPath))
     {
       this.changeResults({
         hits: undefined,

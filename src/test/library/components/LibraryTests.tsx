@@ -56,21 +56,32 @@ import { ItemType } from '../../../items/types/Item';
 
 describe('Library', () =>
 {
-  const groupId = 1;
-  const algorithmId = 2;
-  const variantId = 3;
+  const categoryId = 1;
+  const groupId = 2;
+  const algorithmId = 3;
 
   let library: LibraryState = _LibraryState({
+    categories: Immutable.Map<number, LibraryTypes.Category>({}),
     groups: Immutable.Map<number, LibraryTypes.Group>({}),
     algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({}),
-    variants: Immutable.Map<number, LibraryTypes.Variant>({}),
   });
 
+  library = library.set('categories', library.categories.set(categoryId, LibraryTypes._Category({
+    type: ItemType.Category,
+    id: categoryId,
+    name: 'Category 1',
+    groupsOrder: Immutable.List<number>([2]),
+    lastEdited: '',
+    lastUserId: '',
+    userIds: Immutable.List([]),
+    defaultLanguage: 'elastic',
+    parent: 0,
+  })));
+
   library = library.set('groups', library.groups.set(groupId, LibraryTypes._Group({
-    type: ItemType.Group,
     id: groupId,
     name: 'Group 1',
-    algorithmsOrder: Immutable.List<number>([2]),
+    algorithmsOrder: Immutable.List<number>([3]),
     lastEdited: '',
     lastUserId: '',
     userIds: Immutable.List([]),
@@ -81,17 +92,6 @@ describe('Library', () =>
   library = library.set('algorithms', library.algorithms.set(algorithmId, LibraryTypes._Algorithm({
     id: algorithmId,
     name: 'Algorithm 1',
-    variantsOrder: Immutable.List<number>([3]),
-    lastEdited: '',
-    lastUserId: '',
-    userIds: Immutable.List([]),
-    defaultLanguage: 'elastic',
-    parent: 0,
-  })));
-
-  library = library.set('variants', library.variants.set(variantId, LibraryTypes._Variant({
-    id: variantId,
-    name: 'Variant 1',
   })));
 
   const analytics: AnalyticsState = _AnalyticsState({
@@ -121,7 +121,7 @@ describe('Library', () =>
 
   let libraryComponent = null;
 
-  describe('when props.canPinVariants is true', () =>
+  describe('when props.canPinAlgorithms is true', () =>
   {
     beforeEach(() =>
     {
@@ -131,58 +131,58 @@ describe('Library', () =>
           analytics={analytics}
           analyticsActions={analyticsActions}
           schema={schema}
-          canPinVariants={true}
-          router={{ params: { groupId: '1' } }}
+          canPinAlgorithms={true}
+          router={{ params: { categoryId: '1' } }}
         />,
       );
     });
 
-    describe('and neither props.selectedVariant nor analytics.pinnedVariants are set', () =>
+    describe('and neither props.selectedAlgorithm nor analytics.pinnedAlgorithms are set', () =>
     {
       it('should have 3 columns', () =>
       {
+        expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
         expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
         expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
-        expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
         expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(0);
       });
     });
 
-    describe('and props.selectedVariant is set', () =>
+    describe('and props.selectedAlgorithm is set', () =>
     {
       it('should have 3 columns and display the analytics chart', () =>
       {
-        const selectedVariants = library.get('selectedVariants');
-        const nextLibrary = library.set('selectedVariant', 1);
+        const selectedAlgorithms = library.get('selectedAlgorithms');
+        const nextLibrary = library.set('selectedAlgorithm', 1);
         libraryComponent.setProps({
           library: nextLibrary,
         });
 
+        expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
         expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
         expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
-        expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
         expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
         expect(libraryComponent.find('AnalyticsSelector')).toHaveLength(1);
       });
     });
 
-    describe('and props.analytics.pinnedVariants is set', () =>
+    describe('and props.analytics.pinnedAlgorithms is set', () =>
     {
       it('should have 3 columns and display the analytics chart', () =>
       {
-        const selectedVariants = library.get('selectedVariants');
+        const selectedAlgorithms = library.get('selectedAlgorithms');
         const nextAnalytics = analytics.setIn(
-          ['pinnedVariants', 1], true,
+          ['pinnedAlgorithms', 1], true,
         );
         libraryComponent.setProps({
           analytics: nextAnalytics,
         });
 
+        expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
         expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
         expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
-        expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
         expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
         expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
         expect(libraryComponent.find('AnalyticsSelector')).toHaveLength(1);
@@ -190,7 +190,7 @@ describe('Library', () =>
     });
   });
 
-  describe('when props.canPinVariants is false', () =>
+  describe('when props.canPinAlgorithms is false', () =>
   {
     beforeEach(() =>
     {
@@ -200,17 +200,17 @@ describe('Library', () =>
           analytics={analytics}
           analyticsActions={analyticsActions}
           schema={schema}
-          canPinVariants={false}
-          router={{ params: { groupId: '1' } }}
+          canPinAlgorithms={false}
+          router={{ params: { categoryId: '1' } }}
         />,
       );
     });
 
     it('should have 4 columns', () =>
     {
+      expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
       expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
       expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
-      expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
       expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(1);
     });
   });
@@ -233,17 +233,37 @@ describe('Library', () =>
 
     describe('and the active column is null', () =>
     {
-      describe('and the URL has no groupId, algorithmId or variantId specified', () =>
+      describe('and the URL has no categoryId, groupId or algorithmId specified', () =>
       {
-        it('should only display the groups column by default', () =>
+        it('should only display the categories column by default', () =>
         {
+          expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
+          expect(libraryComponent.find('GroupsColumn')).toHaveLength(0);
+          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(0);
+        });
+      });
+
+      describe('and the URL has a categoryId, and no groupId or algorithmId specified', () =>
+      {
+        it('should only display the groups column', () =>
+        {
+          libraryComponent = shallow(
+            <Library
+              library={library}
+              analytics={analytics}
+              analyticsActions={analyticsActions}
+              schema={schema}
+              singleColumn={true}
+              router={{ params: { categoryId } }}
+            />,
+          );
+          expect(libraryComponent.find('CategoriesColumn')).toHaveLength(0);
           expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
           expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(0);
-          expect(libraryComponent.find('VariantsColumn')).toHaveLength(0);
         });
       });
 
-      describe('and the URL has a groupId, and no algorithmId or variantId specified', () =>
+      describe('and the URL has a categoryId and groupId but no algorithmId specified', () =>
       {
         it('should only display the algorithms column', () =>
         {
@@ -254,18 +274,18 @@ describe('Library', () =>
               analyticsActions={analyticsActions}
               schema={schema}
               singleColumn={true}
-              router={{ params: { groupId } }}
+              router={{ params: { categoryId, groupId } }}
             />,
           );
+          expect(libraryComponent.find('CategoriesColumn')).toHaveLength(0);
           expect(libraryComponent.find('GroupsColumn')).toHaveLength(0);
           expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
-          expect(libraryComponent.find('VariantsColumn')).toHaveLength(0);
         });
       });
 
-      describe('and the URL has a groupId and algorithmId but no variantId specified', () =>
+      describe('and the URL has a categoryId, an groupId and a algorithmId specified', () =>
       {
-        it('should only display the variants column', () =>
+        it('should only display the groups column', () =>
         {
           libraryComponent = shallow(
             <Library
@@ -274,32 +294,12 @@ describe('Library', () =>
               analyticsActions={analyticsActions}
               schema={schema}
               singleColumn={true}
-              router={{ params: { groupId, algorithmId } }}
+              router={{ params: { categoryId, groupId, algorithmId: algorithmId.toString() } }}
             />,
           );
+          expect(libraryComponent.find('CategoriesColumn')).toHaveLength(0);
           expect(libraryComponent.find('GroupsColumn')).toHaveLength(0);
-          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(0);
-          expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
-        });
-      });
-
-      describe('and the URL has a groupId, an algorithmId and a variantId specified', () =>
-      {
-        it('should only display the algorithms column', () =>
-        {
-          libraryComponent = shallow(
-            <Library
-              library={library}
-              analytics={analytics}
-              analyticsActions={analyticsActions}
-              schema={schema}
-              singleColumn={true}
-              router={{ params: { groupId, algorithmId, variantId: variantId.toString() } }}
-            />,
-          );
-          expect(libraryComponent.find('GroupsColumn')).toHaveLength(0);
-          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(0);
-          expect(libraryComponent.find('VariantsColumn')).toHaveLength(1);
+          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
         });
       });
     });

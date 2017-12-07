@@ -43,26 +43,31 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
+import * as React from 'react';
+import { Line, Point } from 'victory';
 
-const _Role = Immutable.Record(
-  {
-    categoryId: '',
-    userId: '',
-    admin: false,
-    builder: false,
-  });
-export class Role extends _Role
+interface TVictoryLinePointProps
 {
-  public categoryId: ID;
-  public userId: string;
-  public admin: boolean;
-  public builder: boolean;
+  chartHeight: number;
+  lineStyle: any;
+  x?: number;
+  active?: boolean;
 }
-// { { userId: Role }
-export type CategoryRoleMap = Immutable.Map<ID, Role>;
-// { categoryId: { userId: Role }}
-export type RoleMap = Immutable.Map<ID, CategoryRoleMap>;
 
-// if
-// roles.getIn([categoryId, userId])
+const TVictoryLinePoint = (props: TVictoryLinePointProps) =>
+{
+  return props.active ? (
+    <g>
+      <Line
+        style={props.lineStyle}
+        x1={props.x}
+        y1={0}
+        x2={props.x}
+        y2={props.chartHeight}
+      />
+      <Point {...props} />
+    </g>
+  ) : null;
+};
+
+export default TVictoryLinePoint;

@@ -53,7 +53,7 @@ import { makePromiseCallback } from './Util';
 export interface EventConfig
 {
   eventname: string;
-  variantid: number | string;
+  algorithmid: number | string;
   visitorid: number | string;
   source: {
     ip: string;
@@ -84,7 +84,7 @@ export class Events
     });
 
     this.client.ping({
-      requestTimeout: 100,
+      requestTimeout: 500,
     }, (err) =>
       {
         if (err !== null && err !== undefined)

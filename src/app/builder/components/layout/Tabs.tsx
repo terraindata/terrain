@@ -176,12 +176,12 @@ interface TabsProps
 {
   config: string;
   actions: List<TabAction>;
-  onNoVariant(variantId: string);
+  onNoAlgorithm(algorithmId: string);
 }
 
 export class Tabs extends TerrainComponent<TabsProps> {
   public state = {
-    variants: LibraryStore.getState().variants,
+    algorithms: LibraryStore.getState().algorithms,
     tabs: null,
   };
   public cancel = null;
@@ -189,8 +189,8 @@ export class Tabs extends TerrainComponent<TabsProps> {
   public componentDidMount()
   {
     this._subscribe(LibraryStore, {
-      stateKey: 'variants',
-      storeKeyPath: ['variants'],
+      stateKey: 'algorithms',
+      storeKeyPath: ['algorithms'],
       updater: (state) =>
       {
         this.computeTabs(this.props.config);
@@ -221,23 +221,23 @@ export class Tabs extends TerrainComponent<TabsProps> {
 
   public computeTabs(config)
   {
-    const { variants } = this.state;
-    const tabs = config && variants && config.split(',').map((vId) =>
+    const { algorithms } = this.state;
+    const tabs = config && algorithms && config.split(',').map((vId) =>
     {
       const id = this.getId(vId);
-      const variant = variants.get(+id);
+      const algorithm = algorithms.get(+id);
       let name = 'Loading...';
-      if (variant)
+      if (algorithm)
       {
-        name = variant.name || 'Untitled';
-        if (variant.version)
+        name = algorithm.name || 'Untitled';
+        if (algorithm.version)
         {
-          name += ' @ ' + moment(variants.get(+id).lastEdited).format('ha M/D/YY');
+          name += ' @ ' + moment(algorithms.get(+id).lastEdited).format('ha M/D/YY');
         }
       }
       else
       {
-        LibraryActions.variants.fetchVersion(id, this.props.onNoVariant);
+        LibraryActions.algorithms.fetchVersion(id, this.props.onNoAlgorithm);
       }
       return {
         id,

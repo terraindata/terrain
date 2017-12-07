@@ -251,7 +251,7 @@ describe('Version route tests', () =>
             createdAt: '2017-05-31 00:22:04',
             createdByUserId: 1,
             id: 1,
-            object: '{"id":2,"meta":"#realmusician","name":"Updated Item","parent":0,"status":"LIVE","type":"GROUP"}',
+            object: '{"id":2,"meta":"#realmusician","name":"Updated Item","parent":0,"status":"LIVE","type":"CATEGORY"}',
             objectId: 2,
             objectType: 'items',
           });
@@ -287,13 +287,13 @@ describe('Item route tests', () =>
               name: 'Al Gore',
               parent: 0,
               status: 'Still Alive',
-              type: 'ALGORITHM',
+              type: 'GROUP',
             },
             {
               id: 2,
               meta: '#realmusician',
               parent: 0,
-              type: 'GROUP',
+              type: 'CATEGORY',
             },
             {
               id: 3,
@@ -301,7 +301,7 @@ describe('Item route tests', () =>
               name: 'Justin Bieber',
               parent: 0,
               status: 'Baby',
-              type: 'VARIANT',
+              type: 'ALGORITHM',
             },
           ]);
       })
@@ -362,7 +362,7 @@ describe('Item route tests', () =>
           name: 'Al Gore',
           parent: 0,
           status: 'Still Alive',
-          type: 'ALGORITHM',
+          type: 'GROUP',
         });
       })
       .catch((error) =>
@@ -1263,10 +1263,10 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 10, 6, 7, 24, 4),
-        end: new Date(2017, 10, 6, 7, 32, 4),
+        start: new Date(2017, 11, 16, 7, 24, 4),
+        end: new Date(2017, 11, 16, 7, 36, 4),
         eventname: 'impression',
-        variantid: 'terrain_5',
+        algorithmid: 'terrain_5',
         agg: 'select',
       })
       .expect(200)
@@ -1290,10 +1290,10 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 10, 6, 7, 24, 4),
-        end: new Date(2017, 10, 6, 7, 32, 4),
+        start: new Date(2017, 11, 16, 7, 24, 4),
+        end: new Date(2017, 11, 16, 7, 36, 4),
         eventname: 'impression',
-        variantid: 'terrain_5',
+        algorithmid: 'terrain_5',
         agg: 'histogram',
         interval: 'minute',
       })
@@ -1306,7 +1306,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(6);
+        expect(respData['terrain_5'].length).toEqual(2);
       });
   });
 
@@ -1318,10 +1318,10 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 10, 6, 7, 24, 4),
-        end: new Date(2017, 10, 6, 10, 24, 4),
+        start: new Date(2017, 11, 16, 7, 24, 4),
+        end: new Date(2017, 11, 16, 10, 24, 4),
         eventname: 'click,impression',
-        variantid: 'terrain_5',
+        algorithmid: 'terrain_5',
         agg: 'rate',
         interval: 'hour',
       })

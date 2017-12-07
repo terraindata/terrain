@@ -602,7 +602,7 @@ const TransformChart = {
             const distanceRatio = (x - first['x']) / (second['x'] - first['x']);
             yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
           }
-          else
+          else if (first || second)
           {
             yVal = (first || second)['y'];
           }
