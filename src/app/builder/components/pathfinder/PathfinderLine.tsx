@@ -49,6 +49,7 @@ THE SOFTWARE.
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as $ from 'jquery';
 import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
@@ -91,7 +92,7 @@ export class PathfinderLine extends TerrainComponent<Props>
   public render()
   {
     const { canDrag, canDelete, canEdit, children, pieces } = this.props;
-    return (
+    return this.addIndentation(
       <div className='pf-line-wrapper'>
         <div
           className={classNames({
@@ -143,7 +144,6 @@ export class PathfinderLine extends TerrainComponent<Props>
         content = piece['content'] as El;
         visible = piece['visible'] as boolean;
       }
-      console.log(content);
       return (
         <div
           className={classNames({
@@ -207,6 +207,54 @@ export class PathfinderLine extends TerrainComponent<Props>
       </div>
     );
   }
+  
+  private addIndentation(content: El): El
+  {
+    const { depth } = this.props;
+    
+    if (depth > 0)
+    {
+      for (let i = 0; i < depth; i++)
+      {
+        content = (
+          <div
+            style={{
+              paddingLeft: INDENT_WIDTH,
+              borderLeft: '1px solid ' + Colors().stroke,
+            }}
+          >
+            {
+              content
+            }
+          </div>
+        );
+      }
+      // return (
+      //   <div
+      //     style={{
+      //       width: INDENT_WIDTH * depth,
+      //       display: 'flex',
+      //     }}
+      //   >
+      //     {
+      //       _.range(0, depth).map(() => 
+      //         <div
+      //           style={{
+      //             width: INDENT_WIDTH,
+      //             borderLeft: '1px solid ' + Colors().stroke,
+      //             boxSixing: 'border-box',
+      //           }}
+      //         />
+      //       )
+      //     }
+      //   </div>
+      // );
+    }
+    
+    return content;
+  }
 }
+
+const INDENT_WIDTH = 12;
 
 export default PathfinderLine;

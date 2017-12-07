@@ -107,13 +107,18 @@ class PathC extends BaseClass
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
 {
-  let path = New<Path>(new PathC(config || {}), config);
-  path = path
-    .set('source', _Source(path['source']))
-    .set('score', _Score(path['score']))
-    .set('filterGroup', _FilterGroup(path['filterGroup']))
-    .set('more', _More(path['more']));
-  return path;
+  if (config)
+  {
+    config = 
+    {
+      source: _Source(config['source']),
+      score: _Score(config['score']),
+      filterGroup: _FilterGroup(config['filterGroup']),
+      more: _More(config['more']),
+    };
+  }
+  
+  return New<Path>(new PathC(config || {}), config);
 };
 
 class FilterGroupC extends BaseClass
@@ -123,7 +128,14 @@ class FilterGroupC extends BaseClass
 }
 export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;
 export const _FilterGroup = (config?: { [key: string]: any }) =>
-  New<FilterGroup>(new FilterGroupC(config), config);
+{
+  if (config)
+  {
+    config.lines = List(config.lines.map((line) => _FilterLine(line)));
+  }
+  
+  return New<FilterGroup>(new FilterGroupC(config), config);
+}
 
 class ScoreC extends BaseClass
 {
@@ -252,7 +264,7 @@ class FilterLineC extends LineC
 {
   // Members for when it is a single line condition
   public field: string = null; // autocomplete
-  public method: string = null; // autocomplete
+  public comparison: string = null; // autocomplete
   public valueType: ValueType = null;
   public value: string | number = null;
 
@@ -261,7 +273,14 @@ class FilterLineC extends LineC
 }
 export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
-  New<FilterLine>(new FilterLineC(config), config);
+{
+  if (config && config.filterGroup !== null && config.filterGroup !== undefined)
+  {
+    config.filterGroup = _FilterGroup(config.filterGroup);
+  }
+  
+  return New<FilterLine>(new FilterLineC(config), config);
+}
 
 export type ValueType = 'number' | 'text' | 'date' | 'input' | 'location';
 
@@ -320,7 +339,14 @@ class SourceC extends BaseClass
 }
 export type Source = SourceC & IRecord<SourceC>;
 export const _Source = (config?: { [key: string]: any }) =>
-  New<Source>(new SourceC(config), config);
+{
+  if (config)
+  {
+    config.dataSource = _ElasticDataSource(config.dataSource);
+  }
+  
+  return New<Source>(new SourceC(config), config);
+}
 
 abstract class DataSource extends BaseClass
 {
@@ -369,7 +395,7 @@ type ChoiceContext = {
     source: Source,
     schemaState: SchemaState,
     field: string,
-    method: string,
+    comparison: string,
   } | {
     type: 'input',
     // TODO builder state
@@ -424,36 +450,20 @@ class ElasticDataSourceC extends DataSource
     
     if (context.type === 'comparison')
     {
-      return List(ElasticComparisons.map((comp) => _ChoiceOption({
-        displayName: comp,
-        value: comp,
-      })));
+      return List(ElasticComparisons.map((c) => _ChoiceOption(c)));
     }
     
     if (context.type === 'valueType')
     {
-      return List([
-        _ChoiceOption({
-          displayName: 'a number',
-          value: 'number',
-        }),
-        _ChoiceOption({
-          displayName: 'text',
-          value: 'text',
-        }),
-        _ChoiceOption({
-          displayName: 'a date',
-          value: 'date',
-        }),
-        _ChoiceOption({
-          displayName: 'an input',
-          value: 'input',
-        }),
-        _ChoiceOption({
-          displayName: 'a location',
-          value: 'location',
-        }),
-      ]);
+      const comparison = ElasticComparisons.find((comp) => comp.value === context.comparison);
+      
+      if (comparison)
+      {
+        return comparison.valueTypes.map((valueType) => _ChoiceOption({
+          value: valueType,
+          displayName: valueType,
+        })).toList();
+      }
     }
     
     if (context.type === 'input')
@@ -486,9 +496,73 @@ export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>
 export const _ElasticDataSource = (config?: { [key: string]: any }) =>
   New<ElasticDataSource>(new ElasticDataSourceC(config), config);
 
-// TODO
-const ElasticComparisons = ['equals', 'contains', 'does not equal', 'does not contain', 'is greater than', 'is less than', 'is greater than or equal to',
-        'is less than or equal to', 'comes before', 'comes after', 'starts before', 'starts after'];
+const ElasticComparisons = [
+  {
+    value: 'equal',
+    displayName: 'equals',
+    valueTypes: List(['number']),
+  }, 
+  {
+    value: 'contains',
+    displayName: 'contains',
+    valueTypes: List(['text']),
+  }, 
+  {
+    value: 'notequal',
+    displayName: 'does not equal',
+    valueTypes: List(['auto']),
+  }, 
+  {
+    value: 'notcontain',
+    displayName: 'does not contain',
+    valueTypes: List(['text']),
+  }, 
+  {
+    value: 'greater',
+    displayName: 'is greater than',
+    valueTypes: List(['number']),
+  }, 
+  {
+    value: 'less',
+    displayName: 'is less than',
+    valueTypes: List(['number']),
+  }, 
+  {
+    value: 'greaterequal',
+    displayName: 'is greater than or equal to',
+    valueTypes: List(['number']),
+  },
+  {
+    value: 'lessequal',
+    displayName: 'is less than or equal to',
+    valueTypes: List(['number']),
+  }, 
+  {
+    value: 'alphabefore',
+    displayName: 'comes before',
+    valueTypes: List(['text']),
+  }, 
+  {
+    value: 'alphaafter',
+    displayName: 'comes after',
+    valueTypes: List(['text']),
+  }, 
+  {
+    value: 'datebefore',
+    displayName: 'starts before',
+    valueTypes: List(['date']),
+  }, 
+  {
+    value: 'dateafter',
+    displayName: 'starts after',
+    valueTypes: List(['date']),
+  },
+  {
+    value: 'located',
+    displayName: 'is located within',
+    valueTypes: List(['distance']),
+  },
+];
 
 /**
  * Section: Classes representing parts of the view
@@ -498,8 +572,8 @@ class ChoiceOptionC extends BaseClass
 {
   public value: any = null; // a value to distinguish it to the parser
   public displayName: string | number | El = '';
-  public tooltipContent: string | El = null;
   public color: string = null;
+  public tooltipContent: string | El = null;
 }
 export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
 export const _ChoiceOption = (config?: { [key: string]: any }) =>

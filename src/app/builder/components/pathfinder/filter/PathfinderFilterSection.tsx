@@ -120,7 +120,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       keyPath,
     });
 
-    depth++;
+    // depth++;
 
     keyPath = keyPath.push('lines');
 
@@ -129,7 +129,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       if (filterLine.filterGroup)
       {
         // it is a filter group
-        this.buildFilterTree(filterLine.filterGroup, entries, depth, keyPath.push(index));
+        this.buildFilterTree(filterLine.filterGroup, entries, depth + 1, keyPath.push(index));
       }
       else
       {
@@ -163,6 +163,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           keyPath={filterEntry.keyPath}
           onChange={this.handleFilterChange}
           key={index}
+          onDelete={this.handleFilterDelete}
         />
       );
     }

@@ -79,14 +79,16 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   public render()
   {
-    const { filterLine, canEdit, pathfinderContext } = this.props;
+    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
+    
     return (
       <PathfinderLine
         canDelete={true}
         canDrag={true}
         canEdit={canEdit}
         onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
+        depth={depth}
         pieces={List([
           <AdvancedDropdown
             options={source.dataSource.getChoiceOptions({
@@ -108,29 +110,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                   source,
                   schemaState: pathfinderContext.schemaState,
                 })}
-                value={filterLine.method}
+                value={filterLine.comparison}
                 canEdit={pathfinderContext.canEdit}
-                onChange={this._fn(this.handleChange, 'method')}
-                placeholder={'Choose method'}
+                onChange={this._fn(this.handleChange, 'comparison')}
+                placeholder={'Choose comparison'}
               />,
             visible: filterLine.field !== null,
-          },
-          {
-            content:
-              <AdvancedDropdown 
-                options={source.dataSource.getChoiceOptions({
-                  type: 'valueType',
-                  field: filterLine.field,
-                  method: filterLine.method,
-                  source,
-                  schemaState: pathfinderContext.schemaState,
-                })}
-                value={filterLine.valueType}
-                canEdit={pathfinderContext.canEdit}
-                onChange={this._fn(this.handleChange, 'valueType')}
-                placeholder={'Choose type'}
-              />,
-            visible: filterLine.method !== null,
           },
           {
             content:
@@ -146,10 +131,24 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine, pathfinderContext } = this.props;
     
-    switch (filterLine.valueType)
+    const valueTypes = pathfinderContext.source.dataSource.getChoiceOptions({
+      type: 'valueType',
+      field: filterLine.field,
+      comparison: filterLine.comparison,
+      source: pathfinderContext.source,
+      schemaState: pathfinderContext.schemaState,
+    });
+    
+    if (valueTypes.size !== 1)
+    {
+      throw new Error('Zero / Multiple filter valueTypes not supported yet.');
+    }
+    
+    switch (filterLine.valueType.get(0))
     {
       case 'text':
       case 'number':
+      case 'auto':
         return (
           <Autocomplete
             options={null}
@@ -165,6 +164,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         );
       
       case 'location':
+      case 'distance':
         return (
           <div>Map here</div>
         );
@@ -191,7 +191,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   
   private handleChange(key, value)
   {
-    console.log('change', key, value);
     this.props.onChange(this.props.keyPath, this.props.filterLine.set(key, value));
   }
 

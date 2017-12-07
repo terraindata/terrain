@@ -275,9 +275,12 @@ class Autocomplete extends TerrainComponent<Props>
     }
   }
 
-  public showOption(option: string): boolean
+  public showOption(option: string, level: 'any' | 'first' | 'second' = 'any'): boolean
   {
-    if (!option)
+    // "first" level means the word starts with the term
+    // "second" level means the word contains the term
+    // "any" level accepts both first and second
+    if (option === null || option === undefined)
     {
       return false;
     }
@@ -290,9 +293,24 @@ class Autocomplete extends TerrainComponent<Props>
     const haystack = option.toLowerCase();
     const needle = typeof this.state.value === 'string' ? this.state.value.toLowerCase() : '';
 
-    return haystack.indexOf(needle) === 0
+    const isFirst = 
+      haystack.indexOf(needle) === 0
       || haystack.indexOf(' ' + needle) !== -1
       || haystack.indexOf('.' + needle) !== -1;
+    
+    const isSecond = haystack.indexOf(needle) !== -1;
+    
+    if (level === 'first')
+    {
+      return isFirst;
+    }
+    
+    if (level === 'second')
+    {
+      return isSecond;
+    }
+    
+    return isFirst || isSecond;
   }
 
   public renderOption(option: string, index: number)
@@ -301,12 +319,14 @@ class Autocomplete extends TerrainComponent<Props>
     let second = '';
     let third = '';
 
-    if (this.state.value && this.state.value.length)
+    const { value } = this.state;
+    if (value && value.length && this.showOption(option))
     {
-      const i = option.toLowerCase().indexOf(this.state.value.toLowerCase());
+      // if this was part of the found set, show a highlight
+      const i = option.toLowerCase().indexOf(value.toLowerCase());
       first = option.substr(0, i);
-      second = option.substr(i, this.state.value.length);
-      third = option.substr(this.state.value.length + i);
+      second = option.substr(i, value.length);
+      third = option.substr(value.length + i);
     }
 
     return (
@@ -325,10 +345,25 @@ class Autocomplete extends TerrainComponent<Props>
       </div>
     );
   }
+  
+  public getOptions(): List<string>
+  {
+    const { options } = this.props;
+    
+    if (!options)
+    {
+      return null;
+    }
+    
+    const firstOptions = options.filter((o) => this.showOption(o, 'first'));
+    const secondOptions = options.filter((o) => this.showOption(o, 'second'));
+    const otherOptions = options.filterNot((o) => this.showOption(o, 'any'));
+    return firstOptions.concat(secondOptions).concat(otherOptions).toList();
+  }
 
   public render()
   {
-    const options = this.props.options && this.props.options.filter(this.showOption);
+    const options = this.getOptions();
     const inputClassName = 'ac-input ' + (this.props.className || '');
 
     const open = this.state.open && !!options && options.size > 0;
