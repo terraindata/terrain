@@ -113,12 +113,12 @@ export default class ElasticQueryHandler extends QueryHandler
 
         if (request.streaming === true)
         {
-          return new ElasticsearchScrollStream(client.getDelegate(), {body: query});
+          return new ElasticsearchScrollStream(client.getDelegate(), { body: query });
         }
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          client.search({body: query} as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
+          client.search({ body: query } as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
         });
 
       case 'deleteTemplate':
@@ -157,7 +157,7 @@ export default class ElasticQueryHandler extends QueryHandler
       {
         parentResults = await new Promise<QueryResponse>((res, rej) =>
         {
-          client.search({body: parentQuery}, this.makeQueryCallback(res, rej));
+          client.search({ body: parentQuery }, this.makeQueryCallback(res, rej));
         });
 
         winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
