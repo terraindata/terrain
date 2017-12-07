@@ -71,6 +71,11 @@ export default class ESParameterFiller
       (param: string): string =>
       {
         const ps = param.split('.');
+        if (ps[0] === 'parent')
+        {
+          return JSON.stringify('@' + param);
+        }
+
         let value = params;
         for (const p of ps)
         {
