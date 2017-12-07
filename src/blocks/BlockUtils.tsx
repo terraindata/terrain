@@ -182,6 +182,10 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
   {
     theBlock = theBlock.set('static', _.cloneDeep(theBlock.static));
   }
+  if (theBlock.customBlockAfterInit)
+  {
+    theBlock = theBlock.customBlockAfterInit(theBlock);
+  }
   return theBlock;
 };
 

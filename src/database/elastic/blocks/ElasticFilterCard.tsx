@@ -90,10 +90,99 @@ export class FilterUtils
     blockType: string, extraConfig?: { [key: string]: any }, skipTemplate?: boolean)
   {
     console.assert(blockType === 'eqlbool_query', 'Unrecognized block type ' + blockType);
-    return BlockUtils.make(blocksConfig, 'elasticFilter', extraConfig, skipTemplate);
+    const filterCard = BlockUtils.make(blocksConfig, 'elasticFilter', extraConfig, skipTemplate);
+    // delete any filter blocks since they are in filter rows now
+    return filterCard;
   }
 
-  public static updateFilterRows(block: Block): Block
+  public static customFilterBlock(block: Block)
+  {
+    // update filter rows if there is any
+    block = FilterUtils.generateFilterRowsFromBlocks(block);
+    block = FilterUtils.removeFilterBlocks(block);
+    return block;
+  }
+
+  public static removeFilterBlocks(block: Block): Block
+  {
+    const cardTree = new ESCardParser(block);
+    if (cardTree.hasError())
+    {
+      return block;
+    }
+    const boolValueInfo = cardTree.getValueInfo();
+    for (const boolOp of ['filter', 'must', 'should', 'must_not'])
+    {
+      if (boolValueInfo.objectChildren[boolOp])
+      {
+        const opValueInfo = boolValueInfo.objectChildren[boolOp].propertyValue;
+        let nonFilterCards;
+        if (opValueInfo.card.type === 'eqlquery')
+        {
+          const currentQueryCard = opValueInfo.card;
+          const allCards = Immutable.List([currentQueryCard]);
+          nonFilterCards = allCards.filter((queryBlock) => FilterUtils.isNotFilterBlock(queryBlock));
+        } else
+        {
+          console.assert(opValueInfo.card.type === 'eqlquery[]');
+          const allCards = opValueInfo.card.cards;
+          nonFilterCards = allCards.filter((queryBlock) => FilterUtils.isNotFilterBlock(queryBlock));
+        }
+
+        if (nonFilterCards.size === 0)
+        {
+          // there is no non-filter cards in this query
+          block = block.setIn(opValueInfo.cardPath, null);
+        } else
+        {
+          const opCard = BlockUtils.make(ElasticBlocks, 'eqlquery[]',
+            {
+              key: boolOp,
+              cards: nonFilterCards,
+            },
+            true);
+          block = block.setIn(opValueInfo.cardPath, opCard);
+        }
+      }
+    }
+    const newCards = block.cards.filter((card) => card !== null);
+    block = block.set('cards', newCards);
+    return block;
+  }
+
+  public static reGroupFilterRows(block: Block): Block
+  {
+    console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
+    const filterRows = block['indexFilters'].concat(block['typeFilters']).concat(block['otherFilters']);
+    const filterRowList = { indexFilters: [], typeFilters: [], otherFilters: [] };
+    filterRows.map((row: Block) =>
+    {
+      switch (row.field)
+      {
+        case '_index':
+          filterRowList.indexFilters.push(row);
+          break;
+        case '_type':
+          filterRowList.typeFilters.push(row);
+          break;
+        default:
+          filterRowList.otherFilters.push(row);
+          break;
+      }
+    });
+    // regroup the filter rows first because a new other-filter row added into
+    // the index filter list or the type filter list
+    for (const index in filterRowList)
+    {
+      if (filterRowList.hasOwnProperty(index))
+      {
+        block = block.set(index, Immutable.List(filterRowList[index]));
+      }
+    }
+    return block;
+  }
+
+  public static generateFilterRowsFromBlocks(block: Block): Block
   {
     console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
     const cardTree = new ESCardParser(block);
@@ -151,7 +240,7 @@ export class FilterUtils
 
   public static insertRowsToBlock(block: Block, rows: Block[]): Immutable.List<Block>
   {
-    let cards = block.cards.filter((queryBlock) => FilterUtils.isNotFilterBlock(queryBlock));
+    let cards = block.cards;
     rows.map((rowBlock) =>
     {
       cards = cards.push(FilterUtils.filterRowToQueryCard(rowBlock));
@@ -159,99 +248,22 @@ export class FilterUtils
     return cards;
   }
 
-  // If CCT adds another card with name filter/must/should/must_not and we have rows
-  // that have the same name, we can get two cards with the same name, so we have to merge
-  // these two cards to a same card.
-  //  public static mergeFilterCards(block: Block)
-  //  {
-  //    for (const key of ['filter', 'must', 'should', 'must_not'])
-  //    {
-
-  //    }
-  //  }
-
-  public static hideFilterBlocks(block: Block): Block
-  {
-    console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
-    block.cards.map((filterBlock: Block, filterBlockIndex) =>
-    {
-      if (
-        filterBlock.key === 'filter' ||
-        filterBlock.key === 'must' ||
-        filterBlock.key === 'should' ||
-        filterBlock.key === 'must_not'
-      )
-      {
-        if (filterBlock.type === 'eqlquery')
-        {
-          if (FilterUtils.isNotFilterBlock(filterBlock) === false)
-          {
-            // hide filter blocks since they should appear as filter rows
-            if (filterBlock.hidden === false)
-            {
-              block = block.setIn(['cards', filterBlockIndex, 'hidden'], true);
-            }
-          }
-        } else if (filterBlock.type === 'eqlquery[]')
-        {
-          filterBlock.cards.map((queryBlock, index) =>
-          {
-            if (FilterUtils.isNotFilterBlock(queryBlock) === false)
-            {
-              // hide filter blocks since they should appear as filter rows
-              if (queryBlock.hidden === false)
-              {
-                block = block.setIn(['cards', filterBlockIndex, 'cards', index, 'hidden'], true);
-              }
-            }
-          });
-        } else
-        {
-          console.assert(false, 'The card ' + filterBlock.key + ' is ' + filterBlock.type);
-        }
-      }
-    });
-    return block;
-  }
-
-  public static updateFilterBlocks(block: Block): Block
+  public static mergeFilterBlocksAndRows(block: Block): Block
   {
     console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
     const cardTree = new ESCardParser(block);
     const boolValueInfo = cardTree.getValueInfo();
     const filterRows = block['indexFilters'].concat(block['typeFilters']).concat(block['otherFilters']);
     const filterRowMap = { filter: [], must: [], should: [], must_not: [] };
-    const filterRowList = { indexFilters: [], typeFilters: [], otherFilters: [] };
     filterRows.map((row: Block) =>
     {
       filterRowMap[row.boolQuery].push(row);
-      switch (row.field)
-      {
-        case '_index':
-          filterRowList.indexFilters.push(row);
-          break;
-        case '_type':
-          filterRowList.typeFilters.push(row);
-          break;
-        default:
-          filterRowList.otherFilters.push(row);
-          break;
-      }
     });
-    // regroup the filter rows first because a new other-filter row added into
-    // the index filter list or the type filter list
-    for (const index in filterRowList)
-    {
-      if (filterRowList.hasOwnProperty(index))
-      {
-        block = block.set(index, Immutable.List(filterRowList[index]));
-      }
-    }
     for (const boolOp of ['filter', 'must', 'should', 'must_not'])
     {
-      if (boolValueInfo.objectChildren[boolOp] === undefined)
+      if (filterRowMap[boolOp].length > 0)
       {
-        if (filterRowMap[boolOp].size > 0)
+        if (boolValueInfo.objectChildren[boolOp] === undefined)
         {
           // create boolOp query[], and insert the rows into the card
           let opCard = BlockUtils.make(ElasticBlocks, 'eqlquery[]',
@@ -261,27 +273,28 @@ export class FilterUtils
             true);
           opCard = opCard.set('cards', FilterUtils.insertRowsToBlock(opCard, filterRowMap[boolOp]));
           block = block.set('cards', block.cards.push(opCard));
-        }
-      } else
-      {
-        const opValueInfo = boolValueInfo.objectChildren[boolOp].propertyValue;
-        if (opValueInfo.card.type === 'eqlquery')
-        {
-          const currentQueryCard = opValueInfo.card;
-          let opCard = BlockUtils.make(ElasticBlocks, 'eqlquery[]',
-            {
-              key: boolOp,
-              cards: Immutable.List([currentQueryCard]),
-            },
-            true);
-          opCard = opCard.set('cards', FilterUtils.insertRowsToBlock(opCard, filterRowMap[boolOp]));
-          block = block.setIn(opValueInfo.cardPath, opCard);
+
         } else
         {
-          console.assert(opValueInfo.card.type === 'eqlquery[]');
-          let opCard = opValueInfo.card;
-          opCard = opCard.set('cards', FilterUtils.insertRowsToBlock(opCard, filterRowMap[boolOp]));
-          block = block.setIn(opValueInfo.cardPath, opCard);
+          const opValueInfo = boolValueInfo.objectChildren[boolOp].propertyValue;
+          if (opValueInfo.card.type === 'eqlquery')
+          {
+            const currentQueryCard = opValueInfo.card;
+            let opCard = BlockUtils.make(ElasticBlocks, 'eqlquery[]',
+              {
+                key: boolOp,
+                cards: Immutable.List([currentQueryCard]),
+              },
+              true);
+            opCard = opCard.set('cards', FilterUtils.insertRowsToBlock(opCard, filterRowMap[boolOp]));
+            block = block.setIn(opValueInfo.cardPath, opCard);
+          } else
+          {
+            console.assert(opValueInfo.card.type === 'eqlquery[]');
+            let opCard = opValueInfo.card;
+            opCard = opCard.set('cards', FilterUtils.insertRowsToBlock(opCard, filterRowMap[boolOp]));
+            block = block.setIn(opValueInfo.cardPath, opCard);
+          }
         }
       }
     }
@@ -474,6 +487,7 @@ export const elasticFilter = _card({
   childOptionClickHandler: FilterUtils.BoolQueryCard.childOptionClickHandler,
   childrenHaveKeys: true,
   key: 'bool',
+  customBlockAfterInit: FilterUtils.customFilterBlock,
 
   static: {
     // this makes the shape of elasticFilterBlock similar with the bool_query clause card.
@@ -484,19 +498,24 @@ export const elasticFilter = _card({
     colors: getCardColors('filter', Colors().builder.cards.structureClause),
     preview: '[cards.size] Properties',
     // this tql is same as tql of other clause cards.
-    tql: FilterUtils.BoolQueryCard.static.tql,
+    tql: (block, tqlTranslationFn, tqlConfig) =>
+    {
+      const json: object = {};
+      const mergedBlock = FilterUtils.mergeFilterBlocksAndRows(block);
+      mergedBlock['cards'].map(
+        (card) =>
+        {
+          _.extend(json, {
+            [card['key']]: tqlTranslationFn(card, tqlConfig),
+          });
+        },
+      );
+      return json;
+    },
     // this is called before parsing/interpreting cards, so we have to update the cards fields.
     updateCards: (rootBlock: Block, block: Block, blockPath: KeyPath) =>
     {
-      const filterRows = block['indexFilters'].concat(block['typeFilters']).concat(block['otherFilters']);
-      if (filterRows.size === 0)
-      {
-        block = FilterUtils.updateFilterRows(block);
-      } else
-      {
-        block = FilterUtils.updateFilterBlocks(block);
-      }
-      block = FilterUtils.hideFilterBlocks(block);
+      block = FilterUtils.reGroupFilterRows(block);
       // updating cached index and type
       if (block['indexFilters'].size > 0)
       {
