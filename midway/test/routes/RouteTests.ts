@@ -501,13 +501,9 @@ describe('Query route tests', () =>
           database: 1,
           type: 'search',
           body: JSON.stringify({
-            index: 'movies',
-            type: 'data',
             from: 0,
             size: 0,
-            body: {
-              query: {},
-            },
+            query: {},
           }),
         },
       })
@@ -530,48 +526,6 @@ describe('Query route tests', () =>
       });
   });
 
-  test('Elastic Search Query Error: POST /midway/v1/query', async () =>
-  {
-    await request(server)
-      .post('/midway/v1/query/')
-      .send({
-        id: 1,
-        accessToken: 'ImAnAdmin',
-        body: {
-          database: 1,
-          type: 'search',
-          body: JSON.stringify({
-            index: 'wrongindex',
-            type: 'data',
-            from: 0,
-            size: 0,
-            body: {
-              query: {},
-            },
-          }),
-        },
-      })
-      .expect(200)
-      .then((response) =>
-      {
-        winston.info(response.text);
-        expect(JSON.parse(response.text)).toMatchObject(
-          {
-            result: {},
-            errors: [
-              {
-                status: 404,
-                // tslint:disable-next-line:max-line-length
-                title: '[index_not_found_exception] no such index, with { resource.type="index_or_alias" & resource.id="wrongindex" & index_uuid="_na_" & index="wrongindex" }',
-              },
-            ],
-          });
-      })
-      .catch((error) =>
-      {
-        fail('POST /midway/v1/query/ request returned an error: ' + String(error));
-      });
-  });
 
   test('Elastic Search Route Error: POST /midway/v1/query', async () =>
   {
@@ -584,13 +538,9 @@ describe('Query route tests', () =>
           database: 1,
           type: 'wrongtype',
           body: {
-            index: 'wrongindex',
-            type: 'data',
             from: 0,
             size: 0,
-            body: {
-              query: {},
-            },
+            query: {},
           },
         },
       })
@@ -743,31 +693,29 @@ describe('Query route tests', () =>
           body: `{
             "from": 0,
             "size": 5,
-            "body": {
-              "_source": ["movieid", "title"],
-              "query": {
-                "bool": {
-                  "filter": [
-                    {
-                      "term": {
-                        "_index": "movies"
-                      }
-                    },
-                    {
-                      "term": {
-                        "_type": "data"
-                      }
+            "_source": ["movieid", "title"],
+            "query": {
+              "bool": {
+                "filter": [
+                  {
+                    "term": {
+                      "_index": "movies"
                     }
-                  ],
-                  "must": [
-                    { "match": { "status": "Released" } },
-                    { "match": { "language": "en" } }
-                  ],
-                  "must_not": [
-                    { "term": { "budget": 0 } },
-                    { "term": { "revenue": 0 } }
-                  ]
-                }
+                  },
+                  {
+                    "term": {
+                      "_type": "data"
+                    }
+                  }
+                ],
+                "must": [
+                  { "match": { "status": "Released" } },
+                  { "match": { "language": "en" } }
+                ],
+                "must_not": [
+                  { "term": { "budget": 0 } },
+                  { "term": { "revenue": 0 } }
+                ]
               }
             },
             "groupJoin": {
@@ -803,6 +751,7 @@ describe('Query route tests', () =>
         const respData = JSON.parse(response.text);
         expect(respData['errors'].length).toEqual(0);
         expect(respData['result'].hits.hits.length).toEqual(5);
+        expect(respData['result'].hits.hits[0]._id === respData['result'].hits.hits[0].englishMovies[0]._id);
       })
       .catch((error) =>
       {
