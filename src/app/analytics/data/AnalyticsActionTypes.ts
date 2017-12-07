@@ -55,7 +55,7 @@ export const AnalyticsActionTypes =
     selectInterval: '',
     selectDateRange: '',
     selectAnalyticsConnection: '',
-    pinVariant: '',
+    pinAlgorithm: '',
     fetchAvailableMetricsStart: '',
     fetchAvailableMetricsSuccess: '',
   };
