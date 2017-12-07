@@ -286,6 +286,7 @@ const EQLSpec: ESClause[] =
         search_after: 'search_after',
         ignore_failure: 'boolean',
         all_fields: 'boolean',
+        groupJoin: 'groupjoin_clause',
         // ext: 'ext', not much documents about the usage of this ext
         //        _name: 'query_name',
         //        inner_hits: 'inner_hits',
@@ -319,6 +320,22 @@ const EQLSpec: ESClause[] =
         name: 'slice',
         desc: 'A slice allowing to split a scroll in multiple partitions',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html',
+      }),
+    // Terrain Extension: groupJoin clause
+    new ESMapClause('groupjoin_clause',
+      'groupjoin_name',
+      'body',
+      {
+        path: ['groupjoin'],
+        name: 'groupJoin query',
+        desc: 'Create and name a groupJoin query.',
+        url: '',
+      }),
+    new ESStringClause('groupjoin_name',
+      {
+        path: ['groupjoin'],
+        desc: 'names this groupJoin subquery, must be alpha-numeric and can only contain \'_\' and \'-\'',
+        url: '',
       }),
     // aggregation
     // AggregatorFactories.java
