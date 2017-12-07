@@ -140,7 +140,10 @@ class Autocomplete extends TerrainComponent<Props>
 
     const { value } = target;
     this.value = value;
-    this.props.onChange(value);
+    if (this.props.onChange)
+    {
+      this.props.onChange(value);
+    }
     this.setState({
       value,
     });
