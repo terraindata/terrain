@@ -58,7 +58,8 @@ import { _TemplateField, TEMPLATE_TYPES, TemplateEditorState, TemplateField } fr
 
 /*
  *  This class defines a base class with useful functions that are used by components
- *  that act as both a View and a Controller into a TemplateEditorField
+ *  that handle UI for template editor fields. This abstract "component" is sort of an object-oriented representation
+ *  of a template editor field.
  */
 
 export interface TemplateEditorFieldProps

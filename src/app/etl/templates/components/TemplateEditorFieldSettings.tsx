@@ -57,9 +57,11 @@ const { List, Map } = Immutable;
 
 import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
+import Dropdown from 'common/components/Dropdown';
 import { Menu, MenuOption } from 'common/components/Menu';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, TEMPLATE_TYPES, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { _TemplateField, ELASTIC_TYPES, TEMPLATE_TYPES,
+  TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 
@@ -86,6 +88,17 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   {
     super(props);
     this._getContextMenuOptions = memoizeOne(this._getContextMenuOptions);
+    this._getDataTypeListIndex = memoizeOne(this._getDataTypeListIndex);
+  }
+
+  public _getDataTypeListIndex(type): number
+  {
+    return elasticTypeOptions.indexOf(type);
+  }
+
+  public getDataTypeListIndex(): number
+  {
+    return this._getDataTypeListIndex(this.props.field.type);
   }
 
   public _getContextMenuOptions(isExport: boolean): List<MenuOption>
@@ -107,11 +120,10 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     return this._getContextMenuOptions(this._isExport());
   }
 
-  public render()
+  public renderFieldNameSection()
   {
     const { field, canEdit } = this.props;
     const inputDisabled = this._inputDisabled();
-    const disableCheckbox = !canEdit; // only disable checkbox if it is disabled from a parent
 
     const inputFieldName =
       <Autocomplete
@@ -140,7 +152,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
       </div>
 
     const fieldNameSection = (
-      <div className='tef-layout-content-row'>
+      <div className='tef-layout-content-row tef-layout-no-padding-bottom'>
         <div className='tef-layout-label'> Name </div>
         <div className='tef-layout-autocomplete-spacer'> {inputFieldName} </div>
         <div
@@ -155,6 +167,38 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         </div>
       </div>
     );
+
+    return fieldNameSection;
+  }
+
+  public renderTypeSection()
+  {
+    const { field, canEdit } = this.props;
+    const inputDisabled = this._inputDisabled();
+
+    const fieldTypeDropdown = (
+      <Dropdown
+        options={elasticTypeOptions}
+        selectedIndex={this.getDataTypeListIndex()}
+        canEdit={canEdit}
+        onChange={this.handleChangeDataType}
+      />
+    )
+    return (
+      <div className='tef-layout-content-row'>
+        <div className='tef-layout-label'> Type </div>
+        <div className='tef-layout-dropdown-spacer'> {fieldTypeDropdown} </div>
+        <div className='tef-layout-label'>  Analyzed </div>
+        <div className='tef-layout-dropdown-spacer'> {fieldTypeDropdown} </div>
+      </div>
+    );
+  }
+
+  public render()
+  {
+    const { field, canEdit } = this.props;
+    const inputDisabled = this._inputDisabled();
+    const disableCheckbox = !canEdit; // only disable checkbox if it is disabled from a parent
 
     return (
       <div className='template-editor-field-row'>
@@ -176,11 +220,15 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
           ]}
         >
           <div className='tef-layout-row'>
-            {fieldNameSection}
-            <div className='tef-layout-padded'>
+            <div className='tef-layout-column'>
+              {this.renderFieldNameSection()}
+              {this.renderTypeSection()}
+            </div>
+            <div className='tef-layout-padded flex-container-center'>
               <div className='tef-menu-wrapper-positioning'>
                 <Menu
                   options={this.getContextMenuOptions()}
+                  style={_.extend({}, getStyle('top', '0px'), getStyle('right', '0px'))}
                 />
               </div>
             </div>
@@ -204,12 +252,40 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     })
   }
 
+  public handleChangeDataType(index)
+  {
+    if (index >= elasticTypeOptions.size || index < 0 )
+    {
+      return; // this should technically be impossible
+    }
+    else
+    {
+      this._set('type', elasticTypeOptions.get(index));
+    }
+  }
+
   public handleIncludeCheckboxClicked()
   {
     this._set('isIncluded', !this.props.field.isIncluded)
   }
 
 }
+
+const elasticTypeOptions = List([
+  ELASTIC_TYPES.TEXT,
+  ELASTIC_TYPES.LONG,
+  ELASTIC_TYPES.BOOLEAN,
+  ELASTIC_TYPES.DATE,
+  ELASTIC_TYPES.ARRAY,
+  ELASTIC_TYPES.NESTED,
+  ELASTIC_TYPES.DOUBLE,
+  ELASTIC_TYPES.SHORT,
+  ELASTIC_TYPES.BYTE,
+  ELASTIC_TYPES.INTEGER,
+  ELASTIC_TYPES.HALF_FLOAT,
+  ELASTIC_TYPES.FLOAT,
+  ELASTIC_TYPES.GEO_POINT,
+]);
 
 const originalNameLabelStyle = [
   fontColor(Colors().text3),

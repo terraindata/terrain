@@ -5,18 +5,22 @@
 .tef-layout-row {
   display: flex;
   flex-direction: row;
+  flex: 1 0;
 }
 
 .tef-layout-content-row {
   display: flex;
   flex-direction: row;
   padding: @half-spacing;
-  flex: 1;
+  &.tef-layout-no-padding-bottom {
+    padding-bottom: 0px;
+  }
 }
 
 .tef-layout-column {
   display: flex;
   flex-direction: column;
+  flex: 1 0;
 }
 
 .tef-layout-padded {
@@ -24,6 +28,10 @@
 }
 
 .tef-layout-autocomplete-spacer {
+  padding: 0px @half-spacing;
+}
+
+.tef-layout-dropdown-spacer {
   padding: 0px @half-spacing;
 }
 
@@ -39,10 +47,15 @@
     padding-right: 0px;
     padding-left: 0px;
   }
+  &.tef-indent {
+    padding-left: @double-spacing;
+  }
 }
 
 .tef-menu-wrapper-positioning {
   position: relative;
+  width: 24px;
+  height: 24px;
 }
 
 
@@ -76,7 +89,7 @@
 .template-editor-children-container {
   display: flex;
   flex-direction: column;
-
+  padding-left: @double-spacing;
   .subfield-spacer {
     padding: @item-spacing;
   }
@@ -88,7 +101,7 @@
     .create-new-template-field-button {
       display: flex;
       align-items: center;
-      padding: @half-spacing;
+      padding: @spacing @half-spacing;
       border-radius: 3px;
       cursor: pointer;
 

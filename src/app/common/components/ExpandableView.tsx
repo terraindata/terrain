@@ -83,18 +83,22 @@ class ExpandableView extends TerrainComponent<Props>
         style={this.props.style || {}}
       >
         <div className='expandable-view-content-row' style={fontColor(Colors().text1)}>
-          <ArrowIcon
-            className={classNames({
-              'expandable-view-arrow-icon': true,
-              'expandable-view-open': this.props.open
-            })}
-            onClick={this.props.onToggle}
-            style={{
-              width: arrowSize,
-              height: arrowSize,
-              padding: `0px ${arrowPadding}px`,
-            }}
-          />
+          <div className='expandable-view-arrow-column'>
+            <div className='expandable-view-arrow-spacer-top'/>
+            <ArrowIcon
+              className={classNames({
+                'expandable-view-arrow-icon': true,
+                'expandable-view-open': this.props.open
+              })}
+              onClick={this.props.onToggle}
+              style={{
+                width: arrowSize,
+                height: arrowSize,
+                padding: `0px ${arrowPadding}px`,
+              }}
+            />
+            <div className='expandable-view-arrow-spacer-bottom'/>
+          </div>
           <div className='expandable-view-content'>
             {this.props.content}
           </div>
