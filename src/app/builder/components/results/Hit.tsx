@@ -99,7 +99,7 @@ class HitComponent extends TerrainComponent<Props> {
     spotlights: IMMap<string, any>;
   } =
   {
-    spotlights: Map({}),
+    spotlights: SpotlightStore.getState().spotlights,
   }
 
   public menuOptions =
