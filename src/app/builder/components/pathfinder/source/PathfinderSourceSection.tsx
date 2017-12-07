@@ -55,11 +55,11 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
+import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
-import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _ElasticDataSource, Path, PathfinderContext, Source, sourceCountOptions, sourceCountDropdownOptions } from '../PathfinderTypes';
+import { _ElasticDataSource, Path, PathfinderContext, Source, sourceCountDropdownOptions, sourceCountOptions } from '../PathfinderTypes';
 
 export interface Props
 {
@@ -130,7 +130,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     this.changeSource(
       this.props.pathfinderContext.source
-        .set('count', value)
+        .set('count', value),
     );
   }
 

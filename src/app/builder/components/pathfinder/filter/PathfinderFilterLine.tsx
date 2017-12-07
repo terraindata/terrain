@@ -55,6 +55,7 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
+import Dropdown from 'app/common/components/Dropdown';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
 
@@ -64,9 +65,9 @@ export interface Props
   canEdit: boolean;
   depth: number;
   keyPath: KeyPath;
+  pathfinderContext: PathfinderContext;
   onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine);
   onDelete(keyPath: KeyPath);
-  pathfinderContext: PathfinderContext;
 }
 
 class PathfinderFilterLine extends TerrainComponent<Props>
@@ -126,7 +127,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       />
     );
   }
-  
+
   private renderValue()
   {
     const { filterLine, pathfinderContext } = this.props;
@@ -157,7 +158,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             disabled={!pathfinderContext.canEdit}
           />
         );
-        
+
       case 'date':
         return (
           <div>Calendar here</div>
@@ -181,14 +182,14 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             placeholder={'Choose input'}
           />
         );
-      
+
       case null:
         return null;
+      default:
+        throw new Error('No value type handler for ' + filterLine.valueType);
     }
-    
-    throw new Error('No value type handler for ' + filterLine.valueType);
   }
-  
+
   private handleChange(key, value)
   {
     this.props.onChange(this.props.keyPath, this.props.filterLine.set(key, value));
@@ -196,7 +197,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private getPieces()
   {
-
+    //
   }
 
 }

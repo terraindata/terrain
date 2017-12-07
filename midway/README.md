@@ -9,7 +9,7 @@ Midway handles backend requests from Terraformer.
 ### How Terraformer Is Built
 
 Midway stores and serves all of Terraformer's data (user accounts,
-groups, algorithms, variants, etc.), authenticates users when they log in, and passes queries from Terraformer to
+categories, groups, algorithms, etc.), authenticates users when they log in, and passes queries from Terraformer to
 the backing DB (Elastic, MySQL) and returns the results. Midway is built in Node and has a CRUD-like API.
 
 ## Setup
@@ -54,7 +54,7 @@ curl -X POST <midway address>/midway/v1/import/headless -F templateId=<template 
 
 Exports results from Terraformer as a csv/json/json [type object] file. Headless cURL request:
 ```
-curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"templateId":<template id>,"persistentAccessToken":"<persistent template access token>","body":{"dbid":<database id>,"templateId":<template id>, "variantId":<variant id>,"filetype":"<csv or json or json [type object]>"}}' '<midway address>/midway/v1/export/headless'
+curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"templateId":<template id>,"persistentAccessToken":"<persistent template access token>","body":{"dbid":<database id>,"templateId":<template id>, "algorithmId":<algorithm id>,"filetype":"<csv or json or json [type object]>"}}' '<midway address>/midway/v1/export/headless'
 ```
 
 #### Template Creation
@@ -85,7 +85,7 @@ curl -X GET 'localhost:3000/midway/v1/credentials/?id=<user id>&accessToken=<acc
 
 Allows users to schedule persistent jobs within Midway. Headless cURL request:
 ```
-curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"id":<user id>,"accessToken":"<access token>","body":{"jobType":"<import or export>","schedule":"<cron format>","sort":"<asc or desc>","transport":{"type":"<sftp/ssh/email/etc.","id":<credentials id>,"filename":"<full path to file in SFTP server>"}, "paramsJob": {<params for headless import or export i.e. "dbid":<database id>,"templateId":<template id>, "variantId":<variant id>,"filetype":"<csv or json or json [type object]>">}}}' '<midway url>/midway/v1/scheduler/create'
+curl -X POST -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"id":<user id>,"accessToken":"<access token>","body":{"jobType":"<import or export>","schedule":"<cron format>","sort":"<asc or desc>","transport":{"type":"<sftp/ssh/email/etc.","id":<credentials id>,"filename":"<full path to file in SFTP server>"}, "paramsJob": {<params for headless import or export i.e. "dbid":<database id>,"templateId":<template id>, "algorithmId":<algorithm id>,"filetype":"<csv or json or json [type object]>">}}}' '<midway url>/midway/v1/scheduler/create'
 ```
 
 ## Testing

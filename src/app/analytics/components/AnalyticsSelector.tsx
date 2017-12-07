@@ -75,9 +75,10 @@ const INTERVALS = Immutable.List([
 ]);
 
 const DATE_RANGES = Immutable.List([
-  { value: '1', label: 'Today' },
-  { value: '2', label: 'Last 7 days' },
-  { value: '3', label: 'Last Month' },
+  { value: '1', label: 'Last Hour' },
+  { value: '2', label: 'Today' },
+  { value: '3', label: 'Last 7 days' },
+  { value: '4', label: 'Last Month' },
 ]);
 
 class AnalyticsSelector extends TerrainComponent<Props>
@@ -125,7 +126,7 @@ class AnalyticsSelector extends TerrainComponent<Props>
     const metricOptions = this.getMetricOptions();
 
     return (
-      <div>
+      <div className='analytics-selector'>
         <Dropdown
           onChange={this.handleConnectionChange}
           options={connectionOptions}
@@ -134,7 +135,7 @@ class AnalyticsSelector extends TerrainComponent<Props>
           directionBias={90}
           selectedIndex={connectionOptions.indexOf(analyticsConnection)}
         />
-        <div className='analytics-selector'>
+        <div className='analytics-selector-filters'>
           <div className='analytics-selector-multiswitch'>
             <p>Metric</p>
             <MultiSwitch

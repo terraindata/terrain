@@ -378,7 +378,6 @@ export default class ESCardParser extends ESParser
     valueInfo.card = block;
     valueInfo.jsonType = ESJSONType.array;
     valueInfo.value = theValue;
-    block.static.valueInfo = valueInfo;
     const childrenCard = blockPath.push('cards');
     block['cards'].map(
       (card, key) =>
@@ -399,7 +398,6 @@ export default class ESCardParser extends ESParser
     const theValue = {};
     valueInfo.jsonType = ESJSONType.object;
     valueInfo.value = theValue;
-    block.static.valueInfo = valueInfo;
     const childrenCard = blockPath.push('cards');
     block['cards'].map(
       (card, key) =>

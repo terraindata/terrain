@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map } = Immutable;
+import Colors from 'app/colors/Colors';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -110,7 +111,7 @@ class TransformChartPreviewWrapper extends TerrainComponent<Props>
       },
       width: this.props.width,
       height: this.props.height,
-      colors: ['#1eb4fa', 'rgb(60, 63, 65)'], // TODO
+      colors: [Colors().builder.cards.categories.score, Colors().bg3],
       mode: this.props.mode,
     };
 

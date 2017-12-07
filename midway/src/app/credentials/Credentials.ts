@@ -54,6 +54,7 @@ import sha1 = require('sha1');
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import { users } from '../users/UserRouter';
 import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
@@ -143,6 +144,28 @@ export class Credentials
         };
       })));
     });
+  }
+
+  public async initializeLocalFilesystemCredential(): Promise<void>
+  {
+    const userExists = await users.select(['id'], { email: 'admin@terraindata.com' });
+    if (userExists.length !== 0)
+    {
+      const localConfigs: string[] = await this.getByType('local');
+      if (localConfigs.length === 0)
+      {
+        const seedUser = userExists[0];
+        const localCred: CredentialConfig =
+          {
+            createdBy: seedUser.id as number,
+            meta: '',
+            name: 'Local Filesystem Config',
+            permissions: 0,
+            type: 'local',
+          };
+        await this.upsert(seedUser, localCred);
+      }
+    }
   }
 
   public async upsert(user: UserConfig, cred: CredentialConfig): Promise<CredentialConfig>

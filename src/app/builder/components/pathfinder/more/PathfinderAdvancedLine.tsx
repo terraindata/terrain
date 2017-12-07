@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
@@ -57,14 +56,14 @@ import BuilderActions from 'app/builder/data/BuilderActions';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import Dropdown from 'app/common/components/Dropdown';
 import FadeInOut from 'app/common/components/FadeInOut';
+import MapComponent from 'app/common/components/MapComponent';
 import MultiInput from 'app/common/components/MultiInput';
 import RadioButtons, { RadioButtonOption } from 'app/common/components/RadioButtons';
 import RangesInput from 'app/common/components/RangesInput';
 import { tooltip } from 'app/common/components/tooltip/Tooltips';
+import Util from 'app/util/Util';
 import { ADVANCED } from '../PathfinderTypes';
 import { AdvancedDisplays } from './PathfinderAggregationDisplay';
-import MapComponent from 'app/common/components/MapComponent';
-import Util from 'app/util/Util';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
@@ -76,7 +75,8 @@ export interface Props
   canEdit: boolean;
   fieldName: string;
   // When a radioKey is changed, call this function to update elasticType of parent aggregeation
-  onRadioChange?: (key: string) => void;
+  onRadioChange?: (key: string, radioKey?: string) => void;
+  fields: List<string>;
 }
 
 export class PathfinderAdvancedLine extends TerrainComponent<Props>
@@ -107,13 +107,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
     {
       return (
         <div key={i} className='pf-advanced-section-item'>
-          {item.component(
-            this.props.fieldName,
-            this.props.keyPath.push(item.key),
-            this.handleMissingChange,
-            this.props.canEdit,
-            this.props.advancedData.get(item.key) !== undefined,
-            this.props.advancedData.get(item.key))}
+          {item.component(this.props, item, this.handleMissingChange)}
         </div>
       );
     }
@@ -150,14 +144,15 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           />;
         break;
       case 'dropdown':
+        const options = item.fieldOptions ? this.props.fields : item.options;
         content =
           <Dropdown
             canEdit={this.props.canEdit && !disabled}
             keyPath={this.props.keyPath.push(item.key)}
-            options={item.options}
-            selectedIndex={item.options.indexOf(this.props.advancedData.get(item.key))}
-          />
-        break
+            options={options}
+            selectedIndex={options.indexOf(this.props.advancedData.get(item.key))}
+          />;
+        break;
       case 'map':
         content =
           <div className='pf-advanced-map'>
@@ -173,7 +168,8 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
               textKeyPath={this.props.keyPath.push(item.textKey)}
               hideSearchSettings={true}
             />
-          </div>
+          </div>;
+        break;
       default:
     }
 
@@ -182,15 +178,16 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         className={classNames({
           'pf-advanced-section-item': true,
           'pf-advanced-section-item-range': item.inputType === 'range',
+          'pf-advanced-section-item-first': i === 0,
         })}
         key={i}
       >
-        <span> {item.text}</span>
+        {item.text && <span> {item.text}</span>}
         {content}
       </div>, { title: item.tooltipText, key: i });
   }
 
-  public renderAdvancedItems(items, onlyOne, radioKey?)
+  public renderAdvancedItems(items, onlyOne, radioKey?, inline?)
   {
     if (onlyOne)
     {
@@ -208,6 +205,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           options={options}
           keyPath={this.props.keyPath.push(radioKey)}
           onSelectOption={this.props.onRadioChange}
+          radioKey={radioKey}
         />
       );
     }
@@ -215,7 +213,8 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
       <div
         className={classNames({
           'pf-advanced-section-items': true,
-          'pf-advanced-section-multiple-items': items.length,
+          'pf-advanced-section-multiple-items': items.length && !inline,
+          'pf-advanced-section-multiple-inline': items.length && inline,
         })}
       >
         {
@@ -249,7 +248,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
         </div>
         <FadeInOut
           open={this.state.expanded}
-          children={this.renderAdvancedItems(display.items, display.onlyOne, display.radioKey)}
+          children={this.renderAdvancedItems(display.items, display.onlyOne, display.radioKey, display.inline)}
         />
       </div>
     );

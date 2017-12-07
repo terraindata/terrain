@@ -179,7 +179,19 @@
 			padding-bottom: 12px;
 			font-size: @font-size;
 			.pf-advanced-section-multiple-items {
-				display: inline-grid;
+				display: inline-grid !important;
+				span {
+					width: 138px;
+				}
+			}
+			.pf-advanced-section-multiple-inline {
+				display: inline-flex !important;
+				.pf-advanced-section-item {
+					margin-left: 12px;
+				}
+				.pf-advanced-section-item-first {
+					margin-left: 36px;
+				}
 			}
 			.pf-aggregation-missing {
 				display: inline-flex;
@@ -189,8 +201,8 @@
 			    	flex-basis: 50px;
 			    }
 			    span {
-			    	margin-top: 6px;
 			    	padding: 0px 6px;
+			    	max-width: 100% !important;
 			    }
 			}
 			.pf-advanced-section-title
@@ -206,11 +218,13 @@
 				top: 3px;
 			}
 			.builder-tb {
-				max-width: 300px;
+				max-width: 350px;
 			}
 			.multi-input-wrapper {
 				max-width: 500px;
 				padding-top: 12px;
+				position: relative;
+    			top: -10px;
 			}
 			.pf-advanced-section-item {
 				display: inline-flex;
@@ -219,7 +233,7 @@
 				    top: 7px;
 				    padding-right: 12px;				
 				    display: block;
-    				width: 138px;
+    				max-width: 138px;
 				}
 			}
 			.radio-button-option {
@@ -252,6 +266,75 @@
 			}
 			br {
 				display: none;
+			}
+		}
+	}
+	.pf-aggregation-more-menu-wrapper {
+		position: relative;
+		height: 20px;
+		width: 20px;
+		margin-bottom: 10px;
+		margin-left: 100px;
+	}
+	.pf-aggregation-more-section {
+		margin-left: 114px;
+		font-size: 16px;
+		max-width: 500px;
+		border: 1px solid;
+		padding: 6px;
+		margin-bottom: 6px;
+		border-radius: 6px;
+		.pf-aggregation-more-section-title {
+			cursor: pointer;
+		}
+		.close {
+			float: right;
+			margin-top: 3px;
+			margin-right: 6px;
+		}
+		.pf-line {
+			.close {
+				margin-right: 0px;
+			}
+		}
+		.pf-aggregation-more-section-content {
+			margin-left: 30px;
+		}
+		.pf-aggregation-sampler-option {
+			display: inline-flex;
+			max-width: 400px;
+			.builder-tb {
+				flex-grow: 0;
+				flex-basis: 60px;
+				padding-right: 3px;
+			}
+			span {
+				position: relative;
+				top: 4px;
+				padding-right: 3px;
+			}
+		}
+		.pf-aggregation-script-section {
+			.pf-aggregation-script-item {
+				margin-bottom: 12px;
+			}
+			textarea {
+				min-width: 100%;
+				max-width: 100%;
+			}
+			.pf-aggregation-script-title {
+				display: flex;
+				margin-bottom: 6px;
+				span {
+					position: relative;
+					top: 7px;
+					margin-right: 6px;
+					margin-left: 6px;
+				}
+				.builder-tb {
+					width: 100%;
+					flex-basis: none;
+				}
 			}
 		}
 	}

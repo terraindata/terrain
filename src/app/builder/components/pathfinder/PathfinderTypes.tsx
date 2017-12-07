@@ -84,10 +84,10 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
+import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType, FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
-import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 
 export const PathfinderSteps =
   [
@@ -236,6 +236,10 @@ class AggregationLineC extends BaseClass
   public type: string = '';
   public advanced: any = Map<string, any>({});
   public expanded: boolean = false;
+  public sampler: Sample = undefined;
+  public filters: FilterGroup = undefined;
+  public nested: List<AggregationLine> = undefined;
+  public scripts: List<Script> = undefined;
 }
 
 export type AggregationLine = AggregationLineC & IRecord<AggregationLineC>;
@@ -246,19 +250,46 @@ export const _AggregationLine = (config?: { [key: string]: any }) =>
   _.keys(aggregation['advanced']).map((key) =>
   {
     advanced[key] = Immutable.fromJS(aggregation['advanced'][key]);
-    // if (Array.isArray(aggregation['advanced'][key]))
-    // {
-    //   advanced[key] = List(aggregation['advanced'][key]);
-    // }
-    // else
-    // {
-    //   advanced[key] = aggregation['advanced'][key];
-    // }
   });
+  if (aggregation['sampler'] !== undefined)
+  {
+    aggregation = aggregation.set('sampler', _Sample(aggregation['sampler']));
+  }
+  if (aggregation['filters'] !== undefined)
+  {
+    aggregation = aggregation.set('filters', _FilterGroup(aggregation['filters']));
+  }
+  if (aggregation['nested'] !== undefined)
+  {
+    aggregation = aggregation.set('nested', List(aggregation['nested'].map((agg) => _AggregationLine(agg))));
+  }
+  if (aggregation['scripts'] !== undefined)
+  {
+    aggregation = aggregation.set('scripts', List(aggregation['scripts'].map((script) => _Script(script))));
+  }
   aggregation = aggregation
     .set('advanced', Map(advanced));
   return aggregation;
 };
+
+class SampleC extends BaseClass
+{
+  public sampleType: string = 'global';
+  public numSamples: number = 100;
+  public diverseField: string = '';
+}
+export type Sample = SampleC & IRecord<SampleC>;
+export const _Sample = (config?: { [key: string]: any }) =>
+  New<Sample>(new SampleC(config), config);
+
+class ScriptC extends BaseClass
+{
+  public id: string = '';
+  public script: string = '';
+}
+export type Script = ScriptC & IRecord<ScriptC>;
+export const _Script = (config?: { [key: string]: any }) =>
+  New<Script>(new ScriptC(config), config);
 
 class FilterLineC extends LineC
 {
@@ -375,9 +406,9 @@ export const _PathfinderContext = (config?: { [key: string]: any }) =>
 // This type union shows what contexts and parameters are allowable
 //  for autocompletes and dropdowns
 type ChoiceContext = {
-    type: 'source',
-    schemaState: SchemaState,
-  } | {
+  type: 'source',
+  schemaState: SchemaState,
+} | {
     type: 'transformFields',
     source: Source,
     schemaState: SchemaState,
@@ -447,12 +478,12 @@ class ElasticDataSourceC extends DataSource
         },
       ).toList();
     }
-    
+
     if (context.type === 'comparison')
     {
       return List(ElasticComparisons.map((c) => _ChoiceOption(c)));
     }
-    
+
     if (context.type === 'valueType')
     {
       const comparison = ElasticComparisons.find((comp) => comp.value === context.comparison);
@@ -494,7 +525,12 @@ class ElasticDataSourceC extends DataSource
 }
 export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>;
 export const _ElasticDataSource = (config?: { [key: string]: any }) =>
-  New<ElasticDataSource>(new ElasticDataSourceC(config), config);
+{
+  let elasticSource = New<ElasticDataSource>(new ElasticDataSourceC(config), config);
+  elasticSource = elasticSource.set('indexes', List(elasticSource['indexes']));
+  elasticSource = elasticSource.set('types', List(elasticSource)['types']);
+  return elasticSource;
+};
 
 const ElasticComparisons = [
   {
@@ -604,12 +640,13 @@ export enum ADVANCED
   Precision,
   IncludeExclude,
   Type,
+  TermsType,
 }
 
 // The data that needs to be stored for each type of advanced field
 export const ADVANCED_MAPPINGS =
   {
-    [ADVANCED.Missing]: { missing: 0, ignoreMissing: true },
+    [ADVANCED.Missing]: {},
     [ADVANCED.Sigma]: { sigma: 2 },
     [ADVANCED.Percentiles]: { percentiles: List([1, 5, 25, 50, 75, 95, 99]) },
     [ADVANCED.PercentileRanks]: { values: List([]) },
@@ -619,7 +656,7 @@ export const ADVANCED_MAPPINGS =
     [ADVANCED.Format]: { format: 'MM/dd/yyyy', timezone: '' },
     [ADVANCED.ExtendedRange]: { offset: 0, min: '', max: '' },
     [ADVANCED.MinDocCount]: { min_doc_count: 0 },
-    [ADVANCED.Order]: { order: 'asc' },
+    [ADVANCED.Order]: { order: 'ascending' },
     [ADVANCED.Size]: { size: 10 },
     [ADVANCED.Error]: { show_term_doc_count_error: 'false' },
     [ADVANCED.Origin]: { origin: [30, 100], origin_address: '' },
@@ -627,6 +664,7 @@ export const ADVANCED_MAPPINGS =
     [ADVANCED.Precision]: { precision: 5 },
     [ADVANCED.IncludeExclude]: { include: List([]), exclude: List([]) },
     [ADVANCED.Type]: { geoType: 'geo_distance' },
+    [ADVANCED.TermsType]: { termsType: 'terms' },
   };
 
 interface AggregationData
@@ -716,8 +754,11 @@ export const AggregationTypes = Map<string, AggregationData>({
       ip_range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges]),
       geo_distance: List([ADVANCED.Name, ADVANCED.Type, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.Origin, ADVANCED.Distance]),
       geo_hash: List([ADVANCED.Name, ADVANCED.Type, ADVANCED.Missing, ADVANCED.Size, ADVANCED.Precision]),
-      terms: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Size, ADVANCED.MinDocCount, ADVANCED.IncludeExclude,
-      ADVANCED.Order])
+      terms: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.TermsType, ADVANCED.Size, ADVANCED.MinDocCount, ADVANCED.IncludeExclude,
+      ADVANCED.Order]),
+      significant_terms: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.TermsType,
+      ADVANCED.Size, ADVANCED.MinDocCount, ADVANCED.IncludeExclude,
+      ADVANCED.Order]),
     }),
     acceptedTypes: List([FieldType.Any]),
     fieldTypesToElasticTypes: Map({
@@ -726,6 +767,6 @@ export const AggregationTypes = Map<string, AggregationData>({
       [FieldType.Geopoint]: List(['geo_distance', 'geo_hash']),
       [FieldType.Text]: List(['terms', 'significant_terms']),
       [FieldType.Ip]: List(['ip_range']),
-    })
-  }
+    }),
+  },
 });

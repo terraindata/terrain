@@ -66,6 +66,7 @@ export interface Props
 {
   pathfinderContext: PathfinderContext;
   filterGroup: FilterGroup;
+  keyPath: KeyPath;
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
@@ -83,7 +84,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
     // flatten tree
     const entries: FilterEntry[] = [];
-    this.buildFilterTree(filterGroup, entries, 0, List(['query', 'path']));
+    this.buildFilterTree(filterGroup, entries, 0, this.props.keyPath);
     return (
       <div
         className='pf-section'
@@ -112,7 +113,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   private buildFilterTree(filterGroup: FilterGroup, entries: FilterEntry[], depth: number, keyPath: KeyPath): void
   {
-    keyPath = keyPath.push('filterGroup');
 
     entries.push({
       filterGroup,

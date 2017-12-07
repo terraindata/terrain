@@ -52,16 +52,16 @@ import BackendInstance from '../../../database/types/BackendInstance';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
+import bodybuilder = require('bodybuilder');
 import * as PropTypes from 'prop-types';
 import Util from 'util/Util';
 import { _ResultsConfig } from '../../../../shared/results/types/ResultsConfig';
+import { AllBackendsMap } from '../../../database/AllBackends';
 import { _Query, Query } from '../../../items/types/Query';
 import HitsArea from '../../builder/components/results/HitsArea';
 import { ResultsManager } from '../../builder/components/results/ResultsManager';
 import { _ResultsState, ResultsState } from '../../builder/components/results/ResultTypes';
 import InfoArea from '../../common/components/InfoArea';
-
-import { AllBackendsMap } from '../../../database/AllBackends';
 
 export interface Props
 {
@@ -96,7 +96,6 @@ class SchemaResults extends TerrainComponent<Props>
       this.setState({
         initialized: true,
       });
-      return;
     }
     const { selectedId } = storeState;
     // TODO change if store changes
@@ -125,24 +124,43 @@ class SchemaResults extends TerrainComponent<Props>
         switch (selectedItem.type)
         {
           case 'server':
-            queryString = '{ "index": "", "type": "", "from": 0, "size": 1000 }';
+            queryString = JSON.stringify(
+              bodybuilder()
+                .rawOption('query', { bool: {} })
+                .from(0)
+                .size(1000)
+                .build(),
+            );
             break;
           case 'database':
-            queryString = '{ "index": "' + selectedItem['name'] + '", "type": "", "from": 0, "size": 1000 }';
+            queryString = JSON.stringify(
+              bodybuilder()
+                .filter('term', '_index', selectedItem['name'])
+                .from(0)
+                .size(1000)
+                .build(),
+            );
             break;
           case 'table':
-            queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
-              + '", "type": "' + selectedItem['name'] + '", "from": 0, "size": 1000 }';
+            queryString = JSON.stringify(
+              bodybuilder()
+                .filter('term', '_index', selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', ''))
+                .filter('term', '_type', selectedItem['name'])
+                .from(0)
+                .size(1000)
+                .build(),
+            );
             break;
           case 'column':
-            queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
-              + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '",'
-              + '"from": 0, "size": 1000 }';
-            break;
           case 'fieldProperty':
-            queryString = '{ "index": "' + selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', '')
-              + '", "type": "' + selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', '') + '",'
-              + '"from": 0, "size": 1000 }';
+            queryString = JSON.stringify(
+              bodybuilder()
+                .filter('term', '_index', selectedItem['databaseId'].replace(selectedItem['serverId'] + '/', ''))
+                .filter('term', '_type', selectedItem['tableId'].replace(selectedItem['databaseId'] + '.', ''))
+                .from(0)
+                .size(1000)
+                .build(),
+            );
             break;
         }
 
@@ -214,7 +232,6 @@ class SchemaResults extends TerrainComponent<Props>
           this.showsResults(this.state.selectedItem) ?
             <div
               style={{
-                marginLeft: 12,
                 paddingRight: 6,
                 boxSizing: 'border-box',
               }}
@@ -224,12 +241,13 @@ class SchemaResults extends TerrainComponent<Props>
                 query={this.state.resultsQuery}
                 canEdit={false}
                 db={this.state.resultsServer}
-                variantName={''}
+                algorithmName={''}
                 onNavigationException={PropTypes.func}
                 resultsState={this.state.resultsState}
                 showExport={false}
                 showCustomizeView={false}
                 allowSpotlights={false}
+                ignoreEmptyCards={true}
               />
             </div>
             :

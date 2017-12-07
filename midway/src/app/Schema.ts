@@ -137,7 +137,7 @@ const appSchemaSQL: string[] = [
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
 {
-  if (dbtype === 'sqlite' || dbtype === 'mysql')
+  if (dbtype === 'sqlite' || dbtype === 'mysql' || dbtype === 'postgres')
   {
     return tasty.getDB().execute(appSchemaSQL);
   }

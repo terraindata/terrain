@@ -63,7 +63,7 @@ let batch: any[] = [];
 let batchSize: number = 0; // memoized so we aren't always computing sizeof(batch)
 
 const TerrainAnalytics = {
-  assembleParams(asObject: boolean, eventName: string | any, variantOrSourceID: string | any, meta?: any): string | object
+  assembleParams(asObject: boolean, eventName: string | any, algorithmOrSourceID: string | any, meta?: any): string | object
   {
     const visitorID = meta != null && meta.hasOwnProperty('visitorid') ? meta['visitorid'] :
       (fingerprint || (fingerprint = client.getFingerprint()));
@@ -73,14 +73,14 @@ const TerrainAnalytics = {
       return {
         eventname: eventName,
         visitorid: String(visitorID),
-        variantid: String(variantOrSourceID),
+        algorithmid: String(algorithmOrSourceID),
         meta,
       };
     }
 
     let paramString = 'eventname=' + String(eventName)
       + '&visitorid=' + String(visitorID)
-      + '&variantid=' + String(variantOrSourceID);
+      + '&algorithmid=' + String(algorithmOrSourceID);
 
     if (meta !== null && meta !== undefined)
     {
@@ -90,9 +90,9 @@ const TerrainAnalytics = {
     return paramString;
   },
 
-  logEvent(eventName: string | any, variantOrSourceID: string | any, meta?: any)
+  logEvent(eventName: string | any, algorithmOrSourceID: string | any, meta?: any)
   {
-    const event = TerrainAnalytics.assembleParams(true, eventName, variantOrSourceID, meta);
+    const event = TerrainAnalytics.assembleParams(true, eventName, algorithmOrSourceID, meta);
     batch.push(event);
     batchSize += sizeof(event);
     // GET requests should be under 2KB.  If we get too close to this limit,
@@ -123,10 +123,10 @@ const TerrainAnalytics = {
     batchSize = 0;
   },
 
-  logEventImmediately(eventName: string | any, variantOrSourceID: string | any, meta?: any)
+  logEventImmediately(eventName: string | any, algorithmOrSourceID: string | any, meta?: any)
   {
     const xhr = new XMLHttpRequest();
-    xhr.open('GET', (server || '') + '?' + String(TerrainAnalytics.assembleParams(false, eventName, variantOrSourceID, meta)), true);
+    xhr.open('GET', (server || '') + '?' + String(TerrainAnalytics.assembleParams(false, eventName, algorithmOrSourceID, meta)), true);
     xhr.send();
   },
 };

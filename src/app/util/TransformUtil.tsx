@@ -51,7 +51,8 @@ THE SOFTWARE.
   It is used by the TransformChart to draw lines and the Elastic Transform Card to pass data into the PWL script
 
   Logarithmic:
-    Two different functions are used for growth versus decay to get the desired shape of the curve
+    Two different functions are used for growth versus decay to get the desired shape of the curve.
+    For growth the curve is shifted so that x is small (relative to range) and then shifted back, to maximize curviness!
 
   Exponential:
     The curve is shifted down so that the lower point is at 0, the curve is built and then it is shifted back up
@@ -83,22 +84,23 @@ export const NUM_CURVE_POINTS = {
 
 const TransformUtil = {
 
-  getLogarithmicData(numPoints, pointsData, domainMin?, domainMax?)
+  getLogarithmicData(numPoints, pointsData, domainMin, domainMax)
   {
-    const x1: number = pointsData[0].x || pointsData[0].value;
+    let x1: number = pointsData[0].x || pointsData[0].value;
     const y1: number = pointsData[0].y || pointsData[0].score;
-    const x2: number = pointsData[1].x || pointsData[1].value;
+    let x2: number = pointsData[1].x || pointsData[1].value;
     const y2: number = pointsData[1].y || pointsData[1].score;
 
     const ranges = [];
     const outputs = [];
-    const stepSize = Math.abs(pointsData[1].x - pointsData[0].x) * (1 / numPoints);
-    if (pointsData[0].y > pointsData[1].y)
+    const stepSize = Math.abs(x2 - x1) * (1 / numPoints);
+    // Decay
+    if (y1 > y2)
     {
       const yMax = y1 + 0.05;
       const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
       const b = x2 - Math.log(yMax - y2) / k;
-      let x = pointsData[0].x;
+      let x = x1;
       for (let i = 0; i <= numPoints; i++)
       {
         const y = -1 * Math.exp(k * (x - b)) + yMax;
@@ -107,15 +109,19 @@ const TransformUtil = {
         x += stepSize;
       }
     }
+    // Growth
     else
     {
+      const shift = x1 - 0.005 * (domainMax - domainMin);
+      x1 = x1 - shift;
+      x2 = x2 - shift;
       const a: number = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / (1 - Math.log(x1) / Math.log(x2));
       const b: number = (y2 - a) / Math.log(x2);
-      let x = pointsData[0].x;
+      let x = x1;
       for (let i = 0; i <= numPoints; i++)
       {
         const y = TransformUtil._logarithmic(x, a, b);
-        ranges.push(x);
+        ranges.push(x + shift);
         outputs.push(y);
         x += stepSize;
       }
@@ -126,6 +132,39 @@ const TransformUtil = {
   _logarithmic(x: number, a: number, b: number)
   {
     return a + b * Math.log(x);
+  },
+
+  // Given a logarithmic x value and all of the points data, return the y value for the x
+  getLogarithmicY(x: number, pointsData, domainMin, domainMax)
+  {
+    let x1: number = pointsData[0].x || pointsData[0].value;
+    const y1: number = pointsData[0].y || pointsData[0].score;
+    let x2: number = pointsData[1].x || pointsData[1].value;
+    const y2: number = pointsData[1].y || pointsData[1].score;
+    if (x >= x2)
+    {
+      return y2;
+    }
+    if (x <= x1)
+    {
+      return y1;
+    }
+    if (y1 > y2)
+    {
+      const yMax = y1 + 0.05;
+      const k = (Math.log(yMax - y1) - Math.log(yMax - y2)) / (x1 - x2);
+      const b = x2 - Math.log(yMax - y2) / k;
+      return -1 * Math.exp(k * (x - b)) + yMax;
+    }
+    else
+    {
+      const shift = x1 - 0.005 * (domainMax - domainMin);
+      x1 = x1 - shift;
+      x2 = x2 - shift;
+      const a: number = (y1 - y2 * (Math.log(x1) / Math.log(x2))) / (1 - Math.log(x1) / Math.log(x2));
+      const b: number = (y2 - a) / Math.log(x2);
+      return TransformUtil._logarithmic(x - shift, a, b);
+    }
   },
 
   getExponentialData(numPoints, pointsData)
@@ -159,24 +198,50 @@ const TransformUtil = {
     return A * Math.exp(-1 * lambda * x);
   },
 
+  getExponentialY(x, pointsData, domainMin?, domainMax?)
+  {
+    const x1: number = pointsData[0].x || pointsData[0].value;
+    let y1: number = pointsData[0].y || pointsData[0].score;
+    const x2: number = pointsData[1].x || pointsData[1].value;
+    let y2: number = pointsData[1].y || pointsData[1].score;
+
+    if (x >= x2)
+    {
+      return y2;
+    }
+    if (x <= x1)
+    {
+      return y1;
+    }
+    const shift = y2 < y1 ? y2 - 0.001 : y1 - 0.001;
+    y1 -= shift;
+    y2 -= shift;
+    const lambda = (Math.log(y2) / x1 - Math.log(y1) / x1) / (1 - x2 / x1);
+    const a = y2 / Math.exp(-1 * lambda * x2);
+    return TransformUtil._exponential(x, lambda, a) + shift;
+  },
+
   getNormalData(numPoints, pointsData, domainMin, domainMax)
   {
+    console.log(pointsData);
     const average = pointsData[1].x || pointsData[1].value;
-    const rightPoint = pointsData[0].x || pointsData[0].value;
-    const leftPoint = pointsData[2].x || pointsData[2].value;
+    let leftPoint = (pointsData[0].x || pointsData[0].value);
+    const rightPoint = pointsData[2].x || pointsData[2].value;
     const averageHeight = pointsData[1].y || pointsData[1].score;
     // Left half of data
-    let stdDev = Math.abs(average - rightPoint);
+    leftPoint = leftPoint > 0 ? leftPoint : 0.001;
+    let stdDev = Math.abs(average - leftPoint);
     let maxY = TransformUtil._normal(average, average, stdDev);
     let scaleFactor = averageHeight / maxY;
     const left = TransformUtil._getNormalDataSubset(average, stdDev, domainMin, average, scaleFactor, Math.floor(numPoints / 2));
 
     // Right half of data
-    stdDev = Math.abs(leftPoint - average);
+    stdDev = Math.abs(rightPoint - average);
     maxY = TransformUtil._normal(average, average, stdDev);
     scaleFactor = averageHeight / maxY;
     const right = TransformUtil._getNormalDataSubset(average, stdDev, average, domainMax, scaleFactor, Math.floor(numPoints / 2));
-
+    console.log(left.xData.concat(right.xData));
+    console.log(left.yData.concat(right.yData));
     return { ranges: left.xData.concat(right.xData), outputs: left.yData.concat(right.yData) };
   },
 
@@ -200,6 +265,29 @@ const TransformUtil = {
     return NORMAL_CONSTANT * Math.exp(-.5 * x * x) / stdDev;
   },
 
+  getNormalY(x, pointsData, domainMin, domainMax)
+  {
+    const average = pointsData[1].x || pointsData[1].value;
+    const averageHeight = pointsData[1].y || pointsData[1].score;
+    // Left half
+    if (x < average)
+    {
+      const leftPoint = pointsData[0].x || pointsData[0].value;
+      const stdDev = Math.abs(average - leftPoint);
+      const maxY = TransformUtil._normal(average, average, stdDev);
+      const scaleFactor = averageHeight / maxY;
+      return TransformUtil._normal(x, average, stdDev) * scaleFactor;
+    }
+    else
+    {
+      const rightPoint = pointsData[2].x || pointsData[2].value;
+      const stdDev = Math.abs(average - rightPoint);
+      const maxY = TransformUtil._normal(average, average, stdDev);
+      const scaleFactor = averageHeight / maxY;
+      return TransformUtil._normal(x, average, stdDev) * scaleFactor;
+    }
+  },
+
   getSigmoidData(numPoints, pointsData, domainMin: number, domainMax: number)
   {
     const a: number = pointsData[0].y || pointsData[0].score;
@@ -213,13 +301,25 @@ const TransformUtil = {
     const ranges = [];
     const outputs = [];
     const stepSize: number = (domainMax - domainMin) * (1 / numPoints);
-    for (let i = (domainMin - stepSize); i < (domainMax + stepSize); i += stepSize)
+    for (let i = domainMin; i <= domainMax; i += stepSize)
     {
       const y = TransformUtil._sigmoid(i, a, k, x0, L);
       ranges.push(i);
       outputs.push(y);
     }
     return { ranges, outputs };
+  },
+
+  getSigmoidY(x, pointsData, domainMin, domainMax)
+  {
+    const a: number = pointsData[0].y || pointsData[0].score;
+    const xVal: number = pointsData[1].x || pointsData[1].value;
+    const yVal: number = pointsData[1].y || pointsData[1].score;
+    const x0: number = pointsData[2].x || pointsData[2].value;
+    const y3: number = pointsData[3].y || pointsData[3].score;
+    const L: number = y3 - a;
+    const k: number = (-1 * Math.log(L / (yVal - a) - 1)) / (xVal - x0);
+    return TransformUtil._sigmoid(x, a, k, x0, L);
   },
 
   _sigmoid(x: number, a: number, k: number, x0: number, L: number)

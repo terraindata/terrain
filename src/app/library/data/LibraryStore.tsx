@@ -47,18 +47,18 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Redux from 'redux';
 import thunk from 'redux-thunk';
-
 import BackendInstance from '../../../database/types/BackendInstance';
 import * as LibraryTypes from './../LibraryTypes';
 
 import { ItemStatus } from '../../../items/types/Item';
 import Util from './../../util/Util';
 
+type Category = LibraryTypes.Category;
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
-type Variant = LibraryTypes.Variant;
 
 class LibraryStateC
 {
@@ -67,26 +67,33 @@ class LibraryStateC
   public dbs: List<BackendInstance> = Immutable.List([]);
   public dbsLoaded: boolean = false;
 
+  public categories: IMMap<ID, Category> = null;
   public groups: IMMap<ID, Group> = null;
   public algorithms: IMMap<ID, Algorithm> = null;
-  public variants: IMMap<ID, Variant> = null;
-  public selectedVariant: ID = null;
+  public selectedAlgorithm: ID = null;
 
   // these are set these on initial load
+  public prevCategories: IMMap<ID, Category> = null;
   public prevGroups: IMMap<ID, Group> = null;
   public prevAlgorithms: IMMap<ID, Algorithm> = null;
-  public prevVariants: IMMap<ID, Variant> = null;
 
-  public groupsOrder: List<ID> = Immutable.List([]);
+  public categoriesOrder: List<ID> = Immutable.List([]);
 
   public changingStatus: boolean = false;
-  public changingStatusOf: LibraryTypes.Variant = null;
+  public changingStatusOf: LibraryTypes.Algorithm = null;
   public changingStatusTo: ItemStatus = 'BUILD';
+
+  // Keep track of versioning
+  public modelVersion: number = 3;
 }
 const LibraryState_Record = Immutable.Record(new LibraryStateC());
 export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
 export const _LibraryState = (config?: any) =>
 {
+  if (config && !(config['modelVersion'] || config['modelVersion'] < 2))
+  {
+    config['modelVersion'] = 3;
+  }
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
 };
 
@@ -96,7 +103,7 @@ export const _LibraryState = (config?: any) =>
 // but by itself, that class won’t have Immutability, so we make:
 // 2. `LibraryState_Record` is an Immutable class that’s created from `LibraryStateC`. It will contain
 //      the members that are specified in LibraryStateC and their default values (they have to have default values for Immutable)
-// but Typescript doesn’t know the properties that LibraryState_Record can have (e.g. `loaded`, `groups`), so we make
+// but Typescript doesn’t know the properties that LibraryState_Record can have (e.g. `loaded`, `categories`), so we make
 // 3. `interface LibraryState`, which is just a union of the `LibraryStateC` type with the Immutable Record type for LibraryState.
 //  This correctly expresses the typings of `LibraryState_Record`, and this is the actual type that we use throughout
 //   the app when referring to LibraryState types
@@ -106,7 +113,7 @@ export const _LibraryState = (config?: any) =>
 
 // …So I know it’s a little messy and a lot to take in. The goal is to be able to do things like these:
 // const libraryState = _LibraryState({ ... });
-// const groups = libraryState.groups; // typescript recognizes the groups property on libraryState
+// const categories = libraryState.categories; // typescript recognizes the categories property on libraryState
 // const loadingLibraryState = libraryState.set('loading', true); // typescript still knows that this returns a LibraryState type
 
 const DefaultState = _LibraryState();

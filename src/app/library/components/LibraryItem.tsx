@@ -98,9 +98,9 @@ export interface Props
   draggingOverIndex: number;
 
   // partially-optional. need to be provided if available.
+  categoryId?: ID;
   groupId?: ID;
   algorithmId?: ID;
-  variantId?: ID;
 
   // optional
   className?: string;
@@ -108,7 +108,7 @@ export interface Props
   onDoubleClick?: (id: ID) => void;
   isStarred?: boolean;
   isPinned?: boolean;
-  onPin?: (variantId) => void;
+  onPin?: (algorithmId) => void;
 
   // populated by DnD code
   connectDropTarget?: (html: any) => JSX.Element;
@@ -127,7 +127,7 @@ class LibraryItem extends TerrainComponent<Props>
   public static defaultProps: Partial<Props> = {
     canPin: false,
     isPinned: false,
-    onPin: (variantId) => { return; },
+    onPin: (algorithmId) => { return; },
   };
 
   public state = {
@@ -149,6 +149,7 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Rename',
         disabled: true,
+        tooltip: "Can't rename Live or Default Algorithms",
       },
     ]),
     duplicateRename:
@@ -171,6 +172,7 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Rename',
         disabled: true,
+        tooltip: "Can't rename Live or Default Algorithms",
       },
     ]),
     archiveRename:
@@ -193,6 +195,7 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Rename',
         disabled: true,
+        tooltip: "Can't rename Live or Default Algorithms",
       },
     ]),
     unarchiveRename:
@@ -219,6 +222,7 @@ class LibraryItem extends TerrainComponent<Props>
       {
         text: 'Rename',
         disabled: true,
+        tooltip: "Can't rename Live or Default Algorithms",
       },
     ]),
     duplicateRenameArchive:
@@ -453,7 +457,6 @@ class LibraryItem extends TerrainComponent<Props>
         shiftedDown = true;
       }
     }
-
     return connectDropTarget((
       <div
         className={classNames({

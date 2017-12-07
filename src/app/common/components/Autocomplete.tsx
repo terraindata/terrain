@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-unused-expression no-var-requires
 
 // TODO consider showing all options, even when a search text has been entered
-//  so that they can easily change it 
+//  so that they can easily change it
 // and different labels for user inputs, fields, etc.
 
 import './Autocomplete.less';
@@ -86,6 +86,8 @@ export interface Props
 
   autoFocus?: boolean;
   moveCursorToEnd?: boolean;
+
+  onKeyDown?: (e) => void;
 }
 
 @Radium
@@ -97,6 +99,7 @@ class Autocomplete extends TerrainComponent<Props>
     value: string;
     open: boolean;
     selectedIndex: number;
+    hoveredIndex: number;
   };
 
   public blurValue: string = '';
@@ -104,19 +107,20 @@ class Autocomplete extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-    this.value = props.value;
+    this.value = String(props.value);
     this.state =
       {
         value: props.value === null || props.value === undefined
-          ? '' : props.value,
+          ? '' : String(props.value),
         open: false,
         selectedIndex: -1,
+        hoveredIndex: -1,
       };
   }
 
   public componentWillMount()
   {
-    this.value = this.props.value;
+    this.value = String(this.props.value);
     this.setState({
       value: this.props.value,
     });
@@ -217,6 +221,10 @@ class Autocomplete extends TerrainComponent<Props>
 
   public handleKeydown(event)
   {
+    if (this.props.onKeyDown)
+    {
+      this.props.onKeyDown(event);
+    }
     if (!this.props.options)
     {
       // still be able to hit enter when there are no options
@@ -248,11 +256,16 @@ class Autocomplete extends TerrainComponent<Props>
       case 13:
       case 9:
         // enter or tab
-        let value = visibleOptions.get(this.state.selectedIndex);
-        if (!value || this.state.selectedIndex === -1)
+        let value = event.target.value;
+        if (this.state.selectedIndex !== -1)
         {
-          value = event.target.value;
+          value = visibleOptions.get(this.state.selectedIndex);
         }
+        else if (this.state.hoveredIndex !== -1)
+        {
+          value = visibleOptions.get(this.state.hoveredIndex);
+        }
+
         this.setState({
           open: false,
           selectedIndex: -1,
@@ -313,6 +326,20 @@ class Autocomplete extends TerrainComponent<Props>
     return isFirst || isSecond;
   }
 
+  public mouseOverOption(index)
+  {
+    this.setState({
+      hoveredIndex: index,
+    });
+  }
+
+  public mouseLeaveOption(value)
+  {
+    this.setState({
+      hoveredIndex: -1,
+    });
+  }
+
   public renderOption(option: string, index: number)
   {
     let first = option;
@@ -336,6 +363,8 @@ class Autocomplete extends TerrainComponent<Props>
           'ac-option-selected': index === this.state.selectedIndex,
         })}
         onMouseDown={this._fn(this.handleSelect, option)}
+        onMouseEnter={this._fn(this.mouseOverOption, index)}
+        onMouseLeave={this.mouseLeaveOption}
         data-value={option}
         key={option}
         ref={'opt' + index}

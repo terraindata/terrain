@@ -65,7 +65,7 @@ import TQLResultsBar from './TQLResultsBar';
 
 export interface Props
 {
-  variant?: LibraryTypes.Variant;
+  algorithm?: LibraryTypes.Algorithm;
   query?: Query;
   canEdit?: boolean;
   resultsState: ResultsState;

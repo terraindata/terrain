@@ -119,6 +119,8 @@ export interface Props
   textStyle?: React.CSSProperties;
 
   tuningMode?: boolean;
+
+  onKeyDown?: (e) => void;
 }
 
 interface State
@@ -240,7 +242,6 @@ class BuilderTextbox extends TerrainComponent<Props>
     // {
     //   value = +value;
     // }
-
     Actions.change(this.props.keyPath, value);
     this.props.onChange && this.props.onChange(value);
   }
@@ -456,6 +457,7 @@ class BuilderTextbox extends TerrainComponent<Props>
                 onFocus={this.handleFocus}
                 onBlur={this.handleBlur}
                 style={this.props.textStyle}
+                onKeyDown={this.props.onKeyDown}
               />
           }
           {this.props.acceptsCards && this.renderSwitch()}

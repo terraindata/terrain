@@ -106,7 +106,7 @@ class PathfinderStepSection extends TerrainComponent<Props>
 
     switch (step)
     {
-
+      default:
     }
 
     return {

@@ -48,11 +48,10 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../../colors/Colors';
+import { Colors, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
+const { List } = Immutable;
 import ColorsActions from 'app/colors/data/ColorsActions';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
@@ -68,16 +67,11 @@ export interface Props
   pathfinderContext: PathfinderContext;
   more: More;
   keyPath: KeyPath;
+  hideTitle?: boolean;
 }
 
 class PathfinderMoreSection extends TerrainComponent<Props>
 {
-  public state: {
-
-  } = {
-
-  };
-
   public componentWillMount()
   {
     ColorsActions.setStyle('.pf-line-wrapper .expand', getStyle('fill', Colors().iconColor));
@@ -135,10 +129,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       <div
         className='pf-section pf-more-section'
       >
-        <PathfinderSectionTitle
-          title={PathfinderText.moreSectionTitle}
-          text={PathfinderText.moreSectionSubtitle}
-        />
+        {!this.props.hideTitle &&
+          <PathfinderSectionTitle
+            title={PathfinderText.moreSectionTitle}
+            text={PathfinderText.moreSectionSubtitle}
+          />
+        }
         <DragAndDrop
           draggableItems={this.getAggregationLines()}
           onDrop={this.handleLinesReorder}

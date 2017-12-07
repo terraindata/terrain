@@ -54,7 +54,8 @@ export interface AdvancedAggregationDisplay
 {
   title: string;
   items: AdvancedAggregationItem | AdvancedAggregationItem[];
-
+  // Display items on the same line
+  inline: boolean;
   // This is for groups of items where only one can be active at a time
   // e.g. for percentiles, there are two ways of setting accuracy (compression and number of sig figs)
   // but only one can be used
@@ -72,6 +73,7 @@ export interface AdvancedAggregationItem
   placeholder?: string;
   options?: List<string>;
   isNumber?: boolean;
+  fieldOptions?: boolean; // Use the fields as options
 }
 
 export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDisplay>({
@@ -164,7 +166,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         inputType: 'range',
         tooltipText: PathfinderText.aggregation.ranges.tooltipText2,
         key: 'ranges',
-      }
+      },
     ],
   },
   [ADVANCED.ExtendedRange]:
@@ -176,7 +178,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         text: PathfinderText.aggregation.extendedRange.text1,
         inputType: 'single',
         tooltipText: PathfinderText.aggregation.extendedRange.tooltipText1,
-        key: 'interval',
+        key: 'offset',
       },
       {
         text: PathfinderText.aggregation.extendedRange.text2,
@@ -189,7 +191,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         inputType: 'single',
         key: 'max',
         tooltipText: PathfinderText.aggregation.extendedRange.tooltipText3,
-      }
+      },
     ],
   },
   [ADVANCED.MinDocCount]:
@@ -200,20 +202,34 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       text: PathfinderText.aggregation.minDocCount.text,
       inputType: 'single',
       key: 'min_doc_count',
-      tooltipText: PathfinderText.aggregation.minDocCount.tooltipText
-    }
+      tooltipText: PathfinderText.aggregation.minDocCount.tooltipText,
+    },
   },
   [ADVANCED.Order]:
   {
     title: PathfinderText.aggregation.order.title,
     onlyOne: false,
-    items: {
-      text: PathfinderText.aggregation.order.text,
-      options: List(['ascending', 'descending']),
-      inputType: 'dropdown',
-      key: 'order',
-      tooltipText: PathfinderText.aggregation.order.tooltipText,
-    }
+    inline: true,
+    items: [
+      {
+        text: PathfinderText.aggregation.order.text1,
+        fieldOptions: true,
+        key: 'sortField',
+        inputType: 'dropdown',
+        tooltipText: PathfinderText.aggregation.order.tooltipText,
+      },
+      {
+        text: PathfinderText.aggregation.order.text2,
+        options: List(['ascending', 'descending']),
+        inputType: 'dropdown',
+        key: 'order',
+      },
+      {
+        text: PathfinderText.aggregation.order.text3,
+        inputType: '',
+        key: '',
+      },
+    ],
   },
   [ADVANCED.Format]:
   {
@@ -224,14 +240,14 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         text: PathfinderText.aggregation.format.text1,
         inputType: 'single',
         key: 'format',
-        tooltipText: PathfinderText.aggregation.format.tooltipText1
+        tooltipText: PathfinderText.aggregation.format.tooltipText1,
       },
       {
         text: PathfinderText.aggregation.format.text2,
         inputType: 'single',
         key: 'timezone',
         tooltipText: PathfinderText.aggregation.format.tooltipText2,
-      }]
+      }],
   },
   [ADVANCED.Error]:
   {
@@ -242,8 +258,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       inputType: 'dropdown',
       key: 'show_term_doc_count_error',
       options: List(['true', 'false']),
-      tooltipText: PathfinderText.aggregation.error.tooltipText
-    }
+      tooltipText: PathfinderText.aggregation.error.tooltipText,
+    },
   },
   [ADVANCED.Distance]:
   {
@@ -264,8 +280,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         key: 'distance_type',
         options: List(['arc', 'plane']),
         tooltipText: PathfinderText.aggregation.distance.tooltipText2,
-      }
-    ]
+      },
+    ],
   },
   [ADVANCED.Origin]:
   {
@@ -276,8 +292,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       inputType: 'map',
       key: 'origin',
       textKey: 'origin_address',
-      tooltipText: PathfinderText.aggregation.origin.tooltipText
-    }
+      tooltipText: PathfinderText.aggregation.origin.tooltipText,
+    },
   },
   [ADVANCED.Precision]:
   {
@@ -287,8 +303,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       text: PathfinderText.aggregation.precision.text,
       inputType: 'single',
       key: 'precision',
-      tooltipText: PathfinderText.aggregation.precision.tooltipText
-    }
+      tooltipText: PathfinderText.aggregation.precision.tooltipText,
+    },
   },
   [ADVANCED.IncludeExclude]:
   {
@@ -308,8 +324,8 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         key: 'exclude',
         isNumber: false,
         tooltipText: PathfinderText.aggregation.includeExclude.tooltipText2,
-      }
-    ]
+      },
+    ],
   },
   [ADVANCED.Type]:
   {
@@ -321,21 +337,44 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
         text: PathfinderText.aggregation.type.text1,
         inputType: '',
         key: 'geo_distance',
-        tooltipText: PathfinderText.aggregation.type.tooltipText1
+        tooltipText: PathfinderText.aggregation.type.tooltipText1,
       },
       {
         text: PathfinderText.aggregation.type.text2,
         inputType: '',
         key: 'geo_hash',
-        tooltipText: PathfinderText.aggregation.type.tooltipText2
-      }]
+        tooltipText: PathfinderText.aggregation.type.tooltipText2,
+      }],
+  },
+  [ADVANCED.TermsType]:
+  {
+    title: PathfinderText.aggregation.termsType.title,
+    onlyOne: true,
+    radioKey: 'termsType',
+    items: [
+      {
+        text: PathfinderText.aggregation.termsType.text1,
+        inputType: '',
+        key: 'terms',
+        tooltipText: PathfinderText.aggregation.termsType.tooltipText1,
+      },
+      {
+        text: PathfinderText.aggregation.termsType.text2,
+        inputType: '',
+        key: 'significant_terms',
+        tooltipText: PathfinderText.aggregation.termsType.tooltipText2,
+      }],
   },
   [ADVANCED.Missing]: {
     title: PathfinderText.aggregation.missing.title,
     onlyOne: false,
     items: {
-      component: (fieldName: string, keyPath: KeyPath, onChange, canEdit: boolean, replace: boolean, value?: any) =>
+      component: (props: any, item: AdvancedAggregationItem, onChange: (index: number) => void) =>
       {
+        const { fieldName, keyPath, canEdit, advancedData } = props;
+        const { key } = item;
+        const replace = advancedData.get(key) !== undefined;
+        const value = advancedData.get(key);
         return (
           <div className='pf-aggregation-missing'>
             <span>{PathfinderText.aggregation.missing.text} {fieldName}, </span>
@@ -352,7 +391,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
               replace ?
                 <BuilderTextbox
                   value={value}
-                  keyPath={keyPath}
+                  keyPath={keyPath.push(key)}
                   canEdit={canEdit}
                 />
                 : null

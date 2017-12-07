@@ -98,6 +98,14 @@ class RangesInput extends TerrainComponent<Props>
     }
   }
 
+  public handleKeyDown(e)
+  {
+    if (e.keyCode === 13 && this.props.canEdit)
+    {
+      this.handleAddRange();
+    }
+  }
+
   public renderItems()
   {
     const { ranges } = this.props;
@@ -115,6 +123,7 @@ class RangesInput extends TerrainComponent<Props>
                   value={range.get('name')}
                   keyPath={this.props.keyPath.push(index).push('name')}
                   canEdit={this.props.canEdit}
+                  ref={'input-' + String(index)}
                 />
                 <div>:</div>
                 <BuilderTextbox
@@ -127,6 +136,7 @@ class RangesInput extends TerrainComponent<Props>
                   value={range.get('to')}
                   keyPath={this.props.keyPath.push(index).push('to')}
                   canEdit={this.props.canEdit}
+                  onKeyDown={this.handleKeyDown}
                 />
                 {
                   this.props.canEdit ?

@@ -130,6 +130,7 @@ class PathfinderColumn extends TerrainComponent<Props>
         <PathfinderFilterSection
           pathfinderContext={pathfinderContext}
           filterGroup={path.filterGroup}
+          keyPath={keyPath.push('filterGroup')}
         />
 
         <PathfinderScoreSection
