@@ -65,12 +65,12 @@ AnalyticsReducer[ActionTypes.fetchSuccess] =
     const { analytics, dateRangeDomain } = action.payload;
     let nextState = state;
 
-    Object.keys(analytics).forEach((variantId) =>
+    Object.keys(analytics).forEach((algorithmId) =>
     {
-      const variantAnalytics = analytics[variantId];
+      const algorithmAnalytics = analytics[algorithmId];
       nextState = nextState
         .set('loaded', true)
-        .setIn(['data', variantId], variantAnalytics)
+        .setIn(['data', algorithmId], algorithmAnalytics)
         .set('selectedDateRangeDomain', dateRangeDomain)
         .set('errors', []);
     });
@@ -117,13 +117,13 @@ AnalyticsReducer[ActionTypes.selectAnalyticsConnection] =
     return state.set('selectedAnalyticsConnection', connectionName);
   };
 
-AnalyticsReducer[ActionTypes.pinVariant] =
-  (state, action: Action<{ variantId: ID }>) =>
+AnalyticsReducer[ActionTypes.pinAlgorithm] =
+  (state, action: Action<{ algorithmId: ID }>) =>
   {
-    const { variantId } = action.payload;
-    const isVariantPinned = state.getIn(['pinnedVariants', variantId], false);
+    const { algorithmId } = action.payload;
+    const isAlgorithmPinned = state.getIn(['pinnedAlgorithms', algorithmId], false);
 
-    return state.setIn(['pinnedVariants', variantId], !isVariantPinned);
+    return state.setIn(['pinnedAlgorithms', algorithmId], !isAlgorithmPinned);
   };
 
 AnalyticsReducer[ActionTypes.fetchAvailableMetricsSuccess] =

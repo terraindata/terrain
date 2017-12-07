@@ -57,14 +57,14 @@ RolesReducer[ActionTypes.fetch] =
     //   let roles = Immutable.Map({});
     //   rolesData.map((role) =>
     //   {
-    //     const { groupId, username } = role;
-    //     if (!roles.get(groupId))
+    //     const { categoryId, username } = role;
+    //     if (!roles.get(categoryId))
     //     {
-    //       roles = roles.set(groupId, Immutable.Map({}));
+    //       roles = roles.set(categoryId, Immutable.Map({}));
     //     }
     //     role.admin = !! role.admin;
     //     role.builder = !! role.builder;
-    //     roles = roles.setIn([groupId, username], new RoleTypes.Role(role));
+    //     roles = roles.setIn([categoryId, username], new RoleTypes.Role(role));
     //   });
 
     //   Actions.setRoles(roles);
@@ -84,11 +84,11 @@ RolesReducer[ActionTypes.change] =
     const role: RoleTypes.Role = action.payload.role;
 
     // Ajax.saveRole(role);
-    if (!state.get(role.groupId))
+    if (!state.get(role.categoryId))
     {
-      state = state.set(role.groupId, Immutable.Map({}));
+      state = state.set(role.categoryId, Immutable.Map({}));
     }
-    return state.setIn([role.groupId, role.userId], role);
+    return state.setIn([role.categoryId, role.userId], role);
   };
 
 const RolesReducerWrapper = (state: Immutable.Map<ID, any> = Immutable.Map({}), action) =>

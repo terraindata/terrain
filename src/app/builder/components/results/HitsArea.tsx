@@ -92,7 +92,7 @@ export interface Props
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
-  variantName: string;
+  algorithmName: string;
   showExport: boolean;
   showCustomizeView: boolean;
   allowSpotlights: boolean;
@@ -708,41 +708,12 @@ class HitsArea extends TerrainComponent<Props>
 
   public renderExport()
   {
-    // const { previewColumns, columnNames, columnsToInclude, columnTypes, templates, transforms,
-    //   filetype, requireJSONHaveAllFields, exportRank, elasticUpdate, objectKey } = this.props.exportState;
-    // // const { previewRows, primaryKeys, primaryKeyDelimiter, columnNames, columnsToInclude, columnTypes, templates, transforms,
-    // //   filetype, requireJSONHaveAllFields, exportRank, objectKey, elasticUpdate } = this.props.exportState;
 
-    // const content =
-    //   <div
-    //     style={backgroundColor(Colors().bg1)}
-    //   >
-    //     <FileImportPreview
-    //       exporting={true}
-    //       filetype={filetype}
-    //       previewColumns={previewColumns}
-    //       columnNames={columnNames}
-    //       columnsToInclude={columnsToInclude}
-    //       columnTypes={columnTypes}
-    //       templates={templates}
-    //       transforms={transforms}
-    //       columnOptions={List([])}
-    //       uploadInProgress={false}
-    //       requireJSONHaveAllFields={requireJSONHaveAllFields}
-    //       objectKey={objectKey}
-    //       exportRank={exportRank}
-    //       elasticUpdate={elasticUpdate}
-    //       query={this.props.query}
-    //       inputs={this.props.query.inputs}
-    //       serverId={Number(this.props.db.id)}
-    //       variantName={this.props.variantName}
-    //     />
-    //   </div>;
     const content = (
       <ETLExportDisplay
         query={this.props.query}
         serverId={this.props.db.id}
-        variantName={this.props.variantName}
+        algorithmName={this.props.algorithmName}
       />
     );
 

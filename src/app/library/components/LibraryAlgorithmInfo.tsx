@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
-import './LibraryVariantInfo.less';
+import './LibraryAlgorithmInfo.less';
 const { List } = Immutable;
 import { MidwayError } from './../../../../shared/error/MidwayError';
 import Modal from './../../common/components/Modal';
@@ -61,32 +61,32 @@ import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import StatusDropdown from './StatusDropdown';
 
-type Variant = LibraryTypes.Variant;
+type Algorithm = LibraryTypes.Algorithm;
 
 export interface Props
 {
-  variant: Variant;
+  algorithm: Algorithm;
   isSuperUser: boolean;
   isBuilder: boolean;
-  variantActions: any;
+  algorithmActions: any;
 }
 
 // TODO MOD centralize
-// TODO Re-add VariantVersions
+// TODO Re-add AlgorithmVersions
 const LANGUAGES = Immutable.List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends TerrainComponent<Props>
 {
   public state: {
-    variantStatus: string,
-    variantStatusErrorModalOpen: boolean,
+    algorithmStatus: string,
+    algorithmStatusErrorModalOpen: boolean,
     errorModalMessage: string,
-    selectedVariant: ID,
+    selectedAlgorithm: ID,
   } = {
-    variantStatus: 'Loading...',
-    variantStatusErrorModalOpen: false,
+    algorithmStatus: 'Loading...',
+    algorithmStatusErrorModalOpen: false,
     errorModalMessage: '',
-    selectedVariant: -1,
+    selectedAlgorithm: -1,
   };
 
   public componentDidMount()
@@ -94,13 +94,13 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     this._subscribe(LibraryStore, {
       updater: (state) =>
       {
-        const { selectedVariant, changingStatusOf } = state;
-        if (selectedVariant !== this.state.selectedVariant || changingStatusOf)
+        const { selectedAlgorithm, changingStatusOf } = state;
+        if (selectedAlgorithm !== this.state.selectedAlgorithm || changingStatusOf)
         {
           this.setState({
-            selectedVariant,
+            selectedAlgorithm,
           });
-          this.fetchStatus(changingStatusOf || this.props.variant);
+          this.fetchStatus(changingStatusOf || this.props.algorithm);
         }
       },
       isMounted: true,
@@ -109,37 +109,37 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (nextProps.variant !== this.props.variant)
+    if (nextProps.algorithm !== this.props.algorithm)
     {
-      this.fetchStatus(nextProps.variant);
+      this.fetchStatus(nextProps.algorithm);
     }
   }
 
-  public toggleVariantStatusError()
+  public toggleAlgorithmStatusError()
   {
     this.setState({
-      variantStatusErrorModalOpen: !this.state.variantStatusErrorModalOpen,
+      algorithmStatusErrorModalOpen: !this.state.algorithmStatusErrorModalOpen,
     });
   }
 
-  public fetchStatus(variant: Variant)
+  public fetchStatus(algorithm: Algorithm)
   {
-    if (variant !== undefined)
+    if (algorithm !== undefined)
     {
-      this.setState({ variantStatus: 'Loading...' });
-      Ajax.getVariantStatus(
-        variant.id,
-        variant.db.id as number,
-        variant.deployedName,
+      this.setState({ algorithmStatus: 'Loading...' });
+      Ajax.getAlgorithmStatus(
+        algorithm.id,
+        algorithm.db.id as number,
+        algorithm.deployedName,
         (response) =>
         {
-          this.setState({ variantStatus: response });
+          this.setState({ algorithmStatus: response });
         },
         (error) =>
         {
           const readable: string = MidwayError.fromJSON(error).getDetail();
           this.setState({ errorModalMessage: readable });
-          this.toggleVariantStatusError();
+          this.toggleAlgorithmStatusError();
         },
       );
     }
@@ -147,17 +147,17 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public render()
   {
-    if (!this.props.variant)
+    if (!this.props.algorithm)
     {
       return null;
     }
 
     const { isBuilder, isSuperUser } = this.props;
-    const { variant } = this.props;
+    const { algorithm } = this.props;
 
     return (
       <div
-        className='library-info-variant'
+        className='library-info-algorithm'
       >
         <div className='biv-table-wrapper'>
           <div
@@ -169,8 +169,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
               </div>
               <div className='biv-cell-second'>
                 <StatusDropdown
-                  variant={this.props.variant}
-                  variantActions={this.props.variantActions}
+                  algorithm={this.props.algorithm}
+                  algorithmActions={this.props.algorithmActions}
                 />
               </div>
             </div>
@@ -180,7 +180,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
               </div>
               <div className='biv-cell-second'>
                 {
-                  Util.formatDate(variant.lastEdited)
+                  Util.formatDate(algorithm.lastEdited)
                 }
               </div>
             </div>
@@ -190,7 +190,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
               </div>
               <div className='biv-cell-second'>
                 <UserThumbnail
-                  userId={variant.lastUserId}
+                  userId={algorithm.lastUserId}
                   smallest={true}
                   showName={true}
                   link={true}
@@ -203,7 +203,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
               </div>
               <div className='biv-cell-second'>
                 {
-                  this.state.variantStatus
+                  this.state.algorithmStatus
                 }
               </div>
             </div>
@@ -211,8 +211,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
         </div>
         <Modal
           message={this.state.errorModalMessage}
-          onClose={this.toggleVariantStatusError}
-          open={this.state.variantStatusErrorModalOpen}
+          onClose={this.toggleAlgorithmStatusError}
+          open={this.state.algorithmStatusErrorModalOpen}
           error={true}
         />
       </div>

@@ -63,7 +63,7 @@ export interface Props
 {
   query: Query;
   serverId: string | number;
-  variantName: string;
+  algorithmName: string;
   // below from container
   etl: ETLState;
   etlActions: any;

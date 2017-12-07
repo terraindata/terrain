@@ -126,7 +126,7 @@ const BuilderColumn = createReactClass<any, any>(
     {
       query: PropTypes.object.isRequired,
       resultsState: PropTypes.object.isRequired,
-      variant: PropTypes.object.isRequired,
+      algorithm: PropTypes.object.isRequired,
       className: PropTypes.string,
       index: PropTypes.number,
       canAddColumn: PropTypes.bool,
@@ -242,8 +242,8 @@ const BuilderColumn = createReactClass<any, any>(
           return <ResultsColumn
             query={query}
             canEdit={canEdit}
-            db={this.props.variant.db}
-            variantName={this.props.variant.name}
+            db={this.props.algorithm.db}
+            algorithmName={this.props.algorithm.name}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
             showExport={true}
@@ -257,7 +257,7 @@ const BuilderColumn = createReactClass<any, any>(
             addColumn={this.props.onAddManualColumn}
             columnIndex={this.props.index}
             query={query}
-            variant={this.props.variant}
+            algorithm={this.props.algorithm}
             resultsState={this.props.resultsState}
             language={query.language}
           />;
