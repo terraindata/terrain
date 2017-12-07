@@ -330,10 +330,7 @@ const Actions =
 
       unselect:
       (algorithmId: string) =>
-        $(ActionTypes.algorithms.unselect, { algorithmId }),
-
-      unselectAll:
-      () => $(ActionTypes.algorithms.unselectAll, {}),
+        $(ActionTypes.algorithms.unselect, {}),
     },
 
     loadState:

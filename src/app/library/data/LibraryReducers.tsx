@@ -261,9 +261,7 @@ LibraryReducers[ActionTypes.algorithms.select] =
 LibraryReducers[ActionTypes.algorithms.unselect] =
   (
     state: LibraryState,
-    action: Action<{
-      algorithmId: string,
-    }>,
+    action: Action<{}>,
   ) =>
   {
     return state.set('selectedAlgorithm', null);

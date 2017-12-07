@@ -136,7 +136,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     if (params && params.algorithmId !== null && params.algorithmId !== undefined)
     {
       this.props.algorithmActions.select(params.algorithmId);
-      algorithmIds.push(params.algorithmId);
+      algorithmIds.push(parseInt(params.algorithmId, 10));
     }
 
     if (canPinItems && location.query && location.query.pinned !== undefined)
@@ -210,7 +210,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       (canPinItems && analytics.pinnedAlgorithms !== nextAnalytics.pinnedAlgorithms)
     )
     {
-      const pinnedParams = canPinItems && pinnedAlgorithms.length > 0 ? `/?pinned=${pinnedAlgorithms.join(',')}` : '';
+      const pinnedParams = canPinItems && pinnedAlgorithms.length > 0 ? `?pinned=${pinnedAlgorithms.join(',')}` : '';
       if (nextSelectedAlgorithm !== null && nextSelectedAlgorithm !== undefined)
       {
         browserHistory
@@ -399,7 +399,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleItemSelect(id: ID)
+  public handleItemSelect(id: ID, fadeIndex: number)
   {
     const {
       canPinItems,
@@ -412,7 +412,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
     if (selectedAlgorithm === id)
     {
-      this.props.algorithmActions.unselect(id);
+      this.props.algorithmActions.unselect();
     } else
     {
       this.props.algorithmActions.select(id);
@@ -554,13 +554,13 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         onDragFinish={this.handleDragFinish}
+        onSelect={this.handleItemSelect}
         item={algorithm}
         onDoubleClick={this.handleDoubleClick}
         canEdit={canDrag}
         canDrag={canDrag}
         canCreate={canDrag}
         isStarred={algorithm.status === 'DEFAULT'}
-        onSelect={this.handleItemSelect}
         isSelected={isSelected}
         isFocused={true}
       >

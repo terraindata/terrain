@@ -127,7 +127,7 @@ class Library extends TerrainComponent<any>
       const path = this.getLastPath();
       if (path != null)
       {
-        browserHistory.replace(path);
+        browserHistory.replace({ pathname: path });
       }
     }
   }
@@ -168,6 +168,12 @@ class Library extends TerrainComponent<any>
     {
       this.fetchAnalytics(nextProps);
     }
+  }
+
+  public componentWillUnmount()
+  {
+    this.props.libraryAlgorithmActions.unselect();
+    //this.props.analyticsActions.clearPinned();
   }
 
   public getData(algorithmId: ID)
@@ -226,7 +232,7 @@ class Library extends TerrainComponent<any>
     const { location, basePath } = this.props;
 
     const lastPath = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
-    localStorage.setItem(lastPath, location.pathname);
+    localStorage.setItem(lastPath, `${location.pathname}${location.search}`);
   }
 
   public fetchAnalytics(props)
@@ -437,6 +443,7 @@ class Library extends TerrainComponent<any>
                 basePath,
                 categoryActions: this.props.libraryCategoryActions,
                 algorithms,
+                algorithmActions: this.props.libraryAlgorithmActions,
               }}
               isFocused={group === undefined}
             /> : null
@@ -454,6 +461,7 @@ class Library extends TerrainComponent<any>
                 basePath,
                 groupActions: this.props.libraryGroupActions,
                 referrer: groupsReferrer,
+                algorithmActions: this.props.libraryAlgorithmActions,
               }}
               isFocused={algorithmIds === null}
             /> : null

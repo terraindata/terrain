@@ -93,6 +93,7 @@ export interface Props
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
   groupActions: any;
+  algorithmActions: any;
   referrer?: { label: string, path: string };
 }
 
@@ -415,6 +416,20 @@ class GroupsColumn extends TerrainComponent<Props>
     });
   }
 
+  public handleItemSelect(id: ID)
+  {
+    const {
+      basePath,
+      categoryId,
+    } = this.props;
+
+    this.props.algorithmActions.unselect();
+
+    browserHistory.replace(`/${basePath}/${categoryId}/${id}`);
+
+    return true;
+  }
+
   public renderGroup(id: ID, fadeIndex: number)
   {
     const { params, basePath } = this.props;
@@ -531,6 +546,7 @@ class GroupsColumn extends TerrainComponent<Props>
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         onDragFinish={this.handleDragFinish}
+        onSelect={this.handleItemSelect}
         item={group}
         canEdit={canEdit}
         canDrag={canDrag}
