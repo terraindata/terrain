@@ -60,7 +60,7 @@ import { notificationManager } from 'common/components/InAppNotification';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
-import VariantSelector from 'library/components/VariantSelector';
+import AlgorithmSelector from 'library/components/AlgorithmSelector';
 import { LibraryStore } from 'library/data/LibraryStore';
 
 import TemplateSelector from './TemplateSelector';
@@ -91,7 +91,7 @@ export interface HeadlessCommandArgs
   template: Template;
   fileType: string;
   midwayURL: string;
-  variantId?: number; // for export
+  algorithmId?: number; // for export
   filename?: string; // for import
   objectKey?: string;
 }
@@ -156,11 +156,11 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
 
     if (template.export) // export
     {
-      const { variantId, objectKey } = headlessArgs;
+      const { algorithmId, objectKey } = headlessArgs;
 
-      if (variantId === -1)
+      if (algorithmId === -1)
       {
-        requests.push('Please Select a Variant');
+        requests.push('Please Select a Algorithm');
       }
 
       if (fileType === fileTypeOptions.get(FileTypes.JSON_TYPE_OBJECT) && (objectKey === undefined || objectKey === ''))
@@ -171,7 +171,7 @@ export function computeHeadlessCommand(headlessArgs: HeadlessCommandArgs): Headl
       command = `${midwayURL}/midway/v1/export/headless` +
         `?id=${template.templateId}&persistentAccessToken=${template.persistentAccessToken}` +
         `&dbid=${template.dbid}&filetype=${fileType}` +
-        `&templateId=${template.templateId}&variantId=${variantId}`;
+        `&templateId=${template.templateId}&algorithmId=${algorithmId}`;
     }
     else // import
     {
@@ -271,7 +271,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     const { fileTypeIndex } = this.state;
     return (
       <div>
-        <VariantSelector
+        <AlgorithmSelector
           libraryState={LibraryStore.getState()}
           onChangeSelection={this._setStateWrapper('selectedIds')}
           ids={this.state.selectedIds}
@@ -416,7 +416,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
       template,
       fileType: fileTypeOptions.get(this.state.fileTypeIndex),
       midwayURL: this.state.midwayURLValue,
-      variantId: this.state.selectedIds.get(2),
+      algorithmId: this.state.selectedIds.get(2),
       filename: this.state.filenameValue,
       objectKey: template.objectKey ? template.objectKey : this.state.objectKeyValue,
     });

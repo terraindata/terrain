@@ -106,7 +106,7 @@ const Periscope = {
       fill: ${Colors().text2} !important;
     }
     .periscope .handle {
-      stroke: rgba(210,215,219,0.75) !important;
+      stroke: ${Colors().altHighlight} !important;
     }
     `;
     const style = $(el).append(`<style>${styleCSS}</style>`);
@@ -140,7 +140,7 @@ const Periscope = {
       .attr('width', scaleMax(scales.x) - scaleMin(scales.x))
       .attr('y', scaleMax(scales.pointY))
       .attr('height', scaleMin(scales.pointY) - scaleMax(scales.pointY))
-      .attr('fill', '#fff');
+      .attr('fill', Colors().transformChartBg);
   },
 
   _drawAxes(el, scales)
@@ -153,7 +153,7 @@ const Periscope = {
       .orient('bottom');
     d3.select(el).select('.bottomAxis')
       .attr('transform', 'translate(0, ' + scaleMin(scales.pointY) + ')')
-      .attr('style', 'stroke: ' + '#fff')
+      .attr('style', 'stroke: ' + Colors().transformChartBg)
       .call(bottomAxis);
   },
 
@@ -246,12 +246,12 @@ const Periscope = {
       .append('circle')
       .attr('class', 'handle')
       .attr('style', 'stroke: ' + Colors().altHighlight)
-      .attr('fill', '#fff');
+      .attr('fill', Colors().transformChartBg);
 
     handle
       .attr('cx', (d) => scales.x(d))
       .attr('cy', scaleMin(scales.barY))
-      .attr('fill', '#fff')
+      .attr('fill', Colors().transformChartBg)
       .attr('style', 'stroke: ' + Colors().altHighlight)
       .attr('stroke-width', '3px')
       .attr('r', 10);

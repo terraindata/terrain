@@ -87,7 +87,7 @@ const analyticsErrorResponse = {
     {
       status: 400,
       title: `Route /midway/v1/events/agg?id=1&
-accessToken=some-token&variantid=6&
+accessToken=some-token&algorithmid=6&
 start=2017-10-25T00%3A00%3A00.000Z&end=2017-10-25T15%3A39%3A59.335Z&eventid=1&
 interval=day&agg=histogram&field=%40timestamp has an error.`,
       detail: 'Parameter "database" not found in request object.',
@@ -95,7 +95,7 @@ interval=day&agg=histogram&field=%40timestamp has an error.`,
         ctx: {
           request: {
             method: 'GET',
-            url: `/midway/v1/events/agg?id=1&accessToken=some-token&variantid=6&
+            url: `/midway/v1/events/agg?id=1&accessToken=some-token&algorithmid=6&
 start=2017-10-25T00%3A00%3A00.000Z&end=2017-10-25T15%3A39%3A59.335Z&eventid=1&interval=day&
 agg=histogram&field=%40timestamp`,
             header: {
@@ -128,7 +128,7 @@ agg=histogram&field=%40timestamp`,
             proxy: true,
             env: 'development',
           },
-          originalUrl: `/midway/v1/events/agg?id=1&accessToken=some-token&variantid=6&
+          originalUrl: `/midway/v1/events/agg?id=1&accessToken=some-token&algorithmid=6&
 start=2017-10-25T00%3A00%3A00.000Z&end=2017-10-25T15%3A39%3A59.335Z&eventid=1&interval=day&
 agg=histogram&field=%40timestamp`,
           req: '<original node req>',
@@ -197,10 +197,10 @@ describe('AnalyticsActions', () =>
     }),
   });
 
-  const variantId = '1';
+  const algorithmId = '1';
   const metric = 'impressions';
   const intervalId = 'day';
-  const dateRangeId = 1;
+  const dateRangeId = 2;
   const connectionName = 'My ElasticSearch Instance';
 
   describe('#fetch', () =>
@@ -215,11 +215,11 @@ describe('AnalyticsActions', () =>
 
     describe('when fetch is successful', () =>
     {
-      it('should create a analytics.fetchSuccess action after the variant analytics have been fetched', (done) =>
+      it('should create a analytics.fetchSuccess action after the algorithm analytics have been fetched', (done) =>
       {
         Ajax.getAnalytics = (
           connectionId: number,
-          variantIds: ID[],
+          algorithmIds: ID[],
           startParam: Date,
           endParam: Date,
           metricParam: string,
@@ -245,10 +245,10 @@ describe('AnalyticsActions', () =>
           },
         ];
 
-        const variant = LibraryTypes._Variant();
-        variant.set('deployedName', 'terrain_1');
+        const algorithm = LibraryTypes._Algorithm();
+        algorithm.set('deployedName', 'terrain_1');
         const library: LibraryState = _LibraryState({
-          variants: Immutable.Map<number, LibraryTypes.Variant>({ 1: variant }),
+          algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({ 1: algorithm }),
         });
 
         const store = mockStore(Immutable.Map({ analytics, schema, library }));
@@ -256,7 +256,7 @@ describe('AnalyticsActions', () =>
         store.dispatch(
           Actions.fetch(
             connectionName,
-            [variantId],
+            [algorithmId],
             metric,
             intervalId,
             dateRangeId,
@@ -276,7 +276,7 @@ describe('AnalyticsActions', () =>
       {
         Ajax.getAnalytics = (
           connectionId: number,
-          variantIds: ID[],
+          algorithmIds: ID[],
           startParam: Date,
           endParam: Date,
           metricParam: string,
@@ -297,17 +297,17 @@ describe('AnalyticsActions', () =>
           },
         ];
 
-        const variant = LibraryTypes._Variant();
-        variant.set('deployedName', 'terrain_1');
+        const algorithm = LibraryTypes._Algorithm();
+        algorithm.set('deployedName', 'terrain_1');
         const library: LibraryState = _LibraryState({
-          variants: Immutable.Map<number, LibraryTypes.Variant>({ 1: variant }),
+          algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({ 1: algorithm }),
         });
         const store = mockStore(Immutable.Map({ analytics, schema, library }));
 
         store.dispatch(
           Actions.fetch(
             connectionName,
-            [variantId],
+            [algorithmId],
             metric,
             intervalId,
             dateRangeId,
@@ -377,20 +377,20 @@ describe('AnalyticsActions', () =>
     });
   });
 
-  describe('#pinVariant', () =>
+  describe('#pinAlgorithm', () =>
   {
-    it('should create an analytics.pinVariant action', () =>
+    it('should create an analytics.pinAlgorithm action', () =>
     {
       const expectedActions = [
         {
-          type: ActionTypes.pinVariant,
-          payload: { variantId },
+          type: ActionTypes.pinAlgorithm,
+          payload: { algorithmId },
         },
       ];
 
       const store = mockStore(Immutable.Map({ analytics, schema }));
 
-      store.dispatch(Actions.pinVariant(variantId));
+      store.dispatch(Actions.pinAlgorithm(algorithmId));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });
@@ -404,7 +404,7 @@ describe('AnalyticsActions', () =>
 
     describe('when fetch is successful', () =>
     {
-      it('should create a analytics.fetchAvailableMetricsSuccess action after the variant analytics have been fetched', (done) =>
+      it('should create a analytics.fetchAvailableMetricsSuccess action after the algorithm analytics have been fetched', (done) =>
       {
         const expectedActions = [
           {

@@ -105,13 +105,13 @@ export class Items
     return this.select([], {});
   }
 
-  public parseDeployedName(variant: ItemConfig): string
+  public parseDeployedName(algorithm: ItemConfig): string
   {
-    if (variant.meta === undefined)
+    if (algorithm.meta === undefined)
     {
       return '';
     }
-    const meta = JSON.parse(variant.meta);
+    const meta = JSON.parse(algorithm.meta);
     if (meta['deployedName'] === undefined)
     {
       return '';
@@ -119,13 +119,13 @@ export class Items
     return meta['deployedName'];
   }
 
-  public async getLiveVariants(ids: number[]): Promise<string[] | object[]>
+  public async getLiveAlgorithms(ids: number[]): Promise<string[] | object[]>
   {
     return new Promise<string[] | object[]>(async (resolve, reject) =>
     {
       if (ids.length === 0)
       {
-        const items: ItemConfig[] = await this.select([], { type: 'VARIANT', status: 'LIVE' } as object);
+        const items: ItemConfig[] = await this.select([], { type: 'ALGORITHM', status: 'LIVE' } as object);
         const liveItems: object[] = items.map((item) =>
         {
           return { id: item.id, name: this.parseDeployedName(item as ItemConfig) };
@@ -136,7 +136,7 @@ export class Items
       {
         const liveItems: string[] = await Promise.all(ids.map(async (id) =>
         {
-          const items: ItemConfig[] = await this.select([], { id, type: 'VARIANT', status: 'LIVE' } as object);
+          const items: ItemConfig[] = await this.select([], { id, type: 'ALGORITHM', status: 'LIVE' } as object);
           return items.length !== 0 ? this.parseDeployedName(items[0] as ItemConfig) as string : '' as string;
         }));
         return resolve(liveItems);
@@ -144,11 +144,11 @@ export class Items
     });
   }
 
-  public async checkStatusVariants(dbid: number): Promise<string[] | string>
+  public async checkStatusAlgorithms(dbid: number): Promise<string[] | string>
   {
     return new Promise<string[] | string>(async (resolve, reject) =>
     {
-      const result: string[] | string = await this._getAllVariantsInCluster(dbid);
+      const result: string[] | string = await this._getAllAlgorithmsInCluster(dbid);
       if (!Array.isArray(result))
       {
         return reject(result as string);
@@ -157,13 +157,13 @@ export class Items
     });
   }
 
-  public async checkVariantInES(variantId?: number, dbid?: number, deployedName?: string): Promise<string>
+  public async checkAlgorithmInES(algorithmId?: number, dbid?: number, deployedName?: string): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (variantId === undefined || isNaN(variantId))
+      if (algorithmId === undefined || isNaN(algorithmId))
       {
-        return reject('Must provide variant id.');
+        return reject('Must provide algorithm id.');
       }
       if (dbid === undefined || isNaN(dbid))
       {
@@ -173,7 +173,7 @@ export class Items
       {
         return reject('Must provide deployed name.');
       }
-      const liveScripts: string = await this._checkVariantInESHelper(variantId, dbid, deployedName);
+      const liveScripts: string = await this._checkAlgorithmInESHelper(algorithmId, dbid, deployedName);
       return resolve(liveScripts);
     });
   }
@@ -224,7 +224,7 @@ export class Items
     });
   }
 
-  private async _checkVariantInESHelper(variantId: number, dbid: number, deployedName: string): Promise<string>
+  private async _checkAlgorithmInESHelper(algorithmId: number, dbid: number, deployedName: string): Promise<string>
   {
     return new Promise<string>(async (resolve, reject) =>
     {
@@ -237,41 +237,57 @@ export class Items
       {
         return resolve('Status metadata currently is only supported for Elastic databases');
       }
-      const items: ItemConfig[] = await this.select([], { id: variantId } as object);
+      const items: ItemConfig[] = await this.select([], { id: algorithmId } as object);
       if (items.length === 0)
       {
-        return resolve('Variant not found');
+        return resolve('Algorithm not found');
       }
 
       const elasticClient: ElasticClient = database.getClient() as ElasticClient;
       elasticClient.getScript({ id: deployedName, lang: 'mustache' }, async function getState(err, resp)
       {
-        if (items[0].type !== 'VARIANT')
+        if (items[0]['meta'] !== undefined)
         {
-          return resolve('Item is not a Variant');
+          const metaObj = JSON.parse(String(items[0]['meta']));
+          if (metaObj['modelVersion'] < 3 && items[0].type === 'GROUP')
+          {
+            items[0].type = 'CATEGORY';
+          }
+          if (metaObj['modelVersion'] < 3 && items[0].type === 'ALGORITHM')
+          {
+            items[0].type = 'GROUP';
+          }
+          if (metaObj['modelVersion'] < 3 && items[0].type === 'VARIANT')
+          {
+            items[0].type = 'ALGORITHM';
+          }
+        }
+        if (items[0].type !== 'ALGORITHM')
+        {
+          return resolve('Item is not an Algorithm');
         }
         if (resp['_id'] === deployedName && resp['found'] === true && items[0].status === 'LIVE'
-          && await this._verifyVariantScript(variantId, resp['_script']))
+          && await this._verifyAlgorithmScript(algorithmId, resp['_script']))
         {
-          return resolve('Variant is LIVE as ' + (deployedName as string));
+          return resolve('Algorithm is LIVE as ' + (deployedName as string));
         }
         else if (resp['_id'] === deployedName && resp['found'] === true && items[0].status !== 'LIVE')
         {
-          return resolve('Error: Variant found in ES instance but not LIVE');
+          return resolve('Error: Algorithm found in ES instance but not LIVE');
         }
         else if (resp['_id'] === deployedName && resp['found'] === false && items[0].status === 'LIVE')
         {
-          return resolve('Error: LIVE Variant not found in ES instance');
+          return resolve('Error: LIVE Algorithm not found in ES instance');
         }
         else
         {
-          return resolve('Confirmed that Variant is not deployed');
+          return resolve('Confirmed that Algorithm is not deployed');
         }
       }.bind(this));
     });
   }
 
-  private async _getAllVariantsInCluster(dbid: number): Promise<string[] | string>
+  private async _getAllAlgorithmsInCluster(dbid: number): Promise<string[] | string>
   {
     return new Promise<string[] | string>(async (resolve, reject) =>
     {
@@ -305,7 +321,7 @@ export class Items
     });
   }
 
-  private async _verifyVariantScript(variantId: number, storedScript: string): Promise<boolean>
+  private async _verifyAlgorithmScript(algorithmId: number, storedScript: string): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
     {
