@@ -157,7 +157,7 @@ QueryRouter.post('/template', passport.authenticate('access-token-local'), async
 
   });
   const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
-  const elasticClient: ElasticClient = database.getClient() as ElasticClient;
+  const elasticClient: ElasticClient = (database as DatabaseController).getClient() as ElasticClient;
   const params: any =
     {
       index: [...indexSet],
