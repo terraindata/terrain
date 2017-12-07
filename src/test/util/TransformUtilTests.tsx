@@ -79,19 +79,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -99,7 +99,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -108,22 +108,21 @@ describe('TransformUtil', () =>
     {
       const data = TransformUtil.getLogarithmicData(99, pointsDataDecayChart2, 0, 10);
       expect(data.outputs).toHaveLength(100);
-
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeLessThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -131,7 +130,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -143,19 +142,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -163,7 +162,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -175,19 +174,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeLessThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -195,7 +194,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -211,19 +210,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -231,7 +230,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -243,19 +242,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeLessThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -263,7 +262,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -275,19 +274,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -295,7 +294,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -307,19 +306,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeLessThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -327,7 +326,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -344,59 +343,42 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
-
-      data.outputs.forEach((datapoint, i) =>
-      {
-        if (i > 0)
-        {
-          expect(datapoint >= data.outputs[i - 1]);
-        }
-      });
-
       data.ranges.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
 
-    it('should return normal data for growth for backend', () =>
+    it('should return normal data for backend', () =>
     {
       const data = TransformUtil.getNormalData(31, pointsDataBackend3, 0, 10);
       expect(data.outputs).toHaveLength(32);
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
-      });
-
-      data.outputs.forEach((datapoint, i) =>
-      {
-        if (i > 0)
-        {
-          expect(datapoint >= data.outputs[i - 1]);
-        }
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -413,19 +395,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -433,7 +415,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -445,19 +427,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeLessThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -465,7 +447,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -477,19 +459,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -497,7 +479,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
@@ -509,19 +491,19 @@ describe('TransformUtil', () =>
 
       data.outputs.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.ranges.forEach((datapoint) =>
       {
-        expect(!isNaN(datapoint));
+        expect(datapoint).not.toBeNaN();
       });
 
       data.outputs.forEach((datapoint, i) =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.outputs[i - 1]);
+          expect(datapoint).toBeLessThanOrEqual(data.outputs[i - 1]);
         }
       });
 
@@ -529,7 +511,7 @@ describe('TransformUtil', () =>
       {
         if (i > 0)
         {
-          expect(datapoint >= data.ranges[i - 1]);
+          expect(datapoint).toBeGreaterThanOrEqual(data.ranges[i - 1]);
         }
       });
     });
