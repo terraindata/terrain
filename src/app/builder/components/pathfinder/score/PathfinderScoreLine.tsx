@@ -243,6 +243,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public render()
   {
+    console.log(this.props.pathfinderContext);
     const { step } = this.props;
     return (
       <PathfinderLine

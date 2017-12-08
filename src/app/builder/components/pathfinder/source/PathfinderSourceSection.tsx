@@ -59,25 +59,48 @@ import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _ElasticDataSource, Path, PathfinderContext, Source, sourceCountDropdownOptions, sourceCountOptions } from '../PathfinderTypes';
+import { ChoiceOption, _ElasticDataSource, Path, PathfinderContext, Source, sourceCountDropdownOptions, sourceCountOptions } from '../PathfinderTypes';
 
 export interface Props
 {
   pathfinderContext: PathfinderContext;
+  keyPath: KeyPath;
 }
 
 class PathfinderSourceSection extends TerrainComponent<Props>
 {
   public state: {
-
+    dataSourceOptions: List<ChoiceOption>
   } = {
-
+    dataSourceOptions: List([]),
   };
+
+  public componentWillMount()
+  {
+    this.setState({
+      dataSourceOptions: this.getDataSourceOptions(),
+    });
+  }
+
+  public componentWillReceiveProps(nextProps: Props)
+  {
+    if (this.props.pathfinderContext !== nextProps.pathfinderContext)
+    {
+      this.setState({
+        dataSourceOptions: this.getDataSourceOptions(nextProps.pathfinderContext),
+      });
+    }
+  }
 
   public render()
   {
     const { source, step, canEdit } = this.props.pathfinderContext;
-
+    const sourceValues = this.state.dataSourceOptions.map((option) => option.value).toList();
+    const sourceNames = this.state.dataSourceOptions.map((option) => option.displayName).toList()
+    let displayNames: IMMap<string, any> = Map({});
+    this.state.dataSourceOptions.forEach((option) => {
+      displayNames = displayNames.set(option.value, option.displayName);
+    });
     return (
       <div
         className='pf-section'
@@ -109,11 +132,11 @@ class PathfinderSourceSection extends TerrainComponent<Props>
           </div>
           <div className='pf-piece'>
             <Dropdown
-              options={this.getDataSourceOptions()}
-              selectedIndex={this.getSelectedDataSourceIndex()}
+              options={sourceValues}
+              optionsDisplayName={displayNames}
+              selectedIndex={sourceNames.indexOf(this.props.pathfinderContext.source.dataSource.name)}
               canEdit={canEdit}
-              onChange={this.handleSourceDropdownChange}
-              placeholder={PathfinderText.chooseDataSourceDropdownPrompt}
+              onChange={this.handleSourceChange}
             />
           </div>
         </div>
@@ -121,38 +144,29 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     );
   }
 
-  private changeSource(source: Source)
+  private handleSourceChange(index)
   {
-    BuilderActions.change(List(['query', 'path', 'source']), source);
+    const options = this.getDataSourceOptions();
+    const dataSource = this.props.pathfinderContext.source.dataSource
+    if ((dataSource as any).index !== undefined)
+    {
+      BuilderActions.change(this.props.keyPath.push('dataSource').push('index'), options.get(index).value.id);
+      BuilderActions.change(this.props.keyPath.push('dataSource').push('types'), options.get(index).value.tableIds);
+    }
+
+    BuilderActions.change(this.props.keyPath.push('dataSource').push('name'), options.get(index).displayName);
   }
 
   private handleCountChange(value: string | number)
   {
-    this.changeSource(
-      this.props.pathfinderContext.source
-        .set('count', value),
-    );
+    BuilderActions.change(this.props.keyPath.push('dataSource').push('count'), value);
   }
 
-  private getDataSourceOptions(): List<string>
+  private getDataSourceOptions(overrideContext?: PathfinderContext): List<ChoiceOption>
   {
-    // TODO
-    return List(['Products', 'Customers', 'Purchases', 'Reviews']);
-  }
-
-  private getSelectedDataSourceIndex(): number
-  {
-    return this.getDataSourceOptions().indexOf(this.props.pathfinderContext.source.dataSource.name);
-  }
-
-  private handleSourceDropdownChange(sourceIndex: number)
-  {
-    this.changeSource(this.props.pathfinderContext.source.set(
-      'dataSource',
-      _ElasticDataSource({
-        name: this.getDataSourceOptions().get(sourceIndex),
-      }),
-    ));
+    const {schemaState, source} = (overrideContext || this.props.pathfinderContext);
+    const options = source.dataSource.getChoiceOptions({schemaState, type: 'source'});
+    return options;
   }
 }
 
