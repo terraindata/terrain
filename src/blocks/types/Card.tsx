@@ -129,6 +129,8 @@ export interface Card extends IRecord<Card>
     //  receives the appropriate block spec as an argument, to avoid
     //  a circular dependency
     init?: InitFn;
+    // epilogueInit is called after the block is created but before returning the block.
+    epilogueInit?: (block: Block) => Block;
 
     // given a card, return the "terms" it generates for autocomplete
     // TODO schemaState type is : SchemaTypes.SchemaState
@@ -185,6 +187,7 @@ export interface CardConfig
     metaFields?: string[];
 
     init?: InitFn;
+    epilogueInit?: (card: Block) => Block;
   };
 }
 

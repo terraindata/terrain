@@ -83,9 +83,10 @@ const esFilterOperatorsTooltips = {
 
 export class FilterUtils
 {
+  // ElasticFilterCard is a custom card based on the bool_query clause card.
   public static BoolQueryCard = ElasticElasticCards['eqlbool_query'];
 
-  // custom make for the filter card
+  // Make a Filter card with parameters of making the bool_query card
   public static makeCustomFilterCard(blocksConfig: { [type: string]: BlockConfig },
     blockType: string, extraConfig?: { [key: string]: any }, skipTemplate?: boolean)
   {
@@ -95,6 +96,7 @@ export class FilterUtils
     return filterCard;
   }
 
+  // Generate the filter rows for a Filter card.
   public static customFilterBlock(block: Block)
   {
     // update filter rows if there is any
@@ -103,6 +105,7 @@ export class FilterUtils
     return block;
   }
 
+  // Remove the filter blocks which can be presented as filter rows from a Filter card.
   public static removeFilterBlocks(block: Block): Block
   {
     const cardTree = new ESCardParser(block);
@@ -150,6 +153,7 @@ export class FilterUtils
     return block;
   }
 
+  // Shuffle filter cards to indexFilters, typeFilters, and otherFilters
   public static reGroupFilterRows(block: Block): Block
   {
     console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
@@ -157,17 +161,15 @@ export class FilterUtils
     const filterRowList = { indexFilters: [], typeFilters: [], otherFilters: [] };
     filterRows.map((row: Block) =>
     {
-      switch (row.field)
+      if (row.boolQuery === 'filter' && row.filterOp === '=' && row.field === '_index')
       {
-        case '_index':
-          filterRowList.indexFilters.push(row);
-          break;
-        case '_type':
-          filterRowList.typeFilters.push(row);
-          break;
-        default:
-          filterRowList.otherFilters.push(row);
-          break;
+        filterRowList.indexFilters.push(row);
+      } else if (row.boolQuery === 'filter' && row.filterOp === '=' && row.field === '_type')
+      {
+        filterRowList.typeFilters.push(row);
+      } else
+      {
+        filterRowList.otherFilters.push(row);
       }
     });
     // regroup the filter rows first because a new other-filter row added into
@@ -238,16 +240,20 @@ export class FilterUtils
     return false;
   }
 
-  public static insertRowsToBlock(block: Block, rows: Block[]): Immutable.List<Block>
+  // Insert query blocks generated from the filter rows to a card
+  // Please take care the order when pushing rows to cards
+  // [Row1, Row2, ... block's child1, child2...]
+  public static insertRowsToBlock(block: Block, rows: Block[])
   {
-    let cards = block.cards;
+    const filterCards = [];
     rows.map((rowBlock) =>
     {
-      cards = cards.push(FilterUtils.filterRowToQueryCard(rowBlock));
+      filterCards.push(FilterUtils.filterRowToQueryCard(rowBlock));
     });
-    return cards;
+    return Immutable.List(filterCards).concat(block.cards);
   }
 
+  // Generate a new card whose child cards are from combining filter rows and other cards.
   public static mergeFilterBlocksAndRows(block: Block): Block
   {
     console.assert(block.type === 'elasticFilter', 'Block is not elasticFilter.');
@@ -317,6 +323,7 @@ export class FilterUtils
     }
     return filters;
   }
+
   public static ParseFilterBlock(boolQuery: string, filters: any): Block[]
   {
     if (typeof filters !== 'object')
@@ -377,7 +384,8 @@ export class FilterUtils
     return filterBlocks;
   }
 
-  public static filterRowToQueryCard(block: Block)
+  // generate matched query cards from filter rows
+  public static filterRowToQueryCard(block: Block): Block
   {
     console.assert(block.type === 'elasticFilterBlock', 'Rows of the Elastic filter card must be elasticFilterBlock');
     let queryCard;
@@ -426,23 +434,6 @@ export class FilterUtils
     }
     return queryCard;
   }
-
-  public static diffFilterBlocks(filterRows, filterBlocks)
-  {
-    const ret = { newRows: [], newBlocks: [] };
-    filterRows.map();
-  }
-
-  public static sameFilterBlock(blockA, blockB): boolean
-  {
-    if (blockA.field === blockB.field &&
-      blockA.value === blockB.value &&
-      blockA.boolQuery === blockB.boolQuery)
-    {
-      return true;
-    }
-    return false;
-  }
 }
 
 export const elasticFilterBlock = _block(
@@ -475,9 +466,9 @@ export const elasticFilterBlock = _block(
   });
 
 export const elasticFilter = _card({
-  // a short-path for searching the index.
+  // caching the index.
   currentIndex: '',
-  // a short-path for searching the type.
+  // caching the type
   currentType: '',
   indexFilters: List(),
   typeFilters: List(),
@@ -487,7 +478,6 @@ export const elasticFilter = _card({
   childOptionClickHandler: FilterUtils.BoolQueryCard.childOptionClickHandler,
   childrenHaveKeys: true,
   key: 'bool',
-  customBlockAfterInit: FilterUtils.customFilterBlock,
 
   static: {
     // this makes the shape of elasticFilterBlock similar with the bool_query clause card.
@@ -531,6 +521,7 @@ export const elasticFilter = _card({
     },
 
     init: FilterUtils.BoolQueryCard.static.init,
+    epilogueInit: FilterUtils.customFilterBlock,
 
     display:
     [

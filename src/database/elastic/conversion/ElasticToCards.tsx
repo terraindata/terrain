@@ -58,6 +58,7 @@ import { Block } from '../../../blocks/types/Block';
 import { Card, Cards } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
 
+import ESBaseClause from '../../../../shared/database/elastic/parser/clauses/ESBaseClause';
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import { FilterUtils } from '../blocks/ElasticFilterCard';
@@ -222,7 +223,13 @@ export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
   const clauseCardType = 'eql' + valueInfo.clause.type;
   if (typeof valueInfo.value !== 'object')
   {
-    valueMap.value = valueInfo.value;
+    if (valueInfo.clause instanceof ESBaseClause)
+    {
+      valueMap.value = JSON.stringify(valueInfo.value);
+    } else
+    {
+      valueMap.value = String(valueInfo.value);
+    }
   }
 
   if (valueInfo.arrayChildren && valueInfo.arrayChildren.length)
