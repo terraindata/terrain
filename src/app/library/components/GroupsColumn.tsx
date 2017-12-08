@@ -47,10 +47,10 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
 
 import * as Immutable from 'immutable';
+import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import { Colors, fontColor } from '../../colors/Colors';
@@ -341,9 +341,13 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public handleNewGroupCreated(groupId)
   {
-    const { groups } = this.props;
+    const { basePath, groups } = this.props;
     const categoryId = groups.get(groupId).categoryId;
-    browserHistory.push(`/library/${categoryId}/${groupId}`);
+    replaceRoute({
+      basePath,
+      categoryId,
+      groupId,
+    });
   }
 
   public handleNewGroupCreate()
@@ -425,7 +429,11 @@ class GroupsColumn extends TerrainComponent<Props>
 
     this.props.algorithmActions.unselect();
 
-    browserHistory.replace(`/${basePath}/${categoryId}/${id}`);
+    replaceRoute({
+      basePath,
+      categoryId,
+      groupId: id,
+    });
 
     return true;
   }

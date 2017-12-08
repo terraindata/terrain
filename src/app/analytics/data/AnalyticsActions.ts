@@ -243,8 +243,8 @@ const Actions =
     {
       return {
         type: ActionTypes.clearPinned,
-      }
-    }
+      };
+    },
 
     fetchAvailableMetrics: (
       callback?: (analyticsAlgorithms: any) => void,

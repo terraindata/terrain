@@ -48,9 +48,9 @@ import AnalyticsSelector from 'analytics/components/AnalyticsSelector';
 import Loading from 'common/components/Loading';
 import RadioButtons from 'common/components/RadioButtons';
 import * as Immutable from 'immutable';
+import { loadLastRoute, saveLastRoute } from 'library/helpers/LibraryRoutesHelper';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import MultipleAreaChart from '../../charts/components/MultipleAreaChart';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
@@ -123,12 +123,7 @@ class Library extends TerrainComponent<any>
 
     if ((!this.props.params || !this.props.params.categoryId))
     {
-      // no path given, redirect to last library path
-      const path = this.getLastPath();
-      if (path != null)
-      {
-        browserHistory.replace({ pathname: path });
-      }
+      loadLastRoute(basePath);
     }
   }
 
@@ -173,7 +168,6 @@ class Library extends TerrainComponent<any>
   public componentWillUnmount()
   {
     this.props.libraryAlgorithmActions.unselect();
-    //this.props.analyticsActions.clearPinned();
   }
 
   public getData(algorithmId: ID)
@@ -216,23 +210,6 @@ class Library extends TerrainComponent<any>
       });
 
     return datasets.toMap();
-  }
-
-  public getLastPath()
-  {
-    const { basePath } = this.props;
-
-    const lastPath = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
-    // no path given, redirect to last library path
-    return localStorage.getItem(lastPath);
-  }
-
-  public setLastPath()
-  {
-    const { location, basePath } = this.props;
-
-    const lastPath = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
-    localStorage.setItem(lastPath, `${location.pathname}${location.search}`);
   }
 
   public fetchAnalytics(props)
@@ -363,55 +340,17 @@ class Library extends TerrainComponent<any>
 
     const categoryId = params.categoryId ? +params.categoryId : null;
     const groupId = params.groupId ? +params.groupId : null;
-    const algorithmIds = params.algorithmId ? params.algorithmId.split(',') : null;
+    const algorithmId = params.algorithmId ? +params.algorithmId : null;
 
-    let category: LibraryTypes.Category;
-    let group: LibraryTypes.Group;
-    let algorithm: LibraryTypes.Algorithm;
-    let groupsOrder: List<ID>;
-    let algorithmsOrder: List<ID>;
-
-    if (categoryId !== null)
-    {
-      category = categories.get(categoryId);
-
-      if (category !== undefined)
-      {
-        groupsOrder = category.groupsOrder;
-        if (groupId !== null)
-        {
-          group = groups.get(groupId);
-          if (group !== undefined)
-          {
-            algorithmsOrder = group.algorithmsOrder;
-
-            if (algorithmIds !== null)
-            {
-              if (algorithmIds.length === 0)
-              {
-                browserHistory.replace(`/${basePath}/${categoryId}/${groupId}`);
-              } else if (algorithmIds.length === 1)
-              {
-                algorithm = algorithms.get(+algorithmIds[0]);
-              }
-            }
-          } else
-          {
-            // !group
-            browserHistory.replace(`/${basePath}/${categoryId}`);
-          }
-        }
-      }
-      else
-      {
-        // !category
-        browserHistory.replace(`/${basePath}`);
-      }
-    }
+    const category: LibraryTypes.Category = categoryId !== null ? categories.get(categoryId) : undefined;
+    const group: LibraryTypes.Group = groupId !== null ? groups.get(groupId) : undefined;
+    const algorithm: LibraryTypes.Algorithm = algorithmId !== null ? algorithms.get(algorithmId) : undefined;
+    const groupsOrder: List<ID> = category !== undefined ? category.groupsOrder : undefined;
+    const algorithmsOrder: List<ID> = group !== undefined ? group.algorithmsOrder : undefined;
 
     if (!!this.props.location.pathname)
     {
-      this.setLastPath();
+      saveLastRoute(basePath, this.props.location);
     }
 
     const groupsReferrer = singleColumn && category !== undefined ?
@@ -463,7 +402,7 @@ class Library extends TerrainComponent<any>
                 referrer: groupsReferrer,
                 algorithmActions: this.props.libraryAlgorithmActions,
               }}
-              isFocused={algorithmIds === null}
+              isFocused={algorithmId === null}
             /> : null
           }
           {this.isColumnVisible(Library.ALGORITHMS_COLUMN) ?

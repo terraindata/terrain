@@ -55,6 +55,7 @@ import { uniq } from 'lodash';
 
 import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
 import { Colors, fontColor } from '../../colors/Colors';
@@ -210,16 +211,24 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       (canPinItems && analytics.pinnedAlgorithms !== nextAnalytics.pinnedAlgorithms)
     )
     {
-      const pinnedParams = canPinItems && pinnedAlgorithms.length > 0 ? `?pinned=${pinnedAlgorithms.join(',')}` : '';
       if (nextSelectedAlgorithm !== null && nextSelectedAlgorithm !== undefined)
       {
-        browserHistory
-          .replace(`/${basePath}/${categoryId}/${groupId}/${nextSelectedAlgorithm}${pinnedParams}`);
+        replaceRoute({
+          basePath,
+          categoryId,
+          groupId,
+          algorithmId: nextSelectedAlgorithm,
+          pinned: canPinItems ? pinnedAlgorithms : undefined,
+        });
       }
       else
       {
-        browserHistory
-          .replace(`/${basePath}/${categoryId}/${groupId}${pinnedParams}`);
+        replaceRoute({
+          basePath,
+          categoryId,
+          groupId,
+          pinned: canPinItems ? pinnedAlgorithms : undefined,
+        });
       }
     }
   }

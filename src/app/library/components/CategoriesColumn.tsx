@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-var-requires
 
+import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import { ItemStatus } from '../../../items/types/Item';
 import CreateLine from '../../common/components/CreateLine';
 import RolesStore from '../../roles/data/RolesStore';
@@ -173,7 +173,7 @@ class CategoriesColumn extends TerrainComponent<Props>
 
     this.props.algorithmActions.unselect();
 
-    browserHistory.replace(`/${basePath}/${id}`);
+    replaceRoute({ basePath, categoryId: id });
 
     return true;
   }
