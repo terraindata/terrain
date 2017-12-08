@@ -59,6 +59,7 @@ import { AutocompleteMatchType, ElasticBlockHelpers } from '../../../database/el
 
 import SpecializedCreateCardTool from 'builder/components/cards/SpecializedCreateCardTool';
 import { ESInterpreterDefaultConfig } from '../../../../shared/database/elastic/parser/ESInterpreter';
+import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 import ESCardParser from '../conversion/ESCardParser';
 import { ElasticBlocks } from './ElasticBlocks';
 import { ElasticElasticCards } from './ElasticElasticCards';
@@ -70,6 +71,15 @@ const esFilterOperatorsMap = {
   '≤': 'lte',
   '=': 'term',
   '≈': 'match',
+};
+
+const esRangeOperatorMap = {
+  gt: '>',
+  gte: '≥',
+  lt: '<',
+  lte: '≤',
+  term: '=',
+  match: '≈',
 };
 
 const esFilterOperatorsTooltips = {
@@ -227,8 +237,8 @@ export class FilterUtils
     if (queryBlock.cards.find((termBlock) =>
     {
       if ((termBlock.key === 'term' && termBlock.type === 'eqlterm_query') ||
-        (termBlock.key === 'range' && termBlock.type === 'eqlterm_range') ||
-        (termBlock.key === 'match' && termBlock.type === 'eqlterm_range'))
+        (termBlock.key === 'range' && termBlock.type === 'eqlrange_query') ||
+        (termBlock.key === 'match' && termBlock.type === 'eqlmatch'))
       {
         return true;
       }
@@ -354,7 +364,8 @@ export class FilterUtils
           delete obj['range'][field][filterOp];
           filterBlocks = filterBlocks.concat(FilterUtils.ParseFilterBlock(boolQuery, [obj]));
         }
-        filterOp = esFilterOperatorsMap[filterOp];
+        filterOp = esRangeOperatorMap[filterOp];
+        console.assert(filterOp !== undefined, 'ParseFilterBlock could not parse the object ' + JSON.stringify(obj));
       }
       else if (obj['term'] !== undefined)
       {
@@ -389,7 +400,17 @@ export class FilterUtils
   {
     console.assert(block.type === 'elasticFilterBlock', 'Rows of the Elastic filter card must be elasticFilterBlock');
     let queryCard;
-    const templateField = String(block['field']) + ':string';
+    // detect the type of the value string
+    let valueType = ':string';
+    const valueParser = new ESJSONParser(String(block['value']));
+    if (valueParser.hasError() === false)
+    {
+      if (typeof valueParser.getValue() === 'number')
+      {
+        valueType = ':number';
+      }
+    }
+    const templateField = String(block['field']) + valueType;
 
     if (block['filterOp'] === '=')
     {

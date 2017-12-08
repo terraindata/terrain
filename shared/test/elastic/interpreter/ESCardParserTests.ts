@@ -56,7 +56,8 @@ import ESCardParser from 'src/database/elastic/conversion/ESCardParser';
 import { ElasticValueInfoToCards, parseCardFromValueInfo } from 'src/database/elastic/conversion/ElasticToCards';
 
 import * as Immutable from 'immutable';
-import ESParserError from 'shareddatabase/elastic/parser/ESParserError';
+import ESParserError from 'shared/database/elastic/parser/ESParserError';
+import CardsToElastic from 'src/database/elastic/conversion/CardsToElastic';
 
 function getExpectedFile(): string
 {
@@ -96,8 +97,8 @@ function testCardParse(testName: string,
   const cardParser = new ESCardParser(rootCard);
   // interpreting the parsed card
   const cardInterpreter = new ESInterpreter(cardParser);
-  expect(cardParser.getValue()).toEqual(expectedValue);
   expect(cardInterpreter.errors).toEqual(expectedErrors);
+  expect(CardsToElastic.blockToElastic(rootCard)).toEqual(expectedValue);
 }
 
 test('parse card', () =>
