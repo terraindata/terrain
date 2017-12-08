@@ -174,7 +174,7 @@ class TransformCardChart extends TerrainComponent<Props>
   public debouncedUpdatePoints: any = (points, lastUpdateConcrete) =>
   {
     this.props.updatePoints(points, lastUpdateConcrete);
-  };
+  }
 
   public updatePoints(points: ScorePoints, isConcrete?: boolean)
   {
