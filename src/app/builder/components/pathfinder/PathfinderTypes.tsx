@@ -123,8 +123,11 @@ class FilterGroupC extends BaseClass
   public lines: List<FilterLine> = List<FilterLine>([]);
 }
 export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;
-export const _FilterGroup = (config?: { [key: string]: any }) =>
-  New<FilterGroup>(new FilterGroupC(config), config);
+export const _FilterGroup = (config?: { [key: string]: any }) => {
+  let filterGroup = New<FilterGroup>(new FilterGroupC(config), config);
+  filterGroup = filterGroup.set('lines', List(filterGroup['lines'].map((line) => _FilterLine(line))));
+  return filterGroup;
+}
 
 class ScoreC extends BaseClass
 {
@@ -286,7 +289,8 @@ class FilterLineC extends LineC
   public field: string = null; // autocomplete
   public method: string = null; // autocomplete
   public valueType: ValueType = null;
-  public value: string | number = null;
+  public value: string | number | [number, number] = null;
+  public textValue?: string = null; // This is for the map component (needs value for address and location)
 
   // Members for when it is a group of filter conditions
   public filterGroup: FilterGroup = null;
@@ -295,7 +299,7 @@ export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
   New<FilterLine>(new FilterLineC(config), config);
 
-export type ValueType = 'number' | 'text' | 'date' | 'input';
+export type ValueType = 'number' | 'text' | 'date' | 'location' | 'input';
 
 export const sourceCountOptions = List([
   'all',
@@ -538,6 +542,10 @@ class ElasticDataSourceC extends DataSource
           value: 'date',
         }),
         _ChoiceOption({
+          displayName: 'a location',
+          value: 'location',
+        }),
+        _ChoiceOption({
           displayName: 'an input',
           value: 'input',
         }),
@@ -546,7 +554,7 @@ class ElasticDataSourceC extends DataSource
 
     if (context.type === 'input')
     {
-      //
+      return List([]);
     }
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));
@@ -556,7 +564,7 @@ export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>
 export const _ElasticDataSource = (config?: { [key: string]: any }) =>
 {
   let elasticSource = New<ElasticDataSource>(new ElasticDataSourceC(config), config);
-  elasticSource = elasticSource.set('types', List(elasticSource)['types']);
+  elasticSource = elasticSource.set('types', List(elasticSource['types']));
   return elasticSource;
 };
 

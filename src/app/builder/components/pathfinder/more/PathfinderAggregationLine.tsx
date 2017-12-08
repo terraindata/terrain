@@ -53,7 +53,6 @@ import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map, Set } = Immutable;
 import ElasticBlockHelpers, { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
-import { getIndex, getType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import AdvancedDropdown from '../../../../common/components/AdvancedDropdown';
 import Dropdown from '../../../../common/components/Dropdown';
 import Ajax from '../../../../util/Ajax';
@@ -64,6 +63,7 @@ import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 import PathfinderAdvancedLine from './PathfinderAdvancedLine';
 import PathfinderAggregationMoreArea from './PathfinderAggregationMoreArea';
+import { getIndex, getType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
@@ -202,8 +202,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
         type: db.type,
         source: db.source,
       };
-      const index: string = getIndex('');
-      const type: string = getType('');
+      const index: string = (this.props.pathfinderContext.source.dataSource as any).index.split('/')[1];
       const domainQuery = {
         body: {
           size: 0,
@@ -225,20 +224,22 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       };
 
       domainQuery['index'] = index;
-      domainQuery['type'] = type;
-
       Ajax.query(
         JSON.stringify(domainQuery),
         backend,
         (resp) =>
         {
           // Set the bounds and interval of the advanced section based on the aggregation results
-          const min = resp.result.aggregations.minimum.value;
-          const max = resp.result.aggregations.maximum.value;
-          const interval = (max - min) / 10;
-          BuilderActions.change(this.props.keyPath.push('advanced').push('min'), min);
-          BuilderActions.change(this.props.keyPath.push('advanced').push('max'), max);
-          BuilderActions.change(this.props.keyPath.push('advanced').push('interval'), interval);
+          if (resp && resp.result && resp.result.aggregations)
+          {
+            const min = resp.result.aggregations.minimum.value;
+            const max = resp.result.aggregations.maximum.value;
+            const interval = (max - min) / 10;
+            BuilderActions.change(this.props.keyPath.push('advanced').push('min'), min);
+            BuilderActions.change(this.props.keyPath.push('advanced').push('max'), max);
+            BuilderActions.change(this.props.keyPath.push('advanced').push('interval'), interval);
+          }
+
         },
         (err) =>
         { /**/ },

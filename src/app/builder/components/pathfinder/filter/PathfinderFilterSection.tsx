@@ -61,6 +61,7 @@ import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../Pat
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
+import BuilderStore from 'app/builder/data/BuilderStore';
 
 export interface Props
 {
@@ -101,10 +102,16 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     BuilderActions.change(keyPath, filter);
   }
 
+  private handleAddFilter(keyPath, filter: FilterGroup | FilterLine)
+  {
+    const oldLines = this.props.filterGroup.getIn(keyPath.skip(3).toList());
+    BuilderActions.change(keyPath, oldLines.push(filter));
+  }
+
   private handleFilterDelete(keyPath: KeyPath)
   {
     const parentKeyPath = keyPath.butLast().toList();
-    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(2).toList());
+    const parent = this.props.filterGroup.getIn(parentKeyPath.skip(3).toList());
     const index = keyPath.last();
     BuilderActions.change(parentKeyPath, parent.splice(index, 1));
   }
@@ -119,7 +126,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     });
 
     depth++;
-
     keyPath = keyPath.push('lines');
 
     filterGroup.lines.map((filterLine, index) =>
@@ -127,7 +133,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       if (filterLine.filterGroup)
       {
         // it is a filter group
-        this.buildFilterTree(filterLine.filterGroup, entries, depth, keyPath.push(index));
+        this.buildFilterTree(filterLine.filterGroup, entries, depth, keyPath.push(index).push('filterGroup'));
       }
       else
       {
@@ -150,7 +156,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
   {
     const { pathfinderContext } = this.props;
     const { source, canEdit } = pathfinderContext;
-
     if (filterEntry.filterGroup)
     {
       return (
@@ -187,8 +192,8 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         <PathfinderFilterCreate
           canEdit={canEdit}
           depth={filterEntry.depth}
-          keyPath={filterEntry.keyPath}
-          onChange={this.handleFilterChange}
+          keyPath={filterEntry.keyPath.butLast().toList()}
+          onChange={this.handleAddFilter}
           key={index}
         />
       );

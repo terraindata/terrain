@@ -187,6 +187,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           language={'elastic'}
           onChange={BuilderActions.change}
           parentData={undefined}
+          index={(this.props.pathfinderContext.source.dataSource as any).index.split('/')[1]}
         />
       </div>);
   }
@@ -243,7 +244,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
 
   public render()
   {
-    console.log(this.props.pathfinderContext);
     const { step } = this.props;
     return (
       <PathfinderLine

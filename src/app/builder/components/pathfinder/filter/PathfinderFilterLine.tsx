@@ -58,6 +58,9 @@ import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import DatePicker from 'app/common/components/DatePicker';
+import MapComponent from 'app/common/components/MapComponent';
+import Util from 'app/util/Util';
 
 export interface Props
 {
@@ -159,7 +162,35 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
       case 'date':
         return (
-          <div>Calendar here</div>
+          <DatePicker
+            date={String(filterLine.value)}
+            onChange={this._fn(this.handleChange, 'value')}
+            canEdit={pathfinderContext.canEdit}
+            language={'elastic'}
+          />
+        );
+
+      case 'location':
+        let value = filterLine.value;
+        if (!filterLine.value || !Array.isArray(filterLine.value))
+        {
+          value = [37, -95];
+        }
+        console.log(filterLine.value);
+        console.log(value);
+        return (
+            <MapComponent
+              address={filterLine.textValue || ''}
+              location={Util.asJS(value)}
+              markLocation={true}
+              showSearchBar={true}
+              zoomControl={true}
+              keepAddressInSync={false}
+              geocoder='google'
+              keyPath={this.props.keyPath.push('value')}
+              textKeyPath={this.props.keyPath.push('textValue')}
+              hideSearchSettings={true}
+            />
         );
 
       case 'input':
@@ -183,6 +214,9 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private handleChange(key, value)
   {
+    console.log('handle change key ', key);
+    console.log(value);
+    console.log(this.props.keyPath);
     this.props.onChange(this.props.keyPath, this.props.filterLine.set(key, value));
   }
 
