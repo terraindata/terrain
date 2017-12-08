@@ -75,7 +75,7 @@ export interface Props
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
-  variantName: string;
+  algorithmName: string;
   showExport: boolean;
   showCustomizeView: boolean;
   allowSpotlights: boolean;
@@ -103,7 +103,7 @@ class ResultsColumn extends TerrainComponent<Props>
     });
   }
 
-  public componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps: Props)
   {
     if (this.props.resultsState.hits !== undefined && nextProps.resultsState.hits !== undefined &&
       !this.props.resultsState.hits.equals(nextProps.resultsState.hits) && this.state.selectedTab !== 0)
@@ -217,7 +217,7 @@ class ResultsColumn extends TerrainComponent<Props>
             query={this.props.query}
             canEdit={this.props.canEdit}
             db={this.props.db}
-            variantName={this.props.variantName}
+            algorithmName={this.props.algorithmName}
             onNavigationException={this.props.onNavigationException}
             resultsState={this.props.resultsState}
             showExport={this.props.showExport}

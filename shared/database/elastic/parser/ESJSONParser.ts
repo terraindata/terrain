@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESParser from 'shared/database/elastic/parser/ESParser';
 import ESJSONType from './ESJSONType';
+import ESParser from './ESParser';
 import ESParserError from './ESParserError';
 import ESParserToken from './ESParserToken';
 import ESPropertyInfo from './ESPropertyInfo';
@@ -68,7 +68,7 @@ import ESValueInfo from './ESValueInfo';
  * myModeWithTokens(tokenizeWholeFile(cm.getValue())), starting a new highlight."
  *
  */
-export default class ESJSONParser extends ESParser
+export class ESJSONParser extends ESParser
 {
   private queryString: string; // string being parsed
   private allowParameters: boolean; // if @parameters are allowed (non-compliant)
@@ -477,7 +477,7 @@ export default class ESJSONParser extends ESParser
 
   private readParameter(): string
   {
-    let match: string | null = this.matchAndSetToken(/^@([a-zA-Z_][a-zA-Z_0-9]*)/);
+    let match: string | null = this.matchAndSetToken(/^@([a-zA-Z_\.?][a-zA-Z_0-9\.?]*)/);
     if (match === null || !this.allowParameters)
     {
       match = '';
@@ -616,3 +616,5 @@ export default class ESJSONParser extends ESParser
     return this.charNumber - this.lastRowChar;
   }
 }
+
+export default ESJSONParser;

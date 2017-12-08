@@ -54,7 +54,7 @@ import * as Util from '../Util';
 
 export interface MetricConfig
 {
-  id: number;
+  id?: number;
   database: number;
   label: string;
   events: string;
@@ -75,6 +75,38 @@ export class Metrics
         'events',
       ],
     );
+  }
+
+  public async initialize(database: number): Promise<any>
+  {
+    const predefinedMetrics: MetricConfig[] = [
+      {
+        database,
+        label: 'Impressions',
+        events: 'impression',
+      },
+      {
+        database,
+        label: 'Clicks',
+        events: 'click',
+      },
+      {
+        database,
+        label: 'Conversions',
+        events: 'conversion',
+      },
+      {
+        database,
+        label: 'Click-Through Rate',
+        events: 'click,impression',
+      },
+      {
+        database,
+        label: 'Conversion Rate',
+        events: 'conversion,impression',
+      },
+    ];
+    predefinedMetrics.map((m) => this.upsert(m));
   }
 
   public async upsert(metric: MetricConfig): Promise<MetricConfig>

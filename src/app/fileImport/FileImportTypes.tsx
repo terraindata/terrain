@@ -216,6 +216,7 @@ export const ELASTIC_TYPES =
     'half_float',
     'float',
     'geo_point',
+    'nested',
   ];
 
 export const ELASTIC_TYPE_INDEXES =

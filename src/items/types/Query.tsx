@@ -55,7 +55,7 @@ import * as BlockUtils from '../../blocks/BlockUtils';
 import { Cards } from '../../blocks/types/Card';
 import { AllBackendsMap } from '../../database/AllBackends';
 // A query can be viewed and edited in the Builder
-// currently, only Variants have Queries, 1:1, but that may change
+// currently, only Algorithms have Queries, 1:1, but that may change
 class QueryC
 {
   type: 'QUERY' = 'QUERY';
@@ -66,7 +66,7 @@ class QueryC
   language: 'elastic' | 'mysql' = 'elastic';
 
   id: ID = -1;
-  variantId: number = -1;
+  algorithmId: number = -1;
 
   // TODO change?
   db: {
@@ -114,6 +114,11 @@ export const _Query = (config?: object) =>
   config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);
   config['tuningOrder'] = List<string>(config['tuningOrder']);
   config['aggregationList'] = Map<string, Aggregation>(config['aggregationList']);
+  if (config && (!config['modelVersion'] || config['modelVersion'] < 3))
+  {
+    config['modelVersion'] = 3;
+    config['algorithmId'] = config['variantId'];
+  }
   const query = new Query_Record(config) as any as Query;
 
   return query;
@@ -129,7 +134,8 @@ export function queryForSave(query: Query): object
 }
 
 // first version is 2
-// version 3 introduces a new custom filter card.
-export const CurrentQueryModelVersion = 3;
+// version 3 introduces .
+// version 4 introduces a new custom filter card.
+export const CurrentQueryModelVersion = 4;
 
 export default Query;

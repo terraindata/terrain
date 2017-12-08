@@ -52,13 +52,13 @@ import ESValueInfo from './ESValueInfo';
  */
 export default class ESParserError
 {
-  public token: ESParserToken; // token which triggered the error
-  public valueInfo: ESValueInfo; // value info which triggered the error
+  public token: ESParserToken | null; // token which triggered the error
+  public valueInfo: ESValueInfo | null; // value info which triggered the error
   public isWarning: boolean;
   public message: string; // what went wrong
 
-  public constructor(token: ESParserToken,
-    valueInfo: ESValueInfo,
+  public constructor(token: ESParserToken | null,
+    valueInfo: ESValueInfo | null,
     message: string,
     isWarning: boolean = false)
   {

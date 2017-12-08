@@ -91,11 +91,12 @@ export interface Props
   db: BackendInstance;
   query: Query;
   canEdit: boolean;
-  variantName: string;
+  algorithmName: string;
   showExport: boolean;
   showCustomizeView: boolean;
   allowSpotlights: boolean;
   onNavigationException: () => void;
+  ignoreEmptyCards?: boolean;
 }
 
 interface State
@@ -138,9 +139,9 @@ class HitsArea extends TerrainComponent<Props>
   public hitsFodderRange = _.range(0, 25);
   public locations = {};
 
-  public componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps: Props)
   {
-    if (nextProps.query.cards !== this.props.query
+    if (nextProps.query.cards !== this.props.query.cards
       || nextProps.query.inputs !== this.props.query.inputs)
     {
       if (this.state.onHitsLoaded)
@@ -151,7 +152,7 @@ class HitsArea extends TerrainComponent<Props>
     }
     if (this.props.resultsState.hits !== nextProps.resultsState.hits)
     {
-      let spotlightHits = Map({});
+      let spotlightHits = Map();
       if (nextProps.resultsState.hits === undefined)
       {
         return;
@@ -254,8 +255,8 @@ class HitsArea extends TerrainComponent<Props>
 
   public isQueryEmpty(): boolean
   {
-    const { query } = this.props;
-    return !query || (!query.cards.size);
+    const { query, ignoreEmptyCards } = this.props;
+    return !query || (!ignoreEmptyCards && !query.cards.size);
   }
 
   public handleSpotlightAdded(id, spotlightData)
@@ -572,11 +573,17 @@ class HitsArea extends TerrainComponent<Props>
         </InfiniteScroll>
       );
     }
-    const mapHeight = Math.min(this.state.mapHeight, MAP_MAX_HEIGHT);
+
+    let mapHeight = Math.min(this.state.mapHeight, MAP_MAX_HEIGHT);
+    if (_.keys(this.locations).length === 0)
+    {
+      mapHeight = 0;
+    }
+
     return (
       <div
         className='results-area-results-wrapper'
-        style={{ height: `calc(100% - ${mapHeight + 24}px)` }}
+        style={{ height: `calc(100% - ${mapHeight}px - 60px)` }}
       >
         {
           hitsContent
@@ -600,7 +607,7 @@ class HitsArea extends TerrainComponent<Props>
       false,
       {
         streaming: true,
-        streamingTo: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.json',
+        streamingTo: this.props.algorithmName + ' on ' + moment().format('MM/DD/YY') + '.json',
       },
     );
 
@@ -632,7 +639,7 @@ column if you have customized the results view.');
         false,
         {
           csv: true,
-          csvName: this.props.variantName + ' on ' + moment().format('MM/DD/YY') + '.csv',
+          csvName: this.props.algorithmName + ' on ' + moment().format('MM/DD/YY') + '.csv',
         },
       );
 
@@ -777,7 +784,7 @@ column if you have customized the results view.');
           columnTypes={columnTypes}
           templates={templates}
           transforms={transforms}
-          columnOptions={List([])}
+          columnOptions={List()}
           uploadInProgress={false}
           requireJSONHaveAllFields={requireJSONHaveAllFields}
           objectKey={objectKey}
@@ -786,7 +793,7 @@ column if you have customized the results view.');
           query={this.props.query}
           inputs={this.props.query.inputs}
           serverId={Number(this.props.db.id)}
-          variantName={this.props.variantName}
+          algorithmName={this.props.algorithmName}
         />
       </div>;
 

@@ -61,7 +61,7 @@ export const metrics: Metrics = new Metrics();
 const Router = new KoaRouter();
 
 // * eventname: the source event(s) to use for aggregation (view / impression, click / add-to-cart, transaction)
-// * variantid: list of variantids
+// * algorithmid: list of algorithmids
 // * database: database (connection) id
 // * start: start time of the interval
 // * end: end time of the interval
@@ -89,7 +89,7 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
   {
     Util.verifyParameters(
       request,
-      ['start', 'end', 'eventname', 'variantid'],
+      ['start', 'end', 'eventname', 'algorithmid'],
     );
   }
 
@@ -101,9 +101,8 @@ Router.get('/agg', passport.authenticate('access-token-local'), async (ctx, next
   {
     throw new Error('Database "' + String(databaseid) + '" does not exist or does not have analytics enabled.');
   }
-
   const response: object[] = await events.AggregationHandler(db, request);
-  if (request['variantid'] !== undefined)
+  if (request['algorithmid'] !== undefined)
   {
     ctx.body = response.reduce((acc, x) =>
     {

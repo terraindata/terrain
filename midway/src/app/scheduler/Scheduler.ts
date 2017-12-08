@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as fs from 'fs';
 import * as naturalSort from 'javascript-natural-sort';
 import * as nodeScheduler from 'node-schedule';
 import * as request from 'request';
@@ -207,6 +208,22 @@ export class Scheduler
         jobId = 2;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'http')
+      {
+        // Not implemented yet
+        jobId = 3;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'import' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'local')
+      {
+        jobId = 4;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
+      else if (req['jobType'] === 'export' && req['transport'] !== undefined && (req['transport'] as any)['type'] === 'local')
+      {
+        jobId = 5;
+        packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
+      }
       req.active = 1;
       req.archived = 0;
       req.jobId = jobId;
@@ -269,6 +286,9 @@ export class Scheduler
     // 0: import via sftp
     // 1: export via sftp
     // 2: import via http
+    // 3: export via http (not implemented yet)
+    // 4: import via local filesystem
+    // 5: export via local filesystem
     await this.createJob(async (scheduleID: number, fields: object, // 0
       transport: object, sort: string, encoding?: string | null): Promise<any> => // import with sftp
     {
@@ -336,7 +356,7 @@ export class Scheduler
             }
             catch (e)
             {
-              winston.info('Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string));
+              winston.info('Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string));
             }
             return rejectJob('Failure to import.');
           }
@@ -473,6 +493,106 @@ export class Scheduler
 
           await this.setJobStatus(scheduleID, 0);
           return rejectJob('Failed to import.');
+        }
+        catch (e)
+        {
+          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob(e.toString());
+        }
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, // 3, not implemented yet
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // export with http
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        resolveJob('');
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, // 4
+      transport: object, sort: string, encoding?: string | null): Promise<any> => // import with local filesystem
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        try
+        {
+          let readStream: stream.Readable | string;
+          try
+          {
+            await this.setJobStatus(scheduleID, 1);
+            readStream = await this._readFromFilesystem(transport['filename']);
+            if (typeof readStream === 'string')
+            {
+              winston.info('Schedule ' + scheduleID.toString() + ': Failed to complete scheduled import from local filesystem.');
+              return rejectJob(readStream as string);
+            }
+            winston.info('Schedule ' + scheduleID.toString() + ': Starting import with sftp');
+            const result = await imprt.upsert(readStream as stream.Readable, fields, true);
+            await this.setJobStatus(scheduleID, 0);
+            winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled import from local filesystem.');
+            return resolveJob('Successfully completed scheduled import from local filesystem.');
+          }
+          catch (e)
+          {
+            winston.info('Schedule ' + scheduleID.toString() + ': Error while importing: ' + ((e as any).toString() as string));
+          }
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob('Failed to import.');
+        }
+        catch (e)
+        {
+          winston.info('Schedule ' + scheduleID.toString() + ': Exception caught: ' + (e.toString() as string));
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob(e.toString());
+        }
+      });
+    });
+
+    await this.createJob(async (scheduleID: number, fields: object, transport: object, // 5
+      sort: string, encoding?: string | null) => // export to local filesystem
+    {
+      return new Promise<any>(async (resolveJob, rejectJob) =>
+      {
+        try
+        {
+          const path: string = transport['filename'];
+          winston.info('Schedule ' + scheduleID.toString() + ': Starting export to local filesystem');
+          await this.setJobStatus(scheduleID, 1);
+          let writeStream: stream.Readable = new stream.Readable();
+          try
+          {
+            writeStream = await exprt.export(fields as ExportConfig, true) as stream.Readable;
+          }
+          catch (e)
+          {
+            winston.info('Schedule ' + scheduleID.toString() + ': Error while exporting: ' + ((e as any).toString() as string));
+            await this.setJobStatus(scheduleID, 0);
+            return rejectJob('Failed to export.');
+          }
+          try
+          {
+            const didWriteToFile: string = await this._writeToFilesystem(writeStream, path);
+            if (didWriteToFile !== 'Success')
+            {
+              throw new Error(didWriteToFile);
+            }
+            winston.info('Schedule ' + scheduleID.toString() + ': Successfully completed scheduled export to local filesystem.');
+            return resolveJob('Successfully completed scheduled export to local filesystem.');
+          }
+          catch (e)
+          {
+            if (e.message !== undefined)
+            {
+              winston.info('Error: ' + ((e.message as string).toString() as string));
+            }
+            winston.info('Schedule ' + scheduleID.toString() +
+              ': Error while trying to write file. Do you have write permission?');
+          }
+          await this.setJobStatus(scheduleID, 0);
+          return rejectJob('Failed to export.');
         }
         catch (e)
         {
@@ -622,6 +742,60 @@ export class Scheduler
         schedule.currentlyRunning = 0;
       }
       return resolve(await App.DB.upsert(this.schedulerTable, schedule) as SchedulerConfig[]);
+    });
+  }
+
+  private async _readFromFilesystem(filename: string): Promise<stream.Readable | string>
+  {
+    return new Promise<stream.Readable | string>(async (resolve, reject) =>
+    {
+      try
+      {
+        // tslint:disable-next-line:no-bitwise
+        fs.accessSync(filename, fs.constants.F_OK | fs.constants.R_OK);
+        return resolve(fs.createReadStream(filename));
+      }
+      catch (e)
+      {
+        if (e.message !== undefined)
+        {
+          return resolve(e.message as string);
+        }
+        else
+        {
+          return resolve(e.toString());
+        }
+      }
+    });
+  }
+
+  private async _writeToFilesystem(readStream: stream.Readable, filename: string): Promise<string>
+  {
+    return new Promise<string>(async (resolve, reject) =>
+    {
+      try
+      {
+        const filepath = filename.substring(0, filename.lastIndexOf('/') + 1);
+        // tslint:disable-next-line:no-bitwise
+        fs.accessSync(filepath, fs.constants.F_OK | fs.constants.W_OK);
+        const writeStream = fs.createWriteStream(filename);
+        readStream.pipe(writeStream);
+        writeStream.on('close', () =>
+        {
+          return resolve('Success');
+        });
+      }
+      catch (e)
+      {
+        if (e.message !== undefined)
+        {
+          return resolve(e.message as string);
+        }
+        else
+        {
+          return resolve(e.toString());
+        }
+      }
     });
   }
 }

@@ -83,7 +83,7 @@ const TransformChart = {
 
     svg.append('rect')
       .attr('class', 'bg')
-      .attr('fill', '#fff');
+      .attr('fill', Colors().transformChartBg);
 
     svg.append('g')
       .attr('class', 'yLeftAxis');
@@ -508,7 +508,7 @@ const TransformChart = {
     bar.exit().remove();
   },
 
-  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData)
+  _drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domainMin, domainMax)
   {
     const g = d3.select(el).selectAll('.spotlights');
 
@@ -593,18 +593,24 @@ const TransformChart = {
         }
 
         let yVal = 0;
-        const first = pointsData[i - 1];
-        const second = pointsData[i];
-        if (first && second)
+        if (mode === 'linear')
         {
-          const distanceRatio = (x - first['x']) / (second['x'] - first['x']);
-          yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
+          const first = pointsData[i - 1];
+          const second = pointsData[i];
+          if (first && second)
+          {
+            const distanceRatio = (x - first['x']) / (second['x'] - first['x']);
+            yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
+          }
+          else if (first || second)
+          {
+            yVal = (first || second)['y'];
+          }
         }
         else
         {
-          yVal = (first || second)['y'];
+          yVal = pointFn(x, pointsData, domainMin, domainMax);
         }
-
         const y = scales.realPointY(yVal);
         if (text)
         {
@@ -664,7 +670,6 @@ const TransformChart = {
       if (!offset)
       {
         return scales.realX(ys[getBucket(d)].x);
-
       }
       const shift = getTextOffset(d);
       return scales.realX(ys[getBucket(d)].x) - shift;
@@ -679,8 +684,8 @@ const TransformChart = {
       ;
 
     spotlight.select('.spotlight-rank')
-      .attr('y', (d) => getSpotlightY(d, true) + 4)
       .attr('x', (d) => getFinalX(d, true))
+      .attr('y', (d) => getSpotlightY(d, true) + 4)
       .attr('fill', '#fff')
       .attr('style', fontSize)
       .text((d) => d['rank'] + 1);
@@ -782,7 +787,7 @@ const TransformChart = {
         return '';
       });
 
-    spotlight.selectAll('.spotlight-tooltip, rect, .spotlight-rank')
+    spotlight.selectAll('.spotlight-tooltip, rect')
       .attr('transform', (d) =>
       {
         let rotate = '0';
@@ -805,8 +810,26 @@ const TransformChart = {
         {
           translateX = -1 * width - SPOTLIGHT_SIZE - 2 * SPOTLIGHT_PADDING;
         }
-
         return 'rotate(' + rotate + ')translate(' + translateX + ',' + translateY + ')';
+      });
+
+    spotlight.selectAll('.spotlight-rank')
+      .attr('transform', (d) =>
+      {
+        let rotate = '0';
+        let translateY = 0;
+
+        const bg = ys[getBucket(d)];
+        const x = scales.realX(bg['x']);
+        const y = bg['y'];
+        const offset = bg['offset'];
+
+        if (y - offset < 10)
+        {
+          translateY = 2 * (y - idToY[d['id']]);
+          rotate = '180,' + x + ',' + y;
+        }
+        return 'rotate(' + rotate + ')translate(0,' + translateY + ')';
       });
 
     spotlight.exit().remove();
@@ -1628,7 +1651,7 @@ const TransformChart = {
     point
       .attr('cx', pointXValue)
       .attr('cy', pointYValue)
-      .attr('fill', '#fff')
+      .attr('fill', Colors().transformChartBg)
       .attr('style', (d) => 'stroke: ' + (d['selected'] ? Colors().error : colors[0]))
       .attr('class', (d) =>
         'point' + (d['selected'] ? ' point-selected' : '')
@@ -1675,25 +1698,30 @@ const TransformChart = {
     }
     d3.select(el).select('.inner-svg').select('.overlay').remove();
     this._drawBars(el, scales, barsData, colors);
-    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData);
     const numPoints = pointsData.length;
     let curveFn;
+    let pointFn;
     if (mode === 'normal' && numPoints === NUM_CURVE_POINTS.normal)
     {
       curveFn = TransformUtil.getNormalData;
+      pointFn = TransformUtil.getNormalY;
     }
     else if (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential
       && Math.abs(pointsData[1].x - pointsData[0].x) > (domain.x[1] - domain.x[0]) / 900) // points can't be too close horiz.
     {
       curveFn = TransformUtil.getExponentialData;
+      pointFn = TransformUtil.getExponentialY;
     }
     else if (mode === 'logarithmic' && numPoints === NUM_CURVE_POINTS.logarithmic)
     {
       curveFn = TransformUtil.getLogarithmicData;
+      pointFn = TransformUtil.getLogarithmicY;
     }
     else if (mode === 'sigmoid' && numPoints === NUM_CURVE_POINTS.sigmoid)
     {
       curveFn = TransformUtil.getSigmoidData;
+      pointFn = TransformUtil.getSigmoidY;
+
     }
 
     if (curveFn !== undefined)
@@ -1704,6 +1732,7 @@ const TransformChart = {
     {
       this._drawLines(el, scales, pointsData, onLineClick, onLineMove, canEdit);
     }
+    this._drawSpotlights(el, scales, spotlights, inputKey, pointsData, barsData, pointFn, mode, domain.x[0], domain.x[1]);
 
     if (mode === 'linear'
       || (mode === 'exponential' && numPoints === NUM_CURVE_POINTS.exponential)
