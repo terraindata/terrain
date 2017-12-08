@@ -93,8 +93,7 @@ class QueryC
   dbFields = ['id', 'parent', 'name', 'status', 'type'];
   excludeFields = ['dbFields', 'excludeFields'];
 
-  //modelVersion = CurrentQueryModelVersion; // 2 is for the first version of Node midway
-  modelVersion = 2;
+  modelVersion = CurrentQueryModelVersion;
 
   // what order the cards are in the tuning column
   tuningOrder: List<string> = List([]);
@@ -128,5 +127,9 @@ export function queryForSave(query: Query): object
     .set('resultsConfig', query.resultsConfig.toJS());
   return query.toJS();
 }
+
+// first version is 2
+// version 3 introduces a new custom filter card.
+export const CurrentQueryModelVersion = 3;
 
 export default Query;
