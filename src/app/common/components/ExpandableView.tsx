@@ -84,7 +84,7 @@ class ExpandableView extends TerrainComponent<Props>
       >
         <div className='expandable-view-content-row' style={fontColor(Colors().text1)}>
           <div className='expandable-view-arrow-column'>
-            <div className='expandable-view-arrow-spacer-top'/>
+            <div className='expandable-view-arrow-spacer-top' />
             <ArrowIcon
               className={classNames({
                 'expandable-view-arrow-icon': true,
@@ -103,7 +103,7 @@ class ExpandableView extends TerrainComponent<Props>
                 'expandable-view-arrow-spacer-bottom': true,
                 'expandable-view-open': this.props.open,
                 'expandable-view-has-children': this.props.children !== undefined,
-                })}
+              })}
               style={{
                 borderColor: Colors().active,
               }}

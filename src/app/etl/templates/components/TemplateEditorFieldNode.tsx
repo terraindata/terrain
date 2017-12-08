@@ -133,7 +133,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       />
     );
 
-    const children = (this._isRoot() || field.type === ELASTIC_TYPES.NESTED) ? (
+    const children = (this._isRoot() || this._isNested()) ? (
       <div className='template-editor-children-container'>
         {this.renderChildFields()}
         {this.renderCreateNewFieldButton()}

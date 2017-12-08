@@ -54,7 +54,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, TEMPLATE_TYPES, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { _TemplateField, ELASTIC_TYPES, TEMPLATE_TYPES, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 
 /*
  *  This class defines a base class with useful functions that are used by components
@@ -110,6 +110,15 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
       key: 'children',
       value: List([]),
     });
+  }
+
+  // returns true if type is nested or if arrayType ends with nested
+  protected _isNested(): boolean
+  {
+    const type = this.props.field.type;
+    const arrayType = this.props.field.arrayType;
+    return type === ELASTIC_TYPES.NESTED ||
+      (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
   }
 
   protected _isExport(): boolean

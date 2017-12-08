@@ -60,9 +60,15 @@ import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { Menu, MenuOption } from 'common/components/Menu';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, ELASTIC_TYPES, TEMPLATE_TYPES,
-  TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+
+import
+{
+  _TemplateField, ELASTIC_TYPES, TEMPLATE_TYPES,
+  TemplateEditorState, TemplateField
+} from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import TemplateEditorFieldTypeSection from './TemplateEditorFieldTypeSection';
+
 import './TemplateEditorField.less';
 
 export interface Props extends TemplateEditorFieldProps
@@ -87,56 +93,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   constructor(props)
   {
     super(props);
-
     this._getContextMenuOptions = memoizeOne(this._getContextMenuOptions);
-    this.cleanArrayType = memoizeOne(this.cleanArrayType);
-
-    this._getTypeListIndex = _.memoize(this._getTypeListIndex);
-    this.handleChangeArrayType = _.memoize(this.handleChangeArrayType);
-  }
-
-  /*
-   * (memoized once)
-   * Turns [] into [text]
-   * Turns [array, array] into [array, array, text]
-   * Turns [array, array, text, array] into [array, array, text]
-   */
-  public cleanArrayType(arrayType: List<ELASTIC_TYPES>)
-  {
-    let cutIndex = -1;
-    let newArrayType = arrayType;
-    arrayType.forEach((value, index) => {
-      if (value !== ELASTIC_TYPES.ARRAY)
-      {
-        cutIndex = index + 1;
-        return false;
-      }
-    });
-    if (cutIndex !== -1 && cutIndex < arrayType.size)
-    {
-      newArrayType = arrayType.slice(0, cutIndex).toList();
-    }
-    if (newArrayType.size === 0 || newArrayType.last() === ELASTIC_TYPES.ARRAY)
-    {
-      newArrayType = newArrayType.push(ELASTIC_TYPES.TEXT);
-    }
-    return newArrayType;
-  }
-
-  // memoized
-  public _getTypeListIndex(type): number
-  {
-    return elasticTypeOptions.indexOf(type);
-  }
-
-  public getDataTypeListIndex(): number
-  {
-    return this._getTypeListIndex(this.props.field.type);
-  }
-
-  public getArrayTypeListIndex(arrayTypeIndex): number
-  {
-    return this._getTypeListIndex(this.props.field.arrayType.get(arrayTypeIndex));
   }
 
   // memoized once
@@ -174,7 +131,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
       />;
 
     const showOriginalName = field.name !== field.originalName;
-    let inputOriginalName = <div/>
+    let inputOriginalName = <div />
 
     if (showOriginalName)
     {
@@ -201,7 +158,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
       <div className='tef-layout-content-row tef-layout-no-padding-bottom'>
         <div className='tef-layout-label tef-special-first-label'> Name </div>
         <div className='tef-layout-autocomplete-spacer'> {inputFieldName} </div>
-        {  showOriginalName ?
+        {showOriginalName ?
           <div
             className='template-editor-field-label-group'
             style={originalNameLabelStyle}
@@ -219,88 +176,9 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     return fieldNameSection;
   }
 
-  public renderAnalyzerSection()
-  {
-    const { field } = this.props;
-    const inputDisabled = this._inputDisabled();
-
-    const analyzedCheckbox = (
-      <CheckBox
-        checked={field.isAnalyzed}
-        onChange={voidFunction}
-        disabled={inputDisabled}
-      />
-    );
-
-    return (
-      <div
-        className='template-editor-analyzed-section'
-        style={field.isAnalyzed ? fontColor(Colors().text1) : fontColor(Colors().text3)}
-        onClick={this._noopIfDisabled(this.handleAnalyzedCheckboxClicked)}
-      >
-        <div className='tef-layout-checkbox-spacer'> {analyzedCheckbox} </div>
-        <div className='tef-layout-label tef-right'>  Analyzed </div>
-      </div>
-    );
-  }
-
-  public renderArrayTypeSection()
-  {
-    const { field } = this.props;
-    const inputDisabled = this._inputDisabled();
-
-    return field.arrayType.flatMap((value, i) => {
-      const arrayTypeDropdown = (
-        <Dropdown
-          options={elasticTypeOptions}
-          selectedIndex={this.getArrayTypeListIndex(i)}
-          canEdit={!inputDisabled}
-          onChange={this.handleChangeArrayType(i)}
-        />
-      );
-      return List([
-        <div className='tef-layout-label' key={`of ${i}`}> of </div>,
-        <div className='tef-layout-dropdown-spacer' key={`dropdown ${i}`}> {arrayTypeDropdown} </div>,
-      ]);
-    });
-  }
-
-  public renderTypeSection()
-  {
-    const { field } = this.props;
-    const inputDisabled = this._inputDisabled();
-
-    const fieldTypeDropdown = (
-      <Dropdown
-        options={elasticTypeOptions}
-        selectedIndex={this.getDataTypeListIndex()}
-        canEdit={!inputDisabled}
-        onChange={this.handleChangeDataType}
-      />
-    );
-
-    const showArrayTypeSection = field.type === ELASTIC_TYPES.ARRAY;
-    const showAnalyzedSection = field.type === ELASTIC_TYPES.TEXT ||
-      (
-        field.type === ELASTIC_TYPES.ARRAY &&
-        field.arrayType.size > 0 &&
-        field.arrayType.get(field.arrayType.size - 1) === ELASTIC_TYPES.TEXT
-      );
-    // TODO make it show only for import
-
-    return (
-      <div className='tef-layout-content-row tef-layout-allow-wrap'>
-        <div className='tef-layout-label tef-special-first-label'> Type </div>
-        <div className='tef-layout-dropdown-spacer'> {fieldTypeDropdown} </div>
-        { showArrayTypeSection && this.renderArrayTypeSection().map((v, i) => v)}
-        { showAnalyzedSection && this.renderAnalyzerSection()}
-      </div>
-    );
-  }
-
   public render()
   {
-    const { field, canEdit } = this.props;
+    const { field, canEdit, keyPath } = this.props;
     const inputDisabled = this._inputDisabled();
     const disableCheckbox = !canEdit; // only disable checkbox if it is disabled from a parent
 
@@ -329,7 +207,13 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
           <div className='tef-layout-row'>
             <div className='tef-layout-column'>
               {this.renderFieldNameSection()}
-              {this.renderTypeSection()}
+              {
+                <TemplateEditorFieldTypeSection
+                  field={field}
+                  canEdit={canEdit}
+                  keyPath={keyPath}
+                />
+              }
             </div>
             <div className='tef-layout-padded flex-container-center'>
               <div className='tef-menu-wrapper-positioning'>
@@ -359,74 +243,12 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     });
   }
 
-  public handleChangeDataType(index)
-  {
-    if (index >= elasticTypeOptions.size || index < 0 )
-    {
-      return; // this should technically be impossible
-    }
-    else
-    {
-      const nextType = elasticTypeOptions.get(index);
-      const currentType = this.props.field.type;
-      if (currentType === ELASTIC_TYPES.ARRAY && nextType !== ELASTIC_TYPES.ARRAY)
-      { // if user changes type from array, clear the array type
-        this._set('arrayType', List([ELASTIC_TYPES.TEXT]));
-      }
-      else if (currentType === ELASTIC_TYPES.NESTED && nextType !== ELASTIC_TYPES.NESTED)
-      { // if user changes type from nested to something else, clear the children
-        this._clearChildren();
-      }
-      this._set('type', elasticTypeOptions.get(index));
-    }
-  }
-
-  // memoized
-  public handleChangeArrayType(arrayTypeIndex: number)
-  {
-    return (index: number) => {
-      if (arrayTypeIndex >= this.props.field.arrayType.size
-        || arrayTypeIndex < 0
-        || index >= elasticTypeOptions.size
-        || index < 0)
-      {
-        return;
-      }
-      else
-      {
-        const newArray = this.props.field.arrayType.set(arrayTypeIndex, elasticTypeOptions.get(index));
-        this._set('arrayType', this.cleanArrayType(newArray));
-      }
-    }
-  }
-
-  public handleAnalyzedCheckboxClicked()
-  {
-    this._set('isAnalyzed', !this.props.field.isAnalyzed);
-  }
-
   public handleIncludeCheckboxClicked()
   {
     this._set('isIncluded', !this.props.field.isIncluded);
   }
 
 }
-
-const elasticTypeOptions = List([
-  ELASTIC_TYPES.TEXT,
-  ELASTIC_TYPES.LONG,
-  ELASTIC_TYPES.BOOLEAN,
-  ELASTIC_TYPES.DATE,
-  ELASTIC_TYPES.ARRAY,
-  ELASTIC_TYPES.NESTED,
-  ELASTIC_TYPES.DOUBLE,
-  ELASTIC_TYPES.SHORT,
-  ELASTIC_TYPES.BYTE,
-  ELASTIC_TYPES.INTEGER,
-  ELASTIC_TYPES.HALF_FLOAT,
-  ELASTIC_TYPES.FLOAT,
-  ELASTIC_TYPES.GEO_POINT,
-]);
 
 const originalNameLabelStyle = [
   fontColor(Colors().text3),
@@ -438,8 +260,6 @@ const originalNameAutocompleteStyle = [
 ];
 
 const emptyOptions = List([]);
-
-const voidFunction = () => { /* do nothing */ }
 
 export default Util.createTypedContainer(
   TemplateEditorFieldSettings,
