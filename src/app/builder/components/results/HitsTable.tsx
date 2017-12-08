@@ -96,7 +96,6 @@ export default class HitsTable extends TerrainComponent<Props>
       storeKeyPath: ['spotlights'],
       stateKey: 'spotlights',
     });
-    // using the spotlights set the correct indexes
   }
 
   public componentWillMount()
@@ -106,7 +105,7 @@ export default class HitsTable extends TerrainComponent<Props>
     const spotlightKeys = _.keys(spotlights.toJS());
     this.props.hits.forEach((r, index) =>
     {
-      if (spotlightKeys.includes(r.fields.get('_id')))
+      if (spotlightKeys.includes(r.primaryKey))
       {
         selectedIndexes = selectedIndexes.push(index);
       }
@@ -125,12 +124,11 @@ export default class HitsTable extends TerrainComponent<Props>
       const spotlights = SpotlightStore.getState().spotlights;
       // using the spotlights set the correct indexes
       // force the table to update
-
       let selectedIndexes = List([]);
-      const spotlightKeys = _.keys(spotlights);
+      const spotlightKeys = _.keys(spotlights.toJS());
       nextProps.hits.forEach((r, index) =>
       {
-        if (spotlightKeys.includes(r.fields.get('_id')))
+        if (spotlightKeys.includes(r.primaryKey))
         {
           selectedIndexes = selectedIndexes.push(index);
         }
