@@ -134,7 +134,6 @@ class Autocomplete extends TerrainComponent<Props>
     {
       this.props.onChange(value);
     }
-
   }
 
   public handleFocus(event: React.FocusEvent<any>)
