@@ -46,36 +46,36 @@ THE SOFTWARE.
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import VariantsColumn from 'library/components/VariantsColumn';
+import AlgorithmsColumn from 'library/components/AlgorithmsColumn';
 import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import configureStore from 'redux-mock-store';
 
-describe('VariantsColumn', () =>
+describe('AlgorithmsColumn', () =>
 {
-  const groupId = 1;
-  const algId = 2;
-  const variantId = 3;
+  const categoryId = 1;
+  const groupId = 2;
+  const algorithmId = 3;
   let library = _LibraryState({
-    groups: Immutable.Map<number, LibraryTypes.Group>({}),
-    algorithms: Immutable.Map<number, LibraryTypes.Group>({}),
-    variants: Immutable.Map<number, LibraryTypes.Variant>({}),
+    categories: Immutable.Map<number, LibraryTypes.Category>({}),
+    groups: Immutable.Map<number, LibraryTypes.Category>({}),
+    algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({}),
   });
 
   library = library
+    .setIn(['categories', categoryId], LibraryTypes._Category({
+      id: categoryId,
+      name: 'Category 1',
+    }))
     .setIn(['groups', groupId], LibraryTypes._Group({
       id: groupId,
       name: 'Group 1',
     }))
-    .setIn(['algorithms', algId], LibraryTypes._Algorithm({
-      id: algId,
+    .setIn(['algorithms', algorithmId], LibraryTypes._Algorithm({
+      id: algorithmId,
       name: 'Algorithm 1',
-    }))
-    .setIn(['variants', variantId], LibraryTypes._Variant({
-      id: variantId,
-      name: 'Variant 1',
     }));
 
   const analytics: AnalyticsState = _AnalyticsState({
@@ -89,25 +89,25 @@ describe('VariantsColumn', () =>
     fetch: () => { return; },
   };
 
-  const selectedVariant = 3;
+  const selectedAlgorithm = 3;
 
-  let variantsColumnComponent = null;
+  let algorithmsColumnComponent = null;
 
   beforeEach(() =>
   {
-    variantsColumnComponent = shallow(
-      <VariantsColumn
+    algorithmsColumnComponent = shallow(
+      <AlgorithmsColumn
         basePath={'/library'}
-        variants={library.variants}
-        variantsOrder={library.algorithms.get(algId).variantsOrder}
-        groupId={groupId}
-        algorithmId={algId}
         algorithms={library.algorithms}
-        selectedVariant={selectedVariant}
+        algorithmsOrder={library.groups.get(groupId).algorithmsOrder}
+        categoryId={categoryId}
+        groupId={groupId}
+        groups={library.groups}
+        selectedAlgorithm={selectedAlgorithm}
         analytics={analytics}
         analyticsActions={analyticsActions}
         canPinItems={false}
-        router={{ params: { groupId: '1' }, location: { query: '' } }}
+        router={{ params: { categoryId: '1' }, location: { query: '' } }}
       />,
     );
   });
@@ -119,10 +119,10 @@ describe('VariantsColumn', () =>
       it('should redirect to the builder', () =>
       {
         browserHistory.push = jest.fn();
-        variantsColumnComponent.instance().handleDoubleClick(variantId);
+        algorithmsColumnComponent.instance().handleDoubleClick(algorithmId);
 
         expect(browserHistory.push).toHaveBeenCalledTimes(1);
-        expect(browserHistory.push).toHaveBeenCalledWith(`/builder/?o=${variantId}`);
+        expect(browserHistory.push).toHaveBeenCalledWith(`/builder/?o=${algorithmId}`);
       });
     });
 
@@ -130,24 +130,24 @@ describe('VariantsColumn', () =>
     {
       it('should NOT redirect to the builder', () =>
       {
-        variantsColumnComponent = shallow(
-          <VariantsColumn
+        algorithmsColumnComponent = shallow(
+          <AlgorithmsColumn
             basePath={'/library'}
-            variants={library.variants}
-            variantsOrder={library.algorithms.get(algId).variantsOrder}
-            groupId={groupId}
-            algorithmId={algId}
             algorithms={library.algorithms}
-            selectedVariant={selectedVariant}
+            algorithmsOrder={library.groups.get(groupId).algorithmsOrder}
+            categoryId={categoryId}
+            groupId={groupId}
+            groups={library.groups}
+            selectedAlgorithm={selectedAlgorithm}
             analytics={analytics}
             analyticsActions={analyticsActions}
             canPinItems={true}
-            router={{ params: { groupId: '1' }, location: { query: '' } }}
+            router={{ params: { categoryId: '1' }, location: { query: '' } }}
           />,
         );
 
         browserHistory.push = jest.fn();
-        variantsColumnComponent.instance().handleDoubleClick(variantId);
+        algorithmsColumnComponent.instance().handleDoubleClick(algorithmId);
 
         expect(browserHistory.push).not.toHaveBeenCalled();
       });

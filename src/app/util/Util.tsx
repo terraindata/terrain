@@ -130,7 +130,7 @@ const Util = {
       );
   },
 
-  haveRole(groupId: ID, role: string, UserStore, RolesStore)
+  haveRole(categoryId: ID, role: string, UserStore, RolesStore)
   {
     return true;
     // const me = UserStore.getState().get('currentUser');
@@ -139,7 +139,7 @@ const Util = {
     //   return false;
     // }
 
-    // return !! RolesStore.getState().getIn([groupId, me.id, role]);
+    // return !! RolesStore.getState().getIn([categoryId, me.id, role]);
   },
 
   duplicateNameFor(name: string): string
@@ -173,20 +173,20 @@ const Util = {
     {
       return false;
     }
-    if (item.type === 'group' && me.isAdmin)
+    if (item.type === 'category' && me.isAdmin)
     {
       return true;
     }
 
-    const groupId = item.type === 'group' ? item.id : item['groupId'];
-    if (Util.haveRole(groupId, 'admin', UserStore, RolesStore))
+    const categoryId = item.type === 'category' ? item.id : item['categoryId'];
+    if (Util.haveRole(categoryId, 'admin', UserStore, RolesStore))
     {
       return true;
     }
 
-    if (item.type !== 'group')
+    if (item.type !== 'category')
     {
-      return Util.haveRole(groupId, 'builder', UserStore, RolesStore);
+      return Util.haveRole(categoryId, 'builder', UserStore, RolesStore);
     }
 
     return false;
@@ -685,6 +685,11 @@ const Util = {
       mapStateToProps,
       mapDispatchToProps,
     )(component);
+  },
+
+  createTypedContainer<ComponentType>(component: ComponentType, stateToPropsKeys, dispatchToPropsMap): ComponentType
+  {
+    return Util.createContainer(component, stateToPropsKeys, dispatchToPropsMap);
   },
 };
 

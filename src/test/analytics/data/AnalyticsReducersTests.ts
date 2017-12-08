@@ -82,7 +82,7 @@ describe('AnalyticsReducer', () =>
     ],
   };
 
-  const variantId = 1;
+  const algorithmId = 1;
 
   const availableMetrics = [
     {
@@ -259,27 +259,27 @@ describe('AnalyticsReducer', () =>
     });
   });
 
-  describe('#pinVariant', () =>
+  describe('#pinAlgorithm', () =>
   {
-    it('should handle analytics.pinVariant', () =>
+    it('should handle analytics.pinAlgorithm', () =>
     {
       let nextState = reducer(analytics, {
-        type: ActionTypes.pinVariant,
+        type: ActionTypes.pinAlgorithm,
         payload: {
-          variantId,
+          algorithmId,
         },
       });
 
-      expect(nextState.pinnedVariants.get(variantId)).toEqual(true);
+      expect(nextState.pinnedAlgorithms.get(algorithmId)).toEqual(true);
 
       nextState = reducer(nextState, {
-        type: ActionTypes.pinVariant,
+        type: ActionTypes.pinAlgorithm,
         payload: {
-          variantId,
+          algorithmId,
         },
       });
 
-      expect(nextState.pinnedVariants.get(variantId)).toEqual(false);
+      expect(nextState.pinnedAlgorithms.get(algorithmId)).toEqual(false);
     });
   });
 

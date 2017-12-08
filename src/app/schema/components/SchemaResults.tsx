@@ -66,7 +66,8 @@ import InfoArea from '../../common/components/InfoArea';
 export interface Props
 {
   servers: SchemaTypes.ServerMap;
-  schema: SchemaTypes.SchemaState;
+  // injected props
+  schema?: SchemaTypes.SchemaState;
 }
 
 @Radium
@@ -241,7 +242,7 @@ class SchemaResults extends TerrainComponent<Props>
                 query={this.state.resultsQuery}
                 canEdit={false}
                 db={this.state.resultsServer}
-                variantName={''}
+                algorithmName={''}
                 onNavigationException={PropTypes.func}
                 resultsState={this.state.resultsState}
                 showExport={false}
@@ -267,7 +268,7 @@ class SchemaResults extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaResults,
   ['schema'],
   {},

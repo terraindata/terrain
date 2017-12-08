@@ -72,7 +72,7 @@ export async function search(req: Request): Promise<object[]>
     await new Promise((resolve, reject) =>
     {
       client.ping({
-        requestTimeout: 100,
+        requestTimeout: 500,
       }, makePromiseCallback(resolve, reject));
     });
   }

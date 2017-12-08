@@ -52,13 +52,13 @@ class AnalyticsStateC
   public loaded = false;
   public errors: string[] = [];
   public data: IMMap<ID, any> = Immutable.Map({});
-  // TODO: dynamically populate metrics for each variant and select the first metric
+  // TODO: dynamically populate metrics for each algorithm and select the first metric
   public selectedMetric: string = 'impression';
   public selectedInterval: string = 'day';
   public selectedDateRange: ID = 3;
   public selectedDateRangeDomain: { start: number, end: number } = { start: 0, end: 0 };
   public selectedAnalyticsConnection: string = '';
-  public pinnedVariants: Immutable.Map<ID, boolean> = Immutable.Map<ID, boolean>({});
+  public pinnedAlgorithms: Immutable.Map<ID, boolean> = Immutable.Map<ID, boolean>({});
   public availableMetrics: Immutable.List<any> = Immutable.List<any>([]);
 }
 

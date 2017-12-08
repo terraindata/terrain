@@ -83,7 +83,7 @@ const TransformChart = {
 
     svg.append('rect')
       .attr('class', 'bg')
-      .attr('fill', '#fff');
+      .attr('fill', Colors().transformChartBg);
 
     svg.append('g')
       .attr('class', 'yLeftAxis');
@@ -602,7 +602,7 @@ const TransformChart = {
             const distanceRatio = (x - first['x']) / (second['x'] - first['x']);
             yVal = first['y'] * (1 - distanceRatio) + second['y'] * distanceRatio;
           }
-          else
+          else if (first || second)
           {
             yVal = (first || second)['y'];
           }
@@ -1651,7 +1651,7 @@ const TransformChart = {
     point
       .attr('cx', pointXValue)
       .attr('cy', pointYValue)
-      .attr('fill', '#fff')
+      .attr('fill', Colors().transformChartBg)
       .attr('style', (d) => 'stroke: ' + (d['selected'] ? Colors().error : colors[0]))
       .attr('class', (d) =>
         'point' + (d['selected'] ? ' point-selected' : '')

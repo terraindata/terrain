@@ -62,7 +62,7 @@ import { Template, Transform } from '../../fileImport/FileImportTypes';
 
 export class BuilderStateClass
 {
-  public variantId: ID = '';
+  public algorithmId: ID = '';
   public query: Query = null;
 
   // for undo/redo
@@ -74,7 +74,7 @@ export class BuilderStateClass
 
   public loading: boolean = false;
   public loadingXhr: XMLHttpRequest = null;
-  public loadingVariantId: ID = '';
+  public loadingAlgorithmId: ID = '';
 
   public hoveringCardId: ID = '';
 
@@ -94,6 +94,8 @@ export class BuilderStateClass
 
   public resultsState: ResultsState = _ResultsState();
   public exportState: FileImportState = _FileImportState();
+
+  public modelVersion = 3;
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
 const BuilderState_Record = Immutable.Record(new BuilderStateClass());
@@ -161,6 +163,13 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
         .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
         .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
         .setIn(['query', 'cardsAndCodeInSync'], true);
+    }
+
+    if (!state.modelVersion || state.modelVersion < 3)
+    {
+      state = state.set('modelVersion', 3);
+      state = state.set('algorithmId', (state as any).variantId);
+      state = state.set('loadingAlgorithmId', (state as any).loadingVariantId);
     }
 
     return state;

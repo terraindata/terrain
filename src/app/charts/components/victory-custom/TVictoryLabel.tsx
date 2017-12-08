@@ -43,20 +43,17 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
+import * as React from 'react';
+import { VictoryLabel } from 'victory';
 
-export let SchemaActionTypes =
-  {
-    fetch: '',
-    setServer: '', // sets the schema for a database
-    addDbToServer: '',
-    error: '',
-    serverCount: '',
+interface Props
+{
+  datum?: any;
+}
 
-    highlightId: '',
-    selectId: '',
-  };
+const TVictoryLabel = (props: Props) => (
+  props.datum.isPinned ?
+    <VictoryLabel dx='10' {...props} /> : <VictoryLabel {...props} />
+);
 
-Util.setValuesToKeys(SchemaActionTypes, 'schema');
-
-export default SchemaActionTypes;
+export default TVictoryLabel;

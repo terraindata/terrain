@@ -73,6 +73,9 @@ export default class ElasticQueryHandler extends QueryHandler
 {
   private controller: ElasticController;
 
+  private GROUP_JOIN_SEARCH_THRESHOLD = 10000;
+  private GROUP_JOIN_MSEARCH_THRESHOLD = 1000;
+
   constructor(controller: ElasticController)
   {
     super();
@@ -147,13 +150,23 @@ export default class ElasticQueryHandler extends QueryHandler
 
     return new Promise<QueryResponse>(async (resolve, reject) =>
     {
+      let parentResults;
       const client: ElasticClient = this.controller.getClient();
-      const parentResults = await new Promise<QueryResponse>((res, rej) =>
+      const size = (parentQuery !== undefined && parentQuery.size !== undefined) ? parentQuery.size : 0;
+      if (size < this.GROUP_JOIN_SEARCH_THRESHOLD)
       {
-        client.search(parentQuery, this.makeQueryCallback(res, rej));
-      });
+        parentResults = await new Promise<QueryResponse>((res, rej) =>
+        {
+          client.search(parentQuery, this.makeQueryCallback(res, rej));
+        });
 
-      winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
+        winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
+      }
+      else
+      {
+        // todo: perform scrolled query here
+        throw new Error('Not implemented');
+      }
 
       const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
       if (valueInfo === null)
@@ -170,7 +183,7 @@ export default class ElasticQueryHandler extends QueryHandler
           const vi = valueInfo.objectChildren[subQuery].propertyValue;
           if (vi !== null)
           {
-            promises.push(this.handleGroupJoinSubQuery(vi, parentResults));
+            promises.push(this.handleGroupJoinSubQuery(vi, subQuery, parentResults));
           }
           else
           {
@@ -180,23 +193,14 @@ export default class ElasticQueryHandler extends QueryHandler
         }
         catch (e)
         {
-          reject(e);
+          return reject(e);
         }
       }
 
-      const subQueryResults = await Promise.all(promises);
-      winston.debug('subQueryResults for handleGroupJoin: ' + JSON.stringify(subQueryResults, null, 2));
+      await Promise.all(promises);
       if (parentResults.hasError())
       {
-        reject(parentResults);
-      }
-
-      for (let i = 0; i < parentResults.result.hits.hits.length; ++i)
-      {
-        for (let j = 0; j < subQueries.length; ++j)
-        {
-          parentResults.result.hits.hits[i][subQueries[j]] = subQueryResults[j].result.responses[i].hits.hits;
-        }
+        return reject(parentResults);
       }
 
       winston.debug('parentResults (annotated with subQueryResults): ' + JSON.stringify(parentResults.result, null, 2));
@@ -204,33 +208,55 @@ export default class ElasticQueryHandler extends QueryHandler
     });
   }
 
-  private handleGroupJoinSubQuery(valueInfo: ESValueInfo, parentResults: any)
+  private async handleGroupJoinSubQuery(valueInfo: ESValueInfo, subQuery: string, parentResults: any)
   {
-    return new Promise<QueryResponse>((resolve, reject) =>
+    const hits = parentResults.result.hits.hits;
+    const promises: Array<Promise<any>> = [];
+    for (let i = 0, chunkSize = this.GROUP_JOIN_MSEARCH_THRESHOLD; i < hits.length; i += chunkSize)
     {
-      const body: any[] = [];
+      if (i + chunkSize > hits.length)
+      {
+        chunkSize = hits.length - i;
+      }
 
       // todo: optimization to avoid repeating index and type if they're the same
       // const index = (childQuery.index !== undefined) ? childQuery.index : undefined;
       // const type = (childQuery.type !== undefined) ? childQuery.type : undefined;
 
-      for (const r of parentResults.result.hits.hits)
+      promises.push(new Promise((resolve, reject) =>
       {
-        winston.debug('parentObject ' + JSON.stringify(r._source, null, 2));
-        const header = {};
-        body.push(header);
-
-        const queryStr = ESParameterFiller.generate(valueInfo, { parent: r._source });
-        body.push(queryStr);
-      }
-
-      const client: ElasticClient = this.controller.getClient();
-      client.msearch(
+        const body: any[] = [];
+        for (let j = i; j < i + chunkSize; ++j)
         {
-          body,
-        },
-        this.makeQueryCallback(resolve, reject));
-    });
+          winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
+          const header = {};
+          body.push(header);
+
+          const queryStr = ESParameterFiller.generate(valueInfo, { parent: hits[j]._source });
+          body.push(queryStr);
+        }
+
+        const client: ElasticClient = this.controller.getClient();
+        client.msearch(
+          {
+            body,
+          },
+          (error: Error | null, response: any) =>
+          {
+            if (error !== null && error !== undefined)
+            {
+              return reject(error);
+            }
+
+            for (let j = 0; j < chunkSize; ++j)
+            {
+              hits[i + j][subQuery] = response.responses[j].hits.hits;
+            }
+            resolve();
+          });
+      }));
+    }
+    return Promise.all(promises);
   }
 
   private getParsedQuery(bodyStr: string): ESParser

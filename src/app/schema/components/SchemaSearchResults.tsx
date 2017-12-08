@@ -63,7 +63,8 @@ type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 export interface Props
 {
   search: string;
-  schema: SchemaState;
+  // injected props
+  schema?: SchemaState;
 }
 
 let INIT_SHOWING_COUNT: IMMap<string, number> = Immutable.Map<string, number>({});
@@ -288,7 +289,7 @@ class SchemaSearchResults extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaSearchResults,
   ['schema'],
   {},
