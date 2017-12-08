@@ -88,17 +88,22 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   {
     super(props);
     this._getContextMenuOptions = memoizeOne(this._getContextMenuOptions);
-    this._getDataTypeListIndex = memoizeOne(this._getDataTypeListIndex);
+    this._getTypeListIndex = _.memoize(this._getTypeListIndex);
   }
 
-  public _getDataTypeListIndex(type): number
+  public _getTypeListIndex(type): number
   {
     return elasticTypeOptions.indexOf(type);
   }
 
   public getDataTypeListIndex(): number
   {
-    return this._getDataTypeListIndex(this.props.field.type);
+    return this._getTypeListIndex(this.props.field.type);
+  }
+
+  public getArrayTypeListIndex(): number
+  {
+    return this._getTypeListIndex(this.props.field.arrayType);
   }
 
   public _getContextMenuOptions(isExport: boolean): List<MenuOption>
@@ -131,65 +136,125 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         onChange={this._setFactory('name')}
         disabled={inputDisabled}
         options={emptyOptions}
+        style={fontColor(Colors().text1)}
       />;
 
-    const inputOriginalName = this.state.originalNameOpen ?
-      <div className='tef-layout-autocomplete-spacer'>
-        <Autocomplete
-          value={field.originalName}
-          onChange={this._setFactory('originalName')}
-          disabled={inputDisabled}
-          options={emptyOptions}
-          onFocus={this.enableOriginalNameInput}
-          onBlur={this.disableOriginalNameInput}
-          autoFocus={true}
-          style={originalNameAutocompleteStyle}
-        />
-      </div>
-      :
-      <div className='tef-layout-label tef-center normal-text'>
-        &nbsp;{field.originalName}
-      </div>
+    const showOriginalName = field.name !== field.originalName;
+    let inputOriginalName = <div/>
+
+    if (showOriginalName)
+    {
+      inputOriginalName = this.state.originalNameOpen ?
+        <div className='tef-layout-autocomplete-spacer'>
+          <Autocomplete
+            value={field.originalName}
+            onChange={this._setFactory('originalName')}
+            disabled={inputDisabled}
+            options={emptyOptions}
+            onFocus={this.enableOriginalNameInput}
+            onBlur={this.disableOriginalNameInput}
+            autoFocus={true}
+            style={originalNameAutocompleteStyle}
+          />
+        </div>
+        :
+        <div className='tef-layout-label tef-center normal-text'>
+          &nbsp;{field.originalName}
+        </div>
+    }
 
     const fieldNameSection = (
       <div className='tef-layout-content-row tef-layout-no-padding-bottom'>
         <div className='tef-layout-label tef-special-first-label'> Name </div>
         <div className='tef-layout-autocomplete-spacer'> {inputFieldName} </div>
-        <div
-          className='template-editor-field-label-group'
-          style={originalNameLabelStyle}
-          onClick={this._noopIfDisabled(this.enableOriginalNameInput)}
-          key={this.state.originalNameOpen ? 'autocomplete' : 'label'}
-        >
-          <div className='tef-layout-label tef-left normal-text'> (from </div>
-          {inputOriginalName}
-          <div className='tef-layout-label tef-right normal-text'> ) </div>
-        </div>
+        {  showOriginalName ?
+          <div
+            className='template-editor-field-label-group'
+            style={originalNameLabelStyle}
+            onClick={this._noopIfDisabled(this.enableOriginalNameInput)}
+            key={this.state.originalNameOpen ? 'autocomplete' : 'label'}
+          >
+            <div className='tef-layout-label tef-left normal-text'> (from </div>
+            {inputOriginalName}
+            <div className='tef-layout-label tef-right normal-text'> ) </div>
+          </div> : undefined
+        }
       </div>
     );
 
     return fieldNameSection;
   }
 
+  public renderAnalyzerSection()
+  {
+    const { field } = this.props;
+    const inputDisabled = this._inputDisabled();
+
+    const analyzedCheckbox = (
+      <CheckBox
+        checked={field.isAnalyzed}
+        onChange={voidFunction}
+        disabled={inputDisabled}
+      />
+    );
+
+    return (
+      <div
+        className='template-editor-analyzed-section'
+        style={field.isAnalyzed ? fontColor(Colors().text1) : fontColor(Colors().text3)}
+        onClick={this._noopIfDisabled(this.handleAnalyzedCheckboxClicked)}
+      >
+        <div className='tef-layout-checkbox-spacer'> {analyzedCheckbox} </div>
+        <div className='tef-layout-label tef-right'>  Analyzed </div>
+      </div>
+    );
+  }
+
+  public renderArrayTypeSection()
+  {
+    const { field } = this.props;
+    const inputDisabled = this._inputDisabled();
+
+    const arrayTypeDropdown = (
+      <Dropdown
+        options={elasticTypeOptions}
+        selectedIndex={this.getArrayTypeListIndex()}
+        canEdit={!inputDisabled}
+        onChange={this.handleChangeArrayType}
+      />
+    );
+
+    return List([
+      <div className='tef-layout-label' key='of'> of </div>,
+      <div className='tef-layout-dropdown-spacer' key='dropdown'> {arrayTypeDropdown} </div>,
+    ]);
+  }
+
   public renderTypeSection()
   {
-    const { field, canEdit } = this.props;
+    const { field } = this.props;
     const inputDisabled = this._inputDisabled();
 
     const fieldTypeDropdown = (
       <Dropdown
         options={elasticTypeOptions}
         selectedIndex={this.getDataTypeListIndex()}
-        canEdit={canEdit}
+        canEdit={!inputDisabled}
         onChange={this.handleChangeDataType}
       />
-    )
+    );
+
+    const showArrayTypeSection = field.type === ELASTIC_TYPES.ARRAY;
+    const showAnalyzedSection = field.type === ELASTIC_TYPES.TEXT ||
+      (field.type === ELASTIC_TYPES.ARRAY && field.arrayType === ELASTIC_TYPES.TEXT);
+    // TODO make it show only for import
+
     return (
       <div className='tef-layout-content-row'>
         <div className='tef-layout-label tef-special-first-label'> Type </div>
         <div className='tef-layout-dropdown-spacer'> {fieldTypeDropdown} </div>
-        <div className='tef-layout-label'>  Analyzed </div>
-        <div className='tef-layout-dropdown-spacer'> {fieldTypeDropdown} </div>
+        { showArrayTypeSection && this.renderArrayTypeSection().map((v, i) => v)}
+        { showAnalyzedSection && this.renderAnalyzerSection()}
       </div>
     );
   }
@@ -201,7 +266,10 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     const disableCheckbox = !canEdit; // only disable checkbox if it is disabled from a parent
 
     return (
-      <div className='template-editor-field-row'>
+      <div
+        className='template-editor-field-row'
+        style={fontColor(Colors().text1)}
+      >
         <div className='include-field-checkbox-spacer'>
           <CheckBox
             checked={field.isIncluded}
@@ -264,9 +332,26 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     }
   }
 
+  public handleChangeArrayType(index)
+  {
+    if (index >= elasticTypeOptions.size || index < 0 )
+    {
+      return;
+    }
+    else
+    {
+      this._set('arrayType', elasticTypeOptions.get(index));
+    }
+  }
+
+  public handleAnalyzedCheckboxClicked()
+  {
+    this._set('isAnalyzed', !this.props.field.isAnalyzed);
+  }
+
   public handleIncludeCheckboxClicked()
   {
-    this._set('isIncluded', !this.props.field.isIncluded)
+    this._set('isIncluded', !this.props.field.isIncluded);
   }
 
 }
@@ -292,10 +377,13 @@ const originalNameLabelStyle = [
 ];
 
 const originalNameAutocompleteStyle = [
-  getStyle('width', '160px')
+  getStyle('width', '160px'),
+  fontColor(Colors().text1),
 ];
 
 const emptyOptions = List([]);
+
+const voidFunction = () => { /* do nothing */ }
 
 export default Util.createTypedContainer(
   TemplateEditorFieldSettings,

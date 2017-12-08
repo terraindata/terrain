@@ -153,6 +153,7 @@ class TemplateFieldC
   public isAnalyzed: boolean = true; // import only
   public isIncluded: boolean = true;
   public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
+  public arrayType: ELASTIC_TYPES = ELASTIC_TYPES.TEXT; // if type is array
   public analyzer: string = '';
   public originalName: string = '';
   public name: string = '';
