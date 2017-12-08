@@ -74,7 +74,7 @@ export class Router
      * @apiDescription Track an analytics event using a POST request. Event parameters can be provided using the POST payload / body.
      *
      * @apiParam {String} eventname Mandatory Name of the tracking event
-     * @apiParam {Number} variantid Mandatory ID of the Terrain variant to track this event for
+     * @apiParam {Number} algorithmid Mandatory ID of the Terrain algorithm to track this event for
      * @apiParam {Number} visitorid Mandatory A unique ID to identify the current visitor
      * @apiParam {Object} meta Mandatory Auxiliary information associated with the tracking event
      * @apiParam {Object} batch Optional A batch registration request
@@ -92,7 +92,7 @@ export class Router
      * @apiGroup Tracking
      *
      * @apiParam {String} eventname Name of the tracking event
-     * @apiParam {Number} variantid ID of the Terrain variant to track this event for
+     * @apiParam {Number} algorithmid ID of the Terrain algorithm to track this event for
      * @apiParam {Number} visitorid A unique ID to identify the current visitor
      * @apiParam {Object} meta Auxiliary information associated with the tracking event
      * @apiParam {Object} batch Optional A batch registration request
@@ -100,7 +100,7 @@ export class Router
      * @apiDescription Track an analytics event using a GET request. Event parameters can be provided using the GET query string.
      *
      * @apiExample {curl} Example usage:
-     *     curl http://localhost:3001/v1?eventname=impression&visitorid=3161077040&variantid=123&meta=~(itemName~343~itemType~%27movie)
+     *     curl http://localhost:3001/v1?eventname=impression&visitorid=3161077040&algorithmid=123&meta=~(itemName~343~itemType~%27movie)
      */
     this.router.get('/', async (ctx, next) =>
     {
@@ -155,7 +155,7 @@ export class Router
      * @apiParam {String} s Elasticsearch server to query
      * @apiParam {String} q Title to search
      * @apiParam {Number} p Page number
-     * @apiParam {Number} v Variant ID
+     * @apiParam {Number} v Algorithm ID
      *
      * @apiParamExample {json} Request-Example:
      *     {
@@ -208,7 +208,7 @@ export class Router
 
     const ev: EventConfig = {
       eventname: event['eventname'],
-      variantid: event['variantid'],
+      algorithmid: event['algorithmid'],
       visitorid: event['visitorid'],
       source: {
         ip: request.ip,

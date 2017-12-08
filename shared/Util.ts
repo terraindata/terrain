@@ -46,6 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length
 
+import * as _ from 'lodash';
+
 const BAD_DELIMITERS =
   [
     '\r',
@@ -348,6 +350,17 @@ export function getTemplateId(template: string): number
 
 export class CSVTypeParser
 {
+  public getBestTypeFromArrayAsArray(values: string[]): string[]
+  {
+    const types: Set<string> = new Set();
+    for (const value of values)
+    {
+      types.add(JSON.stringify(this._getCSVTypeAsArray(value)));
+    }
+    const bestType: string[] = this._getBestTypeFromArrayHelper(types);
+    return bestType[0] === 'BAD' ? ['text'] : bestType;
+  }
+
   public getDoubleFromString(value: string): number | boolean
   {
     const parsedValue: number | boolean = this._getDoubleFromStringHelper(value);
@@ -374,16 +387,72 @@ export class CSVTypeParser
     return false;
   }
 
-  public getBestTypeFromArrayAsArray(values: string[]): string[]
+  public isArrayHelper(value: string): boolean
   {
-    const types: Set<string> = new Set();
-    for (const value of values)
+    let parsedValue: any;
+    try
     {
-      types.add(JSON.stringify(this._getCSVTypeAsArray(value)));
+      parsedValue = JSON.parse(value);
     }
-    const bestType: string[] = this._getBestTypeFromArrayHelper(types);
-    return bestType[0] === 'BAD' ? ['text'] : bestType;
+    catch (e)
+    {
+      return false;
+    }
+    return Array.isArray(parsedValue);
   }
+
+  public isBooleanHelper(value: string): boolean
+  {
+    let parsedValue: any;
+    try
+    {
+      parsedValue = JSON.parse(value);
+    }
+    catch (e)
+    {
+      return false;
+    }
+    return parsedValue === false || parsedValue === true;
+  }
+
+  public isDateHelper(value: string): boolean
+  {
+    const MMDDYYYYRegex = new RegExp(/^((0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4}))$/);
+    const YYYYMMDDRegex = new RegExp(/([0-9]{4}-[0,1]{1}[0-9]{1}-[0-3]{1}[0-9]{1})/);
+    const ISORegex = new RegExp(/^([0-9]{4})-([0,1]{1}[0-9]{1})-([0-3]{1}[0-9]{1})( |T){0,1}([0-2]{1}[0-9]{1}):{0,1}([0-5]{1}[0-9]{1}):{0,1}([0-9]{2})(\.([0-9]{3,6})|((-|\+)?[0-9]{2}:[0-9]{2}))?Z?$/);
+    return MMDDYYYYRegex.test(value) || YYYYMMDDRegex.test(value) || ISORegex.test(value);
+  }
+
+  public isDoubleHelper(value: string): boolean
+  {
+    const parsedValue: number | boolean = this.getDoubleFromString(value);
+    return (typeof parsedValue) === 'number';
+  }
+
+  public isIntHelper(value: string): boolean
+  {
+    const parsedValue: number | boolean = this.getDoubleFromString(value);
+    // return ((typeof parsedValue) === 'number') && Number.isInteger(parsedValue as number);
+    return ((typeof parsedValue) === 'number') && (value.indexOf('.') === -1);
+  }
+
+  public isNestedHelper(value: object): boolean
+  {
+    try
+    {
+      return value !== null && (_.isEqual(value, {}) || (Array.isArray(Object.keys(value)) && Object.keys(value).length !== 0));
+    }
+    catch (e)
+    {
+      return false;
+    }
+  }
+
+  public isNullHelper(value: string): boolean
+  {
+    return value === null || value === undefined || value === '' || value === 'null' || value === 'undefined';
+  }
+
   private _getBestTypeFromArrayHelper(types: Set<string>): string[]
   {
     types.delete(JSON.stringify(['null']));
@@ -464,65 +533,17 @@ export class CSVTypeParser
     return false;
   }
 
-  private _isNullHelper(value: string): boolean
-  {
-    return value === null || value === undefined || value === '' || value === 'null' || value === 'undefined';
-  }
-  private _isIntHelper(value: string): boolean
-  {
-    const parsedValue: number | boolean = this.getDoubleFromString(value);
-    // return ((typeof parsedValue) === 'number') && Number.isInteger(parsedValue as number);
-    return ((typeof parsedValue) === 'number') && (value.indexOf('.') === -1);
-  }
-  private _isDoubleHelper(value: string): boolean
-  {
-    const parsedValue: number | boolean = this.getDoubleFromString(value);
-    return (typeof parsedValue) === 'number';
-  }
-  private _isBooleanHelper(value: string): boolean
-  {
-    let parsedValue: any;
-    try
-    {
-      parsedValue = JSON.parse(value);
-    }
-    catch (e)
-    {
-      return false;
-    }
-    return parsedValue === false || parsedValue === true;
-  }
-
-  private _isDateHelper(value: string): boolean
-  {
-    const dateFormatRegex = new RegExp('^(0?[1-9]|1[0,1,2])\/(0?[1-9]|[1,2][0-9]|3[0,1])\/([0-9]{4})$');
-    return dateFormatRegex.test(value);
-  }
-
-  private _isArrayHelper(value: string): boolean
-  {
-    let parsedValue: any;
-    try
-    {
-      parsedValue = JSON.parse(value);
-    }
-    catch (e)
-    {
-      return false;
-    }
-    return Array.isArray(parsedValue);
-  }
   private _getCSVTypeAsArray(value: string): string[]
   {
-    if (this._isNullHelper(value))
+    if (this.isNullHelper(value))
     {
       return ['null'];
     }
-    if (this._isBooleanHelper(value))
+    if (this.isBooleanHelper(value))
     {
       return ['boolean'];
     }
-    if (this._isArrayHelper(value))
+    if (this.isArrayHelper(value))
     {
       const innerValue = JSON.parse(value);
       if (innerValue.length === 0)
@@ -531,15 +552,15 @@ export class CSVTypeParser
       }
       return isTypeConsistent(innerValue) ? ['array'].concat(this._getCSVTypeAsArray(JSON.stringify(innerValue[0]))) : ['text'];
     }
-    if (this._isIntHelper(value))
+    if (this.isIntHelper(value))
     {
       return ['long'];
     }
-    if (this._isDoubleHelper(value))
+    if (this.isDoubleHelper(value))
     {
       return ['double'];
     }
-    if (this._isDateHelper(value))
+    if (this.isDateHelper(value))
     {
       return ['date'];
     }
@@ -621,6 +642,10 @@ export function getType(obj: object): string
     if (Array.isArray(obj))
     {
       return 'array';
+    }
+    if (_.isEqual(obj, {}) || (Array.isArray(Object.keys(obj)) && Object.keys(obj).length !== 0))
+    {
+      return 'nested';
     }
   }
   if (typeof obj === 'string')

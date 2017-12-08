@@ -29,7 +29,6 @@
             "users/*": ["app/users/*"],
             "util/*": ["app/util/*"],
             "x/*": ["app/x/*"],
-            "colors/*": ["app/colors*"]
         },
         "experimentalDecorators": true,
         "allowJs": true,

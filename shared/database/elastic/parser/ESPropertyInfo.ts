@@ -54,7 +54,7 @@ export default class ESPropertyInfo
   public propertyName: ESValueInfo; // the value info for the property name
   public propertyValue: ESValueInfo | null; // the value info for the property value
 
-  public constructor(propertyName: ESValueInfo, propertyValue: ESValueInfo = null)
+  public constructor(propertyName: ESValueInfo, propertyValue: ESValueInfo | null = null)
   {
     this.propertyName = propertyName;
     this.propertyValue = propertyValue;

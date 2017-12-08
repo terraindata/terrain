@@ -72,7 +72,7 @@ class DeployModal extends TerrainComponent<Props>
 {
   public state: {
     changingStatus: boolean;
-    changingStatusOf: LibraryTypes.Variant;
+    changingStatusOf: LibraryTypes.Algorithm;
     changingStatusTo: ItemStatus;
     defaultChecked: boolean;
     errorModalMessage: string;
@@ -115,23 +115,23 @@ class DeployModal extends TerrainComponent<Props>
 
   public handleClose()
   {
-    TerrainStore.dispatch(LibraryActions.variants.status(null, null));
+    TerrainStore.dispatch(LibraryActions.algorithms.status(null, null));
   }
 
   public handleDeploy()
   {
-    const variant = this.state.changingStatusOf;
+    const algorithm = this.state.changingStatusOf;
 
     const state = LibraryStore.getState();
-    const group = state.getIn(['groups', variant.groupId]) as LibraryTypes.Group;
-    const algorithm = state.getIn(['algorithms', variant.algorithmId]) as LibraryTypes.Algorithm;
+    const category = state.getIn(['categories', algorithm.categoryId]) as LibraryTypes.Category;
+    const group = state.getIn(['groups', algorithm.groupId]) as LibraryTypes.Group;
 
     const { changingStatusTo } = this.state;
 
-    if ((changingStatusTo === ItemStatus.Live && variant.status !== 'LIVE')
-      || (changingStatusTo === ItemStatus.Default && variant.status !== 'DEFAULT'))
+    if ((changingStatusTo === ItemStatus.Live && algorithm.status !== 'LIVE')
+      || (changingStatusTo === ItemStatus.Default && algorithm.status !== 'DEFAULT'))
     {
-      const tql = variant ? variant.query.tql : '';
+      const tql = algorithm ? algorithm.query.tql : '';
       const parser: ESJSONParser = new ESJSONParser(tql);
       const valueInfo: ESValueInfo = parser.getValueInfo();
       if (parser.getErrors().length > 0)
@@ -149,25 +149,25 @@ class DeployModal extends TerrainComponent<Props>
           template,
         },
       };
-      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'putTemplate', body, changingStatusTo, this.state.deployedName));
+      TerrainStore.dispatch(LibraryActions.algorithms.deploy(algorithm, 'putTemplate', body, changingStatusTo, this.state.deployedName));
     }
-    else if ((changingStatusTo !== ItemStatus.Live && variant.status === 'LIVE')
-      || (changingStatusTo !== ItemStatus.Default && variant.status === 'DEFAULT'))
+    else if ((changingStatusTo !== ItemStatus.Live && algorithm.status === 'LIVE')
+      || (changingStatusTo !== ItemStatus.Default && algorithm.status === 'DEFAULT'))
     {
-      // undeploy this variant
+      // undeploy this algorithm
       const body: object = {
         id: this.state.deployedName,
       };
-      TerrainStore.dispatch(LibraryActions.variants.deploy(variant, 'deleteTemplate', body, changingStatusTo, this.state.deployedName));
+      TerrainStore.dispatch(LibraryActions.algorithms.deploy(algorithm, 'deleteTemplate', body, changingStatusTo, this.state.deployedName));
     }
   }
 
-  public renderTQLColumn(defaultVariant: LibraryTypes.Variant)
+  public renderTQLColumn(defaultAlgorithm: LibraryTypes.Algorithm)
   {
-    const variant = this.state.changingStatusOf;
+    const algorithm = this.state.changingStatusOf;
     const defaultTql =
-      (this.state.defaultChecked && defaultVariant) ? defaultVariant.query.tql : null;
-    const tql = variant ? variant.query.tql : '';
+      (this.state.defaultChecked && defaultAlgorithm) ? defaultAlgorithm.query.tql : null;
+    const tql = algorithm ? algorithm.query.tql : '';
     return (
       <div className='deploy-modal-tql'>
         <div className='deploy-modal-tql-wrapper'>
@@ -225,12 +225,12 @@ class DeployModal extends TerrainComponent<Props>
       title = 'Remove "' + name + '" from Live';
     }
 
-    let defaultVariant: LibraryTypes.Variant;
+    let defaultAlgorithm: LibraryTypes.Algorithm;
     if (this.state.defaultChecked)
     {
       const libraryState = LibraryStore.getState();
-      defaultVariant = libraryState.variants.find(
-        (v) => v.algorithmId === changingStatusOf.algorithmId && v.status === 'DEFAULT',
+      defaultAlgorithm = libraryState.algorithms.find(
+        (v) => v.groupId === changingStatusOf.groupId && v.status === 'DEFAULT',
       );
     }
 
@@ -254,15 +254,15 @@ class DeployModal extends TerrainComponent<Props>
               })}
             >
               {
-                this.renderTQLColumn(defaultVariant)
+                this.renderTQLColumn(defaultAlgorithm)
               }
               <DeployModalColumn
-                variant={changingStatusOf}
+                algorithm={changingStatusOf}
                 status={changingStatusTo}
                 onDeploy={this.handleDeploy}
                 defaultChecked={this.state.defaultChecked}
                 deployedName={this.state.deployedName}
-                defaultVariant={defaultVariant}
+                defaultAlgorithm={defaultAlgorithm}
                 onDefaultCheckedChange={this.handleDefaultCheckedChange}
                 onDeployedNameChange={this.handleDeployedNameChange}
                 onCancelDeploy={this.handleClose}
