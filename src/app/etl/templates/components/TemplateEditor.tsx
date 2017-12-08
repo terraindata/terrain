@@ -53,7 +53,7 @@ import Util from 'util/Util';
 
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _ExportTemplate, _TemplateField, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { _ExportTemplate, _TemplateField, ELASTIC_TYPES, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 
 const { List } = Immutable;
@@ -74,8 +74,8 @@ class ETLExportDisplay extends TerrainComponent<Props>
       templateId: 1,
       templateName: 'Test Template',
     });
-    template = template.setIn(['rootField', 'children', 0], _TemplateField({ name: 'field 1' }));
-    template = template.setIn(['rootField', 'children', 1], _TemplateField({ name: 'field 2' }));
+    template = template.setIn(['rootField', 'children', 0], _TemplateField({ name: 'field 1', type: ELASTIC_TYPES.NESTED }));
+    template = template.setIn(['rootField', 'children', 1], _TemplateField({ name: 'field 2', type: ELASTIC_TYPES.NESTED }));
     template = template.setIn(['rootField', 'children', 1, 'children', 0], _TemplateField({ name: 'nested field' }));
     template = template.setIn(['rootField', 'children', 1, 'children', 1], _TemplateField({ name: 'another nested field' }));
 

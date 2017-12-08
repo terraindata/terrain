@@ -55,7 +55,7 @@ import Util from 'util/Util';
 
 import ExpandableView from 'common/components/ExpandableView';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { _TemplateField, ELASTIC_TYPES, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
@@ -133,7 +133,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       />
     );
 
-    const children = (this._isRoot() || field.children.size >= 0) ? (
+    const children = (this._isRoot() || field.type === ELASTIC_TYPES.NESTED) ? (
       <div className='template-editor-children-container'>
         {this.renderChildFields()}
         {this.renderCreateNewFieldButton()}

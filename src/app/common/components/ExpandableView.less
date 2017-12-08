@@ -24,7 +24,9 @@
     align-self: center;
     margin-top: @half-spacing;
     &.expandable-view-open {
-      border-left: 1px solid;
+      &.expandable-view-has-children {
+        border-left: 1px solid;
+      }
     }
   }
 
@@ -36,6 +38,9 @@
     transform: rotate(90deg);
     &.expandable-view-open {
       transform: rotate(180deg);
+    }
+    &:not(.expandable-view-has-children) {
+      opacity: 0;
     }
   }
 

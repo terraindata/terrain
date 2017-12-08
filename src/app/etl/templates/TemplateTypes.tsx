@@ -153,7 +153,8 @@ class TemplateFieldC
   public isAnalyzed: boolean = true; // import only
   public isIncluded: boolean = true;
   public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
-  public arrayType: ELASTIC_TYPES = ELASTIC_TYPES.TEXT; // if type is array
+  public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
+  // if type is array. e.g. array of text, or array of array of text
   public analyzer: string = '';
   public originalName: string = '';
   public name: string = '';
@@ -164,7 +165,6 @@ export const _TemplateField = (cfg?: any) =>
 {
   const config = cfg || {}
   config.type = config.type || ELASTIC_TYPES.TEXT;
-  config.isAnalyzed = config.isAnalyzed || (config.type === ELASTIC_TYPES.TEXT);
   config.analyzer = config.analyzer || (config.type === ELASTIC_TYPES.TEXT ? 'standard' : null);
   config.originalName = config.originalName || config.name || '';
   config.name = config.name || config.originalName;

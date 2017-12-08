@@ -83,7 +83,7 @@ export interface TemplateEditorActionTypes
   deleteField: {
     actionType: 'deleteField';
     sourcePath: KeyPath;
-  }
+  };
 }
 
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>

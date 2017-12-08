@@ -101,6 +101,17 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     });
   }
 
+  protected _clearChildren()
+  {
+    const { act, keyPath } = this.props;
+    act({
+      actionType: 'updateField',
+      sourcePath: keyPath,
+      key: 'children',
+      value: List([]),
+    });
+  }
+
   protected _isExport(): boolean
   {
     return this.props.templateEditor.template !== undefined &&
