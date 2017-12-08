@@ -99,6 +99,24 @@ export default class HitsTable extends TerrainComponent<Props>
     // using the spotlights set the correct indexes
   }
 
+  public componentWillMount()
+  {
+    let selectedIndexes = List([]);
+    const spotlights = SpotlightStore.getState().spotlights;
+    const spotlightKeys = _.keys(spotlights.toJS());
+    this.props.hits.forEach((r, index) =>
+    {
+      if (spotlightKeys.includes(r.fields.get('_id')))
+      {
+        selectedIndexes = selectedIndexes.push(index);
+      }
+    });
+
+    this.setState({
+      selectedIndexes,
+    });
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.hits !== this.props.hits || nextProps.resultsConfig !== this.props.resultsConfig)
@@ -106,11 +124,22 @@ export default class HitsTable extends TerrainComponent<Props>
       const spotlights = SpotlightStore.getState().spotlights;
       // using the spotlights set the correct indexes
       // force the table to update
+
+      let selectedIndexes = List([]);
+      const spotlightKeys = _.keys(spotlights);
+      nextProps.hits.forEach((r, index) =>
+      {
+        if (spotlightKeys.includes(r.fields.get('_id')))
+        {
+          selectedIndexes = selectedIndexes.push(index);
+        }
+      });
       this.setState({
         random: Math.random(),
         columns: this.getColumns(nextProps),
         rows: nextProps.hits,
         spotlights,
+        selectedIndexes,
       });
     }
   }
@@ -160,7 +189,7 @@ export default class HitsTable extends TerrainComponent<Props>
               sortable: true,
             });
           }
-        }
+        },
       );
     }
     else
@@ -178,7 +207,8 @@ export default class HitsTable extends TerrainComponent<Props>
               resizable: true,
               sortable: true,
             });
-          }}
+          }
+        },
       );
     }
 
@@ -350,30 +380,24 @@ export default class HitsTable extends TerrainComponent<Props>
 
   public rowRenderer(props)
   {
-    console.log('ROW RENDERER');
     // if (this.state.selectedIndexes.includes(props.idx))
     // {
-      const hit = this.state.rows && this.state.rows.get(props.idx);
-      const id = hit.primaryKey;
-      console.log(this.state.spotlights);
-      console.log(id);
-      console.log(this.state.spotlights.get(String(id)));
-      const spotlight = this.state.spotlights.get(String(id));
-      if (spotlight === undefined)
-      {
-        return (<ReactDataGrid.Row {...props} />);
-      }
-      console.log('RETURNING A ROW WITH A SPOTLIGHT');
-
-      return (
-        <div
-          style={{
-            backgroundColor: spotlight.color,
-          }}>
-          <ReactDataGrid.Row {...props} />
-        </div>
-      );
-   // }
+    const hit = this.state.rows && this.state.rows.get(props.idx);
+    const id = hit.primaryKey;
+    const spotlight = this.state.spotlights.get(String(id));
+    if (spotlight === undefined)
+    {
+      return (<ReactDataGrid.Row {...props} />);
+    }
+    return (
+      <div
+        style={{
+          backgroundColor: spotlight.color,
+        }}>
+        <ReactDataGrid.Row {...props} />
+      </div>
+    );
+    // }
     // return (<ReactDataGrid.Row {...props} />);
   }
 

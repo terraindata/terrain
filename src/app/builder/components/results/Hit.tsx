@@ -100,7 +100,7 @@ class HitComponent extends TerrainComponent<Props> {
   } =
   {
     spotlights: SpotlightStore.getState().spotlights,
-  }
+  };
 
   public menuOptions =
   [
@@ -279,7 +279,7 @@ class HitComponent extends TerrainComponent<Props> {
       );
     }
     const spotlight = this.state.spotlights.get(this.props.primaryKey);
-    const color = spotlight ? spotlight.color: 'black';
+    const color = spotlight ? spotlight.color : 'black';
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
     const fields = getResultFields(hit, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
