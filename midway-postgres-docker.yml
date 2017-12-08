@@ -1,0 +1,20 @@
+# This file specifies the configuration for launching the Postgres
+# instance that is used to store midway's state.
+
+version: '3.1'
+
+services:
+    db:
+        container_name: midway-postgres
+        network_mode: "host"
+        image: postgres
+        environment:
+          - POSTGRES_USER=t3rr41n-demo
+          - POSTGRES_PASSWORD=r3curs1v3$$
+          - POSTGRES_DB=midway
+        ports:
+          - "5432:5432"
+        volumes:
+          - pgdata:/var/lib/postgresql/data
+        volumes: 
+          - ./postgres-data:/var/lib/postgresql/data
