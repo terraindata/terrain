@@ -105,7 +105,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       fontColor(Colors().text3, Colors().text3) :
       fontColor(Colors().text3, Colors().text2);
     return (
-      <div className='new-field-button-spacer'>
+      <div className='new-field-button-spacer' key='new field button'>
         <div
           className={classNames({
             'create-new-template-field-button': true,
