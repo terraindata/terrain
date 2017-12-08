@@ -114,6 +114,7 @@ export default class HitsTable extends TerrainComponent<Props>
 
     this.setState({
       selectedIndexes,
+      rows: this.props.hits,
     });
   }
 
@@ -236,12 +237,6 @@ export default class HitsTable extends TerrainComponent<Props>
     }
 
     return List(cols);
-  }
-
-  public componentDidMount()
-  {
-
-    this.setState({ rows: this.props.hits });
   }
 
   public getRow(i: number): object
@@ -380,8 +375,6 @@ export default class HitsTable extends TerrainComponent<Props>
 
   public rowRenderer(props)
   {
-    // if (this.state.selectedIndexes.includes(props.idx))
-    // {
     const hit = this.state.rows && this.state.rows.get(props.idx);
     const id = hit.primaryKey;
     const spotlight = this.state.spotlights.get(String(id));
@@ -397,8 +390,6 @@ export default class HitsTable extends TerrainComponent<Props>
         <ReactDataGrid.Row {...props} />
       </div>
     );
-    // }
-    // return (<ReactDataGrid.Row {...props} />);
   }
 
   public render()
