@@ -125,6 +125,7 @@ class PathfinderColumn extends TerrainComponent<Props>
       >
         <PathfinderSourceSection
           pathfinderContext={pathfinderContext}
+          keyPath={keyPath.push('source')}
         />
 
         <PathfinderFilterSection

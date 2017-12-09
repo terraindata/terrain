@@ -81,6 +81,7 @@ export interface Props
   spotlights?: any;
 
   containerWidth?: number;
+  index?: string;
 }
 
 export interface Bar
@@ -390,9 +391,17 @@ class TransformCard extends TerrainComponent<Props>
     {
       return;
     }
-
-    const index: string = getIndex('');
-    const type: string = getType('');
+    let index: string = '';
+    let type: string = '';
+    if (this.props.index !== undefined)
+    {
+      index = this.props.index;
+    }
+    else
+    {
+      index = getIndex('');
+      type = getType('');
+    }
 
     if (recomputeDomain)
     {

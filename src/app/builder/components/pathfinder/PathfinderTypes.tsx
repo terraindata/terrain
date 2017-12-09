@@ -88,6 +88,7 @@ import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType, FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
+import BuilderStore from 'app/builder/data/BuilderStore';
 
 export const PathfinderSteps =
   [
@@ -297,7 +298,8 @@ class FilterLineC extends LineC
   public field: string = null; // autocomplete
   public comparison: string = null; // autocomplete
   public valueType: ValueType = null;
-  public value: string | number = null;
+  public value: string | number | [number, number] = null;
+  public textValue?: string = null; // This is for the map component (needs value for address and location)
 
   // Members for when it is a group of filter conditions
   public filterGroup: FilterGroup = null;
@@ -434,49 +436,105 @@ type ChoiceContext = {
 
 class ElasticDataSourceC extends DataSource
 {
-  public indexes: List<string> = List([]);
+  public index: string = '';
   public types: List<string> = List([]);
 
   public getChoiceOptions = (context: ChoiceContext): List<ChoiceOption> =>
   {
+    const server =  BuilderStore.getState().db.name;
     if (context.type === 'source')
     {
-      return context.schemaState.tables.valueSeq().map((table) =>
-      {
-        return _ChoiceOption({
-          displayName: context.schemaState.databases.get(table.databaseId).name + ' / ' + table.name,
-          value: table,
-        });
-      },
+      const sources = context.schemaState.databases.toList().filter(
+        (db) => db.serverId === server,
+      ).map(
+        (db) => {
+          return _ChoiceOption({
+            displayName: db.name,
+            value: db,
+          });
+        }
       ).toList();
+      return sources;
     }
 
     if (context.type === 'transformFields')
     {
-      // TODO need to actually use Source
-      return ElasticBlockHelpers.autocompleteMatches(context.schemaState, AutocompleteMatchType.Transform).map(
-        (value) =>
+      const defaultOptions: List<ChoiceOption> = List([
+            _ChoiceOption({
+              displayName: '_score',
+              value: '_score',
+            }),
+            _ChoiceOption({
+              displayName: '_size',
+              value: '_size',
+            })
+          ]);
+      const transformableTypes =
+        [
+          'long',
+          'double',
+          'short',
+          'byte',
+          'integer',
+          'half_float',
+          'float',
+        ];
+      const {dataSource} = context.source;
+      const {index, types} = dataSource as any;
+      if (index)
+      {
+        if (types && types.size)
         {
-          return _ChoiceOption({
-            displayName: value,
-            value,
-          });
-        },
-      ).toList();
+          const transformableCols = context.schemaState.columns.filter(
+            (column) => column.serverId === String(server) &&
+                column.databaseId === String(index) &&
+                transformableTypes.indexOf(column.datatype) !== -1
+            );
+          const transformableOptions: List<ChoiceOption> = transformableCols.map((col) =>
+          {
+            return _ChoiceOption({
+              displayName: col.name,
+              value: col.name,
+            });
+          }).toList();
+          return transformableOptions.concat(defaultOptions).toList();
+        }
+      }
+      return defaultOptions;
     }
 
     if (context.type === 'fields')
     {
-      // TODO need to actually use Source
-      return ElasticBlockHelpers.autocompleteMatches(context.schemaState, AutocompleteMatchType.Field).map(
-        (value) =>
+      const metaFields = ['_index', '_type', '_uid', '_id',
+        '_source', '_size',
+        '_all', '_field_names',
+        '_parent', '_routing',
+        '_meta'];
+      const defaultOptions = List(metaFields.map((option) => {
+              return _ChoiceOption({
+                displayName: option,
+                value: option,
+              });
+            }));
+      const {dataSource} = context.source;
+      const {index, types} = dataSource as any;
+      if (index)
+      {
+        if (types && types.size)
         {
-          return _ChoiceOption({
-            displayName: value,
-            value,
-          });
-        },
-      ).toList();
+          const cols = context.schemaState.columns.filter(
+            (column) => column.serverId === String(server) &&
+              column.databaseId === String(index));
+          const fields = cols.map((col) => {
+            return _ChoiceOption({
+              displayName: col.name,
+              value: col.name,
+            });
+          }).toList();
+          return fields.concat(defaultOptions).toList();
+        }
+      }
+      return defaultOptions;
     }
 
     if (context.type === 'comparison')
@@ -495,6 +553,11 @@ class ElasticDataSourceC extends DataSource
           displayName: valueType,
         })).toList();
       }
+      
+      return List([_ChoiceOption({
+        value: null,
+        displayName: 'Choose a comparison first',
+      })]);
     }
     
     if (context.type === 'input')
@@ -527,8 +590,7 @@ export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>
 export const _ElasticDataSource = (config?: { [key: string]: any }) =>
 {
   let elasticSource = New<ElasticDataSource>(new ElasticDataSourceC(config), config);
-  elasticSource = elasticSource.set('indexes', List(elasticSource['indexes']));
-  elasticSource = elasticSource.set('types', List(elasticSource)['types']);
+  elasticSource = elasticSource.set('types', List(elasticSource['types']));
   return elasticSource;
 };
 
