@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions restrict-plus-operands
 
 import * as React from 'react';
-import SchemaActions from 'schema/data/SchemaActions';
+import { SchemaActions } from 'schema/data/SchemaRedux';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { columnChildrenConfig, ColumnTreeInfo } from './items/ColumnTreeInfo';
@@ -68,10 +68,11 @@ export interface Props
   id: ID;
   type: string;
   search: string;
-
   inSearchResults?: boolean;
-  schema: SchemaTypes.SchemaState;
-  schemaActions: any;
+
+  // injected props
+  schema?: SchemaTypes.SchemaState;
+  schemaActions?: typeof SchemaActions;
 }
 
 class State
@@ -258,14 +259,20 @@ class SchemaTreeItem extends TerrainComponent<Props>
           isSelected: true,
           // open: !this.state.open, // need to decide whether or not to keep this in
         });
-        this.props.schemaActions.selectId(this.props.id);
+        this.props.schemaActions({
+          actionType: 'selectId',
+          id: this.props.id,
+        });
       }
       else
       {
         this.setState({
           isSelected: false,
         });
-        this.props.schemaActions.selectId(null);
+        this.props.schemaActions({
+          actionType: 'selectId',
+          id: null,
+        });
       }
     }
 
@@ -457,7 +464,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaTreeItem,
   ['schema'],
   { schemaActions: SchemaActions },
