@@ -101,6 +101,10 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   {
     return List([
       {
+        text: 'transform this field*',
+        onClick: () => 0,
+      },
+      {
         text: 'duplicate field*',
         onClick: () => 0,
       },
