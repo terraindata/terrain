@@ -124,7 +124,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           {
             content:
               this.renderValue(),
-            visible: filterLine.valueType !== null,
+            visible: filterLine.comparison !== null,
           },
         ])}
       />
@@ -153,10 +153,17 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       case 'text':
       case 'number':
       case 'auto':
+        if (Array.isArray(filterLine.value))
+        {
+          return <div>Arrays not supported</div>;
+        }
+        
         return (
           <Autocomplete
-            options={null}
-            value={filterLine.value}
+            options={pathfinderContext.source.dataSource.getChoiceOptions({
+              type: 'input',
+            }).map((c) => c.value).toList()}
+            value={filterLine.value as string | number}
             onChange={this._fn(this.handleChange, 'value')}
             disabled={!pathfinderContext.canEdit}
           />
@@ -222,9 +229,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private handleChange(key, value)
   {
-    console.log('handle change key ', key);
-    console.log(value);
-    console.log(this.props.keyPath);
     this.props.onChange(this.props.keyPath, this.props.filterLine.set(key, value));
   }
 

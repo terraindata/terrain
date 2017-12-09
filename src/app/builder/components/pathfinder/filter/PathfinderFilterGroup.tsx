@@ -101,37 +101,25 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
         canDelete={depth !== 0}
         onDelete={this.handleDelete}
         depth={depth}
-      >
-        <div
-          className='pf-line'
-        >
-          <div
-            className='pf-piece'
-          >
+        pieces={List([
+          <div>
             {
               depth === 0 ? PathfinderText.firstFilterIntro : PathfinderText.nestedFilterIntro
             }
-          </div>
-          <div
-            className='pf-piece'
-          >
-            <AdvancedDropdown
-              options={filterDropdownOptions}
-              value={filterGroup.minMatches}
-              canEdit={canEdit}
-              onChange={this.handleDropdownChange}
-            />
-          </div>
-          <div
-            className='pf-piece'
-          >
+          </div>,
+          <AdvancedDropdown
+            options={filterDropdownOptions}
+            value={filterGroup.minMatches}
+            canEdit={canEdit}
+            onChange={this.handleDropdownChange}
+          />,
+          <div>
             {
               PathfinderText.filterGroupPost
             }
           </div>
-
-        </div>
-      </PathfinderLine>
+        ])}
+      />
     );
   }
 

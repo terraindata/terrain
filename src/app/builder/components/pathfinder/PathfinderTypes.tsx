@@ -130,12 +130,10 @@ class FilterGroupC extends BaseClass
 export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;
 export const _FilterGroup = (config?: { [key: string]: any }) =>
 {
-  if (config)
-  {
-    config.lines = List(config.lines.map((line) => _FilterLine(line)));
-  }
-  
-  return New<FilterGroup>(new FilterGroupC(config), config);
+  let filterGroup = New<FilterGroup>(new FilterGroupC(config), config);
+  filterGroup = filterGroup.set('lines', 
+    List(filterGroup.lines.map((line) => _FilterLine(line))));
+  return filterGroup;
 }
 
 class ScoreC extends BaseClass
@@ -307,12 +305,13 @@ class FilterLineC extends LineC
 export type FilterLine = FilterLineC & IRecord<FilterLineC>;
 export const _FilterLine = (config?: { [key: string]: any }) =>
 {
+  let filterLine = New<FilterLine>(new FilterLineC(config), config);
   if (config && config.filterGroup !== null && config.filterGroup !== undefined)
   {
-    config.filterGroup = _FilterGroup(config.filterGroup);
+    filterLine = filterLine.set('filterGroup', _FilterGroup(config.filterGroup));
   }
   
-  return New<FilterLine>(new FilterLineC(config), config);
+  return filterLine;
 }
 
 export type ValueType = 'number' | 'text' | 'date' | 'input' | 'location';

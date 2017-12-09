@@ -383,6 +383,13 @@ class Autocomplete extends TerrainComponent<Props>
     const inputClassName = 'ac-input ' + (this.props.className || '');
 
     const open = this.state.open && !!options && options.size > 0;
+    
+    let { value } = this.props;
+    if (value === null || value === undefined)
+    {
+      // HTML inputs should not have null/undefined value
+      value = '';
+    }
 
     return (
       <div className='autocomplete'>
@@ -398,7 +405,7 @@ class Autocomplete extends TerrainComponent<Props>
             'ac-input-disabled': this.props.disabled,
             'ac-input-has-tooltip': this.props.help !== undefined,
           })}
-          value={this.props.value}
+          value={value}
           onChange={this.handleChange}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}

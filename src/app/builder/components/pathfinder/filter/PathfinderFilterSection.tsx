@@ -128,7 +128,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     });
 
     keyPath = keyPath.push('lines');
-
+    console.log(filterGroup.lines);
     filterGroup.lines.map((filterLine, index) =>
     {
       if (filterLine.filterGroup)
