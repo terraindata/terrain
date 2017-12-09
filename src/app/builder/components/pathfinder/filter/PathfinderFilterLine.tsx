@@ -58,7 +58,7 @@ import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
-import DatePicker from 'app/common/components/DatePicker';
+import DatePickerWrapper from 'app/common/components/DatePickerWrapper';
 import MapComponent from 'app/common/components/MapComponent';
 import Util from 'app/util/Util';
 
@@ -162,11 +162,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
       case 'date':
         return (
-          <DatePicker
+          <DatePickerWrapper
             date={String(filterLine.value)}
             onChange={this._fn(this.handleChange, 'value')}
             canEdit={pathfinderContext.canEdit}
             language={'elastic'}
+            format='MM/DD/YYYY'
           />
         );
 
@@ -176,8 +177,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         {
           value = [37, -95];
         }
-        console.log(filterLine.value);
-        console.log(value);
         return (
             <MapComponent
               address={filterLine.textValue || ''}

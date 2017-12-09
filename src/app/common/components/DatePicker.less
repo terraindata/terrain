@@ -7,6 +7,77 @@
 @day-corner-radius: 3px;
 @day-border-width: 1px;
 
+.date-picker-wrapper
+{
+  position: relative;
+  width: 200px;
+  .date-picker {
+    width: 107%;
+    position: absolute;
+    top: 38px;
+    .DayPicker-Caption {
+      font-size: 14px;
+      width: 196px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    .DayPicker-NavButton {
+      height: 1rem;
+      width: 0.5rem;
+    }
+    .DayPicker-wrapper 
+    {
+      width: 100%;
+      .DayPicker-Month {
+        display: block;
+        margin: 0px 9px;
+      }
+      .DayPicker-Months {
+        font-size: 14px;
+        font-weight: normal;
+     }
+     .DayPicker-Weekdays {
+      display: block;
+      .DayPicker-WeekdaysRow {
+        .DayPicker-Weekday {
+          padding: 3px 6px;
+        }
+      }
+     }
+     .DayPicker-Week {
+      display: block;
+      width: 100%;
+      .DayPicker-Day {
+        width: 27px;
+        height: 27px;
+        padding: 0px
+      }
+     }
+    }
+  }
+  .date-picker-wrapper-date {
+    font-size: @font-size;
+    padding: 6px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 100%;
+    svg {
+      height: 20px;
+      width: 20px;
+      padding-right: 6px;
+      position: relative;
+      top: 4px;
+    }
+    span {
+      position: relative;
+      top: -2px;
+    }
+
+  }
+}
+
 .date-picker {
   border-radius: 5px;
   padding-bottom: 12px;
