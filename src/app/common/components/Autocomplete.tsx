@@ -93,10 +93,9 @@ export interface Props
 @Radium
 class Autocomplete extends TerrainComponent<Props>
 {
-  public value: string;
+  public value: string; // this is used by parent components
 
   public state: {
-    value: string;
     open: boolean;
     selectedIndex: number;
     hoveredIndex: number;
@@ -110,8 +109,6 @@ class Autocomplete extends TerrainComponent<Props>
     this.value = String(props.value);
     this.state =
       {
-        value: props.value === null || props.value === undefined
-          ? '' : String(props.value),
         open: false,
         selectedIndex: -1,
         hoveredIndex: -1,
@@ -120,20 +117,12 @@ class Autocomplete extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.value = String(this.props.value);
-    this.setState({
-      value: this.props.value,
-    });
+    this.value = this.props.value;
   }
 
   public componentWillReceiveProps(nextProps)
   {
-    if (this.props.value !== nextProps.value)
-    {
-      this.setState({
-        value: nextProps.value,
-      });
-    }
+    this.value = nextProps.value;
   }
 
   public handleChange(event)
@@ -146,10 +135,11 @@ class Autocomplete extends TerrainComponent<Props>
 
     const { value } = target;
     this.value = value;
-    this.props.onChange(value);
-    this.setState({
-      value,
-    });
+
+    if (this.props.onChange)
+    {
+      this.props.onChange(value);
+    }
   }
 
   public handleFocus(event: React.FocusEvent<any>)
@@ -174,7 +164,7 @@ class Autocomplete extends TerrainComponent<Props>
       open: false,
       selectedIndex: -1,
     });
-    this.props.onBlur && this.props.onBlur(event, this.blurValue || this.state.value);
+    this.props.onBlur && this.props.onBlur(event, this.blurValue || this.props.value);
     this.blurValue = '';
   }
 
@@ -186,7 +176,6 @@ class Autocomplete extends TerrainComponent<Props>
       this.props.onSelectOption(value);
     }
     this.setState({
-      value,
       open: false,
       selectedIndex: -1,
     });
@@ -233,7 +222,6 @@ class Autocomplete extends TerrainComponent<Props>
         const value = event.target.value;
         this.setState({
           open: false,
-          value,
         });
         this.blurValue = value;
         this.props.onChange(value);
@@ -269,7 +257,6 @@ class Autocomplete extends TerrainComponent<Props>
         this.setState({
           open: false,
           selectedIndex: -1,
-          value,
         });
         this.blurValue = value;
         this.props.onChange(value);
@@ -288,24 +275,42 @@ class Autocomplete extends TerrainComponent<Props>
     }
   }
 
-  public showOption(option: string): boolean
+  public showOption(option: string, level: 'any' | 'first' | 'second' = 'any'): boolean
   {
-    if (!option)
+    // "first" level means the word starts with the term
+    // "second" level means the word contains the term
+    // "any" level accepts both first and second
+    if (option === null || option === undefined)
     {
       return false;
     }
 
-    if (!this.state.value)
+    if (!this.props.value)
     {
       return true;
     }
 
     const haystack = option.toLowerCase();
-    const needle = typeof this.state.value === 'string' ? this.state.value.toLowerCase() : '';
+    const needle = typeof this.props.value === 'string' ? this.props.value.toLowerCase() : '';
 
-    return haystack.indexOf(needle) === 0
+    const isFirst = 
+      haystack.indexOf(needle) === 0
       || haystack.indexOf(' ' + needle) !== -1
       || haystack.indexOf('.' + needle) !== -1;
+    
+    const isSecond = haystack.indexOf(needle) !== -1;
+    
+    if (level === 'first')
+    {
+      return isFirst;
+    }
+    
+    if (level === 'second')
+    {
+      return isSecond;
+    }
+    
+    return isFirst || isSecond;
   }
 
   public mouseOverOption(index)
@@ -328,12 +333,14 @@ class Autocomplete extends TerrainComponent<Props>
     let second = '';
     let third = '';
 
-    if (this.state.value && this.state.value.length)
+    const { value } = this.props;
+    if (value && typeof value === 'string' && value.length && this.showOption(option))
     {
-      const i = option.toLowerCase().indexOf(this.state.value.toLowerCase());
+      // if this was part of the found set, show a highlight
+      const i = option.toLowerCase().indexOf(value.toLowerCase());
       first = option.substr(0, i);
-      second = option.substr(i, this.state.value.length);
-      third = option.substr(this.state.value.length + i);
+      second = option.substr(i, value.length);
+      third = option.substr(value.length + i);
     }
 
     return (
@@ -354,13 +361,35 @@ class Autocomplete extends TerrainComponent<Props>
       </div>
     );
   }
+  
+  public getOptions(): List<string>
+  {
+    const { options } = this.props;
+    
+    if (!options)
+    {
+      return null;
+    }
+    
+    const firstOptions = options.filter((o) => this.showOption(o, 'first'));
+    const secondOptions = options.filter((o) => this.showOption(o, 'second'));
+    const otherOptions = options.filterNot((o) => this.showOption(o, 'any'));
+    return firstOptions.concat(secondOptions).concat(otherOptions).toList();
+  }
 
   public render()
   {
-    const options = this.props.options && this.props.options.filter(this.showOption);
+    const options = this.getOptions();
     const inputClassName = 'ac-input ' + (this.props.className || '');
 
     const open = this.state.open && !!options && options.size > 0;
+    
+    let { value } = this.props;
+    if (value === null || value === undefined)
+    {
+      // HTML inputs should not have null/undefined value
+      value = '';
+    }
 
     return (
       <div className='autocomplete'>
@@ -376,13 +405,14 @@ class Autocomplete extends TerrainComponent<Props>
             'ac-input-disabled': this.props.disabled,
             'ac-input-has-tooltip': this.props.help !== undefined,
           })}
-          value={this.state.value}
+          value={value}
           onChange={this.handleChange}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
           onKeyDown={this.handleKeydown}
           disabled={this.props.disabled}
           placeholder={this.props.placeholder}
+          autoFocus={this.props.autoFocus}
         />
         {
           this.props.help &&
@@ -428,7 +458,10 @@ class Autocomplete extends TerrainComponent<Props>
   // }
 }
 
-const DISABLED_STYLE = backgroundColor(Colors().darkerHighlight, Colors().highlight);
+const DISABLED_STYLE = _.extend({},
+  backgroundColor(Colors().darkerHighlight, Colors().highlight),
+  borderColor(Colors().inputBorder, Colors().inputBorder),
+);
 
 const ENABLED_STYLE = {
   ':focus': borderColor(Colors().active),

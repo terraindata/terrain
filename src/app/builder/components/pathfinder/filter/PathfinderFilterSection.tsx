@@ -113,7 +113,9 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const parentKeyPath = keyPath.butLast().toList();
     const parent = this.props.filterGroup.getIn(parentKeyPath.skip(3).toList());
     const index = keyPath.last();
+    console.log(keyPath, parentKeyPath, parent, index);
     BuilderActions.change(parentKeyPath, parent.splice(index, 1));
+    // TODO consider 'removeIn' instead
   }
 
   private buildFilterTree(filterGroup: FilterGroup, entries: FilterEntry[], depth: number, keyPath: KeyPath): void
@@ -125,15 +127,14 @@ class PathfinderFilterSection extends TerrainComponent<Props>
       keyPath,
     });
 
-    depth++;
     keyPath = keyPath.push('lines');
-
+    console.log(filterGroup.lines);
     filterGroup.lines.map((filterLine, index) =>
     {
       if (filterLine.filterGroup)
       {
         // it is a filter group
-        this.buildFilterTree(filterLine.filterGroup, entries, depth, keyPath.push(index).push('filterGroup'));
+        this.buildFilterTree(filterLine.filterGroup, entries, depth + 1, keyPath.push(index).push('filterGroup'));
       }
       else
       {
@@ -166,6 +167,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           keyPath={filterEntry.keyPath}
           onChange={this.handleFilterChange}
           key={index}
+          onDelete={this.handleFilterDelete}
         />
       );
     }

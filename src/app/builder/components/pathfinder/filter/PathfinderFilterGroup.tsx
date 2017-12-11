@@ -54,8 +54,9 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../..
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import Dropdown from 'app/common/components/Dropdown';
+import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
+import { PathfinderLine } from '../PathfinderLine';
 
 export interface Props
 {
@@ -64,16 +65,22 @@ export interface Props
   depth: number;
   keyPath: KeyPath;
   onChange(keyPath: KeyPath, filterGroup: FilterGroup | FilterLine);
+  onDelete(keyPath: KeyPath);
 }
 
-const filterDropdownOptions = List([
-  'all',
-  'any',
-  2,
-  3,
-  4,
-  5,
-]);
+const filterDropdownOptions = List(
+  [
+    'all',
+    'any',
+    2,
+    3,
+    4,
+    5,
+  ].map((v) => ({
+    displayName: v,
+    value: v,
+  }))
+);
 
 class PathfinderFilterGroup extends TerrainComponent<Props>
 {
@@ -85,62 +92,46 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
 
   public render()
   {
-    const { filterGroup, canEdit } = this.props;
+    const { filterGroup, canEdit, depth } = this.props;
 
     return (
-      <div
-        className='pf-line'
-      >
-        <div
-          className='pf-piece'
-        >
-          {
-            this.props.depth === 0 ? PathfinderText.firstFilterIntro : PathfinderText.nestedFilterIntro
-          }
-        </div>
-        <div
-          className='pf-piece'
-        >
-          <Dropdown
+      <PathfinderLine
+        canEdit={canEdit}
+        canDrag={depth !== 0}
+        canDelete={depth !== 0}
+        onDelete={this.handleDelete}
+        depth={depth}
+        pieces={List([
+          <div>
+            {
+              depth === 0 ? PathfinderText.firstFilterIntro : PathfinderText.nestedFilterIntro
+            }
+          </div>,
+          <AdvancedDropdown
             options={filterDropdownOptions}
-            selectedIndex={this.getDropdownSelectedIndex()}
+            value={filterGroup.minMatches}
             canEdit={canEdit}
             onChange={this.handleDropdownChange}
-          />
-        </div>
-        <div
-          className='pf-piece'
-        >
-          {
-            PathfinderText.filterGroupPost
-          }
-        </div>
-
-      </div>
+          />,
+          <div>
+            {
+              PathfinderText.filterGroupPost
+            }
+          </div>
+        ])}
+      />
     );
   }
 
-  private handleDropdownChange(index: number)
+  private handleDropdownChange(value: number | string)
   {
-    let value = filterDropdownOptions[index];
-
-    if (value === 'any')
-    {
-      value = 1;
-    }
     this.props.onChange(this.props.keyPath, this.props.filterGroup.set('minMatches', value));
   }
-
-  private getDropdownSelectedIndex(): number
+  
+  private handleDelete()
   {
-    const value = this.props.filterGroup.minMatches;
-
-    if (value === 1)
-    {
-      return filterDropdownOptions.indexOf('any');
-    }
-
-    return filterDropdownOptions.indexOf(value);
+    // have to trim off the `filterGroup` key for onDelete to work
+    this.props.onDelete(this.props.keyPath.butLast().toList());
   }
 }
 

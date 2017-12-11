@@ -83,14 +83,16 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   public render()
   {
-    const { filterLine, canEdit, pathfinderContext } = this.props;
+    const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
+    
     return (
       <PathfinderLine
         canDelete={true}
         canDrag={true}
         canEdit={canEdit}
         onDelete={this._fn(this.props.onDelete, this.props.keyPath)}
+        depth={depth}
         pieces={List([
           <AdvancedDropdown
             options={source.dataSource.getChoiceOptions({
@@ -101,42 +103,28 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             value={filterLine.field}
             canEdit={pathfinderContext.canEdit}
             onChange={this._fn(this.handleChange, 'field')}
+            placeholder={'Choose field'}
           />,
           {
             content:
-            <AdvancedDropdown
-              options={source.dataSource.getChoiceOptions({
-                type: 'comparison',
-                field: filterLine.field,
-                source,
-                schemaState: pathfinderContext.schemaState,
-              })}
-              value={filterLine.method}
-              canEdit={pathfinderContext.canEdit}
-              onChange={this._fn(this.handleChange, 'method')}
-            />,
+              <AdvancedDropdown
+                options={source.dataSource.getChoiceOptions({
+                  type: 'comparison',
+                  field: filterLine.field,
+                  source,
+                  schemaState: pathfinderContext.schemaState,
+                })}
+                value={filterLine.comparison}
+                canEdit={pathfinderContext.canEdit}
+                onChange={this._fn(this.handleChange, 'comparison')}
+                placeholder={'Choose comparison'}
+              />,
             visible: filterLine.field !== null,
           },
           {
             content:
-            <AdvancedDropdown
-              options={source.dataSource.getChoiceOptions({
-                type: 'valueType',
-                field: filterLine.field,
-                method: filterLine.method,
-                source,
-                schemaState: pathfinderContext.schemaState,
-              })}
-              value={filterLine.valueType}
-              canEdit={pathfinderContext.canEdit}
-              onChange={this._fn(this.handleChange, 'valueType')}
-            />,
-            visible: filterLine.method !== null,
-          },
-          {
-            content:
-            this.renderValue(),
-            visible: filterLine.valueType !== null,
+              this.renderValue(),
+            visible: filterLine.comparison !== null,
           },
         ])}
       />
@@ -146,15 +134,36 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   private renderValue()
   {
     const { filterLine, pathfinderContext } = this.props;
-    const { source } = pathfinderContext;
-    switch (filterLine.valueType)
+    
+    const valueTypes = pathfinderContext.source.dataSource.getChoiceOptions({
+      type: 'valueType',
+      field: filterLine.field,
+      comparison: filterLine.comparison,
+      source: pathfinderContext.source,
+      schemaState: pathfinderContext.schemaState,
+    });
+    
+    if (valueTypes.size !== 1)
+    {
+      throw new Error('Zero / Multiple filter valueTypes not supported yet.');
+    }
+    
+    switch (valueTypes.get(0).value)
     {
       case 'text':
       case 'number':
+      case 'auto':
+        if (Array.isArray(filterLine.value))
+        {
+          return <div>Arrays not supported</div>;
+        }
+        
         return (
           <Autocomplete
-            options={null}
-            value={filterLine.value}
+            options={pathfinderContext.source.dataSource.getChoiceOptions({
+              type: 'input',
+            }).map((c) => c.value).toList()}
+            value={filterLine.value as string | number}
             onChange={this._fn(this.handleChange, 'value')}
             disabled={!pathfinderContext.canEdit}
           />
@@ -191,16 +200,23 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               hideSearchSettings={true}
             />
         );
-
-      case 'input':
+      
+      case 'location':
+      case 'distance':
         return (
-          <AdvancedDropdown
-            options={source.dataSource.getChoiceOptions({
+          <div>Map here</div>
+        );
+      
+      case 'input':  
+        return (
+          <AdvancedDropdown 
+            options={pathfinderContext.source.dataSource.getChoiceOptions({
               type: 'input',
             })}
             value={filterLine.value}
             canEdit={pathfinderContext.canEdit}
             onChange={this._fn(this.handleChange, 'value')}
+            placeholder={'Choose input'}
           />
         );
 

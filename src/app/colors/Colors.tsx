@@ -109,6 +109,8 @@ interface Theme
 
   tqlEditor: string;
 
+  transformChartBg: string;
+
   iconColor: string;
 
   // DO NOT USE these below colors anymore -- these need to be cleaned up
@@ -372,6 +374,8 @@ const DARK: Theme =
 
     tqlEditor: 'monokai',
 
+    transformChartBg: 'rgb(43,60,69)',
+
     iconColor: '#fff',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
@@ -608,6 +612,8 @@ const LIGHT: Theme =
     resultLine: 'rgba(0,0,0,0.25)',
 
     tqlEditor: 'default',
+
+    transformChartBg: '#fff',
 
     iconColor: 'rgba(0, 0, 0, 0.4)',
 
@@ -850,6 +856,8 @@ const HALLOWEEN: Theme =
     resultLine: 'rgba(255,255,255,0.25)',
 
     tqlEditor: 'monokai',
+
+    transformChartBg: '#fff',
 
     // DO NOT USE these below colors anymore -- these need to be cleaned up
 

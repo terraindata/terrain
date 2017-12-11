@@ -86,7 +86,7 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // for error reporting
 
 // data that needs to be loaded
-import SchemaActions from 'schema/data/SchemaActions';
+import { SchemaActions } from 'schema/data/SchemaRedux';
 import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
@@ -168,7 +168,7 @@ interface Props
     pathname: string,
   };
   children: any;
-  schemaActions: any;
+  schemaActions: typeof SchemaActions;
 }
 
 const APP_STYLE = _.extend({},
@@ -299,7 +299,9 @@ class App extends TerrainComponent<Props>
     UserActions.fetch();
     TerrainStore.dispatch(LibraryActions.fetch());
     LibraryStore.dispatch(LibraryActions.fetch());
-    this.props.schemaActions.fetch();
+    this.props.schemaActions({
+      actionType: 'fetch',
+    });
     // RolesActions.fetch();
   }
 
