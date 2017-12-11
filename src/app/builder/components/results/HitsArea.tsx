@@ -53,19 +53,17 @@ import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
-// import * as moment from 'moment';
-const moment = require('moment');
-const ReactModal = require('react-modal');
 
-import BackendInstance from 'database/types/BackendInstance';
 import ETLExportDisplay from 'etl/components/ETLExportDisplay';
-import { ResultsConfig } from 'shared/results/types/ResultsConfig';
 
-import Query from 'src/items/types/Query';
+import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
+import BackendInstance from '../../../../database/types/BackendInstance';
+import Query from '../../../../items/types/Query';
+import InfoArea from '../../../common/components/InfoArea';
+import Modal from '../../../common/components/Modal';
+import FileImportPreview from '../../../fileImport/components/FileImportPreview';
+import { FileImportState } from '../../../fileImport/FileImportTypes';
 
-import Modal from 'common/components/Modal';
-import Ajax from 'util/Ajax';
-import Util from 'util/Util';
 import Actions from '../../data/BuilderActions';
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
@@ -73,15 +71,14 @@ import HitsTable from './HitsTable';
 
 import Radium = require('radium');
 
-import { backgroundColor, borderColor, Colors, fontColor, getStyle, link } from 'app/colors/Colors';
+import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
+import DragHandle from '../../../common/components/DragHandle';
+import InfiniteScroll from '../../../common/components/InfiniteScroll';
+import MapComponent from '../../../common/components/MapComponent';
+import Switch from '../../../common/components/Switch';
+import TerrainComponent from '../../../common/components/TerrainComponent';
+import MapUtil from '../../../util/MapUtil';
 
-import DragHandle from 'common/components/DragHandle';
-import InfiniteScroll from 'common/components/InfiniteScroll';
-import InfoArea from 'common/components/InfoArea';
-import MapComponent from 'common/components/MapComponent';
-import Switch from 'common/components/Switch';
-import TerrainComponent from 'common/components/TerrainComponent';
-import MapUtil from 'util/MapUtil';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
 
 const HITS_PAGE_SIZE = 20;
@@ -124,6 +121,11 @@ const MAP_MIN_HEIGHT = 25; // height of top bar on map
 @Radium
 class HitsArea extends TerrainComponent<Props>
 {
+  public static handleConfigChange(config: ResultsConfig)
+  {
+    Actions.changeResultsConfig(config);
+  }
+
   public state: State = {
     expanded: false,
     expandedHitIndex: null,
@@ -204,6 +206,7 @@ class HitsArea extends TerrainComponent<Props>
       return null;
     }
 
+    // noinspection CheckTagEmptyBody
     return (
       <div className={classNames({
         'result-expanded-wrapper': true,
@@ -306,9 +309,10 @@ class HitsArea extends TerrainComponent<Props>
 
   public handleMapMouseDown(event)
   {
-    $('body').on('mouseup', this.handleMapMouseUp);
-    $('body').on('mouseleave', this.handleMapMouseUp);
-    $('body').on('mousemove', this.handleMapMouseMove);
+    $('body')
+      .on('mouseup', this.handleMapMouseUp)
+      .on('mouseleave', this.handleMapMouseUp)
+      .on('mousemove', this.handleMapMouseMove);
     const el = this.refs['map'];
     const cr = el['getBoundingClientRect']();
     const parentEl = this.refs['resultsarea'];
@@ -324,9 +328,10 @@ class HitsArea extends TerrainComponent<Props>
 
   public handleMapMouseUp(event)
   {
-    $('body').off('mouseup', this.handleMapMouseUp);
-    $('body').off('mouseleave', this.handleMapMouseUp);
-    $('body').off('mousemove', this.handleMapMouseMove);
+    $('body')
+      .off('mouseup', this.handleMapMouseUp)
+      .off('mouseleave', this.handleMapMouseUp)
+      .off('mousemove', this.handleMapMouseMove);
     event.preventDefault();
     event.stopPropagation();
   }
@@ -467,7 +472,6 @@ class HitsArea extends TerrainComponent<Props>
     {
       if (resultsState.loading)
       {
-        hitsAreOutdated = true;
         infoAreaContent = <InfoArea
           large='Querying results...'
         />;
@@ -737,14 +741,9 @@ class HitsArea extends TerrainComponent<Props>
         config={this.props.query.resultsConfig}
         fields={this.props.resultsState.fields}
         onClose={this.hideConfig}
-        onConfigChange={this.handleConfigChange}
+        onConfigChange={HitsArea.handleConfigChange}
       />;
     }
-  }
-
-  public handleConfigChange(config: ResultsConfig)
-  {
-    Actions.changeResultsConfig(config);
   }
 
   public render()

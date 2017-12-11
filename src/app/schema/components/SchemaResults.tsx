@@ -73,6 +73,11 @@ export interface Props
 @Radium
 class SchemaResults extends TerrainComponent<Props>
 {
+  public static showsResults(selectedItem: SchemaBaseClass): boolean
+  {
+    return selectedItem && selectedItem.type !== 'index';
+  }
+
   public state: {
     initialized?: boolean,
     selectedId?: ID,
@@ -114,7 +119,7 @@ class SchemaResults extends TerrainComponent<Props>
         selectedItem,
       });
 
-      if (this.showsResults(selectedItem))
+      if (SchemaResults.showsResults(selectedItem))
       {
         const resultsServer: SchemaTypes.Server =
           selectedItem['type'] === 'server' ? selectedItem :
@@ -207,11 +212,6 @@ class SchemaResults extends TerrainComponent<Props>
     }
   }
 
-  public showsResults(selectedItem: SchemaBaseClass): boolean
-  {
-    return selectedItem && selectedItem.type !== 'index';
-  }
-
   public handleResultsStateChange(resultsState: ResultsState)
   {
     this.setState({
@@ -230,7 +230,7 @@ class SchemaResults extends TerrainComponent<Props>
         }}
       >
         {
-          this.showsResults(this.state.selectedItem) ?
+          SchemaResults.showsResults(this.state.selectedItem) ?
             <div
               style={{
                 paddingRight: 6,

@@ -49,30 +49,18 @@ THE SOFTWARE.
 import * as _ from 'lodash';
 import Colors from '../../colors/Colors';
 import Styles from '../../Styles';
-const color = require('color');
-
-const itemHeaderHeight = 22;
 
 const arrowSvgStyles = {
   'width': '12px',
   'height': '12px',
   'fill': Colors().text3,
   'cursor': 'pointer',
-  // fill: Styles.colors.transBlack,
-  // fill: 'rgba(0,0,0,0)',
-  // stroke: Styles.colors.transBlack,
-  // strokeWidth: 20,
   'marginLeft': 5.5,
-  // 'position': 'relative',
-  // 'top': 5,
   'marginTop': 4,
   ':hover': {
     fill: Colors().text2,
   },
 };
-
-const headerHighlightedColor = color(Styles.colors.active).fade('0.85').string();
-const headerSelectedColor = color(Styles.colors.active).fade('0.75').string();
 
 const SchemaTreeStyles =
   {
@@ -112,7 +100,6 @@ const SchemaTreeStyles =
         width: '12px',
         height: '12px',
         fill: Colors().active,
-        // stroke: Styles.colors.active,
       },
       Styles.rotate180,
       Styles.transition,
@@ -121,8 +108,6 @@ const SchemaTreeStyles =
     treeItemHeader: [{
       'display': 'flex',
       'cursor': 'pointer',
-      // 'height': itemHeaderHeight,
-
       'borderRadius': 4,
 
       ':hover': {
@@ -159,10 +144,6 @@ const SchemaTreeStyles =
       normal: [
         {
           paddingLeft: 11,
-          // marginBottom: 6,
-          // paddingBottom: 6,
-          // borderBottom: '0.5px solid rgba(0,0,0,0.1)',
-          // margin: '0px 6px',
         },
         Styles.transition,
       ],

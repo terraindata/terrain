@@ -129,7 +129,7 @@ export const _block = (config: BlockConfig): Block =>
     id: '',
     type: '',
     _isBlock: true,
-  }, config);
+  } as Block, config);
 
   if (blockConfig.static.metaFields)
   {
