@@ -526,7 +526,6 @@ describe('Query route tests', () =>
       });
   });
 
-
   test('Elastic Search Route Error: POST /midway/v1/query', async () =>
   {
     await request(server)
