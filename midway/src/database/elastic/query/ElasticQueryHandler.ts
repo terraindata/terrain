@@ -104,20 +104,20 @@ export default class ElasticQueryHandler extends QueryHandler
           return new QueryResponse({}, errors);
         }
 
-        const body = parser.getValue();
-        if (body['groupJoin'] !== undefined)
+        const query = parser.getValue();
+        if (query['groupJoin'] !== undefined)
         {
-          return this.handleGroupJoin(parser, body);
+          return this.handleGroupJoin(parser, query);
         }
 
         if (request.streaming === true)
         {
-          return new ElasticsearchScrollStream(client.getDelegate(), body);
+          return new ElasticsearchScrollStream(client.getDelegate(), { body: query });
         }
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          client.search(body as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
+          client.search({ body: query } as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
         });
 
       case 'deleteTemplate':
@@ -141,11 +141,11 @@ export default class ElasticQueryHandler extends QueryHandler
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
-  private async handleGroupJoin(parser: ESParser, body: object): Promise<QueryResponse>
+  private async handleGroupJoin(parser: ESParser, query: object): Promise<QueryResponse>
   {
-    const childQuery = body['groupJoin'];
-    body['groupJoin'] = undefined;
-    const parentQuery: Elastic.SearchParams | undefined = body;
+    const childQuery = query['groupJoin'];
+    query['groupJoin'] = undefined;
+    const parentQuery: Elastic.SearchParams | undefined = query;
     if (parentQuery === undefined)
     {
       throw new Error('Expecting body parameter in the groupJoin query');
@@ -208,7 +208,7 @@ export default class ElasticQueryHandler extends QueryHandler
           }
         };
 
-        client.search(parentQuery, getMoreUntilDone);
+        client.search({ body: parentQuery }, getMoreUntilDone);
       });
 
       if (parentResults.hasError())
