@@ -99,7 +99,6 @@ class DatePickerWrapper extends TerrainComponent<Props>
     const dateText = this.props.format === undefined ? Util.formatInputDate(date, language) :
              moment(date).format(this.props.format);
     const dateStyle = _.extend({}, fontColor(Colors().text1), backgroundColor(Colors().inputBg), borderColor(Colors().inputBorder));
-    console.log(dateStyle);
     return (
       <div className='date-picker-wrapper'>
         <div

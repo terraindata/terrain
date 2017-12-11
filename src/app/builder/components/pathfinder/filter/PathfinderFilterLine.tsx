@@ -167,7 +167,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             onChange={this._fn(this.handleChange, 'value')}
             canEdit={pathfinderContext.canEdit}
             language={'elastic'}
-            format='MM/DD/YYYY'
+            format='MM/DD/YYYY h:mma'
           />
         );
 
@@ -213,9 +213,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private handleChange(key, value)
   {
-    console.log('handle change key ', key);
-    console.log(value);
-    console.log(this.props.keyPath);
     this.props.onChange(this.props.keyPath, this.props.filterLine.set(key, value));
   }
 
