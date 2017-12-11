@@ -130,7 +130,7 @@ export function New<T>(
 export function recordForSave(record: IRecord<any>)
 {
   const recordData = record.toJS();
-  const meta = _.extend({}, recordData);
+  const meta: any = _.extend({}, recordData);
 
   if (record['excludeFields'])
   {

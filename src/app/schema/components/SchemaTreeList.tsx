@@ -142,14 +142,14 @@ class SchemaTreeList extends TerrainComponent<Props>
       <div
         style={[
           NORMAL_STYLE,
-          this.props.search && SEARCH_STYLE,
-          this.props.topLevel && TOP_LEVEL_STYLE,
+          search && SEARCH_STYLE,
+          topLevel && TOP_LEVEL_STYLE,
         ]}
       >
         {
           label &&
           <FadeInOut
-            open={!this.props.search}
+            open={!search}
           >
             <div
               style={
