@@ -208,7 +208,7 @@ export default class ElasticQueryHandler extends QueryHandler
           }
         };
 
-        client.search(parentQuery, getMoreUntilDone);
+        client.search({body: parentQuery}, getMoreUntilDone);
       });
 
       if (parentResults.hasError())
