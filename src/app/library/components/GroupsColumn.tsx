@@ -205,8 +205,8 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public handleGroupDuplicateConfirm()
   {
-    const categoryKeys = _.keys(this.props.categories.toJS());
-    const categoryId = categoryKeys
+    const categoryKeys: string[] = _.keys(this.props.categories.toJS());
+    const categoryId: number = categoryKeys
       .map((key) => parseFloat(key))
       .sort()[this.state.duplicateGroupCategoryIndex];
     const id = this.state.duplicateGroupId;
@@ -218,7 +218,7 @@ class GroupsColumn extends TerrainComponent<Props>
       index,
       this.state.duplicateGroupTextboxValue,
       dbs.get(dbIndex),
-      this.props.categories.get(parseFloat(categoryId)).id,
+      this.props.categories.get(categoryId).id,
     );
     this.setState({
       duplicatingGroup: false,
@@ -633,7 +633,7 @@ class GroupsColumn extends TerrainComponent<Props>
   public renderCategoryDropdown()
   {
     const categoryKeys = _.keys(this.props.categories.toJS());
-    const values = categoryKeys.map((key) => parseFloat(key)).sort();
+    const values: string[] = categoryKeys.sort((a, b) => parseFloat(a) - parseFloat(b));
     let categoryNames = Immutable.Map<number, string>({});
     categoryKeys.forEach((key) =>
     {

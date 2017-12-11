@@ -354,7 +354,7 @@ const Util = {
     {
       return obj;
     }
-    return _.extend({}, { id: Util.getId(isString) }, _.omit(obj, (value) => value === undefined));
+    return _.extend({}, { id: Util.getId(isString) }, _.omitBy(obj, (value) => value === undefined));
   },
 
   moveIndexOffset(index: number, newIndex: number): number
@@ -685,6 +685,11 @@ const Util = {
       mapStateToProps,
       mapDispatchToProps,
     )(component);
+  },
+
+  createTypedContainer<ComponentType>(component: ComponentType, stateToPropsKeys, dispatchToPropsMap): ComponentType
+  {
+    return Util.createContainer(component, stateToPropsKeys, dispatchToPropsMap);
   },
 };
 

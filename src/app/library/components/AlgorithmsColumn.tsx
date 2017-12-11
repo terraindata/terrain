@@ -51,11 +51,12 @@ import * as React from 'react';
 const moment = require('moment');
 
 import * as Immutable from 'immutable';
-import { uniq } from 'lodash';
+import * as _ from 'lodash';
 
 import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { browserHistory } from 'react-router';
+import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import { Colors, fontColor } from '../../colors/Colors';
 import CreateLine from '../../common/components/CreateLine';
@@ -68,6 +69,7 @@ import Util from '../../util/Util';
 import Dropdown from './../../common/components/Dropdown';
 import { notificationManager } from './../../common/components/InAppNotification';
 import InfoArea from './../../common/components/InfoArea';
+import Scoreline from './../../common/components/Scoreline';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import * as LibraryTypes from './../LibraryTypes';
@@ -78,18 +80,19 @@ import StatusDropdown from './StatusDropdown';
 
 const AlgorithmIcon = require('./../../../images/icon_variant_15x17.svg?name=AlgorithmIcon');
 
-type Algorithm = LibraryTypes.Algorithm;
+type Category = LibraryTypes.Category;
 type Group = LibraryTypes.Group;
+type Algorithm = LibraryTypes.Algorithm;
 
 export interface Props
 {
   basePath: string;
+  groups: Immutable.Map<ID, Group>;
   algorithms: Immutable.Map<ID, Algorithm>;
   selectedAlgorithm: ID;
   algorithmsOrder: Immutable.List<ID>;
   categoryId: ID;
   groupId: ID;
-  groups: Immutable.Map<ID, Group>;
   canPinItems: boolean;
   params?: any;
   algorithmActions?: any;
@@ -156,7 +159,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     {
       this.props.analyticsActions.fetch(
         analytics.selectedAnalyticsConnection,
-        uniq(algorithmIds),
+        _.uniq(algorithmIds),
         analytics.selectedMetric,
         analytics.selectedInterval,
         analytics.selectedDateRange,
@@ -387,6 +390,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
           this.props.categoryId,
           this.props.groupId,
         );
+        break;
+      case 'variant':
+        // no good
         break;
     }
   }

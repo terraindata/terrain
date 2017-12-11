@@ -63,7 +63,8 @@ type SchemaBaseClass = SchemaTypes.SchemaBaseClass;
 export interface Props
 {
   search: string;
-  schema: SchemaState;
+  // injected props
+  schema?: SchemaState;
 }
 
 let INIT_SHOWING_COUNT: IMMap<string, number> = Immutable.Map<string, number>({});
@@ -73,7 +74,7 @@ let INIT_PREV_ITEMS: IMMap<string, IMMap<string, SchemaBaseClass>> =
   Immutable.Map<string, IMMap<string, SchemaBaseClass>>({});
 
 _.map(SchemaTypes.typeToStoreKey as any,
-  (storeKey: string, type) =>
+  (storeKey: string) =>
   {
     INIT_SHOWING_COUNT = INIT_SHOWING_COUNT.set(storeKey, 15);
     INIT_ITEMS = INIT_ITEMS.set(storeKey, Immutable.List([]));
@@ -182,7 +183,7 @@ class SchemaSearchResults extends TerrainComponent<Props>
 
           {
             renderItems.map(
-              (item, index) =>
+              (item) =>
                 <SchemaTreeItem
                   id={item.id}
                   type={type}
@@ -288,7 +289,7 @@ class SchemaSearchResults extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaSearchResults,
   ['schema'],
   {},
