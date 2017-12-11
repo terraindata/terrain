@@ -132,6 +132,11 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this.props.keyPath.size === 0;
   }
 
+  protected _depth(): number
+  {
+    return Math.floor(this.props.keyPath.size / 2);
+  }
+
   protected _inputDisabled(): boolean
   {
     return !this.props.field.isIncluded || !this.props.canEdit;

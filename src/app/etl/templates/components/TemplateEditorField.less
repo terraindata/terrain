@@ -6,17 +6,29 @@
   display: flex;
   flex-direction: row;
   flex: 1 0;
+  align-items: center;
 }
 
 .tef-layout-content-row {
   display: flex;
   flex-direction: row;
   padding: @half-spacing;
-  &.tef-layout-no-padding-bottom {
-    padding-bottom: 0px;
+}
+
+.tef-layout-wrappable-content-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: @quarter-spacing @half-spacing;
+
+  .tef-layout-dropdown-spacer {
+    padding-bottom: @quarter-spacing;
+    padding-top: @quarter-spacing;
   }
-  &.tef-layout-allow-wrap {
-    flex-wrap: wrap;
+
+  .tef-layout-label {
+    padding-top: @quarter-spacing + @half-spacing;
+    padding-bottom: @quarter-spacing + @half-spacing;
   }
 }
 
@@ -32,6 +44,9 @@
 
 .tef-layout-autocomplete-spacer {
   padding: 0px @half-spacing;
+  &.no-padding {
+    padding: 0px;
+  }
 }
 
 .tef-layout-dropdown-spacer {
@@ -48,6 +63,8 @@
 }
 
 .tef-layout-label {
+  .noselect;
+  white-space: nowrap;
   padding: @half-spacing;
   &.tef-right {
     padding-left: 0px;
@@ -61,10 +78,6 @@
   }
   &.tef-indent {
     padding-left: @double-spacing;
-  }
-  &.tef-special-first-label { // this is to get Name and Type to line up (I know, it's gross)
-    width: 45px;
-    text-align: right;
   }
 }
 
@@ -81,6 +94,27 @@
 
   .include-field-checkbox-spacer {
     padding-left: @quarter-spacing;
+  }
+
+  .template-editor-pkey-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .template-editor-key-button {
+      .transition;
+      cursor: pointer;
+      padding: @half-spacing @half-spacing @quarter-spacing @half-spacing;
+      margin-left: @half-spacing;
+      border-radius: 3px;
+      svg path {
+        stroke: currentColor;
+      }
+    }
+
+    .template-editor-key-icon {
+      fill: currentColor;
+    }
   }
 
   .template-editor-analyzed-section {

@@ -43,6 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires
+
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
@@ -70,6 +72,7 @@ import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorF
 import TemplateEditorFieldTypeSection from './TemplateEditorFieldTypeSection';
 
 import './TemplateEditorField.less';
+const KeyIcon = require('images/icon_key-2.svg');
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -131,7 +134,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         onChange={this._setFactory('name')}
         disabled={inputDisabled}
         options={emptyOptions}
-        style={fontColor(Colors().text1)}
+        style={inputNameAutocompleteStyle}
       />;
 
     const showOriginalName = field.name !== field.originalName;
@@ -159,9 +162,9 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     }
 
     const fieldNameSection = (
-      <div className='tef-layout-content-row tef-layout-no-padding-bottom'>
-        <div className='tef-layout-label tef-special-first-label'> Name </div>
-        <div className='tef-layout-autocomplete-spacer'> {inputFieldName} </div>
+      <div className='tef-layout-content-row'>
+        { /*<div className='tef-layout-label'> Name </div>*/}
+        <div className='tef-layout-autocomplete-spacer no-padding'> {inputFieldName} </div>
         {showOriginalName ?
           <div
             className='template-editor-field-label-group'
@@ -180,11 +183,35 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     return fieldNameSection;
   }
 
+  public renderPrimaryKeySection()
+  {
+    const buttonStyle = this.props.field.isPrimaryKey ? [
+      getStyle('opacity', '1'),
+      fontColor(Colors().active),
+    ] : [
+        getStyle('opacity', '0.5'),
+        fontColor(Colors().text2),
+      ]
+    return (
+      <div className='template-editor-pkey-section'>
+        <div
+          className='template-editor-key-button'
+          style={buttonStyle}
+          onClick={this._noopIfDisabled(this.handlePrimaryKeyClicked)}
+        >
+          <KeyIcon className='template-editor-key-icon' width='28px' />
+        </div>
+      </div>
+    );
+  }
+
   public render()
   {
     const { field, canEdit, keyPath } = this.props;
     const inputDisabled = this._inputDisabled();
     const disableCheckbox = !canEdit; // only disable checkbox if it is disabled from a parent
+
+    const showPrimaryKeyButton = this._depth() === 1; // todo make this only for import
 
     return (
       <div
@@ -209,7 +236,8 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
           ]}
         >
           <div className='tef-layout-row'>
-            <div className='tef-layout-column'>
+            {showPrimaryKeyButton && this.renderPrimaryKeySection()}
+            <div className='tef-layout-row'>
               {this.renderFieldNameSection()}
               {
                 <TemplateEditorFieldTypeSection
@@ -252,6 +280,11 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     this._set('isIncluded', !this.props.field.isIncluded);
   }
 
+  public handlePrimaryKeyClicked()
+  {
+    this._set('isPrimaryKey', !this.props.field.isPrimaryKey);
+  }
+
 }
 
 const originalNameLabelStyle = [
@@ -261,6 +294,12 @@ const originalNameLabelStyle = [
 const originalNameAutocompleteStyle = [
   getStyle('width', '160px'),
   fontColor(Colors().text1),
+];
+
+const inputNameAutocompleteStyle = [
+  getStyle('width', '200px'),
+  fontColor(Colors().text1),
+  getStyle('fontSize', '20px'),
 ];
 
 const emptyOptions = List([]);

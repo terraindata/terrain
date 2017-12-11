@@ -149,6 +149,8 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
       />
     );
 
+    const showAnalyzer = field.isAnalyzed;
+
     return (
       <div
         className='template-editor-analyzed-section'
@@ -156,7 +158,17 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
         onClick={this._noopIfDisabled(this.handleAnalyzedCheckboxClicked)}
       >
         <div className='tef-layout-checkbox-spacer'> {analyzedCheckbox} </div>
-        <div className='tef-layout-label tef-right'>  Analyzed </div>
+        <div className='tef-layout-label tef-right'> Analyze </div>
+        {showAnalyzer &&
+          <div className='tef-layout-dropdown-spacer'>
+            <Dropdown
+              options={elasticAnalyzerOptions}
+              selectedIndex={0}
+              canEdit={!inputDisabled}
+              onChange={() => 0}
+            />
+          </div>
+        }
       </div>
     );
   }
@@ -207,8 +219,8 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
     // TODO make it show only for import
 
     return (
-      <div className='tef-layout-content-row tef-layout-allow-wrap'>
-        <div className='tef-layout-label tef-special-first-label'> Type </div>
+      <div className='tef-layout-wrappable-content-row'>
+        <div className='tef-layout-label'> Type </div>
         <div className='tef-layout-dropdown-spacer'> {fieldTypeDropdown} </div>
         {showArrayTypeSection && this.renderArrayTypeSection().map((v, i) => v)}
         {showAnalyzedSection && this.renderAnalyzerSection()}
@@ -231,13 +243,14 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
         this._set('arrayType', List([ELASTIC_TYPES.TEXT]));
       }
       else if (currentType === ELASTIC_TYPES.NESTED && nextType !== ELASTIC_TYPES.NESTED)
-      { // if user changes type from nested to something else, clear the children
+      { // if user changes type from nested to something else, clear the children TODO add a confirmation modal
         this._clearChildren();
       }
       this._set('type', elasticTypeOptions.get(index));
     }
   }
 
+  // memoized
   public handleChangeArrayType(arrayTypeIndex: number)
   {
     return (index: number) =>
@@ -279,6 +292,12 @@ const elasticTypeOptions = List([
   ELASTIC_TYPES.FLOAT,
   ELASTIC_TYPES.GEO_POINT,
 ]);
+
+const elasticAnalyzerOptions = List([
+  'standard',
+  'test analyzer',
+  'test analyzer 2',
+]); // this is just a placeholder
 
 const voidFunction = () => { /* do nothing */ }
 

@@ -74,10 +74,14 @@ class ETLExportDisplay extends TerrainComponent<Props>
       templateId: 1,
       templateName: 'Test Template',
     });
-    template = template.setIn(['rootField', 'children', 0], _TemplateField({ name: 'field 1', type: ELASTIC_TYPES.NESTED }));
-    template = template.setIn(['rootField', 'children', 1], _TemplateField({ name: 'field 2', type: ELASTIC_TYPES.NESTED }));
-    template = template.setIn(['rootField', 'children', 1, 'children', 0], _TemplateField({ name: 'nested field' }));
-    template = template.setIn(['rootField', 'children', 1, 'children', 1], _TemplateField({ name: 'another nested field' }));
+    template = template.setIn(['rootField', 'children', 0],
+      _TemplateField({ name: 'productId', type: ELASTIC_TYPES.TEXT, isPrimaryKey: true, isAnalyzed: false }));
+    template = template.setIn(['rootField', 'children', 1],
+      _TemplateField({ name: 'product_info', type: ELASTIC_TYPES.NESTED }));
+    template = template.setIn(['rootField', 'children', 1, 'children', 0],
+      _TemplateField({ name: 'value' }));
+    template = template.setIn(['rootField', 'children', 1, 'children', 1],
+      _TemplateField({ name: 'other_value', type: ELASTIC_TYPES.LONG }));
 
     this.props.act({
       actionType: 'loadTemplate',
