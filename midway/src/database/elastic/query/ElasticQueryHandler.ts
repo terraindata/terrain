@@ -163,6 +163,9 @@ export default class ElasticQueryHandler extends QueryHandler
       const parentResults = await new Promise<QueryResponse>((res, rej) =>
       {
         let allResponse: any | null = null;
+        let rowsProcessed: number = 0;
+        const originalSize: number = (parentQuery['size'] !== undefined) ? parentQuery['size'] as number : -1;
+
         const getMoreUntilDone = async (error: any, response: any) =>
         {
           if (error !== null && error !== undefined)
@@ -182,16 +185,20 @@ export default class ElasticQueryHandler extends QueryHandler
             allResponse.hits.hits = allResponse.hits.hits.concat(response.hits.hits);
           }
 
-          let size = response.hits.total;
-          if (parentQuery['size'] !== undefined)
+          rowsProcessed += response.hits.hits.length;
+
+          let total = response.hits.total;
+          if (originalSize > 0 && originalSize <= total)
           {
-            if (parentQuery['size'] as any < size)
-            {
-              size = parentQuery['size'];
-            }
+            total = originalSize;
+          }
+          else
+          {
+            // TODO: choose optimal size parameter
+            parentQuery['size'] = 10000;
           }
 
-          if (response.hits.hits.length > 0 && size > response.hits.hits.length)
+          if (response.hits.hits.length > 0 && rowsProcessed < total)
           {
             const scroll = (parentQuery['scroll'] !== undefined) ? parentQuery['scroll'] : '60s';
             client.scroll({
