@@ -43,47 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import ActionTypes from './SpotlightActionTypes';
+import Store from './SpotlightStore';
 
-// tslint:disable:no-var-requires
+const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 
-// Copyright 2017 Terrain Data, Inc.
+const SpotlightActions =
+  {
+    spotlightAction:
+    (id: string, hit: any) =>
+      $(ActionTypes.spotlightAction, { id, hit }),
+    clearSpotlightsAction: 
+    (id: string) =>
+    	$(ActionTypes.clearSpotlightsAction, {}),
+  };
 
-// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
-import * as Immutable from 'immutable';
-import { Map } from 'immutable';
-import * as _ from 'lodash';
-import * as ReduxActions from 'redux-actions';
-const Redux = require('redux');
-import { BaseClass, New } from '../../Classes';
-import SpotlightReducers from './SpotlightReducers';
-import Util from 'app/util/Util';
-import thunk from 'redux-thunk';
-class SpotlightStateC extends BaseClass
-{
-  public spotlights: IMMap<string, any> = Map({});
-}
-const SpotlightState_Record = Immutable.Record(new SpotlightStateC);
-export interface SpotlightState extends SpotlightStateC, IRecord<SpotlightState> { }
-export const _SpotlightState = (config?: { [key: string]: any }) =>
-  new SpotlightState_Record(Util.extendId(config || {})) as any as SpotlightState;
-
-const DefaultState = _SpotlightState();
-
-// TODO something better like this
-// class SpotlightC extends BaseClass
-// {
-//   name: string;
-//   color: string;
-
-// }
-// export type Spotlight = SpotlightC & IRecord<Spotlight>;
-// export const _Spotlight = (config?: {[key:string]: any}) =>
-//   New<Spotlight>(new SpotlightC(config), config);
-
-export const SpotlightStore: IStore<SpotlightState> = Redux.createStore(
-  SpotlightReducers !== undefined ? SpotlightReducers : (state, action) => state,
-  DefaultState,
-  Redux.applyMiddleware(thunk),
-);
-
-export default SpotlightStore;
+export default SpotlightActions;

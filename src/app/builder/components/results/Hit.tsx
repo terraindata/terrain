@@ -58,7 +58,8 @@ import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import MapUtil from '../../../util/MapUtil';
-import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
+import SpotlightStore from '../../data/SpotlightStore';
+import SpotlightActions from '../../data/SpotlightActions';
 import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
@@ -213,14 +214,14 @@ class HitComponent extends TerrainComponent<Props> {
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = this.props.index;
-    spotlightAction(id, spotlightData);
+    SpotlightActions.spotlightAction(id, spotlightData);
     this.props.onSpotlightAdded(id, spotlightData);
   }
 
   public unspotlight()
   {
     this.props.onSpotlightRemoved(this.props.primaryKey);
-    spotlightAction(this.props.primaryKey, null);
+    SpotlightActions.clearSpotlightsAction(this.props.primaryKey);
   }
 
   public renderSpotlight()

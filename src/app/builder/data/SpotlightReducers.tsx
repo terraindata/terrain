@@ -43,47 +43,36 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:no-var-requires
-
-// Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 import * as Immutable from 'immutable';
-import { Map } from 'immutable';
 import * as _ from 'lodash';
-import * as ReduxActions from 'redux-actions';
-const Redux = require('redux');
-import { BaseClass, New } from '../../Classes';
-import SpotlightReducers from './SpotlightReducers';
-import Util from 'app/util/Util';
-import thunk from 'redux-thunk';
-class SpotlightStateC extends BaseClass
+
+import ActionTypes from './SpotlightActionTypes';
+import { _SpotlightState, SpotlightState } from './SpotlightStore';
+
+const SpotlightReducers = {};
+
+SpotlightReducers[ActionTypes.spotlightAction] =
+  (state, action) =>
+  {
+    const { id, hit } = action.payload;
+    return state.setIn(['spotlights', id], _.extend({ id }, hit))
+  };
+
+SpotlightReducers[ActionTypes.clearSpotlightsAction] = 
+  (state, action) =>
+  {
+    const {id} = action.payload;
+    return state.removeIn(['spotlights', id]);
+  }
+
+const SpotlightReducerWrapper = (state: SpotlightState = _SpotlightState(), action) =>
 {
-  public spotlights: IMMap<string, any> = Map({});
-}
-const SpotlightState_Record = Immutable.Record(new SpotlightStateC);
-export interface SpotlightState extends SpotlightStateC, IRecord<SpotlightState> { }
-export const _SpotlightState = (config?: { [key: string]: any }) =>
-  new SpotlightState_Record(Util.extendId(config || {})) as any as SpotlightState;
+  let nextState = state;
+  if (SpotlightReducers[action.type])
+  {
+    nextState = SpotlightReducers[action.type](state, action);
+  }
+  return nextState;
+};
 
-const DefaultState = _SpotlightState();
-
-// TODO something better like this
-// class SpotlightC extends BaseClass
-// {
-//   name: string;
-//   color: string;
-
-// }
-// export type Spotlight = SpotlightC & IRecord<Spotlight>;
-// export const _Spotlight = (config?: {[key:string]: any}) =>
-//   New<Spotlight>(new SpotlightC(config), config);
-
-export const SpotlightStore: IStore<SpotlightState> = Redux.createStore(
-  SpotlightReducers !== undefined ? SpotlightReducers : (state, action) => state,
-  DefaultState,
-  Redux.applyMiddleware(thunk),
-);
-
-export default SpotlightStore;
+export default SpotlightReducerWrapper;

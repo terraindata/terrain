@@ -57,7 +57,8 @@ import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
-import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
+import { SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
+import SpotlightActions from '../../data/SpotlightActions';
 import { getResultName } from './Hit';
 import { Hits } from './ResultTypes';
 
@@ -360,14 +361,14 @@ export default class HitsTable extends TerrainComponent<Props>
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = row;
-    spotlightAction(id, spotlightData);
+    SpotlightActions.spotlightAction(id, spotlightData);
     this.props.onSpotlightAdded(id, spotlightData);
   }
 
   public unspotlight(row: number)
   {
     const hit = this.state.rows && this.state.rows.get(row);
-    spotlightAction(hit.primaryKey, null);
+    SpotlightActions.clearSpotlightsAction(hit.primaryKey);
     this.props.onSpotlightRemoved(hit.primaryKey);
   }
 

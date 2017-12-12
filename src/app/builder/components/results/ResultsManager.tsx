@@ -65,7 +65,8 @@ import * as FileImportTypes from '../../../fileImport/FileImportTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
-import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
+import { SpotlightStore } from '../../data/SpotlightStore';
+import SpotlightActions from '../../data/SpotlightActions';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
 
@@ -228,7 +229,7 @@ export class ResultsManager extends TerrainComponent<Props>
           );
           if (hitIndex !== -1)
           {
-            spotlightAction(id, _.extend({
+            SpotlightActions.spotlightAction(id, _.extend({
               color: spotlight.color,
               name: spotlight.name,
               rank: hitIndex,
@@ -246,7 +247,7 @@ export class ResultsManager extends TerrainComponent<Props>
           }
           else
           {
-            spotlightAction(id, null);
+            SpotlightActions.clearSpotlightsAction(id);
           }
         },
       );
