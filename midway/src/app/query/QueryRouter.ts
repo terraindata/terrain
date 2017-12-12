@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as _ from 'lodash';
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
 import * as winston from 'winston';
 import * as Util from '../Util';
 
