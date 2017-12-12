@@ -49,8 +49,8 @@ THE SOFTWARE.
 import TerrainComponent from 'app/common/components/TerrainComponent';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 const { List, Map } = Immutable;
@@ -121,7 +121,7 @@ export class PathfinderLine extends TerrainComponent<Props>
             {this.props.expandableContent}
           </FadeInOut>
         }
-      </div>
+      </div>,
     );
   }
 
@@ -207,11 +207,11 @@ export class PathfinderLine extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private addIndentation(content: El): El
   {
     const { depth } = this.props;
-    
+
     if (depth > 0)
     {
       for (let i = 0; i < depth; i++)
@@ -237,7 +237,7 @@ export class PathfinderLine extends TerrainComponent<Props>
       //     }}
       //   >
       //     {
-      //       _.range(0, depth).map(() => 
+      //       _.range(0, depth).map(() =>
       //         <div
       //           style={{
       //             width: INDENT_WIDTH,
@@ -250,7 +250,7 @@ export class PathfinderLine extends TerrainComponent<Props>
       //   </div>
       // );
     }
-    
+
     return content;
   }
 }

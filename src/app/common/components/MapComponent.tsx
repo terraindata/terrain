@@ -50,6 +50,7 @@ import { divIcon, point } from 'leaflet';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { Circle, Map, Marker, Polygon, Polyline, Popup, Rectangle, TileLayer, ZoomControl } from 'react-leaflet';
+import onClickOutside from 'react-onclickoutside';
 
 import Switch from 'common/components/Switch';
 import Actions from '../../builder/data/BuilderActions';
@@ -57,6 +58,7 @@ import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';
 import CheckBox from './CheckBox';
+import FadeInOut from './FadeInOut';
 import './MapComponentStyle.less';
 import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';
@@ -104,6 +106,10 @@ export interface Props
 
   className?: string;
   style?: string;
+  wrapperClassName?: string;
+
+  // When the text box is selected, the map will expand below it, otherwise it will be hidden
+  fadeInOut?: boolean;
 }
 
 interface LocationData
@@ -145,6 +151,19 @@ const UNIT_CONVERSIONS =
     NM: 1852,
   };
 
+export const units =
+  {
+    mi: 'miles',
+    yd: 'yards',
+    ft: 'feet',
+    in: 'inches',
+    km: 'kilometers',
+    m: 'meters',
+    cm: 'centimeters',
+    mm: 'millimeters',
+    nmi: 'nautical miles',
+  };
+
 class MapComponent extends TerrainComponent<Props>
 {
 
@@ -160,6 +179,7 @@ class MapComponent extends TerrainComponent<Props>
     usingInput: boolean,
     zoom: number,
     focused: boolean,
+    mapExpanded: boolean,
   } = {
     address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
     searchByCoordinate: false,
@@ -173,6 +193,7 @@ class MapComponent extends TerrainComponent<Props>
       && this.props.address[0] === '@' && this.props.address !== '@'),
     zoom: 15,
     focused: false,
+    mapExpanded: false,
   };
 
   public geoCache = {};
@@ -846,6 +867,7 @@ class MapComponent extends TerrainComponent<Props>
           autoFocus={this.state.focused}
           moveCursorToEnd={true}
           disabled={this.props.canEdit === false}
+          onMouseUp={this._toggle('mapExpanded')}
         />
       );
     }
@@ -863,7 +885,10 @@ class MapComponent extends TerrainComponent<Props>
     };
 
     return (
-      <div className='map-component-search-bar'>
+      <div
+        className='map-component-search-bar'
+        onMouseUp={this._toggle('mapExpanded')}
+      >
         {
           this.state.searchByCoordinate ?
             this.renderCoordinateInputs()
@@ -894,20 +919,41 @@ class MapComponent extends TerrainComponent<Props>
     );
   }
 
+  public handleClickOutside()
+  {
+    this.setState({
+      mapExpanded: false,
+    });
+  }
+
   public render()
   {
     return (
-      <div>
+      <div
+        className={this.props.wrapperClassName}
+      >
         {
           this.props.showSearchBar ?
             this.renderSearchBar()
             :
             null
         }
-        {this.renderMap()}
+        {
+          this.props.fadeInOut ?
+            <div
+              className={classNames({
+                'map-component-fade-in-out': true,
+                'map-component-fade-in-out-hidden': !this.state.mapExpanded,
+              })}
+            >
+              {this.renderMap()}
+            </div>
+            :
+            this.renderMap()
+        }
       </div>
     );
   }
 }
 
-export default MapComponent;
+export default onClickOutside(MapComponent);

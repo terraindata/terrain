@@ -80,7 +80,7 @@ export interface Props
   disabled?: boolean;
 
   onFocus?: (event: React.FocusEvent<any>) => void;
-  onBlur?: (event: React.FocusEvent<any>, value: string) => void;
+  onBlur?: (event: React.FocusEvent<any>, value: string | number) => void;
   onEnter?: (value: string) => void;
   onSelectOption?: (value: string) => void;
 
@@ -88,12 +88,13 @@ export interface Props
   moveCursorToEnd?: boolean;
 
   onKeyDown?: (e) => void;
+  onMouseUp?: (e) => void;
 }
 
 @Radium
 class Autocomplete extends TerrainComponent<Props>
 {
-  public value: string; // this is used by parent components
+  public value: string | number; // this is used by parent components
 
   public state: {
     open: boolean;
@@ -230,7 +231,7 @@ class Autocomplete extends TerrainComponent<Props>
       }
       return;
     }
-    const visibleOptions = this.props.options && this.props.options.filter(this.showOption);
+    const visibleOptions = this.props.options && this.props.options.filter((option) => this.showOption(option, 'any'));
     switch (event.keyCode)
     {
       case 38:
@@ -275,11 +276,15 @@ class Autocomplete extends TerrainComponent<Props>
     }
   }
 
-  public showOption(option: string, level: 'any' | 'first' | 'second' = 'any'): boolean
+  public showOption(option: string | number, level: 'any' | 'first' | 'second' = 'any'): boolean
   {
     // "first" level means the word starts with the term
     // "second" level means the word contains the term
     // "any" level accepts both first and second
+    if (typeof option === 'number')
+    {
+      option = String(option);
+    }
     if (option === null || option === undefined)
     {
       return false;
@@ -293,23 +298,23 @@ class Autocomplete extends TerrainComponent<Props>
     const haystack = option.toLowerCase();
     const needle = typeof this.props.value === 'string' ? this.props.value.toLowerCase() : '';
 
-    const isFirst = 
+    const isFirst =
       haystack.indexOf(needle) === 0
       || haystack.indexOf(' ' + needle) !== -1
       || haystack.indexOf('.' + needle) !== -1;
-    
+
     const isSecond = haystack.indexOf(needle) !== -1;
-    
+
     if (level === 'first')
     {
       return isFirst;
     }
-    
+
     if (level === 'second')
     {
       return isSecond;
     }
-    
+
     return isFirst || isSecond;
   }
 
@@ -327,8 +332,9 @@ class Autocomplete extends TerrainComponent<Props>
     });
   }
 
-  public renderOption(option: string, index: number)
+  public renderOption(option: string | number, index: number)
   {
+    option = String(option);
     let first = option;
     let second = '';
     let third = '';
@@ -361,16 +367,16 @@ class Autocomplete extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   public getOptions(): List<string>
   {
     const { options } = this.props;
-    
+
     if (!options)
     {
       return null;
     }
-    
+
     const firstOptions = options.filter((o) => this.showOption(o, 'first'));
     const secondOptions = options.filter((o) => this.showOption(o, 'second'));
     const otherOptions = options.filterNot((o) => this.showOption(o, 'any'));
@@ -383,7 +389,7 @@ class Autocomplete extends TerrainComponent<Props>
     const inputClassName = 'ac-input ' + (this.props.className || '');
 
     const open = this.state.open && !!options && options.size > 0;
-    
+
     let { value } = this.props;
     if (value === null || value === undefined)
     {
@@ -392,7 +398,10 @@ class Autocomplete extends TerrainComponent<Props>
     }
 
     return (
-      <div className='autocomplete'>
+      <div
+        className='autocomplete'
+        onMouseUp={this.props.onMouseUp}
+      >
         <input
           style={[
             this.props.disabled ? DISABLED_STYLE : ENABLED_STYLE,

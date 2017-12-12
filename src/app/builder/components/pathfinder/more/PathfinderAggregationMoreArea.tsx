@@ -60,7 +60,7 @@ import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import
 {
   _AggregationLine, _FilterGroup, _Sample, _Script,
-  AggregationLine, PathfinderContext
+  AggregationLine, PathfinderContext,
 } from 'app/builder/components/pathfinder/PathfinderTypes';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';

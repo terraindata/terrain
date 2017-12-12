@@ -84,11 +84,11 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
+import BuilderStore from 'app/builder/data/BuilderStore';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType, FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
-import BuilderStore from 'app/builder/data/BuilderStore';
 
 export const PathfinderSteps =
   [
@@ -110,15 +110,15 @@ export const _Path = (config?: { [key: string]: any }) =>
 {
   if (config)
   {
-    config = 
-    {
-      source: _Source(config['source']),
-      score: _Score(config['score']),
-      filterGroup: _FilterGroup(config['filterGroup']),
-      more: _More(config['more']),
-    };
+    config =
+      {
+        source: _Source(config['source']),
+        score: _Score(config['score']),
+        filterGroup: _FilterGroup(config['filterGroup']),
+        more: _More(config['more']),
+      };
   }
-  
+
   return New<Path>(new PathC(config || {}), config);
 };
 
@@ -131,10 +131,10 @@ export type FilterGroup = FilterGroupC & IRecord<FilterGroupC>;
 export const _FilterGroup = (config?: { [key: string]: any }) =>
 {
   let filterGroup = New<FilterGroup>(new FilterGroupC(config), config);
-  filterGroup = filterGroup.set('lines', 
+  filterGroup = filterGroup.set('lines',
     List(filterGroup.lines.map((line) => _FilterLine(line))));
   return filterGroup;
-}
+};
 
 class ScoreC extends BaseClass
 {
@@ -296,8 +296,7 @@ class FilterLineC extends LineC
   public field: string = null; // autocomplete
   public comparison: string = null; // autocomplete
   public valueType: ValueType = null;
-  public value: string | number | [number, number] = null;
-  public textValue?: string = null; // This is for the map component (needs value for address and location)
+  public value: string | number | DistanceValue = null;
 
   // Members for when it is a group of filter conditions
   public filterGroup: FilterGroup = null;
@@ -310,9 +309,24 @@ export const _FilterLine = (config?: { [key: string]: any }) =>
   {
     filterLine = filterLine.set('filterGroup', _FilterGroup(config.filterGroup));
   }
-  
+  if (config && config.value !== null && typeof config.value !== 'string' && typeof config.value !== 'number')
+  {
+    filterLine = filterLine.set('value', _DistanceValue(config.value));
+  }
   return filterLine;
+};
+
+class DistanceValueC extends BaseClass
+{
+  public location: [number, number] = [37.7749295, -122.41941550000001];
+  public address: string = 'San Francisco';
+  public distance?: number = 10;
+  public units?: string = 'mi';
 }
+
+export type DistanceValue = DistanceValueC & IRecord<DistanceValueC>;
+export const _DistanceValue = (config?: { [key: string]: any }) =>
+  New<DistanceValue>(new DistanceValueC(config), config);
 
 export type ValueType = 'number' | 'text' | 'date' | 'input' | 'location';
 
@@ -376,9 +390,9 @@ export const _Source = (config?: { [key: string]: any }) =>
   {
     config.dataSource = _ElasticDataSource(config.dataSource);
   }
-  
+
   return New<Source>(new SourceC(config), config);
-}
+};
 
 abstract class DataSource extends BaseClass
 {
@@ -440,18 +454,19 @@ class ElasticDataSourceC extends DataSource
 
   public getChoiceOptions = (context: ChoiceContext): List<ChoiceOption> =>
   {
-    const server =  BuilderStore.getState().db.name;
+    const server = BuilderStore.getState().db.name;
     if (context.type === 'source')
     {
       const sources = context.schemaState.databases.toList().filter(
         (db) => db.serverId === server,
       ).map(
-        (db) => {
+        (db) =>
+        {
           return _ChoiceOption({
             displayName: db.name,
             value: db,
           });
-        }
+        },
       ).toList();
       return sources;
     }
@@ -459,15 +474,15 @@ class ElasticDataSourceC extends DataSource
     if (context.type === 'transformFields')
     {
       const defaultOptions: List<ChoiceOption> = List([
-            _ChoiceOption({
-              displayName: '_score',
-              value: '_score',
-            }),
-            _ChoiceOption({
-              displayName: '_size',
-              value: '_size',
-            })
-          ]);
+        _ChoiceOption({
+          displayName: '_score',
+          value: '_score',
+        }),
+        _ChoiceOption({
+          displayName: '_size',
+          value: '_size',
+        }),
+      ]);
       const transformableTypes =
         [
           'long',
@@ -478,17 +493,17 @@ class ElasticDataSourceC extends DataSource
           'half_float',
           'float',
         ];
-      const {dataSource} = context.source;
-      const {index, types} = dataSource as any;
+      const { dataSource } = context.source;
+      const { index, types } = dataSource as any;
       if (index)
       {
         if (types && types.size)
         {
           const transformableCols = context.schemaState.columns.filter(
             (column) => column.serverId === String(server) &&
-                column.databaseId === String(index) &&
-                transformableTypes.indexOf(column.datatype) !== -1
-            );
+              column.databaseId === String(index) &&
+              transformableTypes.indexOf(column.datatype) !== -1,
+          );
           const transformableOptions: List<ChoiceOption> = transformableCols.map((col) =>
           {
             return _ChoiceOption({
@@ -509,14 +524,15 @@ class ElasticDataSourceC extends DataSource
         '_all', '_field_names',
         '_parent', '_routing',
         '_meta'];
-      const defaultOptions = List(metaFields.map((option) => {
-              return _ChoiceOption({
-                displayName: option,
-                value: option,
-              });
-            }));
-      const {dataSource} = context.source;
-      const {index, types} = dataSource as any;
+      const defaultOptions = List(metaFields.map((option) =>
+      {
+        return _ChoiceOption({
+          displayName: option,
+          value: option,
+        });
+      }));
+      const { dataSource } = context.source;
+      const { index, types } = dataSource as any;
       if (index)
       {
         if (types && types.size)
@@ -524,7 +540,8 @@ class ElasticDataSourceC extends DataSource
           const cols = context.schemaState.columns.filter(
             (column) => column.serverId === String(server) &&
               column.databaseId === String(index));
-          const fields = cols.map((col) => {
+          const fields = cols.map((col) =>
+          {
             return _ChoiceOption({
               displayName: col.name,
               value: col.name,
@@ -544,7 +561,7 @@ class ElasticDataSourceC extends DataSource
     if (context.type === 'valueType')
     {
       const comparison = ElasticComparisons.find((comp) => comp.value === context.comparison);
-      
+
       if (comparison)
       {
         return comparison.valueTypes.map((valueType) => _ChoiceOption({
@@ -552,13 +569,13 @@ class ElasticDataSourceC extends DataSource
           displayName: valueType,
         })).toList();
       }
-      
+
       return List([_ChoiceOption({
         value: null,
         displayName: 'Choose a comparison first',
       })]);
     }
-    
+
     if (context.type === 'input')
     {
       // TODO use current builder state
@@ -598,32 +615,32 @@ const ElasticComparisons = [
     value: 'equal',
     displayName: 'equals',
     valueTypes: List(['number']),
-  }, 
+  },
   {
     value: 'contains',
     displayName: 'contains',
     valueTypes: List(['text']),
-  }, 
+  },
   {
     value: 'notequal',
     displayName: 'does not equal',
     valueTypes: List(['auto']),
-  }, 
+  },
   {
     value: 'notcontain',
     displayName: 'does not contain',
     valueTypes: List(['text']),
-  }, 
+  },
   {
     value: 'greater',
     displayName: 'is greater than',
     valueTypes: List(['number']),
-  }, 
+  },
   {
     value: 'less',
     displayName: 'is less than',
     valueTypes: List(['number']),
-  }, 
+  },
   {
     value: 'greaterequal',
     displayName: 'is greater than or equal to',
@@ -633,22 +650,22 @@ const ElasticComparisons = [
     value: 'lessequal',
     displayName: 'is less than or equal to',
     valueTypes: List(['number']),
-  }, 
+  },
   {
     value: 'alphabefore',
     displayName: 'comes before',
     valueTypes: List(['text']),
-  }, 
+  },
   {
     value: 'alphaafter',
     displayName: 'comes after',
     valueTypes: List(['text']),
-  }, 
+  },
   {
     value: 'datebefore',
     displayName: 'starts before',
     valueTypes: List(['date']),
-  }, 
+  },
   {
     value: 'dateafter',
     displayName: 'starts after',

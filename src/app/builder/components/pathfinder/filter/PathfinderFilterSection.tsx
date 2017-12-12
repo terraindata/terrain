@@ -55,13 +55,13 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
+import BuilderStore from 'app/builder/data/BuilderStore';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
 import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
-import BuilderStore from 'app/builder/data/BuilderStore';
 
 export interface Props
 {
@@ -113,7 +113,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const parentKeyPath = keyPath.butLast().toList();
     const parent = this.props.filterGroup.getIn(parentKeyPath.skip(3).toList());
     const index = keyPath.last();
-    console.log(keyPath, parentKeyPath, parent, index);
     BuilderActions.change(parentKeyPath, parent.splice(index, 1));
     // TODO consider 'removeIn' instead
   }
@@ -128,7 +127,6 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     });
 
     keyPath = keyPath.push('lines');
-    console.log(filterGroup.lines);
     filterGroup.lines.map((filterLine, index) =>
     {
       if (filterLine.filterGroup)

@@ -53,6 +53,7 @@ import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map, Set } = Immutable;
 import ElasticBlockHelpers, { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { getIndex, getType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import AdvancedDropdown from '../../../../common/components/AdvancedDropdown';
 import Dropdown from '../../../../common/components/Dropdown';
 import Ajax from '../../../../util/Ajax';
@@ -63,7 +64,6 @@ import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 import PathfinderAdvancedLine from './PathfinderAdvancedLine';
 import PathfinderAggregationMoreArea from './PathfinderAggregationMoreArea';
-import { getIndex, getType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 

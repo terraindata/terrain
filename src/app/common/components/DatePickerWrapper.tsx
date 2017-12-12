@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands
 
-import * as React from 'react';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import * as React from 'react';
 const moment = require('moment');
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
@@ -57,8 +57,8 @@ import Dropdown from './Dropdown';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import ColorsActions from '../../colors/data/ColorsActions';
 import DatePicker from './DatePicker';
-import FadeInOut from './FadeInOut';
 import './DatePicker.less';
+import FadeInOut from './FadeInOut';
 
 const CalendarIcon = require('images/icon_calendar.svg');
 
@@ -94,10 +94,10 @@ class DatePickerWrapper extends TerrainComponent<Props>
 
   public render()
   {
-    const {language} = this.props;
+    const { language } = this.props;
     const date = this.getDate();
     const dateText = this.props.format === undefined ? Util.formatInputDate(date, language) :
-             moment(date).format(this.props.format);
+      moment(date).format(this.props.format);
     const dateStyle = _.extend({}, fontColor(Colors().text1), backgroundColor(Colors().inputBg), borderColor(Colors().inputBorder));
     return (
       <div className='date-picker-wrapper'>
@@ -106,7 +106,7 @@ class DatePickerWrapper extends TerrainComponent<Props>
           className='date-picker-wrapper-date'
           style={dateStyle}
         >
-          <CalendarIcon style={getStyle('fill', Colors().iconColor)}/>
+          <CalendarIcon style={getStyle('fill', Colors().iconColor)} />
           <span>{dateText}</span>
         </div>
         <FadeInOut

@@ -59,7 +59,11 @@ import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { ChoiceOption, _ElasticDataSource, Path, PathfinderContext, Source, sourceCountDropdownOptions, sourceCountOptions } from '../PathfinderTypes';
+import
+{
+  _ElasticDataSource, ChoiceOption, Path, PathfinderContext,
+  Source, sourceCountDropdownOptions, sourceCountOptions
+} from '../PathfinderTypes';
 
 export interface Props
 {
@@ -70,7 +74,7 @@ export interface Props
 class PathfinderSourceSection extends TerrainComponent<Props>
 {
   public state: {
-    dataSourceOptions: List<ChoiceOption>
+    dataSourceOptions: List<ChoiceOption>,
   } = {
     dataSourceOptions: List([]),
   };
@@ -96,9 +100,10 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   {
     const { source, step, canEdit } = this.props.pathfinderContext;
     const sourceValues = this.state.dataSourceOptions.map((option) => option.value).toList();
-    const sourceNames = this.state.dataSourceOptions.map((option) => option.displayName).toList()
+    const sourceNames = this.state.dataSourceOptions.map((option) => option.displayName).toList();
     let displayNames: IMMap<string, any> = Map({});
-    this.state.dataSourceOptions.forEach((option) => {
+    this.state.dataSourceOptions.forEach((option) =>
+    {
       displayNames = displayNames.set(option.value, option.displayName);
     });
     return (
@@ -147,7 +152,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   private handleSourceChange(index)
   {
     const options = this.getDataSourceOptions();
-    const dataSource = this.props.pathfinderContext.source.dataSource
+    const dataSource = this.props.pathfinderContext.source.dataSource;
     if ((dataSource as any).index !== undefined)
     {
       BuilderActions.change(this.props.keyPath.push('dataSource').push('index'), options.get(index).value.id);
@@ -164,8 +169,8 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   private getDataSourceOptions(overrideContext?: PathfinderContext): List<ChoiceOption>
   {
-    const {schemaState, source} = (overrideContext || this.props.pathfinderContext);
-    const options = source.dataSource.getChoiceOptions({schemaState, type: 'source'});
+    const { schemaState, source } = (overrideContext || this.props.pathfinderContext);
+    const options = source.dataSource.getChoiceOptions({ schemaState, type: 'source' });
     return options;
   }
 }

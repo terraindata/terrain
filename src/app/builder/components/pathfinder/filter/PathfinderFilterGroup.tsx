@@ -55,8 +55,8 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
-import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
 import { PathfinderLine } from '../PathfinderLine';
+import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
 
 export interface Props
 {
@@ -79,7 +79,7 @@ const filterDropdownOptions = List(
   ].map((v) => ({
     displayName: v,
     value: v,
-  }))
+  })),
 );
 
 class PathfinderFilterGroup extends TerrainComponent<Props>
@@ -117,7 +117,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
             {
               PathfinderText.filterGroupPost
             }
-          </div>
+          </div>,
         ])}
       />
     );
@@ -127,7 +127,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
   {
     this.props.onChange(this.props.keyPath, this.props.filterGroup.set('minMatches', value));
   }
-  
+
   private handleDelete()
   {
     // have to trim off the `filterGroup` key for onDelete to work

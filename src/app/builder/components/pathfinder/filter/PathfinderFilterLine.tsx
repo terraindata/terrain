@@ -49,18 +49,20 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
-import Dropdown from 'app/common/components/Dropdown';
-import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
-import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import DatePickerWrapper from 'app/common/components/DatePickerWrapper';
-import MapComponent from 'app/common/components/MapComponent';
+import Dropdown from 'app/common/components/Dropdown';
+import MapComponent, { units } from 'app/common/components/MapComponent';
 import Util from 'app/util/Util';
+import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
+import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
 
 export interface Props
 {
@@ -85,7 +87,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
-    
     return (
       <PathfinderLine
         canDelete={true}
@@ -107,23 +108,23 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           />,
           {
             content:
-              <AdvancedDropdown
-                options={source.dataSource.getChoiceOptions({
-                  type: 'comparison',
-                  field: filterLine.field,
-                  source,
-                  schemaState: pathfinderContext.schemaState,
-                })}
-                value={filterLine.comparison}
-                canEdit={pathfinderContext.canEdit}
-                onChange={this._fn(this.handleChange, 'comparison')}
-                placeholder={'Choose comparison'}
-              />,
+            <AdvancedDropdown
+              options={source.dataSource.getChoiceOptions({
+                type: 'comparison',
+                field: filterLine.field,
+                source,
+                schemaState: pathfinderContext.schemaState,
+              })}
+              value={filterLine.comparison}
+              canEdit={pathfinderContext.canEdit}
+              onChange={this._fn(this.handleChange, 'comparison')}
+              placeholder={'Choose comparison'}
+            />,
             visible: filterLine.field !== null,
           },
           {
             content:
-              this.renderValue(),
+            this.renderValue(),
             visible: filterLine.comparison !== null,
           },
         ])}
@@ -134,7 +135,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   private renderValue()
   {
     const { filterLine, pathfinderContext } = this.props;
-    
     const valueTypes = pathfinderContext.source.dataSource.getChoiceOptions({
       type: 'valueType',
       field: filterLine.field,
@@ -142,12 +142,10 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       source: pathfinderContext.source,
       schemaState: pathfinderContext.schemaState,
     });
-    
     if (valueTypes.size !== 1)
     {
       throw new Error('Zero / Multiple filter valueTypes not supported yet.');
     }
-    
     switch (valueTypes.get(0).value)
     {
       case 'text':
@@ -157,7 +155,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         {
           return <div>Arrays not supported</div>;
         }
-        
         return (
           <Autocomplete
             options={pathfinderContext.source.dataSource.getChoiceOptions({
@@ -181,35 +178,49 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         );
 
       case 'location':
-        let value = filterLine.value;
-        if (!filterLine.value || !Array.isArray(filterLine.value))
+      case 'distance':
+        let value = filterLine.value as DistanceValue;
+        if (filterLine.value === null)
         {
-          value = [37, -95];
+          value = _DistanceValue();
+          this.handleChange('value', value);
         }
         return (
+          <div className='pf-filter-map-input-wrapper'>
+            <BuilderTextbox
+              value={value.distance}
+              canEdit={pathfinderContext.canEdit}
+              keyPath={this.props.keyPath.push('value').push('distance')}
+            />
+            <Dropdown
+              options={List(_.keys(units))}
+              selectedIndex={_.keys(units).indexOf(value.units)}
+              canEdit={pathfinderContext.canEdit}
+              optionsDisplayName={Map(units)}
+              keyPath={this.props.keyPath.push('value').push('units')}
+            />
             <MapComponent
-              address={filterLine.textValue || ''}
-              location={Util.asJS(value)}
+              address={value.address}
+              location={value.location}
               markLocation={true}
               showSearchBar={true}
               zoomControl={true}
               keepAddressInSync={false}
               geocoder='google'
-              keyPath={this.props.keyPath.push('value')}
-              textKeyPath={this.props.keyPath.push('textValue')}
+              keyPath={this.props.keyPath.push('value').push('location')}
+              textKeyPath={this.props.keyPath.push('value').push('address')}
               hideSearchSettings={true}
+              showDistanceCircle={true}
+              distance={value.distance}
+              distanceUnit={value.units}
+              wrapperClassName={'pf-filter-map-component-wrapper'}
+              fadeInOut={true}
             />
+          </div>
         );
-      
-      case 'location':
-      case 'distance':
+      case 'input':
         return (
-          <div>Map here</div>
-        );
-      
-      case 'input':  
-        return (
-          <AdvancedDropdown 
+          <AdvancedDropdown
             options={pathfinderContext.source.dataSource.getChoiceOptions({
               type: 'input',
             })}

@@ -49,6 +49,7 @@
 		.pf-piece {
 			margin: 0px @half-spacing;
 			display: block;
+			position: relative;
 			.fade-in-quick;
 			// opacity: 1;
 			// .transition;
@@ -56,6 +57,44 @@
 			&.pf-piece-hidden {
 				display: none;
 				// opacity: 0;
+			}
+
+			.pf-filter-map-input-wrapper {
+			    position: relative;
+			    display: inline-flex;
+			    .builder-tb {
+			    	flex-grow: 0;
+			    	flex-basis: 60px;
+			    	margin-right: 6px;
+			    	margin-top: 5px;
+			    	margin-left: -6px;
+			    }
+			    .dropdown-wrapper {
+			    	margin-top: 5px;
+			    	flex-grow: 0;
+			    	margin-right: 6px;
+			    }
+			    .map-component-search-bar {
+			    	margin-bottom: -18px;
+			    	width: calc(~"100% + 2px");
+			    }
+			    .pf-filter-map-component-wrapper {
+			    	flex-grow: 1;
+			    	.leaflet-container {
+				    	position: absolute;
+	    				width: 100%;
+				    	min-height: 250px;
+					    border-bottom-left-radius: 6px;
+					    border-bottom-right-radius: 6px;
+				    }
+				    .map-component-fade-in-out {
+				    	position: relative;
+				    	width: 100%;
+				    }
+				    #PlacesAutocomplete__autocomplete-container {
+				    	font-size: @font-size;
+				    }
+				}	
 			}
 		}
 		.pf-score-line-inner {
