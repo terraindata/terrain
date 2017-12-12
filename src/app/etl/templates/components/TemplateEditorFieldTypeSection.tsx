@@ -233,7 +233,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
   {
     if (index >= elasticTypeOptions.size || index < 0)
     {
-      return; // this should technically be impossible
+      return;
     }
     else
     {

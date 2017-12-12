@@ -209,7 +209,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   {
     const { field, canEdit, keyPath } = this.props;
     const inputDisabled = this._inputDisabled();
-    const disableCheckbox = !canEdit; // only disable checkbox if it is disabled from a parent
+    const disableCheckbox = !canEdit; // Only disable the checkbox if it is disabled from a parent
 
     const showPrimaryKeyButton = this._depth() === 1; // todo make this only for import
 

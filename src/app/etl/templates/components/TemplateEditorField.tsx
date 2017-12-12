@@ -80,7 +80,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     this._setFactory = _.memoize(this._setFactory);
   }
 
-  // helper to calling setIn() on the TemplateField in the store
+  // Helper to calling setIn() on the TemplateField in the store.
   protected _set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
   {
     const { act, keyPath } = this.props;
@@ -112,7 +112,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     });
   }
 
-  // returns true if type is nested or if arrayType ends with nested
+  // Returns true if the field's type is nested or if the field's arrayType ends with nested
   protected _isNested(): boolean
   {
     const type = this.props.field.type;
@@ -142,13 +142,13 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return !this.props.field.isIncluded || !this.props.canEdit;
   }
 
-  // for event handlers that should be disabled if input is disabled
+  // Returns the given function if input is not disabled. Otherwise returns undefined.
   protected _noopIfDisabled<F>(fn: F): F | undefined
   {
     return this._inputDisabled() ? undefined : fn;
   }
 
-  // similar to setStateWrapper
+  // similar to setStateWrapper but performs _set on the field instead
   protected _setFactory<K extends keyof TemplateField>(key: K, ...path: string[])
   {
     return (val) =>

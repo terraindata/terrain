@@ -77,11 +77,9 @@ class TemplateEditorStateC
 {
   public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
   public isDirty: boolean = true;
-  public originalPreviewData: any = ''; // figure out this type
-  public previewData: any = '';
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
-export const _TemplateEditorState = makeConstructor<TemplateEditorStateC>(TemplateEditorStateC);
+export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);
 
 interface TemplateBase
 {
@@ -125,7 +123,7 @@ class ExportTemplateC implements ExportTemplateBase
   public rank = true;
 }
 export type ExportTemplate = WithIRecord<ExportTemplateC>;
-export const _ExportTemplate = makeConstructor<ExportTemplateC>(ExportTemplateC);
+export const _ExportTemplate = makeConstructor(ExportTemplateC);
 
 class ImportTemplateC implements ImportTemplateBase
 {
@@ -143,7 +141,7 @@ class ImportTemplateC implements ImportTemplateBase
   public primaryKeyDelimiter = '-';
 }
 export type ImportTemplate = WithIRecord<ImportTemplateC>;
-export const _ImportTemplate = makeConstructor<ImportTemplateC>(ImportTemplateC);
+export const _ImportTemplate = makeConstructor(ImportTemplateC);
 
 export type ETLTemplate = ImportTemplate | ExportTemplate;
 
