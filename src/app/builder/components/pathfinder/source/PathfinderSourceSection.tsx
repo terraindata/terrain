@@ -62,7 +62,7 @@ import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
 {
   _ElasticDataSource, ChoiceOption, Path, PathfinderContext,
-  Source, sourceCountDropdownOptions, sourceCountOptions
+  Source, sourceCountDropdownOptions, sourceCountOptions,
 } from '../PathfinderTypes';
 
 export interface Props
