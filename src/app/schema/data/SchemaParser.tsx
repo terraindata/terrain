@@ -81,7 +81,7 @@ function recursiveParseFieldProperties(fieldProperty: FieldProperty, fieldProper
   else if (typeof fieldProperty.value === 'object')
   {
     let fieldPropertyChildIds = List<string>();
-    _.each((fieldProperty.value as any), (fieldPropertyChildValue, fieldPropertyChildName, fieldPropertyChildList) =>
+    _.each((fieldProperty.value as any), (fieldPropertyChildValue, fieldPropertyChildName) =>
     {
       let fieldPropertyChild = SchemaTypes._FieldProperty({
         name: (fieldPropertyChildName as any) as string,
@@ -129,7 +129,7 @@ export function parseElasticDb(elasticServer: object,
 
   let didSetServer = false;
 
-  _.each((schemaData as any), (databaseValue, databaseKey, databaseList) =>
+  _.each((schemaData as any), (databaseValue, databaseKey) =>
   {
     let database = SchemaTypes._Database({
       name: databaseKey.toString(),
@@ -149,7 +149,7 @@ export function parseElasticDb(elasticServer: object,
     let columnNamesByTable = Map<string, List<string>>();
 
     _.each((databaseValue as any),
-      (tableFields, tableName, tableList) =>
+      (tableFields, tableName) =>
       {
         const tableId = SchemaTypes.tableId(databaseId, (tableName as any) as string);
         let table = tables.get(tableId);
@@ -171,12 +171,12 @@ export function parseElasticDb(elasticServer: object,
           );
         }
 
-        _.each((tableFields as any), (fieldProperties, fieldName, fieldList) =>
+        _.each((tableFields as any), (fieldProperties, fieldName) =>
         {
           // fieldPropertiesMap = fieldPropertiesMap.clear();
           fieldPropertyIds = fieldPropertyIds.clear();
 
-          _.each((fieldProperties as any), (fieldPropertyValue, fieldPropertyName, fieldPropertyList) =>
+          _.each((fieldProperties as any), (fieldPropertyValue, fieldPropertyName) =>
           {
             let fieldProperty = SchemaTypes._FieldProperty({
               name: (fieldPropertyName as any) as string,
@@ -202,7 +202,6 @@ export function parseElasticDb(elasticServer: object,
             databaseId,
             tableId,
             datatype: fieldProperties['type'],
-            // fieldProperties: fieldPropertiesMap,
           });
 
           column = column.set(
