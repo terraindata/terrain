@@ -90,19 +90,20 @@ import { SchemaState } from 'schema/SchemaTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType, FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
 
-export const PathfinderSteps =
-  [
-    'Source',
-    'Filter',
-    'Score',
-  ];
+export enum PathfinderSteps
+{
+  Source,
+  Filter,
+  Score,
+  More,
+}
 
 class PathC extends BaseClass
 {
   public source: Source = _Source();
   public filterGroup: FilterGroup = _FilterGroup();
   public score: Score = _Score();
-  public step: string = PathfinderSteps[0];
+  public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
 }
 export type Path = PathC & IRecord<PathC>;
@@ -116,9 +117,9 @@ export const _Path = (config?: { [key: string]: any }) =>
         score: _Score(config['score']),
         filterGroup: _FilterGroup(config['filterGroup']),
         more: _More(config['more']),
+        step: config['step'] as PathfinderSteps,
       };
   }
-
   return New<Path>(new PathC(config || {}), config);
 };
 

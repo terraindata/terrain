@@ -61,7 +61,7 @@ import Util from '../../../../util/Util';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _ScoreLine, Path, PathfinderContext, Score, Source } from '../PathfinderTypes';
+import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
 
 export interface Props
@@ -69,6 +69,8 @@ export interface Props
   pathfinderContext: PathfinderContext;
   score: Score;
   keyPath: KeyPath;
+  onStepChange: (oldStep: PathfinderSteps) => void;
+  step: PathfinderSteps;
 }
 
 class PathfinderScoreSection extends TerrainComponent<Props>
@@ -194,13 +196,12 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     });
   }
 
-  public renderTitle()
+  public handleStepChange()
   {
-    return (
-      <div>
-        I want to sort my data using the following factors:
-      </div>
-    );
+    if (this.props.step === PathfinderSteps.Score)
+    {
+      this.props.onStepChange(this.props.step);
+    }
   }
 
   public render()
@@ -226,6 +227,12 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           onCreate={this.handleAddScoreLine}
           text={PathfinderText.createScoreLine}
         />
+        <div
+          onClick={this.handleStepChange}
+          className='pf-step-button'
+        >
+          Scoring looks good for now
+        </div>
       </div>
     );
   }

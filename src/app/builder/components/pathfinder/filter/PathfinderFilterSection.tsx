@@ -58,7 +58,7 @@ import BuilderActions from 'app/builder/data/BuilderActions';
 import BuilderStore from 'app/builder/data/BuilderStore';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
-import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import { FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine';
@@ -68,6 +68,8 @@ export interface Props
   pathfinderContext: PathfinderContext;
   filterGroup: FilterGroup;
   keyPath: KeyPath;
+  step?: PathfinderSteps;
+  onStepChange?: (oldStep: PathfinderSteps) => void;
 }
 
 class PathfinderFilterSection extends TerrainComponent<Props>
@@ -93,8 +95,22 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         {
           entries.map(this.renderFilterEntry)
         }
+        <div
+          onClick={this.handleStepChange}
+          className='pf-step-button'
+        >
+          Filters look good for now
+        </div>
       </div>
     );
+  }
+
+  private handleStepChange()
+  {
+    if (this.props.step === PathfinderSteps.Filter)
+    {
+      this.props.onStepChange(this.props.step);
+    }
   }
 
   private handleFilterChange(keyPath: KeyPath, filter: FilterGroup | FilterLine)

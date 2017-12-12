@@ -61,7 +61,7 @@ import Dropdown from 'app/common/components/Dropdown';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
 {
-  _ElasticDataSource, ChoiceOption, Path, PathfinderContext,
+  _ElasticDataSource, ChoiceOption, Path, PathfinderContext, PathfinderSteps,
   Source, sourceCountDropdownOptions, sourceCountOptions,
 } from '../PathfinderTypes';
 
@@ -69,6 +69,8 @@ export interface Props
 {
   pathfinderContext: PathfinderContext;
   keyPath: KeyPath;
+  onStepChange: (oldStep: PathfinderSteps) => void;
+  step: PathfinderSteps;
 }
 
 class PathfinderSourceSection extends TerrainComponent<Props>
@@ -160,11 +162,15 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     }
 
     BuilderActions.change(this.props.keyPath.push('dataSource').push('name'), options.get(index).displayName);
+    if (this.props.step === PathfinderSteps.Source)
+    {
+      this.props.onStepChange(this.props.step);
+    }
   }
 
   private handleCountChange(value: string | number)
   {
-    BuilderActions.change(this.props.keyPath.push('dataSource').push('count'), value);
+    BuilderActions.change(this.props.keyPath.push('count'), value);
   }
 
   private getDataSourceOptions(overrideContext?: PathfinderContext): List<ChoiceOption>
