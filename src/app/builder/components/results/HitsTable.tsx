@@ -76,27 +76,69 @@ export default class HitsTable extends TerrainComponent<Props>
 {
   public state: {
     random: number;
-    spotlightState: SpotlightState;
+    spotlights: IMMap<string, any>;
     columns: List<TableColumn>;
     rows: List<any>;
     selectedIndexes: List<any>;
   } = {
     random: 0,
-    spotlightState: null,
+    spotlights: SpotlightStore.getState().spotlights,
     columns: this.getColumns(this.props),
     rows: List([]),
     selectedIndexes: List([]),
   };
 
+  public constructor(props: Props)
+  {
+    super(props);
+    this._subscribe(SpotlightStore, {
+      isMounted: true,
+      storeKeyPath: ['spotlights'],
+      stateKey: 'spotlights',
+    });
+  }
+
+  public componentWillMount()
+  {
+    let selectedIndexes = List([]);
+    const spotlights = SpotlightStore.getState().spotlights;
+    const spotlightKeys = _.keys(spotlights.toJS());
+    this.props.hits.forEach((r, index) =>
+    {
+      if (spotlightKeys.includes(r.primaryKey))
+      {
+        selectedIndexes = selectedIndexes.push(index);
+      }
+    });
+
+    this.setState({
+      selectedIndexes,
+      rows: this.props.hits,
+    });
+  }
+
   public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.hits !== this.props.hits || nextProps.resultsConfig !== this.props.resultsConfig)
     {
+      const spotlights = SpotlightStore.getState().spotlights;
+      // using the spotlights set the correct indexes
       // force the table to update
+      let selectedIndexes = List([]);
+      const spotlightKeys = _.keys(spotlights.toJS());
+      nextProps.hits.forEach((r, index) =>
+      {
+        if (spotlightKeys.includes(r.primaryKey))
+        {
+          selectedIndexes = selectedIndexes.push(index);
+        }
+      });
       this.setState({
         random: Math.random(),
         columns: this.getColumns(nextProps),
         rows: nextProps.hits,
+        spotlights,
+        selectedIndexes,
       });
     }
   }
@@ -134,14 +176,19 @@ export default class HitsTable extends TerrainComponent<Props>
     if (resultsConfig.enabled && resultsConfig.fields && resultsConfig.fields.size)
     {
       resultsConfig.fields.map(
-        (field) =>
-          cols.push({
-            key: field,
-            name: field,
-            filterable: true,
-            resizable: true,
-            sortable: true,
-          }),
+        (field, i) =>
+        {
+          if (field !== resultsConfig.name && field !== resultsConfig.score)
+          {
+            cols.push({
+              key: field,
+              name: field,
+              filterable: true,
+              resizable: true,
+              sortable: true,
+            });
+          }
+        },
       );
     }
     else
@@ -149,14 +196,18 @@ export default class HitsTable extends TerrainComponent<Props>
       const resultFields = props.hits.size ? props.hits.get(0).fields : Map({});
       resultFields.map(
         (value, field) =>
-          cols.push({
-            key: field,
-            name: field,
-            filterable: true,
-            resizable: true,
-            sortable: true,
-            width: 120,
-          }),
+        {
+          if (field !== resultsConfig.name && field !== resultsConfig.score)
+          {
+            cols.push({
+              key: field,
+              name: field,
+              filterable: true,
+              resizable: true,
+              sortable: true,
+            });
+          }
+        },
       );
     }
 
@@ -184,16 +235,6 @@ export default class HitsTable extends TerrainComponent<Props>
     }
 
     return List(cols);
-  }
-
-  public componentDidMount()
-  {
-    this._subscribe(SpotlightStore, {
-      isMounted: true,
-      stateKey: 'spotlightState',
-    });
-
-    this.setState({ rows: this.props.hits });
   }
 
   public getRow(i: number): object
@@ -332,27 +373,21 @@ export default class HitsTable extends TerrainComponent<Props>
 
   public rowRenderer(props)
   {
-    if (this.state.selectedIndexes.includes(props.idx))
+    const hit = this.state.rows && this.state.rows.get(props.idx);
+    const id = hit.primaryKey;
+    const spotlight = this.state.spotlights.get(String(id));
+    if (spotlight === undefined)
     {
-      const hit = this.state.rows && this.state.rows.get(props.idx);
-      const id = hit.primaryKey;
-      const spotlight = this.state.spotlightState.getIn(['spotlights', id]);
-      if (spotlight === undefined)
-      {
-        return (<ReactDataGrid.Row {...props} />);
-      }
-
-      return (
-        <div
-          style={{
-            backgroundColor: spotlight.color,
-          }}>
-          <ReactDataGrid.Row {...props} />
-        </div>
-      );
+      return (<ReactDataGrid.Row {...props} />);
     }
-
-    return (<ReactDataGrid.Row {...props} />);
+    return (
+      <div
+        style={{
+          backgroundColor: spotlight.color,
+        }}>
+        <ReactDataGrid.Row {...props} />
+      </div>
+    );
   }
 
   public render()
