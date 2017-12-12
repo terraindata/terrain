@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires
+// tslint:disable:no-var-requires import-spacing
 
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
@@ -66,7 +66,7 @@ import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import
 {
   _TemplateField, ELASTIC_TYPES, TEMPLATE_TYPES,
-  TemplateEditorState, TemplateField
+  TemplateEditorState, TemplateField,
 } from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import TemplateEditorFieldTypeSection from './TemplateEditorFieldTypeSection';
@@ -91,7 +91,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     originalNameOpen: boolean;
   } = {
     originalNameOpen: false,
-  }
+  };
 
   constructor(props)
   {
@@ -138,7 +138,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
       />;
 
     const showOriginalName = field.name !== field.originalName;
-    let inputOriginalName = <div />
+    let inputOriginalName = <div />;
 
     if (showOriginalName)
     {
@@ -158,7 +158,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         :
         <div className='tef-layout-label tef-center normal-text'>
           &nbsp;{field.originalName}
-        </div>
+        </div>;
     }
 
     const fieldNameSection = (
@@ -191,7 +191,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     ] : [
         getStyle('opacity', '0.5'),
         fontColor(Colors().text2),
-      ]
+      ];
     return (
       <div className='template-editor-pkey-section'>
         <div
@@ -232,7 +232,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         })}
           style={[
             backgroundColor(Colors().bg3),
-            borderColor(Colors().border1)
+            borderColor(Colors().darkerHighlight),
           ]}
         >
           <div className='tef-layout-row'>

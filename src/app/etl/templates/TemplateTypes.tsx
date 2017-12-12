@@ -163,11 +163,11 @@ class TemplateFieldC
 export type TemplateField = WithIRecord<TemplateFieldC>;
 export const _TemplateField = (cfg?: any) =>
 {
-  const config = cfg || {}
+  const config = cfg || {};
   config.type = config.type || ELASTIC_TYPES.TEXT;
   config.analyzer = config.analyzer || (config.type === ELASTIC_TYPES.TEXT ? 'standard' : null);
   config.originalName = config.originalName || config.name || '';
   config.name = config.name || config.originalName;
 
   return New<WithIRecord<TemplateFieldC>>(new TemplateFieldC(), config);
-}
+};

@@ -62,7 +62,7 @@ export interface Props
   content: any;
   open: boolean;
   onToggle: () => void;
-  style?: any
+  style?: any;
   unmountOnClose?: boolean;
   children?: any;
 }

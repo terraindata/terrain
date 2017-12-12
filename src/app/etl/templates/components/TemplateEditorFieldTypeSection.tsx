@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:import-spacing
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
@@ -62,7 +63,7 @@ import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import
 {
   _TemplateField, ELASTIC_TYPES, TEMPLATE_TYPES,
-  TemplateEditorState, TemplateField
+  TemplateEditorState, TemplateField,
 } from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
@@ -267,7 +268,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
         const newArray = this.props.field.arrayType.set(arrayTypeIndex, elasticTypeOptions.get(index));
         this._set('arrayType', this.cleanArrayType(newArray));
       }
-    }
+    };
   }
 
   public handleAnalyzedCheckboxClicked()
@@ -299,7 +300,7 @@ const elasticAnalyzerOptions = List([
   'test analyzer 2',
 ]); // this is just a placeholder
 
-const voidFunction = () => { /* do nothing */ }
+const voidFunction = () => { /* do nothing */ };
 
 export default Util.createTypedContainer(
   TemplateEditorFieldTypeSection,

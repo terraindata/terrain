@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+// tslint:disable:import-spacing
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 
@@ -60,11 +60,6 @@ const { List, Map } = Immutable;
 
 export interface TemplateEditorActionTypes
 {
-  setPreviewData: {
-    actionType: 'setPreviewData';
-    preview: any;
-    originalNames?: any;
-  };
   loadTemplate: { // load a new template to edit / view
     actionType: 'loadTemplate';
     template: ETLTemplate;
@@ -90,10 +85,6 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
 {
   public reducers: ConstrainedMap<TemplateEditorActionTypes, TemplateEditorState> =
   {
-    setPreviewData: (state, action) =>
-    {
-      return state.set('previewData', action.payload.preview);
-    },
     loadTemplate: (state, action) =>
     {
       return state.set('isDirty', false).
@@ -120,8 +111,8 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       const fieldKeyPath = List<string | number>(['template', 'rootField'])
         .push(...action.payload.sourcePath.toJS());
       return state.deleteIn(fieldKeyPath);
-    }
-  }
+    },
+  };
 }
 
 const ReduxInstance = new TemplateEditorActionsClass();

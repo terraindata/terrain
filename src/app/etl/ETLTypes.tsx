@@ -54,7 +54,7 @@ export enum FILE_TYPES
 {
   JSON = 'json',
   JSON_TYPE_OBJECT = 'json [type object]',
-  CSV = 'csv'
+  CSV = 'csv',
 }
 
 // Store type
@@ -62,5 +62,5 @@ class ETLStateC
 {
   public placeholder: number = 0;
 }
-export type ETLState = WithIRecord<ETLStateC>
+export type ETLState = WithIRecord<ETLStateC>;
 export const _ETLState = makeConstructor<ETLStateC>(ETLStateC);
