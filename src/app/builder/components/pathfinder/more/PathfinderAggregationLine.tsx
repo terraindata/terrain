@@ -204,14 +204,20 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       };
       const index: string = (this.props.pathfinderContext.source.dataSource as any).index.split('/')[1];
       const domainQuery = {
-        body: {
-          size: 0,
-          query: {
-          },
-          aggs: {
-            maximum: {
-              max: {
-                field,
+        query: {
+          bool: {
+            filter: [
+            {
+              term: {
+                _index: index
+              }
+            }]
+          }
+        },
+        aggs: {
+          maximum: {
+            max: {
+              field,
               },
             },
             minimum: {
@@ -219,11 +225,8 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
                 field,
               },
             },
-          },
-        },
-      };
-
-      domainQuery['index'] = index;
+        }
+      }
       Ajax.query(
         JSON.stringify(domainQuery),
         backend,
