@@ -43,14 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-const SpotlightActionTypes =
-  {
-    spotlightAction: '',
-    clearSpotlightsAction: '',
-  };
+// tslint:disable:no-var-requires
 
-Util.setValuesToKeys(SpotlightActionTypes, '');
+// Copyright 2017 Terrain Data, Inc.
 
-export default SpotlightActionTypes;
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import { BaseClass, makeConstructor, New, WithIRecord } from 'app/Classes';
+import * as Immutable from 'immutable';
+import { Map } from 'immutable';
+
+class SpotlightStateC
+{
+  public spotlights: IMMap<string, any> = Map({});
+}
+export type SpotlightState = WithIRecord<SpotlightStateC>;
+export const _SpotlightState = makeConstructor(SpotlightStateC);

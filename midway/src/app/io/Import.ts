@@ -1290,6 +1290,7 @@ export class Import
         byte: (self, node, typeObj) => node,
         integer: (self, node, typeObj) => node,
         half_float: (self, node, typeObj) => node,
+        geo_point: (self, node, typeObj) => node,
         date: (self, node, typeObj) =>
         {
           if (node !== null)

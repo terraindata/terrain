@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 
 import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import SpotlightReducer from 'app/builder/data/SpotlightReducers';
+import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
@@ -65,7 +65,7 @@ const reducers = {
   roles: RolesReducer,
   schema: SchemaReducers,
   users: UserReducer,
-  spotlights: SpotlightReducer,
+  spotlights: SpotlightReducers,
 };
 
 const rootReducer = combineReducers(reducers);
