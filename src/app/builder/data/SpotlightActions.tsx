@@ -53,9 +53,9 @@ const SpotlightActions =
     spotlightAction:
     (id: string, hit: any) =>
       $(ActionTypes.spotlightAction, { id, hit }),
-    clearSpotlightsAction: 
+    clearSpotlightsAction:
     (id: string) =>
-    	$(ActionTypes.clearSpotlightsAction, {}),
+      $(ActionTypes.clearSpotlightsAction, { id }),
   };
 
 export default SpotlightActions;

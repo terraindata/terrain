@@ -58,8 +58,8 @@ import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import MapUtil from '../../../util/MapUtil';
-import SpotlightStore from '../../data/SpotlightStore';
 import SpotlightActions from '../../data/SpotlightActions';
+import SpotlightStore from '../../data/SpotlightStore';
 import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';

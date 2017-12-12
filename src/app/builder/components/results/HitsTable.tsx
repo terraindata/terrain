@@ -57,8 +57,8 @@ import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
-import { SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import SpotlightActions from '../../data/SpotlightActions';
+import { SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
 import { getResultName } from './Hit';
 import { Hits } from './ResultTypes';
 

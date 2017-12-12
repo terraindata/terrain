@@ -65,8 +65,8 @@ import * as FileImportTypes from '../../../fileImport/FileImportTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
-import { SpotlightStore } from '../../data/SpotlightStore';
 import SpotlightActions from '../../data/SpotlightActions';
+import { SpotlightStore } from '../../data/SpotlightStore';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
 

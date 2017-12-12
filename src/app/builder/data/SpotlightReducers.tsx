@@ -55,15 +55,15 @@ SpotlightReducers[ActionTypes.spotlightAction] =
   (state, action) =>
   {
     const { id, hit } = action.payload;
-    return state.setIn(['spotlights', id], _.extend({ id }, hit))
+    return state.setIn(['spotlights', id], _.extend({}, hit, { id }));
   };
 
-SpotlightReducers[ActionTypes.clearSpotlightsAction] = 
+SpotlightReducers[ActionTypes.clearSpotlightsAction] =
   (state, action) =>
   {
-    const {id} = action.payload;
+    const { id } = action.payload;
     return state.removeIn(['spotlights', id]);
-  }
+  };
 
 const SpotlightReducerWrapper = (state: SpotlightState = _SpotlightState(), action) =>
 {

@@ -54,15 +54,15 @@ import { Map } from 'immutable';
 import * as _ from 'lodash';
 import * as ReduxActions from 'redux-actions';
 const Redux = require('redux');
-import { BaseClass, New } from '../../Classes';
-import SpotlightReducers from './SpotlightReducers';
 import Util from 'app/util/Util';
 import thunk from 'redux-thunk';
+import { BaseClass, New } from '../../Classes';
+import SpotlightReducers from './SpotlightReducers';
 class SpotlightStateC extends BaseClass
 {
   public spotlights: IMMap<string, any> = Map({});
 }
-const SpotlightState_Record = Immutable.Record(new SpotlightStateC);
+const SpotlightState_Record = Immutable.Record(new SpotlightStateC());
 export interface SpotlightState extends SpotlightStateC, IRecord<SpotlightState> { }
 export const _SpotlightState = (config?: { [key: string]: any }) =>
   new SpotlightState_Record(Util.extendId(config || {})) as any as SpotlightState;

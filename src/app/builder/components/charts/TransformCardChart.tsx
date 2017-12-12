@@ -562,7 +562,6 @@ class TransformCardChart extends TerrainComponent<Props>
     }
 
     const spotlights = overrideState.spotlights || this.props.spotlights || [];
-    console.log(spotlights);
     _.map(spotlights, (spotlight: any) =>
     {
       spotlight.id = spotlight.id.replace(/[.#]/g, '-');
