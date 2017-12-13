@@ -60,6 +60,7 @@ export const enum AutocompleteMatchType
   Transform = 4,
 }
 
+// TODO move this to a centralized, shared place, not back-end specific
 export const enum FieldType
 {
   Numerical,
@@ -70,7 +71,7 @@ export const enum FieldType
   Any,
 }
 
-const FieldTypeMapping =
+export const FieldTypeMapping =
   {
     [FieldType.Numerical]: ['long', 'double', 'short', 'byte', 'integer', 'half_float', 'float', 'boolean'],
     [FieldType.Text]: ['text'],

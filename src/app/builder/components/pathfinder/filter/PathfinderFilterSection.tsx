@@ -61,7 +61,7 @@ import DragHandle from 'app/common/components/DragHandle';
 import { FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
-import PathfinderFilterLine from './PathfinderFilterLine';
+import PathfinderFilterLine from './PathfinderFilterLine2';
 
 export interface Props
 {
