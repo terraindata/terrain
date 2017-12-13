@@ -341,14 +341,14 @@ export class Export
           returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
           for (const doc of returnDocs)
           {
-            if (exprt.rank === true)
+            if (Boolean(exprt.rank))
             {
-              if (doc['terrainRank'] !== undefined)
+              if (doc['TERRAINRANK'] !== undefined)
               {
-                errMsg = 'Conflicting field: terrainRank.';
+                errMsg = 'Conflicting field: TERRAINRANK.';
                 return reject(errMsg);
               }
-              doc['terrainRank'] = rankCounter;
+              doc['TERRAINRANK'] = rankCounter;
             }
             rankCounter++;
           }
