@@ -452,7 +452,6 @@ class ElasticDataSourceC extends DataSource
 {
   public index: string = '';
   public types: List<string> = List([]);
-
   public getChoiceOptions = (context: ChoiceContext): List<ChoiceOption> =>
   {
     const server = BuilderStore.getState().db.name;
@@ -465,11 +464,37 @@ class ElasticDataSourceC extends DataSource
         {
           return _ChoiceOption({
             displayName: db.name,
-            value: db,
+            value: db.serverId + '/' + db.name,
           });
         },
       ).toList();
-      return sources;
+      // Get examples for each data source by looking at the example results of their types
+      const sourceExamples = {};
+      sources.forEach((source) =>
+      {
+        const types = context.schemaState.tables.toList().filter((table) =>
+          table.databaseId === source.value,
+        );
+        types.forEach((type) =>
+        {
+          if (sourceExamples[source.value])
+          {
+            sourceExamples[source.value] = sourceExamples[source.value].concat(type.sampleData);
+          }
+          else
+          {
+            sourceExamples[source.value] = type.sampleData;
+          }
+        });
+      });
+      return sources.map((source) =>
+      {
+        return _ChoiceOption({
+          displayName: source.displayName,
+          value: source.value,
+          sampleData: List(sourceExamples[source.value]),
+        });
+      }).toList();
     }
 
     if (context.type === 'transformFields')
@@ -478,10 +503,12 @@ class ElasticDataSourceC extends DataSource
         _ChoiceOption({
           displayName: '_score',
           value: '_score',
+          sampleData: List([]),
         }),
         _ChoiceOption({
           displayName: '_size',
           value: '_size',
+          sampleData: List([]),
         }),
       ]);
       const transformableTypes =
@@ -510,6 +537,7 @@ class ElasticDataSourceC extends DataSource
             return _ChoiceOption({
               displayName: col.name,
               value: col.name,
+              sampleData: col.sampleData,
             });
           }).toList();
           return transformableOptions.concat(defaultOptions).toList();
@@ -530,6 +558,7 @@ class ElasticDataSourceC extends DataSource
         return _ChoiceOption({
           displayName: option,
           value: option,
+          sampleData: List([]),
         });
       }));
       const { dataSource } = context.source;
@@ -546,6 +575,7 @@ class ElasticDataSourceC extends DataSource
             return _ChoiceOption({
               displayName: col.name,
               value: col.name,
+              sampleData: col.sampleData,
             });
           }).toList();
           return fields.concat(defaultOptions).toList();
@@ -689,6 +719,7 @@ class ChoiceOptionC extends BaseClass
   public displayName: string | number | El = '';
   public color: string = null;
   public tooltipContent: string | El = null;
+  public sampleData: List<any> = List([]);
 }
 export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
 export const _ChoiceOption = (config?: { [key: string]: any }) =>

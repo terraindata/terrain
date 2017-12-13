@@ -207,26 +207,27 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
         query: {
           bool: {
             filter: [
-            {
-              term: {
-                _index: index
-              }
-            }]
-          }
+              {
+                term: {
+                  _index: index,
+                },
+              }],
+          },
         },
         aggs: {
           maximum: {
             max: {
               field,
-              },
             },
-            minimum: {
-              min: {
-                field,
-              },
+          },
+          minimum: {
+            min: {
+              field,
             },
-        }
-      }
+          },
+        },
+        size: 0,
+      };
       Ajax.query(
         JSON.stringify(domainQuery),
         backend,
