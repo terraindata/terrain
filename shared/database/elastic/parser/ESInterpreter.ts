@@ -117,6 +117,11 @@ export default class ESInterpreter
         {
           if (info.parameter !== undefined)
           {
+            if (info.parameter.split('.')[0] === 'parent')
+            {
+              return false;
+            }
+
             const value: null | any = this.params[info.parameter];
             if (value === undefined)
             {

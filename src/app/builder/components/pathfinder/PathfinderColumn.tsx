@@ -55,6 +55,7 @@ import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../..
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
+import BuilderActions from 'app/builder/data/BuilderActions';
 import { SchemaState } from 'schema/SchemaTypes';
 import TerrainStore from 'store/TerrainStore';
 import Util from 'util/Util';
@@ -62,7 +63,7 @@ import ColorsActions from '../../../colors/data/ColorsActions';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
-import { _PathfinderContext, Path, Source } from './PathfinderTypes';
+import { _PathfinderContext, Path, PathfinderSteps, Source } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 import PathfinderStepSection from './step/PathfinderStepSection';
@@ -93,6 +94,10 @@ class PathfinderColumn extends TerrainComponent<Props>
   {
     ColorsActions.setStyle('.pf-section-title',
       { color: Colors().text1 });
+    ColorsActions.setStyle('.pf-step-button:hover',
+      {
+        color: Colors().active,
+      });
   }
 
   public getPathfinderContext(props: Props)
@@ -103,6 +108,14 @@ class PathfinderColumn extends TerrainComponent<Props>
       step: props.path.step,
       schemaState: props.schema,
     };
+  }
+
+  public incrementStep(oldStep)
+  {
+    if (oldStep < PathfinderSteps.More)
+    {
+      BuilderActions.change(this.getKeyPath().push('step'), this.props.path.step + 1);
+    }
   }
 
   public getKeyPath()
@@ -126,31 +139,40 @@ class PathfinderColumn extends TerrainComponent<Props>
         <PathfinderSourceSection
           pathfinderContext={pathfinderContext}
           keyPath={keyPath.push('source')}
+          onStepChange={this.incrementStep}
+          step={path.step}
         />
-
-        <PathfinderFilterSection
-          pathfinderContext={pathfinderContext}
-          filterGroup={path.filterGroup}
-          keyPath={keyPath.push('filterGroup')}
-        />
-
-        <PathfinderScoreSection
-          pathfinderContext={pathfinderContext}
-          score={path.score}
-          keyPath={keyPath.push('score')}
-        />
-
-        <PathfinderMoreSection
-          pathfinderContext={pathfinderContext}
-          more={path.more}
-          keyPath={keyPath.push('more')}
-        />
-
         {
-          // <PathfinderStepSection
-          //         pathfinderContext={pathfinderContext}
-          //         path={path}
-          //       />
+          path.step >= PathfinderSteps.Filter ?
+            <PathfinderFilterSection
+              pathfinderContext={pathfinderContext}
+              filterGroup={path.filterGroup}
+              keyPath={keyPath.push('filterGroup')}
+              onStepChange={this.incrementStep}
+              step={path.step}
+            />
+            : null
+        }
+        {
+          path.step >= PathfinderSteps.Score ?
+            <PathfinderScoreSection
+              pathfinderContext={pathfinderContext}
+              score={path.score}
+              keyPath={keyPath.push('score')}
+              step={path.step}
+              onStepChange={this.incrementStep}
+
+            />
+            : null
+        }
+        {
+          path.step >= PathfinderSteps.More ?
+            <PathfinderMoreSection
+              pathfinderContext={pathfinderContext}
+              more={path.more}
+              keyPath={keyPath.push('more')}
+            />
+            : null
         }
       </div>
     );

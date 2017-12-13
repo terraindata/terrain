@@ -53,7 +53,7 @@ import * as AuthTypes from '../AuthTypes';
 
 import AuthReducers from './AuthReducers';
 
-const AuthStore: IStore<AuthTypes.AuthState> = Redux.createStore(ReduxActions.handleActions(_.extend({},
+const AuthStore: IStore<AuthTypes.AuthState> = Redux.createStore(ReduxActions.handleActions(_.extend({} as any,
   AuthReducers,
   {}), AuthTypes._AuthState()), AuthTypes._AuthState());
 

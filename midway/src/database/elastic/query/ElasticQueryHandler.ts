@@ -73,8 +73,7 @@ export default class ElasticQueryHandler extends QueryHandler
 {
   private controller: ElasticController;
 
-  private GROUP_JOIN_SEARCH_THRESHOLD = 10000;
-  private GROUP_JOIN_MSEARCH_THRESHOLD = 1000;
+  private GROUPJOIN_MSEARCH_BATCH_SIZE = 1000;
 
   constructor(controller: ElasticController)
   {
@@ -105,20 +104,20 @@ export default class ElasticQueryHandler extends QueryHandler
           return new QueryResponse({}, errors);
         }
 
-        const body = parser.getValue();
-        if (body['groupJoin'] !== undefined)
+        const query = parser.getValue();
+        if (query['groupJoin'] !== undefined)
         {
-          return this.handleGroupJoin(parser, body);
+          return this.handleGroupJoin(parser, query);
         }
 
         if (request.streaming === true)
         {
-          return new ElasticsearchScrollStream(client.getDelegate(), body);
+          return new ElasticsearchScrollStream(client.getDelegate(), { body: query });
         }
 
         return new Promise<QueryResponse>((resolve, reject) =>
         {
-          client.search(body as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
+          client.search({ body: query } as Elastic.SearchParams, this.makeQueryCallback(resolve, reject));
         });
 
       case 'deleteTemplate':
@@ -142,81 +141,118 @@ export default class ElasticQueryHandler extends QueryHandler
     throw new Error('Query type "' + type + '" is not currently supported.');
   }
 
-  private async handleGroupJoin(parser: ESParser, body: object): Promise<QueryResponse>
+  private async handleGroupJoin(parser: ESParser, query: object): Promise<QueryResponse>
   {
-    const childQuery = body['groupJoin'];
-    body['groupJoin'] = undefined;
-    const parentQuery: Elastic.SearchParams = body;
+    const childQuery = query['groupJoin'];
+    query['groupJoin'] = undefined;
+    const parentQuery: Elastic.SearchParams | undefined = query;
+    if (parentQuery === undefined)
+    {
+      throw new Error('Expecting body parameter in the groupJoin query');
+    }
+
+    const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
+    if (valueInfo === null)
+    {
+      throw new Error('Error finding groupJoin clause in the query');
+    }
 
     return new Promise<QueryResponse>(async (resolve, reject) =>
     {
-      let parentResults;
       const client: ElasticClient = this.controller.getClient();
-      const size = (parentQuery !== undefined && parentQuery.size !== undefined) ? parentQuery.size : 0;
-      if (size < this.GROUP_JOIN_SEARCH_THRESHOLD)
+      const parentResults = await new Promise<QueryResponse>((res, rej) =>
       {
-        parentResults = await new Promise<QueryResponse>((res, rej) =>
+        let allResponse: any | null = null;
+        let rowsProcessed: number = 0;
+        const originalSize: number = (parentQuery['size'] !== undefined) ? parentQuery['size'] as number : -1;
+
+        const getMoreUntilDone = async (error: any, response: any) =>
         {
-          client.search(parentQuery, this.makeQueryCallback(res, rej));
-        });
-
-        winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(parentResults, null, 2));
-      }
-      else
-      {
-        // todo: perform scrolled query here
-        throw new Error('Not implemented');
-      }
-
-      const valueInfo = parser.getValueInfo().objectChildren['groupJoin'].propertyValue;
-      if (valueInfo === null)
-      {
-        throw new Error('Error finding groupJoin clause in the query');
-      }
-
-      const subQueries = Object.keys(childQuery);
-      const promises: Array<Promise<any>> = [];
-      for (const subQuery of subQueries)
-      {
-        try
-        {
-          const vi = valueInfo.objectChildren[subQuery].propertyValue;
-          if (vi !== null)
+          if (error !== null && error !== undefined)
           {
-            promises.push(this.handleGroupJoinSubQuery(vi, subQuery, parentResults));
+            return this.makeQueryCallback(res, rej)(error, allResponse);
+          }
+
+          // winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(response, null, 2));
+          await this.handleGroupJoinSubQueries(valueInfo, childQuery, response);
+
+          if (allResponse === null)
+          {
+            allResponse = response;
           }
           else
           {
-            throw new Error('Error finding subquery property');
+            allResponse.hits.hits = allResponse.hits.hits.concat(response.hits.hits);
           }
 
-        }
-        catch (e)
-        {
-          return reject(e);
-        }
-      }
+          rowsProcessed += response.hits.hits.length;
 
-      await Promise.all(promises);
+          let total = response.hits.total;
+          if (originalSize > 0 && originalSize <= total)
+          {
+            total = originalSize;
+          }
+          else
+          {
+            // TODO: choose optimal size parameter
+            parentQuery['size'] = 10000;
+          }
+
+          if (response.hits.hits.length > 0 && rowsProcessed < total)
+          {
+            const scroll = (parentQuery['scroll'] !== undefined) ? parentQuery['scroll'] : '60s';
+            client.scroll({
+              scrollId: response._scroll_id,
+              scroll,
+            } as Elastic.ScrollParams, getMoreUntilDone);
+          }
+          else
+          {
+            client.clearScroll({
+              scrollId: response._scroll_id,
+            }, (_err, _resp) => { return; });
+            return this.makeQueryCallback(res, rej)(error, allResponse);
+          }
+        };
+
+        client.search({ body: parentQuery }, getMoreUntilDone);
+      });
+
       if (parentResults.hasError())
       {
         return reject(parentResults);
       }
 
-      winston.debug('parentResults (annotated with subQueryResults): ' + JSON.stringify(parentResults.result, null, 2));
+      // winston.debug('parentResults (annotated with subQueryResults): ' + JSON.stringify(parentResults.result, null, 2));
       resolve(parentResults);
     });
   }
 
+  private async handleGroupJoinSubQueries(parentValueInfo: ESValueInfo, query: object, results: object)
+  {
+    const promises: Array<Promise<any>> = [];
+    for (const subQuery of Object.keys(query))
+    {
+      const vi = parentValueInfo.objectChildren[subQuery].propertyValue;
+      if (vi === null)
+      {
+        throw new Error('Error finding subquery property');
+      }
+
+      promises.push(this.handleGroupJoinSubQuery(vi, subQuery, results));
+    }
+    return Promise.all(promises);
+  }
+
   private async handleGroupJoinSubQuery(valueInfo: ESValueInfo, subQuery: string, parentResults: any)
   {
-    const hits = parentResults.result.hits.hits;
+    const hits = parentResults.hits.hits;
     const promises: Array<Promise<any>> = [];
-    for (let i = 0, chunkSize = this.GROUP_JOIN_MSEARCH_THRESHOLD; i < hits.length; i += chunkSize)
+    for (let i = 0, batchSize = this.GROUPJOIN_MSEARCH_BATCH_SIZE; i < hits.length; i += batchSize)
     {
-      if (i + chunkSize > hits.length)
+      if (i + batchSize > hits.length)
       {
-        chunkSize = hits.length - i;
+        batchSize = hits.length - i;
       }
 
       // todo: optimization to avoid repeating index and type if they're the same
@@ -226,9 +262,9 @@ export default class ElasticQueryHandler extends QueryHandler
       promises.push(new Promise((resolve, reject) =>
       {
         const body: any[] = [];
-        for (let j = i; j < i + chunkSize; ++j)
+        for (let j = i; j < i + batchSize; ++j)
         {
-          winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
+          // winston.debug('parentObject ' + JSON.stringify(hits[j]._source, null, 2));
           const header = {};
           body.push(header);
 
@@ -248,7 +284,7 @@ export default class ElasticQueryHandler extends QueryHandler
               return reject(error);
             }
 
-            for (let j = 0; j < chunkSize; ++j)
+            for (let j = 0; j < batchSize; ++j)
             {
               hits[i + j][subQuery] = response.responses[j].hits.hits;
             }

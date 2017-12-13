@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
+import * as _ from 'lodash';
 import * as winston from 'winston';
 import * as Util from '../Util';
 
@@ -56,6 +57,7 @@ import QueryResponse from '../../../../src/database/types/QueryResponse';
 import { QueryHandler } from './QueryHandler';
 
 import DatabaseController from '../../database/DatabaseController';
+import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 
 const QueryRouter = new KoaRouter();
@@ -116,5 +118,56 @@ QueryRouter.post(
       ctx.status = 200;
     }
   });
+
+QueryRouter.post('/template', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  // parse ctx.request.body.body as an Array
+  const reqArr: object[] = ctx.request.body.body as object[];
+  const bodyArr: object[] = [];
+  const indexSet: Set<string> = new Set();
+  const typeSet: Set<string> = new Set();
+  let dbid: number = -1;
+  reqArr.forEach((elem) =>
+  {
+    // get index and types, if any and add them to the Set
+    if (elem['index'] !== undefined)
+    {
+      indexSet.add(elem['index']);
+    }
+    if (elem['type'] !== undefined)
+    {
+      typeSet.add(elem['type']);
+    }
+    if (elem['dbid'] !== undefined && typeof elem['dbid'] === 'number')
+    {
+      dbid = elem['dbid'];
+    }
+    const bodyObj: object = {};
+    const headerObj: object = {};
+    if (elem['id'] !== undefined && typeof elem['id'] === 'string' && elem['params'] !== undefined && typeof elem['params'] === 'object'
+      && elem['explain'] !== undefined && typeof elem['explain'] === 'boolean')
+    {
+      bodyObj['id'] = elem['id'];
+      bodyObj['params'] = elem['params'];
+      headerObj['index'] = elem['index'];
+      headerObj['type'] = elem['type'];
+      bodyArr.push(headerObj);
+      bodyArr.push(bodyObj);
+    }
+
+  });
+  const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+  const elasticClient: ElasticClient = (database as DatabaseController).getClient() as ElasticClient;
+  const params: any =
+    {
+      index: [...indexSet],
+      type: [...typeSet],
+      body: bodyArr,
+    };
+  ctx.body = await new Promise<any>(async (resolve, reject) =>
+  {
+    elasticClient.msearchTemplate(params, Util.makePromiseCallback(resolve, reject));
+  });
+});
 
 export default QueryRouter;

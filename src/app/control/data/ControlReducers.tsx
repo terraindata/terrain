@@ -68,7 +68,7 @@ ControlReducer[ActionTypes.importExport.fetchTemplates] =
       {
         const templates: List<Template> = List<Template>(templatesArr.map((template) =>
         { // TODO move this translation to _Template
-          return FileImportTypes._Template(_.extend({},
+          return FileImportTypes._Template(_.extend({} as any,
             template,
             {
               export: action.payload.exporting,
@@ -167,7 +167,7 @@ ControlReducer[ActionTypes.importExport.fetchCredentials] =
       {
         const credentials: List<CredentialConfig> = List<CredentialConfig>(credentialsArr.map((credential) =>
         {
-          return _CredentialConfig(_.extend({}, credential));
+          return _CredentialConfig(_.extend({} as any, credential));
         },
         ));
         action.payload.setCredentials(credentials);

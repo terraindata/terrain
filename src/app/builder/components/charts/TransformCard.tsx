@@ -386,7 +386,6 @@ class TransformCard extends TerrainComponent<Props>
   {
     const { builderState } = this.props;
     const { db } = builderState;
-
     if (!input)
     {
       return;

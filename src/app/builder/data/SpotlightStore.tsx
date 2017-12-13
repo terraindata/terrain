@@ -93,7 +93,6 @@ export const SpotlightStore: IStore<SpotlightState> = Redux.createStore(
       {
         return state.removeIn(['spotlights', id]);
       }
-
       return state.setIn(['spotlights', id], _.extend({ id }, hit));
     },
 

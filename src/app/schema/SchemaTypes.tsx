@@ -163,6 +163,7 @@ class TableC extends SchemaBaseClass
 
   public columnIds: List<string> = List();
   public indexIds: List<string> = List();
+  public sampleData: List<any> = List();
 }
 export type Table = TableC & IRecord<TableC>;
 export const _Table = (config: {
@@ -196,6 +197,7 @@ class ColumnC extends SchemaBaseClass
   public defaultValue = '';
   public isNullable = false;
   public isPrimaryKey = false;
+  public sampleData: List<any> = List();
 }
 export type Column = ColumnC & IRecord<ColumnC>;
 export const _Column = (config: {
