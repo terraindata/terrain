@@ -101,21 +101,28 @@ export async function authenticateStreamPersistentAccessToken(req: http.Incoming
 {
   return new Promise<object>(async (resolve, reject) =>
   {
-    const { files, fields } = await asyncBusboy(req);
-    if (fields['templateId'] === undefined || fields['persistentAccessToken'] === undefined)
+    try
     {
-      return reject(`Missing one or more auth fields. ${fields['templateId']} , ${fields['persistentAccessToken']}`);
+      const { files, fields } = await asyncBusboy(req);
+      if (fields['templateId'] === undefined || fields['persistentAccessToken'] === undefined)
+      {
+        return reject(`Missing one or more auth fields. ${fields['templateId']} , ${fields['persistentAccessToken']}`);
+      }
+      const importTemplate: object[] =
+        await importTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
+      const exportTemplate: object[] =
+        await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
+      const template = importTemplate.concat(exportTemplate);
+      if (template.length === 0)
+      {
+        return resolve({ files, fields, template: null });
+      }
+      resolve({ files, fields, template: template[0] });
     }
-    const importTemplate: object[] =
-      await importTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
-    const exportTemplate: object[] =
-      await exportTemplates.loginWithPersistentAccessToken(Number(parseInt(fields['templateId'], 10)), fields['persistentAccessToken']);
-    const template = importTemplate.concat(exportTemplate);
-    if (template.length === 0)
+    catch (e)
     {
-      return resolve({ files, fields, template: null });
+      return resolve({ template: null });
     }
-    resolve({ files, fields, template: template[0] });
   });
 }
 

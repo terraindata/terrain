@@ -54,12 +54,14 @@ import { Permissions } from '../permissions/Permissions';
 import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { Import } from './Import';
+import { GoogleAPI, GoogleSpreadsheetConfig } from './sources/GoogleAPI';
 import ImportTemplateRouter from './templates/ImportTemplateRouter';
 import { fieldTypes } from './templates/ImportTemplateRouter';
 
 const Router = new KoaRouter();
 export const imprt: Import = new Import();
 const perm: Permissions = new Permissions();
+const googleAPI = new GoogleAPI();
 
 Router.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.allowedMethods());
 
@@ -98,6 +100,11 @@ Router.post('/analyzers', passport.authenticate('access-token-local'), async (ct
   ctx.body = '';
 });
 
+Router.post('/googleanalyticstest', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await googleAPI.getSpreadsheets(ctx.request.body.body as GoogleSpreadsheetConfig);
+});
+
 Router.post('/mysqlheadless', async (ctx, next) =>
 {
   winston.info('importing to database, from mysql formatted file and template id');
@@ -116,11 +123,33 @@ Router.post('/mysqlheadless', async (ctx, next) =>
 Router.post('/headless', async (ctx, next) =>
 {
   winston.info('importing to database, from file and template id');
-  const authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
+  let authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
   if (authStream['template'] === null)
   {
-    ctx.body = 'Unauthorized';
-    ctx.status = 400;
+    // may not be form data, attempt normal JSON format
+    authStream = await Util.authenticatePersistentAccessToken(ctx.request.body);
+    if (authStream['template'] === null)
+    {
+      ctx.body = 'Unauthorized';
+      ctx.status = 400;
+      return;
+    }
+    Util.verifyParameters(ctx.request.body.body, ['source', 'filetype']);
+
+    const source = ctx.request.body.body.source;
+    const type = source['type'];
+    const sourceParams = source['params'];
+    const restOfParams = ctx.request.body.body;
+    delete restOfParams.source;
+    restOfParams['templateId'] = Number(parseInt(ctx.request.body.templateId, 10));
+    let writeStream: any;
+    if (type === 'spreadsheets')
+    {
+      writeStream = await googleAPI.getSpreadsheetValuesAsCSVStream(
+        await googleAPI.getSpreadsheets(sourceParams as GoogleSpreadsheetConfig)) as stream.Readable;
+      restOfParams['filetype'] = 'csv';
+    }
+    ctx.body = await imprt.upsert(writeStream as stream.Readable, restOfParams, true);
     return;
   }
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
