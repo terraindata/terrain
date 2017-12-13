@@ -85,19 +85,19 @@ export class GoogleAPI
           scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
         },
       }, (err, res, body) =>
-      {
-        try
         {
-          const bodyObj = JSON.parse(body);
-          resolve(bodyObj['values']);
-        }
-        catch (e)
-        {
-          winston.info(e);
-          winston.info('Potentially incorrect credentials.');
-          reject('Potentially incorrect Google API credentials.');
-        }
-      });
+          try
+          {
+            const bodyObj = JSON.parse(body);
+            resolve(bodyObj['values']);
+          }
+          catch (e)
+          {
+            winston.info(e);
+            winston.info('Potentially incorrect credentials.');
+            reject('Potentially incorrect Google API credentials.');
+          }
+        });
     });
   }
 

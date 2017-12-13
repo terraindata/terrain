@@ -117,7 +117,7 @@ export async function authenticateStreamPersistentAccessToken(req: http.Incoming
       {
         return resolve({ files, fields, template: null });
       }
-      resolve({ files, fields, template: template[0] });
+      return resolve({ files, fields, template: template[0] });
     }
     catch (e)
     {
