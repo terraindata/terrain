@@ -343,12 +343,12 @@ export class Export
           {
             if (exprt.rank === true)
             {
-              if (doc['terrainRank'] !== undefined)
+              if (doc['TERRAINRANK'] !== undefined)
               {
-                errMsg = 'Conflicting field: terrainRank.';
+                errMsg = 'Conflicting field: TERRAINRANK.';
                 return reject(errMsg);
               }
-              doc['terrainRank'] = rankCounter;
+              doc['TERRAINRANK'] = rankCounter;
             }
             rankCounter++;
           }
