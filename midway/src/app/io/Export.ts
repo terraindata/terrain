@@ -186,30 +186,34 @@ export class Export
       //   Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
       // } // Parse the TQL and set the filters so that when we fetch we get the right templates.
 
-      // get query data from variantId or query
-      if (exprt.variantId !== undefined && exprt.query === undefined)
+      // get query data from algorithmId or query (or variant Id if necessary)
+      if ((exprt as any).variantId !== undefined && exprt.algorithmId === undefined)
       {
-        const variants: ItemConfig[] = await TastyItems.get(exprt.variantId);
-        if (variants.length === 0)
+        exprt.algorithmId = (exprt as any).variantId;
+      }
+      if (exprt.algorithmId !== undefined && exprt.query === undefined)
+      {
+        const algorithms: ItemConfig[] = await TastyItems.get(exprt.algorithmId);
+        if (algorithms.length === 0)
         {
-          return reject('Variant not found.');
+          return reject('Algorithm not found.');
         }
-        if (variants[0]['meta'] !== undefined)
+        if (algorithms[0]['meta'] !== undefined)
         {
-          const variantMeta: object = JSON.parse(variants[0]['meta'] as string);
-          if (variantMeta['query'] !== undefined && variantMeta['query']['tql'] !== undefined)
+          const algorithmMeta: object = JSON.parse(algorithms[0]['meta'] as string);
+          if (algorithmMeta['query'] !== undefined && algorithmMeta['query']['tql'] !== undefined)
           {
-            qry = variantMeta['query']['tql'];
+            qry = algorithmMeta['query']['tql'];
           }
         }
       }
-      else if (exprt.variantId === undefined && exprt.query !== undefined)
+      else if (exprt.algorithmId === undefined && exprt.query !== undefined)
       {
         qry = exprt.query;
       }
       else
       {
-        return reject('Must provide either variant ID or query, not both or neither.');
+        return reject('Must provide either algorithm ID or query, not both or neither.');
       }
       if (qry === '')
       {
@@ -339,12 +343,12 @@ export class Export
           {
             if (exprt.rank === true)
             {
-              if (doc['terrainRank'] !== undefined)
+              if (doc['TERRAINRANK'] !== undefined)
               {
-                errMsg = 'Conflicting field: terrainRank.';
+                errMsg = 'Conflicting field: TERRAINRANK.';
                 return reject(errMsg);
               }
-              doc['terrainRank'] = rankCounter;
+              doc['TERRAINRANK'] = rankCounter;
             }
             rankCounter++;
           }
@@ -424,7 +428,7 @@ export class Export
     });
   }
 
-  public async getNamesAndTypesFromVariant(dbid: number, variantId: number): Promise<object | string>
+  public async getNamesAndTypesFromAlgorithm(dbid: number, algorithmId: number): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
@@ -438,12 +442,12 @@ export class Export
         return reject('File export currently is only supported for Elastic databases.');
       }
       const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-      const variants: ItemConfig[] = await TastyItems.get(variantId);
-      if (variants.length === 0)
+      const algorithms: ItemConfig[] = await TastyItems.get(algorithmId);
+      if (algorithms.length === 0)
       {
-        return reject('Variant not found.');
+        return reject('Algorithm not found.');
       }
-      let qry: object | string = await this._getQueryFromVariant(variants[0]);
+      let qry: object | string = await this._getQueryFromAlgorithm(algorithms[0]);
       if (typeof qry === 'string')
       {
         return reject(qry);
@@ -467,21 +471,21 @@ export class Export
     return qry;
   }
 
-  private async _getQueryFromVariant(variant: ItemConfig): Promise<object | string>
+  private async _getQueryFromAlgorithm(algorithm: ItemConfig): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
       let qry: object = {};
       try
       {
-        if (variant.meta !== undefined)
+        if (algorithm.meta !== undefined)
         {
-          qry = JSON.parse(variant.meta)['query']['tql'];
+          qry = JSON.parse(algorithm.meta)['query']['tql'];
         }
       }
       catch (e)
       {
-        return resolve('Malformed variant');
+        return resolve('Malformed algorithm');
       }
       return resolve(qry);
     });

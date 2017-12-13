@@ -44,12 +44,17 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
+// tslint:disable:no-var-requires switch-default strict-boolean-expressions restrict-plus-operands
+
+import * as React from 'react';
+// import * as moment from 'moment';
+const moment = require('moment');
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import memoizeOne from 'memoize-one';
-import * as React from 'react';
+
+import { AnalyticsState } from 'analytics/data/AnalyticsStore';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { browserHistory } from 'react-router';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
@@ -62,6 +67,7 @@ import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import Dropdown from './../../common/components/Dropdown';
+import { notificationManager } from './../../common/components/InAppNotification';
 import InfoArea from './../../common/components/InfoArea';
 import Scoreline from './../../common/components/Scoreline';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -70,29 +76,29 @@ import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
+import StatusDropdown from './StatusDropdown';
 
-import './AlgorithmsColumn.less';
+const AlgorithmIcon = require('./../../../images/icon_variant_15x17.svg?name=AlgorithmIcon');
 
-import { tooltip } from 'common/components/tooltip/Tooltips';
-
-const AlgorithmIcon = require('./../../../images/icon_algorithm_16x13.svg?name=AlgorithmIcon');
-
+type Category = LibraryTypes.Category;
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
-type Variant = LibraryTypes.Variant;
 
 export interface Props
 {
   basePath: string;
-  dbs: List<BackendInstance>;
   groups: Immutable.Map<ID, Group>;
   algorithms: Immutable.Map<ID, Algorithm>;
-  variants: Immutable.Map<ID, Variant>;
+  selectedAlgorithm: ID;
   algorithmsOrder: Immutable.List<ID>;
+  categoryId: ID;
   groupId: ID;
-  params: any;
-  isFocused: boolean; // is this the last thing focused / selected?
-  algorithmActions: any;
+  canPinItems: boolean;
+  params?: any;
+  algorithmActions?: any;
+  analytics: any;
+  analyticsActions?: any;
+  router?: any;
   referrer?: { label: string, path: string };
 }
 
@@ -100,55 +106,75 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 {
   public state: {
     rendered: boolean,
+    lastMoved: any,
     me: UserTypes.User,
     roles: RoleTypes.RoleMap,
-    lastMoved: string;
     draggingItemIndex: number;
     draggingOverIndex: number;
-    creatingNewAlgorithm: boolean;
-    newAlgorithmTextboxValue: string;
-    newAlgorithmDbIndex: number;
+
     duplicatingAlgorithm: boolean;
     duplicateAlgorithmTextboxValue: string;
-    duplicateAlgorithmId: ID;
     duplicateAlgorithmGroupIndex: number;
+    duplicateAlgorithmId: ID;
   } = {
     rendered: false,
+    lastMoved: null,
     me: null,
     roles: null,
-    lastMoved: '',
     draggingItemIndex: -1,
     draggingOverIndex: -1,
-    creatingNewAlgorithm: false,
-    newAlgorithmTextboxValue: '',
-    newAlgorithmDbIndex: -1,
+
     duplicatingAlgorithm: false,
     duplicateAlgorithmTextboxValue: '',
-    duplicateAlgorithmId: '',
     duplicateAlgorithmGroupIndex: 0,
+    duplicateAlgorithmId: undefined,
   };
-
-  constructor(props)
-  {
-    super(props);
-    this.getSortedDatabases = memoizeOne(this.getSortedDatabases);
-  }
 
   public componentWillMount()
   {
+    const { canPinItems, router, analytics } = this.props;
+    const { params, location } = router;
+    const algorithmIds = [];
+
+    if (params && params.algorithmId !== null && params.algorithmId !== undefined)
+    {
+      this.props.algorithmActions.select(params.algorithmId);
+      algorithmIds.push(params.algorithmId);
+    }
+
+    if (canPinItems && location.query && location.query.pinned !== undefined)
+    {
+      const pinnedAlgorithmIds = location.query.pinned.split(',');
+
+      pinnedAlgorithmIds.forEach((id) =>
+      {
+        const numericId = parseInt(id, 10);
+
+        this.props.analyticsActions.pinAlgorithm(numericId);
+        algorithmIds.push(numericId);
+      });
+    }
+
+    if (algorithmIds.length > 0)
+    {
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        _.uniq(algorithmIds),
+        analytics.selectedMetric,
+        analytics.selectedInterval,
+        analytics.selectedDateRange,
+      );
+    }
+
     this._subscribe(UserStore, {
       stateKey: 'me',
       storeKeyPath: ['currentUser'],
-      // isMounted: true,
+      isMounted: true,
     });
     this._subscribe(RolesStore, {
       stateKey: 'roles',
-      // isMounted: true
+      isMounted: true,
     });
-  }
-
-  public componentDidMount()
-  {
     this.setState({
       rendered: true,
     });
@@ -172,105 +198,98 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         rendered: false,
       });
     }
-  }
 
-  public getSortedDatabases(dbs)
-  {
-    return Util.sortDatabases(dbs);
-  }
+    const { canPinItems, selectedAlgorithm, basePath, analytics } = this.props;
+    const { params, analytics: nextAnalytics } = nextProps;
+    const { categoryId, groupId } = params;
+    const nextSelectedAlgorithm = nextProps.selectedAlgorithm;
+    const pinnedAlgorithms = nextAnalytics
+      .pinnedAlgorithms
+      .filter((pinnedAlgorithm) => pinnedAlgorithm)
+      .keySeq()
+      .toJS();
 
-  public getNewAlgorithmIndex(): number
-  {
-    const { groups } = this.props;
-    const dbs = this.getSortedDatabases(this.props.dbs);
-    const group = groups.get(this.props.groupId);
-
-    if (this.state.newAlgorithmDbIndex !== -1)
+    if (selectedAlgorithm !== nextSelectedAlgorithm ||
+      (canPinItems && analytics.pinnedAlgorithms !== nextAnalytics.pinnedAlgorithms)
+    )
     {
-      return this.state.newAlgorithmDbIndex;
-    }
-    else
-    {
-      return dbs && group.db && dbs.findIndex((db) => db.id === group.db.id);
+      const pinnedParams = canPinItems && pinnedAlgorithms.length > 0 ? `/?pinned=${pinnedAlgorithms.join(',')}` : '';
+      if (nextSelectedAlgorithm !== null && nextSelectedAlgorithm !== undefined)
+      {
+        browserHistory
+          .replace(`/${basePath}/${categoryId}/${groupId}/${nextSelectedAlgorithm}${pinnedParams}`);
+      }
+      else
+      {
+        browserHistory
+          .replace(`/${basePath}/${categoryId}/${groupId}${pinnedParams}`);
+      }
     }
   }
 
-  public handleAlgorithmDuplicateClose()
+  public handleDuplicateModalConfirm()
   {
-    this.setState({
-      duplicatingAlgorithm: false,
-      duplicateAlgorithmTextboxValue: '',
-    });
-  }
-
-  public handleAlgorithmDuplicateConfirm()
-  {
-    const groupKeys = _.keys(this.props.groups.toJS());
-    const groupId = groupKeys
-      .map((key) => parseFloat(key))
-      .sort()[this.state.duplicateAlgorithmGroupIndex];
     const id = this.state.duplicateAlgorithmId;
-    const index = this.props.algorithmsOrder.findIndex((iid) => iid === id);
-    const dbs = this.getSortedDatabases(this.props.dbs);
-    const dbIndex = this.getNewAlgorithmIndex();
+    const sorted = this.getSortedGroups();
+    const groupIds = [];
+    sorted.map((value) =>
+    {
+      groupIds.push(value.id);
+    });
     this.props.algorithmActions.duplicate(
       this.props.algorithms.get(id),
-      index,
+      this.props.algorithmsOrder.findIndex((iid) => iid === id),
       this.state.duplicateAlgorithmTextboxValue,
-      dbs.get(dbIndex),
-      this.props.groups.get(parseFloat(groupId.toString())).id,
+      null,
+      groupIds[this.state.duplicateAlgorithmGroupIndex],
     );
     this.setState({
       duplicatingAlgorithm: false,
-      duplicateAlgorithmTextboxValue: '',
     });
   }
 
-  public handleDuplicateAlgorithmTextboxChange(value)
+  public handleDuplicateModalClose()
   {
     this.setState({
-      duplicateAlgorithmTextboxValue: value,
+      duplicatingAlgorithm: false,
     });
   }
 
-  public handleDuplicateAlgorithmGroupChange(value)
+  public getSortedGroups()
   {
-    this.setState({
-      duplicateAlgorithmGroupIndex: value,
-    });
+    const filtered = this.props.groups.filter((value) => value.categoryId === this.props.categoryId);
+    const sorted = filtered.sortBy((group) => group.id);
+    return sorted;
   }
 
   public handleDuplicate(id: ID)
   {
-    const dbs = this.getSortedDatabases(this.props.dbs);
-    const options = dbs ? dbs.filter((db) => db.type === 'elastic').map((db) => db.name + ` (${db.type})`).toList() : [];
-    let selected;
-    const algorithm = this.props.algorithms.get(id);
-    if (algorithm !== undefined)
+    const sorted = this.getSortedGroups();
+    const groupIds = [];
+    sorted.map((value) =>
     {
-      selected = algorithm.db.name + ` (${algorithm.db.type})`;
-    }
-
-    const groupNames = this.getSortedGroupNames();
-    const currGroupName = this.props.groups.get(algorithm.groupId).name;
+      groupIds.push(value.id);
+    });
     this.setState({
-      duplicateAlgorithmId: id,
-      duplicateAlgorithmTextboxValue: Util.duplicateNameFor(this.props.algorithms.get(id).name),
       duplicatingAlgorithm: true,
-      newAlgorithmDbIndex: options.indexOf(selected),
-      duplicateAlgorithmGroupIndex: groupNames.indexOf(currGroupName),
+      duplicateAlgorithmId: id,
+      duplicateAlgorithmGroupIndex: groupIds.indexOf(this.props.groupId),  // get index,
+      duplicateAlgorithmTextboxValue: Util.duplicateNameFor(this.props.algorithms.get(id).name),
     });
   }
 
-  public getSortedGroupNames()
+  public handleAlgorithmGroupIndexChange(index)
   {
-    const groupNames = [];
-    const sorted = this.props.groups.sortBy((group) => group.id);
-    sorted.map((value) =>
-    {
-      groupNames.push(value.name);
+    this.setState({
+      duplicateAlgorithmGroupIndex: index,
     });
-    return groupNames;
+  }
+
+  public handleDuplicateTextboxChange(value)
+  {
+    this.setState({
+      duplicateAlgorithmTextboxValue: value,
+    });
   }
 
   public handleArchive(id: ID)
@@ -291,76 +310,37 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public handleCreate()
   {
-    this.props.algorithmActions.create(this.props.groupId);
+    this.props.algorithmActions.create(this.props.categoryId, this.props.groupId);
   }
 
   public handleNameChange(id: ID, name: string)
   {
+    if (this.props.algorithms.get(id).name !== name)
+    {
+      const oldName = this.props.algorithms.get(id).name;
+      let message = '"' + oldName + '" is now "' + name + '"';
+      if (!oldName)
+      {
+        message = 'To "' + name + '"';
+      }
+
+      notificationManager.addNotification(
+        'Renamed',
+        message,
+        'info',
+        5,
+      );
+    }
+
     this.props.algorithmActions.change(
       this.props.algorithms.get(id)
         .set('name', name) as Algorithm,
     );
   }
 
-  public handleNewAlgorithmModalOpen()
-  {
-    let index = this.getNewAlgorithmIndex();
-    if (index === -1)
-    {
-      index = 0;
-    }
-    this.setState({
-      creatingNewAlgorithm: true,
-      newAlgorithmDbIndex: index,
-      newAlgorithmTextboxValue: '',
-    });
-  }
-
-  public handleNewAlgorithmModalClose()
-  {
-    this.setState({
-      creatingNewAlgorithm: false,
-      newAlgorithmDbIndex: -1,
-    });
-  }
-
-  public handleNewAlgorithmTextboxChange(value)
-  {
-    this.setState({
-      newAlgorithmTextboxValue: value,
-    });
-  }
-
-  public handleNewAlgorithmDbChange(dbIndex: number)
-  {
-    this.setState({
-      newAlgorithmDbIndex: dbIndex,
-    });
-  }
-
-  public handleNewAlgorithmCreated(algorithmId)
-  {
-    const { algorithms } = this.props;
-    const groupId = algorithms.get(algorithmId).groupId;
-    browserHistory.push(`/library/${groupId}/${algorithmId}`);
-  }
-
-  public handleNewAlgorithmCreate()
-  {
-    const dbs = this.getSortedDatabases(this.props.dbs);
-    const index = this.getNewAlgorithmIndex();
-
-    this.props.algorithmActions.createAs(
-      this.props.groupId,
-      this.state.newAlgorithmTextboxValue,
-      dbs.get(index),
-      this.handleNewAlgorithmCreated,
-    );
-  }
-
   public handleHover(index: number, type: string, id: ID)
   {
-    const itemIndex = this.props.algorithmsOrder.indexOf(id);
+    const itemIndex = this.props.algorithmsOrder.findIndex((v) => v === id);
     if (type === 'algorithm'
       && this.state.lastMoved !== index + ' ' + itemIndex)
     {
@@ -369,6 +349,10 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         draggingItemIndex: itemIndex,
         draggingOverIndex: index,
       });
+
+      // var target = this.props.algorithms.get(this.props.algorithmsOrder.get(index));
+      // this.props.algorithmActions.move(this.props.algorithms.get(id).set('status', target.status) as Algorithm,
+      //   index, this.props.categoryId, this.props.groupId);
     }
   }
 
@@ -376,28 +360,34 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   {
     switch (targetType)
     {
+      case 'category':
+        // move this one to the new category
+        // and create a new category
+        // Actions.groups.move(this.props.groups.get(id), undefined, targetItem.id);
+        break;
       case 'group':
+        const groupName = targetItem.name || 'Untitled';
+        const vrntName = this.props.algorithms.get(id).name || 'Untitled';
+        notificationManager.addNotification(
+          'Moved',
+          '"' + vrntName + '" was moved to group "' + groupName + '"',
+          'info',
+          5,
+        );
         if (shiftKey)
         {
-          this.props.algorithmActions.duplicate(
-            this.props.algorithms.get(id),
-            0,
-            targetItem.id,
-          );
+          this.props.algorithmActions.duplicate(this.props.algorithms.get(id), 0, targetItem.categoryId, targetItem.id);
         }
         else
         {
-          this.props.algorithmActions.move(
-            this.props.algorithms.get(id),
-            0,
-            targetItem.id,
-          );
+          this.props.algorithmActions.move(this.props.algorithms.get(id), 0, targetItem.categoryId, targetItem.id);
         }
         break;
       case 'algorithm':
         this.props.algorithmActions.move(
           this.props.algorithms.get(id),
           this.props.algorithmsOrder.indexOf(targetItem.id),
+          this.props.categoryId,
           this.props.groupId,
         );
         break;
@@ -415,102 +405,133 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
+  public handleItemSelect(id: ID)
+  {
+    const {
+      canPinItems,
+      selectedAlgorithm,
+      basePath,
+      categoryId,
+      groupId,
+      analytics,
+    } = this.props;
+
+    if (selectedAlgorithm === id)
+    {
+      this.props.algorithmActions.unselect(id);
+    } else
+    {
+      this.props.algorithmActions.select(id);
+      this.props.analyticsActions.fetch(
+        analytics.selectedAnalyticsConnection,
+        [id],
+        analytics.selectedMetric,
+        analytics.selectedInterval,
+        analytics.selectedDateRange,
+      );
+    }
+  }
+
+  public handleDoubleClick(id: ID)
+  {
+    const { canPinItems } = this.props;
+
+    if (!canPinItems)
+    {
+      browserHistory.push(`/builder/?o=${id}`);
+    }
+  }
+
+  public handlePinAlgorithm(algorithmId)
+  {
+    const { analytics } = this.props;
+
+    this.props.analyticsActions.pinAlgorithm(algorithmId);
+    this.props.analyticsActions.fetch(
+      analytics.selectedAnalyticsConnection,
+      [algorithmId],
+      analytics.selectedMetric,
+      analytics.selectedInterval,
+      analytics.selectedDateRange,
+    );
+  }
+
+  public renderDuplicateDropdown()
+  {
+    const sorted = this.getSortedGroups();
+    const groupNames = sorted.map((value) => value.name);
+    return (
+      <div className='new-group-modal-child'>
+        <div className='database-dropdown-wrapper'>
+          <Dropdown
+            selectedIndex={this.state.duplicateAlgorithmGroupIndex}
+            options={groupNames.toList()}
+            onChange={this.handleAlgorithmGroupIndexChange}
+            canEdit={true}
+            directionBias={90}
+            className={'bic-db-dropdown'}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  public renderDuplicateModal()
+  {
+    return (<Modal
+      open={this.state.duplicatingAlgorithm}
+      showTextbox={true}
+      confirm={true}
+      onClose={this.handleDuplicateModalClose}
+      onConfirm={this.handleDuplicateModalConfirm}
+      onTextboxValueChange={this.handleDuplicateTextboxChange}
+      textboxValue={this.state.duplicateAlgorithmTextboxValue}
+      title='Duplicate Algorithm'
+      confirmButtonText='Duplicate'
+      message='What would you like to name the duplicate algorithm?'
+      textboxPlaceholderValue='Varaint Name'
+      children={this.renderDuplicateDropdown()}
+      childrenMessage='Please select an group for the duplicate algorithm.'
+      allowOverflow={true}
+      inputClassName='duplicate-group-modal-input'
+    />);
+  }
+
   public renderAlgorithm(id: ID, fadeIndex: number)
   {
-    const { params, basePath } = this.props;
+    const { canPinItems, params, basePath, analytics } = this.props;
+    const currentAlgorithmId = params.algorithmId;
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
-    const scores = {
-      [ItemStatus.Archive]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Archive),
-        name: 'Variants in Archived Status',
-      },
-      [ItemStatus.Build]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Build),
-        name: 'Variants in Build Status',
-      },
-      [ItemStatus.Approve]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Approve),
-        name: 'Variants in Approve Status',
-      },
-      [ItemStatus.Live]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Live),
-        name: 'Variants in Live Status',
-      },
-      [ItemStatus.Default]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Default),
-        name: 'Variants in Default Status',
-      },
-    };
-
-    const variants = this.props.variants.filter(
-      (v: Variant) =>
-        v.algorithmId === id,
-    );
-
-    variants.map(
-      (v: Variant) =>
-      {
-        if (v.status !== undefined)
-        {
-          scores[v.status].score++;
-        }
-      },
-    );
-
-    // scores.splice(0, 1); // remove Archived count
     const { me, roles } = this.state;
-    const canArchive = (algorithm.status !== ItemStatus.Archive); // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
-    const canDuplicate = true;
-    const canRename = (scores[ItemStatus.Live].score === 0 && scores[ItemStatus.Default].score === 0);
-    const canDrag = true; // me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
-    const canEdit = canDrag; // ||me && roles && roles.getIn([algorithm.groupId, me.id, 'admin']);
-    // (me && roles && roles.getIn([algorithm.groupId, me.id, 'builder']));
+    let canEdit: boolean;
+    let canDrag: boolean;
+    canEdit = true;
+    canDrag = true;
+    const isSelected = currentAlgorithmId === algorithm.id.toString();
+    const isPinned = analytics.pinnedAlgorithms.get(algorithm.id, false);
 
-    const lastTouched: Variant = variants.reduce(
-      (lastTouched: Variant, v: Variant) =>
-      {
-        const date = new Date(v.lastEdited);
-        const lastTouchedDate = new Date(lastTouched && lastTouched.lastEdited);
-        if (!lastTouched || (lastTouchedDate < date || isNaN(lastTouchedDate.getTime())))
-        {
-          return v;
-        }
-        return lastTouched;
-      },
-      null,
-    );
+    // if (me && roles)
+    // {
+    //   canEdit = roles.getIn([this.props.categoryId, me.id, 'builder'])
+    //     || roles.getIn([this.props.categoryId, me.id, 'admin']);
+    //   canDrag = canEdit &&
+    //     (algorithm.status !== ItemStatus.Live ||
+    //       roles.getIn([this.props.categoryId, me.id, 'admin']));
+    // }
 
-    let date: string;
-    let userId: string | number = 'There are no variants';
-    if (lastTouched)
-    {
-      date = lastTouched.lastEdited;
-      userId = lastTouched.lastUserId;
-    }
-
-    let role = 'Viewer';
-    if (roles && roles.getIn([this.props.groupId, userId]))
-    {
-      if (roles && roles.getIn([this.props.groupId, userId]).admin)
-      {
-        role = 'Admin';
-      }
-      else if (roles && roles.getIn([this.props.groupId, userId]).builder)
-      {
-        role = 'Builder';
-      }
-    }
+    // let role = 'Viewer';
+    // if (roles && roles.getIn([this.props.categoryId, algorithm.lastUserId]))
+    // {
+    //   if (roles && roles.getIn([this.props.categoryId, algorithm.lastUserId]).admin)
+    //   {
+    //     role = 'Admin';
+    //   }
+    //   else if (roles && roles.getIn([this.props.categoryId, algorithm.lastUserId]).builder)
+    //   {
+    //     role = 'Builder';
+    //   }
+    // }
     return (
       <LibraryItem
         index={index}
@@ -521,44 +542,52 @@ class AlgorithmsColumn extends TerrainComponent<Props>
         icon={<AlgorithmIcon />}
         onDuplicate={this.handleDuplicate}
         onArchive={this.handleArchive}
+        onUnarchive={this.handleUnarchive}
+        canArchive={canDrag && algorithm.status !== ItemStatus.Archive}
+        canDuplicate={canEdit}
+        canUnarchive={algorithm.status === ItemStatus.Archive}
+        canRename={algorithm.status !== ItemStatus.Live && algorithm.status !== ItemStatus.Default}
+        canPin={canPinItems}
+        isPinned={isPinned}
+        onPin={this.handlePinAlgorithm}
         key={algorithm.id}
-        to={`/${basePath}/${this.props.groupId}/${algorithm.id}`}
-        className='library-item-lighter'
+        to={`/${basePath}/${this.props.categoryId}/${this.props.groupId}/${id}`}
+        className='library-item-lightest'
         id={id}
-        onNameChange={this.handleNameChange}
         type='algorithm'
+        onNameChange={this.handleNameChange}
         rendered={this.state.rendered}
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         onDragFinish={this.handleDragFinish}
         item={algorithm}
-        canEdit={canEdit}
+        onDoubleClick={this.handleDoubleClick}
+        canEdit={canDrag}
         canDrag={canDrag}
         canCreate={canDrag}
-        canArchive={canArchive}
-        canDuplicate={canDuplicate}
-        canRename={canRename}
-        isSelected={+algorithm.id === +params.algorithmId}
-        isFocused={this.props.isFocused}
-        canUnarchive={algorithm.status === ItemStatus.Archive}
-        onUnarchive={this.handleUnarchive}
+        isStarred={algorithm.status === 'DEFAULT'}
+        onSelect={this.handleItemSelect}
+        isSelected={isSelected}
+        isFocused={true}
       >
         <div className='flex-container'>
-          <UserThumbnail userId={userId} medium={true} />
+          <UserThumbnail
+            userId={algorithm.lastUserId}
+            medium={true}
+          />
+
           <div className='flex-grow'>
-            <div className='library-item-line'>
-              <Scoreline
-                scores={_.values(scores)}
-                hideZeroes={true}
-              />
-            </div>
+            <StatusDropdown
+              algorithm={algorithm}
+              noBorder={true}
+              algorithmActions={this.props.algorithmActions}
+            />
             <div
               className='library-item-line'
               style={fontColor(Colors().text1)}
             >
               {
-                date === undefined ? 'There are no variants' :
-                  'Most Recent Change: ' + Util.formatDate(date)
+                'Changed ' + Util.formatDate(algorithm.lastEdited)
               }
             </div>
           </div>
@@ -567,40 +596,73 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
-  public handleCategoryHover(statusString: string, id: ID)
+  public handleItemStatusHover(statusString: string, id: ID)
   {
-    const a = this.props.algorithms.get(id);
-    if (a.status !== statusString && statusString !== undefined)
+    // do nothing
+  }
+
+  public handleItemDrop(toStatus: string, id: ID)
+  {
+    const v = this.props.algorithms.get(id);
+    if (v.status === ItemStatus.Archive && toStatus === ItemStatus.Build)
     {
-      this.props.algorithmActions.change(a.set('status', statusString) as Algorithm);
+      this.props.algorithmActions.change(v.set('status', ItemStatus.Build) as Algorithm);
+      return;
+    }
+    else if (v.status === ItemStatus.Build && toStatus === ItemStatus.Archive)
+    {
+      this.props.algorithmActions.change(v.set('status', ItemStatus.Archive) as Algorithm);
+      return;
+    }
+    else if (toStatus === ItemStatus.Archive && (v.status === ItemStatus.Live || v.status === ItemStatus.Default))
+    {
+      this.props.algorithmActions.status(v, ItemStatus.Archive, false);
+      return;
     }
   }
 
-  public renderCategory(status: ItemStatus)
+  public hasStatus(id: ID, status: ItemStatus)
   {
-    const { algorithms } = this.props;
-    const ids = this.props.algorithmsOrder.filter((id) => algorithms.get(id) && algorithms.get(id).status === status);
+    return this.props.algorithms.getIn([id, 'status']) === status;
+  }
+
+  public renderAlgorithms(archived?: boolean)
+  {
     const { me, roles } = this.state;
-    const canCreate = true; // me && roles && roles.getIn([this.props.groupId, me.id, 'admin']);
+    const canMakeLive = me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
+    const canCreate = true; // canMakeLive;
+    // TODO maybe on the new middle tier, builders can create algorithms
+    //  || (
+    //   me && roles && roles.getIn([this.props.categoryId, me.id, 'builder'])
+    // );
+
+    let fadeIndex = 0;
 
     return (
       <LibraryItemCategory
-        status={status}
-        key={status}
-        onHover={this.handleCategoryHover}
+        status={archived ? ItemStatus.Archive : ItemStatus.Build}
+        key={archived ? '1' : '0'}
         type='algorithm'
-        titleHidden={status === ItemStatus.Build}
+        onHover={this.handleItemStatusHover}
+        onDrop={this.handleItemDrop}
+        titleHidden={!archived}
       >
         {
-          ids.map(this.renderAlgorithm)
+          this.props.algorithmsOrder.map((id, index) =>
+            this.props.algorithms.get(id) &&
+            (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
+            && this.renderAlgorithm(id, fadeIndex++),
+          )
         }
         {
-          ids.size === 0 && <div className='library-category-none'>None</div>
+          this.props.algorithmsOrder.some((id) => archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
+            ? null
+            : <div className='library-category-none'>None</div>
         }
         {
-          status === ItemStatus.Build && canCreate &&
+          canCreate && !archived &&
           tooltip(
-            <CreateLine onClick={this.handleNewAlgorithmModalOpen} open={false} />,
+            <CreateLine onClick={this.handleCreate} open={false} />,
             {
               title: 'Create a New Algorithm',
               position: 'top',
@@ -611,154 +673,36 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     );
   }
 
-  public renderDatabaseDropdown()
-  {
-    const dbs = this.getSortedDatabases(this.props.dbs);
-    const options = dbs ? dbs.filter((db) => db.type === 'elastic').map((db) => db.name + ` (${db.type})`).toList() : [];
-    return (
-      <div className='new-algorithm-modal-child'>
-        <div className='database-dropdown-wrapper'>
-          <Dropdown
-            selectedIndex={this.state.newAlgorithmDbIndex}
-            options={options}
-            onChange={this.handleNewAlgorithmDbChange}
-            canEdit={true}
-            directionBias={90}
-            className='bic-db-dropdown'
-          />
-        </div>
-      </div>
-    );
-  }
-
-  public renderGroupDropdown()
-  {
-    const groupKeys = _.keys(this.props.groups.toJS());
-    const values: string[] = groupKeys.map((key) => parseFloat(key)).sort().map((key) => key.toString());
-    let groupNames = Immutable.Map<number, string>({});
-    groupKeys.forEach((key) =>
-    {
-      groupNames = groupNames.set(parseFloat(key), this.props.groups.get(parseFloat(key)).name);
-    });
-    return (
-      <div className='new-algorithm-modal-child'>
-        <div className='database-dropdown-wrapper'>
-          <div className='duplicate-algorithm-child-message'>Please select a group for the duplicate algorithm.</div>
-          <Dropdown
-            selectedIndex={this.state.duplicateAlgorithmGroupIndex}
-            options={Immutable.List(values)}
-            optionsDisplayName={groupNames}
-            onChange={this.handleDuplicateAlgorithmGroupChange}
-            canEdit={true}
-            directionBias={90}
-            className={'bic-db-dropdown'}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  public renderDuplicateDropdowns()
-  {
-    return (
-      <div>
-        {this.renderDatabaseDropdown()}
-        {this.renderGroupDropdown()}
-      </div>
-    );
-  }
-
-  public renderDuplicateAlgorithmModal()
-  {
-    const dbs = this.getSortedDatabases(this.props.dbs);
-    const algorithm = this.props.algorithms.get(this.state.duplicateAlgorithmId);
-    return (<Modal
-      open={this.state.duplicatingAlgorithm}
-      showTextbox={true}
-      confirm={true}
-      onClose={this.handleAlgorithmDuplicateClose}
-      onConfirm={this.handleAlgorithmDuplicateConfirm}
-      onTextboxValueChange={this.handleDuplicateAlgorithmTextboxChange}
-      textboxValue={this.state.duplicateAlgorithmTextboxValue}
-      title='Duplicate Algorithm'
-      confirmButtonText='Duplicate'
-      message='What would you like to name the duplicate algorithm?'
-      textboxPlaceholderValue='Algorithm Name'
-      children={this.renderDuplicateDropdowns()}
-      childrenMessage='Please select a database for the duplicate algorithm.'
-      allowOverflow={true}
-      inputClassName='duplicate-algorithm-modal-input'
-    />);
-  }
-
-  public renderCreateAlgorithmModal()
-  {
-    const dbs = this.getSortedDatabases(this.props.dbs);
-    const canCreateAlgorithm: boolean = dbs && dbs.size > 0;
-
-    return canCreateAlgorithm ?
-      (<Modal
-        open={this.state.creatingNewAlgorithm}
-        showTextbox={true}
-        confirm={true}
-        onClose={this.handleNewAlgorithmModalClose}
-        onConfirm={this.handleNewAlgorithmCreate}
-        onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
-        title='New Algorithm'
-        confirmButtonText='Create'
-        message='What would you like to name the algorithm?'
-        textboxPlaceholderValue='Algorithm Name'
-        children={this.renderDatabaseDropdown()}
-        childrenMessage='Please select a database'
-        allowOverflow={true}
-      />) :
-      (<Modal
-        open={this.state.creatingNewAlgorithm}
-        onClose={this.handleNewAlgorithmModalClose}
-        onTextboxValueChange={this.handleNewAlgorithmTextboxChange}
-        title='Cannot Create New Algorithm'
-        message='No databases available'
-      />);
-  }
-
   public render()
   {
-    const { algorithms, algorithmsOrder, groupId, referrer } = this.props;
+    const { referrer } = this.props;
 
     return (
       <LibraryColumn
-        index={2}
+        index={3}
         title='Algorithms'
         referrer={referrer}
       >
+        {this.renderDuplicateModal()}
         {
-          this.renderCreateAlgorithmModal()
-        }
-        {
-          this.renderDuplicateAlgorithmModal()
-        }
-        {
-          algorithmsOrder ?
+          this.props.algorithmsOrder ?
             (
-              algorithmsOrder.size ?
+              this.props.algorithmsOrder.size ?
                 (
                   <div>
-                    {
-                      this.renderCategory('BUILD')
-                    }
-                    {
-                      this.renderCategory('ARCHIVE')
-                    }
+                    {this.renderAlgorithms()}
+                    {this.renderAlgorithms(true)}
                   </div>
                 )
                 :
                 <InfoArea
                   large='No algorithms created, yet.'
                   button={
-                    Util.haveRole(groupId, 'admin', UserStore, RolesStore)
+                    Util.haveRole(this.props.categoryId, 'builder', UserStore, RolesStore) ||
+                      Util.haveRole(this.props.categoryId, 'admin', UserStore, RolesStore)
                       ? 'Create a algorithm' : null
                   }
-                  onClick={this.handleNewAlgorithmModalOpen}
+                  onClick={this.handleCreate}
                 />
             )
             : null

@@ -299,7 +299,7 @@ const TransformUtil = {
     const ranges = [];
     const outputs = [];
     const stepSize: number = (domainMax - domainMin) * (1 / numPoints);
-    for (let i = (domainMin - stepSize); i < (domainMax + stepSize); i += stepSize)
+    for (let i = domainMin; i <= domainMax; i += stepSize)
     {
       const y = TransformUtil._sigmoid(i, a, k, x0, L);
       ranges.push(i);

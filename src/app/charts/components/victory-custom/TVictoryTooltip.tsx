@@ -43,17 +43,87 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import TerrainVictoryTheme from 'charts/TerrainVictoryTheme';
+import { omit, random, round } from 'lodash';
+import * as moment from 'moment';
 import * as React from 'react';
-import { VictoryLabel } from 'victory';
+import { Border, VictoryLegend } from 'victory';
 
-interface Props
+const CustomLabel = (props) =>
 {
+  return (
+    <text dy={5} x={props.x} y={props.y} style={props.style} >
+      <tspan style={{ fontWeight: 'bold' }}>{round(props.datum.value, 3)}</tspan>
+      <tspan dx={10} style={{ fill: 'white' }}>{props.datum.reference}</tspan>
+    </text>
+  );
+};
+
+interface TVictoryTooltipProps
+{
+  xDataKey: string;
+  dateFormat: string;
+  tooltipStyle: any;
   datum?: any;
+  text?: any;
+  style?: any;
 }
 
-const TerrainVictoryLabel = (props: Props) => (
-  props.datum.isPinned ?
-    <VictoryLabel dx='10' {...props} /> : <VictoryLabel {...props} />
-);
+const TVictoryTooltip = (props: TVictoryTooltipProps) =>
+{
+  const {
+    datum,
+    text,
+    xDataKey,
+    style,
+    dateFormat,
+    tooltipStyle,
+  } = props;
 
-export default TerrainVictoryLabel;
+  const data = text.map((t) =>
+  {
+    const parsedText = t.split('|');
+    const value = round(parsedText[1], 3);
+    return {
+      id: parsedText[0],
+      value,
+      // set the full label text in the 'name' key so the legend border width
+      // is correctly calculated
+      name: `${value} ${parsedText[2]}`,
+      reference: parsedText[2],
+      symbol: { fill: parsedText[3] },
+      labels: {
+        ...omit(style[0], ['textAnchor']),
+        fill: parsedText[3],
+      },
+    };
+  });
+
+  const timestamp = datum[xDataKey];
+  const date = moment(timestamp);
+  const title = date.format(dateFormat);
+
+  const labelComponent = <CustomLabel />;
+
+  return (
+    <VictoryLegend
+      theme={TerrainVictoryTheme}
+      standalone={false}
+      x={10}
+      y={50}
+      padding={0}
+      gutter={20}
+      data={data}
+      orientation={'vertical'}
+      style={tooltipStyle}
+      title={title}
+      labelComponent={labelComponent}
+      borderComponent={<Border
+        // need to change this prop so the border re-renders
+        className={`custom-tooltip-label-${random(0, 100)}`}
+      />}
+    />
+  );
+};
+
+export default TVictoryTooltip;

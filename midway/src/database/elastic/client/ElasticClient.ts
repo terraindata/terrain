@@ -180,6 +180,16 @@ class ElasticClient
   }
 
   /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-clearscroll
+   */
+  public clearScroll<T>(params: Elastic.ClearScrollParams,
+    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+  {
+    this.log('clearScroll', params);
+    this.delegate.clearScroll(params, callback);
+  }
+
+  /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
    */
   public search<T>(params: Elastic.SearchParams,
@@ -197,6 +207,16 @@ class ElasticClient
   {
     this.log('msearch', params);
     this.delegate.msearch(params, callback);
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-msearchtemplate
+   */
+  public msearchTemplate<T>(params: Elastic.MSearchTemplateParams,
+    callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
+  {
+    this.log('msearchTemplate', params);
+    this.delegate.msearchTemplate(params, callback);
   }
 
   public getDelegate(): Elastic.Client

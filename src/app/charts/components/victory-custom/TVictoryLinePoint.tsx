@@ -43,87 +43,31 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as React from 'react';
+import { Line, Point } from 'victory';
 
-// tslint:disable:no-var-requires
-
-import { Map } from 'immutable';
-import * as _ from 'lodash';
-import * as ReduxActions from 'redux-actions';
-const Redux = require('redux');
-import { BaseClass, New } from '../../Classes';
-
-class SpotlightStateC extends BaseClass
+interface TVictoryLinePointProps
 {
-  public spotlights: IMMap<string, any> = Map({});
-}
-export type SpotlightState = SpotlightStateC & IRecord<SpotlightStateC>;
-export const _SpotlightState = (config?: { [key: string]: any }) =>
-  New<SpotlightState>(new SpotlightStateC(config), config);
-
-const DefaultState = _SpotlightState();
-
-// TODO something better like this
-// class SpotlightC extends BaseClass
-// {
-//   name: string;
-//   color: string;
-
-// }
-// export type Spotlight = SpotlightC & IRecord<Spotlight>;
-// export const _Spotlight = (config?: {[key:string]: any}) =>
-//   New<Spotlight>(new SpotlightC(config), config);
-
-interface SpotlightAction
-{
-  type: string;
-  payload:
-  {
-    hit: any;
-    id: string;
-  };
+  chartHeight: number;
+  lineStyle: any;
+  x?: number;
+  active?: boolean;
 }
 
-export const SpotlightStore: IStore<SpotlightState> = Redux.createStore(
-  ReduxActions.handleActions({
-    spotlight:
-    (state: SpotlightState, action: SpotlightAction) =>
-    {
-      const { hit, id } = action.payload;
-      if (!hit)
-      {
-        return state.removeIn(['spotlights', id]);
-      }
-      return state.setIn(['spotlights', id], _.extend({ id }, hit));
-    },
-
-    clearSpotlights:
-    (state: SpotlightState) =>
-    {
-      return state.set('spotlights', Map({}));
-    },
-  }, DefaultState),
-  DefaultState);
-
-export function spotlightAction(id: string, hit: any)
+const TVictoryLinePoint = (props: TVictoryLinePointProps) =>
 {
-  SpotlightStore.dispatch({
-    type: 'spotlight',
-    payload:
-    {
-      id,
-      hit: hit == null ? null : _.extend(hit, { id }),
-    },
-  });
-}
+  return props.active ? (
+    <g>
+      <Line
+        style={props.lineStyle}
+        x1={props.x}
+        y1={0}
+        x2={props.x}
+        y2={props.chartHeight}
+      />
+      <Point {...props} />
+    </g>
+  ) : null;
+};
 
-export function clearSpotlightsAction()
-{
-  SpotlightStore.dispatch({
-    type: 'clearSpotlights',
-    payload:
-    {
-    },
-  });
-}
-
-export default SpotlightStore;
+export default TVictoryLinePoint;

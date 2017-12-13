@@ -175,3 +175,11 @@ export function responseToRecordConfig(response: object): object
 
   return response;
 }
+
+// boilerplate generator
+export type WithIRecord<T> = T & IRecord<T>;
+export function makeConstructor<T>(Type: { new(): T; })
+{
+  return (config?: { [key: string]: any }) =>
+    New<WithIRecord<T>>(new Type(), config);
+}
