@@ -54,6 +54,7 @@ import * as React from 'react';
 import { notificationManager } from 'common/components/InAppNotification';
 import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
@@ -95,10 +96,6 @@ enum ConfirmActionType
 class TemplateControlList extends TerrainComponent<Props>
 {
   public state: {
-    responseModalOpen: boolean;
-    responseModalMessage: string;
-    responseModalTitle: string;
-    responseModalIsError: boolean;
     confirmModalOpen: boolean;
     confirmModalMessage: string;
     confirmModalTitle: string;
@@ -108,11 +105,8 @@ class TemplateControlList extends TerrainComponent<Props>
     currentActiveIndex: number;
     headlessModalOpen: boolean;
     schedulerModalOpen: boolean;
+    modalRequests: List<ModalProps>;
   } = {
-    responseModalOpen: false,
-    responseModalMessage: '',
-    responseModalTitle: '',
-    responseModalIsError: false,
     confirmModalOpen: false,
     confirmModalMessage: '',
     confirmModalTitle: '',
@@ -122,6 +116,7 @@ class TemplateControlList extends TerrainComponent<Props>
     currentActiveIndex: -1,
     headlessModalOpen: false,
     schedulerModalOpen: false,
+    modalRequests: List([]),
   };
 
   public templateConfig: HeaderConfig =
@@ -138,6 +133,14 @@ class TemplateControlList extends TerrainComponent<Props>
       </div>,
     ],
   ];
+
+  public requestModal(newRequest: ModalProps)
+  {
+    const modalRequests = MultiModal.handleRequest(this.state.modalRequests, newRequest);
+    this.setState({
+      modalRequests,
+    });
+  }
 
   public getOptions(template: Template, index: number)
   {
@@ -247,13 +250,22 @@ class TemplateControlList extends TerrainComponent<Props>
 
   public handleDeleteTemplateError(error: string)
   {
-    const readable = MidwayError.fromJSON(error).getDetail();
-    this.setState({
-      responseModalOpen: true,
-      responseModalMessage: `Error deleting template: ${readable}`,
-      responseModalTitle: 'Error',
-      responseModalIsError: true,
+    let readable = error;
+    try
+    {
+      readable = MidwayError.fromJSON(error).getDetail();
+    }
+    catch (e)
+    {
+      readable = `Unknown Error: ${e}`;
+    }
+
+    this.requestModal({
+      title: 'Error',
+      message: `Error deleting template: ${readable}`,
+      error: true,
     });
+
   }
 
   public handleScheduleSuccess()
@@ -263,12 +275,20 @@ class TemplateControlList extends TerrainComponent<Props>
 
   public handleScheduleError(error: string)
   {
-    const readable = MidwayError.fromJSON(error).getDetail();
-    this.setState({
-      responseModalOpen: true,
-      responseModalMessage: `Error creating schedule: ${readable}`,
-      responseModalTitle: 'Error',
-      responseModalIsError: true,
+    let readable = error;
+    try
+    {
+      readable = MidwayError.fromJSON(error).getDetail();
+    }
+    catch (e)
+    {
+      readable = `Unknown Error: ${e}`;
+    }
+
+    this.requestModal({
+      title: 'Error',
+      message: `Error creating schedule: ${readable}`,
+      error: true,
     });
   }
 
@@ -279,12 +299,19 @@ class TemplateControlList extends TerrainComponent<Props>
 
   public handleResetTemplateTokenError(error: string)
   {
-    const readable = MidwayError.fromJSON(error).getDetail();
-    this.setState({
-      responseModalOpen: true,
-      responseModalMessage: `Error resetting access token: ${readable}`,
-      responseModalTitle: 'Error',
-      responseModalIsError: true,
+    let readable = error;
+    try
+    {
+      readable = MidwayError.fromJSON(error).getDetail();
+    }
+    catch (e)
+    {
+      readable = `Unknown Error: ${e}`;
+    }
+    this.requestModal({
+      message: `Error resetting access token: ${readable}`,
+      title: 'Error',
+      error: true,
     });
   }
 
@@ -305,13 +332,6 @@ class TemplateControlList extends TerrainComponent<Props>
   {
     this.setState({
       confirmModalOpen: false,
-    });
-  }
-
-  public responseCloseModal()
-  {
-    this.setState({
-      responseModalOpen: false,
     });
   }
 
@@ -356,14 +376,9 @@ class TemplateControlList extends TerrainComponent<Props>
           />
         }
         {
-          this.state.responseModalOpen &&
-          <Modal
-            open={this.state.responseModalOpen}
-            message={this.state.responseModalMessage}
-            title={this.state.responseModalTitle}
-            error={this.state.responseModalIsError}
-            onClose={this.responseCloseModal}
-            confirm={false}
+          <MultiModal
+            requests={this.state.modalRequests}
+            onCloseModal={this._setStateWrapper('modalRequests')}
           />
         }
         {

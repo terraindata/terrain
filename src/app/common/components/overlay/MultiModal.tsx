@@ -49,11 +49,15 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import * as _ from 'lodash';
 import * as React from 'react';
-import { BaseClass, makeConstructor, New, WithIRecord } from '../Classes';
+import { BaseClass, makeConstructor, New, WithIRecord } from 'src/app/Classes';
 
 import Modal from 'common/components/Modal';
-import { Props as ModalProps } from 'common/components/Modal';
+import { Props as _ModalProps } from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
+
+export type ModalProps = {
+  [key in keyof _ModalProps]?: _ModalProps[key];
+}; // we need to force all the props to be optional
 
 export interface Props
 {
@@ -61,11 +65,11 @@ export interface Props
   onCloseModal: (newRequests: List<ModalProps>) => void;
 }
 
-class MultiModal extends TerrainComponent<Props>
+export class MultiModal extends TerrainComponent<Props>
 {
   public static handleRequest(requests: List<ModalProps>, newRequest: ModalProps): List<ModalProps>
   {
-    return requests;
+    return requests.push(newRequest);
   }
 
   public handleCloseModal()
@@ -75,9 +79,12 @@ class MultiModal extends TerrainComponent<Props>
       return;
     }
     const firstProps = this.props.requests.first();
-    const firstOnClose = firstProps !== undefined && firstProps.onClose;
+    const hasOnClose = firstProps !== undefined && firstProps.onClose !== undefined;
     const newRequests = this.props.requests.delete(0);
-    firstProps.onClose();
+    if (hasOnClose)
+    {
+      firstProps.onClose();
+    }
     this.props.onCloseModal(newRequests);
   }
 
@@ -86,14 +93,15 @@ class MultiModal extends TerrainComponent<Props>
     const firstProps = this.props.requests !== undefined && this.props.requests.first();
     if (firstProps === undefined)
     {
-      return undefined;
+      return null;
     }
     else
     {
-
       return (
         <Modal
           {...firstProps}
+          onClose={this.handleCloseModal}
+          open={true}
         />
       );
     }
@@ -101,7 +109,4 @@ class MultiModal extends TerrainComponent<Props>
   }
 }
 
-function noop()
-{
-  // do nothing
-}
+export default MultiModal;
