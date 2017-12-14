@@ -411,11 +411,6 @@ class TransformCard extends TerrainComponent<Props>
                   _index: index,
                 },
               },
-              {
-                term: {
-                  _type: type,
-                },
-              },
             ],
           },
         },
@@ -433,6 +428,16 @@ class TransformCard extends TerrainComponent<Props>
         },
         size: 0,
       };
+      const typeObj =
+        {
+          term: {
+            _type: type,
+          },
+        };
+      if (type)
+      {
+        (domainQuery.query.bool.filter as any).push(typeObj);
+      }
       Ajax.query(
         JSON.stringify(domainQuery),
         db,
@@ -460,11 +465,6 @@ class TransformCard extends TerrainComponent<Props>
                   _index: index,
                 },
               },
-              {
-                term: {
-                  _type: type,
-                },
-              },
             ],
             must: {
               range: {
@@ -486,7 +486,16 @@ class TransformCard extends TerrainComponent<Props>
         },
         size: 0,
       };
-
+      const typeObj =
+        {
+          term: {
+            _type: type,
+          },
+        };
+      if (type)
+      {
+        (aggQuery.query.bool.filter as any).push(typeObj);
+      }
       this.setState(
         Ajax.query(
           JSON.stringify(aggQuery),
