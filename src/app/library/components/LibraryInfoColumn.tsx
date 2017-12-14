@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions restrict-plus-operands
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as React from 'react';
-const { List } = Immutable;
+
 import BackendInstance from '../../../database/types/BackendInstance';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import Dropdown from './../../common/components/Dropdown';

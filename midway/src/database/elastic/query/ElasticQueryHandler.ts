@@ -45,9 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
-import * as _ from 'lodash';
 import { Readable } from 'stream';
-import * as util from 'util';
 import * as winston from 'winston';
 
 import * as Elastic from 'elasticsearch';
@@ -55,14 +53,12 @@ import * as Elastic from 'elasticsearch';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
-import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryRequest from '../../../../../src/database/types/QueryRequest';
 import QueryResponse from '../../../../../src/database/types/QueryResponse';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { QueryError } from '../../../error/QueryError';
-import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 
