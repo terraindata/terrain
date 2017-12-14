@@ -136,7 +136,7 @@ class TemplateControlList extends TerrainComponent<Props>
 
   public requestModal(newRequest: ModalProps)
   {
-    const modalRequests = MultiModal.handleRequest(this.state.modalRequests, newRequest);
+    const modalRequests = MultiModal.addRequest(this.state.modalRequests, newRequest);
     this.setState({
       modalRequests,
     });
@@ -378,7 +378,7 @@ class TemplateControlList extends TerrainComponent<Props>
         {
           <MultiModal
             requests={this.state.modalRequests}
-            onCloseModal={this._setStateWrapper('modalRequests')}
+            setRequests={this._setStateWrapper('modalRequests')}
           />
         }
         {
