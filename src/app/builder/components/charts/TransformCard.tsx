@@ -401,7 +401,6 @@ class TransformCard extends TerrainComponent<Props>
       index = getIndex('');
       type = getType('');
     }
-
     if (recomputeDomain)
     {
       const domainQuery = {

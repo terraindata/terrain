@@ -113,6 +113,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     {
       displayNames = displayNames.set(option.value, option.displayName);
     });
+    console.log(source);
     const sourceOptions = this.state.dataSourceOptions.map((option) =>
     {
       return {
