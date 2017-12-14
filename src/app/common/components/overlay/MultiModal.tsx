@@ -65,15 +65,15 @@ export type ModalProps = {
 export interface Props
 {
   requests: List<ModalProps>;
-  onCloseModal: (newRequests: List<ModalProps>) => void;
-  // onCloseModal gets called whenever requests should change. It's just like onChange for a textbox.
+  setRequests: (newRequests: List<ModalProps>) => void;
+  // a function that allows MultiModal to change requests - it's like onChange for a textbox
 }
 
 export class MultiModal extends TerrainComponent<Props>
 {
-  // handleRequest is like a reducer in that it takes in a previous state and returns a new state.
+  // addRequest is like a reducer in that it takes in a previous state and returns a new state.
   // This allows it to be more easily integrated inside a redux store.
-  public static handleRequest(requests: List<ModalProps>, newRequest: ModalProps): List<ModalProps>
+  public static addRequest(requests: List<ModalProps>, newRequest: ModalProps): List<ModalProps>
   {
     return requests.push(newRequest);
   }
@@ -91,7 +91,7 @@ export class MultiModal extends TerrainComponent<Props>
     {
       firstProps.onClose();
     }
-    this.props.onCloseModal(newRequests);
+    this.props.setRequests(newRequests);
   }
 
   public render()
