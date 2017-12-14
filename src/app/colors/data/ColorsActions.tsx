@@ -46,11 +46,11 @@ THE SOFTWARE.
 import ActionTypes from './ColorsActionTypes';
 import Store from './ColorsStore';
 
-const $ = (type: string, payload: any) => 
+const $ = (type: string, payload: any) =>
 {
-	Store.dispatch({ type, payload });
-	return  {type, payload}
-}
+  Store.dispatch({ type, payload });
+  return { type, payload };
+};
 
 const ColorsActions =
   {

@@ -86,11 +86,12 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // for error reporting
 
 // data that needs to be loaded
+import { ColorsActions } from 'app/colors/data/ColorsRedux';
+import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
-import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
@@ -98,8 +99,6 @@ import LibraryStore from './library/data/LibraryStore';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 import UserStore from './users/data/UserStore';
-import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
-
 
 // Icons
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
@@ -268,15 +267,12 @@ class App extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.props.colorsActions({
-       actionType: 'setStyle',
-       selector: 'input',
-       style: { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder }
+      actionType: 'setStyle',
+      selector: 'input',
+      style: { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder },
     });
 
-
-    //this.props.colorsActions.setStyle('input', { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder });
-    
-
+    // this.props.colorsActions.setStyle('input', { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder });
 
     // this.props.colorsActions.setStyle('input:hover', { 'background': Colors().inputFocusBg, 'border-color': Colors().inactiveHover });
     // this.props.colorsActions.setStyle('input:focus', { 'background': Colors().inputFocusBg, 'border-color': Colors().inputBorder });
@@ -443,6 +439,8 @@ class App extends TerrainComponent<Props>
 export default Util.createContainer(
   App,
   ['colors'],
-  { schemaActions: SchemaActions,
-    colorsActions: ColorsActions },
+  {
+    schemaActions: SchemaActions,
+    colorsActions: ColorsActions
+  },
 );
