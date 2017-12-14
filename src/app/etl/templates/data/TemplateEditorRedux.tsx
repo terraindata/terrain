@@ -84,6 +84,10 @@ export interface TemplateEditorActionTypes
     actionType: 'addModalConfirmation';
     props: ModalProps;
   };
+  setModalRequests: {
+    actionType: 'setModalRequests';
+    requests: List<ModalProps>;
+  }
 }
 
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
@@ -120,8 +124,12 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
     addModalConfirmation: (state, action) =>
     {
       return state.set('modalRequests',
-        MultiModal.handleRequest(state.modalRequests, action.payload.props));
+        MultiModal.addRequest(state.modalRequests, action.payload.props));
     },
+    setModalRequests: (state, action) =>
+    {
+      return state.set('modalRequests', action.payload.requests);
+    }
   };
 }
 

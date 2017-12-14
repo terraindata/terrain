@@ -51,6 +51,7 @@ import * as React from 'react';
 import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { MultiModal } from 'common/components/overlay/MultiModal';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _ExportTemplate, _TemplateField, ELASTIC_TYPES, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
@@ -89,6 +90,14 @@ class ETLExportDisplay extends TerrainComponent<Props>
     });
   }
 
+  public setModalRequests(requests)
+  {
+    this.props.act({
+      actionType: 'setModalRequests',
+      requests,
+    });
+  }
+
   public render()
   {
     const template: ETLTemplate = this.props.templateEditor.template;
@@ -99,6 +108,10 @@ class ETLExportDisplay extends TerrainComponent<Props>
           keyPath={List([])}
           field={template.rootField}
           canEdit={true}
+        />
+        <MultiModal
+          requests={this.props.templateEditor.modalRequests}
+          setRequests={this.setModalRequests}
         />
       </div>
     );

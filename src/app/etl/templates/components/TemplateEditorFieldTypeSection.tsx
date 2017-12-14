@@ -86,39 +86,8 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
   {
     super(props);
 
-    this.cleanArrayType = memoizeOne(this.cleanArrayType);
-
     this._getTypeListIndex = _.memoize(this._getTypeListIndex);
     this.handleChangeArrayType = _.memoize(this.handleChangeArrayType);
-  }
-
-  /*
-   * (memoized once)
-   * Turns [] into [text]
-   * Turns [array, array] into [array, array, text]
-   * Turns [array, array, text, array] into [array, array, text]
-   */
-  public cleanArrayType(arrayType: List<ELASTIC_TYPES>)
-  {
-    let cutIndex = -1;
-    let newArrayType = arrayType;
-    arrayType.forEach((value, index) =>
-    {
-      if (value !== ELASTIC_TYPES.ARRAY)
-      {
-        cutIndex = index + 1;
-        return false;
-      }
-    });
-    if (cutIndex !== -1 && cutIndex < arrayType.size)
-    {
-      newArrayType = arrayType.slice(0, cutIndex).toList();
-    }
-    if (newArrayType.size === 0 || newArrayType.last() === ELASTIC_TYPES.ARRAY)
-    {
-      newArrayType = newArrayType.push(ELASTIC_TYPES.TEXT);
-    }
-    return newArrayType;
   }
 
   // memoized
@@ -235,18 +204,32 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
     {
       return;
     }
+    const { field, act } = this.props;
+    const nextType = elasticTypeOptions.get(index);
+    const currentType = this.props.field.type;
+    if (currentType === ELASTIC_TYPES.ARRAY && nextType !== ELASTIC_TYPES.ARRAY)
+    { // if user changes type from array, clear the array type
+      this._set('arrayType', List([ELASTIC_TYPES.TEXT]));
+      this._set('type', elasticTypeOptions.get(index));
+    }
+    else if (isNested(currentType, field.arrayType) && !isNested(nextType, field.arrayType) && field.children.size > 0)
+    { // if user changes type from nested to something else and there are children, then show a warning
+      const deferredAction = () => {
+        this._clearChildren();
+        this._set('type', elasticTypeOptions.get(index));
+      };
+      act({
+        actionType: 'addModalConfirmation',
+        props: {
+          title: 'Confirm Action',
+          message: `Changing this type will remove ${field.children.size} nested fields. Would you like to continue?`,
+          onConfirm: deferredAction,
+          confirm: true,
+        }
+      });
+    }
     else
     {
-      const nextType = elasticTypeOptions.get(index);
-      const currentType = this.props.field.type;
-      if (currentType === ELASTIC_TYPES.ARRAY && nextType !== ELASTIC_TYPES.ARRAY)
-      { // if user changes type from array, clear the array type
-        this._set('arrayType', List([ELASTIC_TYPES.TEXT]));
-      }
-      else if (currentType === ELASTIC_TYPES.NESTED && nextType !== ELASTIC_TYPES.NESTED)
-      { // if user changes type from nested to something else, clear the children TODO add a confirmation modal
-        this._clearChildren();
-      }
       this._set('type', elasticTypeOptions.get(index));
     }
   }
@@ -265,8 +248,28 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
       }
       else
       {
-        const newArray = this.props.field.arrayType.set(arrayTypeIndex, elasticTypeOptions.get(index));
-        this._set('arrayType', this.cleanArrayType(newArray));
+        const { field, act } = this.props;
+        const newArray = cleanArrayType(field.arrayType.set(arrayTypeIndex, elasticTypeOptions.get(index)));
+        if (!isNested(field.type, newArray) && field.children.size > 0)
+        {
+          const deferredAction = () => {
+            this._clearChildren();
+            this._set('arrayType', newArray);
+          };
+          act({
+            actionType: 'addModalConfirmation',
+            props: {
+              title: 'Confirm Action',
+              message: `Changing this type will remove ${field.children.size} nested fields. Would you like to continue?`,
+              onConfirm: deferredAction,
+              confirm: true,
+            }
+          });
+        }
+        else
+        {
+          this._set('arrayType', newArray);
+        }
       }
     };
   }
@@ -299,6 +302,40 @@ const elasticAnalyzerOptions = List([
   'test analyzer',
   'test analyzer 2',
 ]); // this is just a placeholder
+
+// returns true if type or arrayType are nested
+function isNested(type: ELASTIC_TYPES, arrayType: List<ELASTIC_TYPES>)
+{
+  return type === ELASTIC_TYPES.NESTED || (arrayType && arrayType.last() === ELASTIC_TYPES.NESTED);
+}
+
+/*
+ * Turns [] into [text]
+ * Turns [array, array] into [array, array, text]
+ * Turns [array, array, text, array] into [array, array, text]
+ */
+function cleanArrayType(arrayType: List<ELASTIC_TYPES>)
+{
+  let cutIndex = -1;
+  let newArrayType = arrayType;
+  arrayType.forEach((value, index) =>
+  {
+    if (value !== ELASTIC_TYPES.ARRAY)
+    {
+      cutIndex = index + 1;
+      return false;
+    }
+  });
+  if (cutIndex !== -1 && cutIndex < arrayType.size)
+  {
+    newArrayType = arrayType.slice(0, cutIndex).toList();
+  }
+  if (newArrayType.size === 0 || newArrayType.last() === ELASTIC_TYPES.ARRAY)
+  {
+    newArrayType = newArrayType.push(ELASTIC_TYPES.TEXT);
+  }
+  return newArrayType;
+}
 
 const voidFunction = () => { /* do nothing */ };
 
