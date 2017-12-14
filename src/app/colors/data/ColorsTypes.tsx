@@ -44,34 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires
+
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import { BaseClass, makeConstructor, New, WithIRecord } from 'app/Classes';
 import * as Immutable from 'immutable';
+import { Map } from 'immutable';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import UserReducer from 'users/data/UserReducers';
-import Ajax from 'util/Ajax';
-import { ColorsReducers } from '../colors/data/ColorsRedux';
-
-const reducers = {
-  analytics: AnalyticsReducer,
-  colors: ColorsReducers,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  schema: SchemaReducers,
-  users: UserReducer,
-};
-
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
-
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax)),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+class ColorsStateC
+{
+  public stylesTag: IMMap<string, React.CSSProperties> = Map({});
+}
+export type ColorsState = WithIRecord<ColorsStateC>;
+export const _ColorsState = makeConstructor(ColorsStateC);

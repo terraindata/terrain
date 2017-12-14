@@ -44,34 +44,44 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires
+
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 import * as Immutable from 'immutable';
-
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
+import { Map } from 'immutable';
+import * as _ from 'lodash';
+import * as ReduxActions from 'redux-actions';
+const Redux = require('redux');
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
+import Util from 'app/util/Util';
 import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import UserReducer from 'users/data/UserReducers';
-import Ajax from 'util/Ajax';
-import { ColorsReducers } from '../colors/data/ColorsRedux';
+import { BaseClass, New } from '../../Classes';
+import { _ColorsState, ColorsState } from './ColorsTypes';
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  colors: ColorsReducers,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  schema: SchemaReducers,
-  users: UserReducer,
-};
+export interface ColorsActionTypes
+{
+  setStyle: {
+    actionType: 'setStyle',
+    selector: string,
+    style: React.CSSProperties,
+  };
+}
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+class ColorsRedux extends TerrainRedux<ColorsActionTypes, ColorsState>
+{
+  public reducers: ConstrainedMap<ColorsActionTypes, ColorsState> =
+  {
+    setStyle: (state, action) =>
+    {
+      const { selector, style } = action.payload;
+      return state.setIn(['stylesTag', selector], style);
+    }
+  };
+}
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax)),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+const ReduxInstance = new ColorsRedux();
+export const ColorsActions = ReduxInstance._actionsForExport();
+export const ColorsReducers = ReduxInstance._reducersForExport(_ColorsState);
+export declare type ColorsActionType<K extends keyof ColorsActionTypes> = GetType<K, ColorsActionTypes>;

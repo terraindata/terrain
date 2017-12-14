@@ -46,7 +46,11 @@ THE SOFTWARE.
 import ActionTypes from './ColorsActionTypes';
 import Store from './ColorsStore';
 
-const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
+const $ = (type: string, payload: any) => 
+{
+	Store.dispatch({ type, payload });
+	return  {type, payload}
+}
 
 const ColorsActions =
   {
