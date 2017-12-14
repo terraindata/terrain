@@ -57,16 +57,22 @@ import TerrainComponent from 'common/components/TerrainComponent';
 
 export type ModalProps = {
   [key in keyof _ModalProps]?: _ModalProps[key];
-}; // we need to force all the props to be optional
+};
+// ModalProps is the same as the Props type from Modal.tsx, however all the props are optional.
+// This is important because MultiModal overrides the open prop.
+// MultiModal also wraps around the onClose prop if it is provided;
 
 export interface Props
 {
   requests: List<ModalProps>;
   onCloseModal: (newRequests: List<ModalProps>) => void;
+  // onCloseModal gets called whenever requests should change. It's just like onChange for a textbox.
 }
 
 export class MultiModal extends TerrainComponent<Props>
 {
+  // handleRequest is like a reducer in that it takes in a previous state and returns a new state.
+  // This allows it to be more easily integrated inside a redux store.
   public static handleRequest(requests: List<ModalProps>, newRequest: ModalProps): List<ModalProps>
   {
     return requests.push(newRequest);
