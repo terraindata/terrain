@@ -141,6 +141,7 @@ class PathfinderColumn extends TerrainComponent<Props>
           keyPath={keyPath.push('source')}
           onStepChange={this.incrementStep}
           step={path.step}
+          source={path.source}
         />
         {
           path.step >= PathfinderSteps.Filter ?
