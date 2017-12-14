@@ -91,7 +91,6 @@ import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
 import AuthStore from './auth/data/AuthStore';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
-//import ColorsStore from 'colors/data/ColorsStore';
 import LibraryActions from './library/data/LibraryActions';
 import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
@@ -257,11 +256,6 @@ class App extends TerrainComponent<Props>
     //   storeKeyPath: ['loaded'],
     // });
 
-    // this._subscribe(ColorsStore, {
-    //   stateKey: 'stylesTag',
-    //   storeKeyPath: ['styles'],
-    // });
-
     // Retrieve logged-in state from persistent storage.
     const accessToken = localStorage['accessToken'];
     const id = localStorage['id'];
@@ -304,7 +298,7 @@ class App extends TerrainComponent<Props>
     const tooltipStyles = generateThemeStyles();
     _.map(tooltipStyles, (value, key) =>
     {
-      //this.props.colorsActions.setStyle(key, value);
+      // this.props.colorsActions.setStyle(key, value);
     });
   }
 
@@ -396,7 +390,6 @@ class App extends TerrainComponent<Props>
 
   public render()
   {
-    console.log(this.props.colors);
     if (this.state.noLocalStorage)
     {
       return (
