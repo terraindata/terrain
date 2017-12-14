@@ -44,47 +44,82 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// split
-function split<T, R extends T, S extends T>(obj: R, oldCol: string, newCols: string[], splitText: string): S
+// =====================================================================
+
+// put
+function put<T, K extends keyof V, V extends T>(obj: T, name: K, value: V[K]): V
 {
-  if (oldCol === undefined || newCols === undefined || splitText === undefined)
+  (obj as V)[name] = value;
+  return obj as V;
+}
+
+// get
+function get<T, K extends keyof T>(obj: T, name: K): T[K] {
+  return obj[name];
+}
+
+// =====================================================================
+
+// put multiple
+function putS<T, K extends keyof V, V extends T>(obj: T, names: K[], values: Array<V[K]>): V
+{
+  for (let i = 0; i < names.length && i < values.length; i++)
   {
-    throw new Error('Split transformation must supply oldCol, newCols, and splitText arguments.');
+    (obj as V)[names[i]] = values[i];
   }
 
-  if (typeof obj[oldCol] !== 'string')
+  return obj as V;
+}
+
+// get multiple
+function getS<T, K extends keyof T>(obj: T, names: K[]): Array<T[K]> {
+  return names.map((n) => obj[n]);
+}
+
+// =====================================================================
+
+// split
+function split(str: string, splitText: string): string[]
+{
+  return str.split(splitText);
+}
+
+function splitObj<T, R extends T, S extends T>(obj: R, oldName: string, newNames: string[], splitText: string): S
+{
+  if (typeof obj[oldName] !== 'string')
   {
     throw new Error('Can only split columns of type string.');
   }
 
-  const splits = obj[oldCol].split(splitText);
+  const v = get(obj, oldName);
+  const splits =   obj[oldName].split(splitText);
   const n = splits.length;
 
-  for (let i = 0; i < splits.length && i < newCols.length; ++i)
+  for (let i = 0; i < splits.length && i < newNames.length; ++i)
   {
-    obj[newCols[i]] = splits[i];
+    obj[newNames[i]] = splits[i];
   }
-  delete obj[oldCol];
+  delete obj[oldName];
   return obj as T as S;
 }
 
 // join
-function join<T, R extends T, S extends T>(obj: R, oldCols: string[], newCol: string, joinText?: string): S
+function join<T, R extends T, S extends T>(obj: R, oldNames: string[], newName: string, joinText?: string): S
 {
-  if (oldCols === undefined || newCol === undefined)
+  if (oldNames === undefined || newName === undefined)
   {
-    throw new Error('Join transformation must supply oldCols and newCol arguments.');
+    throw new Error('Join transformation must supply oldNames and newName arguments.');
   }
 
-  const joins: string[] = oldCols.reduce((arr, n) =>
+  const joins: string[] = oldNames.reduce((arr, n) =>
   {
     const v = obj[n];
     if (typeof v !== 'string')
     {
-      throw new Error('Can only join columns of type string.');
+      throw new Error('Can only join Nameumns of type string.');
     }
 
-    if (n !== newCol)
+    if (n !== newName)
     {
       delete obj[n];
     }
@@ -93,61 +128,61 @@ function join<T, R extends T, S extends T>(obj: R, oldCols: string[], newCol: st
     return arr;
   }, []);
 
-  obj[newCol] = joins.join(joinText);
+  obj[newName] = joins.join(joinText);
   return obj as T as S;
 }
 
 // filter
-function filter<T, R extends T>(obj: R, col: string): T
+function filter<T, R extends T>(obj: R, Name: string): T
 {
-  if (col === undefined)
+  if (Name === undefined)
   {
-    throw new Error('Filter transformation must supply col argument.');
+    throw new Error('Filter transformation must supply Name argument.');
   }
 
-  delete obj[col];
+  delete obj[Name];
   return obj as T;
 }
 
 // duplicate
-function duplicate<T, R extends T>(obj: T, oldCol: string, newCol: string): R
+function duplicate<T, R extends T>(obj: T, oldName: string, newName: string): R
 {
-  if (oldCol === undefined || newCol === undefined)
+  if (oldName === undefined || newName === undefined)
   {
-    throw new Error('Duplicate transformation must supply oldCol and newCol arguments.');
+    throw new Error('Duplicate transformation must supply oldName and newName arguments.');
   }
 
-  if (oldCol !== newCol)
+  if (oldName !== newName)
   {
-    obj[newCol] = obj[oldCol];
+    obj[newName] = obj[oldName];
   }
 
   return obj as R;
 }
 
 // rename
-function rename<T, R extends T, S extends T>(obj: R, oldCol: string, newCol: string): S
+function rename<T, R extends T, S extends T>(obj: R, oldName: string, newName: string): S
 {
-  if (oldCol === undefined || newCol === undefined)
+  if (oldName === undefined || newName === undefined)
   {
-    throw new Error('Rename transformation must supply oldCol and newCol arguments.');
+    throw new Error('Rename transformation must supply oldName and newName arguments.');
   }
 
-  duplicate(obj, oldCol, newCol);
-  if (oldCol !== newCol)
+  duplicate(obj, oldName, newName);
+  if (oldName !== newName)
   {
-    filter(obj, oldCol);
+    filter(obj, oldName);
   }
 
   return obj as T as S;
 }
 
 // plus (monoid plus)
-function plus<T>(obj: T, leftCol: string, rightCol: string): T
+function plus<T>(obj: T, leftName: string, rightName: string): T
 {
-  if (leftCol === undefined || rightCol === undefined)
+  if (leftName === undefined || rightName === undefined)
   {
-    throw new Error('Plus transformation must supply leftCol and rightCol arguments.');
+    throw new Error('Plus transformation must supply leftName and rightName arguments.');
   }
 
 }
