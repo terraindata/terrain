@@ -190,7 +190,8 @@ export class ResultsManager extends TerrainComponent<Props>
           (
             this.props.query.tql !== nextProps.query.tql ||
             // this.props.query.cards !== nextProps.query.cards ||
-            this.props.query.inputs !== nextProps.query.inputs
+            this.props.query.inputs !== nextProps.query.inputs ||
+            this.props.query.path !== nextProps.query.path
           )
         )
       )
@@ -403,9 +404,10 @@ export class ResultsManager extends TerrainComponent<Props>
     {
       return;
     }
-
     if (query !== this.state.lastQuery)
     {
+      // TODO TODO: SINCE WE ARE USING THE PATHFINDER AND THERE IS NO PARSE
+      // TREE BUILT FOR IT, WE JUST USE THE TQL FOR THE QUERY
       const eql = AllBackendsMap[query.language].parseTreeToQueryString(
         query,
         {
@@ -415,9 +417,9 @@ export class ResultsManager extends TerrainComponent<Props>
 
       this.setState({
         lastQuery: query,
-        queriedTql: eql,
+        queriedTql: query.tql,
         query: Ajax.query(
-          eql,
+          query.tql,
           db,
           (resp) =>
           {

@@ -145,4 +145,9 @@ export let BuilderCardActionTypes = {};
   BuilderActionTypes.dropCard,
 ].map((type) => BuilderCardActionTypes[type] = true);
 
+export let BuilderPathActionTypes = {};
+[
+ // BuilderActionTypes.change,
+].map((type) => BuilderPathActionTypes[type] = true);
+
 export default BuilderActionTypes;

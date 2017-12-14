@@ -107,6 +107,8 @@ export class MySQLBackend implements Backend
 
   syntaxConfig = syntaxConfig;
 
+  pathToCode = (path) => null;
+
   // function to get transform bars?
   // autocomplete?
 }

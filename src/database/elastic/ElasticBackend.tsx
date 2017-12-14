@@ -65,6 +65,7 @@ import CardsToElastic from './conversion/CardsToElastic';
 import ElasticToCards from './conversion/ElasticToCards';
 import LoadElasticQuery from './conversion/LoadElasticQuery';
 import { ElasticParseTreeToQuery, ParseElasticQuery } from './conversion/ParseElasticQuery';
+import { parsePath } from 'app/builder/components/pathfinder/PathfinderParser';
 const syntaxConfig = require('../../../shared/database/elastic/syntax/ElasticSyntaxConfig.json');
 
 export class ElasticBackend implements Backend
@@ -92,6 +93,8 @@ export class ElasticBackend implements Backend
   queryToCode = CardsToElastic.toElastic;
 
   codeToQuery = ElasticToCards;
+
+  pathToCode = parsePath;
 
   parseQuery = ParseElasticQuery;
 
