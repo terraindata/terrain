@@ -87,7 +87,7 @@ const { List, Map, Record } = Immutable;
 import BuilderStore from 'app/builder/data/BuilderStore';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
-import ElasticBlockHelpers, { AutocompleteMatchType, FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import ElasticBlockHelpers, { AutocompleteMatchType, FieldType, FieldTypeMapping } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
 
 export enum PathfinderSteps
@@ -295,9 +295,10 @@ class FilterLineC extends LineC
 {
   // Members for when it is a single line condition
   public field: string = null; // autocomplete
+  public fieldType: FieldType = null;
   public comparison: string = null; // autocomplete
-  public valueType: ValueType = null;
   public value: string | number | DistanceValue = null;
+  public valueType: ValueType = null;
 
   // Members for when it is a group of filter conditions
   public filterGroup: FilterGroup = null;
@@ -398,8 +399,13 @@ export const _Source = (config?: { [key: string]: any }) =>
 abstract class DataSource extends BaseClass
 {
   // ... shared data source attributes go here
+  
+  // Given some context, 
   public abstract getChoiceOptions:
   (context?: ChoiceContext) => List<ChoiceOption>;
+  
+  public abstract dataTypeToFieldType:
+  (dataType: string) => FieldType;
 
   public name: string = '';
 }
@@ -437,6 +443,7 @@ type ChoiceContext = {
     source: Source,
     schemaState: SchemaState,
     field: string,
+    fieldType?: FieldType,
   } | {
     type: 'valueType',
     source: Source,
@@ -576,6 +583,9 @@ class ElasticDataSourceC extends DataSource
               displayName: col.name,
               value: col.name,
               sampleData: col.sampleData,
+              meta: {
+                fieldType: dataSource.dataTypeToFieldType(col.datatype),
+              },
             });
           }).toList();
           return fields.concat(defaultOptions).toList();
@@ -586,7 +596,16 @@ class ElasticDataSourceC extends DataSource
 
     if (context.type === 'comparison')
     {
-      return List(ElasticComparisons.map((c) => _ChoiceOption(c)));
+      const { field, fieldType, schemaState, source } = context;
+      
+      console.log(fieldType);
+      let options = ElasticComparisons;
+      if (fieldType !== null && fieldType !== undefined)
+      {
+        options = options.filter((opt) => opt.fieldTypes.indexOf(fieldType) !== -1);
+      }
+      
+      return List(options.map((c) => _ChoiceOption(c)));
     }
 
     if (context.type === 'valueType')
@@ -632,6 +651,11 @@ class ElasticDataSourceC extends DataSource
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));
   }
+  
+  public dataTypeToFieldType = (dataType: string) =>
+  {
+    return +_.findKey(FieldTypeMapping, (dataTypes) => dataTypes.indexOf(dataType) !== -1);
+  }
 }
 export type ElasticDataSource = ElasticDataSourceC & IRecord<ElasticDataSourceC>;
 export const _ElasticDataSource = (config?: { [key: string]: any }) =>
@@ -645,67 +669,67 @@ const ElasticComparisons = [
   {
     value: 'equal',
     displayName: 'equals',
-    valueTypes: List(['number']),
+    fieldTypes: List([FieldType.Numerical, FieldType.Text]),
   },
   {
     value: 'contains',
     displayName: 'contains',
-    valueTypes: List(['text']),
+    fieldTypes: List([FieldType.Text]),
   },
   {
     value: 'notequal',
     displayName: 'does not equal',
-    valueTypes: List(['auto']),
+    fieldTypes: List([FieldType.Text, FieldType.Numerical]),
   },
   {
     value: 'notcontain',
     displayName: 'does not contain',
-    valueTypes: List(['text']),
+    fieldTypes: List([FieldType.Text]),
   },
   {
     value: 'greater',
     displayName: 'is greater than',
-    valueTypes: List(['number']),
+    fieldTypes: List([FieldType.Numerical]),
   },
   {
     value: 'less',
     displayName: 'is less than',
-    valueTypes: List(['number']),
+    fieldTypes: List([FieldType.Numerical]),
   },
   {
     value: 'greaterequal',
     displayName: 'is greater than or equal to',
-    valueTypes: List(['number']),
+    fieldTypes: List([FieldType.Numerical]),
   },
   {
     value: 'lessequal',
     displayName: 'is less than or equal to',
-    valueTypes: List(['number']),
+    fieldTypes: List([FieldType.Numerical]),
   },
   {
     value: 'alphabefore',
     displayName: 'comes before',
-    valueTypes: List(['text']),
+    fieldTypes: List([FieldType.Text]),
   },
   {
     value: 'alphaafter',
     displayName: 'comes after',
-    valueTypes: List(['text']),
+    fieldTypes: List([FieldType.Text]),
   },
   {
     value: 'datebefore',
     displayName: 'starts before',
-    valueTypes: List(['date']),
+    fieldTypes: List([FieldType.Date]),
   },
   {
     value: 'dateafter',
     displayName: 'starts after',
-    valueTypes: List(['date']),
+    fieldTypes: List([FieldType.Date]),
   },
   {
     value: 'located',
     displayName: 'is located within',
-    valueTypes: List(['distance']),
+    fieldTypes: List([FieldType.Geopoint]),
   },
 ];
 
@@ -720,6 +744,7 @@ class ChoiceOptionC extends BaseClass
   public color: string = null;
   public tooltipContent: string | El = null;
   public sampleData: List<any> = List([]);
+  public meta: any = null; // metadata, no specific shape, used for helper functions
 }
 export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;
 export const _ChoiceOption = (config?: { [key: string]: any }) =>
