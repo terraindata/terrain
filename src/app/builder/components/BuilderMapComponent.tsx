@@ -81,6 +81,18 @@ class BuilderMapComponent extends TerrainComponent<Props>
   public constructor(props: Props)
   {
     super(props);
+    this._subscribe(BuilderStore, {
+      stateKey: 'builderState',
+      updater: (builderState: BuilderState) =>
+      {
+        if (builderState.query.inputs !== this.state.inputs)
+        {
+          this.setState({
+            inputs: builderState.query.inputs,
+          });
+        }
+      },
+    });
   }
 
   public render()
