@@ -52,6 +52,7 @@ import * as React from 'react';
 import MapComponent from '../../common/components/MapComponent';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import BuilderActions from '../data/BuilderActions';
+import BuilderStore, { BuilderState } from '../data/BuilderStore';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
