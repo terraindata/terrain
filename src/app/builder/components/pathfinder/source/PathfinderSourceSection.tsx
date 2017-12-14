@@ -49,6 +49,7 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
@@ -58,6 +59,7 @@ import BuilderActions from 'app/builder/data/BuilderActions';
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
+import Selector, { SelectionChoice } from 'app/common/components/Selector';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
 {
@@ -71,14 +73,17 @@ export interface Props
   keyPath: KeyPath;
   onStepChange: (oldStep: PathfinderSteps) => void;
   step: PathfinderSteps;
+  source: Source;
 }
 
 class PathfinderSourceSection extends TerrainComponent<Props>
 {
   public state: {
     dataSourceOptions: List<ChoiceOption>,
+    expanded: boolean,
   } = {
     dataSourceOptions: List([]),
+    expanded: this.props.source.expanded,
   };
 
   public componentWillMount()
@@ -108,6 +113,17 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     {
       displayNames = displayNames.set(option.value, option.displayName);
     });
+    const sourceOptions = this.state.dataSourceOptions.map((option) =>
+    {
+      return {
+        title: String(option.displayName),
+        key: option.value,
+        subtitle: 'Sample Values',
+        values: _.keys(option.sampleData.get(0)._source).map((key) =>
+          `${key}: ${option.sampleData.get(0)._source[key]}`,
+        ),
+      };
+    }).toList();
     return (
       <div
         className='pf-section'
@@ -137,21 +153,31 @@ class PathfinderSourceSection extends TerrainComponent<Props>
               textboxWidth={70}
             />
           </div>
-          <div className='pf-piece'>
-            <Dropdown
-              options={sourceValues}
-              optionsDisplayName={displayNames}
-              selectedIndex={sourceNames.indexOf(this.props.pathfinderContext.source.dataSource.name)}
-              canEdit={canEdit}
-              onChange={this.handleSourceChange}
-            />
-          </div>
+          <Dropdown
+            options={sourceValues}
+            optionsDisplayName={displayNames}
+            selectedIndex={sourceNames.indexOf(this.props.pathfinderContext.source.dataSource.name)}
+            canEdit={canEdit}
+            onChange={this.handleSourceChange}
+          />
         </div>
       </div>
     );
   }
+  // <Selector
+  //   selectedIndex={sourceNames.indexOf(this.props.pathfinderContext.source.dataSource.name)}
+  //   items={sourceOptions}
+  //   onSelect={this.handleSourceChange}
+  //   expanded={this.props.source.expanded}
+  //   expandSelector={this.handleExpandSelector}
+  // />
 
-  private handleSourceChange(index)
+  private handleExpandSelector()
+  {
+    BuilderActions.change(this.props.keyPath.push('expanded'), !this.props.source.expanded);
+  }
+
+  private handleSourceChange(index, key)
   {
     const options = this.getDataSourceOptions();
     const dataSource = this.props.pathfinderContext.source.dataSource;
@@ -160,7 +186,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       BuilderActions.change(this.props.keyPath.push('dataSource').push('index'), options.get(index).value.id);
       BuilderActions.change(this.props.keyPath.push('dataSource').push('types'), options.get(index).value.tableIds);
     }
-
+    BuilderActions.change(this.props.keyPath.push('expanded'), false);
     BuilderActions.change(this.props.keyPath.push('dataSource').push('name'), options.get(index).displayName);
     if (this.props.step === PathfinderSteps.Source)
     {

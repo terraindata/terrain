@@ -384,6 +384,7 @@ class SourceC extends BaseClass
   public dataSource: DataSource = _ElasticDataSource();
   public count: number | string = sourceCountOptions.get(0);
   public start: number = 0;
+  public expanded: boolean = true;
 }
 export type Source = SourceC & IRecord<SourceC>;
 export const _Source = (config?: { [key: string]: any }) =>
@@ -471,7 +472,7 @@ class ElasticDataSourceC extends DataSource
         {
           return _ChoiceOption({
             displayName: db.name,
-            value: db.serverId + '/' + db.name,
+            value: db,
           });
         },
       ).toList();
@@ -479,27 +480,29 @@ class ElasticDataSourceC extends DataSource
       const sourceExamples = {};
       sources.forEach((source) =>
       {
+        const databaseId = String(source.value.serverId) + '/' + String(source.value.name);
         const types = context.schemaState.tables.toList().filter((table) =>
-          table.databaseId === source.value,
+          table.databaseId === databaseId,
         );
         types.forEach((type) =>
         {
-          if (sourceExamples[source.value])
+          if (sourceExamples[databaseId])
           {
-            sourceExamples[source.value] = sourceExamples[source.value].concat(type.sampleData);
+            sourceExamples[databaseId] = sourceExamples[databaseId].concat(type.sampleData);
           }
           else
           {
-            sourceExamples[source.value] = type.sampleData;
+            sourceExamples[databaseId] = type.sampleData;
           }
         });
       });
       return sources.map((source) =>
       {
+        const databaseId = String(source.value.serverId) + '/' + String(source.value.name);
         return _ChoiceOption({
           displayName: source.displayName,
           value: source.value,
-          sampleData: List(sourceExamples[source.value]),
+          sampleData: List(sourceExamples[databaseId]),
         });
       }).toList();
     }
