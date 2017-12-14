@@ -54,9 +54,10 @@ import
   TemplateEditorState,
   TemplateField,
 } from 'etl/templates/TemplateTypes';
-
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 const { List, Map } = Immutable;
+
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 
 export interface TemplateEditorActionTypes
 {
@@ -78,6 +79,10 @@ export interface TemplateEditorActionTypes
   deleteField: {
     actionType: 'deleteField';
     sourcePath: KeyPath;
+  };
+  addModalConfirmation: {
+    actionType: 'addModalConfirmation';
+    props: ModalProps;
   };
 }
 
@@ -111,6 +116,11 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       const fieldKeyPath = List<string | number>(['template', 'rootField'])
         .push(...action.payload.sourcePath.toJS());
       return state.deleteIn(fieldKeyPath);
+    },
+    addModalConfirmation: (state, action) =>
+    {
+      return state.set('modalRequests',
+        MultiModal.handleRequest(state.modalRequests, action.payload.props));
     },
   };
 }

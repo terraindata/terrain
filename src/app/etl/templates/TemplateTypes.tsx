@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import { ModalProps } from 'common/components/overlay/MultiModal';
 import { FILE_TYPES } from 'etl/ETLTypes';
 import { makeConstructor, New, WithIRecord } from 'src/app/Classes';
 
@@ -77,6 +78,7 @@ class TemplateEditorStateC
 {
   public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
   public isDirty: boolean = true;
+  public modalRequests: List<ModalProps> = List([]);
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);
