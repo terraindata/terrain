@@ -49,7 +49,6 @@ THE SOFTWARE.
 // via /credentials to localhost for testing purposes
 
 import aesjs = require('aes-js');
-import srs = require('secure-random-string');
 import sha1 = require('sha1');
 
 import * as Tasty from '../../tasty/Tasty';

@@ -48,7 +48,6 @@ THE SOFTWARE.
 
 import * as _ from 'lodash';
 
-import * as Immutable from 'immutable';
 import ESValueInfo from '../../../shared/database/elastic/parser/ESValueInfo';
 
 export type TQLTranslationFn = ((block: Block, tqlConfig: object) => string | object | number | boolean);

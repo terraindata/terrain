@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
 
 import ActionTypes from './ColorsActionTypes';
 import { _ColorsState, ColorsState } from './ColorsStore';

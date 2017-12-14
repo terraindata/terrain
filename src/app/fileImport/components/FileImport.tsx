@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -74,7 +74,6 @@ import './FileImport.less';
 import FileImportPreview from './FileImportPreview';
 
 const HTML5Backend = require('react-dnd-html5-backend');
-const { List } = Immutable;
 
 const ArrowIcon = require('./../../../images/icon_carrot.svg');
 const PREVIEW_CHUNK_SIZE = FileImportTypes.PREVIEW_CHUNK_SIZE;

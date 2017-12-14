@@ -46,15 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
-import * as Immutable from 'immutable';
+import * as classNames from 'classnames';
+import { List } from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import './LibraryItem.less';
-const { List } = Immutable;
-import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
+import './LibraryItem.less';
+
 import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
 import ColorsActions from './../../colors/data/ColorsActions';
 import Menu from './../../common/components/Menu';

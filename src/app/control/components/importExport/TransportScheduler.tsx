@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import cronstrue from 'cronstrue';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
@@ -70,7 +70,6 @@ import ControlActions from '../../data/ControlActions';
 import TemplateSelector from './TemplateSelector';
 import './TransportScheduler.less';
 
-const { List } = Immutable;
 const HelpIcon = require('images/icon_help-1.svg');
 type Template = FileImportTypes.Template;
 

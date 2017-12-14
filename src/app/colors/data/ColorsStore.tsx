@@ -47,9 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 
 import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 import * as Redux from 'redux';
-import * as ReduxActions from 'redux-actions';
 import thunk from 'redux-thunk';
 import Util from './../../util/Util';
 import ColorsReducers from './ColorsReducers';

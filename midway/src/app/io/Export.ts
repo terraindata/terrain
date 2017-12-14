@@ -58,7 +58,6 @@ import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Tasty from '../../tasty/Tasty';
 import { ItemConfig, Items } from '../items/Items';
 import { ExportTemplateConfig, ExportTemplates } from './templates/ExportTemplates';
 import { TemplateBase } from './templates/Templates';

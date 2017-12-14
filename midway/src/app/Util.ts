@@ -49,11 +49,9 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as request from 'request';
 import * as rimraf from 'rimraf';
-import * as sha1 from 'sha1';
 
 import { exportTemplates } from './io/templates/ExportTemplateRouter';
 import { importTemplates } from './io/templates/ImportTemplateRouter';
-import { ImportTemplateConfig } from './io/templates/ImportTemplates';
 import { UserConfig, Users } from './users/Users';
 
 const users = new Users();
