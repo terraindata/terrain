@@ -60,7 +60,14 @@ import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 export function parsePath(path: Path): string
 {
   const baseQuery = {
-    query: {},
+    query: {
+      bool: {
+        filter: [],
+        must: [],
+        must_not:  [],
+        should: [],
+      }
+    },
     sort: {},
     from: 0,
     size: 1000,
@@ -69,20 +76,20 @@ export function parsePath(path: Path): string
   const sourceInfo = parseSource(path.source);
   baseQuery.from = sourceInfo.from;
   baseQuery.size = sourceInfo.size;
-  baseQuery.query = {
-    bool: {
-      filter: [
-        {
-          term: {
-            _index: sourceInfo.index.split('/')[1]
-          }
-        }
-      ]
+  baseQuery.query.bool.filter =
+  [
+    {
+      term: {
+        _index: sourceInfo.index.split('/')[1]
+      }
     }
-  }
+  ];
   console.log(JSON.stringify(baseQuery));
   const sortObj = parseScore(path.score);
   baseQuery.sort = sortObj;
+  const filterObj = parseFilters(path.filterGroup);
+  baseQuery.query.bool.must = filterObj.must;
+  baseQuery.query.bool.must_not = filterObj.mustNot;
   return JSON.stringify(baseQuery, null, 2);
 }
 
@@ -154,14 +161,99 @@ function parseScore(score: Score): any
       outputs,
     };
   }).toArray();
-    console.log(factors);
     sortObj._script.script.params.factors = factors;
     return sortObj;
 }
 
-function parseFilters(filterGroup: FilterGroup)
+function parseFilters(filterGroup: FilterGroup): any
 {
-  //
+  if (filterGroup.minMatches === 'all')
+  {
+    const must = [];
+    const filter = [];
+    const mustNot = [];
+    filterGroup.lines.forEach((line) => {
+      switch (line.comparison)
+      {
+        case 'equal':
+          must.push({
+            term: {
+              [line.field]: String(line.value)
+            }
+          });
+          break;
+        case 'contains':
+          must.push({
+            match: {
+              [line.field]: line.value
+            }
+          });
+          break;
+        case 'notequal':
+          mustNot.push({
+            term: {
+              [line.field]: line.value
+            }
+          });
+          break;
+        case 'notcontain':
+          mustNot.push({
+            match: {
+              [line.field]: line.value
+            }
+          });
+          break;
+        case 'greater':
+        case 'alphaafter':
+        case 'dateafter':
+          must.push({
+            range: {
+              [line.field]:
+              {
+                gt: [line.value]
+              }
+            }
+          });
+          break;
+        case 'less':
+        case 'alphabefore':
+        case 'datebefore':
+          must.push({
+            range: {
+              [line.field]:
+              {
+                lt: [line.value]
+              }
+            }
+          });
+          break;
+        case 'greaterequal':
+          must.push({
+            range: {
+              [line.field]:
+              {
+                gte: [line.value]
+              }
+            }
+          });
+          break;
+        case 'lessequal':
+          must.push({
+            range: {
+              [line.field]:
+              {
+                lte: [line.value]
+              }
+            }
+          });
+          break;
+        case 'located':
+        default:
+      }
+    });
+    return {must, filter, mustNot};
+  }
+  return {must: [], filter: [], mustNot: []}
 }
 
 function parseMore(more: More)

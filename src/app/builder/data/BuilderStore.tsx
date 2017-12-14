@@ -151,14 +151,7 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
       state = (BuilderReducers[action.type] as any)(state, action);
     }
 
-    if (BuilderPathActionTypes[action.type])
-    {
-      const path = state.query.path;
-      state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path));
-    }
-
-
-    else if (BuilderCardActionTypes[action.type])
+    if (BuilderCardActionTypes[action.type])
     {
       // a card changed and we need to re-translate the tql
       //  needs to be after the card change has affected the state
@@ -170,6 +163,12 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
         .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
         .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
         .setIn(['query', 'cardsAndCodeInSync'], true);
+    }
+
+    if (BuilderPathActionTypes[action.type])
+    {
+      const path = state.query.path;
+      state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path));
     }
 
     if (!state.modelVersion || state.modelVersion < 3)
