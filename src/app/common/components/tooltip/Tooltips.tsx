@@ -55,8 +55,7 @@ import * as React from 'react';
 import { Tooltip } from 'react-tippy';
 import 'react-tippy/dist/tippy.css';
 
-import TerrainComponent from 'common/components/TerrainComponent';
-import { backgroundColor, borderColor, Colors, fontColor, getStyle } from './../../../colors/Colors';
+import { Colors } from './../../../colors/Colors';
 
 import './Tooltips.less';
 

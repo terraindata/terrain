@@ -49,7 +49,6 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
 
 import { CredentialConfig, Credentials } from '../credentials/Credentials';
 import * as Util from '../Util';

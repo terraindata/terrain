@@ -49,14 +49,13 @@ import { List } from 'immutable';
 import { divIcon, point } from 'leaflet';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Circle, Map, Marker, Polygon, Polyline, Popup, Rectangle, TileLayer, ZoomControl } from 'react-leaflet';
+import { Circle, Map, Marker, Polyline, Popup, Rectangle, TileLayer } from 'react-leaflet';
 
 import Switch from 'common/components/Switch';
 import Actions from '../../builder/data/BuilderActions';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';
-import CheckBox from './CheckBox';
 import './MapComponentStyle.less';
 import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';

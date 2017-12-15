@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import cronstrue from 'cronstrue';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
@@ -71,8 +71,6 @@ import TransportScheduler from './TransportScheduler';
 import './TemplateControlList.less';
 
 const DeleteIcon = require('images/icon_close.svg');
-
-const { List } = Immutable;
 
 type Template = FileImportTypes.Template;
 

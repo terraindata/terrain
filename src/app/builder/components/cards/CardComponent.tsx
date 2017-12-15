@@ -78,6 +78,8 @@ import { ColorsActions } from '../../../colors/data/ColorsRedux';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
 
+const { List } = Immutable;
+
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('images/icon_more_12x3.svg?name=MoreIcon');
 const HelpIcon = require('images/icon_help-1.svg?name=HelpIcon');
@@ -128,7 +130,6 @@ class _CardComponent extends TerrainComponent<Props>
     hovering: boolean;
     closing: boolean;
     opening: boolean;
-    menuOptions: List<MenuOption>;
 
     scrollState: BuilderScrollState;
     keyPath: KeyPath;
@@ -182,23 +183,6 @@ class _CardComponent extends TerrainComponent<Props>
       dY: 0,
       index: 0,
       cardTransition: true,
-
-      menuOptions:
-      Immutable.List([
-        // {
-        //   text: 'Copy',
-        //   onClick: this.handleCopy,
-        // },
-        {
-          text: 'Duplicate',
-          onClick: this.handleDuplicate,
-        },
-        {
-          text: 'Delete',
-          onClick: this.handleDelete,
-        },
-      ]),
-
       scrollState: BuilderScrollStore.getState(),
       keyPath: props.keyPath,
     };
@@ -329,6 +313,31 @@ class _CardComponent extends TerrainComponent<Props>
     this.props.connectDragPreview(this.dragPreview);
   }
 
+  public getMenuOptions(): List<MenuOption>
+  {
+    const options: List<MenuOption> =
+      List([
+        // {
+        //   text: 'Copy',
+        //   onClick: this.handleCopy,
+        // },
+        {
+          text: 'Duplicate',
+          onClick: this.handleDuplicate,
+        },
+        {
+          text: this.props.card.disabled ? 'Enable' : 'Disable',
+          onClick: this.handleDisable,
+        },
+        {
+          text: 'Delete',
+          onClick: this.handleDelete,
+        },
+      ]);
+
+    return options;
+  }
+
   public toggleClose(event)
   {
     if (this.state.closing || this.state.opening)
@@ -453,7 +462,15 @@ class _CardComponent extends TerrainComponent<Props>
     );
 
     Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);
+  }
 
+  public handleDisable()
+  {
+    const keyPath = this.getKeyPath();
+    Actions.change(
+      keyPath.push('disabled'),
+      !this.props.card.disabled,
+    );
   }
 
   public handleMouseMove(event)
@@ -768,6 +785,15 @@ class _CardComponent extends TerrainComponent<Props>
         zIndex: 999999,
       });
     }
+
+    if (this.props.card.disabled)
+    {
+      style = _.extend(style === null ? {} : style, {
+        opacity: 0.25,
+        zIndex: 999999,
+      });
+    }
+
     const content = <BuilderComponent
       canEdit={this.props.canEdit}
       data={this.props.card}
@@ -880,7 +906,7 @@ class _CardComponent extends TerrainComponent<Props>
                 !this.props.tuningMode &&
                 !card['cannotBeMoved'] &&
                 <Menu
-                  options={this.state.menuOptions}
+                  options={this.getMenuOptions()}
                   openRight={true}
                 />
               }

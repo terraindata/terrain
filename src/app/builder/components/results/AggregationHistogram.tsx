@@ -48,11 +48,11 @@ THE SOFTWARE.
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
 
-import * as Immutable from 'immutable';
-const { List } = Immutable;
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import Histogram from './../../../charts/components/Histogram';
 

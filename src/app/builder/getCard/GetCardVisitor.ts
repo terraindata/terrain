@@ -375,7 +375,15 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
 
         tql: (block, tqlFn, tqlConfig) =>
         {
-          return block['cards'].map((card) => tqlFn(card, tqlConfig)).toArray();
+          return block['cards'].map((card) =>
+          {
+            if (card.disabled)
+            {
+              return undefined;
+            }
+
+            return tqlFn(card, tqlConfig);
+          }).toArray().filter((card) => (card !== undefined));
         },
       },
     });
@@ -572,6 +580,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           block['cards'].map(
             (card) =>
             {
+              if (card.disabled)
+              {
+                return;
+              }
+
               json[card['key']] = tqlFn(card, tqlConfig);
             },
           );
@@ -839,6 +852,11 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             block['cards'].map(
               (card) =>
               {
+                if (card.disabled)
+                {
+                  return;
+                }
+
                 _.extend(json, {
                   [card['key']]: tqlTranslationFn(card, tqlConfig),
                 });

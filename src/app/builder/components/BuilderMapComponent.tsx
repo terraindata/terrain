@@ -48,7 +48,6 @@ THE SOFTWARE.
 import * as React from 'react';
 import MapComponent from '../../common/components/MapComponent';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import BuilderActions from '../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../data/BuilderStore';
 import SpotlightStore from '../data/SpotlightStore';
 

@@ -44,90 +44,74 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+import * as stream from 'stream';
+import * as winston from 'winston';
 
-import * as Radium from 'radium';
-import * as React from 'react';
-import Util from '../../util/Util';
-import { ColorsActions } from './../../colors/data/ColorsRedux';
-import { Colors } from '../../colors/Colors';
-import TerrainComponent from './../../common/components/TerrainComponent';
-import './DragHandleStyle.less';
+import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
 
-const Handle = require('./../../../images/icon_drag_1.svg');
+export const googleAPI: GoogleAPI = new GoogleAPI();
 
-export interface Props
+export interface SourceConfig
 {
-  id?: number;
-  hiddenByDefault?: boolean;
-  showWhenHoveringClassName?: string;
-  useAltColor?: boolean;
-  connectDragSource?: (el: El) => El;
-  colorsActions: typeof ColorsActions;
+  type: string;
+  params: object;
 }
 
-@Radium
-class DragHandle extends TerrainComponent<Props>
+export interface ImportSourceConfig
 {
-  public componentWillMount()
-  {
-    const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
+  filetype: string;
+  params: object;
+  stream: stream.Readable;
+}
 
-    this.props.colorsActions({
-      actionType: 'setStyle',
-      selector: '.drag-icon',
-      style: { fill: this.props.useAltColor ? Colors().altText2 : Colors().iconColor },
-    });
-    this.props.colorsActions({
-      actionType: 'setStyle',
-      selector: '.drag-icon:hover',
-      style: { fill: Colors().inactiveHover },
-    });
-    this.props.colorsActions({
-      actionType: 'setStyle',
-      selector: '.drag-icon:active',
-      style: { fill: Colors().active },
-    });
-    this.props.colorsActions({
-      actionType: 'setStyle',
-      selector: '.' + hoveringClassName,
-      style: { opacity: '0.85 !important' as any },
+export class Sources
+{
+
+  public async handleTemplateSource(body: object): Promise<ImportSourceConfig>
+  {
+    return new Promise<ImportSourceConfig>(async (resolve, reject) =>
+    {
+      let imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: '',
+          params: {},
+          stream: new stream.PassThrough(),
+        };
+      const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
+      switch (sourceConfig.type)
+      {
+        case 'spreadsheets':
+          imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
+          break;
+        default:
+          break;
+      }
+      return resolve(imprtSourceConfig);
     });
   }
 
-  public renderHandle()
+  private async _getStreamFromGoogleSpreadsheets(source: SourceConfig, body: object, templateId?: string): Promise<ImportSourceConfig>
   {
-    return (
-      <div
-        key={this.props.id}
-        style={{
-          'opacity': this.props.hiddenByDefault ? 0 : 0.85,
-          ':hover': {
-            opacity: 0.85,
-          },
-        }}
-      >
-        <Handle className='drag-icon' />
-      </div>
-    );
-  }
+    return new Promise<ImportSourceConfig>(async (resolve, reject) =>
+    {
+      if (templateId !== undefined)
+      {
+        body['templateId'] = Number(parseInt(templateId, 10));
+      }
+      const writeStream = await googleAPI.getSpreadsheetValuesAsCSVStream(
+        await googleAPI.getSpreadsheets(source['params'] as GoogleSpreadsheetConfig)) as stream.Readable;
 
-  public render()
-  {
-    return (
-      (
-        this.props.connectDragSource !== undefined ?
-          this.props.connectDragSource(this.renderHandle()) :
-          this.renderHandle()
-      )
-    );
+      delete body['source'];
+      body['filetype'] = 'csv';
+      const imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: 'csv',
+          params: body,
+          stream: writeStream,
+        };
+      return resolve(imprtSourceConfig);
+    });
   }
 }
 
-export default Util.createContainer(
-  DragHandle,
-  [],
-  {
-    colorsActions: ColorsActions,
-  },
-);
+export default Sources;

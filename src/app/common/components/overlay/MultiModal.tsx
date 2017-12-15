@@ -43,96 +43,76 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
-import * as classNames from 'classnames';
-import { List } from 'immutable';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
 import * as _ from 'lodash';
 import * as React from 'react';
+import { BaseClass, makeConstructor, New, WithIRecord } from 'src/app/Classes';
 
-import { backgroundColor, borderColor, Colors } from 'app/colors/Colors';
-import { Menu, MenuOption } from 'common/components/Menu';
+import Modal from 'common/components/Modal';
+import { Props as _ModalProps } from 'common/components/Modal';
 import TerrainComponent from 'common/components/TerrainComponent';
 
-import './ControlList.less';
-
-export type HeaderConfigItem = [string, (rowElem, index) => any];
-export type HeaderConfig = HeaderConfigItem[];
+export type ModalProps = {
+  [key in keyof _ModalProps]?: _ModalProps[key];
+};
+// ModalProps is the same as the Props type from Modal.tsx, however all the props are optional.
+// This is important because MultiModal overrides the open prop.
+// MultiModal also wraps around the onClose prop if it is provided;
 
 export interface Props
 {
-  items: List<any>;
-  config: HeaderConfig;
-  getMenuOptions?: (item, index) => any; // passed to <Menu/> for each item if a context menu is desired
-  [_dependents: string]: any; // for if the config has functions that depend on values outside of items
+  requests: List<ModalProps>;
+  setRequests: (newRequests: List<ModalProps>) => void;
+  // a function that allows MultiModal to change requests - it's like onChange for a textbox
 }
 
-export class ControlList extends TerrainComponent<Props>
+export class MultiModal extends TerrainComponent<Props>
 {
-  public renderRow(item, index: number)
+  // addRequest is like a reducer in that it takes in a previous state and returns a new state.
+  // This allows it to be more easily integrated inside a redux store.
+  public static addRequest(requests: List<ModalProps>, newRequest: ModalProps): List<ModalProps>
   {
-    return (
-      <div className='row-info' key={index} style={tableRowStyle}>
-        {
-          this.props.config.map((headerItem: HeaderConfigItem, i: number) =>
-          {
-            return (
-              <div className='row-info-data' key={i}>
-                {headerItem[1](item, index)}
-              </div>
-            );
-          })
-        }
-        {
-          this.props.getMenuOptions !== undefined ?
-            <div className='row-info-data' key='context-menu'>
-              <div className='control-list-menu-options-wrapper'>
-                <Menu options={this.props.getMenuOptions(item, index)} />
-              </div>
-            </div>
-            : undefined
-        }
-      </div>
-    );
+    return requests.push(newRequest);
+  }
+
+  public handleCloseModal()
+  {
+    if (this.props.requests === undefined || this.props.requests.size === 0)
+    {
+      return;
+    }
+    const firstProps = this.props.requests.first();
+    const hasOnClose = firstProps !== undefined && firstProps.onClose !== undefined;
+    const newRequests = this.props.requests.delete(0);
+    if (hasOnClose)
+    {
+      firstProps.onClose();
+    }
+    this.props.setRequests(newRequests);
   }
 
   public render()
   {
-    return (
-      this.props.items.size > 0 ?
-        <div className='control-list-table'>
-          <div
-            className={classNames({
-              'row-info-header': true,
-            })}
-            key='header'
-          >
-            {
-              this.props.config.map((headerItem: HeaderConfigItem, i: number) =>
-              {
-                return (
-                  <div className='row-info-data' key={i}>
-                    {headerItem[0]}
-                  </div>
-                );
-              })
-            }
-            {
-              this.props.getMenuOptions !== undefined ?
-                <div className='row-info-data' key='context-menu' />
-                : undefined
-            }
-          </div>
-          {
-            this.props.items.map(this.renderRow)
-          }
-        </div>
-        :
-        <div> List Has No Items </div>
-    );
+    const firstProps = this.props.requests !== undefined && this.props.requests.first();
+    if (firstProps === undefined)
+    {
+      return null;
+    }
+    else
+    {
+      return (
+        <Modal
+          {...firstProps}
+          onClose={this.handleCloseModal}
+          open={true}
+        />
+      );
+    }
+
   }
 }
 
-const tableRowStyle = _.extend({},
-  backgroundColor(Colors().bg3),
-  borderColor(Colors().bg2),
-);
+export default MultiModal;
