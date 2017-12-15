@@ -65,7 +65,6 @@ export interface Props
   parentKeyPath: KeyPath;
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
-  spotlightActions?: typeof SpotlightActions;
 }
 
 class BuilderMapComponent extends TerrainComponent<Props>
@@ -130,5 +129,5 @@ class BuilderMapComponent extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   BuilderMapComponent,
   ['spotlights'],
-  { spotlightActions: SpotlightActions },
+  {},
 );
