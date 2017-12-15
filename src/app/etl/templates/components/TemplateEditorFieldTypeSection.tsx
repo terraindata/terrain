@@ -214,7 +214,8 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
     }
     else if (isNested(currentType, field.arrayType) && !isNested(nextType, field.arrayType) && field.children.size > 0)
     { // if user changes type from nested to something else and there are children, then show a warning
-      const deferredAction = () => {
+      const deferredAction = () =>
+      {
         this._clearChildren();
         this._set('type', elasticTypeOptions.get(index));
       };
@@ -252,7 +253,8 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
         const newArray = cleanArrayType(field.arrayType.set(arrayTypeIndex, elasticTypeOptions.get(index)));
         if (!isNested(field.type, newArray) && field.children.size > 0)
         {
-          const deferredAction = () => {
+          const deferredAction = () =>
+          {
             this._clearChildren();
             this._set('arrayType', newArray);
           };
