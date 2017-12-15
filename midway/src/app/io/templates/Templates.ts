@@ -44,8 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-
-
 export interface TemplateBase
 {
   // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
