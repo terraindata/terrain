@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-// tslint:disable:no-var-requires import-spacing
+// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
