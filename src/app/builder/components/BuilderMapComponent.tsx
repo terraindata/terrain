@@ -45,14 +45,12 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-var-requires
-import { SpotlightActions } from 'app/builder/data/SpotlightRedux';
 import * as SpotlightTypes from 'app/builder/data/SpotlightTypes';
 import Util from 'app/util/Util';
 import * as React from 'react';
 import MapComponent from '../../common/components/MapComponent';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import BuilderActions from '../data/BuilderActions';
-import BuilderStore, { BuilderState } from '../data/BuilderStore';
+import { BuilderState, BuilderStore } from '../data/BuilderStore';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 

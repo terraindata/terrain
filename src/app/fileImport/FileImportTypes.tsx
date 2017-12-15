@@ -46,9 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
-import * as Immutable from 'immutable';
+import { List, Map, Record } from 'immutable';
 import { BaseClass, New } from '../Classes';
-const { List } = Immutable;
 
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass
@@ -104,7 +103,7 @@ class TransformArgsC
   public text?: string = '';                 // text to append/prepend, text to split/merge on
 }
 
-const TransformArgs_Record = Immutable.Record(new TransformArgsC());
+const TransformArgs_Record = Record(new TransformArgsC());
 export interface TransformArgs extends TransformArgsC, IRecord<TransformArgs> { }
 export const _TransformArgs = (config?: any) =>
 {
@@ -118,7 +117,7 @@ class TransformC
   public args: TransformArgs = _TransformArgs();
 }
 
-const Transform_Record = Immutable.Record(new TransformC());
+const Transform_Record = Record(new TransformC());
 export interface Transform extends TransformC, IRecord<Transform> { }
 export const _Transform =
   (config: {
@@ -147,7 +146,7 @@ class TemplateC
   public tablename?: string = '';
 }
 
-const Template_Record = Immutable.Record(new TemplateC());
+const Template_Record = Record(new TemplateC());
 export interface Template extends TemplateC, IRecord<Template> { }
 export const _Template =
   (config: {
@@ -155,7 +154,7 @@ export const _Template =
     templateId: number;
     templateName: string;
     originalNames: List<string>;
-    columnTypes: Immutable.Map<string, object>;
+    columnTypes: Map<string, object>;
     transformations: List<object>;
     primaryKeys: List<number>;
     primaryKeyDelimiter: string;
@@ -178,7 +177,7 @@ class ColumnTypesTreeC
   public innerType?: ColumnTypesTree = null;
 }
 
-const ColumnTypesTree_Record = Immutable.Record(new ColumnTypesTreeC());
+const ColumnTypesTree_Record = Record(new ColumnTypesTreeC());
 export interface ColumnTypesTree extends ColumnTypesTreeC, IRecord<ColumnTypesTree> { }
 export const _ColumnTypesTree = (config?: any) =>
 {

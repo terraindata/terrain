@@ -59,9 +59,9 @@ type Set<T> = Immutable.Set<T>;
 const Color = require('color');
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import { Card, CardConfig, getCardCategory, getCardTitle } from 'src/blocks/types/Card';
+import { CardConfig, getCardCategory, getCardTitle } from 'src/blocks/types/Card';
 import { AllBackendsMap } from 'src/database/AllBackends';
-import { backgroundColor, borderColor, cardHoverBackground, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import { backgroundColor, borderColor, cardHoverBackground, Colors, fontColor, getStyle } from '../../../colors/Colors';
 
 import { CreateCardOption, searchForText } from './CreateCardOption';
 import './CreateCardTool.less';

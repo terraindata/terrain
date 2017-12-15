@@ -44,12 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as classNames from 'classnames';
-import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
-import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import TerrainComponent from './TerrainComponent';
 

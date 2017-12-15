@@ -49,12 +49,8 @@ import * as Elastic from 'elasticsearch';
 import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
-import ElasticClient from '../../database/elastic/client/ElasticClient';
-import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
-import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
-import { items } from '../items/ItemRouter';
 import * as Util from '../Util';
 
 export interface AggregationRequest

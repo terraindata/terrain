@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
@@ -74,8 +74,6 @@ const ImportIcon = require('images/icon_import.svg');
 const ScheduleIcon = require('images/icon_dateDropdown.svg');
 const AccessIcon = require('images/icon_key-1.svg');
 const ViewIcon = require('images/icon_search.svg');
-
-const { List } = Immutable;
 
 type Template = FileImportTypes.Template;
 

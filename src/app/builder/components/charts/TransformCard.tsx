@@ -348,7 +348,6 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
     const newDomain = this.trimDomain(this.state.maxDomain, List([agg['minimum'].value, agg['maximum'].value]));
-
     this.setState({
       chartDomain: newDomain,
       maxDomain: newDomain,
@@ -391,28 +390,36 @@ class TransformCard extends TerrainComponent<Props>
     if (recomputeDomain)
     {
       const domainQuery = {
-        body: {
-          size: 0,
-          query: {
+        query: {
+          bool: {
+            filter: [
+              {
+                term: {
+                  _index: index,
+                },
+              },
+              {
+                term: {
+                  _type: type,
+                },
+              },
+            ],
           },
-          aggs: {
-            maximum: {
-              max: {
-                field: input,
-              },
+        },
+        aggs: {
+          maximum: {
+            max: {
+              field: input,
             },
-            minimum: {
-              min: {
-                field: input,
-              },
+          },
+          minimum: {
+            min: {
+              field: input,
             },
           },
         },
+        size: 0,
       };
-
-      domainQuery['index'] = index;
-      domainQuery['type'] = type;
-
       Ajax.query(
         JSON.stringify(domainQuery),
         db,
@@ -432,32 +439,40 @@ class TransformCard extends TerrainComponent<Props>
       const interval = (max - min) / NUM_BARS;
 
       const aggQuery = {
-        body: {
-          size: 0,
-          query: {
-            bool: {
-              must: {
-                range: {
-                  [input as string]: { gte: min, lt: max },
+        query: {
+          bool: {
+            filter: [
+              {
+                term: {
+                  _index: index,
                 },
               },
-            },
-          },
-          aggs: {
-            transformCard: {
-              histogram: {
-                field: input,
-                interval,
-                extended_bounds: {
-                  min, max, // force the ES server to return NUM_BARS + 1 bins.
+              {
+                term: {
+                  _type: type,
                 },
+              },
+            ],
+            must: {
+              range: {
+                [input as string]: { gte: min, lt: max },
               },
             },
           },
         },
+        aggs: {
+          transformCard: {
+            histogram: {
+              field: input,
+              interval,
+              extended_bounds: {
+                min, max, // force the ES server to return NUM_BARS + 1 bins.
+              },
+            },
+          },
+        },
+        size: 0,
       };
-      aggQuery['index'] = index;
-      aggQuery['type'] = type;
 
       this.setState(
         Ajax.query(
