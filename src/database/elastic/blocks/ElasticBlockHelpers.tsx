@@ -44,6 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:strict-boolean-expressions
+
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { Map, List } = Immutable;
@@ -184,7 +186,7 @@ export const ElasticBlockHelpers = {
     return List(metaFields);
   },
 
-  getFieldsOfType(schemaState, fieldType. dataSource?): List<string>
+  getFieldsOfType(schemaState, fieldType, dataSource?): List<string>
   {
     const state = BuilderStore.getState();
     const index = dataSource && dataSource.index.split('/')[1] || getIndex();
@@ -238,7 +240,7 @@ export const ElasticBlockHelpers = {
       const indexId = state.db.name + '/' + String(index);
       const fields = schemaState.columns.filter(
         (column) => column.serverId === String(server) &&
-          column.databaseId === String(indexId)
+          column.databaseId === String(indexId),
       ).map(
         (column) => column.name,
       ).toList();

@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires
+import BuilderActions from 'app/builder/data/BuilderActions';
 import { backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
 import ColorsActions from 'app/colors/data/ColorsActions';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
@@ -58,7 +59,7 @@ const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Range
 {
-  name: string;
+  key: string;
   from: number;
   to: number;
 }
@@ -120,23 +121,25 @@ class RangesInput extends TerrainComponent<Props>
                 className='range-input-item'>
                 <div>Name </div>
                 <BuilderTextbox
-                  value={range.get('name')}
-                  keyPath={this.props.keyPath.push(index).push('name')}
+                  value={range.get('key')}
+                  keyPath={this.props.keyPath.push(index).push('key')}
                   canEdit={this.props.canEdit}
                   ref={'input-' + String(index)}
                 />
                 <div>:</div>
                 <BuilderTextbox
                   value={range.get('from')}
-                  keyPath={this.props.keyPath.push(index).push('from')}
                   canEdit={this.props.canEdit}
+                  isNumber={true}
+                  onChange={this._fn(this.handleValueChange, index, 'from')}
                 />
                 <div>-</div>
                 <BuilderTextbox
                   value={range.get('to')}
-                  keyPath={this.props.keyPath.push(index).push('to')}
                   canEdit={this.props.canEdit}
                   onKeyDown={this.handleKeyDown}
+                  isNumber={true}
+                  onChange={this._fn(this.handleValueChange, index, 'to')}
                 />
                 {
                   this.props.canEdit ?
@@ -157,16 +160,26 @@ class RangesInput extends TerrainComponent<Props>
     );
   }
 
-  public handleValueChange(event)
+  public handleValueChange(index, key, value)
   {
-    this.setState({
-      newValue: event.target.value,
-    });
+    if (!value || value === '*')
+    {
+      const newRange = this.props.ranges.get(index).delete(key);
+      BuilderActions.change(this.props.keyPath.push(index), newRange);
+    }
+    else if (!isNaN(value))
+    {
+      BuilderActions.change(this.props.keyPath.push(index).push(key), parseFloat(value));
+    }
+    else
+    {
+      BuilderActions.change(this.props.keyPath.push(index).push(key), value);
+    }
   }
 
   public handleAddRange()
   {
-    const newRanges = this.props.ranges.push(Map({ name: '', from: 0, to: 0 }));
+    const newRanges = this.props.ranges.push(Map({ key: '', from: 0, to: 0 }));
     this.changeRanges(newRanges);
   }
 

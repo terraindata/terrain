@@ -57,11 +57,13 @@ const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
+import Dropdown from 'app/common/components/Dropdown';
 import Util from '../../../../util/Util';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
+import PathfinderLine from '../PathfinderLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
-import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, Source } from '../PathfinderTypes';
+import { _ScoreLine, Path, PathfinderContext, PathfinderSteps, Score, ScoreLine, Source } from '../PathfinderTypes';
 import PathfinderScoreLine from './PathfinderScoreLine';
 
 export interface Props
@@ -136,6 +138,60 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     });
   }
 
+  public renderLinearLineContents(line: ScoreLine, dropdownOptions, index)
+  {
+    return (
+      <div className='pf-linear-score-line'>
+        <Dropdown
+          options={dropdownOptions.map((option) => option.displayName)}
+          selectedIndex={dropdownOptions.map((option) => option.displayName).indexOf(line.field)}
+          canEdit={this.props.pathfinderContext.canEdit}
+          keyPath={this.props.keyPath.push('lines').push(index).push('field')}
+        />
+        <Dropdown
+          options={List(['asc', 'desc'])}
+          optionsDisplayName={Map({ asc: 'ascending', desc: 'descending' })}
+          selectedIndex={List(['asc', 'desc']).indexOf(line.sortOrder)}
+          canEdit={this.props.pathfinderContext.canEdit}
+          keyPath={this.props.keyPath.push('lines').push(index).push('sortOrder')}
+        />
+      </div>
+    );
+  }
+
+  public getLinearScoreLines(scoreLines)
+  {
+    const { source, step, canEdit, schemaState } = this.props.pathfinderContext;
+    let dropdownOptions = List([]);
+    if (source.dataSource.getChoiceOptions !== undefined)
+    {
+      dropdownOptions = source.dataSource.getChoiceOptions({
+        type: 'fields',
+        source,
+        schemaState,
+      });
+    }
+    return (
+      scoreLines.map((line, index) =>
+      {
+        return {
+          content: <PathfinderLine
+            children={this.renderLinearLineContents(line, dropdownOptions, index)}
+            index={index}
+            canDrag={true}
+            canEdit={canEdit}
+            canDelete={canEdit}
+            onDelete={this.handleDeleteLine}
+          />,
+          key: index,
+          draggable: true,
+          dragHandle: <DragHandle />,
+          dragHandleStyle: { 'padding-top': '8px' },
+        };
+      })
+    );
+  }
+
   public getScoreLines(scoreLines)
   {
     const { source, step, canEdit, schemaState } = this.props.pathfinderContext;
@@ -207,7 +263,12 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   public render()
   {
     const { source, step, canEdit } = this.props.pathfinderContext;
-    const lines = this.getScoreLines(this.props.score.lines);
+    const types = _.keys(PathfinderText.scoreSectionTypes);
+    const typeDisplayNames = {};
+    types.forEach((type) =>
+    {
+      typeDisplayNames[type] = PathfinderText.scoreSectionTypes[type].title;
+    });
     return (
       <div
         className='pf-section'
@@ -216,23 +277,50 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           title={PathfinderText.scoreSectionTitle}
           text={PathfinderText.scoreSectionSubtitle}
         />
-        <DragAndDrop
-          draggableItems={lines}
-          onDrop={this.handleLinesReorder}
-          onDragStart={this.handleDragStart}
-          className='drag-drop-pf-score'
-        />
-        <PathfinderCreateLine
-          canEdit={canEdit}
-          onCreate={this.handleAddScoreLine}
-          text={PathfinderText.createScoreLine}
-        />
-        <div
-          onClick={this.handleStepChange}
-          className='pf-step-button'
-        >
-          Scoring looks good for now
+        <div className='pf-score-section-type'>
+          Score Type:
+          <Dropdown
+            options={List(types)}
+            optionsDisplayName={Map(typeDisplayNames)}
+            selectedIndex={types.indexOf(this.props.score.type)}
+            keyPath={this.props.keyPath.push('type')}
+            tooltips={List(types.map((type) => PathfinderText.scoreSectionTypes[type].tooltip))}
+            canEdit={canEdit}
+          />
         </div>
+        {
+          this.props.score.type === 'terrain' || this.props.score.type === 'linear' ?
+            <DragAndDrop
+              draggableItems={this.props.score.type === 'terrain' ?
+                this.getScoreLines(this.props.score.lines) : this.getLinearScoreLines(this.props.score.lines)
+              }
+              onDrop={this.handleLinesReorder}
+              onDragStart={this.handleDragStart}
+              className='drag-drop-pf-score'
+            />
+            :
+            null
+        }
+        {
+          this.props.score.type === 'terrain' || this.props.score.type === 'linear' ?
+            <PathfinderCreateLine
+              canEdit={canEdit}
+              onCreate={this.handleAddScoreLine}
+              text={PathfinderText.createScoreLine}
+            />
+            :
+            null
+        }
+
+        {
+          this.props.step === PathfinderSteps.Score &&
+          <div
+            onClick={this.handleStepChange}
+            className='pf-step-button'
+          >
+            Scoring looks good for now
+          </div>
+        }
       </div>
     );
   }

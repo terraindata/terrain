@@ -87,7 +87,10 @@ const { List, Map, Record } = Immutable;
 import BuilderStore from 'app/builder/data/BuilderStore';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
-import ElasticBlockHelpers, { AutocompleteMatchType, FieldType, FieldTypeMapping } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import
+ElasticBlockHelpers,
+{ AutocompleteMatchType, FieldType, FieldTypeMapping }
+  from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
 
 export enum PathfinderSteps
@@ -140,6 +143,7 @@ export const _FilterGroup = (config?: { [key: string]: any }) =>
 class ScoreC extends BaseClass
 {
   public lines: List<ScoreLine> = List<ScoreLine>([]);
+  public type: 'terrain' | 'linear' | 'elastic' | 'random' | 'none' = 'terrain';
 }
 export type Score = ScoreC & IRecord<ScoreC>;
 export const _Score = (config?: { [key: string]: any }) =>
@@ -161,11 +165,10 @@ export const _Line = (config?: { [key: string]: any }) =>
 class ScoreLineC extends LineC
 {
   public field: string = ''; // autocomplete
-  public type: string = 'transform';
   public transformData: TransformData = _TransformData();
   public expanded: boolean = true;
 
-  public sortOrder: string = 'desc'; // only used for certain types
+  public sortOrder: 'desc' | 'asc' = 'desc'; // only used for certain types
 }
 export type ScoreLine = ScoreLineC & IRecord<ScoreLineC>;
 export const _ScoreLine = (config?: { [key: string]: any }) =>
@@ -401,7 +404,7 @@ abstract class DataSource extends BaseClass
 {
   // ... shared data source attributes go here
 
-  // Given some context, 
+  // Given some context,
   public abstract getChoiceOptions:
   (context?: ChoiceContext) => List<ChoiceOption>;
 
@@ -610,23 +613,23 @@ class ElasticDataSourceC extends DataSource
       return List(options.map((c) => _ChoiceOption(c)));
     }
 
-    if (context.type === 'valueType')
-    {
-      const comparison = ElasticComparisons.find((comp) => comp.value === context.comparison);
+    // if (context.type === 'valueType')
+    // {
+    //   const comparison = ElasticComparisons.find((comp) => comp.value === context.comparison);
 
-      if (comparison)
-      {
-        return comparison.valueTypes.map((valueType) => _ChoiceOption({
-          value: valueType,
-          displayName: valueType,
-        })).toList();
-      }
+    //   if (comparison)
+    //   {
+    //     return comparison.valueTypes.map((valueType) => _ChoiceOption({
+    //       value: valueType,
+    //       displayName: valueType,
+    //     })).toList();
+    //   }
 
-      return List([_ChoiceOption({
-        value: null,
-        displayName: 'Choose a comparison first',
-      })]);
-    }
+    //   return List([_ChoiceOption({
+    //     value: null,
+    //     displayName: 'Choose a comparison first',
+    //   })]);
+    // }
 
     if (context.type === 'input')
     {

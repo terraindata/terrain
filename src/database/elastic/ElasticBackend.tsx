@@ -50,6 +50,7 @@ import { List } from 'immutable';
 import { make } from '../../blocks/BlockUtils';
 import { Backend, cardsDeckToList } from '../types/Backend';
 
+import { parsePath } from 'app/builder/components/pathfinder/PathfinderParser';
 import ESConverter from '../../../shared/database/elastic/formatter/ESConverter';
 import ESInterpreter from '../../../shared/database/elastic/parser/ESInterpreter';
 import ESJSONParser from '../../../shared/database/elastic/parser/ESJSONParser';
@@ -65,7 +66,6 @@ import CardsToElastic from './conversion/CardsToElastic';
 import ElasticToCards from './conversion/ElasticToCards';
 import LoadElasticQuery from './conversion/LoadElasticQuery';
 import { ElasticParseTreeToQuery, ParseElasticQuery } from './conversion/ParseElasticQuery';
-import { parsePath } from 'app/builder/components/pathfinder/PathfinderParser';
 const syntaxConfig = require('../../../shared/database/elastic/syntax/ElasticSyntaxConfig.json');
 
 export class ElasticBackend implements Backend

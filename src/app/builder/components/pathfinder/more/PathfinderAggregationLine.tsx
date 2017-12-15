@@ -261,7 +261,11 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       return 'histogram';
     }
     // Get the type of field (using schema) and narrow down th options with fieldTypesToElasticTYpes
-    const fieldType: FieldType = ElasticBlockHelpers.getTypeOfField(this.props.pathfinderContext.schemaState, field, this.props.pathfinderContext.source.dataSource);
+    const fieldType: FieldType = ElasticBlockHelpers.getTypeOfField(
+      this.props.pathfinderContext.schemaState,
+      field,
+      this.props.pathfinderContext.source.dataSource,
+    );
     const options = AggregationTypes.get(type).fieldTypesToElasticTypes.get(String(fieldType));
     // If there are no options, it is a meta-field
     if (options === undefined)
@@ -403,7 +407,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     elasticType = this.getElasticType(type, undefined, key);
     BuilderActions.change(this.props.keyPath.push('elasticType'), elasticType);
     // If switching from ranges to uniform interval, auto-fill the interval values
-    if (radioKey === 'rangeType' && key === 'interval')
+    if (radioKey === 'rangeType')
     {
       const advancedTypes = this.getAdvancedOptions(this.props.aggregation.type, elasticType);
       BuilderActions.change(this.props.keyPath.push('advanced'),

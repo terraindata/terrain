@@ -157,7 +157,7 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
       state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path));
     }
 
-    // else if (BuilderCardActionTypes[action.type])
+    // if (BuilderCardActionTypes[action.type])
     // {
     //   // a card changed and we need to re-translate the tql
     //   //  needs to be after the card change has affected the state

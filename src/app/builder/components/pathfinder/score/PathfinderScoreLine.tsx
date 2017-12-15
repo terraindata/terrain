@@ -245,6 +245,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   public render()
   {
     const { step } = this.props;
+    const expandableContent = this.props.line.field ?
+      this.renderTransformChart() : null;
     return (
       <PathfinderLine
         canDrag={true}
@@ -255,7 +257,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         index={this.props.index}
         onExpand={this.handleExpandedChange}
         expanded={this.props.line.expanded}
-        expandableContent={this.renderTransformChart()}
+        expandableContent={expandableContent}
         expandButton={this.renderTransformChartPreview()}
       />
     );

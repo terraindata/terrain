@@ -322,6 +322,10 @@ class TerrainComponent<T> extends React.Component<T, any>
   // for the construction of instance functions called with arguments
   public _fn(instanceFn: (...args: any[]) => any, ...args: any[]): (...args: any[]) => any
   {
+    if (!instanceFn)
+    {
+      return undefined;
+    }
     const fnName = instanceFn['name'];
     const fns = this._fns[fnName];
     if (!fns)

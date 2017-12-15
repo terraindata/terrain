@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-import { Query } from '../../../../items/types/Query';
-import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
 import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 import * as _ from 'lodash';
+import { Query } from '../../../../items/types/Query';
+import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
 
 export function parsePath(path: Path): string
 {
@@ -60,14 +60,14 @@ export function parsePath(path: Path): string
         must: [],
         must_not: [],
         should: [],
-      }
+      },
     },
     sort: {},
     aggs: {},
     from: 0,
     size: 1000,
     track_scores: true,
-  }
+  };
   const sourceInfo = parseSource(path.source);
   baseQuery.from = sourceInfo.from;
   baseQuery.size = sourceInfo.size;
@@ -75,9 +75,9 @@ export function parsePath(path: Path): string
     [
       {
         term: {
-          _index: sourceInfo.index.split('/')[1]
-        }
-      }
+          _index: sourceInfo.index.split('/')[1],
+        },
+      },
     ];
   if (path.score.lines.size)
   {
@@ -98,11 +98,38 @@ function parseSource(source: Source): any
   return {
     from: source.start,
     size: typeof source.count !== 'string' ? source.count : 1000,
-    index: (source.dataSource as any).index
+    index: (source.dataSource as any).index,
   };
 }
 
 function parseScore(score: Score): any
+{
+  switch (score.type)
+  {
+    case 'terrain':
+      return parseTerrainScore(score);
+    case 'linear':
+      return parseLinearScore(score);
+    case 'elastic':
+      return { _score: { order: 'asc' } };
+    case 'random':
+    case 'none':
+    default:
+      return {};
+  }
+}
+
+function parseLinearScore(score: Score)
+{
+  const sortObj = {};
+  score.lines.forEach((line) =>
+  {
+    sortObj[line.field] = line.sortOrder;
+  });
+  return sortObj;
+}
+
+function parseTerrainScore(score: Score)
 {
   const sortObj = {
     _script: {
@@ -111,10 +138,10 @@ function parseScore(score: Score): any
       script: {
         stored: 'Terrain.Score.PWL',
         params: {
-          factors: []
-        }
-      }
-    }
+          factors: [],
+        },
+      },
+    },
   };
   const factors = score.lines.map((line) =>
   {
@@ -184,7 +211,7 @@ function parseFilters(filterGroup: FilterGroup): any
       must: [],
       must_not: [],
       should: [],
-    }
+    },
   };
   const must = [];
   const mustNot = [];
@@ -241,26 +268,26 @@ function parseFilterLine(line: FilterLine)
     case 'equal':
       return {
         term: {
-          [line.field]: String(line.value)
-        }
+          [line.field]: String(line.value),
+        },
       };
     case 'contains':
       return {
         match: {
-          [line.field]: line.value
-        }
+          [line.field]: line.value,
+        },
       };
     case 'notequal':
       return {
         term: {
-          [line.field]: line.value
-        }
+          [line.field]: line.value,
+        },
       };
     case 'notcontain':
       return {
         match: {
-          [line.field]: line.value
-        }
+          [line.field]: line.value,
+        },
       };
     case 'greater':
     case 'alphaafter':
@@ -269,9 +296,9 @@ function parseFilterLine(line: FilterLine)
         range: {
           [line.field]:
           {
-            gt: line.value
-          }
-        }
+            gt: line.value,
+          },
+        },
       };
     case 'less':
     case 'alphabefore':
@@ -280,35 +307,35 @@ function parseFilterLine(line: FilterLine)
         range: {
           [line.field]:
           {
-            lt: line.value
-          }
-        }
+            lt: line.value,
+          },
+        },
       };
     case 'greaterequal':
       return {
         range: {
           [line.field]:
           {
-            gte: line.value
-          }
-        }
+            gte: line.value,
+          },
+        },
       };
     case 'lessequal':
       return {
         range: {
           [line.field]:
           {
-            lte: line.value
-          }
-        }
+            lte: line.value,
+          },
+        },
       };
     case 'located':
       const distanceObj = line.value as DistanceValue;
       return {
         geo_distance: {
           distance: String(distanceObj.distance) + distanceObj.units,
-          [line.field]: distanceObj.location
-        }
+          [line.field]: distanceObj.location,
+        },
       };
     default:
       return {};
@@ -326,7 +353,19 @@ function parseFilterLine(line: FilterLine)
 // public filters: FilterGroup = undefined;
 // public nested: List<AggregationLine> = undefined;
 // public scripts: List<Script> = undefined;
-const unusedKeys = ['name', 'compression', 'number_of_significant_value_digits', 'rangeType', 'termsType', 'geoType', 'order'];
+const unusedKeys = [
+  'name',
+  'compression',
+  'number_of_significant_value_digits',
+  'rangeType',
+  'termsType',
+  'geoType',
+  'order',
+  'interval',
+  'ranges',
+  'min',
+  'max',
+];
 function parseMore(more: More)
 {
   const moreObj = {};
@@ -348,13 +387,13 @@ function parseMore(more: More)
           {
             advancedObj['tdigest'] = {
               [advanced[key]]: advanced[advanced[key]],
-            }
+            };
           }
           else
           {
             advancedObj['hdr'] = {
               [advanced[key]]: advanced[advanced[key]],
-            }
+            };
           }
         }
         else if (key === 'include' || key === 'exclude')
@@ -373,10 +412,18 @@ function parseMore(more: More)
       {
         advancedObj.field = advancedObj.field + '.keyword';
       }
+      else if (key === 'rangeType')
+      {
+        advancedObj[advanced['rangeType']] = advanced[advanced['rangeType']];
+      }
+      else if (key === 'min')
+      {
+        advancedObj['extended_bounds'] = { min: parseFloat(advanced['min']), max: parseFloat(advanced['max']) };
+      }
     });
     moreObj[agg.advanced.get('name')] = {
-      [agg.elasticType]: advancedObj
-    }
+      [agg.elasticType]: advancedObj,
+    };
 
   });
   return moreObj;

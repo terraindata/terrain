@@ -183,11 +183,10 @@ export class PathfinderLine extends TerrainComponent<Props>
     {
       return null;
     }
-
     return (
       <div className='pf-line-right'>
         {
-          this.props.expandableContent !== undefined && !this.props.expandOnLeft &&
+          !this.props.expandableContent && !this.props.expandOnLeft &&
           <div
             className='expand'
             onClick={this._fn(this.props.onExpand, !this.props.expanded)}
@@ -199,7 +198,7 @@ export class PathfinderLine extends TerrainComponent<Props>
           this.props.canEdit && this.props.canDelete &&
           tooltip(<div
             className='close'
-            onClick={this._fn(this.props.onDelete, this.props.index)}
+            onClick={this.props.onDelete && this._fn(this.props.onDelete, this.props.index)}
           >
             <RemoveIcon />
           </div>, 'Delete')

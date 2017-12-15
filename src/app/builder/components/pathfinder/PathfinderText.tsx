@@ -69,8 +69,29 @@ export const PathfinderText = {
   scoreSectionTitle: 'Score',
   scoreSectionSubtitle: `
   Score your results, so that the best picks show up in the top spots.
-  The score for each result will be the sum of the following factors:
   `,
+  scoreSectionTypes: {
+    terrain: {
+      title: 'Terrain',
+      tooltip: 'The score will be determined by the weighted sum of factors',
+    },
+    linear: {
+      title: 'Linear',
+      tooltip: 'The results will be sorted linearly by the following factors',
+    },
+    elastic: {
+      title: 'Text Match Quality',
+      tooltip: 'The results will be sorted based on how well the match any text filters from above',
+    },
+    random: {
+      title: 'Random',
+      tooltip: 'A diverse set of results will be returned',
+    },
+    none: {
+      title: 'None',
+      tooltip: 'The results will not be sorted in any way',
+    },
+  },
   moreSectionTitle: 'More',
   moreSectionSubtitle: `
   Look at the metadata for your data and add facets to better understand your data.

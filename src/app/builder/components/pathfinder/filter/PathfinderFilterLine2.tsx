@@ -50,8 +50,8 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
-import * as React from 'react';
 import * as Radium from 'radium';
+import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
@@ -62,9 +62,9 @@ import DatePickerWrapper from 'app/common/components/DatePickerWrapper';
 import Dropdown from 'app/common/components/Dropdown';
 import MapComponent, { units } from 'app/common/components/MapComponent';
 import Util from 'app/util/Util';
+import { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
-import { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 
 export interface Props
 {
@@ -78,16 +78,16 @@ export interface Props
 }
 
 const pieceStyle = {
-  padding: '12px 18px',
-  background: '#f2f4f7',
-  color: '#42474f',
-  margin: 6,
+  'padding': '12px 18px',
+  'background': '#f2f4f7',
+  'color': '#42474f',
+  'margin': 6,
 
   ':hover': {
     background: Colors().active,
     color: Colors().activeText,
   },
-}
+};
 
 @Radium
 class PathfinderFilterLine extends TerrainComponent<Props>
@@ -157,7 +157,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               {
                 choiceOption.displayName
               }
-            </div>
+            </div>,
           )
         }
       </div>
@@ -215,7 +215,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                         option.displayName
                       }
                     </div>
-                    : null
+                    : null,
                 )
               }
             </div>
@@ -251,7 +251,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                       option.displayName
                     }
                   </div>
-                  : null
+                  : null,
               )
             }
           </div>
@@ -293,7 +293,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                         option.displayName
                       }
                     </div>
-                    : null
+                    : null,
                 )
               }
             </div>
@@ -367,7 +367,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       if (comparisonOptions.findIndex((option) => option.value === filterLine.comparison) === -1
         && comparisonOptions.size)
       {
-        filterLine = filterLine.set('comparison', null); //comparisonOptions.get(0).value);
+        filterLine = filterLine.set('comparison', null); // comparisonOptions.get(0).value);
       }
     }
 

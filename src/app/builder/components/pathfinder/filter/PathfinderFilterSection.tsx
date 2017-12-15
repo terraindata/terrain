@@ -95,12 +95,15 @@ class PathfinderFilterSection extends TerrainComponent<Props>
         {
           entries.map(this.renderFilterEntry)
         }
-        <div
-          onClick={this.handleStepChange}
-          className='pf-step-button'
-        >
-          Filters look good for now
-        </div>
+        {
+          this.props.step === PathfinderSteps.Filter &&
+          <div
+            onClick={this.handleStepChange}
+            className='pf-step-button'
+          >
+            Filters look good for now
+          </div>
+        }
       </div>
     );
   }
