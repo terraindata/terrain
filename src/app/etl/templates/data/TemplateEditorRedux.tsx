@@ -87,7 +87,7 @@ export interface TemplateEditorActionTypes
   setModalRequests: {
     actionType: 'setModalRequests';
     requests: List<ModalProps>;
-  }
+  };
 }
 
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
@@ -129,7 +129,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
     setModalRequests: (state, action) =>
     {
       return state.set('modalRequests', action.payload.requests);
-    }
+    },
   };
 }
 

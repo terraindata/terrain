@@ -59,12 +59,9 @@ const { List, Map } = Immutable;
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
+import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
-import
-{
-  _TemplateField, ELASTIC_TYPES, TEMPLATE_TYPES,
-  TemplateEditorState, TemplateField,
-} from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 
@@ -226,7 +223,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
           message: `Changing this type will remove ${field.children.size} nested fields. Would you like to continue?`,
           onConfirm: deferredAction,
           confirm: true,
-        }
+        },
       });
     }
     else
@@ -265,7 +262,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
               message: `Changing this type will remove ${field.children.size} nested fields. Would you like to continue?`,
               onConfirm: deferredAction,
               confirm: true,
-            }
+            },
           });
         }
         else

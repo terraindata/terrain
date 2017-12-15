@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-
 /**
  * Settings passed to and stored in an ESClause
  */

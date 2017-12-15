@@ -62,12 +62,9 @@ import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { Menu, MenuOption } from 'common/components/Menu';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
+import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
-import
-{
-  _TemplateField, ELASTIC_TYPES, TEMPLATE_TYPES,
-  TemplateEditorState, TemplateField,
-} from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import TemplateEditorFieldTypeSection from './TemplateEditorFieldTypeSection';
 

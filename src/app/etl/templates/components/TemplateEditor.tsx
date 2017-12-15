@@ -54,15 +54,8 @@ import Util from 'util/Util';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import
-{
-  _ExportTemplate,
-  _TemplateField,
-  ELASTIC_TYPES,
-  ETLTemplate,
-  TEMPLATE_TYPES,
-  TemplateEditorState,
-} from 'etl/templates/TemplateTypes';
+import { _ExportTemplate, _TemplateField, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 
 const { List } = Immutable;

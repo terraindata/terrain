@@ -55,7 +55,8 @@ import Util from 'util/Util';
 
 import ExpandableView from 'common/components/ExpandableView';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, ELASTIC_TYPES, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';

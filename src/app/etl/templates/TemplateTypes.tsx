@@ -51,28 +51,7 @@ import { ModalProps } from 'common/components/overlay/MultiModal';
 import { FILE_TYPES } from 'etl/ETLTypes';
 import { makeConstructor, New, WithIRecord } from 'src/app/Classes';
 
-export enum ELASTIC_TYPES
-{
-  TEXT = 'text',
-  LONG = 'long',
-  BOOLEAN = 'boolean',
-  DATE = 'date',
-  ARRAY = 'array',
-  NESTED = 'nested',
-  DOUBLE = 'double',
-  SHORT = 'short',
-  BYTE = 'byte',
-  INTEGER = 'integer',
-  HALF_FLOAT = 'half_float',
-  FLOAT = 'float',
-  GEO_POINT = 'geo_point',
-}
-
-export enum TEMPLATE_TYPES
-{
-  EXPORT = 'export',
-  IMPORT = 'import',
-}
+import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
 class TemplateEditorStateC
 {
@@ -90,7 +69,7 @@ interface TemplateBase
   type: TEMPLATE_TYPES;
   filetype: FILE_TYPES;
   rootField: TemplateField; // was column types
-  transformations: List<object>;
+  transformations: any;
   objectKey: string;
   dbid: number;
   dbname: string;

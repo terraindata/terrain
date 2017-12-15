@@ -54,7 +54,8 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, ELASTIC_TYPES, TEMPLATE_TYPES, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
 /*
  *  This class defines a base class with useful functions that are used by components
