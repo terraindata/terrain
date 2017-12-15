@@ -49,8 +49,8 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import Util from '../../util/Util';
 import { Colors, getStyle } from '../../colors/Colors';
+import Util from '../../util/Util';
 import { ColorsActions } from './../../colors/data/ColorsRedux';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './DragHandleStyle.less';
@@ -73,7 +73,7 @@ class DragHandle extends TerrainComponent<Props>
   public componentWillMount()
   {
     const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
-    
+
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.drag-icon',
@@ -129,6 +129,6 @@ export default Util.createContainer(
   DragHandle,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

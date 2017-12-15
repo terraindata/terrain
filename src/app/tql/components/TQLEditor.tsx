@@ -54,8 +54,8 @@ const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
 import { Colors } from '../../colors/Colors';
-import Util from '../../util/Util';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
+import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 // syntax highlighters
@@ -142,7 +142,7 @@ class TQLEditor extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    
+
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: 'span.cm-atom',
@@ -166,7 +166,7 @@ class TQLEditor extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: 'span.cm-builtin',
-      style: { color: Colors().builder.cards.baseClause + '!important'  },
+      style: { color: Colors().builder.cards.baseClause + '!important' },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
@@ -507,6 +507,6 @@ export default Util.createContainer(
   TQLEditor,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

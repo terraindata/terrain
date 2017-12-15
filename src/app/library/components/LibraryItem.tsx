@@ -50,8 +50,8 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import './LibraryItem.less';
 import Util from '../../util/Util';
+import './LibraryItem.less';
 const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
@@ -660,12 +660,10 @@ const dropCollect = (connect, monitor) =>
 
 const LI = DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(LibraryItem)) as any;
 
-
 export default Util.createContainer(
   LI,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );
-

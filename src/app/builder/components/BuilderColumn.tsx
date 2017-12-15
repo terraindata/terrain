@@ -54,17 +54,18 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import './BuilderColumn.less';
 const { List } = Immutable;
-import Util from '../../util/Util';
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
 import RolesStore from '../../roles/data/RolesStore';
 import UserStore from '../../users/data/UserStore';
+import Util from '../../util/Util';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
 import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
@@ -72,8 +73,6 @@ import CardsColumn from './cards/CardsColumn';
 import TuningColumn from './cards/TuningColumn';
 import InputsArea from './inputs/InputsArea';
 import ResultsColumn from './results/ResultsColumn';
-import { ColorsActions } from '../../colors/data/ColorsRedux';
-
 
 const SplitScreenIcon = require('./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -449,12 +448,10 @@ const BuilderColumn = createReactClass<any, any>(
   },
 );
 
-//export default BuilderColumn;
-
 export default Util.createContainer(
   BuilderColumn,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

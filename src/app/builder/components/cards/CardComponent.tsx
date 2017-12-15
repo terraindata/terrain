@@ -74,10 +74,9 @@ const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import { ColorsActions } from '../../../colors/data/ColorsRedux';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
-import { ColorsActions } from '../../../colors/data/ColorsRedux';
-
 
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('images/icon_more_12x3.svg?name=MoreIcon');
@@ -208,30 +207,30 @@ class _CardComponent extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.props.colorsActions({
-        actionType: 'setStyle',
-        selector: '.card-drag-handle svg',
-        style: { fill: Colors().iconColor },
-      });
-      this.props.colorsActions({
-        actionType: 'setStyle',
-        selector: '.card-title .menu-icon-wrapper svg',
-        style: { fill: Colors().iconColor },
-      });
-      this.props.colorsActions({
-        actionType: 'setStyle',
-        selector: '.card-minimize-icon .st0',
-        style: { fill: Colors().iconColor },
-      });
-      this.props.colorsActions({
-        actionType: 'setStyle',
-        selector: '.card-help-icon',
-        style: { fill: Colors().iconColor },
-      });
-      this.props.colorsActions({
-        actionType: 'setStyle',
-        selector: '.card-tuning-icon',
-        style: { stroke: Colors().iconColor },
-      });
+      actionType: 'setStyle',
+      selector: '.card-drag-handle svg',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-title .menu-icon-wrapper svg',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-minimize-icon .st0',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-help-icon',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-tuning-icon',
+      style: { stroke: Colors().iconColor },
+    });
 
     // TODO
     // this._subscribe(Store, {
@@ -1041,34 +1040,12 @@ const dragCollect = (connect, monitor) =>
     connectDragPreview: connect.dragPreview(),
   });
 
-//export const CardComponent = DragSource('CARD', cardSource, dragCollect)(_CardComponent);
-
-// export default Util.createContainer(
-//   DragSource('CARD', cardSource, dragCollect)(_CardComponent)),
-//   [],
-//   {colorsActions: ColorsActions},
-// );
-
-// export default Util.createTypedContainer(
-//   DragSource('CARD', cardSource, dragCollect)(_CardComponent),
-//   [],
-//   { colorsActions: ColorsActions },
-// );
-
 const CardContainer = Util.createContainer(
   _CardComponent,
   [],
-  { colorsActions: ColorsActions }
+  { colorsActions: ColorsActions },
 );
 
 export const CardComponent = DragSource('CARD', cardSource, dragCollect)(CardContainer);
 
 export default CardComponent;
-// export default Util.createContainer(
-//   CardComponent,
-//   [],
-//   {
-//     colorsActions: ColorsActions
-//   },
-// );
-

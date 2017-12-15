@@ -55,7 +55,7 @@ import { Map } from 'immutable';
 
 class ColorsStateC
 {
-  public stylesTag: IMMap<string, React.CSSProperties> = Map({});
+  public styles: IMMap<string, React.CSSProperties> = Map({});
 }
 export type ColorsState = WithIRecord<ColorsStateC>;
 export const _ColorsState = makeConstructor(ColorsStateC);

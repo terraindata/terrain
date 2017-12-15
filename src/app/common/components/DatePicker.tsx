@@ -107,10 +107,10 @@ class DatePicker extends TerrainComponent<Props>
       selector: '.DayPicker-Weekday',
       style: { color: Colors().text2 },
     });
-     this.props.colorsActions({
+    this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.DayPicker-Day',
-      style: { 'border-color': Colors().altHighlight, 'background': Colors().altBg1, 'color': Colors().altText3  },
+      style: { 'border-color': Colors().altHighlight, 'background': Colors().altBg1, 'color': Colors().altText3 },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
@@ -221,6 +221,6 @@ export default Util.createContainer(
   DatePicker,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

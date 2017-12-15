@@ -50,8 +50,8 @@ import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import Util from '../../../util/Util';
 import InfoArea from '../../../common/components/InfoArea';
+import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
 import Switch from './../../../common/components/Switch';
@@ -364,12 +364,10 @@ class CardsColumn extends TerrainComponent<Props>
 
 // const CardsColumnInner = Dimensions()(_CardsColumnInner);
 
-//export default Dimensions()(CardsColumn);
-
 export default Util.createContainer(
   Dimensions()(CardsColumn),
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

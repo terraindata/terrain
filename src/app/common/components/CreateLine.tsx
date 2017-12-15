@@ -120,6 +120,6 @@ export default Util.createContainer(
   CreateLine,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

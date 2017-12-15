@@ -76,7 +76,7 @@ class ColorsRedux extends TerrainRedux<ColorsActionTypes, ColorsState>
     setStyle: (state, action) =>
     {
       const { selector, style } = action.payload;
-      return state.setIn(['stylesTag', selector], style);
+      return state.setIn(['styles', selector], style);
     },
   };
 }

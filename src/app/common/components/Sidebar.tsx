@@ -210,6 +210,6 @@ export default Util.createContainer(
   Sidebar,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

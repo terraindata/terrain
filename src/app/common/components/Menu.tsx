@@ -254,7 +254,7 @@ const MenuContainer = Util.createContainer(
   Menu,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );
 

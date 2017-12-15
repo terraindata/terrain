@@ -538,6 +538,6 @@ export default Util.createContainer(
   CardField,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

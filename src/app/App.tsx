@@ -314,7 +314,7 @@ class App extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.close:hover svg, svg.close:hover',
-      style: { fill: Colors().activeText  },
+      style: { fill: Colors().activeText },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
@@ -490,7 +490,7 @@ class App extends TerrainComponent<Props>
 
         <DeployModal />
         <StyleTag
-          style={this.props.colors.stylesTag}
+          style={this.props.colors.styles}
         />
 
         <InAppNotification />
@@ -506,6 +506,6 @@ export default Util.createContainer(
   ['colors'],
   {
     schemaActions: SchemaActions,
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

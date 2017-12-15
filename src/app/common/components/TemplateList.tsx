@@ -49,9 +49,9 @@ THE SOFTWARE.
 import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import Util from '../../util/Util';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
+import Util from '../../util/Util';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './TemplateList.less';
@@ -89,7 +89,7 @@ class TemplateList extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.list-items-item-wrapper .st1',
-      style: { fill: Colors().text3},
+      style: { fill: Colors().text3 },
     });
   }
 
@@ -270,6 +270,6 @@ export default Util.createContainer(
   TemplateList,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

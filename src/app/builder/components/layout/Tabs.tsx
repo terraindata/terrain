@@ -53,9 +53,9 @@ import * as classNames from 'classnames';
 import createReactClass = require('create-react-class');
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
-import Util from '../../../util/Util';
 import { browserHistory } from 'react-router';
 import LibraryActions from '../../../library/data/LibraryActions';
+import Util from '../../../util/Util';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
 import { ColorsActions } from './../../../colors/data/ColorsRedux';
@@ -177,8 +177,8 @@ interface TabsProps
 {
   config: string;
   actions: List<TabAction>;
-  onNoAlgorithm(algorithmId: string);
   colorsActions: typeof ColorsActions;
+  onNoAlgorithm(algorithmId: string);
 }
 
 class Tabs extends TerrainComponent<TabsProps> {
@@ -419,4 +419,3 @@ const TabsContainer = Util.createContainer(
 export { TabsContainer as Tabs };
 
 export default TabsContainer;
-

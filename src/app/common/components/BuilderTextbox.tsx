@@ -86,7 +86,6 @@ export interface Props
   schema: SchemaState;
   colorsActions: typeof ColorsActions;
 
-
   id?: string; // TODO remove
 
   canEdit?: boolean;
@@ -580,11 +579,10 @@ class BuilderTextbox extends TerrainComponent<Props>
 //       && props.display.accepts.indexOf(monitor.getItem().type) !== -1;
 //   },
 
-
 export default Util.createContainer(
   BuilderTextbox,
   ['schema'],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

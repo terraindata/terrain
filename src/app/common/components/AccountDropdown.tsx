@@ -48,7 +48,6 @@ THE SOFTWARE.
 
 import * as $ from 'jquery';
 import * as React from 'react';
-import Util from '../../util/Util';
 import { browserHistory } from 'react-router';
 import { Colors } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
@@ -56,6 +55,7 @@ import TerrainComponent from '../../common/components/TerrainComponent';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
+import Util from '../../util/Util';
 import './AccountDropdown.less';
 import Modal from './Modal';
 const CommitLog = require('../../../commitlog.txt');
@@ -298,6 +298,6 @@ export default Util.createContainer(
   AccountDropdown,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );

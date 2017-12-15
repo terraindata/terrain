@@ -52,11 +52,11 @@ import './ResultsConfigStyle.less';
 const { List, Map } = Immutable;
 import * as classNames from 'classnames';
 import * as React from 'react';
-import Util from '../../../util/Util';
 import { DragSource, DropTarget } from 'react-dnd';
 import { _Format, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import { ColorsActions } from '../../../colors/data/ColorsRedux';
+import Util from '../../../util/Util';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -783,6 +783,6 @@ export default Util.createContainer(
   ResultsConfigComponent,
   [],
   {
-    colorsActions: ColorsActions
+    colorsActions: ColorsActions,
   },
 );
