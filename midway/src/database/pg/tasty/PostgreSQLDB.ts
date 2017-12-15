@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as pg from 'pg';
 
 import SQLGenerator from '../../../tasty/SQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
