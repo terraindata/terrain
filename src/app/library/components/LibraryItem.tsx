@@ -51,12 +51,13 @@ import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
 import './LibraryItem.less';
+import Util from '../../util/Util';
 const { List } = Immutable;
 import * as classNames from 'classnames';
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
 import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
-import ColorsActions from './../../colors/data/ColorsActions';
+import { ColorsActions } from './../../colors/data/ColorsRedux';
 import Menu from './../../common/components/Menu';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -75,6 +76,7 @@ export interface Props
   canArchive: boolean;
   canDuplicate: boolean;
   canUnarchive: boolean;
+  colorsActions: typeof ColorsActions;
   canPin?: boolean;
   icon: any;
   to?: string;
@@ -244,7 +246,11 @@ class LibraryItem extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.library-item .library-item-title-bar .library-item-icon svg, .cls-1 ', { fill: Colors().iconColor });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.library-item .library-item-title-bar .library-item-icon svg, .cls-1 ',
+      style: { fill: Colors().iconColor },
+    });
   }
 
   public componentDidMount()
@@ -654,4 +660,12 @@ const dropCollect = (connect, monitor) =>
 
 const LI = DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(LibraryItem)) as any;
 
-export default LI;
+
+export default Util.createContainer(
+  LI,
+  [],
+  {
+    colorsActions: ColorsActions
+  },
+);
+

@@ -67,7 +67,7 @@ import Actions from '../../builder/data/BuilderActions';
 import { BuilderStore } from '../../builder/data/BuilderStore';
 import Store from '../../builder/data/BuilderStore';
 import { borderColor, cardStyle, Colors, getCardColors, getStyle } from '../../colors/Colors';
-import ColorsActions from '../../colors/data/ColorsActions';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Autocomplete from './Autocomplete';
 
@@ -84,6 +84,8 @@ export interface Props
   onChange?: (value: string | number) => void;
   language: string;
   schema: SchemaState;
+  colorsActions: typeof ColorsActions;
+
 
   id?: string; // TODO remove
 
@@ -119,6 +121,7 @@ export interface Props
   textStyle?: React.CSSProperties;
 
   tuningMode?: boolean;
+
 }
 
 interface State
@@ -166,9 +169,16 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.builder-tb input &::placeholder ', { color: Colors().text3 + '!important' });
-    ColorsActions.setStyle('.builder-tb input ', { color: Colors().text1 });
-
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.builder-tb input &::placeholder',
+      style: { color: Colors().text3 + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.builder-tb input',
+      style: { color: Colors().text1 },
+    });
   }
 
   public getCreatingType(): string
@@ -570,8 +580,11 @@ class BuilderTextbox extends TerrainComponent<Props>
 //       && props.display.accepts.indexOf(monitor.getItem().type) !== -1;
 //   },
 
+
 export default Util.createContainer(
   BuilderTextbox,
   ['schema'],
-  {},
+  {
+    colorsActions: ColorsActions
+  },
 );

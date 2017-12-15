@@ -48,8 +48,9 @@ THE SOFTWARE.
 
 import * as Radium from 'radium';
 import * as React from 'react';
+import Util from 'util/Util';
 import { borderColor, Colors } from '../../colors/Colors';
-import ColorsActions from '../../colors/data/ColorsActions';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import './CreateLine.less';
 
@@ -60,6 +61,7 @@ export interface Props
 {
   open: boolean;
   onClick: () => void;
+  colorsActions: typeof ColorsActions;
 }
 
 const ROW_STYLE = {
@@ -78,7 +80,11 @@ class CreateLine extends TerrainComponent<Props>
 {
   public componentWillMount()
   {
-    ColorsActions.setStyle('.create-line-plus .st0 ', { fill: Colors().text1 });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.create-line-plus .st0',
+      style: { fill: Colors().text1 },
+    });
   }
 
   public render()
@@ -110,4 +116,10 @@ class CreateLine extends TerrainComponent<Props>
   }
 }
 
-export default CreateLine;
+export default Util.createContainer(
+  CreateLine,
+  [],
+  {
+    colorsActions: ColorsActions
+  },
+);

@@ -271,30 +271,95 @@ class App extends TerrainComponent<Props>
       selector: 'input',
       style: { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder },
     });
-
-    // this.props.colorsActions.setStyle('input', { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder });
-
-    // this.props.colorsActions.setStyle('input:hover', { 'background': Colors().inputFocusBg, 'border-color': Colors().inactiveHover });
-    // this.props.colorsActions.setStyle('input:focus', { 'background': Colors().inputFocusBg, 'border-color': Colors().inputBorder });
-    // this.props.colorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
-    // this.props.colorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
-    // this.props.colorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
-    // this.props.colorsActions.setStyle('.altBg', { color: Colors().altText1 });
-    // this.props.colorsActions.setStyle('.card-muted-input input:hover', { 'background': Colors().inputBg + ' !important', 'border-color': Colors().inputBorder });
-    // this.props.colorsActions.setStyle('.close svg, svg.close', { fill: Colors().iconColor });
-    // this.props.colorsActions.setStyle('.close:hover svg, svg.close:hover', { fill: Colors().activeText });
-    // this.props.colorsActions.setStyle('.dropdown-value', { 'border-color': Colors().inputBorder });
-    // this.props.colorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().text1 });
-    // this.props.colorsActions.setStyle('.dropdown-wrapper:not(.dropdown-disabled):hover .dropdown-value:before', { 'border-top': '7px solid ' + Colors().activeText });
-    // this.props.colorsActions.setStyle('.button', { backgroundColor: Colors().active, color: Colors().activeText });
-    // this.props.colorsActions.setStyle('.link', { color: Colors().active });
-    // this.props.colorsActions.setStyle('.link:hover', { color: Colors().import });
-    // this.props.colorsActions.setStyle('.link:active', { color: Colors().active });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'input:hover',
+      style: { 'background': Colors().inputFocusBg, 'border-color': Colors().inactiveHover },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'input:focus',
+      style: { 'background': Colors().inputFocusBg, 'border-color': Colors().inputBorder },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '::-webkit-scrollbar-track',
+      style: { background: Colors().scrollbarBG },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '::-webkit-scrollbar-thumb',
+      style: { background: Colors().scrollbarPiece },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.altBg ::-webkit-scrollbar-thumb',
+      style: { background: Colors().altScrollbarPiece },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.altBg',
+      style: { color: Colors().altText1 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-muted-input input:hover',
+      style: { 'background': Colors().inputBg + ' !important', 'border-color': Colors().inputBorder },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.close svg, svg.close',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.close:hover svg, svg.close:hover',
+      style: { fill: Colors().activeText  },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.dropdown-value',
+      style: { 'border-color': Colors().inputBorder },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.dropdown-value:before',
+      style: { 'border-top': '7px solid ' + Colors().text1 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.dropdown-wrapper:not(.dropdown-disabled):hover .dropdown-value:before',
+      style: { 'border-top': '7px solid ' + Colors().activeText },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.button',
+      style: { backgroundColor: Colors().active, color: Colors().activeText },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.link',
+      style: { color: Colors().active },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.link:hover',
+      style: { color: Colors().import },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.link:active',
+      style: { color: Colors().active },
+    });
 
     const tooltipStyles = generateThemeStyles();
     _.map(tooltipStyles, (value, key) =>
     {
-      // this.props.colorsActions.setStyle(key, value);
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: key,
+        style: value,
+      });
     });
   }
 

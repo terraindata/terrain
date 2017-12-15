@@ -53,7 +53,7 @@ import * as React from 'react';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
-import ColorsActions from '../../../colors/data/ColorsActions';
+import { ColorsActions } from '../../../colors/data/ColorsRedux';
 import DragHandle from '../../../common/components/DragHandle';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ManualInfo from '../../../manual/components/ManualInfo';
@@ -96,6 +96,8 @@ export interface Props
   columnIndex?: number;
   handleCardDrop?: (type: string) => any;
   tuningMode?: boolean;
+
+  colorsActions: typeof ColorsActions;
 }
 
 interface IMoveState
@@ -282,8 +284,11 @@ class CardField extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.card-field-add .st0', { fill: Colors().iconColor });
-
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-field-add .st0',
+      style: { fill: Colors().iconColor },
+    });
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -529,4 +534,10 @@ const CARD_FIELD_MOVING_STYLE = _.extend({},
   borderColor(Colors().active),
 );
 
-export default CardField;
+export default Util.createContainer(
+  CardField,
+  [],
+  {
+    colorsActions: ColorsActions
+  },
+);

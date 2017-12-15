@@ -74,9 +74,10 @@ const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
-import ColorsActions from '../../../colors/data/ColorsActions';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
+import { ColorsActions } from '../../../colors/data/ColorsRedux';
+
 
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('images/icon_more_12x3.svg?name=MoreIcon');
@@ -116,6 +117,8 @@ export interface Props
   allowTuningDragAndDrop?: boolean;
   tuningMode?: boolean;
   handleCardReorder?: (card, index) => void;
+
+  colorsActions: typeof ColorsActions;
 }
 
 @Radium
@@ -204,11 +207,32 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.card-drag-handle svg', { fill: Colors().iconColor });
-    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', { fill: Colors().iconColor });
-    ColorsActions.setStyle('.card-minimize-icon .st0', { fill: Colors().iconColor });
-    ColorsActions.setStyle('.card-help-icon', { fill: Colors().iconColor });
-    ColorsActions.setStyle('.card-tuning-icon', { stroke: Colors().iconColor });
+    this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.card-drag-handle svg',
+        style: { fill: Colors().iconColor },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.card-title .menu-icon-wrapper svg',
+        style: { fill: Colors().iconColor },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.card-minimize-icon .st0',
+        style: { fill: Colors().iconColor },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.card-help-icon',
+        style: { fill: Colors().iconColor },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.card-tuning-icon',
+        style: { stroke: Colors().iconColor },
+      });
+
     // TODO
     // this._subscribe(Store, {
     //   stateKey: 'selected',
@@ -1017,6 +1041,34 @@ const dragCollect = (connect, monitor) =>
     connectDragPreview: connect.dragPreview(),
   });
 
-export const CardComponent = DragSource('CARD', cardSource, dragCollect)(_CardComponent);
+//export const CardComponent = DragSource('CARD', cardSource, dragCollect)(_CardComponent);
+
+// export default Util.createContainer(
+//   DragSource('CARD', cardSource, dragCollect)(_CardComponent)),
+//   [],
+//   {colorsActions: ColorsActions},
+// );
+
+// export default Util.createTypedContainer(
+//   DragSource('CARD', cardSource, dragCollect)(_CardComponent),
+//   [],
+//   { colorsActions: ColorsActions },
+// );
+
+const CardContainer = Util.createContainer(
+  _CardComponent,
+  [],
+  { colorsActions: ColorsActions }
+);
+
+export const CardComponent = DragSource('CARD', cardSource, dragCollect)(CardContainer);
 
 export default CardComponent;
+// export default Util.createContainer(
+//   CardComponent,
+//   [],
+//   {
+//     colorsActions: ColorsActions
+//   },
+// );
+

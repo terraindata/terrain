@@ -53,11 +53,12 @@ import * as classNames from 'classnames';
 import createReactClass = require('create-react-class');
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
+import Util from '../../../util/Util';
 import { browserHistory } from 'react-router';
 import LibraryActions from '../../../library/data/LibraryActions';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
-import ColorsActions from './../../../colors/data/ColorsActions';
+import { ColorsActions } from './../../../colors/data/ColorsRedux';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryStore } from './../../../library/data/LibraryStore';
 
@@ -177,9 +178,10 @@ interface TabsProps
   config: string;
   actions: List<TabAction>;
   onNoAlgorithm(algorithmId: string);
+  colorsActions: typeof ColorsActions;
 }
 
-export class Tabs extends TerrainComponent<TabsProps> {
+class Tabs extends TerrainComponent<TabsProps> {
   public state = {
     algorithms: LibraryStore.getState().algorithms,
     tabs: null,
@@ -202,8 +204,16 @@ export class Tabs extends TerrainComponent<TabsProps> {
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action svg', { fill: Colors().text3 });
-    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action', { 'border-color': Colors().text3 });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.tabs-container .tabs-actions .tabs-action svg',
+      style: { fill: Colors().text3 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.tabs-container .tabs-actions .tabs-action',
+      style: { 'border-color': Colors().text3 },
+    });
   }
 
   public componentWillUnmount()
@@ -400,4 +410,13 @@ export class Tabs extends TerrainComponent<TabsProps> {
   }
 }
 
-export default Tabs;
+const TabsContainer = Util.createContainer(
+  Tabs,
+  [],
+  { colorsActions: ColorsActions },
+);
+
+export { TabsContainer as Tabs };
+
+export default TabsContainer;
+
