@@ -767,6 +767,7 @@ class _CardComponent extends TerrainComponent<Props>
     {
       style = _.extend(style === null ? {} : style, {
         opacity: 0.25,
+        zIndex: 999999,
       });
     }
 

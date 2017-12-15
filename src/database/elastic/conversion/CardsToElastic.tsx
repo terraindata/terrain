@@ -82,7 +82,7 @@ class CardsToElastic
       return block;
     }
 
-    if (block && block.static && block.static.tql && !block.disabled)
+    if (block && block.static && block.static.tql)
     {
       const tql = block.static.tql as TQLRecursiveObjectFn;
       let value = tql(block, CardsToElastic.blockToElastic, options);
