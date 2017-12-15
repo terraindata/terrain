@@ -52,12 +52,14 @@ import { Permissions } from '../permissions/Permissions';
 import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { Import } from './Import';
+import { ImportSourceConfig, Sources } from './sources/Sources';
 import ImportTemplateRouter from './templates/ImportTemplateRouter';
 import { fieldTypes } from './templates/ImportTemplateRouter';
 
 const Router = new KoaRouter();
 export const imprt: Import = new Import();
 const perm: Permissions = new Permissions();
+const sources = new Sources();
 
 Router.use('/templates', ImportTemplateRouter.routes(), ImportTemplateRouter.allowedMethods());
 
@@ -114,11 +116,20 @@ Router.post('/mysqlheadless', async (ctx, next) =>
 Router.post('/headless', async (ctx, next) =>
 {
   winston.info('importing to database, from file and template id');
-  const authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
+  let authStream: object = await Util.authenticateStreamPersistentAccessToken(ctx.req);
   if (authStream['template'] === null)
   {
-    ctx.body = 'Unauthorized';
-    ctx.status = 400;
+    // may not be form data, attempt normal JSON format
+    authStream = await Util.authenticatePersistentAccessToken(ctx.request.body);
+    if (authStream['template'] === null)
+    {
+      ctx.body = 'Unauthorized';
+      ctx.status = 400;
+      return;
+    }
+    Util.verifyParameters(ctx.request.body.body, ['source', 'filetype']);
+    const imprtSourceConfig: ImportSourceConfig = await sources.handleTemplateSource(ctx.request.body);
+    ctx.body = await imprt.upsert(imprtSourceConfig.stream, imprtSourceConfig.params, true);
     return;
   }
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);
