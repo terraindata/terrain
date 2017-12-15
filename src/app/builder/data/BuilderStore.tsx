@@ -151,25 +151,25 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
       state = (BuilderReducers[action.type] as any)(state, action);
     }
 
-    if (BuilderCardActionTypes[action.type])
-    {
-      // a card changed and we need to re-translate the tql
-      //  needs to be after the card change has affected the state
-      const newCards = ESCardParser.parseAndUpdateCards(state.query.cards);
-      state = state.setIn(['query', 'cards'], newCards);
-      state = state
-        .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));
-      state = state
-        .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
-        .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
-        .setIn(['query', 'cardsAndCodeInSync'], true);
-    }
-
-    if (BuilderPathActionTypes[action.type])
+    if (BuilderPathActionTypes[action.type] && !action.payload.notDirty)
     {
       const path = state.query.path;
       state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path));
     }
+
+    // else if (BuilderCardActionTypes[action.type])
+    // {
+    //   // a card changed and we need to re-translate the tql
+    //   //  needs to be after the card change has affected the state
+    //   const newCards = ESCardParser.parseAndUpdateCards(state.query.cards);
+    //   state = state.setIn(['query', 'cards'], newCards);
+    //   state = state
+    //     .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));
+    //   state = state
+    //     .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
+    //     .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
+    //     .setIn(['query', 'cardsAndCodeInSync'], true);
+    // }
 
     if (!state.modelVersion || state.modelVersion < 3)
     {

@@ -82,7 +82,7 @@ const pieceStyle = {
   background: '#f2f4f7',
   color: '#42474f',
   margin: 6,
-  
+
   ':hover': {
     background: Colors().active,
     color: Colors().activeText,
@@ -102,7 +102,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
-    
+
     return (
       <div
         className='pf-filter-line flex-container'
@@ -119,12 +119,12 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private renderField()
   {
     const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
-    
+
     if (filterLine.field !== null)
     {
       return (
@@ -138,13 +138,13 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         </div>
       );
     }
-    
+
     const options = source.dataSource.getChoiceOptions({
       type: 'fields',
       source,
       schemaState: pathfinderContext.schemaState,
     });
-    
+
     return (
       <div>
         {
@@ -163,33 +163,32 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       </div>
     );
   }
-  
+
   private renderMethod()
   {
     const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
-    
+
   }
 
   private renderValue()
   {
     const { filterLine, pathfinderContext } = this.props;
     const { source } = pathfinderContext;
-    
+
     if (filterLine.field === null || filterLine.fieldType === null)
     {
-      console.log('null');
+      // console.log('null');
       return null;
     }
-    
+
     const comparisonOptions = source.dataSource.getChoiceOptions({
-        type: 'comparison',
-        field: filterLine.field,
-        fieldType: filterLine.fieldType,
-        source,
-        schemaState: pathfinderContext.schemaState,
-      });
-      
+      type: 'comparison',
+      field: filterLine.field,
+      fieldType: filterLine.fieldType,
+      source,
+      schemaState: pathfinderContext.schemaState,
+    });
     switch (filterLine.fieldType)
     {
       case FieldType.Numerical:
@@ -206,7 +205,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               {
                 comparisonOptions.map((option) =>
                   option.value === filterLine.comparison ||
-                  filterLine.comparison === null ?
+                    filterLine.comparison === null ?
                     <div
                       style={pieceStyle}
                       onClick={this._fn(this.handleChange, 'comparison', option.value)}
@@ -216,7 +215,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                         option.displayName
                       }
                     </div>
-                  : null
+                    : null
                 )
               }
             </div>
@@ -232,7 +231,30 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         );
 
       case FieldType.Date:
-        return (
+        return (<div
+          className='flex-container'
+          style={{
+            alignItems: 'flex-start',
+          }}
+        >
+          <div>
+            {
+              comparisonOptions.map((option) =>
+                option.value === filterLine.comparison ||
+                  filterLine.comparison === null ?
+                  <div
+                    style={pieceStyle}
+                    onClick={this._fn(this.handleChange, 'comparison', option.value)}
+                    key={option.value}
+                  >
+                    {
+                      option.displayName
+                    }
+                  </div>
+                  : null
+              )
+            }
+          </div>
           <DatePickerWrapper
             date={String(filterLine.value)}
             onChange={this._fn(this.handleChange, 'value')}
@@ -240,6 +262,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             language={'elastic'}
             format='MM/DD/YYYY h:mma'
           />
+        </div>
         );
 
       case FieldType.Geopoint:
@@ -250,39 +273,64 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           this.handleChange('value', value);
         }
         return (
-          <div className='pf-filter-map-input-wrapper'>
-            <BuilderTextbox
-              value={value.distance}
-              canEdit={pathfinderContext.canEdit}
-              keyPath={this.props.keyPath.push('value').push('distance')}
-            />
-            <Dropdown
-              options={List(_.keys(units))}
-              selectedIndex={_.keys(units).indexOf(value.units)}
-              canEdit={pathfinderContext.canEdit}
-              optionsDisplayName={Map(units)}
-              keyPath={this.props.keyPath.push('value').push('units')}
-            />
-            <MapComponent
-              address={value.address}
-              location={value.location}
-              markLocation={true}
-              showSearchBar={true}
-              zoomControl={true}
-              keepAddressInSync={false}
-              geocoder='google'
-              keyPath={this.props.keyPath.push('value').push('location')}
-              textKeyPath={this.props.keyPath.push('value').push('address')}
-              hideSearchSettings={true}
-              showDistanceCircle={true}
-              distance={value.distance}
-              distanceUnit={value.units}
-              wrapperClassName={'pf-filter-map-component-wrapper'}
-              fadeInOut={true}
-            />
+          <div
+            className='flex-container'
+            style={{
+              alignItems: 'flex-start',
+            }}
+          >
+            <div>
+              {
+                comparisonOptions.map((option) =>
+                  option.value === filterLine.comparison ||
+                    filterLine.comparison === null ?
+                    <div
+                      style={pieceStyle}
+                      onClick={this._fn(this.handleChange, 'comparison', option.value)}
+                      key={option.value}
+                    >
+                      {
+                        option.displayName
+                      }
+                    </div>
+                    : null
+                )
+              }
+            </div>
+            <div className='pf-filter-map-input-wrapper'>
+              <BuilderTextbox
+                value={value.distance}
+                canEdit={pathfinderContext.canEdit}
+                keyPath={this.props.keyPath.push('value').push('distance')}
+              />
+              <Dropdown
+                options={List(_.keys(units))}
+                selectedIndex={_.keys(units).indexOf(value.units)}
+                canEdit={pathfinderContext.canEdit}
+                optionsDisplayName={Map(units)}
+                keyPath={this.props.keyPath.push('value').push('units')}
+              />
+              <MapComponent
+                address={value.address}
+                location={value.location}
+                markLocation={true}
+                showSearchBar={true}
+                zoomControl={true}
+                keepAddressInSync={false}
+                geocoder='google'
+                keyPath={this.props.keyPath.push('value').push('location')}
+                textKeyPath={this.props.keyPath.push('value').push('address')}
+                hideSearchSettings={true}
+                showDistanceCircle={true}
+                distance={value.distance}
+                distanceUnit={value.units}
+                wrapperClassName={'pf-filter-map-component-wrapper'}
+                fadeInOut={true}
+              />
+            </div>
           </div>
         );
-        
+
       case FieldType.Ip:
         return (
           <div>IP not supported yet</div>
@@ -292,7 +340,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         return (
           <div>Error: no </div>
         );
-        
+
       default:
         throw new Error('No value type handler for ' + filterLine.valueType);
     }
@@ -301,14 +349,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   private handleChange(key, value, fieldType?)
   {
     let filterLine = this.props.filterLine.set(key, value);
-    
     const { pathfinderContext } = this.props;
     const { source } = pathfinderContext;
-    
     if (key === 'field')
     {
       filterLine = filterLine.set('fieldType', fieldType);
-      
       // this code picks a default method to use
       // console.log(fieldType);
       const comparisonOptions = source.dataSource.getChoiceOptions({
@@ -318,15 +363,14 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         source,
         schemaState: pathfinderContext.schemaState,
       });
-      // console.log(comparisonOptions);
-      
+
       if (comparisonOptions.findIndex((option) => option.value === filterLine.comparison) === -1
         && comparisonOptions.size)
       {
         filterLine = filterLine.set('comparison', null); //comparisonOptions.get(0).value);
       }
     }
-    
+
     this.props.onChange(this.props.keyPath, filterLine);
   }
 }

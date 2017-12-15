@@ -119,7 +119,6 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public handleTypeChange(index)
   {
     const type = this.typeOptions.get(index);
-    BuilderActions.change(this.props.keyPath.push('type'), type);
     this.updateAggregation(type, this.props.aggregation.field);
   }
 
@@ -262,7 +261,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       return 'histogram';
     }
     // Get the type of field (using schema) and narrow down th options with fieldTypesToElasticTYpes
-    const fieldType: FieldType = ElasticBlockHelpers.getTypeOfField(this.props.pathfinderContext.schemaState, field);
+    const fieldType: FieldType = ElasticBlockHelpers.getTypeOfField(this.props.pathfinderContext.schemaState, field, this.props.pathfinderContext.source.dataSource);
     const options = AggregationTypes.get(type).fieldTypesToElasticTypes.get(String(fieldType));
     // If there are no options, it is a meta-field
     if (options === undefined)
@@ -329,7 +328,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
       }).map((option) => option.displayName).toList();
     }
     // If the type has not been chosen, or the type can accept Any field, return all fields
-    if ((type === undefined || type === '') || FieldType.Any in AggregationTypes.get(type).acceptedTypes)
+    if ((type === undefined || type === '') || AggregationTypes.get(type).acceptedTypes.indexOf(FieldType.Any) !== -1)
     {
       return allFieldOptions.sort().toList();
     }
@@ -337,7 +336,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     const acceptedTypes = AggregationTypes.get(type).acceptedTypes;
     acceptedTypes.forEach((fieldType) =>
     {
-      filteredOptions = filteredOptions.union(ElasticBlockHelpers.getFieldsOfType(schemaState, fieldType).toSet());
+      filteredOptions = filteredOptions.union(ElasticBlockHelpers.getFieldsOfType(schemaState, fieldType, source.dataSource).toSet());
     });
     return filteredOptions.sort().toList();
   }

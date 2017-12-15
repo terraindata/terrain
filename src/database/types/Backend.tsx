@@ -53,7 +53,7 @@ import { BlockConfig } from '../../blocks/types/Block';
 import { Card } from '../../blocks/types/Card';
 import Query from '../../items/types/Query';
 import CardsToCodeOptions from './CardsToCodeOptions';
-import {Path} from 'app/builder/components/pathfinder/PathfinderTypes';
+import { Path } from 'app/builder/components/pathfinder/PathfinderTypes';
 
 export interface Backend
 {

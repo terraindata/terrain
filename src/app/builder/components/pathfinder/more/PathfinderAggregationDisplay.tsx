@@ -113,7 +113,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
       text: PathfinderText.aggregation.percentile.text,
       inputType: 'multi',
       tooltipText: PathfinderText.aggregation.percentile.tooltipText,
-      key: 'percentiles',
+      key: 'percents',
       isNumber: true,
     },
   },

@@ -400,11 +400,11 @@ export const _Source = (config?: { [key: string]: any }) =>
 abstract class DataSource extends BaseClass
 {
   // ... shared data source attributes go here
-  
+
   // Given some context, 
   public abstract getChoiceOptions:
   (context?: ChoiceContext) => List<ChoiceOption>;
-  
+
   public abstract dataTypeToFieldType:
   (dataType: string) => FieldType;
 
@@ -600,14 +600,13 @@ class ElasticDataSourceC extends DataSource
     if (context.type === 'comparison')
     {
       const { field, fieldType, schemaState, source } = context;
-      
-      console.log(fieldType);
+
       let options = ElasticComparisons;
       if (fieldType !== null && fieldType !== undefined)
       {
         options = options.filter((opt) => opt.fieldTypes.indexOf(fieldType) !== -1);
       }
-      
+
       return List(options.map((c) => _ChoiceOption(c)));
     }
 
@@ -654,7 +653,7 @@ class ElasticDataSourceC extends DataSource
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));
   }
-  
+
   public dataTypeToFieldType = (dataType: string) =>
   {
     return +_.findKey(FieldTypeMapping, (dataTypes) => dataTypes.indexOf(dataType) !== -1);
@@ -786,7 +785,7 @@ export const ADVANCED_MAPPINGS =
   {
     [ADVANCED.Missing]: {},
     [ADVANCED.Sigma]: { sigma: 2 },
-    [ADVANCED.Percentiles]: { percentiles: List([1, 5, 25, 50, 75, 95, 99]) },
+    [ADVANCED.Percentiles]: { percents: List([1, 5, 25, 50, 75, 95, 99]) },
     [ADVANCED.PercentileRanks]: { values: List([]) },
     [ADVANCED.Accuracy]: { accuracyType: 'compression', compression: 100, number_of_significant_value_digits: 3 },
     [ADVANCED.Name]: { name: '' },

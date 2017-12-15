@@ -184,38 +184,31 @@ export const ElasticBlockHelpers = {
     return List(metaFields);
   },
 
-  getFieldsOfType(schemaState, fieldType): List<string>
+  getFieldsOfType(schemaState, fieldType. dataSource?): List<string>
   {
     const state = BuilderStore.getState();
-    const index = getIndex();
+    const index = dataSource && dataSource.index.split('/')[1] || getIndex();
     const server = BuilderStore.getState().db.name;
-
     if (index !== null)
     {
       const indexId = state.db.name + '/' + String(index);
       // 2. Need to get current type
-      const type = getType();
-      if (type !== null)
+      const fields = schemaState.columns.filter(
+        (column) => column.serverId === String(server) &&
+          column.databaseId === String(indexId) &&
+          FieldTypeMapping[fieldType].indexOf(column.datatype) !== -1,
+      ).map(
+        (column) => column.name,
+      ).toList(); // concat meta fields if necessary
+      if (fieldType === FieldType.Numerical)
       {
-        const typeId = state.db.name + '/' + String(index) + '.' + String(type);
-        const fields = schemaState.columns.filter(
-          (column) => column.serverId === String(server) &&
-            column.databaseId === String(indexId) &&
-            column.tableId === String(typeId) &&
-            FieldTypeMapping[fieldType].indexOf(column.datatype) !== -1,
-        ).map(
-          (column) => column.name,
-        ).toList(); // concat meta fields if necessary
-        if (fieldType === FieldType.Numerical)
-        {
-          return fields.concat(List(['_score', '_size']));
-        }
-        if (fieldType === FieldType.Any)
-        {
-          return fields.concat(List(metaFields));
-        }
-        return fields;
+        return fields.concat(List(['_score', '_size']));
       }
+      if (fieldType === FieldType.Any)
+      {
+        return fields.concat(List(metaFields));
+      }
+      return fields;
     }
     if (fieldType === FieldType.Numerical)
     {
@@ -226,7 +219,7 @@ export const ElasticBlockHelpers = {
 
   // Given a field, return the fieldType (numerical, text, date, geopoint, ip)
   // If the field is a metaField, return string / number accrodingly
-  getTypeOfField(schemaState, field): FieldType
+  getTypeOfField(schemaState, field, dataSource): FieldType
   {
     if (metaFields.indexOf(field) !== -1)
     {
@@ -237,43 +230,35 @@ export const ElasticBlockHelpers = {
       return FieldType.Text;
     }
     const state = BuilderStore.getState();
-    const index = getIndex();
+    const index = dataSource && dataSource.index.split('/')[1] || getIndex();
     const server = BuilderStore.getState().db.name;
 
     if (index !== null)
     {
       const indexId = state.db.name + '/' + String(index);
-      // 2. Need to get current type
-      const type = getType();
-      if (type !== null)
-      {
-        const typeId = state.db.name + '/' + String(index) + '.' + String(type);
-        const fields = schemaState.columns.filter(
-          (column) => column.serverId === String(server) &&
-            column.databaseId === String(indexId) &&
-            column.tableId === String(typeId),
-        ).map(
-          (column) => column.name,
-        ).toList();
-        const col = schemaState.columns.filter(
-          (column) => column.serverId === String(server) &&
-            column.databaseId === String(indexId) &&
-            column.tableId === String(typeId) &&
-            column.name === field,
+      const fields = schemaState.columns.filter(
+        (column) => column.serverId === String(server) &&
+          column.databaseId === String(indexId)
+      ).map(
+        (column) => column.name,
+      ).toList();
+      const col = schemaState.columns.filter(
+        (column) => column.serverId === String(server) &&
+          column.databaseId === String(indexId) &&
+          column.name === field,
 
-        ).toList().get(0);
-        const dataType = col.datatype;
-        let fieldType = 0;
-        _.keys(FieldTypeMapping).forEach((ft) =>
+      ).toList().get(0);
+      const dataType = col.datatype;
+      let fieldType = 0;
+      _.keys(FieldTypeMapping).forEach((ft) =>
+      {
+        if (FieldTypeMapping[ft].indexOf(dataType) !== -1
+          && String(ft) !== String(FieldType.Any))
         {
-          if (FieldTypeMapping[ft].indexOf(dataType) !== -1
-            && String(ft) !== String(FieldType.Any))
-          {
-            fieldType = ft;
-          }
-        });
-        return fieldType;
-      }
+          fieldType = ft;
+        }
+      });
+      return fieldType;
     }
     return undefined;
   },
