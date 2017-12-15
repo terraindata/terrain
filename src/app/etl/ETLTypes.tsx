@@ -44,38 +44,23 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:max-classes-per-file strict-boolean-expressions no-shadowed-variable
+
 import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+import { makeConstructor, WithIRecord } from '../Classes';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import ETLReducer from 'etl/data/ETLReducers';
-import { TemplateEditorReducers } from 'etl/templates/data/TemplateEditorRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import UserReducer from 'users/data/UserReducers';
-import Ajax from 'util/Ajax';
-import ColorsReducer from '../colors/data/ColorsReducers';
+export enum FILE_TYPES
+{
+  JSON = 'json',
+  JSON_TYPE_OBJECT = 'json [type object]',
+  CSV = 'csv',
+}
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  colors: ColorsReducer,
-  etl: ETLReducer,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  templateEditor: TemplateEditorReducers,
-  schema: SchemaReducers,
-  users: UserReducer,
-};
-
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
-
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax)),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+// Store type
+class ETLStateC
+{
+  public placeholder: number = 0;
+}
+export type ETLState = WithIRecord<ETLStateC>;
+export const _ETLState = makeConstructor<ETLStateC>(ETLStateC);

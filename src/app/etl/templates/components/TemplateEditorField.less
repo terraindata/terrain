@@ -1,0 +1,182 @@
+@import "../../../common/Common.less";
+
+@item-spacing: @half-spacing 0px 0px 0px;
+
+.tef-layout-row {
+  display: flex;
+  flex-direction: row;
+  flex: 1 0;
+  align-items: center;
+}
+
+.tef-layout-content-row {
+  display: flex;
+  flex-direction: row;
+  padding: @half-spacing;
+}
+
+.tef-layout-wrappable-content-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: @quarter-spacing @half-spacing;
+
+  .tef-layout-dropdown-spacer {
+    padding-bottom: @quarter-spacing;
+    padding-top: @quarter-spacing;
+  }
+
+  .tef-layout-label {
+    padding-top: @quarter-spacing + @half-spacing;
+    padding-bottom: @quarter-spacing + @half-spacing;
+  }
+}
+
+.tef-layout-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0;
+}
+
+.tef-layout-padded {
+  padding: @half-spacing;
+}
+
+.tef-layout-autocomplete-spacer {
+  padding: 0px @half-spacing;
+  &.no-padding {
+    padding: 0px;
+  }
+}
+
+.tef-layout-dropdown-spacer {
+  padding: 0px @half-spacing;
+}
+
+.tef-layout-checkbox-spacer {
+  margin-top: 2px;
+  padding: @half-spacing;
+  padding-right: 0px;
+  margin-right: -3px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  bottom: 1px;
+}
+
+.tef-layout-label {
+  .noselect;
+  white-space: nowrap;
+  padding: @half-spacing;
+  margin-top: 2px;
+  &.tef-right {
+    padding-left: 0px;
+  }
+  &.tef-left {
+    padding-right: 0px;
+  }
+  &.tef-center {
+    padding-right: 0px;
+    padding-left: 0px;
+  }
+  &.tef-indent {
+    padding-left: @double-spacing;
+  }
+}
+
+.tef-menu-wrapper-positioning {
+  position: relative;
+  width: 24px;
+  height: 24px;
+}
+
+
+.template-editor-field-row {
+  display: flex;
+  align-items: center;
+
+  .include-field-checkbox-spacer {
+    padding-left: @quarter-spacing;
+  }
+
+  .template-editor-pkey-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .template-editor-key-button {
+      .transition;
+      cursor: pointer;
+      padding: @half-spacing @half-spacing @quarter-spacing @half-spacing;
+      margin-left: @half-spacing;
+      border-radius: 3px;
+      svg path {
+        stroke: currentColor;
+      }
+    }
+
+    .template-editor-key-icon {
+      fill: currentColor;
+    }
+  }
+
+  .template-editor-analyzed-section {
+    padding-left: @half-spacing;
+    display: flex;
+    cursor: pointer;
+    .transition;
+  }
+
+  .template-editor-field-settings {
+    .transition;
+    border: 1px solid;
+    flex-grow: 1;
+  }
+
+  .template-editor-field-label-group {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .template-editor-field-input-disabled {
+    .template-editor-field-label-group {
+      cursor: auto;
+    }
+  }
+}
+
+.template-editor-children-container {
+  display: flex;
+  flex-direction: column;
+  padding-left: @double-spacing;
+  .subfield-spacer {
+    padding: @item-spacing;
+  }
+
+  .new-field-button-spacer {
+    margin-left: @double-spacing;
+    margin-top: @half-spacing;
+    margin-bottom: @half-spacing;
+    display: flex;
+    justify-content: flex-start;
+
+    .create-new-template-field-button {
+      display: flex;
+      align-items: center;
+      padding: @half-spacing;
+      border-radius: 3px;
+      cursor: pointer;
+
+      &.template-editor-field-input-disabled {
+        cursor: auto;
+      }
+
+      .template-editor-add-icon {
+        fill: currentColor;
+        width: 12px;
+        margin-right: 16px;
+      }
+    }
+  }
+}

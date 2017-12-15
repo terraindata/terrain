@@ -44,38 +44,63 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Immutable from 'immutable';
+import TerrainComponent from 'common/components/TerrainComponent';
+import * as Radium from 'radium';
+import * as React from 'react';
+import { backgroundColor, borderColor, Colors, fontColor } from 'src/app/colors/Colors';
+import Query from 'src/items/types/Query';
+import Util from 'util/Util';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import ETLReducer from 'etl/data/ETLReducers';
-import { TemplateEditorReducers } from 'etl/templates/data/TemplateEditorRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import UserReducer from 'users/data/UserReducers';
-import Ajax from 'util/Ajax';
-import ColorsReducer from '../colors/data/ColorsReducers';
+import ETLActions from 'etl/data/ETLActions';
+import { ETLState } from 'etl/ETLTypes';
+import TemplateEditor from 'etl/templates/components/TemplateEditor';
+import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
+import { TemplateEditorState } from 'etl/templates/TemplateTypes';
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  colors: ColorsReducer,
-  etl: ETLReducer,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  templateEditor: TemplateEditorReducers,
-  schema: SchemaReducers,
-  users: UserReducer,
-};
+import './ETLExportDisplay.less';
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+export interface Props
+{
+  query: Query;
+  serverId: string | number;
+  algorithmName: string;
+  // below from container
+  etl: ETLState;
+  etlActions: any;
+  templateEditor: TemplateEditorState;
+  templateEditorActions: typeof TemplateEditorActions;
+}
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax)),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
+@Radium
+class ETLExportDisplay extends TerrainComponent<Props>
+{
 
-export default terrainStore;
+  public render()
+  {
+    return (
+      <div
+        className='etl-export-display-wrapper'
+        style={[backgroundColor(Colors().bg1), fontColor(Colors().text1)]}
+      >
+        <TemplateEditor />
+        <div>
+          <div className='export-button'
+            style={[
+              fontColor(Colors().import),
+              borderColor(Colors().import),
+              backgroundColor(Colors().bg3),
+            ]}
+          >
+            Export
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default Util.createContainer(
+  ETLExportDisplay,
+  ['etl', 'templateEditor'],
+  { etlActions: ETLActions, templateEditorActions: TemplateEditorActions },
+);

@@ -103,7 +103,6 @@ export interface Props
 class Builder extends TerrainComponent<Props>
 {
   public state: {
-    exportState: FileImportTypes.FileImportState,
     builderState: BuilderState,
     algorithms: IMMap<ID, Algorithm>,
 
@@ -126,7 +125,6 @@ class Builder extends TerrainComponent<Props>
     savingAs?: boolean;
 
   } = {
-    exportState: FileImportStore.getState(),
     builderState: BuilderStore.getState(),
     algorithms: LibraryStore.getState().algorithms,
 
@@ -176,10 +174,6 @@ class Builder extends TerrainComponent<Props>
     this._subscribe(LibraryStore, {
       stateKey: 'algorithms',
       storeKeyPath: ['algorithms'],
-    });
-
-    this._subscribe(FileImportStore, {
-      stateKey: 'exportState',
     });
 
     let colKeys: List<number>;
@@ -642,7 +636,6 @@ class Builder extends TerrainComponent<Props>
       content: query && <BuilderColumn
         query={query}
         resultsState={this.state.builderState.resultsState}
-        exportState={this.state.exportState}
         index={index}
         colKey={key}
         algorithm={algorithm}

@@ -44,38 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-shadowed-variable strict-boolean-expressions no-unused-expression
+
 import * as Immutable from 'immutable';
+import ActionTypes from './ETLActionTypes';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import ETLReducer from 'etl/data/ETLReducers';
-import { TemplateEditorReducers } from 'etl/templates/data/TemplateEditorRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import UserReducer from 'users/data/UserReducers';
-import Ajax from 'util/Ajax';
-import ColorsReducer from '../colors/data/ColorsReducers';
-
-const reducers = {
-  analytics: AnalyticsReducer,
-  colors: ColorsReducer,
-  etl: ETLReducer,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  templateEditor: TemplateEditorReducers,
-  schema: SchemaReducers,
-  users: UserReducer,
+const $ = (type: string, payload: any) =>
+{
+  return { type, payload };
 };
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+const ETLActions =
+  {
+    placeholder:
+    (value) =>
+      $(ActionTypes.placeholder, { value }),
+  };
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax)),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+export default ETLActions;

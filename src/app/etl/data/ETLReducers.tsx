@@ -43,39 +43,28 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 import * as Immutable from 'immutable';
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import ETLReducer from 'etl/data/ETLReducers';
-import { TemplateEditorReducers } from 'etl/templates/data/TemplateEditorRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import UserReducer from 'users/data/UserReducers';
-import Ajax from 'util/Ajax';
-import ColorsReducer from '../colors/data/ColorsReducers';
+import { _ETLState, ETLState } from '../ETLTypes';
+import ActionTypes from './ETLActionTypes';
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  colors: ColorsReducer,
-  etl: ETLReducer,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  templateEditor: TemplateEditorReducers,
-  schema: SchemaReducers,
-  users: UserReducer,
+const { List, Map } = Immutable;
+const ETLReducers = {};
+
+ETLReducers[ActionTypes.placeholder] =
+  (state: ETLState, action) =>
+  {
+    return state.set('placeholder', action.payload.value);
+  };
+
+const ETLReducersWrapper = (state: ETLState = _ETLState(), action) =>
+{
+  let nextState = state;
+  if (ETLReducers[action.type])
+  {
+    nextState = ETLReducers[action.type](state, action);
+  }
+  return nextState;
 };
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
-
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax)),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+export default ETLReducersWrapper;

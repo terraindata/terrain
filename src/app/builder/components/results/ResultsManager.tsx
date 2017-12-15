@@ -60,7 +60,6 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
-import Actions from '../../../fileImport/data/FileImportActions';
 import * as FileImportTypes from '../../../fileImport/FileImportTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
@@ -308,7 +307,6 @@ export class ResultsManager extends TerrainComponent<Props>
     if (exportChanges)
     {
       const { filetype, filesize, preview, originalNames } = exportChanges;
-      Actions.chooseFile(filetype, filesize, preview, originalNames);
     }
 
     this.props.onResultsStateChange(resultsState);
