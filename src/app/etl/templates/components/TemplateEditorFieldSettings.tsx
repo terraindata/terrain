@@ -137,35 +137,34 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         style={inputNameAutocompleteStyle}
       />;
 
-    const showOriginalName = field.name !== field.originalName;
-    let inputOriginalName = <div />;
+    // const showOriginalName = field.name !== field.originalName;
+    // let inputOriginalName = <div />;
 
-    if (showOriginalName)
-    {
-      inputOriginalName = this.state.originalNameOpen ?
-        <div className='tef-layout-autocomplete-spacer'>
-          <Autocomplete
-            value={field.originalName}
-            onChange={this._setFactory('originalName')}
-            disabled={inputDisabled}
-            options={emptyOptions}
-            onFocus={this.enableOriginalNameInput}
-            onBlur={this.disableOriginalNameInput}
-            autoFocus={true}
-            style={originalNameAutocompleteStyle}
-          />
-        </div>
-        :
-        <div className='tef-layout-label tef-center normal-text'>
-          &nbsp;{field.originalName}
-        </div>;
-    }
+    // if (showOriginalName)
+    // {
+    //   inputOriginalName = this.state.originalNameOpen ?
+    //     <div className='tef-layout-autocomplete-spacer'>
+    //       <Autocomplete
+    //         value={field.originalName}
+    //         onChange={this._setFactory('originalName')}
+    //         disabled={inputDisabled}
+    //         options={emptyOptions}
+    //         onFocus={this.enableOriginalNameInput}
+    //         onBlur={this.disableOriginalNameInput}
+    //         autoFocus={true}
+    //         style={originalNameAutocompleteStyle}
+    //       />
+    //     </div>
+    //     :
+    //     <div className='tef-layout-label tef-center normal-text'>
+    //       &nbsp;{field.originalName}
+    //     </div>;
+    // }
 
     const fieldNameSection = (
       <div className='tef-layout-content-row'>
-        { /*<div className='tef-layout-label'> Name </div>*/}
         <div className='tef-layout-autocomplete-spacer no-padding'> {inputFieldName} </div>
-        {showOriginalName ?
+        {/*showOriginalName ?
           <div
             className='template-editor-field-label-group'
             style={originalNameLabelStyle}
@@ -176,7 +175,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
             {inputOriginalName}
             <div className='tef-layout-label tef-right normal-text'> ) </div>
           </div> : undefined
-        }
+        */}
       </div>
     );
 

@@ -156,7 +156,7 @@ class TemplateFieldC
   public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
   // if type is array. e.g. array of text, or array of array of text
   public analyzer: string = '';
-  public originalName: string = '';
+  public originalName: string = ''; // this may change based on how we implement transformations
   public name: string = '';
   public children: List<TemplateField> = List([]);
 }

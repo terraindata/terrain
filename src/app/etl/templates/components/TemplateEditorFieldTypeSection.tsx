@@ -129,7 +129,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
       >
         <div className='tef-layout-checkbox-spacer'> {analyzedCheckbox} </div>
         <div className='tef-layout-label tef-right'> Analyze </div>
-        {showAnalyzer &&
+        {/*showAnalyzer &&
           <div className='tef-layout-dropdown-spacer'>
             <Dropdown
               options={elasticAnalyzerOptions}
@@ -138,7 +138,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
               onChange={() => 0}
             />
           </div>
-        }
+        */}
       </div>
     );
   }

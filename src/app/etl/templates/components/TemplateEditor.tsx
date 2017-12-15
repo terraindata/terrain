@@ -43,7 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+// tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
@@ -54,7 +54,15 @@ import Util from 'util/Util';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _ExportTemplate, _TemplateField, ELASTIC_TYPES, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import
+{
+  _ExportTemplate,
+  _TemplateField,
+  ELASTIC_TYPES,
+  ETLTemplate,
+  TEMPLATE_TYPES,
+  TemplateEditorState,
+} from 'etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 
 const { List } = Immutable;
@@ -101,9 +109,13 @@ class ETLExportDisplay extends TerrainComponent<Props>
   public render()
   {
     const template: ETLTemplate = this.props.templateEditor.template;
-
+    const titleTypeText = template.type === TEMPLATE_TYPES.IMPORT ? 'Import' : 'Export';
     return (
       <div className='template-editor-root-container'>
+        <div className='template-editor-title-bar'>
+          <div className='template-editor-editor-title'> Edit {titleTypeText} Template </div>
+          <div className='template-editor-preview-title'> {titleTypeText} Preview </div>
+        </div>
         <TemplateEditorFieldNode
           keyPath={List([])}
           field={template.rootField}
