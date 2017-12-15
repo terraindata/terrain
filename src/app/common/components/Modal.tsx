@@ -289,7 +289,7 @@ class Modal extends TerrainComponent<Props>
                             'button': true,
                             'modal-confirm-button': true,
                           })}
-                          onClick={this.closeModalSuccess}
+                          onClick={!this.props.confirmDisabled && this.closeModalSuccess}
                           style={confirmButtonStyle}
                           key='modal-confirm-button'
                         >
