@@ -186,7 +186,7 @@ export class Items
     return new Promise<ItemConfig>(async (resolve, reject) =>
     {
       // check privileges if setting to live/default
-      if (user.isSuperUser === 0 && (item.status === 'LIVE' || item.status === 'DEFAULT'))
+      if (!user.isSuperUser && (item.status === 'LIVE' || item.status === 'DEFAULT'))
       {
         return reject('Cannot set item status as LIVE or DEFAULT as non-superuser');
       }
@@ -202,7 +202,7 @@ export class Items
         }
 
         const status = items[0].status;
-        if (user.isSuperUser === 0 && (status === 'LIVE' || status === 'DEFAULT'))
+        if (!user.isSuperUser && (status === 'LIVE' || status === 'DEFAULT'))
         {
           // only superusers can update live / default items
           return reject('Cannot update LIVE or DEFAULT item as non-superuser');

@@ -66,9 +66,9 @@ export const credentials: Credentials = new Credentials();
 
 export interface SchedulerConfig
 {
-  active?: number;                   // whether the schedule is running (different from currentlyRunning)
-  archived?: number;                 // whether the schedule has been archived (deleted) or not
-  currentlyRunning?: number;         // whether the job is currently running
+  active?: boolean;                  // whether the schedule is running (different from currentlyRunning)
+  archived?: boolean;                // whether the schedule has been archived (deleted) or not
+  currentlyRunning?: boolean;        // whether the job is currently running
   name: string;                      // name of the schedule
   id?: number;                       // schedule ID
   jobId?: number;                    // corresponds to job ID
@@ -122,7 +122,7 @@ export class Scheduler
         {
           for (const schedule of schedules)
           {
-            schedule.archived = 1;
+            schedule.archived = true;
             await this.cancelJob(schedule.id);
             return resolve(await App.DB.upsert(this.schedulerTable, schedule as object) as SchedulerConfig[]);
           }
@@ -164,7 +164,7 @@ export class Scheduler
         {
           for (const schedule of schedules)
           {
-            schedule.active = status;
+            schedule.active = status ? true : false;
             if (status === 0)
             {
               await this.cancelJob(schedule.id);
@@ -224,8 +224,8 @@ export class Scheduler
         jobId = 5;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
-      req.active = 1;
-      req.archived = 0;
+      req.active = true;
+      req.archived = false;
       req.jobId = jobId;
       req.paramsScheduleArr = packedParamsSchedule;
       const newScheduledJob: SchedulerConfig[] = await this.upsert(user, req);
@@ -259,8 +259,8 @@ export class Scheduler
     {
       if (req['jobId'] !== undefined && Object.keys(this.jobMap).indexOf((req['jobId'] as number).toString()) !== -1)
       {
-        req.active = 1;
-        req.archived = 0;
+        req.active = true;
+        req.archived = false;
         const newScheduledJob: SchedulerConfig[] = await this.upsert(user, req);
         const resultJobId: string = newScheduledJob[0]['id'] !== undefined ? (newScheduledJob[0]['id'] as any).toString() : '-1';
         const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[resultJobId]);
@@ -273,12 +273,11 @@ export class Scheduler
 
   public async get(id?: number, archived?: boolean): Promise<SchedulerConfig[]>
   {
-    const archivedInt: number = archived === true ? 1 : 0;
     if (id !== undefined)
     {
-      return App.DB.select(this.schedulerTable, [], { id, archived: archivedInt }) as any;
+      return App.DB.select(this.schedulerTable, [], { id, archived: archived }) as any;
     }
-    return App.DB.select(this.schedulerTable, [], { archived: archivedInt }) as any;
+    return App.DB.select(this.schedulerTable, [], { archived: archived }) as any;
   }
 
   public async initializeJobs(): Promise<void>
@@ -609,7 +608,7 @@ export class Scheduler
     const schedules: SchedulerConfig[] = await this.get() as SchedulerConfig[];
     for (const scheduleInd in schedules)
     {
-      if (schedules[scheduleInd].active !== undefined && schedules[scheduleInd].active === 1) // only start active schedules
+      if (schedules[scheduleInd].active) // only start active schedules
       {
         const schedule: SchedulerConfig = schedules[scheduleInd];
         const scheduleJobId: string = schedule['id'] !== undefined ? (schedule['id'] as number).toString() : '-1';
@@ -663,7 +662,7 @@ export class Scheduler
       if (schedules.length !== 0)
       {
         const schedule: SchedulerConfig = schedules[0];
-        schedule.currentlyRunning = status;
+        schedule.currentlyRunning = status ? true : false;
         return resolve(true);
       }
       return resolve(false);
@@ -714,12 +713,12 @@ export class Scheduler
         {
           for (const scheduleObj of schedules)
           {
-            if (scheduleObj.archived !== undefined && scheduleObj.archived === 1)
+            if (scheduleObj.archived)
             {
               return reject('Cannot upsert on an archived schedule.');
             }
             this.scheduleMap[(scheduleObj['id'] as number)].cancel();
-            if (scheduleObj.active === 1)
+            if (scheduleObj.active)
             {
               const resultJobId: string = schedule.id !== undefined ? (schedule['id'] as number).toString() : '-1';
               const appendedParamsArr: any[] = [schedule.paramsScheduleArr];
@@ -737,9 +736,9 @@ export class Scheduler
       }
       else
       {
-        schedule.active = schedule.active !== undefined ? schedule.active : 0;
-        schedule.archived = 0;
-        schedule.currentlyRunning = 0;
+        schedule.active = schedule.active !== undefined ? schedule.active : false;
+        schedule.archived = false;
+        schedule.currentlyRunning = false;
       }
       return resolve(await App.DB.upsert(this.schedulerTable, schedule) as SchedulerConfig[]);
     });

@@ -107,7 +107,8 @@ export class Tasty
    */
   public async execute(query: TastyQuery): Promise<object[]>
   {
-    const queryString = this.db.generate(query);
+  const queryString = this.db.generate(query);
+  console.log('t1');
     return this.db.execute(queryString);
   }
 
@@ -153,7 +154,10 @@ export class Tasty
     }
 
     const generatedQuery: string[] = this.db.generate(query);
-    return this.db.execute(generatedQuery);
+  console.log('t2');
+  let foo= await this.db.execute(generatedQuery);
+console.log(foo);
+  return foo;
   }
 
   /**
@@ -230,6 +234,8 @@ export class Tasty
       query.delete();
     }
     const queryString = this.db.generate(query);
+
+  console.log('t3');
     return this.db.execute(queryString);
   }
 

@@ -44,67 +44,83 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-const SQLQueries: Array<[string, [string]]> = [
-  [
-    'simple query (select all)',
-    [`SELECT * \n  FROM movies\n  LIMIT 1;`],
-  ],
+import * as winston from 'winston';
 
-/*  [
-    'simple query (select columns)',
-    [`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n  LIMIT 10;`],
-  ],
+import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
+import PostgresController from '../../../../src/database/pg/PostgreSQLController';
 
-  [
-    'simple query (filter equals)',
-    [`SELECT * \n  FROM movies\n  WHERE movies.movieid = 123;`],
-  ],
+import * as Tasty from '../../../../src/tasty/Tasty';
+import SQLQueries from '../../../tasty/SQLQueries';
+import * as Utils from '../../../Utils';
 
-  [
-    'simple query (filter doesNotEqual)',
-    [`SELECT * \n  FROM movies\n  WHERE movies.title <> 'Toy Story (1995)'\n  LIMIT 10;`],
-  ],
+function getExpectedFile(): string
+{
+  return __filename.split('.')[0] + '.expected';
+}
 
-  [
-    'simple query (sort asc)',
-    [`SELECT * \n  FROM movies\n  ORDER BY movies.title ASC\n  LIMIT 10;`],
-  ],
+const DBMovies: Tasty.Table = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+let tasty: Tasty.Tasty;
+let postgresController: PostgresController;
 
-  [
-    'simple query (sort desc)',
-    [`SELECT * \n  FROM movies\n  ORDER BY movies.title DESC\n  LIMIT 10;`],
-  ],
+beforeAll(async () =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  const config: PostgresConfig =
+    {
+      connectionLimit: 20,
+      database: 'moviesdb',
+      host: 'localhost',
+      password: 'r3curs1v3$',
+      user: 't3rr41n-demo',
+      dateStrings: true,
+    };
 
-  [
-    'simple query (take)',
-    [`SELECT * \n  FROM movies\n  LIMIT 10;`],
-  ],
+  try
+  {
+    postgresController = new PostgresController(config, 0, 'PostgresExecutorTests');
+    tasty = postgresController.getTasty();
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+});
 
-  [
-    'simple query (skip)',
-    [`SELECT * \n  FROM movies\n  LIMIT 10 OFFSET 20;`],
-  ],
+function runTest(index: number)
+{
+  const testName: string = 'Postgres: execute ' + SQLQueries[index][0];
+  test(testName, async (done) =>
+  {
+    try
+    {
+      const results = await tasty.getDB().execute(SQLQueries[index][1]);
+      console.log("RESULTS:");
+      console.log(results);
+      exit();
+      await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
+    }
+    catch (e)
+    {
+      fail(e);
+    }
+    done();
+  });
+}
 
-  [
-    'simple query (upsert)',
-    [`REPLACE \n  INTO movies (movieid, releasedate, title) VALUES (13371337, '2017-01-01', 'My New Movie');`],
-  ],
+for (let i = 0; i < SQLQueries.length; i++)
+{
+  runTest(i);
+}
 
-  [
-    'simple query (delete)',
-    [`DELETE \n  FROM movies\n  WHERE movies.movieid = 13371337;`],
-  ],
-
-  [
-    'complex query',
-    [
-      `SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies
-  WHERE movies.movieid <> 2134\n     AND movies.releasedate >= '2007-03-24'
-     AND movies.releasedate < '2017-03-24'
-  ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC
-  LIMIT 10 OFFSET 20;`,
-    ],
-    ],*/
-];
-
-export default SQLQueries;
+afterAll(async () =>
+{
+  try
+  {
+    await tasty.destroy();
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+});

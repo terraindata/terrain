@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as pg from 'pg';
 
-import SQLGenerator from '../../../tasty/SQLGenerator';
+import PostgreSQLGenerator from '../../../tasty/PostgreSQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
@@ -57,6 +57,9 @@ import PostgreSQLClient from '../client/PostgreSQLClient';
 
 export class PostgreSQLDB implements TastyDB
 {
+  public falseValue: string = 'false';
+  public trueValue: string = 'true';
+
   private client: PostgreSQLClient;
 
   constructor(client: PostgreSQLClient)
@@ -69,7 +72,7 @@ export class PostgreSQLDB implements TastyDB
    */
   public generateQuery(query: TastyQuery, placeholder: boolean): [string[], any[][]]
   {
-    const generator = new SQLGenerator();
+    const generator = new PostgreSQLGenerator();
     if (query.command.tastyType === TastyNodeTypes.select || query.command.tastyType === TastyNodeTypes.delete)
     {
       generator.generateSelectQuery(query, placeholder);
@@ -115,8 +118,10 @@ export class PostgreSQLDB implements TastyDB
       {
         this.client.query(statement, [], makePromiseCallback(resolve, reject));
       });
+      console.log('result:');
+      console.log(JSON.stringify(result['rows']));
 
-      results = results.concat(result);
+      results = results.concat(result['rows']);
     }
     return results;
   }

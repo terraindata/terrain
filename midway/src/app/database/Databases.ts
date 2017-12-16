@@ -95,7 +95,7 @@ export class Databases
 
   public async delete(user: UserConfig, id: number): Promise<object>
   {
-    if (user.isSuperUser === 0)
+    if (!user.isSuperUser)
     {
       throw new Error('Only superusers can delete databases.');
     }
@@ -136,6 +136,10 @@ export class Databases
       }
 
       db = Util.updateObject(results[0], db);
+    } else {
+      const results: DatabaseConfig[] = await this.get();
+      console.log('how many DBs? ' + results.length);
+      db.id = results.length + 1;
     }
 
     if (db.isAnalytics === undefined)

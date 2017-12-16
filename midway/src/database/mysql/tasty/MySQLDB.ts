@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as mysql from 'mysql';
 
-import SQLGenerator from '../../../tasty/SQLGenerator';
+import SQLGenerator from '../../../tasty/MySQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
@@ -57,6 +57,9 @@ import MySQLClient from '../client/MySQLClient';
 
 export class MySQLDB implements TastyDB
 {
+  public falseValue: string = '0';
+  public trueValue: string = '1';
+
   private client: MySQLClient;
 
   constructor(client: MySQLClient)

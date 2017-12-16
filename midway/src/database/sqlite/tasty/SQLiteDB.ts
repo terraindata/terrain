@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import SQLGenerator from '../../../tasty/SQLGenerator';
+import SQLGenerator from '../../../tasty/MySQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
@@ -58,6 +58,9 @@ export type Config = SQLiteConfig;
 
 export class SQLiteDB implements TastyDB
 {
+  public falseValue: string = '0';
+  public trueValue: string = '1';
+
   private client: SQLiteClient;
 
   constructor(client: SQLiteClient)

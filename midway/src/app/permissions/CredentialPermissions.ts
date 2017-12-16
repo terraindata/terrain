@@ -52,7 +52,7 @@ export class CredentialPermissions
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (user.isSuperUser === 0)
+      if (!user.isSuperUser)
       {
         return reject('User must be a super user.');
       }

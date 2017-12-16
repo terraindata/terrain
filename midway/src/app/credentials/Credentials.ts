@@ -119,10 +119,16 @@ export class Credentials
   {
     return new Promise<string[]>(async (resolve, reject) =>
     {
-      const creds: CredentialConfig[] = await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[];
+    const creds: CredentialConfig[] = await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[];
+    console.log('creds');
+    console.log(creds);
+    console.log('that was creds');
       return resolve(await Promise.all(creds.map(async (cred) =>
       {
-        return await this._decrypt(cred.meta);
+      let fo= await this._decrypt(cred.meta);
+      console.log('fo');
+      console.log(fo);
+      return fo;
       })));
     });
   }
@@ -148,10 +154,14 @@ export class Credentials
 
   public async initializeLocalFilesystemCredential(): Promise<void>
   {
-    const userExists = await users.select(['id'], { email: 'admin@terraindata.com' });
+  const userExists = await users.select(['id'], { email: 'admin@terraindata.com' });
+  console.log('user existsssss');
+  console.log(userExists);
     if (userExists.length !== 0)
     {
-      const localConfigs: string[] = await this.getByType('local');
+    const localConfigs: string[] = await this.getByType('local');
+    console.log('local confgssss');
+    console.log(localConfigs);
       if (localConfigs.length === 0)
       {
         const seedUser = userExists[0];
@@ -173,7 +183,7 @@ export class Credentials
     return new Promise<CredentialConfig>(async (resolve, reject) =>
     {
       // check privileges
-      if (user.isSuperUser === 0)
+      if (!user.isSuperUser)
       {
         return reject('Cannot create/update credentials as non-super user.');
       }
@@ -211,6 +221,8 @@ export class Credentials
       {
         cred.createdBy = user.id !== undefined ? user.id : -1;
         cred.meta = await this._encrypt(cred.meta);
+        const results: CredentialConfig[] = await this.get();
+        cred.id = results.length + 1;
       }
       let newCredObj: object = await App.DB.upsert(this.credentialTable, cred) as object;
 

@@ -95,6 +95,9 @@ function runTest(index: number)
     try
     {
       const results = await tasty.getDB().execute(SQLQueries[index][1]);
+      console.log("RESULTS:");
+      console.log(results);
+      exit();
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
     }
     catch (e)
@@ -109,47 +112,6 @@ for (let i = 0; i < SQLQueries.length; i++)
 {
   runTest(i);
 }
-
-test('MySQL: schema', async (done) =>
-{
-  try
-  {
-    const result = await tasty.schema();
-    await Utils.checkResults(getExpectedFile(), 'MySQL: schema', result);
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-  done();
-});
-
-test('MySQL: upsert', async (done) =>
-{
-  try
-  {
-    const movies: object[] = [];
-    movies[0] = { title: 'Arrival', releasedate: new Date('01/01/17') };
-    movies[1] = { title: "Schindler's List", releasedate: new Date('01/01/17') };
-    movies[2] = {
-      movieid: 232323, title: 'Guardians of the Galaxy 2',
-      releasedate: new Date('04/04/17').toISOString().substring(0, 10),
-    };
-
-    const results: any = await tasty.upsert(DBMovies, movies);
-    expect(results).not.toBeUndefined();
-    for (let i = 0; i < results.length; i++)
-    {
-      expect(results[i]).toMatchObject(movies[i]);
-      expect(results[i]['movieid']).toBeGreaterThan(0);
-    }
-  }
-  catch (e)
-  {
-    fail(e);
-  }
-  done();
-});
 
 afterAll(async () =>
 {

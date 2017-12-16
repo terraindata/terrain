@@ -139,7 +139,7 @@ export class ImportTemplates
         {
           return reject('Invalid template id passed');
         }
-        if (user.isSuperUser !== 1)
+        if (!user.isSuperUser)
         {
           return reject('Insufficient Permissions');
         }

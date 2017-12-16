@@ -57,6 +57,9 @@ import ElasticQuery from './ElasticQuery';
 
 export class ElasticDB implements TastyDB
 {
+  public falseValue: string = 'false';
+  public trueValue: string = 'true';
+
   private client: ElasticClient;
 
   constructor(client: ElasticClient)
