@@ -219,6 +219,11 @@ export class Items
 
         item = Util.updateObject(items[0], item);
       }
+      else
+      {
+        const items: ItemConfig[] = await this.get();
+        item.id = items.length + 1;
+      }
 
       resolve(await App.DB.upsert(this.itemTable, item) as ItemConfig);
     });

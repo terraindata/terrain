@@ -94,6 +94,8 @@ export class Versions
         objectId: id,
         objectType: type,
       };
+    const results = await this.get();
+    newVersion.id = results.length + 1;
     return App.DB.upsert(this.versionTable, newVersion) as Promise<VersionConfig>;
   }
 
