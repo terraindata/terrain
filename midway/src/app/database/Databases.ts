@@ -52,24 +52,12 @@ import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Scripts from '../../scripts/Scripts';
 import { metrics } from '../events/EventRouter';
-import { UserConfig } from '../users/UserRouter';
+import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
+import DatabaseConfig from './DatabaseConfig';
 
 // CREATE TABLE databases (id integer PRIMARY KEY, name text NOT NULL, type text NOT NULL, \
 // dsn text NOT NULL, status text, isAnalytics bool NOT NULL, analyticsIndex text, analyticsType text);
-
-export interface DatabaseConfig
-{
-  id?: number;
-  name: string;
-  type: string;
-  dsn: string;
-  host: string;
-  status?: string;
-  isAnalytics: boolean;
-  analyticsIndex?: string;
-  analyticsType?: string;
-}
 
 export class Databases
 {
@@ -104,7 +92,12 @@ export class Databases
 
   public async select(columns: string[], filter?: object): Promise<DatabaseConfig[]>
   {
-    return App.DB.select(this.databaseTable, columns, filter) as Promise<DatabaseConfig[]>;
+    return new Promise<DatabaseConfig[]>(async (resolve, reject) =>
+    {
+      const rawResults = await App.DB.select(this.databaseTable, columns, filter);
+      const results: DatabaseConfig[] = rawResults.map((result: object) => new DatabaseConfig(result));
+      resolve(results);
+    });
   }
 
   public async get(id?: number, fields?: string[]): Promise<DatabaseConfig[]>
@@ -138,7 +131,6 @@ export class Databases
       db = Util.updateObject(results[0], db);
     } else {
       const results: DatabaseConfig[] = await this.get();
-      console.log('how many DBs? ' + results.length);
       db.id = results.length + 1;
     }
 

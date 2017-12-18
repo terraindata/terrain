@@ -57,9 +57,6 @@ import PostgreSQLClient from '../client/PostgreSQLClient';
 
 export class PostgreSQLDB implements TastyDB
 {
-  public falseValue: string = 'false';
-  public trueValue: string = 'true';
-
   private client: PostgreSQLClient;
 
   constructor(client: PostgreSQLClient)
@@ -97,10 +94,8 @@ export class PostgreSQLDB implements TastyDB
 
   public async schema(): Promise<TastySchema>
   {
-    const result = await this.execute(
-      ['SELECT table_schema, table_name, column_name, data_type ' +
-        'FROM information_schema.columns ' +
-        'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'PostgreSQL\', \'sys\');']);
+    // TODO Implement when/if PostreSQL DBs are made visible in the schema browser
+    const result = null;
     return TastySchema.fromSQLResultSet(result);
   }
 
@@ -118,8 +113,6 @@ export class PostgreSQLDB implements TastyDB
       {
         this.client.query(statement, [], makePromiseCallback(resolve, reject));
       });
-      console.log('result:');
-      console.log(JSON.stringify(result['rows']));
 
       results = results.concat(result['rows']);
     }

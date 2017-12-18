@@ -49,22 +49,14 @@ import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import { UserConfig } from '../users/Users';
+import MetricConfig from '../events/MetricConfig';
+import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
+import ItemConfig from './ItemConfig';
 
 // CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
 // parent integer, status text, type text);
-
-export interface ItemConfig
-{
-  id?: number;
-  meta?: string;
-  name: string;
-  parent?: number;
-  status?: string;
-  type?: string;
-}
 
 export class Items
 {
@@ -93,7 +85,12 @@ export class Items
 
   public async select(columns: string[], filter: object): Promise<ItemConfig[]>
   {
-    return App.DB.select(this.itemTable, columns, filter) as Promise<ItemConfig[]>;
+    return new Promise<ItemConfig[]>(async (resolve, reject) =>
+    {
+      const rawResults = await App.DB.select(this.itemTable, columns, filter);
+      const results: ItemConfig[] = rawResults.map((result: object) => new ItemConfig(result));
+      resolve(results);
+    });
   }
 
   public async get(id?: number): Promise<ItemConfig[]>

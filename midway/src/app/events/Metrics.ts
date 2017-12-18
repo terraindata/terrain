@@ -49,16 +49,10 @@ import * as winston from 'winston';
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../Util';
+import MetricConfig from './MetricConfig';
+import UserConfig from "../users/UserConfig";
 
 // CREATE TABLE metrics (id integer PRIMARY KEY, database integer NOT NULL, label text NOT NULL, events text NOT NULL)
-
-export interface MetricConfig
-{
-  id?: number;
-  database: number;
-  label: string;
-  events: string;
-}
 
 export class Metrics
 {
@@ -127,7 +121,12 @@ export class Metrics
 
   public async select(columns: string[], filter: object): Promise<MetricConfig[]>
   {
-    return App.DB.select(this.metricsTable, columns, filter) as Promise<MetricConfig[]>;
+    return new Promise<MetricConfig[]>(async (resolve, reject) =>
+    {
+      const rawResults = await App.DB.select(this.metricsTable, columns, filter);
+      const results: MetricConfig[] = rawResults.map((result: object) => new MetricConfig(result));
+      resolve(results);
+    });
   }
 }
 

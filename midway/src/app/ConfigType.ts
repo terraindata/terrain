@@ -44,82 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as winston from 'winston';
-import { CmdLineUsage } from './CmdLineArgs';
-import DatabaseConfig from './database/DatabaseConfig';
-import { databases } from './database/DatabaseRouter';
-import UserConfig from './users/UserConfig';
-import * as Util from './Util';
-
-export interface Config
-{
-  config?: string;
-  port?: number;
-  db?: string;
-  dsn?: string;
-  debug?: boolean;
-  help?: boolean;
-  verbose?: boolean;
-  databases?: object[];
-  analyticsdb?: string;
-}
-
-export function loadConfigFromFile(config: Config): Config
-{
-  // load options from a configuration file, if specified.
-  if (config.config !== undefined)
+export class ConfigType {
+  public static initialize(obj: object, props: object)
   {
-    try
+    for (const key of Object.keys(obj))
     {
-      const settings = fs.readFileSync(config.config, 'utf8');
-      const cfgSettings = JSON.parse(settings);
-      config = Util.updateObject(config, cfgSettings);
-    }
-    catch (e)
-    {
-      winston.error('Failed to read configuration settings from ' + String(config.config));
-    }
-  }
-  return config;
-}
-
-export async function handleConfig(config: Config): Promise<void>
-{
-  winston.debug('Using configuration: ' + JSON.stringify(config));
-  if (config.help === true)
-  {
-    // tslint:disable-next-line
-    console.log(CmdLineUsage);
-    process.exit();
-  }
-
-  if (config.verbose === true)
-  {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'verbose';
-  }
-
-  if (config.debug === true)
-  {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'debug';
-  }
-
-  if (config.databases !== undefined)
-  {
-    const results = await databases.select(['id'], {});
-    if (results.length === 0)
-    {
-      for (const database of config.databases)
+      if (props.hasOwnProperty(key))
       {
-        const db = database as DatabaseConfig;
-        db.status = 'DISCONNECTED';
-        winston.info('Registering new database item: ', db);
-        await databases.upsert({} as UserConfig, db);
+        obj[key] = props[key];
+      }
+      else if (props.hasOwnProperty(key.toLowerCase()))
+      {
+        obj[key] = props[key.toLowerCase()];
       }
     }
   }
 }
 
-export default Config;
+export default ConfigType;

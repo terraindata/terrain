@@ -54,7 +54,8 @@ import * as sha1 from 'sha1';
 import { exportTemplates } from './io/templates/ExportTemplateRouter';
 import { importTemplates } from './io/templates/ImportTemplateRouter';
 import { ImportTemplateConfig } from './io/templates/ImportTemplates';
-import { UserConfig, Users } from './users/Users';
+import UserConfig from './users/UserConfig';
+import Users from './users/Users';
 
 const users = new Users();
 

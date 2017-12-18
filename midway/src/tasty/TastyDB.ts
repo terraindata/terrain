@@ -50,9 +50,6 @@ import TastyTable from './TastyTable';
 
 abstract class TastyDB
 {
-  public abstract falseValue: string;
-  public abstract trueValue: string;
-
   /**
    * makes a database specific query from a TastyQuery
    *

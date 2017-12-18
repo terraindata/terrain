@@ -51,39 +51,10 @@ import srs = require('secure-random-string');
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../Util';
-import {User} from "../../../../src/app/users/UserTypes";
+import UserConfig from './UserConfig';
 
 // CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL
 // , isSuperUser bool NOT NULL, name text NOT NULL, oldPassword text, password text NOT NULL, timezone string)
-
-export class UserConfig
-{
-  public accessToken?: string = undefined;
-  public email: string = '';
-  public id?: number = undefined;
-  public isDisabled: boolean = true;
-  public isSuperUser: boolean = false;
-  public name: string = '';
-  public oldPassword?: string = undefined;
-  public password: string = '';
-  public timezone?: string = undefined;
-  public meta?: string = undefined;
-
-  constructor(props: object)
-  {
-    for (const key of Object.keys(this))
-    {
-      if (props.hasOwnProperty(key))
-      {
-        this[key] = props[key];
-      }
-      else if (props.hasOwnProperty(key.toLowerCase()))
-      {
-        this[key] = props[key.toLowerCase()];
-      }
-    }
-  }
-}
 
 export class Users
 {
@@ -205,7 +176,7 @@ export class Users
     return new Promise<UserConfig[]>(async (resolve, reject) =>
     {
       const rawResults = await App.DB.select(this.userTable, columns, filter);
-      const results = rawResults.map((result: object) => new UserConfig(result));
+      const results: UserConfig[] = rawResults.map((result: object) => new UserConfig(result));
       resolve(results);
     });
   }

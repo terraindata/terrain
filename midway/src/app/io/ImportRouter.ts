@@ -51,7 +51,7 @@ import * as winston from 'winston';
 
 import { HA } from '../App';
 import { Permissions } from '../permissions/Permissions';
-import { UserConfig } from '../users/Users';
+import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import { Import } from './Import';
 import ImportTemplateRouter from './templates/ImportTemplateRouter';

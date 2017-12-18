@@ -44,82 +44,30 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
-import * as winston from 'winston';
-import { CmdLineUsage } from './CmdLineArgs';
-import DatabaseConfig from './database/DatabaseConfig';
-import { databases } from './database/DatabaseRouter';
-import UserConfig from './users/UserConfig';
-import * as Util from './Util';
+import ConfigType from '../ConfigType';
 
-export interface Config
+export class SchedulerConfig extends ConfigType
 {
-  config?: string;
-  port?: number;
-  db?: string;
-  dsn?: string;
-  debug?: boolean;
-  help?: boolean;
-  verbose?: boolean;
-  databases?: object[];
-  analyticsdb?: string;
-}
+  public active?: boolean = undefined;                  // whether the schedule is running (different from currentlyRunning)
+  public archived?: boolean = undefined;                // whether the schedule has been archived (deleted) or not
+  public currentlyRunning?: boolean = undefined;        // whether the job is currently running
+  public name: string = '';                             // name of the schedule
+  public id?: number = undefined;                       // schedule ID
+  public jobId?: number = undefined;                    // corresponds to job ID
+  public jobType?: string = undefined;                  // import or export etc.
+  public paramsJob?: object = undefined;                // parameters passed for the job, excluding info like filename
+  public paramsScheduleArr?: any[] = undefined;         // parameters passed for the schedule
+  public paramsScheduleStr?: string = undefined;        // JSON stringified representation of paramsScheduleArr
+  public schedule: string = '';                         // cronjob format for when the schedule should run
+  public sort?: string = undefined;                     // for regex expression file matching, which end of the list should be used
+  public transport?: object = undefined;                // sftp and relevant parameters, https, local filesystem, etc.
+  public transportStr?: string = undefined;             // JSON stringified representation of transport
 
-export function loadConfigFromFile(config: Config): Config
-{
-  // load options from a configuration file, if specified.
-  if (config.config !== undefined)
+  constructor(props: object)
   {
-    try
-    {
-      const settings = fs.readFileSync(config.config, 'utf8');
-      const cfgSettings = JSON.parse(settings);
-      config = Util.updateObject(config, cfgSettings);
-    }
-    catch (e)
-    {
-      winston.error('Failed to read configuration settings from ' + String(config.config));
-    }
-  }
-  return config;
-}
-
-export async function handleConfig(config: Config): Promise<void>
-{
-  winston.debug('Using configuration: ' + JSON.stringify(config));
-  if (config.help === true)
-  {
-    // tslint:disable-next-line
-    console.log(CmdLineUsage);
-    process.exit();
-  }
-
-  if (config.verbose === true)
-  {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'verbose';
-  }
-
-  if (config.debug === true)
-  {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'debug';
-  }
-
-  if (config.databases !== undefined)
-  {
-    const results = await databases.select(['id'], {});
-    if (results.length === 0)
-    {
-      for (const database of config.databases)
-      {
-        const db = database as DatabaseConfig;
-        db.status = 'DISCONNECTED';
-        winston.info('Registering new database item: ', db);
-        await databases.upsert({} as UserConfig, db);
-      }
-    }
+    super();
+    ConfigType.initialize(this, props);
   }
 }
 
-export default Config;
+export default SchedulerConfig;

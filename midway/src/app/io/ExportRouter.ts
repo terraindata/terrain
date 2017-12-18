@@ -52,7 +52,6 @@ import * as winston from 'winston';
 
 import { HA } from '../App';
 import { Permissions } from '../permissions/Permissions';
-import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { Export, ExportConfig } from './Export';
 import ExportTemplateRouter from './templates/ExportTemplateRouter';

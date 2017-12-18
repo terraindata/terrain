@@ -49,7 +49,7 @@ import * as winston from 'winston';
 
 import * as Tasty from '../../../tasty/Tasty';
 import * as App from '../../App';
-import { UserConfig } from '../../users/UserRouter';
+import UserConfig from '../../users/UserConfig';
 import * as Util from '../../Util';
 import { TemplateBase, TemplateBaseStringified } from './Templates';
 

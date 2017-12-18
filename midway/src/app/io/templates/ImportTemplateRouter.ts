@@ -50,9 +50,9 @@ import * as winston from 'winston';
 
 import { FieldTypes } from '../../../../../shared/etl/FieldTypes';
 import { Permissions } from '../../permissions/Permissions';
-import { UserConfig } from '../../users/Users';
 import * as Util from '../../Util';
 
+import UserConfig from '../../users/UserConfig';
 import { Import } from '../Import';
 import { ImportTemplateConfig, ImportTemplates } from './ImportTemplates';
 

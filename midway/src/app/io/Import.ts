@@ -62,7 +62,7 @@ import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import { ItemConfig, Items } from '../items/Items';
+import Items from '../items/Items';
 import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
 import { ImportTemplateConfig, ImportTemplates } from './templates/ImportTemplates';

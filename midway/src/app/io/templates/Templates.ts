@@ -49,7 +49,6 @@ import * as winston from 'winston';
 import * as Tasty from '../../../tasty/Tasty';
 import * as App from '../../App';
 
-import { UserConfig } from '../../users/UserRouter';
 import * as Util from '../../Util';
 
 export interface TemplateBase

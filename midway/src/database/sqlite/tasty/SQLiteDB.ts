@@ -58,9 +58,6 @@ export type Config = SQLiteConfig;
 
 export class SQLiteDB implements TastyDB
 {
-  public falseValue: string = '0';
-  public trueValue: string = '1';
-
   private client: SQLiteClient;
 
   constructor(client: SQLiteClient)

@@ -57,9 +57,6 @@ import MySQLClient from '../client/MySQLClient';
 
 export class MySQLDB implements TastyDB
 {
-  public falseValue: string = '0';
-  public trueValue: string = '1';
-
   private client: MySQLClient;
 
   constructor(client: MySQLClient)
