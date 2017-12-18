@@ -61,16 +61,17 @@ const Actions =
       $(ActionTypes.change, { user }),
 
     fetch:
-    () =>
-      $(ActionTypes.fetch, { setUsers: Actions.setUsers }),
+    () => (dispatch) =>
+      dispatch($(ActionTypes.fetch, { setUsers: Actions.setUsers, dispatch })),
 
     setUsers:
-    (users: UserTypes.UserMap) =>
-      $(ActionTypes.setUsers, { users }),
+    (users: UserTypes.UserMap) => (dispatch, getState) =>
+      dispatch($(ActionTypes.setUsers, { users, currentUserId: getState().get('auth').id })),
 
     updateCurrentUser:
     () =>
-      $(ActionTypes.updateCurrentUser, {}),
+      (dispatch, getState) =>
+        $(ActionTypes.updateCurrentUser, { id: getState().get('auth').id }),
 
     copmleteTutorial:
     (stepId: string, complete: boolean = true) =>
@@ -81,9 +82,6 @@ const Actions =
       $(ActionTypes.changeType, { type }),
 
   };
-
-import AuthStore from './../../auth/data/AuthStore';
-AuthStore.subscribe(Actions.updateCurrentUser);
 
 // TODO remove when no longer needed
 window['completeTutorial'] = Actions.copmleteTutorial;

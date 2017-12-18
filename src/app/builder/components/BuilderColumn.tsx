@@ -57,8 +57,6 @@ import './BuilderColumn.less';
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
 import RolesStore from '../../roles/data/RolesStore';
-import UserStore from '../../users/data/UserStore';
-import Util from '../../util/Util';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
@@ -73,6 +71,7 @@ import CardsColumn from './cards/CardsColumn';
 import TuningColumn from './cards/TuningColumn';
 import InputsArea from './inputs/InputsArea';
 import ResultsColumn from './results/ResultsColumn';
+import Util from 'util/Util';
 
 const SplitScreenIcon = require('./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -180,7 +179,6 @@ const BuilderColumn = createReactClass<any, any>(
     {
       // TODO fix
       const rejigger = () => this.setState({ rand: Math.random() });
-      this.unsubUser = UserStore.subscribe(rejigger);
       this.unsubRoles = RolesStore.subscribe(rejigger);
 
       this.props.colorsActions({
@@ -200,9 +198,16 @@ const BuilderColumn = createReactClass<any, any>(
       });
     },
 
+    componentWillReceiveProps(nextProps)
+    {
+      if (this.props.users !== nextProps.users)
+      {
+        this.setState({ rand: Math.random() });
+      }
+    },
+
     componentWillUnmount()
     {
-      this.unsubUser && this.unsubUser();
       this.unsubRoles && this.unsubRoles();
     },
 
@@ -448,9 +453,9 @@ const BuilderColumn = createReactClass<any, any>(
   },
 );
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   BuilderColumn,
-  [],
+  ['auth'],
   {
     colorsActions: ColorsActions,
   },

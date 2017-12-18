@@ -43,18 +43,75 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import Actions from 'auth/data/AuthActions';
+import ActionTypes from 'auth/data/AuthActionTypes';
+import { _AuthState, AuthState } from 'auth/AuthTypes';
+import * as Immutable from 'immutable';
+import { Ajax, createMockStore } from '../../helpers';
 
-// tslint:disable:no-var-requires
+const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
-import * as _ from 'lodash';
-const Redux = require('redux');
-import * as ReduxActions from 'redux-actions';
-import * as AuthTypes from '../AuthTypes';
+const loginResponse =
+{
+  "accessToken": "valid_access_token",
+  "id": 1,
+};
 
-import AuthReducers from './AuthReducers';
+const logoutResponse =
+{
+  accessToken: "",
+  email: "luser@terraindata.com",
+  id: 1,
+  isDisabled: 0,
+  isSuperUser: 1,
+  meta: "{}",
+  name: "Terrain Admin",
+  oldPassword: null,
+  password: "$2a$10$HWMqhIOEnaVwmaT5R3trBuuutBGq0ljGbdCMv6s0sZfyT7vCo.JSO",
+  timezone: "",
+};
 
-const AuthStore: IStore<AuthTypes.AuthState> = Redux.createStore(ReduxActions.handleActions(_.extend({} as any,
-  AuthReducers,
-  {}), AuthTypes._AuthState()), AuthTypes._AuthState());
+const mockStore = createMockStore();
 
-export default AuthStore;
+describe('AuthActions', () =>
+{
+  const auth: AuthState = _AuthState();
+  const schema: AuthState = _AuthState({
+    id: 1,
+    accessToken: 'valid_access_token',
+  });
+
+  describe('#login', () =>
+  {
+    it('should create a login action', () => {
+      const expectedActions = [
+        {
+          type: 'login',
+          payload: { id: 2, accessToken: 'another_valid_token' },
+        },
+      ];
+
+      const store = mockStore(Immutable.Map({ auth }));
+
+      store.dispatch(Actions.login('another_valid_token', 2));
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+
+  describe('#logout', () =>
+  {
+    it('should create a logout action', () => {
+      const expectedActions = [
+        {
+          type: 'logout',
+          payload: null,
+        },
+      ];
+
+      const store = mockStore(Immutable.Map({ auth }));
+
+      store.dispatch(Actions.logout());
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+});

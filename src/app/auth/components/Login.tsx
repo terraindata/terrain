@@ -55,6 +55,7 @@ import Ajax from '../../util/Ajax';
 import Actions from '../data/AuthActions';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
+import Util from 'util/Util';
 import './Login.less';
 
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
@@ -66,6 +67,7 @@ export interface Props
   appStateLoaded: boolean;
   loggedIn: boolean;
   onLoadComplete: () => void;
+  authActions?: typeof Actions;
 }
 
 @Radium
@@ -193,7 +195,7 @@ class Login extends TerrainComponent<Props>
 
         (userData: { accessToken: string, id: number }) =>
         {
-          Actions.login(userData.accessToken, userData.id);
+          this.props.authActions.login(userData.accessToken, userData.id);
         },
 
         (ev: Event) =>
@@ -231,6 +233,7 @@ class Login extends TerrainComponent<Props>
   {
     // show loading if you are logging in, or if you are already logged in
     //  but the app state is still loading
+
     const loading = (this.state.loggingIn && !this.props.loggedIn) ||
       (this.props.loggedIn && !this.props.appStateLoaded);
     return (
@@ -377,4 +380,8 @@ class Login extends TerrainComponent<Props>
 //   </div>
 // </div>
 
-export default Login;
+export default Util.createTypedContainer(
+  Login,
+  ['auth'],
+  { authActions: Actions }
+);

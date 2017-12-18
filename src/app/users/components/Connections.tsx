@@ -54,9 +54,9 @@ import FadeInOut from 'common/components/FadeInOut';
 import Switch from 'common/components/Switch';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { SchemaState } from 'schema/SchemaTypes';
+import { AuthState } from 'auth/AuthTypes';
 import Util from 'util/Util';
 import BackendInstance from '../../../database/types/BackendInstance';
-import AuthStore from '../../auth/data/AuthStore';
 import CreateItem from '../../common/components/CreateItem';
 import Dropdown from '../../common/components/Dropdown';
 import InfoArea from '../../common/components/InfoArea';
@@ -64,7 +64,6 @@ import Modal from '../../common/components/Modal';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Ajax from '../../util/Ajax';
 import UserActions from '../data/UserActions';
-import UserStore from '../data/UserStore';
 import * as UserTypes from '../UserTypes';
 
 const CloseIcon = require('../../../images/icon_close_8x8.svg');
@@ -87,20 +86,26 @@ export interface Props
   children?: any;
   // injected props
   schema?: SchemaState;
+  auth?: AuthState;
+  users?: UserTypes.UserState;
+  userActions?: typeof UserActions;
+}
+
+export interface State
+{
+  typeIndex: number,
+  loading: boolean,
+  servers: Server[],
+  expanded: Map<number, boolean>,
+  addingConnection: boolean,
+  errorModalOpen: boolean,
+  errorModalMessage: string,
+  analyticsEnabled: number,
 }
 
 class Connections extends TerrainComponent<Props>
 {
-  public state: {
-    typeIndex: number,
-    loading: boolean,
-    servers: Server[],
-    expanded: Map<number, boolean>,
-    addingConnection: boolean,
-    errorModalOpen: boolean,
-    errorModalMessage: string,
-    analyticsEnabled: number,
-  } = {
+  public state: State = {
     typeIndex: 0,
     loading: true,
     servers: null,
@@ -349,13 +354,13 @@ class Connections extends TerrainComponent<Props>
     });
 
     const type = this.ConnectionTypes.get(index);
-    UserActions.changeType(type);
+    this.props.userActions.changeType(type);
   }
 
   public renderAddConnection()
   {
-    const userId = AuthStore.getState().id;
-    const user = UserStore.getState().getIn(['users', userId]) as UserTypes.User;
+    const userId = this.props.auth.id;
+    const user = this.props.users.users.get(userId) as UserTypes.User;
 
     if (user && user.isSuperUser)
     {
@@ -504,6 +509,6 @@ class Connections extends TerrainComponent<Props>
 
 export default Util.createTypedContainer(
   Connections,
-  ['schema'],
-  {},
+  ['auth', 'schema', 'users'],
+  { userActions: UserActions },
 );

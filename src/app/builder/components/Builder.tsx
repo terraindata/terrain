@@ -66,7 +66,6 @@ import { LibraryStore } from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesStore from '../../roles/data/RolesStore';
 import TerrainStore from '../../store/TerrainStore';
-import UserStore from '../../users/data/UserStore';
 import Util from './../../util/Util';
 import Actions from './../data/BuilderActions';
 import { BuilderState, BuilderStore } from './../data/BuilderStore';
@@ -84,6 +83,7 @@ import BuilderColumn from './BuilderColumn';
 import LayoutManager from './layout/LayoutManager';
 import { TabAction, Tabs } from './layout/Tabs';
 import ResultsManager from './results/ResultsManager';
+import { UserState } from 'users/UserTypes';
 
 const NewIcon = require('./../../../images/icon_new_21x17.svg?name=NewIcon');
 const OpenIcon = require('./../../../images/icon_open_11x10.svg?name=OpenIcon');
@@ -98,6 +98,7 @@ export interface Props
   location?: any;
   router?: any;
   route?: any;
+  users?: UserState;
 }
 
 class Builder extends TerrainComponent<Props>
@@ -532,6 +533,8 @@ class Builder extends TerrainComponent<Props>
     {
       return false;
     }
+
+    const { users } = this.props;
     const algorithm = this.getAlgorithm();
     if (algorithm)
     {
@@ -540,8 +543,8 @@ class Builder extends TerrainComponent<Props>
         return false;
       }
       if (
-        !Util.haveRole(algorithm.categoryId, 'builder', UserStore, RolesStore)
-        && !Util.haveRole(algorithm.categoryId, 'admin', UserStore, RolesStore)
+        !Util.haveRole(algorithm.categoryId, 'builder', users, RolesStore)
+        && !Util.haveRole(algorithm.categoryId, 'admin', users, RolesStore)
       )
       {
         // not auth
@@ -615,9 +618,10 @@ class Builder extends TerrainComponent<Props>
 
   public canEdit(): boolean
   {
+    const { users } = this.props;
     const algorithm = this.getAlgorithm();
     return algorithm && (algorithm.status === ItemStatus.Build
-      && Util.canEdit(algorithm, UserStore, RolesStore));
+      && Util.canEdit(algorithm, users, RolesStore));
   }
 
   public cantEditReason(): string
@@ -966,4 +970,9 @@ class Builder extends TerrainComponent<Props>
     );
   }
 }
-export default withRouter(DragDropContext(HTML5Backend)(Builder));
+const BuilderContainer = Util.createTypedContainer(
+  Builder,
+  ['users'],
+  {},
+);
+export default withRouter(DragDropContext(HTML5Backend)(BuilderContainer));

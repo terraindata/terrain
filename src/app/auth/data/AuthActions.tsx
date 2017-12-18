@@ -44,15 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import ActionTypes from './AuthActionTypes';
-import Store from './AuthStore';
 
-const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
+const $ = (type: string, payload: any) =>
+{
+  return { type, payload };
+}
 
 const AuthActions =
   {
     login:
     (accessToken: string, id: number) =>
       $(ActionTypes.login, { accessToken, id }),
+
     logout:
     () =>
       $(ActionTypes.logout, null),

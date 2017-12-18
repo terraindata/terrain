@@ -47,38 +47,44 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions no-unused-expression
 
 import * as React from 'react';
-import AuthStore from './../../auth/data/AuthStore';
 import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
-import UserStore from './../data/UserStore';
 import * as UserTypes from './../UserTypes';
 const CameraIcon = require('./../../../images/icon_camera.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg');
 import { browserHistory } from 'react-router';
+import Util from 'util/Util';
+import { AuthState } from 'auth/AuthTypes';
+import { UserState } from 'users/UserTypes';
 
 export interface Props
 {
   params?: any;
   children?: any;
+  auth?: AuthState;
+  users?: UserState;
+  userActions?: typeof Actions;
+}
+
+export interface State
+{
+  user: UserTypes.User,
+  loading: boolean,
+  saving: boolean,
+  savingReq: any,
+  showDropDown: boolean,
+  errorModalOpen: boolean,
+  errorModalMessage: string,
 }
 
 class Profile extends TerrainComponent<Props>
 {
   public userUnsubscribe = null;
-  public authUnsubscribe = null;
 
-  public state: {
-    user: UserTypes.User,
-    loading: boolean,
-    saving: boolean,
-    savingReq: any,
-    showDropDown: boolean,
-    errorModalOpen: boolean,
-    errorModalMessage: string,
-  } = {
+  public state: State = {
     user: null,
     loading: false,
     saving: false,
@@ -114,17 +120,12 @@ class Profile extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-
-    this.userUnsubscribe =
-      UserStore.subscribe(() => this.updateUser(this.props));
-    this.authUnsubscribe =
-      AuthStore.subscribe(() => this.updateUser(this.props));
   }
 
   public updateUser(props: Props)
   {
-    const userState: UserTypes.UserState = UserStore.getState();
-    const authState = AuthStore.getState();
+    const userState: UserTypes.UserState = this.props.users;
+    const authState = this.props.auth;
     this.setState({
       user: userState.getIn(['users', authState.id]),
       loading: userState.get('loading'),
@@ -133,15 +134,23 @@ class Profile extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    Actions.fetch();
+    this.props.userActions.fetch();
     this.updateUser(this.props);
   }
 
   public componentWillUnmount()
   {
     this.userUnsubscribe && this.userUnsubscribe();
-    this.authUnsubscribe && this.authUnsubscribe();
     this.state.savingReq && this.state.savingReq.abort();
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if ((this.props.auth !== nextProps.auth) ||
+      (this.props.users !== nextProps.users))
+    {
+      this.updateUser(nextProps);
+    }
   }
 
   public handleSave()
@@ -152,7 +161,7 @@ class Profile extends TerrainComponent<Props>
       newUser = newUser.set(infoKey.key, this.refs[infoKey.key]['value']) as UserTypes.User;
     });
 
-    Actions.change(newUser as UserTypes.User);
+    this.props.userActions.change(newUser as UserTypes.User);
 
     this.setState({
       saving: true,
@@ -360,4 +369,8 @@ class Profile extends TerrainComponent<Props>
   }
 }
 
-export default Profile;
+export default Util.createTypedContainer(
+  Profile,
+  ['auth', 'users'],
+  { userActions: Actions },
+);;

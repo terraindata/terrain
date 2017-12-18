@@ -50,8 +50,6 @@ import * as _ from 'lodash';
 import * as ReduxActions from 'redux-actions';
 const Redux = require('redux');
 
-import AuthStore from './../../auth/data/AuthStore';
-
 import * as UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';
 import UserReducers from './UserReducers';
@@ -61,7 +59,7 @@ const UserStore = Redux.createStore(UserReducers);
 UserStore.subscribe(() =>
 {
   const state = UserStore.getState();
-  if (state.getIn(['users', AuthStore.getState().id]) !== state.get('currentUser'))
+  if (state.getIn(['users', localStorage['id']]) !== state.get('currentUser'))
   {
     // currentUser object changed
     UserStore.dispatch({

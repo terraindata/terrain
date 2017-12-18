@@ -54,13 +54,15 @@ import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
 import RolesReducer from 'roles/data/RolesReducers';
 import { SchemaReducers } from 'schema/data/SchemaRedux';
+import { AuthReducers } from 'auth/data/AuthRedux';
 import UserReducer from 'users/data/UserReducers';
 import Ajax from 'util/Ajax';
 import { ColorsReducers } from '../colors/data/ColorsRedux';
 
 const reducers = {
   analytics: AnalyticsReducer,
-  colors: ColorsReducers,
+  auth: AuthReducers,
+  colors: ColorsReducer,
   library: LibraryReducer,
   roles: RolesReducer,
   schema: SchemaReducers,

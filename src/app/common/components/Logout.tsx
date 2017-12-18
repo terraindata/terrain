@@ -48,17 +48,19 @@ import { browserHistory } from 'react-router';
 import AuthActions from '../../auth/data/AuthActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import InfoArea from './InfoArea';
+import Util from 'util/Util';
 
 export interface Props
 {
   history?: any;
+  authActions: typeof AuthActions;
 }
 
 class Logout extends TerrainComponent<Props>
 {
   public componentWillMount()
   {
-    AuthActions.logout();
+    this.props.authActions.logout();
     browserHistory.replace('/');
   }
 
@@ -69,4 +71,8 @@ class Logout extends TerrainComponent<Props>
     );
   }
 }
-export default Logout;
+export default Util.createTypedContainer(
+  Logout,
+  [],
+  { authActions: AuthActions }
+);

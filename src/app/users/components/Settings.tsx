@@ -56,15 +56,15 @@ import Modal from 'common/components/Modal';
 import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { MidwayError } from 'shared/error/MidwayError';
-import AuthStore from '../../auth/data/AuthStore';
 import { Colors, Themes, ThemesArray } from '../../colors/Colors';
 import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
 import Actions from '../data/UserActions';
-import Store from '../data/UserStore';
 import * as UserTypes from '../UserTypes';
 import AccountEntry from './AccountEntry';
 import PasswordStrengthInput from './PasswordStrengthInput';
+import { AuthState } from 'auth/AuthTypes';
+import Util from 'util/Util';
 
 import './Settings.less';
 type User = UserTypes.User;
@@ -78,6 +78,9 @@ export interface Props
   params?: any;
   history?: any;
   children?: any;
+  auth?: AuthState;
+  users?: UserTypes.UserState;
+  userActions?: typeof Actions;
 }
 
 class Settings extends TerrainComponent<Props>
@@ -88,10 +91,9 @@ class Settings extends TerrainComponent<Props>
   {
     super(props);
 
-    const authState = AuthStore.getState();
+    const authState = props.auth;
 
     this.state = {
-      istate: Store.getState(),
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
@@ -104,16 +106,11 @@ class Settings extends TerrainComponent<Props>
       errorModal: false,
       analyticsEnabled: Number(TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS)),
     };
-
-    this.cancelSubscription =
-      Store.subscribe(() => this.setState({
-        istate: Store.getState(),
-      }));
   }
 
   public componentWillMount()
   {
-    Actions.fetch();
+    this.props.userActions.fetch();
   }
 
   // public componentDidMount()
@@ -139,9 +136,9 @@ class Settings extends TerrainComponent<Props>
 
   public changeUserField(field: string, value: string)
   {
-    let newUser = this.state.istate.currentUser;
+    let newUser = this.props.users.currentUser;
     newUser = newUser.set(field, value);
-    Actions.change(newUser as UserTypes.User);
+    this.props.userActions.change(newUser as UserTypes.User);
 
     this.setState({
       saving: true,
@@ -206,7 +203,7 @@ class Settings extends TerrainComponent<Props>
 
     Ajax.changePassword(+userId, currentPassword, newPassword, () =>
     {
-      Actions.fetch();
+      this.props.userActions.fetch();
       notificationManager.addNotification('Success', 'Updated password', 'info', 4);
     }, (error) =>
       {
@@ -316,9 +313,9 @@ class Settings extends TerrainComponent<Props>
 
   public renderEmailDescription()
   {
-    if (this.state.istate.currentUser && this.state.istate.currentUser.email)
+    if (this.props.users.currentUser && this.props.users.currentUser.email)
     {
-      const email = this.state.istate.currentUser.email;
+      const email = this.props.users.currentUser.email;
       return (
         <div>
           Your email is <b>{email}</b>.
@@ -388,9 +385,9 @@ class Settings extends TerrainComponent<Props>
   {
     let timeZone: number;
 
-    if (this.state.istate.currentUser)
+    if (this.props.users.currentUser)
     {
-      timeZone = this.state.istate.currentUser.timeZone || 158;
+      timeZone = this.props.users.currentUser.timeZone || 158;
     }
     else
     {
@@ -430,9 +427,9 @@ class Settings extends TerrainComponent<Props>
     const timeZonesList = this.getTimeZonesList();
     let timeZone: number;
 
-    if (this.state.istate.currentUser)
+    if (this.props.users.currentUser)
     {
-      timeZone = this.state.istate.currentUser.timeZone || 158;
+      timeZone = this.props.users.currentUser.timeZone || 158;
     }
     else
     {
@@ -655,4 +652,8 @@ class Settings extends TerrainComponent<Props>
   }
 }
 
-export default Settings;
+export default Util.createContainer(
+  Settings,
+  ['auth', 'users'],
+  { userActions: Actions },
+);

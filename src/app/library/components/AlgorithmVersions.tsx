@@ -53,7 +53,6 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
-import UserStore from './../../users/data/UserStore';
 import * as UserTypes from './../../users/UserTypes';
 import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
@@ -71,6 +70,14 @@ type UserMap = UserTypes.UserMap;
 export interface Props
 {
   algorithm: Algorithm;
+  users?: UserTypes.UserState;
+}
+
+export interface State
+{
+  users: UserMap,
+  versions: any,
+  roles: RoleTypes.RoleMap,
 }
 
 const MAX_RENDERED_ALGORITHMS = 100;
@@ -78,12 +85,8 @@ const MAX_RENDERED_ALGORITHMS = 100;
 @Radium
 class AlgorithmVersions extends TerrainComponent<Props>
 {
-  public state: {
-    users: UserMap,
-    versions: any,
-    roles: RoleTypes.RoleMap,
-  } = {
-    users: null,
+  public state: State = {
+    users: this.props.users.users,
     versions: null,
     roles: null,
   };
@@ -94,11 +97,6 @@ class AlgorithmVersions extends TerrainComponent<Props>
   {
     super(props);
 
-    this._subscribe(UserStore,
-      {
-        stateKey: 'users',
-        storeKeyPath: ['users'],
-      });
     this._subscribe(RolesStore,
       {
         stateKey: 'roles',
@@ -237,4 +235,8 @@ const ACTIVE_VERSION_STYLE = [
   fontColor(Colors().text1, Colors().text1),
 ];
 
-export default AlgorithmVersions;
+export default Util.createTypedContainer(
+  AlgorithmVersions,
+  ['users'],
+  {}
+);

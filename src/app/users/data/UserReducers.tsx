@@ -48,7 +48,6 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-import AuthStore from './../../auth/data/AuthStore';
 import Ajax from './../../util/Ajax';
 import * as UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';
@@ -72,7 +71,7 @@ UserReducers[ActionTypes.fetch] =
           UserTypes._User(userObj),
         );
       });
-      action.payload.setUsers(users);
+      action.payload.dispatch(action.payload.setUsers(users));
     });
     return state.set('loading', true);
   };
@@ -81,7 +80,7 @@ UserReducers[ActionTypes.setUsers] =
   (state, action) =>
   {
     return state.set('users', action.payload.users)
-      .set('currentUser', action.payload.users.get(AuthStore.getState().id))
+      .set('currentUser', action.payload.users.get(action.payload.currentUserId))
       .set('loading', false)
       .set('loaded', true);
   };
@@ -90,7 +89,7 @@ UserReducers[ActionTypes.setUsers] =
 UserReducers[ActionTypes.updateCurrentUser] =
   (state, action) =>
     state.set('currentUser',
-      state.getIn(['users', AuthStore.getState().id]));
+      state.getIn(['users', action.payload.id]));
 
 UserReducers[ActionTypes.completeTutorial] =
   (

@@ -63,7 +63,6 @@ import CreateLine from '../../common/components/CreateLine';
 import Modal from '../../common/components/Modal';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
-import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import Dropdown from './../../common/components/Dropdown';
@@ -100,26 +99,28 @@ export interface Props
   analyticsActions?: any;
   router?: any;
   referrer?: { label: string, path: string };
+  users?: UserTypes.UserState;
+}
+
+export interface State
+{
+  rendered: boolean,
+  lastMoved: any,
+  roles: RoleTypes.RoleMap,
+  draggingItemIndex: number;
+  draggingOverIndex: number;
+
+  duplicatingAlgorithm: boolean;
+  duplicateAlgorithmTextboxValue: string;
+  duplicateAlgorithmGroupIndex: number;
+  duplicateAlgorithmId: ID;
 }
 
 class AlgorithmsColumn extends TerrainComponent<Props>
 {
-  public state: {
-    rendered: boolean,
-    lastMoved: any,
-    me: UserTypes.User,
-    roles: RoleTypes.RoleMap,
-    draggingItemIndex: number;
-    draggingOverIndex: number;
-
-    duplicatingAlgorithm: boolean;
-    duplicateAlgorithmTextboxValue: string;
-    duplicateAlgorithmGroupIndex: number;
-    duplicateAlgorithmId: ID;
-  } = {
+  public state: State = {
     rendered: false,
     lastMoved: null,
-    me: null,
     roles: null,
     draggingItemIndex: -1,
     draggingOverIndex: -1,
@@ -166,11 +167,6 @@ class AlgorithmsColumn extends TerrainComponent<Props>
       );
     }
 
-    this._subscribe(UserStore, {
-      stateKey: 'me',
-      storeKeyPath: ['currentUser'],
-      isMounted: true,
-    });
     this._subscribe(RolesStore, {
       stateKey: 'roles',
       isMounted: true,
@@ -499,11 +495,18 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderAlgorithm(id: ID, fadeIndex: number)
   {
-    const { canPinItems, params, basePath, analytics } = this.props;
+    const {
+      canPinItems,
+      params,
+      basePath,
+      analytics,
+      users,
+    } = this.props;
+    const { currentUser: me } = users;
     const currentAlgorithmId = params.algorithmId;
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
-    const { me, roles } = this.state;
+    const { roles } = this.state;
     let canEdit: boolean;
     let canDrag: boolean;
     canEdit = true;
@@ -628,7 +631,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderAlgorithms(archived?: boolean)
   {
-    const { me, roles } = this.state;
+    const { users } = this.props;
+    const { roles } = this.state;
+    const { currentUser: me } = users;
     const canMakeLive = me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
     const canCreate = true; // canMakeLive;
     // TODO maybe on the new middle tier, builders can create algorithms
@@ -675,7 +680,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public render()
   {
-    const { referrer } = this.props;
+    const { referrer, users } = this.props;
 
     return (
       <LibraryColumn
@@ -698,8 +703,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
                 <InfoArea
                   large='No algorithms created, yet.'
                   button={
-                    Util.haveRole(this.props.categoryId, 'builder', UserStore, RolesStore) ||
-                      Util.haveRole(this.props.categoryId, 'admin', UserStore, RolesStore)
+                    Util.haveRole(this.props.categoryId, 'builder', users, RolesStore) ||
+                      Util.haveRole(this.props.categoryId, 'admin', users, RolesStore)
                       ? 'Create a algorithm' : null
                   }
                   onClick={this.handleCreate}
@@ -712,4 +717,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   }
 }
 
-export default AlgorithmsColumn;
+export default Util.createTypedContainer(
+  AlgorithmsColumn,
+  ['users'],
+  {}
+);
