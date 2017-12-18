@@ -342,7 +342,7 @@ export class Export
           returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
           for (const doc of returnDocs)
           {
-            if (exprt.rank === true)
+            if (Boolean(exprt.rank))
             {
               if (doc['TERRAINRANK'] !== undefined)
               {

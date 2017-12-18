@@ -44,32 +44,74 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import * as stream from 'stream';
+import * as winston from 'winston';
 
-import * as Immutable from 'immutable';
-import * as Redux from 'redux';
-import thunk from 'redux-thunk';
-import Util from './../../util/Util';
-import ColorsReducers from './ColorsReducers';
+import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
 
-class ColorsStateC
+export const googleAPI: GoogleAPI = new GoogleAPI();
+
+export interface SourceConfig
 {
-  public styles: IMMap<string, React.CSSProperties> = Immutable.Map();
+  type: string;
+  params: object;
 }
 
-const ColorsState_Record = Immutable.Record(new ColorsStateC());
-export interface ColorsState extends ColorsStateC, IRecord<ColorsState> { }
-export const _ColorsState = (config?: any) =>
+export interface ImportSourceConfig
 {
-  return new ColorsState_Record(Util.extendId(config || {})) as any as ColorsState;
-};
+  filetype: string;
+  params: object;
+  stream: stream.Readable;
+}
 
-const DefaultState = _ColorsState();
+export class Sources
+{
 
-export const ColorsStore = Redux.createStore(
-  ColorsReducers,
-  DefaultState,
-  Redux.applyMiddleware(thunk),
-);
+  public async handleTemplateSource(body: object): Promise<ImportSourceConfig>
+  {
+    return new Promise<ImportSourceConfig>(async (resolve, reject) =>
+    {
+      let imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: '',
+          params: {},
+          stream: new stream.PassThrough(),
+        };
+      const sourceConfig: SourceConfig = body['body']['source'] as SourceConfig;
+      switch (sourceConfig.type)
+      {
+        case 'spreadsheets':
+          imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
+          break;
+        default:
+          break;
+      }
+      return resolve(imprtSourceConfig);
+    });
+  }
 
-export default ColorsStore;
+  private async _getStreamFromGoogleSpreadsheets(source: SourceConfig, body: object, templateId?: string): Promise<ImportSourceConfig>
+  {
+    return new Promise<ImportSourceConfig>(async (resolve, reject) =>
+    {
+      if (templateId !== undefined)
+      {
+        body['templateId'] = Number(parseInt(templateId, 10));
+      }
+      const writeStream = await googleAPI.getSpreadsheetValuesAsCSVStream(
+        await googleAPI.getSpreadsheets(source['params'] as GoogleSpreadsheetConfig)) as stream.Readable;
+
+      delete body['source'];
+      body['filetype'] = 'csv';
+      const imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: 'csv',
+          params: body,
+          stream: writeStream,
+        };
+      return resolve(imprtSourceConfig);
+    });
+  }
+}
+
+export default Sources;

@@ -45,9 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as ElasticsearchScrollStream from 'elasticsearch-scroll-stream';
-import * as _ from 'lodash';
 import { Readable } from 'stream';
-import * as util from 'util';
 import * as winston from 'winston';
 
 import * as Elastic from 'elasticsearch';
@@ -55,14 +53,12 @@ import * as Elastic from 'elasticsearch';
 import ESParameterFiller from '../../../../../shared/database/elastic/parser/EQLParameterFiller';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import ESParser from '../../../../../shared/database/elastic/parser/ESParser';
-import ESPropertyInfo from '../../../../../shared/database/elastic/parser/ESPropertyInfo';
 import ESValueInfo from '../../../../../shared/database/elastic/parser/ESValueInfo';
 import MidwayErrorItem from '../../../../../shared/error/MidwayErrorItem';
 import QueryRequest from '../../../../../src/database/types/QueryRequest';
 import QueryResponse from '../../../../../src/database/types/QueryResponse';
 import QueryHandler from '../../../app/query/QueryHandler';
 import { QueryError } from '../../../error/QueryError';
-import { makePromiseCallback } from '../../../tasty/Utils';
 import ElasticClient from '../client/ElasticClient';
 import ElasticController from '../ElasticController';
 
@@ -73,7 +69,10 @@ export default class ElasticQueryHandler extends QueryHandler
 {
   private controller: ElasticController;
 
+  private GROUPJOIN_SEARCH_MAX_SIZE = 10000;
   private GROUPJOIN_MSEARCH_BATCH_SIZE = 1000;
+  private GROUPJOIN_DEFAULT_SIZE = 10;
+  private GROUPJOIN_SCROLL_TIMEOUT = '1m';
 
   constructor(controller: ElasticController)
   {
@@ -164,7 +163,16 @@ export default class ElasticQueryHandler extends QueryHandler
       {
         let allResponse: any | null = null;
         let rowsProcessed: number = 0;
-        const originalSize: number = (parentQuery['size'] !== undefined) ? parentQuery['size'] as number : -1;
+        const originalSize: number = (parentQuery['size'] !== undefined) ? parentQuery['size'] as number : this.GROUPJOIN_DEFAULT_SIZE;
+        const originalScroll = (parentQuery['scroll'] !== undefined) ? parentQuery['scroll'] : this.GROUPJOIN_SCROLL_TIMEOUT;
+        let size;
+        let scroll;
+
+        if (originalSize > this.GROUPJOIN_SEARCH_MAX_SIZE)
+        {
+          size = this.GROUPJOIN_SEARCH_MAX_SIZE;
+          scroll = originalScroll;
+        }
 
         const getMoreUntilDone = async (error: any, response: any) =>
         {
@@ -186,21 +194,9 @@ export default class ElasticQueryHandler extends QueryHandler
           }
 
           rowsProcessed += response.hits.hits.length;
-
-          let total = response.hits.total;
-          if (originalSize > 0 && originalSize <= total)
+          if (response.hits.hits.length > 0 && Math.min(response.hits.total, originalSize) > rowsProcessed)
           {
-            total = originalSize;
-          }
-          else
-          {
-            // TODO: choose optimal size parameter
-            parentQuery['size'] = 10000;
-          }
-
-          if (response.hits.hits.length > 0 && rowsProcessed < total)
-          {
-            const scroll = (parentQuery['scroll'] !== undefined) ? parentQuery['scroll'] : '60s';
+            scroll = originalScroll;
             client.scroll({
               scrollId: response._scroll_id,
               scroll,
@@ -215,7 +211,11 @@ export default class ElasticQueryHandler extends QueryHandler
           }
         };
 
-        client.search({ body: parentQuery }, getMoreUntilDone);
+        client.search({
+          body: parentQuery,
+          scroll,
+          size,
+        }, getMoreUntilDone);
       });
 
       if (parentResults.hasError())

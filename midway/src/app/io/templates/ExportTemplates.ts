@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as srs from 'secure-random-string';
-import * as winston from 'winston';
 import * as Tasty from '../../../tasty/Tasty';
 import * as App from '../../App';
 

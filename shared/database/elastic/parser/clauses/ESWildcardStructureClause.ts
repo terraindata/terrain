@@ -50,7 +50,6 @@ import EQLConfig from '../EQLConfig';
 import ESClauseSettings from '../ESClauseSettings';
 import ESClauseType from '../ESClauseType';
 import ESInterpreter from '../ESInterpreter';
-import ESJSONType from '../ESJSONType';
 import ESPropertyInfo from '../ESPropertyInfo';
 import ESValueInfo from '../ESValueInfo';
 import ESClause from './ESClause';
