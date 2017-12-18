@@ -84,11 +84,11 @@ export interface Props extends TemplateEditorFieldProps
 @Radium
 class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 {
-  public state: {
-    originalNameOpen: boolean;
-  } = {
-    originalNameOpen: false,
-  };
+  // public state: {
+  //   originalNameOpen: boolean;
+  // } = {
+  //   originalNameOpen: false,
+  // };
 
   constructor(props)
   {
@@ -257,19 +257,19 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
     );
   }
 
-  public enableOriginalNameInput()
-  {
-    this.setState({
-      originalNameOpen: true,
-    });
-  }
+  // public enableOriginalNameInput()
+  // {
+  //   this.setState({
+  //     originalNameOpen: true,
+  //   });
+  // }
 
-  public disableOriginalNameInput()
-  {
-    this.setState({
-      originalNameOpen: false,
-    });
-  }
+  // public disableOriginalNameInput()
+  // {
+  //   this.setState({
+  //     originalNameOpen: false,
+  //   });
+  // }
 
   public handleIncludeCheckboxClicked()
   {

@@ -43,8 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
 // tslint:disable:no-var-requires
+
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
@@ -53,16 +53,11 @@ import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import ExpandableView from 'common/components/ExpandableView';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
-import './TemplateEditorField.less';
-import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
-import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
-const AddIcon = require('images/icon_add.svg');
+import './TemplateEditorField.less';
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -75,127 +70,68 @@ export interface Props extends TemplateEditorFieldProps
 }
 
 @Radium
-class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
+class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 {
-  public state: {
-    expandableViewOpen: boolean;
-  } = {
-    expandableViewOpen: true,
-  };
 
-  public renderChildFields()
+  public renderBorderDrawSection()
   {
-    const { field, keyPath, canEdit } = this.props;
+    const { field } = this.props;
 
-    return field.children.map((value, index) =>
+    const depth = this._depth();
+    const topDrawStyle = {};
+    const bottomDrawStyle = {};
+    const wrapperDrawStyle = {};
+    if (depth > 1)
     {
-      const newKeyPath = keyPath.push('children', index);
-      return (
-        <TemplateEditorFieldNode
-          keyPath={newKeyPath}
-          field={value}
-          canEdit={field.isIncluded && canEdit}
-          key={index}
-        />
-      );
-    }).toList();
-  }
+      const widthStyle = getStyle('width', `${(depth - 1) * indentSize}px`);
+      const marginStyle = getStyle('marginRight', `${indentSize}px`);
+      _.extend(wrapperDrawStyle, marginStyle);
+      _.extend(topDrawStyle, widthStyle);
+      // _.extend(bottomDrawStyle, widthStyle);
+      const borderStyle = `1px solid ${Colors().border3}`;
+      // _.extend(topDrawStyle, getStyle('borderLeft', borderStyle));
+      _.extend(topDrawStyle, getStyle('borderBottom', borderStyle));
+      const hasNextSibling = this._getPosition() + 1 < this._getParent().children.size;
+      if (hasNextSibling)
+      {
+        // _.extend(bottomDrawStyle, getStyle('borderLeft', borderStyle));
+      }
+    }
 
-  public renderCreateNewFieldButton()
-  {
-    const buttonStyle = this._inputDisabled() ?
-      fontColor(Colors().text3, Colors().text3) :
-      fontColor(Colors().text3, Colors().text2);
     return (
-      <div className='new-field-button-spacer' key='new field button'>
+      <div
+        className='field-preview-draw-borders-wrapper'
+        style={wrapperDrawStyle}
+      >
         <div
-          className={classNames({
-            'create-new-template-field-button': true,
-            'template-editor-field-input-disabled': this._inputDisabled(),
-          })}
-          onClick={this._noopIfDisabled(this.handleCreateNewField)}
-          style={buttonStyle}
-        >
-          <AddIcon className='template-editor-add-icon' />
-          <div> Add Field </div>
-        </div>
+          className='field-preview-draw-borders'
+          style={topDrawStyle}
+        />
+        <div
+          className='field-preview-draw-borders'
+          style={bottomDrawStyle}
+        />
       </div>
     );
   }
 
   public render()
   {
-    const { field, keyPath, canEdit } = this.props;
+    const { field } = this.props;
 
-    const settings = (
-      <div className='template-editor-content'>
-        <TemplateEditorFieldSettings
-          keyPath={keyPath}
-          field={field}
-          canEdit={canEdit}
-        />
-        <TemplateEditorFieldPreview
-          keyPath={keyPath}
-          field={field}
-          canEdit={canEdit}
-        />
+    return (
+      <div className='template-editor-field-preview-row'>
+        {this.renderBorderDrawSection()}
+        <div className='field-preview-name'> {field.name} </div>
       </div>
     );
-
-    const children = (this._isRoot() || this._isNested()) ? (
-      <div className='template-editor-children-container'>
-        {this.renderChildFields()}
-        {this.renderCreateNewFieldButton()}
-      </div>) : undefined;
-
-    if (this._isRoot())
-    {
-      return children;
-    }
-    else
-    {
-      const childrenStyle = (canEdit === true && field.isIncluded === false) ?
-        getStyle('opacity', '0.7') : {};
-      return (
-        <ExpandableView
-          content={settings}
-          open={this.state.expandableViewOpen}
-          onToggle={this.handleExpandArrowClicked}
-          children={children}
-          style={childrenStyle}
-        />
-      );
-    }
-  }
-
-  public handleExpandArrowClicked()
-  {
-    this.setState({
-      expandableViewOpen: !this.state.expandableViewOpen,
-    });
-  }
-
-  public handleCreateNewField()
-  {
-    const { keyPath, act } = this.props;
-    const newField = _TemplateField({ name: `new field hello there` });
-    act({
-      actionType: 'createField',
-      sourcePath: keyPath,
-      field: newField,
-    });
-  }
-
-  public handleFieldClicked()
-  {
-    const { field, keyPath, act } = this.props;
   }
 }
 
-const TemplateEditorFieldNode = Util.createTypedContainer(
-  TemplateEditorFieldNodeC,
+const indentSize = 12;
+
+export default Util.createTypedContainer(
+  TemplateEditorFieldPreview,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );
-
-export default TemplateEditorFieldNode;
