@@ -87,6 +87,8 @@ export function parsePath(path: Path): string
 
   const filterObj = parseFilters(path.filterGroup);
   filterObj.bool.filter.concat(baseQuery.query.bool.filter);
+  console.log(baseQuery);
+  console.log(filterObj);
   baseQuery.query = filterObj;
   const moreObj = parseMore(path.more);
   baseQuery.aggs = moreObj;

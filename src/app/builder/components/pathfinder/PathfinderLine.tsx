@@ -186,7 +186,7 @@ export class PathfinderLine extends TerrainComponent<Props>
     return (
       <div className='pf-line-right'>
         {
-          !this.props.expandableContent && !this.props.expandOnLeft &&
+          this.props.expandableContent !== undefined && !this.props.expandOnLeft &&
           <div
             className='expand'
             onClick={this._fn(this.props.onExpand, !this.props.expanded)}
