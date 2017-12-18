@@ -203,7 +203,7 @@ class InputComponent extends TerrainComponent<Props>
           showSearchBar={true}
           zoomControl={true}
           keepAddressInSync={false}
-          geocoder='google'
+          geocoder='photon'
           className='input-map-wrapper'
         />);
     }

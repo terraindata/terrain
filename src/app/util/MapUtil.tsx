@@ -315,14 +315,7 @@ const MapUtil = {
     // string = geohash or 0,0 format
     if (typeof geopoint === 'string')
     {
-      if (geopoint.indexOf(']') !== -1 || geopoint.indexOf('[') !== -1)
-      {
-        const coords = geopoint.split(',');
-        lon = parseFloat(coords[0].replace(/ /g, '').replace(/\[/, ''));
-        lat = parseFloat(coords[1].replace(/ /g, '').replace(/\]/, ''));
-        console.assert(!isNaN(lat) && !isNaN(lon));
-      }
-      else if (geopoint.split(',').length > 1)
+      if (geopoint.split(',').length > 1)
       {
         const coords = geopoint.split(',');
         lat = parseFloat(coords[0].replace(/ /g, ''));

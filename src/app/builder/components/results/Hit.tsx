@@ -518,7 +518,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
               zoomControl={false}
               secondLocation={resultLocation}
               keepAddressInSync={false}
-              geocoder='google'
+              geocoder='photon'
               secondaryMarkerColor={color}
               colorMarker={true}
             />
