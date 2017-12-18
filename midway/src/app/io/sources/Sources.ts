@@ -48,8 +48,10 @@ import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
+import { MySQL, MySQLConfig } from './MySQL';
 
 export const googleAPI: GoogleAPI = new GoogleAPI();
+export const mySQL: MySQL = new MySQL();
 
 export interface SourceConfig
 {
@@ -83,6 +85,9 @@ export class Sources
         case 'spreadsheets':
           imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
           break;
+        case 'mysql':
+          imprtSourceConfig = await this._getStreamFromMySQL(sourceConfig, body['body'], body['templateId']);
+          break;
         default:
           break;
       }
@@ -100,6 +105,29 @@ export class Sources
       }
       const writeStream = await googleAPI.getSpreadsheetValuesAsCSVStream(
         await googleAPI.getSpreadsheets(source['params'] as GoogleSpreadsheetConfig)) as stream.Readable;
+
+      delete body['source'];
+      body['filetype'] = 'csv';
+      const imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: 'csv',
+          params: body,
+          stream: writeStream,
+        };
+      return resolve(imprtSourceConfig);
+    });
+  }
+
+  private async _getStreamFromMySQL(source: SourceConfig, body: object, templateId?: string): Promise<ImportSourceConfig>
+  {
+    return new Promise<ImportSourceConfig>(async (resolve, reject) =>
+    {
+      if (templateId !== undefined)
+      {
+        body['templateId'] = Number(parseInt(templateId, 10));
+      }
+      const writeStream = await mySQL.getQueryAsCSVStream(
+        await mySQL.runQuery(source['params'] as MySQLConfig)) as stream.Readable;
 
       delete body['source'];
       body['filetype'] = 'csv';

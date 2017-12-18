@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import csvWriter = require('csv-write-stream');
 
-import * as googleoauthjwt from 'google-oauth-jwt';
 import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
@@ -54,53 +53,27 @@ import * as winston from 'winston';
 import { CredentialConfig, Credentials } from '../../credentials/Credentials';
 
 export const credentials: Credentials = new Credentials();
-export const request = googleoauthjwt.requestWithJWT();
 
-export interface GoogleSpreadsheetConfig
+export interface MySQLConfig
 {
   id: string;
-  name: string;
-  range: string;
+  dbname: string;
+  tablename: string;
+  query: string;
 }
 
-export class GoogleAPI
+export interface MySQLRowConfig
+{
+  columnNames: string[];
+  rows: object[];
+}
+
+export class MySQL
 {
   private storedEmail: string;
   private storedKeyFilePath: string;
 
-  public async getSpreadsheets(spreadsheet: GoogleSpreadsheetConfig): Promise<any>
-  {
-    return new Promise<any>(async (resolve, reject) =>
-    {
-      if (this.storedEmail === undefined && this.storedKeyFilePath === undefined)
-      {
-        await this._getStoredGoogleAPICredentials();
-      }
-      request({
-        url: 'https://sheets.googleapis.com/v4/spreadsheets/' + spreadsheet.id + '/values/' + spreadsheet.name + '!' + spreadsheet.range,
-        jwt: {
-          email: this.storedEmail,
-          keyFile: this.storedKeyFilePath,
-          scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-        },
-      }, (err, res, body) =>
-        {
-          try
-          {
-            const bodyObj = JSON.parse(body);
-            resolve(bodyObj['values']);
-          }
-          catch (e)
-          {
-            winston.info(e);
-            winston.info('Potentially incorrect credentials.');
-            reject('Potentially incorrect Google API credentials.');
-          }
-        });
-    });
-  }
-
-  public async getSpreadsheetValuesAsCSVStream(values: any): Promise<stream.Readable>
+  public async getQueryAsCSVStream(values: any): Promise<stream.Readable>
   {
     return new Promise<stream.Readable>(async (resolve, reject) =>
     {
@@ -119,20 +92,18 @@ export class GoogleAPI
     });
   }
 
-  private async _getStoredGoogleAPICredentials()
+  public async runQuery(mysqlconfig: MySQLConfig): Promise<MySQLRowConfig>
   {
-    const creds: string[] = await credentials.getByType('googleapi');
-    if (creds.length === 0)
-    {
-      winston.info('No credential found for type googleapi.');
-    }
-    else
-    {
-      const cred: object = JSON.parse(creds[0]);
-      this.storedEmail = cred['storedEmail'];
-      this.storedKeyFilePath = cred['storedKeyFilePath'];
-    }
+    return new Promise<MySQLRowConfig>(async (resolve, reject) =>
+      {
+        const mysqlRowConfig: MySQLRowConfig =
+        {
+          columnNames: [],
+          rows: [],
+        };
+        resolve(mysqlRowConfig);
+      });
   }
 }
 
-export default GoogleAPI;
+export default MySQL;
