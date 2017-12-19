@@ -44,36 +44,53 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires
+
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
 import * as Immutable from 'immutable';
-
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
+import { Map } from 'immutable';
+import * as _ from 'lodash';
+import * as ReduxActions from 'redux-actions';
+const Redux = require('redux');
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
+import Util from 'app/util/Util';
 import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import UserReducer from 'users/data/UserReducers';
-import Ajax from 'util/Ajax';
-import { ColorsReducers } from '../colors/data/ColorsRedux';
+import { BaseClass, New } from '../../Classes';
+import { _SpotlightState, SpotlightState } from './SpotlightTypes';
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  colors: ColorsReducers,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  schema: SchemaReducers,
-  users: UserReducer,
-  spotlights: SpotlightReducers,
-};
+export interface SpotlightActionTypes
+{
+  spotlightAction: {
+    actionType: 'spotlightAction',
+    id: string,
+    hit: any,
+  };
+  clearSpotlightAction: {
+    actionType: 'clearSpotlightAction',
+    id: string,
+  };
+}
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
+class SpotlightRedux extends TerrainRedux<SpotlightActionTypes, SpotlightState>
+{
+  public reducers: ConstrainedMap<SpotlightActionTypes, SpotlightState> =
+  {
+    spotlightAction: (state, action) =>
+    {
+      const { id, hit } = action.payload;
+      return state.setIn(['spotlights', id], _.extend({}, hit, { id }));
+    },
+    clearSpotlightAction: (state, action) =>
+    {
+      const { id } = action.payload;
+      return state.removeIn(['spotlights', id]);
+    },
+  };
+}
 
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax)),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+const ReduxInstance = new SpotlightRedux();
+export const SpotlightActions = ReduxInstance._actionsForExport();
+export const SpotlightReducers = ReduxInstance._reducersForExport(_SpotlightState);
+export declare type SpotlightActionType<K extends keyof SpotlightActionTypes> = GetType<K, SpotlightActionTypes>;
