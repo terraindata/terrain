@@ -49,7 +49,6 @@ import { Provider } from 'react-redux';
 import TerrainTools from 'util/TerrainTools';
 import AppRouter from './AppRouter';
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
-import ColorsStore from './colors/data/ColorsStore';
 import LibraryStore from './library/data/LibraryStore';
 import TerrainStore from './store/TerrainStore';
 import UserStore from './users/data/UserStore';
@@ -73,8 +72,8 @@ if (!DEV)
     const libraryState = JSON.stringify(LibraryStore.getState().toJS());
     const builderState = JSON.stringify(BuilderStore.getState().toJS());
     const location = JSON.stringify(window.location);
-    const colorsState = JSON.stringify(ColorsStore.getState().toJS());
-
+    const store = TerrainStore.getState() as Immutable.Map<string, any>;
+    const colorsState = store.get('colors').toJS();
     const msg = `${errorMsg} by ${userId}
       Location:
       ${location}

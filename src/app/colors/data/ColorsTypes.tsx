@@ -43,13 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-const ColorsActionTypes =
-  {
-    setStyle: '',
-  };
+// tslint:disable:no-var-requires
 
-Util.setValuesToKeys(ColorsActionTypes, '');
+// Copyright 2017 Terrain Data, Inc.
 
-export default ColorsActionTypes;
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import { BaseClass, makeConstructor, New, WithIRecord } from 'app/Classes';
+import * as Immutable from 'immutable';
+import { Map } from 'immutable';
+
+class ColorsStateC
+{
+  public styles: IMMap<string, React.CSSProperties> = Map({});
+}
+export type ColorsState = WithIRecord<ColorsStateC>;
+export const _ColorsState = makeConstructor(ColorsStateC);

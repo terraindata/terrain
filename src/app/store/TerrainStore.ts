@@ -55,11 +55,11 @@ import RolesReducer from 'roles/data/RolesReducers';
 import { SchemaReducers } from 'schema/data/SchemaRedux';
 import UserReducer from 'users/data/UserReducers';
 import Ajax from 'util/Ajax';
-import ColorsReducer from '../colors/data/ColorsReducers';
+import { ColorsReducers } from '../colors/data/ColorsRedux';
 
 const reducers = {
   analytics: AnalyticsReducer,
-  colors: ColorsReducer,
+  colors: ColorsReducers,
   library: LibraryReducer,
   roles: RolesReducer,
   schema: SchemaReducers,
