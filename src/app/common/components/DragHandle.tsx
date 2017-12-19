@@ -48,9 +48,9 @@ THE SOFTWARE.
 
 import * as Radium from 'radium';
 import * as React from 'react';
+import { Colors } from '../../colors/Colors';
 import Util from '../../util/Util';
 import { ColorsActions } from './../../colors/data/ColorsRedux';
-import { Colors } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './DragHandleStyle.less';
 
