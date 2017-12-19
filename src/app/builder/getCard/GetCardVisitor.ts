@@ -426,7 +426,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
             'true',
           ]),
         },
-        tql: (boolBlock) => !!boolBlock['value'],
+        tql: (boolBlock) => boolBlock['value'] === 'true',
         singleType: true,
         typeName: 'boolean',
       },
@@ -624,7 +624,7 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
           key: 'value',
           // TODO autocomplete?
         },
-        tql: (numBlock) => +numBlock['value'],
+        tql: (numBlock) => Number(numBlock['value']),
         singleType: true,
         typeName: 'number',
       },

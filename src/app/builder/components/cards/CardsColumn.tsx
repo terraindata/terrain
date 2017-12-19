@@ -51,6 +51,7 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
 import InfoArea from '../../../common/components/InfoArea';
+import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
 import Switch from './../../../common/components/Switch';
@@ -64,7 +65,7 @@ import { Cards } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { ElasticBlocks } from '../../../../database/elastic/blocks/ElasticBlocks';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
-import ColorsActions from './../../../colors/data/ColorsActions';
+import { ColorsActions } from './../../../colors/data/ColorsRedux';
 const { List, Map } = Immutable;
 const ExpandIcon = require('./../../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 
@@ -81,6 +82,8 @@ export interface Props
 
   containerWidth?: number;
   containerHeight?: number;
+
+  colorsActions: typeof ColorsActions;
 
 }
 
@@ -101,10 +104,16 @@ class CardsColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon ',
-      { fill: Colors().text3, background: Colors().bg3 });
-    ColorsActions.setStyle('.cards-deck-knob .cards-deck-knob-icon &:hover ',
-      { 'fill': Colors().bg3, 'background-color': Colors().text3 });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.cards-deck-knob .cards-deck-knob-icon',
+      style: { fill: Colors().text3, background: Colors().bg3 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.cards-deck-knob .cards-deck-knob-icon &:hover',
+      style: { 'fill': Colors().bg3, 'background-color': Colors().text3 },
+    });
   }
 
   public computeKeyPath(props: Props): KeyPath
@@ -355,4 +364,10 @@ class CardsColumn extends TerrainComponent<Props>
 
 // const CardsColumnInner = Dimensions()(_CardsColumnInner);
 
-export default Dimensions()(CardsColumn);
+export default Util.createContainer(
+  Dimensions()(CardsColumn),
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);

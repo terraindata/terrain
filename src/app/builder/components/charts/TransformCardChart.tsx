@@ -250,9 +250,9 @@ class TransformCardChart extends TerrainComponent<Props>
       {
         if (scorePoint.id === pointId || this.state.selectedPointIds.get(scorePoint.id))
         {
-          // With exponential or sigmoid or log mode, the point's score can never be 0 because of how
+          // With exponential or sigmoid mode, the point's score can never be 0 because of how
           // the curve between points is calculated
-          let scoreMin = (mode === 'exponential' || mode === 'sigmoid' || mode === 'logarithmic') ? OFFSET_FACTOR : 0;
+          let scoreMin = (mode === 'exponential' || mode === 'sigmoid') ? OFFSET_FACTOR : 0;
           // The lower bound of the sigmoid curve can't be dragged above the midpoint and
           // The upper bound of the sigmoid curve can't be dragged below the midpoint
           let scoreMax = mode === 'sigmoid' && pointName === 'a' ? pointScores[1] : 1;

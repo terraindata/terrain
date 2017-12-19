@@ -43,13 +43,54 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-const ColorsActionTypes =
-  {
-    setStyle: '',
+// tslint:disable:no-var-requires
+
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import * as Immutable from 'immutable';
+import { Map } from 'immutable';
+import * as _ from 'lodash';
+import * as ReduxActions from 'redux-actions';
+const Redux = require('redux');
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
+import Util from 'app/util/Util';
+import thunk from 'redux-thunk';
+import { BaseClass, New } from '../../Classes';
+import { _SpotlightState, SpotlightState } from './SpotlightTypes';
+
+export interface SpotlightActionTypes
+{
+  spotlightAction: {
+    actionType: 'spotlightAction',
+    id: string,
+    hit: any,
   };
+  clearSpotlightAction: {
+    actionType: 'clearSpotlightAction',
+    id: string,
+  };
+}
 
-Util.setValuesToKeys(ColorsActionTypes, '');
+class SpotlightRedux extends TerrainRedux<SpotlightActionTypes, SpotlightState>
+{
+  public reducers: ConstrainedMap<SpotlightActionTypes, SpotlightState> =
+  {
+    spotlightAction: (state, action) =>
+    {
+      const { id, hit } = action.payload;
+      return state.setIn(['spotlights', id], _.extend({}, hit, { id }));
+    },
+    clearSpotlightAction: (state, action) =>
+    {
+      const { id } = action.payload;
+      return state.removeIn(['spotlights', id]);
+    },
+  };
+}
 
-export default ColorsActionTypes;
+const ReduxInstance = new SpotlightRedux();
+export const SpotlightActions = ReduxInstance._actionsForExport();
+export const SpotlightReducers = ReduxInstance._reducersForExport(_SpotlightState);
+export declare type SpotlightActionType<K extends keyof SpotlightActionTypes> = GetType<K, SpotlightActionTypes>;

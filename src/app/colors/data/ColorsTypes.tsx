@@ -44,32 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+// tslint:disable:no-var-requires
 
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import { BaseClass, makeConstructor, New, WithIRecord } from 'app/Classes';
 import * as Immutable from 'immutable';
-import * as Redux from 'redux';
-import thunk from 'redux-thunk';
-import Util from './../../util/Util';
-import ColorsReducers from './ColorsReducers';
+import { Map } from 'immutable';
 
 class ColorsStateC
 {
-  public styles: IMMap<string, React.CSSProperties> = Immutable.Map();
+  public styles: IMMap<string, React.CSSProperties> = Map({});
 }
-
-const ColorsState_Record = Immutable.Record(new ColorsStateC());
-export interface ColorsState extends ColorsStateC, IRecord<ColorsState> { }
-export const _ColorsState = (config?: any) =>
-{
-  return new ColorsState_Record(Util.extendId(config || {})) as any as ColorsState;
-};
-
-const DefaultState = _ColorsState();
-
-export const ColorsStore = Redux.createStore(
-  ColorsReducers,
-  DefaultState,
-  Redux.applyMiddleware(thunk),
-);
-
-export default ColorsStore;
+export type ColorsState = WithIRecord<ColorsStateC>;
+export const _ColorsState = makeConstructor(ColorsStateC);

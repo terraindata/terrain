@@ -58,7 +58,7 @@ import Util from '../../util/Util';
 import Dropdown from './Dropdown';
 
 import { backgroundColor, Colors, fontColor, getStyle } from '../../colors/Colors';
-import ColorsActions from '../../colors/data/ColorsActions';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
 
 const MINUTE_INTERVAL = 30;
 const MINUTE_RATIO = (60 / MINUTE_INTERVAL);
@@ -85,26 +85,63 @@ export interface Props
   onChange: (newDate: string) => void;
   canEdit: boolean;
   language: string;
+  colorsActions: typeof ColorsActions;
 }
 
 class DatePicker extends TerrainComponent<Props>
 {
   public componentWillMount()
   {
-    ColorsActions.setStyle('.date-picker', { background: Colors().bg1, color: Colors().text2 });
-    ColorsActions.setStyle('.date-picker .dropdown-wrapper:not(:hover)',
-      { 'box-shadow': getStyle('boxShadow', '0px 0px 0px 1px ' + Colors().boxShadow) });
-    ColorsActions.setStyle('.DayPicker-Weekday', { color: Colors().text2 });
-    ColorsActions.setStyle('.DayPicker-Day',
-      { 'border-color': Colors().altHighlight, 'background': Colors().altBg1, 'color': Colors().altText3 });
-    ColorsActions.setStyle('.DayPicker-Day:hover:not(.DayPicker-Day--selected):not(.DayPicker-Day--outside)',
-      { background: Colors().inactiveHover });
-    ColorsActions.setStyle('.DayPicker-Day--today', { 'color': Colors().altText1, 'background-color': Colors().altBg1 });
-    ColorsActions.setStyle('.DayPicker-Day--disabled', { 'color': Colors().text2, 'background-color': Colors().altBg2 });
-    ColorsActions.setStyle('.DayPicker-Day--outside', { color: Colors().text2, background: Colors().altBg2 });
-    ColorsActions.setStyle('.DayPicker-Day--sunday', { 'color': Colors().text2, 'background-color': Colors().altBg1 });
-    ColorsActions.setStyle('.DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)',
-      { 'color': Colors().text1, 'background-color': Colors().active });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.date-picker',
+      style: { background: Colors().bg1, color: Colors().text2 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.date-picker .dropdown-wrapper:not(:hover)',
+      style: { 'box-shadow': getStyle('boxShadow', '0px 0px 0px 1px ' + Colors().boxShadow) },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.DayPicker-Weekday',
+      style: { color: Colors().text2 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.DayPicker-Day',
+      style: { 'border-color': Colors().altHighlight, 'background': Colors().altBg1, 'color': Colors().altText3 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.DayPicker-Day:hover:not(.DayPicker-Day--selected):not(.DayPicker-Day--outside)',
+      style: { background: Colors().inactiveHover },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.DayPicker-Day--today',
+      style: { 'color': Colors().altText1, 'background-color': Colors().altBg1 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.DayPicker-Day--disabled',
+      style: { 'color': Colors().text2, 'background-color': Colors().altBg2 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.DayPicker-Day--outside',
+      style: { color: Colors().text2, background: Colors().altBg2 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.DayPicker-Day--sunday',
+      style: { 'color': Colors().text2, 'background-color': Colors().altBg1 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)',
+      style: { 'color': Colors().text1, 'background-color': Colors().active },
+    });
   }
 
   public getDate(): Date
@@ -180,4 +217,10 @@ class DatePicker extends TerrainComponent<Props>
   }
 }
 
-export default DatePicker;
+export default Util.createContainer(
+  DatePicker,
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);

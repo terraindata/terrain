@@ -54,7 +54,8 @@ const CodeMirror = require('./Codemirror.js');
 import './TQLEditor.less';
 
 import { Colors } from '../../colors/Colors';
-import ColorsActions from '../../colors/data/ColorsActions';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
+import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
 // syntax highlighters
@@ -97,6 +98,7 @@ import './dialog.less';
 export interface Props
 {
   tql: string;
+  colorsActions: typeof ColorsActions;
   language?: string;
   canEdit: boolean;
 
@@ -140,24 +142,87 @@ class TQLEditor extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('span.cm-atom', { color: Colors().builder.cards.booleanClause + '!important' });
-    ColorsActions.setStyle('span.cm-property ', { color: Colors().builder.cards.structureClause + '!important' });
-    ColorsActions.setStyle('span.cm-attribute', { color: '#f00' /* what is an attribute? */ + '!important' });
-    ColorsActions.setStyle('span.cm-keyword', { color: Colors().builder.cards.mapClause + '!important' });
-    ColorsActions.setStyle('span.cm-builtin', { color: Colors().builder.cards.baseClause + '!important' });
-    ColorsActions.setStyle('span.cm-string', { color: Colors().builder.cards.stringClause + '!important' });
-    ColorsActions.setStyle('span.cm-variable', { color: Colors().builder.cards.fieldClause + '!important' });
-    ColorsActions.setStyle('span.cm-variable-2', { color: Colors().builder.cards.inputParameter + '!important' });
-    ColorsActions.setStyle('span.cm-variable-3', { color: Colors().builder.cards.fieldClause + '!important' });
-    ColorsActions.setStyle('span.es-null', { color: Colors().builder.cards.nullClause + '!important' });
-    ColorsActions.setStyle('span.es-number', { color: Colors().builder.cards.numberClause + '!important' });
-    ColorsActions.setStyle('span.es-boolean', { color: Colors().builder.cards.booleanClause + '!important' });
-    ColorsActions.setStyle('span.es-parameter', { color: Colors().builder.cards.inputParameter + '!important' });
-    ColorsActions.setStyle('span.es-strin', { color: Colors().builder.cards.stringClause + '!important' });
-    ColorsActions.setStyle('.CodeMirror-scroll',
-      { background: (localStorage.getItem('theme') === 'DARK') ? Colors().bg1 + ' !important' : Colors().bg3 + ' !important' });
-    ColorsActions.setStyle('.CodeMirror-gutters',
-      { background: (localStorage.getItem('theme') === 'DARK') ? Colors().bg1 + ' !important' : Colors().bg3 + ' !important' });
+
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.cm-atom',
+      style: { color: Colors().builder.cards.booleanClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.cm-property',
+      style: { color: Colors().builder.cards.structureClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.cm-attribute',
+      style: { color: '#f00' /* what is an attribute? */ + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.cm-keyword',
+      style: { color: Colors().builder.cards.mapClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.cm-builtin',
+      style: { color: Colors().builder.cards.baseClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.cm-string',
+      style: { color: Colors().builder.cards.stringClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.cm-variable',
+      style: { color: Colors().builder.cards.fieldClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.cm-variable-2',
+      style: { color: Colors().builder.cards.inputParameter + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.cm-variable-3',
+      style: { olor: Colors().builder.cards.fieldClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.es-null',
+      style: { color: Colors().builder.cards.nullClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.es-number',
+      style: { color: Colors().builder.cards.numberClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.es-boolean',
+      style: { color: Colors().builder.cards.booleanClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.es-parameter',
+      style: { color: Colors().builder.cards.inputParameter + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'span.es-strin',
+      style: { color: Colors().builder.cards.stringClause + '!important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.CodeMirror-scroll',
+      style: { background: (localStorage.getItem('theme') === 'DARK') ? Colors().bg1 + ' !important' : Colors().bg3 + ' !important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.CodeMirror-gutters',
+      style: { background: (localStorage.getItem('theme') === 'DARK') ? Colors().bg1 + ' !important' : Colors().bg3 + ' !important' },
+    });
   }
 
   public componentWillUnmount()
@@ -438,4 +503,10 @@ class TQLEditor extends TerrainComponent<Props>
 
 }
 
-export default TQLEditor;
+export default Util.createContainer(
+  TQLEditor,
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);
