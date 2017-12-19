@@ -480,12 +480,11 @@ export class Export
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {
-          let fullTypeObj = {};
-          fullTypeObj = { type: 'text', index: 'not_analyzed', analyzer: null };
+          const fullTypeObj = { type: 'text', index: 'not_analyzed', analyzer: null as (string | null) };
           switch (typeof doc['_source'][field])
           {
             case 'number':
-              fullTypeObj['type'] = doc['_source'][field] % 1 === 0 ? 'long' : 'double';
+              fullTypeObj.type = doc['_source'][field] % 1 === 0 ? 'long' : 'double';
               if (!fieldObj.hasOwnProperty(field))
               {
                 fieldObj[field] = [fullTypeObj];
@@ -500,7 +499,7 @@ export class Export
               }
               break;
             case 'boolean':
-              fullTypeObj['type'] = 'boolean';
+              fullTypeObj.type = 'boolean';
               if (!fieldObj.hasOwnProperty(field))
               {
                 fieldObj[field] = [fullTypeObj];
@@ -515,15 +514,15 @@ export class Export
               }
               break;
             case 'object':
-              fullTypeObj['type'] = Array.isArray(doc['_source'][field]) === true ? 'array' : 'object';
+              fullTypeObj.type = Array.isArray(doc['_source'][field]) === true ? 'array' : 'object';
               if (!fieldObj.hasOwnProperty(field))
               {
-                fieldObj[field] = [fullTypeObj['type'] === 'array' ?
+                fieldObj[field] = [fullTypeObj.type === 'array' ?
                   this._recursiveArrayTypeHelper(doc['_source'][field]) : fullTypeObj];
               }
               else
               {
-                if (fullTypeObj['type'] === 'array')
+                if (fullTypeObj.type === 'array')
                 {
                   const fullArrayObj: object = this._recursiveArrayTypeHelper(doc['_source'][field]);
                   if (fieldObj[field].indexOf(fullArrayObj) < 0)
@@ -542,8 +541,8 @@ export class Export
               }
               break;
             default:
-              fullTypeObj['index'] = 'analyzed';
-              fullTypeObj['analyzer'] = 'standard';
+              fullTypeObj.index = 'analyzed';
+              fullTypeObj.analyzer = 'standard';
               if (!fieldObj.hasOwnProperty(field))
               {
                 fieldObj[field] = [fullTypeObj];
