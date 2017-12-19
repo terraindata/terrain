@@ -46,18 +46,18 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
+import { AuthState } from 'auth/AuthTypes';
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
+import { UserState } from 'users/UserTypes';
+import Util from 'util/Util';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import * as UserTypes from './../UserTypes';
-import Util from 'util/Util';
 import './Profile.less';
-import { AuthState } from 'auth/AuthTypes';
-import { UserState } from 'users/UserTypes';
 
 export interface Props
 {
@@ -140,7 +140,7 @@ class Profile extends TerrainComponent<Props>
 
   public componentWillUpdate(nextProps)
   {
-    this.updateUser(nextProps)
+    this.updateUser(nextProps);
   }
 
   public renderInfoItem(key: string)
@@ -286,6 +286,6 @@ immediately be logged out of any existing sessions. \
 
 export default Util.createContainer(
   Profile,
-  ['auth'],
+  ['auth', 'users'],
   { userActions: Actions },
 );

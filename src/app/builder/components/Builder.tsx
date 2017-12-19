@@ -73,6 +73,7 @@ type Algorithm = LibraryTypes.Algorithm;
 
 // Components
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { UserState } from 'users/UserTypes';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
@@ -83,7 +84,6 @@ import BuilderColumn from './BuilderColumn';
 import LayoutManager from './layout/LayoutManager';
 import { TabAction, Tabs } from './layout/Tabs';
 import ResultsManager from './results/ResultsManager';
-import { UserState } from 'users/UserTypes';
 
 const NewIcon = require('./../../../images/icon_new_21x17.svg?name=NewIcon');
 const OpenIcon = require('./../../../images/icon_open_11x10.svg?name=OpenIcon');

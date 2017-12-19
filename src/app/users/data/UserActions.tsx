@@ -43,6 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import Ajax from './../../util/Ajax';
 import * as UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';
@@ -60,7 +62,21 @@ const Actions =
 
     fetch:
     () => (dispatch) =>
-      dispatch($(ActionTypes.fetch, { setUsers: Actions.setUsers, dispatch })),
+    {
+      dispatch($(ActionTypes.fetch, {}));
+      Ajax.getUsers((usersObj) =>
+      {
+        let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
+        _.map(usersObj, (userObj, userId) =>
+        {
+          users = users.set(
+            +userId,
+            UserTypes._User(userObj),
+          );
+        });
+        dispatch(Actions.setUsers(users));
+      });
+    },
 
     setUsers:
     (users: UserTypes.UserMap) => (dispatch, getState) =>

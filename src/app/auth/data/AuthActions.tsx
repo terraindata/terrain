@@ -43,22 +43,26 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import UserActionTypes from 'users/data/UserActionTypes';
 import ActionTypes from './AuthActionTypes';
 
 const $ = (type: string, payload: any) =>
 {
   return { type, payload };
-}
+};
 
 const AuthActions =
   {
     login:
-    (accessToken: string, id: number) =>
-      $(ActionTypes.login, { accessToken, id }),
+    (accessToken: string, id: number) => (dispatch) =>
+    {
+      dispatch($(ActionTypes.login, { accessToken, id }));
+      dispatch($(UserActionTypes.updateCurrentUser, { id }));
+    },
 
     logout:
     () =>
-      $(ActionTypes.logout, null),
+      $(ActionTypes.logout, {}),
   };
 
 export default AuthActions;

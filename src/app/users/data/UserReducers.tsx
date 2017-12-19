@@ -61,18 +61,6 @@ UserReducers[ActionTypes.change] =
 UserReducers[ActionTypes.fetch] =
   (state, action) =>
   {
-    Ajax.getUsers((usersObj) =>
-    {
-      let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
-      _.map(usersObj, (userObj, userId) =>
-      {
-        users = users.set(
-          +userId,
-          UserTypes._User(userObj),
-        );
-      });
-      action.payload.dispatch(action.payload.setUsers(users));
-    });
     return state.set('loading', true);
   };
 
@@ -112,7 +100,7 @@ UserReducers[ActionTypes.completeTutorial] =
     return state;
   };
 
-const UserReducersWrapper = (state: Immutable.Map<ID, any> = Immutable.Map({}), action) =>
+const UserReducersWrapper = (state: UserTypes.UserState = UserTypes._UserState(), action) =>
 {
   let nextState = state;
   if (UserReducers[action.type] !== undefined)

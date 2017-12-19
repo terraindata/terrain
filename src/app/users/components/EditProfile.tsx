@@ -55,10 +55,10 @@ import Actions from './../data/UserActions';
 import * as UserTypes from './../UserTypes';
 const CameraIcon = require('./../../../images/icon_camera.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg');
-import { browserHistory } from 'react-router';
-import Util from 'util/Util';
 import { AuthState } from 'auth/AuthTypes';
+import { browserHistory } from 'react-router';
 import { UserState } from 'users/UserTypes';
+import Util from 'util/Util';
 
 export interface Props
 {
@@ -71,13 +71,13 @@ export interface Props
 
 export interface State
 {
-  user: UserTypes.User,
-  loading: boolean,
-  saving: boolean,
-  savingReq: any,
-  showDropDown: boolean,
-  errorModalOpen: boolean,
-  errorModalMessage: string,
+  user: UserTypes.User;
+  loading: boolean;
+  saving: boolean;
+  savingReq: any;
+  showDropDown: boolean;
+  errorModalOpen: boolean;
+  errorModalMessage: string;
 }
 
 class Profile extends TerrainComponent<Props>
@@ -124,8 +124,8 @@ class Profile extends TerrainComponent<Props>
 
   public updateUser(props: Props)
   {
-    const userState: UserTypes.UserState = this.props.users;
-    const authState = this.props.auth;
+    const userState: UserTypes.UserState = props.users;
+    const authState = props.auth;
     this.setState({
       user: userState.getIn(['users', authState.id]),
       loading: userState.get('loading'),
@@ -373,4 +373,4 @@ export default Util.createTypedContainer(
   Profile,
   ['auth', 'users'],
   { userActions: Actions },
-);;
+);

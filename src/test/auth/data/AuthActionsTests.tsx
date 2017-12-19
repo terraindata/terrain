@@ -43,33 +43,33 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { _AuthState, AuthState } from 'auth/AuthTypes';
 import Actions from 'auth/data/AuthActions';
 import ActionTypes from 'auth/data/AuthActionTypes';
-import { _AuthState, AuthState } from 'auth/AuthTypes';
 import * as Immutable from 'immutable';
 import { Ajax, createMockStore } from '../../helpers';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
 const loginResponse =
-{
-  "accessToken": "valid_access_token",
-  "id": 1,
-};
+  {
+    accessToken: 'valid_access_token',
+    id: 1,
+  };
 
 const logoutResponse =
-{
-  accessToken: "",
-  email: "luser@terraindata.com",
-  id: 1,
-  isDisabled: 0,
-  isSuperUser: 1,
-  meta: "{}",
-  name: "Terrain Admin",
-  oldPassword: null,
-  password: "$2a$10$HWMqhIOEnaVwmaT5R3trBuuutBGq0ljGbdCMv6s0sZfyT7vCo.JSO",
-  timezone: "",
-};
+  {
+    accessToken: '',
+    email: 'luser@terraindata.com',
+    id: 1,
+    isDisabled: 0,
+    isSuperUser: 1,
+    meta: '{}',
+    name: 'Terrain Admin',
+    oldPassword: null,
+    password: '$2a$10$HWMqhIOEnaVwmaT5R3trBuuutBGq0ljGbdCMv6s0sZfyT7vCo.JSO',
+    timezone: '',
+  };
 
 const mockStore = createMockStore();
 
@@ -83,11 +83,16 @@ describe('AuthActions', () =>
 
   describe('#login', () =>
   {
-    it('should create a login action', () => {
+    it('should create a login action', () =>
+    {
       const expectedActions = [
         {
           type: 'login',
           payload: { id: 2, accessToken: 'another_valid_token' },
+        },
+        {
+          type: 'users.updateCurrentUser',
+          payload: { id: 2 },
         },
       ];
 
@@ -100,11 +105,12 @@ describe('AuthActions', () =>
 
   describe('#logout', () =>
   {
-    it('should create a logout action', () => {
+    it('should create a logout action', () =>
+    {
       const expectedActions = [
         {
           type: 'logout',
-          payload: null,
+          payload: {},
         },
       ];
 

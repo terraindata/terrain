@@ -48,13 +48,13 @@ import * as Immutable from 'immutable';
 
 import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
 import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
+import { AuthReducers } from 'auth/data/AuthRedux';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
 import RolesReducer from 'roles/data/RolesReducers';
 import { SchemaReducers } from 'schema/data/SchemaRedux';
-import { AuthReducers } from 'auth/data/AuthRedux';
 import UserReducer from 'users/data/UserReducers';
 import Ajax from 'util/Ajax';
 import { ColorsReducers } from '../colors/data/ColorsRedux';

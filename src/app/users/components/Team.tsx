@@ -46,8 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
+import { AuthState } from 'auth/AuthTypes';
 import * as React from 'react';
 import { Link } from 'react-router';
+import Util from 'util/Util';
 import CreateItem from '../../common/components/CreateItem';
 import Ajax from '../../util/Ajax';
 import * as UserTypes from '../UserTypes';
@@ -57,8 +59,6 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/UserActions';
 import './Team.less';
 import UserThumbnail from './UserThumbnail';
-import { AuthState } from 'auth/AuthTypes';
-import Util from 'util/Util';
 type User = UserTypes.User;
 type UserMap = UserTypes.UserMap;
 
@@ -74,10 +74,10 @@ export interface Props
 
 export interface State
 {
-  addingUser: boolean,
-  showDisabledUsers: boolean,
-  errorModalOpen: boolean,
-  errorModalMessage: string,
+  addingUser: boolean;
+  showDisabledUsers: boolean;
+  errorModalOpen: boolean;
+  errorModalMessage: string;
 }
 
 class Team extends TerrainComponent<Props>
@@ -360,5 +360,5 @@ class Team extends TerrainComponent<Props>
 export default Util.createContainer(
   Team,
   ['auth', 'users'],
-  { userActions: Actions }
+  { userActions: Actions },
 );

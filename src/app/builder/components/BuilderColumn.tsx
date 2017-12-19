@@ -62,6 +62,7 @@ const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import Util from 'util/Util';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import DragHandle from '../../common/components/DragHandle';
@@ -71,7 +72,6 @@ import CardsColumn from './cards/CardsColumn';
 import TuningColumn from './cards/TuningColumn';
 import InputsArea from './inputs/InputsArea';
 import ResultsColumn from './results/ResultsColumn';
-import Util from 'util/Util';
 
 const SplitScreenIcon = require('./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');

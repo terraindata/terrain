@@ -50,12 +50,12 @@ import * as classNames from 'classnames';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import Util from 'util/Util';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Ajax from '../../util/Ajax';
 import Actions from '../data/AuthActions';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
-import Util from 'util/Util';
 import './Login.less';
 
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
@@ -383,5 +383,5 @@ class Login extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   Login,
   ['auth'],
-  { authActions: Actions }
+  { authActions: Actions },
 );

@@ -104,9 +104,9 @@ export interface Props
 
 export interface State
 {
-  rendered: boolean,
-  lastMoved: any,
-  roles: RoleTypes.RoleMap,
+  rendered: boolean;
+  lastMoved: any;
+  roles: RoleTypes.RoleMap;
   draggingItemIndex: number;
   draggingOverIndex: number;
 
@@ -720,5 +720,5 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   AlgorithmsColumn,
   ['users'],
-  {}
+  {},
 );

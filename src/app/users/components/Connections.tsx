@@ -50,11 +50,11 @@ import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as React from 'react';
 
+import { AuthState } from 'auth/AuthTypes';
 import FadeInOut from 'common/components/FadeInOut';
 import Switch from 'common/components/Switch';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { SchemaState } from 'schema/SchemaTypes';
-import { AuthState } from 'auth/AuthTypes';
 import Util from 'util/Util';
 import BackendInstance from '../../../database/types/BackendInstance';
 import CreateItem from '../../common/components/CreateItem';
@@ -93,14 +93,14 @@ export interface Props
 
 export interface State
 {
-  typeIndex: number,
-  loading: boolean,
-  servers: Server[],
-  expanded: Map<number, boolean>,
-  addingConnection: boolean,
-  errorModalOpen: boolean,
-  errorModalMessage: string,
-  analyticsEnabled: number,
+  typeIndex: number;
+  loading: boolean;
+  servers: Server[];
+  expanded: Map<number, boolean>;
+  addingConnection: boolean;
+  errorModalOpen: boolean;
+  errorModalMessage: string;
+  analyticsEnabled: number;
 }
 
 class Connections extends TerrainComponent<Props>

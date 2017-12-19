@@ -86,9 +86,14 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // for error reporting
 
 // data that needs to be loaded
+<<<<<<< HEAD
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
+=======
+import { AuthState } from 'auth/AuthTypes';
+>>>>>>> Fixed bugs that emerged from the auth and user store unifications. Fixed lint and styles.
 import { SchemaActions } from 'schema/data/SchemaRedux';
+import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
 import LibraryActions from './library/data/LibraryActions';
@@ -97,8 +102,6 @@ import LibraryStore from './library/data/LibraryStore';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
-import { UserState } from 'users/UserTypes';
-import { AuthState } from 'auth/AuthTypes';
 
 // Icons
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');

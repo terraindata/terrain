@@ -51,10 +51,10 @@ import * as _ from 'lodash';
 import * as React from 'react';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { UserState } from 'users/UserTypes';
 import { ItemStatus as Status } from '../../../items/types/Item';
 import RolesStore from '../../roles/data/RolesStore';
 import Util from '../../util/Util';
-import { UserState } from 'users/UserTypes';
 import * as LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -251,5 +251,5 @@ _.map(Status, (status, statusKey) =>
 export default Util.createTypedContainer(
   StatusDropdown,
   ['users'],
-  {}
+  {},
 );

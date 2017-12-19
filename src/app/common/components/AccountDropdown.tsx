@@ -76,9 +76,9 @@ export interface Props
 
 export interface State
 {
-  open?: boolean,
-  commitLogOpen?: boolean,
-  showingCredits?: boolean,
+  open?: boolean;
+  commitLogOpen?: boolean;
+  showingCredits?: boolean;
 }
 
 class AccountDropdown extends TerrainComponent<Props>

@@ -47,6 +47,8 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands no-unused-expression
 
 import * as React from 'react';
+import { UserState } from 'users/UserTypes';
+import Util from 'util/Util';
 import * as UserTypes from '../UserTypes';
 import CheckBox from './../../common/components/CheckBox';
 import Modal from './../../common/components/Modal';
@@ -55,8 +57,6 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
 import AccountEntry from './AccountEntry';
-import Util from 'util/Util';
-import { UserState } from 'users/UserTypes';
 import './Notifications.less';
 import './Select.less';
 
@@ -198,7 +198,7 @@ class Notifications extends TerrainComponent<Props>
   public async playSound()
   {
     const { users } = this.props;
-    if (users.currentUser)
+    if (users.currentUser !== null)
     {
       const soundName = users.currentUser.sound;
       if (soundName !== 'none')
@@ -218,7 +218,7 @@ class Notifications extends TerrainComponent<Props>
 
     const { users } = this.props;
 
-    if (users.currentUser)
+    if (users.currentUser !== null)
     {
       desktopNotification = users.currentUser.desktopNotificationType;
       sound = users.currentUser.sound;
@@ -294,7 +294,7 @@ class Notifications extends TerrainComponent<Props>
     let emailNotification: any;
     let emailTiming: any;
 
-    if (users.currentUser)
+    if (users.currentUser !== null)
     {
       emailNotification = users.currentUser.emailNotificationType;
       emailTiming = users.currentUser.emailNotificationTiming;
@@ -339,7 +339,7 @@ class Notifications extends TerrainComponent<Props>
     const { users } = this.props;
     let emailNewsOn: boolean;
 
-    if (users.currentUser)
+    if (users.currentUser !== null)
     {
       emailNewsOn = users.currentUser.emailNews === 'on';
     }
@@ -368,7 +368,7 @@ class Notifications extends TerrainComponent<Props>
   public renderEmail()
   {
     const { users } = this.props;
-    if (users.currentUser && users.currentUser.email)
+    if (users.currentUser !== null && users.currentUser.email !== '')
     {
       return (
         <div>
@@ -388,7 +388,7 @@ class Notifications extends TerrainComponent<Props>
     const { users } = this.props;
     let desktopNotification: any;
 
-    if (users.currentUser)
+    if (users.currentUser !== null)
     {
       desktopNotification = users.currentUser.desktopNotificationType;
     }
@@ -408,7 +408,7 @@ class Notifications extends TerrainComponent<Props>
     const { users } = this.props;
     let emailTiming: string;
 
-    if (users.currentUser)
+    if (users.currentUser !== null)
     {
       emailTiming = users.currentUser.emailNotificationTiming;
     }
@@ -427,7 +427,7 @@ class Notifications extends TerrainComponent<Props>
     const { users } = this.props;
     let emailNewsOn: boolean;
 
-    if (users.currentUser)
+    if (users.currentUser !== null)
     {
       emailNewsOn = (users.currentUser.emailNews) === 'on';
     }
@@ -477,5 +477,5 @@ class Notifications extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   Notifications,
   ['users'],
-  { userActions: Actions }
+  { userActions: Actions },
 );

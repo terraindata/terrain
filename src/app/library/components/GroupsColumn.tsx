@@ -98,8 +98,8 @@ export interface Props
 
 export interface State
 {
-  rendered: boolean,
-  roles: RoleTypes.RoleMap,
+  rendered: boolean;
+  roles: RoleTypes.RoleMap;
   lastMoved: string;
   draggingItemIndex: number;
   draggingOverIndex: number;
@@ -465,7 +465,7 @@ class GroupsColumn extends TerrainComponent<Props>
     );
 
     // scores.splice(0, 1); // remove Archived count
-    const { currentUser: me} = users;
+    const { currentUser: me } = users;
     const { roles } = this.state;
     const canArchive = (group.status !== ItemStatus.Archive); // me && roles && roles.getIn([group.categoryId, me.id, 'admin']);
     const canDuplicate = true;
@@ -767,5 +767,5 @@ class GroupsColumn extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   GroupsColumn,
   ['users'],
-  {}
+  {},
 );

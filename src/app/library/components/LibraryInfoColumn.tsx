@@ -95,7 +95,7 @@ export interface Props
 
 export interface State
 {
-  roles: RoleMap,
+  roles: RoleMap;
 }
 
 class LibraryInfoColumn extends TerrainComponent<Props>
@@ -381,5 +381,5 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 export default Util.createContainer(
   LibraryInfoColumn,
   ['users'],
-  {}
+  {},
 );

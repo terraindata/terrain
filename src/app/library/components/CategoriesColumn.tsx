@@ -47,6 +47,8 @@ THE SOFTWARE.
 // tslint:disable:no-empty no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-var-requires
 
 import * as React from 'react';
+import { UserState } from 'users/UserTypes';
+import Util from 'util/Util';
 import { ItemStatus } from '../../../items/types/Item';
 import CreateLine from '../../common/components/CreateLine';
 import RolesStore from '../../roles/data/RolesStore';
@@ -59,8 +61,6 @@ import * as LibraryTypes from './../LibraryTypes';
 import LibraryColumn from './LibraryColumn';
 import LibraryItem from './LibraryItem';
 import LibraryItemCategory from './LibraryItemCategory';
-import { UserState } from 'users/UserTypes';
-import Util from 'util/Util';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
 const CategoryIcon = require('./../../../images/icon_group_17x11.svg?name=GroupIcon');
@@ -82,10 +82,10 @@ export interface Props
 
 export interface State
 {
-  rendered: boolean,
-  lastMoved: any,
-  me: UserTypes.User,
-  roles: RoleTypes.RoleMap,
+  rendered: boolean;
+  lastMoved: any;
+  me: UserTypes.User;
+  roles: RoleTypes.RoleMap;
 }
 
 class CategoriesColumn extends TerrainComponent<Props>
@@ -325,5 +325,5 @@ class CategoriesColumn extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   CategoriesColumn,
   ['users'],
-  {}
+  {},
 );

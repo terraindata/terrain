@@ -46,11 +46,11 @@ THE SOFTWARE.
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import TerrainTools from 'util/TerrainTools';
 import AppRouter from './AppRouter';
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
 import LibraryStore from './library/data/LibraryStore';
 import TerrainStore from './store/TerrainStore';
-import TerrainTools from 'util/TerrainTools';
 
 declare global
 {

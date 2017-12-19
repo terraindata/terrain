@@ -75,9 +75,9 @@ export interface Props
 
 export interface State
 {
-  users: UserMap,
-  versions: any,
-  roles: RoleTypes.RoleMap,
+  users: UserMap;
+  versions: any;
+  roles: RoleTypes.RoleMap;
 }
 
 const MAX_RENDERED_ALGORITHMS = 100;
@@ -238,5 +238,5 @@ const ACTIVE_VERSION_STYLE = [
 export default Util.createTypedContainer(
   AlgorithmVersions,
   ['users'],
-  {}
+  {},
 );

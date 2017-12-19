@@ -49,6 +49,7 @@ THE SOFTWARE.
 import { List } from 'immutable';
 import * as React from 'react';
 
+import { AuthState } from 'auth/AuthTypes';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { notificationManager } from 'common/components/InAppNotification';
@@ -56,6 +57,7 @@ import Modal from 'common/components/Modal';
 import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { MidwayError } from 'shared/error/MidwayError';
+import Util from 'util/Util';
 import { Colors, Themes, ThemesArray } from '../../colors/Colors';
 import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
@@ -63,8 +65,6 @@ import Actions from '../data/UserActions';
 import * as UserTypes from '../UserTypes';
 import AccountEntry from './AccountEntry';
 import PasswordStrengthInput from './PasswordStrengthInput';
-import { AuthState } from 'auth/AuthTypes';
-import Util from 'util/Util';
 
 import './Settings.less';
 type User = UserTypes.User;
