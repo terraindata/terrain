@@ -70,6 +70,7 @@ const ExponentialIcon = require('images/icon_exponential.svg?name=ExponentialIco
 const LogarithmicIcon = require('images/icon_logarithmic.svg?name=LogarithmicIcon');
 const NormalIcon = require('images/icon_normal.svg?name=NormalIcon');
 const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
+const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
 export interface Props
 {
@@ -196,7 +197,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   {
     return (
       <div className='pf-score-line-expand'>
-        <span>Score:</span>
         <div className='pf-score-line-transform-preview'>
           <TransformChartPreviewWrapper
             points={this.props.line.transformData.scorePoints}
@@ -238,6 +238,14 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('field')}
         />
+        <div
+          className='pf-score-line-transform-arrow'
+        />
+        {
+          !this.props.line.expanded ?
+            this.renderTransformChartPreview() :
+            null
+        }
       </div>
     );
   }
@@ -258,7 +266,17 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         onExpand={this.handleExpandedChange}
         expanded={this.props.line.expanded}
         expandableContent={expandableContent}
-        expandButton={this.renderTransformChartPreview()}
+        expandButton={<div
+          className={classNames({
+            'pf-score-line-arrow': true,
+            'pf-score-line-arrow-open': this.props.line.expanded,
+          })}
+          style={this.props.line.expanded ? getStyle('fill', Colors().active)
+            : getStyle('fill', Colors().iconColor)}
+        >
+          <ArrowIcon />
+        </div>}
+        expandOnLeft={true}
       />
     );
   }

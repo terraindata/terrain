@@ -50,7 +50,6 @@ import ElasticController from '../../src/database/elastic/ElasticController';
 import MySQLConfig from '../../src/database/mysql/MySQLConfig';
 import MySQLController from '../../src/database/mysql/MySQLController';
 import * as Tasty from '../../src/tasty/Tasty';
-import { TastyQuery } from '../../src/tasty/TastyQuery';
 
 // run this test `./node_modules/.bin/ts-node --harmony ./midway/test/utils/CopyDataFromSqlToElastic.ts`
 

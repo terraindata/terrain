@@ -91,6 +91,7 @@ export interface Card extends IRecord<Card>
   _isCard: boolean;
   _isBlock: boolean;
   closed: boolean;
+  disabled: boolean;
   tuning?: boolean; // whether the card is in the tuning section
   // whether a card in tuning column is collapsed (needs to be sep. from closed)
   tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
@@ -187,7 +188,7 @@ export interface CardConfig
   };
 }
 
-export const allCardsMetaFields = allBlocksMetaFields.concat(['closed', 'tuning', 'tuningClosed', 'map_text']);
+export const allCardsMetaFields = allBlocksMetaFields.concat(['disabled', 'closed', 'tuning', 'tuningClosed', 'map_text']);
 
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
@@ -201,6 +202,7 @@ export const _card = (config: CardConfig) =>
     _isCard: true,
     _isBlock: true,
     closed: false,
+    disabled: false,
     tuning: false,
     tuningClosed: false,
     map_text: '',

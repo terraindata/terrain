@@ -46,11 +46,10 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import './StatusDropdown.less';
-const { List } = Immutable;
+
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { ItemStatus as Status } from '../../../items/types/Item';
 import RolesStore from '../../roles/data/RolesStore';
@@ -59,6 +58,7 @@ import Util from '../../util/Util';
 import * as LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import './StatusDropdown.less';
 
 const StarIcon = require('../../../images/icon_star.svg?name=StarIcon');
 

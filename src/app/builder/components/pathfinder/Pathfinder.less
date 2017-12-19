@@ -123,11 +123,35 @@
 				}	
 			}
 		}
+		.pf-score-line-arrow {
+			svg
+			{
+				height: 11px;
+			}
+	    	margin-left: 12px;
+	    	margin-right: -6px;
+	    	cursor: pointer;
+	    	.transition;
+			.rotate(90deg);
+			&.pf-score-line-arrow-open {
+				.rotate180;
+			}
+			&.pf-score-line-arrow {
+				display: inline-block;
+			}
+		}
 		.pf-score-line-inner {
 			.builder-tb {
 				flex-basis: 50px;
 				margin: 0px 4px;
 			}
+			.pf-score-line-transform-arrow {
+			    border-top: 1px solid #47a7ff;
+			    border-right: 1px solid #47a7ff;
+			    position: absolute;
+			    z-index: 9; // put it on top of the child card's background
+			    .transition;
+		 	}
 		}
 		.pf-score-line-text {
 			font-size: @font-size;
@@ -146,14 +170,6 @@
 			.close {
 				margin-top: 6px;
     			margin-left: 6px;
-			}
-			.pf-score-line-expand {
-				display: flex;
-				font-size: @font-size;
-				span {
-					padding-right: 6px;
-    				padding-top: 3px;
-				}
 			}
 		}
 	}

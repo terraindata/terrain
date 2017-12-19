@@ -148,6 +148,7 @@ export let BuilderCardActionTypes = {};
 export let BuilderPathActionTypes = {};
 [
   BuilderActionTypes.change,
+  BuilderActionTypes.queryLoaded,
 ].map((type) => BuilderPathActionTypes[type] = true);
 
 export default BuilderActionTypes;

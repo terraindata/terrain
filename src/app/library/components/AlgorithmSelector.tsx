@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
 
@@ -59,7 +59,6 @@ import { LibraryItem } from 'library/LibraryTypes';
 import './AlgorithmSelector.less';
 
 const Color = require('color');
-const { List } = Immutable;
 
 export interface Props
 {

@@ -90,7 +90,6 @@ const TransformUtil = {
     const y1: number = pointsData[0].y || pointsData[0].score;
     let x2: number = pointsData[1].x || pointsData[1].value;
     const y2: number = pointsData[1].y || pointsData[1].score;
-
     const ranges = [];
     const outputs = [];
     const stepSize = Math.abs(x2 - x1) * (1 / numPoints);

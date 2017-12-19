@@ -48,14 +48,14 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-const { Map, List } = Immutable;
 
 import { Block, BlockConfig } from './types/Block';
 import { Card, Cards } from './types/Card';
 
 import { DisplayType } from './displays/Display';
-
 // import { AllBackendsMap } from '../database/AllBackends';
+
+const { List, Map } = Immutable;
 
 export function getChildIds(_block: Block): IMMap<ID, boolean>
 {

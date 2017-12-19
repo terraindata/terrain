@@ -48,12 +48,12 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import createReactClass = require('create-react-class');
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import './BuilderColumn.less';
-const { List } = Immutable;
+
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
 import RolesStore from '../../roles/data/RolesStore';
@@ -320,7 +320,7 @@ const BuilderColumn = createReactClass<any, any>(
 
     getMenuOptions(): List<MenuOption> // TODO
     {
-      const options: List<MenuOption> = Immutable.List(_.range(0, NUM_COLUMNS).map((index) => ({
+      const options: List<MenuOption> = List(_.range(0, NUM_COLUMNS).map((index) => ({
         text: COLUMNS[index],
         onClick: this.switchView,
         selected: index === this.state.column,

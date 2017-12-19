@@ -47,52 +47,52 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
 import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
+import Util from 'app/util/Util';
+import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
 
 export function parsePath(path: Path): string
 {
-  const baseQuery = {
-    query: {
-      bool: {
-        filter: [],
-        must: [],
-        must_not: [],
-        should: [],
-      },
-    },
-    sort: {},
-    aggs: {},
+  let baseQuery = Map({
+    query: Map({
+      bool: Map({
+        filter: List([]),
+        must: List([]),
+        should: List([]),
+        must_not: List([]),
+      }),
+    }),
+    sort: Map({}),
+    aggs: Map({}),
     from: 0,
     size: 1000,
     track_scores: true,
-  };
+  });
   const sourceInfo = parseSource(path.source);
-  baseQuery.from = sourceInfo.from;
-  baseQuery.size = sourceInfo.size;
-  baseQuery.query.bool.filter =
-    [
-      {
-        term: {
-          _index: sourceInfo.index.split('/')[1],
-        },
-      },
-    ];
-  if (path.score.lines.size)
+  baseQuery = baseQuery.set('from', sourceInfo.from);
+  baseQuery = baseQuery.set('size', sourceInfo.size);
+  baseQuery = baseQuery.setIn(['query', 'bool', 'filter'], List([
+    Map({
+      term: Map({
+        _index: sourceInfo.index.split('/')[1],
+      }),
+    }),
+  ]));
+  let filterObj = parseFilters(path.filterGroup);
+  filterObj = filterObj.setIn(['bool', 'filter'],
+    filterObj.getIn(['bool', 'filter'])
+      .concat(baseQuery.getIn(['query', 'bool', 'filter'])));
+  baseQuery = baseQuery.set('query', filterObj);
+  if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
     const sortObj = parseScore(path.score);
-    baseQuery.sort = sortObj;
+    baseQuery = baseQuery.set('sort', sortObj);
   }
-
-  const filterObj = parseFilters(path.filterGroup);
-  filterObj.bool.filter.concat(baseQuery.query.bool.filter);
-  console.log(baseQuery);
-  console.log(filterObj);
-  baseQuery.query = filterObj;
   const moreObj = parseMore(path.more);
-  baseQuery.aggs = moreObj;
-  return JSON.stringify(baseQuery, null, 2);
+  baseQuery = baseQuery.set('aggs', Map(moreObj));
+  return JSON.stringify(baseQuery.toJS(), null, 2);
 }
 
 function parseSource(source: Source): any
@@ -150,8 +150,8 @@ function parseTerrainScore(score: Score)
     let ranges = [];
     let outputs = [];
     let data;
-    const min = line.transformData.dataDomain[0];
-    const max = line.transformData.dataDomain[1];
+    const min = Util.asJS(line.transformData).dataDomain[0];
+    const max = Util.asJS(line.transformData).dataDomain[1];
     const numPoints = 31;
     if (line.transformData['mode'] === 'normal' &&
       line.transformData['scorePoints'].size === NUM_CURVE_POINTS.normal)
@@ -175,7 +175,6 @@ function parseTerrainScore(score: Score)
       ranges = line.transformData['scorePoints'].map((scorePt) => scorePt.value).toArray();
       outputs = line.transformData['scorePoints'].map((scorePt) => scorePt.score).toArray();
     }
-
     if (data !== undefined)
     {
       ranges = data.ranges;
@@ -207,18 +206,18 @@ function parseFilters(filterGroup: FilterGroup): any
   // If the minMatches is not all
   // add all the filter conditions to should, set minimum_should_match on the outside of that bool
   // By adding all the filter conditions to should, do same process as above
-  const filterObj = {
-    bool: {
-      filter: [],
-      must: [],
-      must_not: [],
-      should: [],
-    },
-  };
-  const must = [];
-  const mustNot = [];
-  const filter = [];
-  const should = [];
+  let filterObj = Map({
+    bool: Map({
+      filter: List([]),
+      must: List([]),
+      must_not: List([]),
+      should: List([]),
+    }),
+  });
+  let must = List([]);
+  let mustNot = List([]);
+  let filter = List([]);
+  let should = List([]);
   let useShould = false;
   if (filterGroup.minMatches !== 'all')
   {
@@ -231,35 +230,35 @@ function parseFilters(filterGroup: FilterGroup): any
       const lineInfo = parseFilterLine(line);
       if (useShould)
       {
-        should.push(lineInfo);
+        should = should.push(lineInfo);
       }
       else if (line.comparison === 'notequal' || line.comparison === 'notcontain')
       {
-        mustNot.push(lineInfo);
+        mustNot = mustNot.push(lineInfo);
       }
       else if (line.comparison === 'located') // TODO MAYBE ADD NON-TEXT FILTERS HERE AS WELL
       {
-        filter.push(lineInfo);
+        filter = filter.push(lineInfo);
       }
       else
       {
-        must.push(lineInfo);
+        must = must.push(lineInfo);
       }
     }
     else
     {
       const nestedFilter = parseFilters(line.filterGroup);
-      must.push(nestedFilter);
+      must = must.push(nestedFilter);
     }
   });
   if (useShould)
   {
-    filterObj.bool['minimum_should_match'] = filterGroup.minMatches === 'any' ? 1 : filterGroup.minMatches;
+    filterObj = filterObj.setIn(['bool', 'minimum_should_match'], filterGroup.minMatches === 'any' ? 1 : filterGroup.minMatches);
   }
-  filterObj.bool.must = must;
-  filterObj.bool.must_not = mustNot;
-  filterObj.bool.should = should;
-  filterObj.bool.filter = filter;
+  filterObj = filterObj.setIn(['bool', 'must'], must);
+  filterObj = filterObj.setIn(['bool', 'must_not'], mustNot);
+  filterObj = filterObj.setIn(['bool', 'should'], should);
+  filterObj = filterObj.setIn(['bool', 'filter'], filter);
   return filterObj;
 }
 
@@ -268,93 +267,98 @@ function parseFilterLine(line: FilterLine)
   switch (line.comparison)
   {
     case 'equal':
-      return {
-        term: {
-          [line.field]: String(line.value),
-        },
-      };
+      return Map({
+        term: Map({
+          [line.field]: Map({
+            value: line.value,
+            boost: line.weight,
+          }),
+        }),
+      });
     case 'contains':
-      return {
-        match: {
-          [line.field]: line.value,
-        },
-      };
+      return Map({
+        match: Map({
+          [line.field]: Map({
+            value: String(line.value),
+            boost: line.weight,
+          }),
+        }),
+      });
     case 'notequal':
-      return {
-        term: {
-          [line.field]: line.value,
-        },
-      };
+      return Map({
+        term: Map({
+          [line.field]: Map({
+            value: String(line.value),
+            boost: line.weight,
+          }),
+        }),
+      });
     case 'notcontain':
-      return {
-        match: {
-          [line.field]: line.value,
-        },
-      };
+      return Map({
+        match: Map({
+          [line.field]: Map({
+            value: String(line.value),
+            boost: line.weight,
+          }),
+        }),
+      });
     case 'greater':
     case 'alphaafter':
     case 'dateafter':
-      return {
-        range: {
+      return Map({
+        range: Map({
           [line.field]:
-          {
+          Map({
             gt: line.value,
-          },
-        },
-      };
+            boost: line.weight,
+          }),
+        }),
+      });
     case 'less':
     case 'alphabefore':
     case 'datebefore':
-      return {
-        range: {
+      return Map({
+        range: Map({
           [line.field]:
-          {
+          Map({
             lt: line.value,
-          },
-        },
-      };
+            boost: line.weight,
+          }),
+        }),
+      });
     case 'greaterequal':
-      return {
-        range: {
+      return Map({
+        range: Map({
           [line.field]:
-          {
+          Map({
             gte: line.value,
-          },
-        },
-      };
+            boost: line.weight,
+          }),
+        }),
+      });
     case 'lessequal':
-      return {
-        range: {
+      return Map({
+        range: Map({
           [line.field]:
-          {
+          Map({
             lte: line.value,
-          },
-        },
-      };
+            boost: line.weight,
+          }),
+        }),
+      });
     case 'located':
       const distanceObj = line.value as DistanceValue;
-      return {
-        geo_distance: {
+      return Map({
+        geo_distance: Map({
           distance: String(distanceObj.distance) + distanceObj.units,
           [line.field]: distanceObj.location,
-        },
-      };
+        }),
+      });
     default:
-      return {};
+      return Map({});
   }
 }
-// public field: string = '';
-// public name: string = '';
-// // Type is the human readable version of elasticType
-// // e.g. type = Full Statistics, elasticType = extended_stats
-// public elasticType: string = '';
-// public type: string = '';
-// public advanced: any = Map<string, any>({});
-// public expanded: boolean = false;
-// public sampler: Sample = undefined;
-// public filters: FilterGroup = undefined;
-// public nested: List<AggregationLine> = undefined;
-// public scripts: List<Script> = undefined;
+
 const unusedKeys = [
   'name',
   'compression',
@@ -368,7 +372,7 @@ const unusedKeys = [
   'min',
   'max',
 ];
-function parseMore(more: More)
+function parseMore(more: More): {}
 {
   const moreObj = {};
   more.aggregations.forEach((agg) =>

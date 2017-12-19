@@ -251,7 +251,7 @@ export const ElasticBlockHelpers = {
 
       ).toList().get(0);
       const dataType = col.datatype;
-      let fieldType = 0;
+      let fieldType: any = 0;
       _.keys(FieldTypeMapping).forEach((ft) =>
       {
         if (FieldTypeMapping[ft].indexOf(dataType) !== -1
