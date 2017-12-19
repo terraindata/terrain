@@ -527,6 +527,11 @@ class Builder extends TerrainComponent<Props>
 
   public shouldSave(overrideState?: BuilderState): boolean
   {
+    // empty builder, should never have to save
+    if (!this.props.params.config)
+    {
+      return false;
+    }
     const algorithm = this.getAlgorithm();
     if (algorithm)
     {
