@@ -56,12 +56,12 @@ import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import CredentialConfig from '../credentials/CredentialConfig';
 import Credentials from '../credentials/Credentials';
+import DatabaseConfig from '../database/DatabaseConfig';
 import { Export, ExportConfig } from '../io/Export';
 import { Import } from '../io/Import';
 import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
 import SchedulerConfig from './SchedulerConfig';
-import DatabaseConfig from "../database/DatabaseConfig";
 
 export const exprt: Export = new Export();
 export const imprt: Import = new Import();
@@ -150,7 +150,7 @@ export class Scheduler
         {
           for (const schedule of schedules)
           {
-            schedule.active = !!status;
+            schedule.active = status === 1 ? true : false;
             if (status === 0)
             {
               await this.cancelJob(schedule.id);
@@ -657,7 +657,7 @@ export class Scheduler
       if (schedules.length !== 0)
       {
         const schedule: SchedulerConfig = schedules[0];
-        schedule.currentlyRunning = status ? true : false;
+        schedule.currentlyRunning = status === 1 ? true : false;
         return resolve(true);
       }
       return resolve(false);

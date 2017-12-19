@@ -240,14 +240,14 @@ export default class SQLGenerator
   {
     this.appendExpression(query.command);
     this.queryString = 'INSERT INTO ';
-    //this.indent();
+    // this.indent();
 
     // write INTO clause
-    //this.newLine();
-    //this.queryString += 'INTO ';
+    // this.newLine();
+    // this.queryString += 'INTO ';
     const tableName: string = this.escapeString(query.table.getTableName());
     this.queryString += tableName;
-    //this.queryString += ' SET ';
+    // this.queryString += ' SET ';
 
     const baseQuery = this.queryString;
 
@@ -310,7 +310,9 @@ export default class SQLGenerator
     return definedColumns;
   }
 
-  public accumulateUpsert(columns: string[], primaryKeys: string[], tableName: string, accumulatedUpdates: object[], placeholder: boolean): void
+  public accumulateUpsert(columns: string[], primaryKeys: string[],
+      tableName: string, accumulatedUpdates: object[],
+      placeholder: boolean): void
   {
     if (accumulatedUpdates.length <= 0)
     {

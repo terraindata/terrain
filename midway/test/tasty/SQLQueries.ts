@@ -50,7 +50,7 @@ const SQLQueries: Array<[string, [string]]> = [
     [`SELECT * \n  FROM movies\n  LIMIT 1;`],
   ],
 
-/*  [
+  [
     'simple query (select columns)',
     [`SELECT movies.movieid, movies.title, movies.releasedate \n  FROM movies\n  LIMIT 10;`],
   ],
@@ -86,11 +86,6 @@ const SQLQueries: Array<[string, [string]]> = [
   ],
 
   [
-    'simple query (upsert)',
-    [`REPLACE \n  INTO movies (movieid, releasedate, title) VALUES (13371337, '2017-01-01', 'My New Movie');`],
-  ],
-
-  [
     'simple query (delete)',
     [`DELETE \n  FROM movies\n  WHERE movies.movieid = 13371337;`],
   ],
@@ -104,7 +99,7 @@ const SQLQueries: Array<[string, [string]]> = [
   ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC
   LIMIT 10 OFFSET 20;`,
     ],
-    ],*/
+    ],
 ];
 
 export default SQLQueries;

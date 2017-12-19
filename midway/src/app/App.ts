@@ -145,19 +145,15 @@ class App
   {
     // create application schema
     await Schema.createAppSchema(this.config.db as string, this.DB);
-    console.log("MADE DAT SCHEMA");
 
     // process configuration options
     await Config.handleConfig(this.config);
-    console.log("MADE DEM CONF OPTIONS");
 
     // create a default seed user
     await users.initializeDefaultUser();
-    console.log("MADE DEFAULT USER");
 
     // add local filesystem credential config
     await credentials.initializeLocalFilesystemCredential();
-    console.log("MADE CREDNETIALXZXXZZZZZZZZ");
 
     // connect to configured databases
     const dbs = await databases.select(['id'], {});

@@ -50,6 +50,7 @@ import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
 import PostgresController from '../../../../src/database/pg/PostgreSQLController';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
+import PostgreSQLQueries from '../../../tasty/PostgreSQLQueries';
 import SQLQueries from '../../../tasty/SQLQueries';
 import * as Utils from '../../../Utils';
 
@@ -68,12 +69,10 @@ beforeAll(async () =>
   (winston as any).level = 'debug';
   const config: PostgresConfig =
     {
-      connectionLimit: 20,
       database: 'moviesdb',
       host: 'localhost',
       password: 'r3curs1v3$',
       user: 't3rr41n-demo',
-      dateStrings: true,
     };
 
   try
@@ -87,17 +86,16 @@ beforeAll(async () =>
   }
 });
 
-function runTest(index: number)
+function runTest(testObj: object)
 {
-  const testName: string = 'Postgres: execute ' + SQLQueries[index][0];
+  const testName: string = 'Postgres: execute ' + testObj[0];
   test(testName, async (done) =>
   {
     try
     {
-      const results = await tasty.getDB().execute(SQLQueries[index][1]);
-      console.log("RESULTS:");
-      console.log(results);
-      exit();
+      const results = await tasty.getDB().execute(testObj[1]);
+      console.log('RESULTS for ' + testName + ':');
+      console.log(JSON.stringify(results));
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
     }
     catch (e)
@@ -108,9 +106,11 @@ function runTest(index: number)
   });
 }
 
-for (let i = 0; i < SQLQueries.length; i++)
+const tests = SQLQueries.concat(PostgreSQLQueries);
+
+for (let i = 0; i < tests.length; i++)
 {
-  runTest(i);
+  runTest(tests[i]);
 }
 
 afterAll(async () =>
