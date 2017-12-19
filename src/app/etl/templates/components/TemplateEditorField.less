@@ -1,5 +1,4 @@
 @import "../../../common/Common.less";
-@import "./TemplateEditor.less";
 
 .tef-layout-row {
   display: flex;
@@ -89,100 +88,62 @@
   height: 24px;
 }
 
-.template-editor-content {
+.template-editor-field-row {
   display: flex;
+  align-items: center;
+  flex: 1;
+  padding: @quarter-spacing 0px;
 
-  .template-editor-field-row {
+  .include-field-checkbox-spacer {
+    padding-left: @quarter-spacing;
+  }
+
+  .template-editor-pkey-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .template-editor-key-button {
+      .transition;
+      cursor: pointer;
+      padding: @half-spacing @half-spacing @quarter-spacing @half-spacing;
+      margin-left: @half-spacing;
+      border-radius: 3px;
+      svg path {
+        stroke: currentColor;
+      }
+    }
+
+    .template-editor-key-icon {
+      fill: currentColor;
+    }
+  }
+
+  .template-editor-analyzed-section {
+    padding-left: @half-spacing;
+    display: flex;
+    cursor: pointer;
+    .transition;
+  }
+
+  .template-editor-field-settings {
+    .transition;
+    border: 1px solid;
+    flex-grow: 1;
+  }
+
+  .template-editor-field-label-group {
     display: flex;
     align-items: center;
-    flex: 1;
-    padding: @quarter-spacing 0px;
+    cursor: pointer;
+  }
 
-    .include-field-checkbox-spacer {
-      padding-left: @quarter-spacing;
-    }
-
-    .template-editor-pkey-section {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      .template-editor-key-button {
-        .transition;
-        cursor: pointer;
-        padding: @half-spacing @half-spacing @quarter-spacing @half-spacing;
-        margin-left: @half-spacing;
-        border-radius: 3px;
-        svg path {
-          stroke: currentColor;
-        }
-      }
-
-      .template-editor-key-icon {
-        fill: currentColor;
-      }
-    }
-
-    .template-editor-analyzed-section {
-      padding-left: @half-spacing;
-      display: flex;
-      cursor: pointer;
-      .transition;
-    }
-
-    .template-editor-field-settings {
-      .transition;
-      border: 1px solid;
-      flex-grow: 1;
-    }
-
+  .template-editor-field-input-disabled {
     .template-editor-field-label-group {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-    }
-
-    .template-editor-field-input-disabled {
-      .template-editor-field-label-group {
-        cursor: auto;
-      }
+      cursor: auto;
     }
   }
 }
-
-.template-editor-field-preview-row {
-  display: flex;
-  padding-left: @spacing;
-  align-items: center;
-  width: @template-editor-preview-width;
-
-  .field-preview-draw-borders-wrapper {
-    align-self: stretch;
-    display: flex;
-    flex-direction: column;
-    .field-preview-draw-borders {
-      flex: 1;
-    }
-  }
-
-  ::-webkit-scrollbar {
-    height: 5px;
-  }
-
-  // ::-webkit-scrollbar-thumb {
-  //   height: 3px;
-  // }
-
-  .field-preview-name {
-    width: 140px;
-    overflow: auto;
-    text-align: left;
-    white-space: nowrap;
-  }
-  
-}
-
-
 
 .template-editor-children-container {
   display: flex;

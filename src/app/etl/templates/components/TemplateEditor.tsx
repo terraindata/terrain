@@ -105,10 +105,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
     const titleTypeText = template.type === TEMPLATE_TYPES.IMPORT ? 'Import' : 'Export';
     return (
       <div className='template-editor-root-container'>
-        <div className='template-editor-title-bar'>
-          <div className='template-editor-editor-title'> Edit {titleTypeText} Template </div>
-          <div className='template-editor-preview-title'> {titleTypeText} Preview </div>
-        </div>
         <TemplateEditorFieldNode
           keyPath={List([])}
           field={template.rootField}

@@ -59,7 +59,6 @@ import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/template
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
-import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
 const AddIcon = require('images/icon_add.svg');
@@ -128,18 +127,11 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     const { field, keyPath, canEdit } = this.props;
 
     const settings = (
-      <div className='template-editor-content'>
-        <TemplateEditorFieldSettings
-          keyPath={keyPath}
-          field={field}
-          canEdit={canEdit}
-        />
-        <TemplateEditorFieldPreview
-          keyPath={keyPath}
-          field={field}
-          canEdit={canEdit}
-        />
-      </div>
+      <TemplateEditorFieldSettings
+        keyPath={keyPath}
+        field={field}
+        canEdit={canEdit}
+      />
     );
 
     const children = (this._isRoot() || this._isNested()) ? (
