@@ -52,7 +52,6 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { addBodyToQuery } from '../../../../shared/database/elastic/ElasticUtil';
 import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
@@ -72,46 +71,6 @@ export interface ExportConfig extends TemplateBase, ExportTemplateConfig
   file: stream.Readable;
   filetype: string;
   update: boolean;      // false means replace (instead of update) ; default should be true
-}
-
-function temporaryFindIndexAndType(queryObj)
-{
-  let index = '';
-  let type = '';
-  try
-  {
-    const filters = queryObj['body']['query']['bool']['filter'];
-    for (const filter of filters)
-    {
-      try
-      {
-        if (filter['term']['_index'] !== undefined)
-        {
-          index = filter['term']['_index'];
-        }
-      }
-      catch (e)
-      {
-        // do nothing
-      }
-      try
-      {
-        if (filter['term']['_type'] !== undefined)
-        {
-          type = filter['term']['_index'];
-        }
-      }
-      catch (e)
-      {
-        // do nothing
-      }
-    }
-  }
-  catch (e)
-  {
-    return [];
-  }
-  return [index, type];
 }
 
 export class Export
@@ -173,38 +132,16 @@ export class Export
       {
         exprt.objectKey = objectKeyValue;
       }
-      let qry: string = '';
-
-      // if (this.props.exporting)
-      // {
-      //   const stringQuery: string =
-      //     ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      //   const parsedQuery = JSON.parse(stringQuery);
-      //   const dbName = parsedQuery['index'];
-      //   const tableName = parsedQuery['type'];
-      //   Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
-      // } // Parse the TQL and set the filters so that when we fetch we get the right templates.
 
       // get query data from algorithmId or query (or variant Id if necessary)
+      let qry: string = '';
       if ((exprt as any).variantId !== undefined && exprt.algorithmId === undefined)
       {
         exprt.algorithmId = (exprt as any).variantId;
       }
       if (exprt.algorithmId !== undefined && exprt.query === undefined)
       {
-        const algorithms: ItemConfig[] = await TastyItems.get(exprt.algorithmId);
-        if (algorithms.length === 0)
-        {
-          return reject('Algorithm not found.');
-        }
-        if (algorithms[0]['meta'] !== undefined)
-        {
-          const algorithmMeta: object = JSON.parse(algorithms[0]['meta'] as string);
-          if (algorithmMeta['query'] !== undefined && algorithmMeta['query']['tql'] !== undefined)
-          {
-            qry = algorithmMeta['query']['tql'];
-          }
-        }
+        qry = JSON.stringify(await this._getQueryFromAlgorithm(exprt.algorithmId));
       }
       else if (exprt.algorithmId === undefined && exprt.query !== undefined)
       {
@@ -219,8 +156,13 @@ export class Export
         return reject('Empty query provided.');
       }
 
-      let qryObj: object;
       const mapping: object = exprt.columnTypes;
+      if (typeof mapping === 'string')
+      {
+        return reject(mapping);
+      }
+
+      let qryObj: object;
       try
       {
         qryObj = JSON.parse(qry);
@@ -231,12 +173,6 @@ export class Export
       }
 
       qryObj = this._shouldRandomSample(qryObj);
-
-      if (typeof mapping === 'string')
-      {
-        return reject(mapping);
-      }
-      qryObj = addBodyToQuery(qryObj, this.SCROLL_TIMEOUT);
 
       let rankCounter: number = 1;
       let writer: any;
@@ -274,7 +210,6 @@ export class Export
       });
 
       const renameTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'rename');
-
       renameTransformations.forEach((transformation) =>
       {
         originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
@@ -429,31 +364,8 @@ export class Export
 
   public async getNamesAndTypesFromAlgorithm(dbid: number, algorithmId: number): Promise<object | string>
   {
-    return new Promise<object | string>(async (resolve, reject) =>
-    {
-      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
-      if (database === undefined)
-      {
-        return reject('Database "' + dbid.toString() + '" not found.');
-      }
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File export currently is only supported for Elastic databases.');
-      }
-      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-      const algorithms: ItemConfig[] = await TastyItems.get(algorithmId);
-      if (algorithms.length === 0)
-      {
-        return reject('Algorithm not found.');
-      }
-      let qry: object | string = await this._getQueryFromAlgorithm(algorithms[0]);
-      if (typeof qry === 'string')
-      {
-        return reject(qry);
-      }
-      qry = this._shouldRandomSample(qry as object);
-      return resolve(await this._getAllFieldsAndTypesFromQuery(elasticClient, qry));
-    });
+    const qry: object | string = await this._getQueryFromAlgorithm(algorithmId);
+    return this.getNamesAndTypesFromQuery(dbid, qry);
   }
 
   private _shouldRandomSample(qry: object): object
@@ -470,21 +382,27 @@ export class Export
     return qry;
   }
 
-  private async _getQueryFromAlgorithm(algorithm: ItemConfig): Promise<object | string>
+  private async _getQueryFromAlgorithm(algorithmId: number): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
+      const algorithms: ItemConfig[] = await TastyItems.get(algorithmId);
+      if (algorithms.length === 0)
+      {
+        return reject('Algorithm not found.');
+      }
+
       let qry: object = {};
       try
       {
-        if (algorithm.meta !== undefined)
+        if (algorithms[0].meta !== undefined)
         {
-          qry = JSON.parse(algorithm.meta)['query']['tql'];
+          qry = JSON.parse(algorithms[0].meta as string)['query']['tql'];
         }
       }
       catch (e)
       {
-        return resolve('Malformed algorithm');
+        return reject('Malformed algorithm');
       }
       return resolve(qry);
     });
