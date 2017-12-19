@@ -116,7 +116,7 @@ export interface State
   duplicateAlgorithmId: ID;
 }
 
-class AlgorithmsColumn extends TerrainComponent<Props>
+export class AlgorithmsColumn extends TerrainComponent<Props>
 {
   public state: State = {
     rendered: false,
