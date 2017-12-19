@@ -239,8 +239,16 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           keyPath={this.props.keyPath.push('field')}
         />
         <div
-          className='pf-score-line-transform-arrow'
-        />
+          className={this.props.line.expanded ?
+            'pf-score-line-transform-arrow-open' :
+            'pf-score-line-transform-arrow-closed'}
+        >
+          <div
+            className={this.props.line.expanded ?
+              'pf-score-line-transform-arrow-inner-open' :
+              'pf-score-line-transform-arrow-inner-closed'}
+          />
+        </div>
         {
           !this.props.line.expanded ?
             this.renderTransformChartPreview() :

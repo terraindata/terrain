@@ -88,7 +88,15 @@ export function parsePath(path: Path): string
   if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
     const sortObj = parseScore(path.score);
-    baseQuery = baseQuery.set('sort', sortObj);
+    if (path.score.type !== 'random')
+    {
+      baseQuery = baseQuery.set('sort', sortObj);
+    }
+    else
+    {
+      baseQuery = baseQuery.setIn(['query', 'bool', 'filter'],
+        baseQuery.getIn(['query', 'bool', 'filter']).push(sortObj));
+    }
   }
   const moreObj = parseMore(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
@@ -115,6 +123,14 @@ function parseScore(score: Score): any
     case 'elastic':
       return { _score: { order: 'asc' } };
     case 'random':
+      return {
+        function_score: {
+          random_score: {
+            seed: 10,
+          },
+          query: {},
+        },
+      };
     case 'none':
     default:
       return {};
@@ -227,7 +243,7 @@ function parseFilters(filterGroup: FilterGroup): any
   {
     if (!line.filterGroup)
     {
-      const lineInfo = parseFilterLine(line);
+      const lineInfo = parseFilterLine(line, useShould);
       if (useShould)
       {
         should = should.push(lineInfo);
@@ -262,7 +278,7 @@ function parseFilters(filterGroup: FilterGroup): any
   return filterObj;
 }
 
-function parseFilterLine(line: FilterLine)
+function parseFilterLine(line: FilterLine, useShould: boolean)
 {
   switch (line.comparison)
   {
@@ -279,12 +295,26 @@ function parseFilterLine(line: FilterLine)
       return Map({
         match: Map({
           [line.field]: Map({
-            value: String(line.value),
-            boost: line.weight,
+            query: String(line.value),
           }),
         }),
       });
     case 'notequal':
+      if (useShould)
+      {
+        return Map({
+          bool: Map({
+            must_not: Map({
+              term: Map({
+                [line.field]: Map({
+                  value: String(line.value),
+                  boost: line.weight,
+                }),
+              }),
+            }),
+          }),
+        });
+      }
       return Map({
         term: Map({
           [line.field]: Map({
@@ -294,11 +324,24 @@ function parseFilterLine(line: FilterLine)
         }),
       });
     case 'notcontain':
+      if (useShould)
+      {
+        return Map({
+          bool: Map({
+            must_not: Map({
+              match: Map({
+                [line.field]: Map({
+                  query: String(line.value),
+                }),
+              }),
+            }),
+          }),
+        });
+      }
       return Map({
         match: Map({
           [line.field]: Map({
-            value: String(line.value),
-            boost: line.weight,
+            query: String(line.value),
           }),
         }),
       });

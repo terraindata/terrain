@@ -44,8 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import csvWriter = require('csv-write-stream');
 import sha1 = require('sha1');
 
+import { json } from 'd3-request';
 import * as csv from 'fast-csv';
 import * as _ from 'lodash';
 import * as promiseQueue from 'promise-queue';
@@ -57,9 +59,11 @@ import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import { FieldTypes } from '../../../../shared/etl/FieldTypes';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
+import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import { Items } from '../items/Items';
+import { ItemConfig, Items } from '../items/Items';
+import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
 import { ImportTemplateConfig, ImportTemplates } from './templates/ImportTemplates';
 import { TemplateBase } from './templates/Templates';
@@ -1286,6 +1290,7 @@ export class Import
         byte: (self, node, typeObj) => node,
         integer: (self, node, typeObj) => node,
         half_float: (self, node, typeObj) => node,
+        geo_point: (self, node, typeObj) => node,
         date: (self, node, typeObj) =>
         {
           if (node !== null)
