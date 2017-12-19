@@ -148,7 +148,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
       return null;
     }
     const parentKeyPath = keyPath.slice(0, -2).toList();
-    const storeKeyPath = List(['template', 'rootField']).push(... parentKeyPath.toJS());
+    const storeKeyPath = List(['template', 'rootField']).push(...parentKeyPath.toJS());
     return this.props.templateEditor.getIn(storeKeyPath);
   }
 
