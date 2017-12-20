@@ -52,6 +52,7 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
+import {FieldType} from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 
 export function parsePath(path: Path): string
 {
@@ -414,66 +415,74 @@ const unusedKeys = [
   'ranges',
   'min',
   'max',
+  'sortField',
 ];
 function parseMore(more: More): {}
 {
   const moreObj = {};
   more.aggregations.forEach((agg) =>
   {
-    const advanced = agg.advanced.toJS();
-    const advancedObj = { field: agg.field };
-    _.keys(advanced).forEach((key) =>
+    if (agg.elasticType && agg.field)
     {
-      if (unusedKeys.indexOf(key) === -1)
+      const advanced = agg.advanced.toJS();
+      const advancedObj = { field: agg.field };
+      if (String(agg.fieldType) === String(FieldType.Text))
       {
-        if (key === 'missing' || key === 'sigma')
+        advancedObj.field = advancedObj.field + '.keyword';
+      }
+      _.keys(advanced).forEach((key) =>
+      {
+        if (unusedKeys.indexOf(key) === -1)
         {
-          advancedObj[key] = parseFloat(advanced[key]);
-        }
-        else if (key === 'accuracyType')
-        {
-          if (advanced[key] === 'compression')
+          if (key === 'missing' || key === 'sigma' || key === 'offset' || key === 'min_doc_count')
           {
-            advancedObj['tdigest'] = {
-              [advanced[key]]: advanced[advanced[key]],
-            };
+            const value = !isNaN(advanced[key]) ? parseFloat(advanced[key]) : 0;
+            advancedObj[key] = value;
+          }
+          else if (key === 'accuracyType')
+          {
+            if (advanced[key] === 'compression')
+            {
+              advancedObj['tdigest'] = {
+                [advanced[key]]: advanced[advanced[key]],
+              };
+            }
+            else
+            {
+              advancedObj['hdr'] = {
+                [advanced[key]]: advanced[advanced[key]],
+              };
+            }
+          }
+          else if (key === 'include' || key === 'exclude')
+          {
+            if (advanced[key].length)
+            {
+              advancedObj[key] = advanced[key];
+            }
           }
           else
-          {
-            advancedObj['hdr'] = {
-              [advanced[key]]: advanced[advanced[key]],
-            };
-          }
-        }
-        else if (key === 'include' || key === 'exclude')
-        {
-          if (advanced[key].length)
           {
             advancedObj[key] = advanced[key];
           }
         }
-        else
+        else if (key === 'rangeType')
         {
-          advancedObj[key] = advanced[key];
+          advancedObj[advanced['rangeType']] = advanced[advanced['rangeType']];
         }
-      }
-      else if (key === 'termsType')
-      {
-        advancedObj.field = advancedObj.field + '.keyword';
-      }
-      else if (key === 'rangeType')
-      {
-        advancedObj[advanced['rangeType']] = advanced[advanced['rangeType']];
-      }
-      else if (key === 'min')
-      {
-        advancedObj['extended_bounds'] = { min: parseFloat(advanced['min']), max: parseFloat(advanced['max']) };
-      }
-    });
-    moreObj[agg.advanced.get('name')] = {
-      [agg.elasticType]: advancedObj,
-    };
-
+        else if (key === 'min')
+        {
+          advancedObj['extended_bounds'] = { min: parseFloat(advanced['min']), max: parseFloat(advanced['max']) };
+        }
+        else if (key === 'sortField')
+        {
+          advancedObj['order'] = {[advanced['sortField']]: advanced['order']};
+        }
+      });
+      moreObj[agg.advanced.get('name')] = {
+        [agg.elasticType]: advancedObj,
+      };
+    }
   });
   return moreObj;
 }

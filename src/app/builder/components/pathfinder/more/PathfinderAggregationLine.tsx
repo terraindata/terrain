@@ -125,6 +125,12 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public handleFieldChange(newField)
   {
     BuilderActions.change(this.props.keyPath.push('field'), newField);
+    const fieldType = ElasticBlockHelpers.getTypeOfField(
+      this.props.pathfinderContext.schemaState,
+      newField,
+      this.props.pathfinderContext.source.dataSource
+    );
+    BuilderActions.change(this.props.keyPath.push('fieldType'), fieldType);
     this.updateAggregation(this.props.aggregation.type, newField);
   }
 

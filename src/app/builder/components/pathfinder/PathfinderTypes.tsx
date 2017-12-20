@@ -233,6 +233,7 @@ class AggregationLineC extends BaseClass
 {
   public field: string = '';
   public name: string = '';
+  public fieldType: FieldType = FieldType.Any;
   // Type is the human readable version of elasticType
   // e.g. type = Full Statistics, elasticType = extended_stats
   public elasticType: string = '';
