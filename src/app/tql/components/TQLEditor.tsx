@@ -265,7 +265,7 @@ class TQLEditor extends TerrainComponent<Props>
     }
     else
     {
-      options['mode'] = '';
+      options['mode'] = this.props.language;
     }
 
     let CM: any;

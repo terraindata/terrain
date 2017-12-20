@@ -58,6 +58,7 @@ import TQLEditor from 'tql/components/TQLEditor';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
 import Actions from '../../data/BuilderActions';
@@ -196,10 +197,31 @@ class ResultsColumn extends TerrainComponent<Props>
 
   public renderRawResult()
   {
-    const formatted = JSON.stringify(this.props.resultsState.rawResult, null, 2);
+    const { resultsState } = this.props;
+    const { hits } = resultsState;
+
+    if (resultsState.hasError)
+    {
+      return (
+        <InfoArea
+          large='There was an error with your query.'
+          small={resultsState.errorMessage}
+        />
+      );
+    }
+
+    if (resultsState.loading)
+    {
+      return <InfoArea
+        large='Querying results...'
+      />;
+    }
+
+    const formatted = JSON.stringify(resultsState.rawResult, null, 2);
     return (
       <div className='results-column-raw-results'>
         <TQLEditor
+          language={'application/json'}
           tql={formatted}
           canEdit={false}
         />
