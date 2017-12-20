@@ -374,6 +374,49 @@ class TransformCard extends TerrainComponent<Props>
     }
   }
 
+  // To calculate a histogram for _score, the query that is actually being run has to
+  // be run because _score is only set when there are text filters, so an empty query isn't sufficient
+  private computeScoreElasticBars(maxDomain: List<number>, recomputeDomain: boolean)
+  {
+    const { query } = this.props.builderState;
+    const tql = JSON.parse(query.tql);
+    tql['size'] = 0;
+    tql['sort'] = {};
+    if (recomputeDomain)
+    {
+      tql['aggs'] = {
+        maximum: {
+          max: {
+            script: { inline: '_score' },
+          },
+        },
+        minimum: {
+          min: {
+            script: { inline: '_score' },
+          },
+        },
+      };
+    }
+    else
+    {
+      const min = maxDomain.get(0);
+      const max = maxDomain.get(1);
+      const interval = (max - min) / NUM_BARS;
+      tql['aggs'] = {
+        transformCard: {
+          histogram: {
+            script: { inline: '_score' },
+            interval,
+            extended_bounds: {
+              min, max,
+            },
+          },
+        },
+      };
+    }
+    return tql;
+  }
+
   private computeElasticBars(input: CardString, maxDomain: List<number>, recomputeDomain: boolean)
   {
     const { builderState } = this.props;
@@ -386,40 +429,47 @@ class TransformCard extends TerrainComponent<Props>
 
     const index: string = getIndex('');
     const type: string = getType('');
-
     if (recomputeDomain)
     {
-      const domainQuery = {
-        query: {
-          bool: {
-            filter: [
-              {
-                term: {
-                  _index: index,
+      let domainQuery;
+      if (input === '_score')
+      {
+        domainQuery = this.computeScoreElasticBars(maxDomain, recomputeDomain);
+      }
+      else
+      {
+        domainQuery = {
+          query: {
+            bool: {
+              filter: [
+                {
+                  term: {
+                    _index: index,
+                  },
                 },
-              },
-              {
-                term: {
-                  _type: type,
+                {
+                  term: {
+                    _type: type,
+                  },
                 },
-              },
-            ],
-          },
-        },
-        aggs: {
-          maximum: {
-            max: {
-              field: input,
+              ],
             },
           },
-          minimum: {
-            min: {
-              field: input,
+          aggs: {
+            maximum: {
+              max: {
+                field: input,
+              },
+            },
+            minimum: {
+              min: {
+                field: input,
+              },
             },
           },
-        },
-        size: 0,
-      };
+          size: 0,
+        };
+      }
       Ajax.query(
         JSON.stringify(domainQuery),
         db,
@@ -437,43 +487,49 @@ class TransformCard extends TerrainComponent<Props>
       const min = maxDomain.get(0);
       const max = maxDomain.get(1);
       const interval = (max - min) / NUM_BARS;
-
-      const aggQuery = {
-        query: {
-          bool: {
-            filter: [
-              {
-                term: {
-                  _index: index,
+      let aggQuery;
+      if (input === '_score')
+      {
+        aggQuery = this.computeScoreElasticBars(maxDomain, recomputeDomain);
+      }
+      else
+      {
+        aggQuery = {
+          query: {
+            bool: {
+              filter: [
+                {
+                  term: {
+                    _index: index,
+                  },
                 },
-              },
-              {
-                term: {
-                  _type: type,
+                {
+                  term: {
+                    _type: type,
+                  },
                 },
-              },
-            ],
-            must: {
-              range: {
-                [input as string]: { gte: min, lt: max },
+              ],
+              must: {
+                range: {
+                  [input as string]: { gte: min, lt: max },
+                },
               },
             },
           },
-        },
-        aggs: {
-          transformCard: {
-            histogram: {
-              field: input,
-              interval,
-              extended_bounds: {
-                min, max, // force the ES server to return NUM_BARS + 1 bins.
+          aggs: {
+            transformCard: {
+              histogram: {
+                field: input,
+                interval,
+                extended_bounds: {
+                  min, max, // force the ES server to return NUM_BARS + 1 bins.
+                },
               },
             },
           },
-        },
-        size: 0,
-      };
-
+          size: 0,
+        };
+      }
       this.setState(
         Ajax.query(
           JSON.stringify(aggQuery),
