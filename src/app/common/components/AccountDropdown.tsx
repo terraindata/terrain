@@ -189,15 +189,17 @@ class AccountDropdown extends TerrainComponent<Props>
           </div>
         </div>
         {
-          this.state.user && this.state.user.isSuperUser &&
-          <div className='account-dropdown-row' onMouseDown={this._toggle('commitLogOpen')}>
-            <div className='account-dropdown-icon account-dropdown-icon-blue'>
-              <InfoIcon />
-            </div>
-            <div className='account-dropdown-link'>
-              Commit Log
+          this.state.user && this.state.user.isSuperUser ?
+            <div className='account-dropdown-row' onMouseDown={this._toggle('commitLogOpen')}>
+              <div className='account-dropdown-icon account-dropdown-icon-blue'>
+                <InfoIcon />
               </div>
-          </div>
+              <div className='account-dropdown-link'>
+                Commit Log
+              </div>
+            </div>
+            :
+            null
         }
         <div className='account-dropdown-row' onMouseDown={this._toggle('showingCredits')}>
           <div className='account-dropdown-icon account-dropdown-icon-green'>
