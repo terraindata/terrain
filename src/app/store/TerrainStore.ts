@@ -62,7 +62,7 @@ import { ColorsReducers } from '../colors/data/ColorsRedux';
 const reducers = {
   analytics: AnalyticsReducer,
   auth: AuthReducers,
-  colors: ColorsReducer,
+  colors: ColorsReducers,
   library: LibraryReducer,
   roles: RolesReducer,
   schema: SchemaReducers,

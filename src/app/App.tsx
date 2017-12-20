@@ -86,18 +86,15 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // for error reporting
 
 // data that needs to be loaded
-<<<<<<< HEAD
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
-=======
 import { AuthState } from 'auth/AuthTypes';
->>>>>>> Fixed bugs that emerged from the auth and user store unifications. Fixed lint and styles.
+import { LibraryState } from 'library/data/LibraryStore';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
 import LibraryActions from './library/data/LibraryActions';
-import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
@@ -178,6 +175,7 @@ interface Props
   userActions?: typeof UserActions;
   auth?: AuthState;
   authActions?: typeof AuthActions;
+  library?: LibraryState;
 }
 
 const APP_STYLE = _.extend({},
@@ -193,7 +191,6 @@ class App extends TerrainComponent<Props>
     sidebarExpanded: false,
     loggedInAndLoaded: false,
 
-    libraryLoaded: false,
     schemaLoaded: false,
 
     noLocalStorage: false,
@@ -224,11 +221,6 @@ class App extends TerrainComponent<Props>
     {
       alert('Terrain is not meant to work in Internet Explorer. Please try another browser.');
     }
-
-    this._subscribe(LibraryStore, {
-      stateKey: 'libraryLoaded',
-      storeKeyPath: ['loaded'],
-    });
 
     // this._subscribe(RolesStore, {
     //   stateKey: 'rolesLoaded',
@@ -365,9 +357,9 @@ class App extends TerrainComponent<Props>
 
   public fetchData()
   {
+    console.error('FETCHDATA!!!!!');
     this.props.userActions.fetch();
     TerrainStore.dispatch(LibraryActions.fetch());
-    LibraryStore.dispatch(LibraryActions.fetch());
     this.props.schemaActions({
       actionType: 'fetch',
     });
@@ -390,7 +382,7 @@ class App extends TerrainComponent<Props>
 
   public isAppStateLoaded(): boolean
   {
-    return this.state.libraryLoaded
+    return this.props.library.loaded
       && (this.props.users && this.props.users.get('loaded'));
     // && this.state.rolessLoaded
   }
@@ -503,7 +495,7 @@ class App extends TerrainComponent<Props>
 
 export default Util.createContainer(
   App,
-  ['users', 'auth', 'colors'],
+  ['users', 'auth', 'colors', 'library'],
   {
     authActions: AuthActions,
     schemaActions: SchemaActions,

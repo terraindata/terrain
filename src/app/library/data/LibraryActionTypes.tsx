@@ -78,7 +78,7 @@ export let LibraryActionTypes =
     setDbs: '',
   };
 
-Util.setValuesToKeys(LibraryActionTypes, '');
+Util.setValuesToKeys(LibraryActionTypes, 'library');
 
 export const CleanLibraryActionTypes = // not dirty
   [

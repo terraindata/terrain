@@ -70,7 +70,7 @@ const CreditsIcon = require('../../../images/icon_group.svg?name=CreditsIcon');
 
 export interface Props
 {
-  colorsActions: typeof ColorsActions;
+  colorsActions?: typeof ColorsActions;
   users?: UserTypes.UserState;
 }
 
