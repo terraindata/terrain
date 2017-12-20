@@ -138,7 +138,7 @@ class TransformCard extends TerrainComponent<Props>
       stateKey: 'builderState',
       updater: (builderState: BuilderState) =>
       {
-        if (builderState.query.tql !== this.state.builderState.query.tql)
+        if (builderState.query.tql !== this.state.builderState.query.tql && !this.props.data.closed)
         {
           console.log('RECOMPUTE BARS');
           this.computeBars(this.props.data.input, this.state.maxDomain, true);
