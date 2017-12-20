@@ -47,7 +47,9 @@ THE SOFTWARE.
 const PostgreSQLQueries: Array<[string, [string]]> = [
   [
     'simple query (upsert)',
-    [`REPLACE \n  INTO movies (movieid, releasedate, title) VALUES (13371337, '2017-01-01', 'My New Movie');`],
+    [`INSERT INTO movies (movieid, releasedate, title) VALUES (13371337, '2017-01-01', 'My New Movie') ON CONFLICT
+    (movieid) DO UPDATE SET (movieid, releasedate, title) = (13371337, '2017-01-01', 'My New Movie') WHERE
+    (movies.movieid) = 13371337;`],
   ],
 ];
 

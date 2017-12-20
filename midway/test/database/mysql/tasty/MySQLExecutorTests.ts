@@ -50,6 +50,7 @@ import MySQLConfig from '../../../../src/database/mysql/MySQLConfig';
 import MySQLController from '../../../../src/database/mysql/MySQLController';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
+import MySQLQueries from '../../../tasty/MySQLQueries';
 import SQLQueries from '../../../tasty/SQLQueries';
 import * as Utils from '../../../Utils';
 
@@ -87,17 +88,14 @@ beforeAll(async () =>
   }
 });
 
-function runTest(index: number)
+function runTest(testObj: object)
 {
-  const testName: string = 'MySQL: execute ' + SQLQueries[index][0];
+  const testName: string = 'MySQL: execute ' + testObj[0];
   test(testName, async (done) =>
   {
     try
     {
-      const results = await tasty.getDB().execute(SQLQueries[index][1]);
-      console.log("RESULTS:");
-      console.log(results);
-      exit();
+      const results = await tasty.getDB().execute(testObj[1]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
     }
     catch (e)
@@ -108,9 +106,11 @@ function runTest(index: number)
   });
 }
 
-for (let i = 0; i < SQLQueries.length; i++)
+const tests = SQLQueries.concat(MySQLQueries);
+
+for (let i = 0; i < tests.length; i++)
 {
-  runTest(i);
+  runTest(tests[i]);
 }
 
 afterAll(async () =>

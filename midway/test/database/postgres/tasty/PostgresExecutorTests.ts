@@ -94,8 +94,6 @@ function runTest(testObj: object)
     try
     {
       const results = await tasty.getDB().execute(testObj[1]);
-      console.log('RESULTS for ' + testName + ':');
-      console.log(JSON.stringify(results));
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
     }
     catch (e)
