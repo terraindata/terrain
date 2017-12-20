@@ -67,6 +67,7 @@ import { MidwayError } from '../../../../../shared/error/MidwayError';
 import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
+import BuilderStore, {BuilderState} from 'app/builder/data/BuilderStore';
 
 const NUM_BARS = 1000;
 
@@ -109,6 +110,7 @@ class TransformCard extends TerrainComponent<Props>
     queryXhr?: XMLHttpRequest;
     queryId?: string;
     error?: boolean;
+    builderState?: any;
   };
 
   constructor(props: Props)
@@ -120,7 +122,29 @@ class TransformCard extends TerrainComponent<Props>
       chartDomain: List([Number(props.data.domain.get(0)), Number(props.data.domain.get(1))]),
       range: List([0, 1]),
       bars: List([]),
+      builderState: this.props.builderState,
     };
+    // If the query changed, and you are scoring on _score, there is a chance that the filters changed which affects the
+    // distribution of _score, so you have to recalculate the domain and histogram
+    if (this.props.data.input === '_score')
+    {
+      this.subscribeToBuilderStore();
+    }
+  }
+
+  public subscribeToBuilderStore()
+  {
+    this._subscribe(BuilderStore, {
+      stateKey: 'builderState',
+      updater: (builderState: BuilderState) =>
+      {
+        if (builderState.query.tql !== this.state.builderState.query.tql)
+        {
+          console.log('RECOMPUTE BARS');
+          this.computeBars(this.props.data.input, this.state.maxDomain, true);
+        }
+      },
+    });
   }
 
   public componentDidMount()
@@ -130,6 +154,17 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    if (this.props.data.input !== nextProps.data.input)
+    {
+      if (nextProps.data.input === '_score')
+      {
+        this.subscribeToBuilderStore();
+      }
+      else if (this.props.data.input === '_score')
+      {
+        this._unsubscribe();
+      }
+    }
     // nextProps.data.domain is list<string>
     const newDomain: List<number> = List([Number(nextProps.data.domain.get(0)), Number(nextProps.data.domain.get(1))]);
     if (!newDomain.equals(this.state.maxDomain))
@@ -475,6 +510,7 @@ class TransformCard extends TerrainComponent<Props>
         db,
         (resp) =>
         {
+          console.log(resp);
           this.handleElasticDomainAggregationResponse(resp);
         },
         (err) =>
@@ -486,6 +522,8 @@ class TransformCard extends TerrainComponent<Props>
     {
       const min = maxDomain.get(0);
       const max = maxDomain.get(1);
+      console.log(min);
+      console.log(max);
       const interval = (max - min) / NUM_BARS;
       let aggQuery;
       if (input === '_score')
@@ -536,6 +574,7 @@ class TransformCard extends TerrainComponent<Props>
           db,
           (resp) =>
           {
+            console.log(resp);
             this.handleElasticAggregationResponse(resp);
           },
           (err) =>
