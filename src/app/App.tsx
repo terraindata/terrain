@@ -357,7 +357,6 @@ class App extends TerrainComponent<Props>
 
   public fetchData()
   {
-    console.error('FETCHDATA!!!!!');
     this.props.userActions.fetch();
     TerrainStore.dispatch(LibraryActions.fetch());
     this.props.schemaActions({
