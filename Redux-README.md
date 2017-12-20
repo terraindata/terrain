@@ -28,7 +28,7 @@ In this way, we're making sure that every actions is dispatch to the single stor
 ### Find and replace
 In order to completely remove a single store, we need to remove all references to it and replace every action call in components and every store import and direct access. The final result is that every action dispatched from a component will cause a change of the state in the global store and also that the component will be notified about any store value updates.
 
-### Single store removal example
+#### Single store removal example
 
 Old way:
 ```
@@ -51,7 +51,15 @@ New way:
 ...
 -import AuthStore from '../../auth/data/AuthStore';
 import AuthActions from 'auth/data/AuthActions';
++import { AuthState } from 'auth/AuthTypes';
 ...
+
+interface Props
+{
+  ...
+  auth?: AuthState;
+  ...
+}
 
 class SomeComponent extends TerrainComponent...
 {
@@ -89,6 +97,44 @@ AuthActions.login(accessToken, id);
 New way:
 ```
 this.props.authActions.login(accessToken, id);
+```
+
+New new way -if your actions are already type-safe (see next section)-
+```
+this.props.authActions({
+  actionType: 'login',
+  accessToken, 
+  id
+});
+```
+
+#### _subscribe() method replacement
+Because new we are wrapping our components into Redux Containers, they will take care of subscribing to store changes an notify the component about those changes. This means the `_subscribe()` method to map store values into the component state is no longer necessary
+
+```
+constructor(props: Props)
+{
+  ...
+  // Remove the whole _subscribe method call
+- this._subscribe(LibraryStore, {
+-   stateKey: 'libraryLoaded',
+-   storeKeyPath: ['loaded'],
+- });
+  ...
+}
+...
+
+public isAppStateLoaded(): boolean
+{
+  // Replace all references to the removed state property
+  // with a direct reference to the store value accessible 
+  // through the component's props.
+- return this.state.libraryLoaded
++ return this.props.library.loaded
+    && this.state.usersLoaded;
+}
+...
+
 ```
 
 ## Create new type-safe reducer and actions.
