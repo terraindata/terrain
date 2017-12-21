@@ -104,7 +104,7 @@ function runTest(testObj: object)
   });
 }
 
-const tests = SQLQueries.concat(PostgreSQLQueries);
+const tests = PostgreSQLQueries.concat(SQLQueries);
 
 for (let i = 0; i < tests.length; i++)
 {

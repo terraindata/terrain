@@ -106,7 +106,7 @@ function runTest(testObj: object)
   });
 }
 
-const tests = SQLQueries.concat(MySQLQueries);
+const tests = MySQLQueries.concat(SQLQueries);
 
 for (let i = 0; i < tests.length; i++)
 {
