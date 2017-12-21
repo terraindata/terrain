@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 
 import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
+import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
@@ -55,15 +56,16 @@ import RolesReducer from 'roles/data/RolesReducers';
 import { SchemaReducers } from 'schema/data/SchemaRedux';
 import UserReducer from 'users/data/UserReducers';
 import Ajax from 'util/Ajax';
-import ColorsReducer from '../colors/data/ColorsReducers';
+import { ColorsReducers } from '../colors/data/ColorsRedux';
 
 const reducers = {
   analytics: AnalyticsReducer,
-  colors: ColorsReducer,
+  colors: ColorsReducers,
   library: LibraryReducer,
   roles: RolesReducer,
   schema: SchemaReducers,
   users: UserReducer,
+  spotlights: SpotlightReducers,
 };
 
 const rootReducer = combineReducers(reducers);

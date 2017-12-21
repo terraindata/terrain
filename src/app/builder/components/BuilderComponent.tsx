@@ -58,7 +58,6 @@ import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderActions from '../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../data/BuilderStore';
-import SpotlightStore from '../data/SpotlightStore';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 

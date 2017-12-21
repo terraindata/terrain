@@ -50,7 +50,7 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import { Colors } from '../../colors/Colors';
-import ColorsActions from '../../colors/data/ColorsActions';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import UserStore from '../../users/data/UserStore';
@@ -71,6 +71,7 @@ const CreditsIcon = require('../../../images/icon_group.svg?name=CreditsIcon');
 
 export interface Props
 {
+  colorsActions: typeof ColorsActions;
 }
 
 class AccountDropdown extends TerrainComponent<Props>
@@ -99,7 +100,11 @@ class AccountDropdown extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.account-arrow-icon .st0', { fill: Colors().text3 });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.account-arrow-icon .st0',
+      style: { fill: Colors().text3 },
+    });
   }
 
   public componentWillUnmount()
@@ -184,15 +189,17 @@ class AccountDropdown extends TerrainComponent<Props>
           </div>
         </div>
         {
-          this.state.user && this.state.user.isSuperUser &&
-          <div className='account-dropdown-row' onMouseDown={this._toggle('commitLogOpen')}>
-            <div className='account-dropdown-icon account-dropdown-icon-blue'>
-              <InfoIcon />
-            </div>
-            <div className='account-dropdown-link'>
-              Commit Log
+          this.state.user && this.state.user.isSuperUser ?
+            <div className='account-dropdown-row' onMouseDown={this._toggle('commitLogOpen')}>
+              <div className='account-dropdown-icon account-dropdown-icon-blue'>
+                <InfoIcon />
               </div>
-          </div>
+              <div className='account-dropdown-link'>
+                Commit Log
+              </div>
+            </div>
+            :
+            null
         }
         <div className='account-dropdown-row' onMouseDown={this._toggle('showingCredits')}>
           <div className='account-dropdown-icon account-dropdown-icon-green'>
@@ -289,4 +296,10 @@ Terrain Version 1.0 Created By:
 - The Pine Marten
 `;
 
-export default AccountDropdown;
+export default Util.createContainer(
+  AccountDropdown,
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);

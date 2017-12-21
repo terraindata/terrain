@@ -44,32 +44,44 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+// tslint:disable:no-var-requires
+
+// Copyright 2017 Terrain Data, Inc.
+
 // tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
-
 import * as Immutable from 'immutable';
-import * as Redux from 'redux';
+import { Map } from 'immutable';
+import * as _ from 'lodash';
+import * as ReduxActions from 'redux-actions';
+const Redux = require('redux');
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
+import Util from 'app/util/Util';
 import thunk from 'redux-thunk';
-import Util from './../../util/Util';
-import ColorsReducers from './ColorsReducers';
+import { BaseClass, New } from '../../Classes';
+import { _ColorsState, ColorsState } from './ColorsTypes';
 
-class ColorsStateC
+export interface ColorsActionTypes
 {
-  public styles: IMMap<string, React.CSSProperties> = Immutable.Map();
+  setStyle: {
+    actionType: 'setStyle',
+    selector: string,
+    style: React.CSSProperties,
+  };
 }
 
-const ColorsState_Record = Immutable.Record(new ColorsStateC());
-export interface ColorsState extends ColorsStateC, IRecord<ColorsState> { }
-export const _ColorsState = (config?: any) =>
+class ColorsRedux extends TerrainRedux<ColorsActionTypes, ColorsState>
 {
-  return new ColorsState_Record(Util.extendId(config || {})) as any as ColorsState;
-};
+  public reducers: ConstrainedMap<ColorsActionTypes, ColorsState> =
+  {
+    setStyle: (state, action) =>
+    {
+      const { selector, style } = action.payload;
+      return state.setIn(['styles', selector], style);
+    },
+  };
+}
 
-const DefaultState = _ColorsState();
-
-export const ColorsStore = Redux.createStore(
-  ColorsReducers,
-  DefaultState,
-  Redux.applyMiddleware(thunk),
-);
-
-export default ColorsStore;
+const ReduxInstance = new ColorsRedux();
+export const ColorsActions = ReduxInstance._actionsForExport();
+export const ColorsReducers = ReduxInstance._reducersForExport(_ColorsState);
+export declare type ColorsActionType<K extends keyof ColorsActionTypes> = GetType<K, ColorsActionTypes>;
