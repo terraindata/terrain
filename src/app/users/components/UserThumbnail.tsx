@@ -50,9 +50,9 @@ import * as classNames from 'classnames';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as React from 'react';
 import { Link } from 'react-router';
+import Util from 'util/Util';
 import { Colors, fontColor } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import UserStore from './../data/UserStore';
 import * as UserTypes from './../UserTypes';
 import './UserThumbnail.less';
 
@@ -71,56 +71,20 @@ export interface Props
   hideAdmin?: boolean;
   link?: boolean;
   extra?: string;
+  users?: UserTypes.UserState;
 }
 
 class UserThumbnail extends TerrainComponent<Props>
 {
-  public state: {
-    user?: User,
-  } = {
-  };
-
-  constructor(props: Props)
+  public shouldComponentUpdate(nextProps)
   {
-    super(props);
-  }
-
-  public componentDidMount()
-  {
-    this.subscribeUser();
-  }
-
-  public subscribeUser(nextProps?: Props)
-  {
-    this._unsubscribe();
-    this._subscribe(UserStore, {
-      stateKey: 'user',
-      storeKeyPath: this.getStoreKeyPath(nextProps),
-      isMounted: true,
-    });
-  }
-
-  public getStoreKeyPath(props?: Props)
-  {
-    return ['users', (props || this.props).userId];
-  }
-
-  public componentWillReceiveProps(nextProps)
-  {
-    if (nextProps.userId !== this.props.userId)
-    {
-      this.subscribeUser(nextProps);
-    }
-  }
-
-  public shouldComponentUpdate(nextProps, nextState)
-  {
-    return nextState.user !== this.state.user;
+    return nextProps.users !== this.props.users;
   }
 
   public render()
   {
-    const { user } = this.state;
+    const { userId, users } = this.props;
+    const user = users.users !== undefined ? users.users.get(userId) : undefined;
     const name: string = user ? (user.name !== undefined && user.name.length > 0 ? user.name : user.email) : 'Loading...';
     const src: string = UserTypes.profileUrlFor(user);
     const tip = this.props.showName ?
@@ -185,4 +149,8 @@ class UserThumbnail extends TerrainComponent<Props>
   }
 }
 
-export default UserThumbnail;
+export default Util.createTypedContainer(
+  UserThumbnail,
+  ['users'],
+  {},
+);
