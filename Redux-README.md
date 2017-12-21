@@ -23,7 +23,7 @@ While the single store is being merged, there will be parts of the code that wil
 +}
 ```
 
-In this way, we're making sure that every actions is dispatch to the single store and the global store, so no matter where the code is trying to read the data from, it will be there.
+In this way, we're making sure that every action is dispatch to the single store and the global store, so no matter where the code is trying to read the data from, it will be there.
 
 ### Find and replace
 In order to completely remove a single store, we need to remove all references to it and replace every action call in components and every store import and direct access. The final result is that every action dispatched from a component will cause a change of the state in the global store and also that the component will be notified about any store value updates.
@@ -109,7 +109,7 @@ this.props.authActions({
 ```
 
 #### _subscribe() method replacement
-Because new we are wrapping our components into Redux Containers, they will take care of subscribing to store changes an notify the component about those changes. This means the `_subscribe()` method to map store values into the component state is no longer necessary
+Because now we are wrapping our components into Redux Containers, they will take care of subscribing to store changes an notify the component about those changes. This means the `_subscribe()` method to map store values into the component state is no longer necessary
 
 ```
 constructor(props: Props)
