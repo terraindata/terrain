@@ -46,15 +46,16 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
+import { AuthState } from 'auth/AuthTypes';
 import * as classNames from 'classnames';
 import * as React from 'react';
 import { Link } from 'react-router';
-import AuthStore from './../../auth/data/AuthStore';
+import { UserState } from 'users/UserTypes';
+import Util from 'util/Util';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
-import UserStore from './../data/UserStore';
 import * as UserTypes from './../UserTypes';
 import './Profile.less';
 
@@ -63,6 +64,9 @@ export interface Props
   params?: any;
   history?: any;
   children?: any;
+  auth?: AuthState;
+  users?: UserState;
+  userActions?: typeof Actions;
 }
 
 class Profile extends TerrainComponent<Props>
@@ -94,17 +98,12 @@ class Profile extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-
-    this._subscribe(UserStore, {
-      stateKey: 'me',
-      storeKeyPath: ['currentUser'],
-    });
   }
 
   public updateUser(props: Props)
   {
-    const userState: UserTypes.UserState = UserStore.getState();
-    const authState = AuthStore.getState();
+    const userState: UserTypes.UserState = props.users;
+    const authState = this.props.auth;
     let userId = authState.id;
     const routeUserId = +this.props.params.userId;
     let isLoggedInUser = true;
@@ -127,19 +126,21 @@ class Profile extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    Actions.fetch();
+    this.props.userActions.fetch();
     this.updateUser(this.props);
-
-    this.userUnsubscribe =
-      UserStore.subscribe(() => this.updateUser(this.props));
-    this.authUnsubscribe =
-      AuthStore.subscribe(() => this.updateUser(this.props));
   }
 
-  public componentWillUnmount()
+  public componentWillReceiveProps(nextProps)
   {
-    this.userUnsubscribe && this.userUnsubscribe();
-    this.authUnsubscribe && this.authUnsubscribe();
+    if (this.props.users !== nextProps.users)
+    {
+      this.updateUser(nextProps);
+    }
+  }
+
+  public componentWillUpdate(nextProps)
+  {
+    this.updateUser(nextProps);
   }
 
   public renderInfoItem(key: string)
@@ -170,7 +171,7 @@ any existing system administrator privileges, including your own. \
 are still a system administrator yourself.)'))
     {
       const user = this.state.user.set('isSuperUser', !this.state.user.isSuperUser) as UserTypes.User;
-      Actions.change(user);
+      this.props.userActions.change(user);
       Ajax.adminSaveUser(user);
     }
   }
@@ -187,14 +188,16 @@ immediately be logged out of any existing sessions. \
 (You can re-enable this user later, if needed.)'))
     {
       const user = this.state.user.set('isDisabled', !this.state.user.isDisabled) as UserTypes.User;
-      Actions.change(user);
+      this.props.userActions.change(user);
       Ajax.adminSaveUser(user);
     }
   }
 
   public renderAdminTools()
   {
-    const { me, user } = this.state;
+    const { users } = this.props;
+    const { currentUser: me } = users;
+    const { user } = this.state;
     if (!me || !me.isSuperUser || me.id === user.id)
     {
       return null;
@@ -281,4 +284,8 @@ immediately be logged out of any existing sessions. \
   }
 }
 
-export default Profile;
+export default Util.createContainer(
+  Profile,
+  ['auth', 'users'],
+  { userActions: Actions },
+);

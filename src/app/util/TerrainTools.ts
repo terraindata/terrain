@@ -43,9 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import AuthStore from 'auth/data/AuthStore';
 import * as _ from 'lodash';
-import UserStore from 'users/data/UserStore';
+import TerrainStore from 'store/TerrainStore';
 // Log levels
 const LEVEL_TEXT = 'text';
 const LEVEL_DEBUG = 'debug';
@@ -91,8 +90,8 @@ Toggle-able Features:
 
   public static isAdmin()
   {
-    const userId = AuthStore.getState().id;
-    const user = UserStore.getState().getIn(['users', userId]);
+    const store = TerrainStore.getState() as Immutable.Map<string, any>;
+    const user = store.get('users').get('currentUser');
 
     return user && user.isSuperUser;
   }

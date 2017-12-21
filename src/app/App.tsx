@@ -88,17 +88,17 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // data that needs to be loaded
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
+import { AuthState } from 'auth/AuthTypes';
+import { LibraryState } from 'library/data/LibraryStore';
 import { SchemaActions } from 'schema/data/SchemaRedux';
+import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
-import AuthStore from './auth/data/AuthStore';
 import LibraryActions from './library/data/LibraryActions';
-import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
-import UserStore from './users/data/UserStore';
 
 // Icons
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
@@ -171,6 +171,11 @@ interface Props
   schemaActions: typeof SchemaActions;
   colorsActions: typeof ColorsActions;
   colors: ColorsState;
+  users?: UserState;
+  userActions?: typeof UserActions;
+  auth?: AuthState;
+  authActions?: typeof AuthActions;
+  library?: LibraryState;
 }
 
 const APP_STYLE = _.extend({},
@@ -186,10 +191,7 @@ class App extends TerrainComponent<Props>
     sidebarExpanded: false,
     loggedInAndLoaded: false,
 
-    libraryLoaded: false,
     schemaLoaded: false,
-
-    usersLoaded: false,
 
     noLocalStorage: false,
 
@@ -220,36 +222,6 @@ class App extends TerrainComponent<Props>
       alert('Terrain is not meant to work in Internet Explorer. Please try another browser.');
     }
 
-    // Respond to authentication state changes.
-    this._subscribe(AuthStore, {
-      updater: (state) =>
-      {
-        const token = AuthStore.getState().accessToken;
-        const loggedIn = !!token;
-        const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
-
-        this.setState({
-          loggedIn,
-          loggedInAndLoaded,
-        });
-
-        if (token !== null)
-        {
-          this.fetchData();
-        }
-      },
-    });
-
-    this._subscribe(LibraryStore, {
-      stateKey: 'libraryLoaded',
-      storeKeyPath: ['loaded'],
-    });
-
-    this._subscribe(UserStore, {
-      stateKey: 'usersLoaded',
-      storeKeyPath: ['loaded'],
-    });
-
     // this._subscribe(RolesStore, {
     //   stateKey: 'rolesLoaded',
     //   storeKeyPath: ['loaded'],
@@ -260,7 +232,7 @@ class App extends TerrainComponent<Props>
     const id = localStorage['id'];
     if (accessToken !== undefined && id !== undefined)
     {
-      AuthActions.login(accessToken, id);
+      this.props.authActions.login(accessToken, id);
     }
   }
 
@@ -363,11 +335,30 @@ class App extends TerrainComponent<Props>
     });
   }
 
+  public componentWillReceiveProps(nextProps)
+  {
+    if (this.props.auth !== nextProps.auth)
+    {
+      const token = nextProps.auth.accessToken;
+      const loggedIn = !!token;
+      const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
+
+      this.setState({
+        loggedIn,
+        loggedInAndLoaded,
+      });
+
+      if (token !== null)
+      {
+        this.fetchData();
+      }
+    }
+  }
+
   public fetchData()
   {
-    UserActions.fetch();
+    this.props.userActions.fetch();
     TerrainStore.dispatch(LibraryActions.fetch());
-    LibraryStore.dispatch(LibraryActions.fetch());
     this.props.schemaActions({
       actionType: 'fetch',
     });
@@ -390,9 +381,9 @@ class App extends TerrainComponent<Props>
 
   public isAppStateLoaded(): boolean
   {
-    return this.state.libraryLoaded
-      && this.state.usersLoaded;
-    // && this.state.rolesLoaded
+    return this.props.library.loaded
+      && (this.props.users && this.props.users.get('loaded'));
+    // && this.state.rolessLoaded
   }
 
   public renderApp()
@@ -503,9 +494,11 @@ class App extends TerrainComponent<Props>
 
 export default Util.createContainer(
   App,
-  ['colors'],
+  ['users', 'auth', 'colors', 'library'],
   {
+    authActions: AuthActions,
     schemaActions: SchemaActions,
+    userActions: UserActions,
     colorsActions: ColorsActions,
   },
 );

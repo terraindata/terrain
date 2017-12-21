@@ -55,5 +55,10 @@ export function createMockStore()
   return configureMockStore(middlewares);
 }
 
+export function connect(componentName)
+{
+  return `Connect(${componentName})`;
+}
+
 // We'll need to also mock the single stores until they're completely removed.
 LibraryStore.dispatch = jest.fn();

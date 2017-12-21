@@ -43,39 +43,54 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:no-var-requires no-console
-
-import * as _ from 'lodash';
-import * as ReduxActions from 'redux-actions';
-const Redux = require('redux');
-
-import AuthStore from './../../auth/data/AuthStore';
-
-import * as UserTypes from './../UserTypes';
-import ActionTypes from './UserActionTypes';
-import UserReducers from './UserReducers';
-
-const UserStore = Redux.createStore(UserReducers);
-
-UserStore.subscribe(() =>
+import { _AuthState, AuthState } from 'auth/AuthTypes';
+import
 {
-  const state = UserStore.getState();
-  if (state.getIn(['users', AuthStore.getState().id]) !== state.get('currentUser'))
+  ConstrainedMap,
+  GetType,
+  TerrainRedux,
+  Unroll,
+} from 'store/TerrainRedux';
+import Ajax from 'util/Ajax';
+
+export interface AuthActionTypes
+{
+  login: {
+    actionType: 'login';
+    accessToken: string;
+    id: number;
+  };
+  logout: {
+    actionType: 'logout';
+  };
+}
+
+class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
+{
+  public reducers: ConstrainedMap<AuthActionTypes, AuthState> =
   {
-    // currentUser object changed
-    UserStore.dispatch({
-      type: ActionTypes.updateCurrentUser,
-      payload: {},
-    });
-  }
-});
+    login: (state, action) =>
+    {
+      const { accessToken, id } = action.payload;
+      // store these values in localStorage so that the user is auto-logged in next time they visit
+      localStorage['accessToken'] = accessToken;
+      localStorage['id'] = id;
+      return state.set('accessToken', accessToken).set('id', +id);
+    },
 
-/*window['test'] = () =>
-{
-  const users = UserStore.getState().users;
-  console.log('users', users);
-  Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
-};*/
+    logout: (state, action) =>
+    {
+      Ajax.logout((success) =>
+      {
+        delete localStorage['accessToken'];
+        delete localStorage['id'];
+      });
+      return state.set('accessToken', null).set('id', null);
+    },
+  };
+}
 
-export default UserStore;
+const ReduxInstance = new AuthRedux();
+export const AuthActions = ReduxInstance._actionsForExport();
+export const AuthReducers = ReduxInstance._reducersForExport(_AuthState);
+export declare type AuthActionType<K extends keyof AuthActionTypes> = GetType<K, AuthActionTypes>;
