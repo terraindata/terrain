@@ -284,8 +284,8 @@ export default class SQLGenerator
 
     this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates, placeholder);
     this.queryString = '';
-    console.log('statements:');
-    console.log(this.statements);
+    // console.log('statements:');
+    // console.log(this.statements);
   }
 
   public accumulateStatement(queryString: string): void
@@ -311,8 +311,8 @@ export default class SQLGenerator
   }
 
   public accumulateUpsert(columns: string[], primaryKeys: string[],
-      tableName: string, accumulatedUpdates: object[],
-      placeholder: boolean): void
+    tableName: string, accumulatedUpdates: object[],
+    placeholder: boolean): void
   {
     if (accumulatedUpdates.length <= 0)
     {
@@ -335,15 +335,15 @@ export default class SQLGenerator
       first = false;
 
       query += '(';
-      let currentColumn: number = 0;
+      let currentColumn1: number = 0;
       query += columns.map(
         (col: string) =>
         {
           if (placeholder === true)
           {
             values.push(obj[col]);
-            currentColumn++;
-            return '$' + currentColumn.toString();
+            currentColumn1++;
+            return '$' + currentColumn1.toString();
           }
           else
           {
@@ -374,9 +374,10 @@ export default class SQLGenerator
       }).join(', ');
     query += ')';
     query += ' WHERE (' + primaryKeys.map((col: string) => tableName + '.' + col).join(', ') + ') = (' + primaryKeys.map(
-      (col: string) => {
+      (col: string) =>
+      {
         return accumulatedUpdates[0][col];
-    }).join(', ');
+      }).join(', ');
     query += ')';
 
     this.values.push(values);

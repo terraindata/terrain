@@ -61,8 +61,9 @@ import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
-import { ExportTemplateConfig, ExportTemplates } from './templates/ExportTemplates';
-import { TemplateBase } from './templates/Templates';
+import ExportTemplateConfig from './templates/ExportTemplateConfig';
+import { ExportTemplates } from './templates/ExportTemplates';
+import { TemplateBase } from './templates/TemplateBase';
 
 const exportTemplates = new ExportTemplates();
 

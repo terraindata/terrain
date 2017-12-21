@@ -114,7 +114,7 @@ export class Credentials
       const creds = rawCreds.map((result: object) => new CredentialConfig(result));
       return resolve(await Promise.all(creds.map(async (cred) =>
       {
-      return await this._decrypt(cred.meta);
+        return await this._decrypt(cred.meta);
       })));
     });
   }
@@ -141,10 +141,10 @@ export class Credentials
 
   public async initializeLocalFilesystemCredential(): Promise<void>
   {
-  const userExists = await users.select(['id'], { email: 'admin@terraindata.com' });
+    const userExists = await users.select([], { email: 'admin@terraindata.com' });
     if (userExists.length !== 0)
     {
-    const localConfigs: string[] = await this.getByType('local');
+      const localConfigs: string[] = await this.getByType('local');
       if (localConfigs.length === 0)
       {
         const seedUser = userExists[0];

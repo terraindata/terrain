@@ -264,11 +264,11 @@ export class Scheduler
       let rawResults;
       if (id !== undefined)
       {
-        rawResults = await App.DB.select(this.schedulerTable, [], {id, archived});
+        rawResults = await App.DB.select(this.schedulerTable, [], { id, archived });
       }
       else
       {
-        rawResults = await App.DB.select(this.schedulerTable, [], {archived});
+        rawResults = await App.DB.select(this.schedulerTable, [], { archived });
       }
       const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result));
       resolve(results);
@@ -603,7 +603,7 @@ export class Scheduler
     const schedules: SchedulerConfig[] = await this.get() as SchedulerConfig[];
     for (const scheduleInd in schedules)
     {
-      if (schedules[scheduleInd].active) // only start active schedules
+      if (schedules[scheduleInd].active === true) // only start active schedules
       {
         const schedule: SchedulerConfig = schedules[scheduleInd];
         const scheduleJobId: string = schedule['id'] !== undefined ? (schedule['id'] as number).toString() : '-1';
@@ -708,12 +708,12 @@ export class Scheduler
         {
           for (const scheduleObj of schedules)
           {
-            if (scheduleObj.archived)
+            if (scheduleObj.archived === true)
             {
               return reject('Cannot upsert on an archived schedule.');
             }
             this.scheduleMap[(scheduleObj['id'] as number)].cancel();
-            if (scheduleObj.active)
+            if (scheduleObj.active === true)
             {
               const resultJobId: string = schedule.id !== undefined ? (schedule['id'] as number).toString() : '-1';
               const appendedParamsArr: any[] = [schedule.paramsScheduleArr];
@@ -734,6 +734,9 @@ export class Scheduler
         schedule.active = schedule.active !== undefined ? schedule.active : false;
         schedule.archived = false;
         schedule.currentlyRunning = false;
+
+        const results: SchedulerConfig[] = await this.get();
+        schedule.id = results.length + 1;
       }
       return resolve(await App.DB.upsert(this.schedulerTable, schedule) as SchedulerConfig[]);
     });

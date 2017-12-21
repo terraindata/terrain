@@ -114,7 +114,10 @@ export class PostgreSQLDB implements TastyDB
         this.client.query(statement, [], makePromiseCallback(resolve, reject));
       });
 
-      results = results.concat(result['rows']);
+      if (result !== undefined && result['rows'] !== undefined)
+      {
+        results = results.concat(result['rows']);
+      }
     }
     return results;
   }

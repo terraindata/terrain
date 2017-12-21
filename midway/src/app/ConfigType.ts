@@ -44,7 +44,8 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export class ConfigType {
+export class ConfigType
+{
   public static initialize(obj: object, props: object)
   {
     for (const key of Object.keys(obj))

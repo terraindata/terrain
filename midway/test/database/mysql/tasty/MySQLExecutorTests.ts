@@ -90,7 +90,7 @@ beforeAll(async () =>
 
 function runTest(testObj: object)
 {
-  const testName: string = 'MySQL: execute ' + testObj[0];
+  const testName: string = 'MySQL: execute ' + String(testObj[0]);
   test(testName, async (done) =>
   {
     try

@@ -88,7 +88,7 @@ beforeAll(async () =>
 
 function runTest(testObj: object)
 {
-  const testName: string = 'Postgres: execute ' + testObj[0];
+  const testName: string = 'Postgres: execute ' + String(testObj[0]);
   test(testName, async (done) =>
   {
     try

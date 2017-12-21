@@ -99,7 +99,7 @@ const SQLQueries: Array<[string, [string]]> = [
   ORDER BY movies.title ASC, movies.movieid DESC, movies.releasedate ASC
   LIMIT 10 OFFSET 20;`,
     ],
-    ],
+  ],
 ];
 
 export default SQLQueries;

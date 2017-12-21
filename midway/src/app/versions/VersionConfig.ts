@@ -48,6 +48,7 @@ import ConfigType from '../ConfigType';
 
 export class VersionConfig extends ConfigType
 {
+  public createdAt?: string = undefined;
   public createdByUserId: number = -1;
   public id?: number = undefined;
   public object: string = '';

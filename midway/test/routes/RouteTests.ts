@@ -45,11 +45,10 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as fs from 'fs';
-import * as sqlite3 from 'sqlite3';
 import * as request from 'supertest';
 import * as winston from 'winston';
 
-import App from '../../src/app/App';
+import { App, DB } from '../../src/app/App';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../src/database/elastic/ElasticController';
 import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
@@ -58,25 +57,18 @@ import { readFile } from '../Utils';
 let elasticDB: ElasticDB;
 let server;
 
-/* tslint:disable:max-line-length */
+// tslint:disable:max-line-length
 
 beforeAll(async (done) =>
 {
-  const testDBName = 'midwaytest.db';
-  if (fs.existsSync(testDBName))
-  {
-    fs.unlinkSync(testDBName);
-  }
-
   try
   {
-    const db = new sqlite3.Database(testDBName);
     const options =
       {
         debug: true,
-        db: 'sqlite',
-        dsn: testDBName,
-        port: 43001,
+        db: 'postgres',
+        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:5432/moviesdb',
+        port: 3000,
         databases: [
           {
             name: 'My ElasticSearch Instance',
@@ -101,16 +93,9 @@ beforeAll(async (done) =>
     elasticDB = elasticController.getTasty().getDB() as ElasticDB;
 
     const sql = await readFile('./midway/test/scripts/test.sql');
-    const results = await new Promise((resolve, reject) =>
+    const results = await new Promise(async (resolve, reject) =>
     {
-      return db.exec(sql.toString(), (error: Error) =>
-      {
-        if (error !== null && error !== undefined)
-        {
-          reject(error);
-        }
-        resolve();
-      });
+      resolve(await DB.getDB().execute([sql.toString()]));
     });
   }
   catch (e)
@@ -136,11 +121,6 @@ beforeAll(async (done) =>
     {
       done();
     });
-});
-
-afterAll(() =>
-{
-  fs.unlinkSync('midwaytest.db');
 });
 
 describe('User and auth route tests', () =>
@@ -248,7 +228,7 @@ describe('Version route tests', () =>
         expect(respData.length).toBeGreaterThan(0);
         expect(respData[0])
           .toMatchObject({
-            createdAt: '2017-05-31 00:22:04',
+            createdAt: '2017-05-31T00:22:04.000Z',
             createdByUserId: 1,
             id: 1,
             object: '{"id":2,"meta":"#realmusician","name":"Updated Item","parent":0,"status":"LIVE","type":"CATEGORY"}',
@@ -1003,7 +983,7 @@ describe('File export templates route tests', () =>
       });
   });
 
-  test('Get all import templates: GET /midway/v1/export/templates/', async () =>
+  test('Get all export templates: GET /midway/v1/export/templates/', async () =>
   {
     await request(server)
       .get('/midway/v1/export/templates/')

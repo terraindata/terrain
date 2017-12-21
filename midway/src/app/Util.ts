@@ -52,7 +52,6 @@ import * as rimraf from 'rimraf';
 
 import { exportTemplates } from './io/templates/ExportTemplateRouter';
 import { importTemplates } from './io/templates/ImportTemplateRouter';
-import { ImportTemplateConfig } from './io/templates/ImportTemplates';
 import UserConfig from './users/UserConfig';
 import Users from './users/Users';
 

@@ -44,88 +44,35 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
-import UserConfig from '../users/UserConfig';
-import * as Util from '../Util';
-import MetricConfig from './MetricConfig';
+import ConfigType from '../../ConfigType';
+import { TemplateBase } from './TemplateBase';
 
-// CREATE TABLE metrics (id integer PRIMARY KEY, database integer NOT NULL, label text NOT NULL, events text NOT NULL)
-
-export class Metrics
+export class TemplateBaseStringified extends ConfigType
 {
-  private metricsTable: Tasty.Table;
+  public columnTypes: string = '';
+  public dbid: number = -1;
+  public dbname: string = '';
+  public id?: number = undefined;
+  public name: string = '';
+  public originalNames: string = '';
+  public persistentAccessToken?: string = undefined;
+  public primaryKeyDelimiter: string = '';
+  public primaryKeys: string = '';
+  public tablename: string = '';
+  public transformations: string = '';
 
-  constructor()
+  constructor(template: TemplateBase)
   {
-    this.metricsTable = new Tasty.Table(
-      'metrics',
-      ['id'],
-      [
-        'database',
-        'label',
-        'events',
-      ],
-    );
-  }
-
-  public async initialize(database: number): Promise<any>
-  {
-    const predefinedMetrics: MetricConfig[] = [
-      {
-        database,
-        label: 'Impressions',
-        events: 'impression',
-      },
-      {
-        database,
-        label: 'Clicks',
-        events: 'click',
-      },
-      {
-        database,
-        label: 'Conversions',
-        events: 'conversion',
-      },
-      {
-        database,
-        label: 'Click-Through Rate',
-        events: 'click,impression',
-      },
-      {
-        database,
-        label: 'Conversion Rate',
-        events: 'conversion,impression',
-      },
-    ];
-    predefinedMetrics.map((m) => this.upsert(m));
-  }
-
-  public async upsert(metric: MetricConfig): Promise<MetricConfig>
-  {
-    if (metric.database === undefined || metric.label === undefined || metric.events === undefined)
-    {
-      throw new Error('Database, label and events fields are required to create a metric');
-    }
-
-    if (metric.id === undefined)
-    {
-      const results: MetricConfig[] = await this.select(['id'], []);
-      metric.id = results.length + 1;
-    }
-
-    return App.DB.upsert(this.metricsTable, metric) as Promise<MetricConfig>;
-  }
-
-  public async select(columns: string[], filter: object): Promise<MetricConfig[]>
-  {
-    return new Promise<MetricConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.metricsTable, columns, filter);
-      const results: MetricConfig[] = rawResults.map((result: object) => new MetricConfig(result));
-      resolve(results);
-    });
+    super();
+    this.columnTypes = template.columnTypes !== undefined ? template.columnTypes.toString() : '';
+    this.dbid = template.dbid;
+    this.dbname = template.dbname;
+    this.id = template.id;
+    this.name = template.name;
+    this.originalNames = template.originalNames !== undefined ? template.originalNames.toString() : '';
+    this.persistentAccessToken = template.persistentAccessToken;
+    this.primaryKeys = template.primaryKeys !== undefined ? template.primaryKeys.toString() : '';
+    this.tablename = template.tablename;
+    this.transformations = template.transformations !== undefined ? template.transformations.toString() : '';
   }
 }
-
-export default Metrics;

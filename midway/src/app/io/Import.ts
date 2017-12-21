@@ -65,8 +65,9 @@ import * as Tasty from '../../tasty/Tasty';
 import Items from '../items/Items';
 import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
-import { ImportTemplateConfig, ImportTemplates } from './templates/ImportTemplates';
-import { TemplateBase } from './templates/Templates';
+import ImportTemplateConfig from './templates/ImportTemplateConfig';
+import { ImportTemplates } from './templates/ImportTemplates';
+import { TemplateBase } from './templates/TemplateBase';
 
 const importTemplates = new ImportTemplates();
 

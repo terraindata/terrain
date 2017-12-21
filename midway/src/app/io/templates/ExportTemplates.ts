@@ -51,22 +51,10 @@ import * as App from '../../App';
 import * as Util from '../../Util';
 
 import UserConfig from '../../users/UserConfig';
-import { TemplateBase, TemplateBaseStringified } from './Templates';
-
-export interface ExportTemplateConfig extends TemplateBase
-{
-  objectKey?: string;
-  query?: string;
-  rank?: boolean;
-  templateId?: number;
-  algorithmId?: number;
-}
-
-export interface ExportTemplateBaseStringified extends TemplateBaseStringified
-{
-  objectKey?: string;
-  rank?: boolean;
-}
+import ExportTemplateBaseStringified from './ExportTemplateBaseStringified';
+import ExportTemplateConfig from './ExportTemplateConfig';
+import { TemplateBase } from './TemplateBase';
+import { TemplateBaseStringified } from './TemplateBaseStringified';
 
 export class ExportTemplates
 {
@@ -130,9 +118,9 @@ export class ExportTemplates
   {
     return new Promise<ExportTemplateConfig[]>(async (resolve, reject) =>
     {
-      const templates: ExportTemplateBaseStringified[] =
-        await App.DB.select(this.exportTemplateTable, columns, filter) as ExportTemplateBaseStringified[];
-      resolve(this._parseConfig(templates) as ExportTemplateConfig[]);
+      const rawResults = await App.DB.select(this.exportTemplateTable, columns, filter);
+      const results: ExportTemplateConfig[] = rawResults.map((result: object) => new ExportTemplateConfig(result));
+      resolve(this._parseConfig(results.map((result) => new ExportTemplateBaseStringified(result))) as ExportTemplateConfig[]);
     });
   }
 
@@ -176,6 +164,11 @@ export class ExportTemplates
 
         template = Util.updateObject(results[0], template);
       }
+      else
+      {
+        const results: ExportTemplateConfig[] = await this.select(['id'], []);
+        template.id = results.length + 1;
+      }
       if (template['persistentAccessToken'] === undefined || template['persistentAccessToken'] === '')
       {
         const persistentAccessToken = srs(
@@ -203,6 +196,14 @@ export class ExportTemplates
 
   private _parseConfigHelper(stringified: ExportTemplateBaseStringified): ExportTemplateConfig
   {
+    const objKeys = ['columnTypes', 'originalNames', 'primaryKeys', 'transformations'];
+    for (const objKey of objKeys)
+    {
+      if (stringified[objKey] === '')
+      {
+        stringified[objKey] = '{}';
+      }
+    }
     const template: ExportTemplateConfig =
       {
         persistentAccessToken: stringified['persistentAccessToken'],
