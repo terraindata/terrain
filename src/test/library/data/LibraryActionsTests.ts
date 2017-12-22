@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import Actions from 'library/data/LibraryActions';
 import ActionTypes from 'library/data/LibraryActionTypes';
-import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 import { Ajax, createMockStore } from '../../helpers';
 

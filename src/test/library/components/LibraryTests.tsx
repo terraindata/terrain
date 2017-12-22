@@ -47,7 +47,7 @@ import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
 import Library from 'library/components/Library';
-import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';

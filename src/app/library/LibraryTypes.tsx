@@ -48,11 +48,49 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import Util from 'util/Util';
+import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
 import { _Query, Query, queryForSave } from '../../items/types/Query';
 
+class LibraryStateC
+{
+  public loaded = false;
+  public loading = true;
+  public dbs: List<BackendInstance> = Immutable.List([]);
+  public dbsLoaded: boolean = false;
+
+  public categories: IMMap<ID, Category> = null;
+  public groups: IMMap<ID, Group> = null;
+  public algorithms: IMMap<ID, Algorithm> = null;
+  public selectedAlgorithm: ID = null;
+
+  // these are set these on initial load
+  public prevCategories: IMMap<ID, Category> = null;
+  public prevGroups: IMMap<ID, Group> = null;
+  public prevAlgorithms: IMMap<ID, Algorithm> = null;
+
+  public categoriesOrder: List<ID> = Immutable.List([]);
+
+  public changingStatus: boolean = false;
+  public changingStatusOf: Algorithm = null;
+  public changingStatusTo: ItemStatus = 'BUILD';
+
+  // Keep track of versioning
+  public modelVersion: number = 3;
+}
+const LibraryState_Record = Immutable.Record(new LibraryStateC());
+export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
+export const _LibraryState = (config?: any) =>
+{
+  if (config && !(config['modelVersion'] || config['modelVersion'] < 2))
+  {
+    config['modelVersion'] = 3;
+  }
+  return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
+};
+
 export type LibraryItem = Category | Algorithm | Group;
-// TODO MOD refactor
 
 class AlgorithmC extends ItemC
 {
