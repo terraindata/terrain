@@ -51,6 +51,6 @@ const AuthActionTypes =
     logout: '',
   };
 
-Util.setValuesToKeys(AuthActionTypes, '');
+Util.setValuesToKeys(AuthActionTypes, 'auth');
 
 export default AuthActionTypes;
