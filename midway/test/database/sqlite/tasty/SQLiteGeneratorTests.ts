@@ -99,7 +99,7 @@ test('node type: skip', (done) =>
 
 test(testName(0), (done) =>
 {
-  const query = new Tasty.Query(DBMovies).take(1);
+  const query = new Tasty.Query(DBMovies).take(10);
   const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(0));
   done();
