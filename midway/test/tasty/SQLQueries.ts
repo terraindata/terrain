@@ -47,7 +47,7 @@ THE SOFTWARE.
 const SQLQueries: Array<[string, [string]]> = [
   [
     'simple query (select all)',
-    [`SELECT * \n  FROM movies\n  LIMIT 1;`],
+    [`SELECT * \n  FROM movies\n  LIMIT 10;`],
   ],
 
   [
