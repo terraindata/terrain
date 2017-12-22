@@ -75,6 +75,8 @@ export interface SpotlightActionTypes
 
 class SpotlightRedux extends TerrainRedux<SpotlightActionTypes, SpotlightState>
 {
+  public namespace: string = 'spotlight';
+
   public reducers: ConstrainedMap<SpotlightActionTypes, SpotlightState> =
   {
     spotlightAction: (state, action) =>
