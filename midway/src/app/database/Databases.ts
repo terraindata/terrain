@@ -129,13 +129,10 @@ export class Databases
     if (db.id !== undefined)
     {
       const results: DatabaseConfig[] = await this.get(db.id);
-      // database id specified but database not found
-      if (results.length === 0)
+      if (results.length !== 0)
       {
-        throw new Error('Invalid db id passed');
+        db = Util.updateObject(results[0], db);
       }
-
-      db = Util.updateObject(results[0], db);
     }
 
     if (db.isAnalytics === undefined)
