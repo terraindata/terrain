@@ -57,14 +57,14 @@ import './BuilderColumn.less';
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
 import RolesStore from '../../roles/data/RolesStore';
-import UserStore from '../../users/data/UserStore';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
-import ColorsActions from '../../colors/data/ColorsActions';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import Util from 'util/Util';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
 import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
 import BuilderTQLColumn from '../../tql/components/BuilderTQLColumn';
@@ -179,18 +179,35 @@ const BuilderColumn = createReactClass<any, any>(
     {
       // TODO fix
       const rejigger = () => this.setState({ rand: Math.random() });
-      this.unsubUser = UserStore.subscribe(rejigger);
       this.unsubRoles = RolesStore.subscribe(rejigger);
 
-      ColorsActions.setStyle('.builder-column .builder-title-bar-options .bc-options-svg .cls-1 ', { fill: Colors().iconColor });
-      ColorsActions.setStyle('.builder-column .builder-title-bar-options .menu-wrapper ', { 'border-color': Colors().iconColor });
-      ColorsActions.setStyle('.builder-column .builder-title-bar .builder-title-bar-title svg .cls-1', { fill: Colors().iconColor });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.builder-column .builder-title-bar-options .bc-options-svg .cls-1',
+        style: { fill: Colors().iconColor },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.builder-column .builder-title-bar-options .menu-wrapper',
+        style: { fill: Colors().iconColor },
+      });
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: '.builder-column .builder-title-bar .builder-title-bar-title svg .cls-1',
+        style: { fill: Colors().iconColor },
+      });
+    },
 
+    componentWillReceiveProps(nextProps)
+    {
+      if (this.props.users !== nextProps.users)
+      {
+        this.setState({ rand: Math.random() });
+      }
     },
 
     componentWillUnmount()
     {
-      this.unsubUser && this.unsubUser();
       this.unsubRoles && this.unsubRoles();
     },
 
@@ -436,4 +453,10 @@ const BuilderColumn = createReactClass<any, any>(
   },
 );
 
-export default BuilderColumn;
+export default Util.createTypedContainer(
+  BuilderColumn,
+  ['auth'],
+  {
+    colorsActions: ColorsActions,
+  },
+);

@@ -71,6 +71,7 @@ export default class ElasticQueryHandler extends QueryHandler
 
   private GROUPJOIN_SEARCH_MAX_SIZE = 10000;
   private GROUPJOIN_MSEARCH_BATCH_SIZE = 1000;
+  private GROUPJOIN_MSEARCH_MAX_PENDING_BATCHES = 1;
   private GROUPJOIN_DEFAULT_SIZE = 10;
   private GROUPJOIN_SCROLL_TIMEOUT = '1m';
 
@@ -182,7 +183,14 @@ export default class ElasticQueryHandler extends QueryHandler
           }
 
           // winston.debug('parentResults for handleGroupJoin: ' + JSON.stringify(response, null, 2));
-          await this.handleGroupJoinSubQueries(valueInfo, childQuery, response);
+          try
+          {
+            await this.handleGroupJoinSubQueries(valueInfo, childQuery, response);
+          }
+          catch (e)
+          {
+            return this.makeQueryCallback(res, rej)(e, allResponse);
+          }
 
           if (allResponse === null)
           {
@@ -286,11 +294,21 @@ export default class ElasticQueryHandler extends QueryHandler
 
             for (let j = 0; j < batchSize; ++j)
             {
+              if (response.error !== undefined)
+              {
+                return reject(response.error);
+              }
+
               hits[i + j][subQuery] = response.responses[j].hits.hits;
             }
             resolve();
           });
       }));
+
+      if (promises.length >= this.GROUPJOIN_MSEARCH_MAX_PENDING_BATCHES)
+      {
+        await Promise.all(promises);
+      }
     }
     return Promise.all(promises);
   }

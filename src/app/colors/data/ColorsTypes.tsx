@@ -44,26 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ActionTypes from './ColorsActionTypes';
-import { _ColorsState, ColorsState } from './ColorsStore';
+// tslint:disable:no-var-requires
 
-const ColorsReducer = {};
+// Copyright 2017 Terrain Data, Inc.
 
-ColorsReducer[ActionTypes.setStyle] =
-  (state, action) =>
-  {
-    const { selector, style } = action.payload;
-    return state.set('styles', state.styles.set(selector, style));
-  };
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import { BaseClass, makeConstructor, New, WithIRecord } from 'app/Classes';
+import * as Immutable from 'immutable';
+import { Map } from 'immutable';
 
-const ColorsReducerWrapper = (state: ColorsState = _ColorsState(), action) =>
+class ColorsStateC
 {
-  let nextState = state;
-  if (ColorsReducer[action.type])
-  {
-    nextState = ColorsReducer[action.type](state, action);
-  }
-  return nextState;
-};
-
-export default ColorsReducerWrapper;
+  public styles: IMMap<string, React.CSSProperties> = Map({});
+}
+export type ColorsState = WithIRecord<ColorsStateC>;
+export const _ColorsState = makeConstructor(ColorsStateC);

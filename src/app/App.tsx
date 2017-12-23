@@ -86,19 +86,19 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 // for error reporting
 
 // data that needs to be loaded
+import { ColorsActions } from 'app/colors/data/ColorsRedux';
+import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
+import { AuthState } from 'auth/AuthTypes';
+import { LibraryState } from 'library/data/LibraryStore';
 import { SchemaActions } from 'schema/data/SchemaRedux';
+import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';
 import AuthActions from './auth/data/AuthActions';
-import AuthStore from './auth/data/AuthStore';
-import ColorsActions from './colors/data/ColorsActions';
-import ColorsStore from './colors/data/ColorsStore';
 import LibraryActions from './library/data/LibraryActions';
-import LibraryStore from './library/data/LibraryStore';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
-import UserStore from './users/data/UserStore';
 
 // Icons
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
@@ -169,6 +169,13 @@ interface Props
   };
   children: any;
   schemaActions: typeof SchemaActions;
+  colorsActions: typeof ColorsActions;
+  colors: ColorsState;
+  users?: UserState;
+  userActions?: typeof UserActions;
+  auth?: AuthState;
+  authActions?: typeof AuthActions;
+  library?: LibraryState;
 }
 
 const APP_STYLE = _.extend({},
@@ -184,10 +191,7 @@ class App extends TerrainComponent<Props>
     sidebarExpanded: false,
     loggedInAndLoaded: false,
 
-    libraryLoaded: false,
     schemaLoaded: false,
-
-    usersLoaded: false,
 
     noLocalStorage: false,
 
@@ -218,87 +222,143 @@ class App extends TerrainComponent<Props>
       alert('Terrain is not meant to work in Internet Explorer. Please try another browser.');
     }
 
-    // Respond to authentication state changes.
-    this._subscribe(AuthStore, {
-      updater: (state) =>
-      {
-        const token = AuthStore.getState().accessToken;
-        const loggedIn = !!token;
-        const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
-
-        this.setState({
-          loggedIn,
-          loggedInAndLoaded,
-        });
-
-        if (token !== null)
-        {
-          this.fetchData();
-        }
-      },
-    });
-
-    this._subscribe(LibraryStore, {
-      stateKey: 'libraryLoaded',
-      storeKeyPath: ['loaded'],
-    });
-
-    this._subscribe(UserStore, {
-      stateKey: 'usersLoaded',
-      storeKeyPath: ['loaded'],
-    });
-
     // this._subscribe(RolesStore, {
     //   stateKey: 'rolesLoaded',
     //   storeKeyPath: ['loaded'],
     // });
-
-    this._subscribe(ColorsStore, {
-      stateKey: 'stylesTag',
-      storeKeyPath: ['styles'],
-    });
 
     // Retrieve logged-in state from persistent storage.
     const accessToken = localStorage['accessToken'];
     const id = localStorage['id'];
     if (accessToken !== undefined && id !== undefined)
     {
-      AuthActions.login(accessToken, id);
+      this.props.authActions.login(accessToken, id);
     }
   }
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('input', { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder });
-    ColorsActions.setStyle('input:hover', { 'background': Colors().inputFocusBg, 'border-color': Colors().inactiveHover });
-    ColorsActions.setStyle('input:focus', { 'background': Colors().inputFocusBg, 'border-color': Colors().inputBorder });
-    ColorsActions.setStyle('::-webkit-scrollbar-track', { background: Colors().scrollbarBG });
-    ColorsActions.setStyle('::-webkit-scrollbar-thumb', { background: Colors().scrollbarPiece });
-    ColorsActions.setStyle('.altBg ::-webkit-scrollbar-thumb', { background: Colors().altScrollbarPiece });
-    ColorsActions.setStyle('.altBg', { color: Colors().altText1 });
-    ColorsActions.setStyle('.card-muted-input input:hover', { 'background': Colors().inputBg + ' !important', 'border-color': Colors().inputBorder });
-    ColorsActions.setStyle('.close svg, svg.close', { fill: Colors().iconColor });
-    ColorsActions.setStyle('.close:hover svg, svg.close:hover', { fill: Colors().activeText });
-    ColorsActions.setStyle('.dropdown-value', { 'border-color': Colors().inputBorder });
-    ColorsActions.setStyle('.dropdown-value:before', { 'border-top': '7px solid ' + Colors().text1 });
-    ColorsActions.setStyle('.dropdown-wrapper:not(.dropdown-disabled):hover .dropdown-value:before', { 'border-top': '7px solid ' + Colors().activeText });
-    ColorsActions.setStyle('.button', { backgroundColor: Colors().active, color: Colors().activeText });
-    ColorsActions.setStyle('.link', { color: Colors().active });
-    ColorsActions.setStyle('.link:hover', { color: Colors().import });
-    ColorsActions.setStyle('.link:active', { color: Colors().active });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'input',
+      style: { 'background': Colors().inputBg, 'color': Colors().text1, 'border-color': Colors().inputBorder },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'input:hover',
+      style: { 'background': Colors().inputFocusBg, 'border-color': Colors().inactiveHover },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: 'input:focus',
+      style: { 'background': Colors().inputFocusBg, 'border-color': Colors().inputBorder },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '::-webkit-scrollbar-track',
+      style: { background: Colors().scrollbarBG },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '::-webkit-scrollbar-thumb',
+      style: { background: Colors().scrollbarPiece },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.altBg ::-webkit-scrollbar-thumb',
+      style: { background: Colors().altScrollbarPiece },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.altBg',
+      style: { color: Colors().altText1 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-muted-input input:hover',
+      style: { 'background': Colors().inputBg + ' !important', 'border-color': Colors().inputBorder },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.close svg, svg.close',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.close:hover svg, svg.close:hover',
+      style: { fill: Colors().activeText },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.dropdown-value',
+      style: { 'border-color': Colors().inputBorder },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.dropdown-value:before',
+      style: { 'border-top': '7px solid ' + Colors().text1 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.dropdown-wrapper:not(.dropdown-disabled):hover .dropdown-value:before',
+      style: { 'border-top': '7px solid ' + Colors().activeText },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.button',
+      style: { backgroundColor: Colors().active, color: Colors().activeText },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.link',
+      style: { color: Colors().active },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.link:hover',
+      style: { color: Colors().import },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.link:active',
+      style: { color: Colors().active },
+    });
 
     const tooltipStyles = generateThemeStyles();
     _.map(tooltipStyles, (value, key) =>
     {
-      ColorsActions.setStyle(key, value);
+      this.props.colorsActions({
+        actionType: 'setStyle',
+        selector: key,
+        style: value,
+      });
     });
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (this.props.auth !== nextProps.auth)
+    {
+      const token = nextProps.auth.accessToken;
+      const loggedIn = !!token;
+      const loggedInAndLoaded = loggedIn && this.state.loggedInAndLoaded;
+
+      this.setState({
+        loggedIn,
+        loggedInAndLoaded,
+      });
+
+      if (token !== null)
+      {
+        this.fetchData();
+      }
+    }
   }
 
   public fetchData()
   {
-    UserActions.fetch();
+    this.props.userActions.fetch();
     TerrainStore.dispatch(LibraryActions.fetch());
-    LibraryStore.dispatch(LibraryActions.fetch());
     this.props.schemaActions({
       actionType: 'fetch',
     });
@@ -321,9 +381,9 @@ class App extends TerrainComponent<Props>
 
   public isAppStateLoaded(): boolean
   {
-    return this.state.libraryLoaded
-      && this.state.usersLoaded;
-    // && this.state.rolesLoaded
+    return this.props.library.loaded
+      && (this.props.users && this.props.users.get('loaded'));
+    // && this.state.rolessLoaded
   }
 
   public renderApp()
@@ -421,7 +481,7 @@ class App extends TerrainComponent<Props>
 
         <DeployModal />
         <StyleTag
-          style={this.state.stylesTag}
+          style={this.props.colors.styles}
         />
 
         <InAppNotification />
@@ -434,6 +494,11 @@ class App extends TerrainComponent<Props>
 
 export default Util.createContainer(
   App,
-  [],
-  { schemaActions: SchemaActions },
+  ['users', 'auth', 'colors', 'library'],
+  {
+    authActions: AuthActions,
+    schemaActions: SchemaActions,
+    userActions: UserActions,
+    colorsActions: ColorsActions,
+  },
 );

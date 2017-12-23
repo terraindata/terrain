@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { _SchemaState, Column, Database, FieldProperty, Index, SchemaState, Server, Table } from 'schema/SchemaTypes';
-import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 const { List, Map } = Immutable;
 
 import BackendInstance from 'database/types/BackendInstance';
@@ -103,6 +103,8 @@ export interface SchemaActionTypes
 
 class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
 {
+  public namespace: string = 'schema';
+
   public reducers: ConstrainedMap<SchemaActionTypes, SchemaState> =
   {
     fetch: (state, action) =>

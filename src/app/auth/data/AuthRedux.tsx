@@ -43,13 +43,56 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
+import { _AuthState, AuthState } from 'auth/AuthTypes';
+import
+{
+  ConstrainedMap,
+  GetType,
+  TerrainRedux,
+  Unroll,
+} from 'store/TerrainRedux';
+import Ajax from 'util/Ajax';
 
-const ColorsActionTypes =
-  {
-    setStyle: '',
+export interface AuthActionTypes
+{
+  login: {
+    actionType: 'login';
+    accessToken: string;
+    id: number;
   };
+  logout: {
+    actionType: 'logout';
+  };
+}
 
-Util.setValuesToKeys(ColorsActionTypes, '');
+class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
+{
+  public namespace: string = 'auth';
 
-export default ColorsActionTypes;
+  public reducers: ConstrainedMap<AuthActionTypes, AuthState> =
+  {
+    login: (state, action) =>
+    {
+      const { accessToken, id } = action.payload;
+      // store these values in localStorage so that the user is auto-logged in next time they visit
+      localStorage['accessToken'] = accessToken;
+      localStorage['id'] = id;
+      return state.set('accessToken', accessToken).set('id', +id);
+    },
+
+    logout: (state, action) =>
+    {
+      Ajax.logout((success) =>
+      {
+        delete localStorage['accessToken'];
+        delete localStorage['id'];
+      });
+      return state.set('accessToken', null).set('id', null);
+    },
+  };
+}
+
+const ReduxInstance = new AuthRedux();
+export const AuthActions = ReduxInstance._actionsForExport();
+export const AuthReducers = ReduxInstance._reducersForExport(_AuthState);
+export declare type AuthActionType<K extends keyof AuthActionTypes> = GetType<K, AuthActionTypes>;
