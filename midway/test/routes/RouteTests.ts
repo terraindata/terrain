@@ -136,6 +136,24 @@ beforeAll(async (done) =>
     {
       done();
     });
+
+  request(server)
+    .post('/midway/v1/database/')
+    .send({
+      id: 1,
+      accessToken: 'ImAnAdmin',
+      body: {
+        name: 'MySQL Test Connection',
+        type: 'mysql',
+        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:3306/moviesdb',
+        host: '127.0.0.1:3306',
+        isAnalytics: false,
+      },
+    })
+    .end(() =>
+    {
+      done();
+    });
 });
 
 afterAll(() =>
@@ -942,12 +960,98 @@ describe('File import route tests', () =>
         fail('POST /midway/v1/import/ request returned an error: ' + String(error));
       });
   });
+
 });
 
-describe('File export templates route tests', () =>
+describe('File io templates route tests', () =>
 {
-  let persistentAccessToken: string = '';
-  test('Create template: POST /midway/v1/export/templates/create', async () =>
+  let persistentImportMySQLAccessToken: string = '';
+  test('Create import template for MySQL: POST /midway/v1/import/templates/create', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/import/templates/create')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          name: 'mysql_import_template',
+          dbid: 1,
+          dbname: 'mysqlimport',
+          tablename: 'data',
+          csvHeaderMissing: false,
+          originalNames: ['movieid', 'title', 'genres', 'backdroppath', 'overview', 'posterpath', 'status', 'tagline', 'releasedate', 'budget', 'revenue', 'votecount', 'popularity', 'voteaverage', 'homepage', 'language', 'runtime'],
+          columnTypes:
+          {
+            movieid: { type: 'long' },
+            title: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            genres: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            backdroppath: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            overview: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            posterpath: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            status: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            tagline: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            releasedate: { type: 'date' },
+            budget: { type: 'long' },
+            revenue: { type: 'long' },
+            votecount: { type: 'long' },
+            popularity: { type: 'double' },
+            voteaverage: { type: 'double' },
+            homepage: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+            language: { type: 'text', index: 'not_analyzed', analyzer: null },
+            runtime: { type: 'long' },
+          },
+          primaryKeys: ['movieid'],
+          transformations: [],
+        },
+      })
+      .expect(200)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData.length).toBeGreaterThan(0);
+        persistentImportMySQLAccessToken = respData[0]['persistentAccessToken'];
+        expect(respData[0])
+          .toMatchObject({
+            id: 1,
+            name: 'mysql_import_template',
+            dbid: 1,
+            dbname: 'mysqlimport',
+            tablename: 'data',
+            originalNames: ['movieid', 'title', 'genres', 'backdroppath', 'overview', 'posterpath', 'status', 'tagline', 'releasedate', 'budget', 'revenue', 'votecount', 'popularity', 'voteaverage', 'homepage', 'language', 'runtime'],
+            columnTypes:
+            {
+              movieid: { type: 'long' },
+              title: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              genres: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              backdroppath: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              overview: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              posterpath: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              status: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              tagline: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              releasedate: { type: 'date' },
+              budget: { type: 'long' },
+              revenue: { type: 'long' },
+              votecount: { type: 'long' },
+              popularity: { type: 'double' },
+              voteaverage: { type: 'double' },
+              homepage: { type: 'text', index: 'analyzed', analyzer: 'standard' },
+              language: { type: 'text', index: 'not_analyzed', analyzer: null },
+              runtime: { type: 'long' },
+            },
+            primaryKeys: ['movieid'],
+            transformations: [],
+            persistentAccessToken: persistentImportMySQLAccessToken,
+          });
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/export/templates/create request returned an error: ' + String(error));
+      });
+  });
+
+  let persistentExportAccessToken: string = '';
+  test('Create export template: POST /midway/v1/export/templates/create', async () =>
   {
     await request(server)
       .post('/midway/v1/export/templates/create')
@@ -976,7 +1080,7 @@ describe('File export templates route tests', () =>
         expect(response.text).not.toBe('Unauthorized');
         const respData = JSON.parse(response.text);
         expect(respData.length).toBeGreaterThan(0);
-        persistentAccessToken = respData[0]['persistentAccessToken'];
+        persistentExportAccessToken = respData[0]['persistentAccessToken'];
         expect(respData[0])
           .toMatchObject({
             id: 1,
@@ -984,7 +1088,7 @@ describe('File export templates route tests', () =>
             dbid: 1,
             dbname: 'movies',
             tablename: 'data',
-
+            objectKey: '',
             originalNames: ['pkey', 'column1', 'column2'],
             columnTypes:
             {
@@ -994,7 +1098,7 @@ describe('File export templates route tests', () =>
             },
             primaryKeys: ['pkey'],
             transformations: [],
-            persistentAccessToken,
+            persistentAccessToken: persistentExportAccessToken,
           });
       })
       .catch((error) =>
@@ -1003,7 +1107,7 @@ describe('File export templates route tests', () =>
       });
   });
 
-  test('Get all import templates: GET /midway/v1/export/templates/', async () =>
+  test('Get all export templates: GET /midway/v1/export/templates/', async () =>
   {
     await request(server)
       .get('/midway/v1/export/templates/')
@@ -1024,7 +1128,7 @@ describe('File export templates route tests', () =>
           dbid: 1,
           dbname: 'movies',
           tablename: 'data',
-
+          objectKey: '',
           originalNames: ['pkey', 'column1', 'column2'],
           columnTypes:
           {
@@ -1034,7 +1138,7 @@ describe('File export templates route tests', () =>
           },
           primaryKeys: ['pkey'],
           transformations: [],
-          persistentAccessToken,
+          persistentAccessToken: persistentExportAccessToken,
         });
       })
       .catch((error) =>
@@ -1068,13 +1172,112 @@ describe('File export templates route tests', () =>
       });
   });
 
+  test('Headless import via MySQL: POST /midway/v1/import/headless', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/import/headless')
+      .send({
+        templateId: 1,
+        persistentAccessToken: persistentImportMySQLAccessToken,
+        body: {
+          source: {
+            type: 'mysql',
+            params: {
+              id: 2,
+              tablename: 'movies',
+              query: 'SELECT * FROM movies LIMIT 10;',
+            },
+          },
+          filetype: 'csv',
+        },
+      }).expect(200)
+      .then(async (response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        try
+        {
+          await elasticDB.refresh('test_elastic_db');
+          const result: object = await elasticDB.query([
+            {
+              index: 'mysqlimport',
+              type: 'data',
+              body: {
+                query: {},
+                sort: [{ movieid: 'asc' }],
+              },
+            },
+          ]);
+          expect(result['hits']['hits'].length).toBeGreaterThan(0);
+          expect(result['hits']['hits'][0]['_source'])
+            .toMatchObject({
+              movieid: 1,
+              title: 'Toy Story (1995)',
+              genres: 'Adventure|Animation|Children|Comedy|Fantasy',
+              backdroppath: '/dji4Fm0gCDVb9DQQMRvAI8YNnTz.jpg',
+              overview: 'Woody the cowboy is young Andy’s favorite toy. Yet this changes when Andy get the new super toy Buzz Lightyear for his birthday. Now that Woody is no longer number one he plans his revenge on Buzz. Toy Story is a milestone in film history for being the first feature film to use entirely computer animation.',
+              posterpath: '/uMZqKhT4YA6mqo2yczoznv7IDmv.jpg',
+              status: 'Released',
+              tagline: 'The adventure takes off!',
+              releasedate: '1995-10-30T08:00:00.000Z',
+              budget: 30000000,
+              revenue: 361958736,
+              votecount: 3022,
+              popularity: 2.45948,
+              voteaverage: 7.5,
+              homepage: 'http://toystory.disney.com/toy-story',
+              language: 'en',
+              runtime: 81,
+            });
+        }
+        catch (e)
+        {
+          fail(e);
+        }
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
+      });
+  });
+
+  test('Headless import via MySQL with bad SQL: POST /midway/v1/import/headless', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/import/headless')
+      .send({
+        templateId: 1,
+        persistentAccessToken: persistentImportMySQLAccessToken,
+        body: {
+          source: {
+            type: 'mysql',
+            params: {
+              id: 2,
+              tablename: 'movies',
+              query: 'SELECT * FROM moviesss LIMIT 10;',
+            },
+          },
+          filetype: 'csv',
+        },
+      }).expect(400)
+      .then((response) =>
+      {
+        expect(response.text).not.toBe('Unauthorized');
+        const respData = JSON.parse(response.text);
+        expect(respData['errors'].length).toBeGreaterThan(0);
+      })
+      .catch((error) =>
+      {
+        fail('POST /midway/v1/import/headless request returned an error: ' + String(error));
+      });
+  });
+
   test('Post headless export: POST /midway/v1/export/headless', async () =>
   {
     await request(server)
       .post('/midway/v1/export/headless')
       .send({
         templateId: 1,
-        persistentAccessToken,
+        persistentAccessToken: persistentExportAccessToken,
         body: {
           dbid: 1,
           dbname: 'movies',

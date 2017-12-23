@@ -52,57 +52,84 @@ import * as winston from 'winston';
 
 import { CredentialConfig, Credentials } from '../../credentials/Credentials';
 
+import * as Tasty from '../../../../src/tasty/Tasty';
+import DatabaseController from '../../../database/DatabaseController';
+import MySQLClient from '../../../database/mysql/client/MySQLClient';
+import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
+
 export const credentials: Credentials = new Credentials();
 
-export interface MySQLConfig
+let tasty: Tasty.Tasty;
+
+export interface MySQLSourceConfig
 {
-  id: string;
-  dbname: string;
+  id: number;
   tablename: string;
   query: string;
 }
 
 export interface MySQLRowConfig
 {
-  columnNames: string[];
   rows: object[];
 }
 
 export class MySQL
 {
-  private storedEmail: string;
-  private storedKeyFilePath: string;
 
-  public async getQueryAsCSVStream(values: any): Promise<stream.Readable>
+  public async getQueryAsCSVStream(mysqlRowConfig: MySQLRowConfig | string): Promise<stream.Readable | string>
   {
-    return new Promise<stream.Readable>(async (resolve, reject) =>
+    return new Promise<stream.Readable | string>(async (resolve, reject) =>
     {
       const writer = csvWriter();
       const pass = new stream.PassThrough();
       writer.pipe(pass);
-      if (values.length > 0)
+      if (typeof mysqlRowConfig === 'string')
       {
-        for (let i = 1; i < values.length; ++i)
+        return resolve(mysqlRowConfig);
+      }
+      if ((mysqlRowConfig as MySQLRowConfig).rows.length > 0)
+      {
+        (mysqlRowConfig as MySQLRowConfig).rows.forEach((row) =>
         {
-          writer.write(_.zipObject(values[0], values[i]));
-        }
+          writer.write(row);
+        });
       }
       writer.end();
       resolve(pass);
     });
   }
 
-  public async runQuery(mysqlconfig: MySQLConfig): Promise<MySQLRowConfig>
+  public async runQuery(mysqlConfig: MySQLSourceConfig): Promise<MySQLRowConfig | string>
   {
-    return new Promise<MySQLRowConfig>(async (resolve, reject) =>
+    return new Promise<MySQLRowConfig | string>(async (resolve, reject) =>
+    {
+      try
       {
         const mysqlRowConfig: MySQLRowConfig =
+          {
+            rows: [],
+          };
+        const database: DatabaseController | undefined = DatabaseRegistry.get(mysqlConfig.id);
+        if (database !== undefined)
         {
-          columnNames: [],
-          rows: [],
-        };
-        resolve(mysqlRowConfig);
-      });
+          if (database.getType() !== 'MySQLController')
+          {
+            return resolve('MySQL source requires a MySQL database ID.');
+          }
+          tasty = database.getTasty() as Tasty.Tasty;
+          mysqlRowConfig.rows = await tasty.getDB().execute([mysqlConfig.query]) as object[];
+          resolve(mysqlRowConfig);
+        }
+        else
+        {
+          return resolve('Database not found.');
+        }
+      }
+      catch (e)
+      {
+        resolve((e as any).toString());
+      }
+    });
   }
 }
 
