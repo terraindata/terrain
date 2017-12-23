@@ -1196,7 +1196,7 @@ describe('File io templates route tests', () =>
         expect(response.text).not.toBe('Unauthorized');
         try
         {
-          await elasticDB.refresh('test_elastic_db');
+          await elasticDB.refresh('mysqlimport');
           const result: object = await elasticDB.query([
             {
               index: 'mysqlimport',
