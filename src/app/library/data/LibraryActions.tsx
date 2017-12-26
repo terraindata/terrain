@@ -52,9 +52,10 @@ import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import Util from '../../util/Util';
 import * as LibraryTypes from '../LibraryTypes';
+import { _LibraryState, LibraryState } from '../LibraryTypes';
 import ActionTypes from './LibraryActionTypes';
 import Store from './LibraryStore';
-import { _LibraryState, LibraryState, LibraryStore } from './LibraryStore';
+import { LibraryStore } from './LibraryStore';
 
 type Category = LibraryTypes.Category;
 type Group = LibraryTypes.Group;

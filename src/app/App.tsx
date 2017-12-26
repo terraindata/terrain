@@ -89,7 +89,7 @@ import BuilderActions from './builder/data/BuilderActions'; // for card hovering
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { _ColorsState, ColorsState } from 'app/colors/data/ColorsTypes';
 import { AuthState } from 'auth/AuthTypes';
-import { LibraryState } from 'library/data/LibraryStore';
+import { LibraryState } from 'library/LibraryTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';

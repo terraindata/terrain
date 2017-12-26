@@ -53,7 +53,7 @@ import * as React from 'react';
 
 import Dropdown from 'common/components/Dropdown';
 import TerrainComponent from 'common/components/TerrainComponent';
-import { LibraryState } from 'library/data/LibraryStore';
+import { LibraryState } from 'library/LibraryTypes';
 import { LibraryItem } from 'library/LibraryTypes';
 
 import './AlgorithmSelector.less';
