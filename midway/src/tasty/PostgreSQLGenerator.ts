@@ -240,14 +240,9 @@ export default class SQLGenerator
   {
     this.appendExpression(query.command);
     this.queryString = 'INSERT INTO ';
-    // this.indent();
 
-    // write INTO clause
-    // this.newLine();
-    // this.queryString += 'INTO ';
     const tableName: string = this.escapeString(query.table.getTableName());
     this.queryString += tableName;
-    // this.queryString += ' SET ';
 
     const baseQuery = this.queryString;
 
@@ -284,8 +279,6 @@ export default class SQLGenerator
 
     this.accumulateUpsert(definedColumnsList, primaryKeys, tableName, accumulatedUpdates, placeholder);
     this.queryString = '';
-    // console.log('statements:');
-    // console.log(this.statements);
   }
 
   public accumulateStatement(queryString: string): void
