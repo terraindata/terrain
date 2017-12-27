@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import Util from 'util/Util';
-import AuthActions from '../../auth/data/AuthActions';
+import { AuthActions } from '../../auth/data/AuthRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import InfoArea from './InfoArea';
 
@@ -60,7 +60,9 @@ class Logout extends TerrainComponent<Props>
 {
   public componentWillMount()
   {
-    this.props.authActions.logout();
+    this.props.authActions({
+      actionType: 'logout'
+    });
     browserHistory.replace('/');
   }
 

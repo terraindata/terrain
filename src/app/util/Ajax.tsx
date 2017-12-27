@@ -55,7 +55,7 @@ import * as _ from 'lodash';
 import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemType } from '../../items/types/Item';
 import Query from '../../items/types/Query';
-import Actions from './../auth/data/AuthActions';
+import { AuthActions as Actions } from './../auth/data/AuthRedux';
 import * as LibraryTypes from './../library/LibraryTypes';
 import * as UserTypes from './../users/UserTypes';
 
@@ -65,6 +65,7 @@ import { MidwayError } from '../../../shared/error/MidwayError';
 import { QueryRequest } from '../../database/types/QueryRequest';
 import { recordForSave, responseToRecordConfig } from '../Classes';
 import AjaxM1 from './AjaxM1';
+import TerrainStore from 'store/TerrainStore';
 // const { List, Map } = Immutable;
 
 export const Ajax =
@@ -191,7 +192,7 @@ export const Ajax =
         if (xhr.status === 401)
         {
           // TODO re-enable
-          Actions.logout();
+          TerrainStore.dispatch(Actions({ actionType: 'logout' }));
         }
 
         if (xhr.status !== 200)
@@ -862,7 +863,7 @@ export const Ajax =
         if (xhr.status === 401)
         {
           // TODO re-enable
-          Actions.logout();
+          TerrainStore.dispatch(Actions({ actionType: 'logout' }));
         }
 
         if (xhr.status !== 200)

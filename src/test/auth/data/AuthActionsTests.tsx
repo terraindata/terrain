@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import { _AuthState, AuthState } from 'auth/AuthTypes';
-import Actions from 'auth/data/AuthActions';
+import { AuthActions as Actions } from 'auth/data/AuthRedux';
 import ActionTypes from 'auth/data/AuthActionTypes';
 import * as Immutable from 'immutable';
 import { Ajax, createMockStore } from '../../helpers';
@@ -98,7 +98,11 @@ describe('AuthActions', () =>
 
       const store = mockStore(Immutable.Map({ auth }));
 
-      store.dispatch(Actions.login('another_valid_token', 2));
+      store.dispatch(Actions({
+        actionType: 'login',
+        accessToken: 'another_valid_token',
+        id: 2
+      }));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });
@@ -116,7 +120,9 @@ describe('AuthActions', () =>
 
       const store = mockStore(Immutable.Map({ auth }));
 
-      store.dispatch(Actions.logout());
+      store.dispatch(Actions({
+        actionType: 'logout'
+      }));
       expect(store.getActions()).toEqual(expectedActions);
     });
   });

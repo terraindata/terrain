@@ -61,7 +61,7 @@ import Util from 'util/Util';
 import { Colors, Themes, ThemesArray } from '../../colors/Colors';
 import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
-import Actions from '../data/UserActions';
+import { UserActions as Actions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
 import AccountEntry from './AccountEntry';
 import PasswordStrengthInput from './PasswordStrengthInput';
@@ -110,7 +110,9 @@ class Settings extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.props.userActions.fetch();
+    this.props.userActions({
+      actionType: 'fetch',
+    });
   }
 
   // public componentDidMount()
@@ -138,7 +140,10 @@ class Settings extends TerrainComponent<Props>
   {
     let newUser = this.props.users.currentUser;
     newUser = newUser.set(field, value);
-    this.props.userActions.change(newUser as UserTypes.User);
+    this.props.userActions({
+      actionType: 'change',
+      user: newUser as UserTypes.User,
+    });
 
     this.setState({
       saving: true,
@@ -203,7 +208,9 @@ class Settings extends TerrainComponent<Props>
 
     Ajax.changePassword(+userId, currentPassword, newPassword, () =>
     {
-      this.props.userActions.fetch();
+      this.props.userActions({
+        actionType: 'fetch',
+      });
       notificationManager.addNotification('Success', 'Updated password', 'info', 4);
     }, (error) =>
       {

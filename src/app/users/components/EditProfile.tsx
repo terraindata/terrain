@@ -51,7 +51,7 @@ import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
-import Actions from './../data/UserActions';
+import { UserActions as Actions } from './../data/UserRedux';
 import * as UserTypes from './../UserTypes';
 const CameraIcon = require('./../../../images/icon_camera.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg');
@@ -134,7 +134,9 @@ class Profile extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.props.userActions.fetch();
+    this.props.userActions({
+      actionType: 'fetch',
+    });
     this.updateUser(this.props);
   }
 
@@ -161,7 +163,10 @@ class Profile extends TerrainComponent<Props>
       newUser = newUser.set(infoKey.key, this.refs[infoKey.key]['value']) as UserTypes.User;
     });
 
-    this.props.userActions.change(newUser as UserTypes.User);
+    this.props.userActions({
+      actionType: 'change',
+      user: newUser as UserTypes.User,
+    });
 
     this.setState({
       saving: true,
