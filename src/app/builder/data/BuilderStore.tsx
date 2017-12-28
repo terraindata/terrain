@@ -48,9 +48,10 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
-import { CardItem } from '../components/cards/CardComponent';
-const Redux = require('redux');
+import { applyMiddleware, createStore } from 'redux';
+import logger from 'redux-logger';
 import { _FileImportState, FileImportState } from '../../fileImport/FileImportTypes';
+import { CardItem } from '../components/cards/CardComponent';
 import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
@@ -110,7 +111,7 @@ import BuilderReducers from './BuilderReducers';
 
 import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
 
-export const BuilderStore: IStore<BuilderState> = Redux.createStore(
+export const BuilderStore: IStore<BuilderState> = createStore(
   (
     state: BuilderState = DefaultState,
     action: Action<{
@@ -174,6 +175,6 @@ export const BuilderStore: IStore<BuilderState> = Redux.createStore(
 
     return state;
   }
-  , DefaultState);
+  , DefaultState, applyMiddleware(logger));
 
 export default BuilderStore;
