@@ -55,7 +55,7 @@ import { combineReducers } from 'redux-immutable';
 import thunk from 'redux-thunk';
 import RolesReducer from 'roles/data/RolesReducers';
 import { SchemaReducers } from 'schema/data/SchemaRedux';
-import UserReducer from 'users/data/UserReducers';
+import { UserReducers } from 'users/data/UserRedux';
 import Ajax from 'util/Ajax';
 import { ColorsReducers } from '../colors/data/ColorsRedux';
 
@@ -66,7 +66,7 @@ const reducers = {
   library: LibraryReducer,
   roles: RolesReducer,
   schema: SchemaReducers,
-  users: UserReducer,
+  users: UserReducers,
   spotlights: SpotlightReducers,
 };
 
