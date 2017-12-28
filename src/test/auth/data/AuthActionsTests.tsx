@@ -87,7 +87,7 @@ describe('AuthActions', () =>
     {
       const expectedActions = [
         {
-          type: 'login',
+          type: ActionTypes.login,
           payload: { id: 2, accessToken: 'another_valid_token' },
         },
         {
@@ -109,7 +109,7 @@ describe('AuthActions', () =>
     {
       const expectedActions = [
         {
-          type: 'logout',
+          type: ActionTypes.logout,
           payload: {},
         },
       ];

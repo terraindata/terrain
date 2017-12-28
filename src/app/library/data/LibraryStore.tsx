@@ -50,7 +50,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Redux from 'redux';
 import thunk from 'redux-thunk';
-import BackendInstance from '../../../database/types/BackendInstance';
+import { _LibraryState, LibraryState } from '../LibraryTypes';
 import * as LibraryTypes from './../LibraryTypes';
 
 import { ItemStatus } from '../../../items/types/Item';
@@ -59,43 +59,6 @@ import Util from './../../util/Util';
 type Category = LibraryTypes.Category;
 type Group = LibraryTypes.Group;
 type Algorithm = LibraryTypes.Algorithm;
-
-class LibraryStateC
-{
-  public loaded = false;
-  public loading = true;
-  public dbs: List<BackendInstance> = Immutable.List([]);
-  public dbsLoaded: boolean = false;
-
-  public categories: IMMap<ID, Category> = null;
-  public groups: IMMap<ID, Group> = null;
-  public algorithms: IMMap<ID, Algorithm> = null;
-  public selectedAlgorithm: ID = null;
-
-  // these are set these on initial load
-  public prevCategories: IMMap<ID, Category> = null;
-  public prevGroups: IMMap<ID, Group> = null;
-  public prevAlgorithms: IMMap<ID, Algorithm> = null;
-
-  public categoriesOrder: List<ID> = Immutable.List([]);
-
-  public changingStatus: boolean = false;
-  public changingStatusOf: LibraryTypes.Algorithm = null;
-  public changingStatusTo: ItemStatus = 'BUILD';
-
-  // Keep track of versioning
-  public modelVersion: number = 3;
-}
-const LibraryState_Record = Immutable.Record(new LibraryStateC());
-export interface LibraryState extends LibraryStateC, IRecord<LibraryState> { }
-export const _LibraryState = (config?: any) =>
-{
-  if (config && !(config['modelVersion'] || config['modelVersion'] < 2))
-  {
-    config['modelVersion'] = 3;
-  }
-  return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
-};
 
 // So this is the best way I’ve found so far to combine the advantages of ImmutableJS with Typescript.
 // It does get a little messy or hacky

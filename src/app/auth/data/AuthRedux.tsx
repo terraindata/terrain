@@ -67,6 +67,8 @@ export interface AuthActionTypes
 
 class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
 {
+  public namespace: string = 'auth';
+
   public reducers: ConstrainedMap<AuthActionTypes, AuthState> =
   {
     login: (state, action) =>

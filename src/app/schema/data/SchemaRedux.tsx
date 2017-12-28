@@ -103,6 +103,8 @@ export interface SchemaActionTypes
 
 class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
 {
+  public namespace: string = 'schema';
+
   public reducers: ConstrainedMap<SchemaActionTypes, SchemaState> =
   {
     fetch: (state, action) =>
