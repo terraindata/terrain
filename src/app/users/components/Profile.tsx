@@ -175,7 +175,7 @@ are still a system administrator yourself.)'))
       const user = this.state.user.set('isSuperUser', !this.state.user.isSuperUser) as UserTypes.User;
       this.props.userActions({
         actionType: 'change',
-        user
+        user,
       });
       Ajax.adminSaveUser(user);
     }

@@ -235,7 +235,7 @@ class App extends TerrainComponent<Props>
       this.props.authActions({
         actionType: 'login',
         accessToken,
-        id
+        id,
       });
     }
   }

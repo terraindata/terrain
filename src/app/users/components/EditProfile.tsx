@@ -51,7 +51,7 @@ import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
-import { UserActions as Actions } from './../data/UserRedux';
+import { UserActions as Actions } from './../data/UserRedux';
 import * as UserTypes from './../UserTypes';
 const CameraIcon = require('./../../../images/icon_camera.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg');

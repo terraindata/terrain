@@ -61,7 +61,7 @@ class Logout extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.props.authActions({
-      actionType: 'logout'
+      actionType: 'logout',
     });
     browserHistory.replace('/');
   }

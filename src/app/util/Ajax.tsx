@@ -61,11 +61,11 @@ import * as UserTypes from './../users/UserTypes';
 
 import MidwayQueryResponse from '../../database/types/MidwayQueryResponse';
 
+import TerrainStore from 'store/TerrainStore';
 import { MidwayError } from '../../../shared/error/MidwayError';
 import { QueryRequest } from '../../database/types/QueryRequest';
 import { recordForSave, responseToRecordConfig } from '../Classes';
 import AjaxM1 from './AjaxM1';
-import TerrainStore from 'store/TerrainStore';
 // const { List, Map } = Immutable;
 
 export const Ajax =

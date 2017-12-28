@@ -43,7 +43,9 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { _UserState, UserState, User, _User, UserMap } from 'users/UserTypes';
+// tslint:disable:no-empty
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import
 {
   ConstrainedMap,
@@ -51,33 +53,32 @@ import
   TerrainRedux,
   Unroll,
 } from 'store/TerrainRedux';
+import { _User, _UserState, User, UserMap, UserState } from 'users/UserTypes';
 import Ajax from 'util/Ajax';
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
 
 export interface UserActionTypes
 {
   change: {
     actionType: 'change';
     user: User;
-  },
+  };
   fetch: {
     actionType: 'fetch';
-  },
+  };
   setUsers: {
     actionType: 'setUsers';
     users: Immutable.Map<ID, User>;
     currentUserId: ID;
-  },
+  };
   updateCurrentUser: {
     actionType: 'updateCurrentUser';
     id: ID;
-  },
+  };
   completeTutorial: {
     actionType: 'completeTutorial';
     complete: boolean,
     stepId: number,
-  },
+  };
 }
 
 class UserRedux extends TerrainRedux<UserActionTypes, UserState>
@@ -150,7 +151,6 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
   {
     if (action.actionType === 'fetch')
     {
-      console.error({action})
       return this.fetchAction.bind(this);
     }
   }
