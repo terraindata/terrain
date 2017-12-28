@@ -46,6 +46,7 @@ THE SOFTWARE.
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import Ajax from 'util/Ajax';
 import TerrainTools from 'util/TerrainTools';
 import AppRouter from './AppRouter';
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
@@ -101,6 +102,10 @@ if (!DEV)
   window.TerrainTools = TerrainTools;
   TerrainTools.welcome();
 }
+
+Ajax.config({
+  reduxStoreDispatch: TerrainStore.dispatch,
+});
 
 ReactDOM.render(
   <Provider store={TerrainStore}>

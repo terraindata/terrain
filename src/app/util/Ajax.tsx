@@ -61,7 +61,6 @@ import * as UserTypes from './../users/UserTypes';
 
 import MidwayQueryResponse from '../../database/types/MidwayQueryResponse';
 
-import TerrainStore from 'store/TerrainStore';
 import { MidwayError } from '../../../shared/error/MidwayError';
 import { QueryRequest } from '../../database/types/QueryRequest';
 import { recordForSave, responseToRecordConfig } from '../Classes';
@@ -70,6 +69,13 @@ import AjaxM1 from './AjaxM1';
 
 export const Ajax =
   {
+    reduxStoreDispatch: (action) => console.error('Ajax reduxStoreDispatch property has not been set.'),
+
+    config: (config) =>
+    {
+      Ajax.reduxStoreDispatch = config.reduxStoreDispatch;
+    },
+
     req(method: 'post' | 'get',
       url: string,
       body: object,
@@ -192,7 +198,7 @@ export const Ajax =
         if (xhr.status === 401)
         {
           // TODO re-enable
-          TerrainStore.dispatch(Actions({ actionType: 'logout' }));
+          Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
         }
 
         if (xhr.status !== 200)
@@ -863,7 +869,7 @@ export const Ajax =
         if (xhr.status === 401)
         {
           // TODO re-enable
-          TerrainStore.dispatch(Actions({ actionType: 'logout' }));
+          Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
         }
 
         if (xhr.status !== 200)

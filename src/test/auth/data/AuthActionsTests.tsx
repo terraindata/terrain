@@ -86,12 +86,13 @@ describe('AuthActions', () =>
     {
       const expectedActions = [
         {
-          type: 'login',
-          payload: { id: 2, accessToken: 'another_valid_token' },
-        },
-        {
-          type: 'users.updateCurrentUser',
-          payload: { id: 2 },
+          type: 'auth.login',
+
+          payload: {
+            id: 2,
+            accessToken: 'another_valid_token',
+            actionType: 'login',
+          },
         },
       ];
 
@@ -112,8 +113,10 @@ describe('AuthActions', () =>
     {
       const expectedActions = [
         {
-          type: 'logout',
-          payload: {},
+          type: 'auth.logout',
+          payload: {
+            actionType: 'logout',
+          },
         },
       ];
 
