@@ -46,6 +46,6 @@ THE SOFTWARE.
 
 import * as mysql from 'mysql';
 
-export type MySQLConfig = mysql.IPoolConfig;
+export type MySQLConfig = mysql.PoolConfig;
 
 export default MySQLConfig;
