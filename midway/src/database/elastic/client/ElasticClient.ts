@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as _ from 'lodash';
 import * as Elastic from 'elasticsearch';
 
 import ElasticConfig from '../ElasticConfig';
@@ -71,7 +72,7 @@ class ElasticClient
     // Do not reuse objects to configure the elasticsearch Client class:
     // https://github.com/elasticsearch/elasticsearch-js/issues/33
     this.config = JSON.parse(JSON.stringify(config));
-    this.delegate = new Elastic.Client(this.config);
+    this.delegate = new Elastic.Client(_.extend(this.config, { apiVersion: '5.5' }));
 
     this.cluster = new ElasticCluster(controller, this.delegate);
     this.indices = new ElasticIndices(controller, this.delegate);
@@ -111,6 +112,8 @@ class ElasticClient
   public deleteTemplate(params: Elastic.DeleteTemplateParams, callback: (error: any, response: any) => void): void
   {
     this.log('deleteTemplate', params);
+    console.log('this.delegate = ');
+    console.log(this.delegate);
     this.delegate.deleteTemplate(params, callback);
   }
 
