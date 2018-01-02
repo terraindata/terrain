@@ -653,7 +653,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
         titleHidden={!archived}
       >
         {
-          this.props.algorithmsOrder.map((id, index) =>
+          this.props.algorithmsOrder.toSet().toList().map((id, index) =>
             this.props.algorithms.get(id) &&
             (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
             && this.renderAlgorithm(id, fadeIndex++),
