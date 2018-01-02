@@ -182,7 +182,7 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
   {
     theBlock = theBlock.set('static', _.cloneDeep(theBlock.static));
   }
-  if (skipTemplate === false && theBlock.static.epilogueInit)
+  if (skipTemplate !== true && theBlock.static.epilogueInit)
   {
     theBlock = theBlock.static.epilogueInit(theBlock);
   }
