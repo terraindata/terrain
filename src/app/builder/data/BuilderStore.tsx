@@ -175,6 +175,6 @@ export const BuilderStore: IStore<BuilderState> = createStore(
 
     return state;
   }
-  , DefaultState, applyMiddleware(logger));
+  , DefaultState);
 
 export default BuilderStore;

@@ -101,7 +101,8 @@ export class FilterUtils
     blockType: string, extraConfig?: { [key: string]: any }, skipTemplate?: boolean)
   {
     console.assert(blockType === 'eqlbool_query', 'Unrecognized block type ' + blockType);
-    const filterCard = BlockUtils.make(blocksConfig, 'elasticFilter', extraConfig, skipTemplate);
+    let filterCard = BlockUtils.make(blocksConfig, 'elasticFilter', extraConfig, skipTemplate);
+    filterCard = filterCard.static.epilogueInit(filterCard);
     // delete any filter blocks since they are in filter rows now
     return filterCard;
   }

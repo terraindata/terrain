@@ -182,7 +182,7 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
   {
     theBlock = theBlock.set('static', _.cloneDeep(theBlock.static));
   }
-  if (theBlock.static.epilogueInit)
+  if (skipTemplate === false && theBlock.static.epilogueInit)
   {
     theBlock = theBlock.static.epilogueInit(theBlock);
   }
@@ -221,7 +221,7 @@ export const recordFromJS = (value: any, Blocks: { [type: string]: BlockConfig }
     const type = value.type || (typeof value.get === 'function' && value.get('type'));
     if (type && Blocks[type])
     {
-      value = make(Blocks, type, value);
+      value = make(Blocks, type, value, true);
     }
     else
     {
