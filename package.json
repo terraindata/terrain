@@ -236,7 +236,7 @@
     "jest": "^22.0.4",
     "json-loader": "^0.5.4",
     "less": "^2.7.3",
-    "less-loader": "^4.0.5",
+    "less-loader": "0.6.2",
     "nodemon": "^1.14.7",
     "pre-commit": "^1.2.2",
     "raw-loader": "^0.5.1",
