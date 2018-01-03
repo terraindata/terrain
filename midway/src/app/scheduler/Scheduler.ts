@@ -403,7 +403,8 @@ export class Scheduler
           }
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
           await sftp.connect(sftpconfig);
-          const checkIfDirectoryExists: object[] = await sftp.list(path.substring(0, path.substring(0, path.lastIndexOf('/')).lastIndexOf('/') + 1));
+          const checkIfDirectoryExists: object[] =
+            await sftp.list(path.substring(0, path.substring(0, path.lastIndexOf('/')).lastIndexOf('/') + 1));
           const parentDir: string = path.substring(path.lastIndexOf('/', path.lastIndexOf('/') - 1) + 1, path.lastIndexOf('/'));
           const dirExists = checkIfDirectoryExists.filter((obj) => obj['name'] === parentDir);
 
