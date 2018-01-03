@@ -403,8 +403,11 @@ export class Scheduler
           }
           encoding = (encoding !== undefined ? (encoding === 'binary' ? null : encoding) : 'utf8');
           await sftp.connect(sftpconfig);
-          const checkIfDirectoryExists = await sftp.list(path.substring(0, path.lastIndexOf('/') + 1));
-          if (checkIfDirectoryExists.length !== 0)
+          const checkIfDirectoryExists: object[] = await sftp.list(path.substring(0, path.substring(0, path.lastIndexOf('/')).lastIndexOf('/') + 1));
+          const parentDir: string = path.substring(path.lastIndexOf('/', path.lastIndexOf('/') - 1) + 1, path.lastIndexOf('/'));
+          const dirExists = checkIfDirectoryExists.filter((obj) => obj['name'] === parentDir);
+
+          if (dirExists.length > 0 && parentDir !== '/')
           {
             winston.info('Schedule ' + scheduleID.toString() + ': Starting export with sftp');
             let writeStream: stream.Readable = new stream.Readable();
@@ -433,6 +436,10 @@ export class Scheduler
             }
             await this.setJobStatus(scheduleID, 0);
             return rejectJob('Failed to export.');
+          }
+          else
+          {
+            winston.info('Unable to export to that file. Are you sure that path exists?');
           }
         }
         catch (e)
