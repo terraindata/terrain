@@ -112,8 +112,6 @@ class ElasticClient
   public deleteTemplate(params: Elastic.DeleteTemplateParams, callback: (error: any, response: any) => void): void
   {
     this.log('deleteTemplate', params);
-    console.log('this.delegate = ');
-    console.log(this.delegate);
     this.delegate.deleteTemplate(params, callback);
   }
 
