@@ -122,12 +122,6 @@ class DeployModal extends TerrainComponent<Props>
     TerrainStore.dispatch(LibraryActions.algorithms.status(null, null));
   }
 
-  private haveValidDeployedName(): boolean {
-    return this.state.algorithms.valueSeq().filter((algorithm: LibraryTypes.Algorithm) => {
-      return algorithm !== this.state.changingStatusOf && algorithm.deployedName === this.state.deployedName;
-    }).toList().size === 0;
-  }
-
   public handleDeploy()
   {
     const algorithm = this.state.changingStatusOf;
@@ -297,6 +291,14 @@ class DeployModal extends TerrainComponent<Props>
         </Modal>
       </div>
     );
+  }
+
+  private haveValidDeployedName(): boolean
+  {
+    return this.state.algorithms.valueSeq().filter((algorithm: LibraryTypes.Algorithm) =>
+    {
+      return algorithm !== this.state.changingStatusOf && algorithm.deployedName === this.state.deployedName;
+    }).toList().size === 0;
   }
 }
 

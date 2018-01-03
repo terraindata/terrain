@@ -197,7 +197,7 @@
     "@types/koa-send": "^4.1.1",
     "@types/lodash": "^4.14.91",
     "@types/mysql": "^2.15.2",
-    "@types/node": "^8.5.2",
+    "@types/node": "^8.5.5",
     "@types/node-schedule": "^1.2.1",
     "@types/passport-local": "^1.0.30",
     "@types/pg": "^7.4.1",
