@@ -61,6 +61,7 @@ import TerrainStore from 'store/TerrainStore';
 import Util from 'util/Util';
 import ColorsActions from '../../../colors/data/ColorsActions';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
+import PathfinderFilterSection2 from './filter/PathfinderFilterSection2';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
 import { _PathfinderContext, Path, PathfinderSteps, Source } from './PathfinderTypes';
@@ -145,7 +146,7 @@ class PathfinderColumn extends TerrainComponent<Props>
         />
         {
           path.step >= PathfinderSteps.Filter ?
-            <PathfinderFilterSection
+            <PathfinderFilterSection2
               pathfinderContext={pathfinderContext}
               filterGroup={path.filterGroup}
               keyPath={keyPath.push('filterGroup')}

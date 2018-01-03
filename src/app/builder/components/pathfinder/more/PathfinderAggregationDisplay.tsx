@@ -213,7 +213,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
     items: [
       {
         text: PathfinderText.aggregation.order.text1,
-        fieldOptions: true,
+        options: List(['_term', '_count']), // TODO Different for non terms aggs
         key: 'sortField',
         inputType: 'dropdown',
         tooltipText: PathfinderText.aggregation.order.tooltipText,
