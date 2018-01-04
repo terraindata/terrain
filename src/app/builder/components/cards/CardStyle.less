@@ -445,11 +445,11 @@
 
 .transform-card-inner {
   text-align: center;
-  margin-left: -110px;
-  width: calc(~"100% + 110px");
+  // margin-left: -110px;
+  // width: calc(~"100% + 110px");
 
   margin-left: -55px;
-  width: calc(~"100% + 55px");
+  width: calc(~"100% - 55px");
 
   // margin-left: 0px;
   // width: 100%;
@@ -459,7 +459,6 @@
 .card-body {
   // top: -32px;
   .transition;
-  margin-left: @title-width;
   margin-left: 0px;
   padding: 6px 3px;
 }
@@ -496,37 +495,15 @@
     .normal-white-text;
 }
 
-.card-closed {
-  // .builder-card-header.sfw-select-header {
-  //   opacity: 0;
-  // }
-}
-
-.card-inner {
-  // border-left-width: 6px !important;
-}
-
 .card .cards-area {
   margin-right: -10px !important;
-  margin-left: -108px;
-  margin-left: -75px;
+  // margin-left: -108px;
+  // margin-left: -75px;
 }
 
 .builder-tb-cards-area {
   margin-right: -4px !important;
 }
-
-// .card-no-title {
-//   // .builder-tb-cards-area,
-//   .cards-area {
-//     margin-left: -55px;
-//     // width: calc(~"100% + 110px");
-//   }
-//   .transform-card-inner {
-//     margin-left: -55px;
-//     width: calc(~"100% + 55px");
-//   }
-// }
 
 .builder-comp-list-item.card-fields {
     margin-bottom: 6px !important;
@@ -629,4 +606,13 @@
   &::placeholder {
     color: rgba(0,0,0,0.7) !important;
   }
+}
+
+.builder-label-card-title-offset {
+  // offset the title label to not overlap with the controls
+  margin-left: 75px;
+}
+
+.elasticTransform-card .card-body {
+  margin-left: 55px;
 }
