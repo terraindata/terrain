@@ -44,38 +44,69 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires no-console
+import * as fs from 'fs';
+import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
+import * as winston from 'winston';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
+import { makePromiseCallback } from '../../Utils';
 
-import * as _ from 'lodash';
-import * as ReduxActions from 'redux-actions';
-const Redux = require('redux');
+// make sure importing ESCardParser before importing ElasticToCards
+import ESCardParser from 'src/database/elastic/conversion/ESCardParser';
 
-import AuthStore from './../../auth/data/AuthStore';
+import { ElasticValueInfoToCards, parseCardFromValueInfo } from 'src/database/elastic/conversion/ElasticToCards';
 
-import * as UserTypes from './../UserTypes';
-import ActionTypes from './UserActionTypes';
-import UserReducers from './UserReducers';
+import * as Immutable from 'immutable';
+import ESParserError from 'shared/database/elastic/parser/ESParserError';
+import CardsToElastic from 'src/database/elastic/conversion/CardsToElastic';
 
-const UserStore = Redux.createStore(UserReducers);
-
-UserStore.subscribe(() =>
+function getExpectedFile(): string
 {
-  const state = UserStore.getState();
-  if (state.getIn(['users', AuthStore.getState().id]) !== state.get('currentUser'))
+  return __filename.split('.')[0] + '.expected';
+}
+
+let expected;
+
+beforeAll(async (done) =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+
+  const contents: any = await new Promise((resolve, reject) =>
   {
-    // currentUser object changed
-    UserStore.dispatch({
-      type: ActionTypes.updateCurrentUser,
-      payload: {},
-    });
-  }
+    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+  });
+
+  expected = JSON.parse(contents);
+  done();
 });
 
-/*window['test'] = () =>
+function testCardParse(testName: string,
+  testString: string,
+  expectedValue: any,
+  expectedErrors: ESParserError[] = [])
 {
-  const users = UserStore.getState().users;
-  console.log('users', users);
-  Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
-};*/
+  winston.info('testing "' + testName + '": "' + testString + '"');
+  const emptyCards = Immutable.List([]);
+  const interpreter: ESInterpreter = new ESInterpreter(testString);
+  const parser: ESJSONParser = interpreter.parser as ESJSONParser;
+  const rootValueInfo = parser.getValueInfo();
+  const rootCards = ElasticValueInfoToCards(rootValueInfo, Immutable.List([]));
+  // parse the card
+  const rootCard = rootCards.get(0);
+  expect(rootCard['type']).toEqual('eqlbody');
+  const cardParser = new ESCardParser(rootCard);
+  // interpreting the parsed card
+  const cardInterpreter = new ESInterpreter(cardParser);
+  expect(cardInterpreter.errors).toEqual(expectedErrors);
+  expect(CardsToElastic.blockToElastic(rootCard)).toEqual(expectedValue);
+}
 
-export default UserStore;
+test('parse card', () =>
+{
+  Object.getOwnPropertyNames(expected).forEach(
+    (testName: string) =>
+    {
+      const testValue: any = expected[testName];
+      testCardParse('test', JSON.stringify(testValue), testValue);
+    });
+});

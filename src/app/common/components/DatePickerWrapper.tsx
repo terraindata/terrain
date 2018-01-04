@@ -56,7 +56,6 @@ import Util from '../../util/Util';
 import Dropdown from './Dropdown';
 
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
-import ColorsActions from '../../colors/data/ColorsActions';
 import DatePicker from './DatePicker';
 import './DatePicker.less';
 import FadeInOut from './FadeInOut';

@@ -145,10 +145,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           value: any,
         },
       }) =>
-      state.setIn(
+    {
+      return state.setIn(
         action.payload.keyPath,
         action.payload.value,
-      ),
+      );
+
+    },
 
     [ActionTypes.changeQuery]: (state: BuilderState,
       action: {

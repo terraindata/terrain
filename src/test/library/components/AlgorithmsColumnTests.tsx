@@ -46,8 +46,8 @@ THE SOFTWARE.
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
-import AlgorithmsColumn from 'library/components/AlgorithmsColumn';
-import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import { AlgorithmsColumn } from 'library/components/AlgorithmsColumn';
+import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import { browserHistory } from 'react-router';

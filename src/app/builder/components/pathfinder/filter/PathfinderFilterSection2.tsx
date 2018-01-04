@@ -61,14 +61,14 @@ import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
 import Dropdown from 'app/common/components/Dropdown';
 import Ajax from 'app/util/Ajax';
+import Select from 'react-select';
+import 'react-select/dist/react-select.css';
 import
 {
   _FilterLine, ElasticDataSource, FilterGroup, FilterLine,
-  Path, PathfinderContext, PathfinderSteps, Source
+  Path, PathfinderContext, PathfinderSteps, Source,
 } from '../PathfinderTypes';
 import './PathfinderFilter.less';
-import Select from 'react-select';
-import 'react-select/dist/react-select.css';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine2';
@@ -319,7 +319,7 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
   //                 name='form-field-name'
   //                 value={filter.comparison}
   //                 onChange={this._fn(this.handleComparisonChange, i)}
-  //                 options={comparisonOptions.map((option) => 
+  //                 options={comparisonOptions.map((option) =>
   //                   { return {value: option.value, label: option.displayName}})
   //                 .toArray()}
   //               />

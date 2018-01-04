@@ -72,8 +72,8 @@ const emptyList = Immutable.List([]);
 
 const STYLE = {
   marginTop: -2,
-  width: 'calc(100% + 59px)',
-  marginLeft: -55,
+  // width: 'calc(100% + 59px)',
+  // marginLeft: -55,
 };
 
 class SpecializedCreateCardTool extends TerrainComponent<Props>

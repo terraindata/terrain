@@ -56,11 +56,12 @@ import { Card, CardString } from '../../../../blocks/types/Card';
 
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1 from '../../../util/AjaxM1';
-import SpotlightStore from '../../data/SpotlightStore';
+import * as SpotlightTypes from '../../data/SpotlightTypes';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 import TransformCardPeriscope from './TransformCardPeriscope';
 
+import Util from 'app/util/Util';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
 import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
@@ -78,8 +79,8 @@ export interface Props
   language: string;
 
   canEdit?: boolean;
-  spotlights?: any;
-
+  // spotlights?: any;
+  spotlights?: SpotlightTypes.SpotlightState;
   containerWidth?: number;
   index?: string;
 }
@@ -106,7 +107,6 @@ class TransformCard extends TerrainComponent<Props>
     maxDomain: List<number>;
     range: List<number>;
     bars: Bars;
-    spotlights: IMMap<string, any>;
     queryXhr?: XMLHttpRequest;
     queryId?: string;
     error?: boolean;
@@ -121,18 +121,12 @@ class TransformCard extends TerrainComponent<Props>
       chartDomain: List([Number(props.data.domain.get(0)), Number(props.data.domain.get(1))]),
       range: List([0, 1]),
       bars: List([]),
-      spotlights: null,
     };
   }
 
   public componentDidMount()
   {
     this.computeBars(this.props.data.input, this.state.maxDomain, !this.props.data.hasCustomDomain);
-    this._subscribe(SpotlightStore, {
-      isMounted: true,
-      storeKeyPath: ['spotlights'],
-      stateKey: 'spotlights',
-    });
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -237,7 +231,7 @@ class TransformCard extends TerrainComponent<Props>
 
   public render()
   {
-    const spotlights = this.state.spotlights;
+    const spotlights = this.props.spotlights.spotlights;
     const { data } = this.props;
     const width = this.props.containerWidth ? this.props.containerWidth + 55 : 300;
     return (
@@ -737,9 +731,13 @@ class TransformCard extends TerrainComponent<Props>
   }
 }
 
-export default Dimensions({
-  elementResize: true,
-  containerStyle: {
-    height: 'auto',
-  },
-})(TransformCard);
+export default Util.createTypedContainer(
+  Dimensions({
+    elementResize: true,
+    containerStyle: {
+      height: 'auto',
+    },
+  })(TransformCard),
+  ['spotlights'],
+  {},
+);

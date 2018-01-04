@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import * as React from 'react';
 import { browserHistory } from 'react-router';
+import Util from 'util/Util';
 import AuthActions from '../../auth/data/AuthActions';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import InfoArea from './InfoArea';
@@ -52,13 +53,14 @@ import InfoArea from './InfoArea';
 export interface Props
 {
   history?: any;
+  authActions: typeof AuthActions;
 }
 
 class Logout extends TerrainComponent<Props>
 {
   public componentWillMount()
   {
-    AuthActions.logout();
+    this.props.authActions.logout();
     browserHistory.replace('/');
   }
 
@@ -69,4 +71,8 @@ class Logout extends TerrainComponent<Props>
     );
   }
 }
-export default Logout;
+export default Util.createTypedContainer(
+  Logout,
+  [],
+  { authActions: AuthActions },
+);

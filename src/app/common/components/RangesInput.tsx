@@ -46,7 +46,6 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires
 import BuilderActions from 'app/builder/data/BuilderActions';
 import { backgroundColor, borderColor, Colors, fontColor } from 'app/colors/Colors';
-import ColorsActions from 'app/colors/data/ColorsActions';
 import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import * as classNames from 'classnames';
 import { List, Map } from 'immutable';

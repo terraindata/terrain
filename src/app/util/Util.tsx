@@ -143,10 +143,10 @@ const Util = {
       );
   },
 
-  haveRole(categoryId: ID, role: string, UserStore, RolesStore)
+  haveRole(categoryId: ID, role: string, usersState, RolesStore)
   {
     return true;
-    // const me = UserStore.getState().get('currentUser');
+    // const me = usersState.currentUser;
     // if (!me)
     // {
     //   return false;
@@ -179,9 +179,9 @@ const Util = {
     return str && str !== ' ' && !Number.isNaN(+str);
   },
 
-  canEdit(item: { type: string, id: ID }, UserStore, RolesStore)
+  canEdit(item: { type: string, id: ID }, usersState, RolesStore)
   {
-    const me = UserStore.getState().get('currentUser');
+    const me = usersState.currentUser;
     if (!me)
     {
       return false;
@@ -192,14 +192,14 @@ const Util = {
     }
 
     const categoryId = item.type === 'category' ? item.id : item['categoryId'];
-    if (Util.haveRole(categoryId, 'admin', UserStore, RolesStore))
+    if (Util.haveRole(categoryId, 'admin', usersState, RolesStore))
     {
       return true;
     }
 
     if (item.type !== 'category')
     {
-      return Util.haveRole(categoryId, 'builder', UserStore, RolesStore);
+      return Util.haveRole(categoryId, 'builder', usersState, RolesStore);
     }
 
     return false;
