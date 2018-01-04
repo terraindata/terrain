@@ -257,7 +257,8 @@ class HitsArea extends TerrainComponent<Props>
   public isQueryEmpty(): boolean
   {
     const { query, ignoreEmptyCards } = this.props;
-    return !query || (!ignoreEmptyCards && !query.cards.size);
+    const cardsAndPathEmpty = !query.cards.size && !query.path;
+    return !query || (!ignoreEmptyCards && cardsAndPathEmpty);
   }
 
   public handleSpotlightAdded(id, spotlightData)

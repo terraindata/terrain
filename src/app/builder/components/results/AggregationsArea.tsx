@@ -77,7 +77,8 @@ class AggregationsArea extends TerrainComponent<Props>
   public isQueryEmpty(): boolean
   {
     const { query } = this.props;
-    return !query || (!query.cards.size);
+    const cardsAndPathEmpty = !query.cards.size && !query.path;
+    return !query || cardsAndPathEmpty;
   }
 
   public componentWillMount()
