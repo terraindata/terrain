@@ -88,13 +88,6 @@ export default class LoadElasticQuery
       }
     }
 
-    if (query.modelVersion < CurrentQueryModelVersion)
-    {
-      query = query
-        .set('cardsAndCodeInSync', false)
-        .set('modelVersion', CurrentQueryModelVersion);
-    }
-
     if (query.tql)
     {
       query = query.set('parseTree', ParseElasticQuery(query));

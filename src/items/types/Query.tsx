@@ -114,10 +114,19 @@ export const _Query = (config?: object) =>
   config['cardKeyPaths'] = Map<ID, KeyPath>(config['cardKeyPaths']);
   config['tuningOrder'] = List<string>(config['tuningOrder']);
   config['aggregationList'] = Map<string, Aggregation>(config['aggregationList']);
-  if (config && (!config['modelVersion'] || config['modelVersion'] < 3))
+  if (config)
   {
-    config['modelVersion'] = 3;
-    config['algorithmId'] = config['variantId'];
+    if (!config['modelVersion'] || config['modelVersion'] < 3)
+    {
+      config['modelVersion'] = 3;
+      config['algorithmId'] = config['variantId'];
+    }
+
+    if (config['modelVersion'] < 4)
+    {
+      config['modelVersion'] = 4;
+      config['cardsAndCodeInSync'] = false;
+    }
   }
   const query = new Query_Record(config) as any as Query;
 
@@ -133,8 +142,8 @@ export function queryForSave(query: Query): object
   return query.toJS();
 }
 
-// first version is 2
-// version 3 introduces .
+// first version is 2.
+// version 3 renames algorithmId to variantId.
 // version 4 introduces a new custom filter card.
 export const CurrentQueryModelVersion = 4;
 
