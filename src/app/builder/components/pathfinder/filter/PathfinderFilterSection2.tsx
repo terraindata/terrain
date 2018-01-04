@@ -67,6 +67,8 @@ import
   Path, PathfinderContext, PathfinderSteps, Source
 } from '../PathfinderTypes';
 import './PathfinderFilter.less';
+import Select from 'react-select';
+import 'react-select/dist/react-select.css';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine2';
@@ -311,6 +313,20 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
       </div>
     );
   }
+
+  // Way of using a searchable dropdown to select the comparison type
+  //                <Select
+  //                 name='form-field-name'
+  //                 value={filter.comparison}
+  //                 onChange={this._fn(this.handleComparisonChange, i)}
+  //                 options={comparisonOptions.map((option) => 
+  //                   { return {value: option.value, label: option.displayName}})
+  //                 .toArray()}
+  //               />
+  // private handleComparisonChange(i: number, selected: string)
+  // {
+  //   BuilderActions.change(this.props.keyPath.push('lines').push(i).push('comparison'), selected);
+  // }
 
   private handleRemoveFilter(filter)
   {

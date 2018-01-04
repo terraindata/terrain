@@ -146,7 +146,7 @@ class PathfinderColumn extends TerrainComponent<Props>
         />
         {
           path.step >= PathfinderSteps.Filter ?
-            <PathfinderFilterSection2
+            <PathfinderFilterSection
               pathfinderContext={pathfinderContext}
               filterGroup={path.filterGroup}
               keyPath={keyPath.push('filterGroup')}
