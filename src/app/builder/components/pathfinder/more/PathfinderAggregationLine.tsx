@@ -122,13 +122,13 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     this.updateAggregation(type, this.props.aggregation.field);
   }
 
-  public handleFieldChange(newField)
+  public handleFieldChange(index: number)
   {
-    BuilderActions.change(this.props.keyPath.push('field'), newField);
+    const newField = this.state.fieldOptions.get(index);
     const fieldType = ElasticBlockHelpers.getTypeOfField(
       this.props.pathfinderContext.schemaState,
       newField,
-      this.props.pathfinderContext.source.dataSource
+      this.props.pathfinderContext.source.dataSource,
     );
     BuilderActions.change(this.props.keyPath.push('fieldType'), fieldType);
     this.updateAggregation(this.props.aggregation.type, newField);
@@ -366,18 +366,13 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           onChange={this.handleTypeChange}
           canEdit={canEdit}
         />
-        <AdvancedDropdown
-          value={this.props.aggregation.field}
-          options={List(this.state.fieldOptions.map((option) =>
-          {
-            return {
-              value: option,
-              displayName: option,
-            };
-          }))}
+        <Dropdown
+          selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
+          options={this.state.fieldOptions}
           onChange={this.handleFieldChange}
           canEdit={canEdit}
           placeholder={'Field'}
+          keyPath={this.props.keyPath.push('field')}
         />
       </div>
     );

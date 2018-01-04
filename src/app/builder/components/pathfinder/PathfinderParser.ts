@@ -50,9 +50,9 @@ import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 import Util from 'app/util/Util';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
+import { FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
-import {FieldType} from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 
 export function parsePath(path: Path): string
 {
@@ -474,9 +474,9 @@ function parseMore(more: More): {}
         {
           advancedObj['extended_bounds'] = { min: parseFloat(advanced['min']), max: parseFloat(advanced['max']) };
         }
-        else if (key === 'sortField')
+        else if (key === 'sortField' && advanced['sortField'])
         {
-          advancedObj['order'] = {[advanced['sortField']]: advanced['order']};
+          advancedObj['order'] = { [advanced['sortField']]: advanced['order'] };
         }
       });
       moreObj[agg.advanced.get('name')] = {

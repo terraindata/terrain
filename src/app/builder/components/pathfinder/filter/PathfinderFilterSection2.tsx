@@ -56,14 +56,20 @@ const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import BuilderStore from 'app/builder/data/BuilderStore';
+import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import DragAndDrop from 'app/common/components/DragAndDrop';
 import DragHandle from 'app/common/components/DragHandle';
-import { ElasticDataSource, FilterGroup, FilterLine, Path, PathfinderContext, PathfinderSteps, Source } from '../PathfinderTypes';
+import Dropdown from 'app/common/components/Dropdown';
+import Ajax from 'app/util/Ajax';
+import
+{
+  _FilterLine, ElasticDataSource, FilterGroup, FilterLine,
+  Path, PathfinderContext, PathfinderSteps, Source
+} from '../PathfinderTypes';
+import './PathfinderFilter.less';
 import PathfinderFilterCreate from './PathfinderFilterCreate';
 import PathfinderFilterGroup from './PathfinderFilterGroup';
 import PathfinderFilterLine from './PathfinderFilterLine2';
-import Ajax from 'app/util/Ajax';
-import './PathfinderFilter.less'; 
 
 const NUM_RESULTS = 10;
 export interface Props
@@ -81,13 +87,13 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
     sampleData: List<any>,
     schema: List<string | List<string>>,
     currentResult: number,
-    filtersOpen: Immutable.Map<string, boolean>
+    filtersOpen: Immutable.Map<string, boolean>,
 
   } = {
     sampleData: List([]),
     schema: List([]),
     currentResult: 0,
-    filtersOpen: Immutable.Map<string, boolean>({})
+    filtersOpen: Immutable.Map<string, boolean>({}),
   };
 
   public componentWillMount()
@@ -119,7 +125,7 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
     );
   }
 
-  private changeCurrentResult(value)
+  private changeCurrentResult(value: number)
   {
     let newValue = this.state.currentResult + value;
     if (newValue >= NUM_RESULTS)
@@ -131,36 +137,37 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
       newValue = NUM_RESULTS - 1;
     }
     this.setState({
-      currentResult: newValue
+      currentResult: newValue,
     });
   }
 
   private buildSchema()
   {
-    const {index, types} = this.props.pathfinderContext.source.dataSource as ElasticDataSource;
-    const {schemaState} = this.props.pathfinderContext;
+    const { index, types } = this.props.pathfinderContext.source.dataSource as ElasticDataSource;
+    const { schemaState } = this.props.pathfinderContext;
     const server = BuilderStore.getState().db.name;
     if (index)
+    {
+      if (types && types.size)
       {
-        if (types && types.size)
-        {
-          const cols = schemaState.columns.filter(
-            (column) => column.serverId === String(server) &&
-              column.databaseId === String(index))
-            .map((col) => {
-              return col.name
-            }).toList();
-          // need to handle nested stuff here
-          this.setState({
-            schema: cols,
-          })
+        const cols = schemaState.columns.filter(
+          (column) => column.serverId === String(server) &&
+            column.databaseId === String(index))
+          .map((col) =>
+          {
+            return col.name;
+          }).toList();
+        // need to handle nested stuff here
+        this.setState({
+          schema: cols,
+        });
       }
     }
   }
 
   private getSampleResults(numResults: number)
-  {    
-    const {index} = this.props.pathfinderContext.source.dataSource as ElasticDataSource;
+  {
+    const { index } = this.props.pathfinderContext.source.dataSource as ElasticDataSource;
     const { db } = BuilderStore.getState();
     const query = {
       query: {
@@ -168,14 +175,14 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
           filter: [
             {
               term: {
-                _index: index.split('/')[1]
-              }
-            }
-          ]
-        }
+                _index: index.split('/')[1],
+              },
+            },
+          ],
+        },
       },
-      size: 10
-    }
+      size: 10,
+    };
     Ajax.query(
       JSON.stringify(query),
       db,
@@ -183,9 +190,7 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
       {
         if (resp.result && resp.result.hits && resp.result.hits.hits)
         {
-          console.log('here');
           const sampleData = resp.result.hits.hits.map((hit) => hit._source);
-          console.log(sampleData);
           this.setState({
             sampleData: List(sampleData),
           });
@@ -193,7 +198,7 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
       },
       (err) =>
       {
-        console.log(err);
+        // console.log(err);
       },
     );
   }
@@ -205,12 +210,18 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
     {
       return null;
     }
+    const backText = '<';
+    const nextText = '>';
     return (
-      <div>
-        <div onClick={this._fn(this.changeCurrentResult, -1)}> Back </div>
+      <div className='pf-filter-sample-wrapper'>
+        <div
+          onClick={this._fn(this.changeCurrentResult, -1)}
+          className='pf-filter-sample-arrow'
+        > {backText} </div>
         <div className='pf-filter-sample-result'>
           {
-            this.state.schema.map((field: string, i) => {
+            this.state.schema.map((field: string, i) =>
+            {
               return (
                 <div
                   key={i}
@@ -222,27 +233,105 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
                   <span className='pf-filter-sample-result-value'>{result[field]}</span>
                   {
                     this.state.filtersOpen.get(field) &&
-                    <div onClick={this._fn(this.handleAddFilter, field)}> Add Filter </div>
+                    this.renderFilters(field)
                   }
                 </div>
-              )
+              );
             })
           }
         </div>
-        <div onClick={this._fn(this.changeCurrentResult, 1)}> Next </div>
+        <div
+          onClick={this._fn(this.changeCurrentResult, 1)}
+          className='pf-filter-sample-arrow pf-filter-sample-arrow-next'
+        > {nextText} </div>
       </div>
     );
   }
 
-  public handleAddFilter(field)
+  private getFiltersForField(field)
   {
-    console.log('add filter for field', field);
+    const allFilters = this.props.filterGroup.lines;
+    const fieldFilters = allFilters.filter((f: FilterLine) =>
+    {
+      return f.field === field;
+    });
+    return fieldFilters.toList();
   }
 
-  public toggleFilters(field)
+  private renderFilters(field)
+  {
+    const filters = this.getFiltersForField(field);
+    if (filters.size === 0)
+    {
+      return (
+        <div onClick={this._fn(this.handleAddFilter, field)} className='pf-filter-add-filter'> Add Filter </div>
+      );
+    }
+    const { source, schemaState, canEdit } = this.props.pathfinderContext;
+    return (
+      <div>
+        {
+          filters.map((filter: FilterLine, i) =>
+          {
+            const comparisonOptions = source.dataSource.getChoiceOptions({
+              type: 'comparison',
+              field,
+              fieldType: filter.fieldType,
+              source,
+              schemaState,
+            });
+            let displayNames = Map<string, string>({});
+            comparisonOptions.forEach((option) =>
+            {
+              displayNames = displayNames.set(option.value, String(option.displayName));
+            });
+            return (
+              <div key={i} className='pf-filter-filter-line' onClick={(e) => { e.stopPropagation(); }}>
+                <Dropdown
+                  options={comparisonOptions.map((option) => option.value).toList()}
+                  optionsDisplayName={displayNames}
+                  selectedIndex={comparisonOptions.map((option) => option.value).toList().indexOf(filter.comparison)}
+                  keyPath={this.props.keyPath.push('lines').push(i).push('comparison')}
+                  canEdit={canEdit}
+                />
+                <BuilderTextbox
+                  value={filter.value}
+                  keyPath={this.props.keyPath.push('lines').push(i).push('value')}
+                  canEdit={canEdit}
+                />
+                <div
+                  onClick={this._fn(this.handleRemoveFilter, filter)}
+                  className='pf-filter-remove-filter'>
+                  X
+               </div>
+              </div>
+            );
+          })
+        }
+      </div>
+    );
+  }
+
+  private handleRemoveFilter(filter)
+  {
+    const oldLines = this.props.filterGroup.get('lines');
+    const index = oldLines.indexOf(filter);
+    BuilderActions.change(this.props.keyPath.push('lines'), oldLines.delete(index));
+  }
+
+  private handleAddFilter(field, e)
+  {
+    const oldLines = this.props.filterGroup.get('lines');
+    const filter = _FilterLine({ field, comparison: 'equals', value: '' });
+    BuilderActions.change(this.props.keyPath.push('lines'), oldLines.push(filter));
+    e.stopPropagation();
+    e.preventDefault();
+  }
+
+  private toggleFilters(field)
   {
     this.setState({
-      filtersOpen: this.state.filtersOpen.set(field, !this.state.filtersOpen.get(field))
+      filtersOpen: this.state.filtersOpen.set(field, !this.state.filtersOpen.get(field)),
     });
   }
 
@@ -259,6 +348,5 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
     }
   }
 }
-
 
 export default PathfinderFilterSection2;

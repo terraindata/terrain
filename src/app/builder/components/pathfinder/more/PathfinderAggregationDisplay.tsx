@@ -72,8 +72,10 @@ export interface AdvancedAggregationItem
   key: string;
   placeholder?: string;
   options?: List<string>;
+  optionDisplayNames?: Map<string, any>;
   isNumber?: boolean;
   fieldOptions?: boolean; // Use the fields as options
+  textOptions?: List<string>; // Options to use if the field is a text (could change how this is set up)
 }
 
 export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDisplay>({
@@ -213,14 +215,16 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
     items: [
       {
         text: PathfinderText.aggregation.order.text1,
-        options: List(['_term', '_count']), // TODO Different for non terms aggs
+        options: List(['_key', '_count']),
+        textOptions: List(['_term', '_count']),
         key: 'sortField',
         inputType: 'dropdown',
         tooltipText: PathfinderText.aggregation.order.tooltipText,
       },
       {
         text: PathfinderText.aggregation.order.text2,
-        options: List(['ascending', 'descending']),
+        options: List(['asc', 'desc']),
+        optionDisplayNames: Map({ asc: 'ascending', desc: 'descending' }),
         inputType: 'dropdown',
         key: 'order',
       },

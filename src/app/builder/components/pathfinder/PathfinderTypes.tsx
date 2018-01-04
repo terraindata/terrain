@@ -797,7 +797,7 @@ export const ADVANCED_MAPPINGS =
     [ADVANCED.Format]: { format: 'MM/dd/yyyy', timezone: '' },
     [ADVANCED.ExtendedRange]: { offset: 0, min: '', max: '' },
     [ADVANCED.MinDocCount]: { min_doc_count: 0 },
-    [ADVANCED.Order]: { order: 'ascending' },
+    [ADVANCED.Order]: { order: 'desc', sortField: '' },
     [ADVANCED.Size]: { size: 10 },
     [ADVANCED.Error]: { show_term_doc_count_error: 'false' },
     [ADVANCED.Origin]: { origin: [30, 100], origin_address: '' },
