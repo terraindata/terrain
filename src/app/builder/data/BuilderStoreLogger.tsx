@@ -43,72 +43,29 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import TerrainTools from 'util/TerrainTools';
-import AppRouter from './AppRouter';
-import BuilderStore from './builder/data/BuilderStore'; // for error reporting
-import LibraryStore from './library/data/LibraryStore';
-import TerrainStore from './store/TerrainStore';
+import * as TerrainLog from 'loglevel';
 
-declare global
+export default class BuilderStoreLogger
 {
-  interface Window
-  {
-    TerrainTools: any;
-  }
+  public static reduxMiddleWare = (store: any) =>
+    (next: any) =>
+      (action: any): any =>
+      {
+        //  console.log('dispatching', action);
+        const actionStart = performance.now();
+        let result;
+        try
+        {
+          result = next(action);
+        }
+        catch (err)
+        {
+          TerrainLog.error('Builder Event caught an exception: ', action, err);
+        }
+        const actionEnd = performance.now();
+        // should we log this event
+        const actionLatency = actionEnd - actionStart;
+        TerrainLog.debug(action.type + ' takes ' + actionLatency + 'ms');
+        return result;
+      }
 }
-
-if (!DEV)
-{
-  TerrainTools.setDefaultLogLevel('warn');
-  // report uncaught errors in production
-  window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
-  {
-    const store = TerrainStore.getState() as Immutable.Map<string, any>;
-    const user = store.get('users').currentUser;
-    const userId = user && user.id;
-    const libraryState = JSON.stringify(LibraryStore.getState().toJS());
-    const builderState = JSON.stringify(BuilderStore.getState().toJS());
-    const location = JSON.stringify(window.location);
-    const colorsState = store.get('colors').toJS();
-    const msg = `${errorMsg} by ${userId}
-      Location:
-      ${location}
-
-      Library State:
-      ${libraryState}
-
-      Builder State:
-      ${builderState}
-
-      Colors State:
-      ${colorsState}
-
-      Error Stack:
-      ${(error != null && error.stack != null) ? error.stack : ''}
-    `;
-
-    $.post('http://lukeknepper.com/email.php', {
-      msg,
-      secret: '11235813',
-    });
-
-    return false;
-  };
-} else
-{
-  TerrainTools.setLogLevel('info');
-  window.TerrainTools = TerrainTools;
-  TerrainTools.welcome();
-}
-
-ReactDOM.render(
-  <Provider store={TerrainStore}>
-    <AppRouter />
-  </Provider>,
-  document.getElementById('app'), () =>
-  {
-    // tests can go here
-  });
