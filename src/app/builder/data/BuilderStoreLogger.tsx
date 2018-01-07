@@ -65,7 +65,7 @@ export default class BuilderStoreLogger
         const actionEnd = performance.now();
         // should we log this event
         const actionLatency = actionEnd - actionStart;
-        TerrainLog.debug(action.type + ' takes ' + actionLatency + 'ms');
+        TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + 'ms');
         return result;
       }
 }

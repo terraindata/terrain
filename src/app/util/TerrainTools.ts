@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 import * as _ from 'lodash';
-import TerrainStore from 'store/TerrainStore';
 import * as TerrainLog from 'loglevel';
 import {LogLevelDesc} from 'loglevel';
+import TerrainStore from 'store/TerrainStore';
 
 // Log levels
 const LEVEL_TRACE = 'trace';

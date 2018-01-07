@@ -107,9 +107,9 @@ const DefaultState = _BuilderState();
 
 import BuilderReducers from './BuilderReducers';
 
-import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
-import {Middleware} from 'react-router/lib/applyRouterMiddleware';
 import BuilderStoreLogger from 'builder/data/BuilderStoreLogger';
+import {Middleware} from 'react-router/lib/applyRouterMiddleware';
+import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
 
 export const BuilderStore: IStore<BuilderState> = createStore(
   (
