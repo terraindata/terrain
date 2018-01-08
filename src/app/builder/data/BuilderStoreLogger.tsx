@@ -43,10 +43,15 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as hdr from 'hdr-histogram-js';
 import * as TerrainLog from 'loglevel';
 
 export default class BuilderStoreLogger
 {
+  public static actionLatencyLog: { [key: string]: hdr.Histogram } = {};
+
+  public static recordingActionPercentileLatency = false;
+
   public static reduxMiddleWare = (store: any) =>
     (next: any) =>
       (action: any): any =>
@@ -65,7 +70,27 @@ export default class BuilderStoreLogger
         const actionEnd = performance.now();
         // should we log this event
         const actionLatency = actionEnd - actionStart;
+        if (BuilderStoreLogger.recordingActionPercentileLatency)
+        {
+          if (BuilderStoreLogger.actionLatencyLog[action.type] === undefined)
+          {
+            BuilderStoreLogger.actionLatencyLog[action.type] = hdr.build();
+          }
+          BuilderStoreLogger.actionLatencyLog[action.type].recordValue(actionLatency);
+        }
         TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + 'ms');
         return result;
       }
+
+  public static reportActionLatency()
+  {
+    for (const actionType in BuilderStoreLogger.actionLatencyLog)
+    {
+      if (BuilderStoreLogger.actionLatencyLog.hasOwnProperty(actionType))
+      {
+        const actionHdr: hdr.Histogram = BuilderStoreLogger.actionLatencyLog[actionType];
+        TerrainLog.info(actionType, actionHdr.outputPercentileDistribution());
+      }
+    }
+  }
 }

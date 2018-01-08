@@ -110,6 +110,7 @@
     "fast-csv": "^2.4.0",
     "global": "^4.3.2",
     "google-oauth-jwt": "^0.2.0",
+    "hdr-histogram-js": "^1.0.0",
     "immutable": "^3.7.3",
     "javascript-natural-sort": "^0.7.1",
     "jquery": "^3.2.1",

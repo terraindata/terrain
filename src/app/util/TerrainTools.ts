@@ -43,9 +43,10 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import BuilderStoreLogger from 'builder/data/BuilderStoreLogger';
 import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
-import {LogLevelDesc} from 'loglevel';
+import { LogLevelDesc } from 'loglevel';
 import TerrainStore from 'store/TerrainStore';
 
 // Log levels
@@ -72,6 +73,8 @@ const FEATURE_KEY_PREFIX = 'toggle-feature-'; // prefix for the localStorage key
 class TerrainTools
 {
   public static ANALYTICS = 'analytics';
+
+  public static builderStoreLogger = BuilderStoreLogger;
 
   public static welcome()
   {
