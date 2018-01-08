@@ -44,78 +44,93 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as fs from 'fs';
+import csvWriter = require('csv-write-stream');
+
+import * as _ from 'lodash';
+import * as stream from 'stream';
 import * as winston from 'winston';
-import { CmdLineUsage } from './CmdLineArgs';
-import DatabaseConfig from './database/DatabaseConfig';
-import { databases } from './database/DatabaseRouter';
-import UserConfig from './users/UserConfig';
-import * as Util from './Util';
 
-export interface Config
+import { CredentialConfig, Credentials } from '../../credentials/Credentials';
+
+import * as Tasty from '../../../../src/tasty/Tasty';
+import DatabaseController from '../../../database/DatabaseController';
+import MySQLClient from '../../../database/mysql/client/MySQLClient';
+import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
+
+export const credentials: Credentials = new Credentials();
+
+let tasty: Tasty.Tasty;
+
+export interface MySQLSourceConfig
 {
-  config?: string;
-  port?: number;
-  db?: string;
-  dsn?: string;
-  debug?: boolean;
-  help?: boolean;
-  verbose?: boolean;
-  databases?: object[];
-  analyticsdb?: string;
+  id: number;
+  tablename: string;
+  query: string;
 }
 
-export function loadConfigFromFile(config: Config): Config
+export interface MySQLRowConfig
 {
-  // load options from a configuration file, if specified.
-  if (config.config !== undefined)
-  {
-    try
-    {
-      const settings = fs.readFileSync(config.config, 'utf8');
-      const cfgSettings = JSON.parse(settings);
-      config = Util.updateObject(config, cfgSettings);
-    }
-    catch (e)
-    {
-      winston.error('Failed to read configuration settings from ' + String(config.config));
-    }
-  }
-  return config;
+  rows: object[];
 }
 
-export async function handleConfig(config: Config): Promise<void>
+export class MySQL
 {
-  winston.debug('Using configuration: ' + JSON.stringify(config));
-  if (config.help === true)
-  {
-    // tslint:disable-next-line
-    console.log(CmdLineUsage);
-    process.exit();
-  }
 
-  if (config.verbose === true)
+  public async getQueryAsCSVStream(mysqlRowConfig: MySQLRowConfig | string): Promise<stream.Readable | string>
   {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'verbose';
-  }
-
-  if (config.debug === true)
-  {
-    // TODO: get rid of this monstrosity once @types/winston is updated.
-    (winston as any).level = 'debug';
-  }
-
-  if (config.databases !== undefined)
-  {
-    for (const database of config.databases)
+    return new Promise<stream.Readable | string>(async (resolve, reject) =>
     {
-      const db = database as DatabaseConfig;
-      db.status = 'DISCONNECTED';
-      winston.info('Registering new database item: ', db);
-      await databases.upsert({} as UserConfig, db);
-    }
+      const writer = csvWriter();
+      const pass = new stream.PassThrough();
+      writer.pipe(pass);
+      if (typeof mysqlRowConfig === 'string')
+      {
+        return resolve(mysqlRowConfig);
+      }
+      if ((mysqlRowConfig as MySQLRowConfig).rows.length > 0)
+      {
+        (mysqlRowConfig as MySQLRowConfig).rows.forEach((row) =>
+        {
+          writer.write(row);
+        });
+      }
+      writer.end();
+      resolve(pass);
+    });
+  }
+
+  public async runQuery(mysqlConfig: MySQLSourceConfig): Promise<MySQLRowConfig | string>
+  {
+    return new Promise<MySQLRowConfig | string>(async (resolve, reject) =>
+    {
+      try
+      {
+        const mysqlRowConfig: MySQLRowConfig =
+          {
+            rows: [],
+          };
+        const database: DatabaseController | undefined = DatabaseRegistry.get(mysqlConfig.id);
+        if (database !== undefined)
+        {
+          if (database.getType() !== 'MySQLController')
+          {
+            return resolve('MySQL source requires a MySQL database ID.');
+          }
+          tasty = database.getTasty() as Tasty.Tasty;
+          mysqlRowConfig.rows = await tasty.getDB().execute([mysqlConfig.query]) as object[];
+          resolve(mysqlRowConfig);
+        }
+        else
+        {
+          return resolve('Database not found.');
+        }
+      }
+      catch (e)
+      {
+        resolve((e as any).toString());
+      }
+    });
   }
 }
 
-export default Config;
+export default MySQL;

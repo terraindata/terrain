@@ -210,15 +210,7 @@ export class ResultsManager extends TerrainComponent<Props>
       }
     }
 
-    if (this.props.algorithmPath !== undefined && (this.props.algorithmPath !== nextProps.algorithmPath))
-    {
-      this.changeResults({
-        hits: undefined,
-        aggregations: {},
-      });
-    }
-
-    if (nextProps.query && (nextProps.resultsState.hits !== this.props.resultsState.hits))
+    if (nextProps.query && this.props.spotlights && (nextProps.resultsState.hits !== this.props.resultsState.hits))
     {
       // update spotlights
       let nextState = nextProps.resultsState;

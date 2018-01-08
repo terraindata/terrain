@@ -181,7 +181,7 @@ class CardsArea extends TerrainComponent<Props>
 
         >
           {
-            cards.map((card: Card, index: number) =>
+            cards.filter((card: Card) => card.hidden === false).map((card: Card, index: number) =>
               <div
                 key={card.id}
               >
