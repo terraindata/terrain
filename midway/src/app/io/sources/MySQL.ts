@@ -46,93 +46,91 @@ THE SOFTWARE.
 
 import csvWriter = require('csv-write-stream');
 
-import * as googleoauthjwt from 'google-oauth-jwt';
 import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { CredentialConfig, Credentials } from '../../credentials/Credentials';
 
-export const credentials: Credentials = new Credentials();
-export const request = googleoauthjwt.requestWithJWT();
+import * as Tasty from '../../../../src/tasty/Tasty';
+import DatabaseController from '../../../database/DatabaseController';
+import MySQLClient from '../../../database/mysql/client/MySQLClient';
+import DatabaseRegistry from '../../../databaseRegistry/DatabaseRegistry';
 
-export interface GoogleSpreadsheetConfig
+export const credentials: Credentials = new Credentials();
+
+let tasty: Tasty.Tasty;
+
+export interface MySQLSourceConfig
 {
-  id: string;
-  name: string;
-  range: string;
+  id: number;
+  tablename: string;
+  query: string;
 }
 
-export class GoogleAPI
+export interface MySQLRowConfig
 {
-  private storedEmail: string;
-  private storedKeyFilePath: string;
+  rows: object[];
+}
 
-  public async getSpreadsheets(spreadsheet: GoogleSpreadsheetConfig): Promise<any>
-  {
-    return new Promise<any>(async (resolve, reject) =>
-    {
-      if (this.storedEmail === undefined && this.storedKeyFilePath === undefined)
-      {
-        await this._getStoredGoogleAPICredentials();
-      }
-      request({
-        url: 'https://sheets.googleapis.com/v4/spreadsheets/' + spreadsheet.id + '/values/' + spreadsheet.name + '!' + spreadsheet.range,
-        jwt: {
-          email: this.storedEmail,
-          keyFile: this.storedKeyFilePath,
-          scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-        },
-      }, (err, res, body) =>
-        {
-          try
-          {
-            const bodyObj = JSON.parse(body);
-            resolve(bodyObj['values']);
-          }
-          catch (e)
-          {
-            winston.info(e);
-            winston.info('Potentially incorrect credentials.');
-            reject('Potentially incorrect Google API credentials.');
-          }
-        });
-    });
-  }
+export class MySQL
+{
 
-  public async getSpreadsheetValuesAsCSVStream(values: any): Promise<stream.Readable>
+  public async getQueryAsCSVStream(mysqlRowConfig: MySQLRowConfig | string): Promise<stream.Readable | string>
   {
-    return new Promise<stream.Readable>(async (resolve, reject) =>
+    return new Promise<stream.Readable | string>(async (resolve, reject) =>
     {
       const writer = csvWriter();
       const pass = new stream.PassThrough();
       writer.pipe(pass);
-      if (values.length > 0)
+      if (typeof mysqlRowConfig === 'string')
       {
-        for (let i = 1; i < values.length; ++i)
+        return resolve(mysqlRowConfig);
+      }
+      if ((mysqlRowConfig as MySQLRowConfig).rows.length > 0)
+      {
+        (mysqlRowConfig as MySQLRowConfig).rows.forEach((row) =>
         {
-          writer.write(_.zipObject(values[0], values[i]));
-        }
+          writer.write(row);
+        });
       }
       writer.end();
       resolve(pass);
     });
   }
 
-  private async _getStoredGoogleAPICredentials()
+  public async runQuery(mysqlConfig: MySQLSourceConfig): Promise<MySQLRowConfig | string>
   {
-    const creds: string[] = await credentials.getByType('googleapi');
-    if (creds.length === 0)
+    return new Promise<MySQLRowConfig | string>(async (resolve, reject) =>
     {
-      winston.info('No credential found for type googleapi.');
-    }
-    else
-    {
-      const cred: object = JSON.parse(creds[0]);
-      this.storedEmail = cred['storedEmail'];
-      this.storedKeyFilePath = cred['storedKeyFilePath'];
-    }
+      try
+      {
+        const mysqlRowConfig: MySQLRowConfig =
+          {
+            rows: [],
+          };
+        const database: DatabaseController | undefined = DatabaseRegistry.get(mysqlConfig.id);
+        if (database !== undefined)
+        {
+          if (database.getType() !== 'MySQLController')
+          {
+            return resolve('MySQL source requires a MySQL database ID.');
+          }
+          tasty = database.getTasty() as Tasty.Tasty;
+          mysqlRowConfig.rows = await tasty.getDB().execute([mysqlConfig.query]) as object[];
+          resolve(mysqlRowConfig);
+        }
+        else
+        {
+          return resolve('Database not found.');
+        }
+      }
+      catch (e)
+      {
+        resolve((e as any).toString());
+      }
+    });
   }
 }
 
-export default GoogleAPI;
+export default MySQL;
