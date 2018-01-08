@@ -235,7 +235,7 @@
     "jest": "^21.2.1",
     "json-loader": "^0.5.4",
     "less-loader": "^0.6.2",
-    "nodemon": "^1.12.1",
+    "nodemon": "^1.14.9",
     "pre-commit": "^1.2.2",
     "raw-loader": "^0.5.1",
     "react-test-renderer": "^15.6.1",
