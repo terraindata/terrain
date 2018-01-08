@@ -57,7 +57,6 @@ import Credentials from '../../credentials/Credentials';
 export const credentials: Credentials = new Credentials();
 export const request = googleoauthjwt.requestWithJWT();
 
-// add interfaces later for spreadsheets and analytics API calls
 export interface GoogleSpreadsheetConfig
 {
   id: string;

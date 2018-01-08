@@ -43,18 +43,56 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { _AuthState, AuthState } from 'auth/AuthTypes';
+import
+{
+  ConstrainedMap,
+  GetType,
+  TerrainRedux,
+  Unroll,
+} from 'store/TerrainRedux';
+import Ajax from 'util/Ajax';
 
-// tslint:disable:no-var-requires
+export interface AuthActionTypes
+{
+  login: {
+    actionType: 'login';
+    accessToken: string;
+    id: number;
+  };
+  logout: {
+    actionType: 'logout';
+  };
+}
 
-import * as _ from 'lodash';
-const Redux = require('redux');
-import * as ReduxActions from 'redux-actions';
-import * as AuthTypes from '../AuthTypes';
+class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
+{
+  public namespace: string = 'auth';
 
-import AuthReducers from './AuthReducers';
+  public reducers: ConstrainedMap<AuthActionTypes, AuthState> =
+  {
+    login: (state, action) =>
+    {
+      const { accessToken, id } = action.payload;
+      // store these values in localStorage so that the user is auto-logged in next time they visit
+      localStorage['accessToken'] = accessToken;
+      localStorage['id'] = id;
+      return state.set('accessToken', accessToken).set('id', +id);
+    },
 
-const AuthStore: IStore<AuthTypes.AuthState> = Redux.createStore(ReduxActions.handleActions(_.extend({} as any,
-  AuthReducers,
-  {}), AuthTypes._AuthState()), AuthTypes._AuthState());
+    logout: (state, action) =>
+    {
+      Ajax.logout((success) =>
+      {
+        delete localStorage['accessToken'];
+        delete localStorage['id'];
+      });
+      return state.set('accessToken', null).set('id', null);
+    },
+  };
+}
 
-export default AuthStore;
+const ReduxInstance = new AuthRedux();
+export const AuthActions = ReduxInstance._actionsForExport();
+export const AuthReducers = ReduxInstance._reducersForExport(_AuthState);
+export declare type AuthActionType<K extends keyof AuthActionTypes> = GetType<K, AuthActionTypes>;

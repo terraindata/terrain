@@ -43,39 +43,81 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { _AuthState, AuthState } from 'auth/AuthTypes';
+import Actions from 'auth/data/AuthActions';
+import ActionTypes from 'auth/data/AuthActionTypes';
+import * as Immutable from 'immutable';
+import { Ajax, createMockStore } from '../../helpers';
 
-// tslint:disable:no-var-requires no-console
+const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
-import * as _ from 'lodash';
-import * as ReduxActions from 'redux-actions';
-const Redux = require('redux');
-
-import AuthStore from './../../auth/data/AuthStore';
-
-import * as UserTypes from './../UserTypes';
-import ActionTypes from './UserActionTypes';
-import UserReducers from './UserReducers';
-
-const UserStore = Redux.createStore(UserReducers);
-
-UserStore.subscribe(() =>
-{
-  const state = UserStore.getState();
-  if (state.getIn(['users', AuthStore.getState().id]) !== state.get('currentUser'))
+const loginResponse =
   {
-    // currentUser object changed
-    UserStore.dispatch({
-      type: ActionTypes.updateCurrentUser,
-      payload: {},
-    });
-  }
-});
+    accessToken: 'valid_access_token',
+    id: 1,
+  };
 
-/*window['test'] = () =>
+const logoutResponse =
+  {
+    accessToken: '',
+    email: 'luser@terraindata.com',
+    id: 1,
+    isDisabled: 0,
+    isSuperUser: 1,
+    meta: '{}',
+    name: 'Terrain Admin',
+    oldPassword: null,
+    password: '$2a$10$HWMqhIOEnaVwmaT5R3trBuuutBGq0ljGbdCMv6s0sZfyT7vCo.JSO',
+    timezone: '',
+  };
+
+const mockStore = createMockStore();
+
+describe('AuthActions', () =>
 {
-  const users = UserStore.getState().users;
-  console.log('users', users);
-  Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
-};*/
+  const auth: AuthState = _AuthState();
+  const schema: AuthState = _AuthState({
+    id: 1,
+    accessToken: 'valid_access_token',
+  });
 
-export default UserStore;
+  describe('#login', () =>
+  {
+    it('should create a login action', () =>
+    {
+      const expectedActions = [
+        {
+          type: ActionTypes.login,
+          payload: { id: 2, accessToken: 'another_valid_token' },
+        },
+        {
+          type: 'users.updateCurrentUser',
+          payload: { id: 2 },
+        },
+      ];
+
+      const store = mockStore(Immutable.Map({ auth }));
+
+      store.dispatch(Actions.login('another_valid_token', 2));
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+
+  describe('#logout', () =>
+  {
+    it('should create a logout action', () =>
+    {
+      const expectedActions = [
+        {
+          type: ActionTypes.logout,
+          payload: {},
+        },
+      ];
+
+      const store = mockStore(Immutable.Map({ auth }));
+
+      store.dispatch(Actions.logout());
+      expect(store.getActions()).toEqual(expectedActions);
+    });
+  });
+});
