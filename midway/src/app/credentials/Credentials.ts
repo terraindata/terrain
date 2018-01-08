@@ -114,7 +114,7 @@ export class Credentials
       const creds = rawCreds.map((result: object) => new CredentialConfig(result));
       return resolve(await Promise.all(creds.map(async (cred) =>
       {
-        return await this._decrypt(cred.meta);
+        return this._decrypt(cred.meta);
       })));
     });
   }

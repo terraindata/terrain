@@ -153,7 +153,7 @@ export class Tasty
     }
 
     const generatedQuery: string[] = this.db.generate(query);
-    return await this.db.execute(generatedQuery);
+    return this.db.execute(generatedQuery);
   }
 
   /**
