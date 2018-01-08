@@ -83,7 +83,7 @@ export default class ESCardParser extends ESParser
     // assert this is the root card
     if (rootCard['type'] !== 'eqlbody')
     {
-      return cards;
+      return Immutable.List([]);
     }
 
     // update the cards
