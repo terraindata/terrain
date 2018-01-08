@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map, Set } = Immutable;
+import Select from 'react-select';
 import ElasticBlockHelpers, { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { getIndex, getType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import AdvancedDropdown from '../../../../common/components/AdvancedDropdown';
@@ -65,7 +66,6 @@ import BuilderActions from './../../../data/BuilderActions';
 import { BuilderStore } from './../../../data/BuilderStore';
 import PathfinderAdvancedLine from './PathfinderAdvancedLine';
 import PathfinderAggregationMoreArea from './PathfinderAggregationMoreArea';
-import Select from 'react-select';
 
 const ArrowIcon = require('images/icon_arrow.svg?name=ArrowIcon');
 
@@ -369,40 +369,40 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           onChange={this.handleTypeChange}
           canEdit={canEdit}
         />
-         <SearchableDropdown
-            selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
-            options={this.state.fieldOptions}
-            onChange={this.handleFieldChange}
-            canEdit={canEdit}
-            placeholder={'Field'}
-            keyPath={this.props.keyPath.push('field')}
-          />
+        <SearchableDropdown
+          selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
+          options={this.state.fieldOptions}
+          onChange={this.handleFieldChange}
+          canEdit={canEdit}
+          placeholder={'Field'}
+          keyPath={this.props.keyPath.push('field')}
+        />
       </div>
     );
   }
 
-        //   <Select
-        //   name='field-name'
-        //   value={this.props.aggregation.field}
-        //   onChange={this.handleFieldChange}
-        //   options={
-        //     this.state.fieldOptions.map((option) => {
-        //       return {
-        //         value: option,
-        //         label: option,
-        //       }
-        //     }).toArray()
-        //   }
-        // />
+  //   <Select
+  //   name='field-name'
+  //   value={this.props.aggregation.field}
+  //   onChange={this.handleFieldChange}
+  //   options={
+  //     this.state.fieldOptions.map((option) => {
+  //       return {
+  //         value: option,
+  //         label: option,
+  //       }
+  //     }).toArray()
+  //   }
+  // />
 
-   // <Dropdown
-   //        selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
-   //        options={this.state.fieldOptions}
-   //        onChange={this.handleFieldChange}
-   //        canEdit={canEdit}
-   //        placeholder={'Field'}
-   //        keyPath={this.props.keyPath.push('field')}
-   //      />
+  // <Dropdown
+  //        selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
+  //        options={this.state.fieldOptions}
+  //        onChange={this.handleFieldChange}
+  //        canEdit={canEdit}
+  //        placeholder={'Field'}
+  //        keyPath={this.props.keyPath.push('field')}
+  //      />
 
   // Given a type of advanced section to return, and the advanced
   // data from the aggregation return an PathfinderAdvancedLine with the
