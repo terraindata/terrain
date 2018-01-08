@@ -100,8 +100,8 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
   public state: {
     shouldRender: boolean;
   } = {
-    shouldRender: this.computeShouldRender(this.props),
-  };
+      shouldRender: this.computeShouldRender(this.props),
+    };
 
   private findParentCardKeyPath(storeState, keyPath: KeyPath)
   {

@@ -67,8 +67,8 @@ class SchemaPage extends TerrainComponent<Props>
     on: boolean;
     name?: string;
   } = {
-    on: false,
-  };
+      on: false,
+    };
 
   public render()
   {

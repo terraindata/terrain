@@ -70,8 +70,8 @@ class AggregationHistogram extends TerrainComponent<Props>
   public state: {
     chartState: any,
   } = {
-    chartState: {},
-  };
+      chartState: {},
+    };
 
   constructor(props: Props)
   {

@@ -153,6 +153,6 @@ test('t7', () =>
 
   const qstr = elasticDB.generateString(query);
   expect(qstr)
-  // tslint:disable-next-line:max-line-length
+    // tslint:disable-next-line:max-line-length
     .toEqual('[{"index":"movies","table":"data","primaryKeys":["movieid"],"fields":["movieid","releasedate","title"],"op":"select","params":[{"index":"movies","type":"data","from":20,"size":10,"body":{"_source":["movieid","title","releasedate"],"sort":[{"movieid":{"order":"desc"}},{"releasedate":{"order":"asc"}}],"query":{"bool":{"filter":{"bool":{"must":[{"range":{"releasedate":{"gte":"2007-03-24"}}},{"range":{"releasedate":{"lt":"2017-03-24"}}}]}},"must_not":[{"match":{"movieid":2134}}]}}}}]}]');
 });

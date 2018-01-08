@@ -58,11 +58,11 @@ export class EventConfig extends ConfigType
     useragent: string;
     referer?: string;
   } = {
-    ip: '',
-    host: '',
-    useragent: '',
-    referer: undefined,
-  };
+      ip: '',
+      host: '',
+      useragent: '',
+      referer: undefined,
+    };
   public meta?: any = undefined;
 
   constructor(props: object)

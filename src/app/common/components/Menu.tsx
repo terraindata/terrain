@@ -89,8 +89,8 @@ class Menu extends TerrainComponent<Props>
   public state: {
     open: boolean;
   } = {
-    open: false,
-  };
+      open: false,
+    };
 
   public renderOption(option, index)
   {

@@ -80,15 +80,15 @@ class DeployModal extends TerrainComponent<Props>
     showErrorModal: boolean;
     deployedName: string;
   } = {
-    changingStatus: false,
-    changingStatusOf: null,
-    changingStatusTo: null,
-    algorithms: null,
-    defaultChecked: false,
-    errorModalMessage: '',
-    showErrorModal: false,
-    deployedName: '',
-  };
+      changingStatus: false,
+      changingStatusOf: null,
+      changingStatusTo: null,
+      algorithms: null,
+      defaultChecked: false,
+      errorModalMessage: '',
+      showErrorModal: false,
+      deployedName: '',
+    };
 
   public componentDidMount()
   {
@@ -150,7 +150,7 @@ class DeployModal extends TerrainComponent<Props>
       {
         this.setState({
           errorModalMessage: 'Error changing status of ' + this.state.changingStatusOf.name + ' to ' + changingStatusTo
-          + ': Deployed name ' + this.state.deployedName + ' is either already used or invalid.',
+            + ': Deployed name ' + this.state.deployedName + ' is either already used or invalid.',
         });
         this.toggleErrorModal();
         return;

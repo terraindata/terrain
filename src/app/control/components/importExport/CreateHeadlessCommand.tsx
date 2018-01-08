@@ -201,13 +201,13 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     selectedIds: List<number>;
     filenameValue: string;
   } = {
-    index: this.props.index,
-    fileTypeIndex: 0,
-    midwayURLValue: this.getInitialURL(),
-    objectKeyValue: '',
-    selectedIds: List([-1, -1, -1]),
-    filenameValue: '',
-  };
+      index: this.props.index,
+      fileTypeIndex: 0,
+      midwayURLValue: this.getInitialURL(),
+      objectKeyValue: '',
+      selectedIds: List([-1, -1, -1]),
+      filenameValue: '',
+    };
 
   public componentDidMount()
   {

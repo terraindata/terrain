@@ -90,15 +90,15 @@ class TransformCardPeriscope extends TerrainComponent<Props>
     maxDomainLowErrorText: string,
     maxDomainHighErrorText: string,
   } = {
-    chartState: null,
-    initialDomain: null,
-    initialVal: 0,
-    bars: null,
-    maxDomainLow: this.props.maxDomain.get(0),
-    maxDomainHigh: this.props.maxDomain.get(1),
-    maxDomainLowErrorText: '',
-    maxDomainHighErrorText: '',
-  };
+      chartState: null,
+      initialDomain: null,
+      initialVal: 0,
+      bars: null,
+      maxDomainLow: this.props.maxDomain.get(0),
+      maxDomainHigh: this.props.maxDomain.get(1),
+      maxDomainLowErrorText: '',
+      maxDomainHighErrorText: '',
+    };
 
   public refs: {
     [k: string]: Ref;

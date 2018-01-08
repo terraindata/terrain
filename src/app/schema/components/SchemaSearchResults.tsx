@@ -95,10 +95,10 @@ class SchemaSearchResults extends TerrainComponent<Props>
     prevItems: IMMap<string, IMMap<string, SchemaBaseClass>>,
     showingCount: IMMap<string, number>;
   } = {
-    showingCount: INIT_SHOWING_COUNT,
-    items: INIT_ITEMS,
-    prevItems: INIT_PREV_ITEMS,
-  };
+      showingCount: INIT_SHOWING_COUNT,
+      items: INIT_ITEMS,
+      prevItems: INIT_PREV_ITEMS,
+    };
 
   public componentWillReceiveProps(nextProps: Props)
   {

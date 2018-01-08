@@ -102,9 +102,9 @@ class PlacesAutocomplete extends TerrainComponent<Props>
   public state: {
     autocompleteItems: any,
   } =
-  {
-    autocompleteItems: [],
-  };
+    {
+      autocompleteItems: [],
+    };
 
   public constructor(props: Props)
   {

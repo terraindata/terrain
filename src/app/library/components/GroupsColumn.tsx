@@ -418,35 +418,35 @@ class GroupsColumn extends TerrainComponent<Props>
     const index = this.props.groupsOrder.indexOf(id);
     const scores = {
       [ItemStatus.Archive]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Archive),
-        name: 'Algorithms in Archived Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Archive),
+          name: 'Algorithms in Archived Status',
+        },
       [ItemStatus.Build]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Build),
-        name: 'Algorithms in Build Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Build),
+          name: 'Algorithms in Build Status',
+        },
       [ItemStatus.Approve]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Approve),
-        name: 'Algorithms in Approve Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Approve),
+          name: 'Algorithms in Approve Status',
+        },
       [ItemStatus.Live]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Live),
-        name: 'Algorithms in Live Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Live),
+          name: 'Algorithms in Live Status',
+        },
       [ItemStatus.Default]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Default),
-        name: 'Algorithms in Default Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Default),
+          name: 'Algorithms in Default Status',
+        },
     };
 
     const algorithms = this.props.algorithms.filter(
