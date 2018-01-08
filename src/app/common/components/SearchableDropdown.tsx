@@ -44,9 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access
+// tslint:disable:strict-boolean-expressions member-access no-var-requires
 
 import * as classNames from 'classnames';
+import * as Immutable from 'immutable';
+const {List, Map} = Immutable;
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
@@ -57,36 +59,28 @@ import Actions from '../../builder/data/BuilderActions';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
-
 import './Dropdown.less';
+import onClickOutside from 'react-onclickoutside';
+
+const CloseIcon = require('images/icon_close_8x8.svg?name=CloseIcon');
 
 export interface Props
 {
-  options: List<string | number | El>;
+  options: List<string>;
   selectedIndex: number;
-  keyPath?: KeyPath; // TODO required?
-  onChange?: (index: number, event?: any) => void; // TODO remove?
-  values?: List<any>; // maps indices to values, otherwise index will be used as the value
+  keyPath?: KeyPath;
+  onChange?: (index: number, event?: any) => void;
   canEdit?: boolean;
   className?: string;
   centerAlign?: boolean;
-  optionsDisplayName?: Immutable.Map<any, string>; // maps value to display name
-  textColor?: string | ((index: number) => string | undefined);
-  width?: string;
   directionBias?: number; // bias for determining whether or not dropdown opens up or down
-  unmountOnChange?: boolean;
   openDown?: boolean;
-  tooltips?: List<any>;
-  wrapperTooltip?: string;
   placeholder?: string;
-  icons?: Immutable.Map<any, any>;
 }
 
 @Radium
-class Dropdown extends TerrainComponent<Props>
+class SearchableDropdown extends TerrainComponent<Props>
 {
-  public _clickHandlers: { [index: number]: () => void } = {};
-
   constructor(props: Props)
   {
     super(props);
@@ -97,75 +91,84 @@ class Dropdown extends TerrainComponent<Props>
         open: false,
         focusedIndex: -1,
         width: 0,
+        inputValue: '',
+        hoveredIndex: -1,
       };
   }
 
-  public componentWillUnmount()
+  public handleInputChange(e)
   {
-    $('body').unbind('click', this.close);
+    this.setState({
+      inputValue: e.target.value,
+    });
+  }
+
+  public clearInput()
+  {
+    this.setState({
+      inputValue: '',
+    });
+  }
+
+  public getFilteredOptions(filterValue)
+  {
+    let filteredOptions = List([]);
+    this.props.options.forEach((option, i) => {
+      if (option.toLowerCase().indexOf(filterValue.toLowerCase()) !== -1)
+      {
+        filteredOptions = filteredOptions.push({
+          title: option,
+          index: i
+        })
+      }
+    });
+    return filteredOptions
+  }
+
+  public mouseOverOption(index)
+  {
+    this.setState({
+      hoveredIndex: index,
+    });
+  }
+
+  public mouseLeaveOption(value)
+  {
+    this.setState({
+      hoveredIndex: -1,
+    });
   }
 
   public clickHandler(index)
   {
-    if (!this._clickHandlers[index])
+    const value = index === -1 ? '' : this.props.options.get(index);
+    this.setState({
+      inputValue: value,
+      open: false,
+      focusedValue: -1,
+    });
+    if (this.props.keyPath !== undefined)
     {
-      this._clickHandlers[index] = () =>
-      {
-        const pr = this.props;
-        if (pr.keyPath)
-        {
-          Actions.change(pr.keyPath, pr.values ? pr.values.get(index) : pr.options.get(index));
-        }
-        if (pr.onChange)
-        {
-          pr.onChange(index, {
-            target: ReactDOM.findDOMNode(this),
-          });
-        }
-      };
-      $('body').click(this.close);
+      Actions.change(this.props.keyPath, value);
     }
-
-    return this._clickHandlers[index];
+    if (this.props.onChange !== undefined)
+    {
+      this.props.onChange(index);
+    }
   }
 
-  public colorForOption(index): string
+  public renderOption(option, i)
   {
-    const { textColor } = this.props;
-
-    if (typeof textColor === 'function')
-    {
-      return textColor(index);
-    }
-
-    if (typeof textColor === 'string')
-    {
-      return textColor;
-    }
-
-    return undefined;
-  }
-
-  public onMouseDown(event)
-  {
-    event.stopPropagation();
-    $('body').unbind('click', this.close);
-  }
-
-  public renderOption(option, index)
-  {
-    const focused = index === this.state.focusedIndex;
-    const selected = index === this.props.selectedIndex;
-    const customColor = this.colorForOption(index);
-
+    const index = option.index;
+    option = option.title;
+    const focused = i === this.state.focusedIndex;
+    const selected = i === this.props.selectedIndex;
     const style = {
-      'color': customColor,
       ':hover': {
         backgroundColor: Colors().inactiveHover,
         color: Colors().activeText,
         stroke: Colors().activeText,
       },
-      'stroke': customColor,
     };
 
     if (focused)
@@ -179,91 +182,61 @@ class Dropdown extends TerrainComponent<Props>
     if (selected)
     {
       _.extend(style, {
-        'backgroundColor': customColor || Colors().active,
+        'backgroundColor': Colors().active,
         'color': Colors().activeText,
         ':hover': {
-          backgroundColor: customColor || Colors().active,
+          backgroundColor: Colors().active,
           color: Colors().activeText,
           stroke: Colors().activeText,
         },
         'stroke': Colors().activeText,
       });
     }
-
-    let tooltipProps: TooltipProps;
-    const { tooltips } = this.props;
-    if (tooltips !== undefined && tooltips.get(index) !== undefined
-      && tooltips.get(index) !== null)
-    {
-      if (typeof (this.props.tooltips.get(index)) === 'string')
-      {
-        tooltipProps = {
-          key: index,
-          title: this.props.tooltips.get(index),
-          position: 'left',
-        };
-      }
-      else
-      {
-        tooltipProps = this.props.tooltips.get(index);
-        tooltipProps.key = index;
-        if (tooltipProps.position === undefined)
-        {
-          tooltipProps.position = 'left';
-        }
-
-      }
-    }
-    else
-    {
-      tooltipProps = {
-        key: index,
-        title: '',
-      };
-    }
-
-    return (
-      tooltip(<div
+    return (<div
         className={classNames({
           'dropdown-option': true,
           'dropdown-option-selected': selected,
           'dropdown-option-focused': focused,
         })}
         key={index}
-        onMouseDown={this.onMouseDown}
-        onClick={this.clickHandler(index)}
         style={style}
+        onClick={this._fn(this.clickHandler, index)}
+        ref={'opt' + index}
+        onMouseEnter={this._fn(this.mouseOverOption, i)}
+        onMouseLeave={this.mouseLeaveOption}
       >
-        <div className='dropdown-option-inner'>
+        <div
+          className='dropdown-option-inner'
+        >
           {
-            this.getOptionName(option, index)
+            this.props.options.get(index)
           }
         </div>
-      </div>,
-        tooltipProps,
-      )
+      </div>
     );
   }
 
-  public close()
+  public handleClickOutside()
   {
     this.setState({
       open: false,
+      focusedIndex: -1
     });
-    $('body').unbind('click', this.close);
   }
 
-  public toggleOpen(e)
+  public open()
+  {
+    this.toggleOpen(true);
+  }
+
+  public toggleOpen(value?: boolean)
   {
     if (!this.props.canEdit)
     {
       return;
     }
-
-    if (!this.state.open)
+    if (!this.state.open || value)
     {
-      $('body').click(this.close);
-
       const cr = this.refs['value']['getBoundingClientRect']();
       const windowBottom = window.innerHeight;
 
@@ -276,6 +249,10 @@ class Dropdown extends TerrainComponent<Props>
       {
         up = cr.bottom > windowBottom / 2 + (this.props.directionBias || 0);
       }
+      if (!value)
+      {
+        this.refs['input']['focus']();
+      }
       this.setState({
         open: true,
         up,
@@ -283,78 +260,142 @@ class Dropdown extends TerrainComponent<Props>
     }
     else
     {
-      this.close();
+      this.setState({
+        open: false,
+        focusedIndex: -1,
+      });
     }
-    e.preventDefault();
-    e.stopPropagation();
   }
 
-  public getOptionName(option, index: number): El
+  public selectIndex(index)
   {
-    const icon = this.props.icons !== undefined ? this.props.icons.get(option) : null;
-    const name = this.props.optionsDisplayName !== undefined ?
-      this.props.optionsDisplayName.toJS()[option] : option;
-    if (icon)
+    const dropdown = ReactDOM.findDOMNode(this.refs['dropdown']);
+    const opt = ReactDOM.findDOMNode(this.refs['opt' + index]);
+    if (dropdown && opt)
     {
-      return (<span>{icon}{name}</span>);
+      const acMin = dropdown.scrollTop;
+      const acMax = dropdown.scrollTop + dropdown.clientHeight;
+      const oMin = opt['offsetTop'];
+      const oMax = opt['offsetTop'] + opt.clientHeight;
+
+      if (oMin < acMin)
+      {
+        dropdown.scrollTop = oMin;
+      }
+      if (oMax > acMax)
+      {
+        dropdown.scrollTop += (oMax - acMax);
+      }
     }
-    return name;
-  }
-
-  handleFocus()
-  {
     this.setState({
-      focusedIndex: -1,
-    });
+      focusedIndex: index,
+    })
   }
 
-  handleFocusLost()
+  public handleKeydown(event)
   {
-    this.setState({
-      focusedIndex: -1,
-    });
-  }
-
-  handleFocusedIndexChange(focusedIndex: number)
-  {
-    this.setState({
-      focusedIndex,
-    });
-  }
-
-  handleKeyboardSelect(index: number)
-  {
-    this.clickHandler(index)();
-    this.close();
+    const filteredOptions = this.getFilteredOptions(this.state.inputValue);
+    if (!filteredOptions || !filteredOptions.size)
+    {
+      // still be able to hit enter when there are no options
+      if (event.keyCode === 13)
+      {
+        this.clickHandler(-1);
+        this.refs['input']['blur']();
+      }
+      return;
+    }
+    let newIndex = this.state.focusedIndex + 1 >= filteredOptions.size ?
+              0 : this.state.focusedIndex + 1;
+    switch (event.keyCode)
+    {
+      case 38:
+        // up
+         if (!this.state.up)
+         {
+           newIndex = this.state.focusedIndex - 1 === -1 ?
+              filteredOptions.size - 1 : this.state.focusedIndex - 1;
+         }
+         else
+         {
+           newIndex = this.state.focusedIndex === -1 || this.state.focusedIndex - 1 === -1
+             ? filteredOptions.size - 1 :
+             this.state.focusedIndex - 1;
+         }
+         if (newIndex > filteredOptions.size)
+         {
+           newIndex = 0;
+         }
+        this.selectIndex(newIndex);
+        break;
+      case 40:
+         // down
+         if (newIndex > filteredOptions.size)
+         {
+           newIndex = 0;
+         }
+        this.selectIndex(newIndex);
+        break;
+      case 13:
+      case 9:
+        // enter or tab
+        let value;
+        if (this.state.focusedIndex !== -1)
+        {
+          value = filteredOptions.get(this.state.focusedIndex);
+        }
+        else if (this.state.hoveredIndex !== -1)
+        {
+          value = filteredOptions.get(this.state.hoveredIndex);
+        }
+        if (value === undefined)
+        {
+          value = filteredOptions.get(0);
+        }
+        this.clickHandler(value.index);
+        this.refs['input']['blur']();
+        this.setState({
+          open: false,
+          focusedIndex: -1,
+        });
+        break;
+      case 27:
+        // esc
+        this.clickHandler(this.state.focusedIndex);
+        this.refs['input']['blur']();
+        break;
+      default:
+    }
   }
 
   public render()
   {
     // Element with options, rendered at the top or bottom of the dropdown
     let optionsEl: El = null;
+    const filteredOptions = this.getFilteredOptions(this.state.inputValue);
     if (this.state.open)
     {
       optionsEl =
         <div
           className='dropdown-options-wrapper'
+          ref='dropdown'
         >
           {
-            (this.props.options && this.props.options.size > 0) ?
-              this.props.options.map(this.renderOption)
+            (filteredOptions && filteredOptions.size > 0) ?
+              filteredOptions.map((option, i) => this.renderOption(option, i))
               :
               'No options available'
           }
         </div>;
     }
 
-    const { selectedIndex, textColor, options } = this.props;
-    const customColor = this.colorForOption(selectedIndex);
+    const { selectedIndex, options } = this.props;
 
     const dropdownValueStyle = [
       this.props.canEdit ?
         backgroundColor(
-          !this.state.open ? Colors().inputBg : customColor || Colors().active,
-          customColor || Colors().inactiveHover,
+          !this.state.open ? Colors().inputBg : Colors().active,
+          Colors().inactiveHover,
         )
         :
         backgroundColor(Colors().darkerHighlight)
@@ -362,22 +403,24 @@ class Dropdown extends TerrainComponent<Props>
       this.state.open ?
         fontColor(Colors().activeText) :
         fontColor(
-          customColor || Colors().text1,
-          this.props.canEdit ? Colors().activeText : (customColor || Colors().text1),
+          Colors().text1,
+          this.props.canEdit ? Colors().activeText : (Colors().text1),
         ),
       this.state.open ?
         getStyle('stroke', Colors().activeText) :
         getStyle('stroke',
-          customColor || Colors().text1,
-          this.props.canEdit ? Colors().activeText : (customColor || Colors().text1),
+          Colors().text1,
+          this.props.canEdit ? Colors().activeText : (Colors().text1),
         ),
       borderColor(Colors().inputBorder),
     ];
 
+    const closeStyle = _.extend({},
+      getStyle('fill', Colors().iconColor),
+      getStyle('stroke', Colors().iconColor));
+
     return (
       <div
-        onClick={this.toggleOpen}
-        onMouseDown={this.onMouseDown}
         className={classNames({
           'dropdown-wrapper': true,
           'altBg': true,
@@ -393,15 +436,14 @@ class Dropdown extends TerrainComponent<Props>
           this.state.up && this.state.open
           && optionsEl
         }
-        {tooltip(
           <div
             className='dropdown-value'
             ref='value'
             style={[
-              { width: this.props.width },
               ...dropdownValueStyle,
             ]}
             key='dropdown-value'
+            onClick={this._fn(this.toggleOpen, false)}
           >
             {
               // map through all of the options so that the dropdown takes the width of the longest one
@@ -411,54 +453,44 @@ class Dropdown extends TerrainComponent<Props>
                   key={index}
                   className={classNames({
                     'dropdown-option-inner': true,
-                    'dropdown-option-value-selected': index === selectedIndex,
+                    'searchable-dropdown-option-hidden': index !== selectedIndex,
                   })}
-                  style={this.props.icons ? { paddingTop: 6 } : {}}
                 >
                   {
-                    this.getOptionName(option, index)
+                    this.props.options.get(index)
                   }
                 </div>,
               )
             }
-            {
-              this.props.placeholder &&
-              <div
-                key={-1}
-                className={classNames({
-                  'dropdown-option-inner': true,
-                  'dropdown-option-value-selected': -1 === selectedIndex,
-                  'dropdown-option-placeholder': true,
-                })}
-                style={fontColor(Colors().text3)}
-              >
-                {
-                  this.props.placeholder
-                }
-              </div>
-            }
-          </div>,
-          {
-            title: this.props.wrapperTooltip,
-            position: 'right',
-          },
-        )}
+            <div className='searchable-dropdown-input-wrapper'>
+              <input
+                value={this.state.inputValue}
+                onChange={this.handleInputChange}
+                placeholder={this.props.placeholder !== undefined ? this.props.placeholder : ''}
+                onFocus={this.open}
+                onKeyDown={this.handleKeydown}
+                ref='input'
+                disabled={!this.props.canEdit}
+                onClick={(e) => {e.stopPropagation()}}
+              />
+              {
+                this.state.inputValue &&
+                <div
+                  onClick={this.clearInput}
+                  className='searchable-dropdown-input-clear'
+                >
+                  <CloseIcon style={closeStyle}/>
+                </div>
+              }
+            </div>
+          </div>
         {
           !this.state.up && this.state.open
           && optionsEl
         }
-        <KeyboardFocus
-          onFocus={this.handleFocus}
-          onFocusLost={this.handleFocusLost}
-          index={this.state.focusedIndex}
-          onIndexChange={this.handleFocusedIndexChange}
-          length={options && options.size}
-          onSelect={this.handleKeyboardSelect}
-          focusOverride={this.state.open}
-        />
       </div>
     );
   }
 }
 
-export default Dropdown;
+export default onClickOutside(SearchableDropdown);

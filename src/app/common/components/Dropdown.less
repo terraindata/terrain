@@ -91,7 +91,7 @@
     padding-top: 2px;
     
     border: 1px solid;
-  svg {
+    svg {
         height: 14px;
         width: 14px;
         margin-right: 6px;
@@ -112,6 +112,35 @@
         padding-top: 15px;
         opacity: 1;
         white-space: nowrap;
+      }
+      &.searchable-dropdown-option-hidden {
+        height: 0px;
+      }
+    }
+
+    .searchable-dropdown-input-wrapper {
+      display: flex;
+      .searchable-dropdown-input-clear
+      {
+        height: 12px;
+        width: 12px;
+        position: relative;
+        top: 6px;
+        cursor: pointer;
+        opacity: 0.7;
+        &:hover {
+          opacity: 1;
+        }
+      }
+      input {
+        border: none;
+        background: none;
+        &::selection {
+          background: white;
+        }
+        &::-moz-selection {
+          background: white;
+        }
       }
     }
     
