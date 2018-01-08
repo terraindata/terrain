@@ -74,6 +74,7 @@ class DeployModal extends TerrainComponent<Props>
     changingStatus: boolean;
     changingStatusOf: LibraryTypes.Algorithm;
     changingStatusTo: ItemStatus;
+    algorithms: IMMap<ID, LibraryTypes.Algorithm>;
     defaultChecked: boolean;
     errorModalMessage: string;
     showErrorModal: boolean;
@@ -82,6 +83,7 @@ class DeployModal extends TerrainComponent<Props>
     changingStatus: false,
     changingStatusOf: null,
     changingStatusTo: null,
+    algorithms: null,
     defaultChecked: false,
     errorModalMessage: '',
     showErrorModal: false,
@@ -93,17 +95,19 @@ class DeployModal extends TerrainComponent<Props>
     this._subscribe(LibraryStore, {
       updater: (state) =>
       {
-        const { changingStatus, changingStatusOf, changingStatusTo } = state;
+        const { changingStatus, changingStatusOf, changingStatusTo, algorithms } = state;
         if (
           changingStatus !== this.state.changingStatus ||
           changingStatusOf !== this.state.changingStatusOf ||
-          changingStatusTo !== this.state.changingStatusTo
+          changingStatusTo !== this.state.changingStatusTo ||
+          algorithms !== this.state.algorithms
         )
         {
           this.setState({
             changingStatus,
             changingStatusOf,
             changingStatusTo,
+            algorithms,
             defaultChecked: changingStatusTo === 'DEFAULT',
             deployedName: (changingStatusOf && changingStatusOf.deployedName),
           });
@@ -138,6 +142,15 @@ class DeployModal extends TerrainComponent<Props>
       {
         this.setState({
           errorModalMessage: 'Error changing status of ' + this.state.changingStatusOf.name + ' to ' + changingStatusTo,
+        });
+        this.toggleErrorModal();
+        return;
+      }
+      if (!this.haveValidDeployedName())
+      {
+        this.setState({
+          errorModalMessage: 'Error changing status of ' + this.state.changingStatusOf.name + ' to ' + changingStatusTo
+          + ': Deployed name ' + this.state.deployedName + ' is either already used or invalid.',
         });
         this.toggleErrorModal();
         return;
@@ -278,6 +291,14 @@ class DeployModal extends TerrainComponent<Props>
         </Modal>
       </div>
     );
+  }
+
+  private haveValidDeployedName(): boolean
+  {
+    return this.state.algorithms.valueSeq().filter((algorithm: LibraryTypes.Algorithm) =>
+    {
+      return algorithm !== this.state.changingStatusOf && algorithm.deployedName === this.state.deployedName;
+    }).toList().size === 0;
   }
 }
 
