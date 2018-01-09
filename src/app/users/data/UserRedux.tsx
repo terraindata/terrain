@@ -86,41 +86,41 @@ class UserRedux extends TerrainRedux<UserActionTypes, UserState>
   public namespace: string = 'users';
 
   public reducers: ConstrainedMap<UserActionTypes, UserState> =
-  {
-    change: (state, action) =>
-      state.setIn(['users', action.payload.user.id], action.payload.user),
-
-    fetch: (state, action) =>
     {
-      return state.set('loading', true);
-    },
+      change: (state, action) =>
+        state.setIn(['users', action.payload.user.id], action.payload.user),
 
-    setUsers: (state, action) =>
-    {
-      return state.set('users', action.payload.users)
-        .set('currentUser', action.payload.users.get(action.payload.currentUserId))
-        .set('loading', false)
-        .set('loaded', true);
-    },
+      fetch: (state, action) =>
+      {
+        return state.set('loading', true);
+      },
 
-    // This currentUser reference is hacky, and we should change it.
-    updateCurrentUser: (state, action) =>
-      state.set('currentUser', state.getIn(['users', action.payload.id])),
+      setUsers: (state, action) =>
+      {
+        return state.set('users', action.payload.users)
+          .set('currentUser', action.payload.users.get(action.payload.currentUserId))
+          .set('loading', false)
+          .set('loaded', true);
+      },
 
-    completeTutorial: (state, action) =>
-    {
-      state = state.setIn(
-        ['users', state.currentUser.id, 'tutorialStepsCompleted', action.payload.stepId],
-        action.payload.complete,
-      );
+      // This currentUser reference is hacky, and we should change it.
+      updateCurrentUser: (state, action) =>
+        state.set('currentUser', state.getIn(['users', action.payload.id])),
 
-      const user = state.users.get(state.currentUser.id);
-      Ajax.saveUser(user, () => { }, () => { });
+      completeTutorial: (state, action) =>
+      {
+        state = state.setIn(
+          ['users', state.currentUser.id, 'tutorialStepsCompleted', action.payload.stepId],
+          action.payload.complete,
+        );
 
-      state = state.set('currentUser', user); // update the version of the current user reference
-      return state;
-    },
-  };
+        const user = state.users.get(state.currentUser.id);
+        Ajax.saveUser(user, () => { }, () => { });
+
+        state = state.set('currentUser', user); // update the version of the current user reference
+        return state;
+      },
+    };
 
   public fetchAction(dispatch, getState)
   {
