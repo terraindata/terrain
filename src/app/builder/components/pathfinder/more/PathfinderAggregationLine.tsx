@@ -477,7 +477,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     return (
       <PathfinderLine
         canDrag={true}
-        canDelete={true}
+        canDelete={this.props.pathfinderContext.canEdit}
         onDelete={this.props.onDelete}
         index={this.props.index}
         canEdit={this.props.pathfinderContext.canEdit}

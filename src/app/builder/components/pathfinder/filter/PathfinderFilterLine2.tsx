@@ -65,6 +65,7 @@ import Util from 'app/util/Util';
 import { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
+const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
 {
@@ -115,6 +116,17 @@ class PathfinderFilterLine extends TerrainComponent<Props>
         }
         {
           this.renderValue()
+        }
+        {
+          this.renderBoost()
+        }
+        {
+         <div
+            className='close'
+            onClick={this.props.onDelete && this._fn(this.props.onDelete, this.props.keyPath)}
+          >
+            <RemoveIcon />
+          </div>
         }
       </div>
     );
@@ -168,7 +180,46 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   {
     const { filterLine, canEdit, pathfinderContext, depth } = this.props;
     const { source } = pathfinderContext;
+  }
 
+  private addBoost()
+  {
+    this.props.onChange(this.props.keyPath, this.props.filterLine.set('weightSet', true));
+  }
+
+  private handleBoostChange(e)
+  {
+    this.props.onChange(this.props.keyPath, this.props.filterLine.set('weight', e.target.value));
+  }
+
+  private renderBoost()
+  {
+    const { filterLine, pathfinderContext } = this.props;
+    if (filterLine.field === null || filterLine.fieldType === null )
+    {
+      return null;
+    }
+    return (
+      <div>
+        {
+          !filterLine.weightSet ?
+          <div onClick={this.addBoost}>
+            Add Boost
+          </div>
+          :
+          <div>
+            <span>Boost:</span>
+            <input
+              value={filterLine.weight}
+              type='number'
+              min={0}
+              step={1}
+              onChange={this.handleBoostChange}
+            />
+          </div>
+        }
+      </div>
+    );
   }
 
   private renderValue()

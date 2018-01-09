@@ -266,7 +266,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     return (
       <PathfinderLine
         canDrag={true}
-        canDelete={true}
+        canDelete={this.props.pathfinderContext.canEdit}
         canEdit={this.props.pathfinderContext.canEdit}
         children={this.renderLineContents()}
         onDelete={this.props.onDelete}

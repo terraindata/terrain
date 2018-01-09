@@ -359,7 +359,7 @@ class Autocomplete extends TerrainComponent<Props>
         onMouseEnter={this._fn(this.mouseOverOption, index)}
         onMouseLeave={this.mouseLeaveOption}
         data-value={option}
-        key={option}
+        key={option + String(index)}
         ref={'opt' + index}
         style={couldHover(index === this.state.selectedIndex)}
       >

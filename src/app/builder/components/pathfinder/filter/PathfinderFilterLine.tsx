@@ -89,7 +89,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     const { source } = pathfinderContext;
     return (
       <PathfinderLine
-        canDelete={true}
+        canDelete={canEdit}
         canDrag={true}
         canEdit={canEdit}
         onDelete={this._fn(this.props.onDelete, this.props.keyPath)}

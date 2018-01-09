@@ -157,6 +157,7 @@ export const _Score = (config?: { [key: string]: any }) =>
 class LineC extends BaseClass
 {
   public weight: number = 1;
+  public weightSet: boolean = false;
 }
 export type Line = LineC & IRecord<LineC>;
 export const _Line = (config?: { [key: string]: any }) =>
