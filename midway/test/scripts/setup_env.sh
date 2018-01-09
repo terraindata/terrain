@@ -10,7 +10,7 @@ postgres_image="terrain/moviesdb-postgres:$deploy_version"
 sqlite_image="terrain/moviesdb-sqlite:$deploy_version"
 
 mysql_port=3306
-postgres_port=5432
+postgres_port=65432
 elastic_port=9200
 sqlite_path=${DIR}/../../../
 use_mysql=1
