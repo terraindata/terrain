@@ -281,6 +281,7 @@ function parseFilters(filterGroup: FilterGroup): any
 
 function parseFilterLine(line: FilterLine, useShould: boolean)
 {
+  console.log(line.comparison);
   switch (line.comparison)
   {
     case 'equal':
@@ -288,7 +289,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
         term: Map({
           [line.field]: Map({
             value: line.value || '',
-            boost: parseFloat(line.weight),
+            boost: typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight,
           }),
         }),
       });
@@ -391,7 +392,9 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
         }),
       });
     case 'located':
+      console.log('HERE');
       const distanceObj = line.value as DistanceValue;
+      console.log(distanceObj);
       return Map({
         geo_distance: Map({
           distance: String(distanceObj.distance) + distanceObj.units,

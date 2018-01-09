@@ -56,6 +56,7 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
 import Dropdown from '../../../../common/components/Dropdown';
+import SearchableDropdown from '../../../../common/components/SearchableDropdown';
 import ScoreBar from '../../charts/ScoreBar';
 import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
@@ -232,11 +233,12 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           onChange={this.props.onAnimateScoreBars}
         />
         <span className='pf-score-line-text'>times</span>
-        <Dropdown
+        <SearchableDropdown
           options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
           selectedIndex={this.state.fieldIndex}
           canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('field')}
+          placeholder={'Field...'}
         />
         {
           this.props.line.field &&
