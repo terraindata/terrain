@@ -195,7 +195,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
   private renderBoost()
   {
     const { filterLine, pathfinderContext } = this.props;
-    if (filterLine.field === null || filterLine.fieldType === null )
+    if (filterLine.field === null || filterLine.fieldType === null || filterLine.comparison === null)
     {
       return null;
     }
@@ -203,11 +203,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       <div>
         {
           !filterLine.weightSet ?
-          <div onClick={this.addBoost}>
+          <div onClick={this.addBoost} className='pf-filter-add-boost'>
             Add Boost
           </div>
           :
-          <div>
+          <div className='pf-filter-boost'>
             <span>Boost:</span>
             <input
               value={filterLine.weight}

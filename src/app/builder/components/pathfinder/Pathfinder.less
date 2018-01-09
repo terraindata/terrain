@@ -65,7 +65,37 @@
 		cursor: pointer;
 		font-size: @font-size;
 	}
-	
+	.pf-filter-line
+	{
+		.flex-container
+		{
+			.autocomplete {
+				margin-top: 12px;
+			}
+		}
+		.pf-filter-add-boost {
+			font-size: 14px;
+			padding-top: 18px;
+			padding-left: 6px;
+			opacity: 0.7;
+			cursor: pointer;
+			&:hover {
+				text-decoration: underline;
+				opacity: 1;
+			}
+		}
+		.pf-filter-boost {
+			font-size: 13px;
+		    display: inline-flex;
+		    margin-top: 12px;
+		    max-width: 75px;
+		    margin-left: 6px;
+		    span {
+		    	margin-top: 6px;
+		    }
+		}
+	}
+
 	.pf-line {
 		display: flex;
 		align-items: center;
@@ -75,6 +105,7 @@
 			margin: 0px @half-spacing;
 			display: block;
 			position: relative;
+
 			.fade-in-quick;
 			// opacity: 1;
 			// .transition;
