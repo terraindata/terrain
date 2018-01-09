@@ -84,8 +84,8 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
   public state: {
     localColumnName: string;
   } = {
-    localColumnName: this.props.columnName,
-  };
+      localColumnName: this.props.columnName,
+    };
 
   public handleIncludedChange()
   {

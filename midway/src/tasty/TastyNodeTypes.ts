@@ -54,6 +54,7 @@ enum TastyNodeTypes
   'date',
 
   'select',
+  'insert',
   'upsert',
   'delete',
   'filter',

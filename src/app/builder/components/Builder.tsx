@@ -126,25 +126,25 @@ class Builder extends TerrainComponent<Props>
     savingAs?: boolean;
 
   } = {
-    builderState: BuilderStore.getState(),
-    algorithms: LibraryStore.getState().algorithms,
+      builderState: BuilderStore.getState(),
+      algorithms: LibraryStore.getState().algorithms,
 
-    colKeys: null,
-    noColumnAnimation: false,
-    columnType: null,
-    selectedCardName: '',
-    manualIndex: -1,
+      colKeys: null,
+      noColumnAnimation: false,
+      columnType: null,
+      selectedCardName: '',
+      manualIndex: -1,
 
-    leaving: false,
-    nextLocation: null,
-    tabActions: this.getTabActions(BuilderStore.getState()),
+      leaving: false,
+      nextLocation: null,
+      tabActions: this.getTabActions(BuilderStore.getState()),
 
-    nonexistentAlgorithmIds: List([]),
+      nonexistentAlgorithmIds: List([]),
 
-    navigationException: false,
+      navigationException: false,
 
-    saveAsTextboxValue: '',
-  };
+      saveAsTextboxValue: '',
+    };
 
   public initialColSizes: any;
 
@@ -599,9 +599,9 @@ class Builder extends TerrainComponent<Props>
       onColSizeChange: this.handleColSizeChange,
       minColWidth: 316,
       columns:
-      _.range(0, this.state.colKeys.size).map((index) =>
-        this.getColumn(index),
-      ),
+        _.range(0, this.state.colKeys.size).map((index) =>
+          this.getColumn(index),
+        ),
     };
   }
 

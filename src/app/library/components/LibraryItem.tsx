@@ -142,109 +142,109 @@ class LibraryItem extends TerrainComponent<Props>
   };
 
   public menuOptions =
-  {
-    none: List([]),
-    duplicate:
-    List([
-      {
-        text: 'Duplicate',
-        onClick: this.handleDuplicate,
-      },
-      {
-        text: 'Rename',
-        disabled: true,
-        tooltip: "Can't rename Live or Default Algorithms",
-      },
-    ]),
-    duplicateRename:
-    List([
-      {
-        text: 'Duplicate',
-        onClick: this.handleDuplicate,
-      },
-      {
-        text: 'Rename',
-        onClick: this.showTextfield,
-      },
-    ]),
-    archive:
-    List([
-      {
-        text: 'Archive',
-        onClick: this.handleArchive,
-      },
-      {
-        text: 'Rename',
-        disabled: true,
-        tooltip: "Can't rename Live or Default Algorithms",
-      },
-    ]),
-    archiveRename:
-    List([
-      {
-        text: 'Rename',
-        onClick: this.showTextfield,
-      },
-      {
-        text: 'Archive',
-        onClick: this.handleArchive,
-      },
-    ]),
-    unarchive:
-    List([
-      {
-        text: 'Unarchive',
-        onClick: this.handleUnarchive,
-      },
-      {
-        text: 'Rename',
-        disabled: true,
-        tooltip: "Can't rename Live or Default Algorithms",
-      },
-    ]),
-    unarchiveRename:
-    List([
-      {
-        text: 'Rename',
-        onClick: this.showTextfield,
-      },
-      {
-        text: 'Unarchive',
-        onClick: this.handleUnarchive,
-      },
-    ]),
-    duplicateArchive:
-    List([
-      {
-        text: 'Duplicate',
-        onClick: this.handleDuplicate,
-      },
-      {
-        text: 'Archive',
-        onClick: this.handleArchive,
-      },
-      {
-        text: 'Rename',
-        disabled: true,
-        tooltip: "Can't rename Live or Default Algorithms",
-      },
-    ]),
-    duplicateRenameArchive:
-    List([
-      {
-        text: 'Duplicate',
-        onClick: this.handleDuplicate,
-      },
-      {
-        text: 'Rename',
-        onClick: this.showTextfield,
-      },
-      {
-        text: 'Archive',
-        onClick: this.handleArchive,
-      },
-    ]),
-  };
+    {
+      none: List([]),
+      duplicate:
+        List([
+          {
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
+          },
+          {
+            text: 'Rename',
+            disabled: true,
+            tooltip: "Can't rename Live or Default Algorithms",
+          },
+        ]),
+      duplicateRename:
+        List([
+          {
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
+          },
+          {
+            text: 'Rename',
+            onClick: this.showTextfield,
+          },
+        ]),
+      archive:
+        List([
+          {
+            text: 'Archive',
+            onClick: this.handleArchive,
+          },
+          {
+            text: 'Rename',
+            disabled: true,
+            tooltip: "Can't rename Live or Default Algorithms",
+          },
+        ]),
+      archiveRename:
+        List([
+          {
+            text: 'Rename',
+            onClick: this.showTextfield,
+          },
+          {
+            text: 'Archive',
+            onClick: this.handleArchive,
+          },
+        ]),
+      unarchive:
+        List([
+          {
+            text: 'Unarchive',
+            onClick: this.handleUnarchive,
+          },
+          {
+            text: 'Rename',
+            disabled: true,
+            tooltip: "Can't rename Live or Default Algorithms",
+          },
+        ]),
+      unarchiveRename:
+        List([
+          {
+            text: 'Rename',
+            onClick: this.showTextfield,
+          },
+          {
+            text: 'Unarchive',
+            onClick: this.handleUnarchive,
+          },
+        ]),
+      duplicateArchive:
+        List([
+          {
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
+          },
+          {
+            text: 'Archive',
+            onClick: this.handleArchive,
+          },
+          {
+            text: 'Rename',
+            disabled: true,
+            tooltip: "Can't rename Live or Default Algorithms",
+          },
+        ]),
+      duplicateRenameArchive:
+        List([
+          {
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
+          },
+          {
+            text: 'Rename',
+            onClick: this.showTextfield,
+          },
+          {
+            text: 'Archive',
+            onClick: this.handleArchive,
+          },
+        ]),
+    };
 
   public componentWillMount()
   {
@@ -259,12 +259,12 @@ class LibraryItem extends TerrainComponent<Props>
   {
     this.setState({
       timeout:
-      setTimeout(() =>
-      {
-        this.setState({
-          mounted: true,
-        });
-      }, this.props.rendered ? 0 : Math.min(this.props.fadeIndex * 100, 1000)), // re-add this when we get real indexes
+        setTimeout(() =>
+        {
+          this.setState({
+            mounted: true,
+          });
+        }, this.props.rendered ? 0 : Math.min(this.props.fadeIndex * 100, 1000)), // re-add this when we get real indexes
     });
 
     if (!this.props.name.length)

@@ -92,9 +92,9 @@ class ResultsColumn extends TerrainComponent<Props>
     selectedTab: number,
     highlightedTabs: any,
   } = {
-    selectedTab: 0,
-    highlightedTabs: Map({ hits: false, aggregations: false }),
-  };
+      selectedTab: 0,
+      highlightedTabs: Map({ hits: false, aggregations: false }),
+    };
 
   public componentWillMount()
   {

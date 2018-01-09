@@ -50,7 +50,7 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { CredentialConfig, Credentials } from '../../credentials/Credentials';
+import { Credentials } from '../../credentials/Credentials';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
 import DatabaseController from '../../../database/DatabaseController';

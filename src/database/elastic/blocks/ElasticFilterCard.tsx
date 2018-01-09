@@ -546,153 +546,153 @@ export const elasticFilter = _card({
     epilogueInit: FilterUtils.customFilterBlock,
 
     display:
-    [
-      // display _index filters first, so that 1) index filters are always at the beginning
-      // 2) we can auto-complete the value with index schema options.
-      {
-        displayType: DisplayType.ROWS,
-        key: 'indexFilters',
-        english: 'Index',
-        factoryType: 'elasticFilterBlock',
-        row:
+      [
+        // display _index filters first, so that 1) index filters are always at the beginning
+        // 2) we can auto-complete the value with index schema options.
         {
-          inner:
-          [
+          displayType: DisplayType.ROWS,
+          key: 'indexFilters',
+          english: 'Index',
+          factoryType: 'elasticFilterBlock',
+          row:
             {
-              displayType: DisplayType.LABEL,
-              label: 'Index:',
-              key: null,
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'value',
-              getAutoTerms: (schemaState) =>
-              {
-                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Index);
-              },
-            },
-          ],
-        },
-      },
-      // display _type filters second, so that 1) type filters are always following the index filters.
-      // 2) we can auto-complete the value with type schema options.
-      {
-        displayType: DisplayType.ROWS,
-        key: 'typeFilters',
-        english: 'Filter',
-        factoryType: 'elasticFilterBlock',
-        row:
-        {
-          inner:
-          [
-            {
-              displayType: DisplayType.LABEL,
-              label: 'Type:',
-              key: null,
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'value',
-              getAutoTerms: (schemaState) =>
-              {
-                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Type);
-              },
-            },
-          ],
-        },
-      },
-      // finally display all other filters.
-      {
-        displayType: DisplayType.ROWS,
-        key: 'otherFilters',
-        english: 'Index',
-        factoryType: 'elasticFilterBlock',
-        row:
-        {
-          inner:
-          [
-            {
-              displayType: DisplayType.TEXT,
-              key: 'field',
-              getAutoTerms: (schemaState) =>
-              {
-                return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
-              },
-            },
-            {
-              displayType: DisplayType.DROPDOWN,
-              key: 'boolQuery',
-              options: List(
+              inner:
                 [
-                  'must',
-                  'must_not',
-                  'should',
-                  'filter',
+                  {
+                    displayType: DisplayType.LABEL,
+                    label: 'Index:',
+                    key: null,
+                  },
+                  {
+                    displayType: DisplayType.TEXT,
+                    key: 'value',
+                    getAutoTerms: (schemaState) =>
+                    {
+                      return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Index);
+                    },
+                  },
                 ],
-                // Can consider using this, but it includes "minmum_should_match," which
-                //  doesn't make sense in this context
-                // Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])
-              ),
-              optionsDisplayName: Immutable.Map<any, string>(
-                {
-                  must: 'Must',
-                  must_not: 'Must Not',
-                  should: 'Should',
-                  filter: 'Filter',
-                } as any,
-              ),
-              dropdownTooltips: List([
-                'A result must pass the equation you specify to be included in the final results.',
-                'A result must not pass the equation you specify to be included in the final results.',
-                'A result must pass at least one of the "should" equations you specify to be included in the final results.',
-                'A result must pass the equation you specify to be included in the final results, ' +
-                "but this equation won't be included in calculating the Elastic _score.",
-              ]),
-              dropdownUsesRawValues: true,
-              autoDisabled: true,
-              centerDropdown: true,
-              style: {
-                maxWidth: 125,
-                minWidth: 105,
-                marginRight: 3,
-              },
             },
-            {
-              displayType: DisplayType.DROPDOWN,
-              key: 'filterOp',
-              options: List(
-                _.keys(esFilterOperatorsMap) as string[],
-                // can consider using this, but it includes 'boost', and uses raw text values
-                // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
-              ),
-              dropdownTooltips: List(_.values(esFilterOperatorsTooltips)),
-              dropdownUsesRawValues: true,
-              centerDropdown: true,
-              autoDisabled: true,
-              style: {
-                maxWidth: 75,
-              },
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'value',
-            },
-          ],
         },
-      },
-      {
-        displayType: DisplayType.CARDS,
-        key: 'cards',
-        hideCreateCardTool: true,
-      },
-      {
-        provideParentData: true, // need this to grey out the type dropdown
-        displayType: DisplayType.COMPONENT,
-        component: SpecializedCreateCardTool,
-        key: null,
-        // help: ManualConfig.help['score'],
-      },
-    ],
+        // display _type filters second, so that 1) type filters are always following the index filters.
+        // 2) we can auto-complete the value with type schema options.
+        {
+          displayType: DisplayType.ROWS,
+          key: 'typeFilters',
+          english: 'Filter',
+          factoryType: 'elasticFilterBlock',
+          row:
+            {
+              inner:
+                [
+                  {
+                    displayType: DisplayType.LABEL,
+                    label: 'Type:',
+                    key: null,
+                  },
+                  {
+                    displayType: DisplayType.TEXT,
+                    key: 'value',
+                    getAutoTerms: (schemaState) =>
+                    {
+                      return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Type);
+                    },
+                  },
+                ],
+            },
+        },
+        // finally display all other filters.
+        {
+          displayType: DisplayType.ROWS,
+          key: 'otherFilters',
+          english: 'Index',
+          factoryType: 'elasticFilterBlock',
+          row:
+            {
+              inner:
+                [
+                  {
+                    displayType: DisplayType.TEXT,
+                    key: 'field',
+                    getAutoTerms: (schemaState) =>
+                    {
+                      return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+                    },
+                  },
+                  {
+                    displayType: DisplayType.DROPDOWN,
+                    key: 'boolQuery',
+                    options: List(
+                      [
+                        'must',
+                        'must_not',
+                        'should',
+                        'filter',
+                      ],
+                      // Can consider using this, but it includes "minmum_should_match," which
+                      //  doesn't make sense in this context
+                      // Object.keys(ESInterpreterDefaultConfig.getClause('bool_query')['structure'])
+                    ),
+                    optionsDisplayName: Immutable.Map<any, string>(
+                      {
+                        must: 'Must',
+                        must_not: 'Must Not',
+                        should: 'Should',
+                        filter: 'Filter',
+                      } as any,
+                    ),
+                    dropdownTooltips: List([
+                      'A result must pass the equation you specify to be included in the final results.',
+                      'A result must not pass the equation you specify to be included in the final results.',
+                      'A result must pass at least one of the "should" equations you specify to be included in the final results.',
+                      'A result must pass the equation you specify to be included in the final results, ' +
+                      "but this equation won't be included in calculating the Elastic _score.",
+                    ]),
+                    dropdownUsesRawValues: true,
+                    autoDisabled: true,
+                    centerDropdown: true,
+                    style: {
+                      maxWidth: 125,
+                      minWidth: 105,
+                      marginRight: 3,
+                    },
+                  },
+                  {
+                    displayType: DisplayType.DROPDOWN,
+                    key: 'filterOp',
+                    options: List(
+                      _.keys(esFilterOperatorsMap) as string[],
+                      // can consider using this, but it includes 'boost', and uses raw text values
+                      // Object.keys(ESInterpreterDefaultConfig.getClause('range_value')['structure'])),
+                    ),
+                    dropdownTooltips: List(_.values(esFilterOperatorsTooltips)),
+                    dropdownUsesRawValues: true,
+                    centerDropdown: true,
+                    autoDisabled: true,
+                    style: {
+                      maxWidth: 75,
+                    },
+                  },
+                  {
+                    displayType: DisplayType.TEXT,
+                    key: 'value',
+                  },
+                ],
+            },
+        },
+        {
+          displayType: DisplayType.CARDS,
+          key: 'cards',
+          hideCreateCardTool: true,
+        },
+        {
+          provideParentData: true, // need this to grey out the type dropdown
+          displayType: DisplayType.COMPONENT,
+          component: SpecializedCreateCardTool,
+          key: null,
+          // help: ManualConfig.help['score'],
+        },
+      ],
   },
 });
 

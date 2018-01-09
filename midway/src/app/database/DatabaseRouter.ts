@@ -49,7 +49,8 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import * as Util from '../Util';
-import { DatabaseConfig, Databases } from './Databases';
+import DatabaseConfig from './DatabaseConfig';
+import Databases from './Databases';
 
 export const Router = new KoaRouter();
 export const databases = new Databases();

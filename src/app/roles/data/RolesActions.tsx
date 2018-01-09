@@ -56,16 +56,16 @@ const $ = (type: string, payload: any) =>
 const RolesActions =
   {
     fetch:
-    () =>
-      $(ActionTypes.fetch, {}),
+      () =>
+        $(ActionTypes.fetch, {}),
 
     setRoles:
-    (roles: RoleTypes.RoleMap) =>
-      $(ActionTypes.setRoles, { roles }),
+      (roles: RoleTypes.RoleMap) =>
+        $(ActionTypes.setRoles, { roles }),
 
     change:
-    (role: RoleTypes.Role) =>
-      $(ActionTypes.change, { role }),
+      (role: RoleTypes.Role) =>
+        $(ActionTypes.change, { role }),
   };
 
 export default RolesActions;

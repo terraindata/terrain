@@ -39,6 +39,7 @@
     "no-invalid-template-strings" : true,
     "no-invalid-this" : true,
     "no-misused-new" : true,
+    "no-return-await": true,
     "no-switch-case-fall-through" : true,
     "switch-default" : true,
     "restrict-plus-operands" : true,

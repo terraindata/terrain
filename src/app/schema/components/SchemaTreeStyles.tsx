@@ -118,17 +118,17 @@ const SchemaTreeStyles =
     ],
 
     treeItemHeaderSelected:
-    {
-      'background': Colors().inactiveHover,
-      ':hover': {
-        background: Colors().inactiveHover,
+      {
+        'background': Colors().inactiveHover,
+        ':hover': {
+          background: Colors().inactiveHover,
+        },
       },
-    },
 
     treeItemHeaderHighlighted:
-    {
-      background: Colors().inactiveHover,
-    },
+      {
+        background: Colors().inactiveHover,
+      },
 
     name: {
       marginRight: Styles.margin * 3,
@@ -179,9 +179,9 @@ const SchemaTreeStyles =
       'cursor': 'pointer',
 
       ':hover':
-      {
-        color: Colors().activeText,
-      },
+        {
+          color: Colors().activeText,
+        },
 
       'float': 'left',
       'width': '100px',

@@ -187,41 +187,41 @@ export const firstSecondDisplay = (middle: Display, accepts: List<string>): Disp
     key: null,
 
     above:
-    {
-      displayType: CARDSFORTEXT,
-      key: 'first',
-      className: 'card-double-first',
-      accepts,
-    },
+      {
+        displayType: CARDSFORTEXT,
+        key: 'first',
+        className: 'card-double-first',
+        accepts,
+      },
 
     below:
-    {
-      displayType: CARDSFORTEXT,
-      key: 'second',
-      accepts,
-    },
+      {
+        displayType: CARDSFORTEXT,
+        key: 'second',
+        accepts,
+      },
 
     flex:
-    [
-      {
-        displayType: CARDTEXT,
-        key: 'first',
-        top: true,
-        showWhenCards: true,
-        // help: ManualConfig.help['first'],
-        accepts,
-      },
+      [
+        {
+          displayType: CARDTEXT,
+          key: 'first',
+          top: true,
+          showWhenCards: true,
+          // help: ManualConfig.help['first'],
+          accepts,
+        },
 
-      middle,
+        middle,
 
-      {
-        displayType: CARDTEXT,
-        key: 'second',
-        showWhenCards: true,
-        // help: ManualConfig.help['second'],
-        accepts,
-      },
-    ],
+        {
+          displayType: CARDTEXT,
+          key: 'second',
+          showWhenCards: true,
+          // help: ManualConfig.help['second'],
+          accepts,
+        },
+      ],
   });
 
 export const wrapperDisplay: Display =
@@ -244,26 +244,26 @@ export const letVarDisplay =
     displayType: FLEX,
     key: null,
     flex:
-    [
-      {
-        displayType: TEXT,
-        // help: ManualConfig.help['let-var-field'],
-        key: 'field',
-      },
-      {
-        displayType: LABEL,
-        label: '=',
-        key: null,
-      },
-      {
-        displayType: CARDTEXT,
-        // help: ManualConfig.help['expression'],
-        key: 'expression',
-      },
-    ],
+      [
+        {
+          displayType: TEXT,
+          // help: ManualConfig.help['let-var-field'],
+          key: 'field',
+        },
+        {
+          displayType: LABEL,
+          label: '=',
+          key: null,
+        },
+        {
+          displayType: CARDTEXT,
+          // help: ManualConfig.help['expression'],
+          key: 'expression',
+        },
+      ],
     below:
-    {
-      key: 'expression',
-      displayType: CARDSFORTEXT,
-    },
+      {
+        key: 'expression',
+        displayType: CARDSFORTEXT,
+      },
   };

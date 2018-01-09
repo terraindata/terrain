@@ -50,6 +50,7 @@ import SQLiteConfig from '../../../../src/database/sqlite/SQLiteConfig';
 import SQLiteController from '../../../../src/database/sqlite/SQLiteController';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
+import MySQLQueries from '../../../tasty/MySQLQueries';
 import SQLQueries from '../../../tasty/SQLQueries';
 import * as Utils from '../../../Utils';
 
@@ -82,14 +83,16 @@ beforeAll(async () =>
   }
 });
 
+const tests = SQLQueries.concat(MySQLQueries);
+
 function runTest(index: number)
 {
-  const testName: string = 'SQLite: execute ' + SQLQueries[index][0];
+  const testName: string = 'SQLite: execute ' + tests[index][0];
   test(testName, async (done) =>
   {
     try
     {
-      const results = await tasty.getDB().execute(SQLQueries[index][1]);
+      const results = await tasty.getDB().execute(tests[index][1]);
       await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
 
     }
@@ -101,7 +104,7 @@ function runTest(index: number)
   });
 }
 
-for (let i = 0; i < SQLQueries.length; i++)
+for (let i = 0; i < tests.length; i++)
 {
   runTest(i);
 }

@@ -138,15 +138,15 @@ class CardSelector extends TerrainComponent<Props>
     currentCategory: CardCategory;
     optionMap: IMMap<number, any>; // this is to allow proper scrolling when arrow keys are pressed
   } = {
-    searchValue: '',
-    focusedIndex: 0,
-    inputElement: undefined,
-    categoryListElement: undefined,
-    innerSelectorElement: undefined,
-    computedHeight: -1,
-    currentCategory: categories.get(0),
-    optionMap: Map(),
-  };
+      searchValue: '',
+      focusedIndex: 0,
+      inputElement: undefined,
+      categoryListElement: undefined,
+      innerSelectorElement: undefined,
+      computedHeight: -1,
+      currentCategory: categories.get(0),
+      optionMap: Map(),
+    };
 
   constructor(props)
   {
