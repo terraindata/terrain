@@ -53,26 +53,26 @@ const duplicate = '';
 export let LibraryActionTypes =
   {
     categories:
-    {
-      create, change, move,
-      // duplicate,
-    },
+      {
+        create, change, move,
+        // duplicate,
+      },
 
     groups:
-    {
-      create, change, move,
-    },
+      {
+        create, change, move,
+      },
 
     algorithms:
-    {
-      create, change, move,
-      status: '',
-      fetchVersion: '',
-      loadVersion: '',
-      select: '',
-      unselect: '',
-      unselectAll: '',
-    },
+      {
+        create, change, move,
+        status: '',
+        fetchVersion: '',
+        loadVersion: '',
+        select: '',
+        unselect: '',
+        unselectAll: '',
+      },
 
     loadState: '',
     setDbs: '',

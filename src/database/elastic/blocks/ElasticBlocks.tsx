@@ -79,15 +79,15 @@ export const ElasticBlocks = _.extend(
     elasticCreating: _card( // a placeholder for when a card is being created
       {
         static:
-        {
-          language: 'elastic',
-          tql: '',
-          title: 'New Card',
-          colors: ['#777', '#777'],
-          preview: '',
-          display: null,
-          // manualEntry: null,
-        },
+          {
+            language: 'elastic',
+            tql: '',
+            title: 'New Card',
+            colors: ['#777', '#777'],
+            preview: '',
+            display: null,
+            // manualEntry: null,
+          },
       }),
 
     elasticInput: _block(

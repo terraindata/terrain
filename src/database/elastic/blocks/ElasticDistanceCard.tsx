@@ -104,82 +104,82 @@ export const elasticDistance = _card({
     },
 
     display:
-    [
-      {
-        displayType: DisplayType.FLEX,
-        key: 'distance_flex',
-        flex:
-        [
-          {
-            displayType: DisplayType.LABEL,
-            key: 'distance_label',
-            label: 'Distance:',
-          },
-          {
-            displayType: DisplayType.NUM,
-            key: 'distance',
-            placeholder: 'distance',
-            style: {
-              maxWidth: 110,
-              minWidth: 75,
-              marginLeft: 6,
-              marginBottom: 6,
-            },
-          },
-          {
-            displayType: DisplayType.DROPDOWN,
-            key: 'distanceUnit',
-            options: List(_.keys(esMapDistanceUnits) as string[]),
-            optionsDisplayName: Immutable.Map<any, string>(esMapDistanceUnits) as any,
-            dropdownUsesRawValues: true,
-            autoDisabled: true,
-            centerDropdown: true,
-            style: {
-              maxWidth: 125,
-              minWidth: 95,
-              marginLeft: 6,
-              marginRight: 6,
-            },
-          },
-          {
-            displayType: DisplayType.LABEL,
-            key: 'distance_type_label',
-            label: 'Distance Type:',
-            style: {
-              minWidth: 97,
-            },
-          },
-          {
-            displayType: DisplayType.DROPDOWN,
-            key: 'distanceType',
-            options: List(esMapDistanceTypes),
-            dropdownUsesRawValues: true,
-            autoDisabled: true,
-            centerDropdown: true,
-            style: {
-              maxWidth: 95,
-              minWidth: 75,
-              marginLeft: 6,
-            },
-          },
-        ],
-      },
-      {
-        displayType: DisplayType.TEXT,
-        key: 'field',
-        placeholder: 'Field',
-        className: 'builder-comp-list-item-margin-bottom',
-        getAutoTerms: (schemaState): List<string> =>
+      [
         {
-          return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+          displayType: DisplayType.FLEX,
+          key: 'distance_flex',
+          flex:
+            [
+              {
+                displayType: DisplayType.LABEL,
+                key: 'distance_label',
+                label: 'Distance:',
+              },
+              {
+                displayType: DisplayType.NUM,
+                key: 'distance',
+                placeholder: 'distance',
+                style: {
+                  maxWidth: 110,
+                  minWidth: 75,
+                  marginLeft: 6,
+                  marginBottom: 6,
+                },
+              },
+              {
+                displayType: DisplayType.DROPDOWN,
+                key: 'distanceUnit',
+                options: List(_.keys(esMapDistanceUnits) as string[]),
+                optionsDisplayName: Immutable.Map<any, string>(esMapDistanceUnits) as any,
+                dropdownUsesRawValues: true,
+                autoDisabled: true,
+                centerDropdown: true,
+                style: {
+                  maxWidth: 125,
+                  minWidth: 95,
+                  marginLeft: 6,
+                  marginRight: 6,
+                },
+              },
+              {
+                displayType: DisplayType.LABEL,
+                key: 'distance_type_label',
+                label: 'Distance Type:',
+                style: {
+                  minWidth: 97,
+                },
+              },
+              {
+                displayType: DisplayType.DROPDOWN,
+                key: 'distanceType',
+                options: List(esMapDistanceTypes),
+                dropdownUsesRawValues: true,
+                autoDisabled: true,
+                centerDropdown: true,
+                style: {
+                  maxWidth: 95,
+                  minWidth: 75,
+                  marginLeft: 6,
+                },
+              },
+            ],
         },
-      },
-      {
-        displayType: DisplayType.MAP,
-        key: 'geopoint',
-        component: BuilderMapComponent,
-      },
-    ],
+        {
+          displayType: DisplayType.TEXT,
+          key: 'field',
+          placeholder: 'Field',
+          className: 'builder-comp-list-item-margin-bottom',
+          getAutoTerms: (schemaState): List<string> =>
+          {
+            return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+          },
+        },
+        {
+          displayType: DisplayType.MAP,
+          key: 'geopoint',
+          component: BuilderMapComponent,
+        },
+      ],
   },
 });
 

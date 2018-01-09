@@ -82,9 +82,9 @@ class SchemaView extends TerrainComponent<Props>
     highlightedIndex: number;
     search: string;
   } = {
-    highlightedIndex: -1,
-    search: '',
-  };
+      highlightedIndex: -1,
+      search: '',
+    };
 
   public handleSearchChange(event)
   {

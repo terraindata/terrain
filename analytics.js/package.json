@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "build": "webpack --config webpack.config.js --output-filename ./build/bundle.js",
-    "lint": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
+    "lint": "tslint -c tslint.json --fix --project tsconfig.json",
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;"
   },
@@ -45,9 +45,9 @@
   },
   "devDependencies": {
     "ts-loader": "^2.3.7",
-    "tslint": "^5.7.0",
-    "typescript": "^2.5.3",
-    "typescript-formatter": "^6.0.0",
-    "webpack": "^3.5.6"
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2",
+    "typescript-formatter": "^7.0.1",
+    "webpack": "^3.10.0"
   }
 }

@@ -79,12 +79,12 @@ interface Adjustment
 
 const LayoutManager = createReactClass<any, any>({
   propTypes:
-  {
-    layout: PropTypes.object.isRequired, // TODO move to TS, describe different keys allowed
-    moveTo: PropTypes.func,
-    containerWidth: PropTypes.number.isRequired,
-    containerHeight: PropTypes.number.isRequired,
-  },
+    {
+      layout: PropTypes.object.isRequired, // TODO move to TS, describe different keys allowed
+      moveTo: PropTypes.func,
+      containerWidth: PropTypes.number.isRequired,
+      containerHeight: PropTypes.number.isRequired,
+    },
 
   shouldComponentUpdate(nextProps, nextState)
   {

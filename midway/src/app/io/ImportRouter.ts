@@ -49,7 +49,7 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import { Permissions } from '../permissions/Permissions';
-import { UserConfig } from '../users/Users';
+import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import { Import } from './Import';
 import { ImportSourceConfig, Sources } from './sources/Sources';

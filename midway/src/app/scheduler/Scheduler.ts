@@ -54,33 +54,18 @@ import * as winston from 'winston';
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import { CredentialConfig, Credentials } from '../credentials/Credentials';
+import CredentialConfig from '../credentials/CredentialConfig';
+import Credentials from '../credentials/Credentials';
+import DatabaseConfig from '../database/DatabaseConfig';
 import { Export, ExportConfig } from '../io/Export';
 import { Import } from '../io/Import';
-import { UserConfig } from '../users/Users';
+import UserConfig from '../users/UserConfig';
 import { versions } from '../versions/VersionRouter';
+import SchedulerConfig from './SchedulerConfig';
 
 export const exprt: Export = new Export();
 export const imprt: Import = new Import();
 export const credentials: Credentials = new Credentials();
-
-export interface SchedulerConfig
-{
-  active?: number;                   // whether the schedule is running (different from currentlyRunning)
-  archived?: number;                 // whether the schedule has been archived (deleted) or not
-  currentlyRunning?: number;         // whether the job is currently running
-  name: string;                      // name of the schedule
-  id?: number;                       // schedule ID
-  jobId?: number;                    // corresponds to job ID
-  jobType?: string;                  // import or export etc.
-  paramsJob?: object;                // parameters passed for the job, excluding info like filename
-  paramsScheduleArr?: any[];         // parameters passed for the schedule
-  paramsScheduleStr?: string;        // JSON stringified representation of paramsScheduleArr
-  schedule: string;                  // cronjob format for when the schedule should run
-  sort?: string;                     // for regex expression file matching, which end of the list should be used
-  transport?: object;                // sftp and relevant parameters, https, local filesystem, etc.
-  transportStr?: string;             // JSON stringified representation of transport
-}
 
 export class Scheduler
 {
@@ -122,7 +107,7 @@ export class Scheduler
         {
           for (const schedule of schedules)
           {
-            schedule.archived = 1;
+            schedule.archived = true;
             await this.cancelJob(schedule.id);
             return resolve(await App.DB.upsert(this.schedulerTable, schedule as object) as SchedulerConfig[]);
           }
@@ -140,14 +125,15 @@ export class Scheduler
       {
         return resolve(false);
       }
-      const schedules: any[] = await App.DB.select(this.schedulerTable, [], { id }) as any[];
+      const rawSchedules: any[] = await App.DB.select(this.schedulerTable, [], { id }) as any[];
+      const schedules: SchedulerConfig[] = rawSchedules.map((result: object) => new SchedulerConfig(result));
       if (schedules.length === 0)
       {
         return resolve(false);
       }
       schedules.map((schedule) =>
       {
-        this.scheduleMap[schedule['id']].cancel();
+        this.scheduleMap[schedule['id'] as number].cancel();
       });
       return resolve(true);
     });
@@ -164,7 +150,7 @@ export class Scheduler
         {
           for (const schedule of schedules)
           {
-            schedule.active = status;
+            schedule.active = status === 1 ? true : false;
             if (status === 0)
             {
               await this.cancelJob(schedule.id);
@@ -224,8 +210,8 @@ export class Scheduler
         jobId = 5;
         packedParamsSchedule = [req['paramsJob'], req['transport'], req['sort'], 'utf8'];
       }
-      req.active = 1;
-      req.archived = 0;
+      req.active = true;
+      req.archived = false;
       req.jobId = jobId;
       req.paramsScheduleArr = packedParamsSchedule;
       const newScheduledJob: SchedulerConfig[] = await this.upsert(user, req);
@@ -259,8 +245,8 @@ export class Scheduler
     {
       if (req['jobId'] !== undefined && Object.keys(this.jobMap).indexOf((req['jobId'] as number).toString()) !== -1)
       {
-        req.active = 1;
-        req.archived = 0;
+        req.active = true;
+        req.archived = false;
         const newScheduledJob: SchedulerConfig[] = await this.upsert(user, req);
         const resultJobId: string = newScheduledJob[0]['id'] !== undefined ? (newScheduledJob[0]['id'] as any).toString() : '-1';
         const job: any = nodeScheduler.scheduleJob(req.schedule, this.jobMap[resultJobId]);
@@ -273,12 +259,20 @@ export class Scheduler
 
   public async get(id?: number, archived?: boolean): Promise<SchedulerConfig[]>
   {
-    const archivedInt: number = archived === true ? 1 : 0;
-    if (id !== undefined)
+    return new Promise<SchedulerConfig[]>(async (resolve, reject) =>
     {
-      return App.DB.select(this.schedulerTable, [], { id, archived: archivedInt }) as any;
-    }
-    return App.DB.select(this.schedulerTable, [], { archived: archivedInt }) as any;
+      let rawResults;
+      if (id !== undefined)
+      {
+        rawResults = await App.DB.select(this.schedulerTable, [], { id, archived });
+      }
+      else
+      {
+        rawResults = await App.DB.select(this.schedulerTable, [], { archived });
+      }
+      const results: SchedulerConfig[] = rawResults.map((result: object) => new SchedulerConfig(result));
+      resolve(results);
+    });
   }
 
   public async initializeJobs(): Promise<void>
@@ -617,7 +611,7 @@ export class Scheduler
     const schedules: SchedulerConfig[] = await this.get() as SchedulerConfig[];
     for (const scheduleInd in schedules)
     {
-      if (schedules[scheduleInd].active !== undefined && schedules[scheduleInd].active === 1) // only start active schedules
+      if (schedules[scheduleInd].active === true) // only start active schedules
       {
         const schedule: SchedulerConfig = schedules[scheduleInd];
         const scheduleJobId: string = schedule['id'] !== undefined ? (schedule['id'] as number).toString() : '-1';
@@ -671,7 +665,7 @@ export class Scheduler
       if (schedules.length !== 0)
       {
         const schedule: SchedulerConfig = schedules[0];
-        schedule.currentlyRunning = status;
+        schedule.currentlyRunning = status === 1 ? true : false;
         return resolve(true);
       }
       return resolve(false);
@@ -722,12 +716,12 @@ export class Scheduler
         {
           for (const scheduleObj of schedules)
           {
-            if (scheduleObj.archived !== undefined && scheduleObj.archived === 1)
+            if (scheduleObj.archived === true)
             {
               return reject('Cannot upsert on an archived schedule.');
             }
             this.scheduleMap[(scheduleObj['id'] as number)].cancel();
-            if (scheduleObj.active === 1)
+            if (scheduleObj.active === true)
             {
               const resultJobId: string = schedule.id !== undefined ? (schedule['id'] as number).toString() : '-1';
               const appendedParamsArr: any[] = [schedule.paramsScheduleArr];
@@ -745,9 +739,12 @@ export class Scheduler
       }
       else
       {
-        schedule.active = schedule.active !== undefined ? schedule.active : 0;
-        schedule.archived = 0;
-        schedule.currentlyRunning = 0;
+        schedule.active = schedule.active !== undefined ? schedule.active : false;
+        schedule.archived = false;
+        schedule.currentlyRunning = false;
+
+        const results: SchedulerConfig[] = await this.get();
+        schedule.id = results.length + 1;
       }
       return resolve(await App.DB.upsert(this.schedulerTable, schedule) as SchedulerConfig[]);
     });

@@ -25,3 +25,4 @@ moviesdb.db
 build/
 package-lock.json
 yarn-error.log
+.cache

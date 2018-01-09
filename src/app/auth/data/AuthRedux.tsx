@@ -70,26 +70,26 @@ class AuthRedux extends TerrainRedux<AuthActionTypes, AuthState>
   public namespace: string = 'auth';
 
   public reducers: ConstrainedMap<AuthActionTypes, AuthState> =
-  {
-    login: (state, action) =>
     {
-      const { accessToken, id } = action.payload;
-      // store these values in localStorage so that the user is auto-logged in next time they visit
-      localStorage['accessToken'] = accessToken;
-      localStorage['id'] = id;
-      return state.set('accessToken', accessToken).set('id', +id);
-    },
-
-    logout: (state, action) =>
-    {
-      Ajax.logout((success) =>
+      login: (state, action) =>
       {
-        delete localStorage['accessToken'];
-        delete localStorage['id'];
-      });
-      return state.set('accessToken', null).set('id', null);
-    },
-  };
+        const { accessToken, id } = action.payload;
+        // store these values in localStorage so that the user is auto-logged in next time they visit
+        localStorage['accessToken'] = accessToken;
+        localStorage['id'] = id;
+        return state.set('accessToken', accessToken).set('id', +id);
+      },
+
+      logout: (state, action) =>
+      {
+        Ajax.logout((success) =>
+        {
+          delete localStorage['accessToken'];
+          delete localStorage['id'];
+        });
+        return state.set('accessToken', null).set('id', null);
+      },
+    };
 }
 
 const ReduxInstance = new AuthRedux();

@@ -306,22 +306,22 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       cards: List([]),
 
       static:
-      {
-        colors: getCardColors(clause.path[0], Colors().builder.cards.anyClause),
-        title: clause.type + ' (Variant)',
-        tql: (block, tqlFn, tqlConfig) =>
         {
-          return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
-        },
+          colors: getCardColors(clause.path[0], Colors().builder.cards.anyClause),
+          title: clause.type + ' (Variant)',
+          tql: (block, tqlFn, tqlConfig) =>
+          {
+            return tqlFn(block['cards'].get(0), tqlConfig); // straight pass-through
+          },
 
-        display:
-        {
-          displayType: DisplayType.CARDS,
-          key: 'cards',
-          singleChild: true,
+          display:
+            {
+              displayType: DisplayType.CARDS,
+              key: 'cards',
+              singleChild: true,
+            },
+          preview: '',
         },
-        preview: '',
-      },
     });
   }
 
@@ -332,62 +332,62 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       cards: List([]),
 
       static:
-      {
-        colors: getCardColors(clause.path[0], Colors().builder.cards.arrayClause),
-        preview: '[cards.size] ' + clause.type + '(s)',
-        accepts,
-        display:
         {
-          displayType: DisplayType.CARDS,
-          key: 'cards',
+          colors: getCardColors(clause.path[0], Colors().builder.cards.arrayClause),
+          preview: '[cards.size] ' + clause.type + '(s)',
           accepts,
-        },
-
-        init: (blocksConfig, extraConfig?, skipTemplate?) =>
-        {
-          const config = {};
-          let template;
-          if (extraConfig !== undefined && extraConfig.template)
-          {
-            template = extraConfig.template;
-          } else if (clause.template)
-          {
-            template = clause.template;
-          }
-
-          // template : [ card1, card2, ...]
-          const cards = _.compact(
-            _.map(
-              template,
-              (templateValue, templateIndex) =>
-              {
-                //                console.log("Array ->" + templateIndex + " : " + templateValue);
-                const cardTypeName = GetCardVisitor.getCardType(clause.elementID);
-                return BlockUtils.make(
-                  blocksConfig, cardTypeName,
-                  {
-                    key: String(templateIndex),
-                    template: templateValue,
-                  },
-                );
-              }));
-          config['cards'] = List(cards);
-          return config;
-        },
-
-        tql: (block, tqlFn, tqlConfig) =>
-        {
-          return block['cards'].map((card) =>
-          {
-            if (card.disabled)
+          display:
             {
-              return undefined;
+              displayType: DisplayType.CARDS,
+              key: 'cards',
+              accepts,
+            },
+
+          init: (blocksConfig, extraConfig?, skipTemplate?) =>
+          {
+            const config = {};
+            let template;
+            if (extraConfig !== undefined && extraConfig.template)
+            {
+              template = extraConfig.template;
+            } else if (clause.template)
+            {
+              template = clause.template;
             }
 
-            return tqlFn(card, tqlConfig);
-          }).toArray().filter((card) => (card !== undefined));
+            // template : [ card1, card2, ...]
+            const cards = _.compact(
+              _.map(
+                template,
+                (templateValue, templateIndex) =>
+                {
+                  //                console.log("Array ->" + templateIndex + " : " + templateValue);
+                  const cardTypeName = GetCardVisitor.getCardType(clause.elementID);
+                  return BlockUtils.make(
+                    blocksConfig, cardTypeName,
+                    {
+                      key: String(templateIndex),
+                      template: templateValue,
+                    },
+                  );
+                }));
+            config['cards'] = List(cards);
+            return config;
+          },
+
+          tql: (block, tqlFn, tqlConfig) =>
+          {
+            return block['cards'].map((card) =>
+            {
+              if (card.disabled)
+              {
+                return undefined;
+              }
+
+              return tqlFn(card, tqlConfig);
+            }).toArray().filter((card) => (card !== undefined));
+          },
         },
-      },
     });
   }
 
@@ -516,83 +516,83 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       // TODO incorporate nameType into the keys
 
       static:
-      {
-        colors: getCardColors(clause.path[0], Colors().builder.cards.mapClause),
-        preview: '[cards.size] properties',
-        display:
         {
-          displayType: DisplayType.CARDS,
-          key: 'cards',
-          accepts,
-        },
-        accepts,
-        init: (blocksConfig, extraConfig?, skipTemplate?) =>
-        {
-          let template;
-          if (extraConfig !== undefined && extraConfig.template !== undefined)
-          {
-            template = extraConfig.template;
-          } else if (clause.template)
-          {
-            template = clause.template;
-          }
-
-          if (template && skipTemplate !== true)
-          {
-            // create the card list from the template
-            const cards = _.compact(
-              _.map(
-                template,
-                (templateValue, templateKey) =>
-                {
-                  //              console.log(templateKey + ":" + templateValue);
-                  const cardKeyType = templateKey.toString().split(':');
-                  let cardTypeName = cardKeyType[1];
-                  if (!cardTypeName.startsWith('elastic'))
-                  {
-                    cardTypeName = GetCardVisitor.getCardType(cardKeyType[1]);
-                  }
-                  if (blocksConfig[cardTypeName] !== undefined)
-                  {
-                    return BlockUtils.make(
-                      blocksConfig, cardTypeName,
-                      {
-                        key: cardKeyType[0],
-                        template: templateValue,
-                        // value: templateValue === null ? undefined : templateValue,
-                        // all base cards have a 'value' key
-                      },
-                    );
-                  }
-                  else
-                  {
-                    console.log('No block for ' + String(templateKey), cardTypeName, templateValue);
-                  }
-                },
-              ),
-            );
-
-            return { cards: List(cards) };
-          }
-          return {};
-        },
-        tql: (block, tqlFn, tqlConfig) =>
-        {
-          const json = {};
-          block['cards'].map(
-            (card) =>
+          colors: getCardColors(clause.path[0], Colors().builder.cards.mapClause),
+          preview: '[cards.size] properties',
+          display:
             {
-              if (card.disabled)
-              {
-                return;
-              }
-
-              json[card['key']] = tqlFn(card, tqlConfig);
+              displayType: DisplayType.CARDS,
+              key: 'cards',
+              accepts,
             },
-          );
-          return json;
+          accepts,
+          init: (blocksConfig, extraConfig?, skipTemplate?) =>
+          {
+            let template;
+            if (extraConfig !== undefined && extraConfig.template !== undefined)
+            {
+              template = extraConfig.template;
+            } else if (clause.template)
+            {
+              template = clause.template;
+            }
+
+            if (template && skipTemplate !== true)
+            {
+              // create the card list from the template
+              const cards = _.compact(
+                _.map(
+                  template,
+                  (templateValue, templateKey) =>
+                  {
+                    //              console.log(templateKey + ":" + templateValue);
+                    const cardKeyType = templateKey.toString().split(':');
+                    let cardTypeName = cardKeyType[1];
+                    if (!cardTypeName.startsWith('elastic'))
+                    {
+                      cardTypeName = GetCardVisitor.getCardType(cardKeyType[1]);
+                    }
+                    if (blocksConfig[cardTypeName] !== undefined)
+                    {
+                      return BlockUtils.make(
+                        blocksConfig, cardTypeName,
+                        {
+                          key: cardKeyType[0],
+                          template: templateValue,
+                          // value: templateValue === null ? undefined : templateValue,
+                          // all base cards have a 'value' key
+                        },
+                      );
+                    }
+                    else
+                    {
+                      console.log('No block for ' + String(templateKey), cardTypeName, templateValue);
+                    }
+                  },
+                ),
+              );
+
+              return { cards: List(cards) };
+            }
+            return {};
+          },
+          tql: (block, tqlFn, tqlConfig) =>
+          {
+            const json = {};
+            block['cards'].map(
+              (card) =>
+              {
+                if (card.disabled)
+                {
+                  return;
+                }
+
+                json[card['key']] = tqlFn(card, tqlConfig);
+              },
+            );
+            return json;
+          },
         },
-      },
     });
   }
 
@@ -640,27 +640,27 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
       childrenHaveKeys: true,
 
       static:
-      {
-        colors: getCardColors(clause.path[0], Colors().builder.cards.objectClause),
-        preview: '[cards.size] properties',
-        display:
         {
-          displayType: DisplayType.CARDS,
-          key: 'cards',
-        },
-
-        tql: (block, tqlFn, tqlConfig) =>
-        {
-          const json = {};
-          block['cards'].map(
-            (card) =>
+          colors: getCardColors(clause.path[0], Colors().builder.cards.objectClause),
+          preview: '[cards.size] properties',
+          display:
             {
-              json[card['key']] = tqlFn(card, tqlConfig);
+              displayType: DisplayType.CARDS,
+              key: 'cards',
             },
-          );
-          return json;
+
+          tql: (block, tqlFn, tqlConfig) =>
+          {
+            const json = {};
+            block['cards'].map(
+              (card) =>
+              {
+                json[card['key']] = tqlFn(card, tqlConfig);
+              },
+            );
+            return json;
+          },
         },
-      },
     });
   }
 
@@ -847,46 +847,46 @@ export default class GetCardVisitor extends ESClauseVisitor<any>
         childrenHaveKeys: true,
 
         static:
-        {
-          tql: (block, tqlTranslationFn, tqlConfig) =>
           {
-            const json: object = {};
-            block['cards'].map(
-              (card) =>
-              {
-                if (card.disabled)
+            tql: (block, tqlTranslationFn, tqlConfig) =>
+            {
+              const json: object = {};
+              block['cards'].map(
+                (card) =>
                 {
-                  return;
-                }
+                  if (card.disabled)
+                  {
+                    return;
+                  }
 
-                _.extend(json, {
-                  [card['key']]: tqlTranslationFn(card, tqlConfig),
-                });
+                  _.extend(json, {
+                    [card['key']]: tqlTranslationFn(card, tqlConfig),
+                  });
+                },
+              );
+              return json;
+            },
+            colors: getCardColors(clause.path[0], Colors().builder.cards.structureClause),
+            preview: '[cards.size] Properties',
+
+            accepts,
+            init,
+
+            display: [
+              {
+                displayType: DisplayType.CARDS,
+                key: 'cards',
+                hideCreateCardTool: true,
               },
-            );
-            return json;
+              {
+                provideParentData: true, // need this to grey out the type dropdown
+                displayType: DisplayType.COMPONENT,
+                component: SpecializedCreateCardTool,
+                key: null,
+                // help: ManualConfig.help['score'],
+              },
+            ],
           },
-          colors: getCardColors(clause.path[0], Colors().builder.cards.structureClause),
-          preview: '[cards.size] Properties',
-
-          accepts,
-          init,
-
-          display: [
-            {
-              displayType: DisplayType.CARDS,
-              key: 'cards',
-              hideCreateCardTool: true,
-            },
-            {
-              provideParentData: true, // need this to grey out the type dropdown
-              displayType: DisplayType.COMPONENT,
-              component: SpecializedCreateCardTool,
-              key: null,
-              // help: ManualConfig.help['score'],
-            },
-          ],
-        },
       },
     );
   }

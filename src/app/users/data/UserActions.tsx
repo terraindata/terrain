@@ -57,43 +57,43 @@ const $ = (type: string, payload: any) =>
 const Actions =
   {
     change:
-    (user: UserTypes.User) =>
-      $(ActionTypes.change, { user }),
+      (user: UserTypes.User) =>
+        $(ActionTypes.change, { user }),
 
     fetch:
-    () => (dispatch) =>
-    {
-      dispatch($(ActionTypes.fetch, {}));
-      Ajax.getUsers((usersObj) =>
+      () => (dispatch) =>
       {
-        let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
-        _.map(usersObj, (userObj, userId) =>
+        dispatch($(ActionTypes.fetch, {}));
+        Ajax.getUsers((usersObj) =>
         {
-          users = users.set(
-            +userId,
-            UserTypes._User(userObj),
-          );
+          let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
+          _.map(usersObj, (userObj, userId) =>
+          {
+            users = users.set(
+              +userId,
+              UserTypes._User(userObj),
+            );
+          });
+          dispatch(Actions.setUsers(users));
         });
-        dispatch(Actions.setUsers(users));
-      });
-    },
+      },
 
     setUsers:
-    (users: UserTypes.UserMap) => (dispatch, getState) =>
-      dispatch($(ActionTypes.setUsers, { users, currentUserId: getState().get('auth').id })),
+      (users: UserTypes.UserMap) => (dispatch, getState) =>
+        dispatch($(ActionTypes.setUsers, { users, currentUserId: getState().get('auth').id })),
 
     updateCurrentUser:
-    () =>
-      (dispatch, getState) =>
-        $(ActionTypes.updateCurrentUser, { id: getState().get('auth').id }),
+      () =>
+        (dispatch, getState) =>
+          $(ActionTypes.updateCurrentUser, { id: getState().get('auth').id }),
 
     copmleteTutorial:
-    (stepId: string, complete: boolean = true) =>
-      $(ActionTypes.completeTutorial, { stepId, complete }),
+      (stepId: string, complete: boolean = true) =>
+        $(ActionTypes.completeTutorial, { stepId, complete }),
 
     changeType:
-    (type: string) =>
-      $(ActionTypes.changeType, { type }),
+      (type: string) =>
+        $(ActionTypes.changeType, { type }),
 
   };
 

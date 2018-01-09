@@ -55,89 +55,89 @@ export const Styles =
     margin: 6,
 
     colors:
-    {
-      text:
       {
-        light: '#aaa',
-        white: '#fff',
-        black: 'rgba(0,0,0,0.8)',
+        text:
+          {
+            light: '#aaa',
+            white: '#fff',
+            black: 'rgba(0,0,0,0.8)',
 
-        loading: '#aaa',
+            loading: '#aaa',
+          },
+
+        active,
+
+        transBlack: 'rgba(0,0,0,0.75)',
       },
-
-      active,
-
-      transBlack: 'rgba(0,0,0,0.75)',
-    },
 
     link:
-    {
-      'color': active,
-      'cursor': 'pointer',
-
-      ':hover':
       {
-        color: lighterActive,
+        'color': active,
+        'cursor': 'pointer',
+
+        ':hover':
+          {
+            color: lighterActive,
+          },
       },
-    },
 
     font:
-    {
-      title: {
-        fontWeight: 1000,
-        fontSize: '16px',
+      {
+        title: {
+          fontWeight: 1000,
+          fontSize: '16px',
+        },
+        semiBoldBig: {
+          fontWeight: 600,
+          fontSize: '14px',
+        },
+        big: {
+          fontWeight: 400,
+          fontSize: '14px',
+        },
+        boldNormal: {
+          fontWeight: 1000,
+          fontSize: '12px',
+        },
+        semiBoldNormal: {
+          fontWeight: 500,
+          fontSize: '12px',
+        },
+        normal: {
+          fontWeight: 400,
+          fontSize: '12px',
+        },
+        smallBold: {
+          fontWeight: 1000,
+          fontSize: '10px',
+        },
+        small: {
+          fontWeight: 400,
+          fontSize: '10px',
+        },
+        smallest: {
+          fontWeight: 400,
+          fontSize: '9px',
+        },
       },
-      semiBoldBig: {
-        fontWeight: 600,
-        fontSize: '14px',
-      },
-      big: {
-        fontWeight: 400,
-        fontSize: '14px',
-      },
-      boldNormal: {
-        fontWeight: 1000,
-        fontSize: '12px',
-      },
-      semiBoldNormal: {
-        fontWeight: 500,
-        fontSize: '12px',
-      },
-      normal: {
-        fontWeight: 400,
-        fontSize: '12px',
-      },
-      smallBold: {
-        fontWeight: 1000,
-        fontSize: '10px',
-      },
-      small: {
-        fontWeight: 400,
-        fontSize: '10px',
-      },
-      smallest: {
-        fontWeight: 400,
-        fontSize: '9px',
-      },
-    },
 
     rotate90neg:
-    {
-      MozTransform: 'rotate(-90deg)',
-      WebkitTransform: 'rotate(-90deg)',
-      OTransform: 'rotate(-90deg)',
-      msTransform: 'rotate(-90deg)',
-      transform: 'rotate(-90deg)',
-    },
+      {
+        MozTransform: 'rotate(-90deg)',
+        WebkitTransform: 'rotate(-90deg)',
+        OTransform: 'rotate(-90deg)',
+        msTransform: 'rotate(-90deg)',
+        transform: 'rotate(-90deg)',
+      },
 
     rotate90:
-    {
-      MozTransform: 'rotate(90deg)',
-      WebkitTransform: 'rotate(90deg)',
-      OTransform: 'rotate(90deg)',
-      msTransform: 'rotate(90deg)',
-      transform: 'rotate(90deg)',
-    },
+      {
+        MozTransform: 'rotate(90deg)',
+        WebkitTransform: 'rotate(90deg)',
+        OTransform: 'rotate(90deg)',
+        msTransform: 'rotate(90deg)',
+        transform: 'rotate(90deg)',
+      },
 
     rotate180: {
       MozTransform: 'rotate(180deg)',
@@ -148,10 +148,10 @@ export const Styles =
     },
 
     transition:
-    {
-      WebkitTransition: 'all 0.15s',
-      transition: 'all 0.15s',
-    },
+      {
+        WebkitTransition: 'all 0.15s',
+        transition: 'all 0.15s',
+      },
   };
 
 export default Styles;

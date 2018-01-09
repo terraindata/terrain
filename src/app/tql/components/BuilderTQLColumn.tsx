@@ -89,16 +89,16 @@ class BuilderTQLColumn extends TerrainComponent<Props>
     termDefinitionPos: any;
     resultsBarOpen: boolean;
   } = {
-    tql: this.props.query.tql,
-    runMode: 'auto',
-    highlightedLine: null,
-    syntaxHelpOpen: false,
-    syntaxHelpPos: {},
-    cardName: '',
-    termDefinitionOpen: false,
-    termDefinitionPos: {},
-    resultsBarOpen: false,
-  };
+      tql: this.props.query.tql,
+      runMode: 'auto',
+      highlightedLine: null,
+      syntaxHelpOpen: false,
+      syntaxHelpPos: {},
+      cardName: '',
+      termDefinitionOpen: false,
+      termDefinitionPos: {},
+      resultsBarOpen: false,
+    };
 
   constructor(props: Props)
   {

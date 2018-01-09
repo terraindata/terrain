@@ -67,12 +67,12 @@ class EasterEggs extends TerrainComponent<Props>
     w: number;
     h: number;
   } = {
-    christmas: false,
-    snow: null,
-    buckets: null,
-    w: 0,
-    h: 0,
-  };
+      christmas: false,
+      snow: null,
+      buckets: null,
+      w: 0,
+      h: 0,
+    };
 
   public componentDidMount()
   {

@@ -222,19 +222,19 @@ class TransportScheduler extends TerrainComponent<Props>
     cronParam3: string;
     cronParam4: string;
   } = {
-    index: this.props.index,
-    fileTypeIndex: 0,
-    credentialIndex: 0,
-    selectedIds: List([-1, -1, -1]),
-    objectKeyValue: '',
-    filenameValue: '',
-    scheduleNameValue: 'schedule 1',
-    cronParam0: defaultCRONparams[0],
-    cronParam1: defaultCRONparams[1],
-    cronParam2: defaultCRONparams[2],
-    cronParam3: defaultCRONparams[3],
-    cronParam4: defaultCRONparams[4],
-  };
+      index: this.props.index,
+      fileTypeIndex: 0,
+      credentialIndex: 0,
+      selectedIds: List([-1, -1, -1]),
+      objectKeyValue: '',
+      filenameValue: '',
+      scheduleNameValue: 'schedule 1',
+      cronParam0: defaultCRONparams[0],
+      cronParam1: defaultCRONparams[1],
+      cronParam2: defaultCRONparams[2],
+      cronParam3: defaultCRONparams[3],
+      cronParam4: defaultCRONparams[4],
+    };
 
   constructor(props)
   {

@@ -58,7 +58,8 @@
       }
     }
   },
-  "MySQL: execute simple query (select all)": [
+  "MySQL: execute simple query (select all)":
+  [
     {
       "backdroppath": "/dji4Fm0gCDVb9DQQMRvAI8YNnTz.jpg",
       "budget": 30000000,
