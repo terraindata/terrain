@@ -204,8 +204,6 @@ export class Credentials
       {
         cred.createdBy = user.id !== undefined ? user.id : -1;
         cred.meta = await this._encrypt(cred.meta);
-        const results: CredentialConfig[] = await this.get();
-        cred.id = results.length + 1;
       }
       let newCredObj: object = await App.DB.upsert(this.credentialTable, cred) as object;
 

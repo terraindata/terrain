@@ -127,11 +127,6 @@ export class Databases
         db = Util.updateObject(results[0], db);
       }
     }
-    else
-    {
-      const results: DatabaseConfig[] = await this.get();
-      db.id = results.length + 1;
-    }
 
     if (db.isAnalytics === undefined)
     {

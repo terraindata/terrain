@@ -266,11 +266,6 @@ export class Users
 
   public async upsert(newUser: UserConfig): Promise<UserConfig>
   {
-    if (newUser.id === undefined)
-    {
-      const results: UserConfig[] = await this.get();
-      newUser.id = results.length + 1;
-    }
     return App.DB.upsert(this.userTable, newUser) as Promise<UserConfig>;
   }
 

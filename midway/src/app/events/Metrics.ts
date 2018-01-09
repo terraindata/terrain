@@ -107,13 +107,6 @@ export class Metrics
     {
       throw new Error('Database, label and events fields are required to create a metric');
     }
-
-    if (metric.id === undefined)
-    {
-      const results: MetricConfig[] = await this.select(['id'], []);
-      metric.id = results.length + 1;
-    }
-
     return App.DB.upsert(this.metricsTable, metric) as Promise<MetricConfig>;
   }
 

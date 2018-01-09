@@ -164,11 +164,7 @@ export class ExportTemplates
 
         template = Util.updateObject(results[0], template);
       }
-      else
-      {
-        const results: ExportTemplateConfig[] = await this.select(['id'], []);
-        template.id = results.length + 1;
-      }
+
       if (template['persistentAccessToken'] === undefined || template['persistentAccessToken'] === '')
       {
         const persistentAccessToken = srs(

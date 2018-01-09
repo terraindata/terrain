@@ -159,11 +159,7 @@ export class ImportTemplates
 
         template = Util.updateObject(results[0], template);
       }
-      else
-      {
-        const results: ImportTemplateConfig[] = await this.select(['id'], []);
-        template.id = results.length + 1;
-      }
+
       if (template['persistentAccessToken'] === undefined || template['persistentAccessToken'] === '')
       {
         const persistentAccessToken = srs(
@@ -173,8 +169,10 @@ export class ImportTemplates
         );
         template['persistentAccessToken'] = persistentAccessToken;
       }
+
       const upserted: ImportTemplateBaseStringified =
         await App.DB.upsert(this.importTemplateTable, this._stringifyConfig(template)) as ImportTemplateBaseStringified;
+
       resolve(this._parseConfig(upserted) as ImportTemplateConfig);
     });
   }
