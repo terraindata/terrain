@@ -79,8 +79,8 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   public state: {
     expandableViewOpen: boolean;
   } = {
-    expandableViewOpen: true,
-  };
+      expandableViewOpen: true,
+    };
 
   public renderChildFields()
   {

@@ -85,7 +85,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   public render()
   {
     const { field } = this.props;
-    return <div/>;
+    return <div />;
   }
 }
 

@@ -93,44 +93,44 @@ export interface TemplateEditorActionTypes
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
 {
   public reducers: ConstrainedMap<TemplateEditorActionTypes, TemplateEditorState> =
-  {
-    loadTemplate: (state, action) =>
     {
-      return state.set('isDirty', false).
-        set('template', action.payload.template);
-    },
-    createField: (state, action) =>
-    {
-      const fieldKeyPath = List<string | number>(['template', 'rootField'])
-        .push(...action.payload.sourcePath.toJS());
-      const creatingField: TemplateField = state.getIn(fieldKeyPath);
-      const nextIndex = creatingField.children.size;
-      return state.set('isDirty', true).
-        setIn(fieldKeyPath.push('children', nextIndex), action.payload.field);
-    },
-    updateField: (state, action) =>
-    {
-      const keyPath = List<string | number>(['template', 'rootField'])
-        .push(...action.payload.sourcePath.toJS(), action.payload.key);
-      return state.set('isDirty', true).
-        setIn(keyPath, action.payload.value);
-    },
-    deleteField: (state, action) =>
-    {
-      const fieldKeyPath = List<string | number>(['template', 'rootField'])
-        .push(...action.payload.sourcePath.toJS());
-      return state.deleteIn(fieldKeyPath);
-    },
-    addModalConfirmation: (state, action) =>
-    {
-      return state.set('modalRequests',
-        MultiModal.addRequest(state.modalRequests, action.payload.props));
-    },
-    setModalRequests: (state, action) =>
-    {
-      return state.set('modalRequests', action.payload.requests);
-    },
-  };
+      loadTemplate: (state, action) =>
+      {
+        return state.set('isDirty', false).
+          set('template', action.payload.template);
+      },
+      createField: (state, action) =>
+      {
+        const fieldKeyPath = List<string | number>(['template', 'rootField'])
+          .push(...action.payload.sourcePath.toJS());
+        const creatingField: TemplateField = state.getIn(fieldKeyPath);
+        const nextIndex = creatingField.children.size;
+        return state.set('isDirty', true).
+          setIn(fieldKeyPath.push('children', nextIndex), action.payload.field);
+      },
+      updateField: (state, action) =>
+      {
+        const keyPath = List<string | number>(['template', 'rootField'])
+          .push(...action.payload.sourcePath.toJS(), action.payload.key);
+        return state.set('isDirty', true).
+          setIn(keyPath, action.payload.value);
+      },
+      deleteField: (state, action) =>
+      {
+        const fieldKeyPath = List<string | number>(['template', 'rootField'])
+          .push(...action.payload.sourcePath.toJS());
+        return state.deleteIn(fieldKeyPath);
+      },
+      addModalConfirmation: (state, action) =>
+      {
+        return state.set('modalRequests',
+          MultiModal.addRequest(state.modalRequests, action.payload.props));
+      },
+      setModalRequests: (state, action) =>
+      {
+        return state.set('modalRequests', action.payload.requests);
+      },
+    };
 }
 
 const ReduxInstance = new TemplateEditorActionsClass();

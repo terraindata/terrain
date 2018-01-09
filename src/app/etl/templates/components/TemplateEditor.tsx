@@ -129,7 +129,7 @@ const SampleDocument = {
     'Date Added': '01/08/2018',
   },
   'Here are some numbers': [
-    1, 2, 3.14, 4
+    1, 2, 3.14, 4,
   ],
 };
 
