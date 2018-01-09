@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import * as mysql from 'mysql';
 
-import SQLGenerator from '../../../tasty/SQLGenerator';
+import SQLGenerator from '../../../tasty/MySQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
@@ -172,9 +172,9 @@ export class MySQLDB implements TastyDB
     throw new Error('update() is currently only supported for Elastic databases.');
   }
 
-  private async getConnection(): Promise<mysql.IConnection>
+  private async getConnection(): Promise<mysql.Connection>
   {
-    return new Promise<mysql.IConnection>((resolve, reject) =>
+    return new Promise<mysql.Connection>((resolve, reject) =>
     {
       this.client.getConnection(makePromiseCallback(resolve, reject));
     });

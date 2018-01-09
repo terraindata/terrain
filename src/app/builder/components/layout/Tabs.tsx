@@ -71,14 +71,14 @@ const Tab = createReactClass<any, any>({
   mixins: [PanelMixin],
 
   propTypes:
-  {
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    selected: PropTypes.bool.isRequired,
-    index: PropTypes.number.isRequired,
-    onClick: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
-  },
+    {
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      selected: PropTypes.bool.isRequired,
+      index: PropTypes.number.isRequired,
+      onClick: PropTypes.func.isRequired,
+      onClose: PropTypes.func.isRequired,
+    },
 
   getDefaultProps(): any
   {
@@ -372,14 +372,14 @@ class Tabs extends TerrainComponent<TabsProps> {
           {
             key: tab.id,
             content:
-            <Tab
-              name={tab.name}
-              selected={tab.selected}
-              id={tab.id}
-              index={index}
-              onClick={this.handleClick}
-              onClose={this.handleClose}
-            />
+              <Tab
+                name={tab.name}
+                selected={tab.selected}
+                id={tab.id}
+                index={index}
+                onClick={this.handleClick}
+                onClose={this.handleClose}
+              />
             ,
           }))
           : [],

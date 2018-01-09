@@ -56,7 +56,6 @@ import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemType } from '../../items/types/Item';
 import Query from '../../items/types/Query';
 import Actions from './../auth/data/AuthActions';
-import AuthStore from './../auth/data/AuthStore';
 import * as LibraryTypes from './../library/LibraryTypes';
 import * as UserTypes from './../users/UserTypes';
 
@@ -90,10 +89,9 @@ export const Ajax =
       }
       else
       {
-        const authState = AuthStore.getState();
         data = {
-          id: authState.id,
-          accessToken: authState.accessToken,
+          id: localStorage['id'],
+          accessToken: localStorage['accessToken'],
           body,
         };
       }
@@ -157,8 +155,8 @@ export const Ajax =
         form.setAttribute('target', '_blank');
 
         // TODO move
-        const accessToken = AuthStore.getState().accessToken;
-        const id = AuthStore.getState().id;
+        const accessToken = localStorage['accessToken'];
+        const id = localStorage['id'];
         const dataObj = {
           id,
           accessToken,
@@ -830,12 +828,11 @@ export const Ajax =
     )
     {
       // TODO: call Ajax.req() instead with formData in body
-      const authState = AuthStore.getState();
 
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('id', String(authState.id));
-      formData.append('accessToken', authState.accessToken);
+      formData.append('id', String(localStorage['id']));
+      formData.append('accessToken', localStorage['accessToken']);
       formData.append('filetype', filetype);
       formData.append('dbname', dbname);
       formData.append('tablename', tablename);

@@ -131,8 +131,8 @@ class TQLEditor extends TerrainComponent<Props>
   public state: {
     codeMirrorInstance: Doc,
   } = {
-    codeMirrorInstance: undefined,
-  };
+      codeMirrorInstance: undefined,
+    };
 
   constructor(props: Props)
   {
@@ -265,7 +265,7 @@ class TQLEditor extends TerrainComponent<Props>
     }
     else
     {
-      options['mode'] = '';
+      options['mode'] = this.props.language;
     }
 
     let CM: any;

@@ -49,7 +49,8 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import * as Util from '../../Util';
-import { ExportTemplateConfig, ExportTemplates } from './ExportTemplates';
+import ExportTemplateConfig from './ExportTemplateConfig';
+import { ExportTemplates } from './ExportTemplates';
 
 const Router = new KoaRouter();
 export const exportTemplates = new ExportTemplates();

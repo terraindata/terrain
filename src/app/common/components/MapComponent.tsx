@@ -160,19 +160,19 @@ class MapComponent extends TerrainComponent<Props>
     zoom: number,
     focused: boolean,
   } = {
-    address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
-    searchByCoordinate: false,
-    error: null,
-    latitude: this.props.location !== undefined && this.props.location[0] !== undefined ? String(this.props.location[0]) : '',
-    longitude: this.props.location !== undefined && this.props.location[1] !== undefined ? String(this.props.location[1]) : '',
-    errorLatitude: false,
-    errorLongitude: false,
-    inputName: this.props.address !== undefined && this.props.address !== '' && this.props.address[0] === '@' ? this.props.address : '@',
-    usingInput: (this.props.address !== undefined && this.props.address !== ''
-      && this.props.address[0] === '@' && this.props.address !== '@'),
-    zoom: 15,
-    focused: false,
-  };
+      address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
+      searchByCoordinate: false,
+      error: null,
+      latitude: this.props.location !== undefined && this.props.location[0] !== undefined ? String(this.props.location[0]) : '',
+      longitude: this.props.location !== undefined && this.props.location[1] !== undefined ? String(this.props.location[1]) : '',
+      errorLatitude: false,
+      errorLongitude: false,
+      inputName: this.props.address !== undefined && this.props.address !== '' && this.props.address[0] === '@' ? this.props.address : '@',
+      usingInput: (this.props.address !== undefined && this.props.address !== ''
+        && this.props.address[0] === '@' && this.props.address !== '@'),
+      zoom: 15,
+      focused: false,
+    };
 
   public geoCache = {};
   public reverseGeoCache = {};

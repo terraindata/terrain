@@ -44,38 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires no-console
+import ConfigType from '../ConfigType';
 
-import * as _ from 'lodash';
-import * as ReduxActions from 'redux-actions';
-const Redux = require('redux');
-
-import AuthStore from './../../auth/data/AuthStore';
-
-import * as UserTypes from './../UserTypes';
-import ActionTypes from './UserActionTypes';
-import UserReducers from './UserReducers';
-
-const UserStore = Redux.createStore(UserReducers);
-
-UserStore.subscribe(() =>
+export class MetricConfig extends ConfigType
 {
-  const state = UserStore.getState();
-  if (state.getIn(['users', AuthStore.getState().id]) !== state.get('currentUser'))
+  public id?: number = undefined;
+  public database: number = -1;
+  public label: string = '';
+  public events: string = '';
+
+  constructor(props: object)
   {
-    // currentUser object changed
-    UserStore.dispatch({
-      type: ActionTypes.updateCurrentUser,
-      payload: {},
-    });
+    super();
+    ConfigType.initialize(this, props);
   }
-});
+}
 
-/*window['test'] = () =>
-{
-  const users = UserStore.getState().users;
-  console.log('users', users);
-  Ajax.saveUser(users.get(3).set('name', 'worked!'), () => console.log('a'), () => console.log('b'));
-};*/
-
-export default UserStore;
+export default MetricConfig;

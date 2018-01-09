@@ -58,10 +58,10 @@ const xes =
     //   component: XCards,
     // },
     multiSwitch:
-    {
-      name: 'Multi Switch Component',
-      component: MultiSwitchWrapper,
-    },
+      {
+        name: 'Multi Switch Component',
+        component: MultiSwitchWrapper,
+      },
   };
 
 export interface Props

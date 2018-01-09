@@ -71,14 +71,16 @@ export interface ColorsActionTypes
 
 class ColorsRedux extends TerrainRedux<ColorsActionTypes, ColorsState>
 {
+  public namespace: string = 'colors';
+
   public reducers: ConstrainedMap<ColorsActionTypes, ColorsState> =
-  {
-    setStyle: (state, action) =>
     {
-      const { selector, style } = action.payload;
-      return state.setIn(['styles', selector], style);
-    },
-  };
+      setStyle: (state, action) =>
+      {
+        const { selector, style } = action.payload;
+        return state.setIn(['styles', selector], style);
+      },
+    };
 }
 
 const ReduxInstance = new ColorsRedux();

@@ -57,13 +57,12 @@ import './BuilderColumn.less';
 import Menu from '../../common/components/Menu';
 import { MenuOption } from '../../common/components/Menu';
 import RolesStore from '../../roles/data/RolesStore';
-import UserStore from '../../users/data/UserStore';
-import Util from '../../util/Util';
 import PanelMixin from './layout/PanelMixin';
 const shallowCompare = require('react-addons-shallow-compare');
 import Query from '../../../items/types/Query';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import Util from 'util/Util';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import DragHandle from '../../common/components/DragHandle';
@@ -124,28 +123,28 @@ const BuilderColumn = createReactClass<any, any>(
     mixins: [PanelMixin],
 
     propTypes:
-    {
-      query: PropTypes.object.isRequired,
-      resultsState: PropTypes.object.isRequired,
-      exportState: PropTypes.object.isRequired,
-      algorithm: PropTypes.object.isRequired,
-      className: PropTypes.string,
-      index: PropTypes.number,
-      canAddColumn: PropTypes.bool,
-      canCloseColumn: PropTypes.bool,
-      onAddColumn: PropTypes.func.isRequired,
-      onAddManualColumn: PropTypes.func.isRequired,
-      onCloseColumn: PropTypes.func.isRequired,
-      colKey: PropTypes.number.isRequired,
-      history: PropTypes.any,
-      columnType: PropTypes.number,
-      selectedCardName: PropTypes.string,
-      switchToManualCol: PropTypes.func,
-      changeSelectedCardName: PropTypes.func,
-      canEdit: PropTypes.bool.isRequired,
-      cantEditReason: PropTypes.string,
-      onNavigationException: PropTypes.func,
-    },
+      {
+        query: PropTypes.object.isRequired,
+        resultsState: PropTypes.object.isRequired,
+        exportState: PropTypes.object.isRequired,
+        algorithm: PropTypes.object.isRequired,
+        className: PropTypes.string,
+        index: PropTypes.number,
+        canAddColumn: PropTypes.bool,
+        canCloseColumn: PropTypes.bool,
+        onAddColumn: PropTypes.func.isRequired,
+        onAddManualColumn: PropTypes.func.isRequired,
+        onCloseColumn: PropTypes.func.isRequired,
+        colKey: PropTypes.number.isRequired,
+        history: PropTypes.any,
+        columnType: PropTypes.number,
+        selectedCardName: PropTypes.string,
+        switchToManualCol: PropTypes.func,
+        changeSelectedCardName: PropTypes.func,
+        canEdit: PropTypes.bool.isRequired,
+        cantEditReason: PropTypes.string,
+        onNavigationException: PropTypes.func,
+      },
 
     getInitialState()
     {
@@ -180,7 +179,6 @@ const BuilderColumn = createReactClass<any, any>(
     {
       // TODO fix
       const rejigger = () => this.setState({ rand: Math.random() });
-      this.unsubUser = UserStore.subscribe(rejigger);
       this.unsubRoles = RolesStore.subscribe(rejigger);
 
       this.props.colorsActions({
@@ -200,9 +198,16 @@ const BuilderColumn = createReactClass<any, any>(
       });
     },
 
+    componentWillReceiveProps(nextProps)
+    {
+      if (this.props.users !== nextProps.users)
+      {
+        this.setState({ rand: Math.random() });
+      }
+    },
+
     componentWillUnmount()
     {
-      this.unsubUser && this.unsubUser();
       this.unsubRoles && this.unsubRoles();
     },
 
@@ -431,8 +436,8 @@ const BuilderColumn = createReactClass<any, any>(
               'builder-column-content': true,
               // 'builder-column-manual': this.state.column === COLUMNS.Manual,
               'builder-column-content-scroll':
-              this.state.column === COLUMNS.Cards ||
-              this.state.column === COLUMNS.Inputs,
+                this.state.column === COLUMNS.Cards ||
+                this.state.column === COLUMNS.Inputs,
             })}
             style={
               borderColor(Colors().stroke)
@@ -448,9 +453,9 @@ const BuilderColumn = createReactClass<any, any>(
   },
 );
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   BuilderColumn,
-  [],
+  ['auth'],
   {
     colorsActions: ColorsActions,
   },

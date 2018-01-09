@@ -75,19 +75,21 @@ export interface SpotlightActionTypes
 
 class SpotlightRedux extends TerrainRedux<SpotlightActionTypes, SpotlightState>
 {
+  public namespace: string = 'spotlight';
+
   public reducers: ConstrainedMap<SpotlightActionTypes, SpotlightState> =
-  {
-    spotlightAction: (state, action) =>
     {
-      const { id, hit } = action.payload;
-      return state.setIn(['spotlights', id], _.extend({}, hit, { id }));
-    },
-    clearSpotlightAction: (state, action) =>
-    {
-      const { id } = action.payload;
-      return state.removeIn(['spotlights', id]);
-    },
-  };
+      spotlightAction: (state, action) =>
+      {
+        const { id, hit } = action.payload;
+        return state.setIn(['spotlights', id], _.extend({}, hit, { id }));
+      },
+      clearSpotlightAction: (state, action) =>
+      {
+        const { id } = action.payload;
+        return state.removeIn(['spotlights', id]);
+      },
+    };
 }
 
 const ReduxInstance = new SpotlightRedux();

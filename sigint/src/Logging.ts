@@ -50,22 +50,22 @@ import * as winston from 'winston';
 winston.configure(
   {
     transports:
-    [
-      new (winston.transports.Console)(
-        {
-          formatter: (options) =>
+      [
+        new (winston.transports.Console)(
           {
-            const message: string = options.message;
-            const level = winston.config.colorize(options.level);
-            const meta = (options.meta !== undefined) && (Object.keys(options.meta).length > 0) ? '\n\t' + JSON.stringify(options.meta)
-              : '';
-            return `${options.timestamp()} [${process.pid}] ${level}: ${message} ${meta}`;
+            formatter: (options) =>
+            {
+              const message: string = options.message;
+              const level = winston.config.colorize(options.level);
+              const meta = (options.meta !== undefined) && (Object.keys(options.meta).length > 0) ? '\n\t' + JSON.stringify(options.meta)
+                : '';
+              return `${options.timestamp()} [${process.pid}] ${level}: ${message} ${meta}`;
+            },
+            timestamp: () =>
+            {
+              return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
+            },
           },
-          timestamp: () =>
-          {
-            return dateFormat('yyyy-MM-dd hh:mm:ss.SSS');
-          },
-        },
-      ),
-    ],
+        ),
+      ],
   });

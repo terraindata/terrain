@@ -81,12 +81,12 @@ class ImportExportControl extends TerrainComponent<Props>
     schedules: List<SchedulerConfig>;
     credentials: List<CredentialConfig>;
   } = {
-    servers: Map<string, Server>(),
-    importTemplates: List([]),
-    exportTemplates: List([]),
-    schedules: List([]),
-    credentials: List([]),
-  };
+      servers: Map<string, Server>(),
+      importTemplates: List([]),
+      exportTemplates: List([]),
+      schedules: List([]),
+      credentials: List([]),
+    };
 
   constructor(props)
   {

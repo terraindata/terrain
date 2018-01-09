@@ -114,6 +114,7 @@ export type ConstrainedMap<AllActionsT extends AllActionsType<AllActionsT>, S> =
 export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActionsT>, StateType>
 {
   public abstract reducers: ConstrainedMap<AllActionsT, StateType>;
+  public namespace: string = '';
 
   // child class should override this for special actions
   public overrideAct(action: Unroll<AllActionsT>): ActPayload<AllActionsT>
@@ -129,7 +130,7 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
     return (action: Unroll<AllActionsT>) =>
     {
       const payload = {
-        type: (action as any).actionType,
+        type: this.addNamespace((action as any).actionType),
         payload: action,
       };
       dispatch(payload);
@@ -144,7 +145,7 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
       return override;
     }
     return {
-      type: (action as any).actionType, // Can't seem to find a way around this type assertion
+      type: this.addNamespace((action as any).actionType), // Can't seem to find a way around this type assertion
       payload: action,
     };
   }
@@ -156,15 +157,27 @@ export abstract class TerrainRedux<AllActionsT extends AllActionsType<AllActions
 
   public _reducersForExport(_stateCreator): (state, action) => StateType
   {
+    const namespacedReducers = {};
+
+    Object.keys(this.reducers).forEach((reducerName) =>
+    {
+      namespacedReducers[this.addNamespace(reducerName)] = this.reducers[reducerName];
+    });
+
     return (state: StateType = _stateCreator(), action) =>
     {
       let nextState = state;
-      if (this.reducers[action.type])
+      if (namespacedReducers[action.type])
       {
-        nextState = this.reducers[action.type](state, action);
+        nextState = namespacedReducers[action.type](state, action);
       }
       return nextState;
     };
+  }
+
+  protected addNamespace(actionType)
+  {
+    return this.namespace !== '' ? `${this.namespace}.${actionType}` : actionType;
   }
 }
 

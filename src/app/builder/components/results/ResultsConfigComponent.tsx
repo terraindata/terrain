@@ -86,9 +86,9 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     lastHover: { index: number, field: string },
     config: ResultsConfig;
   } = {
-    lastHover: { index: null, field: null },
-    config: null,
-  };
+      lastHover: { index: null, field: null },
+      config: null,
+    };
 
   constructor(props: Props)
   {
@@ -437,8 +437,8 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
   public state: {
     showFormat: boolean;
   } = {
-    showFormat: false,
-  };
+      showFormat: false,
+    };
 
   public handleRemove()
   {
@@ -545,7 +545,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
         className={classNames({
           'results-config-field': true,
           'results-config-field-dragging': this.props.isDragging ||
-          (this.props.draggingField && this.props.draggingField === this.props.field),
+            (this.props.draggingField && this.props.draggingField === this.props.field),
           'results-config-field-name': this.props.is === 'name',
           'results-config-field-score': this.props.is === 'score',
           'results-config-field-field': this.props.is === 'field',

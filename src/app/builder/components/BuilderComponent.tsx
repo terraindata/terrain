@@ -90,11 +90,11 @@ export interface Props
 class BuilderComponent extends TerrainComponent<Props>
 {
   public state:
-  {
-    showExpanded: boolean,
-  } = {
-    showExpanded: false,
-  };
+    {
+      showExpanded: boolean,
+    } = {
+      showExpanded: false,
+    };
 
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {

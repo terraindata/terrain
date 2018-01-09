@@ -74,8 +74,8 @@ class CardsDeck extends TerrainComponent<Props>
   public state: {
     search: string;
   } = {
-    search: '',
-  };
+      search: '',
+    };
 
   public componentWillReceiveProps(nextProps: Props)
   {

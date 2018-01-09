@@ -55,11 +55,13 @@ import Query from '../../../items/types/Query';
 import MapUtil from '../../../../src/app/util/MapUtil';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
-import { Card } from '../../../blocks/types/Card';
+import { Card, Cards } from '../../../blocks/types/Card';
 import Blocks from '../blocks/ElasticBlocks';
 
+import ESBaseClause from '../../../../shared/database/elastic/parser/clauses/ESBaseClause';
 import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseType';
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
+import { FilterUtils } from '../blocks/ElasticFilterCard';
 import ESCardParser from './ESCardParser';
 
 const { make } = BlockUtils;
@@ -87,6 +89,18 @@ const UNIT_MAPPINGS = {
   'nautical miles': 'nmi',
 };
 
+export function ElasticValueInfoToCards(rootValueInfo: ESValueInfo, currentCards: Cards)
+{
+  const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'body');
+  const cards = BlockUtils.reconcileCards(currentCards, List([rootCard]));
+  return ESCardParser.parseAndUpdateCards(cards);
+}
+
+export const ElasticCustomCards: { [type: string]: any } =
+  {
+    eqlbool_query: FilterUtils.makeCustomFilterCard,
+  };
+
 export default function ElasticToCards(
   query: Query,
   queryReady: (query: Query) => void,
@@ -102,9 +116,7 @@ export default function ElasticToCards(
     try
     {
       const rootValueInfo = query.parseTree.parser.getValueInfo();
-      const rootCard = parseCardFromValueInfo(rootValueInfo).set('key', 'body');
-      let cards = BlockUtils.reconcileCards(query.cards, List([rootCard]));
-      cards = ESCardParser.parseAndUpdateCards(cards);
+      const cards = ElasticValueInfoToCards(rootValueInfo, query.cards);
       return query
         .set('cards', cards)
         .set('cardsAndCodeInSync', true);
@@ -118,7 +130,7 @@ export default function ElasticToCards(
   }
 }
 
-const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
+export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
 {
   if (!valueInfo)
   {
@@ -126,25 +138,7 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
   }
 
   const valueMap: { value?: any, cards?: List<Card> } = {};
-  if (isFilterCard(valueInfo))
-  {
-    let filters = [];
-    _.map(valueInfo.value, (value: any, key: string) =>
-    {
-      const fs = parseFilterBlock(key, value);
-      if (fs)
-      {
-        filters = filters.concat(fs);
-      }
-    });
-
-    return make(
-      Blocks, 'elasticFilter',
-      {
-        filters: List(filters),
-      }, true);
-  }
-  else if (isScoreCard(valueInfo))
+  if (isScoreCard(valueInfo))
   {
     const _scriptValueInfo = valueInfo.objectChildren._script.propertyValue;
     const scriptValueInfo = _scriptValueInfo && _scriptValueInfo.objectChildren.script.propertyValue;
@@ -229,7 +223,13 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
   const clauseCardType = 'eql' + valueInfo.clause.type;
   if (typeof valueInfo.value !== 'object')
   {
-    valueMap.value = valueInfo.value;
+    if (valueInfo.clause instanceof ESBaseClause)
+    {
+      valueMap.value = JSON.stringify(valueInfo.value);
+    } else
+    {
+      valueMap.value = String(valueInfo.value);
+    }
   }
 
   if (valueInfo.arrayChildren && valueInfo.arrayChildren.length)
@@ -253,7 +253,13 @@ const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       },
     ));
   }
-  return make(Blocks, clauseCardType, valueMap, true);
+  if (ElasticCustomCards[clauseCardType])
+  {
+    return ElasticCustomCards[clauseCardType](Blocks, clauseCardType, valueMap, true);
+  } else
+  {
+    return make(Blocks, clauseCardType, valueMap, true);
+  }
 };
 
 function isDistanceCard(valueInfo: ESValueInfo): boolean
@@ -303,63 +309,6 @@ const esFilterOperatorsMap = {
   term: '=',
   match: '≈',
 };
-
-function parseFilterBlock(boolQuery: string, filters: any): Block[]
-{
-  if (typeof filters !== 'object')
-  {
-    return [];
-  }
-
-  if (!Array.isArray(filters))
-  {
-    return parseFilterBlock(boolQuery, [filters]);
-  }
-
-  let filterBlocks = [];
-  filters.forEach((obj: object) =>
-  {
-    let field;
-    let filterOp;
-    let value;
-
-    if (obj['range'] !== undefined)
-    {
-      field = Object.keys(obj['range'])[0];
-      const filterOps = Object.keys(obj['range'][field]);
-      filterOp = filterOps[0];
-      value = obj['range'][field][filterOp];
-      if (filterOps.length > 1)
-      {
-        delete obj['range'][field][filterOp];
-        filterBlocks = filterBlocks.concat(parseFilterBlock(boolQuery, [obj]));
-      }
-      filterOp = esFilterOperatorsMap[filterOp];
-    }
-    else if (obj['term'] !== undefined)
-    {
-      field = Object.keys(obj['term'])[0];
-      filterOp = '=';
-      value = obj['term'][field];
-    }
-    else if (obj['match'] !== undefined)
-    {
-      field = Object.keys(obj['match'])[0];
-      filterOp = '≈';
-      value = obj['match'][field];
-    }
-
-    filterBlocks.push(
-      make(Blocks, 'elasticFilterBlock', {
-        field,
-        value,
-        boolQuery,
-        filterOp,
-      }, true),
-    );
-  });
-  return filterBlocks;
-}
 
 function isScoreCard(valueInfo: ESValueInfo): boolean
 {

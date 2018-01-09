@@ -57,82 +57,82 @@ const $ = (type: string, payload: any) => ControlStore.dispatch({ type, payload 
 const ControlActions =
   {
     importExport:
-    {
-      setTemplates:
-      (templates: List<Template>, exporting: boolean) =>
-        $(ActionTypes.importExport.setTemplates, { templates, exporting }),
+      {
+        setTemplates:
+          (templates: List<Template>, exporting: boolean) =>
+            $(ActionTypes.importExport.setTemplates, { templates, exporting }),
 
-      fetchTemplates:
-      (exporting: boolean) =>
-        $(ActionTypes.importExport.fetchTemplates, {
-          exporting,
-          setTemplates: ControlActions.importExport.setTemplates,
-        }),
+        fetchTemplates:
+          (exporting: boolean) =>
+            $(ActionTypes.importExport.fetchTemplates, {
+              exporting,
+              setTemplates: ControlActions.importExport.setTemplates,
+            }),
 
-      deleteTemplate:
-      (templateId: number, exporting: boolean, handleDeleteTemplateSuccess, handleDeleteTemplateError, templateName: string) =>
-        $(ActionTypes.importExport.deleteTemplate, {
-          templateId,
-          exporting,
-          handleDeleteTemplateSuccess,
-          handleDeleteTemplateError,
-          fetchTemplates: ControlActions.importExport.fetchTemplates,
-          templateName,
-        }),
+        deleteTemplate:
+          (templateId: number, exporting: boolean, handleDeleteTemplateSuccess, handleDeleteTemplateError, templateName: string) =>
+            $(ActionTypes.importExport.deleteTemplate, {
+              templateId,
+              exporting,
+              handleDeleteTemplateSuccess,
+              handleDeleteTemplateError,
+              fetchTemplates: ControlActions.importExport.fetchTemplates,
+              templateName,
+            }),
 
-      resetTemplateToken:
-      (templateId: number, exporting: boolean, handleResetSuccess, handleResetError) =>
-        $(ActionTypes.importExport.resetTemplateToken, {
-          templateId,
-          exporting,
-          handleResetSuccess,
-          handleResetError,
-          fetchTemplates: ControlActions.importExport.fetchTemplates,
-        }),
+        resetTemplateToken:
+          (templateId: number, exporting: boolean, handleResetSuccess, handleResetError) =>
+            $(ActionTypes.importExport.resetTemplateToken, {
+              templateId,
+              exporting,
+              handleResetSuccess,
+              handleResetError,
+              fetchTemplates: ControlActions.importExport.fetchTemplates,
+            }),
 
-      setSchedules:
-      (schedules: List<SchedulerConfig>) =>
-        $(ActionTypes.importExport.setSchedules, { schedules }),
+        setSchedules:
+          (schedules: List<SchedulerConfig>) =>
+            $(ActionTypes.importExport.setSchedules, { schedules }),
 
-      fetchSchedules:
-      () =>
-        $(ActionTypes.importExport.fetchSchedules, {
-          setSchedules: ControlActions.importExport.setSchedules,
-        }),
+        fetchSchedules:
+          () =>
+            $(ActionTypes.importExport.fetchSchedules, {
+              setSchedules: ControlActions.importExport.setSchedules,
+            }),
 
-      setCredentials:
-      (credentials: List<SchedulerConfig>) =>
-        $(ActionTypes.importExport.setCredentials, { credentials }),
+        setCredentials:
+          (credentials: List<SchedulerConfig>) =>
+            $(ActionTypes.importExport.setCredentials, { credentials }),
 
-      fetchCredentials:
-      () =>
-        $(ActionTypes.importExport.fetchCredentials, {
-          setCredentials: ControlActions.importExport.setCredentials,
-        }),
+        fetchCredentials:
+          () =>
+            $(ActionTypes.importExport.fetchCredentials, {
+              setCredentials: ControlActions.importExport.setCredentials,
+            }),
 
-      createSchedule:
-      (scheduleName: string, jobType: string, paramsJob: object, schedule: string, sort: string, transport: object, onLoad, onError) =>
-        $(ActionTypes.importExport.createSchedule, {
-          name: scheduleName,
-          jobType,
-          paramsJob,
-          schedule,
-          sort,
-          transport,
-          onLoad,
-          onError,
-          fetchSchedules: ControlActions.importExport.fetchSchedules,
-        }),
+        createSchedule:
+          (scheduleName: string, jobType: string, paramsJob: object, schedule: string, sort: string, transport: object, onLoad, onError) =>
+            $(ActionTypes.importExport.createSchedule, {
+              name: scheduleName,
+              jobType,
+              paramsJob,
+              schedule,
+              sort,
+              transport,
+              onLoad,
+              onError,
+              fetchSchedules: ControlActions.importExport.fetchSchedules,
+            }),
 
-      deleteSchedule:
-      (id: ID, onLoad, onError) =>
-        $(ActionTypes.importExport.deleteSchedule, {
-          id,
-          onLoad,
-          onError,
-          fetchSchedules: ControlActions.importExport.fetchSchedules,
-        }),
-    },
+        deleteSchedule:
+          (id: ID, onLoad, onError) =>
+            $(ActionTypes.importExport.deleteSchedule, {
+              id,
+              onLoad,
+              onError,
+              fetchSchedules: ControlActions.importExport.fetchSchedules,
+            }),
+      },
 
   };
 

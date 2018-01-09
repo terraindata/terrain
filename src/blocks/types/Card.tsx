@@ -97,6 +97,7 @@ export interface Card extends IRecord<Card>
   tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
   errors: List<string>;
   keyDisplayType: DisplayType;
+  hidden: boolean;
 
   // the following fields are excluded from the server save
   static: {
@@ -129,6 +130,8 @@ export interface Card extends IRecord<Card>
     //  receives the appropriate block spec as an argument, to avoid
     //  a circular dependency
     init?: InitFn;
+    // epilogueInit is called after the block is created but before returning the block.
+    epilogueInit?: (block: Block) => Block;
 
     // given a card, return the "terms" it generates for autocomplete
     // TODO schemaState type is : SchemaTypes.SchemaState
@@ -185,6 +188,7 @@ export interface CardConfig
     metaFields?: string[];
 
     init?: InitFn;
+    epilogueInit?: (card: Block) => Block;
   };
 }
 
@@ -199,6 +203,7 @@ export const _card = (config: CardConfig) =>
     id: '',
     errors: Immutable.List([]),
     keyDisplayType: DisplayType.TEXT,
+    hidden: false,
     _isCard: true,
     _isBlock: true,
     closed: false,
