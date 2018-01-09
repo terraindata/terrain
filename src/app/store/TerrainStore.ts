@@ -58,10 +58,12 @@ import { SchemaReducers } from 'schema/data/SchemaRedux';
 import { UserReducers } from 'users/data/UserRedux';
 import Ajax from 'util/Ajax';
 import { ColorsReducers } from '../colors/data/ColorsRedux';
+import BuilderReducers from 'builder/data/BuilderReducers';
 
 const reducers = {
   analytics: AnalyticsReducer,
   auth: AuthReducers,
+  builder: BuilderReducers,
   colors: ColorsReducers,
   library: LibraryReducer,
   roles: RolesReducer,

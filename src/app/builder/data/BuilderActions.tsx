@@ -51,7 +51,11 @@ import { CardItem } from '../components/cards/CardComponent';
 import ActionTypes from './BuilderActionTypes';
 import Store from './BuilderStore';
 
-const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
+const $ = (type: string, payload: any) =>
+{
+  Store.dispatch({ type, payload });
+  return { type, payload };
+}
 
 const BuilderActions =
   {
@@ -152,16 +156,5 @@ const BuilderActions =
           resultsState,
         }),
   };
-
-_.map(ActionTypes,
-  (type: string) =>
-  {
-    if (!BuilderActions[type])
-    {
-      const error = 'Missing Builder Action for Builder Action Type ' + type;
-      throw new Error(error);
-    }
-  },
-);
 
 export default BuilderActions;

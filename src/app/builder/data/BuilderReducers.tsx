@@ -57,21 +57,19 @@ import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
 import Actions from './BuilderActions';
+import {
+  BuilderDirtyActionTypes,
+  BuilderCardActionTypes
+} from './BuilderActionTypes';
 import ActionTypes from './BuilderActionTypes';
-import { BuilderState } from './BuilderStore';
+import { BuilderState, _BuilderState } from './BuilderStore';
+import { invert } from 'lodash';
+import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
 const { List, Map } = Immutable;
 
-const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
+const BuilderReducers =
   {
-
-    [ActionTypes.fetchQuery]: (state: BuilderState,
-      action: {
-        payload?: {
-          algorithmId: ID,
-          handleNoAlgorithm: (id: ID) => void,
-          db: BackendInstance,
-        },
-      }) =>
+    [ActionTypes.fetchQuery]: (state, action) =>
     {
       const { algorithmId, handleNoAlgorithm } = action.payload;
 
@@ -116,12 +114,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         .set('algorithmId', '');
     },
 
-    [ActionTypes.queryLoaded]: (state: BuilderState,
-      action: Action<{
-        query: Query,
-        xhr: XMLHttpRequest,
-        db: BackendInstance,
-      }>) =>
+    [ActionTypes.queryLoaded]: (state, action) =>
     {
       let { query } = action.payload;
       if (state.loadingXhr !== action.payload.xhr)
@@ -144,13 +137,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         ;
     },
 
-    [ActionTypes.change]: (state: BuilderState,
-      action: {
-        payload?: {
-          keyPath: KeyPath,
-          value: any,
-        },
-      }) =>
+    [ActionTypes.change]: (state, action) =>
     {
       return state.setIn(
         action.payload.keyPath,
@@ -159,23 +146,10 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 
     },
 
-    [ActionTypes.changeQuery]: (state: BuilderState,
-      action: {
-        payload?: {
-          query: Query,
-        },
-      }) =>
+    [ActionTypes.changeQuery]: (state, action) =>
       state.set('query', action.payload.query),
 
-    [ActionTypes.create]: (state: BuilderState,
-      action: {
-        payload?: {
-          keyPath: KeyPath,
-          index: number,
-          factoryType: string,
-          data: any,
-        },
-      }) =>
+    [ActionTypes.create]: (state, action) =>
       state.updateIn(
         action.payload.keyPath,
         (arr) =>
@@ -200,14 +174,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       )
     ,
 
-    [ActionTypes.move]: (state: BuilderState,
-      action: {
-        payload?: {
-          keyPath: KeyPath,
-          index: number,
-          newIndex; number
-        },
-      }) =>
+    [ActionTypes.move]: (state, action) =>
       state.updateIn(
         action.payload.keyPath,
         (arr) =>
@@ -222,9 +189,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 
     // first check original keypath
     [ActionTypes.nestedMove]: // a deep move
-      (state: BuilderState, action: {
-        payload?: { itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number },
-      }) =>
+      (state, action) =>
       {
         const { itemKeyPath, itemIndex, newKeyPath, newIndex } = action.payload;
 
@@ -281,9 +246,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         return state;
       },
 
-    [ActionTypes.remove]: (state: BuilderState, action: {
-      payload?: { keyPath: KeyPath, index: number },
-    }) =>
+    [ActionTypes.remove]: (state, action) =>
     {
       let { keyPath, index } = action.payload;
       if (index !== null)
@@ -298,10 +261,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     },
 
     // change handwritten tql
-    [ActionTypes.changeTQL]: (state: BuilderState,
-      action: Action<{
-        tql: string,
-      }>) =>
+    [ActionTypes.changeTQL]: (state, action) =>
     {
       // TODO MOD convert
       let { query } = state;
@@ -316,17 +276,11 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state;
     },
 
-    [ActionTypes.hoverCard]: (state: BuilderState, action: Action<{
-      cardId: ID,
-    }>) =>
+    [ActionTypes.hoverCard]: (state, action) =>
       state.set('hoveringCardId', action.payload.cardId),
     // if hovered over same card, will return original state object
 
-    [ActionTypes.selectCard]: (state: BuilderState, action: Action<{
-      cardId: ID,
-      shiftKey: boolean,
-      ctrlKey: boolean,
-    }>) =>
+    [ActionTypes.selectCard]: (state, action) =>
     {
       const { cardId, shiftKey, ctrlKey } = action.payload;
       if (!shiftKey && !ctrlKey)
@@ -341,15 +295,10 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state.setIn(['selectedCardIds', cardId], true);
     },
 
-    [ActionTypes.dragCard]: (state: BuilderState,
-      action: Action<{
-        cardItem: any,
-      }>) =>
+    [ActionTypes.dragCard]: (state, action) =>
       state.set('draggingCardItem', action.payload.cardItem),
 
-    [ActionTypes.dragCardOver]: (state: BuilderState, action: {
-      payload?: { keyPath: KeyPath, index: number },
-    }) =>
+    [ActionTypes.dragCardOver]: (state, action) =>
     {
       const { keyPath, index } = action.payload;
       return state
@@ -362,28 +311,21 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       .set('draggingOverIndex', null)
       .set('draggingCardItem', null),
 
-    [ActionTypes.toggleDeck]: (state: BuilderState, action) => state
+    [ActionTypes.toggleDeck]: (state, action) => state
       .setIn(['query', 'deckOpen'], action.payload.open),
 
-    [ActionTypes.changeResultsConfig]: (state: BuilderState,
-      action: Action<{
-        resultsConfig: any,
-      }>) =>
+    [ActionTypes.changeResultsConfig]: (state, action) =>
       state
         .update('query',
         (query) =>
           query.set('resultsConfig', action.payload.resultsConfig),
       ),
 
-    [ActionTypes.save]: (state: BuilderState,
-      action: Action<{
-        failed?: boolean,
-      }>) =>
+    [ActionTypes.save]: (state, action) =>
       state
         .set('isDirty', action.payload && action.payload.failed),
 
-    [ActionTypes.undo]: (state: BuilderState,
-      action: Action<{}>) =>
+    [ActionTypes.undo]: (state, action) =>
     {
       if (state.pastQueries.size)
       {
@@ -398,8 +340,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state;
     },
 
-    [ActionTypes.redo]: (state: BuilderState,
-      action: Action<{}>) =>
+    [ActionTypes.redo]: (state, action) =>
     {
       if (state.nextQueries.size)
       {
@@ -414,16 +355,12 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
       return state;
     },
 
-    [ActionTypes.checkpoint]: (state: BuilderState, action: Action<{}>) => state,
+    [ActionTypes.checkpoint]: (state, action) => state,
 
-    [ActionTypes.results]: (state: BuilderState,
-      action: Action<{ resultsState, exportState }>) =>
+    [ActionTypes.results]: (state, action) =>
       state.set('resultsState', action.payload.resultsState),
 
-    [ActionTypes.updateKeyPath]: (state: BuilderState, action: Action<{
-      id: ID,
-      keyPath: KeyPath,
-    }>) =>
+    [ActionTypes.updateKeyPath]: (state, action) =>
       state.setIn(['query', 'cardKeyPaths', action.payload.id], action.payload.keyPath),
   };
 
@@ -443,6 +380,74 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
   return state;
 }
 
-Util.assertKeysArePresent(ActionTypes, BuidlerReducers, 'Missing Builder Reducer for Builder Action Types: ');
+const BuilderReducersWrapper = (
+  state: BuilderState = _BuilderState(),
+  action: Action<{
+    keyPath: KeyPath;
+    notDirty: boolean;
+  }>,
+) =>
+{
+  if (BuilderDirtyActionTypes[action.type] && !action.payload.notDirty)
+  {
+    state = state
+      .set('isDirty', true);
 
-export default BuidlerReducers;
+    // back up for undo, check time to prevent overloading the undo stack
+    const time = (new Date()).getTime();
+    if (
+      action.type !== ActionTypes.change
+      || action.type !== state.lastActionType
+      || action.payload.keyPath !== state.lastActionKeyPath
+      || time - state.lastActionTime > 1500
+    )
+    {
+      state = state
+        .set('lastActionType', action.type)
+        .set('lastActionTime', time)
+        .set('lastActionKeyPath', action.payload.keyPath)
+        .set('pastQueries', state.pastQueries.unshift(state.query));
+    }
+
+    if (state.nextQueries.size)
+    {
+      state = state.set('nextQueries', Immutable.List([]));
+    }
+  }
+
+  if (typeof BuilderReducers[action.type] === 'function')
+  {
+    state = (BuilderReducers[action.type] as any)(state, action);
+  }
+
+  if (BuilderCardActionTypes[action.type])
+  {
+    // a card changed and we need to re-translate the tql
+    //  needs to be after the card change has affected the state
+    const newCards = ESCardParser.parseAndUpdateCards(state.query.cards);
+    state = state.setIn(['query', 'cards'], newCards);
+    state = state
+      .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));
+    state = state
+      .setIn(['query', 'parseTree'], AllBackendsMap[state.query.language].parseQuery(state.query))
+      .setIn(['query', 'lastMutation'], state.query.lastMutation + 1)
+      .setIn(['query', 'cardsAndCodeInSync'], true);
+  }
+
+  if (!state.modelVersion || state.modelVersion < 3)
+  {
+    state = state.set('modelVersion', 3);
+    state = state.set('algorithmId', (state as any).variantId);
+    state = state.set('loadingAlgorithmId', (state as any).loadingVariantId);
+  }
+
+  return state;
+}
+
+Util.assertKeysArePresent(
+  invert(ActionTypes),
+  BuilderReducers,
+  'Missing Builder Reducer for Builder Action Types: '
+);
+
+export default BuilderReducersWrapper;
