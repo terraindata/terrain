@@ -52,13 +52,14 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
-const { List } = Immutable;
+const { List, Map } = Immutable;
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import MapUtil from '../../../util/MapUtil';
-import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
+import { SpotlightActions } from '../../data/SpotlightRedux';
+import * as SpotlightTypes from '../../data/SpotlightTypes';
 import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
@@ -90,55 +91,55 @@ export interface Props
   connectDragPreview?: (a: any) => void;
 
   locations?: { [field: string]: any };
+
+  // injected props
+  spotlights?: SpotlightTypes.SpotlightState;
+  spotlightActions?: typeof SpotlightActions;
 }
 
 @Radium
 class HitComponent extends TerrainComponent<Props> {
+
   public state: {
-    isSpotlit: boolean;
-    spotlightColor: string;
-  } = {
-    isSpotlit: false,
-    spotlightColor: '',
-  };
+    // spotlights: IMMap<string, any>;
+  } =
+    {
+      // spotlights: SpotlightStore.getState().spotlights,
+    };
 
   public menuOptions =
-  [
-    List([
-      {
-        text: 'Spotlight',
-        onClick: this.spotlight,
-      },
-    ]),
+    [
+      List([
+        {
+          text: 'Spotlight',
+          onClick: this.spotlight,
+        },
+      ]),
 
-    List([
-      {
-        text: 'Un-Spotlight',
-        onClick: this.unspotlight,
-      },
-    ]),
-  ];
+      List([
+        {
+          text: 'Un-Spotlight',
+          onClick: this.unspotlight,
+        },
+      ]),
+    ];
+
+  public constructor(props: Props)
+  {
+    super(props);
+    // this._subscribe(SpotlightStore, {
+    //   isMounted: false,
+    //   storeKeyPath: ['spotlights'],
+    //   stateKey: 'spotlights',
+    // });
+  }
 
   public shouldComponentUpdate(nextProps: Props, nextState)
   {
-    const prevSpotlights = SpotlightStore.getState().spotlights;
     for (const key in nextProps)
     {
       if (key !== 'hit' && this.props[key] !== nextProps[key])
       {
-        if (prevSpotlights.get(nextProps.primaryKey))
-        {
-          this.setState({
-            isSpotlit: true,
-            spotlightColor: prevSpotlights.get(nextProps.primaryKey).color,
-          });
-        }
-        else
-        {
-          this.setState({
-            isSpotlit: false,
-          });
-        }
         return true;
       }
     }
@@ -168,7 +169,9 @@ class HitComponent extends TerrainComponent<Props> {
     {
       return null;
     }
-    const color = this.state.isSpotlit ? this.state.spotlightColor : 'black';
+    const spotlights = this.props.spotlights.spotlights;
+    const isSpotlit = spotlights.get(this.props.primaryKey);
+    const color = isSpotlit ? spotlights.get(this.props.primaryKey).color : 'black';
     const value = getResultValue(this.props.hit, field, this.props.resultsConfig,
       false, this.props.expanded, overrideFormat, this.props.locations, color);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
@@ -210,42 +213,42 @@ class HitComponent extends TerrainComponent<Props> {
   {
     const id = overrideId || this.props.primaryKey;
     const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
-    this.setState({
-      isSpotlit: true,
-      spotlightColor,
-    }, function()
-      {
-        const spotlightData = this.props.hit.toJS();
-        spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig,
-          this.props.expanded, this.props.locations, spotlightColor);
-        spotlightData['color'] = spotlightColor;
-        spotlightData['id'] = id;
-        spotlightData['rank'] = this.props.index;
-        spotlightAction(id, spotlightData);
-        this.props.onSpotlightAdded(id, spotlightData);
-      });
+    const spotlightData = this.props.hit.toJS();
+    spotlightData['name'] = getResultName(this.props.hit, this.props.resultsConfig,
+      this.props.expanded, this.props.locations, spotlightColor);
+    spotlightData['color'] = spotlightColor;
+    spotlightData['id'] = id;
+    spotlightData['rank'] = this.props.index;
+    this.props.spotlightActions({
+      actionType: 'spotlightAction',
+      id,
+      hit: spotlightData,
+    });
+    this.props.onSpotlightAdded(id, spotlightData);
   }
 
   public unspotlight()
   {
-    this.setState({
-      isSpotlit: false,
-    });
     this.props.onSpotlightRemoved(this.props.primaryKey);
-    spotlightAction(this.props.primaryKey, null);
+    this.props.spotlightActions({
+      actionType: 'clearSpotlightAction',
+      id: this.props.primaryKey,
+    });
   }
 
   public renderSpotlight()
   {
+    const spotlights = this.props.spotlights.spotlights;
+    const spotlight = spotlights.get(this.props.primaryKey);
     return (
       <div
         className={classNames({
           'result-spotlight': true,
-          'result-spotlight-lit': this.state.isSpotlit,
+          'result-spotlight-lit': spotlight !== undefined,
         })}
         style={{
-          background: this.state.isSpotlit ?
-            this.state.spotlightColor : 'transparent',
+          background: spotlight !== undefined ?
+            spotlight.color : 'transparent',
         }}
       >
         <div
@@ -289,7 +292,9 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
       );
     }
-    const color = this.state.isSpotlit ? this.state.spotlightColor : 'black';
+    const spotlights = this.props.spotlights.spotlights;
+    const spotlight = spotlights.get(this.props.primaryKey);
+    const color = spotlight ? spotlight.color : 'black';
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
     const fields = getResultFields(hit, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
@@ -364,7 +369,7 @@ class HitComponent extends TerrainComponent<Props> {
             this.props.allowSpotlights &&
             <Menu
               options={
-                this.menuOptions[this.state.isSpotlit ? 1 : 0]
+                this.menuOptions[spotlight ? 1 : 0]
               }
             />
           }
@@ -576,7 +581,11 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
   return value;
 }
 
-export default HitComponent;
+export default Util.createTypedContainer(
+  HitComponent,
+  ['spotlights'],
+  { spotlightActions: SpotlightActions },
+);
 
 // DnD stuff
 

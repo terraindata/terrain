@@ -46,15 +46,53 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
+// Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import * as Immutable from 'immutable';
+import { Map } from 'immutable';
 import * as _ from 'lodash';
-const Redux = require('redux');
 import * as ReduxActions from 'redux-actions';
-import * as AuthTypes from '../AuthTypes';
+const Redux = require('redux');
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
+import Util from 'app/util/Util';
+import thunk from 'redux-thunk';
+import { BaseClass, New } from '../../Classes';
+import { _SpotlightState, SpotlightState } from './SpotlightTypes';
 
-import AuthReducers from './AuthReducers';
+export interface SpotlightActionTypes
+{
+  spotlightAction: {
+    actionType: 'spotlightAction',
+    id: string,
+    hit: any,
+  };
+  clearSpotlightAction: {
+    actionType: 'clearSpotlightAction',
+    id: string,
+  };
+}
 
-const AuthStore: IStore<AuthTypes.AuthState> = Redux.createStore(ReduxActions.handleActions(_.extend({},
-  AuthReducers,
-  {}), AuthTypes._AuthState()), AuthTypes._AuthState());
+class SpotlightRedux extends TerrainRedux<SpotlightActionTypes, SpotlightState>
+{
+  public namespace: string = 'spotlight';
 
-export default AuthStore;
+  public reducers: ConstrainedMap<SpotlightActionTypes, SpotlightState> =
+    {
+      spotlightAction: (state, action) =>
+      {
+        const { id, hit } = action.payload;
+        return state.setIn(['spotlights', id], _.extend({}, hit, { id }));
+      },
+      clearSpotlightAction: (state, action) =>
+      {
+        const { id } = action.payload;
+        return state.removeIn(['spotlights', id]);
+      },
+    };
+}
+
+const ReduxInstance = new SpotlightRedux();
+export const SpotlightActions = ReduxInstance._actionsForExport();
+export const SpotlightReducers = ReduxInstance._reducersForExport(_SpotlightState);
+export declare type SpotlightActionType<K extends keyof SpotlightActionTypes> = GetType<K, SpotlightActionTypes>;

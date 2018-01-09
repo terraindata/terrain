@@ -47,9 +47,9 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import Ajax from 'util/Ajax';
 import { ItemStatus } from '../../../items/types/Item';
+import { _LibraryState, LibraryState } from '../LibraryTypes';
 import * as LibraryTypes from './../LibraryTypes';
 import ActionTypes, { CleanLibraryActionTypes, LibraryActionTypes } from './LibraryActionTypes';
-import { _LibraryState, LibraryState } from './LibraryStore';
 
 const LibraryReducers = {};
 

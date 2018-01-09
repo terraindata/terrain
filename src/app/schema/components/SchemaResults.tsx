@@ -66,12 +66,18 @@ import InfoArea from '../../common/components/InfoArea';
 export interface Props
 {
   servers: SchemaTypes.ServerMap;
-  schema: SchemaTypes.SchemaState;
+  // injected props
+  schema?: SchemaTypes.SchemaState;
 }
 
 @Radium
 class SchemaResults extends TerrainComponent<Props>
 {
+  public static showsResults(selectedItem: SchemaBaseClass): boolean
+  {
+    return selectedItem && selectedItem.type !== 'index';
+  }
+
   public state: {
     initialized?: boolean,
     selectedId?: ID,
@@ -83,9 +89,9 @@ class SchemaResults extends TerrainComponent<Props>
     resultsServer?: BackendInstance;
     resultsErrorMessage?: string;
   } = {
-    initialized: false,
-    resultsState: _ResultsState(),
-  };
+      initialized: false,
+      resultsState: _ResultsState(),
+    };
 
   public componentWillReceiveProps(nextProps: Props)
   {
@@ -113,7 +119,7 @@ class SchemaResults extends TerrainComponent<Props>
         selectedItem,
       });
 
-      if (this.showsResults(selectedItem))
+      if (SchemaResults.showsResults(selectedItem))
       {
         const resultsServer: SchemaTypes.Server =
           selectedItem['type'] === 'server' ? selectedItem :
@@ -206,11 +212,6 @@ class SchemaResults extends TerrainComponent<Props>
     }
   }
 
-  public showsResults(selectedItem: SchemaBaseClass): boolean
-  {
-    return selectedItem && selectedItem.type !== 'index';
-  }
-
   public handleResultsStateChange(resultsState: ResultsState)
   {
     this.setState({
@@ -229,7 +230,7 @@ class SchemaResults extends TerrainComponent<Props>
         }}
       >
         {
-          this.showsResults(this.state.selectedItem) ?
+          SchemaResults.showsResults(this.state.selectedItem) ?
             <div
               style={{
                 paddingRight: 6,
@@ -267,7 +268,7 @@ class SchemaResults extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaResults,
   ['schema'],
   {},

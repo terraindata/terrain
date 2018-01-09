@@ -50,7 +50,8 @@ import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
-import ColorsActions from '../../colors/data/ColorsActions';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
+import Util from '../../util/Util';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './TemplateList.less';
@@ -60,6 +61,7 @@ const TrashIcon = require('./../../../images/icon_trash.svg');
 export interface Props
 {
   items: List<string>;
+  colorsActions: typeof ColorsActions;
   title?: string;
   onDelete?: (index: number) => void;
   onSelectOption?: () => void;
@@ -76,16 +78,19 @@ class TemplateList extends TerrainComponent<Props>
     deleteIndex: number,
     errorMsg: string,
   } = {
-    selectedIndex: -1,
-    modalOpen: false,
-    deleteIndex: -1,
-    errorMsg: '',
-  };
+      selectedIndex: -1,
+      modalOpen: false,
+      deleteIndex: -1,
+      errorMsg: '',
+    };
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.list-items-item-wrapper .st1', { fill: Colors().text3 });
-
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.list-items-item-wrapper .st1',
+      style: { fill: Colors().text3 },
+    });
   }
 
   public setErrorMsg(errorMsg: string)
@@ -261,4 +266,10 @@ class TemplateList extends TerrainComponent<Props>
   }
 }
 
-export default TemplateList;
+export default Util.createContainer(
+  TemplateList,
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);

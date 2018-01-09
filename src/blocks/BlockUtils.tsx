@@ -48,14 +48,14 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
-const { Map, List } = Immutable;
 
 import { Block, BlockConfig } from './types/Block';
 import { Card, Cards } from './types/Card';
 
 import { DisplayType } from './displays/Display';
-
 // import { AllBackendsMap } from '../database/AllBackends';
+
+const { List, Map } = Immutable;
 
 export function getChildIds(_block: Block): IMMap<ID, boolean>
 {
@@ -182,6 +182,10 @@ export const make = (blocksConfig: { [type: string]: BlockConfig },
   {
     theBlock = theBlock.set('static', _.cloneDeep(theBlock.static));
   }
+  if (skipTemplate !== true && theBlock.static.epilogueInit)
+  {
+    theBlock = theBlock.static.epilogueInit(theBlock);
+  }
   return theBlock;
 };
 
@@ -217,7 +221,7 @@ export const recordFromJS = (value: any, Blocks: { [type: string]: BlockConfig }
     const type = value.type || (typeof value.get === 'function' && value.get('type'));
     if (type && Blocks[type])
     {
-      value = make(Blocks, type, value);
+      value = make(Blocks, type, value, true);
     }
     else
     {

@@ -47,13 +47,14 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
 import { notificationManager } from 'common/components/InAppNotification';
 import { Menu, MenuOption } from 'common/components/Menu';
 import Modal from 'common/components/Modal';
+import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
@@ -75,8 +76,6 @@ const ScheduleIcon = require('images/icon_dateDropdown.svg');
 const AccessIcon = require('images/icon_key-1.svg');
 const ViewIcon = require('images/icon_search.svg');
 
-const { List } = Immutable;
-
 type Template = FileImportTypes.Template;
 
 export interface Props
@@ -95,10 +94,6 @@ enum ConfirmActionType
 class TemplateControlList extends TerrainComponent<Props>
 {
   public state: {
-    responseModalOpen: boolean;
-    responseModalMessage: string;
-    responseModalTitle: string;
-    responseModalIsError: boolean;
     confirmModalOpen: boolean;
     confirmModalMessage: string;
     confirmModalTitle: string;
@@ -108,36 +103,42 @@ class TemplateControlList extends TerrainComponent<Props>
     currentActiveIndex: number;
     headlessModalOpen: boolean;
     schedulerModalOpen: boolean;
+    modalRequests: List<ModalProps>;
   } = {
-    responseModalOpen: false,
-    responseModalMessage: '',
-    responseModalTitle: '',
-    responseModalIsError: false,
-    confirmModalOpen: false,
-    confirmModalMessage: '',
-    confirmModalTitle: '',
-    confirmModalIsError: false,
-    confirmModalType: ConfirmActionType.DELETE,
-    currentActiveTemplate: undefined,
-    currentActiveIndex: -1,
-    headlessModalOpen: false,
-    schedulerModalOpen: false,
-  };
+      confirmModalOpen: false,
+      confirmModalMessage: '',
+      confirmModalTitle: '',
+      confirmModalIsError: false,
+      confirmModalType: ConfirmActionType.DELETE,
+      currentActiveTemplate: undefined,
+      currentActiveIndex: -1,
+      headlessModalOpen: false,
+      schedulerModalOpen: false,
+      modalRequests: List([]),
+    };
 
   public templateConfig: HeaderConfig =
-  [
-    ['ID', (template, index) => template.templateId],
-    ['Name', (template, index) => template.templateName],
-    ['Template Type', (template, index) => template.export ? 'Export' : 'Import'],
-    ['Server Name', (template, index) => this.getServerName(template.dbid)],
-    ['ES Index', (template, index) => template.dbname],
-    ['ES Type', (template, index) => template.tablename],
-    ['Access Token', (template, index) =>
-      <div className='access-token-cell'>
-        {template.persistentAccessToken}
-      </div>,
-    ],
-  ];
+    [
+      ['ID', (template, index) => template.templateId],
+      ['Name', (template, index) => template.templateName],
+      ['Template Type', (template, index) => template.export ? 'Export' : 'Import'],
+      ['Server Name', (template, index) => this.getServerName(template.dbid)],
+      ['ES Index', (template, index) => template.dbname],
+      ['ES Type', (template, index) => template.tablename],
+      ['Access Token', (template, index) =>
+        <div className='access-token-cell'>
+          {template.persistentAccessToken}
+        </div>,
+      ],
+    ];
+
+  public requestModal(newRequest: ModalProps)
+  {
+    const modalRequests = MultiModal.addRequest(this.state.modalRequests, newRequest);
+    this.setState({
+      modalRequests,
+    });
+  }
 
   public getOptions(template: Template, index: number)
   {
@@ -152,12 +153,12 @@ class TemplateControlList extends TerrainComponent<Props>
         text: `Headless ${typeText}`,
         onClick: () => this.requestCreateHeadless(template, index),
         icon:
-        <ImportIcon
-          className={classNames({
-            'template-menu-option-icon': true,
-            'template-icon-export': template.export,
-          })}
-        />,
+          <ImportIcon
+            className={classNames({
+              'template-menu-option-icon': true,
+              'template-icon-export': template.export,
+            })}
+          />,
       },
       {
         text: `Schedule ${typeText}`,
@@ -247,13 +248,22 @@ class TemplateControlList extends TerrainComponent<Props>
 
   public handleDeleteTemplateError(error: string)
   {
-    const readable = MidwayError.fromJSON(error).getDetail();
-    this.setState({
-      responseModalOpen: true,
-      responseModalMessage: `Error deleting template: ${readable}`,
-      responseModalTitle: 'Error',
-      responseModalIsError: true,
+    let readable = error;
+    try
+    {
+      readable = MidwayError.fromJSON(error).getDetail();
+    }
+    catch (e)
+    {
+      readable = `Unknown Error: ${e}`;
+    }
+
+    this.requestModal({
+      title: 'Error',
+      message: `Error deleting template: ${readable}`,
+      error: true,
     });
+
   }
 
   public handleScheduleSuccess()
@@ -263,12 +273,20 @@ class TemplateControlList extends TerrainComponent<Props>
 
   public handleScheduleError(error: string)
   {
-    const readable = MidwayError.fromJSON(error).getDetail();
-    this.setState({
-      responseModalOpen: true,
-      responseModalMessage: `Error creating schedule: ${readable}`,
-      responseModalTitle: 'Error',
-      responseModalIsError: true,
+    let readable = error;
+    try
+    {
+      readable = MidwayError.fromJSON(error).getDetail();
+    }
+    catch (e)
+    {
+      readable = `Unknown Error: ${e}`;
+    }
+
+    this.requestModal({
+      title: 'Error',
+      message: `Error creating schedule: ${readable}`,
+      error: true,
     });
   }
 
@@ -279,12 +297,19 @@ class TemplateControlList extends TerrainComponent<Props>
 
   public handleResetTemplateTokenError(error: string)
   {
-    const readable = MidwayError.fromJSON(error).getDetail();
-    this.setState({
-      responseModalOpen: true,
-      responseModalMessage: `Error resetting access token: ${readable}`,
-      responseModalTitle: 'Error',
-      responseModalIsError: true,
+    let readable = error;
+    try
+    {
+      readable = MidwayError.fromJSON(error).getDetail();
+    }
+    catch (e)
+    {
+      readable = `Unknown Error: ${e}`;
+    }
+    this.requestModal({
+      message: `Error resetting access token: ${readable}`,
+      title: 'Error',
+      error: true,
     });
   }
 
@@ -305,13 +330,6 @@ class TemplateControlList extends TerrainComponent<Props>
   {
     this.setState({
       confirmModalOpen: false,
-    });
-  }
-
-  public responseCloseModal()
-  {
-    this.setState({
-      responseModalOpen: false,
     });
   }
 
@@ -356,14 +374,9 @@ class TemplateControlList extends TerrainComponent<Props>
           />
         }
         {
-          this.state.responseModalOpen &&
-          <Modal
-            open={this.state.responseModalOpen}
-            message={this.state.responseModalMessage}
-            title={this.state.responseModalTitle}
-            error={this.state.responseModalIsError}
-            onClose={this.responseCloseModal}
-            confirm={false}
+          <MultiModal
+            requests={this.state.modalRequests}
+            setRequests={this._setStateWrapper('modalRequests')}
           />
         }
         {

@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 import Dropdown from './../../common/components/Dropdown';
@@ -54,7 +54,6 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './TypeDropdown.less';
-const { List } = Immutable;
 
 type ColumnTypesTree = FileImportTypes.ColumnTypesTree;
 const ELASTIC_TYPES = List(FileImportTypes.ELASTIC_TYPES);

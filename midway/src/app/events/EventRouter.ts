@@ -46,7 +46,6 @@ THE SOFTWARE.
 
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
-import * as _ from 'lodash';
 import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';

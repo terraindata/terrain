@@ -84,8 +84,8 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
   public state: {
     localColumnName: string;
   } = {
-    localColumnName: this.props.columnName,
-  };
+      localColumnName: this.props.columnName,
+    };
 
   public handleIncludedChange()
   {
@@ -198,6 +198,7 @@ class FileImportPreviewColumn extends TerrainComponent<Props>
           <Autocomplete
             value={this.state.localColumnName}
             options={this.props.columnOptions}
+            onChange={this.handleLocalColumnNameChange}
             placeholder={''}
             disabled={false}
             onEnter={this.handleRename}

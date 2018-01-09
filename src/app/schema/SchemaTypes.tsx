@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
-import { BaseClass, New } from '../Classes';
+import { BaseClass, makeConstructor, New, WithIRecord } from '../Classes';
 
 type stringList = string[] | List<string>;
 
@@ -83,9 +83,8 @@ class SchemaStateC
   public tableNamesByDb: TableNamesByDb = Map<string, List<string>>();
   public columnNamesByDb: ColumnNamesByDb = Map<string, IMMap<string, List<string>>>();
 }
-export type SchemaState = SchemaStateC & IRecord<SchemaStateC>;
-export const _SchemaState = (config?: { [key: string]: any }) =>
-  New<SchemaState>(new SchemaStateC(), config);
+export type SchemaState = WithIRecord<SchemaStateC>;
+export const _SchemaState = makeConstructor(SchemaStateC);
 
 export function serverId(serverName: string)
 {
@@ -197,6 +196,8 @@ class ColumnC extends SchemaBaseClass
   public defaultValue = '';
   public isNullable = false;
   public isPrimaryKey = false;
+
+  public sampleData: List<any> = List();
 }
 export type Column = ColumnC & IRecord<ColumnC>;
 export const _Column = (config: {
@@ -325,25 +326,27 @@ export type ISchemaTreeChildrenConfig = [
 
 export type TableNamesByDb = IMMap<string, List<string>>;
 export type ColumnNamesByDb = IMMap<string, IMMap<string, List<string>>>;
-export interface SetServerActionPayload
-{
-  server: Server;
-  databases: IMMap<string, Database>;
-  tables: IMMap<string, Table>;
-  columns: IMMap<string, Column>;
-  indexes: IMMap<string, Index>;
-  fieldProperties: IMMap<string, FieldProperty>;
-  columnNames: IMMap<string, List<string>>;
-  tableNames: List<string>;
-}
-export interface AddDbToServerActionPayload
-{
-  server: Server;
-  databases: IMMap<string, Database>;
-  tables: IMMap<string, Table>;
-  columns: IMMap<string, Column>;
-  indexes: IMMap<string, Index>;
-  fieldProperties: IMMap<string, FieldProperty>;
-  columnNames: IMMap<string, List<string>>;
-  tableNames: List<string>;
-}
+
+// these are needed for parseMySqlDbs which are not supported
+// export interface SetServerActionPayload
+// {
+//   server: Server;
+//   databases: IMMap<string, Database>;
+//   tables: IMMap<string, Table>;
+//   columns: IMMap<string, Column>;
+//   indexes: IMMap<string, Index>;
+//   fieldProperties: IMMap<string, FieldProperty>;
+//   columnNames: IMMap<string, List<string>>;
+//   tableNames: List<string>;
+// }
+// export interface AddDbToServerActionPayload
+// {
+//   server: Server;
+//   databases: IMMap<string, Database>;
+//   tables: IMMap<string, Table>;
+//   columns: IMMap<string, Column>;
+//   indexes: IMMap<string, Index>;
+//   fieldProperties: IMMap<string, FieldProperty>;
+//   columnNames: IMMap<string, List<string>>;
+//   tableNames: List<string>;
+// }

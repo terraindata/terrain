@@ -51,24 +51,25 @@ import * as React from 'react';
 const moment = require('moment');
 
 import * as Immutable from 'immutable';
-import { uniq } from 'lodash';
+import * as _ from 'lodash';
 
 import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import { browserHistory } from 'react-router';
+import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import { Colors, fontColor } from '../../colors/Colors';
 import CreateLine from '../../common/components/CreateLine';
 import Modal from '../../common/components/Modal';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
-import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import Dropdown from './../../common/components/Dropdown';
 import { notificationManager } from './../../common/components/InAppNotification';
 import InfoArea from './../../common/components/InfoArea';
+import Scoreline from './../../common/components/Scoreline';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import * as LibraryTypes from './../LibraryTypes';
@@ -79,18 +80,19 @@ import StatusDropdown from './StatusDropdown';
 
 const AlgorithmIcon = require('./../../../images/icon_variant_15x17.svg?name=AlgorithmIcon');
 
-type Algorithm = LibraryTypes.Algorithm;
+type Category = LibraryTypes.Category;
 type Group = LibraryTypes.Group;
+type Algorithm = LibraryTypes.Algorithm;
 
 export interface Props
 {
   basePath: string;
+  groups: Immutable.Map<ID, Group>;
   algorithms: Immutable.Map<ID, Algorithm>;
   selectedAlgorithm: ID;
   algorithmsOrder: Immutable.List<ID>;
   categoryId: ID;
   groupId: ID;
-  groups: Immutable.Map<ID, Group>;
   canPinItems: boolean;
   params?: any;
   algorithmActions?: any;
@@ -98,26 +100,28 @@ export interface Props
   analyticsActions?: any;
   router?: any;
   referrer?: { label: string, path: string };
+  users?: UserTypes.UserState;
 }
 
-class AlgorithmsColumn extends TerrainComponent<Props>
+export interface State
 {
-  public state: {
-    rendered: boolean,
-    lastMoved: any,
-    me: UserTypes.User,
-    roles: RoleTypes.RoleMap,
-    draggingItemIndex: number;
-    draggingOverIndex: number;
+  rendered: boolean;
+  lastMoved: any;
+  roles: RoleTypes.RoleMap;
+  draggingItemIndex: number;
+  draggingOverIndex: number;
 
-    duplicatingAlgorithm: boolean;
-    duplicateAlgorithmTextboxValue: string;
-    duplicateAlgorithmGroupIndex: number;
-    duplicateAlgorithmId: ID;
-  } = {
+  duplicatingAlgorithm: boolean;
+  duplicateAlgorithmTextboxValue: string;
+  duplicateAlgorithmGroupIndex: number;
+  duplicateAlgorithmId: ID;
+}
+
+export class AlgorithmsColumn extends TerrainComponent<Props>
+{
+  public state: State = {
     rendered: false,
     lastMoved: null,
-    me: null,
     roles: null,
     draggingItemIndex: -1,
     draggingOverIndex: -1,
@@ -157,18 +161,13 @@ class AlgorithmsColumn extends TerrainComponent<Props>
     {
       this.props.analyticsActions.fetch(
         analytics.selectedAnalyticsConnection,
-        uniq(algorithmIds),
+        _.uniq(algorithmIds),
         analytics.selectedMetric,
         analytics.selectedInterval,
         analytics.selectedDateRange,
       );
     }
 
-    this._subscribe(UserStore, {
-      stateKey: 'me',
-      storeKeyPath: ['currentUser'],
-      isMounted: true,
-    });
     this._subscribe(RolesStore, {
       stateKey: 'roles',
       isMounted: true,
@@ -397,6 +396,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
           this.props.groupId,
         );
         break;
+      case 'variant':
+        // no good
+        break;
     }
   }
 
@@ -502,11 +504,18 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderAlgorithm(id: ID, fadeIndex: number)
   {
-    const { canPinItems, params, basePath, analytics } = this.props;
+    const {
+      canPinItems,
+      params,
+      basePath,
+      analytics,
+      users,
+    } = this.props;
+    const { currentUser: me } = users;
     const currentAlgorithmId = params.algorithmId;
     const algorithm = this.props.algorithms.get(id);
     const index = this.props.algorithmsOrder.indexOf(id);
-    const { me, roles } = this.state;
+    const { roles } = this.state;
     let canEdit: boolean;
     let canDrag: boolean;
     canEdit = true;
@@ -631,7 +640,9 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public renderAlgorithms(archived?: boolean)
   {
-    const { me, roles } = this.state;
+    const { users } = this.props;
+    const { roles } = this.state;
+    const { currentUser: me } = users;
     const canMakeLive = me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
     const canCreate = true; // canMakeLive;
     // TODO maybe on the new middle tier, builders can create algorithms
@@ -678,7 +689,7 @@ class AlgorithmsColumn extends TerrainComponent<Props>
 
   public render()
   {
-    const { referrer } = this.props;
+    const { referrer, users } = this.props;
 
     return (
       <LibraryColumn
@@ -701,8 +712,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
                 <InfoArea
                   large='No algorithms created, yet.'
                   button={
-                    Util.haveRole(this.props.categoryId, 'builder', UserStore, RolesStore) ||
-                      Util.haveRole(this.props.categoryId, 'admin', UserStore, RolesStore)
+                    Util.haveRole(this.props.categoryId, 'builder', users, RolesStore) ||
+                      Util.haveRole(this.props.categoryId, 'admin', users, RolesStore)
                       ? 'Create a algorithm' : null
                   }
                   onClick={this.handleCreate}
@@ -715,4 +726,8 @@ class AlgorithmsColumn extends TerrainComponent<Props>
   }
 }
 
-export default AlgorithmsColumn;
+export default Util.createTypedContainer(
+  AlgorithmsColumn,
+  ['users'],
+  {},
+);

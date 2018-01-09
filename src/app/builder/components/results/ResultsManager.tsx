@@ -65,7 +65,8 @@ import * as FileImportTypes from '../../../fileImport/FileImportTypes';
 import { Ajax } from '../../../util/Ajax';
 import AjaxM1, { M1QueryResponse } from '../../../util/AjaxM1';
 import Util from '../../../util/Util';
-import { spotlightAction, SpotlightStore } from '../../data/SpotlightStore';
+import { SpotlightActions } from '../../data/SpotlightRedux';
+import * as SpotlightTypes from '../../data/SpotlightTypes';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { _Hit, Hit, Hits, MAX_HITS, ResultsState } from './ResultTypes';
 
@@ -77,6 +78,9 @@ export interface Props
   db: BackendInstance;
   onResultsStateChange: (resultsState: ResultsState) => void;
   noExtraFields?: boolean;
+  // injected props
+  spotlights?: SpotlightTypes.SpotlightState;
+  spotlightActions?: typeof SpotlightActions;
 }
 
 interface ResultsQuery
@@ -206,21 +210,13 @@ export class ResultsManager extends TerrainComponent<Props>
       }
     }
 
-    if (this.props.algorithmPath !== undefined && (this.props.algorithmPath !== nextProps.algorithmPath))
-    {
-      this.changeResults({
-        hits: undefined,
-        aggregations: {},
-      });
-    }
-
-    if (nextProps.query && (nextProps.resultsState.hits !== this.props.resultsState.hits))
+    if (nextProps.query && this.props.spotlights && (nextProps.resultsState.hits !== this.props.resultsState.hits))
     {
       // update spotlights
       let nextState = nextProps.resultsState;
       let { resultsConfig } = nextProps.query;
 
-      SpotlightStore.getState().spotlights.map(
+      this.props.spotlights.spotlights.map(
         (spotlight, id) =>
         {
           let hitIndex = nextState.hits && nextState.hits.findIndex(
@@ -228,13 +224,17 @@ export class ResultsManager extends TerrainComponent<Props>
           );
           if (hitIndex !== -1)
           {
-            spotlightAction(id, _.extend({
-              color: spotlight.color,
-              name: spotlight.name,
-              rank: hitIndex,
-            },
-              nextState.hits.get(hitIndex).toJS(),
-            ));
+            this.props.spotlightActions({
+              actionType: 'spotlightAction',
+              id,
+              hit: _.extend({
+                color: spotlight.color,
+                name: spotlight.name,
+                rank: hitIndex,
+              },
+                nextState.hits.get(hitIndex).toJS(),
+              ),
+            });
             // TODO something more like this
             // spotlightAction(id,
             //   {
@@ -246,7 +246,10 @@ export class ResultsManager extends TerrainComponent<Props>
           }
           else
           {
-            spotlightAction(id, null);
+            this.props.spotlightActions({
+              actionType: 'clearSpotlightAction',
+              id,
+            });
           }
         },
       );
@@ -413,13 +416,11 @@ export class ResultsManager extends TerrainComponent<Props>
         },
       );
 
-      const searchQuery = JSON.stringify(addBodyToQuery(eql));
-
       this.setState({
         lastQuery: query,
         queriedTql: eql,
         query: Ajax.query(
-          searchQuery,
+          eql,
           db,
           (resp) =>
           {
@@ -757,4 +758,8 @@ function getPrimaryKeyFor(hit: Hit, config: ResultsConfig, index?: number): stri
   return index + ': ' + JSON.stringify(hit.fields.toJS()); // 'result-' + Math.floor(Math.random() * 100000000);
 }
 
-export default ResultsManager;
+export default Util.createTypedContainer(
+  ResultsManager,
+  ['spotlights'],
+  { spotlightActions: SpotlightActions },
+);

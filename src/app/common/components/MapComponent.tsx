@@ -49,14 +49,13 @@ import { List } from 'immutable';
 import { divIcon, point } from 'leaflet';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { Circle, Map, Marker, Polygon, Polyline, Popup, Rectangle, TileLayer, ZoomControl } from 'react-leaflet';
+import { Circle, Map, Marker, Polyline, Popup, Rectangle, TileLayer } from 'react-leaflet';
 
 import Switch from 'common/components/Switch';
 import Actions from '../../builder/data/BuilderActions';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';
-import CheckBox from './CheckBox';
 import './MapComponentStyle.less';
 import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';
@@ -161,19 +160,19 @@ class MapComponent extends TerrainComponent<Props>
     zoom: number,
     focused: boolean,
   } = {
-    address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
-    searchByCoordinate: false,
-    error: null,
-    latitude: this.props.location !== undefined && this.props.location[0] !== undefined ? String(this.props.location[0]) : '',
-    longitude: this.props.location !== undefined && this.props.location[1] !== undefined ? String(this.props.location[1]) : '',
-    errorLatitude: false,
-    errorLongitude: false,
-    inputName: this.props.address !== undefined && this.props.address !== '' && this.props.address[0] === '@' ? this.props.address : '@',
-    usingInput: (this.props.address !== undefined && this.props.address !== ''
-      && this.props.address[0] === '@' && this.props.address !== '@'),
-    zoom: 15,
-    focused: false,
-  };
+      address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
+      searchByCoordinate: false,
+      error: null,
+      latitude: this.props.location !== undefined && this.props.location[0] !== undefined ? String(this.props.location[0]) : '',
+      longitude: this.props.location !== undefined && this.props.location[1] !== undefined ? String(this.props.location[1]) : '',
+      errorLatitude: false,
+      errorLongitude: false,
+      inputName: this.props.address !== undefined && this.props.address !== '' && this.props.address[0] === '@' ? this.props.address : '@',
+      usingInput: (this.props.address !== undefined && this.props.address !== ''
+        && this.props.address[0] === '@' && this.props.address !== '@'),
+      zoom: 15,
+      focused: false,
+    };
 
   public geoCache = {};
   public reverseGeoCache = {};

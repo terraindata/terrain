@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as Elastic from 'elasticsearch';
+import * as _ from 'lodash';
 
 import ElasticConfig from '../ElasticConfig';
 import ElasticController from '../ElasticController';
@@ -71,7 +72,7 @@ class ElasticClient
     // Do not reuse objects to configure the elasticsearch Client class:
     // https://github.com/elasticsearch/elasticsearch-js/issues/33
     this.config = JSON.parse(JSON.stringify(config));
-    this.delegate = new Elastic.Client(this.config);
+    this.delegate = new Elastic.Client(_.extend(this.config, { apiVersion: '5.5' }));
 
     this.cluster = new ElasticCluster(controller, this.delegate);
     this.indices = new ElasticIndices(controller, this.delegate);
@@ -180,6 +181,16 @@ class ElasticClient
   }
 
   /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-clearscroll
+   */
+  public clearScroll<T>(params: Elastic.ClearScrollParams,
+    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+  {
+    this.log('clearScroll', params);
+    this.delegate.clearScroll(params, callback);
+  }
+
+  /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search
    */
   public search<T>(params: Elastic.SearchParams,
@@ -197,6 +208,16 @@ class ElasticClient
   {
     this.log('msearch', params);
     this.delegate.msearch(params, callback);
+  }
+
+  /**
+   * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-msearchtemplate
+   */
+  public msearchTemplate<T>(params: Elastic.MSearchTemplateParams,
+    callback: (error: any, response: Elastic.MSearchResponse<T>) => void): void
+  {
+    this.log('msearchTemplate', params);
+    this.delegate.msearchTemplate(params, callback);
   }
 
   public getDelegate(): Elastic.Client

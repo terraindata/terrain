@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires max-classes-per-file strict-boolean-expressions restrict-plus-operands
 
 import * as React from 'react';
-import SchemaActions from 'schema/data/SchemaActions';
+import { SchemaActions } from 'schema/data/SchemaRedux';
 import * as SchemaTypes from '../SchemaTypes';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import { columnChildrenConfig, ColumnTreeInfo } from './items/ColumnTreeInfo';
@@ -68,10 +68,11 @@ export interface Props
   id: ID;
   type: string;
   search: string;
-
   inSearchResults?: boolean;
-  schema: SchemaTypes.SchemaState;
-  schemaActions: any;
+
+  // injected props
+  schema?: SchemaTypes.SchemaState;
+  schemaActions?: typeof SchemaActions;
 }
 
 class State
@@ -90,45 +91,45 @@ const typeToRendering: {
   },
 } = {
     server:
-    {
-      component: ServerTreeInfo,
-      childConfig: serverChildrenConfig,
-      canSelect: false,
-    },
+      {
+        component: ServerTreeInfo,
+        childConfig: serverChildrenConfig,
+        canSelect: false,
+      },
     database:
-    {
-      component: DatabaseTreeInfo,
-      childConfig: databaseChildrenConfig,
-      canSelect: false,
-    },
+      {
+        component: DatabaseTreeInfo,
+        childConfig: databaseChildrenConfig,
+        canSelect: false,
+      },
 
     table:
-    {
-      component: TableTreeInfo,
-      childConfig: tableChildrenConfig,
-      canSelect: true,
-    },
+      {
+        component: TableTreeInfo,
+        childConfig: tableChildrenConfig,
+        canSelect: true,
+      },
 
     column:
-    {
-      component: ColumnTreeInfo,
-      childConfig: columnChildrenConfig,
-      canSelect: true,
-    },
+      {
+        component: ColumnTreeInfo,
+        childConfig: columnChildrenConfig,
+        canSelect: true,
+      },
 
     fieldProperty:
-    {
-      component: FieldPropertyTreeInfo,
-      childConfig: fieldPropertyChildrenConfig,
-      canSelect: true,
-    },
+      {
+        component: FieldPropertyTreeInfo,
+        childConfig: fieldPropertyChildrenConfig,
+        canSelect: true,
+      },
 
     index:
-    {
-      component: IndexTreeInfo,
-      childConfig: indexChildrenConfig,
-      canSelect: true,
-    },
+      {
+        component: IndexTreeInfo,
+        childConfig: indexChildrenConfig,
+        canSelect: true,
+      },
   };
 
 @Radium
@@ -249,8 +250,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
     if (time - this.lastHeaderClickTime > 1000)
     {
       this.lastHeaderClickTime = time;
-      const { schema, type, id } = this.props;
-      const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
+      // const { schema, type, id } = this.props;
+      // const item = schema.getIn([SchemaTypes.typeToStoreKey[type], id]);
       const { isSelected } = this.state;
       if (!isSelected)
       {
@@ -258,14 +259,20 @@ class SchemaTreeItem extends TerrainComponent<Props>
           isSelected: true,
           // open: !this.state.open, // need to decide whether or not to keep this in
         });
-        this.props.schemaActions.selectId(this.props.id);
+        this.props.schemaActions({
+          actionType: 'selectId',
+          id: this.props.id,
+        });
       }
       else
       {
         this.setState({
           isSelected: false,
         });
-        this.props.schemaActions.selectId(null);
+        this.props.schemaActions({
+          actionType: 'selectId',
+          id: null,
+        });
       }
     }
 
@@ -457,7 +464,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
   }
 }
 
-export default Util.createContainer(
+export default Util.createTypedContainer(
   SchemaTreeItem,
   ['schema'],
   { schemaActions: SchemaActions },

@@ -230,6 +230,7 @@ export class Tasty
       query.delete();
     }
     const queryString = this.db.generate(query);
+
     return this.db.execute(queryString);
   }
 

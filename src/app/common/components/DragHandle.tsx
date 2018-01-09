@@ -46,11 +46,11 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires
 
-import * as classNames from 'classnames';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { Colors, getStyle } from '../../colors/Colors';
-import ColorsActions from './../../colors/data/ColorsActions';
+import { Colors } from '../../colors/Colors';
+import Util from '../../util/Util';
+import { ColorsActions } from './../../colors/data/ColorsRedux';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './DragHandleStyle.less';
 
@@ -63,6 +63,7 @@ export interface Props
   showWhenHoveringClassName?: string;
   useAltColor?: boolean;
   connectDragSource?: (el: El) => El;
+  colorsActions: typeof ColorsActions;
 }
 
 @Radium
@@ -71,10 +72,27 @@ class DragHandle extends TerrainComponent<Props>
   public componentWillMount()
   {
     const hoveringClassName = this.props.showWhenHoveringClassName + ':hover .drag-icon';
-    ColorsActions.setStyle('.drag-icon ', { fill: this.props.useAltColor ? Colors().altText2 : Colors().iconColor });
-    ColorsActions.setStyle('.drag-icon:hover ', { fill: Colors().inactiveHover });
-    ColorsActions.setStyle('.drag-icon:active ', { fill: Colors().active });
-    ColorsActions.setStyle('.' + hoveringClassName, { opacity: '0.85 !important' as any });
+
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.drag-icon',
+      style: { fill: this.props.useAltColor ? Colors().altText2 : Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.drag-icon:hover',
+      style: { fill: Colors().inactiveHover },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.drag-icon:active',
+      style: { fill: Colors().active },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.' + hoveringClassName,
+      style: { opacity: '0.85 !important' as any },
+    });
   }
 
   public renderHandle()
@@ -106,4 +124,10 @@ class DragHandle extends TerrainComponent<Props>
   }
 }
 
-export default DragHandle;
+export default Util.createContainer(
+  DragHandle,
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);

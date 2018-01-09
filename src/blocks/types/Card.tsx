@@ -91,11 +91,13 @@ export interface Card extends IRecord<Card>
   _isCard: boolean;
   _isBlock: boolean;
   closed: boolean;
+  disabled: boolean;
   tuning?: boolean; // whether the card is in the tuning section
   // whether a card in tuning column is collapsed (needs to be sep. from closed)
   tuningClosed?: boolean; // whether a card in tuning column is collapsed (needs to be sep. from closed)
   errors: List<string>;
   keyDisplayType: DisplayType;
+  hidden: boolean;
 
   // the following fields are excluded from the server save
   static: {
@@ -128,6 +130,8 @@ export interface Card extends IRecord<Card>
     //  receives the appropriate block spec as an argument, to avoid
     //  a circular dependency
     init?: InitFn;
+    // epilogueInit is called after the block is created but before returning the block.
+    epilogueInit?: (block: Block) => Block;
 
     // given a card, return the "terms" it generates for autocomplete
     // TODO schemaState type is : SchemaTypes.SchemaState
@@ -184,10 +188,11 @@ export interface CardConfig
     metaFields?: string[];
 
     init?: InitFn;
+    epilogueInit?: (card: Block) => Block;
   };
 }
 
-export const allCardsMetaFields = allBlocksMetaFields.concat(['closed', 'tuning', 'tuningClosed', 'map_text']);
+export const allCardsMetaFields = allBlocksMetaFields.concat(['disabled', 'closed', 'tuning', 'tuningClosed', 'map_text']);
 
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
@@ -198,9 +203,11 @@ export const _card = (config: CardConfig) =>
     id: '',
     errors: Immutable.List([]),
     keyDisplayType: DisplayType.TEXT,
+    hidden: false,
     _isCard: true,
     _isBlock: true,
     closed: false,
+    disabled: false,
     tuning: false,
     tuningClosed: false,
     map_text: '',

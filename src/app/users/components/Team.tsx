@@ -46,17 +46,17 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions no-unused-expression
 
+import { AuthState } from 'auth/AuthTypes';
 import * as React from 'react';
 import { Link } from 'react-router';
+import Util from 'util/Util';
 import CreateItem from '../../common/components/CreateItem';
 import Ajax from '../../util/Ajax';
 import * as UserTypes from '../UserTypes';
-import AuthStore from './../../auth/data/AuthStore';
 import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/UserActions';
-import Store from './../data/UserStore';
 import './Team.less';
 import UserThumbnail from './UserThumbnail';
 type User = UserTypes.User;
@@ -67,51 +67,38 @@ export interface Props
   params?: any;
   history?: any;
   children?: any;
+  auth?: AuthState;
+  users?: UserTypes.UserState;
+  userActions?: typeof Actions;
+}
+
+export interface State
+{
+  addingUser: boolean;
+  showDisabledUsers: boolean;
+  errorModalOpen: boolean;
+  errorModalMessage: string;
 }
 
 class Team extends TerrainComponent<Props>
 {
   public unsub = null;
 
-  public state: {
-    loading: boolean,
-    users: UserMap,
-    addingUser: boolean,
-    showDisabledUsers: boolean,
-    errorModalOpen: boolean,
-    errorModalMessage: string,
-  } = {
-    users: null,
-    loading: true,
+  public state: State = {
     addingUser: false,
     showDisabledUsers: false,
     errorModalOpen: false,
     errorModalMessage: '',
   };
 
-  constructor(props)
-  {
-    super(props);
-  }
-
   public componentWillMount()
   {
-    Actions.fetch();
-    this.updateState();
-    this.unsub = Store.subscribe(this.updateState);
+    this.props.userActions.fetch();
   }
 
   public componentWillUnmount()
   {
     this.unsub && this.unsub();
-  }
-
-  public updateState()
-  {
-    this.setState({
-      users: Store.getState().get('users'),
-      loading: Store.getState().get('loading'),
-    });
   }
 
   public renderUser(user: User)
@@ -205,7 +192,7 @@ class Team extends TerrainComponent<Props>
 
   public renderShowDisabledUsers()
   {
-    if (!this.state.users.some((user) => user.isDisabled))
+    if (!this.props.users.users.some((user) => user.isDisabled))
     {
       // no disabled users
       return null;
@@ -271,7 +258,7 @@ class Team extends TerrainComponent<Props>
 
     Ajax.createUser(email, password, () =>
     {
-      Actions.fetch();
+      this.props.userActions.fetch();
     }, (error) =>
       {
         this.setState({
@@ -283,8 +270,8 @@ class Team extends TerrainComponent<Props>
 
   public renderAddUser()
   {
-    const userId = AuthStore.getState().id;
-    const user = Store.getState().getIn(['users', userId]) as User;
+    const userId = this.props.auth.id;
+    const user = this.props.users.getIn(['users', userId]) as User;
 
     if (user && user.isSuperUser)
     {
@@ -343,7 +330,7 @@ class Team extends TerrainComponent<Props>
 
   public render()
   {
-    const { users, loading } = this.state;
+    const { users, loading } = this.props.users;
 
     return (
       <div>
@@ -370,4 +357,8 @@ class Team extends TerrainComponent<Props>
   }
 }
 
-export default Team;
+export default Util.createContainer(
+  Team,
+  ['auth', 'users'],
+  { userActions: Actions },
+);

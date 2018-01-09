@@ -43,16 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import ActionTypes from './ColorsActionTypes';
-import Store from './ColorsStore';
 
-const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
+// tslint:disable:no-var-requires
 
-const ColorsActions =
-  {
-    setStyle:
-    (selector: string, style: React.CSSProperties) =>
-      $(ActionTypes.setStyle, { selector, style }),
-  };
+// Copyright 2017 Terrain Data, Inc.
 
-export default ColorsActions;
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import { BaseClass, makeConstructor, New, WithIRecord } from 'app/Classes';
+import * as Immutable from 'immutable';
+import { Map } from 'immutable';
+
+class SpotlightStateC
+{
+  public spotlights: IMMap<string, any> = Map({});
+}
+export type SpotlightState = WithIRecord<SpotlightStateC>;
+export const _SpotlightState = makeConstructor(SpotlightStateC);

@@ -70,13 +70,12 @@ import MidwayRouter from './Router';
 import { scheduler } from './scheduler/SchedulerRouter';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
-import Users from './users/Users';
 
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 export let HA: number;
 
-class App
+export class App
 {
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {

@@ -51,13 +51,15 @@ import * as React from 'react';
 import * as ReactDataGrid from 'react-data-grid';
 import { Toolbar } from 'react-data-grid-addons';
 
+import Util from 'app/util/Util';
 import * as _ from 'lodash';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
-import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
+import { SpotlightActions } from '../../data/SpotlightRedux';
+import * as SpotlightTypes from '../../data/SpotlightTypes';
 import { getResultName } from './Hit';
 import { Hits } from './ResultTypes';
 
@@ -70,33 +72,66 @@ export interface Props
   allowSpotlights: boolean;
   onSpotlightAdded: (id, spotlightData) => void;
   onSpotlightRemoved: (id) => void;
+  // injected props
+  spotlights?: SpotlightTypes.SpotlightState;
+  spotlightActions?: typeof SpotlightActions;
 }
 
-export default class HitsTable extends TerrainComponent<Props>
+class HitsTable extends TerrainComponent<Props>
 {
   public state: {
     random: number;
-    spotlightState: SpotlightState;
     columns: List<TableColumn>;
     rows: List<any>;
     selectedIndexes: List<any>;
   } = {
-    random: 0,
-    spotlightState: null,
-    columns: this.getColumns(this.props),
-    rows: List([]),
-    selectedIndexes: List([]),
-  };
+      random: 0,
+      columns: this.getColumns(this.props),
+      rows: List([]),
+      selectedIndexes: List([]),
+    };
+
+  public componentWillMount()
+  {
+    let selectedIndexes = List([]);
+    const spotlights = this.props.spotlights.spotlights;
+    const spotlightKeys = _.keys(spotlights.toJS());
+    this.props.hits.forEach((r, index) =>
+    {
+      if (spotlightKeys.includes(r.primaryKey))
+      {
+        selectedIndexes = selectedIndexes.push(index);
+      }
+    });
+
+    this.setState({
+      selectedIndexes,
+      rows: this.props.hits,
+    });
+  }
 
   public componentWillReceiveProps(nextProps: Props)
   {
     if (nextProps.hits !== this.props.hits || nextProps.resultsConfig !== this.props.resultsConfig)
     {
+      const spotlights = this.props.spotlights.spotlights;
+      // using the spotlights set the correct indexes
       // force the table to update
+      let selectedIndexes = List([]);
+      const spotlightKeys = _.keys(spotlights.toJS());
+      nextProps.hits.forEach((r, index) =>
+      {
+        if (spotlightKeys.includes(r.primaryKey))
+        {
+          selectedIndexes = selectedIndexes.push(index);
+        }
+      });
       this.setState({
         random: Math.random(),
         columns: this.getColumns(nextProps),
         rows: nextProps.hits,
+        spotlights,
+        selectedIndexes,
       });
     }
   }
@@ -134,14 +169,19 @@ export default class HitsTable extends TerrainComponent<Props>
     if (resultsConfig.enabled && resultsConfig.fields && resultsConfig.fields.size)
     {
       resultsConfig.fields.map(
-        (field) =>
-          cols.push({
-            key: field,
-            name: field,
-            filterable: true,
-            resizable: true,
-            sortable: true,
-          }),
+        (field, i) =>
+        {
+          if (field !== resultsConfig.name && field !== resultsConfig.score)
+          {
+            cols.push({
+              key: field,
+              name: field,
+              filterable: true,
+              resizable: true,
+              sortable: true,
+            });
+          }
+        },
       );
     }
     else
@@ -149,14 +189,18 @@ export default class HitsTable extends TerrainComponent<Props>
       const resultFields = props.hits.size ? props.hits.get(0).fields : Map({});
       resultFields.map(
         (value, field) =>
-          cols.push({
-            key: field,
-            name: field,
-            filterable: true,
-            resizable: true,
-            sortable: true,
-            width: 120,
-          }),
+        {
+          if (field !== resultsConfig.name && field !== resultsConfig.score)
+          {
+            cols.push({
+              key: field,
+              name: field,
+              filterable: true,
+              resizable: true,
+              sortable: true,
+            });
+          }
+        },
       );
     }
 
@@ -184,16 +228,6 @@ export default class HitsTable extends TerrainComponent<Props>
     }
 
     return List(cols);
-  }
-
-  public componentDidMount()
-  {
-    this._subscribe(SpotlightStore, {
-      isMounted: true,
-      stateKey: 'spotlightState',
-    });
-
-    this.setState({ rows: this.props.hits });
   }
 
   public getRow(i: number): object
@@ -319,40 +353,41 @@ export default class HitsTable extends TerrainComponent<Props>
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = row;
-    spotlightAction(id, spotlightData);
+    this.props.spotlightActions({
+      actionType: 'spotlightAction',
+      id,
+      hit: spotlightData,
+    });
     this.props.onSpotlightAdded(id, spotlightData);
   }
 
   public unspotlight(row: number)
   {
     const hit = this.state.rows && this.state.rows.get(row);
-    spotlightAction(hit.primaryKey, null);
+    this.props.spotlightActions({
+      actionType: 'clearSpotlightAction',
+      id: hit.primaryKey,
+    });
     this.props.onSpotlightRemoved(hit.primaryKey);
   }
 
   public rowRenderer(props)
   {
-    if (this.state.selectedIndexes.includes(props.idx))
+    const hit = this.state.rows && this.state.rows.get(props.idx);
+    const id = hit.primaryKey;
+    const spotlight = this.props.spotlights.spotlights.get(String(id));
+    if (spotlight === undefined)
     {
-      const hit = this.state.rows && this.state.rows.get(props.idx);
-      const id = hit.primaryKey;
-      const spotlight = this.state.spotlightState.getIn(['spotlights', id]);
-      if (spotlight === undefined)
-      {
-        return (<ReactDataGrid.Row {...props} />);
-      }
-
-      return (
-        <div
-          style={{
-            backgroundColor: spotlight.color,
-          }}>
-          <ReactDataGrid.Row {...props} />
-        </div>
-      );
+      return (<ReactDataGrid.Row {...props} />);
     }
-
-    return (<ReactDataGrid.Row {...props} />);
+    return (
+      <div
+        style={{
+          backgroundColor: spotlight.color,
+        }}>
+        <ReactDataGrid.Row {...props} />
+      </div>
+    );
   }
 
   public render()
@@ -388,3 +423,9 @@ export default class HitsTable extends TerrainComponent<Props>
     );
   }
 }
+
+export default Util.createTypedContainer(
+  HitsTable,
+  ['spotlights'],
+  { spotlightActions: SpotlightActions },
+);

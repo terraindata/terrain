@@ -43,28 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
 
-import ActionTypes from './ColorsActionTypes';
-import { _ColorsState, ColorsState } from './ColorsStore';
+import ConfigType from '../ConfigType';
 
-const ColorsReducer = {};
-
-ColorsReducer[ActionTypes.setStyle] =
-  (state, action) =>
-  {
-    const { selector, style } = action.payload;
-    return state.set('styles', state.styles.set(selector, style));
-  };
-
-const ColorsReducerWrapper = (state: ColorsState = _ColorsState(), action) =>
+export class ItemConfig extends ConfigType
 {
-  let nextState = state;
-  if (ColorsReducer[action.type])
-  {
-    nextState = ColorsReducer[action.type](state, action);
-  }
-  return nextState;
-};
+  public id?: number = undefined;
+  public meta?: string = undefined;
+  public name: string = '';
+  public parent?: number = undefined;
+  public status?: string = undefined;
+  public type?: string = undefined;
 
-export default ColorsReducerWrapper;
+  constructor(props: object)
+  {
+    super();
+    ConfigType.initialize(this, props);
+  }
+}
+
+export default ItemConfig;

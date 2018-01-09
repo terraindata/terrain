@@ -46,10 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as React from 'react';
-import './LibraryAlgorithmInfo.less';
-const { List } = Immutable;
+
 import { MidwayError } from './../../../../shared/error/MidwayError';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -59,6 +58,7 @@ import Util from './../../util/Util';
 import Actions from './../data/LibraryActions';
 import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
+import './LibraryAlgorithmInfo.less';
 import StatusDropdown from './StatusDropdown';
 
 type Algorithm = LibraryTypes.Algorithm;
@@ -73,7 +73,7 @@ export interface Props
 
 // TODO MOD centralize
 // TODO Re-add AlgorithmVersions
-const LANGUAGES = Immutable.List(['elastic', 'mysql']);
+const LANGUAGES = List(['elastic', 'mysql']);
 
 class LibraryInfoColumn extends TerrainComponent<Props>
 {
@@ -83,11 +83,11 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     errorModalMessage: string,
     selectedAlgorithm: ID,
   } = {
-    algorithmStatus: 'Loading...',
-    algorithmStatusErrorModalOpen: false,
-    errorModalMessage: '',
-    selectedAlgorithm: -1,
-  };
+      algorithmStatus: 'Loading...',
+      algorithmStatusErrorModalOpen: false,
+      errorModalMessage: '',
+      selectedAlgorithm: -1,
+    };
 
   public componentDidMount()
   {

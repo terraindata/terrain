@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import cronstrue from 'cronstrue';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
@@ -71,8 +71,6 @@ import TransportScheduler from './TransportScheduler';
 import './TemplateControlList.less';
 
 const DeleteIcon = require('images/icon_close.svg');
-
-const { List } = Immutable;
 
 type Template = FileImportTypes.Template;
 
@@ -106,31 +104,31 @@ class ScheduleControlList extends TerrainComponent<Props>
     currentActiveSchedule: SchedulerConfig;
     currentActiveIndex: number;
   } = {
-    responseModalOpen: false,
-    responseModalMessage: '',
-    responseModalTitle: '',
-    responseModalIsError: false,
-    confirmModalOpen: false,
-    confirmModalMessage: '',
-    confirmModalTitle: '',
-    confirmModalIsError: false,
-    confirmModalType: ConfirmActionType.DELETE,
-    currentActiveSchedule: undefined,
-    currentActiveIndex: -1,
-  };
+      responseModalOpen: false,
+      responseModalMessage: '',
+      responseModalTitle: '',
+      responseModalIsError: false,
+      confirmModalOpen: false,
+      confirmModalMessage: '',
+      confirmModalTitle: '',
+      confirmModalIsError: false,
+      confirmModalType: ConfirmActionType.DELETE,
+      currentActiveSchedule: undefined,
+      currentActiveIndex: -1,
+    };
 
   public displayConfig: HeaderConfig =
-  [
-    ['ID', (schedule, index) => schedule.id],
-    ['Job Type', (schedule, index) => schedule.jobType],
-    ['Scheduled Job Name', (schedule, index) => schedule.name],
-    ['Schedule Settings', (schedule, index) => cronstrue.toString(schedule.schedule)],
-    ['Template Id', (schedule, index) => schedule.paramsScheduleArr[0].templateId],
-    ['Template Name', (schedule, index) => this.getTemplateName(schedule.paramsScheduleArr[0].templateId)],
-    ['Transfer Type', (schedule, index) => schedule.transport.type],
-    ['Transfer Connection', (schedule, index) => this.getConnectionName(schedule.transport.id)],
-    ['Transfer Filename', (schedule, index) => schedule.transport.filename],
-  ];
+    [
+      ['ID', (schedule, index) => schedule.id],
+      ['Job Type', (schedule, index) => schedule.jobType],
+      ['Scheduled Job Name', (schedule, index) => schedule.name],
+      ['Schedule Settings', (schedule, index) => cronstrue.toString(schedule.schedule)],
+      ['Template Id', (schedule, index) => schedule.paramsScheduleArr[0].templateId],
+      ['Template Name', (schedule, index) => this.getTemplateName(schedule.paramsScheduleArr[0].templateId)],
+      ['Transfer Type', (schedule, index) => schedule.transport.type],
+      ['Transfer Connection', (schedule, index) => this.getConnectionName(schedule.transport.id)],
+      ['Transfer Filename', (schedule, index) => schedule.transport.filename],
+    ];
 
   public getOptions(schedule: SchedulerConfig, index: number)
   {

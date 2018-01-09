@@ -44,51 +44,46 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as srs from 'secure-random-string';
-import * as winston from 'winston';
-import * as Tasty from '../../../tasty/Tasty';
-import * as App from '../../App';
+// tslint:disable:no-var-requires
 
-import { UserConfig } from '../../users/UserRouter';
-import * as Util from '../../Util';
+// Copyright 2017 Terrain Data, Inc.
 
-export interface TemplateBase
+// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import * as Immutable from 'immutable';
+import { Map } from 'immutable';
+import * as _ from 'lodash';
+import * as ReduxActions from 'redux-actions';
+const Redux = require('redux');
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
+import Util from 'app/util/Util';
+import thunk from 'redux-thunk';
+import { BaseClass, New } from '../../Classes';
+import { _ColorsState, ColorsState } from './ColorsTypes';
+
+export interface ColorsActionTypes
 {
-  // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
-  // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
-  columnTypes: object;
-  dbid: number;           // instance id
-  dbname: string;         // for elastic, index name
-  id?: number;
-  name: string;
-  originalNames: string[];    // array of strings (oldName)
-  persistentAccessToken?: string;    // persistent access token
-  primaryKeyDelimiter?: string;
-  primaryKeys: string[];  // newName of primary key(s)
-  tablename: string;      // for elastic, type name
-  transformations: object[];  // list of in-order data transformations
+  setStyle: {
+    actionType: 'setStyle',
+    selector: string,
+    style: React.CSSProperties,
+  };
 }
 
-export interface TemplateBaseStringified
+class ColorsRedux extends TerrainRedux<ColorsActionTypes, ColorsState>
 {
-  columnTypes: string;
-  dbid: number;
-  dbname: string;
-  id?: number;
-  name: string;
-  originalNames: string;
-  persistentAccessToken?: string;
-  primaryKeyDelimiter: string;
-  primaryKeys: string;
-  tablename: string;
-  transformations: string;
+  public namespace: string = 'colors';
+
+  public reducers: ConstrainedMap<ColorsActionTypes, ColorsState> =
+    {
+      setStyle: (state, action) =>
+      {
+        const { selector, style } = action.payload;
+        return state.setIn(['styles', selector], style);
+      },
+    };
 }
 
-export type ImportTemplateConfig = TemplateBase;
-
-class Templates
-{
-
-}
-
-export default Templates;
+const ReduxInstance = new ColorsRedux();
+export const ColorsActions = ReduxInstance._actionsForExport();
+export const ColorsReducers = ReduxInstance._reducersForExport(_ColorsState);
+export declare type ColorsActionType<K extends keyof ColorsActionTypes> = GetType<K, ColorsActionTypes>;

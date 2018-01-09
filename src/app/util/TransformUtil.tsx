@@ -86,10 +86,10 @@ const TransformUtil = {
 
   getLogarithmicData(numPoints, pointsData, domainMin, domainMax)
   {
-    let x1: number = pointsData[0].x || pointsData[0].value;
-    const y1: number = pointsData[0].y || pointsData[0].score;
-    let x2: number = pointsData[1].x || pointsData[1].value;
-    const y2: number = pointsData[1].y || pointsData[1].score;
+    let x1: number = pointsData[0].x !== undefined ? pointsData[0].x : pointsData[0].value;
+    const y1: number = pointsData[0].y !== undefined ? pointsData[0].y : pointsData[0].score;
+    let x2: number = pointsData[1].x !== undefined ? pointsData[1].x : pointsData[1].value;
+    const y2: number = pointsData[1].y !== undefined ? pointsData[1].y : pointsData[1].score;
 
     const ranges = [];
     const outputs = [];
@@ -137,10 +137,10 @@ const TransformUtil = {
   // Given a logarithmic x value and all of the points data, return the y value for the x
   getLogarithmicY(x: number, pointsData, domainMin, domainMax)
   {
-    let x1: number = pointsData[0].x || pointsData[0].value;
-    const y1: number = pointsData[0].y || pointsData[0].score;
-    let x2: number = pointsData[1].x || pointsData[1].value;
-    const y2: number = pointsData[1].y || pointsData[1].score;
+    let x1: number = pointsData[0].x !== undefined ? pointsData[0].x : pointsData[0].value;
+    const y1: number = pointsData[0].y !== undefined ? pointsData[0].y : pointsData[0].score;
+    let x2: number = pointsData[1].x !== undefined ? pointsData[1].x : pointsData[1].value;
+    const y2: number = pointsData[1].y !== undefined ? pointsData[1].y : pointsData[1].score;
     if (x >= x2)
     {
       return y2;
@@ -169,10 +169,10 @@ const TransformUtil = {
 
   getExponentialData(numPoints, pointsData)
   {
-    const x1: number = pointsData[0].x || pointsData[0].value;
-    let y1: number = pointsData[0].y || pointsData[0].score;
-    const x2: number = pointsData[1].x || pointsData[1].value;
-    let y2: number = pointsData[1].y || pointsData[1].score;
+    const x1: number = pointsData[0].x !== undefined ? pointsData[0].x : pointsData[0].value;
+    let y1: number = pointsData[0].y !== undefined ? pointsData[0].y : pointsData[0].score;
+    const x2: number = pointsData[1].x !== undefined ? pointsData[1].x : pointsData[1].value;
+    let y2: number = pointsData[1].y !== undefined ? pointsData[1].y : pointsData[1].score;
 
     const shift = y2 < y1 ? y2 - 0.001 : y1 - 0.001;
     y1 -= shift;
@@ -200,10 +200,10 @@ const TransformUtil = {
 
   getExponentialY(x, pointsData, domainMin?, domainMax?)
   {
-    const x1: number = pointsData[0].x || pointsData[0].value;
-    let y1: number = pointsData[0].y || pointsData[0].score;
-    const x2: number = pointsData[1].x || pointsData[1].value;
-    let y2: number = pointsData[1].y || pointsData[1].score;
+    const x1: number = pointsData[0].x !== undefined ? pointsData[0].x : pointsData[0].value;
+    let y1: number = pointsData[0].y !== undefined ? pointsData[0].y : pointsData[0].score;
+    const x2: number = pointsData[1].x !== undefined ? pointsData[1].x : pointsData[1].value;
+    let y2: number = pointsData[1].y !== undefined ? pointsData[1].y : pointsData[1].score;
 
     if (x >= x2)
     {
@@ -223,23 +223,20 @@ const TransformUtil = {
 
   getNormalData(numPoints, pointsData, domainMin, domainMax)
   {
-    const average = pointsData[1].x || pointsData[1].value;
-    let leftPoint = (pointsData[0].x || pointsData[0].value);
-    const rightPoint = pointsData[2].x || pointsData[2].value;
-    const averageHeight = pointsData[1].y || pointsData[1].score;
+    const average = pointsData[1].x !== undefined ? pointsData[1].x : pointsData[1].value;
+    const leftPoint = pointsData[0].x !== undefined ? pointsData[0].x : pointsData[0].value;
+    const rightPoint = pointsData[2].x !== undefined ? pointsData[2].x : pointsData[2].value;
+    const averageHeight = pointsData[1].y !== undefined ? pointsData[1].y : pointsData[1].score;
     // Left half of data
-    leftPoint = leftPoint > 0 ? leftPoint : 0.001;
     let stdDev = Math.abs(average - leftPoint);
     let maxY = TransformUtil._normal(average, average, stdDev);
     let scaleFactor = averageHeight / maxY;
     const left = TransformUtil._getNormalDataSubset(average, stdDev, domainMin, average, scaleFactor, Math.floor(numPoints / 2));
-
     // Right half of data
     stdDev = Math.abs(rightPoint - average);
     maxY = TransformUtil._normal(average, average, stdDev);
     scaleFactor = averageHeight / maxY;
     const right = TransformUtil._getNormalDataSubset(average, stdDev, average, domainMax, scaleFactor, Math.floor(numPoints / 2));
-
     return { ranges: left.xData.concat(right.xData), outputs: left.yData.concat(right.yData) };
   },
 
@@ -265,12 +262,12 @@ const TransformUtil = {
 
   getNormalY(x, pointsData, domainMin, domainMax)
   {
-    const average = pointsData[1].x || pointsData[1].value;
-    const averageHeight = pointsData[1].y || pointsData[1].score;
+    const average = pointsData[1].x !== undefined ? pointsData[1].x : pointsData[1].value;
+    const averageHeight = pointsData[1].y !== undefined ? pointsData[1].y : pointsData[1].score;
     // Left half
     if (x < average)
     {
-      const leftPoint = pointsData[0].x || pointsData[0].value;
+      const leftPoint = pointsData[0].x !== undefined ? pointsData[0].x : pointsData[0].value;
       const stdDev = Math.abs(average - leftPoint);
       const maxY = TransformUtil._normal(average, average, stdDev);
       const scaleFactor = averageHeight / maxY;
@@ -278,7 +275,7 @@ const TransformUtil = {
     }
     else
     {
-      const rightPoint = pointsData[2].x || pointsData[2].value;
+      const rightPoint = pointsData[2].x !== undefined ? pointsData[2].x : pointsData[2].value;
       const stdDev = Math.abs(average - rightPoint);
       const maxY = TransformUtil._normal(average, average, stdDev);
       const scaleFactor = averageHeight / maxY;
@@ -288,18 +285,18 @@ const TransformUtil = {
 
   getSigmoidData(numPoints, pointsData, domainMin: number, domainMax: number)
   {
-    const a: number = pointsData[0].y || pointsData[0].score;
-    const xVal: number = pointsData[1].x || pointsData[1].value;
-    const yVal: number = pointsData[1].y || pointsData[1].score;
-    const x0: number = pointsData[2].x || pointsData[2].value;
-    const y3: number = pointsData[3].y || pointsData[3].score;
+    const a: number = pointsData[0].y !== undefined ? pointsData[0].y : pointsData[0].score;
+    const xVal: number = pointsData[1].x !== undefined ? pointsData[1].x : pointsData[1].value;
+    const yVal: number = pointsData[1].y !== undefined ? pointsData[1].y : pointsData[1].score;
+    const x0: number = pointsData[2].x !== undefined ? pointsData[2].x : pointsData[2].value;
+    const y3: number = pointsData[3].y !== undefined ? pointsData[3].y : pointsData[3].score;
     const L: number = y3 - a;
     const k: number = (-1 * Math.log(L / (yVal - a) - 1)) / (xVal - x0);
 
     const ranges = [];
     const outputs = [];
     const stepSize: number = (domainMax - domainMin) * (1 / numPoints);
-    for (let i = (domainMin - stepSize); i < (domainMax + stepSize); i += stepSize)
+    for (let i = domainMin; i <= domainMax; i += stepSize)
     {
       const y = TransformUtil._sigmoid(i, a, k, x0, L);
       ranges.push(i);
@@ -310,11 +307,11 @@ const TransformUtil = {
 
   getSigmoidY(x, pointsData, domainMin, domainMax)
   {
-    const a: number = pointsData[0].y || pointsData[0].score;
-    const xVal: number = pointsData[1].x || pointsData[1].value;
-    const yVal: number = pointsData[1].y || pointsData[1].score;
-    const x0: number = pointsData[2].x || pointsData[2].value;
-    const y3: number = pointsData[3].y || pointsData[3].score;
+    const a: number = pointsData[0].y !== undefined ? pointsData[0].y : pointsData[0].score;
+    const xVal: number = pointsData[1].x !== undefined ? pointsData[1].x : pointsData[1].value;
+    const yVal: number = pointsData[1].y !== undefined ? pointsData[1].y : pointsData[1].score;
+    const x0: number = pointsData[2].x !== undefined ? pointsData[2].x : pointsData[2].value;
+    const y3: number = pointsData[3].y !== undefined ? pointsData[3].y : pointsData[3].score;
     const L: number = y3 - a;
     const k: number = (-1 * Math.log(L / (yVal - a) - 1)) / (xVal - x0);
     return TransformUtil._sigmoid(x, a, k, x0, L);

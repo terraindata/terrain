@@ -43,13 +43,19 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-const ColorsActionTypes =
+import ConfigType from '../../ConfigType';
+import { TemplateBase } from './TemplateBase';
+
+export class ImportTemplateConfig extends TemplateBase
+{
+  public name: string = '';
+
+  constructor(props: object)
   {
-    setStyle: '',
-  };
+    super(props);
+    ConfigType.initialize(this, props);
+  }
+}
 
-Util.setValuesToKeys(ColorsActionTypes, '');
-
-export default ColorsActionTypes;
+export default ImportTemplateConfig;

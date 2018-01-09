@@ -46,19 +46,16 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions no-var-requires member-ordering no-unused-expression member-access max-line-length
 
-import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 
-import { backgroundColor, Colors } from 'app/colors/Colors';
 import Actions from 'builder/data/BuilderActions';
 import CreateLine from 'common/components/CreateLine';
-import KeyboardFocus from 'common/components/KeyboardFocus';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as BlockUtils from 'src/blocks/BlockUtils';
-import { Card, CardConfig } from 'src/blocks/types/Card';
+import { CardConfig } from 'src/blocks/types/Card';
 import { AllBackendsMap } from 'src/database/AllBackends';
 
 import Util from 'util/Util';
@@ -104,8 +101,8 @@ class CreateCardTool extends TerrainComponent<Props>
   public state: {
     focusedIndex: number;
   } = {
-    focusedIndex: -1,
-  };
+      focusedIndex: -1,
+    };
 
   constructor(props)
   {

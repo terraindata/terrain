@@ -48,7 +48,7 @@ THE SOFTWARE.
 
 import * as classNames from 'classnames';
 import { tooltip } from 'common/components/tooltip/Tooltips';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -74,7 +74,6 @@ import './FileImport.less';
 import FileImportPreview from './FileImportPreview';
 
 const HTML5Backend = require('react-dnd-html5-backend');
-const { List } = Immutable;
 
 const ArrowIcon = require('./../../../images/icon_carrot.svg');
 const PREVIEW_CHUNK_SIZE = FileImportTypes.PREVIEW_CHUNK_SIZE;
@@ -266,7 +265,7 @@ class FileImport extends TerrainComponent<any>
       }
       const colHeaderSet: Set<string> = new Set();
       const duplicateHeaderSet: Set<string> = new Set();
-      _.map(columnHeaders[0], (colHeader) =>
+      _.map(columnHeaders[0] as string[], (colHeader) =>
       {
         if (colHeaderSet.has(colHeader))
         {
@@ -330,9 +329,9 @@ class FileImport extends TerrainComponent<any>
           columnNames = Array.from(columnNamesSet);
           break;
         case 'csv':
-          columnNames = _.map(items[0], (value, index) =>
+          columnNames = _.map(items[0] as any, (value, index) =>
             !hasCsvHeader ? 'column ' + String(index) : index, // csv's with no header row will be named 'column 0, column 1...'
-          );
+          ) as string[];
           break;
         default:
       }
@@ -341,7 +340,7 @@ class FileImport extends TerrainComponent<any>
         filetype === 'json' || (filetype === 'csv' && hasCsvHeader) ?
           columnNames
           :
-          _.range(columnNames.length);
+          _.range(columnNames.length).map((num) => num.toString());
 
       let previewColumns;
       switch (filetype)

@@ -49,28 +49,18 @@ THE SOFTWARE.
 // via /credentials to localhost for testing purposes
 
 import aesjs = require('aes-js');
-import srs = require('secure-random-string');
 import sha1 = require('sha1');
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import UserConfig from '../users/UserConfig';
 import { users } from '../users/UserRouter';
-import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
+import CredentialConfig from './CredentialConfig';
 
 // CREATE TABLE credentials (id integer PRIMARY KEY, createdBy integer NOT NULL, \
 // meta text NOT NULL, name text NOT NULL, permission integer, type text NOT NULL);
-
-export interface CredentialConfig
-{
-  id?: number;
-  createdBy: number;
-  meta: string;
-  name: string;
-  permissions?: number;
-  type: string;
-}
 
 export class Credentials
 {
@@ -105,7 +95,8 @@ export class Credentials
   {
     return new Promise<CredentialConfig[]>(async (resolve, reject) =>
     {
-      const creds: CredentialConfig[] = await App.DB.select(this.credentialTable, [], { id, type }) as CredentialConfig[];
+      const rawCreds = await App.DB.select(this.credentialTable, [], { id, type });
+      const creds = rawCreds.map((result: object) => new CredentialConfig(result));
       return resolve(await Promise.all(creds.map(async (cred) =>
       {
         cred.meta = await this._decrypt(cred.meta);
@@ -119,10 +110,11 @@ export class Credentials
   {
     return new Promise<string[]>(async (resolve, reject) =>
     {
-      const creds: CredentialConfig[] = await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[];
+      const rawCreds = await App.DB.select(this.credentialTable, [], { type });
+      const creds = rawCreds.map((result: object) => new CredentialConfig(result));
       return resolve(await Promise.all(creds.map(async (cred) =>
       {
-        return await this._decrypt(cred.meta);
+        return this._decrypt(cred.meta);
       })));
     });
   }
@@ -132,7 +124,8 @@ export class Credentials
   {
     return new Promise<object[]>(async (resolve, reject) =>
     {
-      const creds: CredentialConfig[] = await App.DB.select(this.credentialTable, [], { type }) as CredentialConfig[];
+      const rawCreds = await App.DB.select(this.credentialTable, [], { type });
+      const creds = rawCreds.map((result: object) => new CredentialConfig(result));
       return resolve(await Promise.all(creds.map(async (cred) =>
       {
         return {
@@ -148,7 +141,7 @@ export class Credentials
 
   public async initializeLocalFilesystemCredential(): Promise<void>
   {
-    const userExists = await users.select(['id'], { email: 'admin@terraindata.com' });
+    const userExists = await users.select([], { email: 'admin@terraindata.com' });
     if (userExists.length !== 0)
     {
       const localConfigs: string[] = await this.getByType('local');
@@ -173,7 +166,7 @@ export class Credentials
     return new Promise<CredentialConfig>(async (resolve, reject) =>
     {
       // check privileges
-      if (user.isSuperUser === 0)
+      if (!user.isSuperUser)
       {
         return reject('Cannot create/update credentials as non-super user.');
       }
@@ -211,6 +204,8 @@ export class Credentials
       {
         cred.createdBy = user.id !== undefined ? user.id : -1;
         cred.meta = await this._encrypt(cred.meta);
+        const results: CredentialConfig[] = await this.get();
+        cred.id = results.length + 1;
       }
       let newCredObj: object = await App.DB.upsert(this.credentialTable, cred) as object;
 

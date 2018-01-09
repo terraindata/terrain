@@ -45,12 +45,12 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-var-requires
+import * as SpotlightTypes from 'app/builder/data/SpotlightTypes';
+import Util from 'app/util/Util';
 import * as React from 'react';
 import MapComponent from '../../common/components/MapComponent';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import BuilderActions from '../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../data/BuilderStore';
-import SpotlightStore from '../data/SpotlightStore';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -61,29 +61,24 @@ export interface Props
   canEdit: boolean;
   helpOn: boolean;
   parentKeyPath: KeyPath;
+  // injected props
+  spotlights?: SpotlightTypes.SpotlightState;
 }
 
 class BuilderMapComponent extends TerrainComponent<Props>
 {
   public state:
-  {
-    showExpanded: boolean,
-    inputs: any,
-    spotlights: any,
-  } = {
-    showExpanded: false,
-    inputs: null,
-    spotlights: null,
-  };
+    {
+      showExpanded: boolean,
+      inputs: any,
+    } = {
+      showExpanded: false,
+      inputs: null,
+    };
 
   public constructor(props: Props)
   {
     super(props);
-    this._subscribe(SpotlightStore, {
-      isMounted: false,
-      storeKeyPath: ['spotlights'],
-      stateKey: 'spotlights',
-    });
     this._subscribe(BuilderStore, {
       stateKey: 'builderState',
       updater: (builderState: BuilderState) =>
@@ -101,6 +96,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
   public render()
   {
     const { distance, distanceUnit, geopoint, map_text, field } = this.props.data;
+    const spotlights = this.props.spotlights.spotlights;
     return (
       <div className='cards-builder-map-component'>
         <MapComponent
@@ -117,7 +113,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
           hideSearchSettings={true}
           inputs={this.state.inputs}
           textKeyPath={this._ikeyPath(this.props.parentKeyPath, 'map_text')}
-          spotlights={this.state.spotlights}
+          spotlights={spotlights}
           field={field}
           keepAddressInSync={true}
           canEdit={this.props.canEdit}
@@ -128,5 +124,8 @@ class BuilderMapComponent extends TerrainComponent<Props>
     );
   }
 }
-
-export default BuilderMapComponent;
+export default Util.createTypedContainer(
+  BuilderMapComponent,
+  ['spotlights'],
+  {},
+);

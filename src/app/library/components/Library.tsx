@@ -54,7 +54,7 @@ import * as React from 'react';
 import MultipleAreaChart from '../../charts/components/MultipleAreaChart';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesActions from './../../roles/data/RolesActions';
-import { LibraryState } from './../data/LibraryStore';
+import { LibraryState } from './../LibraryTypes';
 import * as LibraryTypes from './../LibraryTypes';
 import AlgorithmsColumn from './AlgorithmsColumn';
 import CategoriesColumn from './CategoriesColumn';

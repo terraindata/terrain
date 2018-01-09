@@ -46,9 +46,9 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires strict-boolean-expressions restrict-plus-operands
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as React from 'react';
-const { List } = Immutable;
+
 import BackendInstance from '../../../database/types/BackendInstance';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import Dropdown from './../../common/components/Dropdown';
@@ -56,7 +56,6 @@ import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import RolesStore from './../../roles/data/RolesStore';
 import * as RoleTypes from './../../roles/RoleTypes';
-import UserStore from './../../users/data/UserStore';
 import * as UserTypes from './../../users/UserTypes';
 import Ajax from './../../util/Ajax';
 import ColorManager from './../../util/ColorManager';
@@ -91,32 +90,24 @@ export interface Props
   algorithmActions: any;
   libraryActions: any;
   roleActions: any;
+  users?: UserTypes.UserState;
+}
+
+export interface State
+{
+  roles: RoleMap;
 }
 
 class LibraryInfoColumn extends TerrainComponent<Props>
 {
-  public state: {
-    users: UserMap,
-    roles: RoleMap,
-    me: User,
-  } = {
-    users: null,
+  public state: State = {
     roles: null,
-    me: null,
   };
 
   constructor(props: Props)
   {
     super(props);
 
-    this._subscribe(UserStore, {
-      stateKey: 'users',
-      storeKeyPath: ['users'],
-    });
-    this._subscribe(UserStore, {
-      stateKey: 'me',
-      storeKeyPath: ['currentUser'],
-    });
     this._subscribe(RolesStore, {
       stateKey: 'roles',
     });
@@ -186,6 +177,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public renderUser(user: User): JSX.Element
   {
+    const { users } = this.props;
     const { roles } = this.state;
     const categoryRoles = roles && roles.get(this.props.category.id);
     if (!user || user.isDisabled)
@@ -195,7 +187,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     return <LibraryInfoUser
       user={user}
       categoryRoles={categoryRoles}
-      me={this.state.me}
+      me={users.currentUser}
       categoryId={this.props.category.id}
       key={user.id}
       roleActions={this.props.roleActions}
@@ -204,7 +196,10 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public renderCategoryRoles(): JSX.Element | JSX.Element[]
   {
-    const { me, users, roles } = this.state;
+    const { users } = this.props;
+    const { roles } = this.state;
+    const { currentUser: me } = users;
+
     const categoryRoles = roles && roles.get(this.props.category.id);
     if (!me || !categoryRoles || !users)
     {
@@ -217,20 +212,22 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       {
         return null; // current user is always rendered at top
       }
-      return this.renderUser(users.get(role.userId));
+      return this.renderUser(users.users.get(role.userId));
     });
   }
 
   public renderRemainingUsers()
   {
-    const { me, roles, users } = this.state;
+    const { users } = this.props;
+    const { roles } = this.state;
+    const { currentUser: me } = users;
     const categoryRoles = roles && roles.get(this.props.category.id);
     if (!me || !users)
     {
       return null;
     }
 
-    return users.toArray().map((user: User) =>
+    return users.users.toArray().map((user: User) =>
     {
       if (user.id === me.id || (categoryRoles && categoryRoles.get(user.id)))
       {
@@ -248,7 +245,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public renderCategory(isSuperUser, isBuilder)
   {
-    const { category } = this.props;
+    const { category, users } = this.props;
     if (!category || this.props.group || this.props.algorithm)
     {
       return null;
@@ -257,8 +254,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     // let users: UserTypes.UserMap = UserStore.getState().get('users');
     // let me: UserTypes.User = UserStore.getState().get('currentUser');
     // let categoryRoles: CategoryRoleMap = RolesStore.getState().getIn(['roles', category.id]);
-
-    const isSysAdmin = this.state.me && this.state.me.isSuperUser;
+    const { currentUser: me } = users;
+    const isSysAdmin = me && me.isSuperUser;
     const dbs = this.getSortedDatabases(this.props.dbs);
     return (
       <div>
@@ -289,6 +286,7 @@ class LibraryInfoColumn extends TerrainComponent<Props>
 
   public render()
   {
+    const { users } = this.props;
     const item: LibraryTypes.Algorithm | LibraryTypes.Group | LibraryTypes.Category =
       this.props.algorithm || this.props.group || this.props.category;
 
@@ -317,8 +315,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
         break;
     }
 
-    const isSuperUser = Util.haveRole(categoryId, 'admin', UserStore, RolesStore);
-    const isBuilder = Util.haveRole(categoryId, 'builder', UserStore, RolesStore);
+    const isSuperUser = Util.haveRole(categoryId, 'admin', users, RolesStore);
+    const isBuilder = Util.haveRole(categoryId, 'builder', users, RolesStore);
 
     return (
       <LibraryColumn
@@ -380,4 +378,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
   }
 }
 
-export default LibraryInfoColumn;
+export default Util.createContainer(
+  LibraryInfoColumn,
+  ['users'],
+  {},
+);

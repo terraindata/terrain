@@ -43,20 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-export let SchemaActionTypes =
+import ConfigType from '../ConfigType';
+
+export class MetricConfig extends ConfigType
+{
+  public id?: number = undefined;
+  public database: number = -1;
+  public label: string = '';
+  public events: string = '';
+
+  constructor(props: object)
   {
-    fetch: '',
-    setServer: '', // sets the schema for a database
-    addDbToServer: '',
-    error: '',
-    serverCount: '',
+    super();
+    ConfigType.initialize(this, props);
+  }
+}
 
-    highlightId: '',
-    selectId: '',
-  };
-
-Util.setValuesToKeys(SchemaActionTypes, 'schema');
-
-export default SchemaActionTypes;
+export default MetricConfig;

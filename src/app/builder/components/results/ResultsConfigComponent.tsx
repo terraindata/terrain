@@ -55,7 +55,8 @@ import * as React from 'react';
 import { DragSource, DropTarget } from 'react-dnd';
 import { _Format, Format, ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
-import ColorsActions from '../../../colors/data/ColorsActions';
+import { ColorsActions } from '../../../colors/data/ColorsRedux';
+import Util from '../../../util/Util';
 import DragHandle from './../../../common/components/DragHandle';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -75,6 +76,7 @@ export interface Props
   config: ResultsConfig;
   onConfigChange: (config: ResultsConfig) => void;
   onClose: () => void;
+  colorsActions: typeof ColorsActions;
 }
 
 @Radium
@@ -84,9 +86,9 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
     lastHover: { index: number, field: string },
     config: ResultsConfig;
   } = {
-    lastHover: { index: null, field: null },
-    config: null,
-  };
+      lastHover: { index: null, field: null },
+      config: null,
+    };
 
   constructor(props: Props)
   {
@@ -96,7 +98,11 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.results-config-field-gear', { fill: Colors().iconColor });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.results-config-field-gear',
+      style: { fill: Colors().iconColor },
+    });
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -431,8 +437,8 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
   public state: {
     showFormat: boolean;
   } = {
-    showFormat: false,
-  };
+      showFormat: false,
+    };
 
   public handleRemove()
   {
@@ -539,7 +545,7 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
         className={classNames({
           'results-config-field': true,
           'results-config-field-dragging': this.props.isDragging ||
-          (this.props.draggingField && this.props.draggingField === this.props.field),
+            (this.props.draggingField && this.props.draggingField === this.props.field),
           'results-config-field-name': this.props.is === 'name',
           'results-config-field-score': this.props.is === 'score',
           'results-config-field-field': this.props.is === 'field',
@@ -773,4 +779,10 @@ const crDropCollect = (connect, monitor) =>
 
 const CRTarget = DropTarget('RESULTCONFIG', crTarget, crDropCollect)(CRTargetC);
 
-export default ResultsConfigComponent;
+export default Util.createContainer(
+  ResultsConfigComponent,
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);

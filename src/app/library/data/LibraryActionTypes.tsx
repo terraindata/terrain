@@ -53,31 +53,31 @@ const duplicate = '';
 export let LibraryActionTypes =
   {
     categories:
-    {
-      create, change, move,
-      // duplicate,
-    },
+      {
+        create, change, move,
+        // duplicate,
+      },
 
     groups:
-    {
-      create, change, move,
-    },
+      {
+        create, change, move,
+      },
 
     algorithms:
-    {
-      create, change, move,
-      status: '',
-      fetchVersion: '',
-      loadVersion: '',
-      select: '',
-      unselect: '',
-    },
+      {
+        create, change, move,
+        status: '',
+        fetchVersion: '',
+        loadVersion: '',
+        select: '',
+        unselect: '',
+      },
 
     loadState: '',
     setDbs: '',
   };
 
-Util.setValuesToKeys(LibraryActionTypes, '');
+Util.setValuesToKeys(LibraryActionTypes, 'library');
 
 export const CleanLibraryActionTypes = // not dirty
   [

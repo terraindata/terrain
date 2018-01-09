@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESAnyClause from './clauses/ESAnyClause';
 import ESArrayClause from './clauses/ESArrayClause';
 import ESBaseClause from './clauses/ESBaseClause';
 import ESBooleanClause from './clauses/ESBooleanClause';
@@ -286,6 +285,7 @@ const EQLSpec: ESClause[] =
         search_after: 'search_after',
         ignore_failure: 'boolean',
         all_fields: 'boolean',
+        groupJoin: 'groupjoin_clause',
         // ext: 'ext', not much documents about the usage of this ext
         //        _name: 'query_name',
         //        inner_hits: 'inner_hits',
@@ -299,7 +299,10 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: {
           'query:query': {
-            'bool:elasticFilter': null,
+            'bool:elasticFilter': {
+              'filter:query[]': [{ 'term:term_query': { '_index:string': '' } }, { 'term:term_query': { '_type:string': '' } }],
+              'must:query[]': [{ 'term:term_query': { ' :string': '' } }],
+            },
           },
           'sort:elasticScore': null,
           'from:from': 0,
@@ -319,6 +322,22 @@ const EQLSpec: ESClause[] =
         name: 'slice',
         desc: 'A slice allowing to split a scroll in multiple partitions',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html',
+      }),
+    // Terrain Extension: groupJoin clause
+    new ESMapClause('groupjoin_clause',
+      'groupjoin_name',
+      'body',
+      {
+        path: ['groupjoin'],
+        name: 'groupJoin query',
+        desc: 'Create and name a groupJoin query.',
+        url: '',
+      }),
+    new ESStringClause('groupjoin_name',
+      {
+        path: ['groupjoin'],
+        desc: 'names this groupJoin subquery, must be alpha-numeric and can only contain \'_\' and \'-\'',
+        url: '',
       }),
     // aggregation
     // AggregatorFactories.java
@@ -1698,7 +1717,6 @@ const EQLSpec: ESClause[] =
         name: 'bool',
         desc: 'Filters in and out documents meeting the given logical conditions.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
-        // template: { must: null, must_not: null, should: null, minimum_should_match: null },
         suggestions: ['must', 'must_not', 'filter', 'should', 'minimum_should_match'],
       }),
     new ESVariantClause('must',

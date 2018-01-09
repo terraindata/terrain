@@ -45,7 +45,7 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 
@@ -54,8 +54,6 @@ import { Menu, MenuOption } from 'common/components/Menu';
 import TerrainComponent from 'common/components/TerrainComponent';
 
 import './ControlList.less';
-
-const { List } = Immutable;
 
 export type HeaderConfigItem = [string, (rowElem, index) => any];
 export type HeaderConfig = HeaderConfigItem[];

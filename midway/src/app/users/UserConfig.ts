@@ -44,34 +44,26 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import ConfigType from '../ConfigType';
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as Redux from 'redux';
-import * as ReduxActions from 'redux-actions';
-import thunk from 'redux-thunk';
-import Util from './../../util/Util';
-import ColorsReducers from './ColorsReducers';
-
-class ColorsStateC
+export class UserConfig extends ConfigType
 {
-  public styles: IMMap<string, React.CSSProperties> = Immutable.Map();
+  public accessToken?: string = undefined;
+  public email: string = '';
+  public id?: number = undefined;
+  public isDisabled: boolean = true;
+  public isSuperUser: boolean = false;
+  public name: string = '';
+  public oldPassword?: string = undefined;
+  public password: string = '';
+  public timezone?: string = undefined;
+  public meta?: string = undefined;
+
+  constructor(props: object)
+  {
+    super();
+    ConfigType.initialize(this, props);
+  }
 }
 
-const ColorsState_Record = Immutable.Record(new ColorsStateC());
-export interface ColorsState extends ColorsStateC, IRecord<ColorsState> { }
-export const _ColorsState = (config?: any) =>
-{
-  return new ColorsState_Record(Util.extendId(config || {})) as any as ColorsState;
-};
-
-const DefaultState = _ColorsState();
-
-export const ColorsStore = Redux.createStore(
-  ColorsReducers,
-  DefaultState,
-  Redux.applyMiddleware(thunk),
-);
-
-export default ColorsStore;
+export default UserConfig;

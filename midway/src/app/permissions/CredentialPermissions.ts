@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { UserConfig } from '../users/Users';
+import UserConfig from '../users/UserConfig';
 
 export class CredentialPermissions
 {
@@ -52,7 +52,7 @@ export class CredentialPermissions
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      if (user.isSuperUser === 0)
+      if (!user.isSuperUser)
       {
         return reject('User must be a super user.');
       }
