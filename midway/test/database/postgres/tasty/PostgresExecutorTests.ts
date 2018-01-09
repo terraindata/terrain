@@ -71,7 +71,7 @@ beforeAll(async () =>
     {
       database: 'moviesdb',
       host: 'localhost',
-      port: '65432',
+      port: 65432,
       password: 'r3curs1v3$',
       user: 't3rr41n-demo',
     };
