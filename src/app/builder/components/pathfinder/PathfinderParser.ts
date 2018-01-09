@@ -287,8 +287,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         term: Map({
           [line.field]: Map({
-            value: line.value,
-            boost: line.weight,
+            value: line.value || '',
+            boost: parseFloat(line.weight),
           }),
         }),
       });
@@ -296,7 +296,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         match: Map({
           [line.field]: Map({
-            query: String(line.value),
+            query: String(line.value || ''),
           }),
         }),
       });
@@ -308,7 +308,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
             must_not: Map({
               term: Map({
                 [line.field]: Map({
-                  value: String(line.value),
+                  value: String(line.value || ''),
                   boost: line.weight,
                 }),
               }),
@@ -319,7 +319,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         term: Map({
           [line.field]: Map({
-            value: String(line.value),
+            value: String(line.value || ''),
             boost: line.weight,
           }),
         }),
@@ -332,7 +332,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
             must_not: Map({
               match: Map({
                 [line.field]: Map({
-                  query: String(line.value),
+                  query: String(line.value || ''),
                 }),
               }),
             }),
@@ -342,7 +342,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         match: Map({
           [line.field]: Map({
-            query: String(line.value),
+            query: String(line.value || ''),
           }),
         }),
       });

@@ -238,17 +238,20 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('field')}
         />
-        <div
-          className={this.props.line.expanded ?
-            'pf-score-line-transform-arrow-open' :
-            'pf-score-line-transform-arrow-closed'}
-        >
+        {
+          this.props.line.field &&
           <div
-            className={this.props.line.expanded ?
-              'pf-score-line-transform-arrow-inner-open' :
-              'pf-score-line-transform-arrow-inner-closed'}
-          />
-        </div>
+                  className={this.props.line.expanded ?
+                    'pf-score-line-transform-arrow-open' :
+                    'pf-score-line-transform-arrow-closed'}
+                >
+                  <div
+                    className={this.props.line.expanded ?
+                      'pf-score-line-transform-arrow-inner-open' :
+                      'pf-score-line-transform-arrow-inner-closed'}
+                  />
+                </div>
+          }
         {
           !this.props.line.expanded ?
             this.renderTransformChartPreview() :

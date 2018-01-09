@@ -848,7 +848,6 @@ column if you have customized the results view.');
 
   private isDatabaseEmpty(): boolean
   {
-    console.log(this.props.db);
     return !this.props.db || !this.props.db.id;
   }
 }
