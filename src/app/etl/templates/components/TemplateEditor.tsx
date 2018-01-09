@@ -54,7 +54,7 @@ import Util from 'util/Util';
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _ExportTemplate, _TemplateField, ETLTemplate, TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { _ExportTemplate, _TemplateField, ETLTemplate, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 
@@ -76,14 +76,16 @@ class ETLExportDisplay extends TerrainComponent<Props>
       templateId: 1,
       templateName: 'Test Template',
     });
-    template = template.setIn(['rootField', 'children', 0],
-      _TemplateField({ name: 'productId', type: ELASTIC_TYPES.TEXT, isPrimaryKey: true, isAnalyzed: false }));
-    template = template.setIn(['rootField', 'children', 1],
-      _TemplateField({ name: 'product_info', type: ELASTIC_TYPES.NESTED }));
-    template = template.setIn(['rootField', 'children', 1, 'children', 0],
-      _TemplateField({ name: 'value' }));
-    template = template.setIn(['rootField', 'children', 1, 'children', 1],
-      _TemplateField({ name: 'other_value', type: ELASTIC_TYPES.LONG }));
+    // template = template.setIn(['rootField', 'children', 0],
+    //   _TemplateField({ name: 'productId', type: ELASTIC_TYPES.TEXT, isPrimaryKey: true, isAnalyzed: false }));
+    // template = template.setIn(['rootField', 'children', 1],
+    //   _TemplateField({ name: 'product_info', type: ELASTIC_TYPES.NESTED }));
+    // template = template.setIn(['rootField', 'children', 1, 'children', 0],
+    //   _TemplateField({ name: 'value' }));
+    // template = template.setIn(['rootField', 'children', 1, 'children', 1],
+    //   _TemplateField({ name: 'other_value', type: ELASTIC_TYPES.LONG }));
+
+    template = template.set('rootField', treeFromDocument(SampleDocument));
 
     this.props.act({
       actionType: 'loadTemplate',
@@ -104,7 +106,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
     const template: ETLTemplate = this.props.templateEditor.template;
     const titleTypeText = template.type === TEMPLATE_TYPES.IMPORT ? 'Import' : 'Export';
     return (
-      <div className='template-editor-root-container'>
+      <div className='template-editor-root-container' style={backgroundColor(Colors().bg2)}>
         <TemplateEditorFieldNode
           keyPath={List([])}
           field={template.rootField}
@@ -117,6 +119,96 @@ class ETLExportDisplay extends TerrainComponent<Props>
       </div>
     );
   }
+}
+
+const SampleDocument = {
+  'Product Name': 'Food',
+  'Product ID': 123,
+  'Product Description': 'You can eat this to survive!',
+  'Meta': {
+    'Date Added': '01/08/2018',
+  },
+  'Here are some numbers': [
+    1, 2, 3.14, 4
+  ],
+};
+
+// temporary helper for debugging. delete this
+function treeFromDocument(document: object, name = ''): TemplateField
+{
+  if (document === null)
+  {
+    return _TemplateField();
+  }
+
+  try
+  {
+    JSON.stringify(document);
+  }
+  catch (e)
+  {
+    console.error(`There is a problem with this document: ${e}`);
+    return _TemplateField();
+  }
+
+  const children = [];
+
+  for (const key of Object.keys(document))
+  {
+    const value = document[key];
+
+    if (value !== Object(value))
+    {
+      if (typeof value === 'number')
+      {
+        children.push(_TemplateField({ name: key, type: ELASTIC_TYPES.FLOAT }));
+      }
+      else if (typeof value === 'boolean')
+      {
+        children.push(_TemplateField({ name: key, type: ELASTIC_TYPES.BOOLEAN }));
+      }
+      else // assume text
+      {
+        children.push(_TemplateField({ name: key, type: ELASTIC_TYPES.TEXT }));
+      }
+    }
+    else if (Array.isArray(value))
+    {
+      let arrayVal: any = Array.isArray(value) && value.length > 0 ? value[0] : '';
+      const arrayType = [];
+
+      while (Array.isArray(arrayVal))
+      {
+        arrayType.push(ELASTIC_TYPES.ARRAY);
+        if (arrayVal.length > 0)
+        {
+          arrayVal = arrayVal[0];
+        }
+        else
+        {
+          arrayVal = '';
+        }
+      }
+      if (typeof value === 'number')
+      {
+        arrayType.push(ELASTIC_TYPES.FLOAT);
+      }
+      else if (typeof value === 'boolean')
+      {
+        arrayType.push(ELASTIC_TYPES.BOOLEAN);
+      }
+      else
+      {
+        arrayType.push(ELASTIC_TYPES.TEXT);
+      }
+      children.push(_TemplateField({ name: key, type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) }));
+    }
+    else // nested
+    {
+      children.push(treeFromDocument(value, key));
+    }
+  }
+  return _TemplateField({ name, children: List(children), type: ELASTIC_TYPES.NESTED });
 }
 
 export default Util.createContainer(

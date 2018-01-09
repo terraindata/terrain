@@ -58,6 +58,7 @@ class TemplateEditorStateC
   public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
   public isDirty: boolean = true;
   public modalRequests: List<ModalProps> = List([]);
+  public previewDocument: object = {};
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);
@@ -68,7 +69,7 @@ interface TemplateBase
   templateName: string;
   type: TEMPLATE_TYPES;
   filetype: FILE_TYPES;
-  rootField: TemplateField; // was column types
+  rootField: TemplateField;
   transformations: any;
   objectKey: string;
   dbid: number;
@@ -95,7 +96,7 @@ class ExportTemplateC implements ExportTemplateBase
   public templateName = '';
   public readonly type = TEMPLATE_TYPES.EXPORT;
   public filetype = FILE_TYPES.JSON;
-  public rootField = _TemplateField();
+  public rootField = _TemplateField({ type: ELASTIC_TYPES.NESTED });
   public transformations = List([]);
   public objectKey = '';
   public dbid = -1;
@@ -112,7 +113,7 @@ class ImportTemplateC implements ImportTemplateBase
   public templateName = '';
   public readonly type = TEMPLATE_TYPES.IMPORT;
   public filetype = FILE_TYPES.JSON;
-  public rootField = _TemplateField();
+  public rootField = _TemplateField({ type: ELASTIC_TYPES.NESTED });
   public transformations = List([]);
   public objectKey = '';
   public dbid = -1;
