@@ -72,8 +72,8 @@ export class PathfinderAggregationMoreSection extends TerrainComponent<Props>
   public state: {
     expanded: boolean;
   } = {
-    expanded: false,
-  };
+      expanded: false,
+    };
 
   public handleDelete()
   {

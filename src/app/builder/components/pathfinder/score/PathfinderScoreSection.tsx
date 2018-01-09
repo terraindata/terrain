@@ -81,9 +81,9 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     allWeights: Array<{ weight: number }>;
     animateScoreBars: boolean;
   } = {
-    allWeights: [],
-    animateScoreBars: true,
-  };
+      allWeights: [],
+      animateScoreBars: true,
+    };
 
   public componentWillMount()
   {

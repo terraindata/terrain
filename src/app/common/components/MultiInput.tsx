@@ -68,8 +68,8 @@ class MultiInput extends TerrainComponent<Props>
   public state: {
     newValue: string;
   } = {
-    newValue: '',
-  };
+      newValue: '',
+    };
 
   public deleteItem(index)
   {

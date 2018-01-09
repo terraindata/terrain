@@ -84,8 +84,8 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public state: {
     fieldOptions: List<string>,
   } = {
-    fieldOptions: List([]),
-  };
+      fieldOptions: List([]),
+    };
 
   public typeOptions: List<string> = List([]);
 

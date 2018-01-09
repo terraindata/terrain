@@ -94,10 +94,10 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     expanded: boolean;
     fieldIndex: number;
   } = {
-    weight: this.props.line.weight,
-    expanded: this.props.line.expanded,
-    fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
-  };
+      weight: this.props.line.weight,
+      expanded: this.props.line.expanded,
+      fieldIndex: this.props.dropdownOptions.map((v) => v.displayName).toList().indexOf(this.props.line.field),
+    };
 
   public componentWillReceiveProps(nextProps)
   {
@@ -241,17 +241,17 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         {
           this.props.line.field &&
           <div
-                  className={this.props.line.expanded ?
-                    'pf-score-line-transform-arrow-open' :
-                    'pf-score-line-transform-arrow-closed'}
-                >
-                  <div
-                    className={this.props.line.expanded ?
-                      'pf-score-line-transform-arrow-inner-open' :
-                      'pf-score-line-transform-arrow-inner-closed'}
-                  />
-                </div>
-          }
+            className={this.props.line.expanded ?
+              'pf-score-line-transform-arrow-open' :
+              'pf-score-line-transform-arrow-closed'}
+          >
+            <div
+              className={this.props.line.expanded ?
+                'pf-score-line-transform-arrow-inner-open' :
+                'pf-score-line-transform-arrow-inner-closed'}
+            />
+          </div>
+        }
         {
           !this.props.line.expanded ?
             this.renderTransformChartPreview() :

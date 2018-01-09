@@ -75,8 +75,8 @@ class DragAndDrop extends TerrainComponent<Props>
   public state: {
     items: any;
   } = {
-    items: this.props.draggableItems,
-  };
+      items: this.props.draggableItems,
+    };
 
   public constructor(props)
   {

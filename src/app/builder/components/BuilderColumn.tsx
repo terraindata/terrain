@@ -126,7 +126,7 @@ const BuilderColumn = createReactClass<any, any>(
     mixins: [PanelMixin],
 
     propTypes:
-    {
+      {
         query: PropTypes.object.isRequired,
         resultsState: PropTypes.object.isRequired,
         exportState: PropTypes.object.isRequired,

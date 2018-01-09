@@ -76,8 +76,8 @@ class DatePickerWrapper extends TerrainComponent<Props>
   public state: {
     expanded: boolean;
   } = {
-    expanded: false,
-  };
+      expanded: false,
+    };
 
   public getDate(): Date
   {

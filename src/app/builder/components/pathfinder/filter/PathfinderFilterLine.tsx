@@ -81,7 +81,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   } = {
 
-  };
+    };
 
   public render()
   {
@@ -108,23 +108,23 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           />,
           {
             content:
-            <AdvancedDropdown
-              options={source.dataSource.getChoiceOptions({
-                type: 'comparison',
-                field: filterLine.field,
-                source,
-                schemaState: pathfinderContext.schemaState,
-              })}
-              value={filterLine.comparison}
-              canEdit={pathfinderContext.canEdit}
-              onChange={this._fn(this.handleChange, 'comparison')}
-              placeholder={'Choose comparison'}
-            />,
+              <AdvancedDropdown
+                options={source.dataSource.getChoiceOptions({
+                  type: 'comparison',
+                  field: filterLine.field,
+                  source,
+                  schemaState: pathfinderContext.schemaState,
+                })}
+                value={filterLine.comparison}
+                canEdit={pathfinderContext.canEdit}
+                onChange={this._fn(this.handleChange, 'comparison')}
+                placeholder={'Choose comparison'}
+              />,
             visible: filterLine.field !== null,
           },
           {
             content:
-            this.renderValue(),
+              this.renderValue(),
             visible: filterLine.comparison !== null,
           },
         ])}

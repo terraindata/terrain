@@ -97,7 +97,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   } = {
 
-  };
+    };
 
   public render()
   {
@@ -121,7 +121,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           this.renderBoost()
         }
         {
-         <div
+          <div
             className='close'
             onClick={this.props.onDelete && this._fn(this.props.onDelete, this.props.keyPath)}
           >
@@ -203,20 +203,20 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       <div>
         {
           !filterLine.weightSet ?
-          <div onClick={this.addBoost} className='pf-filter-add-boost'>
-            Add Boost
+            <div onClick={this.addBoost} className='pf-filter-add-boost'>
+              Add Boost
           </div>
-          :
-          <div className='pf-filter-boost'>
-            <span>Boost:</span>
-            <input
-              value={filterLine.weight}
-              type='number'
-              min={0}
-              step={1}
-              onChange={this.handleBoostChange}
-            />
-          </div>
+            :
+            <div className='pf-filter-boost'>
+              <span>Boost:</span>
+              <input
+                value={filterLine.weight}
+                type='number'
+                min={0}
+                step={1}
+                onChange={this.handleBoostChange}
+              />
+            </div>
         }
       </div>
     );

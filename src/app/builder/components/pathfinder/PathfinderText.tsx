@@ -120,120 +120,120 @@ export const PathfinderText = {
   `,
 
   aggregation:
-  {
-    missing: {
-      title: 'Missing',
-      text: 'If a document is missing',
-      tooltipText: '',
-    },
-    percentileRanks: {
-      title: 'Percentile Ranks',
-      text: 'Return the percentiles of the following values',
-      tooltipText: 'The percentile of each of these values of the selected field will be returned',
-    },
-    percentile: {
-      title: 'Percentiles',
-      text: 'Return the values at the following percentiles',
-      tooltipText: 'The value at each of the following percentiles will be returned',
-    },
-    accuracy: {
-      title: 'Accuracy',
-      text1: 'Compression',
-      tooltipText1: 'A higher compression value will lead to more accurate results but take longer. The default is 100',
-      text2: 'Significant Digits',
-      tooltipText2: 'A higher number of significant digits will be more precise, but will take longer. An HDR histogram will be used.',
-    },
-    sigma: {
-      title: 'Standard Deviation Bounds',
-      text: 'Sigma',
-      tooltipText: 'Where to set the standard deviation bounds, in terms of the number of deviations away from the average',
-    },
-    ranges: {
-      title: 'Ranges',
-      text1: 'Uniform range size:',
-      tooltipText1: 'The width of each equally-sized range of values',
-      text2: 'Custom ranges',
-      tooltipText2: 'Add individually sized and named ranges',
-    },
-    format: {
-      title: 'Format',
-      text1: 'Date Format',
-      tooltipText1: 'The format of the date, e.g. MM/dd/yyyy',
-      text2: 'Timezone',
-      tooltipText2: 'What timezone the dates are in, either a time zone id or UTC offset',
-    },
-    extendedRange: {
-      title: 'Facet Bounds',
-      text1: 'Offset',
-      tooltipText1: 'How much to offset the bars of the data from the lower bound',
-      text2: 'Lower Bound',
-      tooltipText2: 'The lower bound for values of the selected field',
-      text3: 'Upper Bound',
-      tooltipText3: 'The upper bound for values of the selected field',
-    },
-    minDocCount: {
-      title: 'Minimum Facet Size',
-      text: 'Minimum facet size',
-      tooltipText: 'The fewest number of documents in a facet for it to be included in the facets',
-    },
-    order: {
-      title: 'Sort order',
-      text1: 'Sort facets by',
-      text2: 'in ',
-      text3: 'order',
-      tooltipText: 'How to order the facets',
-    },
-    size: {
-      title: 'Size',
-      text: 'Number of facets',
-      tooltipText: 'How many facets will be returned, a higher value will take longer to compute',
-    },
-    error: {
-      title: 'error',
-      text: 'Show the margin of error for each facet',
-      tooltipText: 'Set to true, the upper bound of the error for each facet will be included with each facet',
-    },
-    origin: {
-      title: 'Origin',
-      text: '',
-      tooltipText: 'Geographic location to from the distance from',
-    },
-    distance: {
-      title: 'Distance Settings',
-      text1: 'Units',
-      tooltipText1: 'Units that the distances returned will be in',
-      text2: 'Distance Type',
-      tooltipText2: 'Arc distance is default and more accurate. Plane distance is less accurate but faster',
-    },
-    precision: {
-      title: 'Precision',
-      text: 'Grid size',
-      tooltipText: `This value determines how large the squares of the geo grid will be.
+    {
+      missing: {
+        title: 'Missing',
+        text: 'If a document is missing',
+        tooltipText: '',
+      },
+      percentileRanks: {
+        title: 'Percentile Ranks',
+        text: 'Return the percentiles of the following values',
+        tooltipText: 'The percentile of each of these values of the selected field will be returned',
+      },
+      percentile: {
+        title: 'Percentiles',
+        text: 'Return the values at the following percentiles',
+        tooltipText: 'The value at each of the following percentiles will be returned',
+      },
+      accuracy: {
+        title: 'Accuracy',
+        text1: 'Compression',
+        tooltipText1: 'A higher compression value will lead to more accurate results but take longer. The default is 100',
+        text2: 'Significant Digits',
+        tooltipText2: 'A higher number of significant digits will be more precise, but will take longer. An HDR histogram will be used.',
+      },
+      sigma: {
+        title: 'Standard Deviation Bounds',
+        text: 'Sigma',
+        tooltipText: 'Where to set the standard deviation bounds, in terms of the number of deviations away from the average',
+      },
+      ranges: {
+        title: 'Ranges',
+        text1: 'Uniform range size:',
+        tooltipText1: 'The width of each equally-sized range of values',
+        text2: 'Custom ranges',
+        tooltipText2: 'Add individually sized and named ranges',
+      },
+      format: {
+        title: 'Format',
+        text1: 'Date Format',
+        tooltipText1: 'The format of the date, e.g. MM/dd/yyyy',
+        text2: 'Timezone',
+        tooltipText2: 'What timezone the dates are in, either a time zone id or UTC offset',
+      },
+      extendedRange: {
+        title: 'Facet Bounds',
+        text1: 'Offset',
+        tooltipText1: 'How much to offset the bars of the data from the lower bound',
+        text2: 'Lower Bound',
+        tooltipText2: 'The lower bound for values of the selected field',
+        text3: 'Upper Bound',
+        tooltipText3: 'The upper bound for values of the selected field',
+      },
+      minDocCount: {
+        title: 'Minimum Facet Size',
+        text: 'Minimum facet size',
+        tooltipText: 'The fewest number of documents in a facet for it to be included in the facets',
+      },
+      order: {
+        title: 'Sort order',
+        text1: 'Sort facets by',
+        text2: 'in ',
+        text3: 'order',
+        tooltipText: 'How to order the facets',
+      },
+      size: {
+        title: 'Size',
+        text: 'Number of facets',
+        tooltipText: 'How many facets will be returned, a higher value will take longer to compute',
+      },
+      error: {
+        title: 'error',
+        text: 'Show the margin of error for each facet',
+        tooltipText: 'Set to true, the upper bound of the error for each facet will be included with each facet',
+      },
+      origin: {
+        title: 'Origin',
+        text: '',
+        tooltipText: 'Geographic location to from the distance from',
+      },
+      distance: {
+        title: 'Distance Settings',
+        text1: 'Units',
+        tooltipText1: 'Units that the distances returned will be in',
+        text2: 'Distance Type',
+        tooltipText2: 'Arc distance is default and more accurate. Plane distance is less accurate but faster',
+      },
+      precision: {
+        title: 'Precision',
+        text: 'Grid size',
+        tooltipText: `This value determines how large the squares of the geo grid will be.
       A number between 1-12 is expected with 1 being the least precise. Alternatively,
       an estimate of grid width (12mi) can be given.`,
+      },
+      includeExclude: {
+        title: 'Include / Exclude',
+        text1: 'Terms to Include',
+        tooltipText1: 'A list of exact terms or regular expressions to be included in the facets',
+        text2: 'Terms to Exclude',
+        tooltipText2: 'A list of exact terms or regular expressions to be excluded in the facets',
+      },
+      type: {
+        title: 'Type of Facets',
+        text1: 'Geographic Distance',
+        tooltipText1: 'Find facets for the geographic distance of each document to the origin point',
+        text2: 'Geographic Grid',
+        tooltipText2: 'Find the facets of a geographic grid (the number of documents that fall into each square in the grid)',
+      },
+      termsType: {
+        title: 'Type of Facets',
+        text1: 'Terms',
+        tooltipText1: 'A standard facet for a text field, returning the top values of the chosen field',
+        text2: 'Significant Terms',
+        tooltipText2: 'Significant terms will return interesting or unusal occurences of terms in a set',
+      },
     },
-    includeExclude: {
-      title: 'Include / Exclude',
-      text1: 'Terms to Include',
-      tooltipText1: 'A list of exact terms or regular expressions to be included in the facets',
-      text2: 'Terms to Exclude',
-      tooltipText2: 'A list of exact terms or regular expressions to be excluded in the facets',
-    },
-    type: {
-      title: 'Type of Facets',
-      text1: 'Geographic Distance',
-      tooltipText1: 'Find facets for the geographic distance of each document to the origin point',
-      text2: 'Geographic Grid',
-      tooltipText2: 'Find the facets of a geographic grid (the number of documents that fall into each square in the grid)',
-    },
-    termsType: {
-      title: 'Type of Facets',
-      text1: 'Terms',
-      tooltipText1: 'A standard facet for a text field, returning the top values of the chosen field',
-      text2: 'Significant Terms',
-      tooltipText2: 'Significant terms will return interesting or unusal occurences of terms in a set',
-    },
-  },
 };
 
 export default PathfinderText;

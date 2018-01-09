@@ -84,8 +84,8 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
   public state: {
     expanded: boolean;
   } = {
-    expanded: false,
-  };
+      expanded: false,
+    };
 
   public handleMissingChange(index)
   {

@@ -77,8 +77,8 @@ class RangesInput extends TerrainComponent<Props>
   public state: {
     newValue: string;
   } = {
-    newValue: '',
-  };
+      newValue: '',
+    };
 
   public deleteItem(index)
   {

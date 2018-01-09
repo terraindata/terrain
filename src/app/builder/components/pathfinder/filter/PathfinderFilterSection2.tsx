@@ -92,11 +92,11 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
     filtersOpen: Immutable.Map<string, boolean>,
 
   } = {
-    sampleData: List([]),
-    schema: List([]),
-    currentResult: 0,
-    filtersOpen: Immutable.Map<string, boolean>({}),
-  };
+      sampleData: List([]),
+      schema: List([]),
+      currentResult: 0,
+      filtersOpen: Immutable.Map<string, boolean>({}),
+    };
 
   public componentWillMount()
   {

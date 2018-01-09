@@ -352,10 +352,10 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         range: Map({
           [line.field]:
-          Map({
-            gt: line.value,
-            boost: line.weight,
-          }),
+            Map({
+              gt: line.value,
+              boost: line.weight,
+            }),
         }),
       });
     case 'less':
@@ -364,30 +364,30 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         range: Map({
           [line.field]:
-          Map({
-            lt: line.value,
-            boost: line.weight,
-          }),
+            Map({
+              lt: line.value,
+              boost: line.weight,
+            }),
         }),
       });
     case 'greaterequal':
       return Map({
         range: Map({
           [line.field]:
-          Map({
-            gte: line.value,
-            boost: line.weight,
-          }),
+            Map({
+              gte: line.value,
+              boost: line.weight,
+            }),
         }),
       });
     case 'lessequal':
       return Map({
         range: Map({
           [line.field]:
-          Map({
-            lte: line.value,
-            boost: line.weight,
-          }),
+            Map({
+              lte: line.value,
+              boost: line.weight,
+            }),
         }),
       });
     case 'located':

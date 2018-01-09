@@ -408,10 +408,10 @@ abstract class DataSource extends BaseClass
 
   // Given some context,
   public abstract getChoiceOptions:
-  (context?: ChoiceContext) => List<ChoiceOption>;
+    (context?: ChoiceContext) => List<ChoiceOption>;
 
   public abstract dataTypeToFieldType:
-  (dataType: string) => FieldType;
+    (dataType: string) => FieldType;
 
   public name: string = '';
 }
@@ -821,94 +821,94 @@ interface AggregationData
 // the type of fields it can accept (numbers, text...), and the advanced fields it can accept
 export const AggregationTypes = Map<string, AggregationData>({
   ['average of']:
-  {
-    elasticType: 'avg', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
-  },
+    {
+      elasticType: 'avg', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
+      acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
+    },
   minimum:
-  {
-    elasticType: 'min', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
-  },
+    {
+      elasticType: 'min', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
+      acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
+    },
   maximum:
-  {
-    elasticType: 'max', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
-  },
+    {
+      elasticType: 'max', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
+      acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
+    },
   ['sum of']:
-  {
-    elasticType: 'sum', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
-  },
+    {
+      elasticType: 'sum', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
+      acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
+    },
   ['number of values of']:
-  {
-    elasticType: 'value_count', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Any]),
-  },
+    {
+      elasticType: 'value_count', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
+      acceptedTypes: List([FieldType.Any]),
+    },
   ['approx. number of values of']:
-  {
-    elasticType: 'cardinality', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Any]),
-  },
+    {
+      elasticType: 'cardinality', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
+      acceptedTypes: List([FieldType.Any]),
+    },
   ['geographic center of']:
-  {
-    elasticType: 'geo_centroid', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Geopoint]),
-  },
+    {
+      elasticType: 'geo_centroid', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
+      acceptedTypes: List([FieldType.Geopoint]),
+    },
   ['geographic bounds of']:
-  {
-    elasticType: 'geo_bounds', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Geopoint]),
-  },
+    {
+      elasticType: 'geo_bounds', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
+      acceptedTypes: List([FieldType.Geopoint]),
+    },
   ['percentiles of']:
-  {
-    elasticType: 'percentiles', advanced:
-    List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Percentiles, ADVANCED.Accuracy]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
-  },
+    {
+      elasticType: 'percentiles', advanced:
+        List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Percentiles, ADVANCED.Accuracy]),
+      acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
+    },
   ['percentiles of values of']:
-  {
-    elasticType: 'percentile_ranks', advanced:
-    List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.PercentileRanks, ADVANCED.Accuracy]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
-  },
+    {
+      elasticType: 'percentile_ranks', advanced:
+        List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.PercentileRanks, ADVANCED.Accuracy]),
+      acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
+    },
   ['basic statistics for']:
-  {
-    elasticType: 'stats', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
-  },
+    {
+      elasticType: 'stats', advanced: List([ADVANCED.Name, ADVANCED.Missing]),
+      acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
+    },
   ['full statistics for']:
-  {
-    elasticType: 'extended_stats', advanced: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Sigma]),
-    acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
-  },
+    {
+      elasticType: 'extended_stats', advanced: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Sigma]),
+      acceptedTypes: List([FieldType.Numerical, FieldType.Date]),
+    },
   ['facets for']:
-  {
-    elasticType: List(['histogram', 'range', 'date_histogram', 'date_range', 'terms',
-      'significant_terms', 'ip_range', 'geo_distance', 'geo_hash']), advanced:
-    Map({
-      histogram: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.ExtendedRange, ADVANCED.MinDocCount,
-      ADVANCED.Order]),
-      range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges]),
-      date_range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.Format]),
-      date_histogram: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.ExtendedRange, ADVANCED.MinDocCount,
-      ADVANCED.Order, ADVANCED.Format]),
-      ip_range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges]),
-      geo_distance: List([ADVANCED.Name, ADVANCED.Type, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.Origin, ADVANCED.Distance]),
-      geo_hash: List([ADVANCED.Name, ADVANCED.Type, ADVANCED.Missing, ADVANCED.Size, ADVANCED.Precision]),
-      terms: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.TermsType, ADVANCED.Size, ADVANCED.MinDocCount, ADVANCED.IncludeExclude,
-      ADVANCED.Order]),
-      significant_terms: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.TermsType,
-      ADVANCED.Size, ADVANCED.MinDocCount, ADVANCED.IncludeExclude,
-      ADVANCED.Order]),
-    }),
-    acceptedTypes: List([FieldType.Any]),
-    fieldTypesToElasticTypes: Map({
-      [FieldType.Numerical]: List(['histogram', 'range']),
-      [FieldType.Date]: List(['date_histogram', 'date_range']),
-      [FieldType.Geopoint]: List(['geo_distance', 'geo_hash']),
-      [FieldType.Text]: List(['terms', 'significant_terms']),
-      [FieldType.Ip]: List(['ip_range']),
-    }),
-  },
+    {
+      elasticType: List(['histogram', 'range', 'date_histogram', 'date_range', 'terms',
+        'significant_terms', 'ip_range', 'geo_distance', 'geo_hash']), advanced:
+        Map({
+          histogram: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.ExtendedRange, ADVANCED.MinDocCount,
+          ADVANCED.Order]),
+          range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges]),
+          date_range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.Format]),
+          date_histogram: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.ExtendedRange, ADVANCED.MinDocCount,
+          ADVANCED.Order, ADVANCED.Format]),
+          ip_range: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.Ranges]),
+          geo_distance: List([ADVANCED.Name, ADVANCED.Type, ADVANCED.Missing, ADVANCED.Ranges, ADVANCED.Origin, ADVANCED.Distance]),
+          geo_hash: List([ADVANCED.Name, ADVANCED.Type, ADVANCED.Missing, ADVANCED.Size, ADVANCED.Precision]),
+          terms: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.TermsType, ADVANCED.Size, ADVANCED.MinDocCount, ADVANCED.IncludeExclude,
+          ADVANCED.Order]),
+          significant_terms: List([ADVANCED.Name, ADVANCED.Missing, ADVANCED.TermsType,
+          ADVANCED.Size, ADVANCED.MinDocCount, ADVANCED.IncludeExclude,
+          ADVANCED.Order]),
+        }),
+      acceptedTypes: List([FieldType.Any]),
+      fieldTypesToElasticTypes: Map({
+        [FieldType.Numerical]: List(['histogram', 'range']),
+        [FieldType.Date]: List(['date_histogram', 'date_range']),
+        [FieldType.Geopoint]: List(['geo_distance', 'geo_hash']),
+        [FieldType.Text]: List(['terms', 'significant_terms']),
+        [FieldType.Ip]: List(['ip_range']),
+      }),
+    },
 });

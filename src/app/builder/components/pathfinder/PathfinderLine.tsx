@@ -87,7 +87,7 @@ export class PathfinderLine extends TerrainComponent<Props>
 {
   public state: {
   } = {
-  };
+    };
 
   public render()
   {

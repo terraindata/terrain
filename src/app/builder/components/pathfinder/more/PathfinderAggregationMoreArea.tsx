@@ -122,34 +122,34 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
             {
               key: 'sampler',
               display:
-              <div className='pf-aggregation-sampler-option'>
-                <span>The top</span>
-                <BuilderTextbox
-                  value={this.props.aggregation.sampler.numSamples}
-                  keyPath={this.props.keyPath.push('sampler').push('numSamples')}
-                  canEdit={canEdit && sampleType === 'sampler'}
-                />
-                <span>hits</span>
-              </div>,
+                <div className='pf-aggregation-sampler-option'>
+                  <span>The top</span>
+                  <BuilderTextbox
+                    value={this.props.aggregation.sampler.numSamples}
+                    keyPath={this.props.keyPath.push('sampler').push('numSamples')}
+                    canEdit={canEdit && sampleType === 'sampler'}
+                  />
+                  <span>hits</span>
+                </div>,
             },
             {
               key: 'diversified_sampler',
               display:
-              <div className='pf-aggregation-sampler-option'>
-                <span>The top</span>
-                <BuilderTextbox
-                  value={this.props.aggregation.sampler.numSamples}
-                  keyPath={this.props.keyPath.push('sampler').push('numSamples')}
-                  canEdit={canEdit && sampleType === 'diversified_sampler'}
-                />
-                <span>hits with unique</span>
-                <Dropdown
-                  selectedIndex={fields.indexOf(this.props.aggregation.sampler.diverseField)}
-                  options={fields}
-                  keyPath={this.props.keyPath.push('sampler').push('diverseField')}
-                  canEdit={canEdit && sampleType === 'diversified_sampler'}
-                />
-              </div>,
+                <div className='pf-aggregation-sampler-option'>
+                  <span>The top</span>
+                  <BuilderTextbox
+                    value={this.props.aggregation.sampler.numSamples}
+                    keyPath={this.props.keyPath.push('sampler').push('numSamples')}
+                    canEdit={canEdit && sampleType === 'diversified_sampler'}
+                  />
+                  <span>hits with unique</span>
+                  <Dropdown
+                    selectedIndex={fields.indexOf(this.props.aggregation.sampler.diverseField)}
+                    options={fields}
+                    keyPath={this.props.keyPath.push('sampler').push('diverseField')}
+                    canEdit={canEdit && sampleType === 'diversified_sampler'}
+                  />
+                </div>,
             },
           ])}
         />
