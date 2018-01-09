@@ -847,7 +847,7 @@ column if you have customized the results view.');
 
   private isDatabaseEmpty(): boolean
   {
-    return !this.props.db || !this.props.db.id;
+    return !this.props.db || !(this.props.db.id > -1);
   }
 }
 
