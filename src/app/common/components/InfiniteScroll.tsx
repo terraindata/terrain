@@ -72,8 +72,8 @@ class Library extends TerrainComponent<Props>
   public state: {
     unchanged: boolean;
   } = {
-    unchanged: false,
-  };
+      unchanged: false,
+    };
 
   public unmounted = false;
 

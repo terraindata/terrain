@@ -51,12 +51,12 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { CredentialConfig, Credentials } from '../../credentials/Credentials';
+import CredentialConfig from '../../credentials/CredentialConfig';
+import Credentials from '../../credentials/Credentials';
 
 export const credentials: Credentials = new Credentials();
 export const request = googleoauthjwt.requestWithJWT();
 
-// add interfaces later for spreadsheets and analytics API calls
 export interface GoogleSpreadsheetConfig
 {
   id: string;

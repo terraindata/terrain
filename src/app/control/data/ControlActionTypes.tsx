@@ -48,18 +48,18 @@ import Util from 'util/Util';
 const ControlActionTypes =
   {
     importExport:
-    {
-      setTemplates: '',
-      fetchTemplates: '',
-      deleteTemplate: '',
-      resetTemplateToken: '',
-      fetchSchedules: '',
-      setSchedules: '',
-      fetchCredentials: '',
-      setCredentials: '',
-      createSchedule: '',
-      deleteSchedule: '',
-    },
+      {
+        setTemplates: '',
+        fetchTemplates: '',
+        deleteTemplate: '',
+        resetTemplateToken: '',
+        fetchSchedules: '',
+        setSchedules: '',
+        fetchCredentials: '',
+        setCredentials: '',
+        createSchedule: '',
+        deleteSchedule: '',
+      },
   };
 
 Util.setValuesToKeys(ControlActionTypes, '');

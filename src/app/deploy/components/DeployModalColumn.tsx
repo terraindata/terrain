@@ -64,28 +64,28 @@ const AlgorithmIcon = require('./../../../images/icon_badgeVariant.svg');
 const TEXT =
   {
     live:
-    {
-      main: 'You are deploying the following algorithm to Live. The algorithm query will be pushed to the database servers.',
-      confirm: 'I approve of deploying this query to Live for this algorithm.',
-      button: 'Deploy to Live',
-      cancelButton: 'Cancel and Do Not Deploy',
-    },
+      {
+        main: 'You are deploying the following algorithm to Live. The algorithm query will be pushed to the database servers.',
+        confirm: 'I approve of deploying this query to Live for this algorithm.',
+        button: 'Deploy to Live',
+        cancelButton: 'Cancel and Do Not Deploy',
+      },
 
     default:
-    {
-      main: 'You are deploying the following algorithm to Live. The algorithm query will be pushed to the database servers.',
-      confirm: 'I approve of deploying this query to Live for this algorithm, and making it the Default for this group.',
-      button: 'Deploy to Live and Make Default',
-      cancelButton: 'Cancel and Do Not Deploy',
-    },
+      {
+        main: 'You are deploying the following algorithm to Live. The algorithm query will be pushed to the database servers.',
+        confirm: 'I approve of deploying this query to Live for this algorithm, and making it the Default for this group.',
+        button: 'Deploy to Live and Make Default',
+        cancelButton: 'Cancel and Do Not Deploy',
+      },
 
     notLive:
-    {
-      main: 'You are removing the following algorithm from Live. The algorithm query will be removed from the database servers.',
-      confirm: 'I approve of removing this query from Live for this algorithm.',
-      button: 'Remove from Live',
-      cancelButton: 'Cancel and Do Not Remove',
-    },
+      {
+        main: 'You are removing the following algorithm from Live. The algorithm query will be removed from the database servers.',
+        confirm: 'I approve of removing this query from Live for this algorithm.',
+        button: 'Remove from Live',
+        cancelButton: 'Cancel and Do Not Remove',
+      },
   };
 
 export interface Props
@@ -108,9 +108,9 @@ class DeployModalColumn extends TerrainComponent<Props>
     confirmChecked: boolean;
     deployedName: string;
   } = {
-    confirmChecked: false,
-    deployedName: '',
-  };
+      confirmChecked: false,
+      deployedName: '',
+    };
 
   public componentWillMount()
   {

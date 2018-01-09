@@ -87,14 +87,14 @@ class TransformModal extends TerrainComponent<Props>
     mergeNewName: string;
     duplicateNewName: string;
   } = {
-    transformTypeIndex: -1,
-    mergeIndex: -1,
-    transformText: '',
-    splitNames: List(['', '']),
-    mergeName: '',
-    mergeNewName: '',
-    duplicateNewName: '',
-  };
+      transformTypeIndex: -1,
+      mergeIndex: -1,
+      transformText: '',
+      splitNames: List(['', '']),
+      mergeName: '',
+      mergeNewName: '',
+      duplicateNewName: '',
+    };
 
   public handleClose()
   {

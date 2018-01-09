@@ -43,9 +43,10 @@ THE SOFTWARE.
 */
 
 
-var webpack = require("webpack");
-var path = require("path");
-var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const webpack = require('webpack');
+const path = require('path');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 module.exports =
 {
@@ -105,13 +106,13 @@ module.exports =
             //  keep it first in this list
             {
                 test: /\.ts(x?)$/,
-                exclude: [/midway/, /analytics.js/, /node_modules/],
+                exclude: [/midway/, /analytics.js/, /sigint/, /node_modules/],
                 loader:
-                    "babel-loader!thread-loader!ts-loader?happyPackMode=true"
-                    + JSON.stringify({
-                        compilerOptions: {
-                        },
-                    }),
+                "babel-loader!thread-loader!ts-loader?happyPackMode=true"
+                + JSON.stringify({
+                  compilerOptions: {
+                  },
+                }),
             },
             {
                 test: /\.js(x?)$/,
@@ -138,10 +139,22 @@ module.exports =
 
     plugins:
     [
-        new webpack.DefinePlugin({
-            MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || "localhost:3000") + "'",
-            DEV: true,
-        }),
-        new ForkTsCheckerWebpackPlugin(),
+      new webpack.DefinePlugin({
+          MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || "localhost:3000") + "'",
+          DEV: true,
+      }),
+      new HardSourceWebpackPlugin({
+        cacheDirectory: './.cache/hard-source/dev/[confighash]',
+        recordsPath: './.cache/hard-source/dev/[confighash]/records.json',
+      }),
+      new ForkTsCheckerWebpackPlugin(),
+      new webpack.optimize.CommonsChunkPlugin({
+          name: 'vendor',
+          filename: 'vendor.bundle.js',
+          minChunks(module, count) {
+              const context = module.context;
+              return context && context.indexOf('node_modules') >= 0;
+          },
+      }),
     ],
 };

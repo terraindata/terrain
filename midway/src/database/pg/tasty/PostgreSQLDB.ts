@@ -44,7 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import SQLGenerator from '../../../tasty/SQLGenerator';
+import * as pg from 'pg';
+
+import PostgreSQLGenerator from '../../../tasty/PostgreSQLGenerator';
 import TastyDB from '../../../tasty/TastyDB';
 import TastyNodeTypes from '../../../tasty/TastyNodeTypes';
 import TastyQuery from '../../../tasty/TastyQuery';
@@ -67,7 +69,7 @@ export class PostgreSQLDB implements TastyDB
    */
   public generateQuery(query: TastyQuery, placeholder: boolean): [string[], any[][]]
   {
-    const generator = new SQLGenerator();
+    const generator = new PostgreSQLGenerator();
     if (query.command.tastyType === TastyNodeTypes.select || query.command.tastyType === TastyNodeTypes.delete)
     {
       generator.generateSelectQuery(query, placeholder);
@@ -92,10 +94,8 @@ export class PostgreSQLDB implements TastyDB
 
   public async schema(): Promise<TastySchema>
   {
-    const result = await this.execute(
-      ['SELECT table_schema, table_name, column_name, data_type ' +
-        'FROM information_schema.columns ' +
-        'WHERE table_schema NOT IN (\'information_schema\', \'performance_schema\', \'PostgreSQL\', \'sys\');']);
+    // TODO Implement when/if PostreSQL DBs are made visible in the schema browser
+    const result = null;
     return TastySchema.fromSQLResultSet(result);
   }
 
@@ -114,7 +114,10 @@ export class PostgreSQLDB implements TastyDB
         this.client.query(statement, [], makePromiseCallback(resolve, reject));
       });
 
-      results = results.concat(result);
+      if (result !== undefined && result['rows'] !== undefined)
+      {
+        results = results.concat(result['rows']);
+      }
     }
     return results;
   }

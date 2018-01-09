@@ -101,8 +101,8 @@ class CreateCardTool extends TerrainComponent<Props>
   public state: {
     focusedIndex: number;
   } = {
-    focusedIndex: -1,
-  };
+      focusedIndex: -1,
+    };
 
   constructor(props)
   {

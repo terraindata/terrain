@@ -113,11 +113,11 @@ class AggregationComponent extends TerrainComponent<Props> {
     isSingleValue: boolean,
     singleValue: string,
   } = {
-    expanded: false,
-    displayType: DISPLAY_TYPES.Raw,
-    isSingleValue: false,
-    singleValue: '',
-  };
+      expanded: false,
+      displayType: DISPLAY_TYPES.Raw,
+      isSingleValue: false,
+      singleValue: '',
+    };
 
   public componentDidMount()
   {

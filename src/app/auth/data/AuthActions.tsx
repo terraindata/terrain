@@ -54,15 +54,15 @@ const $ = (type: string, payload: any) =>
 const AuthActions =
   {
     login:
-    (accessToken: string, id: number) => (dispatch) =>
-    {
-      dispatch($(ActionTypes.login, { accessToken, id }));
-      dispatch($(UserActionTypes.updateCurrentUser, { id }));
-    },
+      (accessToken: string, id: number) => (dispatch) =>
+      {
+        dispatch($(ActionTypes.login, { accessToken, id }));
+        dispatch($(UserActionTypes.updateCurrentUser, { id }));
+      },
 
     logout:
-    () =>
-      $(ActionTypes.logout, {}),
+      () =>
+        $(ActionTypes.logout, {}),
   };
 
 export default AuthActions;

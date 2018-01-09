@@ -68,13 +68,13 @@ export interface Props
 class BuilderMapComponent extends TerrainComponent<Props>
 {
   public state:
-  {
-    showExpanded: boolean,
-    inputs: any,
-  } = {
-    showExpanded: false,
-    inputs: null,
-  };
+    {
+      showExpanded: boolean,
+      inputs: any,
+    } = {
+      showExpanded: false,
+      inputs: null,
+    };
 
   public constructor(props: Props)
   {

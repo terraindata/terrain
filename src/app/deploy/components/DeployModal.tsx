@@ -81,14 +81,14 @@ class DeployModal extends TerrainComponent<Props>
     showErrorModal: boolean;
     deployedName: string;
   } = {
-    changingStatus: false,
-    changingStatusOf: null,
-    changingStatusTo: null,
-    defaultChecked: false,
-    errorModalMessage: '',
-    showErrorModal: false,
-    deployedName: '',
-  };
+      changingStatus: false,
+      changingStatusOf: null,
+      changingStatusTo: null,
+      defaultChecked: false,
+      errorModalMessage: '',
+      showErrorModal: false,
+      deployedName: '',
+    };
 
   public componentWillReceiveProps(nextProps)
   {

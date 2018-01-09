@@ -68,15 +68,15 @@ export default class GetSupplementalBlocksVisitor extends ESClauseVisitor<any>
         cardValue: null,
 
         static:
-        {
-          tql: (block, tqlTranslationFn, tqlConfig) =>
           {
-            return {
-              [block['key']]: tqlTranslationFn(block['cardValue'], tqlConfig),
-            };
+            tql: (block, tqlTranslationFn, tqlConfig) =>
+            {
+              return {
+                [block['key']]: tqlTranslationFn(block['cardValue'], tqlConfig),
+              };
+            },
+            language: 'elastic',
           },
-          language: 'elastic',
-        },
       }),
     };
   }

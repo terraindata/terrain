@@ -82,11 +82,11 @@ class LibraryInfoColumn extends TerrainComponent<Props>
     errorModalMessage: string,
     selectedAlgorithm: ID,
   } = {
-    algorithmStatus: 'Loading...',
-    algorithmStatusErrorModalOpen: false,
-    errorModalMessage: '',
-    selectedAlgorithm: -1,
-  };
+      algorithmStatus: 'Loading...',
+      algorithmStatusErrorModalOpen: false,
+      errorModalMessage: '',
+      selectedAlgorithm: -1,
+    };
 
   public componentWillReceiveProps(nextProps)
   {

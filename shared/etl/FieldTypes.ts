@@ -102,19 +102,19 @@ export class FieldTypes
         case 'null': // treat as text
           type = {
             type: analyzed ? 'text' : 'keyword', index: true, fields:
-            {
-              keyword: analyzed ? { type: 'keyword', index: analyzed }
-                : { type: 'keyword', index: true, ignore_above: 256 },
-            },
+              {
+                keyword: analyzed ? { type: 'keyword', index: analyzed }
+                  : { type: 'keyword', index: true, ignore_above: 256 },
+              },
           };
           break;
         case 'text':
           type = {
             type: analyzed ? 'text' : 'keyword', index: true, fields:
-            {
-              keyword: analyzed ? { type: 'keyword', index: analyzed }
-                : { type: 'keyword', index: true, ignore_above: 256 },
-            },
+              {
+                keyword: analyzed ? { type: 'keyword', index: analyzed }
+                  : { type: 'keyword', index: true, ignore_above: 256 },
+              },
           };
           if (analyzed)
           {
