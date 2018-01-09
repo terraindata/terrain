@@ -127,28 +127,27 @@ const BuilderColumn = createReactClass<any, any>(
 
     propTypes:
     {
-      query: PropTypes.object.isRequired,
-      resultsState: PropTypes.object.isRequired,
-      exportState: PropTypes.object.isRequired,
-      algorithm: PropTypes.object.isRequired,
-      className: PropTypes.string,
-      index: PropTypes.number,
-      canAddColumn: PropTypes.bool,
-      canCloseColumn: PropTypes.bool,
-      onAddColumn: PropTypes.func.isRequired,
-      onAddManualColumn: PropTypes.func.isRequired,
-      onCloseColumn: PropTypes.func.isRequired,
-      colKey: PropTypes.number.isRequired,
-      history: PropTypes.any,
-      columnType: PropTypes.number,
-      selectedCardName: PropTypes.string,
-      switchToManualCol: PropTypes.func,
-      changeSelectedCardName: PropTypes.func,
-      canEdit: PropTypes.bool.isRequired,
-      cantEditReason: PropTypes.string,
-      onNavigationException: PropTypes.func,
-      schema: PropTypes.object,
-    },
+        query: PropTypes.object.isRequired,
+        resultsState: PropTypes.object.isRequired,
+        exportState: PropTypes.object.isRequired,
+        algorithm: PropTypes.object.isRequired,
+        className: PropTypes.string,
+        index: PropTypes.number,
+        canAddColumn: PropTypes.bool,
+        canCloseColumn: PropTypes.bool,
+        onAddColumn: PropTypes.func.isRequired,
+        onAddManualColumn: PropTypes.func.isRequired,
+        onCloseColumn: PropTypes.func.isRequired,
+        colKey: PropTypes.number.isRequired,
+        history: PropTypes.any,
+        columnType: PropTypes.number,
+        selectedCardName: PropTypes.string,
+        switchToManualCol: PropTypes.func,
+        changeSelectedCardName: PropTypes.func,
+        canEdit: PropTypes.bool.isRequired,
+        cantEditReason: PropTypes.string,
+        onNavigationException: PropTypes.func,
+      },
 
     getInitialState()
     {
@@ -447,8 +446,8 @@ const BuilderColumn = createReactClass<any, any>(
               'builder-column-content': true,
               // 'builder-column-manual': this.state.column === COLUMNS.Manual,
               'builder-column-content-scroll':
-              this.state.column === COLUMNS.Cards ||
-              this.state.column === COLUMNS.Inputs,
+                this.state.column === COLUMNS.Cards ||
+                this.state.column === COLUMNS.Inputs,
             })}
             style={
               borderColor(Colors().stroke)

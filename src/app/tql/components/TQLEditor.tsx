@@ -131,8 +131,8 @@ class TQLEditor extends TerrainComponent<Props>
   public state: {
     codeMirrorInstance: Doc,
   } = {
-    codeMirrorInstance: undefined,
-  };
+      codeMirrorInstance: undefined,
+    };
 
   constructor(props: Props)
   {

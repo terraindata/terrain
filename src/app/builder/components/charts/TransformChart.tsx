@@ -328,10 +328,10 @@ const TransformChart = {
             percentage: lastBar.percentage + (isNaN(bar.percentage) ? 0 : bar.percentage),
             id: lastBar.id + bar.id,
             range:
-            {
-              min: lastBar.range.min,
-              max: bar.range.max,
-            },
+              {
+                min: lastBar.range.min,
+                max: bar.range.max,
+              },
           };
 
       }

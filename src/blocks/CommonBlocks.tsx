@@ -97,34 +97,34 @@ export const _wrapperCard = (config: IWrapperCardConfig) =>
     cards: L(),
 
     static:
-    {
-      title: config.title,
-      colors: config.colors,
-      accepts: config.accepts,
-      language: config.language,
-
-      // manualEntry: config.manualEntry,
-
-      getChildTerms: config.getChildTerms,
-      getNeighborTerms: config.getNeighborTerms,
-
-      preview: (c: IWrapperCard) =>
       {
-        if (c.cards.size)
+        title: config.title,
+        colors: config.colors,
+        accepts: config.accepts,
+        language: config.language,
+
+        // manualEntry: config.manualEntry,
+
+        getChildTerms: config.getChildTerms,
+        getNeighborTerms: config.getNeighborTerms,
+
+        preview: (c: IWrapperCard) =>
         {
-          const card = c.cards.get(0);
-          return BlockUtils.getPreview(card);
-        }
-        return 'Nothing';
+          if (c.cards.size)
+          {
+            const card = c.cards.get(0);
+            return BlockUtils.getPreview(card);
+          }
+          return 'Nothing';
+        },
+
+        display,
+
+        tql: config.tql,
+        tqlGlue: config.tqlGlue,
+
+        init: config.init,
       },
-
-      display,
-
-      tql: config.tql,
-      tqlGlue: config.tqlGlue,
-
-      init: config.init,
-    },
   });
 };
 
@@ -148,14 +148,14 @@ export const _aggregateCard = (config: {
     isAggregate: true,
 
     display:
-    config.defaultValue === undefined
-      ? stringValueDisplay
-      : _.extend({},
-        stringValueDisplay,
-        {
-          defaultValue: config.defaultValue,
-        },
-      )
+      config.defaultValue === undefined
+        ? stringValueDisplay
+        : _.extend({},
+          stringValueDisplay,
+          {
+            defaultValue: config.defaultValue,
+          },
+        )
     ,
   },
 });

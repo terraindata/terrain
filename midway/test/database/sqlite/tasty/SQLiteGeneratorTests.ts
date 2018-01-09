@@ -52,16 +52,19 @@ import SQLiteDB from '../../../../src/database/sqlite/tasty/SQLiteDB';
 
 import * as Tasty from '../../../../src/tasty/Tasty';
 import TastyNodeTypes from '../../../../src/tasty/TastyNodeTypes';
+import MySQLQueries from '../../../tasty/MySQLQueries';
 import SQLQueries from '../../../tasty/SQLQueries';
+
+const tests = SQLQueries.concat(MySQLQueries);
 
 function testName(index: number)
 {
-  return 'generate ' + SQLQueries[index][0];
+  return 'generate ' + tests[index][0];
 }
 
 function testQuery(index: number)
 {
-  return SQLQueries[index][1];
+  return tests[index][1];
 }
 
 const DBMovies: Tasty.Table = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate'], 'movies');
@@ -90,7 +93,7 @@ beforeAll(async () =>
 test('node type: skip', (done) =>
 {
   expect(TastyNodeTypes[TastyNodeTypes.skip]).toEqual('skip');
-  expect(TastyNodeTypes.skip).toEqual(12);
+  expect(TastyNodeTypes.skip).toEqual(13);
   done();
 });
 
@@ -168,29 +171,16 @@ test(testName(7), (done) =>
 
 test(testName(8), (done) =>
 {
-  const movie = {
-    movieid: 13371337,
-    releasedate: new Date('01/01/17').toISOString().substring(0, 10),
-    title: 'My New Movie',
-  };
-  const query = new Tasty.Query(DBMovies).upsert(movie);
-  const qstr = sqliteDB.generate(query);
-  expect(qstr).toEqual(testQuery(8));
-  done();
-});
-
-test(testName(9), (done) =>
-{
   const query = new Tasty.Query(DBMovies).delete();
   const qstr1 = sqliteDB.generate(query);
   expect(qstr1).toEqual([`DELETE \n  FROM movies;`]);
   query.filter(DBMovies['movieid'].equals(13371337));
   const qstr2 = sqliteDB.generate(query);
-  expect(qstr2).toEqual(testQuery(9));
+  expect(qstr2).toEqual(testQuery(8));
   done();
 });
 
-test(testName(10), (done) =>
+test(testName(9), (done) =>
 {
   const query = new Tasty.Query(DBMovies);
   query.select([DBMovies['movieid'], DBMovies['title'], DBMovies['releasedate']]).filter(DBMovies['movieid'].neq(2134));
@@ -200,6 +190,19 @@ test(testName(10), (done) =>
 
   const qstr = sqliteDB.generate(query);
   /* tslint:disable-next-line:max-line-length */
+  expect(qstr).toEqual(testQuery(9));
+  done();
+});
+
+test(testName(10), (done) =>
+{
+  const movie = {
+    movieid: 13371337,
+    releasedate: new Date('01/01/17').toISOString().substring(0, 10),
+    title: 'My New Movie',
+  };
+  const query = new Tasty.Query(DBMovies).upsert(movie);
+  const qstr = sqliteDB.generate(query);
   expect(qstr).toEqual(testQuery(10));
   done();
 });

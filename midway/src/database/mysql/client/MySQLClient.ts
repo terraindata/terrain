@@ -56,7 +56,7 @@ class MySQLClient
 {
   private controller: MySQLController;
   private config: MySQLConfig;
-  private delegate: mysql.IPool;
+  private delegate: mysql.Pool;
 
   constructor(controller: MySQLController, config: MySQLConfig)
   {
@@ -64,30 +64,32 @@ class MySQLClient
     this.config = config;
     this.delegate = mysql.createPool(config);
 
-    this.delegate.on('acquire', (connection: mysql.IConnection) =>
+    this.delegate.on('acquire', (connection: mysql.Connection) =>
     {
-      this.controller.log('MySQLClient', 'Connection ' + connection.threadId.toString() + ' acquired ');
+      const id: string = connection.threadId !== null ? connection.threadId.toString() : '';
+      this.controller.log('MySQLClient', 'Connection ' + id + ' acquired ');
     });
 
-    this.delegate.on('release', (connection: mysql.IConnection) =>
+    this.delegate.on('release', (connection: mysql.Connection) =>
     {
-      this.controller.log('MySQLClient', 'Connection ' + connection.threadId.toString() + ' released ');
+      const id: string = connection.threadId !== null ? connection.threadId.toString() : '';
+      this.controller.log('MySQLClient', 'Connection ' + id + ' released ');
     });
   }
 
-  public query(queryString: string, params?: any[], callback?: any): mysql.IQuery
+  public query(queryString: string, params?: any[], callback?: any): mysql.Query
   {
     this.controller.log('MySQLClient.query', queryString, params);
     return this.delegate.query(queryString, params, callback);
   }
 
-  public end(callback: (err: mysql.IError, ...args: any[]) => void): void
+  public end(callback: (err: mysql.MysqlError, ...args: any[]) => void): void
   {
     this.controller.log('MySQLClient.end');
     return this.delegate.end(callback);
   }
 
-  public getConnection(callback: (err: mysql.IError, connection: mysql.IConnection) => void): void
+  public getConnection(callback: (err: mysql.MysqlError, connection: mysql.Connection) => void): void
   {
     this.controller.log('MySQLClient.getConnection');
     return this.delegate.getConnection(callback);

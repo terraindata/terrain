@@ -92,8 +92,8 @@ class CardsColumn extends TerrainComponent<Props>
   public state: {
     keyPath: KeyPath;
   } = {
-    keyPath: this.computeKeyPath(this.props),
-  };
+      keyPath: this.computeKeyPath(this.props),
+    };
 
   public innerHeight: number = -1;
 

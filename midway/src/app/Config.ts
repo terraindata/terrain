@@ -47,9 +47,9 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as winston from 'winston';
 import { CmdLineUsage } from './CmdLineArgs';
+import DatabaseConfig from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
-import { DatabaseConfig } from './database/Databases';
-import { UserConfig } from './users/Users';
+import UserConfig from './users/UserConfig';
 import * as Util from './Util';
 
 export interface Config

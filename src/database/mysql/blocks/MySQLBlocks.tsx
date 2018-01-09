@@ -117,54 +117,54 @@ const _mathCard = (config: {
     fields: List(),
 
     static:
-    {
-      language: 'mysql',
-      // manualEntry: null,
-      colors: config.colors,
-      title: config.title,
-      preview:
-      (card) =>
-        card['fields'].map(
-          (field) =>
-            typeof field.field !== 'object' ? field.field : BlockUtils.getPreview(field.field),
-        ).join(config.tqlGlue),
+      {
+        language: 'mysql',
+        // manualEntry: null,
+        colors: config.colors,
+        title: config.title,
+        preview:
+          (card) =>
+            card['fields'].map(
+              (field) =>
+                typeof field.field !== 'object' ? field.field : BlockUtils.getPreview(field.field),
+            ).join(config.tqlGlue),
 
-      tql: '($fields )',
-      tqlGlue: config.tqlGlue,
+        tql: '($fields )',
+        tqlGlue: config.tqlGlue,
 
-      init: () => ({
-        fields: List([
-          make(MySQLBlocks, 'field', { field: '' }),
-        ]),
-      }),
+        init: () => ({
+          fields: List([
+            make(MySQLBlocks, 'field', { field: '' }),
+          ]),
+        }),
 
-      display: [
-        {
-          displayType: DisplayType.ROWS,
-          key: 'fields',
-          english: 'field',
-          factoryType: 'field',
-          row:
+        display: [
           {
-            inner:
-            {
-              displayType: DisplayType.CARDTEXT,
-              key: 'field',
-              accepts: mathsAccept,
-              showWhenCards: true,
-            },
-            below:
-            {
-              displayType: DisplayType.CARDSFORTEXT,
-              key: 'field',
-              accepts: mathsAccept,
-            },
-            // hideToolsWhenNotString: true,
-            noDataPadding: true,
+            displayType: DisplayType.ROWS,
+            key: 'fields',
+            english: 'field',
+            factoryType: 'field',
+            row:
+              {
+                inner:
+                  {
+                    displayType: DisplayType.CARDTEXT,
+                    key: 'field',
+                    accepts: mathsAccept,
+                    showWhenCards: true,
+                  },
+                below:
+                  {
+                    displayType: DisplayType.CARDSFORTEXT,
+                    key: 'field',
+                    accepts: mathsAccept,
+                  },
+                // hideToolsWhenNotString: true,
+                noDataPadding: true,
+              },
           },
-        },
-      ],
-    },
+        ],
+      },
   });
 
 export const MySQLBlocks =
@@ -260,19 +260,19 @@ export const MySQLBlocks =
           ]),
 
           getChildTerms:
-          (card: Card) =>
-            card['fields'].reduce(
-              (list: List<string>, fieldBlock: { field: CardString }): List<string> =>
-              {
-                /* TODO make this better */
-                if (fieldBlock.field['type'] === 'as')
+            (card: Card) =>
+              card['fields'].reduce(
+                (list: List<string>, fieldBlock: { field: CardString }): List<string> =>
                 {
-                  // an as card
-                  return list.push(fieldBlock.field['alias']);
-                }
-                return list;
-              }, List([]),
-            ),
+                  /* TODO make this better */
+                  if (fieldBlock.field['type'] === 'as')
+                  {
+                    // an as card
+                    return list.push(fieldBlock.field['alias']);
+                  }
+                  return list;
+                }, List([]),
+              ),
 
           display: [
             {
@@ -281,24 +281,24 @@ export const MySQLBlocks =
               english: 'field',
               factoryType: 'field',
               row:
-              {
-                inner:
                 {
-                  displayType: DisplayType.CARDTEXT,
-                  // help: ManualConfig.help['select-field'],
-                  key: 'field',
-                  accepts: acceptsAggregates.push('as'),
-                  showWhenCards: true,
+                  inner:
+                    {
+                      displayType: DisplayType.CARDTEXT,
+                      // help: ManualConfig.help['select-field'],
+                      key: 'field',
+                      accepts: acceptsAggregates.push('as'),
+                      showWhenCards: true,
+                    },
+                  below:
+                    {
+                      displayType: DisplayType.CARDSFORTEXT,
+                      key: 'field',
+                      accepts: acceptsAggregates.push('as'),
+                    },
+                  // hideToolsWhenNotString: true,
+                  noDataPadding: true,
                 },
-                below:
-                {
-                  displayType: DisplayType.CARDSFORTEXT,
-                  key: 'field',
-                  accepts: acceptsAggregates.push('as'),
-                },
-                // hideToolsWhenNotString: true,
-                noDataPadding: true,
-              },
             },
 
             {
@@ -314,139 +314,139 @@ export const MySQLBlocks =
       tables: List(),
 
       static:
-      {
-        language: 'mysql',
-        // manualEntry: ManualConfig.cards['sfw'],
-        colors: ['#3a7dcf', Color('#3a7dcf').alpha(0.7).string()],
-        title: 'From',
-        preview: '[tables.table]',
-        tql: 'FROM\n$tables',
-
-        init: () => ({
-          tables: List([make(MySQLBlocks, 'table')]),
-        }),
-
-        getParentTerms:
-        (card: Card, schemaState) =>
-          card['tables'].reduce(
-            (list: List<string>, tableBlock: { table: string, alias: string }): List<string> =>
-            {
-              const dbName = Store.getState().db.name;
-              let columnNames = schemaState.columnNamesByDb.getIn(
-                [dbName, dbName + '.' + tableBlock.table],
-              ) || List([]);
-              columnNames = columnNames.map(
-                (columnName) => tableBlock.alias + '.' + columnName,
-              );
-              return list.concat(columnNames).toList();
-            },
-            List([]),
-          ),
-
-        display:
         {
-          displayType: DisplayType.ROWS,
-          key: 'tables',
-          english: 'table',
-          factoryType: 'table',
-          row:
-          {
-            below:
+          language: 'mysql',
+          // manualEntry: ManualConfig.cards['sfw'],
+          colors: ['#3a7dcf', Color('#3a7dcf').alpha(0.7).string()],
+          title: 'From',
+          preview: '[tables.table]',
+          tql: 'FROM\n$tables',
+
+          init: () => ({
+            tables: List([make(MySQLBlocks, 'table')]),
+          }),
+
+          getParentTerms:
+            (card: Card, schemaState) =>
+              card['tables'].reduce(
+                (list: List<string>, tableBlock: { table: string, alias: string }): List<string> =>
+                {
+                  const dbName = Store.getState().db.name;
+                  let columnNames = schemaState.columnNamesByDb.getIn(
+                    [dbName, dbName + '.' + tableBlock.table],
+                  ) || List([]);
+                  columnNames = columnNames.map(
+                    (columnName) => tableBlock.alias + '.' + columnName,
+                  );
+                  return list.concat(columnNames).toList();
+                },
+                List([]),
+              ),
+
+          display:
             {
-              displayType: DisplayType.CARDSFORTEXT,
-              key: 'table',
-              accepts: List(['sfw']),
-            },
-            noDataPadding: true,
-            inner:
-            [
-              {
-                displayType: DisplayType.CARDTEXT,
-                key: 'table',
-                // help: ManualConfig.help['table'],
-                accepts: List(['sfw']),
-                showWhenCards: true,
-                getAutoTerms: (schemaState) =>
+              displayType: DisplayType.ROWS,
+              key: 'tables',
+              english: 'table',
+              factoryType: 'table',
+              row:
                 {
-                  const db = Store.getState().db.name; // TODO correct?
-                  const tableNames = schemaState.tableNamesByDb.get(db);
-                  // if (!tableNames)
-                  // {
-                  //   const unsubscribe = SchemaStore.subscribe(() =>
-                  //   {
-                  //     if (SchemaStore.getState().tableNamesByDb.get(db))
-                  //     {
-                  //       unsubscribe();
-                  //       comp.forceUpdate();
-                  //     }
-                  //   });
-                  // }
-                  return tableNames;
-                },
-
-                onFocus: (comp: React.Component<any, any>, value: string) =>
-                {
-                  comp.setState({
-                    initialTable: value,
-                  });
-                },
-                onBlur: (comp: React.Component<any, any>, value: string) =>
-                {
-                  const initialTable = comp.state.initialTable;
-                  const newTable = value;
-
-                  if (initialTable !== newTable)
-                  {
-                    const suggestAlias = (table: string) =>
+                  below:
                     {
-                      if (table.charAt(table.length - 1).toLowerCase() === 's')
+                      displayType: DisplayType.CARDSFORTEXT,
+                      key: 'table',
+                      accepts: List(['sfw']),
+                    },
+                  noDataPadding: true,
+                  inner:
+                    [
                       {
-                        return table.substr(0, table.length - 1);
-                      }
-                      return table;
-                    };
+                        displayType: DisplayType.CARDTEXT,
+                        key: 'table',
+                        // help: ManualConfig.help['table'],
+                        accepts: List(['sfw']),
+                        showWhenCards: true,
+                        getAutoTerms: (schemaState) =>
+                        {
+                          const db = Store.getState().db.name; // TODO correct?
+                          const tableNames = schemaState.tableNamesByDb.get(db);
+                          // if (!tableNames)
+                          // {
+                          //   const unsubscribe = SchemaStore.subscribe(() =>
+                          //   {
+                          //     if (SchemaStore.getState().tableNamesByDb.get(db))
+                          //     {
+                          //       unsubscribe();
+                          //       comp.forceUpdate();
+                          //     }
+                          //   });
+                          // }
+                          return tableNames;
+                        },
 
-                    const keyPath: KeyPath = comp.props.keyPath;
-                    const aliasKeyPath = keyPath.set(keyPath.size - 1, 'alias');
-                    const aliasWasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
-                    const initialAlias: string = Store.getState().getIn(aliasKeyPath);
+                        onFocus: (comp: React.Component<any, any>, value: string) =>
+                        {
+                          comp.setState({
+                            initialTable: value,
+                          });
+                        },
+                        onBlur: (comp: React.Component<any, any>, value: string) =>
+                        {
+                          const initialTable = comp.state.initialTable;
+                          const newTable = value;
 
-                    if (!initialTable || initialTable === ''
-                      || initialAlias === '' || initialAlias === suggestAlias(initialTable))
-                    {
-                      // alias or table was blank or was the suggested one, so let's suggest an alias
-                      Actions.change(aliasKeyPath, suggestAlias(newTable));
-                      Actions.change(aliasWasSuggestedKeyPath, true);
-                    }
-                  }
+                          if (initialTable !== newTable)
+                          {
+                            const suggestAlias = (table: string) =>
+                            {
+                              if (table.charAt(table.length - 1).toLowerCase() === 's')
+                              {
+                                return table.substr(0, table.length - 1);
+                              }
+                              return table;
+                            };
+
+                            const keyPath: KeyPath = comp.props.keyPath;
+                            const aliasKeyPath = keyPath.set(keyPath.size - 1, 'alias');
+                            const aliasWasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
+                            const initialAlias: string = Store.getState().getIn(aliasKeyPath);
+
+                            if (!initialTable || initialTable === ''
+                              || initialAlias === '' || initialAlias === suggestAlias(initialTable))
+                            {
+                              // alias or table was blank or was the suggested one, so let's suggest an alias
+                              Actions.change(aliasKeyPath, suggestAlias(newTable));
+                              Actions.change(aliasWasSuggestedKeyPath, true);
+                            }
+                          }
+                        },
+                      },
+                      {
+                        displayType: DisplayType.LABEL,
+                        label: 'as',
+                        key: null,
+                      },
+                      {
+                        displayType: DisplayType.TEXT,
+                        // help: ManualConfig.help['alias'],
+                        key: 'alias',
+                        autoDisabled: true,
+
+                        onFocus: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) =>
+                        {
+                          const keyPath: KeyPath = comp.props.keyPath;
+                          const wasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
+                          if (Store.getState().getIn(wasSuggestedKeyPath))
+                          {
+                            Util.selectText(event.target, 0, event.target['value'].length);
+                            Actions.change(wasSuggestedKeyPath, false);
+                          }
+                        },
+                      },
+                    ],
                 },
-              },
-              {
-                displayType: DisplayType.LABEL,
-                label: 'as',
-                key: null,
-              },
-              {
-                displayType: DisplayType.TEXT,
-                // help: ManualConfig.help['alias'],
-                key: 'alias',
-                autoDisabled: true,
-
-                onFocus: (comp: React.Component<any, any>, value: string, event: React.FocusEvent<any>) =>
-                {
-                  const keyPath: KeyPath = comp.props.keyPath;
-                  const wasSuggestedKeyPath = keyPath.set(keyPath.size - 1, 'aliasWasSuggested');
-                  if (Store.getState().getIn(wasSuggestedKeyPath))
-                  {
-                    Util.selectText(event.target, 0, event.target['value'].length);
-                    Actions.change(wasSuggestedKeyPath, false);
-                  }
-                },
-              },
-            ],
-          },
+            },
         },
-      },
     }),
 
     where: _wrapperCard({
@@ -534,71 +534,71 @@ export const MySQLBlocks =
         sorts: List([]),
 
         static:
-        {
-          language: 'mysql',
-          title: 'Order By',
-          preview: (c: any) =>
           {
-            const { sorts } = c;
-            if (sorts.size === 1)
+            language: 'mysql',
+            title: 'Order By',
+            preview: (c: any) =>
             {
-              const { property } = sorts.get(0);
-              if (typeof property === 'string')
+              const { sorts } = c;
+              if (sorts.size === 1)
               {
-                return property;
+                const { property } = sorts.get(0);
+                if (typeof property === 'string')
+                {
+                  return property;
+                }
+                return BlockUtils.getPreview(property);
               }
-              return BlockUtils.getPreview(property);
-            }
-            return sorts.size + ' Factors';
-          },
-          colors: ['#39918b', Color('#39918b').alpha(0.7).string()],
-          // manualEntry: ManualConfig.cards['sort'],
-          tql: 'ORDER BY $sorts',
+              return sorts.size + ' Factors';
+            },
+            colors: ['#39918b', Color('#39918b').alpha(0.7).string()],
+            // manualEntry: ManualConfig.cards['sort'],
+            tql: 'ORDER BY $sorts',
 
-          init: () =>
-          {
-            return {
-              sorts: List([
-                make(MySQLBlocks, 'sortBlock'),
-              ]),
-            };
-          },
-
-          display: {
-            displayType: DisplayType.ROWS,
-            key: 'sorts',
-            english: 'sort',
-            factoryType: 'sortBlock',
-
-            row:
+            init: () =>
             {
-              inner:
-              [
+              return {
+                sorts: List([
+                  make(MySQLBlocks, 'sortBlock'),
+                ]),
+              };
+            },
+
+            display: {
+              displayType: DisplayType.ROWS,
+              key: 'sorts',
+              english: 'sort',
+              factoryType: 'sortBlock',
+
+              row:
                 {
-                  displayType: DisplayType.CARDTEXT,
-                  // help: ManualConfig.help['property'],
-                  key: 'property',
-                  accepts: _acceptsMath(List(['score', 'transform'])),
-                  showWhenCards: true,
+                  inner:
+                    [
+                      {
+                        displayType: DisplayType.CARDTEXT,
+                        // help: ManualConfig.help['property'],
+                        key: 'property',
+                        accepts: _acceptsMath(List(['score', 'transform'])),
+                        showWhenCards: true,
+                      },
+                      {
+                        displayType: DisplayType.DROPDOWN,
+                        key: 'direction',
+                        options: List(CommonSQL.Directions),
+                        // help: ManualConfig.help['direction'],
+                      },
+                    ],
+                  below:
+                    {
+                      displayType: DisplayType.CARDSFORTEXT,
+                      key: 'property',
+                      accepts: _acceptsMath(List(['score', 'transform'])),
+                    },
+                  hideToolsWhenNotString: false,
+                  noDataPadding: true,
                 },
-                {
-                  displayType: DisplayType.DROPDOWN,
-                  key: 'direction',
-                  options: List(CommonSQL.Directions),
-                  // help: ManualConfig.help['direction'],
-                },
-              ],
-              below:
-              {
-                displayType: DisplayType.CARDSFORTEXT,
-                key: 'property',
-                accepts: _acceptsMath(List(['score', 'transform'])),
-              },
-              hideToolsWhenNotString: false,
-              noDataPadding: true,
             },
           },
-        },
       }),
 
     // let: _card(
@@ -647,38 +647,38 @@ export const MySQLBlocks =
         tql: '$value AS $alias',
         // manualEntry: ManualConfig.cards.where,
         display:
-        {
-          displayType: DisplayType.FLEX,
-          key: null,
-
-          flex:
-          [
-            {
-              displayType: DisplayType.CARDTEXT,
-              key: 'value',
-              top: false,
-              showWhenCards: true,
-              accepts: acceptsAggregates,
-            },
-            {
-              displayType: DisplayType.LABEL,
-              label: 'as',
-              key: null,
-            },
-            {
-              displayType: DisplayType.TEXT,
-              key: 'alias',
-              autoDisabled: true,
-            },
-          ],
-
-          below:
           {
-            displayType: DisplayType.CARDSFORTEXT,
-            key: 'value',
-            accepts: acceptsAggregates,
+            displayType: DisplayType.FLEX,
+            key: null,
+
+            flex:
+              [
+                {
+                  displayType: DisplayType.CARDTEXT,
+                  key: 'value',
+                  top: false,
+                  showWhenCards: true,
+                  accepts: acceptsAggregates,
+                },
+                {
+                  displayType: DisplayType.LABEL,
+                  label: 'as',
+                  key: null,
+                },
+                {
+                  displayType: DisplayType.TEXT,
+                  key: 'alias',
+                  autoDisabled: true,
+                },
+              ],
+
+            below:
+              {
+                displayType: DisplayType.CARDSFORTEXT,
+                key: 'value',
+                accepts: acceptsAggregates,
+              },
           },
-        },
       },
     }),
 
@@ -806,47 +806,47 @@ export const MySQLBlocks =
             ]),
           }),
           display:
-          {
-            displayType: DisplayType.ROWS,
-            key: 'weights',
-            english: 'weight',
-            factoryType: 'weight',
-            provideParentData: true,
-            row:
             {
-              noDataPadding: true,
-              inner:
-              [
+              displayType: DisplayType.ROWS,
+              key: 'weights',
+              english: 'weight',
+              factoryType: 'weight',
+              provideParentData: true,
+              row:
                 {
-                  displayType: DisplayType.CARDTEXT,
-                  key: 'key',
-                  // help: ManualConfig.help['key'],
-                  placeholder: 'Field',
-                  accepts: transformScoreInputTypes,
-                  showWhenCards: true,
+                  noDataPadding: true,
+                  inner:
+                    [
+                      {
+                        displayType: DisplayType.CARDTEXT,
+                        key: 'key',
+                        // help: ManualConfig.help['key'],
+                        placeholder: 'Field',
+                        accepts: transformScoreInputTypes,
+                        showWhenCards: true,
+                      },
+                      {
+                        displayType: DisplayType.NUM,
+                        // help: ManualConfig.help['weight'],
+                        key: 'weight',
+                        placeholder: 'Weight',
+                        // autoDisabled: true,
+                      },
+                      {
+                        displayType: DisplayType.COMPONENT,
+                        component: ScoreBar,
+                        key: 'score',
+                        // help: ManualConfig.help['score'],
+                      },
+                    ],
+                  below:
+                    {
+                      displayType: DisplayType.CARDSFORTEXT,
+                      key: 'key',
+                      accepts: transformScoreInputTypes,
+                    },
                 },
-                {
-                  displayType: DisplayType.NUM,
-                  // help: ManualConfig.help['weight'],
-                  key: 'weight',
-                  placeholder: 'Weight',
-                  // autoDisabled: true,
-                },
-                {
-                  displayType: DisplayType.COMPONENT,
-                  component: ScoreBar,
-                  key: 'score',
-                  // help: ManualConfig.help['score'],
-                },
-              ],
-              below:
-              {
-                displayType: DisplayType.CARDSFORTEXT,
-                key: 'key',
-                accepts: transformScoreInputTypes,
-              },
             },
-          },
         },
       }),
 
@@ -924,23 +924,23 @@ export const MySQLBlocks =
           init: () => (
             {
               scorePoints:
-              List([
-                //   make(MySQLBlocks, 'scorePoint', {
-                //     id: 'a',
-                //     value: 0,
-                //     score: 0.0,
-                //   }),
-                //   make(MySQLBlocks, 'scorePoint', {
-                //     id: 'b',
-                //     value: 50,
-                //     score: 0.5,
-                //   }),
-                //   make(MySQLBlocks, 'scorePoint', {
-                //     id: 'c',
-                //     value: 100,
-                //     score: 1.0,
-                //   }),
-              ]),
+                List([
+                  //   make(MySQLBlocks, 'scorePoint', {
+                  //     id: 'a',
+                  //     value: 0,
+                  //     score: 0.0,
+                  //   }),
+                  //   make(MySQLBlocks, 'scorePoint', {
+                  //     id: 'b',
+                  //     value: 50,
+                  //     score: 0.5,
+                  //   }),
+                  //   make(MySQLBlocks, 'scorePoint', {
+                  //     id: 'c',
+                  //     value: 100,
+                  //     score: 1.0,
+                  //   }),
+                ]),
             }
           ),
 
@@ -985,21 +985,21 @@ export const MySQLBlocks =
           }),
 
           display:
-          {
-            displayType: DisplayType.ROWS,
-            key: 'fields',
-            english: 'field',
-            factoryType: 'field',
-            row:
             {
-              inner:
-              {
-                displayType: DisplayType.TEXT,
-                // help: ManualConfig.help['select-field'],
-                key: 'field',
-              },
+              displayType: DisplayType.ROWS,
+              key: 'fields',
+              english: 'field',
+              factoryType: 'field',
+              row:
+                {
+                  inner:
+                    {
+                      displayType: DisplayType.TEXT,
+                      // help: ManualConfig.help['select-field'],
+                      key: 'field',
+                    },
+                },
             },
-          },
         },
       }),
 
