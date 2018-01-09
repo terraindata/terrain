@@ -49,7 +49,7 @@ import * as KoaRouter from 'koa-router';
 import * as winston from 'winston';
 
 import { Permissions } from '../permissions/Permissions';
-import { UserConfig } from '../users/Users';
+import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import { Import } from './Import';
 import { ImportSourceConfig, Sources } from './sources/Sources';
@@ -128,8 +128,16 @@ Router.post('/headless', async (ctx, next) =>
       return;
     }
     Util.verifyParameters(ctx.request.body.body, ['source', 'filetype']);
-    const imprtSourceConfig: ImportSourceConfig = await sources.handleTemplateSource(ctx.request.body);
-    ctx.body = await imprt.upsert(imprtSourceConfig.stream, imprtSourceConfig.params, true);
+    const imprtSourceConfig: ImportSourceConfig | string = await sources.handleTemplateSource(ctx.request.body);
+    if (typeof imprtSourceConfig === 'string')
+    {
+      ctx.body = imprtSourceConfig as string;
+    }
+    else
+    {
+      ctx.body = await imprt.upsert((imprtSourceConfig as ImportSourceConfig).stream,
+        (imprtSourceConfig as ImportSourceConfig).params, true);
+    }
     return;
   }
   Util.verifyParameters(authStream['fields'], ['filetype', 'templateId']);

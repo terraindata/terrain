@@ -89,9 +89,9 @@ class SchemaResults extends TerrainComponent<Props>
     resultsServer?: BackendInstance;
     resultsErrorMessage?: string;
   } = {
-    initialized: false,
-    resultsState: _ResultsState(),
-  };
+      initialized: false,
+      resultsState: _ResultsState(),
+    };
 
   public componentWillReceiveProps(nextProps: Props)
   {

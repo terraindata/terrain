@@ -57,6 +57,7 @@ export class TastyQuery
   public filters: TastyNode[];
   public sorts: Array<{ node: TastyNode, order: string }>;
   public selected: TastyColumn[];
+  public inserts: object[];
   public upserts: object[];
   public numTaken: number;
   public numSkipped: number;
@@ -68,6 +69,7 @@ export class TastyQuery
     this.filters = [];
     this.sorts = [];
     this.selected = [];
+    this.inserts = [];
     this.upserts = [];
     this.numTaken = 0;
     this.numSkipped = 0;
@@ -83,6 +85,21 @@ export class TastyQuery
   public select(columns: TastyColumn[]): TastyQuery
   {
     this.selected = columns;
+    return this;
+  }
+
+  public insert(value: object | object[]): TastyQuery
+  {
+    this.command = new TastyNode('insert', null);
+    if (value instanceof Array)
+    {
+      this.inserts = this.inserts.concat(value);
+    }
+    else
+    {
+      this.inserts.push(value);
+    }
+
     return this;
   }
 

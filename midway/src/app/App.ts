@@ -75,7 +75,7 @@ export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 export let HA: number;
 
-class App
+export class App
 {
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {

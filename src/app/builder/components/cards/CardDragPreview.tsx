@@ -86,9 +86,9 @@ class CardDragPreview extends TerrainComponent<CDPProps>
     justDropped: boolean;
     language: string;
   } = {
-    justDropped: false,
-    language: Store.getState().query.language,
-  };
+      justDropped: false,
+      language: Store.getState().query.language,
+    };
 
   public timeout: any;
 

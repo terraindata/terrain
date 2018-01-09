@@ -412,30 +412,30 @@ class App extends TerrainComponent<Props>
       {
         fullHeight: true,
         columns:
-        [
-          {
-            width: sidebarWidth,
-            content: <Sidebar
-              links={links}
-              selectedIndex={selectedIndex}
-              expandable={true}
-              expanded={this.state.sidebarExpanded}
-              onExpand={this.toggleSidebar}
-            />,
-          },
-          {
-            noProps: true,
-            content:
-            <div
-              className='app-inner'
-            >
-              {
-                this.props.children
-              }
-            </div>
-            ,
-          },
-        ],
+          [
+            {
+              width: sidebarWidth,
+              content: <Sidebar
+                links={links}
+                selectedIndex={selectedIndex}
+                expandable={true}
+                expanded={this.state.sidebarExpanded}
+                onExpand={this.toggleSidebar}
+              />,
+            },
+            {
+              noProps: true,
+              content:
+                <div
+                  className='app-inner'
+                >
+                  {
+                    this.props.children
+                  }
+                </div>
+              ,
+            },
+          ],
       };
 
     return <LayoutManager layout={layout} />;

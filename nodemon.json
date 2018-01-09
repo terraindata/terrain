@@ -1,3 +1,3 @@
 {
-  "ignore": ["midway/src/assets/*"]
+  "ignore": ["midway/src/assets/*", "postgres-data"]
 }

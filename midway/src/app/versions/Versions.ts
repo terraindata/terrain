@@ -46,20 +46,12 @@ THE SOFTWARE.
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
-import { UserConfig } from '../users/Users';
+import UserConfig from '../users/UserConfig';
+import VersionConfig from './VersionConfig';
 
 // CREATE TABLE versions (id integer PRIMARY KEY, \
 // objectType text NOT NULL, objectId integer NOT NULL, \
 // object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
-
-export interface VersionConfig
-{
-  createdByUserId: number;
-  id?: number;
-  object: string;
-  objectId: number;
-  objectType: string;
-}
 
 export class Versions
 {
@@ -94,30 +86,40 @@ export class Versions
         objectId: id,
         objectType: type,
       };
+    const results = await this.get();
+    newVersion.id = results.length + 1;
     return App.DB.upsert(this.versionTable, newVersion) as Promise<VersionConfig>;
   }
 
   public async find(id: number): Promise<VersionConfig[]>
   {
-    return App.DB.select(this.versionTable, [], { id }) as Promise<VersionConfig[]>;
+    return this.get(undefined, id);
   }
 
   public async get(objectType?: string, objectId?: number): Promise<VersionConfig[]>
   {
-    let result: Promise<object[]>;
-    if (objectId !== undefined && objectType !== undefined)
+    return new Promise<VersionConfig[]>(async (resolve, reject) =>
     {
-      result = App.DB.select(this.versionTable, [], { objectType, objectId });
-    }
-    else if (objectId !== undefined)
-    {
-      result = App.DB.select(this.versionTable, [], { objectType });
-    }
-    else
-    {
-      result = App.DB.select(this.versionTable, [], {});
-    }
-    return result as Promise<VersionConfig[]>;
+      let rawResults;
+      if (objectId !== undefined && objectType !== undefined)
+      {
+        rawResults = await App.DB.select(this.versionTable, [], { objectType, objectId });
+      }
+      else if (objectType !== undefined)
+      {
+        rawResults = await App.DB.select(this.versionTable, [], { objectType });
+      }
+      else if (objectId !== undefined)
+      {
+        rawResults = await App.DB.select(this.versionTable, [], { objectId });
+      }
+      else
+      {
+        rawResults = await App.DB.select(this.versionTable, [], {});
+      }
+      const results: VersionConfig[] = rawResults.map((result: object) => new VersionConfig(result));
+      resolve(results);
+    });
   }
 }
 

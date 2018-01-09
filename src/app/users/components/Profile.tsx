@@ -81,12 +81,12 @@ class Profile extends TerrainComponent<Props>
     isLoggedInUser: boolean,
     routeIsDirect: boolean,
   } = {
-    user: null,
-    me: null,
-    loading: false,
-    isLoggedInUser: false,
-    routeIsDirect: false,
-  };
+      user: null,
+      me: null,
+      loading: false,
+      isLoggedInUser: false,
+      routeIsDirect: false,
+    };
 
   public infoKeys = [
     'userId',

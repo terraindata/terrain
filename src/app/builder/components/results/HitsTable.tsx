@@ -85,11 +85,11 @@ class HitsTable extends TerrainComponent<Props>
     rows: List<any>;
     selectedIndexes: List<any>;
   } = {
-    random: 0,
-    columns: this.getColumns(this.props),
-    rows: List([]),
-    selectedIndexes: List([]),
-  };
+      random: 0,
+      columns: this.getColumns(this.props),
+      rows: List([]),
+      selectedIndexes: List([]),
+    };
 
   public componentWillMount()
   {

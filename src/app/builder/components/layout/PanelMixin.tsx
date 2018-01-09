@@ -60,25 +60,25 @@ const Panel = {
   // },
 
   propTypes:
-  {
-    index: PropTypes.number,
+    {
+      index: PropTypes.number,
 
-    drag_x: PropTypes.bool,
-    drag_y: PropTypes.bool,
-    drag_xy: PropTypes.bool,
-    dragInsideOnly: PropTypes.bool,
+      drag_x: PropTypes.bool,
+      drag_y: PropTypes.bool,
+      drag_xy: PropTypes.bool,
+      dragInsideOnly: PropTypes.bool,
 
-    onPanelDrop: PropTypes.func,
+      onPanelDrop: PropTypes.func,
 
-    onMouseDown: PropTypes.func,
-    mouseDownRef: PropTypes.string,
+      onMouseDown: PropTypes.func,
+      mouseDownRef: PropTypes.string,
 
-    fill: PropTypes.bool,
-    reorderonPanelDrag: PropTypes.bool,
-    neighborDragging: PropTypes.bool,
-    handleRef: PropTypes.string,
-    dragHandleRef: PropTypes.string,
-  },
+      fill: PropTypes.bool,
+      reorderonPanelDrag: PropTypes.bool,
+      neighborDragging: PropTypes.bool,
+      handleRef: PropTypes.string,
+      dragHandleRef: PropTypes.string,
+    },
 
   getInitialState()
   {

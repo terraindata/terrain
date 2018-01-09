@@ -92,12 +92,12 @@ class TuningColumn extends TerrainComponent<Props>
     showNoCardsModal: boolean,
     noCardsMessage: string,
   } = {
-    keyPath: this.computeKeyPath(this.props),
-    allCards: List([]),
-    tuningOrder: List([]),
-    showNoCardsModal: false,
-    noCardsMessage: '',
-  };
+      keyPath: this.computeKeyPath(this.props),
+      allCards: List([]),
+      tuningOrder: List([]),
+      showNoCardsModal: false,
+      noCardsMessage: '',
+    };
 
   public tuningCards: Cards = List([]);
   public tuningIds: List<string> = List([]);
