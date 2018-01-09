@@ -182,7 +182,19 @@ const Actions =
                     (algorithmId, index) =>
                     {
                       const algorithm = algorithms.get(algorithmId);
-                      setTimeout(() => dispatch(Actions.algorithms.duplicate(algorithm, index, null, categoryId, groupId, db)), index * 200);
+                      setTimeout(() =>
+                        dispatch(
+                          Actions.algorithms.duplicate(
+                            algorithm,
+                            index,
+                            null,
+                            categoryId,
+                            groupId,
+                            db,
+                          ),
+                        ),
+                        index * 200,
+                      );
                     },
                   );
                 },
