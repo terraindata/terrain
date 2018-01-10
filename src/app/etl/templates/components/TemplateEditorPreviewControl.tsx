@@ -43,117 +43,99 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:no-var-requires
-import * as classNames from 'classnames';
+// tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import ExpandableView from 'common/components/ExpandableView';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
-import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
-import './TemplateEditorField.less';
-import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
-const AddIcon = require('images/icon_add.svg');
+import './TemplateEditorPreviewControl.less';
+const { List } = Immutable;
+const ArrowIcon = require('images/icon_arrow.svg');
 
-export interface Props extends TemplateEditorFieldProps
+export interface Props
 {
-  keyPath: KeyPath;
-  field: TemplateField;
-  canEdit: boolean;
-  preview: any;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
 }
 
 @Radium
-class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
+class TemplateEditorPreviewControl extends TerrainComponent<Props>
 {
-  public state: {
-    expandableViewOpen: boolean;
-  } = {
-      expandableViewOpen: true,
-    };
-
-  public renderChildFields()
-  {
-    const { field, keyPath, canEdit, preview } = this.props;
-
-    return field.children.map((value, index) =>
-    {
-      const newKeyPath = keyPath.push('children', index);
-      const childPreview = preview !== undefined && preview !== null ? preview[value.name] : null;
-      return (
-        <TemplateEditorFieldNode
-          keyPath={newKeyPath}
-          field={value}
-          canEdit={field.isIncluded && canEdit}
-          preview={childPreview}
-          key={index}
-        />
-      );
-    }).toList();
-  }
-
   public render()
   {
-    const { field, keyPath, canEdit, preview } = this.props;
+    const { documents, previewIndex } = this.props.templateEditor;
+    const indexSelectorText = documents.size > 0 ?
+      `${previewIndex + 1} of ${documents.size}` :
+      'no preview available';
 
-    const settings = (
-      <TemplateEditorFieldSettings
-        keyPath={keyPath}
-        field={field}
-        canEdit={canEdit}
-        preview={preview}
-      />
+    const arrowStylerStyle = _.extend({}, fontColor(Colors().text2, Colors().text1));
+
+    return (
+      <div className='template-editor-preview-control'>
+        <div className='preview-control-title'>
+          Sample UI
+        </div>
+        <div className='preview-control-row' >
+          <div
+            className='preview-control-arrow-styler'
+            style={arrowStylerStyle}
+            onClick={this.handleDecrementDocument}
+            key='left-arrow'
+          >
+            <ArrowIcon className='preview-control-arrow-icon arrow-icon-left' />
+          </div>
+          <div className='preview-control-document-number' style={fontColor(Colors().text2)}>
+            {indexSelectorText}
+          </div>
+          <div
+            className='preview-control-arrow-styler'
+            style={arrowStylerStyle}
+            onClick={this.handleIncrementDocument}
+            key='right-arrow'
+          >
+            <ArrowIcon className='preview-control-arrow-icon arrow-icon-right' />
+          </div>
+        </div>
+      </div>
     );
+  }
 
-    const children = (this._isRoot() || this._isNested()) ? (
-      <div className='template-editor-children-container'>
-        {this.renderChildFields()}
-      </div>) : undefined;
-
-    if (this._isRoot())
+  public handleDecrementDocument()
+  {
+    const { documents, previewIndex } = this.props.templateEditor;
+    if (previewIndex > 0)
     {
-      return children;
-    }
-    else
-    {
-      const childrenStyle = (canEdit === true && field.isIncluded === false) ?
-        getStyle('opacity', '0.7') : {};
-      return (
-        <ExpandableView
-          content={settings}
-          open={this.state.expandableViewOpen}
-          onToggle={this.handleExpandArrowClicked}
-          children={children}
-          style={childrenStyle}
-        />
-      );
+      this.props.act({
+        actionType: 'setPreviewIndex',
+        index: previewIndex - 1,
+      });
     }
   }
 
-  public handleExpandArrowClicked()
+  public handleIncrementDocument()
   {
-    this.setState({
-      expandableViewOpen: !this.state.expandableViewOpen,
-    });
+    const { documents, previewIndex } = this.props.templateEditor;
+    if (previewIndex + 1 < documents.size)
+    {
+      this.props.act({
+        actionType: 'setPreviewIndex',
+        index: previewIndex + 1,
+      });
+    }
   }
 
 }
 
-const TemplateEditorFieldNode = Util.createTypedContainer(
-  TemplateEditorFieldNodeC,
+export default Util.createContainer(
+  TemplateEditorPreviewControl,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );
-
-export default TemplateEditorFieldNode;

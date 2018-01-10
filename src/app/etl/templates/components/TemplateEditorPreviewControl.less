@@ -1,0 +1,41 @@
+@import "../../../common/Common.less";
+
+.template-editor-preview-control {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: @spacing;
+  width: 200px;
+
+  .preview-control-title {
+    padding: @spacing;
+  }
+
+  .preview-control-row {
+    display: flex;
+    align-items: center;
+  }
+
+  .preview-control-arrow-styler {
+    cursor: pointer;
+    padding: @quarter-spacing;
+    .preview-control-arrow-icon {
+      height: 14px;
+      width: 14px;
+      fill: currentColor;
+
+      &.arrow-icon-left {
+        transform: rotate(-90deg);
+      }
+
+      &.arrow-icon-right {
+        transform: rotate(90deg);
+      }
+    }
+  }
+
+  .preview-control-document-number {
+    padding: @spacing;
+  }
+}

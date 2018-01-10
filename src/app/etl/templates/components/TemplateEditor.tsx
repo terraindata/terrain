@@ -53,6 +53,7 @@ import Util from 'util/Util';
 
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
+import TemplateEditorPreviewControl from 'etl/templates/components/TemplateEditorPreviewControl';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _ExportTemplate, _TemplateField, ETLTemplate, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
@@ -86,7 +87,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
     this.props.act({
       actionType: 'setDocuments',
       documents: List(SampleDocuments),
-    })
+    });
   }
 
   public setModalRequests(requests)
@@ -103,13 +104,16 @@ class ETLExportDisplay extends TerrainComponent<Props>
     const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
     const titleTypeText = template.type === TEMPLATE_TYPES.IMPORT ? 'Import' : 'Export';
     return (
-      <div className='template-editor-root-container' style={backgroundColor(Colors().bg3)}>
-        <TemplateEditorFieldNode
-          keyPath={List([])}
-          field={template.rootField}
-          canEdit={true}
-          preview={previewDocument}
-        />
+      <div className='template-editor-root-container'>
+        <div className='template-editor' style={backgroundColor(Colors().bg3)}>
+          <TemplateEditorFieldNode
+            keyPath={List([])}
+            field={template.rootField}
+            canEdit={true}
+            preview={previewDocument}
+          />
+        </div>
+        <TemplateEditorPreviewControl />
         <MultiModal
           requests={this.props.templateEditor.modalRequests}
           setRequests={this.setModalRequests}

@@ -95,7 +95,7 @@ export interface TemplateEditorActionTypes
   setPreviewIndex: {
     actionType: 'setPreviewIndex';
     index: number;
-  }
+  };
 }
 
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>

@@ -61,6 +61,7 @@ import Autocomplete from 'common/components/Autocomplete';
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { Menu, MenuOption } from 'common/components/Menu';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
@@ -86,11 +87,13 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   public render()
   {
     const { field } = this.props;
-    const renderPreview = field.type
+    const renderPreview = field.type;
     return (
       <div className='field-settings-row'>
         <div className='field-settings-label-group'>
-          <div className='field-settings-label' style={fontColor(Colors().text3)}>
+          <div className='field-settings-label'
+            style={fontColor(Colors().text3, Colors().text2)}
+          >
             {`${field.name}${this._isNested() ? '' : ':'}`}
           </div>
         </div>
