@@ -91,13 +91,13 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
       <div className='field-settings-row'>
         <div className='field-settings-label-group'>
           <div className='field-settings-label' style={fontColor(Colors().text3)}>
-            { `${field.name}${this._isNested() ? '' : ':'}` }
+            {`${field.name}${this._isNested() ? '' : ':'}`}
           </div>
         </div>
         {
-          ! this._isNested() &&
+          !this._isNested() &&
           <div className='field-settings-preview'>
-            { this.props.preview.toString() }
+            {this.props.preview.toString()}
           </div>
         }
       </div>

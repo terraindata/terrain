@@ -76,24 +76,17 @@ class ETLExportDisplay extends TerrainComponent<Props>
       templateId: 1,
       templateName: 'Test Template',
     });
-    // template = template.setIn(['rootField', 'children', 0],
-    //   _TemplateField({ name: 'productId', type: ELASTIC_TYPES.TEXT, isPrimaryKey: true, isAnalyzed: false }));
-    // template = template.setIn(['rootField', 'children', 1],
-    //   _TemplateField({ name: 'product_info', type: ELASTIC_TYPES.NESTED }));
-    // template = template.setIn(['rootField', 'children', 1, 'children', 0],
-    //   _TemplateField({ name: 'value' }));
-    // template = template.setIn(['rootField', 'children', 1, 'children', 1],
-    //   _TemplateField({ name: 'other_value', type: ELASTIC_TYPES.LONG }));
 
-    template = template.set('rootField', treeFromDocument(SampleDocument));
+    template = template.set('rootField', treeFromDocument(SampleDocuments[0]));
     this.props.act({
       actionType: 'loadTemplate',
       template,
     });
+
     this.props.act({
-      actionType: 'setOriginalDocument',
-      document: SampleDocument,
-    });
+      actionType: 'setDocuments',
+      documents: List(SampleDocuments),
+    })
   }
 
   public setModalRequests(requests)
@@ -106,7 +99,8 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
   public render()
   {
-    const { template, previewDocument } = this.props.templateEditor;
+    const { template, documents, previewIndex } = this.props.templateEditor;
+    const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
     const titleTypeText = template.type === TEMPLATE_TYPES.IMPORT ? 'Import' : 'Export';
     return (
       <div className='template-editor-root-container' style={backgroundColor(Colors().bg3)}>
@@ -125,18 +119,32 @@ class ETLExportDisplay extends TerrainComponent<Props>
   }
 }
 
-const SampleDocument = {
-  'Product Name': 'Food',
-  'Product ID': 123,
-  'Product Description': 'You can eat this to survive! It can be tasty. Or gross. Some examples of food: Tacos, Burgers, Pasta',
-  'Meta': {
-    'Date Added': '01/08/2018',
-    'Views': 500,
+const SampleDocuments = [
+  {
+    'Product Name': 'Food',
+    'Product ID': 123,
+    'Product Description': 'You can eat this to survive! It can be tasty. Or gross. Some examples of food: Tacos, Burgers, Pasta',
+    'Meta': {
+      'Date Added': '01/08/2018',
+      'Views': 500,
+    },
+    'Here are some numbers': [
+      1, 2, 3.14, 4,
+    ],
   },
-  'Here are some numbers': [
-    1, 2, 3.14, 4,
-  ],
-};
+  {
+    'Product Name': 'Cool stuff',
+    'Product ID': 5,
+    'Product Description': 'Not to be confused with boring things',
+    'Meta': {
+      'Date Added': '01/10/2018',
+      'Views': 515,
+    },
+    'Here are some numbers': [
+      5, 1,
+    ],
+  },
+];
 
 // temporary helper for debugging. delete this
 function treeFromDocument(document: object, name = ''): TemplateField

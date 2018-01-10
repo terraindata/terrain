@@ -88,10 +88,14 @@ export interface TemplateEditorActionTypes
     actionType: 'setModalRequests';
     requests: List<ModalProps>;
   };
-  setOriginalDocument: {
-    actionType: 'setOriginalDocument';
-    document: object;
+  setDocuments: {
+    actionType: 'setDocuments';
+    documents: List<object>
   };
+  setPreviewIndex: {
+    actionType: 'setPreviewIndex';
+    index: number;
+  }
 }
 
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
@@ -134,11 +138,14 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       {
         return state.set('modalRequests', action.payload.requests);
       },
-      setOriginalDocument: (state, action) =>
+      setDocuments: (state, action) =>
       {
-        return state.set('originalDocument', action.payload.document)
-          .set('previewDocument', action.payload.document);
-      }
+        return state.set('documents', action.payload.documents);
+      },
+      setPreviewIndex: (state, action) =>
+      {
+        return state.set('previewIndex', action.payload.index);
+      },
     };
 }
 
