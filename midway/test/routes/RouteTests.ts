@@ -93,10 +93,7 @@ beforeAll(async (done) =>
     elasticDB = elasticController.getTasty().getDB() as ElasticDB;
 
     const sql = await readFile('./midway/test/scripts/test.sql');
-    const results = await new Promise(async (resolve, reject) =>
-    {
-      resolve(await DB.getDB().execute([sql.toString()]));
-    });
+    const results = await DB.getDB().execute([sql.toString()]);
   }
   catch (e)
   {
