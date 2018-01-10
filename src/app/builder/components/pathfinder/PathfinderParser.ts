@@ -54,7 +54,8 @@ import { FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpe
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
 import {isInput} from '../../../../blocks/types/Input';
-import {stringifyWithParameters} from '../../../../database/elastic/conversion/ParseElasticQuery';
+import {stringifyWithParameters, ESParseTreeToCode} from '../../../../database/elastic/conversion/ParseElasticQuery';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 
 export function parsePath(path: Path, inputs): string
 {
@@ -103,7 +104,9 @@ export function parsePath(path: Path, inputs): string
   }
   const moreObj = parseMore(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
-  return stringifyWithParameters(baseQuery.toJS(), inputs);
+  const text = stringifyWithParameters(baseQuery.toJS(), inputs)
+  const parser: ESJSONParser = new ESJSONParser(text, true);
+  return ESParseTreeToCode(parser, {}, inputs);
   // return JSON.stringify(baseQuery.toJS(), null, 2);
 }
 
