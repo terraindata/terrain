@@ -68,6 +68,7 @@ export interface TemplateEditorFieldProps
   keyPath: KeyPath;
   field: TemplateField;
   canEdit: boolean;
+  preview: any;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;

@@ -1,34 +1,54 @@
 @import "../../../common/Common.less";
 
-
+// template editor field node
 .template-editor-children-container {
   display: flex;
   flex-direction: column;
-  padding-left: @double-spacing;
+  padding-left: @spacing;
 
-  .new-field-button-spacer { // keep
-    margin-left: @double-spacing;
-    margin-top: @half-spacing;
-    margin-bottom: @half-spacing;
-    display: flex;
-    justify-content: flex-start;
+  // .new-field-button-spacer {
+  //   margin-left: @double-spacing;
+  //   // margin-top: @half-spacing;
+  //   // margin-bottom: @half-spacing;
+  //   display: flex;
+  //   justify-content: flex-start;
 
-    .create-new-template-field-button {
-      display: flex;
-      align-items: center;
-      padding: @half-spacing;
-      border-radius: 3px;
-      cursor: pointer;
+  //   .create-new-template-field-button {
+  //     display: flex;
+  //     align-items: center;
+  //     padding: @half-spacing;
+  //     border-radius: 3px;
+  //     cursor: pointer;
 
-      &.template-editor-field-input-disabled {
-        cursor: auto;
-      }
+  //     &.template-editor-field-input-disabled {
+  //       cursor: auto;
+  //     }
 
-      .template-editor-add-icon {
-        fill: currentColor;
-        width: 12px;
-        margin-right: 16px;
-      }
-    }
-  }
+  //     .template-editor-add-icon {
+  //       fill: currentColor;
+  //       width: 12px;
+  //       margin-right: 16px;
+  //     }
+  //   }
+  // }
+}
+
+// template editor field
+
+.field-settings-label-group {
+
+}
+
+.field-settings-label {
+  padding: @half-spacing;
+  padding-right: 0px;
+  width: 150px;
+}
+
+.field-settings-preview {
+  padding: @half-spacing;
+}
+
+.field-settings-row {
+  display: flex;
 }

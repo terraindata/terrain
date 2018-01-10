@@ -86,10 +86,13 @@ class ETLExportDisplay extends TerrainComponent<Props>
     //   _TemplateField({ name: 'other_value', type: ELASTIC_TYPES.LONG }));
 
     template = template.set('rootField', treeFromDocument(SampleDocument));
-
     this.props.act({
       actionType: 'loadTemplate',
       template,
+    });
+    this.props.act({
+      actionType: 'setOriginalDocument',
+      document: SampleDocument,
     });
   }
 
@@ -103,14 +106,15 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
   public render()
   {
-    const template: ETLTemplate = this.props.templateEditor.template;
+    const { template, previewDocument } = this.props.templateEditor;
     const titleTypeText = template.type === TEMPLATE_TYPES.IMPORT ? 'Import' : 'Export';
     return (
-      <div className='template-editor-root-container' style={backgroundColor(Colors().bg2)}>
+      <div className='template-editor-root-container' style={backgroundColor(Colors().bg3)}>
         <TemplateEditorFieldNode
           keyPath={List([])}
           field={template.rootField}
           canEdit={true}
+          preview={previewDocument}
         />
         <MultiModal
           requests={this.props.templateEditor.modalRequests}
@@ -124,9 +128,10 @@ class ETLExportDisplay extends TerrainComponent<Props>
 const SampleDocument = {
   'Product Name': 'Food',
   'Product ID': 123,
-  'Product Description': 'You can eat this to survive!',
+  'Product Description': 'You can eat this to survive! It can be tasty. Or gross. Some examples of food: Tacos, Burgers, Pasta',
   'Meta': {
     'Date Added': '01/08/2018',
+    'Views': 500,
   },
   'Here are some numbers': [
     1, 2, 3.14, 4,

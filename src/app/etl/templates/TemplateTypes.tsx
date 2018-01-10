@@ -59,6 +59,7 @@ class TemplateEditorStateC
   public isDirty: boolean = true;
   public modalRequests: List<ModalProps> = List([]);
   public previewDocument: object = {};
+  public originalDocument: object = {};
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);

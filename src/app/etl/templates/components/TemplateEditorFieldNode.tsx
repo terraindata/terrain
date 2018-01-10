@@ -68,6 +68,7 @@ export interface Props extends TemplateEditorFieldProps
   keyPath: KeyPath;
   field: TemplateField;
   canEdit: boolean;
+  preview: any;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
@@ -84,60 +85,62 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
   public renderChildFields()
   {
-    const { field, keyPath, canEdit } = this.props;
+    const { field, keyPath, canEdit, preview } = this.props;
 
     return field.children.map((value, index) =>
     {
       const newKeyPath = keyPath.push('children', index);
+      const childPreview = preview !== undefined && preview !== null ? preview[value.name] : null;
       return (
         <TemplateEditorFieldNode
           keyPath={newKeyPath}
           field={value}
           canEdit={field.isIncluded && canEdit}
+          preview={childPreview}
           key={index}
         />
       );
     }).toList();
   }
 
-  public renderCreateNewFieldButton()
-  {
-    const buttonStyle = this._inputDisabled() ?
-      fontColor(Colors().text3, Colors().text3) :
-      fontColor(Colors().text3, Colors().text2);
-    return (
-      <div className='new-field-button-spacer' key='new field button'>
-        <div
-          className={classNames({
-            'create-new-template-field-button': true,
-            'template-editor-field-input-disabled': this._inputDisabled(),
-          })}
-          onClick={this._noopIfDisabled(this.handleCreateNewField)}
-          style={buttonStyle}
-        >
-          <AddIcon className='template-editor-add-icon' />
-          <div> Add Field </div>
-        </div>
-      </div>
-    );
-  }
+  // public renderCreateNewFieldButton()
+  // {
+  //   const buttonStyle = this._inputDisabled() ?
+  //     fontColor(Colors().text3, Colors().text3) :
+  //     fontColor(Colors().text3, Colors().text2);
+  //   return (
+  //     <div className='new-field-button-spacer' key='new field button'>
+  //       <div
+  //         className={classNames({
+  //           'create-new-template-field-button': true,
+  //           'template-editor-field-input-disabled': this._inputDisabled(),
+  //         })}
+  //         onClick={this._noopIfDisabled(this.handleCreateNewField)}
+  //         style={buttonStyle}
+  //       >
+  //         <AddIcon className='template-editor-add-icon' />
+  //         <div> Add Field </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   public render()
   {
-    const { field, keyPath, canEdit } = this.props;
+    const { field, keyPath, canEdit, preview } = this.props;
 
     const settings = (
       <TemplateEditorFieldSettings
         keyPath={keyPath}
         field={field}
         canEdit={canEdit}
+        preview={preview}
       />
     );
 
     const children = (this._isRoot() || this._isNested()) ? (
       <div className='template-editor-children-container'>
         {this.renderChildFields()}
-        {this.renderCreateNewFieldButton()}
       </div>) : undefined;
 
     if (this._isRoot())
@@ -167,21 +170,17 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     });
   }
 
-  public handleCreateNewField()
-  {
-    const { keyPath, act } = this.props;
-    const newField = _TemplateField({ name: `new field hello there` });
-    act({
-      actionType: 'createField',
-      sourcePath: keyPath,
-      field: newField,
-    });
-  }
+  // public handleCreateNewField()
+  // {
+  //   const { keyPath, act } = this.props;
+  //   const newField = _TemplateField({ name: `new field hello there` });
+  //   act({
+  //     actionType: 'createField',
+  //     sourcePath: keyPath,
+  //     field: newField,
+  //   });
+  // }
 
-  public handleFieldClicked()
-  {
-    const { field, keyPath, act } = this.props;
-  }
 }
 
 const TemplateEditorFieldNode = Util.createTypedContainer(
