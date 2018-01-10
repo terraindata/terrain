@@ -90,9 +90,6 @@ class CardsToElastic
       if ((value === undefined || (typeof (value) === 'number' && isNaN(value)))
         && isInput(block['value'], BuilderStore.getState().query.inputs))
       {
-        console.log(value);
-        console.log(block);
-        console.log(block['value']);
         value = block['value'];
       }
       return value;

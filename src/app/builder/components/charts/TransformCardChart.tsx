@@ -56,7 +56,6 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 import Util from '../../../util/Util';
-
 export interface ScorePoint
 {
   id: string;
@@ -369,8 +368,7 @@ class TransformCardChart extends TerrainComponent<Props>
       AllBackendsMap[this.props.language].blocks, 'scorePoint', {
         value,
         score,
-      },
-    );
+      });
     if (updatePoints)
     {
       this.updatePoints(
@@ -380,6 +378,13 @@ class TransformCardChart extends TerrainComponent<Props>
       );
     }
     return newPoint;
+    // const newPoint = BlockUtils.make(
+    //   AllBackendsMap[this.props.language].blocks, 'scorePoint', {
+    //     value,
+    //     score,
+    //   },
+    // );
+
   }
 
   public changeDomain(domain, override = false)

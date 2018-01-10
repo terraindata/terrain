@@ -87,11 +87,22 @@ const { List, Map, Record } = Immutable;
 import BuilderStore from 'app/builder/data/BuilderStore';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
-import
-ElasticBlockHelpers,
+import ElasticBlockHelpers,
 { AutocompleteMatchType, FieldType, FieldTypeMapping }
   from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
+
+// For some reason, not having the FieldType in PathfinderTypes causes
+// TransformCardChartTests to fail...
+const enum FieldType
+{
+  Numerical,
+  Text,
+  Date,
+  Geopoint,
+  Ip,
+  Any,
+}
 
 export enum PathfinderSteps
 {
@@ -614,34 +625,15 @@ class ElasticDataSourceC extends DataSource
 
       return List(options.map((c) => _ChoiceOption(c)));
     }
-
-    // if (context.type === 'valueType')
-    // {
-    //   const comparison = ElasticComparisons.find((comp) => comp.value === context.comparison);
-
-    //   if (comparison)
-    //   {
-    //     return comparison.valueTypes.map((valueType) => _ChoiceOption({
-    //       value: valueType,
-    //       displayName: valueType,
-    //     })).toList();
-    //   }
-
-    //   return List([_ChoiceOption({
-    //     value: null,
-    //     displayName: 'Choose a comparison first',
-    //   })]);
-    // }
-
     if (context.type === 'input')
     {
       // TODO use current builder state
       const inputs = BuilderStore.getState().query.inputs;
       return inputs.map((input) =>
         _ChoiceOption({
-          displayName: '@' + input.key,
-          value: '@' + input.key
-        })
+          displayName: '@' + String(input.key),
+          value: '@' + String(input.key),
+        }),
       ).toList();
     }
 

@@ -50,12 +50,12 @@ import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 import Util from 'app/util/Util';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import { isInput } from '../../../../blocks/types/Input';
 import { FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
-import {isInput} from '../../../../blocks/types/Input';
-import {stringifyWithParameters, ESParseTreeToCode} from '../../../../database/elastic/conversion/ParseElasticQuery';
-import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 
 export function parsePath(path: Path, inputs): string
 {
@@ -104,7 +104,7 @@ export function parsePath(path: Path, inputs): string
   }
   const moreObj = parseMore(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
-  const text = stringifyWithParameters(baseQuery.toJS(), inputs)
+  const text = stringifyWithParameters(baseQuery.toJS(), inputs);
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, {}, inputs);
   // return JSON.stringify(baseQuery.toJS(), null, 2);
@@ -288,8 +288,8 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
 function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
 {
   const lineValue = String(line.value);
-  const  value: any = String(line.value || '');
-  const boost = typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight
+  const value: any = String(line.value || '');
+  const boost = typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight;
   switch (line.comparison)
   {
     case 'equal':
