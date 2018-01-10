@@ -145,15 +145,19 @@ export class App
   {
     // create application schema
     await Schema.createAppSchema(this.config.db as string, this.DB);
+    winston.info('Finished creating application schema...');
 
     // process configuration options
     await Config.handleConfig(this.config);
+    winston.debug('Finished processing configuration options...');
 
     // create a default seed user
     await users.initializeDefaultUser();
+    winston.debug('Finished creating a default user...');
 
     // add local filesystem credential config
     await credentials.initializeLocalFilesystemCredential();
+    winston.debug('Finished adding local filesystem credentials...');
 
     // connect to configured databases
     const dbs = await databases.select(['id'], {});
@@ -173,6 +177,7 @@ export class App
     // setup stored users
     await scheduler.initializeJobs();
     await scheduler.initializeSchedules();
+    winston.debug('Finished initializing scheduler jobs and schedules...');
 
     const heapStats: object = v8.getHeapStatistics();
     this.heapAvail = Math.floor(0.8 * (heapStats['heap_size_limit'] - heapStats['used_heap_size']));
