@@ -155,7 +155,7 @@ export const BuilderStore: IStore<BuilderState> = createStore(
     if (BuilderPathActionTypes[action.type])
     {
       const path = state.query.path;
-      state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path));
+      state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
     }
 
     if (BuilderCardActionTypes[action.type] && !state.query.path)

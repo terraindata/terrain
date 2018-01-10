@@ -90,6 +90,7 @@ export interface Backend
 
   pathToCode(
     path: Path,
+    inputs: List<any>
   ): string;
 
   codeToQuery(

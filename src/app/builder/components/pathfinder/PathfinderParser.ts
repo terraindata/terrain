@@ -53,8 +53,8 @@ import * as _ from 'lodash';
 import { FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
-
-export function parsePath(path: Path): string
+import {isInput} from '../../../../blocks/types/Input';
+export function parsePath(path: Path, inputs): string
 {
   let baseQuery = Map({
     query: Map({
@@ -81,7 +81,7 @@ export function parsePath(path: Path): string
       }),
     }),
   ]));
-  let filterObj = parseFilters(path.filterGroup);
+  let filterObj = parseFilters(path.filterGroup, inputs);
   filterObj = filterObj.setIn(['bool', 'filter'],
     filterObj.getIn(['bool', 'filter'])
       .concat(baseQuery.getIn(['query', 'bool', 'filter'])));
@@ -211,7 +211,7 @@ function parseTerrainScore(score: Score)
   return sortObj;
 }
 
-function parseFilters(filterGroup: FilterGroup): any
+function parseFilters(filterGroup: FilterGroup, inputs): any
 {
   // init must, mustNot, filter, should
   // If the minMatches is all of the above
@@ -244,7 +244,7 @@ function parseFilters(filterGroup: FilterGroup): any
   {
     if (!line.filterGroup)
     {
-      const lineInfo = parseFilterLine(line, useShould);
+      const lineInfo = parseFilterLine(line, useShould, inputs);
       if (useShould)
       {
         should = should.push(lineInfo);
@@ -264,7 +264,7 @@ function parseFilters(filterGroup: FilterGroup): any
     }
     else
     {
-      const nestedFilter = parseFilters(line.filterGroup);
+      const nestedFilter = parseFilters(line.filterGroup, inputs);
       must = must.push(nestedFilter);
     }
   });
@@ -279,16 +279,25 @@ function parseFilters(filterGroup: FilterGroup): any
   return filterObj;
 }
 
-function parseFilterLine(line: FilterLine, useShould: boolean)
+function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
 {
+  const lineValue = String(line.value);
+  let value: any = String(line.value || '');
+  if (isInput(value, inputs))
+  {
+    // It's an input, do something different ...
+    console.log(inputs);
+    // value = inputs[value];
+  }
+  const boost = typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight
   switch (line.comparison)
   {
     case 'equal':
       return Map({
         term: Map({
           [line.field]: Map({
-            value: line.value || '',
-            boost: typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight,
+            value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
+            boost,
           }),
         }),
       });
@@ -308,8 +317,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
             must_not: Map({
               term: Map({
                 [line.field]: Map({
-                  value: String(line.value || ''),
-                  boost: line.weight,
+                  value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
+                  boost,
                 }),
               }),
             }),
@@ -319,8 +328,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         term: Map({
           [line.field]: Map({
-            value: String(line.value || ''),
-            boost: line.weight,
+            value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
+            boost,
           }),
         }),
       });
@@ -347,26 +356,44 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
         }),
       });
     case 'greater':
+      return Map({
+        range: Map({
+          [line.field]:
+            Map({
+              gt: parseFloat(value),
+              boost,
+            }),
+        }),
+      });
     case 'alphaafter':
     case 'dateafter':
       return Map({
         range: Map({
           [line.field]:
             Map({
-              gt: line.value,
-              boost: line.weight,
+              gt: value,
+              boost,
             }),
         }),
       });
     case 'less':
+      return Map({
+        range: Map({
+          [line.field]:
+            Map({
+              lt: parseFloat(value),
+              boost,
+            }),
+        }),
+      });
     case 'alphabefore':
     case 'datebefore':
       return Map({
         range: Map({
           [line.field]:
             Map({
-              lt: line.value,
-              boost: line.weight,
+              lt: value,
+              boost,
             }),
         }),
       });
@@ -375,8 +402,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
         range: Map({
           [line.field]:
             Map({
-              gte: line.value,
-              boost: line.weight,
+              gte: parseFloat(value),
+              boost,
             }),
         }),
       });
@@ -385,8 +412,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
         range: Map({
           [line.field]:
             Map({
-              lte: line.value,
-              boost: line.weight,
+              lte: parseFloat(value),
+              boost,
             }),
         }),
       });
@@ -395,7 +422,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         geo_distance: Map({
           distance: String(distanceObj.distance) + distanceObj.units,
-          [line.field]: distanceObj.location.reverse(),
+          [line.field]: [distanceObj.location[1], distanceObj.location[0]],
         }),
       });
     default:

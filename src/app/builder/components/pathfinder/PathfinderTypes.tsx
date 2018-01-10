@@ -636,24 +636,13 @@ class ElasticDataSourceC extends DataSource
     if (context.type === 'input')
     {
       // TODO use current builder state
-      return List([
+      const inputs = BuilderStore.getState().query.inputs;
+      return inputs.map((input) =>
         _ChoiceOption({
-          displayName: 'search term',
-          value: '@search',
-        }),
-        _ChoiceOption({
-          displayName: 'genre',
-          value: '@genre',
-        }),
-        _ChoiceOption({
-          displayName: 'user ID',
-          value: '@userid',
-        }),
-        _ChoiceOption({
-          displayName: 'user location',
-          value: '@userlocation',
-        }),
-      ]);
+          displayName: '@' + input.key,
+          value: '@' + input.key
+        })
+      ).toList();
     }
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));
