@@ -180,9 +180,9 @@ class CardDropArea extends TerrainComponent<Props>
     draggingCardItem: CardItem | null;
     language: string;
   } = {
-    draggingCardItem: null,
-    language: Store.getState().query.language,
-  };
+      draggingCardItem: null,
+      language: Store.getState().query.language,
+    };
 
   constructor(props)
   {
@@ -281,7 +281,7 @@ class CardDropArea extends TerrainComponent<Props>
           'card-drop-area-lower': this.props.half && this.props.lower,
           'card-drop-area-over': this.props.isOver,
           'card-drop-area-could-drop': this.state.draggingCardItem
-          && cardCouldWrap(this.props, this.state.draggingCardItem),
+            && cardCouldWrap(this.props, this.state.draggingCardItem),
           'card-drop-area-can-drop': this.props.canDrop,
           'card-drop-area-over-self': this.props.isOver && this.selfDragging(),
           'card-drop-area-render-preview': this.props.renderPreview,

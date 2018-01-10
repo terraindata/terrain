@@ -45,7 +45,6 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:no-var-requires
 import { backgroundColor, borderColor, Colors, getStyle } from 'app/colors/Colors';
-import ColorsActions from 'app/colors/data/ColorsActions';
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import * as React from 'react';
@@ -69,8 +68,8 @@ class MultiInput extends TerrainComponent<Props>
   public state: {
     newValue: string;
   } = {
-    newValue: '',
-  };
+      newValue: '',
+    };
 
   public deleteItem(index)
   {

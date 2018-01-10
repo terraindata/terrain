@@ -79,16 +79,16 @@ export const elasticScore = _card(
         const factors = block['weights'].map((weightBlock) => tqlTranslationFn(weightBlock, tqlConfig)).toArray();
         const _scriptObj = {
           _script:
-          {
-            type: block['sortType'],
-            order: block['sortOrder'],
-            script: {
-              stored: 'Terrain.Score.PWL',
-              params: {
-                factors,
+            {
+              type: block['sortType'],
+              order: block['sortOrder'],
+              script: {
+                stored: 'Terrain.Score.PWL',
+                params: {
+                  factors,
+                },
               },
             },
-          },
         };
 
         if (block['sortMode'] !== 'auto')
@@ -111,140 +111,140 @@ export const elasticScore = _card(
         };
       },
       display:
-      [
-        {
-          displayType: DisplayType.ROWS,
-          key: 'weights',
-          english: 'weight',
-          factoryType: 'elasticWeight',
-          provideParentData: true,
-          row:
+        [
           {
-            noDataPadding: true,
-            inner:
-            [
+            displayType: DisplayType.ROWS,
+            key: 'weights',
+            english: 'weight',
+            factoryType: 'elasticWeight',
+            provideParentData: true,
+            row:
               {
-                displayType: DisplayType.CARDTEXT,
-                key: 'key',
-                // help: ManualConfig.help['key'],
-                placeholder: 'Field',
-                accepts: List(['elasticTransform']),
-                showWhenCards: true,
-              },
-              {
-                displayType: DisplayType.NUM,
-                // help: ManualConfig.help['weight'],
-                key: 'weight',
-                placeholder: 'Weight',
-                style: {
-                  maxWidth: 120,
-                },
-                // autoDisabled: true,
-              },
-              {
-                displayType: DisplayType.COMPONENT,
-                component: ScoreBar,
-                requiresBuilderState: true,
-                key: 'elasticScore',
-                // help: ManualConfig.help['score'],
-              },
-            ],
+                noDataPadding: true,
+                inner:
+                  [
+                    {
+                      displayType: DisplayType.CARDTEXT,
+                      key: 'key',
+                      // help: ManualConfig.help['key'],
+                      placeholder: 'Field',
+                      accepts: List(['elasticTransform']),
+                      showWhenCards: true,
+                    },
+                    {
+                      displayType: DisplayType.NUM,
+                      // help: ManualConfig.help['weight'],
+                      key: 'weight',
+                      placeholder: 'Weight',
+                      style: {
+                        maxWidth: 120,
+                      },
+                      // autoDisabled: true,
+                    },
+                    {
+                      displayType: DisplayType.COMPONENT,
+                      component: ScoreBar,
+                      requiresBuilderState: true,
+                      key: 'elasticScore',
+                      // help: ManualConfig.help['score'],
+                    },
+                  ],
 
-            below:
-            {
-              displayType: DisplayType.CARDSFORTEXT,
-              key: 'key',
-            },
+                below:
+                  {
+                    displayType: DisplayType.CARDSFORTEXT,
+                    key: 'key',
+                  },
+              },
           },
-        },
-        // Advanced controls
-        {
-          displayType: DisplayType.EXPANDABLE,
-          key: null,
-          expandToggle: {
-            displayType: DisplayType.LABEL,
-            label: 'Advanced',
+          // Advanced controls
+          {
+            displayType: DisplayType.EXPANDABLE,
             key: null,
-            style: {
-              display: 'inline',
-              marginLeft: 6,
-              fontSize: 16,
-            },
-          },
-          expandContent:
-          [
-            {
-              displayType: DisplayType.FLEX,
+            expandToggle: {
+              displayType: DisplayType.LABEL,
+              label: 'Advanced',
               key: null,
               style: {
-                paddingBottom: 20,
-                marginTop: 18,
+                display: 'inline',
+                marginLeft: 6,
+                fontSize: 16,
               },
-
-              flex:
+            },
+            expandContent:
               [
                 {
-                  displayType: DisplayType.LABEL,
+                  displayType: DisplayType.FLEX,
                   key: null,
-                  label: 'Order',
                   style: {
-                    paddingLeft: 20,
+                    paddingBottom: 20,
+                    marginTop: 18,
                   },
-                },
-                {
-                  displayType: DisplayType.DROPDOWN,
-                  key: 'sortOrder',
-                  options: List(ESInterpreterDefaultConfig.getClause('sort_order')['values'] as string[]),
-                  autoDisabled: true,
-                  dropdownUsesRawValues: true,
-                  centerDropdown: true,
-                  style: {
-                    maxWidth: 80,
-                  },
-                },
-                {
-                  displayType: DisplayType.LABEL,
-                  key: null,
-                  label: 'Mode',
-                  style: {
-                    paddingLeft: 20,
-                  },
-                },
-                {
-                  displayType: DisplayType.DROPDOWN,
-                  key: 'sortMode',
-                  options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values'].concat(['auto']) as string[]),
-                  dropdownUsesRawValues: true,
-                  autoDisabled: true,
-                  centerDropdown: true,
-                  style: {
-                    maxWidth: 80,
-                  },
-                },
-                {
-                  displayType: DisplayType.LABEL,
-                  key: null,
-                  label: 'Type',
-                  style: {
-                    paddingLeft: 20,
-                  },
-                },
-                {
-                  displayType: DisplayType.DROPDOWN,
-                  key: 'sortType',
-                  options: List(ESInterpreterDefaultConfig.getClause('field_type')['values'] as string[]),
-                  dropdownUsesRawValues: true,
-                  autoDisabled: true,
-                  centerDropdown: true,
-                  style: {
-                    maxWidth: 120,
-                  },
+
+                  flex:
+                    [
+                      {
+                        displayType: DisplayType.LABEL,
+                        key: null,
+                        label: 'Order',
+                        style: {
+                          paddingLeft: 20,
+                        },
+                      },
+                      {
+                        displayType: DisplayType.DROPDOWN,
+                        key: 'sortOrder',
+                        options: List(ESInterpreterDefaultConfig.getClause('sort_order')['values'] as string[]),
+                        autoDisabled: true,
+                        dropdownUsesRawValues: true,
+                        centerDropdown: true,
+                        style: {
+                          maxWidth: 80,
+                        },
+                      },
+                      {
+                        displayType: DisplayType.LABEL,
+                        key: null,
+                        label: 'Mode',
+                        style: {
+                          paddingLeft: 20,
+                        },
+                      },
+                      {
+                        displayType: DisplayType.DROPDOWN,
+                        key: 'sortMode',
+                        options: List(ESInterpreterDefaultConfig.getClause('sort_mode')['values'].concat(['auto']) as string[]),
+                        dropdownUsesRawValues: true,
+                        autoDisabled: true,
+                        centerDropdown: true,
+                        style: {
+                          maxWidth: 80,
+                        },
+                      },
+                      {
+                        displayType: DisplayType.LABEL,
+                        key: null,
+                        label: 'Type',
+                        style: {
+                          paddingLeft: 20,
+                        },
+                      },
+                      {
+                        displayType: DisplayType.DROPDOWN,
+                        key: 'sortType',
+                        options: List(ESInterpreterDefaultConfig.getClause('field_type')['values'] as string[]),
+                        dropdownUsesRawValues: true,
+                        autoDisabled: true,
+                        centerDropdown: true,
+                        style: {
+                          maxWidth: 120,
+                        },
+                      },
+                    ],
                 },
               ],
-            },
-          ],
-        },
-      ],
+          },
+        ],
     },
   });
 

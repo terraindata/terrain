@@ -58,7 +58,6 @@ import CreateLine from '../../common/components/CreateLine';
 import Modal from '../../common/components/Modal';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
-import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import Dropdown from './../../common/components/Dropdown';
@@ -94,27 +93,29 @@ export interface Props
   isFocused: boolean; // is this the last thing focused / selected?
   groupActions: any;
   referrer?: { label: string, path: string };
+  users?: UserTypes.UserState;
+}
+
+export interface State
+{
+  rendered: boolean;
+  roles: RoleTypes.RoleMap;
+  lastMoved: string;
+  draggingItemIndex: number;
+  draggingOverIndex: number;
+  creatingNewGroup: boolean;
+  newGroupTextboxValue: string;
+  newGroupDbIndex: number;
+  duplicatingGroup: boolean;
+  duplicateGroupTextboxValue: string;
+  duplicateGroupId: ID;
+  duplicateGroupCategoryIndex: number;
 }
 
 class GroupsColumn extends TerrainComponent<Props>
 {
-  public state: {
-    rendered: boolean,
-    me: UserTypes.User,
-    roles: RoleTypes.RoleMap,
-    lastMoved: string;
-    draggingItemIndex: number;
-    draggingOverIndex: number;
-    creatingNewGroup: boolean;
-    newGroupTextboxValue: string;
-    newGroupDbIndex: number;
-    duplicatingGroup: boolean;
-    duplicateGroupTextboxValue: string;
-    duplicateGroupId: ID;
-    duplicateGroupCategoryIndex: number;
-  } = {
+  public state: State = {
     rendered: false,
-    me: null,
     roles: null,
     lastMoved: '',
     draggingItemIndex: -1,
@@ -136,11 +137,6 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this._subscribe(UserStore, {
-      stateKey: 'me',
-      storeKeyPath: ['currentUser'],
-      // isMounted: true,
-    });
     this._subscribe(RolesStore, {
       stateKey: 'roles',
       // isMounted: true
@@ -417,40 +413,40 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public renderGroup(id: ID, fadeIndex: number)
   {
-    const { params, basePath } = this.props;
+    const { params, basePath, users } = this.props;
     const group = this.props.groups.get(id);
     const index = this.props.groupsOrder.indexOf(id);
     const scores = {
       [ItemStatus.Archive]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Archive),
-        name: 'Algorithms in Archived Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Archive),
+          name: 'Algorithms in Archived Status',
+        },
       [ItemStatus.Build]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Build),
-        name: 'Algorithms in Build Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Build),
+          name: 'Algorithms in Build Status',
+        },
       [ItemStatus.Approve]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Approve),
-        name: 'Algorithms in Approve Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Approve),
+          name: 'Algorithms in Approve Status',
+        },
       [ItemStatus.Live]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Live),
-        name: 'Algorithms in Live Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Live),
+          name: 'Algorithms in Live Status',
+        },
       [ItemStatus.Default]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Default),
-        name: 'Algorithms in Default Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Default),
+          name: 'Algorithms in Default Status',
+        },
     };
 
     const algorithms = this.props.algorithms.filter(
@@ -469,7 +465,8 @@ class GroupsColumn extends TerrainComponent<Props>
     );
 
     // scores.splice(0, 1); // remove Archived count
-    const { me, roles } = this.state;
+    const { currentUser: me } = users;
+    const { roles } = this.state;
     const canArchive = (group.status !== ItemStatus.Archive); // me && roles && roles.getIn([group.categoryId, me.id, 'admin']);
     const canDuplicate = true;
     const canRename = (scores[ItemStatus.Live].score === 0 && scores[ItemStatus.Default].score === 0);
@@ -578,9 +575,10 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public renderCategory(status: ItemStatus)
   {
-    const { groups } = this.props;
+    const { groups, users } = this.props;
     const ids = this.props.groupsOrder.filter((id) => groups.get(id) && groups.get(id).status === status);
-    const { me, roles } = this.state;
+    const { roles } = this.state;
+    const { currentUser: me } = users;
     const canCreate = true; // me && roles && roles.getIn([this.props.categoryId, me.id, 'admin']);
     return (
       <LibraryItemCategory
@@ -722,7 +720,7 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public render()
   {
-    const { groups, groupsOrder, categoryId, referrer } = this.props;
+    const { groups, groupsOrder, categoryId, referrer, users } = this.props;
     return (
       <LibraryColumn
         index={2}
@@ -753,7 +751,7 @@ class GroupsColumn extends TerrainComponent<Props>
                 <InfoArea
                   large='No groups created, yet.'
                   button={
-                    Util.haveRole(categoryId, 'admin', UserStore, RolesStore)
+                    Util.haveRole(categoryId, 'admin', users, RolesStore)
                       ? 'Create a group' : null
                   }
                   onClick={this.handleNewGroupModalOpen}
@@ -766,4 +764,8 @@ class GroupsColumn extends TerrainComponent<Props>
   }
 }
 
-export default GroupsColumn;
+export default Util.createTypedContainer(
+  GroupsColumn,
+  ['users'],
+  {},
+);

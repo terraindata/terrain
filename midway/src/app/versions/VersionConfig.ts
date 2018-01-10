@@ -44,86 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+import ConfigType from '../ConfigType';
 
-import { Map } from 'immutable';
-import * as _ from 'lodash';
-import * as ReduxActions from 'redux-actions';
-const Redux = require('redux');
-import { BaseClass, New } from '../../Classes';
-
-class SpotlightStateC extends BaseClass
+export class VersionConfig extends ConfigType
 {
-  public spotlights: IMMap<string, any> = Map({});
-}
-export type SpotlightState = SpotlightStateC & IRecord<SpotlightStateC>;
-export const _SpotlightState = (config?: { [key: string]: any }) =>
-  New<SpotlightState>(new SpotlightStateC(config), config);
+  public createdAt?: string = undefined;
+  public createdByUserId: number = -1;
+  public id?: number = undefined;
+  public object: string = '';
+  public objectId: number = -1;
+  public objectType: string = '';
 
-const DefaultState = _SpotlightState();
-
-// TODO something better like this
-// class SpotlightC extends BaseClass
-// {
-//   name: string;
-//   color: string;
-
-// }
-// export type Spotlight = SpotlightC & IRecord<Spotlight>;
-// export const _Spotlight = (config?: {[key:string]: any}) =>
-//   New<Spotlight>(new SpotlightC(config), config);
-
-interface SpotlightAction
-{
-  type: string;
-  payload:
+  constructor(props: object)
   {
-    hit: any;
-    id: string;
-  };
+    super();
+    ConfigType.initialize(this, props);
+  }
 }
 
-export const SpotlightStore: IStore<SpotlightState> = Redux.createStore(
-  ReduxActions.handleActions({
-    spotlight:
-    (state: SpotlightState, action: SpotlightAction) =>
-    {
-      const { hit, id } = action.payload;
-      if (!hit)
-      {
-        return state.removeIn(['spotlights', id]);
-      }
-      return state.setIn(['spotlights', id], _.extend({ id }, hit));
-    },
-
-    clearSpotlights:
-    (state: SpotlightState) =>
-    {
-      return state.set('spotlights', Map({}));
-    },
-  }, DefaultState),
-  DefaultState);
-
-export function spotlightAction(id: string, hit: any)
-{
-  SpotlightStore.dispatch({
-    type: 'spotlight',
-    payload:
-    {
-      id,
-      hit: hit == null ? null : _.extend(hit, { id }),
-    },
-  });
-}
-
-export function clearSpotlightsAction()
-{
-  SpotlightStore.dispatch({
-    type: 'clearSpotlights',
-    payload:
-    {
-    },
-  });
-}
-
-export default SpotlightStore;
+export default VersionConfig;

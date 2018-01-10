@@ -197,6 +197,7 @@ class ColumnC extends SchemaBaseClass
   public defaultValue = '';
   public isNullable = false;
   public isPrimaryKey = false;
+
   public sampleData: List<any> = List();
 }
 export type Column = ColumnC & IRecord<ColumnC>;

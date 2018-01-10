@@ -52,7 +52,8 @@ import * as React from 'react';
 import { Colors, getStyle } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List } = Immutable;
-import ColorsActions from 'app/colors/data/ColorsActions';
+import { ColorsActions } from 'app/colors/data/ColorsRedux';
+import Util from 'app/util/Util';
 import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
@@ -68,15 +69,28 @@ export interface Props
   more: More;
   keyPath: KeyPath;
   hideTitle?: boolean;
+  colorsActions?: typeof ColorsActions;
 }
 
 class PathfinderMoreSection extends TerrainComponent<Props>
 {
   public componentWillMount()
   {
-    ColorsActions.setStyle('.pf-line-wrapper .expand', getStyle('fill', Colors().iconColor));
-    ColorsActions.setStyle('.pf-aggregation-arrow-open', { fill: Colors().active + ' !important' });
-    ColorsActions.setStyle('.pf-aggregation-arrow-advanced', getStyle('fill', Colors().iconColor));
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-line-wrapper .expand',
+      style: getStyle('fill', Colors().iconColor),
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-aggregation-arrow-open',
+      style: { fill: Colors().active + ' !important' },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-aggregation-arrow-advanced',
+      style: getStyle('fill', Colors().iconColor),
+    });
   }
 
   public handleAddLine()
@@ -150,4 +164,10 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   }
 }
 
-export default PathfinderMoreSection;
+export default Util.createContainer(
+  PathfinderMoreSection,
+  ['colors'],
+  {
+    colorsActions: ColorsActions,
+  },
+);

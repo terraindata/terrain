@@ -100,8 +100,8 @@ export class TableComponent extends TerrainComponent<Props>
   public state: {
     rows: List<any>;
   } = {
-    rows: List([]),
-  };
+      rows: List([]),
+    };
 
   constructor(props: Props)
   {

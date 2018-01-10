@@ -168,9 +168,9 @@ export class CreateCardOption extends TerrainComponent<Props>
             <div className='create-card-option-description'> {this.props.description} </div>,
             {
               html:
-              <span className='create-card-option-description-tooltip'>
-                {card.static.description}
-              </span>,
+                <span className='create-card-option-description-tooltip'>
+                  {card.static.description}
+                </span>,
               size: 'small',
               position: 'bottom',
             },

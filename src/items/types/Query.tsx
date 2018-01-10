@@ -97,8 +97,7 @@ class QueryC
   dbFields = ['id', 'parent', 'name', 'status', 'type'];
   excludeFields = ['dbFields', 'excludeFields'];
 
-  //modelVersion = CurrentQueryModelVersion; // 2 is for the first version of Node midway
-  modelVersion = 3;
+  modelVersion = CurrentQueryModelVersion;
 
   // what order the cards are in the tuning column
   tuningOrder: List<string> = List([]);
@@ -120,10 +119,19 @@ export const _Query = (config?: object) =>
   config['tuningOrder'] = List<string>(config['tuningOrder']);
   config['aggregationList'] = Map<string, Aggregation>(config['aggregationList']);
   config['path'] = _Path(config['path']);
-  if (config && (!config['modelVersion'] || config['modelVersion'] < 3))
+  if (config)
   {
-    config['modelVersion'] = 3;
-    config['algorithmId'] = config['variantId'];
+    if (!config['modelVersion'] || config['modelVersion'] < 3)
+    {
+      config['modelVersion'] = 3;
+      config['algorithmId'] = config['variantId'];
+    }
+
+    if (config['modelVersion'] < 4)
+    {
+      config['modelVersion'] = 4;
+      config['cardsAndCodeInSync'] = false;
+    }
   }
   const query = new Query_Record(config) as any as Query;
   return query;
@@ -137,5 +145,10 @@ export function queryForSave(query: Query): object
     .set('resultsConfig', query.resultsConfig.toJS());
   return query.toJS();
 }
+
+// first version is 2.
+// version 3 renames algorithmId to variantId.
+// version 4 introduces a new custom filter card.
+export const CurrentQueryModelVersion = 4;
 
 export default Query;

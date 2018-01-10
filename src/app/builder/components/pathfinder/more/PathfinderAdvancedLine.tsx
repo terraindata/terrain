@@ -84,8 +84,8 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
   public state: {
     expanded: boolean;
   } = {
-    expanded: false,
-  };
+      expanded: false,
+    };
 
   public handleMissingChange(index)
   {
@@ -144,13 +144,14 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           />;
         break;
       case 'dropdown':
-        const options = item.fieldOptions ? this.props.fields : item.options;
+        const options = item.fieldOptions ? this.props.fields : (item.textOptions || item.options);
         content =
           <Dropdown
             canEdit={this.props.canEdit && !disabled}
             keyPath={this.props.keyPath.push(item.key)}
             options={options}
             selectedIndex={options.indexOf(this.props.advancedData.get(item.key))}
+            optionsDisplayName={item.optionDisplayNames}
           />;
         break;
       case 'map':

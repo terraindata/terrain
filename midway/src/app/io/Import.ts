@@ -62,11 +62,12 @@ import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import { ItemConfig, Items } from '../items/Items';
+import Items from '../items/Items';
 import { Permissions } from '../permissions/Permissions';
 import * as Util from '../Util';
-import { ImportTemplateConfig, ImportTemplates } from './templates/ImportTemplates';
-import { TemplateBase } from './templates/Templates';
+import ImportTemplateConfig from './templates/ImportTemplateConfig';
+import { ImportTemplates } from './templates/ImportTemplates';
+import { TemplateBase } from './templates/TemplateBase';
 
 const importTemplates = new ImportTemplates();
 
@@ -88,21 +89,21 @@ export class Import
   private BATCH_SIZE: number = 5000;
   private CHUNK_SIZE: number = 10000000;
   private COMPATIBLE_TYPES: object =
-  {
-    text: new Set(['text']),
-    keyword: new Set(['keyword']),
-    byte: new Set(['text', 'byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']),
-    short: new Set(['text', 'short', 'integer', 'long', 'float', 'double']),
-    integer: new Set(['text', 'integer', 'long', 'double']),
-    long: new Set(['text', 'long']),
-    half_float: new Set(['text', 'half_float', 'float', 'double']),
-    float: new Set(['text', 'float', 'double']),
-    double: new Set(['text', 'double']),
-    boolean: new Set(['text', 'boolean']),
-    date: new Set(['text', 'date']),
-    nested: new Set(['nested']),
-    geo_point: new Set(['array', 'geo_point']),
-  };
+    {
+      text: new Set(['text']),
+      keyword: new Set(['keyword']),
+      byte: new Set(['text', 'byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']),
+      short: new Set(['text', 'short', 'integer', 'long', 'float', 'double']),
+      integer: new Set(['text', 'integer', 'long', 'double']),
+      long: new Set(['text', 'long']),
+      half_float: new Set(['text', 'half_float', 'float', 'double']),
+      float: new Set(['text', 'float', 'double']),
+      double: new Set(['text', 'double']),
+      boolean: new Set(['text', 'boolean']),
+      date: new Set(['text', 'date']),
+      nested: new Set(['nested']),
+      geo_point: new Set(['array', 'geo_point']),
+    };
   private MAX_ACTIVE_READS: number = 3;
   private MAX_ALLOWED_QUEUE_SIZE: number = 3;
   private NUMERIC_TYPES: Set<string> = new Set(['byte', 'short', 'integer', 'long', 'half_float', 'float', 'double']);

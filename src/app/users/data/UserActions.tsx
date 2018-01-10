@@ -43,47 +43,59 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import Ajax from './../../util/Ajax';
 import * as UserTypes from './../UserTypes';
 import ActionTypes from './UserActionTypes';
-import Store from './UserStore';
 
 const $ = (type: string, payload: any) =>
 {
-  Store.dispatch({ type, payload });
   return { type, payload };
 };
 
 const Actions =
   {
     change:
-    (user: UserTypes.User) =>
-      $(ActionTypes.change, { user }),
+      (user: UserTypes.User) =>
+        $(ActionTypes.change, { user }),
 
     fetch:
-    () =>
-      $(ActionTypes.fetch, { setUsers: Actions.setUsers }),
+      () => (dispatch) =>
+      {
+        dispatch($(ActionTypes.fetch, {}));
+        Ajax.getUsers((usersObj) =>
+        {
+          let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
+          _.map(usersObj, (userObj, userId) =>
+          {
+            users = users.set(
+              +userId,
+              UserTypes._User(userObj),
+            );
+          });
+          dispatch(Actions.setUsers(users));
+        });
+      },
 
     setUsers:
-    (users: UserTypes.UserMap) =>
-      $(ActionTypes.setUsers, { users }),
+      (users: UserTypes.UserMap) => (dispatch, getState) =>
+        dispatch($(ActionTypes.setUsers, { users, currentUserId: getState().get('auth').id })),
 
     updateCurrentUser:
-    () =>
-      $(ActionTypes.updateCurrentUser, {}),
+      () =>
+        (dispatch, getState) =>
+          $(ActionTypes.updateCurrentUser, { id: getState().get('auth').id }),
 
     copmleteTutorial:
-    (stepId: string, complete: boolean = true) =>
-      $(ActionTypes.completeTutorial, { stepId, complete }),
+      (stepId: string, complete: boolean = true) =>
+        $(ActionTypes.completeTutorial, { stepId, complete }),
 
     changeType:
-    (type: string) =>
-      $(ActionTypes.changeType, { type }),
+      (type: string) =>
+        $(ActionTypes.changeType, { type }),
 
   };
-
-import AuthStore from './../../auth/data/AuthStore';
-AuthStore.subscribe(Actions.updateCurrentUser);
 
 // TODO remove when no longer needed
 window['completeTutorial'] = Actions.copmleteTutorial;

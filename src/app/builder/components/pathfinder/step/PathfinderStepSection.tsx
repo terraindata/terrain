@@ -69,7 +69,7 @@ class PathfinderStepSection extends TerrainComponent<Props>
 
   } = {
 
-  };
+    };
 
   public render()
   {

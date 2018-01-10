@@ -56,11 +56,13 @@ import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
+import { ColorsActions } from 'app/colors/data/ColorsRedux';
+import { ColorsState } from 'app/colors/data/ColorsTypes';
 import { SchemaState } from 'schema/SchemaTypes';
 import TerrainStore from 'store/TerrainStore';
 import Util from 'util/Util';
-import ColorsActions from '../../../colors/data/ColorsActions';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
+import PathfinderFilterSection2 from './filter/PathfinderFilterSection2';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
 import './Pathfinder.less';
 import { _PathfinderContext, Path, PathfinderSteps, Source } from './PathfinderTypes';
@@ -73,6 +75,8 @@ export interface Props
   path: Path;
   canEdit: boolean;
   schema: SchemaState;
+  colorsActions: typeof ColorsActions;
+  colors: ColorsState;
 }
 
 @Radium
@@ -92,12 +96,16 @@ class PathfinderColumn extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.pf-section-title',
-      { color: Colors().text1 });
-    ColorsActions.setStyle('.pf-step-button:hover',
-      {
-        color: Colors().active,
-      });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-section-title',
+      style: { color: Colors().text1 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.pf-step-button:hover',
+      style: { color: Colors().active },
+    });
   }
 
   public getPathfinderContext(props: Props)
@@ -182,6 +190,8 @@ class PathfinderColumn extends TerrainComponent<Props>
 
 export default Util.createContainer(
   PathfinderColumn,
-  ['schema'],
-  {},
+  ['schema', 'colors'],
+  {
+    colorsActions: ColorsActions,
+  },
 );

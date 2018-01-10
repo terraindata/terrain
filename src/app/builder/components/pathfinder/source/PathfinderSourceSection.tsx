@@ -83,9 +83,9 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     dataSourceOptions: List<ChoiceOption>,
     expanded: boolean,
   } = {
-    dataSourceOptions: List([]),
-    expanded: this.props.source.expanded,
-  };
+      dataSourceOptions: List([]),
+      expanded: this.props.source.expanded,
+    };
 
   public componentWillMount()
   {

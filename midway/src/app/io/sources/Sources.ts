@@ -48,8 +48,10 @@ import * as stream from 'stream';
 import * as winston from 'winston';
 
 import { GoogleAPI, GoogleSpreadsheetConfig } from './GoogleAPI';
+import { MySQL, MySQLSourceConfig } from './MySQL';
 
 export const googleAPI: GoogleAPI = new GoogleAPI();
+export const mySQL: MySQL = new MySQL();
 
 export interface SourceConfig
 {
@@ -67,11 +69,11 @@ export interface ImportSourceConfig
 export class Sources
 {
 
-  public async handleTemplateSource(body: object): Promise<ImportSourceConfig>
+  public async handleTemplateSource(body: object): Promise<ImportSourceConfig | string>
   {
-    return new Promise<ImportSourceConfig>(async (resolve, reject) =>
+    return new Promise<ImportSourceConfig | string>(async (resolve, reject) =>
     {
-      let imprtSourceConfig: ImportSourceConfig =
+      let imprtSourceConfig: ImportSourceConfig | string =
         {
           filetype: '',
           params: {},
@@ -83,10 +85,20 @@ export class Sources
         case 'spreadsheets':
           imprtSourceConfig = await this._getStreamFromGoogleSpreadsheets(sourceConfig, body['body'], body['templateId']);
           break;
+        case 'mysql':
+          imprtSourceConfig = await this._getStreamFromMySQL(sourceConfig, body['body'], body['templateId']);
+          break;
         default:
           break;
       }
-      return resolve(imprtSourceConfig);
+      if (typeof imprtSourceConfig === 'string')
+      {
+        return reject(imprtSourceConfig);
+      }
+      else
+      {
+        return resolve(imprtSourceConfig);
+      }
     });
   }
 
@@ -108,6 +120,33 @@ export class Sources
           filetype: 'csv',
           params: body,
           stream: writeStream,
+        };
+      return resolve(imprtSourceConfig);
+    });
+  }
+
+  private async _getStreamFromMySQL(source: SourceConfig, body: object, templateId?: string): Promise<ImportSourceConfig | string>
+  {
+    return new Promise<ImportSourceConfig | string>(async (resolve, reject) =>
+    {
+      if (templateId !== undefined)
+      {
+        body['templateId'] = Number(parseInt(templateId, 10));
+      }
+      const writeStream: stream.Readable | string = await mySQL.getQueryAsCSVStream(
+        await mySQL.runQuery(source['params'] as MySQLSourceConfig));
+      if (typeof writeStream === 'string')
+      {
+        return resolve(writeStream);
+      }
+
+      delete body['source'];
+      body['filetype'] = 'csv';
+      const imprtSourceConfig: ImportSourceConfig =
+        {
+          filetype: 'csv',
+          params: body,
+          stream: writeStream as stream.Readable,
         };
       return resolve(imprtSourceConfig);
     });

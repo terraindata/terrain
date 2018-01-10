@@ -49,10 +49,8 @@ import { Provider } from 'react-redux';
 import TerrainTools from 'util/TerrainTools';
 import AppRouter from './AppRouter';
 import BuilderStore from './builder/data/BuilderStore'; // for error reporting
-import ColorsStore from './colors/data/ColorsStore';
 import LibraryStore from './library/data/LibraryStore';
 import TerrainStore from './store/TerrainStore';
-import UserStore from './users/data/UserStore';
 
 declare global
 {
@@ -67,14 +65,13 @@ if (!DEV)
   // report uncaught errors in production
   window.onerror = (errorMsg, url, lineNo, columnNo, error) =>
   {
-
-    const user = UserStore.getState().get('currentUser');
+    const store = TerrainStore.getState() as Immutable.Map<string, any>;
+    const user = store.get('users').currentUser;
     const userId = user && user.id;
     const libraryState = JSON.stringify(LibraryStore.getState().toJS());
     const builderState = JSON.stringify(BuilderStore.getState().toJS());
     const location = JSON.stringify(window.location);
-    const colorsState = JSON.stringify(ColorsStore.getState().toJS());
-
+    const colorsState = store.get('colors').toJS();
     const msg = `${errorMsg} by ${userId}
       Location:
       ${location}

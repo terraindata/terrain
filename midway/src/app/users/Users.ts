@@ -51,23 +51,10 @@ import srs = require('secure-random-string');
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
 import * as Util from '../Util';
+import UserConfig from './UserConfig';
 
 // CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL
 // , isSuperUser bool NOT NULL, name text NOT NULL, oldPassword text, password text NOT NULL, timezone string)
-
-export interface UserConfig
-{
-  accessToken?: string;
-  email: string;
-  id?: number;
-  isDisabled: number;
-  isSuperUser: number;
-  name: string;
-  oldPassword?: string;
-  password: string;
-  timezone?: string;
-  meta?: string;
-}
 
 export class Users
 {
@@ -103,10 +90,10 @@ export class Users
         await this.create({
           accessToken: 'ImAnAdmin',
           email: 'admin@terraindata.com',
-          isSuperUser: 1,
+          isSuperUser: true,
           name: 'Terrain Admin',
           password: 'secret',
-          isDisabled: 0,
+          isDisabled: false,
           timezone: '',
         });
       }
@@ -134,8 +121,8 @@ export class Users
       {
         accessToken: user.accessToken === undefined ? '' : user.accessToken,
         email: user.email,
-        isDisabled: user.isDisabled === undefined ? 0 : user.isDisabled,
-        isSuperUser: user.isSuperUser === undefined ? 0 : user.isSuperUser,
+        isDisabled: user.isDisabled === undefined ? false : user.isDisabled,
+        isSuperUser: user.isSuperUser === undefined ? false : user.isSuperUser,
         name: user.name === undefined ? '' : user.name,
         password: await this.hashPassword(user.password),
         timezone: user.timezone === undefined ? '' : user.timezone,
@@ -186,23 +173,28 @@ export class Users
 
   public async select(columns: string[], filter: object): Promise<UserConfig[]>
   {
-    return App.DB.select(this.userTable, columns, filter) as Promise<UserConfig[]>;
+    return new Promise<UserConfig[]>(async (resolve, reject) =>
+    {
+      const rawResults = await App.DB.select(this.userTable, columns, filter);
+      const results: UserConfig[] = rawResults.map((result: object) => new UserConfig(result));
+      resolve(results);
+    });
   }
 
   public async get(id?: number): Promise<UserConfig[]>
   {
     if (id !== undefined)
     {
-      return App.DB.select(this.userTable, [], { id }) as any;
+      return this.select([], { id });
     }
-    return App.DB.select(this.userTable, [], {}) as any;
+    return this.select([], {});
   }
 
   public async loginWithAccessToken(id: number, accessToken: string): Promise<UserConfig | null>
   {
     return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
-      const results: UserConfig[] = await App.DB.select(this.userTable, [], { id, accessToken }) as UserConfig[];
+      const results: UserConfig[] = await this.select([], { id, accessToken }) as UserConfig[];
       if (results.length > 0)
       {
         resolve(results[0]);
@@ -219,7 +211,7 @@ export class Users
     winston.info('logging in with email ' + email + ' and password ' + password);
     return new Promise<UserConfig | null>(async (resolve, reject) =>
     {
-      const results: UserConfig[] = await App.DB.select(this.userTable, [], { email }) as UserConfig[];
+      const results = await this.select([], { email });
       if (results.length === 0)
       {
         winston.info('none');
@@ -274,6 +266,11 @@ export class Users
 
   public async upsert(newUser: UserConfig): Promise<UserConfig>
   {
+    if (newUser.id === undefined)
+    {
+      const results: UserConfig[] = await this.get();
+      newUser.id = results.length + 1;
+    }
     return App.DB.upsert(this.userTable, newUser) as Promise<UserConfig>;
   }
 

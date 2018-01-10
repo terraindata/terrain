@@ -50,10 +50,9 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import { Colors } from '../../colors/Colors';
-import ColorsActions from '../../colors/data/ColorsActions';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import UserThumbnail from '../../users/components/UserThumbnail';
-import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import Util from '../../util/Util';
 import './AccountDropdown.less';
@@ -71,35 +70,30 @@ const CreditsIcon = require('../../../images/icon_group.svg?name=CreditsIcon');
 
 export interface Props
 {
+  colorsActions?: typeof ColorsActions;
+  users?: UserTypes.UserState;
+}
+
+export interface State
+{
+  open?: boolean;
+  commitLogOpen?: boolean;
+  showingCredits?: boolean;
 }
 
 class AccountDropdown extends TerrainComponent<Props>
 {
-  public state: {
-    open?: boolean,
-    user?: UserTypes.User,
-    commitLogOpen?: boolean,
-    showingCredits?: boolean,
-  } = {
-  };
+  public state: State = {};
 
   public unsubscribe = null;
 
-  constructor(props: Props)
-  {
-    super(props);
-    this._subscribe(
-      UserStore,
-      {
-        storeKeyPath: ['currentUser'],
-        stateKey: 'user',
-      },
-    );
-  }
-
   public componentWillMount()
   {
-    ColorsActions.setStyle('.account-arrow-icon .st0', { fill: Colors().text3 });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.account-arrow-icon .st0',
+      style: { fill: Colors().text3 },
+    });
   }
 
   public componentWillUnmount()
@@ -157,6 +151,8 @@ class AccountDropdown extends TerrainComponent<Props>
       return null;
     }
 
+    const { users } = this.props;
+
     return (
       <div className='account-dropdown-content'>
         <div className='account-dropdown-row' onMouseDown={this.editProfile}>
@@ -184,14 +180,14 @@ class AccountDropdown extends TerrainComponent<Props>
           </div>
         </div>
         {
-          this.state.user && this.state.user.isSuperUser &&
+          users.currentUser && users.currentUser.isSuperUser &&
           <div className='account-dropdown-row' onMouseDown={this._toggle('commitLogOpen')}>
             <div className='account-dropdown-icon account-dropdown-icon-blue'>
               <InfoIcon />
             </div>
             <div className='account-dropdown-link'>
               Commit Log
-              </div>
+            </div>
           </div>
         }
         <div className='account-dropdown-row' onMouseDown={this._toggle('showingCredits')}>
@@ -214,11 +210,12 @@ class AccountDropdown extends TerrainComponent<Props>
 
   public renderTopBar()
   {
+    const { users } = this.props;
     return (
       <div className='account-dropdown-top-bar' onClick={this.open} ref='accountDropdownButton'>
         <UserThumbnail
           showName={true}
-          userId={this.state.user && this.state.user.id}
+          userId={users.currentUser && users.currentUser.id}
           hideAdmin={true}
         />
         <ArrowIcon className='account-arrow-icon' />
@@ -289,4 +286,10 @@ Terrain Version 1.0 Created By:
 - The Pine Marten
 `;
 
-export default AccountDropdown;
+export default Util.createTypedContainer(
+  AccountDropdown,
+  ['users'],
+  {
+    colorsActions: ColorsActions,
+  },
+);

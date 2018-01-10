@@ -411,7 +411,6 @@ class Dropdown extends TerrainComponent<Props>
                   key={index}
                   className={classNames({
                     'dropdown-option-inner': true,
-                    'dropdown-option-inner-hidden': this.props.icons !== undefined,
                     'dropdown-option-value-selected': index === selectedIndex,
                   })}
                   style={this.props.icons ? { paddingTop: 6 } : {}}

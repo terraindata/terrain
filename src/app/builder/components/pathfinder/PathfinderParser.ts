@@ -50,9 +50,9 @@ import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 import Util from 'app/util/Util';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
+import { FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
-import {FieldType} from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 
 export function parsePath(path: Path): string
 {
@@ -287,8 +287,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         term: Map({
           [line.field]: Map({
-            value: line.value,
-            boost: line.weight,
+            value: line.value || '',
+            boost: parseFloat(line.weight),
           }),
         }),
       });
@@ -296,7 +296,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         match: Map({
           [line.field]: Map({
-            query: String(line.value),
+            query: String(line.value || ''),
           }),
         }),
       });
@@ -308,7 +308,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
             must_not: Map({
               term: Map({
                 [line.field]: Map({
-                  value: String(line.value),
+                  value: String(line.value || ''),
                   boost: line.weight,
                 }),
               }),
@@ -319,7 +319,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         term: Map({
           [line.field]: Map({
-            value: String(line.value),
+            value: String(line.value || ''),
             boost: line.weight,
           }),
         }),
@@ -332,7 +332,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
             must_not: Map({
               match: Map({
                 [line.field]: Map({
-                  query: String(line.value),
+                  query: String(line.value || ''),
                 }),
               }),
             }),
@@ -342,7 +342,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         match: Map({
           [line.field]: Map({
-            query: String(line.value),
+            query: String(line.value || ''),
           }),
         }),
       });
@@ -352,10 +352,10 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         range: Map({
           [line.field]:
-          Map({
-            gt: line.value,
-            boost: line.weight,
-          }),
+            Map({
+              gt: line.value,
+              boost: line.weight,
+            }),
         }),
       });
     case 'less':
@@ -364,30 +364,30 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         range: Map({
           [line.field]:
-          Map({
-            lt: line.value,
-            boost: line.weight,
-          }),
+            Map({
+              lt: line.value,
+              boost: line.weight,
+            }),
         }),
       });
     case 'greaterequal':
       return Map({
         range: Map({
           [line.field]:
-          Map({
-            gte: line.value,
-            boost: line.weight,
-          }),
+            Map({
+              gte: line.value,
+              boost: line.weight,
+            }),
         }),
       });
     case 'lessequal':
       return Map({
         range: Map({
           [line.field]:
-          Map({
-            lte: line.value,
-            boost: line.weight,
-          }),
+            Map({
+              lte: line.value,
+              boost: line.weight,
+            }),
         }),
       });
     case 'located':
@@ -474,9 +474,9 @@ function parseMore(more: More): {}
         {
           advancedObj['extended_bounds'] = { min: parseFloat(advanced['min']), max: parseFloat(advanced['max']) };
         }
-        else if (key === 'sortField')
+        else if (key === 'sortField' && advanced['sortField'])
         {
-          advancedObj['order'] = {[advanced['sortField']]: advanced['order']};
+          advancedObj['order'] = { [advanced['sortField']]: advanced['order'] };
         }
       });
       moreObj[agg.advanced.get('name')] = {

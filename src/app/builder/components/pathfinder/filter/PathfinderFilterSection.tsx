@@ -78,7 +78,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   } = {
 
-  };
+    };
 
   public render()
   {

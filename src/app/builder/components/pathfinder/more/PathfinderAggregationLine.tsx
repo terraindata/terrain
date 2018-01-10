@@ -52,10 +52,12 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map, Set } = Immutable;
+import Select from 'react-select';
 import ElasticBlockHelpers, { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { getIndex, getType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
 import AdvancedDropdown from '../../../../common/components/AdvancedDropdown';
 import Dropdown from '../../../../common/components/Dropdown';
+import SearchableDropdown from '../../../../common/components/SearchableDropdown';
 import Ajax from '../../../../util/Ajax';
 import PathfinderLine from '../PathfinderLine';
 import PathfinderText from '../PathfinderText';
@@ -82,8 +84,8 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public state: {
     fieldOptions: List<string>,
   } = {
-    fieldOptions: List([]),
-  };
+      fieldOptions: List([]),
+    };
 
   public typeOptions: List<string> = List([]);
 
@@ -122,13 +124,14 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     this.updateAggregation(type, this.props.aggregation.field);
   }
 
-  public handleFieldChange(newField)
+  public handleFieldChange(index: number)
   {
-    BuilderActions.change(this.props.keyPath.push('field'), newField);
+    const newField = this.state.fieldOptions.get(index);
+    // BuilderActions.change(this.props.keyPath.push('field'), newField);
     const fieldType = ElasticBlockHelpers.getTypeOfField(
       this.props.pathfinderContext.schemaState,
       newField,
-      this.props.pathfinderContext.source.dataSource
+      this.props.pathfinderContext.source.dataSource,
     );
     BuilderActions.change(this.props.keyPath.push('fieldType'), fieldType);
     this.updateAggregation(this.props.aggregation.type, newField);
@@ -366,22 +369,40 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           onChange={this.handleTypeChange}
           canEdit={canEdit}
         />
-        <AdvancedDropdown
-          value={this.props.aggregation.field}
-          options={List(this.state.fieldOptions.map((option) =>
-          {
-            return {
-              value: option,
-              displayName: option,
-            };
-          }))}
+        <SearchableDropdown
+          selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
+          options={this.state.fieldOptions}
           onChange={this.handleFieldChange}
           canEdit={canEdit}
           placeholder={'Field'}
+          keyPath={this.props.keyPath.push('field')}
         />
       </div>
     );
   }
+
+  //   <Select
+  //   name='field-name'
+  //   value={this.props.aggregation.field}
+  //   onChange={this.handleFieldChange}
+  //   options={
+  //     this.state.fieldOptions.map((option) => {
+  //       return {
+  //         value: option,
+  //         label: option,
+  //       }
+  //     }).toArray()
+  //   }
+  // />
+
+  // <Dropdown
+  //        selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
+  //        options={this.state.fieldOptions}
+  //        onChange={this.handleFieldChange}
+  //        canEdit={canEdit}
+  //        placeholder={'Field'}
+  //        keyPath={this.props.keyPath.push('field')}
+  //      />
 
   // Given a type of advanced section to return, and the advanced
   // data from the aggregation return an PathfinderAdvancedLine with the
@@ -456,7 +477,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     return (
       <PathfinderLine
         canDrag={true}
-        canDelete={true}
+        canDelete={this.props.pathfinderContext.canEdit}
         onDelete={this.props.onDelete}
         index={this.props.index}
         canEdit={this.props.pathfinderContext.canEdit}

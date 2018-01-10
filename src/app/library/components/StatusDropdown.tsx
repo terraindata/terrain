@@ -51,9 +51,9 @@ import * as _ from 'lodash';
 import * as React from 'react';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { UserState } from 'users/UserTypes';
 import { ItemStatus as Status } from '../../../items/types/Item';
 import RolesStore from '../../roles/data/RolesStore';
-import UserStore from '../../users/data/UserStore';
 import Util from '../../util/Util';
 import * as LibraryTypes from '../LibraryTypes';
 import Dropdown from './../../common/components/Dropdown';
@@ -68,36 +68,14 @@ export interface Props
   noBorder?: boolean;
   algorithmActions: any;
   tooltips?: List<any>;
+  users?: UserState;
 }
 
 class StatusDropdown extends TerrainComponent<Props>
 {
   public state = {
-    isSuperUser: false,
     isBuilder: true,
   };
-
-  public componentDidMount()
-  {
-    this._subscribe(UserStore, {
-      updater: (userState) =>
-      {
-        const currentUser = userState.get('currentUser');
-        const isSuperUser = currentUser === undefined ? false : currentUser.isSuperUser;
-        // Util.haveRole(this.props.algorithm.categoryId, 'admin', UserStore, RolesStore);
-        const isBuilder = true;
-        // Util.haveRole(this.props.algorithm.categoryId, 'builder', UserStore, RolesStore);
-        if (isSuperUser !== this.state.isSuperUser || isBuilder !== this.state.isBuilder)
-        {
-          this.setState({
-            isSuperUser,
-            isBuilder,
-          });
-        }
-      },
-      isMounted: true,
-    });
-  }
 
   public handleChange(index: number)
   {
@@ -107,21 +85,23 @@ class StatusDropdown extends TerrainComponent<Props>
 
   public canEdit(): boolean
   {
-    const { algorithm } = this.props;
-    return this.state.isSuperUser ||
+    const { algorithm, users } = this.props;
+    const { currentUser } = users;
+    return (currentUser !== undefined && currentUser.isSuperUser) ||
       (this.state.isBuilder && algorithm.status !== Status.Live && algorithm.status !== Status.Default);
   }
 
   public getOptions(): List<string> // List<El>
   {
-    const { algorithm } = this.props;
+    const { algorithm, users } = this.props;
+    const { currentUser } = users;
 
     if (!this.canEdit())
     {
       return LockedOptions[algorithm.status];
     }
 
-    if (this.state.isSuperUser)
+    if (currentUser !== undefined && currentUser.isSuperUser)
     {
       return AdminOptions;
     }
@@ -136,7 +116,9 @@ class StatusDropdown extends TerrainComponent<Props>
 
   public getOrder(): Array<Status | string>
   {
-    if (this.state.isSuperUser)
+    const { users } = this.props;
+    const { currentUser } = users;
+    if (currentUser !== undefined && currentUser.isSuperUser)
     {
       return AdminOptionsOrder;
     }
@@ -163,7 +145,8 @@ class StatusDropdown extends TerrainComponent<Props>
 
   public render()
   {
-    const { algorithm } = this.props;
+    const { algorithm, users } = this.props;
+    const { currentUser } = users;
 
     let tooltipText = '';
     if (!this.canEdit())
@@ -172,7 +155,7 @@ class StatusDropdown extends TerrainComponent<Props>
       {
         tooltipText = "You aren't a Builder in this category,<br />so you can't edit this Algorithm's status.";
       }
-      else if (!this.state.isSuperUser)
+      else if (!currentUser.isSuperUser)
       {
         tooltipText = "This Algorithm is Live and you aren't<br />an Admin in this Category, so you<br />can't edit its status.";
       }
@@ -265,4 +248,8 @@ _.map(Status, (status, statusKey) =>
   LockedOptions[status] = List([getOption(status)]);
 });
 
-export default StatusDropdown;
+export default Util.createTypedContainer(
+  StatusDropdown,
+  ['users'],
+  {},
+);

@@ -137,6 +137,6 @@ export function makeDatabaseController(
   }
   else
   {
-    throw new Error('Error making new database controller.');
+    throw new Error('Error making new database controller: undefined database type "' + type + '".');
   }
 }

@@ -46,16 +46,11 @@ THE SOFTWARE.
 
 import * as Tasty from '../../tasty/Tasty';
 import * as App from '../App';
+import UserConfig from '../users/UserConfig';
+import * as Util from '../Util';
+import MetricConfig from './MetricConfig';
 
 // CREATE TABLE metrics (id integer PRIMARY KEY, database integer NOT NULL, label text NOT NULL, events text NOT NULL)
-
-export interface MetricConfig
-{
-  id?: number;
-  database: number;
-  label: string;
-  events: string;
-}
 
 export class Metrics
 {
@@ -113,10 +108,10 @@ export class Metrics
       throw new Error('Database, label and events fields are required to create a metric');
     }
 
-    const existingMetric = await this.select(['id'], { label: metric.label });
-    if (existingMetric.length !== 0)
+    if (metric.id === undefined)
     {
-      throw new Error('Metric ' + String(metric.label) + ' already exists.');
+      const results: MetricConfig[] = await this.select(['id'], []);
+      metric.id = results.length + 1;
     }
 
     return App.DB.upsert(this.metricsTable, metric) as Promise<MetricConfig>;
@@ -124,7 +119,12 @@ export class Metrics
 
   public async select(columns: string[], filter: object): Promise<MetricConfig[]>
   {
-    return App.DB.select(this.metricsTable, columns, filter) as Promise<MetricConfig[]>;
+    return new Promise<MetricConfig[]>(async (resolve, reject) =>
+    {
+      const rawResults = await App.DB.select(this.metricsTable, columns, filter);
+      const results: MetricConfig[] = rawResults.map((result: object) => new MetricConfig(result));
+      resolve(results);
+    });
   }
 }
 

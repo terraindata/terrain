@@ -108,7 +108,7 @@ export const TypeMap: Map<string, SQLGeneratorMapping> = new Map([
   ['descending', newSQLGeneratorMapping('DESC', FixEnum.postfix)],
 ]);
 
-export default class SQLGenerator
+export default class MySQLGenerator
 {
   public statements: string[];
   public values: any[][];

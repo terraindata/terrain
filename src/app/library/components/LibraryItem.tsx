@@ -51,12 +51,15 @@ import { List } from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import Util from '../../util/Util';
+import './LibraryItem.less';
+
 import { DragSource, DropTarget } from 'react-dnd';
 import { Link } from 'react-router';
 import './LibraryItem.less';
 
 import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
-import ColorsActions from './../../colors/data/ColorsActions';
+import { ColorsActions } from './../../colors/data/ColorsRedux';
 import Menu from './../../common/components/Menu';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -75,6 +78,7 @@ export interface Props
   canArchive: boolean;
   canDuplicate: boolean;
   canUnarchive: boolean;
+  colorsActions: typeof ColorsActions;
   canPin?: boolean;
   icon: any;
   to?: string;
@@ -138,125 +142,129 @@ class LibraryItem extends TerrainComponent<Props>
   };
 
   public menuOptions =
-  {
-    none: List([]),
-    duplicate:
-    List([
-      {
-        text: 'Duplicate',
-        onClick: this.handleDuplicate,
-      },
-      {
-        text: 'Rename',
-        disabled: true,
-        tooltip: "Can't rename Live or Default Algorithms",
-      },
-    ]),
-    duplicateRename:
-    List([
-      {
-        text: 'Duplicate',
-        onClick: this.handleDuplicate,
-      },
-      {
-        text: 'Rename',
-        onClick: this.showTextfield,
-      },
-    ]),
-    archive:
-    List([
-      {
-        text: 'Archive',
-        onClick: this.handleArchive,
-      },
-      {
-        text: 'Rename',
-        disabled: true,
-        tooltip: "Can't rename Live or Default Algorithms",
-      },
-    ]),
-    archiveRename:
-    List([
-      {
-        text: 'Rename',
-        onClick: this.showTextfield,
-      },
-      {
-        text: 'Archive',
-        onClick: this.handleArchive,
-      },
-    ]),
-    unarchive:
-    List([
-      {
-        text: 'Unarchive',
-        onClick: this.handleUnarchive,
-      },
-      {
-        text: 'Rename',
-        disabled: true,
-        tooltip: "Can't rename Live or Default Algorithms",
-      },
-    ]),
-    unarchiveRename:
-    List([
-      {
-        text: 'Rename',
-        onClick: this.showTextfield,
-      },
-      {
-        text: 'Unarchive',
-        onClick: this.handleUnarchive,
-      },
-    ]),
-    duplicateArchive:
-    List([
-      {
-        text: 'Duplicate',
-        onClick: this.handleDuplicate,
-      },
-      {
-        text: 'Archive',
-        onClick: this.handleArchive,
-      },
-      {
-        text: 'Rename',
-        disabled: true,
-        tooltip: "Can't rename Live or Default Algorithms",
-      },
-    ]),
-    duplicateRenameArchive:
-    List([
-      {
-        text: 'Duplicate',
-        onClick: this.handleDuplicate,
-      },
-      {
-        text: 'Rename',
-        onClick: this.showTextfield,
-      },
-      {
-        text: 'Archive',
-        onClick: this.handleArchive,
-      },
-    ]),
-  };
+    {
+      none: List([]),
+      duplicate:
+        List([
+          {
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
+          },
+          {
+            text: 'Rename',
+            disabled: true,
+            tooltip: "Can't rename Live or Default Algorithms",
+          },
+        ]),
+      duplicateRename:
+        List([
+          {
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
+          },
+          {
+            text: 'Rename',
+            onClick: this.showTextfield,
+          },
+        ]),
+      archive:
+        List([
+          {
+            text: 'Archive',
+            onClick: this.handleArchive,
+          },
+          {
+            text: 'Rename',
+            disabled: true,
+            tooltip: "Can't rename Live or Default Algorithms",
+          },
+        ]),
+      archiveRename:
+        List([
+          {
+            text: 'Rename',
+            onClick: this.showTextfield,
+          },
+          {
+            text: 'Archive',
+            onClick: this.handleArchive,
+          },
+        ]),
+      unarchive:
+        List([
+          {
+            text: 'Unarchive',
+            onClick: this.handleUnarchive,
+          },
+          {
+            text: 'Rename',
+            disabled: true,
+            tooltip: "Can't rename Live or Default Algorithms",
+          },
+        ]),
+      unarchiveRename:
+        List([
+          {
+            text: 'Rename',
+            onClick: this.showTextfield,
+          },
+          {
+            text: 'Unarchive',
+            onClick: this.handleUnarchive,
+          },
+        ]),
+      duplicateArchive:
+        List([
+          {
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
+          },
+          {
+            text: 'Archive',
+            onClick: this.handleArchive,
+          },
+          {
+            text: 'Rename',
+            disabled: true,
+            tooltip: "Can't rename Live or Default Algorithms",
+          },
+        ]),
+      duplicateRenameArchive:
+        List([
+          {
+            text: 'Duplicate',
+            onClick: this.handleDuplicate,
+          },
+          {
+            text: 'Rename',
+            onClick: this.showTextfield,
+          },
+          {
+            text: 'Archive',
+            onClick: this.handleArchive,
+          },
+        ]),
+    };
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.library-item .library-item-title-bar .library-item-icon svg, .cls-1 ', { fill: Colors().iconColor });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.library-item .library-item-title-bar .library-item-icon svg, .cls-1 ',
+      style: { fill: Colors().iconColor },
+    });
   }
 
   public componentDidMount()
   {
     this.setState({
       timeout:
-      setTimeout(() =>
-      {
-        this.setState({
-          mounted: true,
-        });
-      }, this.props.rendered ? 0 : Math.min(this.props.fadeIndex * 100, 1000)), // re-add this when we get real indexes
+        setTimeout(() =>
+        {
+          this.setState({
+            mounted: true,
+          });
+        }, this.props.rendered ? 0 : Math.min(this.props.fadeIndex * 100, 1000)), // re-add this when we get real indexes
     });
 
     if (!this.props.name.length)
@@ -654,4 +662,10 @@ const dropCollect = (connect, monitor) =>
 
 const LI = DropTarget('BROWSER', target, dropCollect)(DragSource('BROWSER', source, dragCollect)(LibraryItem)) as any;
 
-export default LI;
+export default Util.createContainer(
+  LI,
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);

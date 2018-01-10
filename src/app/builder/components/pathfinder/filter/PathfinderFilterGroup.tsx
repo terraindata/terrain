@@ -88,7 +88,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
 
   } = {
 
-  };
+    };
 
   public render()
   {

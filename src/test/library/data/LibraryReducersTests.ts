@@ -46,7 +46,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import ActionTypes from 'library/data/LibraryActionTypes';
 import reducer from 'library/data/LibraryReducers';
-import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 
 describe('LibraryReducers', () =>

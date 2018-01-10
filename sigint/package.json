@@ -8,7 +8,7 @@
     "start-dev": "nodemon --exec ./node_modules/.bin/ts-node $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./src/Main.ts",
     "start": "node build/src/Main.js",
     "postinstall": "tsc -p .",
-    "lint": "tslint -c tslint.json --fix --type-check --project tsconfig.json",
+    "lint": "tslint -c tslint.json --fix --project tsconfig.json",
     "style": "tsfmt -r | grep replaced || exit 0 && exit 1",
     "fix": "yarn run style && yarn run lint;",
     "test": "jest . --forceExit --coverage",
@@ -76,9 +76,9 @@
     "ts-jest": "^21.1.0",
     "ts-loader": "^2.3.7",
     "ts-node": "^3.3.0",
-    "tslint": "^5.7.0",
-    "typescript": "^2.5.2",
-    "typescript-formatter": "^6.0.0",
-    "webpack": "^3.5.6"
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2",
+    "typescript-formatter": "^7.0.1",
+    "webpack": "^3.10.0"
   }
 }

@@ -44,43 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-export interface TemplateBase
+import ConfigType from '../../ConfigType';
+import { TemplateBase } from './TemplateBase';
+
+export class ExportTemplateConfig extends TemplateBase
 {
-  // object mapping string (newName) to object (contains "type" field, "innerType" field if array type)
-  // supported types: text, byte/short/integer/long/half_float/float/double, boolean, date, array, (null)
-  columnTypes: object;
-  dbid: number;           // instance id
-  dbname: string;         // for elastic, index name
-  id?: number;
-  name: string;
-  originalNames: string[];    // array of strings (oldName)
-  persistentAccessToken?: string;    // persistent access token
-  primaryKeyDelimiter?: string;
-  primaryKeys: string[];  // newName of primary key(s)
-  tablename: string;      // for elastic, type name
-  transformations: object[];  // list of in-order data transformations
+  public objectKey?: string = undefined;
+  public query?: string = undefined;
+  public rank?: boolean = undefined;
+  public templateId?: number = undefined;
+  public algorithmId?: number = undefined;
+
+  constructor(props: object)
+  {
+    super(props);
+    ConfigType.initialize(this, props);
+  }
 }
 
-export interface TemplateBaseStringified
-{
-  columnTypes: string;
-  dbid: number;
-  dbname: string;
-  id?: number;
-  name: string;
-  originalNames: string;
-  persistentAccessToken?: string;
-  primaryKeyDelimiter: string;
-  primaryKeys: string;
-  tablename: string;
-  transformations: string;
-}
-
-export type ImportTemplateConfig = TemplateBase;
-
-class Templates
-{
-
-}
-
-export default Templates;
+export default ExportTemplateConfig;
