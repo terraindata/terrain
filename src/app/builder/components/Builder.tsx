@@ -66,7 +66,7 @@ import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesStore from '../../roles/data/RolesStore';
 import TerrainStore from '../../store/TerrainStore';
 import Util from './../../util/Util';
-import Actions from './../data/BuilderActions';
+import BuilderActions from './../data/BuilderActions';
 import { BuilderState, BuilderStore } from './../data/BuilderStore';
 type Algorithm = LibraryTypes.Algorithm;
 
@@ -100,6 +100,7 @@ export interface Props
   users?: UserState;
   library?: LibraryTypes.LibraryState;
   algorithmActions: typeof LibraryActions.algorithms;
+  builderActions?: typeof BuilderActions;
 }
 
 class Builder extends TerrainComponent<Props>
@@ -360,7 +361,7 @@ class Builder extends TerrainComponent<Props>
     {
       const algorithm = this.props.library.algorithms.get(+algorithmId);
       // need to fetch data for new query
-      Actions.fetchQuery(algorithmId, this.handleNoAlgorithm, algorithm && algorithm.db);
+      this.props.builderActions.fetchQuery(algorithmId, this.handleNoAlgorithm, algorithm && algorithm.db);
     }
   }
 
@@ -465,12 +466,12 @@ class Builder extends TerrainComponent<Props>
 
   public handleUndo()
   {
-    Actions.undo();
+    this.props.builderActions.undo();
   }
 
   public handleRedo()
   {
-    Actions.redo();
+    this.props.builderActions.redo();
   }
 
   public onSave()
@@ -505,7 +506,7 @@ class Builder extends TerrainComponent<Props>
 
   public onSaveError(algorithm: Algorithm)
   {
-    Actions.save(false);
+    this.props.builderActions.save(false);
     notificationManager.addNotification(
       'Error Saving',
       '"' + algorithm.name + '" failed to save.',
@@ -564,7 +565,7 @@ class Builder extends TerrainComponent<Props>
       // TODO remove if queries/algorithms model changes
       this.props.algorithmActions.change(algorithm);
       this.onSaveSuccess(algorithm);
-      Actions.save(); // register that we are saving
+      this.props.builderActions.save(); // register that we are saving
 
       let configArr = window.location.pathname.split('/')[2].split(',');
       let currentAlgorithm;
@@ -850,7 +851,7 @@ class Builder extends TerrainComponent<Props>
       (response, newAlgorithm) =>
       {
         this.onSaveSuccess(newAlgorithm);
-        Actions.save();
+        this.props.builderActions.save();
 
         let configArr = window.location.pathname.split('/')[2].split(',');
         let currentAlgorithm;
@@ -959,7 +960,7 @@ class Builder extends TerrainComponent<Props>
           algorithmPath={algorithmIdentifier}
           resultsState={this.state.builderState.resultsState}
           db={this.state.builderState.db}
-          onResultsStateChange={Actions.results}
+          onResultsStateChange={this.props.builderActions.results}
         />
       </div>
     );
@@ -968,6 +969,9 @@ class Builder extends TerrainComponent<Props>
 const BuilderContainer = Util.createTypedContainer(
   Builder,
   ['library', 'users'],
-  { algorithmActions: LibraryActions.algorithms },
+  {
+    algorithmActions: LibraryActions.algorithms,
+    builderActions: BuilderActions
+  },
 );
 export default withRouter(DragDropContext(HTML5Backend)(BuilderContainer));
