@@ -345,33 +345,43 @@ export default class SQLGenerator
         }).join(', ');
       query += ')';
     }
-    query += ' ON CONFLICT (';
-    query += primaryKeys.join(', ');
-    query += ') DO UPDATE SET';
-    query += joinedColumnNames;
-    query += ' = ';
-    let currentColumn: number = 0;
-    query += '(';
-    query += columns.map(
-      (col: string) =>
-      {
-        if (placeholder === true)
+
+    if (primaryKeys !== undefined && primaryKeys.length > 0 &&
+        accumulatedUpdates[0][primaryKeys[0]] !== undefined)
+    {
+      query += ' ON CONFLICT (';
+      query += primaryKeys.join(', ');
+      query += ') DO UPDATE SET';
+      query += joinedColumnNames;
+      query += ' = ';
+      let currentColumn: number = 0;
+      query += '(';
+      query += columns.map(
+        (col: string) =>
         {
-          currentColumn++;
-          return '$' + currentColumn.toString();
-        }
-        else
+          if (placeholder === true)
+          {
+            currentColumn++;
+            return '$' + currentColumn.toString();
+          }
+          else
+          {
+            return this.sqlName(TastyNode.make(accumulatedUpdates[0][col]));
+          }
+        }).join(', ');
+      query += ')';
+      query += ' WHERE (' + primaryKeys.map((col: string) => tableName + '.' + col).join(', ') + ') = (' + primaryKeys.map(
+        (col: string) =>
         {
-          return this.sqlName(TastyNode.make(accumulatedUpdates[0][col]));
-        }
-      }).join(', ');
-    query += ')';
-    query += ' WHERE (' + primaryKeys.map((col: string) => tableName + '.' + col).join(', ') + ') = (' + primaryKeys.map(
-      (col: string) =>
-      {
-        return accumulatedUpdates[0][col];
-      }).join(', ');
-    query += ')';
+          return accumulatedUpdates[0][col];
+        }).join(', ');
+      query += ')';
+    }
+
+    if (primaryKeys !== undefined && primaryKeys.length > 0)
+    {
+      query += ' RETURNING ' + primaryKeys[0] + ' AS insertid';
+    }
 
     this.values.push(values);
     this.accumulateStatement(query);
