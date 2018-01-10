@@ -54,6 +54,8 @@ import { FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpe
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
 import {isInput} from '../../../../blocks/types/Input';
+import {stringifyWithParameters} from '../../../../database/elastic/conversion/ParseElasticQuery';
+
 export function parsePath(path: Path, inputs): string
 {
   let baseQuery = Map({
@@ -101,7 +103,8 @@ export function parsePath(path: Path, inputs): string
   }
   const moreObj = parseMore(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
-  return JSON.stringify(baseQuery.toJS(), null, 2);
+  return stringifyWithParameters(baseQuery.toJS(), inputs);
+  // return JSON.stringify(baseQuery.toJS(), null, 2);
 }
 
 function parseSource(source: Source): any
@@ -282,13 +285,7 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
 function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
 {
   const lineValue = String(line.value);
-  let value: any = String(line.value || '');
-  if (isInput(value, inputs))
-  {
-    // It's an input, do something different ...
-    console.log(inputs);
-    // value = inputs[value];
-  }
+  const  value: any = String(line.value || '');
   const boost = typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight
   switch (line.comparison)
   {
