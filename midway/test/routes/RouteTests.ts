@@ -68,7 +68,7 @@ beforeAll(async (done) =>
       {
         debug: true,
         db: 'postgres',
-        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:5432/moviesdb',
+        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
         port: 3000,
         databases: [
           {
@@ -220,8 +220,8 @@ beforeAll(async (done) =>
       body: {
         name: 'MySQL Test Connection',
         type: 'mysql',
-        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:3306/moviesdb',
-        host: '127.0.0.1:3306',
+        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
+        host: '127.0.0.1:63306',
         isAnalytics: false,
       },
     })
