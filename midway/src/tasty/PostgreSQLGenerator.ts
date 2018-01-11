@@ -373,7 +373,7 @@ export default class SQLGenerator
       query += ' WHERE (' + primaryKeys.map((col: string) => tableName + '.' + col).join(', ') + ') = (' + primaryKeys.map(
         (col: string) =>
         {
-          return accumulatedUpdates[0][col];
+          return JSON.stringify(accumulatedUpdates[0][col]);
         }).join(', ');
       query += ')';
     }

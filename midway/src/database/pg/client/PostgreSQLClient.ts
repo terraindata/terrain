@@ -78,7 +78,6 @@ class PostgreSQLClient
   public query(queryString: string, params?: any[], callback?: any): pg.Query
   {
     this.controller.log('PostgreSQLClient.query', queryString, params);
-    console.log(queryString, params);
     return this.delegate.query(queryString, params as any, callback);
   }
 
