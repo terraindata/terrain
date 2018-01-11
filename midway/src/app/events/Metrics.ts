@@ -96,7 +96,16 @@ export class Metrics
         events: 'conversion,impression',
       },
     ];
-    predefinedMetrics.map((m) => this.upsert(m));
+    const metrics = await this.select(['id', 'label']);
+    predefinedMetrics.map(async (metric) =>
+    {
+      const foundMetrics = metrics.filter((m) => m.label === metric.label);
+      if (foundMetrics.length > 0)
+      {
+        metric.id = foundMetrics[0].id;
+      }
+      await this.upsert(metric);
+    });
   }
 
   public async upsert(metric: MetricConfig): Promise<MetricConfig>
@@ -108,7 +117,7 @@ export class Metrics
     return App.DB.upsert(this.metricsTable, metric) as Promise<MetricConfig>;
   }
 
-  public async select(columns: string[], filter: object): Promise<MetricConfig[]>
+  public async select(columns: string[], filter?: object): Promise<MetricConfig[]>
   {
     return new Promise<MetricConfig[]>(async (resolve, reject) =>
     {
