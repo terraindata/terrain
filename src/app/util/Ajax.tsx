@@ -1206,7 +1206,24 @@ export const Ajax =
     {
       console.log(starred);
       console.log(columnId);
-    return Ajax.req('post', 'schema/star/', {columnId, starred}, (resp: any) => {
+    return Ajax.req('post', 'schema/star', {columnId, starred}, (resp: any) => {
+        try
+        {
+          console.log(resp);
+          console.log('HERE');
+          Ajax.getColumnInfo(columnId);
+        }
+        catch (e)
+        {
+          console.log('ERROR');
+        }
+      });
+    },
+
+    getColumnInfo(columnId: ID)
+    {
+      console.log('HERE IN AJAX', columnId);
+      return Ajax.req('get', 'schema/' + columnId, {}, (resp: any) => {
         try
         {
           console.log(resp);
@@ -1214,9 +1231,9 @@ export const Ajax =
         }
         catch (e)
         {
-          console.log('ERROR');
+          console.log(e);
         }
-      });
+      })
     },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)

@@ -93,14 +93,21 @@ Router.get('/:database', passport.authenticate('access-token-local'), async (ctx
 
 Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('Setting columns starred value');
-  winston.warn('WHO KNOWS IF THIS WILL WORK HAHA');
+  winston.info('Changing columns starred status');
   const starred: boolean = ctx.request.body.body.starred;
   const columnId: string | number = ctx.request.body.body.columnId;
   winston.info(String(starred));
   winston.info(String(columnId));
   ctx.body = await schema.upsert(ctx.state.user,
     {starred, count: 0, id: columnId});
+});
+
+Router.get('/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('Retrieving column info');
+  const columnId: string | number = ctx.params.columnId;
+  winston.info(String(columnId));
+  ctx.body = await schema.get(columnId);
 });
 
 export default Router;

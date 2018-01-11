@@ -83,9 +83,6 @@ export class Schema
 
   public async select(columns: string[], filter?: object): Promise<SchemaConfig[]>
   {
-    console.log('SELECT');
-    console.log(columns);
-    console.log(filter);
     return new Promise<SchemaConfig[]>(async (resolve, reject) =>
     {
       const rawResults = await App.DB.select(this.schemaTable, columns, filter);
@@ -96,9 +93,6 @@ export class Schema
 
   public async get(id?: number | string, fields?: string[]): Promise<SchemaConfig[]>
   {
-    console.log('GET');
-    console.log(id);
-    console.log(fields);
     if (id !== undefined)
     {
       if (fields !== undefined)
@@ -117,13 +111,10 @@ export class Schema
   // TODO TODO
   public async upsert(user: UserConfig, schema: SchemaConfig): Promise<SchemaConfig>
   {
-    console.log('UPSERT UPSERT ');
-    console.log(schema);
     if (schema.id !== undefined)
     {
       const results: SchemaConfig[] = await this.get(schema.id);
-      console.log('MADE IT PAST THIS PROMISE')
-      console.log(results);
+
       if (results.length !== 0)
       {
         schema = Util.updateObject(results[0], schema);
