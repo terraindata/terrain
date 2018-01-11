@@ -55,9 +55,6 @@ import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
 import ItemConfig from './ItemConfig';
 
-// CREATE TABLE items (id integer PRIMARY KEY, meta text, name text NOT NULL, \
-// parent integer, status text, type text);
-
 export class Items
 {
   private itemTable: Tasty.Table;

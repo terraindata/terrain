@@ -347,7 +347,7 @@ export default class SQLGenerator
     }
 
     if (primaryKeys !== undefined && primaryKeys.length > 0 &&
-        accumulatedUpdates[0][primaryKeys[0]] !== undefined)
+      accumulatedUpdates[0][primaryKeys[0]] !== undefined)
     {
       query += ' ON CONFLICT (';
       query += primaryKeys.join(', ');

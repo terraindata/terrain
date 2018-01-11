@@ -59,9 +59,6 @@ import * as Util from '../Util';
 import { versions } from '../versions/VersionRouter';
 import CredentialConfig from './CredentialConfig';
 
-// CREATE TABLE credentials (id integer PRIMARY KEY, createdBy integer NOT NULL, \
-// meta text NOT NULL, name text NOT NULL, permission integer, type text NOT NULL);
-
 export class Credentials
 {
   private credentialTable: Tasty.Table;

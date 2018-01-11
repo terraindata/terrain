@@ -49,10 +49,6 @@ import * as App from '../App';
 import UserConfig from '../users/UserConfig';
 import VersionConfig from './VersionConfig';
 
-// CREATE TABLE versions (id integer PRIMARY KEY, \
-// objectType text NOT NULL, objectId integer NOT NULL, \
-// object text NOT NULL, createdAt datetime DEFAULT CURRENT_TIMESTAMP, createdByUserId integer NOT NULL);
-
 export class Versions
 {
   private versionTable: Tasty.Table;

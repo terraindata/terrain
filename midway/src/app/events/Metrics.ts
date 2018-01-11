@@ -50,8 +50,6 @@ import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import MetricConfig from './MetricConfig';
 
-// CREATE TABLE metrics (id integer PRIMARY KEY, database integer NOT NULL, label text NOT NULL, events text NOT NULL)
-
 export class Metrics
 {
   private metricsTable: Tasty.Table;
