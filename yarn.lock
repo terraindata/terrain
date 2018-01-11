@@ -7010,7 +7010,7 @@ radium@^0.19.6:
     inline-style-prefixer "^2.0.5"
     prop-types "^15.5.8"
 
-raf-schd@^2.0.2:
+raf-schd@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/raf-schd/-/raf-schd-2.1.0.tgz#64d645723380ec25cc1714e909b953ef1cf254bf"
 
@@ -7092,15 +7092,15 @@ react-addons-test-utils@^15.5.1:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/react-addons-test-utils/-/react-addons-test-utils-15.6.2.tgz#c12b6efdc2247c10da7b8770d185080a7b047156"
 
-react-beautiful-dnd@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/react-beautiful-dnd/-/react-beautiful-dnd-3.0.0.tgz#b07fb06111b7d6ae9908eb71033320fa849b1000"
+react-beautiful-dnd@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-beautiful-dnd/-/react-beautiful-dnd-4.0.0.tgz#adc87358a30b830430ae44574b2af8fd8c7dd0d6"
   dependencies:
     babel-runtime "^6.26.0"
     invariant "^2.2.2"
     memoize-one "^3.0.1"
     prop-types "^15.6.0"
-    raf-schd "^2.0.2"
+    raf-schd "^2.1.0"
     react-motion "^0.5.2"
     react-redux "^5.0.6"
     redux "^3.7.2"

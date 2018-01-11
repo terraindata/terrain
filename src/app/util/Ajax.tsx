@@ -1202,6 +1202,23 @@ export const Ajax =
       );
     },
 
+    starColumn(columnId: ID, starred: boolean)
+    {
+      console.log(starred);
+      console.log(columnId);
+    return Ajax.req('post', 'schema/star/', {columnId, starred}, (resp: any) => {
+        try
+        {
+          console.log(resp);
+          console.log('HERE');
+        }
+        catch (e)
+        {
+          console.log('ERROR');
+        }
+      });
+    },
+
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1

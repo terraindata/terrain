@@ -44,63 +44,19 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import ConfigType from '../ConfigType';
 
-import DatabaseController from '../../database/DatabaseController';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Tasty from '../../tasty/Tasty';
-import Schema from './Schema';
-
-const Router = new KoaRouter();
-export const schema = new Schema();
-
-async function getSchema(databaseID: number): Promise<string>
+export class SchemaConfig extends ConfigType
 {
-  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseID);
-  if (database === undefined)
+  public id?: number | string = undefined;
+  public starred: boolean = false;
+  public count: number = 0;
+
+  constructor(props: object)
   {
-    throw new Error('Database "' + databaseID.toString() + '" not found.');
+    super();
+    ConfigType.initialize(this, props);
   }
-  const schema: Tasty.Schema = await database.getTasty().schema();
-  return schema.toString();
 }
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting all schema');
-  const request = ctx.request.body.body;
-  if (request !== undefined && request.database !== undefined)
-  {
-    ctx.body = await getSchema(request.database);
-  }
-  else
-  {
-    ctx.body = '';
-    for (const [id, database] of DatabaseRegistry.getAll())
-    {
-      ctx.body += await getSchema(id);
-    }
-  }
-});
-
-Router.get('/:database', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('get schema');
-  ctx.body = await getSchema(ctx.params.database);
-});
-
-Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('Setting columns starred value');
-  winston.warn('WHO KNOWS IF THIS WILL WORK HAHA');
-  const starred: boolean = ctx.request.body.body.starred;
-  const columnId: string | number = ctx.request.body.body.columnId;
-  winston.info(String(starred));
-  winston.info(String(columnId));
-  ctx.body = await schema.upsert(ctx.state.user,
-    {starred, count: 0, id: columnId});
-});
-
-export default Router;
+export default SchemaConfig;

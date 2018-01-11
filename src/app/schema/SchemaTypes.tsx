@@ -73,6 +73,9 @@ class SchemaStateC
   public loaded: boolean = false;
   public schemaError: boolean = false;
 
+  // Keep track of starred fields, columnId: boolean mapping
+  public starredColumns = Map<string, boolean>();
+
   // view state
   public selectedId: string = null;
   public highlightedId: string = null;

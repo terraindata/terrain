@@ -58,6 +58,7 @@ import { tableChildrenConfig, TableTreeInfo } from './items/TableTreeInfo';
 const Radium = require('radium');
 import Styles from './SchemaTreeStyles';
 const ArrowIcon = require('./../../../images/icon_arrow.svg?name=ArrowIcon');
+const StarIcon = require('images/icon_star.svg?name=StarIcon');
 import Util from 'util/Util';
 import FadeInOut from '../../common/components/FadeInOut';
 import { fieldPropertyChildrenConfig, FieldPropertyTreeInfo } from './items/FieldPropertyTreeInfo';
@@ -81,6 +82,7 @@ class State
   public childCount: number = -1;
   public isSelected = false;
   public isHighlighted = false;
+  public starred = false;
 }
 
 const typeToRendering: {
@@ -381,6 +383,19 @@ class SchemaTreeItem extends TerrainComponent<Props>
     );
   }
 
+  public toggleStarredColumn()
+  {
+    // Call schema store function that will set this column to starred in midway
+    this.props.schemaActions({
+      actionType: 'starColumn',
+      columnId: this.props.id,
+      starred: !(this.props.schema.getIn(['starredColumns', this.props.id])),
+    });
+    // this.setState({
+    //   starred: !this.state.starred,
+    // });
+  }
+
   public render()
   {
     const { schema, type, id } = this.props;
@@ -390,7 +405,9 @@ class SchemaTreeItem extends TerrainComponent<Props>
     const hasChildren = this.state.childCount > 0;
 
     const showing = SchemaTypes.searchIncludes(item, this.props.search);
-
+    // If the schema item is a field, then there should be a star somewhere near
+    // it that can be toggled on and off
+    // Toggling this will change the field's starred status in midway so that it is persistent
     return (
       <div
         style={Styles.treeItem}
@@ -425,6 +442,15 @@ class SchemaTreeItem extends TerrainComponent<Props>
                         width: 12,
                         height: 12,
                       }}
+                    />
+                  </div>
+                }
+                {
+                  this.props.type === 'column' &&
+                  <div onClick={this.toggleStarredColumn}>
+                    <StarIcon
+                    style={this.props.schema.getIn(['starredColumns', this.props.id])
+                      ? Styles.selectedStarIcon : Styles.unselectedStarIcon}
                     />
                   </div>
                 }

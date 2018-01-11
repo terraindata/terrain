@@ -44,63 +44,98 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as passport from 'koa-passport';
-import * as KoaRouter from 'koa-router';
-import * as winston from 'winston';
+import * as Tasty from '../../tasty/Tasty';
+import * as App from '../App';
 
 import DatabaseController from '../../database/DatabaseController';
+import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Tasty from '../../tasty/Tasty';
-import Schema from './Schema';
+import * as Scripts from '../../scripts/Scripts';
+import { metrics } from '../events/EventRouter';
+import UserConfig from '../users/UserConfig';
+import * as Util from '../Util';
+import SchemaConfig from './SchemaConfig';
 
-const Router = new KoaRouter();
-export const schema = new Schema();
-
-async function getSchema(databaseID: number): Promise<string>
+export class Schema
 {
-  const database: DatabaseController | undefined = DatabaseRegistry.get(databaseID);
-  if (database === undefined)
+  private schemaTable: Tasty.Table;
+
+  constructor()
   {
-    throw new Error('Database "' + databaseID.toString() + '" not found.');
+    this.schemaTable = new Tasty.Table(
+      'schema',
+      ['id'],
+      [
+        'starred',
+        'count',
+      ],
+    );
   }
-  const schema: Tasty.Schema = await database.getTasty().schema();
-  return schema.toString();
+
+  public async delete(user: UserConfig, id: number | string): Promise<object>
+  {
+    if (!user.isSuperUser)
+    {
+      throw new Error('Only superusers can delete databases.');
+    }
+    return App.DB.delete(this.schemaTable, { id } as SchemaConfig);
+  }
+
+  public async select(columns: string[], filter?: object): Promise<SchemaConfig[]>
+  {
+    console.log('SELECT');
+    console.log(columns);
+    console.log(filter);
+    return new Promise<SchemaConfig[]>(async (resolve, reject) =>
+    {
+      const rawResults = await App.DB.select(this.schemaTable, columns, filter);
+      const results: SchemaConfig[] = rawResults.map((result: object) => new SchemaConfig(result));
+      resolve(results);
+    });
+  }
+
+  public async get(id?: number | string, fields?: string[]): Promise<SchemaConfig[]>
+  {
+    console.log('GET');
+    console.log(id);
+    console.log(fields);
+    if (id !== undefined)
+    {
+      if (fields !== undefined)
+      {
+        return this.select(fields, { id });
+      }
+      return this.select([], { id });
+    }
+    if (fields !== undefined)
+    {
+      return this.select(fields, {});
+    }
+    return this.select([], {});
+  }
+
+  // TODO TODO
+  public async upsert(user: UserConfig, schema: SchemaConfig): Promise<SchemaConfig>
+  {
+    console.log('UPSERT UPSERT ');
+    console.log(schema);
+    if (schema.id !== undefined)
+    {
+      const results: SchemaConfig[] = await this.get(schema.id);
+      console.log('MADE IT PAST THIS PROMISE')
+      console.log(results);
+      if (results.length !== 0)
+      {
+        schema = Util.updateObject(results[0], schema);
+      }
+    }
+    else
+    {
+      const results: SchemaConfig[] = await this.get();
+      schema.id = results.length + 1;
+    }
+    return App.DB.upsert(this.schemaTable, schema) as Promise<SchemaConfig>;
+  }
 }
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('getting all schema');
-  const request = ctx.request.body.body;
-  if (request !== undefined && request.database !== undefined)
-  {
-    ctx.body = await getSchema(request.database);
-  }
-  else
-  {
-    ctx.body = '';
-    for (const [id, database] of DatabaseRegistry.getAll())
-    {
-      ctx.body += await getSchema(id);
-    }
-  }
-});
-
-Router.get('/:database', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('get schema');
-  ctx.body = await getSchema(ctx.params.database);
-});
-
-Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('Setting columns starred value');
-  winston.warn('WHO KNOWS IF THIS WILL WORK HAHA');
-  const starred: boolean = ctx.request.body.body.starred;
-  const columnId: string | number = ctx.request.body.body.columnId;
-  winston.info(String(starred));
-  winston.info(String(columnId));
-  ctx.body = await schema.upsert(ctx.state.user,
-    {starred, count: 0, id: columnId});
-});
-
-export default Router;
+export default Schema;

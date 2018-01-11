@@ -99,6 +99,11 @@ export interface SchemaActionTypes
     actionType: 'selectId';
     id: ID;
   };
+  starColumn: {
+    actionType: 'starColumn',
+    columnId: ID,
+    starred: boolean,
+  }
 }
 
 class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
@@ -171,6 +176,13 @@ class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
       {
         return state.set('selectedId', action.payload.id);
       },
+
+      starColumn: (state, action) => {
+        const {columnId, starred} = action.payload;
+        Ajax.starColumn(columnId, starred);
+        return state.setIn(List(['starredColumns', columnId]),
+          starred);
+      }
     };
 
   public fetchAction(dispatch)

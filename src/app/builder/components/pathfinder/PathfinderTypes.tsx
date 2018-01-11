@@ -88,21 +88,9 @@ import BuilderStore from 'app/builder/data/BuilderStore';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import ElasticBlockHelpers,
-{ AutocompleteMatchType, FieldTypeMapping }
+{ AutocompleteMatchType, FieldTypeMapping, FieldType }
   from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
-
-// For some reason, not having the FieldType in PathfinderTypes causes
-// TransformCardChartTests to fail...
-const enum FieldType
-{
-  Numerical,
-  Text,
-  Date,
-  Geopoint,
-  Ip,
-  Any,
-}
 
 export enum PathfinderSteps
 {
