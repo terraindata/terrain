@@ -15,8 +15,8 @@
             "id": 1,
             "name": "My MySQL Instance",
             "type": "mysql",
-            "dsn": "t3rr41n-demo:r3curs1v3$@127.0.0.1:3306",
-            "host": "127.0.0.1:3306"
+            "dsn": "t3rr41n-demo:r3curs1v3$@127.0.0.1:63306",
+            "host": "127.0.0.1:63306"
         },
         {
             "id": 2,
