@@ -57,16 +57,11 @@ import Util from 'util/Util';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
-import Autocomplete from 'common/components/Autocomplete';
-import CheckBox from 'common/components/CheckBox';
-import Dropdown from 'common/components/Dropdown';
-import { Menu, MenuOption } from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
-
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
 import './TemplateEditorField.less';
 
@@ -82,7 +77,7 @@ export interface Props extends TemplateEditorFieldProps
 }
 
 @Radium
-class TemplateEditorFieldSettings extends TemplateEditorField<Props>
+class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 {
   public state: {
     settingsOpen: boolean;
@@ -92,18 +87,51 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 
   public render()
   {
-    const { field } = this.props;
+    const { canEdit, field, keyPath, preview } = this.props;
+    const renderPreview = field.type;
     return (
-      <div>
-        Settings Placeholder
+      <div className='template-editor-field-block'>
+        <div className='field-preview-row'>
+          <div className='field-preview-label-group'>
+            <div className='field-preview-label'
+              style={fontColor(Colors().text3, Colors().text2)}
+              onClick={this._noopIfDisabled(this.handleToggleSettings)}
+            >
+              {`${field.name}${this._isNested() ? '' : ':'}`}
+            </div>
+          </div>
+          {
+            !this._isNested() &&
+            <div className='field-preview-value'>
+              {this.props.preview.toString()}
+            </div>
+          }
+        </div>
+        {
+          this.state.settingsOpen &&
+          <TemplateEditorFieldSettings
+            keyPath={keyPath}
+            field={field}
+            canEdit={canEdit}
+            preview={preview}
+          />
+        }
       </div>
     );
   }
 
+  public handleToggleSettings()
+  {
+    this.setState({
+      settingsOpen: !this.state.settingsOpen,
+    });
+  }
 }
 
+const emptyOptions = List([]);
+
 export default Util.createTypedContainer(
-  TemplateEditorFieldSettings,
+  TemplateEditorFieldPreview,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );

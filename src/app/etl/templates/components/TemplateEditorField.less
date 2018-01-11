@@ -6,23 +6,28 @@
   flex-direction: column;
 }
 
-// template editor field
+// TemplateEditorFieldPreview
 
-.field-settings-label-group {
-  flex: 0 0 160px;
+.template-editor-field-block {
   display: flex;
-  align-items: start;
-}
+  flex-direction: column;
 
-.field-settings-label {
-  padding: @half-spacing;
-  cursor: pointer;
-}
+  .field-preview-label-group {
+    flex: 0 0 160px;
+    display: flex;
+    align-items: start;
+  }
 
-.field-settings-preview {
-  padding: @half-spacing;
-}
+  .field-preview-label {
+    padding: @half-spacing;
+    cursor: pointer;
+  }
 
-.field-settings-row {
-  display: flex;
+  .field-preview-value {
+    padding: @half-spacing;
+  }
+
+  .field-preview-row {
+    display: flex;
+  }
 }

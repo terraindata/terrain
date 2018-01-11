@@ -59,7 +59,7 @@ import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/template
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
-import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
+import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 
 const AddIcon = require('images/icon_add.svg');
 
@@ -108,7 +108,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     const { field, keyPath, canEdit, preview } = this.props;
 
     const settings = (
-      <TemplateEditorFieldSettings
+      <TemplateEditorFieldPreview
         keyPath={keyPath}
         field={field}
         canEdit={canEdit}
