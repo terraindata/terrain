@@ -52,6 +52,7 @@ import { App, DB } from '../../src/app/App';
 import ElasticConfig from '../../src/database/elastic/ElasticConfig';
 import ElasticController from '../../src/database/elastic/ElasticController';
 import ElasticDB from '../../src/database/elastic/tasty/ElasticDB';
+import * as Tasty from '../../src/tasty/Tasty';
 import { readFile } from '../Utils';
 
 let elasticDB: ElasticDB;
@@ -92,8 +93,100 @@ beforeAll(async (done) =>
     const elasticController: ElasticController = new ElasticController(config, 0, 'FileImportRouteTests');
     elasticDB = elasticController.getTasty().getDB() as ElasticDB;
 
-    const sql = await readFile('./midway/test/scripts/test.sql');
-    const results = await DB.getDB().execute([sql.toString()]);
+    const items = [
+      {
+        meta: 'I won a Nobel prize! But Im more proud of my music',
+        name: 'Al Gore',
+        parent: 0,
+        status: 'Still Alive',
+        type: 'GROUP',
+      },
+      {
+        meta: '#realmusician',
+        name: 'Updated Item',
+        parent: 0,
+        status: 'LIVE',
+        type: 'CATEGORY',
+      },
+      {
+        meta: 'Are we an item?',
+        name: 'Justin Bieber',
+        parent: 0,
+        status: 'Baby',
+        type: 'ALGORITHM',
+      },
+    ];
+    const itemTable = new Tasty.Table(
+      'items',
+      ['id'],
+      [
+        'meta',
+        'name',
+        'parent',
+        'status',
+        'type',
+      ],
+    );
+    await DB.getDB().execute([
+      DB.getDB().generate(new Tasty.Query(itemTable).upsert(items)),
+    ]);
+
+    const users = [
+      {
+        accessToken: '',
+        email: 'test@terraindata.com',
+        isDisabled: false,
+        isSuperUser: false,
+        name: 'Test Person',
+        oldPassword: null,
+        password: '$2a$10$Bov3ZgCLKd2l/4bu0cXP2OEofcknNO1mhW9Tt.MjFzQdqRUK//NXe',
+        timezone: 'UTC',
+        meta: '{}',
+      },
+    ];
+    const userTable = new Tasty.Table(
+      'users',
+      ['id'],
+      [
+        'accessToken',
+        'email',
+        'isDisabled',
+        'isSuperUser',
+        'name',
+        'oldPassword',
+        'password',
+        'timezone',
+        'meta',
+      ],
+    );
+    console.log(DB.getDB().generate(new Tasty.Query(userTable).upsert(users)));
+    await DB.getDB().execute([
+      DB.getDB().generate(new Tasty.Query(userTable).upsert(users)),
+    ]);
+
+    const versions = [
+      {
+        objectType: 'items',
+        objectId: 2,
+        object: '{"id":2,"meta":"#realmusician","name":"Updated Item","parent":0,"status":"LIVE","type":"CATEGORY"}',
+        createdAt: '2017-05-31 00:22:04',
+        createdBy: 1,
+      },
+    ];
+    const versionTable = new Tasty.Table(
+      'versions',
+      ['id'],
+      [
+        'createdAt',
+        'createdByUserId',
+        'object',
+        'objectId',
+        'objectType',
+      ],
+    );
+    await DB.getDB().execute([
+      DB.getDB().generate(new Tasty.Query(versionTable).upsert(versions)),
+    ]);
   }
   catch (e)
   {
