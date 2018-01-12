@@ -8,8 +8,10 @@
 	display: inline-flex;
 	position: relative;
 	z-index: 999;
+	height: 18px;
 	.linear-selector-label {
-
+	    font-size: @small-font-size;
+	    margin-right: 9px;
 	}
 	.linear-selector-option, .linear-selector-custom {
 		padding: 0px 6px;
@@ -34,7 +36,7 @@
 		position: absolute;
 		border-radius: 6px;
 	    padding-top: 3px;
-	    top: -1px;
+	    top: -2px;
 		z-index: 100;
 		.transition(~"all 500ms cubic-bezier(0.23, 1, 0.32, 1)");
 	}

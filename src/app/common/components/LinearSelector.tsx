@@ -90,6 +90,7 @@ class LinearSelector extends TerrainComponent<Props>
       selectorWidth: 0,
     };
 
+  // Determine whether using custom input
   public componentWillMount()
   {
     const usingCustomValue = this.props.allowCustomInput
@@ -100,11 +101,14 @@ class LinearSelector extends TerrainComponent<Props>
     });
   }
 
+  // Set the position of the selector
   public componentDidMount()
   {
     this.setSelectedPosition(this.props.selected);
   }
 
+  // Determine whether using custom input
+  // Set position of the selector if selected option has changed
   public componentWillReceiveProps(nextProps)
   {
     const usingCustomValue = nextProps.allowCustomInput
@@ -119,7 +123,7 @@ class LinearSelector extends TerrainComponent<Props>
     }
   }
 
-  public selectOption(option)
+  public selectOption(option, customOption)
   {
     if (!this.props.canEdit)
     {
@@ -133,13 +137,20 @@ class LinearSelector extends TerrainComponent<Props>
     {
       this.props.onChange(option);
     }
+    this.setState({
+      usingCustomValue: customOption,
+    });
   }
 
+  // Select the height, width, and position to put the selector at
   public setSelectedPosition(overrideSelected?, usingCustomValue?)
   {
-    const key = (this.state.usingCustomValue || usingCustomValue)
-      ? 'custom' : String(overrideSelected || this.props.selected);
-    if (this.state.showCustomTextbox || !(this.refs && this.refs[key] && this.refs['all-options']))
+    usingCustomValue = usingCustomValue !== undefined
+      ? usingCustomValue : this.state.usingCustomValue;
+    const key = usingCustomValue ? 'custom'
+      : String(overrideSelected || this.props.selected);
+    if (this.state.showCustomTextbox ||
+      !(this.refs && this.refs[key] && this.refs['all-options']))
     {
       this.setState({
         selectorLeft: 0,
@@ -149,7 +160,7 @@ class LinearSelector extends TerrainComponent<Props>
       return;
     }
     const cr = this.refs[key]['getBoundingClientRect']();
-    const parentCr = this.refs['all']['getBoundingClientRect']();
+    const parentCr = this.refs['all-options']['getBoundingClientRect']();
     this.setState({
       selectorLeft: cr.left - parentCr.left,
       selectorHeight: cr.height,
@@ -165,7 +176,7 @@ class LinearSelector extends TerrainComponent<Props>
           'linear-selector-option': true,
           'linear-selector-option-selected': this.props.selected === option,
         })}
-        onClick={this._fn(this.selectOption, option)}
+        onClick={this._fn(this.selectOption, option, false)}
         key={i}
         ref={String(option)}
       >
@@ -174,22 +185,16 @@ class LinearSelector extends TerrainComponent<Props>
     );
   }
 
-  public handleCustomInput()
-  {
-    this.selectOption('');
-  }
-
   public showCustomTextbox()
   {
     if (!this.state.usingCustomValue)
     {
-      this.selectOption(this.state.customInput);
+      this.selectOption(this.state.customInput, true);
     }
     if (!this.state.showCustomTextbox)
     {
       this.setState({
         showCustomTextbox: true,
-        usingCustomValue: true,
       });
     }
   }
