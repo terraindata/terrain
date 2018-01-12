@@ -213,15 +213,19 @@ export class ImportTemplates
         columnTypes: JSON.stringify(template['columnTypes']),
         dbid: template['dbid'],
         dbname: template['dbname'],
-        id: template['id'],
         name: template['name'],
         originalNames: JSON.stringify(template['originalNames']),
-        // hack around silly linter complaint below
         primaryKeyDelimiter: (template['primaryKeyDelimiter'] === undefined ? '-' : template['primaryKeyDelimiter']) as string,
         primaryKeys: JSON.stringify(template['primaryKeys']),
         tablename: template['tablename'],
         transformations: JSON.stringify(template['transformations']),
       };
+
+    if (template['id'] === undefined)
+    {
+      delete stringified.id;
+    }
+
     return stringified;
   }
 }

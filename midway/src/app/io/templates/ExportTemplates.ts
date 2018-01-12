@@ -238,6 +238,12 @@ export class ExportTemplates
         tablename: template['tablename'],
         transformations: JSON.stringify(template['transformations']),
       };
+
+    if (template['id'] === undefined)
+    {
+      delete stringified.id;
+    }
+
     return stringified;
   }
 }
