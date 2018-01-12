@@ -421,6 +421,7 @@ doesntWork(); // nothing is logged
 
 * Don't panic.
 * Node or npm errors: `yarn` - you may be missing packages.
+* Infinite logo spinning and 401 errors in the console: try in dev tools, go to Application -> Local Storage -> http://localhost:8080/ -> clear local storage and refresh
 * Importing something and it comes up as `undefined`?
   - Check to make sure you don't have a circular dependency (importing something that imports itself)
   - Make sure you are `export`ing and `export default`ing from the file
