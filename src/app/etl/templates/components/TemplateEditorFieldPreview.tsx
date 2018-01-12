@@ -89,12 +89,14 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
   {
     const { canEdit, field, keyPath, preview } = this.props;
     const renderPreview = field.type;
+    const labelStyle = this.state.settingsOpen ?
+      fontColor(Colors().text1, Colors().text1) : fontColor(Colors().text3, Colors().text2);
     return (
       <div className='template-editor-field-block'>
         <div className='field-preview-row'>
           <div className='field-preview-label-group'>
             <div className='field-preview-label'
-              style={fontColor(Colors().text3, Colors().text2)}
+              style={labelStyle}
               onClick={this._noopIfDisabled(this.handleToggleSettings)}
             >
               {`${field.name}${this._isNested() ? '' : ':'}`}
@@ -102,19 +104,28 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
           </div>
           {
             !this._isNested() &&
-            <div className='field-preview-value'>
+            <div
+              className={classNames({
+                'field-preview-value': true,
+                'field-preview-value-settings-open': this.state.settingsOpen,
+              })}
+
+            >
               {this.props.preview.toString()}
             </div>
           }
         </div>
         {
           this.state.settingsOpen &&
-          <TemplateEditorFieldSettings
-            keyPath={keyPath}
-            field={field}
-            canEdit={canEdit}
-            preview={preview}
-          />
+          <div className='editor-settings-wrapper' style={backgroundColor(Colors().highlight)}>
+            <div className='editor-settings-arrow' style={getStyle('borderBottomColor', Colors().highlight)} />
+            <TemplateEditorFieldSettings
+              keyPath={keyPath}
+              field={field}
+              canEdit={canEdit}
+              preview={preview}
+            />
+          </div>
         }
       </div>
     );

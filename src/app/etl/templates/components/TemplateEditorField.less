@@ -16,18 +16,107 @@
     flex: 0 0 160px;
     display: flex;
     align-items: start;
+    min-width: 0;
   }
 
   .field-preview-label {
     padding: @half-spacing;
     cursor: pointer;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .field-preview-value {
     padding: @half-spacing;
+    // display: flex;
+    &.field-preview-value-settings-open {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      // white-space: nowrap;
+      max-height: 1em;
+    }
   }
 
   .field-preview-row {
     display: flex;
+    min-width: 0;
+  }
+
+  .editor-settings-wrapper {
+    border-radius: 3px;
+    margin-left: @quarter-spacing;
+    position: relative;
+
+    .editor-settings-arrow {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid #ddd;
+      position: absolute;
+      top: -8px;
+      left: 8px;
+    }
+  }
+}
+
+// TemplateEditorFieldSettings
+.template-editor-field-settings {
+  padding: @quarter-spacing 0px;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0px;
+
+  .field-settings-row {
+    display: flex;
+    padding: @half-spacing;
+    align-items: center;
+  }
+
+  .field-settings-label {
+    padding-right: @spacing;
+    padding-left: @half-spacing;
+  }
+}
+
+// TemplateEditorFieldTypeSection
+.template-editor-type-section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: @quarter-spacing @half-spacing;
+
+
+  .type-dropdown-spacer {
+    padding-bottom: @quarter-spacing;
+    padding-top: @quarter-spacing;
+  }
+
+  .type-section-label {
+    padding: @quarter-spacing + @half-spacing @half-spacing;
+    // padding-top: @quarter-spacing + @half-spacing;
+    // padding-bottom: @quarter-spacing + @half-spacing;
+    &.label-right {
+      padding-left: 0px;
+    }
+  }
+
+  .type-checkbox-spacer {
+    margin-top: 2px;
+    padding: @half-spacing;
+    padding-right: 0px;
+    margin-right: -3px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    bottom: 1px;
+  }
+
+  .type-analyzed-section {
+    padding-left: @half-spacing;
+    display: flex;
+    cursor: pointer;
+    .transition;
   }
 }

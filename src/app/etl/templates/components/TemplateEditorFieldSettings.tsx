@@ -67,7 +67,7 @@ import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/template
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
-
+import TemplateEditorFieldTypeSection from './TemplateEditorFieldTypeSection';
 import './TemplateEditorField.less';
 
 export interface Props extends TemplateEditorFieldProps
@@ -92,10 +92,28 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 
   public render()
   {
-    const { field } = this.props;
+    const { keyPath, field, canEdit, preview } = this.props;
     return (
-      <div>
-        Settings Placeholder
+      <div className='template-editor-field-settings'>
+        <div className='field-settings-row'>
+          <div className='field-settings-label'> Configure This Field's Settings </div>
+        </div>
+        <div className='field-settings-row'>
+          <div className='field-settings-label'>
+            Name
+          </div>
+          <Autocomplete
+            value='sample value'
+            onChange={() => { }}
+            options={List([])}
+          />
+        </div>
+        <TemplateEditorFieldTypeSection
+          keyPath={keyPath}
+          field={field}
+          canEdit={canEdit}
+          preview={preview}
+        />
       </div>
     );
   }
