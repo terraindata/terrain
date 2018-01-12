@@ -413,7 +413,6 @@ export class ResultsManager extends TerrainComponent<Props>
           replaceInputs: true,
         },
       );
-
       this.setState({
         lastQuery: query,
         queriedTql: eql,
