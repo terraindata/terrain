@@ -61,7 +61,7 @@ describe('LibraryActions', () =>
     const categoryName = 'Test Category';
     const libraryStateMock = LibraryHelper.mockState();
 
-    let library = libraryStateMock.getState();
+    const library = libraryStateMock.getState();
     const category = LibraryHelper.mockCategory();
 
     it('should create a categories.create action after the new category has been created', (done) =>

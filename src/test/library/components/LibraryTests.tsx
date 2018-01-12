@@ -61,7 +61,7 @@ describe('Library', () =>
   const algorithmId = 3;
 
   const libraryStateMock = LibraryHelper.mockState();
-  let library = libraryStateMock
+  const library = libraryStateMock
     .addCategory(categoryId, 'Category 1')
     .addGroup(categoryId, groupId, 'Group 1')
     .addAlgorithm(groupId, algorithmId, 'Algorithm 1')

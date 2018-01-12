@@ -42,15 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
+// Copyright 2017 Terrain Data, Inc.
+// tslint:disable:max-classes-per-file
 import * as Immutable from 'immutable';
-import {
-  _LibraryState,
-  Category,
-  Group,
-  Algorithm,
+import
+{
+  _Algorithm,
   _Category,
   _Group,
-  _Algorithm,
+  _LibraryState,
+  Algorithm,
+  Category,
+  Group,
 } from 'library/LibraryTypes';
 import { ItemType } from '../items/types/Item';
 
@@ -58,7 +61,7 @@ export default class LibraryHelper
 {
   public static mockState()
   {
-     return new LibraryStateMock();
+    return new LibraryStateMock();
   }
 
   public static mockCategory()
@@ -84,18 +87,18 @@ class LibraryStateMock
   {
     const category = _Category({
       type: ItemType.Category,
-      id: id,
+      id,
       name: categoryName,
       lastEdited: '',
       lastUserId: '',
       userIds: Immutable.List([]),
       defaultLanguage: 'elastic',
       parent: 0,
-    }))
+    }));
 
     this.state = this.state.set(
       'categories',
-      this.state.categories.set(id, category)
+      this.state.categories.set(id, category),
     );
 
     return this;
@@ -116,9 +119,9 @@ class LibraryStateMock
     this.state = this.state
       .setIn(['groups', groupId], group)
       .setIn(
-        ['categories', categoryId, 'groupsOrder'],
-        this.state.categories.get(categoryId).groupsOrder.push(groupId)
-      );
+      ['categories', categoryId, 'groupsOrder'],
+      this.state.categories.get(categoryId).groupsOrder.push(groupId),
+    );
 
     return this;
   }
@@ -133,9 +136,9 @@ class LibraryStateMock
     this.state = this.state
       .setIn(['algorithms', algorithmId], algorithm)
       .setIn(
-        ['groups', groupId, 'algorithmsOrder'],
-        this.state.groups.get(groupId).algorithmsOrder.push(algorithmId)
-      );
+      ['groups', groupId, 'algorithmsOrder'],
+      this.state.groups.get(groupId).algorithmsOrder.push(algorithmId),
+    );
 
     return this;
   }

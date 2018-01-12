@@ -45,144 +45,23 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 import Actions from 'analytics/data/AnalyticsActions';
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
-import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
+
 import * as Immutable from 'immutable';
 import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import { Ajax, createMockStore } from '../../helpers';
+import AnalyticsHelper from '../../AnalyticsHelper';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 
-const analyticsResponse = [
-  {
-    key_as_string: '2015-06-02T00:00:00.000Z',
-    key: 1433203200000,
-    doc_count: 10320,
-  },
-  {
-    key_as_string: '2015-06-03T00:00:00.000Z',
-    key: 1433289600000,
-    doc_count: 12582,
-  },
-  {
-    key_as_string: '2015-06-04T00:00:00.000Z',
-    key: 1433376000000,
-    doc_count: 12279,
-  },
-  {
-    key_as_string: '2015-06-05T00:00:00.000Z',
-    key: 1433462400000,
-    doc_count: 6187,
-  },
-  {
-    key_as_string: '2015-06-06T00:00:00.000Z',
-    key: 1433548800000,
-    doc_count: 937,
-  },
-];
-
-const analyticsErrorResponse = {
-  errors: [
-    {
-      status: 400,
-      title: `Route /midway/v1/events/agg?id=1&
-accessToken=some-token&algorithmid=6&
-start=2017-10-25T00%3A00%3A00.000Z&end=2017-10-25T15%3A39%3A59.335Z&eventid=1&
-interval=day&agg=histogram&field=%40timestamp has an error.`,
-      detail: 'Parameter "database" not found in request object.',
-      source: {
-        ctx: {
-          request: {
-            method: 'GET',
-            url: `/midway/v1/events/agg?id=1&accessToken=some-token&algorithmid=6&
-start=2017-10-25T00%3A00%3A00.000Z&end=2017-10-25T15%3A39%3A59.335Z&eventid=1&interval=day&
-agg=histogram&field=%40timestamp`,
-            header: {
-              'host': 'localhost:3000',
-              'connection': 'keep-alive',
-              'pragma': 'no-cache',
-              'cache-control': 'no-cache',
-              'origin': 'http://localhost:8080',
-              'user-agent': 'Mozilla/5.0',
-              'content-type': 'application/json',
-              'accept': '*/*',
-              'referer': 'http://localhost:8080/analytics/1/13',
-              'accept-encoding': 'gzip, deflate, br',
-              'accept-language': 'en-US,en;q=0.8,es-419;q=0.6,es;q=0.4,ms;q=0.2,fr;q=0.2,pt;q=0.2',
-            },
-          },
-          response: {
-            status: 400,
-            message: 'Bad Request',
-            header: {
-              'vary': 'Origin',
-              'access-control-allow-origin': 'http://localhost:8080',
-              'content-type': 'application/json; charset=utf-8',
-              'x-response-time': '45ms',
-              'set-cookie': [],
-            },
-          },
-          app: {
-            subdomainOffset: 2,
-            proxy: true,
-            env: 'development',
-          },
-          originalUrl: `/midway/v1/events/agg?id=1&accessToken=some-token&algorithmid=6&
-start=2017-10-25T00%3A00%3A00.000Z&end=2017-10-25T15%3A39%3A59.335Z&eventid=1&interval=day&
-agg=histogram&field=%40timestamp`,
-          req: '<original node req>',
-          res: '<original node res>',
-          socket: '<original node socket>',
-        },
-        err: {
-
-        },
-      },
-    },
-  ],
-};
-
-const availableMetricsResponse = [
-  {
-    database: 1,
-    events: 'impression',
-    id: 2,
-    label: 'Impressions',
-  },
-  {
-    database: 1,
-    events: 'click',
-    id: 3,
-    label: 'Clicks\n',
-  },
-  {
-    database: 1,
-    events: 'conversion',
-    id: 4,
-    label: 'Conversions',
-  },
-  {
-    database: 1,
-    events: 'click,impression',
-    id: 5,
-    label: 'Click Through Rate',
-  },
-  {
-    database: 1,
-    events: 'conversion,impression',
-    id: 6,
-    label: 'Conversion Rate',
-  },
-];
-
-const serverTimeResponse = { serverTime: '2015-06-06T00:00:00.000Z' };
+const serverResponseMock = AnalyticsHelper.mockServerResponses();
 
 const mockStore = createMockStore();
 
 describe('AnalyticsActions', () =>
 {
-  const analytics: AnalyticsState = _AnalyticsState({});
+  const analytics = AnalyticsHelper.mockState().getState();
   const schema: SchemaState = _SchemaState({
     servers: Immutable.Map({
       'My ElasticSearch Instance': {
@@ -211,7 +90,7 @@ describe('AnalyticsActions', () =>
     Ajax.getServerTime = (
       onLoad: (response: any) => void,
       onError?: (ev: Event) => void,
-    ) => onLoad(serverTimeResponse);
+    ) => onLoad(serverResponseMock.serverTime());
 
     describe('when fetch is successful', () =>
     {
@@ -227,7 +106,7 @@ describe('AnalyticsActions', () =>
           agg: string,
           onLoad: (response: any) => void,
           onError?: (ev: Event) => void,
-        ) => onLoad(analyticsResponse);
+        ) => onLoad(serverResponseMock.success());
 
         const expectedActions = [
           {
@@ -236,10 +115,10 @@ describe('AnalyticsActions', () =>
           {
             type: ActionTypes.fetchSuccess,
             payload: {
-              analytics: analyticsResponse,
+              analytics: serverResponseMock.success(),
               dateRangeDomain: {
-                start: (new Date(serverTimeResponse.serverTime)).getTime(),
-                end: (new Date(serverTimeResponse.serverTime)).getTime(),
+                start: (new Date(serverResponseMock.serverTime().serverTime)).getTime(),
+                end: (new Date(serverResponseMock.serverTime().serverTime)).getTime(),
               },
             },
           },
@@ -284,9 +163,9 @@ describe('AnalyticsActions', () =>
           agg: string,
           onLoad: (response: any) => void,
           onError?: (error: any) => void,
-        ) => onError(JSON.stringify(analyticsErrorResponse));
+        ) => onError(JSON.stringify(serverResponseMock.error()));
 
-        const errorMessages = analyticsErrorResponse.errors.map((error) => error.detail);
+        const errorMessages = serverResponseMock.error().errors.map((error) => error.detail);
         const expectedActions = [
           {
             type: ActionTypes.fetchStart,
@@ -400,7 +279,7 @@ describe('AnalyticsActions', () =>
     Ajax.getAvailableMetrics = (
       onLoad: (response: any) => void,
       onError?: (ev: Event) => void,
-    ) => onLoad(availableMetricsResponse);
+    ) => onLoad(serverResponseMock.available());
 
     describe('when fetch is successful', () =>
     {
@@ -412,7 +291,7 @@ describe('AnalyticsActions', () =>
           },
           {
             type: ActionTypes.fetchAvailableMetricsSuccess,
-            payload: { availableMetrics: availableMetricsResponse },
+            payload: { availableMetrics: serverResponseMock.available() },
           },
         ];
 

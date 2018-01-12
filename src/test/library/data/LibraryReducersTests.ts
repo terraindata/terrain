@@ -51,7 +51,7 @@ import LibraryHelper from '../../LibraryHelper';
 
 describe('LibraryReducers', () =>
 {
-  let library = LibraryHelper.mockState().getState();
+  const library = LibraryHelper.mockState().getState();
 
   it('should return the inital state', () =>
   {
