@@ -46,8 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
-import * as Immutable from 'immutable';
-const { List } = Immutable;
+import { Record } from 'immutable';
 
 // duplicate of SchedulerConfig defined in Scheduler.ts
 class SchedulerConfigC
@@ -68,7 +67,7 @@ class SchedulerConfigC
   public transportStr?: string = '';             // JSON stringified representation of transport
 }
 
-const SchedulerConfig_Record = Immutable.Record(new SchedulerConfigC());
+const SchedulerConfig_Record = Record(new SchedulerConfigC());
 export interface SchedulerConfig extends SchedulerConfigC, IRecord<SchedulerConfig> { }
 export const _SchedulerConfig =
   (config: {
@@ -101,7 +100,7 @@ class CredentialConfigC
   public type: string = '';
 }
 
-const CredentialConfig_Record = Immutable.Record(new CredentialConfigC());
+const CredentialConfig_Record = Record(new CredentialConfigC());
 export interface CredentialConfig extends CredentialConfigC, IRecord<CredentialConfig> { }
 export const _CredentialConfig =
   (config: {

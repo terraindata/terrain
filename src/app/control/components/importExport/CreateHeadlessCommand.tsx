@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
@@ -67,7 +67,6 @@ import TemplateSelector from './TemplateSelector';
 
 import './CreateHeadlessCommand.less';
 
-const { List } = Immutable;
 const ClipboardIcon = require('images/icon_clipboard.svg');
 
 type Template = FileImportTypes.Template;
@@ -202,13 +201,13 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     selectedIds: List<number>;
     filenameValue: string;
   } = {
-    index: this.props.index,
-    fileTypeIndex: 0,
-    midwayURLValue: this.getInitialURL(),
-    objectKeyValue: '',
-    selectedIds: List([-1, -1, -1]),
-    filenameValue: '',
-  };
+      index: this.props.index,
+      fileTypeIndex: 0,
+      midwayURLValue: this.getInitialURL(),
+      objectKeyValue: '',
+      selectedIds: List([-1, -1, -1]),
+      filenameValue: '',
+    };
 
   public componentDidMount()
   {

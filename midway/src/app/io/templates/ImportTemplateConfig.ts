@@ -44,17 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires
+import ConfigType from '../../ConfigType';
+import { TemplateBase } from './TemplateBase';
 
-import * as _ from 'lodash';
-const Redux = require('redux');
-import * as ReduxActions from 'redux-actions';
-import * as AuthTypes from '../AuthTypes';
+export class ImportTemplateConfig extends TemplateBase
+{
+  public name: string = '';
 
-import AuthReducers from './AuthReducers';
+  constructor(props: object)
+  {
+    super(props);
+    ConfigType.initialize(this, props);
+  }
+}
 
-const AuthStore: IStore<AuthTypes.AuthState> = Redux.createStore(ReduxActions.handleActions(_.extend({} as any,
-  AuthReducers,
-  {}), AuthTypes._AuthState()), AuthTypes._AuthState());
-
-export default AuthStore;
+export default ImportTemplateConfig;

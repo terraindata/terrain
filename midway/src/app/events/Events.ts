@@ -49,13 +49,10 @@ import * as Elastic from 'elasticsearch';
 import * as winston from 'winston';
 
 import DatabaseController from '../../database/DatabaseController';
-import ElasticClient from '../../database/elastic/client/ElasticClient';
-import ElasticConfig from '../../database/elastic/ElasticConfig';
 import ElasticController from '../../database/elastic/ElasticController';
-import * as DBUtil from '../../database/Util';
 import * as Tasty from '../../tasty/Tasty';
-import { items } from '../items/ItemRouter';
 import * as Util from '../Util';
+import EventConfig from './EventConfig';
 
 export interface AggregationRequest
 {
@@ -66,21 +63,6 @@ export interface AggregationRequest
   agg: string;
   field?: string;
   interval?: string;
-}
-
-export interface EventConfig
-{
-  eventname: string;
-  algorithmid: number | string;
-  visitorid: number | string;
-  timestamp: Date | string;
-  source: {
-    ip: string;
-    host: string;
-    useragent: string;
-    referer?: string;
-  };
-  meta?: any;
 }
 
 export class Events

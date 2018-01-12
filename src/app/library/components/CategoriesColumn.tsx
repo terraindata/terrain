@@ -46,12 +46,14 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-var-requires
 
+import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import * as React from 'react';
+import { UserState } from 'users/UserTypes';
+import Util from 'util/Util';
 import { ItemStatus } from '../../../items/types/Item';
 import CreateLine from '../../common/components/CreateLine';
 import RolesStore from '../../roles/data/RolesStore';
 import * as RoleTypes from '../../roles/RoleTypes';
-import UserStore from '../../users/data/UserStore';
 import * as UserTypes from '../../users/UserTypes';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
@@ -75,20 +77,25 @@ export interface Props
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
   categoryActions: any;
+  algorithmActions: any;
   algorithms: Immutable.Map<ID, Algorithm>;
+  users?: UserState;
+}
+
+export interface State
+{
+  rendered: boolean;
+  lastMoved: any;
+  me: UserTypes.User;
+  roles: RoleTypes.RoleMap;
 }
 
 class CategoriesColumn extends TerrainComponent<Props>
 {
-  public state: {
-    rendered: boolean,
-    lastMoved: any,
-    me: UserTypes.User,
-    roles: RoleTypes.RoleMap,
-  } = {
+  public state: State = {
     rendered: false,
     lastMoved: null,
-    me: null,
+    me: this.props.users.currentUser,
     roles: null,
   };
 
@@ -97,11 +104,7 @@ class CategoriesColumn extends TerrainComponent<Props>
     this.setState({
       rendered: true,
     });
-    this._subscribe(UserStore, {
-      stateKey: 'me',
-      storeKeyPath: ['currentUser'],
-      isMounted: true,
-    });
+
     this._subscribe(RolesStore, {
       stateKey: 'roles',
       isMounted: true,
@@ -163,12 +166,26 @@ class CategoriesColumn extends TerrainComponent<Props>
 
   }
 
+  public handleItemSelect(id: ID)
+  {
+    const {
+      basePath,
+    } = this.props;
+
+    this.props.algorithmActions.unselect();
+
+    replaceRoute({ basePath, categoryId: id });
+
+    return true;
+  }
+
   public renderCategory(id: ID, index: number)
   {
     const { basePath } = this.props;
     const category = this.props.categories.get(id);
-    const { params } = this.props;
-    const { me, roles } = this.state;
+    const { users, params } = this.props;
+    const { currentUser: me } = users;
+    const { roles } = this.state;
     const categoryRoles = roles && roles.get(id);
     const canCreate = (me && categoryRoles && categoryRoles.getIn([me.id, 'admin']));
     const canEdit = canCreate || (me && me.isSuperUser);
@@ -261,8 +278,9 @@ class CategoriesColumn extends TerrainComponent<Props>
 
   public renderStatusGroup(status: ItemStatus)
   {
+    const { users } = this.props;
     const ids = this.props.categoriesOrder.filter((id) => this.props.categories.get(id).status === status);
-    const canCreate = this.state.me && this.state.me.isSuperUser;
+    const canCreate = users.currentUser && users.currentUser.isSuperUser;
 
     return (
       <LibraryItemCategory
@@ -319,4 +337,8 @@ class CategoriesColumn extends TerrainComponent<Props>
   }
 }
 
-export default CategoriesColumn;
+export default Util.createTypedContainer(
+  CategoriesColumn,
+  ['users'],
+  {},
+);

@@ -58,7 +58,8 @@ import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors
 import Menu from '../../../common/components/Menu';
 import ColorManager from '../../../util/ColorManager';
 import MapUtil from '../../../util/MapUtil';
-import SpotlightStore, { spotlightAction } from '../../data/SpotlightStore';
+import { SpotlightActions } from '../../data/SpotlightRedux';
+import * as SpotlightTypes from '../../data/SpotlightTypes';
 import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
@@ -90,43 +91,47 @@ export interface Props
   connectDragPreview?: (a: any) => void;
 
   locations?: { [field: string]: any };
+
+  // injected props
+  spotlights?: SpotlightTypes.SpotlightState;
+  spotlightActions?: typeof SpotlightActions;
 }
 
 @Radium
 class HitComponent extends TerrainComponent<Props> {
 
   public state: {
-    spotlights: IMMap<string, any>;
+    // spotlights: IMMap<string, any>;
   } =
-  {
-    spotlights: SpotlightStore.getState().spotlights,
-  };
+    {
+      // spotlights: SpotlightStore.getState().spotlights,
+    };
 
   public menuOptions =
-  [
-    List([
-      {
-        text: 'Spotlight',
-        onClick: this.spotlight,
-      },
-    ]),
+    [
+      List([
+        {
+          text: 'Spotlight',
+          onClick: this.spotlight,
+        },
+      ]),
 
-    List([
-      {
-        text: 'Un-Spotlight',
-        onClick: this.unspotlight,
-      },
-    ]),
-  ];
+      List([
+        {
+          text: 'Un-Spotlight',
+          onClick: this.unspotlight,
+        },
+      ]),
+    ];
 
   public constructor(props: Props)
   {
     super(props);
-    this._subscribe(SpotlightStore, {
-      isMounted: false,
-      storeKeyPath: ['spotlights'],
-      stateKey: 'spotlights',
-    });
+    // this._subscribe(SpotlightStore, {
+    //   isMounted: false,
+    //   storeKeyPath: ['spotlights'],
+    //   stateKey: 'spotlights',
+    // });
   }
 
   public shouldComponentUpdate(nextProps: Props, nextState)
@@ -164,8 +169,9 @@ class HitComponent extends TerrainComponent<Props> {
     {
       return null;
     }
-    const isSpotlit = this.state.spotlights.get(this.props.primaryKey);
-    const color = isSpotlit ? this.state.spotlights.get(this.props.primaryKey).color : 'black';
+    const spotlights = this.props.spotlights.spotlights;
+    const isSpotlit = spotlights.get(this.props.primaryKey);
+    const color = isSpotlit ? spotlights.get(this.props.primaryKey).color : 'black';
     const value = getResultValue(this.props.hit, field, this.props.resultsConfig,
       false, this.props.expanded, overrideFormat, this.props.locations, color);
     const format = this.props.resultsConfig && this.props.resultsConfig.formats.get(field);
@@ -213,19 +219,27 @@ class HitComponent extends TerrainComponent<Props> {
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = this.props.index;
-    spotlightAction(id, spotlightData);
+    this.props.spotlightActions({
+      actionType: 'spotlightAction',
+      id,
+      hit: spotlightData,
+    });
     this.props.onSpotlightAdded(id, spotlightData);
   }
 
   public unspotlight()
   {
     this.props.onSpotlightRemoved(this.props.primaryKey);
-    spotlightAction(this.props.primaryKey, null);
+    this.props.spotlightActions({
+      actionType: 'clearSpotlightAction',
+      id: this.props.primaryKey,
+    });
   }
 
   public renderSpotlight()
   {
-    const spotlight = this.state.spotlights.get(this.props.primaryKey);
+    const spotlights = this.props.spotlights.spotlights;
+    const spotlight = spotlights.get(this.props.primaryKey);
     return (
       <div
         className={classNames({
@@ -278,7 +292,8 @@ class HitComponent extends TerrainComponent<Props> {
         </div>
       );
     }
-    const spotlight = this.state.spotlights.get(this.props.primaryKey);
+    const spotlights = this.props.spotlights.spotlights;
+    const spotlight = spotlights.get(this.props.primaryKey);
     const color = spotlight ? spotlight.color : 'black';
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
     const fields = getResultFields(hit, resultsConfig);
@@ -518,7 +533,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
               zoomControl={false}
               secondLocation={resultLocation}
               keepAddressInSync={false}
-              geocoder='photon'
+              geocoder='google'
               secondaryMarkerColor={color}
               colorMarker={true}
             />
@@ -566,7 +581,11 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
   return value;
 }
 
-export default HitComponent;
+export default Util.createTypedContainer(
+  HitComponent,
+  ['spotlights'],
+  { spotlightActions: SpotlightActions },
+);
 
 // DnD stuff
 

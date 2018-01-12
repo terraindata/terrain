@@ -52,7 +52,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as Highlight from 'react-highlighter';
 
-import { backgroundColor, borderColor, cardStyle, Colors, fontColor, getStyle } from 'app/colors/Colors';
+import { backgroundColor, Colors, fontColor, getStyle } from 'app/colors/Colors';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { CardConfig } from 'src/blocks/types/Card';
@@ -168,9 +168,9 @@ export class CreateCardOption extends TerrainComponent<Props>
             <div className='create-card-option-description'> {this.props.description} </div>,
             {
               html:
-              <span className='create-card-option-description-tooltip'>
-                {card.static.description}
-              </span>,
+                <span className='create-card-option-description-tooltip'>
+                  {card.static.description}
+                </span>,
               size: 'small',
               position: 'bottom',
             },

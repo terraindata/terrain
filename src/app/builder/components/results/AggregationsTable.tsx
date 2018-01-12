@@ -71,8 +71,8 @@ export class AggregationsTableComponent extends TerrainComponent<Props>
   public state: {
     rows: any;
   } = {
-    rows: [],
-  };
+      rows: [],
+    };
 
   public componentDidMount()
   {

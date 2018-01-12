@@ -47,9 +47,9 @@ THE SOFTWARE.
 import * as fs from 'fs';
 import * as winston from 'winston';
 import { CmdLineUsage } from './CmdLineArgs';
+import DatabaseConfig from './database/DatabaseConfig';
 import { databases } from './database/DatabaseRouter';
-import { DatabaseConfig } from './database/Databases';
-import { UserConfig } from './users/Users';
+import UserConfig from './users/UserConfig';
 import * as Util from './Util';
 
 export interface Config
@@ -108,16 +108,12 @@ export async function handleConfig(config: Config): Promise<void>
 
   if (config.databases !== undefined)
   {
-    const results = await databases.select(['id'], {});
-    if (results.length === 0)
+    for (const database of config.databases)
     {
-      for (const database of config.databases)
-      {
-        const db = database as DatabaseConfig;
-        db.status = 'DISCONNECTED';
-        winston.info('Registering new database item: ', db);
-        await databases.upsert({} as UserConfig, db);
-      }
+      const db = database as DatabaseConfig;
+      db.status = 'DISCONNECTED';
+      winston.info('Registering new database item: ', db);
+      await databases.upsert({} as UserConfig, db);
     }
   }
 }

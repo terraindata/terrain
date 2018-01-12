@@ -68,7 +68,7 @@ const optionList = [
   },
   {
     alias: 'd',
-    defaultValue: 'sqlite',
+    defaultValue: 'postgres',
     name: 'db',
     type: String,
     typeLabel: 'type',
@@ -76,7 +76,7 @@ const optionList = [
   },
   {
     alias: 'n',
-    defaultValue: 'midway.db',
+    defaultValue: 't3rr41n-demo:r3curs1v3$@127.0.0.1:5432/midway',
     name: 'dsn',
     type: String,
     description: 'Backend-specific connection parameters. (e.g. file, dsn, host)',

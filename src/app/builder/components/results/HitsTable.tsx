@@ -51,13 +51,15 @@ import * as React from 'react';
 import * as ReactDataGrid from 'react-data-grid';
 import { Toolbar } from 'react-data-grid-addons';
 
+import Util from 'app/util/Util';
 import * as _ from 'lodash';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import InfoArea from '../../../common/components/InfoArea';
 import { Table, TableColumn } from '../../../common/components/Table';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import ColorManager from '../../../util/ColorManager';
-import { spotlightAction, SpotlightState, SpotlightStore } from '../../data/SpotlightStore';
+import { SpotlightActions } from '../../data/SpotlightRedux';
+import * as SpotlightTypes from '../../data/SpotlightTypes';
 import { getResultName } from './Hit';
 import { Hits } from './ResultTypes';
 
@@ -70,38 +72,29 @@ export interface Props
   allowSpotlights: boolean;
   onSpotlightAdded: (id, spotlightData) => void;
   onSpotlightRemoved: (id) => void;
+  // injected props
+  spotlights?: SpotlightTypes.SpotlightState;
+  spotlightActions?: typeof SpotlightActions;
 }
 
-export default class HitsTable extends TerrainComponent<Props>
+class HitsTable extends TerrainComponent<Props>
 {
   public state: {
     random: number;
-    spotlights: IMMap<string, any>;
     columns: List<TableColumn>;
     rows: List<any>;
     selectedIndexes: List<any>;
   } = {
-    random: 0,
-    spotlights: SpotlightStore.getState().spotlights,
-    columns: this.getColumns(this.props),
-    rows: List([]),
-    selectedIndexes: List([]),
-  };
-
-  public constructor(props: Props)
-  {
-    super(props);
-    this._subscribe(SpotlightStore, {
-      isMounted: true,
-      storeKeyPath: ['spotlights'],
-      stateKey: 'spotlights',
-    });
-  }
+      random: 0,
+      columns: this.getColumns(this.props),
+      rows: List([]),
+      selectedIndexes: List([]),
+    };
 
   public componentWillMount()
   {
     let selectedIndexes = List([]);
-    const spotlights = SpotlightStore.getState().spotlights;
+    const spotlights = this.props.spotlights.spotlights;
     const spotlightKeys = _.keys(spotlights.toJS());
     this.props.hits.forEach((r, index) =>
     {
@@ -121,7 +114,7 @@ export default class HitsTable extends TerrainComponent<Props>
   {
     if (nextProps.hits !== this.props.hits || nextProps.resultsConfig !== this.props.resultsConfig)
     {
-      const spotlights = SpotlightStore.getState().spotlights;
+      const spotlights = this.props.spotlights.spotlights;
       // using the spotlights set the correct indexes
       // force the table to update
       let selectedIndexes = List([]);
@@ -360,14 +353,21 @@ export default class HitsTable extends TerrainComponent<Props>
     spotlightData['color'] = spotlightColor;
     spotlightData['id'] = id;
     spotlightData['rank'] = row;
-    spotlightAction(id, spotlightData);
+    this.props.spotlightActions({
+      actionType: 'spotlightAction',
+      id,
+      hit: spotlightData,
+    });
     this.props.onSpotlightAdded(id, spotlightData);
   }
 
   public unspotlight(row: number)
   {
     const hit = this.state.rows && this.state.rows.get(row);
-    spotlightAction(hit.primaryKey, null);
+    this.props.spotlightActions({
+      actionType: 'clearSpotlightAction',
+      id: hit.primaryKey,
+    });
     this.props.onSpotlightRemoved(hit.primaryKey);
   }
 
@@ -375,7 +375,7 @@ export default class HitsTable extends TerrainComponent<Props>
   {
     const hit = this.state.rows && this.state.rows.get(props.idx);
     const id = hit.primaryKey;
-    const spotlight = this.state.spotlights.get(String(id));
+    const spotlight = this.props.spotlights.spotlights.get(String(id));
     if (spotlight === undefined)
     {
       return (<ReactDataGrid.Row {...props} />);
@@ -423,3 +423,9 @@ export default class HitsTable extends TerrainComponent<Props>
     );
   }
 }
+
+export default Util.createTypedContainer(
+  HitsTable,
+  ['spotlights'],
+  { spotlightActions: SpotlightActions },
+);

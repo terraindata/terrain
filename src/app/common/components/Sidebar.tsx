@@ -52,7 +52,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { Link } from 'react-router';
 import { backgroundColor, Colors, fontColor } from '../../colors/Colors';
-import ColorsActions from '../../colors/data/ColorsActions';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
@@ -71,6 +71,7 @@ export interface ILink
 export interface Props
 {
   links: ILink[];
+  colorsActions: typeof ColorsActions;
   selectedIndex: number;
   expandable?: boolean;
   expanded?: boolean;
@@ -82,10 +83,27 @@ export class Sidebar extends TerrainComponent<Props>
 {
   public componentWillMount()
   {
-    ColorsActions.setStyle('.sidebar-expand-icon', { fill: Colors().text2 });
-    ColorsActions.setStyle('.sidebar-expand:hover .sidebar-expand-icon', { fill: Colors().text1 });
-    ColorsActions.setStyle('.sidebar-link svg', { fill: Colors().iconColor });
-    ColorsActions.setStyle('.sidebar-link .sidebar-link-inner-selected svg', { fill: Colors().activeText });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.sidebar-expand-icon',
+      style: { fill: Colors().text2 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.sidebar-expand:hover .sidebar-expand-icon',
+      style: { fill: Colors().text1 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.sidebar-link svg',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.sidebar-link .sidebar-link-inner-selected svg',
+      style: { fill: Colors().activeText },
+    });
+
   }
 
   public handleLinkDisabled(link)
@@ -188,4 +206,10 @@ export class Sidebar extends TerrainComponent<Props>
   }
 }
 
-export default Sidebar;
+export default Util.createContainer(
+  Sidebar,
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);

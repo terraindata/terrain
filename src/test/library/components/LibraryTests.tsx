@@ -47,12 +47,13 @@ import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { shallow } from 'enzyme';
 import * as Immutable from 'immutable';
 import Library from 'library/components/Library';
-import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
 import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import { ItemType } from '../../../items/types/Item';
+import { connect } from '../../helpers';
 
 describe('Library', () =>
 {
@@ -141,10 +142,10 @@ describe('Library', () =>
     {
       it('should have 3 columns', () =>
       {
-        expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
-        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
-        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
-        expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
+        expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(1);
+        expect(libraryComponent.find(connect('GroupsColumn'))).toHaveLength(1);
+        expect(libraryComponent.find(connect('AlgorithmsColumn'))).toHaveLength(1);
+        expect(libraryComponent.find(connect('LibraryInfoColumn'))).toHaveLength(0);
         expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(0);
       });
     });
@@ -159,10 +160,10 @@ describe('Library', () =>
           library: nextLibrary,
         });
 
-        expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
-        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
-        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
-        expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
+        expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(1);
+        expect(libraryComponent.find(connect('GroupsColumn'))).toHaveLength(1);
+        expect(libraryComponent.find(connect('AlgorithmsColumn'))).toHaveLength(1);
+        expect(libraryComponent.find(connect('LibraryInfoColumn'))).toHaveLength(0);
         expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
         expect(libraryComponent.find('AnalyticsSelector')).toHaveLength(1);
       });
@@ -180,10 +181,10 @@ describe('Library', () =>
           analytics: nextAnalytics,
         });
 
-        expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
-        expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
-        expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
-        expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(0);
+        expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(1);
+        expect(libraryComponent.find(connect('GroupsColumn'))).toHaveLength(1);
+        expect(libraryComponent.find(connect('AlgorithmsColumn'))).toHaveLength(1);
+        expect(libraryComponent.find(connect('LibraryInfoColumn'))).toHaveLength(0);
         expect(libraryComponent.find('MultipleAreaChart')).toHaveLength(1);
         expect(libraryComponent.find('AnalyticsSelector')).toHaveLength(1);
       });
@@ -208,10 +209,10 @@ describe('Library', () =>
 
     it('should have 4 columns', () =>
     {
-      expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
-      expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
-      expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
-      expect(libraryComponent.find('LibraryInfoColumn')).toHaveLength(1);
+      expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(1);
+      expect(libraryComponent.find(connect('GroupsColumn'))).toHaveLength(1);
+      expect(libraryComponent.find(connect('AlgorithmsColumn'))).toHaveLength(1);
+      expect(libraryComponent.find(connect('LibraryInfoColumn'))).toHaveLength(1);
     });
   });
 
@@ -237,9 +238,9 @@ describe('Library', () =>
       {
         it('should only display the categories column by default', () =>
         {
-          expect(libraryComponent.find('CategoriesColumn')).toHaveLength(1);
-          expect(libraryComponent.find('GroupsColumn')).toHaveLength(0);
-          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(0);
+          expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(1);
+          expect(libraryComponent.find(connect('GroupsColumn'))).toHaveLength(0);
+          expect(libraryComponent.find(connect('AlgorithmsColumn'))).toHaveLength(0);
         });
       });
 
@@ -257,9 +258,9 @@ describe('Library', () =>
               router={{ params: { categoryId } }}
             />,
           );
-          expect(libraryComponent.find('CategoriesColumn')).toHaveLength(0);
-          expect(libraryComponent.find('GroupsColumn')).toHaveLength(1);
-          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(0);
+          expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(0);
+          expect(libraryComponent.find(connect('GroupsColumn'))).toHaveLength(1);
+          expect(libraryComponent.find(connect('AlgorithmsColumn'))).toHaveLength(0);
         });
       });
 
@@ -277,9 +278,9 @@ describe('Library', () =>
               router={{ params: { categoryId, groupId } }}
             />,
           );
-          expect(libraryComponent.find('CategoriesColumn')).toHaveLength(0);
-          expect(libraryComponent.find('GroupsColumn')).toHaveLength(0);
-          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+          expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(0);
+          expect(libraryComponent.find(connect('GroupsColumn'))).toHaveLength(0);
+          expect(libraryComponent.find(connect('AlgorithmsColumn'))).toHaveLength(1);
         });
       });
 
@@ -297,9 +298,9 @@ describe('Library', () =>
               router={{ params: { categoryId, groupId, algorithmId: algorithmId.toString() } }}
             />,
           );
-          expect(libraryComponent.find('CategoriesColumn')).toHaveLength(0);
-          expect(libraryComponent.find('GroupsColumn')).toHaveLength(0);
-          expect(libraryComponent.find('AlgorithmsColumn')).toHaveLength(1);
+          expect(libraryComponent.find(connect('CategoriesColumn'))).toHaveLength(0);
+          expect(libraryComponent.find(connect('GroupsColumn'))).toHaveLength(0);
+          expect(libraryComponent.find(connect('AlgorithmsColumn'))).toHaveLength(1);
         });
       });
     });

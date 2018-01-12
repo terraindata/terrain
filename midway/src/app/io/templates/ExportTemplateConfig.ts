@@ -44,34 +44,22 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-var-requires variable-name strict-boolean-expressions no-unused-expression
+import ConfigType from '../../ConfigType';
+import { TemplateBase } from './TemplateBase';
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import * as Redux from 'redux';
-import * as ReduxActions from 'redux-actions';
-import thunk from 'redux-thunk';
-import Util from './../../util/Util';
-import ColorsReducers from './ColorsReducers';
-
-class ColorsStateC
+export class ExportTemplateConfig extends TemplateBase
 {
-  public styles: IMMap<string, React.CSSProperties> = Immutable.Map();
+  public objectKey?: string = undefined;
+  public query?: string = undefined;
+  public rank?: boolean = undefined;
+  public templateId?: number = undefined;
+  public algorithmId?: number = undefined;
+
+  constructor(props: object)
+  {
+    super(props);
+    ConfigType.initialize(this, props);
+  }
 }
 
-const ColorsState_Record = Immutable.Record(new ColorsStateC());
-export interface ColorsState extends ColorsStateC, IRecord<ColorsState> { }
-export const _ColorsState = (config?: any) =>
-{
-  return new ColorsState_Record(Util.extendId(config || {})) as any as ColorsState;
-};
-
-const DefaultState = _ColorsState();
-
-export const ColorsStore = Redux.createStore(
-  ColorsReducers,
-  DefaultState,
-  Redux.applyMiddleware(thunk),
-);
-
-export default ColorsStore;
+export default ExportTemplateConfig;

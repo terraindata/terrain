@@ -43,16 +43,21 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import ActionTypes from './ColorsActionTypes';
-import Store from './ColorsStore';
 
-const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
+import ConfigType from '../ConfigType';
 
-const ColorsActions =
+export class MetricConfig extends ConfigType
+{
+  public id?: number = undefined;
+  public database: number = -1;
+  public label: string = '';
+  public events: string = '';
+
+  constructor(props: object)
   {
-    setStyle:
-    (selector: string, style: React.CSSProperties) =>
-      $(ActionTypes.setStyle, { selector, style }),
-  };
+    super();
+    ConfigType.initialize(this, props);
+  }
+}
 
-export default ColorsActions;
+export default MetricConfig;

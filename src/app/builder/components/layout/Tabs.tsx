@@ -55,9 +55,10 @@ import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import LibraryActions from '../../../library/data/LibraryActions';
+import Util from '../../../util/Util';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
-import ColorsActions from './../../../colors/data/ColorsActions';
+import { ColorsActions } from './../../../colors/data/ColorsRedux';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryStore } from './../../../library/data/LibraryStore';
 
@@ -70,14 +71,14 @@ const Tab = createReactClass<any, any>({
   mixins: [PanelMixin],
 
   propTypes:
-  {
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    selected: PropTypes.bool.isRequired,
-    index: PropTypes.number.isRequired,
-    onClick: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
-  },
+    {
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      selected: PropTypes.bool.isRequired,
+      index: PropTypes.number.isRequired,
+      onClick: PropTypes.func.isRequired,
+      onClose: PropTypes.func.isRequired,
+    },
 
   getDefaultProps(): any
   {
@@ -176,10 +177,11 @@ interface TabsProps
 {
   config: string;
   actions: List<TabAction>;
+  colorsActions: typeof ColorsActions;
   onNoAlgorithm(algorithmId: string);
 }
 
-export class Tabs extends TerrainComponent<TabsProps> {
+class Tabs extends TerrainComponent<TabsProps> {
   public state = {
     algorithms: LibraryStore.getState().algorithms,
     tabs: null,
@@ -202,8 +204,16 @@ export class Tabs extends TerrainComponent<TabsProps> {
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action svg', { fill: Colors().text3 });
-    ColorsActions.setStyle('.tabs-container .tabs-actions .tabs-action', { 'border-color': Colors().text3 });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.tabs-container .tabs-actions .tabs-action svg',
+      style: { fill: Colors().text3 },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.tabs-container .tabs-actions .tabs-action',
+      style: { 'border-color': Colors().text3 },
+    });
   }
 
   public componentWillUnmount()
@@ -362,14 +372,14 @@ export class Tabs extends TerrainComponent<TabsProps> {
           {
             key: tab.id,
             content:
-            <Tab
-              name={tab.name}
-              selected={tab.selected}
-              id={tab.id}
-              index={index}
-              onClick={this.handleClick}
-              onClose={this.handleClose}
-            />
+              <Tab
+                name={tab.name}
+                selected={tab.selected}
+                id={tab.id}
+                index={index}
+                onClick={this.handleClick}
+                onClose={this.handleClose}
+              />
             ,
           }))
           : [],
@@ -400,4 +410,12 @@ export class Tabs extends TerrainComponent<TabsProps> {
   }
 }
 
-export default Tabs;
+const TabsContainer = Util.createContainer(
+  Tabs,
+  [],
+  { colorsActions: ColorsActions },
+);
+
+export { TabsContainer as Tabs };
+
+export default TabsContainer;

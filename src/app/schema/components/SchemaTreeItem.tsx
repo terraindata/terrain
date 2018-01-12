@@ -91,45 +91,45 @@ const typeToRendering: {
   },
 } = {
     server:
-    {
-      component: ServerTreeInfo,
-      childConfig: serverChildrenConfig,
-      canSelect: false,
-    },
+      {
+        component: ServerTreeInfo,
+        childConfig: serverChildrenConfig,
+        canSelect: false,
+      },
     database:
-    {
-      component: DatabaseTreeInfo,
-      childConfig: databaseChildrenConfig,
-      canSelect: false,
-    },
+      {
+        component: DatabaseTreeInfo,
+        childConfig: databaseChildrenConfig,
+        canSelect: false,
+      },
 
     table:
-    {
-      component: TableTreeInfo,
-      childConfig: tableChildrenConfig,
-      canSelect: true,
-    },
+      {
+        component: TableTreeInfo,
+        childConfig: tableChildrenConfig,
+        canSelect: true,
+      },
 
     column:
-    {
-      component: ColumnTreeInfo,
-      childConfig: columnChildrenConfig,
-      canSelect: true,
-    },
+      {
+        component: ColumnTreeInfo,
+        childConfig: columnChildrenConfig,
+        canSelect: true,
+      },
 
     fieldProperty:
-    {
-      component: FieldPropertyTreeInfo,
-      childConfig: fieldPropertyChildrenConfig,
-      canSelect: true,
-    },
+      {
+        component: FieldPropertyTreeInfo,
+        childConfig: fieldPropertyChildrenConfig,
+        canSelect: true,
+      },
 
     index:
-    {
-      component: IndexTreeInfo,
-      childConfig: indexChildrenConfig,
-      canSelect: true,
-    },
+      {
+        component: IndexTreeInfo,
+        childConfig: indexChildrenConfig,
+        canSelect: true,
+      },
   };
 
 @Radium

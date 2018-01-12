@@ -44,7 +44,6 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ESAnyClause from './clauses/ESAnyClause';
 import ESArrayClause from './clauses/ESArrayClause';
 import ESBaseClause from './clauses/ESBaseClause';
 import ESBooleanClause from './clauses/ESBooleanClause';
@@ -300,7 +299,10 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html',
         template: {
           'query:query': {
-            'bool:elasticFilter': null,
+            'bool:elasticFilter': {
+              'filter:query[]': [{ 'term:term_query': { '_index:string': '' } }, { 'term:term_query': { '_type:string': '' } }],
+              'must:query[]': [{ 'term:term_query': { ' :string': '' } }],
+            },
           },
           'sort:elasticScore': null,
           'from:from': 0,
@@ -1715,7 +1717,6 @@ const EQLSpec: ESClause[] =
         name: 'bool',
         desc: 'Filters in and out documents meeting the given logical conditions.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-filter-context.html',
-        // template: { must: null, must_not: null, should: null, minimum_should_match: null },
         suggestions: ['must', 'must_not', 'filter', 'should', 'minimum_should_match'],
       }),
     new ESVariantClause('must',

@@ -2,6 +2,7 @@
     "debug": true,
     "databases": [
         {
+            "id": 0,
             "name": "My ElasticSearch Instance",
             "type": "elastic",
             "dsn": "127.0.0.1:9200",
@@ -11,18 +12,21 @@
             "analyticsType": "events"
         },
         {
+            "id": 1,
             "name": "My MySQL Instance",
             "type": "mysql",
-            "dsn": "t3rr41n-demo:r3curs1v3$@127.0.0.1:3306",
-            "host": "127.0.0.1:3306"
+            "dsn": "t3rr41n-demo:r3curs1v3$@127.0.0.1:63306",
+            "host": "127.0.0.1:63306"
         },
         {
+            "id": 2,
             "name": "Zazzle ES 1",
             "type": "elastic",
             "dsn": "10.1.0.30:9200",
             "host": "10.1.0.30:9200"
         },
         {
+            "id": 3,
             "name": "Aurea ES 1",
             "type": "elastic",
             "dsn": "52.35.213.216:9200",

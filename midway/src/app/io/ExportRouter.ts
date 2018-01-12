@@ -48,11 +48,8 @@ import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 import * as _ from 'lodash';
 import * as stream from 'stream';
-import * as winston from 'winston';
 
-import { HA } from '../App';
 import { Permissions } from '../permissions/Permissions';
-import { UserConfig } from '../users/Users';
 import * as Util from '../Util';
 import { Export, ExportConfig } from './Export';
 import ExportTemplateRouter from './templates/ExportTemplateRouter';

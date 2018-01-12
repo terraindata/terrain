@@ -59,9 +59,11 @@ import DatabaseController from '../../database/DatabaseController';
 import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import { ItemConfig, Items } from '../items/Items';
-import { ExportTemplateConfig, ExportTemplates } from './templates/ExportTemplates';
-import { TemplateBase } from './templates/Templates';
+import ItemConfig from '../items/ItemConfig';
+import Items from '../items/Items';
+import ExportTemplateConfig from './templates/ExportTemplateConfig';
+import { ExportTemplates } from './templates/ExportTemplates';
+import { TemplateBase } from './templates/TemplateBase';
 
 const exportTemplates = new ExportTemplates();
 
@@ -341,7 +343,7 @@ export class Export
           returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
           for (const doc of returnDocs)
           {
-            if (exprt.rank === true)
+            if (Boolean(exprt.rank))
             {
               if (doc['TERRAINRANK'] !== undefined)
               {

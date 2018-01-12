@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty strict-boolean-expressions no-var-requires
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 
@@ -56,9 +56,9 @@ import Actions from '../../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 import { CardComponent, CardItem } from '../cards/CardComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import CreateCardTool from './CreateCardTool';
-const { List } = Immutable;
 import CardDragPreview from './CardDragPreview';
+import CreateCardTool from './CreateCardTool';
+
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 
 export interface Props
@@ -181,7 +181,7 @@ class CardsArea extends TerrainComponent<Props>
 
         >
           {
-            cards.map((card: Card, index: number) =>
+            cards.filter((card: Card) => card.hidden === false).map((card: Card, index: number) =>
               <div
                 key={card.id}
               >

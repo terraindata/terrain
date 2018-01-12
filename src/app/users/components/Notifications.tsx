@@ -47,6 +47,8 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands no-unused-expression
 
 import * as React from 'react';
+import { UserState } from 'users/UserTypes';
+import Util from 'util/Util';
 import * as UserTypes from '../UserTypes';
 import CheckBox from './../../common/components/CheckBox';
 import Modal from './../../common/components/Modal';
@@ -54,7 +56,6 @@ import RadioButtons from './../../common/components/RadioButtons';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
 import Actions from './../data/UserActions';
-import Store from './../data/UserStore';
 import AccountEntry from './AccountEntry';
 import './Notifications.less';
 import './Select.less';
@@ -67,6 +68,8 @@ export interface Props
   params?: any;
   history?: any;
   children?: any;
+  users?: UserState;
+  userActions?: typeof Actions;
 }
 
 class Notifications extends TerrainComponent<Props>
@@ -133,22 +136,16 @@ class Notifications extends TerrainComponent<Props>
     super(props);
 
     this.state = {
-      istate: Store.getState(),
       saving: false,
       savingReq: null,
       errorModalOpen: false,
       errorModalMessage: '',
     };
-
-    this.cancelSubscription =
-      Store.subscribe(() => this.setState({
-        istate: Store.getState(),
-      }));
   }
 
   public componentWillMount()
   {
-    Actions.fetch();
+    this.props.userActions.fetch();
   }
 
   public componentWillUnmount()
@@ -158,9 +155,10 @@ class Notifications extends TerrainComponent<Props>
 
   public changeUserField(field: string, value: string)
   {
-    let newUser = this.state.istate.currentUser;
+    const { users } = this.props;
+    let newUser = users.currentUser;
     newUser = newUser.set(field, value);
-    Actions.change(newUser as UserTypes.User);
+    this.props.userActions.change(newUser as UserTypes.User);
 
     this.setState({
       saving: true,
@@ -199,9 +197,10 @@ class Notifications extends TerrainComponent<Props>
 
   public async playSound()
   {
-    if (this.state.istate.currentUser)
+    const { users } = this.props;
+    if (users.currentUser !== null)
     {
-      const soundName = this.state.istate.currentUser.sound;
+      const soundName = users.currentUser.sound;
       if (soundName !== 'none')
       {
         const sound = new Audio();
@@ -217,10 +216,12 @@ class Notifications extends TerrainComponent<Props>
     let desktopNotification: any;
     let sound: any;
 
-    if (this.state.istate.currentUser)
+    const { users } = this.props;
+
+    if (users.currentUser !== null)
     {
-      desktopNotification = this.state.istate.currentUser.desktopNotificationType;
-      sound = this.state.istate.currentUser.sound;
+      desktopNotification = users.currentUser.desktopNotificationType;
+      sound = users.currentUser.sound;
     }
 
     return (
@@ -289,13 +290,14 @@ class Notifications extends TerrainComponent<Props>
 
   public renderEmailNotificationsContent()
   {
+    const { users } = this.props;
     let emailNotification: any;
     let emailTiming: any;
 
-    if (this.state.istate.currentUser)
+    if (users.currentUser !== null)
     {
-      emailNotification = this.state.istate.currentUser.emailNotificationType;
-      emailTiming = this.state.istate.currentUser.emailNotificationTiming;
+      emailNotification = users.currentUser.emailNotificationType;
+      emailTiming = users.currentUser.emailNotificationTiming;
     }
 
     return (
@@ -327,18 +329,19 @@ class Notifications extends TerrainComponent<Props>
 
   public toggleEmailNews()
   {
-    const emailNewsSetting = (this.state.istate.currentUser.emailNews) === 'on';
+    const emailNewsSetting = (this.props.users.currentUser.emailNews) === 'on';
     const newEmailNewsSetting = emailNewsSetting ? 'off' : 'on';
     this.changeUserField('emailNews', newEmailNewsSetting);
   }
 
   public renderEmailNewsContent()
   {
+    const { users } = this.props;
     let emailNewsOn: boolean;
 
-    if (this.state.istate.currentUser)
+    if (users.currentUser !== null)
     {
-      emailNewsOn = this.state.istate.currentUser.emailNews === 'on';
+      emailNewsOn = users.currentUser.emailNews === 'on';
     }
 
     return (
@@ -364,13 +367,14 @@ class Notifications extends TerrainComponent<Props>
 
   public renderEmail()
   {
-    if (this.state.istate.currentUser && this.state.istate.currentUser.email)
+    const { users } = this.props;
+    if (users.currentUser !== null && users.currentUser.email !== '')
     {
       return (
         <div>
           Your email is currently set to
         <span className='notification-email-blue'>
-            {this.state.istate.currentUser.email}
+            {users.currentUser.email}
           </span>
           .
         </div>
@@ -381,11 +385,12 @@ class Notifications extends TerrainComponent<Props>
 
   public renderDesktopDescription()
   {
+    const { users } = this.props;
     let desktopNotification: any;
 
-    if (this.state.istate.currentUser)
+    if (users.currentUser !== null)
     {
-      desktopNotification = this.state.istate.currentUser.desktopNotificationType;
+      desktopNotification = users.currentUser.desktopNotificationType;
     }
 
     return (
@@ -400,11 +405,12 @@ class Notifications extends TerrainComponent<Props>
 
   public renderEmailDescription()
   {
+    const { users } = this.props;
     let emailTiming: string;
 
-    if (this.state.istate.currentUser)
+    if (users.currentUser !== null)
     {
-      emailTiming = this.state.istate.currentUser.emailNotificationTiming;
+      emailTiming = users.currentUser.emailNotificationTiming;
     }
 
     return (
@@ -418,11 +424,12 @@ class Notifications extends TerrainComponent<Props>
 
   public renderEmailNewsDescription()
   {
+    const { users } = this.props;
     let emailNewsOn: boolean;
 
-    if (this.state.istate.currentUser)
+    if (users.currentUser !== null)
     {
-      emailNewsOn = (this.state.istate.currentUser.emailNews) === 'on';
+      emailNewsOn = (users.currentUser.emailNews) === 'on';
     }
 
     return (
@@ -467,4 +474,8 @@ class Notifications extends TerrainComponent<Props>
   }
 }
 
-export default Notifications;
+export default Util.createTypedContainer(
+  Notifications,
+  ['users'],
+  { userActions: Actions },
+);

@@ -44,10 +44,10 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'app/store/TerrainRedux';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import { _SchemaState, Column, Database, FieldProperty, Index, SchemaState, Server, Table } from 'schema/SchemaTypes';
-import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
 const { List, Map } = Immutable;
 
 import BackendInstance from 'database/types/BackendInstance';
@@ -103,73 +103,75 @@ export interface SchemaActionTypes
 
 class SchemaRedux extends TerrainRedux<SchemaActionTypes, SchemaState>
 {
+  public namespace: string = 'schema';
+
   public reducers: ConstrainedMap<SchemaActionTypes, SchemaState> =
-  {
-    fetch: (state, action) =>
     {
-      return state
-        .set('loading', true);
-    },
-
-    setServer: (state, action) =>
-    {
-      const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
-      if (state.servers.size === state.serverCount - 1)
+      fetch: (state, action) =>
       {
-        state = state.set('loading', false).set('loaded', true);
-      }
+        return state
+          .set('loading', true);
+      },
 
-      return state
-        .setIn(['servers', server.id], server)
-        .set('databases', state.databases.merge(databases))
-        .set('tables', state.tables.merge(tables))
-        .set('columns', state.columns.merge(columns))
-        .set('indexes', state.indexes.merge(indexes))
-        .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
-    },
-
-    addDbToServer: (state, action) =>
-    {
-      const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
-
-      let newServer = server;
-      if (state.servers.get(server.id) !== undefined)
+      setServer: (state, action) =>
       {
-        newServer = state.servers.get(server.id).set('databaseIds',
-          state.servers.get(server.id).databaseIds.concat(server.databaseIds),
-        );
-      }
+        const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
+        if (state.servers.size === state.serverCount - 1)
+        {
+          state = state.set('loading', false).set('loaded', true);
+        }
 
-      return state
-        .setIn(['servers', server.id], newServer)
-        .set('databases', state.databases.merge(databases))
-        .set('tables', state.tables.merge(tables))
-        .set('columns', state.columns.merge(columns))
-        .set('indexes', state.indexes.merge(indexes))
-        .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
-    },
+        return state
+          .setIn(['servers', server.id], server)
+          .set('databases', state.databases.merge(databases))
+          .set('tables', state.tables.merge(tables))
+          .set('columns', state.columns.merge(columns))
+          .set('indexes', state.indexes.merge(indexes))
+          .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
+      },
 
-    error: (state, action) =>
-    {
-      return state; // this does not do anything
-    },
+      addDbToServer: (state, action) =>
+      {
+        const { server, databases, tables, columns, indexes, fieldProperties, tableNames, columnNames } = action.payload;
 
-    serverCount: (state, action) =>
-    {
-      return state.set('serverCount', action.payload.serverCount);
-    },
+        let newServer = server;
+        if (state.servers.get(server.id) !== undefined)
+        {
+          newServer = state.servers.get(server.id).set('databaseIds',
+            state.servers.get(server.id).databaseIds.concat(server.databaseIds),
+          );
+        }
 
-    highlightId: (state, action) =>
-    {
-      return state.set('highlightedId', action.payload.id)
-        .set('highlightedInSearchResults', action.payload.inSearchResults);
-    },
+        return state
+          .setIn(['servers', server.id], newServer)
+          .set('databases', state.databases.merge(databases))
+          .set('tables', state.tables.merge(tables))
+          .set('columns', state.columns.merge(columns))
+          .set('indexes', state.indexes.merge(indexes))
+          .set('fieldProperties', state.fieldProperties.merge(fieldProperties));
+      },
 
-    selectId: (state, action) =>
-    {
-      return state.set('selectedId', action.payload.id);
-    },
-  };
+      error: (state, action) =>
+      {
+        return state; // this does not do anything
+      },
+
+      serverCount: (state, action) =>
+      {
+        return state.set('serverCount', action.payload.serverCount);
+      },
+
+      highlightId: (state, action) =>
+      {
+        return state.set('highlightedId', action.payload.id)
+          .set('highlightedInSearchResults', action.payload.inSearchResults);
+      },
+
+      selectId: (state, action) =>
+      {
+        return state.set('selectedId', action.payload.id);
+      },
+    };
 
   public fetchAction(dispatch)
   {

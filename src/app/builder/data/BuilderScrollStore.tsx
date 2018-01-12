@@ -81,24 +81,24 @@ interface BuilderScrollAction
 export const BuilderScrollStore: IStore<BuilderScrollState> = Redux.createStore(
   ReduxActions.handleActions({
     scroll:
-    (state: BuilderScrollState, action: BuilderScrollAction) =>
-    {
-      const { columnTop, columnHeight, columnScroll, totalHeight } = action.payload;
-
-      if (
-        columnTop !== state.columnTop || columnHeight !== state.columnHeight
-        || columnScroll !== state.columnScroll || totalHeight !== state.totalHeight
-      )
+      (state: BuilderScrollState, action: BuilderScrollAction) =>
       {
-        return state
-          .set('columnTop', columnTop)
-          .set('columnHeight', columnHeight)
-          .set('columnScroll', columnScroll)
-          .set('totalHeight', totalHeight);
-      }
+        const { columnTop, columnHeight, columnScroll, totalHeight } = action.payload;
 
-      return state;
-    },
+        if (
+          columnTop !== state.columnTop || columnHeight !== state.columnHeight
+          || columnScroll !== state.columnScroll || totalHeight !== state.totalHeight
+        )
+        {
+          return state
+            .set('columnTop', columnTop)
+            .set('columnHeight', columnHeight)
+            .set('columnScroll', columnScroll)
+            .set('totalHeight', totalHeight);
+        }
+
+        return state;
+      },
   }, DefaultState),
   DefaultState);
 
@@ -107,12 +107,12 @@ export function scrollAction(columnTop: number, columnHeight: number, columnScro
   BuilderScrollStore.dispatch({
     type: 'scroll',
     payload:
-    {
-      columnTop,
-      columnHeight,
-      columnScroll,
-      totalHeight,
-    },
+      {
+        columnTop,
+        columnHeight,
+        columnScroll,
+        totalHeight,
+      },
   });
 }
 

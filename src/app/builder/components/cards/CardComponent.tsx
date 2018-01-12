@@ -74,9 +74,11 @@ const CDA = CardDropArea as any;
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
-import ColorsActions from '../../../colors/data/ColorsActions';
+import { ColorsActions } from '../../../colors/data/ColorsRedux';
 import BuilderComponent from '../BuilderComponent';
 import CreateCardTool from './CreateCardTool';
+
+const { List } = Immutable;
 
 const ArrowIcon = require('images/icon_arrow_8x5.svg?name=ArrowIcon');
 const HandleIcon = require('images/icon_more_12x3.svg?name=MoreIcon');
@@ -116,6 +118,8 @@ export interface Props
   allowTuningDragAndDrop?: boolean;
   tuningMode?: boolean;
   handleCardReorder?: (card, index) => void;
+
+  colorsActions: typeof ColorsActions;
 }
 
 @Radium
@@ -126,7 +130,6 @@ class _CardComponent extends TerrainComponent<Props>
     hovering: boolean;
     closing: boolean;
     opening: boolean;
-    menuOptions: List<MenuOption>;
 
     scrollState: BuilderScrollState;
     keyPath: KeyPath;
@@ -180,23 +183,6 @@ class _CardComponent extends TerrainComponent<Props>
       dY: 0,
       index: 0,
       cardTransition: true,
-
-      menuOptions:
-      Immutable.List([
-        // {
-        //   text: 'Copy',
-        //   onClick: this.handleCopy,
-        // },
-        {
-          text: 'Duplicate',
-          onClick: this.handleDuplicate,
-        },
-        {
-          text: 'Delete',
-          onClick: this.handleDelete,
-        },
-      ]),
-
       scrollState: BuilderScrollStore.getState(),
       keyPath: props.keyPath,
     };
@@ -204,11 +190,32 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.card-drag-handle svg', { fill: Colors().iconColor });
-    ColorsActions.setStyle('.card-title .menu-icon-wrapper svg', { fill: Colors().iconColor });
-    ColorsActions.setStyle('.card-minimize-icon .st0', { fill: Colors().iconColor });
-    ColorsActions.setStyle('.card-help-icon', { fill: Colors().iconColor });
-    ColorsActions.setStyle('.card-tuning-icon', { stroke: Colors().iconColor });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-drag-handle svg',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-title .menu-icon-wrapper svg',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-minimize-icon .st0',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-help-icon',
+      style: { fill: Colors().iconColor },
+    });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.card-tuning-icon',
+      style: { stroke: Colors().iconColor },
+    });
+
     // TODO
     // this._subscribe(Store, {
     //   stateKey: 'selected',
@@ -304,6 +311,31 @@ class _CardComponent extends TerrainComponent<Props>
       });
 
     this.props.connectDragPreview(this.dragPreview);
+  }
+
+  public getMenuOptions(): List<MenuOption>
+  {
+    const options: List<MenuOption> =
+      List([
+        // {
+        //   text: 'Copy',
+        //   onClick: this.handleCopy,
+        // },
+        {
+          text: 'Duplicate',
+          onClick: this.handleDuplicate,
+        },
+        {
+          text: this.props.card.disabled ? 'Enable' : 'Disable',
+          onClick: this.handleDisable,
+        },
+        {
+          text: 'Delete',
+          onClick: this.handleDelete,
+        },
+      ]);
+
+    return options;
   }
 
   public toggleClose(event)
@@ -430,7 +462,15 @@ class _CardComponent extends TerrainComponent<Props>
     );
 
     Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);
+  }
 
+  public handleDisable()
+  {
+    const keyPath = this.getKeyPath();
+    Actions.change(
+      keyPath.push('disabled'),
+      !this.props.card.disabled,
+    );
   }
 
   public handleMouseMove(event)
@@ -745,6 +785,15 @@ class _CardComponent extends TerrainComponent<Props>
         zIndex: 999999,
       });
     }
+
+    if (this.props.card.disabled)
+    {
+      style = _.extend(style === null ? {} : style, {
+        opacity: 0.25,
+        zIndex: 999999,
+      });
+    }
+
     const content = <BuilderComponent
       canEdit={this.props.canEdit}
       data={this.props.card}
@@ -857,7 +906,7 @@ class _CardComponent extends TerrainComponent<Props>
                 !this.props.tuningMode &&
                 !card['cannotBeMoved'] &&
                 <Menu
-                  options={this.state.menuOptions}
+                  options={this.getMenuOptions()}
                   openRight={true}
                 />
               }
@@ -938,10 +987,7 @@ class _CardComponent extends TerrainComponent<Props>
             >
               <div
                 className='card-body'
-                style={{
-                  // shrink the width if the card does not have a title
-                  marginLeft: card['noTitle'] ? NO_TITLE_WIDTH : undefined,
-                }}
+
               >
                 {
                   content
@@ -1017,6 +1063,12 @@ const dragCollect = (connect, monitor) =>
     connectDragPreview: connect.dragPreview(),
   });
 
-export const CardComponent = DragSource('CARD', cardSource, dragCollect)(_CardComponent);
+const CardContainer = Util.createContainer(
+  _CardComponent,
+  [],
+  { colorsActions: ColorsActions },
+);
+
+export const CardComponent = DragSource('CARD', cardSource, dragCollect)(CardContainer);
 
 export default CardComponent;

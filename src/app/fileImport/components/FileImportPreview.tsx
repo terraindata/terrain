@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty strict-boolean-expressions no-console no-var-requires
 
 import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as moment from 'moment';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -76,8 +76,6 @@ import FileImportPreviewColumn from './FileImportPreviewColumn';
 import TransformModal from './TransformModal';
 
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
-
-const { List } = Immutable;
 
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 
@@ -154,37 +152,37 @@ class FileImportPreview extends TerrainComponent<Props>
     exportColumnNames: List<string>,
     exportColumnTypes: List<object>,
   } = {
-    templateOptions: List([]),
-    appliedTemplateName: '',
-    saveTemplateName: '',
-    showingDelimTextBox: false,
-    showingUpdateTemplate: false,
-    showingApplyTemplate: false,
-    showingSaveTemplate: false,
+      templateOptions: List([]),
+      appliedTemplateName: '',
+      saveTemplateName: '',
+      showingDelimTextBox: false,
+      showingUpdateTemplate: false,
+      showingApplyTemplate: false,
+      showingSaveTemplate: false,
 
-    showingTransformModal: false,
-    transformColumnId: -1,
+      showingTransformModal: false,
+      transformColumnId: -1,
 
-    showingAdvanced: false,
-    showingAddColumn: false,
-    addColumnName: '',
-    advancedCheck: this.props.requireJSONHaveAllFields,
-    typeObjectKey: this.props.objectKey,
-    advancedExportRank: this.props.exportRank,
-    exportFiletype: 'csv',
+      showingAdvanced: false,
+      showingAddColumn: false,
+      addColumnName: '',
+      advancedCheck: this.props.requireJSONHaveAllFields,
+      typeObjectKey: this.props.objectKey,
+      advancedExportRank: this.props.exportRank,
+      exportFiletype: 'csv',
 
-    leaving: false,
-    nextLocation: null,
-    changeLocationAfterSave: false,
-    showResponseModal: false,
-    responseModalContent: '',
-    responseModalTitle: '',
-    responseModalError: false,
-    previewErrorMsg: '',
-    analyzers: List([]),
-    exportColumnNames: List([]),
-    exportColumnTypes: List([]),
-  };
+      leaving: false,
+      nextLocation: null,
+      changeLocationAfterSave: false,
+      showResponseModal: false,
+      responseModalContent: '',
+      responseModalTitle: '',
+      responseModalError: false,
+      previewErrorMsg: '',
+      analyzers: List([]),
+      exportColumnNames: List([]),
+      exportColumnTypes: List([]),
+    };
 
   public confirmedLeave: boolean = false;
 
@@ -776,7 +774,7 @@ class FileImportPreview extends TerrainComponent<Props>
 
   public renderAdvancedModal()
   {
-    const dropdownTooltips = Immutable.List(
+    const dropdownTooltips = List(
       [
         'Creates a json file where the data is an array of all results',
         'Creates a json file where the data is an object with a single key with an array of all results as it\'s key',

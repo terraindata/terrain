@@ -45,23 +45,16 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 import * as srs from 'secure-random-string';
-import * as winston from 'winston';
 
 import * as Tasty from '../../../tasty/Tasty';
 import * as App from '../../App';
-import { UserConfig } from '../../users/UserRouter';
+import UserConfig from '../../users/UserConfig';
 import * as Util from '../../Util';
-import { TemplateBase, TemplateBaseStringified } from './Templates';
-
-export interface ImportTemplateConfig extends TemplateBase
-{
-  name: string;
-}
-
-export interface ImportTemplateBaseStringified extends TemplateBaseStringified
-{
-  name: string;
-}
+import ExportTemplateConfig from './ExportTemplateConfig';
+import ImportTemplateBaseStringified from './ImportTemplateBaseStringified';
+import ImportTemplateConfig from './ImportTemplateConfig';
+import { TemplateBase } from './TemplateBase';
+import { TemplateBaseStringified } from './TemplateBaseStringified';
 
 export class ImportTemplates
 {
@@ -70,7 +63,6 @@ export class ImportTemplates
 
   constructor()
   {
-
     this.importTemplateTable = new Tasty.Table(
       'importTemplates',
       ['id'],
@@ -121,9 +113,9 @@ export class ImportTemplates
   {
     return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
     {
-      const templates: ImportTemplateBaseStringified[] =
-        await App.DB.select(this.importTemplateTable, columns, filter) as ImportTemplateBaseStringified[];
-      resolve(this._parseConfig(templates) as ImportTemplateConfig[]);
+      const rawResults = await App.DB.select(this.importTemplateTable, columns, filter);
+      const results: ImportTemplateConfig[] = rawResults.map((result: object) => new ImportTemplateConfig(result));
+      resolve(this._parseConfig(results.map((result) => new ImportTemplateBaseStringified(result))) as ImportTemplateConfig[]);
     });
   }
 
@@ -139,7 +131,7 @@ export class ImportTemplates
         {
           return reject('Invalid template id passed');
         }
-        if (user.isSuperUser !== 1)
+        if (!user.isSuperUser)
         {
           return reject('Insufficient Permissions');
         }
@@ -166,6 +158,11 @@ export class ImportTemplates
         }
 
         template = Util.updateObject(results[0], template);
+      }
+      else
+      {
+        const results: ImportTemplateConfig[] = await this.select(['id'], []);
+        template.id = results.length + 1;
       }
       if (template['persistentAccessToken'] === undefined || template['persistentAccessToken'] === '')
       {

@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions
 
-import * as Immutable from 'immutable';
+import { List } from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
@@ -59,7 +59,6 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import Actions from './../data/FileImportActions';
 import * as FileImportTypes from './../FileImportTypes';
 import './TransformModal.less';
-const { List } = Immutable;
 
 type Transform = FileImportTypes.Transform;
 const ELASTIC_TYPES = FileImportTypes.ELASTIC_TYPES;
@@ -88,14 +87,14 @@ class TransformModal extends TerrainComponent<Props>
     mergeNewName: string;
     duplicateNewName: string;
   } = {
-    transformTypeIndex: -1,
-    mergeIndex: -1,
-    transformText: '',
-    splitNames: List(['', '']),
-    mergeName: '',
-    mergeNewName: '',
-    duplicateNewName: '',
-  };
+      transformTypeIndex: -1,
+      mergeIndex: -1,
+      transformText: '',
+      splitNames: List(['', '']),
+      mergeName: '',
+      mergeNewName: '',
+      duplicateNewName: '',
+    };
 
   public handleClose()
   {

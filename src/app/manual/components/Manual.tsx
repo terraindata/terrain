@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions no-unused-expression
 
 import * as classNames from 'classnames';
+import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
@@ -54,9 +55,6 @@ import Autocomplete from './../../common/components/Autocomplete';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Manual.less';
 import ManualEntry from './ManualEntry';
-
-import * as Immutable from 'immutable';
-const { List } = Immutable;
 
 const CloseIcon = require('./../../../images/icon_close.svg');
 const SearchIcon = require('./../../../images/icon_search.svg');
@@ -80,7 +78,7 @@ class Manual extends TerrainComponent<Props>
   public allTqlCards = Object.keys(cardList).sort();
 
   public allPhraseTypes = Object.keys(ManualConfig.phraseTypes).sort();
-  public autocompleteOptions = Immutable.List(this.allPhraseTypes.concat(this.allTqlCards).sort());
+  public autocompleteOptions = List(this.allPhraseTypes.concat(this.allTqlCards).sort());
 
   constructor(props: Props)
   {

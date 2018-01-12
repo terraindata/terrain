@@ -6,12 +6,20 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 deploy_version=1.0a
 elastic_image="terrain/moviesdb-elk:$deploy_version"
 mysql_image="terrain/moviesdb-mysql:$deploy_version"
+postgres_image="terrain/moviesdb-postgres:$deploy_version"
 sqlite_image="terrain/moviesdb-sqlite:$deploy_version"
 
-mysql_port=3306
+orig_mysql_port=3306
+orig_postgres_port=5432
+orig_elastic_port=9200
+
+mysql_port=63306
+postgres_port=65432
 elastic_port=9200
+
 sqlite_path=${DIR}/../../../
 use_mysql=1
+use_postgres=1
 use_elastic=1
 use_sqlite=1
 
@@ -36,6 +44,16 @@ do
 		  --use-mysql=*)
 				use_mysql="${1#*=}"
 				;;
+		  --postgres-port)
+				postgres_port=$2
+				shift
+				;;
+		  --postgres-port=*)
+				postgres_port="${1#*=}"
+				;;
+		  --use-postgres=*)
+				use_postgres="${1#*=}"
+				;;
 		  --elastic-port)
 				elastic_port=$2
 				shift
@@ -57,7 +75,7 @@ do
 				use_sqlite="${1#*=}"
 				;;
 		  --version)
-				echo "Elastic: $elastic_image MySQL: $mysql_image SQLite: $sqlite_image"
+				echo "Elastic: $elastic_image MySQL: $mysql_image Postgres: $postgres_image SQLite: $sqlite_image"
 				exit 0
 				;;
 		  --*)
@@ -73,11 +91,11 @@ do
 done
 
 # stop any existing instances
-${DIR}/teardown_env.sh --use-mysql=${use_mysql} --use-elastic=${use_elastic} --use-sqlite=${use_sqlite}
+${DIR}/teardown_env.sh --use-mysql=${use_mysql} --use-postgres=${use_postgres} --use-elastic=${use_elastic} --use-sqlite=${use_sqlite}
 
 if [ "$use_mysql" == 1 ];
 then
-    if [ "$mysql_port" == 3306 ];
+    if [ "$mysql_port" == "$orig_mysql_port" ];
     then
         echo "Starting mysql on port $mysql_port..."
     else
@@ -85,9 +103,19 @@ then
     fi
 fi
 
+if [ "$use_postgres" == 1 ];
+then
+    if [ "$postgres_port" == "$orig_postgres_port" ];
+    then
+        echo "Starting Postgres on port $postgres_port..."
+    else
+        echo "Starting Postgres on NON-STANDARD port $postgres_port..."
+    fi
+fi
+
 if [ "$use_elastic" == 1 ];
 then
-    if [ "$elastic_port" == 9200 ];
+    if [ "$elastic_port" == "$orig_elastic_port" ];
     then
     	 echo "Starting elastic on port $elastic_port..."
     else
@@ -102,6 +130,9 @@ fi
 if [ "$use_mysql" == 1 ]; then
     docker pull $mysql_image &
 fi
+if [ "$use_postgres" == 1 ]; then
+    docker pull $postgres_image &
+fi
 if [ "$use_elastic" == 1 ]; then
     docker pull $elastic_image &
 fi
@@ -111,17 +142,22 @@ if [ "$use_sqlite" == 1 ]; then
     docker run -v${sqlite_path}:/data/ -u$(id -u):$(id -g) $sqlite_image
 fi
 if [ "$use_mysql" == 1 ]; then
-    MYSQL_ID=$(docker run -d --name moviesdb-mysql -p $mysql_port:$mysql_port $mysql_image)
+    MYSQL_ID=$(docker run -d --name moviesdb-mysql -p $mysql_port:$orig_mysql_port $mysql_image)
 else
     MYSQL_ID=1
 fi
+if [ "$use_postgres" == 1 ]; then
+    POSTGRES_ID=$(docker run -d --name moviesdb-postgres -p $postgres_port:$orig_postgres_port $postgres_image)
+else
+    POSTGRES_ID=1
+fi
 if [ "$use_elastic" == 1 ]; then
-    ELASTIC_ID=$(docker run -d --name moviesdb-elk -p $elastic_port:$elastic_port $elastic_image)
+    ELASTIC_ID=$(docker run -d --name moviesdb-elk -p $elastic_port:$orig_elastic_port $elastic_image)
 else
     ELASTIC_ID=1
 fi
 
-if [ -z "$ELASTIC_ID" -o -z "$MYSQL_ID" ]; then
+if [ -z "$ELASTIC_ID" -o -z "$MYSQL_ID" -o -z "$POSTGRES_ID" ]; then
 	echo "Docker services failed to start..."
 	exit 1
 fi
@@ -130,6 +166,9 @@ echo "Waiting on services to be ready..."
 
 if [ "$use_mysql" == 1 ]; then
     while [ "$(docker inspect -f {{.State.Health.Status}} moviesdb-mysql)" != "healthy" ]; do sleep 0.1; done;
+fi
+if [ "$use_postgres" == 1 ]; then
+    while [ "$(docker inspect -f {{.State.Health.Status}} moviesdb-postgres)" != "healthy" ]; do sleep 0.1; done;
 fi
 if [ "$use_elastic" == 1 ]; then
     while [ "$(docker inspect -f {{.State.Health.Status}} moviesdb-elk)" != "healthy" ]; do sleep 0.1; done;

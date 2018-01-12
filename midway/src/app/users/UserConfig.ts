@@ -43,28 +43,27 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
 
-import ActionTypes from './ColorsActionTypes';
-import { _ColorsState, ColorsState } from './ColorsStore';
+import ConfigType from '../ConfigType';
 
-const ColorsReducer = {};
-
-ColorsReducer[ActionTypes.setStyle] =
-  (state, action) =>
-  {
-    const { selector, style } = action.payload;
-    return state.set('styles', state.styles.set(selector, style));
-  };
-
-const ColorsReducerWrapper = (state: ColorsState = _ColorsState(), action) =>
+export class UserConfig extends ConfigType
 {
-  let nextState = state;
-  if (ColorsReducer[action.type])
-  {
-    nextState = ColorsReducer[action.type](state, action);
-  }
-  return nextState;
-};
+  public accessToken?: string = undefined;
+  public email: string = '';
+  public id?: number = undefined;
+  public isDisabled: boolean = true;
+  public isSuperUser: boolean = false;
+  public name: string = '';
+  public oldPassword?: string = undefined;
+  public password: string = '';
+  public timezone?: string = undefined;
+  public meta?: string = undefined;
 
-export default ColorsReducerWrapper;
+  constructor(props: object)
+  {
+    super();
+    ConfigType.initialize(this, props);
+  }
+}
+
+export default UserConfig;

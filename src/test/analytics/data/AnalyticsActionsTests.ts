@@ -47,7 +47,7 @@ import Actions from 'analytics/data/AnalyticsActions';
 import ActionTypes from 'analytics/data/AnalyticsActionTypes';
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
 import * as Immutable from 'immutable';
-import { _LibraryState, LibraryState } from 'library/data/LibraryStore';
+import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
 import { Ajax, createMockStore } from '../../helpers';

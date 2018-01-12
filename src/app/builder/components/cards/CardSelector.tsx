@@ -59,9 +59,9 @@ type Set<T> = Immutable.Set<T>;
 const Color = require('color');
 
 import TerrainComponent from 'common/components/TerrainComponent';
-import { Card, CardConfig, getCardCategory, getCardTitle } from 'src/blocks/types/Card';
+import { CardConfig, getCardCategory, getCardTitle } from 'src/blocks/types/Card';
 import { AllBackendsMap } from 'src/database/AllBackends';
-import { backgroundColor, borderColor, cardHoverBackground, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
+import { backgroundColor, borderColor, cardHoverBackground, Colors, fontColor, getStyle } from '../../../colors/Colors';
 
 import { CreateCardOption, searchForText } from './CreateCardOption';
 import './CreateCardTool.less';
@@ -138,15 +138,15 @@ class CardSelector extends TerrainComponent<Props>
     currentCategory: CardCategory;
     optionMap: IMMap<number, any>; // this is to allow proper scrolling when arrow keys are pressed
   } = {
-    searchValue: '',
-    focusedIndex: 0,
-    inputElement: undefined,
-    categoryListElement: undefined,
-    innerSelectorElement: undefined,
-    computedHeight: -1,
-    currentCategory: categories.get(0),
-    optionMap: Map(),
-  };
+      searchValue: '',
+      focusedIndex: 0,
+      inputElement: undefined,
+      categoryListElement: undefined,
+      innerSelectorElement: undefined,
+      computedHeight: -1,
+      currentCategory: categories.get(0),
+      optionMap: Map(),
+    };
 
   constructor(props)
   {

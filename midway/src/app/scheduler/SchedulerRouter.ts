@@ -47,11 +47,13 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
-import { CredentialConfig, Credentials } from '../credentials/Credentials';
+import Credentials from '../credentials/Credentials';
 import { Permissions } from '../permissions/Permissions';
-import { UserConfig, Users } from '../users/Users';
+import UserConfig from '../users/UserConfig';
+import Users from '../users/Users';
 import * as Util from '../Util';
-import { Scheduler, SchedulerConfig } from './Scheduler';
+import Scheduler from './Scheduler';
+import SchedulerConfig from './SchedulerConfig';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();

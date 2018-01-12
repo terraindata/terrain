@@ -51,12 +51,13 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Menu.less';
 const MoreIcon = require('./../../../images/icon_more_12x3.svg?name=MoreIcon');
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { borderColor, Colors, fontColor } from '../../colors/Colors';
-import ColorsActions from '../../colors/data/ColorsActions';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
 
 const optionHeight = 30; // coordinate with Menu.less
 
@@ -74,6 +75,7 @@ export interface MenuOption
 export interface Props
 {
   options: List<MenuOption>;
+  colorsActions: typeof ColorsActions;
   small?: boolean;
   style?: any;
   id?: ID;
@@ -82,13 +84,13 @@ export interface Props
 }
 
 @Radium
-export class Menu extends TerrainComponent<Props>
+class Menu extends TerrainComponent<Props>
 {
   public state: {
     open: boolean;
   } = {
-    open: false,
-  };
+      open: false,
+    };
 
   public renderOption(option, index)
   {
@@ -151,7 +153,11 @@ export class Menu extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    ColorsActions.setStyle('.menu-wrapper .menu-icon .st0 ', { fill: Colors().text3 });
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.menu-wrapper .menu-icon .st0',
+      style: { fill: Colors().text3 },
+    });
   }
 
   public componentWillUnmount()
@@ -244,4 +250,14 @@ export class Menu extends TerrainComponent<Props>
   }
 }
 
-export default Menu;
+const MenuContainer = Util.createContainer(
+  Menu,
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);
+
+export { MenuContainer as Menu };
+
+export default MenuContainer;

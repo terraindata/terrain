@@ -66,7 +66,6 @@ import { LibraryStore } from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesStore from '../../roles/data/RolesStore';
 import TerrainStore from '../../store/TerrainStore';
-import UserStore from '../../users/data/UserStore';
 import Util from './../../util/Util';
 import Actions from './../data/BuilderActions';
 import { BuilderState, BuilderStore } from './../data/BuilderStore';
@@ -74,6 +73,7 @@ type Algorithm = LibraryTypes.Algorithm;
 
 // Components
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { UserState } from 'users/UserTypes';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
@@ -98,6 +98,7 @@ export interface Props
   location?: any;
   router?: any;
   route?: any;
+  users?: UserState;
 }
 
 class Builder extends TerrainComponent<Props>
@@ -126,26 +127,26 @@ class Builder extends TerrainComponent<Props>
     savingAs?: boolean;
 
   } = {
-    exportState: FileImportStore.getState(),
-    builderState: BuilderStore.getState(),
-    algorithms: LibraryStore.getState().algorithms,
+      exportState: FileImportStore.getState(),
+      builderState: BuilderStore.getState(),
+      algorithms: LibraryStore.getState().algorithms,
 
-    colKeys: null,
-    noColumnAnimation: false,
-    columnType: null,
-    selectedCardName: '',
-    manualIndex: -1,
+      colKeys: null,
+      noColumnAnimation: false,
+      columnType: null,
+      selectedCardName: '',
+      manualIndex: -1,
 
-    leaving: false,
-    nextLocation: null,
-    tabActions: this.getTabActions(BuilderStore.getState()),
+      leaving: false,
+      nextLocation: null,
+      tabActions: this.getTabActions(BuilderStore.getState()),
 
-    nonexistentAlgorithmIds: List([]),
+      nonexistentAlgorithmIds: List([]),
 
-    navigationException: false,
+      navigationException: false,
 
-    saveAsTextboxValue: '',
-  };
+      saveAsTextboxValue: '',
+    };
 
   public initialColSizes: any;
 
@@ -527,6 +528,13 @@ class Builder extends TerrainComponent<Props>
 
   public shouldSave(overrideState?: BuilderState): boolean
   {
+    // empty builder, should never have to save
+    if (!this.props.params.config)
+    {
+      return false;
+    }
+
+    const { users } = this.props;
     const algorithm = this.getAlgorithm();
     if (algorithm)
     {
@@ -535,8 +543,8 @@ class Builder extends TerrainComponent<Props>
         return false;
       }
       if (
-        !Util.haveRole(algorithm.categoryId, 'builder', UserStore, RolesStore)
-        && !Util.haveRole(algorithm.categoryId, 'admin', UserStore, RolesStore)
+        !Util.haveRole(algorithm.categoryId, 'builder', users, RolesStore)
+        && !Util.haveRole(algorithm.categoryId, 'admin', users, RolesStore)
       )
       {
         // not auth
@@ -597,9 +605,9 @@ class Builder extends TerrainComponent<Props>
       onColSizeChange: this.handleColSizeChange,
       minColWidth: 316,
       columns:
-      _.range(0, this.state.colKeys.size).map((index) =>
-        this.getColumn(index),
-      ),
+        _.range(0, this.state.colKeys.size).map((index) =>
+          this.getColumn(index),
+        ),
     };
   }
 
@@ -610,9 +618,10 @@ class Builder extends TerrainComponent<Props>
 
   public canEdit(): boolean
   {
+    const { users } = this.props;
     const algorithm = this.getAlgorithm();
     return algorithm && (algorithm.status === ItemStatus.Build
-      && Util.canEdit(algorithm, UserStore, RolesStore));
+      && Util.canEdit(algorithm, users, RolesStore));
   }
 
   public cantEditReason(): string
@@ -961,4 +970,9 @@ class Builder extends TerrainComponent<Props>
     );
   }
 }
-export default withRouter(DragDropContext(HTML5Backend)(Builder));
+const BuilderContainer = Util.createTypedContainer(
+  Builder,
+  ['users'],
+  {},
+);
+export default withRouter(DragDropContext(HTML5Backend)(BuilderContainer));
