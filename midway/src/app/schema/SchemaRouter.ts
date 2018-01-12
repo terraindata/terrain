@@ -63,8 +63,8 @@ async function getSchema(databaseID: number): Promise<string>
   {
     throw new Error('Database "' + databaseID.toString() + '" not found.');
   }
-  const schema: Tasty.Schema = await database.getTasty().schema();
-  return schema.toString();
+  const tastySchema: Tasty.Schema = await database.getTasty().schema();
+  return tastySchema.toString();
 }
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
@@ -99,7 +99,7 @@ Router.post('/star', passport.authenticate('access-token-local'), async (ctx, ne
   winston.info(String(starred));
   winston.info(String(columnId));
   ctx.body = await schema.upsert(ctx.state.user,
-    {starred, count: 0, id: columnId});
+    { starred, count: 0, id: columnId });
 });
 
 Router.get('/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>

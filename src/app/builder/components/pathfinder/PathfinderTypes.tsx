@@ -88,7 +88,7 @@ import BuilderStore from 'app/builder/data/BuilderStore';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import ElasticBlockHelpers,
-{ AutocompleteMatchType, FieldTypeMapping, FieldType }
+{ AutocompleteMatchType, FieldType, FieldTypeMapping }
   from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
 

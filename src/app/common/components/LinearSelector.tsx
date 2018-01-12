@@ -72,7 +72,7 @@ export interface Props
 }
 
 class LinearSelector extends TerrainComponent<Props>
-{  
+{
 
   public state: {
     usingCustomValue: boolean,
@@ -82,13 +82,13 @@ class LinearSelector extends TerrainComponent<Props>
     selectorWidth: number,
     selectorHeight: number,
   } = {
-    usingCustomValue: false,
-    showCustomTextbox: false,
-    customInput: '',
-    selectorLeft: 0,
-    selectorHeight: 0,
-    selectorWidth: 0,
-  };
+      usingCustomValue: false,
+      showCustomTextbox: false,
+      customInput: '',
+      selectorLeft: 0,
+      selectorHeight: 0,
+      selectorWidth: 0,
+    };
 
   public componentWillMount()
   {
@@ -108,7 +108,7 @@ class LinearSelector extends TerrainComponent<Props>
   public componentWillReceiveProps(nextProps)
   {
     const usingCustomValue = nextProps.allowCustomInput
-        && nextProps.options.indexOf(nextProps.selected) === -1;
+      && nextProps.options.indexOf(nextProps.selected) === -1;
     this.setState({
       usingCustomValue,
       customInput: usingCustomValue ? nextProps.selected : this.state.customInput,
@@ -139,10 +139,8 @@ class LinearSelector extends TerrainComponent<Props>
   {
     const key = (this.state.usingCustomValue || usingCustomValue)
       ? 'custom' : String(overrideSelected || this.props.selected);
-    console.log('Set selected position ', key);
     if (this.state.showCustomTextbox || !(this.refs && this.refs[key] && this.refs['all-options']))
     {
-      console.log('Removing the marker');
       this.setState({
         selectorLeft: 0,
         selectorHeight: 0,
@@ -165,7 +163,7 @@ class LinearSelector extends TerrainComponent<Props>
       <div
         className={classNames({
           'linear-selector-option': true,
-          'linear-selector-option-selected': this.props.selected === option
+          'linear-selector-option-selected': this.props.selected === option,
         })}
         onClick={this._fn(this.selectOption, option)}
         key={i}
@@ -173,7 +171,7 @@ class LinearSelector extends TerrainComponent<Props>
       >
         {option}
       </div>
-    )
+    );
   }
 
   public handleCustomInput()
@@ -208,7 +206,7 @@ class LinearSelector extends TerrainComponent<Props>
   {
     this.setState({
       customInput: value,
-    })
+    });
   }
 
   public render()
@@ -217,16 +215,16 @@ class LinearSelector extends TerrainComponent<Props>
       <div className='linear-selector-wrapper'>
         {
           !this.state.showCustomTextbox ?
-          <div
-            className='linear-selector-selected-marker'
-            style={{
-              left: this.state.selectorLeft,
-              width: this.state.selectorWidth,
-              height: this.state.selectorHeight,
-              background: Colors().active,
-            }}
-          />
-          : null
+            <div
+              className='linear-selector-selected-marker'
+              style={{
+                left: this.state.selectorLeft,
+                width: this.state.selectorWidth,
+                height: this.state.selectorHeight,
+                background: Colors().active,
+              }}
+            />
+            : null
         }
         <div
           className='linear-selector-options'
@@ -248,21 +246,21 @@ class LinearSelector extends TerrainComponent<Props>
               className='linear-selector-custom'
               onClick={this.showCustomTextbox}
               ref={'custom'}
-            > 
+            >
               {
-                (this.state.usingCustomValue && this.state.showCustomTextbox) ? 
-                <BuilderTextbox
-                  value={this.props.selected}
-                  keyPath={this.props.keyPath}
-                  canEdit={this.props.canEdit}
-                  onBlur={this.submitCustomInput}
-                  autoFocus={true}
-                  onChange={this.onInputChange}
-                /> :
-                this.state.usingCustomValue ?
-                this.props.selected :
-                this.state.customInput  || 'Other'
-              } 
+                (this.state.usingCustomValue && this.state.showCustomTextbox) ?
+                  <BuilderTextbox
+                    value={this.props.selected}
+                    keyPath={this.props.keyPath}
+                    canEdit={this.props.canEdit}
+                    onBlur={this.submitCustomInput}
+                    autoFocus={true}
+                    onChange={this.onInputChange}
+                  /> :
+                  this.state.usingCustomValue ?
+                    this.props.selected :
+                    this.state.customInput || 'Other'
+              }
             </div>
           }
         </div>

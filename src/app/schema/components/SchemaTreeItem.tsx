@@ -449,8 +449,8 @@ class SchemaTreeItem extends TerrainComponent<Props>
                   this.props.type === 'column' &&
                   <div onClick={this.toggleStarredColumn}>
                     <StarIcon
-                    style={this.props.schema.getIn(['starredColumns', this.props.id])
-                      ? Styles.selectedStarIcon : Styles.unselectedStarIcon}
+                      style={this.props.schema.getIn(['starredColumns', this.props.id])
+                        ? Styles.selectedStarIcon : Styles.unselectedStarIcon}
                     />
                   </div>
                 }

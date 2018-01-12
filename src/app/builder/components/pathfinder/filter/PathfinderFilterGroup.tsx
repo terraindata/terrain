@@ -55,9 +55,9 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
+import LinearSelector from 'app/common/components/LinearSelector';
 import { PathfinderLine } from '../PathfinderLine';
 import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
-import LinearSelector from 'app/common/components/LinearSelector';
 
 export interface Props
 {

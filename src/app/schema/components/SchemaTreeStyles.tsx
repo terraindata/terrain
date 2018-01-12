@@ -67,8 +67,8 @@ const starSvgStyles = {
   width: '15px',
   marginLeft: '3px',
   strokeWidth: '2px',
-  stroke: Colors().active
-}
+  stroke: Colors().active,
+};
 
 const SchemaTreeStyles =
   {
