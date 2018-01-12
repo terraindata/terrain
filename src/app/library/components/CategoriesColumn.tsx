@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-empty no-shadowed-variable strict-boolean-expressions restrict-plus-operands no-var-requires
 
+import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import * as React from 'react';
 import { UserState } from 'users/UserTypes';
 import Util from 'util/Util';
@@ -76,6 +77,7 @@ export interface Props
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
   categoryActions: any;
+  algorithmActions: any;
   algorithms: Immutable.Map<ID, Algorithm>;
   users?: UserState;
 }
@@ -162,6 +164,19 @@ class CategoriesColumn extends TerrainComponent<Props>
   public handleDragFinish()
   {
 
+  }
+
+  public handleItemSelect(id: ID)
+  {
+    const {
+      basePath,
+    } = this.props;
+
+    this.props.algorithmActions.unselect();
+
+    replaceRoute({ basePath, categoryId: id });
+
+    return true;
   }
 
   public renderCategory(id: ID, index: number)

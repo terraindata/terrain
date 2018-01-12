@@ -67,7 +67,7 @@ beforeAll(async (done) =>
       {
         debug: true,
         db: 'postgres',
-        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:5432/moviesdb',
+        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:65432/moviesdb',
         port: 3000,
         databases: [
           {
@@ -130,8 +130,8 @@ beforeAll(async (done) =>
       body: {
         name: 'MySQL Test Connection',
         type: 'mysql',
-        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:3306/moviesdb',
-        host: '127.0.0.1:3306',
+        dsn: 't3rr41n-demo:r3curs1v3$@127.0.0.1:63306/moviesdb',
+        host: '127.0.0.1:63306',
         isAnalytics: false,
       },
     })
@@ -278,7 +278,7 @@ describe('Item route tests', () =>
         const respData = JSON.parse(response.text);
         expect(respData.length).toBeGreaterThan(0);
         expect(respData)
-          .toMatchObject([
+          .toEqual(expect.arrayContaining([
             {
               id: 1,
               meta: 'I won a Nobel prize! But Im more proud of my music',
@@ -288,12 +288,6 @@ describe('Item route tests', () =>
               type: 'GROUP',
             },
             {
-              id: 2,
-              meta: '#realmusician',
-              parent: 0,
-              type: 'CATEGORY',
-            },
-            {
               id: 3,
               meta: 'Are we an item?',
               name: 'Justin Bieber',
@@ -301,7 +295,7 @@ describe('Item route tests', () =>
               status: 'Baby',
               type: 'ALGORITHM',
             },
-          ]);
+          ]));
       })
       .catch((error) =>
       {
@@ -329,7 +323,6 @@ describe('Item route tests', () =>
         expect(respData.length).toBeGreaterThan(0);
         expect(respData[0])
           .toMatchObject({
-            id: 4,
             name: 'Test Item',
             status: 'LIVE',
           });
@@ -1305,7 +1298,6 @@ describe('Credentials tests', () =>
         const resultAsArray: object[] = result as object[];
         expect(resultAsArray[0]).toMatchObject({
           createdBy: 1,
-          id: 2,
           meta: '',
           name: 'SFTP Test 1',
           type: 'sftp',
@@ -1330,7 +1322,8 @@ describe('Credentials tests', () =>
       .then((response) =>
       {
         const result = JSON.parse(response.text);
-        expect(result).toMatchObject([{
+        expect(result.length).toBeGreaterThanOrEqual(2);
+        expect(result.slice(0, 2)).toMatchObject([{
           createdBy: 1,
           id: 1,
           meta: '',
