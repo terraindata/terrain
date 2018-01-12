@@ -46,37 +46,28 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import ActionTypes from 'library/data/LibraryActionTypes';
 import reducer from 'library/data/LibraryReducers';
-import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
+import LibraryHelper from '../../LibraryHelper';
 
 describe('LibraryReducers', () =>
 {
-  let library: LibraryState = _LibraryState({});
-  let category = LibraryTypes._Category();
-  const categoryId = 1;
-  const categoryName = 'Test Category';
-  category = category
-    .set('id', categoryId)
-    .set('name', categoryName);
-
-  beforeEach(() =>
-  {
-    library = _LibraryState({});
-  });
+  let library = LibraryHelper.mockState().getState();
 
   it('should return the inital state', () =>
   {
-    expect(reducer(undefined, {})).toEqual(library);
+    expect(reducer(undefined, {})).toEqual(LibraryTypes._LibraryState());
   });
 
   describe('#categories.create', () =>
   {
     it('should handle categories.create', () =>
     {
-      library = library.set(
-        'categories',
-        Immutable.Map<number, LibraryTypes.Category>({}),
-      );
+      let category = LibraryHelper.mockCategory();
+      const categoryId = 1;
+      const categoryName = 'Test Category';
+      category = category
+        .set('id', categoryId)
+        .set('name', categoryName);
 
       const nextState = reducer(library, {
         type: ActionTypes.categories.create,
