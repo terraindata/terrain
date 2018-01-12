@@ -57,6 +57,7 @@ import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import { PathfinderLine } from '../PathfinderLine';
 import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
+import LinearSelector from 'app/common/components/LinearSelector';
 
 export interface Props
 {
@@ -76,11 +77,7 @@ const filterDropdownOptions = List(
     3,
     4,
     5,
-  ].map((v) => ({
-    displayName: v,
-    value: v,
-  })),
-);
+  ]);
 
 class PathfinderFilterGroup extends TerrainComponent<Props>
 {
@@ -102,22 +99,24 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
         onDelete={this.handleDelete}
         depth={depth}
         pieces={List([
-          <div>
-            {
-              depth === 0 ? PathfinderText.firstFilterIntro : PathfinderText.nestedFilterIntro
-            }
-          </div>,
-          <AdvancedDropdown
+          // <div>
+          //   {
+          //     depth === 0 ? PathfinderText.firstFilterIntro : PathfinderText.nestedFilterIntro
+          //   }
+          // </div>,
+          <LinearSelector
             options={filterDropdownOptions}
-            value={filterGroup.minMatches}
+            keyPath={this.props.keyPath.push('minMatches')}
+            selected={this.props.filterGroup.minMatches}
+            allowCustomInput={true}
             canEdit={canEdit}
-            onChange={this.handleDropdownChange}
-          />,
-          <div>
-            {
-              PathfinderText.filterGroupPost
-            }
-          </div>,
+          />
+          ,
+          // <div>
+          //   {
+          //     PathfinderText.filterGroupPost
+          //   }
+          // </div>,
         ])}
       />
     );

@@ -122,6 +122,7 @@ export interface Props
   tuningMode?: boolean;
 
   onKeyDown?: (e) => void;
+  autoFocus?: boolean;
 }
 
 interface State
@@ -469,6 +470,7 @@ class BuilderTextbox extends TerrainComponent<Props>
                 onBlur={this.handleBlur}
                 style={this.props.textStyle}
                 onKeyDown={this.props.onKeyDown}
+                autoFocus={this.props.autoFocus}
               />
           }
           {this.props.acceptsCards && this.renderSwitch()}
