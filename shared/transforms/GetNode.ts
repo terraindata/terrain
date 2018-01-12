@@ -42,5 +42,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
+// Copyright 2018 Terrain Data, Inc.
 
+import TransformNode from './TransformNode';
+import TransformNodeType from './TransformNodeType';
+
+/**
+ *
+ */
+export default class GetNode extends TransformNode
+{
+  public constructor(type: string)
+  {
+    super(type, TransformNodeType.GetNode);
+  }
+}

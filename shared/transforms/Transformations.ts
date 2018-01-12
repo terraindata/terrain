@@ -54,7 +54,8 @@ function put<T, K extends keyof V, V extends T>(obj: T, name: K, value: V[K]): V
 }
 
 // get
-function get<T, K extends keyof T>(obj: T, name: K): T[K] {
+function get<T, K extends keyof T>(obj: T, name: K): T[K]
+{
   return obj[name];
 }
 
@@ -72,7 +73,8 @@ function putS<T, K extends keyof V, V extends T>(obj: T, names: K[], values: Arr
 }
 
 // get multiple
-function getS<T, K extends keyof T>(obj: T, names: K[]): Array<T[K]> {
+function getS<T, K extends keyof T>(obj: T, names: K[]): Array<T[K]>
+{
   return names.map((n) => obj[n]);
 }
 
@@ -92,7 +94,7 @@ function splitObj<T, R extends T, S extends T>(obj: R, oldName: string, newNames
   }
 
   const v = get(obj, oldName);
-  const splits =   obj[oldName].split(splitText);
+  const splits = obj[oldName].split(splitText);
   const n = splits.length;
 
   for (let i = 0; i < splits.length && i < newNames.length; ++i)
