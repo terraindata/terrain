@@ -67,8 +67,8 @@ import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/template
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
-import TemplateEditorFieldTypeSection from './TemplateEditorFieldTypeSection';
 import './TemplateEditorField.less';
+import TemplateEditorFieldTypeSection from './TemplateEditorFieldTypeSection';
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -108,6 +108,22 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
             options={List([])}
           />
         </div>
+        <div className='field-settings-row'>
+          <div
+            className='tef-checkbox-section'
+            style={field.isIncluded ? fontColor(Colors().text1) : fontColor(Colors().text3)}
+            onClick={this.handleIncludeCheckboxClicked}
+          >
+            <div className='tef-checkbox-spacer'>
+              <CheckBox
+                checked={field.isIncluded}
+                onChange={() => { }}
+                disabled={this._inputDisabled()}
+              />
+            </div>
+            <div className='tef-checkbox-label'> Include this field </div>
+          </div>
+        </div>
         <TemplateEditorFieldTypeSection
           keyPath={keyPath}
           field={field}
@@ -116,6 +132,11 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         />
       </div>
     );
+  }
+
+  public handleIncludeCheckboxClicked()
+  {
+    this._set('isIncluded', !this.props.field.isIncluded);
   }
 
 }

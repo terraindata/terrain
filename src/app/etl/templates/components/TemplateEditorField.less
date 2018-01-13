@@ -101,22 +101,28 @@
       padding-left: 0px;
     }
   }
+}
 
-  .type-checkbox-spacer {
-    margin-top: 2px;
-    padding: @half-spacing;
-    padding-right: 0px;
-    margin-right: -3px;
-    display: flex;
-    align-items: center;
-    position: relative;
-    bottom: 1px;
-  }
+// shared
+.tef-checkbox-section {
+  padding-left: @half-spacing;
+  display: flex;
+  cursor: pointer;
+  .transition;
+}
 
-  .type-analyzed-section {
-    padding-left: @half-spacing;
-    display: flex;
-    cursor: pointer;
-    .transition;
-  }
+.tef-checkbox-label {
+  padding: @quarter-spacing + @half-spacing @half-spacing;
+  padding-left: 0px;
+}
+
+.tef-checkbox-spacer {
+  margin-top: 2px;
+  padding: @half-spacing;
+  padding-right: 0px;
+  margin-right: -3px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  bottom: 1px;
 }

@@ -97,7 +97,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
           <div className='field-preview-label-group'>
             <div className='field-preview-label'
               style={labelStyle}
-              onClick={this._noopIfDisabled(this.handleToggleSettings)}
+              onClick={this.handleToggleSettings}
             >
               {`${field.name}${this._isNested() ? '' : ':'}`}
             </div>

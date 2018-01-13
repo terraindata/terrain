@@ -121,11 +121,11 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
 
     return (
       <div
-        className='type-analyzed-section'
+        className='tef-checkbox-section'
         style={field.isAnalyzed ? fontColor(Colors().text1) : fontColor(Colors().text3)}
         onClick={this._noopIfDisabled(this.handleAnalyzedCheckboxClicked)}
       >
-        <div className='type-checkbox-spacer'> {analyzedCheckbox} </div>
+        <div className='tef-checkbox-spacer'> {analyzedCheckbox} </div>
         <div className='type-section-label label-right'> Analyze </div>
       </div>
     );
@@ -148,7 +148,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
       );
       return List([
         <div className='type-section-label' key={`of ${i}`}> of </div>,
-        <div className='type-dropdown-section' key={`dropdown ${i}`}> {arrayTypeDropdown} </div>,
+        <div className='type-dropdown-spacer' key={`dropdown ${i}`}> {arrayTypeDropdown} </div>,
       ]);
     });
   }
