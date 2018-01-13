@@ -47,10 +47,10 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
 
 import * as Immutable from 'immutable';
+import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import { Colors, fontColor } from '../../colors/Colors';
@@ -92,6 +92,7 @@ export interface Props
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
   groupActions: any;
+  algorithmActions: any;
   referrer?: { label: string, path: string };
   users?: UserTypes.UserState;
 }
@@ -336,9 +337,13 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public handleNewGroupCreated(groupId)
   {
-    const { groups } = this.props;
+    const { basePath, groups } = this.props;
     const categoryId = groups.get(groupId).categoryId;
-    browserHistory.push(`/library/${categoryId}/${groupId}`);
+    replaceRoute({
+      basePath,
+      categoryId,
+      groupId,
+    });
   }
 
   public handleNewGroupCreate()
@@ -409,6 +414,24 @@ class GroupsColumn extends TerrainComponent<Props>
       draggingItemIndex: -1,
       draggingOverIndex: -1,
     });
+  }
+
+  public handleItemSelect(id: ID)
+  {
+    const {
+      basePath,
+      categoryId,
+    } = this.props;
+
+    this.props.algorithmActions.unselect();
+
+    replaceRoute({
+      basePath,
+      categoryId,
+      groupId: id,
+    });
+
+    return true;
   }
 
   public renderGroup(id: ID, fadeIndex: number)
@@ -528,6 +551,7 @@ class GroupsColumn extends TerrainComponent<Props>
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         onDragFinish={this.handleDragFinish}
+        onSelect={this.handleItemSelect}
         item={group}
         canEdit={canEdit}
         canDrag={canDrag}
