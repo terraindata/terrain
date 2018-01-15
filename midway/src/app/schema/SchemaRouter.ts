@@ -100,7 +100,8 @@ Router.post('/star', passport.authenticate('access-token-local'), async (ctx, ne
     { starred, id: columnId });
 });
 
-Router.post('/count/:columnId', passport.authenticate('access-token-local'), async (ctx, next) => {
+Router.post('/count/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
   winston.info('Incrementing the count of a column');
   const columnId: string | number = ctx.params.columnId;
   const count: number = ctx.request.body.body.count;
@@ -108,12 +109,12 @@ Router.post('/count/:columnId', passport.authenticate('access-token-local'), asy
   if (algorithmId === undefined)
   {
     // Just incrementing the total count, not for a specific algorithm
-    ctx.body = await schema.upsert(ctx.state.user, {count, id: columnId});
+    ctx.body = await schema.upsert(ctx.state.user, { count, id: columnId });
   }
   else
   {
     // TODO NEED TO MERGE THE COUNT BY ALGORITHM THING WITH THE COLUMN'S OLD countByAlgorithm property
-    ctx.body = await schema.upsert(ctx.state.user, {countByAlgorithm: {algirithmId: count}, id: columnId});
+    ctx.body = await schema.upsert(ctx.state.user, { countByAlgorithm: { algirithmId: count }, id: columnId });
   }
 });
 

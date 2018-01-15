@@ -1248,7 +1248,7 @@ export const Ajax =
       onLoad?: (resp) => void,
       onError?: (error) => void)
     {
-      return Ajax.req('post', 'schema/count/' + columnId, {count, algorithmId}, (resp: any) =>
+      return Ajax.req('post', 'schema/count/' + columnId, { count, algorithmId }, (resp: any) =>
       {
         try
         {
@@ -1259,7 +1259,7 @@ export const Ajax =
         {
           onError && onError(e);
         }
-      })
+      });
     },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)

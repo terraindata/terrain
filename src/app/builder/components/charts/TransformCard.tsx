@@ -481,11 +481,11 @@ class TransformCard extends TerrainComponent<Props>
       type = getType('');
     }
     const typeObj =
-    {
-      term: {
-        _type: type,
-      },
-    };
+      {
+        term: {
+          _type: type,
+        },
+      };
 
     if (recomputeDomain)
     {
@@ -503,23 +503,23 @@ class TransformCard extends TerrainComponent<Props>
                 {
                   term: {
                     _index: index,
-                  }
-                }
-              ]
-            }
+                  },
+                },
+              ],
+            },
           },
           aggs: {
             maximum: {
               max: {
                 field: input,
-              }
+              },
             },
             minimum: {
               min: {
                 field: input,
-              }
-            }
-          }
+              },
+            },
+          },
         };
         if (type)
         {
@@ -558,15 +558,15 @@ class TransformCard extends TerrainComponent<Props>
                 {
                   term: {
                     _index: index,
-                  }
+                  },
                 },
               ],
               must: {
                 range: {
-                  [input as string]: {gte: min, lt: max},
-                }
-              }
-            }
+                  [input as string]: { gte: min, lt: max },
+                },
+              },
+            },
           },
           aggs: {
             transformCard: {
@@ -574,33 +574,33 @@ class TransformCard extends TerrainComponent<Props>
                 field: input,
                 interval,
                 extended_bounds: {
-                  min, max
+                  min, max,
                 },
               },
             },
           },
-          size: 0
+          size: 0,
         };
-      if (type)
-      {
-        (aggQuery.query.bool.filter as any).push(typeObj);
+        if (type)
+        {
+          (aggQuery.query.bool.filter as any).push(typeObj);
+        }
+        this.setState(
+          Ajax.query(
+            JSON.stringify(aggQuery),
+            db,
+            (resp) =>
+            {
+              this.handleElasticAggregationResponse(resp);
+            },
+            (err) =>
+            {
+              this.handleElasticAggregationError(err);
+            }),
+        );
       }
-      this.setState(
-        Ajax.query(
-          JSON.stringify(aggQuery),
-          db,
-          (resp) =>
-          {
-            this.handleElasticAggregationResponse(resp);
-          },
-          (err) =>
-          {
-            this.handleElasticAggregationError(err);
-          }),
-      );
     }
   }
-}
 
   private handleM1TQLQueryResponse(response: M1QueryResponse)
   {
