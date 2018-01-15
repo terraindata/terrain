@@ -44,89 +44,21 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as Tasty from '../../tasty/Tasty';
-import * as App from '../App';
+import ConfigType from '../ConfigType';
 
-import DatabaseController from '../../database/DatabaseController';
-import * as DBUtil from '../../database/Util';
-import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import * as Scripts from '../../scripts/Scripts';
-import { metrics } from '../events/EventRouter';
-import UserConfig from '../users/UserConfig';
-import * as Util from '../Util';
-import SchemaConfig from './SchemaConfig';
-
-export class Schema
+export class SchemaMetadataConfig extends ConfigType
 {
-  private schemaTable: Tasty.Table;
+  public id?: number | string = undefined;
+  public starred?: boolean = false;
+ // public count?: number = 0;
+  // Maps algorithmIds to the number of the times a column has been used in that algorithm
+ // public countByAlgorithm?: object = {};
 
-  constructor()
+  constructor(props: object)
   {
-    this.schemaTable = new Tasty.Table(
-      'schema',
-      ['id'],
-      [
-        'starred',
-        'count',
-      ],
-    );
-  }
-
-  public async delete(user: UserConfig, id: number | string): Promise<object>
-  {
-    if (!user.isSuperUser)
-    {
-      throw new Error('Only superusers can delete databases.');
-    }
-    return App.DB.delete(this.schemaTable, { id } as SchemaConfig);
-  }
-
-  public async select(columns: string[], filter?: object): Promise<SchemaConfig[]>
-  {
-    return new Promise<SchemaConfig[]>(async (resolve, reject) =>
-    {
-      const rawResults = await App.DB.select(this.schemaTable, columns, filter);
-      const results: SchemaConfig[] = rawResults.map((result: object) => new SchemaConfig(result));
-      resolve(results);
-    });
-  }
-
-  public async get(id?: number | string, fields?: string[]): Promise<SchemaConfig[]>
-  {
-    if (id !== undefined)
-    {
-      if (fields !== undefined)
-      {
-        return this.select(fields, { id });
-      }
-      return this.select([], { id });
-    }
-    if (fields !== undefined)
-    {
-      return this.select(fields, {});
-    }
-    return this.select([], {});
-  }
-
-  // TODO TODO
-  public async upsert(user: UserConfig, schema: SchemaConfig): Promise<SchemaConfig>
-  {
-    if (schema.id !== undefined)
-    {
-      const results: SchemaConfig[] = await this.get(schema.id);
-
-      if (results.length !== 0)
-      {
-        schema = Util.updateObject(results[0], schema);
-      }
-    }
-    else
-    {
-      const results: SchemaConfig[] = await this.get();
-      schema.id = results.length + 1;
-    }
-    return App.DB.upsert(this.schemaTable, schema) as Promise<SchemaConfig>;
+    super();
+    ConfigType.initialize(this, props);
   }
 }
 
-export default Schema;
+export default SchemaMetadataConfig;

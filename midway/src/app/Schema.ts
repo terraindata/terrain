@@ -133,10 +133,10 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      database integer NOT NULL,
      label text NOT NULL,
      events text NOT NULL); `,
-  `CREATE TABLE IF NOT EXISTS schema
+  `DROP TABLE schemaMetadata`,
+  `CREATE TABLE schemaMetadata
        (id text PRIMARY KEY,
-       starred boolean NOT NULL,
-       count integer NOT NULL); `
+       starred boolean NOT NULL); `
   ,
 ];
 

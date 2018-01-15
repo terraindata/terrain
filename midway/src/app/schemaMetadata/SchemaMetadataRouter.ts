@@ -44,21 +44,52 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import ConfigType from '../ConfigType';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-export class SchemaConfig extends ConfigType
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import * as Tasty from '../../tasty/Tasty';
+import SchemaMetadata from './SchemaMetadata';
+
+const Router = new KoaRouter();
+export const schemaMetadata = new SchemaMetadata();
+
+Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  public id?: number | string = undefined;
-  public starred?: boolean = false;
-  public count?: number = 0;
-  // Maps algorithmIds to the number of the times a column has been used in that algorithm
-  public countByAlgorithm?: object = {};
+  winston.warn('Changing columns starred status');
+  const starred: boolean = ctx.request.body.body.starred;
+  const columnId: string | number = ctx.request.body.body.columnId;
+  winston.info(String(starred));
+  winston.info(String(columnId));
+  ctx.body = await schemaMetadata.upsert(ctx.state.user,
+    { starred, id: columnId });
+});
 
-  constructor(props: object)
+Router.post('/count/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('Incrementing the count of a column');
+  const columnId: string | number = ctx.params.columnIdreq;
+  const count: number = ctx.request.body.body.count;
+  const algorithmId: string | number = ctx.request.body.body.algorithmId;
+  if (algorithmId === undefined)
   {
-    super();
-    ConfigType.initialize(this, props);
+    // Just incrementing the total count, not for a specific algorithm
+    // ctx.body = await schemaMetadata.upsert(ctx.state.user, { count, id: columnId });
   }
-}
+  else
+  {
+    // TODO NEED TO MERGE THE COUNT BY ALGORITHM THING WITH THE COLUMN'S OLD countByAlgorithm property
+  //  ctx.body = await schemaMetadata.upsert(ctx.state.user, { countByAlgorithm: { algirithmId: count }, id: columnId });
+  }
+});
 
-export default SchemaConfig;
+Router.get('/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('Retrieving column info');
+  const columnId: string | number = ctx.params.columnId;
+  ctx.body = await schemaMetadata.get(columnId);
+});
+
+export default Router;

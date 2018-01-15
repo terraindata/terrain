@@ -51,10 +51,8 @@ import * as winston from 'winston';
 import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
-import Schema from './Schema';
 
 const Router = new KoaRouter();
-export const schema = new Schema();
 
 async function getSchema(databaseID: number): Promise<string>
 {
@@ -89,40 +87,6 @@ Router.get('/:database', passport.authenticate('access-token-local'), async (ctx
 {
   winston.info('get schema');
   ctx.body = await getSchema(ctx.params.database);
-});
-
-Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('Changing columns starred status');
-  const starred: boolean = ctx.request.body.body.starred;
-  const columnId: string | number = ctx.request.body.body.columnId;
-  ctx.body = await schema.upsert(ctx.state.user,
-    { starred, id: columnId });
-});
-
-Router.post('/count/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('Incrementing the count of a column');
-  const columnId: string | number = ctx.params.columnId;
-  const count: number = ctx.request.body.body.count;
-  const algorithmId: string | number = ctx.request.body.body.algorithmId;
-  if (algorithmId === undefined)
-  {
-    // Just incrementing the total count, not for a specific algorithm
-    ctx.body = await schema.upsert(ctx.state.user, { count, id: columnId });
-  }
-  else
-  {
-    // TODO NEED TO MERGE THE COUNT BY ALGORITHM THING WITH THE COLUMN'S OLD countByAlgorithm property
-    ctx.body = await schema.upsert(ctx.state.user, { countByAlgorithm: { algirithmId: count }, id: columnId });
-  }
-});
-
-Router.get('/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('Retrieving column info');
-  const columnId: string | number = ctx.params.columnId;
-  ctx.body = await schema.get(columnId);
 });
 
 export default Router;

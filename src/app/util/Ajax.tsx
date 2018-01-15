@@ -1206,7 +1206,7 @@ export const Ajax =
     {
       console.log(starred);
       console.log(columnId);
-      return Ajax.req('post', 'schema/star', { columnId, starred }, (resp: any) =>
+      return Ajax.req('post', 'schemametadata/star', { columnId, starred }, (resp: any) =>
       {
         try
         {
@@ -1225,7 +1225,7 @@ export const Ajax =
 
     getColumnInfo(columnId: ID, onLoad?: (resp) => void, onError?: (error) => void)
     {
-      return Ajax.req('get', 'schema/' + columnId, {}, (resp: any) =>
+      return Ajax.req('get', 'schemametadata/' + columnId, {}, (resp: any) =>
       {
         try
         {
@@ -1248,7 +1248,7 @@ export const Ajax =
       onLoad?: (resp) => void,
       onError?: (error) => void)
     {
-      return Ajax.req('post', 'schema/count/' + columnId, { count, algorithmId }, (resp: any) =>
+      return Ajax.req('post', 'schemametadata/count/' + columnId, { count, algorithmId }, (resp: any) =>
       {
         try
         {
