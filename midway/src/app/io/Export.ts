@@ -227,7 +227,14 @@ export class Export
         body: JSON.stringify(qryObj),
       };
 
-      const resp: any = await qh.handleQuery(payload);
+      const qryResponse: any = await qh.handleQuery(payload);
+      if (qryResponse === undefined || qryResponse.hasError())
+      {
+        writer.end();
+        errMsg = 'Nothing to export.';
+        return reject(errMsg);
+      }
+      const resp = qryResponse.result;
       if (resp === undefined || resp.hits === undefined || resp.hits.total === 0)
       {
         writer.end();
@@ -438,7 +445,12 @@ export class Export
         body: JSON.stringify(qryObj),
       };
 
-      const resp: any = await qh.handleQuery(payload);
+      const qryResponse: any = await qh.handleQuery(payload);
+      if (qryResponse === undefined || qryResponse.hasError())
+      {
+        return resolve(fieldObj);
+      }
+      const resp = qryResponse.result;
       if (resp.hits === undefined || (resp.hits !== undefined && resp.hits.hits === undefined))
       {
         return resolve(fieldObj);
