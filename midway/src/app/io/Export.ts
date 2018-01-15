@@ -341,32 +341,30 @@ export class Export
 
   public async getNamesAndTypesFromQuery(dbid: number, qry: object | string): Promise<object | string>
   {
-    return new Promise<object | string>(async (resolve, reject) =>
+    if (typeof qry === 'string')
     {
-      if (typeof qry === 'string')
+      try
       {
-        try
-        {
-          qry = JSON.parse(qry);
-        }
-        catch (e)
-        {
-          return reject(e.message as string);
-        }
+        qry = JSON.parse(qry);
       }
+      catch (e)
+      {
+        throw e;
+      }
+    }
 
-      qry = this._shouldRandomSample(qry as object);
-      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
-      if (database === undefined)
-      {
-        return reject('Database "' + dbid.toString() + '" not found.');
-      }
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File export currently is only supported for Elastic databases.');
-      }
-      return resolve(await this._getAllFieldsAndTypesFromQuery(database, qry as object));
-    });
+    qry = this._shouldRandomSample(qry as object);
+    const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+    if (database === undefined)
+    {
+      throw new Error('Database "' + dbid.toString() + '" not found.');
+    }
+    if (database.getType() !== 'ElasticController')
+    {
+      throw new Error('File export currently is only supported for Elastic databases.');
+    }
+
+    return this._getAllFieldsAndTypesFromQuery(database, qry as object);
   }
 
   public async getNamesAndTypesFromAlgorithm(dbid: number, algorithmId: number): Promise<object | string>
