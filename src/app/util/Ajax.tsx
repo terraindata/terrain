@@ -1202,7 +1202,7 @@ export const Ajax =
       );
     },
 
-    starColumn(columnId: ID, starred: boolean)
+    starColumn(columnId: ID, starred: boolean, onLoad?: (resp) => void, onError?: (error) => void)
     {
       console.log(starred);
       console.log(columnId);
@@ -1213,29 +1213,53 @@ export const Ajax =
           console.log(resp);
           console.log('HERE');
           Ajax.getColumnInfo(columnId);
+          onLoad && onLoad(resp);
         }
         catch (e)
         {
           console.log('ERROR');
+          onError && onError(e);
         }
       });
     },
 
-    getColumnInfo(columnId: ID)
+    getColumnInfo(columnId: ID, onLoad?: (resp) => void, onError?: (error) => void)
     {
-      console.log('HERE IN AJAX', columnId);
       return Ajax.req('get', 'schema/' + columnId, {}, (resp: any) =>
       {
         try
         {
           console.log(resp);
           console.log('HERE');
+          onLoad && onLoad(resp);
         }
         catch (e)
         {
           console.log(e);
+          onError && onError(e);
         }
       });
+    },
+
+    countColumn(
+      columnId: ID,
+      count: number,
+      algorithmId?: string | number,
+      onLoad?: (resp) => void,
+      onError?: (error) => void)
+    {
+      return Ajax.req('post', 'schema/count/' + columnId, {count, algorithmId}, (resp: any) =>
+      {
+        try
+        {
+          console.log(resp);
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      })
     },
 
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)

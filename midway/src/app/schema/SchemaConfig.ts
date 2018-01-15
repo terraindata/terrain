@@ -49,8 +49,10 @@ import ConfigType from '../ConfigType';
 export class SchemaConfig extends ConfigType
 {
   public id?: number | string = undefined;
-  public starred: boolean = false;
-  public count: number = 0;
+  public starred?: boolean = false;
+  public count?: number = 0;
+  // Maps algorithmIds to the number of the times a column has been used in that algorithm
+  public countByAlgorithm?: object = {};
 
   constructor(props: object)
   {
