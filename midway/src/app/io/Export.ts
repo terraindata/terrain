@@ -224,7 +224,7 @@ export class Export
         type: 'search',
         streaming: false,
         databasetype: 'elastic',
-        body: qryObj,
+        body: JSON.stringify(qryObj),
       };
 
       const resp: any = await qh.handleQuery(payload);
@@ -435,7 +435,7 @@ export class Export
         type: 'search',
         streaming: false,
         databasetype: 'elastic',
-        body: qryObj,
+        body: JSON.stringify(qryObj),
       };
 
       const resp: any = await qh.handleQuery(payload);
