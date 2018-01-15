@@ -742,9 +742,6 @@ export class Scheduler
         schedule.active = schedule.active !== undefined ? schedule.active : false;
         schedule.archived = false;
         schedule.currentlyRunning = false;
-
-        const results: SchedulerConfig[] = await this.get();
-        schedule.id = results.length + 1;
       }
       return resolve(await App.DB.upsert(this.schedulerTable, schedule) as SchedulerConfig[]);
     });
