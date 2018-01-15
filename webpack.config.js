@@ -95,6 +95,7 @@ module.exports =
             users: path.resolve(__dirname, 'src/app/users'),
             util: path.resolve(__dirname, 'src/app/util'),
             x: path.resolve(__dirname, 'src/app/x'),
+            'test-helpers': path.resolve(__dirname, 'src/test/test-helpers'),
         },
     },
 

@@ -44,9 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 // tslint:disable:max-classes-per-file
-import * as Immutable from 'immutable';
 import { _AnalyticsState, AnalyticsState } from 'analytics/data/AnalyticsStore';
-import { ItemType } from '../items/types/Item';
+import * as Immutable from 'immutable';
+import { ItemType } from '../../items/types/Item';
 
 export default class AnalyticsHelper
 {
@@ -142,7 +142,7 @@ class ServerResponseMock
         key: 1433548800000,
         doc_count: 937,
       },
-    ]
+    ];
   }
 
   public error()

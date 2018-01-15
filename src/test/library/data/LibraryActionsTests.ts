@@ -46,8 +46,8 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 import Actions from 'library/data/LibraryActions';
 import ActionTypes from 'library/data/LibraryActionTypes';
-import { Ajax, createMockStore } from '../../helpers';
-import LibraryHelper from '../../LibraryHelper';
+import { Ajax, createMockStore } from 'test-helpers/helpers';
+import LibraryHelper from 'test-helpers/LibraryHelper';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 

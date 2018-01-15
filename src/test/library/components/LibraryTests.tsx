@@ -51,8 +51,8 @@ import * as LibraryTypes from 'library/LibraryTypes';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
 import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
-import { connect } from '../../helpers';
-import LibraryHelper from '../../LibraryHelper';
+import { connect } from 'test-helpers/helpers';
+import LibraryHelper from 'test-helpers/LibraryHelper';
 
 describe('Library', () =>
 {

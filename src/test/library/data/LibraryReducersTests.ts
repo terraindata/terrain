@@ -47,7 +47,7 @@ import * as Immutable from 'immutable';
 import ActionTypes from 'library/data/LibraryActionTypes';
 import reducer from 'library/data/LibraryReducers';
 import * as LibraryTypes from 'library/LibraryTypes';
-import LibraryHelper from '../../LibraryHelper';
+import LibraryHelper from 'test-helpers/LibraryHelper';
 
 describe('LibraryReducers', () =>
 {

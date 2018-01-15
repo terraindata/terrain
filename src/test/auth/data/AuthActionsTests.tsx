@@ -47,7 +47,7 @@ import { _AuthState, AuthState } from 'auth/AuthTypes';
 import Actions from 'auth/data/AuthActions';
 import ActionTypes from 'auth/data/AuthActionTypes';
 import * as Immutable from 'immutable';
-import { Ajax, createMockStore } from '../../helpers';
+import { Ajax, createMockStore } from 'test-helpers/helpers';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 

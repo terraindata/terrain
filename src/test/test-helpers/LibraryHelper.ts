@@ -55,7 +55,7 @@ import
   Category,
   Group,
 } from 'library/LibraryTypes';
-import { ItemType } from '../items/types/Item';
+import { ItemType } from '../../items/types/Item';
 
 export default class LibraryHelper
 {

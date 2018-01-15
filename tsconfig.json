@@ -35,7 +35,8 @@
             "tql*": ["src/app/tql/*"],
             "users*": ["src/app/users/*"],
             "util*": ["src/app/util/*"],
-            "x*": ["src/app/x/*"]
+            "x*": ["src/app/x/*"],
+            "test-helpers*": ["src/test/test-helpers/*"]
         },
         "experimentalDecorators": true,
         "declaration": false,

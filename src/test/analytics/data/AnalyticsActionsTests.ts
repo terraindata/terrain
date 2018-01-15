@@ -50,8 +50,8 @@ import * as Immutable from 'immutable';
 import { _LibraryState, LibraryState } from 'library/LibraryTypes';
 import * as LibraryTypes from 'library/LibraryTypes';
 import { _SchemaState, SchemaState } from 'schema/SchemaTypes';
-import { Ajax, createMockStore } from '../../helpers';
-import AnalyticsHelper from '../../AnalyticsHelper';
+import AnalyticsHelper from 'test-helpers/AnalyticsHelper';
+import { Ajax, createMockStore } from 'test-helpers/helpers';
 
 const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
 

@@ -29,6 +29,7 @@
             "users/*": ["app/users/*"],
             "util/*": ["app/util/*"],
             "x/*": ["app/x/*"],
+            "test-helpers*": ["src/test/test-helpers/*"]
         },
         "experimentalDecorators": true,
         "allowJs": true,
