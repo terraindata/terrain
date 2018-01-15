@@ -138,7 +138,7 @@ export class PostgreSQLDB implements TastyDB
         this.client.query(statement, value, makePromiseCallback(resolve, reject));
       });
 
-      upserted = upserted.concat(result);
+      upserted = upserted.concat(result['rows']);
     }
 
     const results = new Array(upserted.length);
@@ -148,7 +148,7 @@ export class PostgreSQLDB implements TastyDB
       if ((primaryKeys.length === 1) &&
         (elements[i][primaryKeys[0]] === undefined))
       {
-        results[i][primaryKeys[0]] = upserted[i]['insertId'];
+        results[i][primaryKeys[0]] = upserted[i]['insertid'];
       }
     }
 

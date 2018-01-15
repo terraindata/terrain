@@ -108,9 +108,16 @@ export async function handleConfig(config: Config): Promise<void>
 
   if (config.databases !== undefined)
   {
+    const dbs = await databases.select(['id', 'name']);
     for (const database of config.databases)
     {
       const db = database as DatabaseConfig;
+      const foundDB = dbs.filter((d) => d.name === db.name);
+      if (foundDB.length > 0)
+      {
+        db.id = foundDB[0].id;
+      }
+
       db.status = 'DISCONNECTED';
       winston.info('Registering new database item: ', db);
       await databases.upsert({} as UserConfig, db);
