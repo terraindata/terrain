@@ -55,11 +55,12 @@ import * as winston from 'winston';
 import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
-import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import ItemConfig from '../items/ItemConfig';
 import Items from '../items/Items';
+import { QueryHandler } from '../query/QueryHandler';
+
 import ExportTemplateConfig from './templates/ExportTemplateConfig';
 import { ExportTemplates } from './templates/ExportTemplates';
 import { TemplateBase } from './templates/TemplateBase';
@@ -96,7 +97,6 @@ export class Export
       {
         return reject('File export currently is only supported for Elastic databases.');
       }
-      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
 
       if (exprt.filetype !== 'csv' && exprt.filetype !== 'json' && exprt.filetype !== 'json [type object]')
       {
@@ -218,119 +218,117 @@ export class Export
         originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
       });
 
-      elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
+      const qh: QueryHandler = database.getQueryHandler();
+      const payload = {
+        database: exprt.dbid,
+        type: 'search',
+        streaming: false,
+        databasetype: 'elastic',
+        body: qryObj,
+      };
+
+      const resp: any = await qh.handleQuery(payload);
+      if (resp === undefined || resp.hits === undefined || resp.hits.total === 0)
       {
-        if (resp === undefined || resp.hits === undefined || resp.hits.total === 0)
+        writer.end();
+        errMsg = 'Nothing to export.';
+        return reject(errMsg);
+      }
+
+      const newDocs: object[] = resp.hits.hits as object[];
+      if (newDocs.length === 0)
+      {
+        writer.end();
+        return resolve(pass);
+      }
+      let returnDocs: object[] = [];
+
+      const fieldArrayDepths: object = {};
+      for (const doc of newDocs)
+      {
+        // verify schema mapping with documents and fix documents accordingly
+        const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
+        if (typeof newDoc === 'string')
         {
           writer.end();
-          errMsg = 'Nothing to export.';
+          errMsg = newDoc;
           return reject(errMsg);
         }
-        const newDocs: object[] = resp.hits.hits as object[];
-        if (newDocs.length === 0)
+        for (const field of Object.keys(newDoc))
         {
-          writer.end();
-          return resolve(pass);
-        }
-        let returnDocs: object[] = [];
-
-        const fieldArrayDepths: object = {};
-        for (const doc of newDocs)
-        {
-          // verify schema mapping with documents and fix documents accordingly
-          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
-          if (typeof newDoc === 'string')
+          if (newDoc[field] !== null && newDoc[field] !== undefined)
           {
-            writer.end();
-            errMsg = newDoc;
-            return reject(errMsg);
-          }
-          for (const field of Object.keys(newDoc))
-          {
-            if (newDoc[field] !== null && newDoc[field] !== undefined)
+            if (fieldArrayDepths[field] === undefined)
             {
-              if (fieldArrayDepths[field] === undefined)
-              {
-                fieldArrayDepths[field] = new Set<number>();
-              }
-              fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
+              fieldArrayDepths[field] = new Set<number>();
             }
-            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
-            {
-              newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
-            }
+            fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
           }
-          returnDocs.push(newDoc as object);
-        }
-        for (const field of Object.keys(fieldArrayDepths))
-        {
-          if (fieldArrayDepths[field].size > 1)
+          if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
           {
-            errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
-            return reject(errMsg);
+            newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
           }
         }
-
-        winston.info('Beginning export transformations.');
-        // transform documents with template
-        try
+        returnDocs.push(newDoc as object);
+      }
+      for (const field of Object.keys(fieldArrayDepths))
+      {
+        if (fieldArrayDepths[field].size > 1)
         {
-          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
-          for (const doc of returnDocs)
-          {
-            if (Boolean(exprt.rank))
-            {
-              if (doc['TERRAINRANK'] !== undefined)
-              {
-                errMsg = 'Conflicting field: TERRAINRANK.';
-                return reject(errMsg);
-              }
-              doc['TERRAINRANK'] = rankCounter;
-            }
-            rankCounter++;
-          }
-        } catch (e)
-        {
-          writer.end();
-          errMsg = e;
+          errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
           return reject(errMsg);
         }
+      }
 
-        // export to csv
-        for (const returnDoc of returnDocs)
+      winston.info('Beginning export transformations.');
+      // transform documents with template
+      try
+      {
+        returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
+        for (const doc of returnDocs)
         {
-          if (exprt.filetype === 'csv')
+          if (Boolean(exprt.rank))
           {
-            writer.write(returnDoc);
-          }
-          else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-          {
-            isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-            writer.write(JSON.stringify(returnDoc));
-          }
-        }
-        if (Math.min(resp.hits.total, qryObj['body']['size']) > rankCounter - 1)
-        {
-          elasticClient.scroll({
-            scrollId: resp._scroll_id,
-            scroll: this.SCROLL_TIMEOUT,
-          }, getMoreUntilDone);
-        }
-        else
-        {
-          if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-          {
-            writer.write(']');
-            if (exprt.filetype === 'json [type object]')
+            if (doc['TERRAINRANK'] !== undefined)
             {
-              writer.write('}');
+              errMsg = 'Conflicting field: TERRAINRANK.';
+              return reject(errMsg);
             }
+            doc['TERRAINRANK'] = rankCounter;
           }
-          writer.end();
-          resolve(pass);
+          rankCounter++;
         }
-      }.bind(this),
-      );
+      } catch (e)
+      {
+        writer.end();
+        errMsg = e;
+        return reject(errMsg);
+      }
+
+      // export to csv
+      for (const returnDoc of returnDocs)
+      {
+        if (exprt.filetype === 'csv')
+        {
+          writer.write(returnDoc);
+        }
+        else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+        {
+          isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+          writer.write(JSON.stringify(returnDoc));
+        }
+      }
+
+      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+      {
+        writer.write(']');
+        if (exprt.filetype === 'json [type object]')
+        {
+          writer.write('}');
+        }
+      }
+      writer.end();
+      resolve(pass);
     });
   }
 
@@ -360,8 +358,7 @@ export class Export
       {
         return reject('File export currently is only supported for Elastic databases.');
       }
-      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-      return resolve(await this._getAllFieldsAndTypesFromQuery(elasticClient, qry as object));
+      return resolve(await this._getAllFieldsAndTypesFromQuery(database, qry as object));
     });
   }
 
@@ -411,7 +408,7 @@ export class Export
     });
   }
 
-  private async _getAllFieldsAndTypesFromQuery(elasticClient: ElasticClient, qryObj: object, maxSize?: number): Promise<object | string>
+  private async _getAllFieldsAndTypesFromQuery(database: DatabaseController, qryObj: object, maxSize?: number): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
@@ -431,40 +428,37 @@ export class Export
       {
         qrySize = Math.min(qryObj['body']['size'], maxSize);
       }
-      elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
+
+      const qh: QueryHandler = database.getQueryHandler();
+      const payload = {
+        database: database.getID(),
+        type: 'search',
+        streaming: false,
+        databasetype: 'elastic',
+        body: qryObj,
+      };
+
+      const resp: any = await qh.handleQuery(payload);
+      if (resp.hits === undefined || (resp.hits !== undefined && resp.hits.hits === undefined))
       {
-        if (resp.hits === undefined || (resp.hits !== undefined && resp.hits.hits === undefined))
-        {
-          return resolve(fieldObj);
-        }
-        const newDocs: object[] = resp.hits.hits as object[];
-        if (newDocs.length === undefined)
-        {
-          return resolve('Something was wrong with the query.');
-        }
-        if (newDocs.length === 0)
-        {
-          return resolve(fieldObj);
-        }
-        fieldsAndTypes = await this._getFieldsAndTypesFromDocuments(newDocs, fieldsAndTypes);
-        rankCounter += newDocs.length;
-        if (Math.min(Math.min(resp.hits.total, qrySize), maxSize as number) > rankCounter - 1)
-        {
-          elasticClient.scroll({
-            scrollId: resp._scroll_id,
-            scroll: this.SCROLL_TIMEOUT,
-          }, getMoreUntilDone);
-        }
-        else
-        {
-          for (const field of Object.keys(fieldsAndTypes))
-          {
-            fieldObj[field] = this._getPriorityType(fieldsAndTypes[field] as string[]);
-          }
-          return resolve(fieldObj);
-        }
-      }.bind(this),
-      );
+        return resolve(fieldObj);
+      }
+      const newDocs: object[] = resp.hits.hits as object[];
+      if (newDocs.length === undefined)
+      {
+        return resolve('Something was wrong with the query.');
+      }
+      if (newDocs.length === 0)
+      {
+        return resolve(fieldObj);
+      }
+      fieldsAndTypes = await this._getFieldsAndTypesFromDocuments(newDocs, fieldsAndTypes);
+      rankCounter += newDocs.length;
+      for (const field of Object.keys(fieldsAndTypes))
+      {
+        fieldObj[field] = this._getPriorityType(fieldsAndTypes[field]);
+      }
+      return resolve(fieldObj);
     });
   }
 
@@ -1072,7 +1066,7 @@ export class Export
     if (Array.isArray(item[field]))
     {
       let i: number = 0;
-      while (i < Object.keys(item[field]).length)   // lint hack to get around not recognizing item[field] as an array
+      while (i < Object.keys(item[field]).length)
       {
         this._parseDatesHelper(item[field], String(i));
         i++;
