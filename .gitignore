@@ -26,3 +26,4 @@ build/
 package-lock.json
 yarn-error.log
 .cache
+postgres-data
