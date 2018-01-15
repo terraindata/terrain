@@ -164,7 +164,6 @@ function treeFromDocument(document: object, name = ''): TemplateField
   }
   catch (e)
   {
-    console.error(`There is a problem with this document: ${e}`);
     return _TemplateField();
   }
 

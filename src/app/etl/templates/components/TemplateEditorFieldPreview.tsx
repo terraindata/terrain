@@ -67,10 +67,6 @@ import './TemplateEditorField.less';
 
 export interface Props extends TemplateEditorFieldProps
 {
-  keyPath: KeyPath;
-  field: TemplateField;
-  canEdit: boolean;
-  preview: any;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
@@ -120,10 +116,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
           <div className='editor-settings-wrapper' style={backgroundColor(Colors().highlight)}>
             <div className='editor-settings-arrow' style={getStyle('borderBottomColor', Colors().highlight)} />
             <TemplateEditorFieldSettings
-              keyPath={keyPath}
-              field={field}
-              canEdit={canEdit}
-              preview={preview}
+              {...this._passProps() }
             />
           </div>
         }

@@ -68,14 +68,11 @@ import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateType
 
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
+import TemplateEditorFieldTransformations from './TemplateEditorFieldTransformations';
 import TemplateEditorFieldTypeSection from './TemplateEditorFieldTypeSection';
 
 export interface Props extends TemplateEditorFieldProps
 {
-  keyPath: KeyPath;
-  field: TemplateField;
-  canEdit: boolean;
-  preview: any;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
@@ -92,7 +89,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 
   public render()
   {
-    const { keyPath, field, canEdit, preview } = this.props;
+    const { field } = this.props;
     return (
       <div className='template-editor-field-settings'>
         <div className='field-settings-row'>
@@ -104,7 +101,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
           </div>
           <Autocomplete
             value='sample value'
-            onChange={() => { }}
+            onChange={() => { /* do nothing */ }}
             options={List([])}
           />
         </div>
@@ -117,7 +114,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
             <div className='tef-checkbox-spacer'>
               <CheckBox
                 checked={field.isIncluded}
-                onChange={() => { }}
+                onChange={() => { /* do nothing */ }}
                 disabled={this._inputDisabled()}
               />
             </div>
@@ -125,10 +122,10 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
           </div>
         </div>
         <TemplateEditorFieldTypeSection
-          keyPath={keyPath}
-          field={field}
-          canEdit={canEdit}
-          preview={preview}
+          {...this._passProps() }
+        />
+        <TemplateEditorFieldTransformations
+          {...this._passProps() }
         />
       </div>
     );

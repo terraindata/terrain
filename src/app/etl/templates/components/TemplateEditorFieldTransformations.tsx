@@ -43,25 +43,31 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires import-spacing strict-boolean-expressions
 
-// tslint:disable:no-var-requires
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import ExpandableView from 'common/components/ExpandableView';
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+
+import Autocomplete from 'common/components/Autocomplete';
+import CheckBox from 'common/components/CheckBox';
+import Dropdown from 'common/components/Dropdown';
+import { Menu, MenuOption } from 'common/components/Menu';
+import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
+
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
-import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
-
-const AddIcon = require('images/icon_add.svg');
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -71,82 +77,22 @@ export interface Props extends TemplateEditorFieldProps
 }
 
 @Radium
-class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
+class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
 {
-  public state: {
-    expandableViewOpen: boolean;
-  } = {
-      expandableViewOpen: true,
-    };
-
-  public renderChildFields()
-  {
-    const { field, keyPath, canEdit, preview } = this.props;
-
-    return field.children.map((value, index) =>
-    {
-      const newKeyPath = keyPath.push('children', index);
-      const childPreview = preview !== undefined && preview !== null ? preview[value.name] : null;
-      return (
-        <TemplateEditorFieldNode
-          keyPath={newKeyPath}
-          field={value}
-          canEdit={field.isIncluded && canEdit}
-          preview={childPreview}
-          key={index}
-        />
-      );
-    }).toList();
-  }
-
   public render()
   {
-    const { field, keyPath, canEdit, preview } = this.props;
-
-    const settings = (
-      <TemplateEditorFieldPreview
-        {...this._passProps() }
-      />
+    const { keyPath, field, canEdit, preview } = this.props;
+    return (
+      <div className='template-editor-field-transformations'>
+        Edit transformations here
+      </div>
     );
-
-    const children = (this._isRoot() || this._isNested()) ? (
-      <div className='template-editor-children-container'>
-        {this.renderChildFields()}
-      </div>) : undefined;
-
-    if (this._isRoot())
-    {
-      return children;
-    }
-    else
-    {
-      const childrenStyle = (canEdit === true && field.isIncluded === false) ?
-        getStyle('opacity', '0.7') : {};
-      return (
-        <ExpandableView
-          content={settings}
-          open={this.state.expandableViewOpen}
-          onToggle={this.handleExpandArrowClicked}
-          children={children}
-          style={childrenStyle}
-        />
-      );
-    }
-  }
-
-  public handleExpandArrowClicked()
-  {
-    this.setState({
-      expandableViewOpen: !this.state.expandableViewOpen,
-    });
   }
 
 }
 
-const TemplateEditorFieldNode = Util.createTypedContainer(
-  TemplateEditorFieldNodeC,
+export default Util.createTypedContainer(
+  TemplateEditorFieldTransformations,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );
-
-export default TemplateEditorFieldNode;
