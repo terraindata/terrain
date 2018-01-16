@@ -84,7 +84,7 @@ class MySQLClient
     {
       this.getConnection((err, conn) =>
       {
-        if (err)
+        if (err !== null && err !== undefined)
         {
           resolve(false);
         }
