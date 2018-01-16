@@ -61,7 +61,7 @@ import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
 
 export interface TemplateEditorActionTypes
 {
-  loadTemplate: { // load a new template to edit / view
+  loadTemplate: {
     actionType: 'loadTemplate';
     template: ETLTemplate;
   };

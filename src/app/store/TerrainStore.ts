@@ -49,7 +49,6 @@ import * as Immutable from 'immutable';
 import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
 import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
 import { AuthReducers } from 'auth/data/AuthRedux';
-import ETLReducer from 'etl/data/ETLReducers';
 import { TemplateEditorReducers } from 'etl/templates/data/TemplateEditorRedux';
 import LibraryReducer from 'library/data/LibraryReducers';
 import { applyMiddleware, compose, createStore } from 'redux';
@@ -64,7 +63,6 @@ import { ColorsReducers } from '../colors/data/ColorsRedux';
 const reducers = {
   analytics: AnalyticsReducer,
   auth: AuthReducers,
-  etl: ETLReducer,
   colors: ColorsReducers,
   library: LibraryReducer,
   roles: RolesReducer,

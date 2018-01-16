@@ -51,8 +51,6 @@ import { backgroundColor, borderColor, Colors, fontColor } from 'src/app/colors/
 import Query from 'src/items/types/Query';
 import Util from 'util/Util';
 
-import ETLActions from 'etl/data/ETLActions';
-import { ETLState } from 'etl/ETLTypes';
 import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { TemplateEditorState } from 'etl/templates/TemplateTypes';
@@ -65,8 +63,6 @@ export interface Props
   serverId: string | number;
   algorithmName: string;
   // below from container
-  etl: ETLState;
-  etlActions: any;
   templateEditor: TemplateEditorState;
   templateEditorActions: typeof TemplateEditorActions;
 }
@@ -101,6 +97,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
 export default Util.createContainer(
   ETLExportDisplay,
-  ['etl', 'templateEditor'],
-  { etlActions: ETLActions, templateEditorActions: TemplateEditorActions },
+  ['templateEditor'],
+  { templateEditorActions: TemplateEditorActions },
 );
