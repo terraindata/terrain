@@ -66,10 +66,10 @@ import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
+import ElasticFieldTypeSection from './ElasticFieldTypeSection';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 import TemplateEditorFieldTransformations from './TemplateEditorFieldTransformations';
-import TemplateEditorFieldTypeSection from './TemplateEditorFieldTypeSection';
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -79,7 +79,7 @@ export interface Props extends TemplateEditorFieldProps
 }
 
 @Radium
-class ElasticFieldSettings extends TemplateEditorField<Props>
+class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 {
   public state: {
     settingsOpen: boolean;
@@ -119,7 +119,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
             <div className='tef-checkbox-label'> Include this field </div>
           </div>
         </div>
-        <TemplateEditorFieldTypeSection
+        <ElasticFieldTypeSection
           {...this._passProps() }
         />
         <TemplateEditorFieldTransformations
@@ -140,7 +140,7 @@ class ElasticFieldSettings extends TemplateEditorField<Props>
 }
 
 export default Util.createTypedContainer(
-  ElasticFieldSettings,
+  TemplateEditorFieldSettings,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );

@@ -60,8 +60,8 @@ const { List, Map } = Immutable;
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import ElasticFieldSettings from './ElasticFieldSettings';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
 import './TemplateEditorField.less';
 
@@ -111,7 +111,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
         {
           this.state.settingsOpen &&
           <div className='editor-settings-wrapper' style={backgroundColor(Colors().highlight)}>
-            <ElasticFieldSettings
+            <TemplateEditorFieldSettings
               {...this._passProps() }
             />
           </div>

@@ -73,7 +73,7 @@ export interface Props extends TemplateEditorFieldProps
 }
 
 @Radium
-class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
+class ElasticFieldTypeSection extends TemplateEditorField<Props>
 {
   constructor(props)
   {
@@ -331,7 +331,7 @@ function cleanArrayType(arrayType: List<ELASTIC_TYPES>)
 const voidFunction = () => { /* do nothing */ };
 
 export default Util.createTypedContainer(
-  TemplateEditorFieldTypeSection,
+  ElasticFieldTypeSection,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );
