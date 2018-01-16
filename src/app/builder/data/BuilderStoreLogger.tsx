@@ -43,8 +43,13 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import { BuilderStateUsedRecords } from 'builder/data/BuilderStore';
 import * as hdr from 'hdr-histogram-js';
+import * as Immutable from 'immutable';
 import * as TerrainLog from 'loglevel';
+import * as Serialize from 'remotedev-serialize';
+import { Block } from '../../../blocks/types/Block';
+import { RecordsSerializer } from '../../Classes';
 
 export default class BuilderStoreLogger
 {
@@ -52,11 +57,13 @@ export default class BuilderStoreLogger
 
   public static recordingActionPercentileLatency = false;
 
+  public static actionSerializationLog = [];
+  public static serializeAction = false;
+
   public static reduxMiddleWare = (store: any) =>
     (next: any) =>
       (action: any): any =>
       {
-        //  console.log('dispatching', action);
         const actionStart = performance.now();
         let result;
         try

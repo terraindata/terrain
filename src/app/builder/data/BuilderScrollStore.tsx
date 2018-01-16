@@ -48,9 +48,10 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as ReduxActions from 'redux-actions';
+import { BaseClass, createRecordType, New } from '../../Classes';
 const Redux = require('redux');
 
-export class BuilderScrollStateClass
+export class BuilderScrollStateClass extends BaseClass
 {
   public columnTop: number = 0;
   public columnHeight: number = 0;
@@ -58,7 +59,7 @@ export class BuilderScrollStateClass
   public totalHeight: number = 0;
 }
 export interface BuilderScrollState extends BuilderScrollStateClass, IMap<BuilderScrollState> { }
-const BuilderScrollState_Record = Immutable.Record(new BuilderScrollStateClass());
+const BuilderScrollState_Record = createRecordType(new BuilderScrollStateClass(), 'BuilderScrollStateClass');
 const _BuilderScrollState = (config?: any) =>
 {
   return new BuilderScrollState_Record(config || {}) as any as BuilderScrollState;

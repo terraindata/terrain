@@ -86,6 +86,8 @@ export const _TestClass = (config?: {[key:string]: any}) =>
 
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import * as TerrainLog from 'loglevel';
+import * as Serialize from 'remotedev-serialize';
 import Util from './util/Util';
 
 export class BaseClass
@@ -98,7 +100,9 @@ export class BaseClass
   }
 }
 
-const records: { [class_name: string]: Immutable.Record.Class } = {};
+const AllRecordMap: { [class_name: string]: Immutable.Record.Class } = {};
+const AllRecordArray = [];
+export let RecordsSerializer = Serialize.immutable(Immutable, []);
 
 export function New<T>(
   instance,
@@ -107,9 +111,12 @@ export function New<T>(
 ): T & IRecord<T>
 {
   const class_name = instance.__proto__.constructor.name;
-  if (!records[class_name])
+  if (!AllRecordMap[class_name])
   {
-    records[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
+    TerrainLog.info('New Record ' + class_name);
+    AllRecordMap[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
+    AllRecordArray.push(AllRecordMap[class_name]);
+    RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
   }
 
   if (extendId)
@@ -122,7 +129,19 @@ export function New<T>(
       instance[key] = value,
   );
 
-  return new records[class_name](instance) as any;
+  return new AllRecordMap[class_name](instance) as any;
+}
+
+export function createRecordType(obj, name)
+{
+  if (!AllRecordMap[name])
+  {
+    AllRecordMap[name] = Immutable.Record(obj);
+  }
+
+  AllRecordArray.push(AllRecordMap[name]);
+  RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
+  return AllRecordMap[name];
 }
 
 // This converts the standard Record class format to a plain JS

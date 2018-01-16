@@ -48,16 +48,24 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import { List, Map } from 'immutable';
-import {applyMiddleware, createStore, Dispatch, MiddlewareAPI} from 'redux';
+import { applyMiddleware, createStore, Dispatch, MiddlewareAPI } from 'redux';
 import { _FileImportState, FileImportState } from '../../fileImport/FileImportTypes';
 import { CardItem } from '../components/cards/CardComponent';
 import { _ResultsState, ResultsState } from '../components/results/ResultTypes';
 import { BuilderActionTypes, BuilderCardActionTypes, BuilderDirtyActionTypes } from './BuilderActionTypes';
 
+import { createRecordType } from '../../Classes';
+
+import BuilderStoreLogger from 'builder/data/BuilderStoreLogger';
+
 import { Cards } from '../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import BackendInstance from '../../../database/types/BackendInstance';
-import Query from '../../../items/types/Query';
+import Query, { Query_Record } from '../../../items/types/Query';
+
+import * as TerrainLog from 'loglevel';
+
+export const BuilderStateUsedRecords = [Query_Record];
 
 export class BuilderStateClass
 {
@@ -97,7 +105,7 @@ export class BuilderStateClass
   public modelVersion = 3;
 }
 export interface BuilderState extends BuilderStateClass, IMap<BuilderState> { }
-const BuilderState_Record = Immutable.Record(new BuilderStateClass());
+const BuilderState_Record = createRecordType(new BuilderStateClass(), 'BuilderStateClass');
 const _BuilderState = (config?: any) =>
 {
   return new BuilderState_Record(config || {}) as any as BuilderState;
@@ -107,8 +115,6 @@ const DefaultState = _BuilderState();
 
 import BuilderReducers from './BuilderReducers';
 
-import BuilderStoreLogger from 'builder/data/BuilderStoreLogger';
-import {Middleware} from 'react-router/lib/applyRouterMiddleware';
 import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
 
 export const BuilderStore: IStore<BuilderState> = createStore(
@@ -172,7 +178,6 @@ export const BuilderStore: IStore<BuilderState> = createStore(
       state = state.set('algorithmId', (state as any).variantId);
       state = state.set('loadingAlgorithmId', (state as any).loadingVariantId);
     }
-
     return state;
   }
   , DefaultState, applyMiddleware(BuilderStoreLogger.reduxMiddleWare));

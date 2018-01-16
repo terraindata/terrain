@@ -47,7 +47,7 @@ THE SOFTWARE.
 // tslint:disable:variable-name max-classes-per-file strict-boolean-expressions no-shadowed-variable
 
 import { List, Map, Record } from 'immutable';
-import { BaseClass, New } from '../Classes';
+import { BaseClass, createRecordType, New } from '../Classes';
 
 // This type represents the state of the FileImportStore
 class FileImportStateC extends BaseClass
@@ -103,7 +103,7 @@ class TransformArgsC
   public text?: string = '';                 // text to append/prepend, text to split/merge on
 }
 
-const TransformArgs_Record = Record(new TransformArgsC());
+const TransformArgs_Record = createRecordType(new TransformArgsC(), 'TransformArgsC');
 export interface TransformArgs extends TransformArgsC, IRecord<TransformArgs> { }
 export const _TransformArgs = (config?: any) =>
 {
@@ -117,7 +117,7 @@ class TransformC
   public args: TransformArgs = _TransformArgs();
 }
 
-const Transform_Record = Record(new TransformC());
+const Transform_Record = createRecordType(new TransformC(), 'TransformC');
 export interface Transform extends TransformC, IRecord<Transform> { }
 export const _Transform =
   (config: {
@@ -146,7 +146,8 @@ class TemplateC
   public tablename?: string = '';
 }
 
-const Template_Record = Record(new TemplateC());
+// const Template_Record = Record(new TemplateC());
+const Template_Record = createRecordType(new TemplateC(), 'TemplateC');
 export interface Template extends TemplateC, IRecord<Template> { }
 export const _Template =
   (config: {
@@ -177,7 +178,7 @@ class ColumnTypesTreeC
   public innerType?: ColumnTypesTree = null;
 }
 
-const ColumnTypesTree_Record = Record(new ColumnTypesTreeC());
+const ColumnTypesTree_Record = createRecordType(new ColumnTypesTreeC(), 'ColumnTypesTreeC');
 export interface ColumnTypesTree extends ColumnTypesTreeC, IRecord<ColumnTypesTree> { }
 export const _ColumnTypesTree = (config?: any) =>
 {
