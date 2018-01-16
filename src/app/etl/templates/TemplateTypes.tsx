@@ -99,7 +99,7 @@ class ExportTemplateC implements ExportTemplateBase
   public templateName = '';
   public readonly type = TEMPLATE_TYPES.EXPORT;
   public filetype = FILE_TYPES.JSON;
-  public rootField = _TemplateField({ type: ELASTIC_TYPES.NESTED });
+  public rootField = _TemplateField();
   public transformations = List([]);
   public objectKey = '';
   public dbid = -1;
@@ -116,7 +116,7 @@ class ImportTemplateC implements ImportTemplateBase
   public templateName = '';
   public readonly type = TEMPLATE_TYPES.IMPORT;
   public filetype = FILE_TYPES.JSON;
-  public rootField = _TemplateField({ type: ELASTIC_TYPES.NESTED });
+  public rootField = _TemplateField();
   public transformations = List([]);
   public objectKey = '';
   public dbid = -1;
