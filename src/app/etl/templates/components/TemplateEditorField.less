@@ -11,6 +11,7 @@
 .template-editor-field-block {
   display: flex;
   flex-direction: column;
+  padding: @quarter-spacing 0px;
 
   .field-preview-label-group {
     flex: 0 0 160px;
@@ -29,6 +30,7 @@
 
   .field-preview-value {
     padding: @half-spacing;
+    padding-left: @spacing;
     // display: flex;
     &.field-preview-value-settings-open {
       overflow: hidden;
@@ -44,8 +46,8 @@
   }
 
   .editor-settings-wrapper {
-    border-radius: 3px;
-    margin-left: @quarter-spacing;
+    // border-radius: 3px;
+    // margin-left: @quarter-spacing;
     position: relative;
 
     .editor-settings-arrow {
@@ -63,10 +65,9 @@
 
 // TemplateEditorFieldSettings
 .template-editor-field-settings {
-  padding: @quarter-spacing 0px;
+  padding: @half-spacing 0px;
   display: flex;
   flex-direction: column;
-  padding-bottom: 0px;
 
   .field-settings-row {
     display: flex;
@@ -103,7 +104,20 @@
 
 // TemplateEditorFieldTransformations
 .template-editor-field-transformations {
-  padding: @spacing;
+  padding: @half-spacing @spacing;
+}
+
+// TemplateEditorFieldArrayNode
+.template-editor-field-array-item {
+  display: flex;
+  margin-left: @spacing + @half-spacing;
+  .field-array-index {
+    padding: @half-spacing;
+    width: 160px;
+  }
+  .field-array-value {
+    padding: @half-spacing;
+  }
 }
 
 // shared

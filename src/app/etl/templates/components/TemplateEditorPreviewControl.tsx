@@ -80,9 +80,6 @@ class TemplateEditorPreviewControl extends TerrainComponent<Props>
 
     return (
       <div className='template-editor-preview-control'>
-        <div className='preview-control-title'>
-          Sample UI
-        </div>
         <div className='preview-control-row' >
           <div
             className='preview-control-arrow-styler'

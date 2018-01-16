@@ -53,10 +53,13 @@ import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import * as Immutable from 'immutable';
+const { List, Map } = Immutable;
+
 import ExpandableView from 'common/components/ExpandableView';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
+import { TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
@@ -99,6 +102,24 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
+  public renderArrayChildren()
+  {
+    const { field, preview } = this.props;
+    if (Array.isArray(preview))
+    {
+      return List(preview).map((value, index) =>
+      {
+        return (
+          <div className='template-editor-field-array-item' key={index}>
+            <div className='field-array-index'> {index} </div>
+            <div className='field-array-value'> {value} </div>
+          </div>
+        );
+      }).toList();
+    }
+
+  }
+
   public render()
   {
     const { field, keyPath, canEdit, preview } = this.props;
@@ -109,9 +130,11 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       />
     );
 
-    const children = (this._isRoot() || this._isNested()) ? (
+    const renderChildren = (this._isRoot() || this._isNested() || this._isArray());
+
+    const children = renderChildren ? (
       <div className='template-editor-children-container'>
-        {this.renderChildFields()}
+        {this._isArray() && !this._isNested() ? this.renderArrayChildren() : this.renderChildFields()}
       </div>) : undefined;
 
     if (this._isRoot())

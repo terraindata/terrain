@@ -105,6 +105,15 @@ class ETLExportDisplay extends TerrainComponent<Props>
     const titleTypeText = template.type === TEMPLATE_TYPES.IMPORT ? 'Import' : 'Export';
     return (
       <div className='template-editor-root-container'>
+        <div className='template-editor-title-bar'>
+          <div className='template-editor-title-bar-spacer'/>
+          <div className='template-editor-title'>
+            Preview
+          </div>
+          <div className='template-editor-preview-control-spacer'>
+            <TemplateEditorPreviewControl />
+          </div>
+        </div>
         <div className='template-editor' style={backgroundColor(Colors().bg3)}>
           <TemplateEditorFieldNode
             keyPath={List([])}
@@ -113,7 +122,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
             preview={previewDocument}
           />
         </div>
-        <TemplateEditorPreviewControl />
         <MultiModal
           requests={this.props.templateEditor.modalRequests}
           setRequests={this.setModalRequests}

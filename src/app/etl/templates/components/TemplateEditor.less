@@ -3,6 +3,31 @@
 .template-editor-root-container {
   margin: auto;
   display: flex;
+  flex-direction: column;
+
+  .template-editor-preview-control-spacer {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1 1 0;
+  }
+
+  .template-editor-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .template-editor-title-bar-spacer {
+      align-self: flex-start;
+      flex: 1 1 0;
+      width: 1px;
+    }
+
+    .template-editor-title {
+      text-align: center;
+      .title-text;
+    }
+  }
+
   .template-editor {
     padding: @spacing;
     padding-right: @double-spacing;

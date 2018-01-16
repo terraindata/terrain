@@ -79,7 +79,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   constructor(props)
   {
     super(props);
-    // this._setFactory = _.memoize(this._setFactory);
   }
 
   protected _passProps(): TemplateEditorFieldProps
@@ -128,6 +127,13 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
       (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
   }
 
+  // returns true if the field's type is an array
+  protected _isArray(): boolean
+  {
+    const type = this.props.field.type;
+    return type === ELASTIC_TYPES.ARRAY;
+  }
+
   protected _isExport(): boolean
   {
     return this.props.templateEditor.template !== undefined &&
@@ -138,36 +144,6 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     return this.props.keyPath.size === 0;
   }
-
-  // returns the depth of the field. root field returns 0.
-  // protected _depth(): number
-  // {
-  //   return Math.floor(this.props.keyPath.size / 2);
-  // }
-
-  // returns this field's parent field.
-  // protected _getParent(): TemplateField
-  // {
-  //   const keyPath = this.props.keyPath;
-  //   if (keyPath.size < 2)
-  //   {
-  //     return null;
-  //   }
-  //   const parentKeyPath = keyPath.slice(0, -2).toList();
-  //   const storeKeyPath = List(['template', 'rootField']).push(...parentKeyPath.toJS());
-  //   return this.props.templateEditor.getIn(storeKeyPath);
-  // }
-
-  // returns the index of this field under its parent. returns -1 if field has no parent.
-  // protected _getPosition(): number
-  // {
-  //   const keyPath = this.props.keyPath;
-  //   if (keyPath.size === 0)
-  //   {
-  //     return -1;
-  //   }
-  //   return this.props.keyPath.get(-1) as number;
-  // }
 
   protected _inputDisabled(): boolean
   {
@@ -180,16 +156,4 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     return this._inputDisabled() ? undefined : fn;
   }
 
-  // similar to setStateWrapper but performs _set on the field instead.
-  // protected _setFactory<K extends keyof TemplateField>(key: K, ...path: string[])
-  // {
-  //   return (val) =>
-  //   {
-  //     for (const property of path)
-  //     {
-  //       val = val[property];
-  //     }
-  //     this._set(key, val);
-  //   };
-  // }
 }

@@ -91,7 +91,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   {
     const { field } = this.props;
     return (
-      <div className='template-editor-field-settings'>
+      <div className='template-editor-field-settings' style={fontColor(Colors().text2)}>
         <div className='field-settings-row'>
           <div className='field-settings-label'> Configure This Field's Settings </div>
         </div>
@@ -104,11 +104,9 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
             onChange={() => { /* do nothing */ }}
             options={List([])}
           />
-        </div>
-        <div className='field-settings-row'>
           <div
             className='tef-checkbox-section'
-            style={field.isIncluded ? fontColor(Colors().text1) : fontColor(Colors().text3)}
+            style={field.isIncluded ? fontColor(Colors().text2) : fontColor(Colors().text3)}
             onClick={this.handleIncludeCheckboxClicked}
           >
             <div className='tef-checkbox-spacer'>
@@ -127,6 +125,9 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         <TemplateEditorFieldTransformations
           {...this._passProps() }
         />
+        <div className='field-settings-row'>
+          
+        </div>
       </div>
     );
   }
