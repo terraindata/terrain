@@ -59,6 +59,10 @@ const BuilderActions =
       (keyPath: KeyPath, value: any, notDirty = false) =>
         $(ActionTypes.change, { keyPath, value, notDirty }),
 
+    changePath:
+      (keyPath: KeyPath, value: any, notDirty = false) =>
+        $(ActionTypes.changePath, {keyPath, value, notDirty}),
+
     changeQuery:
       (query: Query) =>
         $(ActionTypes.changeQuery, { query }),

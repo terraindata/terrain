@@ -85,22 +85,22 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
 
   public addSampler(index, id)
   {
-    BuilderActions.change(this.props.keyPath.push('sampler'), _Sample());
+    BuilderActions.changePath(this.props.keyPath.push('sampler'), _Sample());
   }
 
   public addFilters()
   {
-    BuilderActions.change(this.props.keyPath.push('filters'), _FilterGroup());
+    BuilderActions.changePath(this.props.keyPath.push('filters'), _FilterGroup());
   }
 
   public addNested()
   {
-    BuilderActions.change(this.props.keyPath.push('nested'), List([]));
+    BuilderActions.changePath(this.props.keyPath.push('nested'), List([]));
   }
 
   public addScripts()
   {
-    BuilderActions.change(this.props.keyPath.push('scripts'), List([]));
+    BuilderActions.changePath(this.props.keyPath.push('scripts'), List([]));
   }
 
   public renderSampleSection()
@@ -170,12 +170,12 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
 
   public handleDeleteNestedLine(index)
   {
-    BuilderActions.change(this.props.keyPath.push('nested'), this.props.aggregation.nested.delete(index));
+    BuilderActions.changePath(this.props.keyPath.push('nested'), this.props.aggregation.nested.delete(index));
   }
 
   public handleAddLine()
   {
-    BuilderActions.change(this.props.keyPath.push('nested'), this.props.aggregation.nested.push(_AggregationLine()));
+    BuilderActions.changePath(this.props.keyPath.push('nested'), this.props.aggregation.nested.push(_AggregationLine()));
   }
 
   public renderNestedAggregations()
@@ -206,7 +206,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
 
   public handleAddScript()
   {
-    BuilderActions.change(this.props.keyPath.push('scripts'),
+    BuilderActions.changePath(this.props.keyPath.push('scripts'),
       this.props.aggregation.scripts.push(_Script()));
   }
 

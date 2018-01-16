@@ -59,20 +59,14 @@ export const schemaMetadata = new SchemaMetadata();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  let getItems: SchemaMetadataConfig[] = [];
-  if (ctx.query.type !== undefined)
+  const id = ctx.request.body.body.id;
+  let getItems;
+  if (id !== undefined)
   {
-    const typeArr: string[] = ctx.query.type.split(',');
-    for (const type of typeArr)
-    {
-      getItems = getItems.concat(await schemaMetadata.select([], { type }));
-    }
+    getItems = schemaMetadata.get(id);
   }
-  else
-  {
-    winston.info('getting all items');
-    getItems = await schemaMetadata.get();
-  }
+  winston.info('getting all items');
+  getItems = await schemaMetadata.get();
   ctx.body = getItems;
 });
 

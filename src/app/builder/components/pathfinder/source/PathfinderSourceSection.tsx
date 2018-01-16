@@ -174,7 +174,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   private handleExpandSelector()
   {
-    BuilderActions.change(this.props.keyPath.push('expanded'), !this.props.source.expanded);
+    BuilderActions.changePath(this.props.keyPath.push('expanded'), !this.props.source.expanded);
   }
 
   private handleSourceChange(index, key)
@@ -183,11 +183,11 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     const dataSource = this.props.pathfinderContext.source.dataSource;
     if ((dataSource as any).index !== undefined)
     {
-      BuilderActions.change(this.props.keyPath.push('dataSource').push('index'), options.get(index).value.id);
-      BuilderActions.change(this.props.keyPath.push('dataSource').push('types'), options.get(index).value.tableIds);
+      BuilderActions.changePath(this.props.keyPath.push('dataSource').push('index'), options.get(index).value.id);
+      BuilderActions.changePath(this.props.keyPath.push('dataSource').push('types'), options.get(index).value.tableIds);
     }
-    BuilderActions.change(this.props.keyPath.push('expanded'), false);
-    BuilderActions.change(this.props.keyPath.push('dataSource').push('name'), options.get(index).displayName);
+    BuilderActions.changePath(this.props.keyPath.push('expanded'), false);
+    BuilderActions.changePath(this.props.keyPath.push('dataSource').push('name'), options.get(index).displayName);
     if (this.props.step === PathfinderSteps.Source)
     {
       this.props.onStepChange(this.props.step);
@@ -196,7 +196,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   private handleCountChange(value: string | number)
   {
-    BuilderActions.change(this.props.keyPath.push('count'), value);
+    BuilderActions.changePath(this.props.keyPath.push('count'), value);
   }
 
   private getDataSourceOptions(overrideContext?: PathfinderContext): List<ChoiceOption>

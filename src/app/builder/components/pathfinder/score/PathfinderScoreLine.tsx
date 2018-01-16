@@ -120,7 +120,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   public handleTransformModeChange(index)
   {
     const options = ['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid'];
-    BuilderActions.change(this.props.keyPath.push('transformData').push('mode'), options[index]);
+    BuilderActions.changePath(this.props.keyPath.push('transformData').push('mode'), options[index]);
   }
 
   public renderTransformChart()
@@ -187,7 +187,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           helpOn={undefined}
           keyPath={this.props.keyPath.push('transformData')}
           language={'elastic'}
-          onChange={BuilderActions.change}
+          onChange={BuilderActions.changePath}
           parentData={undefined}
           index={this.props.pathfinderContext.source.dataSource.name}
         />

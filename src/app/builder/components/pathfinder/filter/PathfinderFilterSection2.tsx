@@ -332,14 +332,14 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
   {
     const oldLines = this.props.filterGroup.get('lines');
     const index = oldLines.indexOf(filter);
-    BuilderActions.change(this.props.keyPath.push('lines'), oldLines.delete(index));
+    BuilderActions.changePath(this.props.keyPath.push('lines'), oldLines.delete(index));
   }
 
   private handleAddFilter(field, e)
   {
     const oldLines = this.props.filterGroup.get('lines');
     const filter = _FilterLine({ field, comparison: 'equals', value: '' });
-    BuilderActions.change(this.props.keyPath.push('lines'), oldLines.push(filter));
+    BuilderActions.changePath(this.props.keyPath.push('lines'), oldLines.push(filter));
     e.stopPropagation();
     e.preventDefault();
   }

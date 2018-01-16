@@ -113,14 +113,14 @@ class PathfinderScoreSection extends TerrainComponent<Props>
   {
     this.handleAnimateScoreBars();
     const newLines = this.props.score.lines.delete(index);
-    BuilderActions.change(this.props.keyPath.push('lines'), newLines);
+    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public handleAddScoreLine()
   {
     this.handleAnimateScoreBars();
     const newLines = this.props.score.lines.push(_ScoreLine());
-    BuilderActions.change(this.props.keyPath.push('lines'), newLines);
+    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public handleValueChange(key, index, value)
@@ -128,7 +128,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     this.handleAnimateScoreBars();
     const newLine = this.props.score.lines.get(index).set(key, value);
     const newLines = this.props.score.lines.set(index, newLine);
-    BuilderActions.change(this.props.keyPath.push('lines'), newLines);
+    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public handleAnimateScoreBars()
@@ -242,7 +242,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
     {
       return this.props.score.lines.get(index);
     });
-    BuilderActions.change(this.props.keyPath.push('lines'), newLines);
+    BuilderActions.changePath(this.props.keyPath.push('lines'), newLines);
   }
 
   public handleDragStart()

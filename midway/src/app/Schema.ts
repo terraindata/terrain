@@ -147,7 +147,7 @@ export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
   }
   else if (dbtype === 'postgres')
   {
-    return tasty.getDB().execute(appSchemaSQL('timestamp with time zone', 'false', 'varchar(255)', 'serial'));
+    return tasty.getDB().execute(appSchemaSQL('timestamp with time zone', 'false', 'varchar(255)', 'integer'));
   }
   else
   {

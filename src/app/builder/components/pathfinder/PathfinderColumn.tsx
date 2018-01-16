@@ -122,7 +122,7 @@ class PathfinderColumn extends TerrainComponent<Props>
   {
     if (oldStep < PathfinderSteps.More)
     {
-      BuilderActions.change(this.getKeyPath().push('step'), this.props.path.step + 1);
+      BuilderActions.changePath(this.getKeyPath().push('step'), this.props.path.step + 1);
     }
   }
 

@@ -551,7 +551,6 @@ class Builder extends TerrainComponent<Props>
         return false;
       }
     }
-
     return !!(overrideState || this.state.builderState).isDirty;
   }
 
@@ -560,6 +559,7 @@ class Builder extends TerrainComponent<Props>
     let algorithm = LibraryTypes.touchAlgorithm(this.getAlgorithm());
     if (this.shouldSave())
     {
+      console.log(this.getQuery());
       algorithm = algorithm.set('query', this.getQuery());
       this.setState({
         saving: true,
