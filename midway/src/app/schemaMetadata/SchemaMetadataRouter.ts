@@ -52,44 +52,71 @@ import DatabaseController from '../../database/DatabaseController';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Tasty from '../../tasty/Tasty';
 import SchemaMetadata from './SchemaMetadata';
+import SchemaMetadataConfig from './SchemaMetadataConfig';
 
 const Router = new KoaRouter();
 export const schemaMetadata = new SchemaMetadata();
 
-Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.warn('Changing columns starred status');
-  const starred: boolean = ctx.request.body.body.starred;
-  const columnId: string | number = ctx.request.body.body.columnId;
-  winston.info(String(starred));
-  winston.info(String(columnId));
-  ctx.body = await schemaMetadata.upsert(ctx.state.user,
-    { starred, id: columnId });
-});
-
-Router.post('/count/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
-{
-  winston.info('Incrementing the count of a column');
-  const columnId: string | number = ctx.params.columnIdreq;
-  const count: number = ctx.request.body.body.count;
-  const algorithmId: string | number = ctx.request.body.body.algorithmId;
-  if (algorithmId === undefined)
+  let getItems: SchemaMetadataConfig[] = [];
+  if (ctx.query.type !== undefined)
   {
-    // Just incrementing the total count, not for a specific algorithm
-    // ctx.body = await schemaMetadata.upsert(ctx.state.user, { count, id: columnId });
+    const typeArr: string[] = ctx.query.type.split(',');
+    for (const type of typeArr)
+    {
+      getItems = getItems.concat(await schemaMetadata.select([], { type }));
+    }
   }
   else
   {
-    // TODO NEED TO MERGE THE COUNT BY ALGORITHM THING WITH THE COLUMN'S OLD countByAlgorithm property
-  //  ctx.body = await schemaMetadata.upsert(ctx.state.user, { countByAlgorithm: { algirithmId: count }, id: columnId });
+    winston.info('getting all items');
+    getItems = await schemaMetadata.get();
   }
+  ctx.body = getItems;
 });
 
-Router.get('/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.info('Retrieving column info');
-  const columnId: string | number = ctx.params.columnId;
-  ctx.body = await schemaMetadata.get(columnId);
+  winston.warn('TRYING TO CREATE A SCHEMA METADATA');
+  const item: SchemaMetadataConfig = ctx.request.body.body;
+  ctx.body = await schemaMetadata.upsert(ctx.state.user, item);
 });
+
+// Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
+// {
+//   winston.warn('Changing columns starred status');
+//   const starred: boolean = ctx.request.body.body.starred;
+//   const columnId: string | number = ctx.request.body.body.columnId;
+//   winston.info(String(starred));
+//   winston.info(String(columnId));
+//   ctx.body = await schemaMetadata.upsert(ctx.state.user,
+//     { starred, id: columnId });
+// });
+
+// Router.post('/count/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
+// {
+//   winston.info('Incrementing the count of a column');
+//   const columnId: string | number = ctx.params.columnIdreq;
+//   const count: number = ctx.request.body.body.count;
+//   const algorithmId: string | number = ctx.request.body.body.algorithmId;
+//   if (algorithmId === undefined)
+//   {
+//     // Just incrementing the total count, not for a specific algorithm
+//     // ctx.body = await schemaMetadata.upsert(ctx.state.user, { count, id: columnId });
+//   }
+//   else
+//   {
+//     // TODO NEED TO MERGE THE COUNT BY ALGORITHM THING WITH THE COLUMN'S OLD countByAlgorithm property
+//   //  ctx.body = await schemaMetadata.upsert(ctx.state.user, { countByAlgorithm: { algirithmId: count }, id: columnId });
+//   }
+// });
+
+// Router.get('/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
+// {
+//   winston.info('Retrieving column info');
+//   const columnId: string | number = ctx.params.columnId;
+//   ctx.body = await schemaMetadata.get(columnId);
+// });
 
 export default Router;

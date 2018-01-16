@@ -213,7 +213,6 @@ export class Items
 
         item = Util.updateObject(items[0], item);
       }
-
       resolve(await App.DB.upsert(this.itemTable, item) as ItemConfig);
     });
   }

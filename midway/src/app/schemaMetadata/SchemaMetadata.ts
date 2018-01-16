@@ -66,25 +66,15 @@ export class SchemaMetadata
       'schemaMetadata',
       ['id'],
       [
-        'starred',
+        'name',
        // 'count',
        // 'countByAlgorithm',
       ],
     );
   }
 
-  public async delete(user: UserConfig, id: number | string): Promise<object>
+  public async select(columns: string[], filter: object): Promise<SchemaMetadataConfig[]>
   {
-    if (!user.isSuperUser)
-    {
-      throw new Error('Only superusers can delete databases.');
-    }
-    return App.DB.delete(this.schemaMetadataTable, { id } as SchemaMetadataConfig);
-  }
-
-  public async select(columns: string[], filter?: object): Promise<SchemaMetadataConfig[]>
-  {
-    console.log('SELECT');
     return new Promise<SchemaMetadataConfig[]>(async (resolve, reject) =>
     {
       const rawResults = await App.DB.select(this.schemaMetadataTable, columns, filter);
@@ -93,55 +83,93 @@ export class SchemaMetadata
     });
   }
 
-  public async get(id?: number | string, fields?: string[]): Promise<SchemaMetadataConfig[]>
+  public async get(id?: number): Promise<SchemaMetadataConfig[]>
   {
-    console.log('SCHEMA GET');
-    console.log(id);
     if (id !== undefined)
     {
-      if (fields !== undefined)
-      {
-        return this.select(fields, { id });
-      }
       return this.select([], { id });
-    }
-    if (fields !== undefined)
-    {
-      return this.select(fields, {});
     }
     return this.select([], {});
   }
 
-  // TODO TODO
-  public async upsert(user: UserConfig, schema: SchemaMetadataConfig): Promise<SchemaMetadataConfig>
+  public async upsert(user: UserConfig, item: SchemaMetadataConfig): Promise<SchemaMetadataConfig>
   {
-     console.log('HERE IN UPSERT');
-     console.log(schema);
-     console.log(schema.id);
-    if (schema.id !== undefined)
+    console.log('IN UPSERT', item);
+    return new Promise<SchemaMetadataConfig>(async (resolve, reject) =>
     {
-      console.log('DEFINED SCHEMA ID');
-      const results: SchemaMetadataConfig[] = await this.get(schema.id);
-      console.log('MADE IT PAST SELECTING');
-      console.log(results);
-      if (results.length !== 0)
-      {
-        schema = Util.updateObject(results[0], schema);
-        console.log(schema);
-        console.log('HERE');
-      }
-    }
-    else
-    {
-      console.log('UNDEFINED SCHEMA ID');
-      const results: SchemaMetadataConfig[] = await this.get();
-      schema.id = results.length + 1;
-    }
-    console.log('SCHEMA IS ', schema);
-    console.log('MADE IT ALL THE WAY TO THE BOTTOM');
-    console.log(this.schemaMetadataTable);
-    return App.DB.upsert(this.schemaMetadataTable, schema) as Promise<SchemaMetadataConfig>;
+      resolve(await App.DB.upsert(this.schemaMetadataTable, item) as SchemaMetadataConfig);
+    });
   }
+
+  // public async delete(user: UserConfig, id: string): Promise<object>
+  // {
+  //   if (!user.isSuperUser)
+  //   {
+  //     throw new Error('Only superusers can delete databases.');
+  //   }
+  //   return App.DB.delete(this.schemaMetadataTable, { id } as SchemaMetadataConfig);
+  // }
+
+  // public async select(columns: string[], filter?: object): Promise<SchemaMetadataConfig[]>
+  // {
+  //   console.log('SELECT');
+  //   return new Promise<SchemaMetadataConfig[]>(async (resolve, reject) =>
+  //   {
+  //     const rawResults = await App.DB.select(this.schemaMetadataTable, columns, filter);
+  //     const results: SchemaMetadataConfig[] = rawResults.map((result: object) => new SchemaMetadataConfig(result));
+  //     resolve(results);
+  //   });
+  // }
+
+  // public async get(id?: string, fields?: string[]): Promise<SchemaMetadataConfig[]>
+  // {
+  //   console.log('SCHEMA GET');
+  //   console.log(id);
+  //   if (id !== undefined)
+  //   {
+  //     if (fields !== undefined)
+  //     {
+  //       return this.select(fields, { id });
+  //     }
+  //     return this.select([], { id });
+  //   }
+  //   if (fields !== undefined)
+  //   {
+  //     return this.select(fields, {});
+  //   }
+  //   return this.select([], {});
+  // }
+
+  // // TODO TODO
+  // public async upsert(user: UserConfig, schema: SchemaMetadataConfig): Promise<SchemaMetadataConfig>
+  // {
+  //    console.log('HERE IN UPSERT');
+  //    console.log(schema);
+  //    console.log(schema.id);
+  //   if (schema.id !== undefined)
+  //   {
+  //     console.log('DEFINED SCHEMA ID');
+  //     const results: SchemaMetadataConfig[] = await this.get(schema.id);
+  //     console.log('MADE IT PAST SELECTING');
+  //     console.log(results);
+  //     if (results.length !== 0)
+  //     {
+  //       schema = Util.updateObject(results[0], schema);
+  //       console.log(schema);
+  //       console.log('HERE');
+  //     }
+  //   }
+  //   else
+  //   {
+  //     console.log('UNDEFINED SCHEMA ID');
+  //     const results: SchemaMetadataConfig[] = await this.get();
+  //     schema.id = results.length + 1;
+  //   }
+  //   console.log('SCHEMA IS ', schema);
+  //   console.log('MADE IT ALL THE WAY TO THE BOTTOM');
+  //   console.log(this.schemaMetadataTable);
+  //   return App.DB.upsert(this.schemaMetadataTable, schema) as Promise<SchemaMetadataConfig>;
+  // }
 }
 
 export default SchemaMetadata;

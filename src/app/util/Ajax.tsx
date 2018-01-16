@@ -1203,24 +1203,35 @@ export const Ajax =
     },
 
     starColumn(columnId: ID, starred: boolean, onLoad?: (resp) => void, onError?: (error) => void)
-    {
-      console.log(starred);
-      console.log(columnId);
-      return Ajax.req('post', 'schemametadata/star', { columnId, starred }, (resp: any) =>
+    {  
+      return Ajax.req('post', 'schemametadata', {id: 'hello', name: 'hello'}, (resp: any) =>
       {
         try
         {
-          console.log(resp);
-          console.log('HERE');
-          Ajax.getColumnInfo(columnId);
-          onLoad && onLoad(resp);
+          console.log(resp)
         }
         catch (e)
         {
-          console.log('ERROR');
-          onError && onError(e);
+          console.log(e);
         }
       });
+      // console.log(starred);
+      // console.log(columnId);
+      // return Ajax.req('post', 'schemametadata/star', { columnId, starred }, (resp: any) =>
+      // {
+      //   try
+      //   {
+      //     console.log(resp);
+      //     console.log('HERE');
+      //     Ajax.getColumnInfo(columnId);
+      //     onLoad && onLoad(resp);
+      //   }
+      //   catch (e)
+      //   {
+      //     console.log('ERROR');
+      //     onError && onError(e);
+      //   }
+      // });
     },
 
     getColumnInfo(columnId: ID, onLoad?: (resp) => void, onError?: (error) => void)
