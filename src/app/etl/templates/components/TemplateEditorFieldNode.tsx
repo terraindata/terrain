@@ -102,7 +102,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
-  public renderArrayChildren()
+  public renderArrayChildren() // TODO: don't hack this; make this work for nested arrays and arrays of nested
   {
     const { field, preview } = this.props;
     if (Array.isArray(preview))
@@ -111,7 +111,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       {
         return (
           <div className='template-editor-field-array-item' key={index}>
-            <div className='field-array-index'> {index} </div>
+            <div className='field-array-index' style={fontColor(Colors().text3)}> {index} </div>
             <div className='field-array-value'> {value} </div>
           </div>
         );

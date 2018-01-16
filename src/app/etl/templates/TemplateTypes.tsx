@@ -130,15 +130,21 @@ export const _ImportTemplate = makeConstructor(ImportTemplateC);
 
 export type ETLTemplate = ImportTemplate | ExportTemplate;
 
+class ElasticFieldSettingsC
+{
+  public isAnalyzed: boolean = true;
+  public analyzer: string = '';
+  public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
+  public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
+}
+export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
+export const _ElasticFieldSettings = makeConstructor(ElasticFieldSettingsC);
+
 class TemplateFieldC
 {
   public isPrimaryKey: boolean = false; // import only
-  public isAnalyzed: boolean = true; // import only
   public isIncluded: boolean = true;
-  public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
-  public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
-  // if type is array. e.g. array of text, or array of array of text
-  public analyzer: string = '';
+  public langSettings: ElasticFieldSettings = _ElasticFieldSettings(); // if we add more languages, make this a union
   public originalName: string = ''; // this may change based on how we implement transformations
   public name: string = '';
   public children: List<TemplateField> = List([]);

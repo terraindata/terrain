@@ -55,7 +55,11 @@ import { MultiModal } from 'common/components/overlay/MultiModal';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import TemplateEditorPreviewControl from 'etl/templates/components/TemplateEditorPreviewControl';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _ExportTemplate, _TemplateField, ETLTemplate, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import
+{
+  _ElasticFieldSettings, _ExportTemplate, _TemplateField,
+  ETLTemplate, TemplateEditorState, TemplateField,
+} from 'etl/templates/TemplateTypes';
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 
@@ -106,7 +110,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
     return (
       <div className='template-editor-root-container'>
         <div className='template-editor-title-bar'>
-          <div className='template-editor-title-bar-spacer'/>
+          <div className='template-editor-title-bar-spacer' />
           <div className='template-editor-title'>
             Preview
           </div>
@@ -185,15 +189,15 @@ function treeFromDocument(document: object, name = ''): TemplateField
     {
       if (typeof value === 'number')
       {
-        children.push(_TemplateField({ name: key, type: ELASTIC_TYPES.FLOAT }));
+        children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.FLOAT }) }));
       }
       else if (typeof value === 'boolean')
       {
-        children.push(_TemplateField({ name: key, type: ELASTIC_TYPES.BOOLEAN }));
+        children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.BOOLEAN }) }));
       }
       else // assume text
       {
-        children.push(_TemplateField({ name: key, type: ELASTIC_TYPES.TEXT }));
+        children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.TEXT }) }));
       }
     }
     else if (Array.isArray(value))
@@ -225,14 +229,18 @@ function treeFromDocument(document: object, name = ''): TemplateField
       {
         arrayType.push(ELASTIC_TYPES.TEXT);
       }
-      children.push(_TemplateField({ name: key, type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) }));
+      children.push(_TemplateField(
+        {
+          name: key,
+          langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) }),
+        }));
     }
     else // nested
     {
       children.push(treeFromDocument(value, key));
     }
   }
-  return _TemplateField({ name, children: List(children), type: ELASTIC_TYPES.NESTED });
+  return _TemplateField({ name, children: List(children), langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.NESTED }) });
 }
 
 export default Util.createContainer(

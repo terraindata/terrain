@@ -59,7 +59,7 @@ const { List, Map } = Immutable;
 import CheckBox from 'common/components/CheckBox';
 import Dropdown from 'common/components/Dropdown';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import { _TemplateField, ElasticFieldSettings, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
@@ -75,7 +75,6 @@ export interface Props extends TemplateEditorFieldProps
 @Radium
 class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
 {
-
   constructor(props)
   {
     super(props);
@@ -92,12 +91,17 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
 
   public getDataTypeListIndex(): number
   {
-    return this._getTypeListIndex(this.props.field.type);
+    return this._getTypeListIndex(this.props.field.langSettings.type);
   }
 
   public getArrayTypeListIndex(arrayTypeIndex): number
   {
-    return this._getTypeListIndex(this.props.field.arrayType.get(arrayTypeIndex));
+    return this._getTypeListIndex(this.props.field.langSettings.arrayType.get(arrayTypeIndex));
+  }
+
+  public setLangSettings<K extends keyof ElasticFieldSettings>(key: K, value: ElasticFieldSettings[K])
+  {
+    this._set('langSettings', this.props.field.langSettings.set(key, value));
   }
 
   public renderAnalyzerSection()
@@ -107,18 +111,18 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
 
     const analyzedCheckbox = (
       <CheckBox
-        checked={field.isAnalyzed}
+        checked={field.langSettings.isAnalyzed}
         onChange={voidFunction}
         disabled={inputDisabled}
       />
     );
 
-    const showAnalyzer = field.isAnalyzed;
+    const showAnalyzer = field.langSettings.isAnalyzed;
 
     return (
       <div
         className='tef-checkbox-section'
-        style={field.isAnalyzed ? fontColor(Colors().text2) : fontColor(Colors().text3)}
+        style={field.langSettings.isAnalyzed ? fontColor(Colors().text2) : fontColor(Colors().text3)}
         onClick={this._noopIfDisabled(this.handleAnalyzedCheckboxClicked)}
       >
         <div className='tef-checkbox-spacer'> {analyzedCheckbox} </div>
@@ -132,7 +136,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
     const { field } = this.props;
     const inputDisabled = this._inputDisabled();
 
-    return field.arrayType.flatMap((value, i) =>
+    return field.langSettings.arrayType.flatMap((value, i) =>
     {
       const arrayTypeDropdown = (
         <Dropdown
@@ -163,12 +167,12 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
       />
     );
 
-    const showArrayTypeSection = field.type === ELASTIC_TYPES.ARRAY;
-    const showAnalyzedSection = field.type === ELASTIC_TYPES.TEXT ||
+    const showArrayTypeSection = field.langSettings.type === ELASTIC_TYPES.ARRAY;
+    const showAnalyzedSection = field.langSettings.type === ELASTIC_TYPES.TEXT ||
       (
-        field.type === ELASTIC_TYPES.ARRAY &&
-        field.arrayType.size > 0 &&
-        field.arrayType.get(field.arrayType.size - 1) === ELASTIC_TYPES.TEXT
+        field.langSettings.type === ELASTIC_TYPES.ARRAY &&
+        field.langSettings.arrayType.size > 0 &&
+        field.langSettings.arrayType.get(field.langSettings.arrayType.size - 1) === ELASTIC_TYPES.TEXT
       );
     // TODO make it show only for import
 
@@ -190,18 +194,19 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
     }
     const { field, act } = this.props;
     const nextType = elasticTypeOptions.get(index);
-    const currentType = this.props.field.type;
+    const currentType = this.props.field.langSettings.type;
     if (currentType === ELASTIC_TYPES.ARRAY && nextType !== ELASTIC_TYPES.ARRAY)
     { // if user changes type from array, clear the array type
-      this._set('arrayType', List([ELASTIC_TYPES.TEXT]));
-      this._set('type', elasticTypeOptions.get(index));
+      this.setLangSettings('arrayType', List([ELASTIC_TYPES.TEXT]));
+      this.setLangSettings('type', elasticTypeOptions.get(index));
     }
-    else if (isNested(currentType, field.arrayType) && !isNested(nextType, field.arrayType) && field.children.size > 0)
+    else if (isNested(currentType, field.langSettings.arrayType)
+      && !isNested(nextType, field.langSettings.arrayType) && field.children.size > 0)
     { // if user changes type from nested to something else and there are children, then show a warning
       const deferredAction = () =>
       {
         this._clearChildren();
-        this._set('type', elasticTypeOptions.get(index));
+        this.setLangSettings('type', elasticTypeOptions.get(index));
       };
       act({
         actionType: 'addModalConfirmation',
@@ -215,7 +220,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
     }
     else
     {
-      this._set('type', elasticTypeOptions.get(index));
+      this.setLangSettings('type', elasticTypeOptions.get(index));
     }
   }
 
@@ -224,7 +229,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
   {
     return (index: number) =>
     {
-      if (arrayTypeIndex >= this.props.field.arrayType.size
+      if (arrayTypeIndex >= this.props.field.langSettings.arrayType.size
         || arrayTypeIndex < 0
         || index >= elasticTypeOptions.size
         || index < 0)
@@ -234,13 +239,13 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
       else
       {
         const { field, act } = this.props;
-        const newArray = cleanArrayType(field.arrayType.set(arrayTypeIndex, elasticTypeOptions.get(index)));
-        if (!isNested(field.type, newArray) && field.children.size > 0)
+        const newArray = cleanArrayType(field.langSettings.arrayType.set(arrayTypeIndex, elasticTypeOptions.get(index)));
+        if (!isNested(field.langSettings.type, newArray) && field.children.size > 0)
         {
           const deferredAction = () =>
           {
             this._clearChildren();
-            this._set('arrayType', newArray);
+            this.setLangSettings('arrayType', newArray);
           };
           act({
             actionType: 'addModalConfirmation',
@@ -254,7 +259,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
         }
         else
         {
-          this._set('arrayType', newArray);
+          this.setLangSettings('arrayType', newArray);
         }
       }
     };
@@ -262,7 +267,7 @@ class TemplateEditorFieldTypeSection extends TemplateEditorField<Props>
 
   public handleAnalyzedCheckboxClicked()
   {
-    this._set('isAnalyzed', !this.props.field.isAnalyzed);
+    this.setLangSettings('isAnalyzed', !this.props.field.langSettings.isAnalyzed);
   }
 
 }

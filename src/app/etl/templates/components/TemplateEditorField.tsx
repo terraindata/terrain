@@ -121,8 +121,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   // returns true if the field's type is nested or if the field's arrayType ends with nested
   protected _isNested(): boolean
   {
-    const type = this.props.field.type;
-    const arrayType = this.props.field.arrayType;
+    const { type, arrayType } = this.props.field.langSettings;
     return type === ELASTIC_TYPES.NESTED ||
       (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
   }
@@ -130,7 +129,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   // returns true if the field's type is an array
   protected _isArray(): boolean
   {
-    const type = this.props.field.type;
+    const type = this.props.field.langSettings.type;
     return type === ELASTIC_TYPES.ARRAY;
   }
 
@@ -155,5 +154,4 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
   {
     return this._inputDisabled() ? undefined : fn;
   }
-
 }

@@ -64,7 +64,7 @@ import { Menu, MenuOption } from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
+import { TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
@@ -79,7 +79,7 @@ export interface Props extends TemplateEditorFieldProps
 }
 
 @Radium
-class TemplateEditorFieldSettings extends TemplateEditorField<Props>
+class ElasticFieldSettings extends TemplateEditorField<Props>
 {
   public state: {
     settingsOpen: boolean;
@@ -126,7 +126,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
           {...this._passProps() }
         />
         <div className='field-settings-row'>
-          
+
         </div>
       </div>
     );
@@ -140,7 +140,7 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 }
 
 export default Util.createTypedContainer(
-  TemplateEditorFieldSettings,
+  ElasticFieldSettings,
   ['templateEditor'],
   { act: TemplateEditorActions },
 );
