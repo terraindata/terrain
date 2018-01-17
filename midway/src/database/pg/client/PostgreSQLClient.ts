@@ -75,6 +75,15 @@ class PostgreSQLClient
     });
   }
 
+  public isConnected(): Promise<boolean>
+  {
+    this.controller.log('PostgreSQLClient.isConnected');
+    return new Promise<boolean>((resolve, reject) =>
+    {
+      this.delegate.connect((err, client, done) => resolve((err === undefined)));
+    });
+  }
+
   public query(queryString: string, params?: any[], callback?: any): pg.Query
   {
     this.controller.log('PostgreSQLClient.query', queryString, params);
