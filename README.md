@@ -307,7 +307,13 @@ test('GET /midway/v1/schema', (t) =>
 
 ### Front-end
 
-We do not yet have any front-end tests written.
+See the separate README.
+
+## Running in Production
+
+1. `yarn run build-prod` generates production `bundle.js`
+1. Need to copy that into `/midway/src/assets/bundle.js`
+1. and run midway with `NODE_ENV=production`
 
 
 ## Useful Tutorials and Articles
