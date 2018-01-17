@@ -308,6 +308,7 @@ test('GET /midway/v1/schema', (t) =>
 ### Front-end
 
 See the separate README.
+We are using Jest for front-end unit testing.
 
 ## Running in Production
 
@@ -315,6 +316,34 @@ See the separate README.
 1. Need to copy that into `/midway/src/assets/bundle.js`
 1. and run midway with `NODE_ENV=production`
 
+#### How do I run front-end tests?
+
+To run all front-end tests, use:
+
+`yarn test-front`
+
+If you want to run an individual unit test, you can use:
+`./node_modules/.bin/jest <path/to/your/test/file>`
+
+#### Where are the test files?
+
+You can find them at `src/test`. It mirrors the structure of `src/app`.
+
+#### Writing your first test
+
+When you add a new feature in the front-end, you will have to test every new component, action creator and reducer. For examples of how to test each of these you can take a look at `src/test/analytics/`
+
+* In Component tests, you will be asserting on the component structure -make sure it renders the correct children in all variantions of component state and props- and also on the component interactions -event handlers and react lifecycle methods-
+* In redux action creator tests, you will be asserting that it dispatches all the actions that it is supposed to, to the redux store .
+* In redux reducer tests, you will be asserting that the state change is the expected.
+
+#### Test helpers
+
+In `src/test/test-helpers` you can find helper classes and functions that you can use to aid the creation of fake environments to isolate your unit tests and prevent duplicated code.
+
+#### Techonologies
+
+We combine [Jest](https://facebook.github.io/jest/) along with [Enzyme](http://airbnb.io/enzyme/) to fake the component render in unit tests.
 
 ## Useful Tutorials and Articles
 
