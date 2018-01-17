@@ -114,7 +114,7 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
         const creatingField: TemplateField = state.getIn(fieldKeyPath);
         const nextIndex = creatingField.children.size;
         return state.set('isDirty', true).
-          setIn(fieldKeyPath.push('children', nextIndex), action.payload.field);
+          setIn(fieldKeyPath.push('children', nextIndex), action.payload.field); // TODO try updateIn
       },
       updateField: (state, action) =>
       {
