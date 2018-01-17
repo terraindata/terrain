@@ -307,14 +307,7 @@ test('GET /midway/v1/schema', (t) =>
 
 ### Front-end
 
-See the separate README.
 We are using Jest for front-end unit testing.
-
-## Running in Production
-
-1. `yarn run build-prod` generates production `bundle.js`
-1. Need to copy that into `/midway/src/assets/bundle.js`
-1. and run midway with `NODE_ENV=production`
 
 #### How do I run front-end tests?
 
@@ -344,6 +337,11 @@ In `src/test/test-helpers` you can find helper classes and functions that you ca
 #### Techonologies
 
 We combine [Jest](https://facebook.github.io/jest/) along with [Enzyme](http://airbnb.io/enzyme/) to fake the component render in unit tests.
+
+## Running in Production
+
+1. `yarn run build-prod` generates production `bundle.js` into `/midway/src/assets/bundle.js`
+1. Run midway with `NODE_ENV=production`
 
 ## Useful Tutorials and Articles
 
