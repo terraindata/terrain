@@ -92,6 +92,7 @@ export interface Props
   // For card, keeps map in sync with card / builder
   textKeyPath?: KeyPath;
   keyPath?: KeyPath;
+  action?: (keyPath, value) => void;
 
   // builder information
   spotlights?: any;
@@ -293,9 +294,17 @@ class MapComponent extends TerrainComponent<Props>
     }
     if (this.props.keyPath !== undefined)
     {
-      Actions.change(this.props.keyPath, location);
       const addr = inputName ? inputName : address;
-      Actions.change(this.props.textKeyPath, addr);
+      if (this.props.action !== undefined)
+      {
+        this.props.action(this.props.keyPath, location);
+        this.props.action(this.props.keyPath, addr);
+      }
+      else
+      {
+        Actions.change(this.props.keyPath, location);
+        Actions.change(this.props.textKeyPath, addr);
+      }
     }
   }
 

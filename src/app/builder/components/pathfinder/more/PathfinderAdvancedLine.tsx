@@ -122,6 +122,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
             keyPath={this.props.keyPath.push(item.key)}
             language='elastic'
             placeholder={item.placeholder}
+            action={BuilderActions.changePath}
           />;
         break;
       case 'multi':
@@ -152,6 +153,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
             options={options}
             selectedIndex={options.indexOf(this.props.advancedData.get(item.key))}
             optionsDisplayName={item.optionDisplayNames}
+            action={BuilderActions.changePath}
           />;
         break;
       case 'map':
@@ -168,6 +170,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
               keyPath={this.props.keyPath.push(item.key)}
               textKeyPath={this.props.keyPath.push(item.textKey)}
               hideSearchSettings={true}
+              action={BuilderActions.changePath}
             />
           </div>;
         break;
@@ -207,6 +210,7 @@ export class PathfinderAdvancedLine extends TerrainComponent<Props>
           keyPath={this.props.keyPath.push(radioKey)}
           onSelectOption={this.props.onRadioChange}
           radioKey={radioKey}
+          action={BuilderActions.changePath}
         />
       );
     }

@@ -399,9 +399,11 @@ class SchemaTreeItem extends TerrainComponent<Props>
   public toggleStarredColumn()
   {
     // Call schema store function that will set this column to starred in midway
+    const item = this.props.schema.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
+    const columnId = item.databaseId + '/' + item.name;
     this.props.schemaActions({
       actionType: 'starColumn',
-      columnId: this.props.id,
+      columnId,
       starred: !this.state.starred,
     });
     this.setState({

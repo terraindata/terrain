@@ -114,6 +114,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
           selected={sampleType}
           radioKey={'sampleType'}
           keyPath={this.props.keyPath.push('sampler').push('sampleType')}
+          action={BuilderActions.changePath}
           options={List([
             {
               key: 'global',
@@ -128,6 +129,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                     value={this.props.aggregation.sampler.numSamples}
                     keyPath={this.props.keyPath.push('sampler').push('numSamples')}
                     canEdit={canEdit && sampleType === 'sampler'}
+                    action={BuilderActions.changePath}
                   />
                   <span>hits</span>
                 </div>,
@@ -141,6 +143,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                     value={this.props.aggregation.sampler.numSamples}
                     keyPath={this.props.keyPath.push('sampler').push('numSamples')}
                     canEdit={canEdit && sampleType === 'diversified_sampler'}
+                    action={BuilderActions.changePath}
                   />
                   <span>hits with unique</span>
                   <Dropdown
@@ -148,6 +151,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                     options={fields}
                     keyPath={this.props.keyPath.push('sampler').push('diverseField')}
                     canEdit={canEdit && sampleType === 'diversified_sampler'}
+                    action={BuilderActions.changePath}
                   />
                 </div>,
             },
@@ -195,7 +199,8 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                 key={i}
               />
             );
-          })}        <PathfinderCreateLine
+          })}
+        <PathfinderCreateLine
           canEdit={this.props.pathfinderContext.canEdit}
           onCreate={this.handleAddLine}
           text={PathfinderText.createAggregationLine}
@@ -226,6 +231,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                     canEdit={this.props.pathfinderContext.canEdit}
                     keyPath={this.props.keyPath.push('scripts').push(i).push('id')}
                     placeholder={'Script Name'}
+                    action={BuilderActions.changePath}
                   />
                 </div>
                 <BuilderTextbox
@@ -233,6 +239,7 @@ export class PathfinderAggregationMoreArea extends TerrainComponent<Props>
                   keyPath={this.props.keyPath.push('scripts').push(i).push('script')}
                   canEdit={this.props.pathfinderContext.canEdit}
                   textarea={true}
+                  action={BuilderActions.changePath}
                 />
               </div>
             );

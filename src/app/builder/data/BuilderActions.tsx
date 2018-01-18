@@ -118,8 +118,8 @@ const BuilderActions =
 
     // load query from server into state
     queryLoaded:
-      (query: Query, xhr: XMLHttpRequest, db: BackendInstance) =>
-        $(ActionTypes.queryLoaded, { query, xhr, db }),
+      (query: Query, algorithmId: ID, xhr: XMLHttpRequest, db: BackendInstance) =>
+        $(ActionTypes.queryLoaded, { query, algorithmId, xhr, db }),
 
     save:
       (failed?: boolean) =>

@@ -69,6 +69,7 @@ export interface Props
   width?: string;
   label?: string;
   allowCustomInput?: boolean;
+  action?: (keyPath, value) => void;
 }
 
 class LinearSelector extends TerrainComponent<Props>
@@ -131,7 +132,14 @@ class LinearSelector extends TerrainComponent<Props>
     }
     if (this.props.keyPath)
     {
-      Actions.change(this.props.keyPath, option);
+      if (this.props.action)
+      {
+        this.props.action(this.props.keyPath, option);
+      }
+      else
+      {
+        Actions.change(this.props.keyPath, option);
+      }
     }
     if (this.props.onChange)
     {
@@ -261,6 +269,7 @@ class LinearSelector extends TerrainComponent<Props>
                     onBlur={this.submitCustomInput}
                     autoFocus={true}
                     onChange={this.onInputChange}
+                    action={this.props.action}
                   /> :
                   this.state.usingCustomValue ?
                     this.props.selected :

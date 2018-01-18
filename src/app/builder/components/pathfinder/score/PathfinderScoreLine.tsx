@@ -231,6 +231,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           isNumber={true}
           autoDisabled={true}
           onChange={this.props.onAnimateScoreBars}
+          action={BuilderActions.changePath}
         />
         <span className='pf-score-line-text'>times</span>
         <SearchableDropdown
@@ -239,6 +240,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('field')}
           placeholder={'Field...'}
+          action={BuilderActions.changePath}
         />
         {
           this.props.line.field &&

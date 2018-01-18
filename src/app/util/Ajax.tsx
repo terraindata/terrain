@@ -1228,7 +1228,6 @@ export const Ajax =
 
     schemaMetadata(id?: number, onLoad?: (resp) => void, onError?: (error) => void)
     {
-      console.log('Here in ajax', id);
       return Ajax.req('get', 'schemametadata/', { id }, (resp: any) =>
       {
         try
@@ -1244,13 +1243,12 @@ export const Ajax =
 
     countColumn(
       columnId: ID,
-      count: number,
       algorithmId?: string | number,
       id?: number,
       onLoad?: (resp) => void,
       onError?: (error) => void)
     {
-      const body = id === undefined ? { columnId, count, algorithmId } : { columnId, count, algorithmId, id };
+      const body = id === undefined ? { columnId, algorithmId } : { columnId, algorithmId, id };
       return Ajax.req('post', 'schemametadata/count', body, (resp: any) =>
       {
         try

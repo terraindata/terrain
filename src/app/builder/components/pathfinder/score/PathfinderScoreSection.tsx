@@ -147,6 +147,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           selectedIndex={dropdownOptions.map((option) => option.displayName).indexOf(line.field)}
           canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('lines').push(index).push('field')}
+          action={BuilderActions.changePath}
         />
         <Dropdown
           options={List(['asc', 'desc'])}
@@ -154,6 +155,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
           selectedIndex={List(['asc', 'desc']).indexOf(line.sortOrder)}
           canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('lines').push(index).push('sortOrder')}
+          action={BuilderActions.changePath}
         />
       </div>
     );
@@ -286,6 +288,7 @@ class PathfinderScoreSection extends TerrainComponent<Props>
             keyPath={this.props.keyPath.push('type')}
             tooltips={List(types.map((type) => PathfinderText.scoreSectionTypes[type].tooltip))}
             canEdit={canEdit}
+            action={BuilderActions.changePath}
           />
         </div>
         {

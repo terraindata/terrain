@@ -295,11 +295,13 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
                   selectedIndex={comparisonOptions.map((option) => option.value).toList().indexOf(filter.comparison)}
                   keyPath={this.props.keyPath.push('lines').push(i).push('comparison')}
                   canEdit={canEdit}
+                  action={BuilderActions.changePath}
                 />
                 <BuilderTextbox
                   value={filter.value}
                   keyPath={this.props.keyPath.push('lines').push(i).push('value')}
                   canEdit={canEdit}
+                  action={BuilderActions.changePath}
                 />
                 <div
                   onClick={this._fn(this.handleRemoveFilter, filter)}

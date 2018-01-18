@@ -159,6 +159,62 @@ export class SchemaMetadata
       resolve(await App.DB.upsert(this.schemaMetadataTable, schemaMetadata) as SchemaMetadataConfig);
     });
   }
+
+  // First, look in database by id or by column id for the item
+  // if it is in there, increment it's count by 1
+  // Look for that algorithm id in its countByAlgorithm -> if there, increment, otherwise add and set to 1
+  // otherwise, create a new item with the given column id and set it's count to 1
+  // set countByAlgirithm to {algorithmId: 1}
+  // stringify countByAlgorithm
+  // upsert it into thet data base
+  public async increment(user: UserConfig, columnId: string, algorithmId: number): Promise<SchemaMetadataConfig>
+  {
+    const algorithmIdString = String(algorithmId);
+    return new Promise<SchemaMetadataConfig>(async (resolve, reject) =>
+    {
+      let schemaMetadata: SchemaMetadataConfig;
+      const results: SchemaMetadataConfig[] = await this.select(
+        ['columnId',
+          'count',
+          'countByAlgorithm',
+          'id',
+          'starred',
+        ],
+        {
+          columnId,
+        });
+      if (results.length > 0)
+      {
+        schemaMetadata = results[0];
+        const oldCountByAlgorithm = JSON.parse(results[0].countByAlgorithm !== undefined ?
+          results[0].countByAlgorithm : '{}');
+        if (oldCountByAlgorithm[algorithmIdString] !== undefined)
+        {
+          oldCountByAlgorithm[algorithmIdString] += 1;
+        }
+        else
+        {
+          oldCountByAlgorithm[algorithmIdString] = 1;
+        }
+        schemaMetadata['countByAlgorithm'] = JSON.stringify(oldCountByAlgorithm);
+        schemaMetadata['count'] += 1;
+      }
+      else
+      {
+        if (columnId === undefined)
+        {
+          reject('SchemaMetadata must have a column id');
+        }
+        schemaMetadata = {
+          columnId,
+          count: 1,
+          starred: false,
+          countByAlgorithm: JSON.stringify({ [algorithmIdString]: 1 }),
+        };
+      }
+      resolve(await App.DB.upsert(this.schemaMetadataTable, schemaMetadata) as SchemaMetadataConfig);
+    });
+  }
 }
 
 export default SchemaMetadata;

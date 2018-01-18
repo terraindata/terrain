@@ -368,6 +368,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           keyPath={this.props.keyPath.push('type')}
           onChange={this.handleTypeChange}
           canEdit={canEdit}
+          action={BuilderActions.changePath}
         />
         <SearchableDropdown
           selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
@@ -376,33 +377,11 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           canEdit={canEdit}
           placeholder={'Field'}
           keyPath={this.props.keyPath.push('field')}
+          action={BuilderActions.changePath}
         />
       </div>
     );
   }
-
-  //   <Select
-  //   name='field-name'
-  //   value={this.props.aggregation.field}
-  //   onChange={this.handleFieldChange}
-  //   options={
-  //     this.state.fieldOptions.map((option) => {
-  //       return {
-  //         value: option,
-  //         label: option,
-  //       }
-  //     }).toArray()
-  //   }
-  // />
-
-  // <Dropdown
-  //        selectedIndex={this.state.fieldOptions.indexOf(this.props.aggregation.field)}
-  //        options={this.state.fieldOptions}
-  //        onChange={this.handleFieldChange}
-  //        canEdit={canEdit}
-  //        placeholder={'Field'}
-  //        keyPath={this.props.keyPath.push('field')}
-  //      />
 
   // Given a type of advanced section to return, and the advanced
   // data from the aggregation return an PathfinderAdvancedLine with the

@@ -353,6 +353,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 value={value.distance}
                 canEdit={pathfinderContext.canEdit}
                 keyPath={this.props.keyPath.push('value').push('distance')}
+                action={this.props.onChange}
               />
               <Dropdown
                 options={List(_.keys(units))}
@@ -360,6 +361,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 canEdit={pathfinderContext.canEdit}
                 optionsDisplayName={Map(units)}
                 keyPath={this.props.keyPath.push('value').push('units')}
+                action={this.props.onChange}
               />
               <MapComponent
                 address={value.address}
@@ -377,6 +379,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 distanceUnit={value.units}
                 wrapperClassName={'pf-filter-map-component-wrapper'}
                 fadeInOut={true}
+                action={this.props.onChange}
               />
             </div>
           </div>

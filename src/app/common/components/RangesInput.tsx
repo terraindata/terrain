@@ -67,7 +67,7 @@ export interface Props
 {
   canEdit: boolean;
   keyPath?: KeyPath;
-  action?: (keyPath, items) => void;
+  action: (keyPath, items) => void;
   onChange?: (items) => void;
   ranges: List<any>;
 }
@@ -164,15 +164,15 @@ class RangesInput extends TerrainComponent<Props>
     if (!value || value === '*')
     {
       const newRange = this.props.ranges.get(index).delete(key);
-      BuilderActions.change(this.props.keyPath.push(index), newRange);
+      this.props.action(this.props.keyPath.push(index), newRange);
     }
     else if (!isNaN(value))
     {
-      BuilderActions.change(this.props.keyPath.push(index).push(key), parseFloat(value));
+      this.props.action(this.props.keyPath.push(index).push(key), parseFloat(value));
     }
     else
     {
-      BuilderActions.change(this.props.keyPath.push(index).push(key), value);
+      this.props.action(this.props.keyPath.push(index).push(key), value);
     }
   }
 

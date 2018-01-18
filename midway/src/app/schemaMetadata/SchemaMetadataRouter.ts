@@ -79,8 +79,8 @@ Router.post('/star', passport.authenticate('access-token-local'), async (ctx, ne
 Router.post('/count', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   winston.info('Incrementing the count of a schemaMetadata');
-  const metaData: SchemaMetadataConfig = ctx.request.body.body;
-  ctx.body = await schemaMetadata.upsert(ctx.state.user, metaData);
+  const { columnId, algorithmId } = ctx.request.body.body;
+  ctx.body = await schemaMetadata.increment(ctx.state.user, columnId, algorithmId);
 });
 
 export default Router;

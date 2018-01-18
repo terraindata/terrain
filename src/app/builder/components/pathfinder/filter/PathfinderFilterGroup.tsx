@@ -110,6 +110,7 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
             selected={this.props.filterGroup.minMatches}
             allowCustomInput={true}
             canEdit={canEdit}
+            action={this.props.onChange}
           />
           ,
           // <div>

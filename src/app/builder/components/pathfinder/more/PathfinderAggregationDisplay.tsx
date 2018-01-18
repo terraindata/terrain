@@ -47,6 +47,7 @@ import BuilderTextbox from 'app/common/components/BuilderTextbox';
 import Dropdown from 'app/common/components/Dropdown';
 import { List, Map } from 'immutable';
 import * as React from 'react';
+import BuilderActions from '../../../data/BuilderActions';
 import PathfinderText from '../PathfinderText';
 import { ADVANCED } from '../PathfinderTypes';
 
@@ -397,6 +398,7 @@ export const AdvancedDisplays = Map<ADVANCED | string, AdvancedAggregationDispla
                   value={value}
                   keyPath={keyPath.push(key)}
                   canEdit={canEdit}
+                  action={BuilderActions.changePath}
                 />
                 : null
             }
