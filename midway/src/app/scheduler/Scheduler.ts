@@ -675,6 +675,14 @@ export class Scheduler
           const unwrappedParams = [(schedule['jobId'] as number)].concat(JSON.parse(schedule.paramsScheduleStr as string));
           this.jobMap[(schedule['jobId'] as number)](...unwrappedParams);
         }
+        else if (schedule.currentlyRunning === true)
+        {
+          reject(['Schedule is already running.']);
+        }
+        else
+        {
+          reject(['Schedule is deleted and cannot be run.']);
+        }
       }
       else
       {
