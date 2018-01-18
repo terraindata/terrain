@@ -1202,6 +1202,28 @@ export const Ajax =
       );
     },
 
+    runOnDemandSchedule(
+      id: ID,
+      onLoad: (resp: object[]) => void,
+      onError?: (ev: string) => void,
+    )
+    {
+      const payload = {};
+
+      return Ajax.req(
+        'post',
+        'scheduler/run/' + String(id),
+        payload,
+        (response: object[]) =>
+        {
+          onLoad(response);
+        },
+        {
+          onError,
+        },
+      );
+    },
+
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1

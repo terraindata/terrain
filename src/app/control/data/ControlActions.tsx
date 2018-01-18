@@ -132,6 +132,15 @@ const ControlActions =
               onError,
               fetchSchedules: ControlActions.importExport.fetchSchedules,
             }),
+
+        runOnDemandSchedule:
+          (id: ID, onLoad, onError) =>
+            $(ActionTypes.importExport.runOnDemandSchedule, {
+              id,
+              onLoad,
+              onError,
+              fetchSchedules: ControlActions.importExport.fetchSchedules,
+            }),
       },
 
   };
