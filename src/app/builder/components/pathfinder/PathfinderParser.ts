@@ -107,7 +107,6 @@ export function parsePath(path: Path, inputs): string
   const text = stringifyWithParameters(baseQuery.toJS(), inputs);
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, {}, inputs);
-  // return JSON.stringify(baseQuery.toJS(), null, 2);
 }
 
 function parseSource(source: Source): any
@@ -168,11 +167,19 @@ function parseTerrainScore(score: Score)
       },
     },
   };
+  // This is a weird race condition where the path starts loading with the old path and then switches to new path...
+  let dirty = false;
   const factors = score.lines.map((line) =>
   {
     let ranges = [];
     let outputs = [];
     let data;
+    const transformData = Util.asJS(line.transformData);
+    if (transformData === undefined)
+    {
+      dirty = true;
+      return {};
+    }
     const min = Util.asJS(line.transformData).dataDomain[0];
     const max = Util.asJS(line.transformData).dataDomain[1];
     const numPoints = 31;
@@ -214,6 +221,10 @@ function parseTerrainScore(score: Score)
     };
   }).toArray();
   sortObj._script.script.params.factors = factors;
+  if (dirty)
+  {
+    return {};
+  }
   return sortObj;
 }
 

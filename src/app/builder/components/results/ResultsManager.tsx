@@ -57,6 +57,7 @@ import MidwayError from '../../../../../shared/error/MidwayError';
 import { MidwayErrorItem } from '../../../../../shared/error/MidwayErrorItem';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { AllBackendsMap } from '../../../../database/AllBackends';
+import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import Query from '../../../../items/types/Query';
@@ -403,79 +404,95 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private queryM2Results(query: Query, db: BackendInstance)
   {
-    if (query.parseTree === null || query.parseTree.hasError())
+    //
+    // if (query.parseTree === null || query.parseTree.hasError())
+    // {
+    //   return;
+    // }
+    // TODO: This only allows that path to make queries ( when one exists )
+    let eql;
+    if (query === this.state.lastQuery)
     {
       return;
     }
-    if (query !== this.state.lastQuery)
+    if (query.parseTree === null && query.path)
     {
-      // TODO TODO: SINCE WE ARE USING THE PATHFINDER AND THERE IS NO PARSE
-      // TREE BUILT FOR IT, WE JUST USE THE TQL FOR THE QUERY
-      const eql = AllBackendsMap[query.language].parseTreeToQueryString(
+      try
+      {
+        eql = stringifyWithParameters(JSON.parse(query.tql), query.inputs);
+      }
+      catch (e)
+      {
+        return;
+      }
+    }
+    else
+    {
+      eql = AllBackendsMap[query.language].parseTreeToQueryString(
         query,
         {
           replaceInputs: true,
         },
       );
-      this.setState({
-        lastQuery: query,
-        queriedTql: query.tql,
-        query: Ajax.query(
-          query.tql,
-          db,
-          (resp) =>
-          {
-            this.handleM2QueryResponse(resp, false);
-          },
-          (err) =>
-          {
-            this.handleM2RouteError(err, false);
-          },
-        ),
-      });
-
-      // let allFieldsQueryCode;
-      // try
-      // {
-      //   allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
-      //     query,
-      //     {
-      //       allFields: true,
-      //       replaceInputs: true,
-      //     },
-      //   );
-      // }
-      // catch (err)
-      // {
-      //   console.log('Could not generate all field Elastic request, reason:' + err);
-      // }
-      // if (allFieldsQueryCode)
-      // {
-      //   this.setState({
-      //     allQuery: Ajax.query(
-      //       allFieldsQueryCode,
-      //       db,
-      //       (resp) =>
-      //       {
-      //         this.handleM2QueryResponse(resp, true);
-      //       },
-      //       (err) =>
-      //       {
-      //         this.handleM2RouteError(err, true);
-      //       },
-      //     ),
-      //   });
-      //
-      // }
-
-      this.changeResults({
-        loading: true,
-        hasLoadedResults: false,
-        hasLoadedAllFields: false,
-        hasLoadedCount: false,
-        hasLoadedTransform: false,
-      });
     }
+    this.setState({
+      lastQuery: query,
+      queriedTql: query.tql,
+      query: Ajax.query(
+        query.tql,
+        db,
+        (resp) =>
+        {
+          this.handleM2QueryResponse(resp, false);
+        },
+        (err) =>
+        {
+          this.handleM2RouteError(err, false);
+        },
+      ),
+    });
+
+    this.changeResults({
+      loading: true,
+      hasLoadedResults: false,
+      hasLoadedAllFields: false,
+      hasLoadedCount: false,
+      hasLoadedTransform: false,
+    });
+
+    // let allFieldsQueryCode;
+    // try
+    // {
+    //   allFieldsQueryCode = AllBackendsMap[query.language].parseTreeToQueryString(
+    //     query,
+    //     {
+    //       allFields: true,
+    //       replaceInputs: true,
+    //     },
+    //   );
+    // }
+    // catch (err)
+    // {
+    //   console.log('Could not generate all field Elastic request, reason:' + err);
+    // }
+    // if (allFieldsQueryCode)
+    // {
+    //   this.setState({
+    //     allQuery: Ajax.query(
+    //       allFieldsQueryCode,
+    //       db,
+    //       (resp) =>
+    //       {
+    //         this.handleM2QueryResponse(resp, true);
+    //       },
+    //       (err) =>
+    //       {
+    //         this.handleM2RouteError(err, true);
+    //       },
+    //     ),
+    //   });
+    //
+    // }
   }
 
   private updateResults(resultsData: any, isAllFields: boolean)
