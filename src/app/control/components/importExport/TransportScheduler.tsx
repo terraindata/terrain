@@ -64,7 +64,8 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
-import { LibraryStore } from 'library/data/LibraryStore';
+import { LibraryState } from 'library/LibraryTypes';
+import Util from 'util/Util';
 
 import ControlActions from '../../data/ControlActions';
 import TemplateSelector from './TemplateSelector';
@@ -78,6 +79,7 @@ export interface Props
   templates: List<Template>;
   credentials: List<CredentialConfig>;
   index: number;
+  library?: LibraryState;
   getServerName: (dbid) => string;
   modalOpen: boolean;
   onClose: () => void;
@@ -503,7 +505,7 @@ class TransportScheduler extends TerrainComponent<Props>
         {
           !!template.export &&
           <AlgorithmSelector
-            libraryState={LibraryStore.getState()}
+            libraryState={this.props.library}
             onChangeSelection={this._setStateWrapperPath('selectedIds')}
             ids={this.state.selectedIds}
             dropdownWidth={inputElementWidth}
@@ -661,4 +663,8 @@ Examples:
 const helpTooltipElement = <div className='scheduler-help-text'> {scheduleHelpText} </div>;
 const defaultCRONparams = ['0', '0', '*', '*', 'SUN'];
 
-export default TransportScheduler;
+export default Util.createTypedContainer(
+  TransportScheduler,
+  ['library'],
+  {},
+);
