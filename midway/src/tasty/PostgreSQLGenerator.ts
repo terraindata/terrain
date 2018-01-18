@@ -586,7 +586,7 @@ export default class SQLGenerator
     }
     if (node.type === 'boolean')
     {
-      return node.value === true ? '1' : '0';
+      return node.value === true ? 'true' : 'false';
     }
     if (node.type === 'date')
     {
