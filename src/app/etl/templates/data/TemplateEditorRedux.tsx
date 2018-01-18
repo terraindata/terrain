@@ -96,6 +96,10 @@ export interface TemplateEditorActionTypes
     actionType: 'setPreviewIndex';
     index: number;
   };
+  setSettingsKeyPath: {
+    actionType: 'setSettingsKeyPath';
+    keyPath: KeyPath;
+  };
 }
 
 class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes, TemplateEditorState>
@@ -145,6 +149,10 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       setPreviewIndex: (state, action) =>
       {
         return state.set('previewIndex', action.payload.index);
+      },
+      setSettingsKeyPath: (state, action) =>
+      {
+        return state.set('settingsKeyPath', action.payload.keyPath);
       },
     };
 }

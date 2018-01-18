@@ -58,10 +58,9 @@ class TemplateEditorStateC
   public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
   public isDirty: boolean = true;
   public modalRequests: List<ModalProps> = List([]);
-  // public previewDocument: object = {};
-  // public originalDocument: object = {};
   public documents: List<object> = List([]);
   public previewIndex: number = 0;
+  public settingsKeyPath: KeyPath = null;
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);

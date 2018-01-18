@@ -81,53 +81,48 @@ export interface Props extends TemplateEditorFieldProps
 @Radium
 class TemplateEditorFieldSettings extends TemplateEditorField<Props>
 {
-  public state: {
-    settingsOpen: boolean;
-  } = {
-      settingsOpen: false,
-    };
-
-  public render()
+  public renderGeneralSettings()
   {
     const { field } = this.props;
     return (
+      <div className='field-settings-row'>
+        <div className='field-settings-label'>
+          Name
+        </div>
+        <Autocomplete
+          value='sample value'
+          onChange={() => { /* do nothing */ }}
+          options={List([])}
+        />
+        <div
+          className='tef-checkbox-section'
+          style={field.isIncluded ? fontColor(Colors().text2) : fontColor(Colors().text3)}
+          onClick={this.handleIncludeCheckboxClicked}
+        >
+          <div className='tef-checkbox-spacer'>
+            <CheckBox
+              checked={field.isIncluded}
+              onChange={() => { /* do nothing */ }}
+              disabled={this._inputDisabled()}
+            />
+          </div>
+          <div className='tef-checkbox-label'> Include this field </div>
+        </div>
+      </div>
+    );
+  }
+
+  public render()
+  {
+    return (
       <div className='template-editor-field-settings' style={fontColor(Colors().text2)}>
-        <div className='field-settings-row'>
-          <div className='field-settings-label'> Configure This Field's Settings </div>
-        </div>
-        <div className='field-settings-row'>
-          <div className='field-settings-label'>
-            Name
-          </div>
-          <Autocomplete
-            value='sample value'
-            onChange={() => { /* do nothing */ }}
-            options={List([])}
-          />
-          <div
-            className='tef-checkbox-section'
-            style={field.isIncluded ? fontColor(Colors().text2) : fontColor(Colors().text3)}
-            onClick={this.handleIncludeCheckboxClicked}
-          >
-            <div className='tef-checkbox-spacer'>
-              <CheckBox
-                checked={field.isIncluded}
-                onChange={() => { /* do nothing */ }}
-                disabled={this._inputDisabled()}
-              />
-            </div>
-            <div className='tef-checkbox-label'> Include this field </div>
-          </div>
-        </div>
+        {this.renderGeneralSettings()}
         <ElasticFieldTypeSection
           {...this._passProps() }
         />
         <TemplateEditorFieldTransformations
           {...this._passProps() }
         />
-        <div className='field-settings-row'>
-
-        </div>
       </div>
     );
   }

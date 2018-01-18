@@ -75,16 +75,12 @@ export interface Props extends TemplateEditorFieldProps
 @Radium
 class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 {
-  public state: {
-    settingsOpen: boolean;
-  } = {
-      settingsOpen: false,
-    };
 
   public render()
   {
     const { canEdit, field, keyPath, preview } = this.props;
-    const labelStyle = this.state.settingsOpen ?
+    const settingsOpen = this.props.templateEditor.settingsKeyPath === keyPath;
+    const labelStyle = settingsOpen ?
       _.extend({}, fontColor(Colors().text1, Colors().text1), backgroundColor(Colors().highlight))
       :
       fontColor(Colors().text3, Colors().text2);
@@ -92,7 +88,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
       <div className='template-editor-field-block'>
         <div className='field-preview-row'>
           <div className='field-preview-label-group' style={labelStyle}>
-            <div className='field-preview-label' onClick={this.handleToggleSettings}>
+            <div className='field-preview-label' onClick={this.handleLabelClicked}>
               {field.name}
             </div>
           </div>
@@ -101,7 +97,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
             <div
               className={classNames({
                 'field-preview-value': true,
-                'field-preview-value-settings-open': this.state.settingsOpen,
+                'field-preview-value-settings-open': settingsOpen,
               })}
             >
               {this.props.preview.toString()}
@@ -109,21 +105,22 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
           }
         </div>
         {
-          this.state.settingsOpen &&
-          <div className='editor-settings-wrapper' style={backgroundColor(Colors().highlight)}>
-            <TemplateEditorFieldSettings
-              {...this._passProps() }
-            />
-          </div>
+          // this.state.settingsOpen &&
+          // <div className='editor-settings-wrapper' style={backgroundColor(Colors().highlight)}>
+          //   <TemplateEditorFieldSettings
+          //     {...this._passProps() }
+          //   />
+          // </div>
         }
       </div>
     );
   }
 
-  public handleToggleSettings()
+  public handleLabelClicked()
   {
-    this.setState({
-      settingsOpen: !this.state.settingsOpen,
+    this.props.act({
+      actionType: 'setSettingsKeyPath',
+      keyPath: this.props.keyPath,
     });
   }
 }

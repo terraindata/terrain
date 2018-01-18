@@ -53,6 +53,7 @@ import Util from 'util/Util';
 
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
+import TemplateEditorFieldSettings from 'etl/templates/components/TemplateEditorFieldSettings';
 import TemplateEditorPreviewControl from 'etl/templates/components/TemplateEditorPreviewControl';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import
@@ -102,13 +103,36 @@ class ETLExportDisplay extends TerrainComponent<Props>
     });
   }
 
-  public render()
+  public renderSettingsSection()
+  {
+    const { template, settingsKeyPath } = this.props.templateEditor;
+    const renderSettings = settingsKeyPath !== null &&
+      settingsKeyPath !== undefined &&
+      template.rootField.hasIn(settingsKeyPath);
+
+    const field = renderSettings ? template.rootField.getIn(settingsKeyPath) : null;
+    return (
+      <div className='template-editor-column settings-column'>
+        {
+          renderSettings &&
+          <TemplateEditorFieldSettings
+            keyPath={settingsKeyPath}
+            field={field}
+            preview={'placeholder'}
+            canEdit={true}
+          />
+        }
+      </div>
+    );
+  }
+
+  public renderEditorSection()
   {
     const { template, documents, previewIndex } = this.props.templateEditor;
     const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
-    const titleTypeText = template.type === TEMPLATE_TYPES.IMPORT ? 'Import' : 'Export';
+
     return (
-      <div className='template-editor-root-container'>
+      <div className='template-editor-column main-document-column'>
         <div className='template-editor-title-bar'>
           <div className='template-editor-title-bar-spacer' />
           <div className='template-editor-title'>
@@ -126,6 +150,25 @@ class ETLExportDisplay extends TerrainComponent<Props>
             preview={previewDocument}
           />
         </div>
+      </div>
+    );
+  }
+
+  public renderDocumentsSection()
+  {
+    return (
+      <div className='template-editor-column preview-documents-column' />
+    );
+  }
+
+  public render()
+  {
+
+    return (
+      <div className='template-editor-root-container'>
+        {this.renderSettingsSection()}
+        {this.renderEditorSection()}
+        {this.renderDocumentsSection()}
         <MultiModal
           requests={this.props.templateEditor.modalRequests}
           setRequests={this.setModalRequests}
