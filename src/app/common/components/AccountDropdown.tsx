@@ -58,6 +58,7 @@ import Util from '../../util/Util';
 import './AccountDropdown.less';
 import Modal from './Modal';
 const CommitLog = require('../../../commitlog.txt');
+const VersionLog = require('../../../versionlog.txt');
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -77,7 +78,7 @@ export interface Props
 export interface State
 {
   open?: boolean;
-  commitLogOpen?: boolean;
+  aboutTerrainOpen?: boolean;
   showingCredits?: boolean;
 }
 
@@ -181,12 +182,12 @@ class AccountDropdown extends TerrainComponent<Props>
         </div>
         {
           users.currentUser && users.currentUser.isSuperUser &&
-          <div className='account-dropdown-row' onMouseDown={this._toggle('commitLogOpen')}>
+          <div className='account-dropdown-row' onMouseDown={this._toggle('aboutTerrainOpen')}>
             <div className='account-dropdown-icon account-dropdown-icon-blue'>
               <InfoIcon />
             </div>
             <div className='account-dropdown-link'>
-              Commit Log
+              About Terrain
             </div>
           </div>
         }
@@ -240,11 +241,12 @@ class AccountDropdown extends TerrainComponent<Props>
         }
 
         <Modal
-          message={CommitLog}
-          open={this.state.commitLogOpen}
-          title={'Commit Log'}
-          onClose={this._toggle('commitLogOpen')}
+          message={VersionLog.concat("\n \n Commit Log: \n").concat(CommitLog)}
+          open={this.state.aboutTerrainOpen}
+          title={'Terrain'}
+          onClose={this._toggle('aboutTerrainOpen')}
           pre={true}
+          noFooterPadding={true}
         />
 
         <Modal
