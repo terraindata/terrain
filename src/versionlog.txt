@@ -1,0 +1,4 @@
+Version: v2.1.0.2
+Updates: Run now button, images in results span full width 
+
+Commit Log: 
