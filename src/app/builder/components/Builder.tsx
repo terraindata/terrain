@@ -559,7 +559,6 @@ class Builder extends TerrainComponent<Props>
     let algorithm = LibraryTypes.touchAlgorithm(this.getAlgorithm());
     if (this.shouldSave())
     {
-      console.log(this.getQuery());
       algorithm = algorithm.set('query', this.getQuery());
       this.setState({
         saving: true,
@@ -643,7 +642,6 @@ class Builder extends TerrainComponent<Props>
     const key = this.state.colKeys.get(index);
     const query = this.getQuery();
     const algorithm = this.getAlgorithm();
-
     return {
       minWidth: 316,
       resizeable: true,

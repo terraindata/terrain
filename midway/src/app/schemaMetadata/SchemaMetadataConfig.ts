@@ -48,12 +48,11 @@ import ConfigType from '../ConfigType';
 
 export class SchemaMetadataConfig extends ConfigType
 {
-  public id?: string = undefined;
-  public name: string = '';
- // public starred?: boolean = false;
- // public count?: number = 0;
-  // Maps algorithmIds to the number of the times a column has been used in that algorithm
- // public countByAlgorithm?: object = {};
+  public id?: number = undefined;
+  public columnId: string = undefined;
+  public starred: boolean = false;
+  public count: number = 0;
+  public countByAlgorithm: string = undefined;
 
   constructor(props: object)
   {

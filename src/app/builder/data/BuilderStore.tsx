@@ -155,14 +155,11 @@ export const BuilderStore: IStore<BuilderState> = createStore(
     if (BuilderPathActionTypes[action.type])
     {
       const path = state.query.path;
-      console.log('HERE!!');
-      console.log(path);
       state = state.setIn(['query', 'tql'], AllBackendsMap[state.query.language].pathToCode(path, state.query.inputs));
     }
 
     if (BuilderCardActionTypes[action.type])
     {
-      console.log('HERE IN CARDS STUFF');
       // a card changed and we need to re-translate the tql
       //  needs to be after the card change has affected the state
       const newCards = ESCardParser.parseAndUpdateCards(state.query.cards);

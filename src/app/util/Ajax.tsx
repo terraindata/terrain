@@ -1202,46 +1202,20 @@ export const Ajax =
       );
     },
 
-    starColumn(columnId: ID, starred: boolean, onLoad?: (resp) => void, onError?: (error) => void)
-    {  
-      return Ajax.req('post', 'schemametadata', {id: 'hello', name: 'hello'}, (resp: any) =>
-      {
-        try
-        {
-          console.log(resp)
-        }
-        catch (e)
-        {
-          console.log(e);
-        }
-      });
-      // console.log(starred);
-      // console.log(columnId);
-      // return Ajax.req('post', 'schemametadata/star', { columnId, starred }, (resp: any) =>
-      // {
-      //   try
-      //   {
-      //     console.log(resp);
-      //     console.log('HERE');
-      //     Ajax.getColumnInfo(columnId);
-      //     onLoad && onLoad(resp);
-      //   }
-      //   catch (e)
-      //   {
-      //     console.log('ERROR');
-      //     onError && onError(e);
-      //   }
-      // });
-    },
-
-    getColumnInfo(columnId: ID, onLoad?: (resp) => void, onError?: (error) => void)
+    starColumn(
+      columnId: ID,
+      starred: boolean,
+      id?: number,
+      onLoad?: (resp) => void,
+      onError?: (error) => void)
     {
-      return Ajax.req('get', 'schemametadata/' + columnId, {}, (resp: any) =>
+      console.log('Star column');
+      const body = id !== undefined ? { columnId, starred, id } : { columnId, starred, id };
+      return Ajax.req('post', 'schemametadata/star', body, (resp: any) =>
       {
         try
         {
           console.log(resp);
-          console.log('HERE');
           onLoad && onLoad(resp);
         }
         catch (e)
@@ -1252,18 +1226,35 @@ export const Ajax =
       });
     },
 
+    schemaMetadata(id?: number, onLoad?: (resp) => void, onError?: (error) => void)
+    {
+      console.log('Here in ajax', id);
+      return Ajax.req('get', 'schemametadata/', { id }, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
     countColumn(
       columnId: ID,
       count: number,
       algorithmId?: string | number,
+      id?: number,
       onLoad?: (resp) => void,
       onError?: (error) => void)
     {
-      return Ajax.req('post', 'schemametadata/count/' + columnId, { count, algorithmId }, (resp: any) =>
+      const body = id === undefined ? { columnId, count, algorithmId } : { columnId, count, algorithmId, id };
+      return Ajax.req('post', 'schemametadata/count', body, (resp: any) =>
       {
         try
         {
-          console.log(resp);
           onLoad && onLoad(resp);
         }
         catch (e)

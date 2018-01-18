@@ -134,8 +134,11 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
      label text NOT NULL,
      events text NOT NULL); `,
   `CREATE TABLE IF NOT EXISTS schemaMetadata
-       (id text PRIMARY KEY,
-       name text NOT NULL); `
+       (id ` + primaryKeyType + ` PRIMARY KEY,
+       columnId text NOT NULL,
+       count integer NOT NULL,
+       starred bool NOT NULL,
+       countByAlgorithm text); `
   ,
 ];
 
@@ -147,7 +150,7 @@ export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
   }
   else if (dbtype === 'postgres')
   {
-    return tasty.getDB().execute(appSchemaSQL('timestamp with time zone', 'false', 'varchar(255)', 'integer'));
+    return tasty.getDB().execute(appSchemaSQL('timestamp with time zone', 'false', 'varchar(255)', 'serial'));
   }
   else
   {

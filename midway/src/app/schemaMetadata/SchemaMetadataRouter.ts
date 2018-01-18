@@ -59,58 +59,28 @@ export const schemaMetadata = new SchemaMetadata();
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  const id = ctx.request.body.body.id;
   let getItems;
-  if (id !== undefined)
+  if (ctx.request.body.body !== undefined && ctx.request.body.body.id !== undefined)
   {
-    getItems = schemaMetadata.get(id);
+    getItems = schemaMetadata.get(ctx.request.body.body.id);
   }
-  winston.info('getting all items');
+  winston.info('getting all schemaMetadata');
   getItems = await schemaMetadata.get();
   ctx.body = getItems;
 });
 
-Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
-  winston.warn('TRYING TO CREATE A SCHEMA METADATA');
-  const item: SchemaMetadataConfig = ctx.request.body.body;
-  ctx.body = await schemaMetadata.upsert(ctx.state.user, item);
+  winston.info('Starring a schemaMetadata');
+  const metaData: SchemaMetadataConfig = ctx.request.body.body;
+  ctx.body = await schemaMetadata.upsert(ctx.state.user, metaData);
 });
 
-// Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
-// {
-//   winston.warn('Changing columns starred status');
-//   const starred: boolean = ctx.request.body.body.starred;
-//   const columnId: string | number = ctx.request.body.body.columnId;
-//   winston.info(String(starred));
-//   winston.info(String(columnId));
-//   ctx.body = await schemaMetadata.upsert(ctx.state.user,
-//     { starred, id: columnId });
-// });
-
-// Router.post('/count/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
-// {
-//   winston.info('Incrementing the count of a column');
-//   const columnId: string | number = ctx.params.columnIdreq;
-//   const count: number = ctx.request.body.body.count;
-//   const algorithmId: string | number = ctx.request.body.body.algorithmId;
-//   if (algorithmId === undefined)
-//   {
-//     // Just incrementing the total count, not for a specific algorithm
-//     // ctx.body = await schemaMetadata.upsert(ctx.state.user, { count, id: columnId });
-//   }
-//   else
-//   {
-//     // TODO NEED TO MERGE THE COUNT BY ALGORITHM THING WITH THE COLUMN'S OLD countByAlgorithm property
-//   //  ctx.body = await schemaMetadata.upsert(ctx.state.user, { countByAlgorithm: { algirithmId: count }, id: columnId });
-//   }
-// });
-
-// Router.get('/:columnId', passport.authenticate('access-token-local'), async (ctx, next) =>
-// {
-//   winston.info('Retrieving column info');
-//   const columnId: string | number = ctx.params.columnId;
-//   ctx.body = await schemaMetadata.get(columnId);
-// });
+Router.post('/count', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('Incrementing the count of a schemaMetadata');
+  const metaData: SchemaMetadataConfig = ctx.request.body.body;
+  ctx.body = await schemaMetadata.upsert(ctx.state.user, metaData);
+});
 
 export default Router;

@@ -58,9 +58,9 @@ import ItemRouter from './items/ItemRouter';
 import QueryRouter from './query/QueryRouter';
 import SchedulerRouter from './scheduler/SchedulerRouter';
 import SchemaRouter from './schema/SchemaRouter';
+import SchemaMetadataRouter from './schemaMetadata/SchemaMetadataRouter';
 import StatusRouter from './status/StatusRouter';
 import UserRouter from './users/UserRouter';
-import SchemaMetadataRouter from './schemaMetadata/SchemaMetadataRouter';
 import * as Util from './Util';
 import VersionRouter from './versions/VersionRouter';
 

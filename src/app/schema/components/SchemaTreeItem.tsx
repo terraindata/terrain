@@ -145,6 +145,19 @@ class SchemaTreeItem extends TerrainComponent<Props>
   public componentWillMount()
   {
     this.componentWillReceiveProps(this.props);
+    // Set initial starred value of column
+    if (this.props.type === 'column')
+    {
+      let starred = false;
+      const metadata = this.props.schema.schemaMetadata.filter((d) => d.columnId === this.props.id).toList();
+      if (metadata.size && metadata.get(0).starred)
+      {
+        starred = true;
+      }
+      this.setState({
+        starred,
+      });
+    }
   }
 
   public componentWillReceiveProps(nextProps: Props)
@@ -389,11 +402,11 @@ class SchemaTreeItem extends TerrainComponent<Props>
     this.props.schemaActions({
       actionType: 'starColumn',
       columnId: this.props.id,
-      starred: !(this.props.schema.getIn(['starredColumns', this.props.id])),
+      starred: !this.state.starred,
     });
-    // this.setState({
-    //   starred: !this.state.starred,
-    // });
+    this.setState({
+      starred: !this.state.starred,
+    });
   }
 
   public render()
@@ -449,7 +462,7 @@ class SchemaTreeItem extends TerrainComponent<Props>
                   this.props.type === 'column' &&
                   <div onClick={this.toggleStarredColumn}>
                     <StarIcon
-                      style={this.props.schema.getIn(['starredColumns', this.props.id])
+                      style={this.state.starred
                         ? Styles.selectedStarIcon : Styles.unselectedStarIcon}
                     />
                   </div>

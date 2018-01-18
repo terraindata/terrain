@@ -66,9 +66,10 @@ export class SchemaMetadata
       'schemaMetadata',
       ['id'],
       [
-        'name',
-       // 'count',
-       // 'countByAlgorithm',
+        'columnId',
+        'starred',
+        'count',
+        'countByAlgorithm',
       ],
     );
   }
@@ -92,84 +93,72 @@ export class SchemaMetadata
     return this.select([], {});
   }
 
-  public async upsert(user: UserConfig, item: SchemaMetadataConfig): Promise<SchemaMetadataConfig>
+  public async upsert(user: UserConfig, schemaMetadata: SchemaMetadataConfig): Promise<SchemaMetadataConfig>
   {
-    console.log('IN UPSERT', item);
     return new Promise<SchemaMetadataConfig>(async (resolve, reject) =>
     {
-      resolve(await App.DB.upsert(this.schemaMetadataTable, item) as SchemaMetadataConfig);
+      // Modifying an existing schema metadata, make sure the schema metadata exists in midway combine the new
+      // information with the stored information
+      if (schemaMetadata.id !== undefined)
+      {
+        const schemaMetadatas: SchemaMetadataConfig[] = await this.get(schemaMetadata.id);
+        if (schemaMetadatas.length === 0)
+        {
+          return reject('Invalid schema metadata id passed');
+        }
+        const newCountByAlgorithm = JSON.parse(schemaMetadata.countByAlgorithm !== undefined ?
+          schemaMetadata.countByAlgorithm : '{}');
+        const oldCountByAlgorithm = JSON.parse(schemaMetadatas[0].countByAlgorithm !== undefined ?
+          schemaMetadatas[0].countByAlgorithm : '{}');
+        schemaMetadata = Util.updateObject(schemaMetadatas[0], schemaMetadata);
+        schemaMetadata.countByAlgorithm = JSON.stringify(Util.updateObject(newCountByAlgorithm, oldCountByAlgorithm));
+      }
+      // If it is a new item, make sure that all of the fields (count, starred, countByAlgorithm) are set
+      else
+      {
+        // Check to see an item with the same columnId exists in the DB, if so, update this one.
+        const results: SchemaMetadataConfig[] = await this.select(
+          ['columnId',
+            'count',
+            'countByAlgorithm',
+            'id',
+            'starred',
+          ],
+          {
+            columnId: schemaMetadata.columnId,
+          });
+        if (results.length > 0)
+        {
+          const newCountByAlgorithm = JSON.parse(schemaMetadata.countByAlgorithm !== undefined ?
+            schemaMetadata.countByAlgorithm : '{}');
+          const oldCountByAlgorithm = JSON.parse(results[0].countByAlgorithm !== undefined ?
+            results[0].countByAlgorithm : '{}');
+          schemaMetadata = Util.updateObject(results[0], schemaMetadata);
+          schemaMetadata.countByAlgorithm = JSON.stringify(Util.updateObject(newCountByAlgorithm, oldCountByAlgorithm));
+        }
+        else
+        {
+          if (schemaMetadata.columnId === undefined)
+          {
+            reject('SchemaMetadata must have a column id');
+          }
+          if (schemaMetadata.count === undefined)
+          {
+            schemaMetadata.count = 0;
+          }
+          if (schemaMetadata.countByAlgorithm === undefined)
+          {
+            schemaMetadata.countByAlgorithm = '{}';
+          }
+          if (schemaMetadata.starred === undefined)
+          {
+            schemaMetadata.starred = false;
+          }
+        }
+      }
+      resolve(await App.DB.upsert(this.schemaMetadataTable, schemaMetadata) as SchemaMetadataConfig);
     });
   }
-
-  // public async delete(user: UserConfig, id: string): Promise<object>
-  // {
-  //   if (!user.isSuperUser)
-  //   {
-  //     throw new Error('Only superusers can delete databases.');
-  //   }
-  //   return App.DB.delete(this.schemaMetadataTable, { id } as SchemaMetadataConfig);
-  // }
-
-  // public async select(columns: string[], filter?: object): Promise<SchemaMetadataConfig[]>
-  // {
-  //   console.log('SELECT');
-  //   return new Promise<SchemaMetadataConfig[]>(async (resolve, reject) =>
-  //   {
-  //     const rawResults = await App.DB.select(this.schemaMetadataTable, columns, filter);
-  //     const results: SchemaMetadataConfig[] = rawResults.map((result: object) => new SchemaMetadataConfig(result));
-  //     resolve(results);
-  //   });
-  // }
-
-  // public async get(id?: string, fields?: string[]): Promise<SchemaMetadataConfig[]>
-  // {
-  //   console.log('SCHEMA GET');
-  //   console.log(id);
-  //   if (id !== undefined)
-  //   {
-  //     if (fields !== undefined)
-  //     {
-  //       return this.select(fields, { id });
-  //     }
-  //     return this.select([], { id });
-  //   }
-  //   if (fields !== undefined)
-  //   {
-  //     return this.select(fields, {});
-  //   }
-  //   return this.select([], {});
-  // }
-
-  // // TODO TODO
-  // public async upsert(user: UserConfig, schema: SchemaMetadataConfig): Promise<SchemaMetadataConfig>
-  // {
-  //    console.log('HERE IN UPSERT');
-  //    console.log(schema);
-  //    console.log(schema.id);
-  //   if (schema.id !== undefined)
-  //   {
-  //     console.log('DEFINED SCHEMA ID');
-  //     const results: SchemaMetadataConfig[] = await this.get(schema.id);
-  //     console.log('MADE IT PAST SELECTING');
-  //     console.log(results);
-  //     if (results.length !== 0)
-  //     {
-  //       schema = Util.updateObject(results[0], schema);
-  //       console.log(schema);
-  //       console.log('HERE');
-  //     }
-  //   }
-  //   else
-  //   {
-  //     console.log('UNDEFINED SCHEMA ID');
-  //     const results: SchemaMetadataConfig[] = await this.get();
-  //     schema.id = results.length + 1;
-  //   }
-  //   console.log('SCHEMA IS ', schema);
-  //   console.log('MADE IT ALL THE WAY TO THE BOTTOM');
-  //   console.log(this.schemaMetadataTable);
-  //   return App.DB.upsert(this.schemaMetadataTable, schema) as Promise<SchemaMetadataConfig>;
-  // }
 }
 
 export default SchemaMetadata;

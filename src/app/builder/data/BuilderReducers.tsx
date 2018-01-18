@@ -161,6 +161,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         },
       }) =>
     {
+      // When it is a field that has changed, update it's count in midway
+      if (action.payload.keyPath.last() === 'field')
+      {
+        // const columnId = state.db.name + '/' + getIndex() + '.' + getType() + '.c.' + action.payload.value;
+        const algorithmId = state.algorithmId;
+        // Ajax.incrementSchemaMetadata({columnId, algorithmId} (resp) => {}, (e) => {});
+      }
       return state.setIn(
         action.payload.keyPath,
         action.payload.value,
