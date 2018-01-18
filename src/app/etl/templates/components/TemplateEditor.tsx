@@ -48,7 +48,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { MultiModal } from 'common/components/overlay/MultiModal';
@@ -115,12 +115,18 @@ class ETLExportDisplay extends TerrainComponent<Props>
       <div className='template-editor-column settings-column'>
         {
           renderSettings &&
-          <TemplateEditorFieldSettings
-            keyPath={settingsKeyPath}
-            field={field}
-            preview={'placeholder'}
-            canEdit={true}
-          />
+          <div style={getStyle('height', '43px')} />
+        }
+        {
+          renderSettings &&
+          <div className='template-editor-settings-wrapper' style={backgroundColor(Colors().bg3)}>
+            <TemplateEditorFieldSettings
+              keyPath={settingsKeyPath}
+              field={field}
+              preview={'placeholder'}
+              canEdit={true}
+            />
+          </div>
         }
       </div>
     );
@@ -201,6 +207,18 @@ const SampleDocuments = [
     },
     'Here are some numbers': [
       5, 1,
+    ],
+  },
+  {
+    'Product Name': 'Scooter',
+    'Product ID': 10,
+    'Product Description': 'Do you like skateboards but want handlebars? Scooters are for you! Some are electric, others are not.',
+    'Meta': {
+      'Date Added': '01/18/2018',
+      'Views': 25,
+    },
+    'Here are some numbers': [
+      0, 1, 9, -5,
     ],
   },
 ];

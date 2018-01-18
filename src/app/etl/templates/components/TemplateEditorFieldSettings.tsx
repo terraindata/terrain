@@ -85,28 +85,32 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
   {
     const { field } = this.props;
     return (
-      <div className='field-settings-row'>
-        <div className='field-settings-label'>
-          Name
-        </div>
-        <Autocomplete
-          value='sample value'
-          onChange={() => { /* do nothing */ }}
-          options={List([])}
-        />
-        <div
-          className='tef-checkbox-section'
-          style={field.isIncluded ? fontColor(Colors().text2) : fontColor(Colors().text3)}
-          onClick={this.handleIncludeCheckboxClicked}
-        >
-          <div className='tef-checkbox-spacer'>
-            <CheckBox
-              checked={field.isIncluded}
-              onChange={() => { /* do nothing */ }}
-              disabled={this._inputDisabled()}
-            />
+      <div>
+        <div className='field-settings-row'>
+          <div className='field-settings-label'>
+            Name
           </div>
-          <div className='tef-checkbox-label'> Include this field </div>
+          <Autocomplete
+            value={field.name}
+            onChange={this.handleNameChange}
+            options={List([])}
+          />
+        </div>
+        <div className='field-settings-row'>
+          <div
+            className='tef-checkbox-section'
+            style={field.isIncluded ? fontColor(Colors().text2) : fontColor(Colors().text3)}
+            onClick={this.handleIncludeCheckboxClicked}
+          >
+            <div className='tef-checkbox-spacer'>
+              <CheckBox
+                checked={field.isIncluded}
+                onChange={() => { /* do nothing */ }}
+                disabled={this._inputDisabled()}
+              />
+            </div>
+            <div className='tef-checkbox-label'> Include this field </div>
+          </div>
         </div>
       </div>
     );
@@ -125,6 +129,11 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
         />
       </div>
     );
+  }
+
+  public handleNameChange(value)
+  {
+    this._set('name', value);
   }
 
   public handleIncludeCheckboxClicked()

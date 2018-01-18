@@ -84,6 +84,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
       _.extend({}, fontColor(Colors().text1, Colors().text1), backgroundColor(Colors().highlight))
       :
       fontColor(Colors().text3, Colors().text2);
+    const previewText = preview === undefined ? 'Data Missing' : preview.toString();
     return (
       <div className='template-editor-field-block'>
         <div className='field-preview-row'>
@@ -100,7 +101,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
                 'field-preview-value-settings-open': settingsOpen,
               })}
             >
-              {this.props.preview.toString()}
+              {previewText}
             </div>
           }
         </div>
