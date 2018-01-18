@@ -59,6 +59,7 @@ const ControlActionTypes =
         setCredentials: '',
         createSchedule: '',
         deleteSchedule: '',
+        runOnDemandSchedule: '',
       },
   };
 
