@@ -127,7 +127,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
   public handleFieldChange(index: number)
   {
     const newField = this.state.fieldOptions.get(index);
-    // BuilderActions.changePath(this.props.keyPath.push('field'), newField);
+    BuilderActions.changePath(this.props.keyPath.push('field'), newField, false, true);
     const fieldType = ElasticBlockHelpers.getTypeOfField(
       this.props.pathfinderContext.schemaState,
       newField,
@@ -376,8 +376,6 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
           onChange={this.handleFieldChange}
           canEdit={canEdit}
           placeholder={'Field'}
-          keyPath={this.props.keyPath.push('field')}
-          action={BuilderActions.changePath}
         />
       </div>
     );

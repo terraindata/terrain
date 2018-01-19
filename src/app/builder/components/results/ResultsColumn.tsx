@@ -130,7 +130,7 @@ class ResultsColumn extends TerrainComponent<Props>
 
   public setSelectedTab(name, index)
   {
-    Actions.change(List(this._keyPath('query', 'resultsViewMode')), name);
+    Actions.changeQuery(this.props.query.set('resultsViewMode', name));
     this.setState({
       selectedTab: index,
       highlightedTabs: this.state.highlightedTabs.set(name.toLowerCase(), false),

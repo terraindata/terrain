@@ -71,7 +71,7 @@ export interface Props
   depth: number;
   keyPath: KeyPath;
   pathfinderContext: PathfinderContext;
-  onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine);
+  onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
 }
 
@@ -103,7 +103,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
             })}
             value={filterLine.field}
             canEdit={pathfinderContext.canEdit}
-            onChange={this._fn(this.handleChange, 'field')}
+            onChange={this._fn(this.handleChange, 'field', true)}
             placeholder={'Choose field'}
           />,
           {
@@ -241,9 +241,9 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     }
   }
 
-  private handleChange(key, value)
+  private handleChange(key, value, fieldChange?)
   {
-    this.props.onChange(this.props.keyPath, this.props.filterLine.set(key, value));
+    this.props.onChange(this.props.keyPath, this.props.filterLine.set(key, value), false, fieldChange);
   }
 
   private getPieces()

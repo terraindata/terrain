@@ -74,7 +74,7 @@ export interface Props
   depth: number;
   keyPath: KeyPath;
   pathfinderContext: PathfinderContext;
-  onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine);
+  onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
 }
 
@@ -142,7 +142,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       return (
         <div
           style={pieceStyle}
-          onClick={this._fn(this.handleChange, 'field', null)}
+          onClick={this._fn(this.handleChange, 'field', null, true)}
         >
           {
             filterLine.field
@@ -400,7 +400,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     }
   }
 
-  private handleChange(key, value, fieldType?)
+  private handleChange(key, value, fieldType?, fieldChange?)
   {
     let filterLine = this.props.filterLine.set(key, value);
     const { pathfinderContext } = this.props;
@@ -425,7 +425,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       }
     }
 
-    this.props.onChange(this.props.keyPath, filterLine);
+    this.props.onChange(this.props.keyPath, filterLine, false, fieldChange);
   }
 }
 

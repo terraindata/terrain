@@ -123,6 +123,12 @@ class PathfinderScoreLine extends TerrainComponent<Props>
     BuilderActions.changePath(this.props.keyPath.push('transformData').push('mode'), options[index]);
   }
 
+  public handleFieldChange(index)
+  {
+    const value = this.props.dropdownOptions.map((v) => v.displayName).toList().get(index);
+    BuilderActions.changePath(this.props.keyPath.push('field'), value, false, true);
+  }
+
   public renderTransformChart()
   {
     const data = {
@@ -238,9 +244,8 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
           selectedIndex={this.state.fieldIndex}
           canEdit={this.props.pathfinderContext.canEdit}
-          keyPath={this.props.keyPath.push('field')}
           placeholder={'Field...'}
-          action={BuilderActions.changePath}
+          onChange={this.handleFieldChange}
         />
         {
           this.props.line.field &&

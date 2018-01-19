@@ -116,9 +116,9 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     }
   }
 
-  private handleFilterChange(keyPath: KeyPath, filter: FilterGroup | FilterLine)
+  private handleFilterChange(keyPath: KeyPath, filter: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean)
   {
-    BuilderActions.changePath(keyPath, filter);
+    BuilderActions.changePath(keyPath, filter, notDirty, fieldChange);
   }
 
   private handleAddFilter(keyPath, filter: FilterGroup | FilterLine)

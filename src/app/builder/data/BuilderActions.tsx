@@ -60,8 +60,8 @@ const BuilderActions =
         $(ActionTypes.change, { keyPath, value, notDirty }),
 
     changePath:
-      (keyPath: KeyPath, value: any, notDirty = false) =>
-        $(ActionTypes.changePath, { keyPath, value, notDirty }),
+      (keyPath: KeyPath, value: any, notDirty = false, fieldChange: boolean = false) =>
+        $(ActionTypes.changePath, { keyPath, value, notDirty, fieldChange }),
 
     changeQuery:
       (query: Query) =>

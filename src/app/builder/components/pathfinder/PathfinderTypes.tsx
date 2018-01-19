@@ -547,7 +547,7 @@ class ElasticDataSourceC extends DataSource
               column.databaseId === String(index) &&
               transformableTypes.indexOf(column.datatype) !== -1,
           );
-          const transformableOptions: List<ChoiceOption> = transformableCols.map((col) =>
+          let transformableOptions: List<ChoiceOption> = transformableCols.map((col) =>
           {
             return _ChoiceOption({
               displayName: col.name,
@@ -555,6 +555,9 @@ class ElasticDataSourceC extends DataSource
               sampleData: col.sampleData,
             });
           }).toList();
+          let fieldNames = transformableOptions.map((f) => f.value).toList();
+          fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
+          transformableOptions = transformableOptions.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
           return transformableOptions.concat(defaultOptions).toList();
         }
       }

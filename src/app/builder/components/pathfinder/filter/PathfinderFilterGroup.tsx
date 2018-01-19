@@ -65,7 +65,7 @@ export interface Props
   canEdit: boolean;
   depth: number;
   keyPath: KeyPath;
-  onChange(keyPath: KeyPath, filterGroup: FilterGroup | FilterLine);
+  onChange(keyPath: KeyPath, filterGroup: FilterGroup | FilterLine, notDirty?: boolean, fieldChange?: boolean);
   onDelete(keyPath: KeyPath);
 }
 

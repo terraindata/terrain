@@ -160,17 +160,24 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         payload?: {
           keyPath: KeyPath,
           value: any,
+          notDirty: boolean,
+          fieldChange: boolean,
         },
       }) =>
     {
       // When it is a field that has changed, update it's count in midway
-      if (action.payload.keyPath.last() === 'field') // TODO
+      if (action.payload.fieldChange)
       {
         if (state.query.path.source && state.query.path.source.dataSource)
         {
+          let value = action.payload.value;
+          if (typeof action.payload.value !== 'string')
+          {
+            value = (action.payload.value as any).field; // This might not always work...
+          }
           const index = (state.query.path.source.dataSource as any).index;
-          const columnId = index + '/' + action.payload.value;
-          // const columnId = state.db.name + '/' + getIndex() + '.' + getType() + '.c.' + action.payload.value;
+          // This won't be right ...
+          const columnId = index + '/' + value;
           const algorithmId = state.query.algorithmId;
           Ajax.countColumn(columnId, algorithmId);
         }

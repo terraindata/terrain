@@ -148,14 +148,11 @@ class SchemaTreeItem extends TerrainComponent<Props>
     // Set initial starred value of column
     if (this.props.type === 'column')
     {
-      let starred = false;
-      const metadata = this.props.schema.schemaMetadata.filter((d) => d.columnId === this.props.id).toList();
-      if (metadata.size && metadata.get(0).starred)
-      {
-        starred = true;
-      }
+      const item = this.props.schema.getIn([SchemaTypes.typeToStoreKey[this.props.type], this.props.id]);
+      const columnId = item.databaseId + '/' + item.name;
+      const metadata = this.props.schema.schemaMetadata.filter((d) => d.columnId === columnId).toList();
       this.setState({
-        starred,
+        starred: (metadata.size && metadata.get(0).starred),
       });
     }
   }
