@@ -102,6 +102,12 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 
 Whenever new packages are installed by other devs / on other branches, run `yarn add` to get the new package locally.
 
+### Migrations
+
+1. You may want to run `cp -R postgres-data pg-backup` to create a backup of your Midway data
+2. Run the scripts in `/midway/migrations` (you only need to run each script once, ever, and only if
+   you had Midway running before the script was created)
+
 ### Auto Styling
 
 To apply the auto styling / formatting, use `yarn run fix` - a combination of `yarn run style` and `yarn run lint`
