@@ -1,0 +1,26 @@
+@import "../../../common/Common.less";
+
+.template-editor-documents-container {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+
+  .documents-area {
+    overflow-y: scroll;
+    display: block;
+  }
+
+  .preview-document {
+    margin: @spacing;
+    width: 100px;
+    height: 100px;
+    padding: @spacing;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .preview-document-index-label {
+    font-size: 24px;
+  }
+}

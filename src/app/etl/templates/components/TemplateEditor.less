@@ -1,27 +1,37 @@
 @import "../../../common/Common.less";
 
 .template-editor-root-container {
+  position: relative;
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  height: 100%;
+  flex-direction: column;
 
-  .template-editor-column {
+  .template-editor-columns-area {
     display: flex;
-    flex-direction: column;
-    padding: @spacing;
+    flex: 1;
+    flex-direction: row;
+    justify-content: center;
 
-    &.settings-column {
-      flex: 0 1 400px;
-    }
+    .template-editor-column {
+      display: flex;
+      flex-direction: column;
+      padding: @spacing;
 
-    &.main-document-column {
-      flex: 0 1 600px;
-    }
+      &.settings-column {
+        flex: 0 1 400px;
+      }
 
-    &.preview-documents-column {
-      flex: 0 1 400px;
+      &.main-document-column {
+        flex: 0 1 600px;
+      }
+
+      &.preview-documents-column {
+        flex: 0 1 400px;
+      }
     }
   }
+
+
 
   .template-editor-settings-wrapper {
     flex: 1;
@@ -56,6 +66,7 @@
     padding-right: @double-spacing;
     width: 100%;
     box-sizing: border-box;
+    min-height: 600px;
   }
 }
 

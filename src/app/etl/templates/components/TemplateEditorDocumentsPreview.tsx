@@ -43,49 +43,55 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+// tslint:disable:no-var-requires import-spacing
 import TerrainComponent from 'common/components/TerrainComponent';
+import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor } from 'src/app/colors/Colors';
-import Query from 'src/items/types/Query';
+import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
-import TemplateEditor from 'etl/templates/components/TemplateEditor';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
-import { TemplateEditorState } from 'etl/templates/TemplateTypes';
+import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 
-import './ETLExportDisplay.less';
+import './TemplateEditorDocumentsPreview.less';
+const { List } = Immutable;
 
 export interface Props
 {
-  query: Query;
-  serverId: string | number;
-  algorithmName: string;
   // below from container
-  templateEditor: TemplateEditorState;
-  templateEditorActions: typeof TemplateEditorActions;
+  templateEditor?: TemplateEditorState;
+  act?: typeof TemplateEditorActions;
 }
 
 @Radium
-class ETLExportDisplay extends TerrainComponent<Props>
+class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
 {
+  public renderDocument(document: object, index: number)
+  {
+    return (
+      <div className='preview-document' key={index} style={backgroundColor(Colors().bg3)}>
+        <div className='preview-document-index-label'> {index} </div>
+      </div>
+    );
+  }
 
   public render()
   {
     return (
-      <div
-        className='etl-export-display-wrapper'
-        style={[backgroundColor(Colors().bg1), fontColor(Colors().text1)]}
-      >
-        <TemplateEditor />
+      <div className='template-editor-documents-container'>
+        <div className='documents-area'>
+          {this.props.templateEditor.documents.map(this.renderDocument)}
+        </div>
       </div>
     );
   }
+
 }
 
 export default Util.createContainer(
-  ETLExportDisplay,
+  TemplateEditorDocumentsPreview,
   ['templateEditor'],
-  { templateEditorActions: TemplateEditorActions },
+  { act: TemplateEditorActions },
 );

@@ -52,6 +52,7 @@ import { backgroundColor, Colors, fontColor, getStyle } from 'src/app/colors/Col
 import Util from 'util/Util';
 
 import { MultiModal } from 'common/components/overlay/MultiModal';
+import TemplateEditorDocumentsPreview from 'etl/templates/components/TemplateEditorDocumentsPreview';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
 import TemplateEditorFieldSettings from 'etl/templates/components/TemplateEditorFieldSettings';
 import TemplateEditorPreviewControl from 'etl/templates/components/TemplateEditorPreviewControl';
@@ -163,7 +164,9 @@ class ETLExportDisplay extends TerrainComponent<Props>
   public renderDocumentsSection()
   {
     return (
-      <div className='template-editor-column preview-documents-column' />
+      <div className='template-editor-column preview-documents-column'>
+        <TemplateEditorDocumentsPreview/>
+      </div>
     );
   }
 
@@ -172,9 +175,11 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
     return (
       <div className='template-editor-root-container'>
-        {this.renderSettingsSection()}
-        {this.renderEditorSection()}
-        {this.renderDocumentsSection()}
+        <div className='template-editor-columns-area'>
+          {this.renderSettingsSection()}
+          {this.renderEditorSection()}
+          {this.renderDocumentsSection()}
+        </div>
         <MultiModal
           requests={this.props.templateEditor.modalRequests}
           setRequests={this.setModalRequests}
