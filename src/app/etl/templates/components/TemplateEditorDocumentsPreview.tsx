@@ -81,7 +81,7 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
   {
     return (
       <div className='template-editor-documents-container'>
-        <div className='documents-area'>
+        <div className='documents-area' tabIndex={-1}>
           {this.props.templateEditor.documents.map(this.renderDocument)}
         </div>
       </div>

@@ -36,6 +36,11 @@
   .template-editor-settings-wrapper {
     flex: 1;
     padding: @half-spacing;
+    height: 100%;
+    overflow-y: auto;
+    &:focus {
+      outline: none;
+    }
   }
 
   .template-editor-preview-control-spacer {
@@ -45,6 +50,7 @@
   }
 
   .template-editor-title-bar {
+    flex: 0 0 43px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -62,11 +68,18 @@
   }
 
   .template-editor {
+    height: 100%;
     padding: @spacing;
     padding-right: @double-spacing;
     width: 100%;
     box-sizing: border-box;
-    min-height: 600px;
+    overflow-y: auto;
+    &:focus {
+      outline: none;
+    }
+
+    .template-editor-scrollable-area {
+    }
   }
 }
 

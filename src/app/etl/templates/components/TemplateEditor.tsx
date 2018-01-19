@@ -120,7 +120,11 @@ class ETLExportDisplay extends TerrainComponent<Props>
         }
         {
           renderSettings &&
-          <div className='template-editor-settings-wrapper' style={backgroundColor(Colors().bg3)}>
+          <div
+            className='template-editor-settings-wrapper'
+            style={backgroundColor(Colors().bg3)}
+            tabIndex={-1}
+          >
             <TemplateEditorFieldSettings
               keyPath={settingsKeyPath}
               field={field}
@@ -149,13 +153,19 @@ class ETLExportDisplay extends TerrainComponent<Props>
             <TemplateEditorPreviewControl />
           </div>
         </div>
-        <div className='template-editor' style={backgroundColor(Colors().bg3)}>
-          <TemplateEditorFieldNode
-            keyPath={List([])}
-            field={template.rootField}
-            canEdit={true}
-            preview={previewDocument}
-          />
+        <div
+          className='template-editor'
+          style={backgroundColor(Colors().bg3)}
+          tabIndex={-1}
+        >
+          <div className='template-editor-scrollable-area'>
+            <TemplateEditorFieldNode
+              keyPath={List([])}
+              field={template.rootField}
+              canEdit={true}
+              preview={previewDocument}
+            />
+          </div>
         </div>
       </div>
     );
@@ -165,7 +175,8 @@ class ETLExportDisplay extends TerrainComponent<Props>
   {
     return (
       <div className='template-editor-column preview-documents-column'>
-        <TemplateEditorDocumentsPreview/>
+        <div className='template-editor-title-bar' />
+        <TemplateEditorDocumentsPreview />
       </div>
     );
   }
@@ -211,7 +222,19 @@ const SampleDocuments = [
       'Views': 515,
     },
     'Here are some numbers': [
-      5, 1,
+      10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, 100, 200, 300, 400, 500, 600, 700, 800, 900,
+    ],
+  },
+  {
+    'Product Name': 'Acronyms that start and end with P',
+    'Product ID': 666,
+    'Product Description': 'For some reason, these usually are annoying. e.g. PHP, PGP',
+    'Meta': {
+      'Date Added': '01/19/2018',
+      'Views': 50,
+    },
+    'Here are some numbers': [
+      0, 5, 2, 2,
     ],
   },
   {

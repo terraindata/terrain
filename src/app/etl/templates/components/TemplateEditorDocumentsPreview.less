@@ -8,12 +8,15 @@
   .documents-area {
     overflow-y: scroll;
     display: block;
+    &:focus {
+      outline: none;
+    }
   }
 
   .preview-document {
     margin: @spacing;
-    width: 100px;
-    height: 100px;
+    width: 240px;
+    height: 400px;
     padding: @spacing;
     display: flex;
     justify-content: center;

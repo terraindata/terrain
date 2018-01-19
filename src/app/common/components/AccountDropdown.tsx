@@ -241,7 +241,7 @@ class AccountDropdown extends TerrainComponent<Props>
         }
 
         <Modal
-          message={VersionLog.concat("\n \n Commit Log: \n").concat(CommitLog)}
+          message={VersionLog.concat('\n \n Commit Log: \n').concat(CommitLog)}
           open={this.state.aboutTerrainOpen}
           title={'Terrain'}
           onClose={this._toggle('aboutTerrainOpen')}
