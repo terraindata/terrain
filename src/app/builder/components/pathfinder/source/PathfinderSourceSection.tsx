@@ -57,9 +57,9 @@ const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import BuilderActions from 'app/builder/data/BuilderActions';
 import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
-import PathPicker from 'app/common/components/PathPicker';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
+import PathPicker from 'app/common/components/PathPicker';
 import Selector, { SelectionChoice } from 'app/common/components/Selector';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
@@ -67,6 +67,8 @@ import
   _ElasticDataSource, ChoiceOption, Path, PathfinderContext, PathfinderSteps,
   Source, sourceCountDropdownOptions, sourceCountOptions,
 } from '../PathfinderTypes';
+
+import FloatingInput from 'app/common/components/FloatingInput';
 
 export interface Props
 {
@@ -142,15 +144,12 @@ class PathfinderSourceSection extends TerrainComponent<Props>
             }
           </div>
           <div className='pf-piece'>
-            <PathPicker
-              options={sourceCountDropdownOptions}
+            <FloatingInput
+              label='Count'
               value={source.count}
               onChange={this.handleCountChange}
               canEdit={canEdit}
-              shortNameText={'Count'}
-              headerText={'Choose how many results to show'}
-              forceOpen={true}
-              hasOther={true}
+              isTextInput={true}
             />
           </div>
           <Dropdown
@@ -164,6 +163,16 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       </div>
     );
   }
+  // <PathPicker
+  //             options={sourceCountDropdownOptions}
+  //             value={source.count}
+  //             onChange={this.handleCountChange}
+  //             canEdit={canEdit}
+  //             shortNameText={'Count'}
+  //             headerText={'Choose how many results to show'}
+  //             forceOpen={true}
+  //             hasOther={true}
+  //           />
   // <Selector
   //   selectedIndex={sourceNames.indexOf(this.props.pathfinderContext.source.dataSource.name)}
   //   items={sourceOptions}

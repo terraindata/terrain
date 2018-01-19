@@ -51,19 +51,18 @@ import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import styled from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import styled from 'styled-components';
-
 
 const Container = styled.div`
   position: relative;
   flex-grow: 1;
   margin: 0px 12px;
 `;
-  
+
 const LEFT = '12px';
-  
+
 const Label = styled.label`
   position: absolute;
   left: ${LEFT};
@@ -73,11 +72,11 @@ const Label = styled.label`
   color: @grey-text;
 `;
 
-const floatingLabelStyle ={
+const floatingLabelStyle = {
   fontSize: 10,
   top: 6,
 };
-  
+
 const Input = styled.input`
   padding-right: 6px;
   padding-left: ${LEFT};
@@ -90,13 +89,12 @@ const Input = styled.input`
   font-size: 18px;
 `;
 
-
 export interface Props
 {
   label: string;
   isTextInput: boolean;
   value: any;
-  
+
   onChange?: (value: any) => void;
   canEdit?: boolean;
 }
@@ -148,21 +146,21 @@ class FloatingInput extends TerrainComponent<Props>
   {
     this.props.onChange(e.target.value);
   }
-  
+
   public handleFocus()
   {
     this.setState({
       isFocused: true,
     });
   }
-  
+
   public handleBlur()
   {
     this.setState({
       isFocused: false,
     });
   }
-  
+
 }
 
 export default FloatingInput;

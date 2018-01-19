@@ -466,6 +466,6 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
   return state;
 }
 
-Util.assertKeysArePresent(ActionTypes, BuidlerReducers, 'Missing Builder Reducer for Builder Action Types: ');
+// Util.assertKeysArePresent(ActionTypes, BuidlerReducers, 'Missing Builder Reducer for Builder Action Types: ');
 
 export default BuidlerReducers;
