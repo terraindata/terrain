@@ -126,6 +126,12 @@ AnalyticsReducer[ActionTypes.pinAlgorithm] =
     return state.setIn(['pinnedAlgorithms', algorithmId], !isAlgorithmPinned);
   };
 
+AnalyticsReducer[ActionTypes.clearPinned] =
+  (state, action: Action<{}>) =>
+  {
+    return state.set('pinnedAlgorithms', state.pinnedAlgorithms.clear());
+  };
+
 AnalyticsReducer[ActionTypes.fetchAvailableMetricsSuccess] =
   (state, action: Action<{ availableMetrics: any[] }>) =>
   {

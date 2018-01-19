@@ -56,6 +56,7 @@ export const AnalyticsActionTypes =
     selectDateRange: '',
     selectAnalyticsConnection: '',
     pinAlgorithm: '',
+    clearPinned: '',
     fetchAvailableMetricsStart: '',
     fetchAvailableMetricsSuccess: '',
   };

@@ -55,8 +55,6 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import UserThumbnail from './../../users/components/UserThumbnail';
 import Ajax from './../../util/Ajax';
 import Util from './../../util/Util';
-import Actions from './../data/LibraryActions';
-import LibraryStore from './../data/LibraryStore';
 import * as LibraryTypes from './../LibraryTypes';
 import './LibraryAlgorithmInfo.less';
 import StatusDropdown from './StatusDropdown';
@@ -69,6 +67,7 @@ export interface Props
   isSuperUser: boolean;
   isBuilder: boolean;
   algorithmActions: any;
+  library?: LibraryTypes.LibraryState;
 }
 
 // TODO MOD centralize
@@ -89,26 +88,18 @@ class LibraryInfoColumn extends TerrainComponent<Props>
       selectedAlgorithm: -1,
     };
 
-  public componentDidMount()
-  {
-    this._subscribe(LibraryStore, {
-      updater: (state) =>
-      {
-        const { selectedAlgorithm, changingStatusOf } = state;
-        if (selectedAlgorithm !== this.state.selectedAlgorithm || changingStatusOf)
-        {
-          this.setState({
-            selectedAlgorithm,
-          });
-          this.fetchStatus(changingStatusOf || this.props.algorithm);
-        }
-      },
-      isMounted: true,
-    });
-  }
-
   public componentWillReceiveProps(nextProps)
   {
+    const { selectedAlgorithm, changingStatusOf } = nextProps.library;
+    if (selectedAlgorithm !== this.props.library.selectedAlgorithm ||
+      changingStatusOf)
+    {
+      this.setState({
+        selectedAlgorithm,
+      });
+      this.fetchStatus(changingStatusOf || this.props.algorithm);
+    }
+
     if (nextProps.algorithm !== this.props.algorithm)
     {
       this.fetchStatus(nextProps.algorithm);
@@ -220,4 +211,8 @@ class LibraryInfoColumn extends TerrainComponent<Props>
   }
 }
 
-export default LibraryInfoColumn;
+export default Util.createTypedContainer(
+  LibraryInfoColumn,
+  ['library'],
+  {},
+);

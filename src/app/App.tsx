@@ -176,6 +176,7 @@ interface Props
   auth?: AuthState;
   authActions?: typeof AuthActions;
   library?: LibraryState;
+  libraryActions?: typeof LibraryActions;
 }
 
 const APP_STYLE = _.extend({},
@@ -365,6 +366,7 @@ class App extends TerrainComponent<Props>
       actionType: 'fetch',
     });
     TerrainStore.dispatch(LibraryActions.fetch());
+    this.props.libraryActions.fetch();
     this.props.schemaActions({
       actionType: 'fetch',
     });
@@ -506,5 +508,6 @@ export default Util.createContainer(
     schemaActions: SchemaActions,
     userActions: UserActions,
     colorsActions: ColorsActions,
+    libraryActions: LibraryActions,
   },
 );

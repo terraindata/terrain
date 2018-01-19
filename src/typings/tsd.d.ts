@@ -72,6 +72,7 @@ declare type SetFn<T> = (f: string, v: any) => T & IRecord<T>;
 declare type SetIn<T> = (f: Array<string | number> | KeyPath, v: any) => T & IRecord<T>;
 declare type Get = (f: string | number) => any;
 declare type GetIn = (f: Array<string | number> | KeyPath) => any;
+declare type HasIn = (f: Array<string | number> | KeyPath) => boolean;
 declare type Delete<T> = (f: string) => T & IRecord<T>;
 declare type DeleteIn<T> = (f: Array<string | number> | KeyPath) => T & IRecord<T>;
 declare type Update<T> = (f: string, updater: (n: any) => any) => T & IRecord<T>;
@@ -90,6 +91,7 @@ declare interface IMap<T>
   setIn: SetIn<T>;
   get: Get;
   getIn: GetIn;
+  hasIn: HasIn;
   delete: Delete<T>;
   deleteIn: DeleteIn<T>;
   remove: Delete<T>;

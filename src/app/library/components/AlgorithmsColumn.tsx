@@ -55,6 +55,7 @@ import * as _ from 'lodash';
 
 import { AnalyticsState } from 'analytics/data/AnalyticsStore';
 import { tooltip } from 'common/components/tooltip/Tooltips';
+import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import { browserHistory } from 'react-router';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
@@ -140,7 +141,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     if (params && params.algorithmId !== null && params.algorithmId !== undefined)
     {
       this.props.algorithmActions.select(params.algorithmId);
-      algorithmIds.push(params.algorithmId);
+      algorithmIds.push(parseInt(params.algorithmId, 10));
     }
 
     if (canPinItems && location.query && location.query.pinned !== undefined)
@@ -209,16 +210,24 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
       (canPinItems && analytics.pinnedAlgorithms !== nextAnalytics.pinnedAlgorithms)
     )
     {
-      const pinnedParams = canPinItems && pinnedAlgorithms.length > 0 ? `/?pinned=${pinnedAlgorithms.join(',')}` : '';
       if (nextSelectedAlgorithm !== null && nextSelectedAlgorithm !== undefined)
       {
-        browserHistory
-          .replace(`/${basePath}/${categoryId}/${groupId}/${nextSelectedAlgorithm}${pinnedParams}`);
+        replaceRoute({
+          basePath,
+          categoryId,
+          groupId,
+          algorithmId: nextSelectedAlgorithm,
+          pinned: canPinItems ? pinnedAlgorithms : undefined,
+        });
       }
       else
       {
-        browserHistory
-          .replace(`/${basePath}/${categoryId}/${groupId}${pinnedParams}`);
+        replaceRoute({
+          basePath,
+          categoryId,
+          groupId,
+          pinned: canPinItems ? pinnedAlgorithms : undefined,
+        });
       }
     }
   }
@@ -401,7 +410,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
     });
   }
 
-  public handleItemSelect(id: ID)
+  public handleItemSelect(id: ID, fadeIndex: number)
   {
     const {
       canPinItems,
@@ -414,7 +423,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
 
     if (selectedAlgorithm === id)
     {
-      this.props.algorithmActions.unselect(id);
+      this.props.algorithmActions.unselect();
     } else
     {
       this.props.algorithmActions.select(id);
@@ -487,7 +496,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
       message='What would you like to name the duplicate algorithm?'
       textboxPlaceholderValue='Varaint Name'
       children={this.renderDuplicateDropdown()}
-      childrenMessage='Please select an group for the duplicate algorithm.'
+      childrenMessage='Please select a group for the duplicate algorithm.'
       allowOverflow={true}
       inputClassName='duplicate-group-modal-input'
     />);
@@ -563,13 +572,13 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         onDragFinish={this.handleDragFinish}
+        onSelect={this.handleItemSelect}
         item={algorithm}
         onDoubleClick={this.handleDoubleClick}
         canEdit={canDrag}
         canDrag={canDrag}
         canCreate={canDrag}
         isStarred={algorithm.status === 'DEFAULT'}
-        onSelect={this.handleItemSelect}
         isSelected={isSelected}
         isFocused={true}
       >

@@ -64,6 +64,7 @@
       "^control/(.*)$": "<rootDir>/src/app/control/$1",
       "^database/(.*)$": "<rootDir>/src/database/$1",
       "^deploy/(.*)$": "<rootDir>/src/app/deploy/$1",
+      "^etl/(.*)$": "<rootDir>/src/app/etc/$1",
       "^fileImport/(.*)$": "<rootDir>/src/app/fileImport/$1",
       "^images/(.*)$": "<rootDir>/src/images/$1",
       "^library/(.*)$": "<rootDir>/src/app/library/$1",

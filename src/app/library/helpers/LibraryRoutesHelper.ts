@@ -43,50 +43,60 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
+import { browserHistory } from 'react-router';
 
-const create = '';
-const change = '';
-const move = '';
-const duplicate = '';
+interface LibraryRouteComponents
+{
+  basePath: string;
+  categoryId?: ID;
+  groupId?: ID;
+  algorithmId?: ID;
+  pinned?: number[];
+}
 
-export let LibraryActionTypes =
+export function buildRoute(routeComponents: LibraryRouteComponents)
+{
+  let route = `/${routeComponents.basePath}`;
+
+  if (routeComponents.categoryId !== undefined)
   {
-    categories:
+    route += `/${routeComponents.categoryId}`;
+
+    if (routeComponents.groupId !== undefined)
+    {
+      route += `/${routeComponents.groupId}`;
+
+      if (routeComponents.algorithmId !== undefined)
       {
-        create, change, move,
-        // duplicate,
-      },
+        route += `/${routeComponents.algorithmId}`;
+      }
+    }
+  }
 
-    groups:
-      {
-        create, change, move,
-      },
+  if (routeComponents.pinned !== undefined)
+  {
+    route += `?pinned=${routeComponents.pinned.join(',')}`;
+  }
 
-    algorithms:
-      {
-        create, change, move,
-        status: '',
-        fetchVersion: '',
-        loadVersion: '',
-        select: '',
-        unselect: '',
-      },
+  return route;
+}
 
-    loadState: '',
-    setDbs: '',
-  };
+export function replaceRoute(routeComponents: LibraryRouteComponents)
+{
+  browserHistory.replace(buildRoute(routeComponents));
+}
 
-Util.setValuesToKeys(LibraryActionTypes, 'library');
+export function saveLastRoute(basePath, location)
+{
+  const lastPath = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
+  localStorage.setItem(lastPath, `${location.pathname}${location.search}`);
+}
 
-export const CleanLibraryActionTypes = // not dirty
-  [
-    LibraryActionTypes.loadState,
-    LibraryActionTypes.setDbs,
-    LibraryActionTypes.algorithms.fetchVersion,
-    LibraryActionTypes.algorithms.loadVersion,
-    LibraryActionTypes.algorithms.select,
-    LibraryActionTypes.algorithms.unselect,
-  ];
+export function loadLastRoute(basePath: string)
+{
+  const lastPathKey = basePath === 'library' ? 'lastLibraryPath' : 'lastAnalyticsPath';
+  // no path given, redirect to last library path
+  const lastPath = localStorage.getItem(lastPathKey);
 
-export default LibraryActionTypes;
+  browserHistory.replace({ pathname: lastPath });
+}

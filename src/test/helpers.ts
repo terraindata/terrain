@@ -43,7 +43,6 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import LibraryStore from 'library/data/LibraryStore';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 
@@ -59,6 +58,3 @@ export function connect(componentName)
 {
   return `Connect(${componentName})`;
 }
-
-// We'll need to also mock the single stores until they're completely removed.
-LibraryStore.dispatch = jest.fn();
