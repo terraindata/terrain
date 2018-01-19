@@ -55,7 +55,7 @@ import * as _ from 'lodash';
 import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemType } from '../../items/types/Item';
 import Query from '../../items/types/Query';
-import Actions from './../auth/data/AuthActions';
+import { AuthActions as Actions } from './../auth/data/AuthRedux';
 import * as LibraryTypes from './../library/LibraryTypes';
 import * as UserTypes from './../users/UserTypes';
 
@@ -69,6 +69,13 @@ import AjaxM1 from './AjaxM1';
 
 export const Ajax =
   {
+    reduxStoreDispatch: (action) => console.error('Ajax reduxStoreDispatch property has not been set.'),
+
+    config: (config) =>
+    {
+      Ajax.reduxStoreDispatch = config.reduxStoreDispatch;
+    },
+
     req(method: 'post' | 'get',
       url: string,
       body: object,
@@ -191,7 +198,7 @@ export const Ajax =
         if (xhr.status === 401)
         {
           // TODO re-enable
-          Actions.logout();
+          Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
         }
 
         if (xhr.status !== 200)
@@ -862,7 +869,7 @@ export const Ajax =
         if (xhr.status === 401)
         {
           // TODO re-enable
-          Actions.logout();
+          Ajax.reduxStoreDispatch(Actions({ actionType: 'logout' }));
         }
 
         if (xhr.status !== 200)

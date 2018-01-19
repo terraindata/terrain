@@ -52,7 +52,7 @@ import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import RolesActions from 'roles/data/RolesActions';
-import UserActions from 'users/data/UserActions';
+import { UserActions } from 'users/data/UserRedux';
 
 const mapStateToProps = (state) =>
 {

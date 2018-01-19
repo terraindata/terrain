@@ -55,7 +55,7 @@ import Modal from './../../common/components/Modal';
 import RadioButtons from './../../common/components/RadioButtons';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
-import Actions from './../data/UserActions';
+import { UserActions as Actions } from './../data/UserRedux';
 import AccountEntry from './AccountEntry';
 import './Notifications.less';
 import './Select.less';
@@ -145,7 +145,9 @@ class Notifications extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.props.userActions.fetch();
+    this.props.userActions({
+      actionType: 'fetch',
+    });
   }
 
   public componentWillUnmount()
@@ -158,7 +160,10 @@ class Notifications extends TerrainComponent<Props>
     const { users } = this.props;
     let newUser = users.currentUser;
     newUser = newUser.set(field, value);
-    this.props.userActions.change(newUser as UserTypes.User);
+    this.props.userActions({
+      actionType: 'change',
+      user: newUser as UserTypes.User,
+    });
 
     this.setState({
       saving: true,
