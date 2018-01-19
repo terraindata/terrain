@@ -93,7 +93,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         {
           if (query)
           {
-            Actions.queryLoaded(query, xhr, action.payload.db);
+            Actions.queryLoaded(query, algorithmId, xhr, action.payload.db);
           }
           else
           {
@@ -102,22 +102,23 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           }
         },
       );
-
       return state
         .set('loading', true)
         .set('loadingXhr', xhr)
         .set('loadingAlgorithmId', algorithmId)
+        // .setIn(List(['query', 'algorithmId']), algorithmId)
         ;
     },
 
     [ActionTypes.queryLoaded]: (state: BuilderState,
       action: Action<{
         query: Query,
+        algorithmId: ID,
         xhr: XMLHttpRequest,
         db: BackendInstance,
       }>) =>
     {
-      let { query } = action.payload;
+      let { query, algorithmId } = action.payload;
       if (state.loadingXhr !== action.payload.xhr)
       {
         // wrong XHR
@@ -128,6 +129,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 
       return state
         .set('query', query)
+        .setIn(List(['query', 'algorithmId']), algorithmId)
         .set('loading', false)
         .set('loadingXhr', null)
         .set('loadingAlgorithmId', '')
@@ -146,6 +148,33 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         },
       }) =>
     {
+      return state.setIn(
+        action.payload.keyPath,
+        action.payload.value,
+      );
+
+    },
+
+    [ActionTypes.changePath]: (state: BuilderState,
+      action: {
+        payload?: {
+          keyPath: KeyPath,
+          value: any,
+        },
+      }) =>
+    {
+      // When it is a field that has changed, update it's count in midway
+      if (action.payload.keyPath.last() === 'field') // TODO
+      {
+        if (state.query.path.source && state.query.path.source.dataSource)
+        {
+          const index = (state.query.path.source.dataSource as any).index;
+          const columnId = state.db.name + '/' + index + '/' + action.payload.value;
+          // const columnId = state.db.name + '/' + getIndex() + '.' + getType() + '.c.' + action.payload.value;
+          const algorithmId = state.query.algorithmId;
+          Ajax.countColumn(columnId, algorithmId);
+        }
+      }
       return state.setIn(
         action.payload.keyPath,
         action.payload.value,

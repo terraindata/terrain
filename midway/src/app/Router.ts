@@ -58,6 +58,7 @@ import ItemRouter from './items/ItemRouter';
 import QueryRouter from './query/QueryRouter';
 import SchedulerRouter from './scheduler/SchedulerRouter';
 import SchemaRouter from './schema/SchemaRouter';
+import SchemaMetadataRouter from './schemaMetadata/SchemaMetadataRouter';
 import StatusRouter from './status/StatusRouter';
 import UserRouter from './users/UserRouter';
 import * as Util from './Util';
@@ -78,6 +79,7 @@ AppRouter.use('/query', QueryRouter.routes(), QueryRouter.allowedMethods());
 AppRouter.use('/import', ImportRouter.routes(), ImportRouter.allowedMethods());
 AppRouter.use('/export', ExportRouter.routes(), ExportRouter.allowedMethods());
 AppRouter.use('/credentials', CredentialRouter.routes(), CredentialRouter.allowedMethods());
+AppRouter.use('/schemametadata', SchemaMetadataRouter.routes(), SchemaMetadataRouter.allowedMethods());
 // Add future routes here.
 
 AppRouter.get('/time', (ctx, next) =>

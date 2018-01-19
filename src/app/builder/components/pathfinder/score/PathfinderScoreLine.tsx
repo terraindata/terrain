@@ -56,6 +56,7 @@ import TerrainComponent from './../../../../common/components/TerrainComponent';
 const { List, Map } = Immutable;
 import BuilderTextbox from '../../../../common/components/BuilderTextbox';
 import Dropdown from '../../../../common/components/Dropdown';
+import SearchableDropdown from '../../../../common/components/SearchableDropdown';
 import ScoreBar from '../../charts/ScoreBar';
 import TransformCard from '../../charts/TransformCard';
 import TransformChartPreviewWrapper from '../../charts/TransformChartPreviewWrapper';
@@ -119,7 +120,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
   public handleTransformModeChange(index)
   {
     const options = ['linear', 'logarithmic', 'exponential', 'normal', 'sigmoid'];
-    BuilderActions.change(this.props.keyPath.push('transformData').push('mode'), options[index]);
+    BuilderActions.changePath(this.props.keyPath.push('transformData').push('mode'), options[index]);
   }
 
   public renderTransformChart()
@@ -186,7 +187,7 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           helpOn={undefined}
           keyPath={this.props.keyPath.push('transformData')}
           language={'elastic'}
-          onChange={BuilderActions.change}
+          onChange={BuilderActions.changePath}
           parentData={undefined}
           index={this.props.pathfinderContext.source.dataSource.name}
         />
@@ -230,13 +231,16 @@ class PathfinderScoreLine extends TerrainComponent<Props>
           isNumber={true}
           autoDisabled={true}
           onChange={this.props.onAnimateScoreBars}
+          action={BuilderActions.changePath}
         />
         <span className='pf-score-line-text'>times</span>
-        <Dropdown
+        <SearchableDropdown
           options={this.props.dropdownOptions.map((v) => v.displayName).toList()}
           selectedIndex={this.state.fieldIndex}
           canEdit={this.props.pathfinderContext.canEdit}
           keyPath={this.props.keyPath.push('field')}
+          placeholder={'Field...'}
+          action={BuilderActions.changePath}
         />
         {
           this.props.line.field &&

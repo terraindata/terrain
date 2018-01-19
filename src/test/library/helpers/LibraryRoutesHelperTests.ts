@@ -43,50 +43,43 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
+import { buildRoute } from 'library/helpers/LibraryRoutesHelper';
 
-const create = '';
-const change = '';
-const move = '';
-const duplicate = '';
-
-export let LibraryActionTypes =
+describe('LibraryRouterHelper', () =>
+{
+  describe('#buildRoute', () =>
   {
-    categories:
-      {
-        create, change, move,
-        // duplicate,
-      },
+    it('should create the next library/analytics route', () =>
+    {
+      let route = buildRoute({ basePath: 'library' });
+      expect(route).toEqual('/library');
 
-    groups:
-      {
-        create, change, move,
-      },
+      route = buildRoute({ basePath: 'library', categoryId: 1 });
+      expect(route).toEqual('/library/1');
 
-    algorithms:
-      {
-        create, change, move,
-        status: '',
-        fetchVersion: '',
-        loadVersion: '',
-        select: '',
-        unselect: '',
-      },
+      route = buildRoute({
+        basePath: 'library',
+        categoryId: 1,
+        groupId: 2,
+      });
+      expect(route).toEqual('/library/1/2');
 
-    loadState: '',
-    setDbs: '',
-  };
+      route = buildRoute({
+        basePath: 'library',
+        categoryId: 1,
+        groupId: 2,
+        algorithmId: 3,
+      });
+      expect(route).toEqual('/library/1/2/3');
 
-Util.setValuesToKeys(LibraryActionTypes, 'library');
-
-export const CleanLibraryActionTypes = // not dirty
-  [
-    LibraryActionTypes.loadState,
-    LibraryActionTypes.setDbs,
-    LibraryActionTypes.algorithms.fetchVersion,
-    LibraryActionTypes.algorithms.loadVersion,
-    LibraryActionTypes.algorithms.select,
-    LibraryActionTypes.algorithms.unselect,
-  ];
-
-export default LibraryActionTypes;
+      route = buildRoute({
+        basePath: 'library',
+        categoryId: 1,
+        groupId: 2,
+        algorithmId: 3,
+        pinned: [4, 5],
+      });
+      expect(route).toEqual('/library/1/2/3?pinned=4,5');
+    });
+  });
+});

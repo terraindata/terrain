@@ -1202,6 +1202,66 @@ export const Ajax =
       );
     },
 
+    starColumn(
+      columnId: ID,
+      starred: boolean,
+      id?: number,
+      onLoad?: (resp) => void,
+      onError?: (error) => void)
+    {
+      console.log('Star column');
+      const body = id !== undefined ? { columnId, starred, id } : { columnId, starred, id };
+      return Ajax.req('post', 'schemametadata/star', body, (resp: any) =>
+      {
+        try
+        {
+          console.log(resp);
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          console.log(e);
+          onError && onError(e);
+        }
+      });
+    },
+
+    schemaMetadata(id?: number, onLoad?: (resp) => void, onError?: (error) => void)
+    {
+      return Ajax.req('get', 'schemametadata/', { id }, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
+    countColumn(
+      columnId: ID,
+      algorithmId?: string | number,
+      id?: number,
+      onLoad?: (resp) => void,
+      onError?: (error) => void)
+    {
+      const body = id === undefined ? { columnId, algorithmId } : { columnId, algorithmId, id };
+      return Ajax.req('post', 'schemametadata/count', body, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
     schema(dbId: number | string, onLoad: (columns: object | any[], error?: any) => void, onError?: (ev: Event) => void)
     {
       // TODO see if needs to query m1

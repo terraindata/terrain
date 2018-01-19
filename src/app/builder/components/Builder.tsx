@@ -551,7 +551,6 @@ class Builder extends TerrainComponent<Props>
         return false;
       }
     }
-
     return !!(overrideState || this.state.builderState).isDirty;
   }
 
@@ -643,7 +642,6 @@ class Builder extends TerrainComponent<Props>
     const key = this.state.colKeys.get(index);
     const query = this.getQuery();
     const algorithm = this.getAlgorithm();
-
     return {
       minWidth: 316,
       resizeable: true,

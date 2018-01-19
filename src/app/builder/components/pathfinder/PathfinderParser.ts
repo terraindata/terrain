@@ -50,11 +50,14 @@ import TransformUtil, { NUM_CURVE_POINTS } from 'app/util/TransformUtil';
 import Util from 'app/util/Util';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
+import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
+import { isInput } from '../../../../blocks/types/Input';
 import { FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
 
-export function parsePath(path: Path): string
+export function parsePath(path: Path, inputs): string
 {
   let baseQuery = Map({
     query: Map({
@@ -81,7 +84,7 @@ export function parsePath(path: Path): string
       }),
     }),
   ]));
-  let filterObj = parseFilters(path.filterGroup);
+  let filterObj = parseFilters(path.filterGroup, inputs);
   filterObj = filterObj.setIn(['bool', 'filter'],
     filterObj.getIn(['bool', 'filter'])
       .concat(baseQuery.getIn(['query', 'bool', 'filter'])));
@@ -101,7 +104,9 @@ export function parsePath(path: Path): string
   }
   const moreObj = parseMore(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
-  return JSON.stringify(baseQuery.toJS(), null, 2);
+  const text = stringifyWithParameters(baseQuery.toJS(), inputs);
+  const parser: ESJSONParser = new ESJSONParser(text, true);
+  return ESParseTreeToCode(parser, {}, inputs);
 }
 
 function parseSource(source: Source): any
@@ -162,11 +167,19 @@ function parseTerrainScore(score: Score)
       },
     },
   };
+  // This is a weird race condition where the path starts loading with the old path and then switches to new path...
+  let dirty = false;
   const factors = score.lines.map((line) =>
   {
     let ranges = [];
     let outputs = [];
     let data;
+    const transformData = Util.asJS(line.transformData);
+    if (transformData === undefined)
+    {
+      dirty = true;
+      return {};
+    }
     const min = Util.asJS(line.transformData).dataDomain[0];
     const max = Util.asJS(line.transformData).dataDomain[1];
     const numPoints = 31;
@@ -208,10 +221,14 @@ function parseTerrainScore(score: Score)
     };
   }).toArray();
   sortObj._script.script.params.factors = factors;
+  if (dirty)
+  {
+    return {};
+  }
   return sortObj;
 }
 
-function parseFilters(filterGroup: FilterGroup): any
+function parseFilters(filterGroup: FilterGroup, inputs): any
 {
   // init must, mustNot, filter, should
   // If the minMatches is all of the above
@@ -244,7 +261,7 @@ function parseFilters(filterGroup: FilterGroup): any
   {
     if (!line.filterGroup)
     {
-      const lineInfo = parseFilterLine(line, useShould);
+      const lineInfo = parseFilterLine(line, useShould, inputs);
       if (useShould)
       {
         should = should.push(lineInfo);
@@ -264,7 +281,7 @@ function parseFilters(filterGroup: FilterGroup): any
     }
     else
     {
-      const nestedFilter = parseFilters(line.filterGroup);
+      const nestedFilter = parseFilters(line.filterGroup, inputs);
       must = must.push(nestedFilter);
     }
   });
@@ -279,16 +296,19 @@ function parseFilters(filterGroup: FilterGroup): any
   return filterObj;
 }
 
-function parseFilterLine(line: FilterLine, useShould: boolean)
+function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
 {
+  const lineValue = String(line.value);
+  const value: any = String(line.value || '');
+  const boost = typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight;
   switch (line.comparison)
   {
     case 'equal':
       return Map({
         term: Map({
           [line.field]: Map({
-            value: line.value || '',
-            boost: parseFloat(line.weight),
+            value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
+            boost,
           }),
         }),
       });
@@ -308,8 +328,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
             must_not: Map({
               term: Map({
                 [line.field]: Map({
-                  value: String(line.value || ''),
-                  boost: line.weight,
+                  value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
+                  boost,
                 }),
               }),
             }),
@@ -319,8 +339,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         term: Map({
           [line.field]: Map({
-            value: String(line.value || ''),
-            boost: line.weight,
+            value: !isNaN(parseFloat(value)) ? parseFloat(value) : value,
+            boost,
           }),
         }),
       });
@@ -347,26 +367,44 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
         }),
       });
     case 'greater':
+      return Map({
+        range: Map({
+          [line.field]:
+            Map({
+              gt: parseFloat(value),
+              boost,
+            }),
+        }),
+      });
     case 'alphaafter':
     case 'dateafter':
       return Map({
         range: Map({
           [line.field]:
             Map({
-              gt: line.value,
-              boost: line.weight,
+              gt: value,
+              boost,
             }),
         }),
       });
     case 'less':
+      return Map({
+        range: Map({
+          [line.field]:
+            Map({
+              lt: parseFloat(value),
+              boost,
+            }),
+        }),
+      });
     case 'alphabefore':
     case 'datebefore':
       return Map({
         range: Map({
           [line.field]:
             Map({
-              lt: line.value,
-              boost: line.weight,
+              lt: value,
+              boost,
             }),
         }),
       });
@@ -375,8 +413,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
         range: Map({
           [line.field]:
             Map({
-              gte: line.value,
-              boost: line.weight,
+              gte: parseFloat(value),
+              boost,
             }),
         }),
       });
@@ -385,8 +423,8 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
         range: Map({
           [line.field]:
             Map({
-              lte: line.value,
-              boost: line.weight,
+              lte: parseFloat(value),
+              boost,
             }),
         }),
       });
@@ -395,7 +433,7 @@ function parseFilterLine(line: FilterLine, useShould: boolean)
       return Map({
         geo_distance: Map({
           distance: String(distanceObj.distance) + distanceObj.units,
-          [line.field]: distanceObj.location,
+          [line.field]: [distanceObj.location[1], distanceObj.location[0]],
         }),
       });
     default:

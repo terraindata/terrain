@@ -88,6 +88,9 @@ export let BuilderActionTypes =
     undo: '',
     redo: '',
     checkpoint: '', // inserts an undo checkpoint
+
+    // change the poath
+    changePath: '',
   };
 
 // I tried using this type to correclty classify this function,
@@ -124,6 +127,7 @@ export let BuilderDirtyActionTypes = {};
 [
   BuilderActionTypes.create,
   BuilderActionTypes.change,
+  BuilderActionTypes.changePath,
   BuilderActionTypes.move,
   BuilderActionTypes.remove,
   BuilderActionTypes.nestedMove,
@@ -147,7 +151,7 @@ export let BuilderCardActionTypes = {};
 
 export let BuilderPathActionTypes = {};
 [
-  BuilderActionTypes.change,
+  BuilderActionTypes.changePath,
   BuilderActionTypes.queryLoaded,
 ].map((type) => BuilderPathActionTypes[type] = true);
 

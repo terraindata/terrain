@@ -77,7 +77,7 @@ export class PathfinderAggregationMoreSection extends TerrainComponent<Props>
 
   public handleDelete()
   {
-    BuilderActions.change(this.props.keyPath, undefined);
+    BuilderActions.changePath(this.props.keyPath, undefined);
   }
 
   public render()

@@ -295,11 +295,13 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
                   selectedIndex={comparisonOptions.map((option) => option.value).toList().indexOf(filter.comparison)}
                   keyPath={this.props.keyPath.push('lines').push(i).push('comparison')}
                   canEdit={canEdit}
+                  action={BuilderActions.changePath}
                 />
                 <BuilderTextbox
                   value={filter.value}
                   keyPath={this.props.keyPath.push('lines').push(i).push('value')}
                   canEdit={canEdit}
+                  action={BuilderActions.changePath}
                 />
                 <div
                   onClick={this._fn(this.handleRemoveFilter, filter)}
@@ -332,14 +334,14 @@ class PathfinderFilterSection2 extends TerrainComponent<Props>
   {
     const oldLines = this.props.filterGroup.get('lines');
     const index = oldLines.indexOf(filter);
-    BuilderActions.change(this.props.keyPath.push('lines'), oldLines.delete(index));
+    BuilderActions.changePath(this.props.keyPath.push('lines'), oldLines.delete(index));
   }
 
   private handleAddFilter(field, e)
   {
     const oldLines = this.props.filterGroup.get('lines');
     const filter = _FilterLine({ field, comparison: 'equals', value: '' });
-    BuilderActions.change(this.props.keyPath.push('lines'), oldLines.push(filter));
+    BuilderActions.changePath(this.props.keyPath.push('lines'), oldLines.push(filter));
     e.stopPropagation();
     e.preventDefault();
   }

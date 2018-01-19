@@ -59,6 +59,10 @@ const BuilderActions =
       (keyPath: KeyPath, value: any, notDirty = false) =>
         $(ActionTypes.change, { keyPath, value, notDirty }),
 
+    changePath:
+      (keyPath: KeyPath, value: any, notDirty = false) =>
+        $(ActionTypes.changePath, { keyPath, value, notDirty }),
+
     changeQuery:
       (query: Query) =>
         $(ActionTypes.changeQuery, { query }),
@@ -114,8 +118,8 @@ const BuilderActions =
 
     // load query from server into state
     queryLoaded:
-      (query: Query, xhr: XMLHttpRequest, db: BackendInstance) =>
-        $(ActionTypes.queryLoaded, { query, xhr, db }),
+      (query: Query, algorithmId: ID, xhr: XMLHttpRequest, db: BackendInstance) =>
+        $(ActionTypes.queryLoaded, { query, algorithmId, xhr, db }),
 
     save:
       (failed?: boolean) =>

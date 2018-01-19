@@ -118,13 +118,13 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   private handleFilterChange(keyPath: KeyPath, filter: FilterGroup | FilterLine)
   {
-    BuilderActions.change(keyPath, filter);
+    BuilderActions.changePath(keyPath, filter);
   }
 
   private handleAddFilter(keyPath, filter: FilterGroup | FilterLine)
   {
     const oldLines = this.props.filterGroup.getIn(keyPath.skip(3).toList());
-    BuilderActions.change(keyPath, oldLines.push(filter));
+    BuilderActions.changePath(keyPath, oldLines.push(filter));
   }
 
   private handleFilterDelete(keyPath: KeyPath)
@@ -132,7 +132,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     const parentKeyPath = keyPath.butLast().toList();
     const parent = this.props.filterGroup.getIn(parentKeyPath.skip(3).toList());
     const index = keyPath.last();
-    BuilderActions.change(parentKeyPath, parent.splice(index, 1));
+    BuilderActions.changePath(parentKeyPath, parent.splice(index, 1));
     // TODO consider 'removeIn' instead
   }
 

@@ -122,6 +122,9 @@ export interface Props
   tuningMode?: boolean;
 
   onKeyDown?: (e) => void;
+  autoFocus?: boolean;
+
+  action?: (keyPath, value) => void;
 }
 
 interface State
@@ -252,7 +255,14 @@ class BuilderTextbox extends TerrainComponent<Props>
     // }
     if (this.props.keyPath && this.props.keyPath.size)
     {
-      Actions.change(this.props.keyPath, value);
+      if (this.props.action)
+      {
+        this.props.action(this.props.keyPath, value);
+      }
+      else
+      {
+        Actions.change(this.props.keyPath, value);
+      }
     }
     this.props.onChange && this.props.onChange(value);
   }
@@ -371,7 +381,14 @@ class BuilderTextbox extends TerrainComponent<Props>
         keyPath = List(keyPaths.get(card.id));
       }
     }
-    Actions.change(keyPath.push(key), !this.props.value[key]);
+    if (this.props.action)
+    {
+      this.props.action(keyPath.push(key), !this.props.value[key]);
+    }
+    else
+    {
+      Actions.change(keyPath.push(key), !this.props.value[key]);
+    }
   }
 
   public computeOptions()
@@ -469,6 +486,7 @@ class BuilderTextbox extends TerrainComponent<Props>
                 onBlur={this.handleBlur}
                 style={this.props.textStyle}
                 onKeyDown={this.props.onKeyDown}
+                autoFocus={this.props.autoFocus}
               />
           }
           {this.props.acceptsCards && this.renderSwitch()}

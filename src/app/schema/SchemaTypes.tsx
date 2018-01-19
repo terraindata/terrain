@@ -73,6 +73,9 @@ class SchemaStateC
   public loaded: boolean = false;
   public schemaError: boolean = false;
 
+  // Keep track of schema meta data
+  public schemaMetadata: List<SchemaMetadata> = List([]);
+
   // view state
   public selectedId: string = null;
   public highlightedId: string = null;
@@ -90,6 +93,25 @@ export function serverId(serverName: string)
 {
   return serverName;
 }
+
+class SchemaMetadataC extends BaseClass
+{
+  public id: number = undefined;
+  public columnId: string = '';
+  public starred: boolean = false;
+  public count: number = 0;
+  public countByAlgorithm: IMMap<ID, number> = Map<ID, number>();
+}
+export type SchemaMetadata = SchemaMetadataC & IRecord<SchemaMetadataC>;
+export const _SchemaMetadata = (config?: { [key: string]: any }) =>
+{
+  if (typeof config['countByAlgorithm'] === 'string')
+  {
+    config['countByAlgorithm'] = JSON.parse(config['countByAlgorithm']);
+  }
+  config['countByAlgorithm'] = Map<ID, number>(config['countByAlgorithm']);
+  return New<SchemaMetadata>(new SchemaMetadataC(config), config);
+};
 
 class ServerC extends SchemaBaseClass
 {

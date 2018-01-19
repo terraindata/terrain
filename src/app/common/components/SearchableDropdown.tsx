@@ -76,6 +76,7 @@ export interface Props
   directionBias?: number; // bias for determining whether or not dropdown opens up or down
   openDown?: boolean;
   placeholder?: string;
+  action?: (keyPath, value) => void;
 }
 
 @Radium
@@ -157,7 +158,14 @@ class SearchableDropdown extends TerrainComponent<Props>
     });
     if (this.props.keyPath !== undefined)
     {
-      Actions.change(this.props.keyPath, value);
+      if (this.props.action)
+      {
+        this.props.action(this.props.keyPath, value);
+      }
+      else
+      {
+        Actions.change(this.props.keyPath, value);
+      }
     }
     if (this.props.onChange !== undefined)
     {

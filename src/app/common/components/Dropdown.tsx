@@ -80,6 +80,7 @@ export interface Props
   wrapperTooltip?: string;
   placeholder?: string;
   icons?: Immutable.Map<any, any>;
+  action?: (keyPath, value) => void;
 }
 
 @Radium
@@ -114,7 +115,14 @@ class Dropdown extends TerrainComponent<Props>
         const pr = this.props;
         if (pr.keyPath)
         {
-          Actions.change(pr.keyPath, pr.values ? pr.values.get(index) : pr.options.get(index));
+          if (pr.action)
+          {
+            pr.action(pr.keyPath, pr.values ? pr.values.get(index) : pr.options.get(index));
+          }
+          else
+          {
+            Actions.change(pr.keyPath, pr.values ? pr.values.get(index) : pr.options.get(index));
+          }
         }
         if (pr.onChange)
         {

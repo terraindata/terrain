@@ -43,50 +43,44 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-const create = '';
-const change = '';
-const move = '';
-const duplicate = '';
+import * as passport from 'koa-passport';
+import * as KoaRouter from 'koa-router';
+import * as winston from 'winston';
 
-export let LibraryActionTypes =
+import DatabaseController from '../../database/DatabaseController';
+import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
+import * as Tasty from '../../tasty/Tasty';
+import SchemaMetadata from './SchemaMetadata';
+import SchemaMetadataConfig from './SchemaMetadataConfig';
+
+const Router = new KoaRouter();
+export const schemaMetadata = new SchemaMetadata();
+
+Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  let getItems;
+  if (ctx.request.body.body !== undefined && ctx.request.body.body.id !== undefined)
   {
-    categories:
-      {
-        create, change, move,
-        // duplicate,
-      },
+    getItems = schemaMetadata.get(ctx.request.body.body.id);
+  }
+  winston.info('getting all schemaMetadata');
+  getItems = await schemaMetadata.get();
+  ctx.body = getItems;
+});
 
-    groups:
-      {
-        create, change, move,
-      },
+Router.post('/star', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('Starring a schemaMetadata');
+  const metaData: SchemaMetadataConfig = ctx.request.body.body;
+  ctx.body = await schemaMetadata.upsert(ctx.state.user, metaData);
+});
 
-    algorithms:
-      {
-        create, change, move,
-        status: '',
-        fetchVersion: '',
-        loadVersion: '',
-        select: '',
-        unselect: '',
-      },
+Router.post('/count', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  winston.info('Incrementing the count of a schemaMetadata');
+  const { columnId, algorithmId } = ctx.request.body.body;
+  ctx.body = await schemaMetadata.increment(ctx.state.user, columnId, algorithmId);
+});
 
-    loadState: '',
-    setDbs: '',
-  };
-
-Util.setValuesToKeys(LibraryActionTypes, 'library');
-
-export const CleanLibraryActionTypes = // not dirty
-  [
-    LibraryActionTypes.loadState,
-    LibraryActionTypes.setDbs,
-    LibraryActionTypes.algorithms.fetchVersion,
-    LibraryActionTypes.algorithms.loadVersion,
-    LibraryActionTypes.algorithms.select,
-    LibraryActionTypes.algorithms.unselect,
-  ];
-
-export default LibraryActionTypes;
+export default Router;

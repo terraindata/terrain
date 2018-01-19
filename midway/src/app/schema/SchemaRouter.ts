@@ -61,8 +61,8 @@ async function getSchema(databaseID: number): Promise<string>
   {
     throw new Error('Database "' + databaseID.toString() + '" not found.');
   }
-  const schema: Tasty.Schema = await database.getTasty().schema();
-  return schema.toString();
+  const tastySchema: Tasty.Schema = await database.getTasty().schema();
+  return tastySchema.toString();
 }
 
 Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>

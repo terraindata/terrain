@@ -87,8 +87,7 @@ const { List, Map, Record } = Immutable;
 import BuilderStore from 'app/builder/data/BuilderStore';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
-import
-ElasticBlockHelpers,
+import ElasticBlockHelpers,
 { AutocompleteMatchType, FieldType, FieldTypeMapping }
   from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
@@ -614,46 +613,16 @@ class ElasticDataSourceC extends DataSource
 
       return List(options.map((c) => _ChoiceOption(c)));
     }
-
-    // if (context.type === 'valueType')
-    // {
-    //   const comparison = ElasticComparisons.find((comp) => comp.value === context.comparison);
-
-    //   if (comparison)
-    //   {
-    //     return comparison.valueTypes.map((valueType) => _ChoiceOption({
-    //       value: valueType,
-    //       displayName: valueType,
-    //     })).toList();
-    //   }
-
-    //   return List([_ChoiceOption({
-    //     value: null,
-    //     displayName: 'Choose a comparison first',
-    //   })]);
-    // }
-
     if (context.type === 'input')
     {
       // TODO use current builder state
-      return List([
+      const inputs = BuilderStore.getState().query.inputs;
+      return inputs.map((input) =>
         _ChoiceOption({
-          displayName: 'search term',
-          value: '@search',
+          displayName: '@' + String(input.key),
+          value: '@' + String(input.key),
         }),
-        _ChoiceOption({
-          displayName: 'genre',
-          value: '@genre',
-        }),
-        _ChoiceOption({
-          displayName: 'user ID',
-          value: '@userid',
-        }),
-        _ChoiceOption({
-          displayName: 'user location',
-          value: '@userlocation',
-        }),
-      ]);
+      ).toList();
     }
 
     throw new Error('Unrecognized context for autocomplete matches: ' + JSON.stringify(context));

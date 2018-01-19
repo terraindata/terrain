@@ -43,50 +43,22 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-const create = '';
-const change = '';
-const move = '';
-const duplicate = '';
+import ConfigType from '../ConfigType';
 
-export let LibraryActionTypes =
+export class SchemaMetadataConfig extends ConfigType
+{
+  public id?: number = undefined;
+  public columnId: string = undefined;
+  public starred: boolean = false;
+  public count: number = 0;
+  public countByAlgorithm: string = undefined;
+
+  constructor(props: object)
   {
-    categories:
-      {
-        create, change, move,
-        // duplicate,
-      },
+    super();
+    ConfigType.initialize(this, props);
+  }
+}
 
-    groups:
-      {
-        create, change, move,
-      },
-
-    algorithms:
-      {
-        create, change, move,
-        status: '',
-        fetchVersion: '',
-        loadVersion: '',
-        select: '',
-        unselect: '',
-      },
-
-    loadState: '',
-    setDbs: '',
-  };
-
-Util.setValuesToKeys(LibraryActionTypes, 'library');
-
-export const CleanLibraryActionTypes = // not dirty
-  [
-    LibraryActionTypes.loadState,
-    LibraryActionTypes.setDbs,
-    LibraryActionTypes.algorithms.fetchVersion,
-    LibraryActionTypes.algorithms.loadVersion,
-    LibraryActionTypes.algorithms.select,
-    LibraryActionTypes.algorithms.unselect,
-  ];
-
-export default LibraryActionTypes;
+export default SchemaMetadataConfig;

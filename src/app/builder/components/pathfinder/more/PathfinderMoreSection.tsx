@@ -96,13 +96,13 @@ class PathfinderMoreSection extends TerrainComponent<Props>
   public handleAddLine()
   {
     const newLines = this.props.more.aggregations.push(_AggregationLine());
-    BuilderActions.change(this.props.keyPath.push('aggregations'), newLines);
+    BuilderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
   }
 
   public handleDeleteLine(index)
   {
     const newLines = this.props.more.aggregations.delete(index);
-    BuilderActions.change(this.props.keyPath.push('aggregations'), newLines);
+    BuilderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
   }
 
   public handleLinesReorder(items)
@@ -112,7 +112,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     {
       return this.props.more.aggregations.get(index);
     });
-    BuilderActions.change(this.props.keyPath.push('aggregations'), newLines);
+    BuilderActions.changePath(this.props.keyPath.push('aggregations'), newLines);
   }
 
   public getAggregationLines()

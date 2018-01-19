@@ -56,9 +56,6 @@ import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
 import DatabaseConfig from './DatabaseConfig';
 
-// CREATE TABLE databases (id integer PRIMARY KEY, name text NOT NULL, type text NOT NULL, \
-// dsn text NOT NULL, status text, isAnalytics bool NOT NULL, analyticsIndex text, analyticsType text);
-
 export class Databases
 {
   private databaseTable: Tasty.Table;
@@ -126,11 +123,6 @@ export class Databases
       {
         db = Util.updateObject(results[0], db);
       }
-    }
-    else
-    {
-      const results: DatabaseConfig[] = await this.get();
-      db.id = results.length + 1;
     }
 
     if (db.isAnalytics === undefined)
