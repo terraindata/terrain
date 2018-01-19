@@ -1209,18 +1209,15 @@ export const Ajax =
       onLoad?: (resp) => void,
       onError?: (error) => void)
     {
-      console.log('Star column');
       const body = id !== undefined ? { columnId, starred, id } : { columnId, starred, id };
       return Ajax.req('post', 'schemametadata/star', body, (resp: any) =>
       {
         try
         {
-          console.log(resp);
           onLoad && onLoad(resp);
         }
         catch (e)
         {
-          console.log(e);
           onError && onError(e);
         }
       });

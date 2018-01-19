@@ -118,6 +118,26 @@ class SearchableDropdown extends TerrainComponent<Props>
     });
   }
 
+  public componentWillMount()
+  {
+    if (this.props.selectedIndex >= 0)
+    {
+      this.setState({
+        inputValue: this.props.options.get(this.props.selectedIndex),
+      });
+    }
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (nextProps.selectedIndex >= 0 && nextProps.selectedIndex !== this.props.selectedIndex)
+    {
+      this.setState({
+        inputValue: nextProps.options.get(nextProps.selectedIndex),
+      });
+    }
+  }
+
   public getFilteredOptions(filterValue)
   {
     let filteredOptions = List([]);

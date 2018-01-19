@@ -85,6 +85,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 const { List, Map, Record } = Immutable;
 import BuilderStore from 'app/builder/data/BuilderStore';
+import Util from 'app/util/Util';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
 import ElasticBlockHelpers,
@@ -584,7 +585,7 @@ class ElasticDataSourceC extends DataSource
           const cols = context.schemaState.columns.filter(
             (column) => column.serverId === String(server) &&
               column.databaseId === String(index));
-          const fields = cols.map((col) =>
+          let fields = cols.map((col) =>
           {
             return _ChoiceOption({
               displayName: col.name,
@@ -595,6 +596,10 @@ class ElasticDataSourceC extends DataSource
               },
             });
           }).toList();
+          // Sort fields (Sort their names, then use that to sort the choice options)
+          let fieldNames = fields.map((f) => f.value).toList();
+          fieldNames = Util.orderFields(fieldNames, context.schemaState, -1, index);
+          fields = fields.sort((a, b) => fieldNames.indexOf(a.value) - fieldNames.indexOf(b.value)).toList();
           return fields.concat(defaultOptions).toList();
         }
       }

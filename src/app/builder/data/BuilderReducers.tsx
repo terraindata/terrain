@@ -169,7 +169,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         if (state.query.path.source && state.query.path.source.dataSource)
         {
           const index = (state.query.path.source.dataSource as any).index;
-          const columnId = state.db.name + '/' + index + '/' + action.payload.value;
+          const columnId = index + '/' + action.payload.value;
           // const columnId = state.db.name + '/' + getIndex() + '.' + getType() + '.c.' + action.payload.value;
           const algorithmId = state.query.algorithmId;
           Ajax.countColumn(columnId, algorithmId);

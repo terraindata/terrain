@@ -50,6 +50,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 // import * as moment from 'moment';
 const moment = require('moment');
+import { SchemaState } from 'app/schema/SchemaTypes';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
@@ -703,6 +704,55 @@ const Util = {
   createTypedContainer<ComponentType>(component: ComponentType, stateToPropsKeys, dispatchToPropsMap): ComponentType
   {
     return Util.createContainer(component, stateToPropsKeys, dispatchToPropsMap);
+  },
+
+  /*
+    This function sorts fields based on metadata stored about the fields.
+    The metadata available is:
+      starred (boolean) (whether the user actually went into the schema and indidcate that this field was important)
+      count (number) how many times the field has been selected across all algorithms
+      countByAlgorithm (map of algorithmIds: number) how many times the field has been used in the corresponding algorithm
+
+      columnId is $dbName/$index/$fieldName
+  */
+  orderFields(fields: List<string>, schema: SchemaState, algorithmId: ID, serverIndex: string): List<string>
+  {
+    const schemaMetadata = schema.schemaMetadata;
+    // First sort on whether or not a field has been starred
+    // If it has been, it will automaticall be at the top of the list, and all starred fields will be in alpha order
+    let starredFields = Immutable.List([]);
+    schema.schemaMetadata.forEach((d) =>
+    {
+      const pieces = Immutable.List(d.columnId.split('/'));
+      const serverName = pieces.get(0) + '/' + pieces.get(1);
+      const fieldName = pieces.last();
+      if (fields.indexOf(fieldName) !== -1 && d.starred && serverIndex === serverName)
+      {
+        starredFields = starredFields.push(fieldName);
+      }
+    });
+    let nonStarredFields = fields.filter((field) => starredFields.indexOf(field) === -1).toList();
+    // Next sort the non-starred fields by how many times they have been used ( in this algorithm and others)
+    // In case of a tie, use alpha ordering
+    nonStarredFields = nonStarredFields.sort((a, b) =>
+    {
+      let aCount = 0;
+      let bCount = 0;
+      const aData = schemaMetadata.filter((d) => d.columnId === serverIndex + '/' + a).toList();
+      const bData = schemaMetadata.filter((d) => d.columnId === serverIndex + '/' + b).toList();
+      if (aData.size > 0)
+      {
+        aCount = aData.get(0).count;
+      }
+      if (bData.size > 0)
+      {
+        bCount = bData.get(0).count;
+      }
+      // If it's a tie, use alpha sorting, otherwise use count
+      return aCount === bCount ? (a < b ? -1 : 1) : 2 * (bCount - aCount);
+    }).toList();
+    // Put the sorted non starred fields after the starred fields (Starred are sorted in alpha order)
+    return starredFields.sort().concat(nonStarredFields).toList();
   },
 };
 

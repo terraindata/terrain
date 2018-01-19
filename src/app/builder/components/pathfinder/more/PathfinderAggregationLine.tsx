@@ -343,7 +343,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     // If the type has not been chosen, or the type can accept Any field, return all fields
     if ((type === undefined || type === '') || AggregationTypes.get(type).acceptedTypes.indexOf(FieldType.Any) !== -1)
     {
-      return allFieldOptions.sort().toList();
+      return allFieldOptions.toList();
     }
     let filteredOptions = Set([]);
     const acceptedTypes = AggregationTypes.get(type).acceptedTypes;
@@ -351,7 +351,7 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
     {
       filteredOptions = filteredOptions.union(ElasticBlockHelpers.getFieldsOfType(schemaState, fieldType, source.dataSource).toSet());
     });
-    return filteredOptions.sort().toList();
+    return filteredOptions.toList();
   }
 
   public renderInnerLine()
