@@ -301,7 +301,7 @@ class App extends TerrainComponent<Props>
     this.props.colorsActions({
       actionType: 'setStyle',
       selector: '.dropdown-wrapper:not(.dropdown-disabled):hover .dropdown-value:before',
-      style: { 'border-top': '7px solid ' + Colors().activeText },
+      style: { 'border-top': '7px solid ' + Colors().active },
     });
     this.props.colorsActions({
       actionType: 'setStyle',
