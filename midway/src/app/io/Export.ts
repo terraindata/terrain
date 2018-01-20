@@ -881,57 +881,40 @@ export class Export
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _checkTypes(obj: object, exprt: ExportConfig): string
   {
-    if (exprt.filetype === 'json')
+    const targetHash: string = this._buildDesiredHash(exprt.columnTypes);
+    const targetKeys: string = JSON.stringify(Object.keys(exprt.columnTypes).sort());
+
+    // parse dates
+    const dateColumns: string[] = [];
+    for (const colName of Object.keys(exprt.columnTypes))
     {
-      const targetHash: string = this._buildDesiredHash(exprt.columnTypes);
-      const targetKeys: string = JSON.stringify(Object.keys(exprt.columnTypes).sort());
-
-      // parse dates
-      const dateColumns: string[] = [];
-      for (const colName of Object.keys(exprt.columnTypes))
+      if (exprt.columnTypes.hasOwnProperty(colName) && this._getESType(exprt.columnTypes[colName]) === 'date')
       {
-        if (exprt.columnTypes.hasOwnProperty(colName) && this._getESType(exprt.columnTypes[colName]) === 'date')
-        {
-          dateColumns.push(colName);
-        }
-      }
-      if (dateColumns.length > 0)
-      {
-        dateColumns.forEach((colName) =>
-        {
-          this._parseDatesHelper(obj, colName);
-        });
-      }
-
-      if (this._hashObjectStructure(obj) !== targetHash)
-      {
-        if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
-        {
-          return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj);
-        }
-        for (const key of Object.keys(obj))
-        {
-          if (obj.hasOwnProperty(key))
-          {
-            if (!this._jsonCheckTypesHelper(obj[key], exprt.columnTypes[key]))
-            {
-              return 'Encountered an object whose field "' + key + '"does not match the specified type (' +
-                JSON.stringify(exprt.columnTypes[key]) + '): ' + JSON.stringify(obj);
-            }
-          }
-        }
+        dateColumns.push(colName);
       }
     }
-    else if (exprt.filetype === 'csv')
+    if (dateColumns.length > 0)
     {
-      for (const name of Object.keys(exprt.columnTypes))
+      dateColumns.forEach((colName) =>
       {
-        if (exprt.columnTypes.hasOwnProperty(name))
+        this._parseDatesHelper(obj, colName);
+      });
+    }
+
+    if (this._hashObjectStructure(obj) !== targetHash)
+    {
+      if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
+      {
+        return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj);
+      }
+      for (const key of Object.keys(obj))
+      {
+        if (obj.hasOwnProperty(key))
         {
-          if (!this._csvCheckTypesHelper(obj, exprt.columnTypes[name], name))
+          if (!this._jsonCheckTypesHelper(obj[key], exprt.columnTypes[key]))
           {
-            return 'Encountered an object whose field "' + name + '"does not match the specified type (' +
-              JSON.stringify(exprt.columnTypes[name]) + '): ' + JSON.stringify(obj);
+            return 'Encountered an object whose field "' + key + '"does not match the specified type (' +
+              JSON.stringify(exprt.columnTypes[key]) + '): ' + JSON.stringify(obj);
           }
         }
       }
