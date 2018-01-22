@@ -54,9 +54,10 @@ import './CardDropArea.less';
 const classNames = require('classnames');
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import Store from '../../data/BuilderStore';
 import { CardItem } from './CardComponent';
+import Util from 'util/Util';
 
 export const cardWillWrap = (targetProps: Props, cardType: string) =>
 {
@@ -67,7 +68,7 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
 {
   if (monitor.isOver({ shallow: true })) // shouldn't need this: && cardTarget.canDrop(targetProps, monitor))
   {
-    Actions.dropCard();
+    this.props.builderActions.dropCard();
 
     const item = monitor.getItem();
     const { type } = item;
@@ -103,7 +104,7 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
       targetIndex = targetProps.index;
       wrappingCardData = Store.getState().getIn(targetProps.keyPath).get(0);
       wrappingKeyPath = targetProps.keyPath.push(targetIndex);
-      Actions.remove(targetProps.keyPath, targetIndex);
+      this.props.builderActions.remove(targetProps.keyPath, targetIndex);
     }
 
     let cardProps: any;
@@ -116,11 +117,11 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
         const card = BlockUtils.make(
           AllBackendsMap[targetProps.language].blocks, type, targetProps.handleCardDrop(type),
         );
-        Actions.create(targetProps.keyPath, targetIndex, type, card);
+        this.props.builderActions.create(targetProps.keyPath, targetIndex, type, card);
       }
       else
       {
-        Actions.create(targetProps.keyPath, targetIndex, type);
+        this.props.builderActions.create(targetProps.keyPath, targetIndex, type);
       }
     }
     else
@@ -128,12 +129,12 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
       // dragging an existing card
       cardProps = item.props;
       indexOffset = 0;
-      Actions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetIndex);
+      this.props.builderActions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetIndex);
     }
 
     if (isWrapping)
     {
-      Actions.create(wrappingKeyPath.push('cards'), 0, null, wrappingCardData);
+      this.props.builderActions.create(wrappingKeyPath.push('cards'), 0, null, wrappingCardData);
     }
 
     targetProps.afterDrop && targetProps.afterDrop(item, targetProps);
@@ -172,6 +173,8 @@ export interface Props
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
 
   handleCardDrop?: (type: string) => any;
+
+  builderActions?: typeof BuilderActions;
 }
 
 class CardDropArea extends TerrainComponent<Props>
@@ -415,7 +418,7 @@ const cardTarget =
 
         if (keyPath !== state.draggingOverKeyPath || index !== state.draggingOverIndex)
         {
-          Actions.dragCardOver(keyPath, index);
+          this.props.builderActions.dragCardOver(keyPath, index);
         }
       }
 
@@ -435,6 +438,12 @@ const dropCollect = (connect, monitor) =>
     item: monitor.getItem(),
   });
 
-const CDA = DropTarget<Props>('CARD', cardTarget, dropCollect)(CardDropArea) as any;
+const CardDropAreaContainer = Util.createTypedContainer(
+  CardDropArea,
+  [],
+  { builderActions: BuilderActions },
+);
+
+const CDA = DropTarget<Props>('CARD', cardTarget, dropCollect)(CardDropAreaContainer) as any;
 
 export default CDA;

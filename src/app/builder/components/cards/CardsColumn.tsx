@@ -52,7 +52,7 @@ import * as $ from 'jquery';
 import * as React from 'react';
 import InfoArea from '../../../common/components/InfoArea';
 import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -83,8 +83,8 @@ export interface Props
   containerWidth?: number;
   containerHeight?: number;
 
-  colorsActions: typeof ColorsActions;
-
+  colorsActions?: typeof ColorsActions;
+  builderActions?: typeof BuilderActions;
 }
 
 class CardsColumn extends TerrainComponent<Props>
@@ -139,11 +139,11 @@ class CardsColumn extends TerrainComponent<Props>
 
   public createCards()
   {
-    Actions.change(this.state.keyPath, this.getFirstCards());
+    this.props.builderActions.change(this.state.keyPath, this.getFirstCards());
     // _.map(this.getFirstCards(),
     //   (blockConfig: object, index: number) =>
     //   {
-    //     Actions.create(this.state.keyPath, index, blockConfig['type']);
+    //     this.props.builderActions.create(this.state.keyPath, index, blockConfig['type']);
     //   });
   }
 
@@ -167,7 +167,7 @@ class CardsColumn extends TerrainComponent<Props>
 
   public toggleDeck()
   {
-    Actions.toggleDeck(!this.props.deckOpen);
+    this.props.builderActions.toggleDeck(!this.props.deckOpen);
   }
 
   public handleScroll()
@@ -369,5 +369,6 @@ export default Util.createContainer(
   [],
   {
     colorsActions: ColorsActions,
+    builderActions: BuilderActions,
   },
 );

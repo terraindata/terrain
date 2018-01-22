@@ -53,9 +53,10 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { Card } from '../../../../blocks/types/Card';
 import { backgroundColor, cardStyle, Colors } from '../../../colors/Colors';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './CardsDeck.less';
+import Util from 'util/Util';
 
 import { AllBackendsMap } from '../../../../database/AllBackends';
 
@@ -67,6 +68,8 @@ export interface Props
 {
   open: boolean;
   language: string;
+
+  builderActions?: typeof BuilderActions;
 }
 
 class CardsDeck extends TerrainComponent<Props>
@@ -204,7 +207,7 @@ const cardSource =
         new: true,
       };
 
-      Actions.dragCard(item);
+      this.props.builderActions.dragCard(item);
 
       return item;
     },
@@ -212,7 +215,7 @@ const cardSource =
     endDrag: () =>
     {
       $('body').removeClass('body-card-is-dragging');
-      Actions.dragCard(null);
+      this.props.builderActions.dragCard(null);
     },
   };
 
@@ -222,6 +225,12 @@ const dragCollect = (connect, monitor) =>
     isDragging: monitor.isDragging(),
     connectDragPreview: connect.dragPreview(),
   });
+
+const CardDeckCardContainer = Util.createTypedContainer(
+  CardDeckCardComponent,
+  [],
+  { builderActions: BuilderActions },
+);
 
 const CardDeckCard = DragSource('CARD', cardSource, dragCollect)(CardDeckCardComponent);
 

@@ -53,10 +53,11 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import Actions from '../../builder/data/BuilderActions';
+import BuilderActions from 'builder/data/BuilderActions';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import Util from 'util/Util';
 
 import './Dropdown.less';
 
@@ -79,6 +80,8 @@ export interface Props
   tooltips?: List<any>;
   wrapperTooltip?: string;
   icons?: Immutable.Map<any, any>;
+
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -113,7 +116,7 @@ class Dropdown extends TerrainComponent<Props>
         const pr = this.props;
         if (pr.keyPath)
         {
-          Actions.change(pr.keyPath, pr.values ? pr.values.get(index) : pr.options.get(index));
+          this.props.builderActions.change(pr.keyPath, pr.values ? pr.values.get(index) : pr.options.get(index));
         }
         if (pr.onChange)
         {
@@ -443,4 +446,8 @@ class Dropdown extends TerrainComponent<Props>
   }
 }
 
-export default Dropdown;
+export default Util.createTypedContainer(
+  Dropdown,
+  [],
+  { builderActions: BuilderActions }
+);

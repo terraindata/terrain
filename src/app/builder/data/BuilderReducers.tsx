@@ -47,8 +47,10 @@ THE SOFTWARE.
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-unused-expression no-shadowed-variable
 
 import * as Immutable from 'immutable';
+import { invert } from 'lodash';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../database/AllBackends';
+import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
 import { ElasticBackend } from '../../../database/elastic/ElasticBackend';
 import { MySQLBackend } from '../../../database/mysql/MySQLBackend';
 import BackendInstance from '../../../database/types/BackendInstance';
@@ -56,22 +58,25 @@ import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import Util from '../../util/Util';
 import Ajax from './../../util/Ajax';
-import Actions from './BuilderActions';
-import {
+import
+{
+  BuilderCardActionTypes,
   BuilderDirtyActionTypes,
-  BuilderCardActionTypes
 } from './BuilderActionTypes';
 import ActionTypes from './BuilderActionTypes';
-import { BuilderState, _BuilderState } from './BuilderStore';
-import { invert } from 'lodash';
-import ESCardParser from '../../../database/elastic/conversion/ESCardParser';
+import { _BuilderState, BuilderState } from './BuilderStore';
 const { List, Map } = Immutable;
 
 const BuilderReducers =
   {
     [ActionTypes.fetchQuery]: (state, action) =>
     {
-      const { algorithmId, handleNoAlgorithm } = action.payload;
+      const {
+        algorithmId,
+        handleNoAlgorithm,
+        dispatch,
+        onRequestDone
+      } = action.payload;
 
       if (state.loadingXhr)
       {
@@ -91,7 +96,7 @@ const BuilderReducers =
         {
           if (query)
           {
-            Actions.queryLoaded(query, xhr, action.payload.db);
+            onRequestDone(query, xhr, action.payload.db);
           }
           else
           {
@@ -116,14 +121,15 @@ const BuilderReducers =
 
     [ActionTypes.queryLoaded]: (state, action) =>
     {
-      let { query } = action.payload;
+      console.error('queryLoaded')
+      let { query, dispatch } = action.payload;
       if (state.loadingXhr !== action.payload.xhr)
       {
         // wrong XHR
         return state;
       }
 
-      query = AllBackendsMap[query.language].loadQuery(query, Actions.changeQuery);
+      query = AllBackendsMap[query.language].loadQuery(query, action.payload.changeQuery);
 
       return state
         .set('query', query)
@@ -133,8 +139,7 @@ const BuilderReducers =
         .set('isDirty', false)
         .set('pastQueries', Immutable.List([]))
         .set('nextQueries', Immutable.List([]))
-        .set('db', action.payload.db)
-        ;
+        .set('db', action.payload.db);
     },
 
     [ActionTypes.change]: (state, action) =>
@@ -270,7 +275,7 @@ const BuilderReducers =
       query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
       query = AllBackendsMap[query.language].codeToQuery(
         query,
-        Actions.changeQuery,
+        action.payload.changeQuery,
       );
       state = state.set('query', query);
       return state;
@@ -442,12 +447,12 @@ const BuilderReducersWrapper = (
   }
 
   return state;
-}
+};
 
 Util.assertKeysArePresent(
   invert(ActionTypes),
   BuilderReducers,
-  'Missing Builder Reducer for Builder Action Types: '
+  'Missing Builder Reducer for Builder Action Types: ',
 );
 
 export default BuilderReducersWrapper;

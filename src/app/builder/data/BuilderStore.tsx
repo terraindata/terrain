@@ -111,7 +111,7 @@ import BuilderReducers from './BuilderReducers';
 
 export const BuilderStore: IStore<BuilderState> = createStore(
   BuilderReducers,
-  DefaultState
+  DefaultState,
 );
 
 export default BuilderStore;

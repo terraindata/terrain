@@ -61,7 +61,7 @@ import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from 'builder/data/BuilderActions';
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
@@ -76,6 +76,7 @@ import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
+import Util from 'util/Util';
 
 const HITS_PAGE_SIZE = 20;
 
@@ -92,6 +93,7 @@ export interface Props
   allowSpotlights: boolean;
   onNavigationException: () => void;
   ignoreEmptyCards?: boolean;
+  builderActions?: typeof BuilderActions;
 }
 
 interface State
@@ -110,6 +112,7 @@ interface State
   mouseStartY?: number;
   mapMaxHeight?: number;
   spotlightHits?: Immutable.Map<string, any>;
+  builderActions?: typeof BuilderActions;
 }
 
 const MAP_MAX_HEIGHT = 300;
@@ -120,7 +123,7 @@ class HitsArea extends TerrainComponent<Props>
 {
   public static handleConfigChange(config: ResultsConfig)
   {
-    Actions.changeResultsConfig(config);
+    BuilderActions.changeResultsConfig(config);
   }
 
   public state: State = {
@@ -851,4 +854,8 @@ column if you have customized the results view.');
   }
 }
 
-export default HitsArea;
+export default Util.createContainer(
+  HitsArea,
+  [],
+  { builderActions: BuilderActions }
+);

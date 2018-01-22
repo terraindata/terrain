@@ -52,13 +52,14 @@ import * as React from 'react';
 import { Circle, Map, Marker, Polyline, Popup, Rectangle, TileLayer } from 'react-leaflet';
 
 import Switch from 'common/components/Switch';
-import Actions from '../../builder/data/BuilderActions';
+import BuilderActions from '../../builder/data/BuilderActions';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';
 import './MapComponentStyle.less';
 import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';
+import Util from 'util/Util';
 
 export interface Props
 {
@@ -103,6 +104,8 @@ export interface Props
 
   className?: string;
   style?: string;
+
+  builderActions?: typeof BuilderActions;
 }
 
 interface LocationData
@@ -272,9 +275,9 @@ class MapComponent extends TerrainComponent<Props>
     }
     if (this.props.keyPath !== undefined)
     {
-      Actions.change(this.props.keyPath, location);
+      this.props.builderActions.change(this.props.keyPath, location);
       const addr = inputName ? inputName : address;
-      Actions.change(this.props.textKeyPath, addr);
+      this.props.builderActions.change(this.props.textKeyPath, addr);
     }
   }
 
@@ -909,4 +912,8 @@ class MapComponent extends TerrainComponent<Props>
   }
 }
 
-export default MapComponent;
+export default Util.createTypedContainer(
+  MapComponent,
+  [],
+  { builderActions: BuilderActions }
+);

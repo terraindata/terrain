@@ -62,6 +62,7 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
 import TQLResultsBar from './TQLResultsBar';
+import Util from 'util/Util';
 
 export interface Props
 {
@@ -74,6 +75,8 @@ export interface Props
   addColumn?: (number, string?) => void;
   columnIndex: number;
   language: string;
+
+  builderActions?: typeof BuilderActions;
 }
 
 class BuilderTQLColumn extends TerrainComponent<Props>
@@ -171,7 +174,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
   public sendTqlAction()
   {
-    BuilderActions.changeTQL(this.state.tql);
+    this.props.builderActions.changeTQL(this.state.tql);
   }
 
   // public changeThemeDefault()
@@ -393,4 +396,8 @@ class BuilderTQLColumn extends TerrainComponent<Props>
   }
 }
 
-export default BuilderTQLColumn;
+export default Util.createTypedContainer(
+  BuilderTQLColumn,
+  [],
+  { builderActions: BuilderActions }
+);

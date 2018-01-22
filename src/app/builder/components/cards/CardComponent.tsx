@@ -60,11 +60,12 @@ import { Display } from '../../../../blocks/displays/Display';
 import { Card, getCardTitle } from '../../../../blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';
 import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import DragHandle from './../../../common/components/DragHandle';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
 import Store from './../../data/BuilderStore';
+import { BuilderState } from 'builder/data/BuilderStore';
 import CardDropArea from './CardDropArea';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
@@ -120,6 +121,8 @@ export interface Props
   handleCardReorder?: (card, index) => void;
 
   colorsActions: typeof ColorsActions;
+  builder?: BuilderState;
+  builderActions: typeof BuilderActions;
 }
 
 @Radium
@@ -222,25 +225,6 @@ class _CardComponent extends TerrainComponent<Props>
     //   storeKeyPath: ['selectedCardIds', props.card.id],
     // });
 
-    this._subscribe(Store, {
-      updater: (state) =>
-      {
-        if (state.hoveringCardId === this.props.card.id && !this.state.hovering)
-        {
-          this.setState({
-            hovering: true,
-          });
-        }
-        else if (this.state.hovering)
-        {
-          this.setState({
-            hovering: false,
-          });
-        }
-      },
-      isMounted: true,
-    });
-
     this._subscribe(BuilderScrollStore, {
       stateKey: 'scrollState',
       isMounted: true,
@@ -254,6 +238,19 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    if (nextProps.builder.hoveringCardId === this.props.card.id && !this.state.hovering)
+    {
+      this.setState({
+        hovering: true,
+      });
+    }
+    else if (this.state.hovering)
+    {
+      this.setState({
+        hovering: false,
+      });
+    }
+
     if (this.props.keyPath !== nextProps.keyPath || this.props.index !== nextProps.index)
     {
       if (!nextProps.tuningMode)
@@ -263,7 +260,7 @@ class _CardComponent extends TerrainComponent<Props>
         this.setState({
           keyPath: newKeyPath,
         });
-        Actions.updateKeyPath(nextProps.card.id, newKeyPath);
+        this.props.builderActions.updateKeyPath(nextProps.card.id, newKeyPath);
       }
     }
     if ((nextProps.card.closed !== this.props.card.closed && !nextProps.tuningMode) ||
@@ -349,7 +346,7 @@ class _CardComponent extends TerrainComponent<Props>
     let keyPath = this.getKeyPath();
     if (this.props.tuningMode)
     {
-      const keyPaths = Immutable.Map(Store.getState().query.cardKeyPaths);
+      const keyPaths = Immutable.Map(this.props.builder.query.cardKeyPaths);
       if (keyPaths.get(this.props.card.id) !== undefined)
       {
         keyPath = Immutable.List(keyPaths.get(this.props.card.id));
@@ -368,7 +365,7 @@ class _CardComponent extends TerrainComponent<Props>
       Util.animateToHeight(ref, 0, () =>
       {
         // do this after the animation so the rest of the app picks up on it
-        Actions.change(
+        this.props.builderActions.change(
           keyPath.push(key),
           true,
         );
@@ -388,7 +385,7 @@ class _CardComponent extends TerrainComponent<Props>
         Util.animateToAutoHeight(this.refs.cardBody, () =>
         {
           // do this after the animation so the rest of the app picks up on it
-          Actions.change(
+          this.props.builderActions.change(
             keyPath.push(key),
             false,
           );
@@ -412,14 +409,14 @@ class _CardComponent extends TerrainComponent<Props>
 
     // event.stopPropagation();
     // event.preventDefault();
-    // Actions.selectCard(this.props.card.id, event.shiftKey, event.altKey);
+    // this.props.builderActions.selectCard(this.props.card.id, event.shiftKey, event.altKey);
   }
 
   public handleDelete()
   {
     Util.animateToHeight(this.refs.cardInner, 0);
     setTimeout(() =>
-      Actions.remove(this.props.keyPath, this.props.index)
+      this.props.builderActions.remove(this.props.keyPath, this.props.index)
       , 250);
   }
 
@@ -461,13 +458,13 @@ class _CardComponent extends TerrainComponent<Props>
       AllBackendsMap[this.props.card.static.language].blocks,
     );
 
-    Actions.create(this.props.keyPath, this.props.index + 1, card.type, card);
+    this.props.builderActions.create(this.props.keyPath, this.props.index + 1, card.type, card);
   }
 
   public handleDisable()
   {
     const keyPath = this.getKeyPath();
-    Actions.change(
+    this.props.builderActions.change(
       keyPath.push('disabled'),
       !this.props.card.disabled,
     );
@@ -478,7 +475,7 @@ class _CardComponent extends TerrainComponent<Props>
     event.stopPropagation();
     if (!this.state.hovering)
     {
-      Actions.hoverCard(this.props.card.id);
+      this.props.builderActions.hoverCard(this.props.card.id);
     }
   }
 
@@ -645,7 +642,7 @@ class _CardComponent extends TerrainComponent<Props>
       : this._ikeyPath(this.props.keyPath, this.props.index);
     if (!this.props.tuningMode)
     {
-      Actions.updateKeyPath(this.props.card.id, newKeyPath);
+      this.props.builderActions.updateKeyPath(this.props.card.id, newKeyPath);
     }
     return newKeyPath;
   }
@@ -654,11 +651,11 @@ class _CardComponent extends TerrainComponent<Props>
   {
     if (this.props.index === null)
     {
-      Actions.change(this.props.keyPath, '');
+      this.props.builderActions.change(this.props.keyPath, '');
     }
     else
     {
-      Actions.remove(this.props.keyPath, this.props.index);
+      this.props.builderActions.remove(this.props.keyPath, this.props.index);
     }
   }
 
@@ -671,16 +668,16 @@ class _CardComponent extends TerrainComponent<Props>
   {
     if (this.props.tuningMode)
     {
-      const keyPaths = Immutable.Map(Store.getState().query.cardKeyPaths);
+      const keyPaths = Immutable.Map(this.props.builder.query.cardKeyPaths);
       if (keyPaths.get(this.props.card.id) !== undefined)
       {
         const keyPath = Immutable.List(keyPaths.get(this.props.card.id));
-        Actions.change(keyPath.push('tuning'), false);
+        this.props.builderActions.change(keyPath.push('tuning'), false);
       }
     }
     else
     {
-      Actions.change(this.getKeyPath().push('tuning'), !this.props.card.tuning);
+      this.props.builderActions.change(this.getKeyPath().push('tuning'), !this.props.card.tuning);
     }
   }
 
@@ -771,7 +768,7 @@ class _CardComponent extends TerrainComponent<Props>
     let keyPath = this.state.keyPath;
     if (this.props.tuningMode)
     {
-      const keyPaths = Immutable.Map(Store.getState().query.cardKeyPaths);
+      const keyPaths = Immutable.Map(this.props.builder.query.cardKeyPaths);
       if (keyPaths.get(this.props.card.id) !== undefined)
       {
         keyPath = Immutable.List(keyPaths.get(this.props.card.id));
@@ -1043,7 +1040,7 @@ const cardSource =
         type: props.card.type,
       };
 
-      Actions.dragCard(item);
+      this.props.builderActions.dragCard(item);
 
       return item;
     },
@@ -1052,7 +1049,7 @@ const cardSource =
     endDrag: () =>
     {
       $('body').removeClass('body-card-is-dragging');
-      Actions.dragCard(null);
+      this.props.builderActions.dragCard(null);
     },
   };
 
@@ -1065,8 +1062,11 @@ const dragCollect = (connect, monitor) =>
 
 const CardContainer = Util.createContainer(
   _CardComponent,
-  [],
-  { colorsActions: ColorsActions },
+  ['builder'],
+  {
+    colorsActions: ColorsActions,
+    builderActions: BuilderActions,
+  },
 );
 
 export const CardComponent = DragSource('CARD', cardSource, dragCollect)(CardContainer);

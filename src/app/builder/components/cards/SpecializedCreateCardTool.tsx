@@ -51,9 +51,10 @@ import * as React from 'react';
 import { Card } from '../../../../blocks/types/Card';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 
 import CreateCardTool from './CreateCardTool';
+import Util from 'util/Util';
 
 export interface Props
 {
@@ -66,6 +67,8 @@ export interface Props
   // builderState: d.requiresBuilderState && BuilderStore.getState(),
   language: string;
   handleCardDrop: (cardType: string) => any;
+
+  builderActions?: typeof BuilderActions;
 }
 
 const emptyList = Immutable.List([]);
@@ -124,7 +127,7 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
       this.props.data, option,
     );
 
-    Actions.change(
+    this.props.builderActions.change(
       this.props.keyPath,
       card,
     );
@@ -162,4 +165,8 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
   }
 }
 
-export default SpecializedCreateCardTool;
+export default Util.createTypedContainer(
+  SpecializedCreateCardTool,
+  [],
+  { builderActions: BuilderActions }
+);

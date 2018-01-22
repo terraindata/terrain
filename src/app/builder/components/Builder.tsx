@@ -100,6 +100,7 @@ export interface Props
   users?: UserState;
   library?: LibraryTypes.LibraryState;
   algorithmActions: typeof LibraryActions.algorithms;
+  builder?: BuilderState;
   builderActions?: typeof BuilderActions;
 }
 
@@ -968,10 +969,10 @@ class Builder extends TerrainComponent<Props>
 }
 const BuilderContainer = Util.createTypedContainer(
   Builder,
-  ['library', 'users'],
+  ['library', 'users', 'builder'],
   {
     algorithmActions: LibraryActions.algorithms,
-    builderActions: BuilderActions
+    builderActions: BuilderActions,
   },
 );
 export default withRouter(DragDropContext(HTML5Backend)(BuilderContainer));

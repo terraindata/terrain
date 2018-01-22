@@ -52,12 +52,13 @@ import * as Radium from 'radium';
 import * as React from 'react';
 
 import { Card, Cards } from '../../../../blocks/types/Card';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../../data/BuilderStore';
 import { CardComponent, CardItem } from '../cards/CardComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import CardDragPreview from './CardDragPreview';
 import CreateCardTool from './CreateCardTool';
+import Util from 'util/Util';
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 
@@ -84,6 +85,8 @@ export interface Props
   tuningMode?: boolean;
   allowTuningDragAndDrop?: boolean;
   handleCardReorder?: (card, index) => void;
+
+  builderActions?: typeof BuilderActions;
 }
 
 interface KeyState
@@ -152,7 +155,7 @@ class CardsArea extends TerrainComponent<Props>
 
   public createFromCard()
   {
-    Actions.create(this.props.keyPath, 0, 'sfw');
+    this.props.builderActions.create(this.props.keyPath, 0, 'sfw');
   }
 
   public toggleCardTool()
@@ -259,4 +262,8 @@ class CardsArea extends TerrainComponent<Props>
   }
 }
 
-export default CardsArea;
+export default Util.createTypedContainer(
+  CardsArea,
+  [],
+  { builderActions: BuilderActions },
+);

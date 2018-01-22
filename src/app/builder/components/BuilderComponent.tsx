@@ -60,6 +60,7 @@ import BuilderActions from '../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../data/BuilderStore';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
+import Util from 'util/Util';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -85,6 +86,7 @@ export interface Props
   tuningMode?: boolean;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
+  builderActions?: typeof BuilderActions;
 }
 
 class BuilderComponent extends TerrainComponent<Props>
@@ -98,17 +100,17 @@ class BuilderComponent extends TerrainComponent<Props>
 
   public addRow(keyPath: KeyPath, index: number, display: Display)
   {
-    BuilderActions.create(keyPath, index + 1, display.factoryType);
+    this.props.builderActions.create(keyPath, index + 1, display.factoryType);
   }
 
   public removeRow(keyPath: KeyPath, index: number)
   {
-    BuilderActions.remove(keyPath, index);
+    this.props.builderActions.remove(keyPath, index);
   }
 
   public moveRow(keyPath: KeyPath, index: number, newIndex: number)
   {
-    BuilderActions.move(keyPath, index, newIndex);
+    this.props.builderActions.move(keyPath, index, newIndex);
   }
 
   public renderDisplay(displayArg: Display | Display[],
@@ -423,7 +425,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   canEdit: this.props.canEdit,
                   helpOn: this.props.helpOn,
                   className,
-                  onChange: BuilderActions.change,
+                  onChange: this.props.builderActions.change,
                   builderState: d.requiresBuilderState && BuilderStore.getState(),
                   language: this.props.language,
                   handleCardDrop: this.props.handleCardDrop,
@@ -554,4 +556,8 @@ class BuilderComponent extends TerrainComponent<Props>
   }
 }
 
-export default BuilderComponent;
+export default Util.createTypedContainer(
+  BuilderComponent,
+  [],
+  { builderActions: BuilderActions },
+);

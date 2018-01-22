@@ -55,13 +55,14 @@ const $ = (type: string, payload: any) =>
 {
   Store.dispatch({ type, payload });
   return { type, payload };
-}
+};
 
 const BuilderActions =
   {
     change: // reserved for cards only
       (keyPath: KeyPath, value: any, notDirty = false) =>
-        $(ActionTypes.change, { keyPath, value, notDirty }),
+      (dispatch) =>
+        dispatch($(ActionTypes.change, { keyPath, value, notDirty })),
 
     changeQuery:
       (query: Query) =>
@@ -97,7 +98,7 @@ const BuilderActions =
 
     changeTQL:
       (tql: string) =>
-        $(ActionTypes.changeTQL, { tql }),
+        $(ActionTypes.changeTQL, { tql, changeQuery: BuilderActions.changeQuery }),
 
     hoverCard:
       (cardId: ID) =>
@@ -114,12 +115,21 @@ const BuilderActions =
     // fetches the query from the server
     fetchQuery:
       (algorithmId: ID, handleNoAlgorithm: (algorithmId: ID) => void, db: BackendInstance) =>
-        $(ActionTypes.fetchQuery, { algorithmId, handleNoAlgorithm, db }),
+      (dispatch) =>
+        dispatch($(ActionTypes.fetchQuery, {
+          algorithmId,
+          handleNoAlgorithm,
+          db,
+          dispatch,
+          onRequestDone: (query, xhr, db) => dispatch(BuilderActions.queryLoaded(query, xhr, db)),
+          changeQuery: BuilderActions.changeQuery;
+      })),
 
     // load query from server into state
     queryLoaded:
       (query: Query, xhr: XMLHttpRequest, db: BackendInstance) =>
-        $(ActionTypes.queryLoaded, { query, xhr, db }),
+      (dispatch) =>
+        dispatch($(ActionTypes.queryLoaded, { query, xhr, db, dispatch })),
 
     save:
       (failed?: boolean) =>

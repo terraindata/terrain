@@ -60,7 +60,7 @@ import Query from '../../../../items/types/Query';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import ColorManager from '../../../util/ColorManager';
 import Util from '../../../util/Util';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import Histogram from './../../../charts/components/Histogram';
 import Dropdown from './../../../common/components/Dropdown';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -84,6 +84,7 @@ export interface Props
   query: Query;
   containerWidth?: number;
   index: number;
+  builderActions?: typeof BuilderActions;
 }
 
 export enum DISPLAY_TYPES
@@ -159,7 +160,7 @@ class AggregationComponent extends TerrainComponent<Props> {
           displayType,
         });
         currentAgg.displayType = displayType;
-        Actions.change(List(this._keyPath('query', 'aggregationList', nextProps.name)), currentAgg, true);
+        this.props.builderActions.change(List(this._keyPath('query', 'aggregationList', nextProps.name)), currentAgg, true);
       }
     }
   }
@@ -200,7 +201,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     if (displayType !== currentAgg.displayType)
     {
       currentAgg.displayType = displayType;
-      Actions.change(List(this._keyPath('query', 'aggregationList', name)), currentAgg, true);
+      this.props.builderActions.change(List(this._keyPath('query', 'aggregationList', name)), currentAgg, true);
     }
   }
 
@@ -247,7 +248,7 @@ class AggregationComponent extends TerrainComponent<Props> {
     const currAgg = this.props.query.aggregationList.get(this.props.name);
     currAgg.expanded = !this.state.expanded;
 
-    Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), currAgg);
+    this.props.builderActions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), currAgg);
     this.setState({
       expanded: !this.state.expanded,
     });
@@ -257,7 +258,7 @@ class AggregationComponent extends TerrainComponent<Props> {
   {
     const currAgg = this.props.query.aggregationList.get(this.props.name);
     currAgg.displayType = type;
-    Actions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), currAgg);
+    this.props.builderActions.change(List(this._keyPath('query', 'aggregationList', this.props.name)), currAgg);
     this.setState({
       displayType: type,
     });
@@ -617,9 +618,15 @@ class AggregationComponent extends TerrainComponent<Props> {
   }
 }
 
+const AggregationContainer = Util.createTypedContainer(
+  AggregationComponent,
+  [],
+  { builderActions: BuilderActions },
+)
+
 export default Dimensions({
   elementResize: true,
   containerStyle: {
     height: 'auto',
   },
-})(AggregationComponent);
+})(AggregationContainer);

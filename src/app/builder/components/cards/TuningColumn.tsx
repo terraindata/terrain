@@ -51,7 +51,7 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
-import Actions from '../../data/BuilderActions';
+import BuilderActions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
@@ -81,6 +81,8 @@ export interface Props
   containerWidth?: number;
   containerHeight?: number;
   tuning?: boolean;
+
+  builderActions?: typeof BuilderActions;
 }
 
 class TuningColumn extends TerrainComponent<Props>
@@ -148,7 +150,7 @@ class TuningColumn extends TerrainComponent<Props>
   {
     if (!_.isEqual(newOrder, BuilderStore.getState().query.tuningOrder))
     {
-      Actions.change(List(this._keyPath('query', 'tuningOrder')),
+      this.props.builderActions.change(List(this._keyPath('query', 'tuningOrder')),
         newOrder);
     }
   }
@@ -245,7 +247,7 @@ class TuningColumn extends TerrainComponent<Props>
         if (keyPaths.get(card.id) !== undefined)
         {
           const keyPath = Immutable.List(keyPaths.get(card.id));
-          Actions.change(keyPath.push('tuning'), true);
+          this.props.builderActions.change(keyPath.push('tuning'), true);
         }
       }
     });
@@ -356,4 +358,10 @@ class TuningColumn extends TerrainComponent<Props>
   }
 }
 
-export default Dimensions()(TuningColumn);
+const TuningColumnContainer = Util.createTypedContainer(
+  TuningColumn,
+  [],
+  { builderActions: BuilderActions },
+);
+
+export default Dimensions()(TuningColumnContainer);
