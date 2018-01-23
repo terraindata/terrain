@@ -68,6 +68,7 @@ const AddIcon = require('images/icon_add.svg');
 
 export interface Props extends TemplateEditorFieldProps
 {
+  arrayKeyPath?: List<number>;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
@@ -104,57 +105,95 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
   public renderArrayChildren() // TODO: don't hack this; make this work for nested arrays and arrays of nested
   {
-    const { field, preview } = this.props;
+    const { field, canEdit, preview, keyPath, arrayKeyPath } = this.props;
+    const keyPathBase = arrayKeyPath === undefined || arrayKeyPath === null ?
+      List([]) : arrayKeyPath;
+
     if (Array.isArray(preview))
     {
       return List(preview).map((value, index) =>
       {
+        const newArrayKeyPath = keyPathBase.push(index);
         return (
-          <div className='template-editor-field-array-item' key={index}>
-            <div className='field-array-index' style={fontColor(Colors().text3)}> {index} </div>
-            <div className='field-array-value'> {value} </div>
-          </div>
+          <TemplateEditorFieldNode
+            keyPath={keyPath}
+            field={field}
+            canEdit={canEdit}
+            key={index}
+            preview={value}
+            arrayKeyPath={newArrayKeyPath}
+          />
         );
       }).toList();
     }
-
   }
 
   public render()
   {
-    const { field, keyPath, canEdit, preview } = this.props;
-
-    const settings = (
-      <TemplateEditorFieldPreview
-        {...this._passProps() }
-      />
-    );
-
-    const renderChildren = (this._isRoot() || this._isNested() || this._isArray());
-
-    const children = renderChildren ? (
-      <div className='template-editor-children-container'>
-        {this._isArray() && !this._isNested() ? this.renderArrayChildren() : this.renderChildFields()}
-      </div>) : undefined;
+    const { field, keyPath, canEdit, preview, arrayKeyPath } = this.props;
+    let children = null;
+    let content = null;
 
     if (this._isRoot())
     {
-      return children;
-    }
-    else
-    {
-      const childrenStyle = (canEdit === true && field.isIncluded === false) ?
-        getStyle('opacity', '0.7') : {};
       return (
-        <ExpandableView
-          content={settings}
-          open={this.state.expandableViewOpen}
-          onToggle={this.handleExpandArrowClicked}
-          children={children}
-          style={childrenStyle}
+        <div className='template-editor-children-container'>
+          {this.renderChildFields()}
+        </div>
+      );
+    }
+    else if (this._isArray())
+    {
+      const hasArrayKeyPath = arrayKeyPath !== undefined && arrayKeyPath !== null;
+      const isLeaf = hasArrayKeyPath &&
+        arrayKeyPath.size >= this._arrayDepth();
+      const arrayIndex = hasArrayKeyPath && arrayKeyPath.size > 0 ? arrayKeyPath.last() : null;
+      children = isLeaf ? (this._isNested() ? this.renderChildFields() : null) : this.renderArrayChildren();
+
+      content = (
+        <TemplateEditorFieldPreview
+          showPreviewValue={!this._isNested() && isLeaf}
+          arrayIndex={arrayIndex}
+          {...this._passProps() }
+        />
+      );
+
+    }
+    else if (this._isNested())
+    {
+      children = this.renderChildFields();
+      content = (
+        <TemplateEditorFieldPreview
+          showPreviewValue={false}
+          {...this._passProps() }
         />
       );
     }
+    else
+    {
+      content = (
+        <TemplateEditorFieldPreview
+          showPreviewValue={true}
+          {...this._passProps() }
+        />
+      );
+    }
+    const childrenComponent = children !== null ?
+      <div className='template-editor-children-container'>
+        {children}
+      </div> : null;
+
+    const childrenStyle = (canEdit === true && field.isIncluded === false) ?
+      getStyle('opacity', '0.7') : {};
+    return (
+      <ExpandableView
+        content={content}
+        open={this.state.expandableViewOpen}
+        onToggle={this.handleExpandArrowClicked}
+        children={childrenComponent}
+        style={childrenStyle}
+      />
+    );
   }
 
   public handleExpandArrowClicked()

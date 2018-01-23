@@ -75,6 +75,7 @@ class ExpandableView extends TerrainComponent<Props>
 {
   public render()
   {
+    const hasChildren = this.props.children !== undefined && this.props.children !== null;
     return (
       <div className={classNames({
         'expandable-view-container': true,
@@ -88,9 +89,9 @@ class ExpandableView extends TerrainComponent<Props>
               className={classNames({
                 'expandable-view-arrow-icon': true,
                 'expandable-view-open': this.props.open,
-                'expandable-view-has-children': this.props.children !== undefined,
+                'expandable-view-has-children': hasChildren,
               })}
-              onClick={this.props.children !== undefined ? this.props.onToggle : undefined}
+              onClick={hasChildren ? this.props.onToggle : undefined}
               style={{
                 width: arrowSize,
                 height: arrowSize,
@@ -101,7 +102,7 @@ class ExpandableView extends TerrainComponent<Props>
               className={classNames({
                 'expandable-view-arrow-spacer-bottom': true,
                 'expandable-view-open': this.props.open,
-                'expandable-view-has-children': this.props.children !== undefined,
+                'expandable-view-has-children': hasChildren,
               })}
               style={{
                 borderColor: Colors().active,

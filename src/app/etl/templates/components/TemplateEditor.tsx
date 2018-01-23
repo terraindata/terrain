@@ -83,7 +83,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
       templateId: 1,
       templateName: 'Test Template',
     });
-
     template = template.set('rootField', treeFromDocument(SampleDocuments[0]));
     this.props.act({
       actionType: 'loadTemplate',
@@ -115,23 +114,23 @@ class ETLExportDisplay extends TerrainComponent<Props>
     return (
       <div className='template-editor-column settings-column'>
         {
-          renderSettings &&
-          <div style={getStyle('height', '43px')} />
+          !renderSettings ? null :
+            <div style={getStyle('height', '43px')} />
         }
         {
-          renderSettings &&
-          <div
-            className='template-editor-settings-wrapper'
-            style={backgroundColor(Colors().bg3)}
-            tabIndex={-1}
-          >
-            <TemplateEditorFieldSettings
-              keyPath={settingsKeyPath}
-              field={field}
-              preview={'placeholder'}
-              canEdit={true}
-            />
-          </div>
+          !renderSettings ? null :
+            <div
+              className='template-editor-settings-wrapper'
+              style={backgroundColor(Colors().bg3)}
+              tabIndex={-1}
+            >
+              <TemplateEditorFieldSettings
+                keyPath={settingsKeyPath}
+                field={field}
+                preview={'placeholder'}
+                canEdit={true}
+              />
+            </div>
         }
       </div>
     );
@@ -209,50 +208,82 @@ const SampleDocuments = [
       'Date Added': '01/08/2018',
       'Views': 500,
     },
+    'Related Products': [
+      {
+        'Item Name': 'Burger',
+        'Description': 'Meat on a bun',
+      },
+      {
+        'Item Name': 'Taco',
+        'Description': 'Toppings in a tortilla',
+      },
+      {
+        'Item Name': 'Pasta',
+        'Description': 'Carbs in a bowl',
+      },
+    ],
     'Here are some numbers': [
-      1, 2, 3.14, 4,
+      [1, 2, 3],
+      [3, 2, 1],
+      [1, 3, 2],
+      [2, 1, 3],
     ],
   },
-  {
-    'Product Name': 'Cool stuff',
-    'Product ID': 5,
-    'Product Description': 'Not to be confused with boring things',
-    'Meta': {
-      'Date Added': '01/10/2018',
-      'Views': 515,
-    },
-    'Here are some numbers': [
-      10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, 100, 200, 300, 400, 500, 600, 700, 800, 900,
-    ],
-  },
-  {
-    'Product Name': 'Acronyms that start and end with P',
-    'Product ID': 666,
-    'Product Description': 'For some reason, these usually are annoying. e.g. PHP, PGP',
-    'Meta': {
-      'Date Added': '01/19/2018',
-      'Views': 50,
-    },
-    'Here are some numbers': [
-      0, 5, 2, 2,
-    ],
-  },
-  {
-    'Product Name': 'Scooter',
-    'Product ID': 10,
-    'Product Description': 'Do you like skateboards but want handlebars? Scooters are for you! Some are electric, others are not.',
-    'Meta': {
-      'Date Added': '01/18/2018',
-      'Views': 25,
-    },
-    'Here are some numbers': [
-      0, 1, 9, -5,
-    ],
-  },
+  // {
+  //   'Product Name': 'Cool stuff',
+  //   'Product ID': 5,
+  //   'Product Description': 'Not to be confused with boring things',
+  //   'Meta': {
+  //     'Date Added': '01/10/2018',
+  //     'Views': 515,
+  //   },
+  //   'Here are some numbers': [
+  //     [1, 2, 3],
+  //     [3, 2, 1],
+  //     [1, 3, 2],
+  //     [2, 1, 3],
+  //   ],
+  // },
+  // {
+  //   'Product Name': 'Acronyms that start and end with P',
+  //   'Product ID': 666,
+  //   'Product Description': 'For some reason, these usually are annoying. e.g. PHP, PGP',
+  //   'Meta': {
+  //     'Date Added': '01/19/2018',
+  //     'Views': 50,
+  //   },
+  //   'Here are some numbers': [
+  //     [1, 2, 3],
+  //     [3, 2, 1],
+  //     [1, 3, 2],
+  //     [2, 1, 3],
+  //   ],
+  // },
+  // {
+  //   'Product Name': 'This product does not conform',
+  //   'Product ID': 6,
+  //   'Random field': 'hello there',
+  //   'Random array': [1, 2, 3]
+  // },
+  // {
+  //   'Product Name': 'Scooter',
+  //   'Product ID': 10,
+  //   'Product Description': 'Do you like skateboards but want handlebars? Scooters are for you! Some are electric, others are not.',
+  //   'Meta': {
+  //     'Date Added': '01/18/2018',
+  //     'Views': 25,
+  //   },
+  //   'Here are some numbers': [
+  //     [1, 2, 3],
+  //     [3, 2, 1],
+  //     [1, 3, 2],
+  //     [2, 1, 3],
+  //   ],
+  // },
 ];
 
 // temporary helper for debugging. delete this
-function treeFromDocument(document: object, name = ''): TemplateField
+function treeFromDocument(document: object, name = '', fieldSettingsOverride?): TemplateField
 {
   if (document === null)
   {
@@ -306,11 +337,15 @@ function treeFromDocument(document: object, name = ''): TemplateField
           arrayVal = '';
         }
       }
-      if (typeof value === 'number')
+      if (typeof arrayVal === 'object')
+      {
+        arrayType.push(ELASTIC_TYPES.NESTED);
+      }
+      else if (typeof arrayVal === 'number')
       {
         arrayType.push(ELASTIC_TYPES.FLOAT);
       }
-      else if (typeof value === 'boolean')
+      else if (typeof arrayVal === 'boolean')
       {
         arrayType.push(ELASTIC_TYPES.BOOLEAN);
       }
@@ -318,18 +353,31 @@ function treeFromDocument(document: object, name = ''): TemplateField
       {
         arrayType.push(ELASTIC_TYPES.TEXT);
       }
-      children.push(_TemplateField(
-        {
-          name: key,
-          langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) }),
-        }));
+      if (typeof arrayVal === 'object')
+      {
+        const override = _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) });
+        children.push(treeFromDocument(arrayVal, key, override));
+      }
+      else
+      {
+        children.push(_TemplateField(
+          {
+            name: key,
+            langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) }),
+          }));
+      }
     }
     else // nested
     {
       children.push(treeFromDocument(value, key));
     }
   }
-  return _TemplateField({ name, children: List(children), langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.NESTED }) });
+  return _TemplateField(
+    {
+      name,
+      children: List(children),
+      langSettings: fieldSettingsOverride !== undefined ? fieldSettingsOverride : _ElasticFieldSettings({ type: ELASTIC_TYPES.NESTED }),
+    });
 }
 
 export default Util.createContainer(

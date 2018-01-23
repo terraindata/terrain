@@ -67,34 +67,42 @@ import './TemplateEditorField.less';
 
 export interface Props extends TemplateEditorFieldProps
 {
+  showPreviewValue: boolean;
+  arrayIndex?: number;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
 }
-
+// !(this._isNested() || this._isArray())
 @Radium
 class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 {
 
   public render()
   {
-    const { canEdit, field, keyPath, preview } = this.props;
+    const { canEdit, field, keyPath, preview, showPreviewValue, arrayIndex } = this.props;
+    const fieldNotInteractable = arrayIndex !== undefined && arrayIndex !== null;
     const settingsOpen = this.props.templateEditor.settingsKeyPath === keyPath;
     const labelStyle = settingsOpen ?
       _.extend({}, fontColor(Colors().text1, Colors().text1), backgroundColor(Colors().highlight))
       :
-      fontColor(Colors().text3, Colors().text2);
-    const previewText = preview === undefined ? 'Data Missing' : preview.toString();
+      fontColor(Colors().text3, fieldNotInteractable ? Colors().text3 : Colors().text2);
+    const previewText = preview === undefined || preview === null ? 'Data Missing' : preview.toString();
     return (
       <div className='template-editor-field-block'>
         <div className='field-preview-row'>
           <div className='field-preview-label-group' style={labelStyle}>
-            <div className='field-preview-label' onClick={this.handleLabelClicked}>
-              {field.name}
+            <div className={classNames({
+              'field-preview-label': true,
+              'no-interact': fieldNotInteractable,
+            })}
+              onClick={fieldNotInteractable ? undefined : this.handleLabelClicked}
+            >
+              {fieldNotInteractable ? arrayIndex : field.name}
             </div>
           </div>
           {
-            !(this._isNested() || this._isArray()) &&
+            showPreviewValue === true &&
             <div
               className={classNames({
                 'field-preview-value': true,
@@ -105,14 +113,6 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
             </div>
           }
         </div>
-        {
-          // this.state.settingsOpen &&
-          // <div className='editor-settings-wrapper' style={backgroundColor(Colors().highlight)}>
-          //   <TemplateEditorFieldSettings
-          //     {...this._passProps() }
-          //   />
-          // </div>
-        }
       </div>
     );
   }

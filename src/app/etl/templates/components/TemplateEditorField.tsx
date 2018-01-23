@@ -126,6 +126,12 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
       (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
   }
 
+  protected _arrayDepth(): number
+  {
+    const { arrayType } = this.props.field.langSettings;
+    return this._isArray() ? arrayType.size : 0;
+  }
+
   // returns true if the field's type is an array
   protected _isArray(): boolean
   {
