@@ -61,7 +61,7 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 import TransformCardPeriscope from './TransformCardPeriscope';
 
-import BuilderStore, { BuilderState } from 'app/builder/data/BuilderStore';
+import { BuilderState } from 'app/builder/data/BuilderStore';
 import Util from 'app/util/Util';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
@@ -77,13 +77,14 @@ export interface Props
   keyPath: KeyPath;
   data: any; // transform card
   onChange: (keyPath: KeyPath, value: any, isDirty?: boolean) => void;
-  builderState: any;
   language: string;
 
   canEdit?: boolean;
   // spotlights?: any;
   spotlights?: SpotlightTypes.SpotlightState;
   containerWidth?: number;
+
+  builder?: BuilderState;
 }
 
 export interface Bar
@@ -123,30 +124,7 @@ class TransformCard extends TerrainComponent<Props>
       chartDomain: List([Number(props.data.domain.get(0)), Number(props.data.domain.get(1))]),
       range: List([0, 1]),
       bars: List([]),
-      builderState: this.props.builderState,
     };
-    // If the query changed, and you are scoring on _score, there is a chance that the filters changed which affects the
-    // distribution of _score, so you have to recalculate the domain and histogram
-    if (this.props.data.input === '_score')
-    {
-      this.subscribeToBuilderStore();
-    }
-  }
-
-  public subscribeToBuilderStore()
-  {
-    this._subscribe(BuilderStore, {
-      stateKey: 'builderState',
-      updater: (builderState: BuilderState) =>
-      {
-        if ((builderState.query.tql !== this.state.builderState.query.tql ||
-          builderState.query.inputs !== this.state.builderState.query.inputs)
-          && !this.props.data.closed)
-        {
-          this.computeBars(this.props.data.input, this.state.maxDomain, true, builderState.query);
-        }
-      },
-    });
   }
 
   public componentDidMount()
@@ -156,17 +134,13 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (this.props.data.input !== nextProps.data.input)
+    if ((nextProps.builder.query.tql !== this.props.builder.query.tql ||
+      nextProps.builder.query.inputs !== this.props.builder.query.inputs)
+      && !this.props.data.closed)
     {
-      if (nextProps.data.input === '_score')
-      {
-        this.subscribeToBuilderStore();
-      }
-      else if (this.props.data.input === '_score')
-      {
-        this._unsubscribe();
-      }
+      this.computeBars(this.props.data.input, this.state.maxDomain, true, nextProps.builder.query);
     }
+
     // nextProps.data.domain is list<string>
     const newDomain: List<number> = List([Number(nextProps.data.domain.get(0)), Number(nextProps.data.domain.get(1))]);
     if (!newDomain.equals(this.state.maxDomain))
@@ -414,7 +388,7 @@ class TransformCard extends TerrainComponent<Props>
   // be run because _score is only set when there are text filters, so an empty query isn't sufficient
   private computeScoreElasticBars(maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
   {
-    const query = overrideQuery || this.props.builderState.query;
+    const query = overrideQuery || this.props.builder.query;
     const tqlString = AllBackendsMap[query.language].parseTreeToQueryString(
       query,
       {
@@ -461,16 +435,16 @@ class TransformCard extends TerrainComponent<Props>
 
   private computeElasticBars(input: CardString, maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
   {
-    const { builderState } = this.props;
-    const { db } = builderState;
+    const { builder } = this.props;
+    const { db } = builder;
 
     if (!input)
     {
       return;
     }
 
-    const index: string = getIndex('');
-    const type: string = getType('');
+    const index: string = getIndex('', builder);
+    const type: string = getType('', builder);
     if (recomputeDomain)
     {
       let domainQuery;
@@ -711,9 +685,9 @@ class TransformCard extends TerrainComponent<Props>
   private computeTQLBars(input: CardString)
   {
     // TODO consider putting the query in context
-    const { builderState } = this.props;
-    const { cards } = builderState.query;
-    const { db } = builderState;
+    const { builder } = this.props;
+    const { cards } = builder.query;
+    const { db } = builder;
 
     if (typeof input === 'string')
     {
@@ -820,6 +794,6 @@ export default Util.createTypedContainer(
       height: 'auto',
     },
   })(TransformCard),
-  ['spotlights'],
+  ['builder', 'spotlights'],
   {},
 );

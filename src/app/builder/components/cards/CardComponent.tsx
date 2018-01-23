@@ -64,7 +64,6 @@ import BuilderActions from '../../data/BuilderActions';
 import DragHandle from './../../../common/components/DragHandle';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
-import Store from './../../data/BuilderStore';
 import { BuilderState } from 'builder/data/BuilderStore';
 import CardDropArea from './CardDropArea';
 

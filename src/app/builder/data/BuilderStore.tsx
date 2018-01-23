@@ -104,14 +104,3 @@ export const _BuilderState = (config?: any) =>
 {
   return new BuilderState_Record(config || {}) as any as BuilderState;
 };
-
-const DefaultState = _BuilderState();
-
-import BuilderReducers from './BuilderReducers';
-
-export const BuilderStore: IStore<BuilderState> = createStore(
-  BuilderReducers,
-  DefaultState,
-);
-
-export default BuilderStore;

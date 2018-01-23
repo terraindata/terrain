@@ -55,7 +55,7 @@ const classNames = require('classnames');
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import BuilderActions from '../../data/BuilderActions';
-import Store from '../../data/BuilderStore';
+import { BuilderState } from 'builder/data/BuilderStore';
 import { CardItem } from './CardComponent';
 import Util from 'util/Util';
 
@@ -102,7 +102,7 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
     if (isWrapping)
     {
       targetIndex = targetProps.index;
-      wrappingCardData = Store.getState().getIn(targetProps.keyPath).get(0);
+      wrappingCardData = this.props.builder.getIn(targetProps.keyPath).get(0);
       wrappingKeyPath = targetProps.keyPath.push(targetIndex);
       this.props.builderActions.remove(targetProps.keyPath, targetIndex);
     }
@@ -174,6 +174,7 @@ export interface Props
 
   handleCardDrop?: (type: string) => any;
 
+  builder?: BuilderState;
   builderActions?: typeof BuilderActions;
 }
 
@@ -184,27 +185,12 @@ class CardDropArea extends TerrainComponent<Props>
     language: string;
   } = {
       draggingCardItem: null,
-      language: Store.getState().query.language,
+      language: this.props.builder.query.language,
     };
-
-  constructor(props)
-  {
-    super(props);
-
-    this._subscribe(Store, {
-      stateKey: 'draggingCardItem',
-      storeKeyPath: ['draggingCardItem'],
-    });
-
-    this._subscribe(Store, {
-      stateKey: 'language',
-      storeKeyPath: ['query', 'language'],
-    });
-  }
 
   public selfDragging()
   {
-    const item = this.state.draggingCardItem;
+    const item = this.props.builder.draggingCardItem;
 
     return item && !item.new
       && item.props.keyPath === this.props.keyPath
@@ -219,8 +205,8 @@ class CardDropArea extends TerrainComponent<Props>
     }
     return (
       <CardDragPreview
-        cardItem={this.state.draggingCardItem}
-        visible={this.props.isOver && this.props.canDrop && !!this.state.draggingCardItem}
+        cardItem={this.props.builder.draggingCardItem}
+        visible={this.props.isOver && this.props.canDrop && !!this.props.builder.draggingCardItem}
         keyPath={this.props.keyPath}
         index={this.props.index}
         language={this.props.language}
@@ -233,9 +219,12 @@ class CardDropArea extends TerrainComponent<Props>
   {
 
     let color = 'rgba(0,0,0,0)';
-    if (this.state.draggingCardItem !== null)
+    if (this.props.builder.draggingCardItem !== null)
     {
-      color = AllBackendsMap[this.state.language].blocks[this.state.draggingCardItem.type].static.colors[0];
+      color = AllBackendsMap[this.props.builder.query.language]
+        .blocks[this.props.builder.draggingCardItem.type]
+        .static
+        .colors[0];
     }
 
     return (
@@ -251,12 +240,12 @@ class CardDropArea extends TerrainComponent<Props>
 
   public render()
   {
-    if (this.state.draggingCardItem === null)
+    if (this.props.builder.draggingCardItem === null)
     {
       return null;
     }
 
-    if (this.state.draggingCardItem.props && this.state.draggingCardItem.props.tuningMode)
+    if (this.props.builder.draggingCardItem.props && this.props.builder.draggingCardItem.props.tuningMode)
     {
       return null;
     }
@@ -283,8 +272,8 @@ class CardDropArea extends TerrainComponent<Props>
           'card-drop-area-upper': this.props.half && !this.props.lower,
           'card-drop-area-lower': this.props.half && this.props.lower,
           'card-drop-area-over': this.props.isOver,
-          'card-drop-area-could-drop': this.state.draggingCardItem
-            && cardCouldWrap(this.props, this.state.draggingCardItem),
+          'card-drop-area-could-drop': this.props.builder.draggingCardItem
+            && cardCouldWrap(this.props, this.props.builder.draggingCardItem),
           'card-drop-area-can-drop': this.props.canDrop,
           'card-drop-area-over-self': this.props.isOver && this.selfDragging(),
           'card-drop-area-render-preview': this.props.renderPreview,
@@ -400,7 +389,7 @@ const cardTarget =
     {
       if (monitor.isOver({ shallow: true }))
       {
-        const state = Store.getState();
+        const state = this.props.builder;
         let keyPath: KeyPath = null;
         let index: number = null;
 
@@ -440,7 +429,7 @@ const dropCollect = (connect, monitor) =>
 
 const CardDropAreaContainer = Util.createTypedContainer(
   CardDropArea,
-  [],
+  ['builder'],
   { builderActions: BuilderActions },
 );
 

@@ -53,7 +53,7 @@ import * as React from 'react';
 
 import { Card, Cards } from '../../../../blocks/types/Card';
 import BuilderActions from '../../data/BuilderActions';
-import { BuilderState, BuilderStore } from '../../data/BuilderStore';
+import { BuilderState } from '../../data/BuilderStore';
 import { CardComponent, CardItem } from '../cards/CardComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import CardDragPreview from './CardDragPreview';
@@ -117,36 +117,35 @@ class CardsArea extends TerrainComponent<Props>
   {
     super(props);
     this.state.cardToolOpen = props.cards.size === 0;
+  }
 
-    this._subscribe(BuilderStore, {
-      updater: (state: BuilderState) =>
+  public componentWillReceiveProps(nextProps)
+  {
+    if (nextProps.builder.draggingCardItem !== null &&
+      nextProps.builder.draggingOverKeyPath === this.props.keyPath)
+    {
+      // dragging over
+      if (nextProps.builder.draggingOverIndex !== this.state.draggingOverIndex)
       {
-        if (state.draggingCardItem !== null && state.draggingOverKeyPath === this.props.keyPath)
-        {
-          // dragging over
-          if (state.draggingOverIndex !== this.state.draggingOverIndex)
-          {
-            this.setState({
-              isDraggingCardOver: true,
-              draggingOverIndex: state.draggingOverIndex,
-              draggingCardItem: state.draggingCardItem,
-            });
-          }
-        }
-        else
-        {
-          // not dragging over
-          if (this.state.isDraggingCardOver)
-          {
-            this.setState({
-              isDraggingCardOver: false,
-              draggingOverIndex: -1,
-              draggingCardItem: null,
-            });
-          }
-        }
-      },
-    });
+        this.setState({
+          isDraggingCardOver: true,
+          draggingOverIndex: nextProps.builder.draggingOverIndex,
+          draggingCardItem: nextProps.builder.draggingCardItem,
+        });
+      }
+    }
+    else
+    {
+      // not dragging over
+      if (this.state.isDraggingCardOver)
+      {
+        this.setState({
+          isDraggingCardOver: false,
+          draggingOverIndex: -1,
+          draggingCardItem: null,
+        });
+      }
+    }
   }
 
   public copy() { }
@@ -264,6 +263,6 @@ class CardsArea extends TerrainComponent<Props>
 
 export default Util.createTypedContainer(
   CardsArea,
-  [],
+  ['builder'],
   { builderActions: BuilderActions },
 );

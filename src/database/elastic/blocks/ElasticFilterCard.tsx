@@ -566,9 +566,9 @@ export const elasticFilter = _card({
                   {
                     displayType: DisplayType.TEXT,
                     key: 'value',
-                    getAutoTerms: (schemaState) =>
+                    getAutoTerms: (schemaState, builderState) =>
                     {
-                      return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Index);
+                      return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Index);
                     },
                   },
                 ],
@@ -593,9 +593,9 @@ export const elasticFilter = _card({
                   {
                     displayType: DisplayType.TEXT,
                     key: 'value',
-                    getAutoTerms: (schemaState) =>
+                    getAutoTerms: (schemaState, builderState) =>
                     {
-                      return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Type);
+                      return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Type);
                     },
                   },
                 ],
@@ -614,9 +614,9 @@ export const elasticFilter = _card({
                   {
                     displayType: DisplayType.TEXT,
                     key: 'field',
-                    getAutoTerms: (schemaState) =>
+                    getAutoTerms: (schemaState, builderState) =>
                     {
-                      return ElasticBlockHelpers.autocompleteMatches(schemaState, AutocompleteMatchType.Field);
+                      return ElasticBlockHelpers.autocompleteMatches(schemaState, builderState, AutocompleteMatchType.Field);
                     },
                   },
                   {

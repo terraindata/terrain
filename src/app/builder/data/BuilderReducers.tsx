@@ -121,7 +121,6 @@ const BuilderReducers =
 
     [ActionTypes.queryLoaded]: (state, action) =>
     {
-      console.error('queryLoaded')
       let { query, dispatch } = action.payload;
       if (state.loadingXhr !== action.payload.xhr)
       {
@@ -429,7 +428,7 @@ const BuilderReducersWrapper = (
   {
     // a card changed and we need to re-translate the tql
     //  needs to be after the card change has affected the state
-    const newCards = ESCardParser.parseAndUpdateCards(state.query.cards);
+    const newCards = ESCardParser.parseAndUpdateCards(state.query.cards, state.query);
     state = state.setIn(['query', 'cards'], newCards);
     state = state
       .setIn(['query', 'tql'], AllBackendsMap[state.query.language].queryToCode(state.query, {}));

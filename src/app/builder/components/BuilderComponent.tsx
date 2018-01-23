@@ -57,7 +57,7 @@ import Dropdown from '../../common/components/Dropdown';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderActions from '../data/BuilderActions';
-import { BuilderState, BuilderStore } from '../data/BuilderStore';
+import { BuilderState } from '../data/BuilderStore';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 import Util from 'util/Util';
@@ -86,6 +86,7 @@ export interface Props
   tuningMode?: boolean;
   // provide parentData if necessary but avoid if possible
   // as it will cause re-renders
+  builder?: BuilderState;
   builderActions?: typeof BuilderActions;
 }
 
@@ -426,7 +427,7 @@ class BuilderComponent extends TerrainComponent<Props>
                   helpOn: this.props.helpOn,
                   className,
                   onChange: this.props.builderActions.change,
-                  builderState: d.requiresBuilderState && BuilderStore.getState(),
+                  builderState: d.requiresBuilderState && this.props.builder,
                   language: this.props.language,
                   handleCardDrop: this.props.handleCardDrop,
                 },
@@ -558,6 +559,6 @@ class BuilderComponent extends TerrainComponent<Props>
 
 export default Util.createTypedContainer(
   BuilderComponent,
-  [],
+  ['builder'],
   { builderActions: BuilderActions },
 );

@@ -47,8 +47,8 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
 import * as _ from 'lodash';
+import * as Immutable from 'immutable';
 
-import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import Query from '../../../items/types/Query';
 import Options from '../../types/CardsToCodeOptions';
@@ -65,7 +65,7 @@ class CardsToElastic
     const rootCard = query.cards.get(0);
     if (rootCard && rootCard.type === 'eqlbody')
     {
-      const rootCardValue = CardsToElastic.blockToElastic(rootCard, options);
+      const rootCardValue = CardsToElastic.blockToElastic(rootCard, options, query);
       if (rootCardValue !== null)
       {
         body = rootCardValue;
@@ -75,7 +75,11 @@ class CardsToElastic
     return eql;
   }
 
-  public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
+  public static blockToElastic(
+    block: Block,
+    options: Options = {},
+    query: Query
+  ): string | object | number | boolean
   {
     if (typeof block !== 'object')
     {
@@ -85,10 +89,14 @@ class CardsToElastic
     if (block && block.static && block.static.tql)
     {
       const tql = block.static.tql as TQLRecursiveObjectFn;
-      let value = tql(block, CardsToElastic.blockToElastic, options);
+      let value = tql(
+        block,
+        (block, options) => CardsToElastic.blockToElastic(block, options, query),
+        options
+      );
 
       if ((value === undefined || (typeof (value) === 'number' && isNaN(value)))
-        && isInput(block['value'], BuilderStore.getState().query.inputs))
+        && isInput(block['value'], query.inputs))
       {
         value = block['value'];
       }

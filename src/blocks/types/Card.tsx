@@ -137,7 +137,7 @@ export interface Card extends IRecord<Card>
     // TODO schemaState type is : SchemaTypes.SchemaState
     getChildTerms?: (card: Card, schemaState) => List<string>;
     getNeighborTerms?: (card: Card, schemaState) => List<string>;
-    getParentTerms?: (card: Card, schemaState) => List<string>;
+    getParentTerms?: (card: Card, schemaState, builderState) => List<string>;
     // returns terms for its parent and its neighbors (but not its parent's neighbors)
 
     preview: string | ((c: Card) => string);
@@ -181,7 +181,7 @@ export interface CardConfig
 
     getChildTerms?: (card: Card, schemaState) => List<string>;
     getNeighborTerms?: (card: Card, schemaState) => List<string>;
-    getParentTerms?: (card: Card, schemaState) => List<string>;
+    getParentTerms?: (card: Card, schemaState, builderState) => List<string>;
 
     description?: string;
 

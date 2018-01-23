@@ -101,7 +101,7 @@ export interface Props
   parentId?: string;
 
   autoDisabled?: boolean;
-  getAutoTerms?: (schemaState) => List<string>;
+  getAutoTerms?: (schemaState, builderState) => List<string>;
 
   isOverCurrent?: boolean;
   connectDropTarget?: (Element) => JSX.Element;
@@ -375,7 +375,7 @@ class BuilderTextbox extends TerrainComponent<Props>
 
   public computeOptions()
   {
-    const { schema, autoDisabled } = this.props;
+    const { schema, autoDisabled, builder } = this.props;
 
     if (autoDisabled)
     {
@@ -386,11 +386,11 @@ class BuilderTextbox extends TerrainComponent<Props>
 
     if (this.props.getAutoTerms)
     {
-      options = this.props.getAutoTerms(schema);
+      options = this.props.getAutoTerms(schema, builder);
     }
     else
     {
-      options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath, schema);
+      options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath, schema, builder);
     }
 
     if (options && !options.equals(this.state.options))
@@ -582,7 +582,6 @@ class BuilderTextbox extends TerrainComponent<Props>
 //     return props.acceptsCards && props.display
 //       && props.display.accepts.indexOf(monitor.getItem().type) !== -1;
 //   },
-console.error(BuilderActions);
 export default Util.createContainer(
   BuilderTextbox,
   ['builder', 'schema'],

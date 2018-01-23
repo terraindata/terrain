@@ -67,7 +67,7 @@ import RolesStore from '../../roles/data/RolesStore';
 import TerrainStore from '../../store/TerrainStore';
 import Util from './../../util/Util';
 import BuilderActions from './../data/BuilderActions';
-import { BuilderState, BuilderStore } from './../data/BuilderStore';
+import { BuilderState } from './../data/BuilderStore';
 type Algorithm = LibraryTypes.Algorithm;
 
 // Components
@@ -108,7 +108,6 @@ class Builder extends TerrainComponent<Props>
 {
   public state: {
     exportState: FileImportTypes.FileImportState,
-    builderState: BuilderState,
     algorithms: IMMap<ID, Algorithm>,
 
     colKeys: List<number>;
@@ -131,7 +130,6 @@ class Builder extends TerrainComponent<Props>
 
   } = {
       exportState: FileImportStore.getState(),
-      builderState: BuilderStore.getState(),
       algorithms: this.props.library.algorithms,
 
       colKeys: null,
@@ -142,7 +140,7 @@ class Builder extends TerrainComponent<Props>
 
       leaving: false,
       nextLocation: null,
-      tabActions: this.getTabActions(BuilderStore.getState()),
+      tabActions: this.getTabActions(this.props.builder),
 
       nonexistentAlgorithmIds: List([]),
 
@@ -158,24 +156,6 @@ class Builder extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-
-    this._subscribe(BuilderStore, {
-      stateKey: 'builderState',
-      updater: (builderState: BuilderState) =>
-      {
-        if (
-          builderState.query !== this.state.builderState.query
-          || builderState.pastQueries !== this.state.builderState.pastQueries
-          || builderState.nextQueries !== this.state.builderState.nextQueries
-          || builderState.isDirty !== this.state.builderState.isDirty
-        )
-        {
-          this.setState({
-            tabActions: this.getTabActions(builderState),
-          });
-        }
-      },
-    });
 
     this._subscribe(FileImportStore, {
       stateKey: 'exportState',
@@ -259,7 +239,7 @@ class Builder extends TerrainComponent<Props>
       return true;
     }
 
-    if (this.shouldSave(BuilderStore.getState()))
+    if (this.shouldSave(this.props.builder))
     {
       // ^ need to pass in the most recent state, because when you've navigated away
       // in a dirty state, saved on the navigation prompt, and then returned,
@@ -294,6 +274,19 @@ class Builder extends TerrainComponent<Props>
   {
     const currentOpen = this.props.location.query && this.props.location.query.o;
     const nextOpen = nextProps.location.query && nextProps.location.query.o;
+
+    if (
+      nextProps.builder.query !== this.props.builder.query
+      || nextProps.builder.pastQueries !== this.props.builder.pastQueries
+      || nextProps.builder.nextQueries !== this.props.builder.nextQueries
+      || nextProps.builder.isDirty !== this.props.builder.isDirty
+    )
+    {
+      this.setState({
+        tabActions: this.getTabActions(nextProps.builder),
+      });
+    }
+
 
     if (
       nextProps.params.config !== this.props.params.config
@@ -401,7 +394,7 @@ class Builder extends TerrainComponent<Props>
 
   public getQuery(props?: Props): Query
   {
-    return this.state.builderState.query; // || this.loadingQuery;
+    return this.props.builder.query; // || this.loadingQuery;
   }
 
   public getAlgorithm(props?: Props): LibraryTypes.Algorithm
@@ -550,7 +543,7 @@ class Builder extends TerrainComponent<Props>
       }
     }
 
-    return !!(overrideState || this.state.builderState).isDirty;
+    return !!(overrideState || this.props.builder).isDirty;
   }
 
   public save()
@@ -648,7 +641,7 @@ class Builder extends TerrainComponent<Props>
       resizeHandleRef: 'resize-handle',
       content: query && <BuilderColumn
         query={query}
-        resultsState={this.state.builderState.resultsState}
+        resultsState={this.props.builder.resultsState}
         exportState={this.state.exportState}
         index={index}
         colKey={key}
@@ -959,8 +952,8 @@ class Builder extends TerrainComponent<Props>
         <ResultsManager
           query={query}
           algorithmPath={algorithmIdentifier}
-          resultsState={this.state.builderState.resultsState}
-          db={this.state.builderState.db}
+          resultsState={this.props.builder.resultsState}
+          db={this.props.builder.db}
           onResultsStateChange={this.props.builderActions.results}
         />
       </div>

@@ -46,10 +46,10 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
-import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
+import { BuilderState } from 'builder/data/BuilderStore';
 
 export const enum AutocompleteMatchType
 {
@@ -71,14 +71,13 @@ export const TransformableTypes =
   ];
 
 export const ElasticBlockHelpers = {
-  autocompleteMatches(schemaState, matchType: AutocompleteMatchType): List<string>
+  autocompleteMatches(schemaState, builderState, matchType: AutocompleteMatchType): List<string>
   {
     // 1. Need to get current index
 
-    const state = BuilderStore.getState();
-    const cards = state.query.cards;
-    const index = getIndex();
-    const server = BuilderStore.getState().db.name;
+    const cards = builderState.query.cards;
+    const index = getIndex('', builderState);
+    const server = builderState.db.name;
 
     if (matchType === AutocompleteMatchType.Index)
     {
@@ -97,7 +96,7 @@ export const ElasticBlockHelpers = {
 
     if (index !== null)
     {
-      const indexId = state.db.name + '/' + String(index);
+      const indexId = builderState.db.name + '/' + String(index);
 
       if (matchType === AutocompleteMatchType.Type)
       {
@@ -111,14 +110,14 @@ export const ElasticBlockHelpers = {
       // else we are in the Field or Transform case...
 
       // 2. Need to get current type
-      const type = getType();
+      const type = getType('', builderState);
 
       // 3. If Transform, return columns matching server/index/type that can be transformed
       if (matchType === AutocompleteMatchType.Transform)
       {
         if (type !== null)
         {
-          const typeId = state.db.name + '/' + String(index) + '.' + String(type);
+          const typeId = builderState.db.name + '/' + String(index) + '.' + String(type);
           const transformableFields = schemaState.columns.filter(
             (column) => column.serverId === String(server) &&
               column.databaseId === String(indexId) &&
@@ -134,7 +133,7 @@ export const ElasticBlockHelpers = {
 
       if (type !== null)
       {
-        const typeId = state.db.name + '/' + String(index) + '.' + String(type);
+        const typeId = builderState.db.name + '/' + String(index) + '.' + String(type);
 
         // 4. Return all columns matching this (server+)index+type
 
@@ -152,11 +151,10 @@ export const ElasticBlockHelpers = {
   },
 };
 
-export function findCardType(name: string): Block | null
+export function findCardType(name: string, builderState: BuilderState): Block | null
 {
-  const state = BuilderStore.getState();
   let theCard = null;
-  forAllCards(state.query.cards, (card) =>
+  forAllCards(builderState.query.cards, (card) =>
   {
     if (card.type === name)
     {
@@ -166,9 +164,9 @@ export function findCardType(name: string): Block | null
   return theCard;
 }
 
-export function getIndex(notSetIndex: string = null): string | null
+export function getIndex(notSetIndex: string = null, builderState: BuilderState): string | null
 {
-  const c = findCardType('elasticFilter');
+  const c = findCardType('elasticFilter', builderState);
   if (c === null)
   {
     return notSetIndex;
@@ -182,9 +180,9 @@ export function getIndex(notSetIndex: string = null): string | null
   }
 }
 
-export function getType(notSetType: string = null): string | null
+export function getType(notSetType: string = null, builderState: BuilderState): string | null
 {
-  const c = findCardType('elasticFilter');
+  const c = findCardType('elasticFilter', builderState);
   if (c === null)
   {
     return notSetType;

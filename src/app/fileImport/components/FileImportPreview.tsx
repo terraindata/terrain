@@ -74,6 +74,8 @@ import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import TransformModal from './TransformModal';
+import Util from 'util/Util';
+import { BuilderState } from 'builder/data/BuilderStore';
 
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 
@@ -116,6 +118,8 @@ export interface Props
 
   // export only
   algorithmName?: string;
+
+  builder?: BuilderState;
 }
 @Radium
 class FileImportPreview extends TerrainComponent<Props>
@@ -207,8 +211,8 @@ class FileImportPreview extends TerrainComponent<Props>
   {
     if (this.props.exporting)
     {
-      const dbName = getIndex('');
-      const tableName = getType('');
+      const dbName = getIndex('', this.props.builder);
+      const tableName = getType('', this.props.builder);
       Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
@@ -423,8 +427,8 @@ class FileImportPreview extends TerrainComponent<Props>
     }
     if (this.props.exporting)
     {
-      const dbName = getIndex('');
-      const tableName = getType('');
+      const dbName = getIndex('', this.props.builder);
+      const tableName = getType('', this.props.builder);
       Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess,
         this.props.serverId, dbName, tableName);
     }
@@ -1330,4 +1334,8 @@ class FileImportPreview extends TerrainComponent<Props>
   }
 }
 
-export default FileImportPreview;
+export default Util.createTypedContainer(
+  FileImportPreview,
+  ['builder'],
+  {}
+);

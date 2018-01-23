@@ -67,7 +67,7 @@ import { altStyle, backgroundColor, Colors, fontColor } from '../../../colors/Co
 import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import Util from '../../../util/Util';
-import { BuilderState, BuilderStore } from '../../data/BuilderStore';
+import { BuilderState } from '../../data/BuilderStore';
 const { List, Map } = Immutable;
 
 export interface Props
@@ -82,6 +82,7 @@ export interface Props
   containerHeight?: number;
   tuning?: boolean;
 
+  builder?: BuilderState;
   builderActions?: typeof BuilderActions;
 }
 
@@ -105,19 +106,6 @@ class TuningColumn extends TerrainComponent<Props>
   public tuningIds: List<string> = List([]);
   public prevTuningIds: List<string> = List([]);
   public tempTuningOrder: List<string> = List([]);
-  public constructor(props: Props)
-  {
-    super(props);
-    this._subscribe(BuilderStore, {
-      updater: (state: BuilderState) =>
-      {
-        if (!_.isEqual(this.state.allCards, state.query.cards))
-        {
-          this.setTuningCards(state.query.cards);
-        }
-      },
-    });
-  }
 
   public setTuningCards(newCards)
   {
@@ -134,13 +122,13 @@ class TuningColumn extends TerrainComponent<Props>
       allCards: newCards,
       tuningOrder: this.tempTuningOrder,
     });
-    // Update tuning order in the BuilderStore
+    // Update tuning order in TerrainStore
     this.changeTuningOrder(this.tempTuningOrder);
   }
 
   public componentWillMount()
   {
-    const order = BuilderStore.getState().query.tuningOrder;
+    const order = this.props.builder.query.tuningOrder;
     this.setState({
       tuningOrder: order !== undefined ? List(order) : List([]),
     });
@@ -148,7 +136,7 @@ class TuningColumn extends TerrainComponent<Props>
 
   public changeTuningOrder(newOrder)
   {
-    if (!_.isEqual(newOrder, BuilderStore.getState().query.tuningOrder))
+    if (!_.isEqual(newOrder, this.props.builder.query.tuningOrder))
     {
       this.props.builderActions.change(List(this._keyPath('query', 'tuningOrder')),
         newOrder);
@@ -204,6 +192,11 @@ class TuningColumn extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    if (!_.isEqual(this.state.allCards, nextProps.builder.query.cards))
+    {
+      this.setTuningCards(nextProps.builder.query.cards);
+    }
+
     if (nextProps.queryId !== this.props.queryId)
     {
       this.setState({
@@ -243,7 +236,7 @@ class TuningColumn extends TerrainComponent<Props>
         this.tuningCards = this.tuningCards.push(card);
         this.tuningIds = this.tuningIds.push(card.id);
         this.tempTuningOrder = this.tempTuningOrder.push(card.id);
-        const keyPaths = Immutable.Map(BuilderStore.getState().query.cardKeyPaths);
+        const keyPaths = Immutable.Map(this.props.builder.query.cardKeyPaths);
         if (keyPaths.get(card.id) !== undefined)
         {
           const keyPath = Immutable.List(keyPaths.get(card.id));
@@ -360,7 +353,7 @@ class TuningColumn extends TerrainComponent<Props>
 
 const TuningColumnContainer = Util.createTypedContainer(
   TuningColumn,
-  [],
+  ['builder'],
   { builderActions: BuilderActions },
 );
 

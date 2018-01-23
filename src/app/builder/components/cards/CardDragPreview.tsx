@@ -54,9 +54,10 @@ import './CardDragPreview.less';
 const classNames = require('classnames');
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
-import Store from '../../data/BuilderStore';
 import { CardItem } from './CardComponent';
 import { cardWillWrap, onCardDrop } from './CardDropArea';
+import { BuilderState } from 'builder/data/BuilderStore';
+import Util from 'util/Util';
 
 interface CDPProps
 {
@@ -76,6 +77,8 @@ interface CDPProps
   connectDropTarget?: (el: El) => El;
   singleChild?: boolean; // can't have neighbors, but could still drop a wrapper card
   handleCardDrop?: (type: string) => any;
+
+  builder?: BuilderState;
 }
 
 class CardDragPreview extends TerrainComponent<CDPProps>
@@ -87,19 +90,10 @@ class CardDragPreview extends TerrainComponent<CDPProps>
     language: string;
   } = {
       justDropped: false,
-      language: Store.getState().query.language,
+      language: this.props.builder.query.language,
     };
 
   public timeout: any;
-
-  public componentDidMount()
-  {
-    this._subscribe(Store,
-      {
-        stateKey: 'language',
-        storeKeyPath: ['query', 'language'],
-      });
-  }
 
   public componentWillReceiveProps(nextProps: CDPProps)
   {
@@ -125,7 +119,7 @@ class CardDragPreview extends TerrainComponent<CDPProps>
     let title: string;
     let preview: string;
 
-    const Blocks = AllBackendsMap[this.state.language].blocks;
+    const Blocks = AllBackendsMap[this.props.builder.query.language].blocks;
 
     if (!item)
     {
@@ -241,6 +235,12 @@ const cardPreviewCollect = (connect, monitor) =>
     // item: monitor.getItem(),
   });
 
-const CDP = DropTarget('CARD', cardPreviewTarget, cardPreviewCollect)(CardDragPreview) as any;
+const CardDragPreviewContainer = Util.createTypedContainer(
+  CardDragPreview,
+  ['builder'],
+  {}
+);
+
+const CDP = DropTarget('CARD', cardPreviewTarget, cardPreviewCollect)(CardDragPreviewContainer) as any;
 
 export default CDP;
