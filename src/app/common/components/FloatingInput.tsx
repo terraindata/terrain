@@ -103,15 +103,17 @@ class FloatingInput extends TerrainComponent<Props>
 {
   state = {
     isFocused: false,
-    myId: Math.random() + '-floatinginput',
+    myId: String(Math.random()) + '-floatinginput',
   };
 
   componentWillReceiveProps(nextProps: Props)
   {
+    //
   }
 
   public componentDidUpdate(prevProps: Props, prevState)
   {
+    //
   }
 
   public render()
@@ -132,7 +134,7 @@ class FloatingInput extends TerrainComponent<Props>
         />
         <Label
           htmlFor={state.myId}
-          style={ isFloating ? floatingLabelStyle : undefined }
+          style={isFloating ? floatingLabelStyle : undefined}
         >
           {
             props.label
