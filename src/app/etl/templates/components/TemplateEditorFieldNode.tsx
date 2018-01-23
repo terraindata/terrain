@@ -139,8 +139,8 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
           key={-1}
           preview={null}
           arrayKeyPath={newArrayKeyPath}
-        />
-      ])
+        />,
+      ]);
     }
   }
 
