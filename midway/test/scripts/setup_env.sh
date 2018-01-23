@@ -8,6 +8,7 @@ elastic_image="terrain/moviesdb-elk:$deploy_version"
 mysql_image="terrain/moviesdb-mysql:$deploy_version"
 postgres_image="terrain/moviesdb-postgres:$deploy_version"
 sqlite_image="terrain/moviesdb-sqlite:$deploy_version"
+chrome_image="yukinying/chrome-headless-browser"
 
 orig_mysql_port=3306
 orig_postgres_port=5432
@@ -16,12 +17,14 @@ orig_elastic_port=9200
 mysql_port=63306
 postgres_port=65432
 elastic_port=9200
+chrome_port=9222
 
 sqlite_path=${DIR}/../../../
 use_mysql=1
 use_postgres=1
 use_elastic=1
 use_sqlite=1
+use_chrome=1
 
 function usage {
 	 echo "Help!"
@@ -64,6 +67,9 @@ do
 		  --use-elastic=*)
 				use_elastic="${1#*=}"
 				;;
+		  --use-chrome=*)
+				use_chrome="${1#*=}"
+				;;
 		  --sqlite-path)
 				sqlite_path=$2
 				shift
@@ -91,7 +97,7 @@ do
 done
 
 # stop any existing instances
-${DIR}/teardown_env.sh --use-mysql=${use_mysql} --use-postgres=${use_postgres} --use-elastic=${use_elastic} --use-sqlite=${use_sqlite}
+${DIR}/teardown_env.sh --use-mysql=${use_mysql} --use-postgres=${use_postgres} --use-elastic=${use_elastic} --use-chrome=${use_chrome} --use-sqlite=${use_sqlite}
 
 if [ "$use_mysql" == 1 ];
 then
@@ -121,6 +127,11 @@ then
     else
     	 echo "Starting elastic on NON-STANDARD port $elastic_port..."
     fi
+fi
+
+if [ "$use_chrome" == 1 ];
+then
+    echo "Starting the headless Chrome on port $chrome_port...";
 fi
 
 # Pull images in parallel in order to minimize latency...
@@ -157,7 +168,13 @@ else
     ELASTIC_ID=1
 fi
 
-if [ -z "$ELASTIC_ID" -o -z "$MYSQL_ID" -o -z "$POSTGRES_ID" ]; then
+if [ "$use_chrome" == 1 ]; then
+    CHROME_ID=$(docker run -d --name chrome --shm-size=1024m -p $chrome_port:$chrome_port --cap-add=SYS_ADMIN $chrome_image)
+else
+    CHROME_ID=1
+fi
+
+if [ -z "$ELASTIC_ID" ] || [ -z "$MYSQL_ID" ] || [ -z "$POSTGRES_ID" ] || [ -z "$CHROME_ID" ]; then
 	echo "Docker services failed to start..."
 	exit 1
 fi
@@ -173,4 +190,3 @@ fi
 if [ "$use_elastic" == 1 ]; then
     while [ "$(docker inspect -f {{.State.Health.Status}} moviesdb-elk)" != "healthy" ]; do sleep 0.1; done;
 fi
-
