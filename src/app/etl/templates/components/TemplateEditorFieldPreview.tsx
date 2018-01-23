@@ -68,7 +68,8 @@ import './TemplateEditorField.less';
 export interface Props extends TemplateEditorFieldProps
 {
   showPreviewValue: boolean;
-  arrayIndex?: number;
+  notInteractable?: boolean;
+  labelOverride?: string;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
@@ -80,13 +81,13 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 
   public render()
   {
-    const { canEdit, field, keyPath, preview, showPreviewValue, arrayIndex } = this.props;
-    const fieldNotInteractable = arrayIndex !== undefined && arrayIndex !== null;
+    const { canEdit, field, keyPath, preview, showPreviewValue, labelOverride, notInteractable } = this.props;
+    // const fieldNotInteractable = labelOverride !== undefined && labelOverride !== null;
     const settingsOpen = this.props.templateEditor.settingsKeyPath === keyPath;
     const labelStyle = settingsOpen ?
       _.extend({}, fontColor(Colors().text1, Colors().text1), backgroundColor(Colors().highlight))
       :
-      fontColor(Colors().text3, fieldNotInteractable ? Colors().text3 : Colors().text2);
+      fontColor(Colors().text3, notInteractable ? Colors().text3 : Colors().text2);
     const previewText = preview === undefined || preview === null ? 'Data Missing' : preview.toString();
     return (
       <div className='template-editor-field-block'>
@@ -94,11 +95,11 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
           <div className='field-preview-label-group' style={labelStyle}>
             <div className={classNames({
               'field-preview-label': true,
-              'no-interact': fieldNotInteractable,
+              'no-interact': notInteractable,
             })}
-              onClick={fieldNotInteractable ? undefined : this.handleLabelClicked}
+              onClick={notInteractable ? undefined : this.handleLabelClicked}
             >
-              {fieldNotInteractable ? arrayIndex : field.name}
+              {labelOverride !== undefined && labelOverride !== null ? labelOverride : field.name}
             </div>
           </div>
           {

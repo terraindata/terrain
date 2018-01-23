@@ -68,6 +68,7 @@ const AddIcon = require('images/icon_add.svg');
 
 export interface Props extends TemplateEditorFieldProps
 {
+  arraySize?: number;
   arrayKeyPath?: List<number>;
   // below from container
   templateEditor?: TemplateEditorState;
@@ -103,13 +104,13 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
-  public renderArrayChildren() // TODO: don't hack this; make this work for nested arrays and arrays of nested
+  public renderArrayChildren() // TODO: arrays are awkward and involves awkward logic. Can this be better?
   {
     const { field, canEdit, preview, keyPath, arrayKeyPath } = this.props;
     const keyPathBase = arrayKeyPath === undefined || arrayKeyPath === null ?
       List([]) : arrayKeyPath;
 
-    if (Array.isArray(preview))
+    if (Array.isArray(preview) && preview.length > 0)
     {
       return List(preview).map((value, index) =>
       {
@@ -122,15 +123,30 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
             key={index}
             preview={value}
             arrayKeyPath={newArrayKeyPath}
+            arraySize={preview.length}
           />
         );
       }).toList();
+    }
+    else
+    {
+      const newArrayKeyPath = keyPathBase.push(-1);
+      return List([
+        <TemplateEditorFieldNode
+          keyPath={keyPath}
+          field={field}
+          canEdit={canEdit}
+          key={-1}
+          preview={null}
+          arrayKeyPath={newArrayKeyPath}
+        />
+      ])
     }
   }
 
   public render()
   {
-    const { field, keyPath, canEdit, preview, arrayKeyPath } = this.props;
+    const { field, keyPath, canEdit, preview, arrayKeyPath, arraySize } = this.props;
     let children = null;
     let content = null;
 
@@ -147,13 +163,21 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       const hasArrayKeyPath = arrayKeyPath !== undefined && arrayKeyPath !== null;
       const isLeaf = hasArrayKeyPath &&
         arrayKeyPath.size >= this._arrayDepth();
-      const arrayIndex = hasArrayKeyPath && arrayKeyPath.size > 0 ? arrayKeyPath.last() : null;
+      let labelOverride = null;
+      let notInteractable = false;
+      if (hasArrayKeyPath && arrayKeyPath.size > 0)
+      {
+        notInteractable = true;
+        labelOverride = arrayKeyPath.last() === -1 ? 'No Preview Available' : `${arrayKeyPath.last() + 1} of ${arraySize}`;
+      }
+
       children = isLeaf ? (this._isNested() ? this.renderChildFields() : null) : this.renderArrayChildren();
 
       content = (
         <TemplateEditorFieldPreview
           showPreviewValue={!this._isNested() && isLeaf}
-          arrayIndex={arrayIndex}
+          notInteractable={notInteractable}
+          labelOverride={labelOverride}
           {...this._passProps() }
         />
       );

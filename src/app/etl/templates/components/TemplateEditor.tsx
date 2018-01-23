@@ -222,49 +222,46 @@ const SampleDocuments = [
         'Description': 'Carbs in a bowl',
       },
     ],
-    'Here are some numbers': [
-      [1, 2, 3],
-      [3, 2, 1],
-      [1, 3, 2],
-      [2, 1, 3],
+  },
+  {
+    'Product Name': 'Cool stuff',
+    'Product ID': 5,
+    'Product Description': 'Not to be confused with boring things',
+    'Meta': {
+      'Date Added': '01/10/2018',
+      'Views': 515,
+    },
+    'Related Products': [
+      {
+        'Item Name': 'Video Games',
+        'Description': 'Just my opinion, man',
+      },
+      {
+        'Item Name': 'Fast cars',
+        'Description': 'Zoom Zoom!',
+      },
+      {
+        'Item Name': 'Friends',
+        'extra field': 'this is an extra field',
+      },
     ],
   },
-  // {
-  //   'Product Name': 'Cool stuff',
-  //   'Product ID': 5,
-  //   'Product Description': 'Not to be confused with boring things',
-  //   'Meta': {
-  //     'Date Added': '01/10/2018',
-  //     'Views': 515,
-  //   },
-  //   'Here are some numbers': [
-  //     [1, 2, 3],
-  //     [3, 2, 1],
-  //     [1, 3, 2],
-  //     [2, 1, 3],
-  //   ],
-  // },
-  // {
-  //   'Product Name': 'Acronyms that start and end with P',
-  //   'Product ID': 666,
-  //   'Product Description': 'For some reason, these usually are annoying. e.g. PHP, PGP',
-  //   'Meta': {
-  //     'Date Added': '01/19/2018',
-  //     'Views': 50,
-  //   },
-  //   'Here are some numbers': [
-  //     [1, 2, 3],
-  //     [3, 2, 1],
-  //     [1, 3, 2],
-  //     [2, 1, 3],
-  //   ],
-  // },
-  // {
-  //   'Product Name': 'This product does not conform',
-  //   'Product ID': 6,
-  //   'Random field': 'hello there',
-  //   'Random array': [1, 2, 3]
-  // },
+  {
+    'Product Name': 'Acronyms that start and end with P',
+    'Product ID': 666,
+    'Product Description': 'For some reason, these usually are annoying. e.g. PHP, PGP',
+    'Meta': {
+      'Date Added': '01/19/2018',
+      'Views': 50,
+    },
+    'Related Products': [
+
+    ],
+  },
+  {
+    'Product Name': 'This product does not conform',
+    'Product ID': 6,
+  },
   // {
   //   'Product Name': 'Scooter',
   //   'Product ID': 10,
