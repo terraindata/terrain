@@ -82,10 +82,8 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 {
   public state: {
     dataSourceOptions: List<ChoiceOption>,
-    expanded: boolean,
   } = {
       dataSourceOptions: List([]),
-      expanded: this.props.source.expanded,
     };
 
   public componentWillMount()
@@ -182,7 +180,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       BuilderActions.changePath(this.props.keyPath.push('dataSource').push('index'), options.get(index).value.id);
       BuilderActions.changePath(this.props.keyPath.push('dataSource').push('types'), options.get(index).value.tableIds);
     }
-    BuilderActions.changePath(this.props.keyPath.push('expanded'), false);
     BuilderActions.changePath(this.props.keyPath.push('dataSource').push('name'), options.get(index).displayName);
     if (this.props.step === PathfinderSteps.Source)
     {

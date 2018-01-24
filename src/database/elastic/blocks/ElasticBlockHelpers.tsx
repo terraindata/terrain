@@ -51,9 +51,9 @@ import * as _ from 'lodash';
 const { Map, List } = Immutable;
 import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
+import { FieldType, FieldTypeMapping } from '../../../../shared/builder/FieldTypes';
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
-import { FieldType, FieldTypeMapping } from '../../../../shared/builder/FieldTypes';
 
 export const enum AutocompleteMatchType
 {

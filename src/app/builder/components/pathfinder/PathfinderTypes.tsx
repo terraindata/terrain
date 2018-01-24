@@ -88,8 +88,8 @@ import BuilderStore from 'app/builder/data/BuilderStore';
 import Util from 'app/util/Util';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
-import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { FieldType, FieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
+import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
 
 export enum PathfinderSteps

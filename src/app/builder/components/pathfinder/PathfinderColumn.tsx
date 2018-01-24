@@ -60,10 +60,10 @@ import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
+import './Pathfinder.less';
 import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
-import './Pathfinder.less';
 
 export interface Props
 {

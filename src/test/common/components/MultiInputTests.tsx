@@ -43,63 +43,58 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
-// tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
-
-import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
+// tslint:disable:no-empty
+import MultiInput from 'app/common/components/MultiInput';
+import { shallow } from 'enzyme';
+import * as Immutable from 'immutable';
+import { List, Map } from 'immutable';
 import * as React from 'react';
-import PathfinderCreateLine from '../PathfinderCreateLine';
-import PathfinderLine from '../PathfinderLine';
-import { _FilterGroup, _FilterLine, FilterGroup, FilterLine } from '../PathfinderTypes';
-import TerrainComponent from './../../../../common/components/TerrainComponent';
 
-export interface Props
+describe('MultiInput', () =>
 {
-  canEdit: boolean;
-  depth: number;
-  keyPath: KeyPath;
-  onChange(keyPath: KeyPath, filter: FilterGroup | FilterLine);
-}
+  let inputComponent = null;
+  const inputState = {
+    isNumber: false,
+    canEdit: true,
+    keyPath: List([]),
+    action: (keyPath, items) => {},
+    items: List(['a', 'b', 'c']),
+  }
 
-class PathfinderFilterCreate extends TerrainComponent<Props>
-{
-  public render()
+  beforeEach(() =>
   {
-    const { canEdit } = this.props;
-    return (
-      <PathfinderLine
-        canDelete={false}
-        canDrag={false}
-        canEdit={canEdit}
-        depth={this.props.depth}
-      >
-        <div>
-          <PathfinderCreateLine
-            canEdit={canEdit}
-            onCreate={this.handleCreateFilterLine}
-            text={PathfinderText.createFilterLine}
-          />
-          <PathfinderCreateLine
-            canEdit={canEdit}
-            onCreate={this.handleCreateFilterGroup}
-            text={PathfinderText.createFilterGroup}
-          />
-        </div>
-      </PathfinderLine>
+    inputComponent = shallow(
+      <MultiInput
+        {...inputState}
+      />,
     );
-  }
+  });
 
-  private handleCreateFilterLine()
+  it('should render a multi input with three values and 1 input', () =>
   {
-    this.props.onChange(this.props.keyPath, _FilterLine());
-  }
+    expect(inputComponent.find('.multi-input-item')).toHaveLength(3);
+    expect(inputComponent.find('input')).toHaveLength(1);
+  });
 
-  private handleCreateFilterGroup()
+  describe('#addNewInput', () => {
+    it('should update the input value', () =>
+    {
+      inputComponent.setState({newValue: 'd'});
+      expect(inputComponent.find('input').node.props.value).toEqual('d');
+    });
+    it ('should add a new item', () =>
+    {
+      inputComponent.setProps({items: List(['a', 'b', 'c', 'd'])});
+      expect(inputComponent.find('.multi-input-item')).toHaveLength(4);
+    });
+  });
+
+  describe('#cannotEdit', () =>
   {
-    this.props.onChange(this.props.keyPath, _FilterLine({
-      filterGroup: _FilterGroup(),
-    }));
-  }
-}
-
-export default PathfinderFilterCreate;
+    it('should not render an input if it is not editable', () =>
+    {
+      inputComponent.setProps({canEdit: false});
+    expect(inputComponent.find('input')).toHaveLength(0);
+    });
+  })
+});

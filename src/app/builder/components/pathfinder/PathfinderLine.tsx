@@ -47,13 +47,13 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
 import TerrainComponent from 'app/common/components/TerrainComponent';
+import { tooltip } from 'app/common/components/tooltip/Tooltips';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 import { Colors } from '../../../colors/Colors';
-import { tooltip } from 'app/common/components/tooltip/Tooltips';
 const { List } = Immutable;
 import FadeInOut from 'app/common/components/FadeInOut';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
