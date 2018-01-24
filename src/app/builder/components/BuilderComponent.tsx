@@ -50,6 +50,7 @@ import './BuilderComponent.less';
 
 import FadeInOut from 'common/components/FadeInOut';
 import * as React from 'react';
+import Util from 'util/Util';
 import { Display, DisplayType } from '../../../blocks/displays/Display';
 import BuilderTextbox from '../../common/components/BuilderTextbox';
 import BuilderTextboxCards from '../../common/components/BuilderTextboxCards';
@@ -60,7 +61,6 @@ import BuilderActions from '../data/BuilderActions';
 import { BuilderState } from '../data/BuilderStore';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
-import Util from 'util/Util';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 

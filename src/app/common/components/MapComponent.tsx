@@ -52,6 +52,7 @@ import * as React from 'react';
 import { Circle, Map, Marker, Polyline, Popup, Rectangle, TileLayer } from 'react-leaflet';
 
 import Switch from 'common/components/Switch';
+import Util from 'util/Util';
 import BuilderActions from '../../builder/data/BuilderActions';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
@@ -59,7 +60,6 @@ import Autocomplete from './Autocomplete';
 import './MapComponentStyle.less';
 import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';
-import Util from 'util/Util';
 
 export interface Props
 {
@@ -915,5 +915,5 @@ class MapComponent extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   MapComponent,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

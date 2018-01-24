@@ -54,6 +54,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
 
+import BuilderActions from 'builder/data/BuilderActions';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
@@ -61,13 +62,13 @@ import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import FileImportPreview from '../../../fileImport/components/FileImportPreview';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
-import BuilderActions from 'builder/data/BuilderActions';
 import Hit from '../results/Hit';
 import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 
 import Radium = require('radium');
 
+import Util from 'util/Util';
 import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import DragHandle from '../../../common/components/DragHandle';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
@@ -76,7 +77,6 @@ import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
 import { Hit as HitClass, MAX_HITS, ResultsState } from './ResultTypes';
-import Util from 'util/Util';
 
 const HITS_PAGE_SIZE = 20;
 
@@ -857,5 +857,5 @@ column if you have customized the results view.');
 export default Util.createContainer(
   HitsArea,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

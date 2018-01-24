@@ -52,12 +52,12 @@ import { DropTarget } from 'react-dnd';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDragPreview.less';
 const classNames = require('classnames');
+import { BuilderState } from 'builder/data/BuilderStore';
+import Util from 'util/Util';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { CardItem } from './CardComponent';
 import { cardWillWrap, onCardDrop } from './CardDropArea';
-import { BuilderState } from 'builder/data/BuilderStore';
-import Util from 'util/Util';
 
 interface CDPProps
 {
@@ -238,7 +238,7 @@ const cardPreviewCollect = (connect, monitor) =>
 const CardDragPreviewContainer = Util.createTypedContainer(
   CardDragPreview,
   ['builder'],
-  {}
+  {},
 );
 
 const CDP = DropTarget('CARD', cardPreviewTarget, cardPreviewCollect)(CardDragPreviewContainer) as any;

@@ -622,7 +622,7 @@ const AggregationContainer = Util.createTypedContainer(
   AggregationComponent,
   [],
   { builderActions: BuilderActions },
-)
+);
 
 export default Dimensions({
   elementResize: true,

@@ -48,11 +48,11 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import Ajax from 'util/Ajax';
 import Util from 'util/Util';
 import BackendInstance from '../../database/types/BackendInstance';
 import { Item, ItemC, ItemStatus, ItemType } from '../../items/types/Item';
 import { _Query, Query, queryForSave } from '../../items/types/Query';
-import Ajax from 'util/Ajax';
 
 class LibraryStateC
 {
@@ -88,6 +88,7 @@ export const _LibraryState = (config?: any) =>
   if (config && !(config['modelVersion'] || config['modelVersion'] < 2))
   {
     config['modelVersion'] = 3;
+    config['api'] = Ajax;
   }
   if (config === undefined)
   {

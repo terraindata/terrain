@@ -48,6 +48,7 @@ THE SOFTWARE.
 
 import * as Immutable from 'immutable';
 import * as React from 'react';
+import Util from 'util/Util';
 import { Input } from '../../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import CreateLine from '../../../common/components/CreateLine';
@@ -55,7 +56,6 @@ import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import BuilderActions from '../../data/BuilderActions';
 import InputComponent from '../inputs/InputComponent';
-import Util from 'util/Util';
 
 export interface Props
 {
@@ -130,5 +130,5 @@ class InputsArea extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   InputsArea,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

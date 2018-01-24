@@ -50,22 +50,22 @@ import './ResultsColumnStyle.less';
 
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
+import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import Radium = require('radium');
 import * as React from 'react';
 import TQLEditor from 'tql/components/TQLEditor';
+import Util from 'util/Util';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import InfoArea from '../../../common/components/InfoArea';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import { FileImportState } from '../../../fileImport/FileImportTypes';
-import BuilderActions from 'builder/data/BuilderActions';
 import AggregationsArea from './AggregationsArea';
 import HitsArea from './HitsArea';
 import { MAX_HITS, ResultsState } from './ResultTypes';
-import Util from 'util/Util';
 
 const RESULTS_PAGE_SIZE = 20;
 const ClipboardIcon = require('images/icon_clipboard.svg');

@@ -53,8 +53,8 @@ import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import BuilderActions from '../../data/BuilderActions';
 
-import CreateCardTool from './CreateCardTool';
 import Util from 'util/Util';
+import CreateCardTool from './CreateCardTool';
 
 export interface Props
 {
@@ -168,5 +168,5 @@ class SpecializedCreateCardTool extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   SpecializedCreateCardTool,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

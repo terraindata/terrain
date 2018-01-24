@@ -53,8 +53,10 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 
+import { BuilderState } from 'builder/data/BuilderStore';
 import { getIndex, getType } from 'database/elastic/blocks/ElasticBlockHelpers';
 import { addBodyToQuery } from 'shared/database/elastic/ElasticUtil';
+import Util from 'util/Util';
 import { backgroundColor, buttonColors, Colors, fontColor } from '../../colors/Colors';
 import TemplateList from '../../common/components/TemplateList';
 import { getTemplateId, getTemplateName } from './../../../../shared/Util';
@@ -74,8 +76,6 @@ import * as FileImportTypes from './../FileImportTypes';
 import './FileImportPreview.less';
 import FileImportPreviewColumn from './FileImportPreviewColumn';
 import TransformModal from './TransformModal';
-import Util from 'util/Util';
-import { BuilderState } from 'builder/data/BuilderStore';
 
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 
@@ -1337,5 +1337,5 @@ class FileImportPreview extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   FileImportPreview,
   ['builder'],
-  {}
+  {},
 );

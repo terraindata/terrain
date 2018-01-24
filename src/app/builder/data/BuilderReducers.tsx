@@ -75,7 +75,7 @@ const BuilderReducers =
         algorithmId,
         handleNoAlgorithm,
         dispatch,
-        onRequestDone
+        onRequestDone,
       } = action.payload;
 
       if (state.loadingXhr)

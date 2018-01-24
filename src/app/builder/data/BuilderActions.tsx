@@ -59,8 +59,8 @@ const BuilderActions =
   {
     change: // reserved for cards only
       (keyPath: KeyPath, value: any, notDirty = false) =>
-      (dispatch) =>
-        dispatch($(ActionTypes.change, { keyPath, value, notDirty })),
+        (dispatch) =>
+          dispatch($(ActionTypes.change, { keyPath, value, notDirty })),
 
     changeQuery:
       (query: Query) =>
@@ -113,21 +113,21 @@ const BuilderActions =
     // fetches the query from the server
     fetchQuery:
       (algorithmId: ID, handleNoAlgorithm: (algorithmId: ID) => void, db: BackendInstance) =>
-      (dispatch) =>
-        dispatch($(ActionTypes.fetchQuery, {
-          algorithmId,
-          handleNoAlgorithm,
-          db,
-          dispatch,
-          onRequestDone: (query, xhr, db) => dispatch(BuilderActions.queryLoaded(query, xhr, db)),
-          changeQuery: BuilderActions.changeQuery;
-      })),
+        (dispatch) =>
+          dispatch($(ActionTypes.fetchQuery, {
+            algorithmId,
+            handleNoAlgorithm,
+            db,
+            dispatch,
+            onRequestDone: (query, xhr, database) => dispatch(BuilderActions.queryLoaded(query, xhr, database)),
+            changeQuery: BuilderActions.changeQuery,
+          })),
 
     // load query from server into state
     queryLoaded:
       (query: Query, xhr: XMLHttpRequest, db: BackendInstance) =>
-      (dispatch) =>
-        dispatch($(ActionTypes.queryLoaded, { query, xhr, db, dispatch })),
+        (dispatch) =>
+          dispatch($(ActionTypes.queryLoaded, { query, xhr, db, dispatch })),
 
     save:
       (failed?: boolean) =>

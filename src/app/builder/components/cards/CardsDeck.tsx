@@ -51,12 +51,12 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
+import Util from 'util/Util';
 import { Card } from '../../../../blocks/types/Card';
 import { backgroundColor, cardStyle, Colors } from '../../../colors/Colors';
 import BuilderActions from '../../data/BuilderActions';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import './CardsDeck.less';
-import Util from 'util/Util';
 
 import { AllBackendsMap } from '../../../../database/AllBackends';
 
@@ -234,5 +234,5 @@ const CardDeckCard = DragSource('CARD', cardSource, dragCollect)(CardDeckCardCom
 export default Util.createTypedContainer(
   CardsDeck,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

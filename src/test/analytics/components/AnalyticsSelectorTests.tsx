@@ -50,6 +50,7 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import configureStore from 'redux-mock-store';
 import { _Server } from 'schema/SchemaTypes';
+import { connect } from '../../helpers';
 
 describe('AnalyticsSelector', () =>
 {
@@ -112,7 +113,7 @@ describe('AnalyticsSelector', () =>
   {
     it('should have 3 MultiSwitch components', () =>
     {
-      const connectionDropdown = analyticsComponent.find('Dropdown');
+      const connectionDropdown = analyticsComponent.find(connect('Dropdown'));
       const multiswitchs = analyticsComponent.find('MultiSwitch');
 
       expect(connectionDropdown).toHaveLength(1);

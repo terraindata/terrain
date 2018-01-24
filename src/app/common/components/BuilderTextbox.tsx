@@ -48,11 +48,11 @@ THE SOFTWARE.
 
 import './BuilderTextbox.less';
 
+import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import BuilderActions from 'builder/data/BuilderActions';
 import Util from 'util/Util';
 import * as BlockUtils from '../../../blocks/BlockUtils';
 

@@ -49,13 +49,13 @@ THE SOFTWARE.
 import './BuilderTextbox.less';
 
 import * as React from 'react';
+import Util from 'util/Util';
 import { Display } from '../../../blocks/displays/Display';
 import { CardString } from '../../../blocks/types/Card';
 import { BuilderState } from '../../builder/data/BuilderStore';
 // import { AllBackendsMap } from '../../../../shared/database/AllBackends';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import BuilderTextbox from './BuilderTextbox';
-import Util from 'util/Util';
 
 export interface Props
 {
@@ -168,5 +168,5 @@ const PLACEHOLDER_STYLE = {
 export default Util.createTypedContainer(
   ElasticKeyBuilderTextbox,
   ['builder'],
-  {}
+  {},
 );

@@ -315,5 +315,5 @@ class InputComponent extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   InputComponent,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

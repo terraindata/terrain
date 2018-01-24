@@ -287,7 +287,6 @@ class Builder extends TerrainComponent<Props>
       });
     }
 
-
     if (
       nextProps.params.config !== this.props.params.config
       || currentOpen !== nextOpen

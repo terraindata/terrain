@@ -56,6 +56,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { DragSource } from 'react-dnd';
 const { createDragPreview } = require('react-dnd-text-dragpreview');
+import { BuilderState } from 'builder/data/BuilderStore';
 import { Display } from '../../../../blocks/displays/Display';
 import { Card, getCardTitle } from '../../../../blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';
@@ -64,7 +65,6 @@ import BuilderActions from '../../data/BuilderActions';
 import DragHandle from './../../../common/components/DragHandle';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { BuilderScrollState, BuilderScrollStore } from './../../data/BuilderScrollStore';
-import { BuilderState } from 'builder/data/BuilderStore';
 import CardDropArea from './CardDropArea';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
@@ -1043,16 +1043,16 @@ const cardSource =
         type: props.card.type,
       };
 
-      this.props.builderActions.dragCard(item);
+      props.builderActions.dragCard(item);
 
       return item;
     },
     // select card?
 
-    endDrag: () =>
+    endDrag: (props) =>
     {
       $('body').removeClass('body-card-is-dragging');
-      this.props.builderActions.dragCard(null);
+      props.builderActions.dragCard(null);
     },
   };
 

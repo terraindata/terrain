@@ -51,6 +51,7 @@ import { List } from 'immutable';
 import * as React from 'react';
 import './BuilderTQLColumn.less';
 
+import Util from 'util/Util';
 import { cardList } from '../../../database/mysql/blocks/MySQLBlocks';
 import Query from '../../../items/types/Query';
 import { ResultsState } from '../../builder/components/results/ResultTypes';
@@ -62,7 +63,6 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 import TQLEditor from './TQLEditor';
 import TQLPopup from './TQLPopup';
 import TQLResultsBar from './TQLResultsBar';
-import Util from 'util/Util';
 
 export interface Props
 {
@@ -399,5 +399,5 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   BuilderTQLColumn,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

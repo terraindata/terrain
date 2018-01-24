@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions member-access
 
+import BuilderActions from 'builder/data/BuilderActions';
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as $ from 'jquery';
@@ -53,11 +54,10 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import BuilderActions from 'builder/data/BuilderActions';
+import Util from 'util/Util';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import Util from 'util/Util';
 
 import './Dropdown.less';
 
@@ -449,5 +449,5 @@ class Dropdown extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   Dropdown,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

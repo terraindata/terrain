@@ -302,5 +302,5 @@ class TransformCardPeriscope extends TerrainComponent<Props>
 export default Util.createTypedContainer(
   TransformCardPeriscope,
   [],
-  { builderActions: BuilderActions }
+  { builderActions: BuilderActions },
 );

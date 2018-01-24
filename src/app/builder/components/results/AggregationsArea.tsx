@@ -52,6 +52,7 @@ import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import Radium = require('radium');
 import * as React from 'react';
+import Util from 'util/Util';
 import BackendInstance from '../../../../database/types/BackendInstance';
 import Query from '../../../../items/types/Query';
 import InfoArea from '../../../common/components/InfoArea';
@@ -60,7 +61,6 @@ import BuilderActions from '../../data/BuilderActions';
 import Aggregation from '../results/Aggregation';
 import './AggregationsArea.less';
 import { ResultsState } from './ResultTypes';
-import Util from 'util/Util';
 
 const RESULTS_PAGE_SIZE = 20;
 

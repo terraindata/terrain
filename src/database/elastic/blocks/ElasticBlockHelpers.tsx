@@ -47,9 +47,9 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 
+import { BuilderState } from 'builder/data/BuilderStore';
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
-import { BuilderState } from 'builder/data/BuilderStore';
 
 export const enum AutocompleteMatchType
 {
@@ -96,7 +96,7 @@ export const ElasticBlockHelpers = {
 
     if (index !== null)
     {
-      const indexId = builderState.db.name + '/' + String(index);
+      const indexId = `${builderState.db.name}/${index}`;
 
       if (matchType === AutocompleteMatchType.Type)
       {
@@ -117,7 +117,7 @@ export const ElasticBlockHelpers = {
       {
         if (type !== null)
         {
-          const typeId = builderState.db.name + '/' + String(index) + '.' + String(type);
+          const typeId = `${builderState.db.name}/${index}.${type}`;
           const transformableFields = schemaState.columns.filter(
             (column) => column.serverId === String(server) &&
               column.databaseId === String(indexId) &&
@@ -133,7 +133,7 @@ export const ElasticBlockHelpers = {
 
       if (type !== null)
       {
-        const typeId = builderState.db.name + '/' + String(index) + '.' + String(type);
+        const typeId = `${builderState.db.name}/${index}.${type}`;
 
         // 4. Return all columns matching this (server+)index+type
 

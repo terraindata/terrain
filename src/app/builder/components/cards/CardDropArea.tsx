@@ -52,12 +52,12 @@ import { DropTarget } from 'react-dnd';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDropArea.less';
 const classNames = require('classnames');
+import { BuilderState } from 'builder/data/BuilderStore';
+import Util from 'util/Util';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import BuilderActions from '../../data/BuilderActions';
-import { BuilderState } from 'builder/data/BuilderStore';
 import { CardItem } from './CardComponent';
-import Util from 'util/Util';
 
 export const cardWillWrap = (targetProps: Props, cardType: string) =>
 {

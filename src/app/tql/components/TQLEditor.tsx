@@ -65,9 +65,9 @@ import ElasticHighlighter from '../highlighters/ElasticHighlighter';
 import ESConverter from '../../../../shared/database/elastic/formatter/ESConverter';
 import ESJSONParser from '../../../../shared/database/elastic/parser/ESJSONParser';
 
+import { BuilderState } from 'builder/data/BuilderStore';
 import { Doc, Editor } from 'codemirror';
 import * as CodeMirrorLib from 'codemirror';
-import { BuilderState } from 'builder/data/BuilderStore';
 
 import './ElasticMode';
 import './TQLMode.js';

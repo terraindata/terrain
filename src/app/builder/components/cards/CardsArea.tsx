@@ -51,6 +51,7 @@ import { List } from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import Util from 'util/Util';
 import { Card, Cards } from '../../../../blocks/types/Card';
 import BuilderActions from '../../data/BuilderActions';
 import { BuilderState } from '../../data/BuilderStore';
@@ -58,7 +59,6 @@ import { CardComponent, CardItem } from '../cards/CardComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import CardDragPreview from './CardDragPreview';
 import CreateCardTool from './CreateCardTool';
-import Util from 'util/Util';
 
 const AddIcon = require('./../../../../images/icon_add_7x7.svg?name=AddIcon');
 

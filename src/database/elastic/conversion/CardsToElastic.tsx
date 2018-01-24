@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:restrict-plus-operands strict-boolean-expressions
 
-import * as _ from 'lodash';
 import * as Immutable from 'immutable';
+import * as _ from 'lodash';
 
 import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import Query from '../../../items/types/Query';
@@ -78,7 +78,7 @@ class CardsToElastic
   public static blockToElastic(
     block: Block,
     options: Options = {},
-    query: Query
+    query: Query,
   ): string | object | number | boolean
   {
     if (typeof block !== 'object')
@@ -91,8 +91,8 @@ class CardsToElastic
       const tql = block.static.tql as TQLRecursiveObjectFn;
       let value = tql(
         block,
-        (block, options) => CardsToElastic.blockToElastic(block, options, query),
-        options
+        (_block, _options) => CardsToElastic.blockToElastic(_block, _options, query),
+        options,
       );
 
       if ((value === undefined || (typeof (value) === 'number' && isNaN(value)))
