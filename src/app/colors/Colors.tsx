@@ -53,6 +53,29 @@ const Color = require('color');
 
 interface Theme
 {
+  fontColor: string;
+  fontColor2: string; // less contrast
+  fontColorLightest: string;
+  
+  blockBg: string; // e.g., in Pathfinder, behind block elements
+  
+  sidebarBg: string;
+}
+
+const NewTheme: Theme = 
+{
+  fontColor: '#221E1F',
+  fontColor2: '#606262',
+  fontColorLightest: '#CECECE',
+  
+  blockBg: '#F8F8F8',
+  
+  sidebarBg: '#fff',
+}
+
+// Will be deprecated
+interface OldTheme
+{
   // Use these colors
 
   // main background colors
@@ -316,7 +339,7 @@ const code =
 
   };
 
-const DARK: Theme =
+const DARK: OldTheme =
   {
     // Use these colors
 
@@ -555,7 +578,7 @@ const DARK: Theme =
     },
   };
 
-const LIGHT: Theme =
+const LIGHT: OldTheme =
   {
     // Use these colors
 
@@ -796,7 +819,7 @@ const LIGHT: Theme =
 
 const halloweenActive = '#ffa125';
 
-const HALLOWEEN: Theme =
+const HALLOWEEN: OldTheme =
   {
     // Use these colors
 
@@ -1036,29 +1059,40 @@ const HALLOWEEN: Theme =
     },
   };
 
-export const Themes: { [name: string]: Theme } =
+export const OldThemes: { [name: string]: OldTheme } =
   {
     DARK, LIGHT, HALLOWEEN,
   };
 
-export const ThemesInt =
+export const OldThemesInt =
   {
     DARK: 0,
     LIGHT: 1,
     HALLOWEEN: 2,
   };
 
-export const ThemesArray = ['DARK', 'LIGHT', 'HALLOWEEN'];
+export const OldThemesArray = ['DARK', 'LIGHT', 'HALLOWEEN'];
 
 const curTheme = 'DARK';
 
-export function Colors()
+// Moving setup out here, since we currently need to reload the webpage anyways
+//  for theme changes to take effect
+if (localStorage.getItem('theme') === null)
 {
-  if (localStorage.getItem('theme') === null)
-  {
-    localStorage.setItem('theme', 'DARK');
-  }
-  return Themes[localStorage.getItem('theme')];
+  localStorage.setItem('theme', 'LIGHT');
+}
+
+const oldTheme = OldThemes[localStorage.getItem('theme')];
+const newTheme = NewTheme;
+
+// contains the mash of the old theme and the new theme
+// only initialized once, as we need to reload browser anyway for theme changes
+const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme); 
+   // ^ new theme comes second, overrides old theme's properties
+
+export function Colors(): Theme & OldTheme
+{
+  return themeMash;
 }
 
 const dynamicMap: any = {
