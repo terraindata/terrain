@@ -46,29 +46,24 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
-import InfoArea from '../../../common/components/InfoArea';
+import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
+const { List } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
 import { SchemaState } from 'schema/SchemaTypes';
-import TerrainStore from 'store/TerrainStore';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
-import PathfinderFilterSection2 from './filter/PathfinderFilterSection2';
 import PathfinderMoreSection from './more/PathfinderMoreSection';
-import './Pathfinder.less';
-import { _PathfinderContext, Path, PathfinderSteps, Source } from './PathfinderTypes';
+import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
-import PathfinderStepSection from './step/PathfinderStepSection';
+import './Pathfinder.less';
 
 export interface Props
 {
@@ -133,7 +128,7 @@ class PathfinderColumn extends TerrainComponent<Props>
 
   public render()
   {
-    const { path, canEdit } = this.props;
+    const { path } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
     return (

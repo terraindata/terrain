@@ -173,13 +173,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   //             forceOpen={true}
   //             hasOther={true}
   //           />
-  // <Selector
-  //   selectedIndex={sourceNames.indexOf(this.props.pathfinderContext.source.dataSource.name)}
-  //   items={sourceOptions}
-  //   onSelect={this.handleSourceChange}
-  //   expanded={this.props.source.expanded}
-  //   expandSelector={this.handleExpandSelector}
-  // />
 
   private handleExpandSelector()
   {

@@ -52,6 +52,9 @@ export const PathfinderText = {
   // Source section
   firstWord: 'Find',
   chooseDataSourceDropdownPrompt: 'Choose a data source',
+  findSectionTitle: 'Find',
+  findSectionSubtitle: `
+    Choose where your data are located and filter out everything that isn't a match.`,
 
   // Filter section
   firstFilterIntro: 'With',
@@ -62,10 +65,7 @@ export const PathfinderText = {
   createScoreLine: 'score factor',
   createAggregationLine: 'metadata',
 
-  findSectionTitle: 'Find',
-  findSectionSubtitle: `
-    Choose where your data are located and filter out everything that isn't a match.`,
-
+  // Score section
   scoreSectionTitle: 'Score',
   scoreSectionSubtitle: `
   Score your results, so that the best picks show up in the top spots.
@@ -92,31 +92,11 @@ export const PathfinderText = {
       tooltip: 'The results will not be sorted in any way',
     },
   },
+
+  // More section
   moreSectionTitle: 'More',
   moreSectionSubtitle: `
   Look at the metadata for your data and add facets to better understand your data.
-  `,
-
-  // Steps
-
-  pickSourceStepTitle: `
-		Where are the data that you care about located?
-	`,
-
-  filterStepTitle: `
-		Let's find the data you want by filtering out everything that isn't a match.
-	`,
-
-  scoreStepTitle: `
-		Let's score your results, so that the best picks show up in the top spots.
-	`,
-
-  finalStepTitle: `
-		You can edit your algorithm directly above, or pick one of these actions to perform on it.
-	`,
-
-  scoreStepSubtitle: `
-
   `,
 
   aggregation:

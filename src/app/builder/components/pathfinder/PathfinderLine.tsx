@@ -52,12 +52,11 @@ import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
-const { List, Map } = Immutable;
-import DragHandle from 'app/common/components/DragHandle';
+import { Colors } from '../../../colors/Colors';
+import { tooltip } from 'app/common/components/tooltip/Tooltips';
+const { List } = Immutable;
 import FadeInOut from 'app/common/components/FadeInOut';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
-import { tooltip } from 'app/common/components/tooltip/Tooltips';
 
 export interface Props
 {
@@ -74,7 +73,6 @@ export interface Props
   expandableContent?: any;
   onExpand?: (index: number, expanded: boolean) => void;
   expandButton?: any; // What the user presses to expand the section
-  expandOnLeft?: boolean;
 }
 
 export type PathfinderPiece = El |
@@ -85,10 +83,6 @@ export type PathfinderPiece = El |
 
 export class PathfinderLine extends TerrainComponent<Props>
 {
-  public state: {
-  } = {
-    };
-
   public render()
   {
     const { canDrag, canDelete, canEdit, children, pieces } = this.props;
@@ -162,7 +156,7 @@ export class PathfinderLine extends TerrainComponent<Props>
 
   private renderLeft(): El
   {
-    if (this.props.expandableContent === undefined || !this.props.expandOnLeft)
+    if (this.props.expandButton === undefined)
     {
       return null;
     }
@@ -179,21 +173,12 @@ export class PathfinderLine extends TerrainComponent<Props>
 
   private renderRight(): El
   {
-    if ((!this.props.canEdit || !this.props.canDelete) && this.props.expandableContent === undefined)
+    if (!this.props.canEdit || !this.props.canDelete)
     {
       return null;
     }
     return (
       <div className='pf-line-right'>
-        {
-          this.props.expandableContent !== undefined && !this.props.expandOnLeft &&
-          <div
-            className='expand'
-            onClick={this._fn(this.props.onExpand, !this.props.expanded)}
-          >
-            {this.props.expandButton}
-          </div>
-        }
         {
           this.props.canEdit && this.props.canDelete &&
           tooltip(<div
@@ -228,26 +213,6 @@ export class PathfinderLine extends TerrainComponent<Props>
           </div>
         );
       }
-      // return (
-      //   <div
-      //     style={{
-      //       width: INDENT_WIDTH * depth,
-      //       display: 'flex',
-      //     }}
-      //   >
-      //     {
-      //       _.range(0, depth).map(() =>
-      //         <div
-      //           style={{
-      //             width: INDENT_WIDTH,
-      //             borderLeft: '1px solid ' + Colors().stroke,
-      //             boxSixing: 'border-box',
-      //           }}
-      //         />
-      //       )
-      //     }
-      //   </div>
-      // );
     }
 
     return content;

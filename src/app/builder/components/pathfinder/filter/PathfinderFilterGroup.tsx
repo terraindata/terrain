@@ -46,18 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
+const { List } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
-import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import LinearSelector from 'app/common/components/LinearSelector';
 import { PathfinderLine } from '../PathfinderLine';
-import { FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
+import { FilterGroup, FilterLine } from '../PathfinderTypes';
 
 export interface Props
 {
@@ -99,11 +96,6 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
         onDelete={this.handleDelete}
         depth={depth}
         pieces={List([
-          // <div>
-          //   {
-          //     depth === 0 ? PathfinderText.firstFilterIntro : PathfinderText.nestedFilterIntro
-          //   }
-          // </div>,
           <LinearSelector
             options={filterDropdownOptions}
             keyPath={this.props.keyPath.push('minMatches')}
@@ -113,24 +105,14 @@ class PathfinderFilterGroup extends TerrainComponent<Props>
             action={this.props.onChange}
           />
           ,
-          // <div>
-          //   {
-          //     PathfinderText.filterGroupPost
-          //   }
-          // </div>,
         ])}
       />
     );
   }
 
-  private handleDropdownChange(value: number | string)
-  {
-    this.props.onChange(this.props.keyPath, this.props.filterGroup.set('minMatches', value));
-  }
-
+  // have to trim off the `filterGroup` key for onDelete to work
   private handleDelete()
   {
-    // have to trim off the `filterGroup` key for onDelete to work
     this.props.onDelete(this.props.keyPath.butLast().toList());
   }
 }

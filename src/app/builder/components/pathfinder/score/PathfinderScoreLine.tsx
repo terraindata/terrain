@@ -296,7 +296,6 @@ class PathfinderScoreLine extends TerrainComponent<Props>
         >
           <ArrowIcon />
         </div>}
-        expandOnLeft={true}
       />
     );
   }

@@ -113,7 +113,7 @@ export class SchemaMetadata
         schemaMetadata = Util.updateObject(schemaMetadatas[0], schemaMetadata);
         schemaMetadata.countByAlgorithm = JSON.stringify(Util.updateObject(newCountByAlgorithm, oldCountByAlgorithm));
       }
-      // If it is a new item, make sure that all of the fields (count, starred, countByAlgorithm) are set
+      // If the id hasn't been set...
       else
       {
         // Check to see an item with the same columnId exists in the DB, if so, update this one.
@@ -136,6 +136,7 @@ export class SchemaMetadata
           schemaMetadata = Util.updateObject(results[0], schemaMetadata);
           schemaMetadata.countByAlgorithm = JSON.stringify(Util.updateObject(newCountByAlgorithm, oldCountByAlgorithm));
         }
+        // If it is a new item, make sure that all of the fields (count, starred, countByAlgorithm) are set
         else
         {
           if (schemaMetadata.columnId === undefined)

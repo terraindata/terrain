@@ -462,7 +462,6 @@ class PathfinderAggregationLine extends TerrainComponent<Props>
         expandableContent={this.renderAdvancedSection()}
         expanded={this.props.aggregation.expanded}
         onExpand={this.toggleExpanded}
-        expandOnLeft={true}
         expandButton={
           <div
             className={classNames({

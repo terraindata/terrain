@@ -176,10 +176,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
             value = (action.payload.value as any).field; // This might not always work...
           }
           const index = (state.query.path.source.dataSource as any).index;
-          // This won't be right ...
-          const columnId = index + '/' + value;
-          const algorithmId = state.query.algorithmId;
-          Ajax.countColumn(columnId, algorithmId);
+          Ajax.countColumn(index + '/' + value, state.query.algorithmId);
         }
       }
       return state.setIn(
@@ -473,6 +470,6 @@ function trimParent(state: BuilderState, keyPath: KeyPath): BuilderState
   return state;
 }
 
-// Util.assertKeysArePresent(ActionTypes, BuidlerReducers, 'Missing Builder Reducer for Builder Action Types: ');
+Util.assertKeysArePresent(ActionTypes, BuidlerReducers, 'Missing Builder Reducer for Builder Action Types: ');
 
 export default BuidlerReducers;

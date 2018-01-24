@@ -63,7 +63,7 @@ export interface ScorePoint
   value: number;
   set: (f: string, v: any) => ScorePoint;
 }
-export type ScorePoints = List<ScorePoint>;
+type ScorePoints = List<ScorePoint>;
 
 const ZOOM_FACTOR = 2.0;
 const OFFSET_FACTOR = 0.0011;
@@ -378,13 +378,6 @@ class TransformCardChart extends TerrainComponent<Props>
       );
     }
     return newPoint;
-    // const newPoint = BlockUtils.make(
-    //   AllBackendsMap[this.props.language].blocks, 'scorePoint', {
-    //     value,
-    //     score,
-    //   },
-    // );
-
   }
 
   public changeDomain(domain, override = false)

@@ -46,17 +46,12 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
-import * as classNames from 'classnames';
-import * as Immutable from 'immutable';
-import * as $ from 'jquery';
 import * as React from 'react';
-import { altStyle, backgroundColor, borderColor, Colors, fontColor } from '../../../../colors/Colors';
 import TerrainComponent from './../../../../common/components/TerrainComponent';
-const { List, Map } = Immutable;
 import PathfinderText from 'app/builder/components/pathfinder/PathfinderText';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderLine from '../PathfinderLine';
-import { _FilterGroup, _FilterLine, FilterGroup, FilterLine, Path, Source } from '../PathfinderTypes';
+import { _FilterGroup, _FilterLine, FilterGroup, FilterLine } from '../PathfinderTypes';
 
 export interface Props
 {
