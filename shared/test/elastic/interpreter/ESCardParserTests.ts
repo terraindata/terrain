@@ -59,6 +59,8 @@ import * as Immutable from 'immutable';
 import ESParserError from 'shared/database/elastic/parser/ESParserError';
 import CardsToElastic from 'src/database/elastic/conversion/CardsToElastic';
 
+import Query, { _Query } from 'src/items/types/Query';
+
 function getExpectedFile(): string
 {
   return __filename.split('.')[0] + '.expected';
@@ -90,7 +92,7 @@ function testCardParse(testName: string,
   const interpreter: ESInterpreter = new ESInterpreter(testString);
   const parser: ESJSONParser = interpreter.parser as ESJSONParser;
   const rootValueInfo = parser.getValueInfo();
-  const rootCards = ElasticValueInfoToCards(rootValueInfo, Immutable.List([]));
+  const rootCards = ElasticValueInfoToCards(rootValueInfo, Immutable.List([]), _Query());
   // parse the card
   const rootCard = rootCards.get(0);
   expect(rootCard['type']).toEqual('eqlbody');
@@ -98,7 +100,7 @@ function testCardParse(testName: string,
   // interpreting the parsed card
   const cardInterpreter = new ESInterpreter(cardParser);
   expect(cardInterpreter.errors).toEqual(expectedErrors);
-  expect(CardsToElastic.blockToElastic(rootCard)).toEqual(expectedValue);
+  expect(CardsToElastic.blockToElastic(rootCard, {}, _Query())).toEqual(expectedValue);
 }
 
 test('parse card', () =>
