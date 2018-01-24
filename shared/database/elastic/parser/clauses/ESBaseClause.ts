@@ -67,7 +67,7 @@ export default class ESBaseClause extends ESClause
 
     if (ESJSONType[valueInfo.jsonType] === 'parameter')
     {
-      if (valueInfo.parameterValue !== null && valueInfo.parameterValue.getValueInfo() != null)
+      if (valueInfo.parameterValue !== null && valueInfo.parameterValue.getValueInfo() !== null)
       {
         jsonType = valueInfo.parameterValue.getValueInfo().jsonType;
       }
