@@ -136,6 +136,7 @@ class CardsDeck extends TerrainComponent<Props>
                       search={this.state.search}
                       key={cardType}
                       type={cardType}
+                      builderActions={this.props.builderActions}
                     />,
                   )
                 }
@@ -157,6 +158,8 @@ interface CardProps
   isDragging?: boolean;
   connectDragPreview?: (a?: any) => void;
   connectDragSource?: (el: El) => El;
+
+  builderActions?: typeof BuilderActions;
 }
 
 @Radium
@@ -207,15 +210,15 @@ const cardSource =
         new: true,
       };
 
-      this.props.builderActions.dragCard(item);
+      props.builderActions.dragCard(item);
 
       return item;
     },
 
-    endDrag: () =>
+    endDrag: (props) =>
     {
       $('body').removeClass('body-card-is-dragging');
-      this.props.builderActions.dragCard(null);
+      props.builderActions.dragCard(null);
     },
   };
 
@@ -226,12 +229,10 @@ const dragCollect = (connect, monitor) =>
     connectDragPreview: connect.dragPreview(),
   });
 
-const CardDeckCardContainer = Util.createTypedContainer(
-  CardDeckCardComponent,
-  [],
-  { builderActions: BuilderActions },
-);
-
 const CardDeckCard = DragSource('CARD', cardSource, dragCollect)(CardDeckCardComponent);
 
-export default CardsDeck;
+export default Util.createTypedContainer(
+  CardsDeck,
+  [],
+  { builderActions: BuilderActions }
+);

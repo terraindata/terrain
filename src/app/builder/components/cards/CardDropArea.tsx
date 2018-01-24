@@ -68,7 +68,7 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
 {
   if (monitor.isOver({ shallow: true })) // shouldn't need this: && cardTarget.canDrop(targetProps, monitor))
   {
-    this.props.builderActions.dropCard();
+    targetProps.builderActions.dropCard();
 
     const item = monitor.getItem();
     const { type } = item;
@@ -102,9 +102,9 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
     if (isWrapping)
     {
       targetIndex = targetProps.index;
-      wrappingCardData = this.props.builder.getIn(targetProps.keyPath).get(0);
+      wrappingCardData = targetProps.builder.getIn(targetProps.keyPath).get(0);
       wrappingKeyPath = targetProps.keyPath.push(targetIndex);
-      this.props.builderActions.remove(targetProps.keyPath, targetIndex);
+      targetProps.builderActions.remove(targetProps.keyPath, targetIndex);
     }
 
     let cardProps: any;
@@ -117,11 +117,11 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
         const card = BlockUtils.make(
           AllBackendsMap[targetProps.language].blocks, type, targetProps.handleCardDrop(type),
         );
-        this.props.builderActions.create(targetProps.keyPath, targetIndex, type, card);
+        targetProps.builderActions.create(targetProps.keyPath, targetIndex, type, card);
       }
       else
       {
-        this.props.builderActions.create(targetProps.keyPath, targetIndex, type);
+        targetProps.builderActions.create(targetProps.keyPath, targetIndex, type);
       }
     }
     else
@@ -129,12 +129,12 @@ export const onCardDrop = (targetProps: Props, monitor, component) =>
       // dragging an existing card
       cardProps = item.props;
       indexOffset = 0;
-      this.props.builderActions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetIndex);
+      targetProps.builderActions.nestedMove(cardProps.keyPath, cardProps.index, targetProps.keyPath, targetIndex);
     }
 
     if (isWrapping)
     {
-      this.props.builderActions.create(wrappingKeyPath.push('cards'), 0, null, wrappingCardData);
+      targetProps.builderActions.create(wrappingKeyPath.push('cards'), 0, null, wrappingCardData);
     }
 
     targetProps.afterDrop && targetProps.afterDrop(item, targetProps);
@@ -203,6 +203,7 @@ class CardDropArea extends TerrainComponent<Props>
     {
       return null;
     }
+
     return (
       <CardDragPreview
         cardItem={this.props.builder.draggingCardItem}
@@ -211,6 +212,8 @@ class CardDropArea extends TerrainComponent<Props>
         index={this.props.index}
         language={this.props.language}
         handleCardDrop={this.props.handleCardDrop}
+        builder={this.props.builder}
+        builderActions={this.props.builderActions}
       />
     );
   }
@@ -389,7 +392,7 @@ const cardTarget =
     {
       if (monitor.isOver({ shallow: true }))
       {
-        const state = this.props.builder;
+        const state = targetProps.builder;
         let keyPath: KeyPath = null;
         let index: number = null;
 
@@ -407,7 +410,7 @@ const cardTarget =
 
         if (keyPath !== state.draggingOverKeyPath || index !== state.draggingOverIndex)
         {
-          this.props.builderActions.dragCardOver(keyPath, index);
+          targetProps.builderActions.dragCardOver(keyPath, index);
         }
       }
 

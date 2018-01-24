@@ -848,6 +848,8 @@ class _CardComponent extends TerrainComponent<Props>
             singleChild={this.props.singleChild || this.props.singleCard}
             language={card.static.language}
             handleCardDrop={this.props.handleCardDrop}
+            builder={this.props.builder}
+            builderActions={this.props.builderActions}
           />
         }
         <div
@@ -1003,6 +1005,8 @@ class _CardComponent extends TerrainComponent<Props>
             singleChild={this.props.singleChild || this.props.singleCard}
             language={card.static.language}
             handleCardDrop={this.props.handleCardDrop}
+            builder={this.props.builder}
+            builderActions={this.props.builderActions}
           />
         }
       </div>

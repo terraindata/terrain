@@ -86,6 +86,7 @@ export interface Props
   allowTuningDragAndDrop?: boolean;
   handleCardReorder?: (card, index) => void;
 
+  builder?: BuilderState;
   builderActions?: typeof BuilderActions;
 }
 
@@ -198,6 +199,8 @@ class CardsArea extends TerrainComponent<Props>
                   wrapType={card.type}
                   language={this.props.language}
                   handleCardDrop={this.props.handleCardDrop}
+                  builder={this.props.builder}
+                  builderActions={this.props.builderActions}
                 />
                 <CardComponent
                   card={card}
@@ -233,6 +236,8 @@ class CardsArea extends TerrainComponent<Props>
             wrapUp={true}
             language={this.props.language}
             handleCardDrop={this.props.handleCardDrop}
+            builder={this.props.builder}
+            builderActions={this.props.builderActions}
           />
 
           {
