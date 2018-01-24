@@ -76,7 +76,14 @@ export default class ESVariantClause extends ESClause
 
   public mark(interpreter: ESInterpreter, valueInfo: ESValueInfo): void
   {
-    const valueType: string = ESJSONType[valueInfo.jsonType];
+    let valueType: string = ESJSONType[valueInfo.jsonType];
+    if (valueType === 'parameter')
+    {
+      if (valueInfo.parameterValue !== null && valueInfo.parameterValue.getValueInfo() !== null)
+      {
+        valueType = ESJSONType[valueInfo.parameterValue.getValueInfo().jsonType];
+      }
+    }
     const refinedValueType: string = this.refineType(valueType, valueInfo);
 
     // try with refined value type first

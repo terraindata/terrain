@@ -1,0 +1,13 @@
+{
+  "empty query" : {
+    "query": "{}",
+    "parameter": "{}"
+  },
+  "empty query" : {
+      "query": "{\"from\": @number}",
+      "expect": {
+            "from" : "@number"
+      },
+      "parameter": {"number":0}
+    }
+}
