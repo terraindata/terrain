@@ -104,7 +104,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
-  public renderArrayChildren() // TODO: arrays are awkward and involves awkward logic. Can this be better?
+  public renderArrayChildren()
   {
     const { field, canEdit, preview, keyPath, arrayKeyPath } = this.props;
     const keyPathBase = arrayKeyPath === undefined || arrayKeyPath === null ?
@@ -144,6 +144,13 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }
   }
 
+  /*
+   *  A couple possibilities:
+   *  - Node is an array node, nested node, or primitive node
+   *  - Node has an array parent or a nested parent
+   *  cartesian product of those possibilities
+   *  The logic to render all of these option is awkward and sphagetti, so big TODO: clean this up / make the code easier to follow
+   */
   public render()
   {
     const { field, keyPath, canEdit, preview, arrayKeyPath, arraySize } = this.props;

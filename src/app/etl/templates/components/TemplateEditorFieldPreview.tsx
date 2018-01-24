@@ -74,7 +74,7 @@ export interface Props extends TemplateEditorFieldProps
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
 }
-// !(this._isNested() || this._isArray())
+
 @Radium
 class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 {
