@@ -78,7 +78,7 @@ export default class ESValueInfo
    * When this value is the result of substituting in a parameter,
    * this is set to the name of that parameter.
    */
-  public parameter: undefined | string ;
+  public parameter: undefined | string;
   public parameterValue: ESJSONParser;
 
   /**
