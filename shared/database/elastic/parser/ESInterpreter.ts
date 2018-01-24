@@ -127,8 +127,11 @@ export default class ESInterpreter
             {
               this.accumulateError(info, 'Undefined parameter: ' + info.parameter);
             }
-
-            return false; // don't validate parameters
+            info.parameterValue = new ESJSONParser(JSON.stringify(value));
+            if (info.parameterValue.hasError())
+            {
+              this.accumulateError(info, 'Unable to parse parameter (' + info.parameter + ':' + JSON.stringify(value) + ')');
+            }
           }
 
           if (info.clause !== undefined)
