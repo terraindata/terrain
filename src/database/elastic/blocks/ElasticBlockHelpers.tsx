@@ -53,6 +53,7 @@ import { BuilderStore } from '../../../app/builder/data/BuilderStore';
 
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
+import { FieldType, FieldTypeMapping } from '../../../../shared/builder/FieldTypes';
 
 export const enum AutocompleteMatchType
 {
@@ -61,38 +62,6 @@ export const enum AutocompleteMatchType
   Field = 3,
   Transform = 4,
 }
-
-// TODO move this to a centralized, shared place, not back-end specific
-export const enum FieldType
-{
-  Numerical,
-  Text,
-  Date,
-  Geopoint,
-  Ip,
-  Any,
-}
-
-export const FieldTypeMapping =
-  {
-    [FieldType.Numerical]: ['long', 'double', 'short', 'byte', 'integer', 'half_float', 'float', 'boolean'],
-    [FieldType.Text]: ['text'],
-    [FieldType.Date]: ['date'],
-    [FieldType.Geopoint]: ['geo_point'],
-    [FieldType.Ip]: ['ip'],
-    [FieldType.Any]: ['text',
-      'long',
-      'boolean',
-      'date',
-      'array',
-      'double',
-      'short',
-      'byte',
-      'integer',
-      'half_float',
-      'float',
-      'geo_point'],
-  };
 
 export const TransformableTypes =
   [

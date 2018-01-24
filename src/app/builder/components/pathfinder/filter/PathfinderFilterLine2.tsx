@@ -62,7 +62,7 @@ import DatePickerWrapper from 'app/common/components/DatePickerWrapper';
 import Dropdown from 'app/common/components/Dropdown';
 import MapComponent, { units } from 'app/common/components/MapComponent';
 import Util from 'app/util/Util';
-import { FieldType } from '../../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { FieldType } from '../../../../../../shared/builder/FieldTypes';
 import { PathfinderLine, PathfinderPiece } from '../PathfinderLine';
 import { _DistanceValue, DistanceValue, FilterGroup, FilterLine, Path, PathfinderContext, Source } from '../PathfinderTypes';
 const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');

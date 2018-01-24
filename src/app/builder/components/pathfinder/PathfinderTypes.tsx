@@ -88,9 +88,8 @@ import BuilderStore from 'app/builder/data/BuilderStore';
 import Util from 'app/util/Util';
 import { AdvancedDropdownOption } from 'common/components/AdvancedDropdown';
 import { SchemaState } from 'schema/SchemaTypes';
-import ElasticBlockHelpers,
-{ AutocompleteMatchType, FieldType, FieldTypeMapping }
-  from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { FieldType, FieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
 import { BaseClass, New } from '../../../Classes';
 
 export enum PathfinderSteps
@@ -389,7 +388,6 @@ class SourceC extends BaseClass
   public dataSource: DataSource = _ElasticDataSource();
   public count: number | string = sourceCountOptions.get(0);
   public start: number = 0;
-  public expanded: boolean = true;
 }
 export type Source = SourceC & IRecord<SourceC>;
 export const _Source = (config?: { [key: string]: any }) =>

@@ -52,7 +52,7 @@ import { List, Map } from 'immutable';
 import * as _ from 'lodash';
 import ESJSONParser from '../../../../../shared/database/elastic/parser/ESJSONParser';
 import { isInput } from '../../../../blocks/types/Input';
-import { FieldType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import { FieldType } from '../../../../../shared/builder/FieldTypes';
 import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database/elastic/conversion/ParseElasticQuery';
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';

@@ -60,7 +60,6 @@ import AdvancedDropdown from 'app/common/components/AdvancedDropdown';
 import Autocomplete from 'app/common/components/Autocomplete';
 import Dropdown from 'app/common/components/Dropdown';
 import PathPicker from 'app/common/components/PathPicker';
-import Selector, { SelectionChoice } from 'app/common/components/Selector';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import
 {
@@ -173,11 +172,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   //             forceOpen={true}
   //             hasOther={true}
   //           />
-
-  private handleExpandSelector()
-  {
-    BuilderActions.changePath(this.props.keyPath.push('expanded'), !this.props.source.expanded);
-  }
 
   private handleSourceChange(index, key)
   {
