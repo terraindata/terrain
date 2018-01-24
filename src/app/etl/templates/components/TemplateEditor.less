@@ -13,9 +13,11 @@
     justify-content: center;
 
     .template-editor-column {
+      position: relative;
       display: flex;
       flex-direction: column;
-      padding: @spacing;
+      margin: @spacing;
+      align-items: stretch;
 
       &.settings-column {
         flex: 0 1 400px;
@@ -29,17 +31,40 @@
         flex: 0 1 400px;
       }
     }
+
+    .template-editor-settings-drawer {
+      position: absolute;
+      width: 100%;
+      bottom: 0px;
+    }
   }
-
-
 
   .template-editor-settings-wrapper {
     flex: 1;
-    padding: @half-spacing;
     height: 100%;
-    overflow-y: auto;
+
     &:focus {
       outline: none;
+    }
+
+    .template-editor-close-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: @half-spacing @spacing 0px @spacing;
+    }
+
+    .settings-drawer-close-line {
+      flex: 1;
+      height: 1px;
+      border-bottom: 1px solid;
+      border-color: inherit;
+      opacity: 0.2;
+    }
+
+    .settings-drawer-close-icon {
+      fill: currentColor;
+      transform: rotate(90deg);
     }
   }
 
@@ -69,8 +94,7 @@
 
   .template-editor {
     height: 100%;
-    padding: @spacing;
-    padding-right: @double-spacing;
+    position: relative;
     width: 100%;
     box-sizing: border-box;
     overflow-y: auto;
@@ -78,7 +102,9 @@
       outline: none;
     }
 
-    .template-editor-scrollable-area {
+    .template-editor-full-area {
+      padding: @spacing;
+      padding-right: @double-spacing;
     }
   }
 }

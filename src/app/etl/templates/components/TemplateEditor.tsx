@@ -48,7 +48,7 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { MultiModal } from 'common/components/overlay/MultiModal';
@@ -62,9 +62,11 @@ import
   _ElasticFieldSettings, _ExportTemplate, _TemplateField,
   ETLTemplate, TemplateEditorState, TemplateField,
 } from 'etl/templates/TemplateTypes';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import './TemplateEditor.less';
 
+import { SampleDocuments, treeFromDocument } from './TemporaryUtil';
+
+const CloseIcon = require('images/icon_carrot.svg');
 const { List } = Immutable;
 
 export interface Props
@@ -109,21 +111,29 @@ class ETLExportDisplay extends TerrainComponent<Props>
     const renderSettings = settingsKeyPath !== null &&
       settingsKeyPath !== undefined &&
       template.rootField.hasIn(settingsKeyPath);
-
     const field = renderSettings ? template.rootField.getIn(settingsKeyPath) : null;
+
     return (
-      <div className='template-editor-column settings-column'>
-        {
-          !renderSettings ? null :
-            <div style={getStyle('height', '43px')} />
-        }
+      <div className='template-editor-settings-drawer'>
         {
           !renderSettings ? null :
             <div
               className='template-editor-settings-wrapper'
-              style={backgroundColor(Colors().bg3)}
+              style={backgroundColor(Colors().bg2)}
               tabIndex={-1}
             >
+              <div
+                className='template-editor-close-row'
+                style={[borderColor(Colors().text3, Colors().text2), fontColor(Colors().text3, Colors().text2)]}
+                onClick={this.handleCloseDrawer}
+              >
+                <div className='settings-drawer-close-line' style={getStyle('marginRight', '12px')} />
+                <CloseIcon
+                  className='settings-drawer-close-icon'
+                  width='16px' height='16px'
+                />
+                <div className='settings-drawer-close-line' style={getStyle('marginLeft', '12px')} />
+              </div>
               <TemplateEditorFieldSettings
                 keyPath={settingsKeyPath}
                 field={field}
@@ -157,7 +167,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
           style={backgroundColor(Colors().bg3)}
           tabIndex={-1}
         >
-          <div className='template-editor-scrollable-area'>
+          <div className='template-editor-full-area'>
             <TemplateEditorFieldNode
               keyPath={List([])}
               field={template.rootField}
@@ -166,6 +176,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
             />
           </div>
         </div>
+        {this.renderSettingsSection()}
       </div>
     );
   }
@@ -186,7 +197,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
     return (
       <div className='template-editor-root-container'>
         <div className='template-editor-columns-area'>
-          {this.renderSettingsSection()}
+          {/*this.renderSettingsSection()*/}
           {this.renderEditorSection()}
           {this.renderDocumentsSection()}
         </div>
@@ -197,184 +208,14 @@ class ETLExportDisplay extends TerrainComponent<Props>
       </div>
     );
   }
-}
 
-const SampleDocuments = [
+  public handleCloseDrawer()
   {
-    'Product Name': 'Food',
-    'Product ID': 123,
-    'Product Description': 'You can eat this to survive! It can be tasty. Or gross. Some examples of food: Tacos, Burgers, Pasta',
-    'Meta': {
-      'Date Added': '01/08/2018',
-      'Views': 500,
-    },
-    'Related Products': [
-      {
-        'Item Name': 'Burger',
-        'Description': 'Meat on a bun',
-      },
-      {
-        'Item Name': 'Taco',
-        'Description': 'Toppings in a tortilla',
-      },
-      {
-        'Item Name': 'Pasta',
-        'Description': 'Carbs in a bowl',
-      },
-    ],
-  },
-  {
-    'Product Name': 'Cool stuff',
-    'Product ID': 5,
-    'Product Description': 'Not to be confused with boring things',
-    'Meta': {
-      'Date Added': '01/10/2018',
-      'Views': 515,
-    },
-    'Related Products': [
-      {
-        'Item Name': 'Video Games',
-        'Description': 'Just my opinion, man',
-      },
-      {
-        'Item Name': 'Fast cars',
-        'Description': 'Zoom Zoom!',
-      },
-      {
-        'Item Name': 'Friends',
-        'extra field': 'this is an extra field',
-      },
-    ],
-  },
-  {
-    'Product Name': 'Acronyms that start and end with P',
-    'Product ID': 666,
-    'Product Description': 'For some reason, these usually are annoying. e.g. PHP, PGP',
-    'Meta': {
-      'Date Added': '01/19/2018',
-      'Views': 50,
-    },
-    'Related Products': [
-
-    ],
-  },
-  {
-    'Product Name': 'This product does not conform',
-    'Product ID': 6,
-  },
-  // {
-  //   'Product Name': 'Scooter',
-  //   'Product ID': 10,
-  //   'Product Description': 'Do you like skateboards but want handlebars? Scooters are for you! Some are electric, others are not.',
-  //   'Meta': {
-  //     'Date Added': '01/18/2018',
-  //     'Views': 25,
-  //   },
-  //   'Here are some numbers': [
-  //     [1, 2, 3],
-  //     [3, 2, 1],
-  //     [1, 3, 2],
-  //     [2, 1, 3],
-  //   ],
-  // },
-];
-
-// temporary helper for debugging. delete this
-function treeFromDocument(document: object, name = '', fieldSettingsOverride?): TemplateField
-{
-  if (document === null)
-  {
-    return _TemplateField();
-  }
-
-  try
-  {
-    JSON.stringify(document);
-  }
-  catch (e)
-  {
-    return _TemplateField();
-  }
-
-  const children = [];
-
-  for (const key of Object.keys(document))
-  {
-    const value = document[key];
-
-    if (value !== Object(value))
-    {
-      if (typeof value === 'number')
-      {
-        children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.FLOAT }) }));
-      }
-      else if (typeof value === 'boolean')
-      {
-        children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.BOOLEAN }) }));
-      }
-      else // assume text
-      {
-        children.push(_TemplateField({ name: key, langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.TEXT }) }));
-      }
-    }
-    else if (Array.isArray(value))
-    {
-      let arrayVal: any = Array.isArray(value) && value.length > 0 ? value[0] : '';
-      const arrayType = [];
-
-      while (Array.isArray(arrayVal))
-      {
-        arrayType.push(ELASTIC_TYPES.ARRAY);
-        if (arrayVal.length > 0)
-        {
-          arrayVal = arrayVal[0];
-        }
-        else
-        {
-          arrayVal = '';
-        }
-      }
-      if (typeof arrayVal === 'object')
-      {
-        arrayType.push(ELASTIC_TYPES.NESTED);
-      }
-      else if (typeof arrayVal === 'number')
-      {
-        arrayType.push(ELASTIC_TYPES.FLOAT);
-      }
-      else if (typeof arrayVal === 'boolean')
-      {
-        arrayType.push(ELASTIC_TYPES.BOOLEAN);
-      }
-      else
-      {
-        arrayType.push(ELASTIC_TYPES.TEXT);
-      }
-      if (typeof arrayVal === 'object')
-      {
-        const override = _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) });
-        children.push(treeFromDocument(arrayVal, key, override));
-      }
-      else
-      {
-        children.push(_TemplateField(
-          {
-            name: key,
-            langSettings: _ElasticFieldSettings({ type: ELASTIC_TYPES.ARRAY, arrayType: List(arrayType) }),
-          }));
-      }
-    }
-    else // nested
-    {
-      children.push(treeFromDocument(value, key));
-    }
-  }
-  return _TemplateField(
-    {
-      name,
-      children: List(children),
-      langSettings: fieldSettingsOverride !== undefined ? fieldSettingsOverride : _ElasticFieldSettings({ type: ELASTIC_TYPES.NESTED }),
+    this.props.act({
+      actionType: 'setSettingsKeyPath',
+      keyPath: null,
     });
+  }
 }
 
 export default Util.createContainer(
