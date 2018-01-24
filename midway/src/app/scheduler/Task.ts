@@ -67,6 +67,14 @@ export const exprt: Export = new Export();
 export const imprt: Import = new Import();
 export const credentials: Credentials = new Credentials();
 
+export interface TaskConfig
+{
+  id: number;
+  name: string;
+  type: string;
+  task: Task;
+}
+
 export class Task
 {
 

@@ -44,13 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import { Task } from './Task';
-
-export const task: Task = new Task();
+import { Task, TaskConfig } from './Task';
 
 export class Job
 {
-  private tasks: Task[];
+  private tasks: TaskConfig[];
 /*
   Job (Jason)
   Each job is comprised of a series of tasks
@@ -84,20 +82,26 @@ export class Job
   {
     return new Promise<string>(async (resolve, reject) =>
     {
-      const task: Task = new Task(params);
-      this.tasks.push(task);
+      const taskConfig: TaskConfig =
+      {
+        id: params[0],
+        name: params[1],
+        type: params[2],
+        task: new Task(params.splice(3)),
+      };
+      this.tasks.push(taskConfig);
       resolve('success');
     });
   }
-  
+
   public async run(...params): Promise<any[]>
   {
     return new Promise<any[]>(async (resolve, reject) =>
     {
       let runParams: any[] = params;
-      this.tasks.forEach((task) =>
+      this.tasks.forEach((taskConfig) =>
       {
-        runParams = task.run.call(runParams);
+        runParams = taskConfig.task.run.call(runParams);
       });
       return resolve(runParams);
     });
