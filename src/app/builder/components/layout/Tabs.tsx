@@ -127,7 +127,7 @@ const Tab = createReactClass<any, any>({
         className='tabs-close'
         onClick={this.close}
       >
-        <CloseIcon className='close close-icon' />
+        <CloseIcon className='close-icon' />
       </div>
     );
   },
@@ -144,14 +144,15 @@ const Tab = createReactClass<any, any>({
         key={this.props.id}
         onClick={this.handleClick}
         style={{
-          backgroundColor: this.props.selected ? Colors().active : Colors().bg3,
           color: this.props.selected ? Colors().text.baseLight : Colors().text.secondaryLight,
           zIndex: this.zIndexStyle(),
         }}
       >
         <div
           className='tab-inner'
-          style={backgroundColor(this.props.selected ? Colors().bg2 : Colors().bg1)}
+          style={{
+            // color: this.props.selected ? Colors().font
+          }}
         >
           {
             this.props.name
@@ -394,7 +395,6 @@ class Tabs extends TerrainComponent<TabsProps> {
         >
           <div
             className='tabs-row'
-            style={backgroundColor(Colors().emptyBg)}
           >
             <div className='tabs-inner-wrapper'>
               <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />

@@ -458,19 +458,6 @@ class App extends TerrainComponent<Props>
         key='app'
         style={APP_STYLE}
       >
-        {
-          this.state.loggedInAndLoaded &&
-          <div
-            className='app-top-bar'
-            style={backgroundColor(Colors().bg2)}
-          >
-            <img
-              src={TerrainIcon}
-              className='app-top-bar-icon'
-            />
-            <AccountDropdown />
-          </div>
-        }
         <div
           className='app-wrapper'
         >

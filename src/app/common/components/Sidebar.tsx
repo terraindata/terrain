@@ -79,6 +79,21 @@ export interface Props
 }
 
 @Radium
+/*
+        {
+          this.state.loggedInAndLoaded &&
+          <div
+            className='app-top-bar'
+            style={backgroundColor(Colors().bg2)}
+          >
+            <img
+              src={TerrainIcon}
+              className='app-top-bar-icon'
+            />
+            <AccountDropdown />
+          </div>
+        }
+*/
 export class Sidebar extends TerrainComponent<Props>
 {
   public componentWillMount()
