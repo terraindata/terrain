@@ -69,7 +69,6 @@ window['PerfEnd'] = () => { Perf.stop(); setTimeout(() => Perf.printWasted(Perf.
 import { generateThemeStyles } from 'common/components/tooltip/Tooltips';
 import Login from './auth/components/Login';
 import LayoutManager from './builder/components/layout/LayoutManager';
-import AccountDropdown from './common/components/AccountDropdown';
 import InfoArea from './common/components/InfoArea';
 import Sidebar from './common/components/Sidebar';
 import TerrainComponent from './common/components/TerrainComponent';
@@ -101,7 +100,6 @@ import TerrainStore from './store/TerrainStore';
 import UserActions from './users/data/UserActions';
 
 // Icons
-const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
 const HomeIcon = require('./../images/icon_profile_16x16.svg?name=HomeIcon');
 const LibraryIcon = require('./../images/icon_library_20x16.svg?name=LibraryIcon');
 const BuilderIcon = require('./../images/icon_bldr-3.svg');
@@ -126,33 +124,33 @@ const links =
     // },
     {
       icon: <LibraryIcon />,
-      text: 'Manage',
+      text: 'MANAGE',
       route: '/library',
     },
     {
       icon: <BuilderIcon />,
-      text: 'Build',
+      text: 'BUILD',
       route: '/builder',
     },
     {
       icon: <SchemaIcon />,
-      text: 'Schema',
+      text: 'SCHEMA',
       route: '/schema',
     },
     {
       icon: <ImportIcon />,
-      text: 'Import',
+      text: 'IMPORT',
       route: '/import',
     },
     {
       icon: <ReportingIcon />,
-      text: 'Analytics',
+      text: 'ANALYTICS',
       route: '/analytics',
       enabled: TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS),
     },
     {
       icon: <ControlIcon />,
-      text: 'Control',
+      text: 'CONTROL',
       route: '/control',
     },
     // {
@@ -188,7 +186,7 @@ class App extends TerrainComponent<Props>
   public state = {
     selectedPage: 3,
     loggedIn: false,
-    sidebarExpanded: false,
+    sidebarExpanded: true,
     loggedInAndLoaded: false,
 
     schemaLoaded: false,
@@ -399,7 +397,7 @@ class App extends TerrainComponent<Props>
       );
     }
 
-    const sidebarWidth = this.state.sidebarExpanded ? 130 : 36;
+    const sidebarWidth = this.state.sidebarExpanded ? 150 : 36;
     const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0);
 
     const layout =

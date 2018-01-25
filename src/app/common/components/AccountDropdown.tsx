@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-empty-interface strict-boolean-expressions no-var-requires
 
 import * as $ from 'jquery';
+import * as classNames from 'classnames';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 import { Colors } from '../../colors/Colors';
@@ -72,6 +73,7 @@ export interface Props
 {
   colorsActions?: typeof ColorsActions;
   users?: UserTypes.UserState;
+  small?: boolean;
 }
 
 export interface State
@@ -154,7 +156,12 @@ class AccountDropdown extends TerrainComponent<Props>
     const { users } = this.props;
 
     return (
-      <div className='account-dropdown-content'>
+      <div
+        className={classNames({
+          'account-dropdown-content': true,
+          'account-dropdown-content-open-right': this.props.small,
+        })}
+      >
         <div className='account-dropdown-row' onMouseDown={this.editProfile}>
           <div className='account-dropdown-icon account-dropdown-icon-red'>
             <EditIcon />
@@ -211,14 +218,27 @@ class AccountDropdown extends TerrainComponent<Props>
   public renderTopBar()
   {
     const { users } = this.props;
+    const user = users.users.get(users.currentUser.id);
+    const src: string = UserTypes.profileUrlFor(user);
     return (
-      <div className='account-dropdown-top-bar' onClick={this.open} ref='accountDropdownButton'>
-        <UserThumbnail
-          showName={true}
-          userId={users.currentUser && users.currentUser.id}
-          hideAdmin={true}
+      <div
+        className={classNames({
+          'account-dropdown-top-bar': true,
+          'account-dropdown-top-bar-small': this.props.small,
+        })}
+        onClick={this.open}
+        ref='accountDropdownButton'
+      >
+        <div
+          className='account-dropdown-image'
+          style={{
+            backgroundImage: `url(${src})`,
+          }}
         />
-        <ArrowIcon className='account-arrow-icon' />
+        <div className='account-dropdown-name-wrapper'>
+          <div className='account-dropdown-name'>{user.name}</div>
+          <ArrowIcon className='account-arrow-icon' />
+        </div>
       </div>
     );
   }

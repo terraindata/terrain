@@ -140,7 +140,7 @@ const Tab = createReactClass<any, any>({
   {
     const style = _.extend({},
             fontColor(this.props.selected ? Colors().highlightFont : Colors().fontColor2),
-            backgroundColor(this.props.selected ? Colors().active : '')
+            // backgroundColor(this.props.selected ? Colors().active : '')
           );
     return this.renderPanel(
       <div
@@ -192,6 +192,9 @@ class Tabs extends TerrainComponent<TabsProps> {
   public state = {
     algorithms: LibraryStore.getState().algorithms,
     tabs: null,
+    selectorLeft: 0,
+    selectorHeight: 0,
+    selectorWidth: 0,
   };
   public cancel = null;
 
@@ -207,6 +210,26 @@ class Tabs extends TerrainComponent<TabsProps> {
       isMounted: true,
     });
     this.computeTabs(this.props.config);
+  }
+
+  public setSelectedPosition()
+  {
+    console.log(this.state.tabs);
+    if (this.state.tabs === null || this.state.tabs.length === 0)
+    {
+      return;
+    }
+    const selected = this.state.tabs.filter((tab) => tab.selected);
+    console.log(selected);
+    const key = selected.name;
+    console.log(this.refs);
+    const cr = this.refs[key]['getBoundingClientRect']();
+    const parentCr = this.refs['all-tabs']['getBoundingClientRect']();
+    this.setState({
+      selectorLeft: cr.left - parentCr.left,
+      selectorHeight: cr.height,
+      selectorWidth: cr.width,
+    });
   }
 
   public componentWillMount()
@@ -265,7 +288,7 @@ class Tabs extends TerrainComponent<TabsProps> {
 
     this.setState({
       tabs,
-    });
+    }, () => {this.setSelectedPosition()});
   }
 
   // shouldComponentUpdate(nextProps, nextState)
@@ -329,6 +352,7 @@ class Tabs extends TerrainComponent<TabsProps> {
             {
             title: action.tooltip,
             distance: 24,
+            key: index,
             }
             )
           )
@@ -401,6 +425,7 @@ class Tabs extends TerrainComponent<TabsProps> {
                 index={index}
                 onClick={this.handleClick}
                 onClose={this.handleClose}
+                ref={tab.name}
               />
             ,
           }))
@@ -417,7 +442,18 @@ class Tabs extends TerrainComponent<TabsProps> {
           <div
             className='tabs-row'
           >
-            <div className='tabs-inner-wrapper'>
+            <div
+              className='tabs-inner-wrapper'
+              ref={'all-tabs'}
+            >
+              <div
+                className='tabs-selected-marker'
+                style={{
+                  width: this.state.selectorWidth,
+                  height: this.state.selectorHeight,
+                  left: this.state.selectorLeft,
+                }}
+              />
               <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
             </div>
             {

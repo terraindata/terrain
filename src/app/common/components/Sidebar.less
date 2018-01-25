@@ -1,13 +1,15 @@
 @import "../Common.less";
 
 @sidebar-link-height: 36px;
-@sidebar-container-expanded-width: 130px;
+@sidebar-container-expanded-width: 150px;
 
 .sidebar-container {
   width: @sidebar-link-height;
   height: 100%;
   .transition;
-  overflow: hidden;
+ // overflow: hidden;
+  position: relative;
+  z-index: 10;
   
   .slide-right;
   .animation-delay(0.35s);
@@ -31,6 +33,17 @@
     }
   }
   
+  .sidebar-logo {
+    height: 18px;
+    width: 75%;
+    margin: 10px 0px 10px 16px;
+  }
+  .sidebar-logo-small {
+    height: 18px;
+    /* margin: auto; */
+    margin: 10px 3px;
+  }
+
   .sidebar-selected-square {
     height: @sidebar-link-height;
     width: 100%;
@@ -39,6 +52,10 @@
     top: 0px;
     
     .transition(~"all 600ms cubic-bezier(0.23, 1, 0.32, 1)");
+    &.sidebar-selected-square-hidden {
+      display: none;
+      .transition.no-transition;
+    }
   }
   
   .sidebar-link {
@@ -61,11 +78,16 @@
     }
     
     .sidebar-link-text {
-      .big-white-text;
-      display: inline-block;
-      position: relative;
-      top: -3px;
-      left: 10px;
+        font-weight: 500;
+        font-size: 12px;
+        display: inline-block;
+        position: relative;
+        top: -3px;
+        left: 10px;
+        letter-spacing: 0.5;
+      &.sidebar-link-text-hidden {
+        display: none;
+      }
     }
   }
   
