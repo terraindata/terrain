@@ -111,7 +111,6 @@
       position: relative;
       padding: 2px;
       border-radius: 10px;
-      color: gray;
       padding-left: 10px;
       
       .tabs-close {
@@ -137,10 +136,7 @@
       }
     }
     .tab-inner:hover {
-      background: #1eb4fa;
-      color: white;
       .tabs-close {
-        fill: #fff;
         opacity: 1;
       }
     }
@@ -160,11 +156,8 @@
   .tabs-tab-selected {
     z-index: 9999;
     .tab-inner {
-      background: #1eb4fa;
-      color: white;
       .transition;
       .tabs-close {
-        fill: #fff;
         opacity: 1;
       }
     }
@@ -192,29 +185,26 @@
       display: inline-block;
       padding: 4px 6px;
       margin-top: 6px;
-      margin-left: 6px;
       cursor: default;
-      border-radius: 3px;
+      border-radius: 6px;
+      letter-spacing: 1;
+      font-weight: 500;
       
       svg {
         .transition;
-        opacity: 0.75;
+        opacity: 0.5;
         width: 14px;
       }
       
-      .transition;
-      border: 1px solid;
-      
+      .transition;      
       opacity: 0.5;
       
       &.tabs-action-enabled {
         cursor: pointer;
         opacity: 1;
-        &:hover {
-          svg {
-            opacity: 0.9;
-          }
-        }
+      }
+      &.tabs-action-text {
+        margin-left: 6px;
       }
       .transition;
       

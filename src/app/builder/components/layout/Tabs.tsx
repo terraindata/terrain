@@ -49,6 +49,7 @@ THE SOFTWARE.
 import './Tabs.less';
 // import * as moment from 'moment';
 const moment = require('moment');
+import * as _ from 'lodash';
 import * as classNames from 'classnames';
 import createReactClass = require('create-react-class');
 import * as PropTypes from 'prop-types';
@@ -61,8 +62,8 @@ import PanelMixin from '../layout/PanelMixin';
 import { ColorsActions } from './../../../colors/data/ColorsRedux';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { LibraryStore } from './../../../library/data/LibraryStore';
-
-import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
+import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -127,13 +128,20 @@ const Tab = createReactClass<any, any>({
         className='tabs-close'
         onClick={this.close}
       >
-        <CloseIcon className='close-icon' />
+        <CloseIcon
+          className='close-icon'
+          style={getStyle('fill', this.props.selected ? Colors().highlightFont : Colors().iconColor)}
+        />
       </div>
     );
   },
 
   render()
   {
+    const style = _.extend({},
+            fontColor(this.props.selected ? Colors().highlightFont : Colors().fontColor2),
+            backgroundColor(this.props.selected ? Colors().active : '')
+          );
     return this.renderPanel(
       <div
         className={classNames({
@@ -144,15 +152,12 @@ const Tab = createReactClass<any, any>({
         key={this.props.id}
         onClick={this.handleClick}
         style={{
-          color: this.props.selected ? Colors().text.baseLight : Colors().text.secondaryLight,
           zIndex: this.zIndexStyle(),
         }}
       >
         <div
           className='tab-inner'
-          style={{
-            // color: this.props.selected ? Colors().font
-          }}
+          style={style}
         >
           {
             this.props.name
@@ -168,7 +173,8 @@ const Tab = createReactClass<any, any>({
 
 export interface TabAction
 {
-  text: string;
+  text?: string;
+  tooltip?: string;
   icon: any;
   enabled?: boolean;
   onClick();
@@ -285,14 +291,18 @@ class Tabs extends TerrainComponent<TabsProps> {
       <div className='tabs-actions'>
         {
           this.props.actions.map((action, index) =>
+            tooltip(
             <a
               className={classNames({
                 'tabs-action': true,
+                'tabs-action-text': action.text !== undefined && action.text !== '',
                 'tabs-action-enabled': action.enabled || action.enabled === undefined,
               })}
               key={index}
               onClick={action.onClick}
-              style={action.enabled ? backgroundColor(Colors().bg3) : undefined}
+              style={
+                 action.text ? backgroundColor(action.enabled ? Colors().highlightFont : Colors().blockBg) : undefined
+              }
             >
               {
                 action.icon &&
@@ -302,15 +312,26 @@ class Tabs extends TerrainComponent<TabsProps> {
                   }
                 </div>
               }
-              <div
-                className='tabs-action-piece'
-                style={fontColor(Colors().text1)}
-              >
-                {
-                  action.text
-                }
-              </div>
-            </a>)
+              {
+                action.text &&
+                <div
+                  className='tabs-action-piece'
+                  style={_.extend({},
+                    fontColor(action.enabled ? Colors().active : Colors().fontColor)
+                  )}
+                >
+                  {
+                    action.text
+                  }
+                </div>
+              }
+            </a>,
+            {
+            title: action.tooltip,
+            distance: 24,
+            }
+            )
+          )
         }
       </div>
     );

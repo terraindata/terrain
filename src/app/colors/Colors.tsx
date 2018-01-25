@@ -56,20 +56,21 @@ interface Theme
   fontColor: string;
   fontColor2: string; // less contrast
   fontColorLightest: string;
-  
+  highlightFont: string; // Font color for when something is highlighted (in blue usually)
   blockBg: string; // e.g., in Pathfinder, behind block elements
   
   sidebarBg: string;
 }
 
-const NewTheme: Theme = 
+const NewTheme: Theme =
 {
   fontColor: '#221E1F',
   fontColor2: '#606262',
   fontColorLightest: '#CECECE',
-  
+  highlightFont: '#FFFFFF',
+
   blockBg: '#F8F8F8',
-  
+
   sidebarBg: '#fff',
 }
 
