@@ -80,7 +80,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   public state: {
     expandableViewOpen: boolean;
   } = {
-      expandableViewOpen: true,
+      expandableViewOpen: false,
     };
 
   public renderChildFields(preview = this.props.preview)
@@ -117,26 +117,33 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }
     else if (this._isArray())
     {
-      children = (
+      return (
         <TemplateEditorFieldArrayNode
           depth={0}
           renderNestedFields={this.renderChildFields}
           {...this._passProps() }
         />
       );
-      content = (
-        <TemplateEditorFieldPreview
-          showPreviewValue={false}
-          {...this._passProps() }
-        />
-      );
+      // children = (
+      //   <TemplateEditorFieldArrayNode
+      //     depth={0}
+      //     renderNestedFields={this.renderChildFields}
+      //     {...this._passProps() }
+      //   />
+      // );
+      // content = (
+      //   <TemplateEditorFieldPreview
+      //     hidePreviewValue={true}
+      //     {...this._passProps() }
+      //   />
+      // );
     }
     else if (this._isNested())
     {
       children = this.renderChildFields();
       content = (
         <TemplateEditorFieldPreview
-          showPreviewValue={false}
+          hidePreviewValue={true}
           {...this._passProps() }
         />
       );
@@ -145,7 +152,6 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     {
       content = (
         <TemplateEditorFieldPreview
-          showPreviewValue={true}
           {...this._passProps() }
         />
       );

@@ -67,9 +67,10 @@ import './TemplateEditorField.less';
 
 export interface Props extends TemplateEditorFieldProps
 {
-  showPreviewValue: boolean;
+  hidePreviewValue?: boolean;
   notInteractable?: boolean;
   labelOverride?: string;
+  displayValueOverride?: any;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
@@ -81,14 +82,20 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 
   public render()
   {
-    const { canEdit, field, keyPath, preview, showPreviewValue, labelOverride, notInteractable } = this.props;
+    const { canEdit, field, keyPath, preview, hidePreviewValue, labelOverride, notInteractable, displayValueOverride } = this.props;
     // const fieldNotInteractable = labelOverride !== undefined && labelOverride !== null;
     const settingsOpen = this.props.templateEditor.settingsKeyPath === keyPath;
     const labelStyle = settingsOpen ?
       _.extend({}, fontColor(Colors().text1, Colors().text1), backgroundColor(Colors().highlight))
       :
       fontColor(Colors().text3, notInteractable ? Colors().text3 : Colors().text2);
-    const previewText = preview === undefined || preview === null ? 'Data Missing' : preview.toString();
+    // const previewText = preview === undefined || preview === null ? 'Data Missing' : preview.toString();
+
+    const previewContent = (displayValueOverride === undefined || displayValueOverride === null) ?
+      (preview === undefined || preview === null ? 'Data Missing' : preview.toString())
+      :
+      displayValueOverride;
+
     return (
       <div className='template-editor-field-block'>
         <div className='field-preview-row'>
@@ -103,14 +110,14 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
             </div>
           </div>
           {
-            showPreviewValue === true &&
+            !hidePreviewValue &&
             <div
               className={classNames({
                 'field-preview-value': true,
                 'field-preview-value-settings-open': settingsOpen,
               })}
             >
-              {previewText}
+              {previewContent}
             </div>
           }
         </div>

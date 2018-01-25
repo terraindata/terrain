@@ -64,6 +64,7 @@ import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorF
 import './TemplateEditorField.less';
 import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 
+import ArrayPreview from './preview/ArrayPreview';
 const AddIcon = require('images/icon_add.svg');
 
 export interface Props extends TemplateEditorFieldProps
@@ -107,25 +108,31 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
           label={`${index + 1} of ${previewList.size}`}
         />
       );
-    },
-    ).toList();
+    }).toList();
   }
 
   public render()
   {
     const { field, keyPath, canEdit, preview, depth, label } = this.props;
-    const content = null;
+    let content = null;
     let children = null;
+    let override = null;
+    const simpleArrayDisplay: boolean = !this._isNested() && depth + 1 === this._arrayDepth();
+
     if (depth === this._arrayDepth())
     {
       if (this._isNested())
       {
         children = this.props.renderNestedFields(preview);
       }
-      else
-      {
-        children = <div className='editor-array-leaf-item'> {preview} </div>;
-      }
+    }
+    else if (simpleArrayDisplay)
+    {
+      override = (
+        <div className='editor-array-item'>
+          <ArrayPreview items={preview} style={fontColor(Colors().text2)} />
+        </div>
+      );
     }
     else
     {
@@ -136,12 +143,37 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
       );
     }
 
-    const childrenComponent = children !== null ?
+    const childrenComponent = (children !== null || override !== null) ?
       <div className='editor-array-children'>
         {depth !== 0 ? <div className='editor-array-seperator'> {label} </div > : null}
-        {children}
+        {simpleArrayDisplay ? override : children}
       </div> : null;
-    return childrenComponent;
+
+    if (depth === 0)
+    {
+      content = (
+        <TemplateEditorFieldPreview
+          hidePreviewValue={!simpleArrayDisplay}
+          displayValueOverride={override}
+          {...this._passProps() }
+        />
+      );
+      const childrenStyle = (canEdit === true && field.isIncluded === false) ?
+        getStyle('opacity', '0.7') : {};
+      return (
+        <ExpandableView
+          content={content}
+          open={this.state.expandableViewOpen}
+          onToggle={this.handleExpandArrowClicked}
+          children={simpleArrayDisplay ? null : childrenComponent}
+          style={childrenStyle}
+        />
+      );
+    }
+    else
+    {
+      return childrenComponent;
+    }
   }
 
   public handleExpandArrowClicked()
