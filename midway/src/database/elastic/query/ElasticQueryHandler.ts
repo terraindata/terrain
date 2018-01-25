@@ -299,7 +299,10 @@ export default class ElasticQueryHandler extends QueryHandler
                 return reject(response.error);
               }
 
-              hits[i + j][subQuery] = response.responses[j].hits.hits;
+              if (response.responses[j].hits !== undefined)
+              {
+                hits[i + j][subQuery] = response.responses[j].hits.hits;
+              }
             }
             resolve();
           });

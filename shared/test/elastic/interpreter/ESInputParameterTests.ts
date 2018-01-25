@@ -43,26 +43,61 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import UserActionTypes from 'users/data/UserActionTypes';
-import ActionTypes from './AuthActionTypes';
 
-const $ = (type: string, payload: any) =>
+import * as fs from 'fs';
+import ESInterpreter from 'shared/database/elastic/parser/ESInterpreter';
+import * as winston from 'winston';
+import ESJSONParser from '../../../database/elastic/parser/ESJSONParser';
+import { makePromiseCallback } from '../../Utils';
+
+import * as Immutable from 'immutable';
+import ESParserError from 'shared/database/elastic/parser/ESParserError';
+
+function getExpectedFile(): string
 {
-  return { type, payload };
-};
+  return __filename.split('.')[0] + '.expected';
+}
 
-const AuthActions =
+let expected;
+
+beforeAll(async (done) =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+
+  const contents: any = await new Promise((resolve, reject) =>
   {
-    login:
-      (accessToken: string, id: number) => (dispatch) =>
-      {
-        dispatch($(ActionTypes.login, { accessToken, id }));
-        dispatch($(UserActionTypes.updateCurrentUser, { id }));
-      },
+    fs.readFile(getExpectedFile(), makePromiseCallback(resolve, reject));
+  });
+  expected = JSON.parse(contents);
+  done();
+});
 
-    logout:
-      () =>
-        $(ActionTypes.logout, {}),
-  };
+function testCardParseWithInputParameter(testName: string,
+  testString: string,
+  expectedValue: any,
+  inputParameter: any,
+  expectedErrors: ESParserError[] = [])
+{
+  winston.info('testing "' + testName + '": "' + testString + '"' + '": "' + JSON.stringify(inputParameter) + '"');
+  const emptyCards = Immutable.List([]);
+  const parameters = { number: 10 };
+  const interpreter: ESInterpreter = new ESInterpreter(testString, parameters);
+  const parser: ESJSONParser = interpreter.parser as ESJSONParser;
+  const rootValueInfo = parser.getValueInfo();
+  expect(rootValueInfo.value).toEqual(expectedValue);
+  expect(interpreter.errors).toEqual(expectedErrors);
+}
 
-export default AuthActions;
+test('parse card', () =>
+{
+  Object.getOwnPropertyNames(expected).forEach(
+    (testName: string) =>
+    {
+      const testValue: any = expected[testName];
+      const testString = testValue['query'];
+      const inputParameter = testValue['parameter'];
+      const expectedValue = testValue['expect'];
+      testCardParseWithInputParameter('test', testString, expectedValue, inputParameter);
+    });
+});
