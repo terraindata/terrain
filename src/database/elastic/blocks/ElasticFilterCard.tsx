@@ -359,7 +359,7 @@ export class FilterUtils
         field = Object.keys(obj['range'])[0];
         const filterOps = Object.keys(obj['range'][field]);
         filterOp = filterOps[0];
-        value = obj['range'][field][filterOp];
+        value = String(obj['range'][field][filterOp]);
         if (filterOps.length > 1)
         {
           delete obj['range'][field][filterOp];
@@ -372,13 +372,13 @@ export class FilterUtils
       {
         field = Object.keys(obj['term'])[0];
         filterOp = '=';
-        value = obj['term'][field];
+        value = String(obj['term'][field]);
       }
       else if (obj['match'] !== undefined)
       {
         field = Object.keys(obj['match'])[0];
         filterOp = '≈';
-        value = obj['match'][field];
+        value = String(obj['match'][field]);
       }
 
       if (field !== undefined)
@@ -403,7 +403,9 @@ export class FilterUtils
     let queryCard;
     // detect the type of the value string
     let valueType = ':string';
-    const valueParser = new ESJSONParser(String(block['value']));
+    const valueString = String(block['value']);
+    const valueParser = new ESJSONParser(valueString);
+
     if (valueParser.hasError() === false)
     {
       if (typeof valueParser.getValue() === 'number')
@@ -420,7 +422,7 @@ export class FilterUtils
         {
           template: {
             'term:term_query': {
-              [templateField]: block['value'],
+              [templateField]: valueString,
             },
           },
         });
@@ -432,7 +434,7 @@ export class FilterUtils
         {
           template: {
             'match:match': {
-              [templateField]: block['value'],
+              [templateField]: valueString,
             },
           },
         });
@@ -448,7 +450,7 @@ export class FilterUtils
           template: {
             'range:range_query': {
               [rangeField]: {
-                [rangeOp]: block['value'],
+                [rangeOp]: valueString,
               },
             },
           },
