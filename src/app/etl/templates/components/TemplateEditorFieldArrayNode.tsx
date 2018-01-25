@@ -43,122 +43,116 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+
+// tslint:disable:no-var-requires
 import * as classNames from 'classnames';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
+import ExpandableView from 'common/components/ExpandableView';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
+import { TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
+import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
+import './TemplateEditorField.less';
+import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 
-/*
- *  This class defines a base class with useful functions that are used by components
- *  that handle UI for template editor fields. This abstract "component" is sort of an object-oriented representation
- *  of a template editor field.
- */
+const AddIcon = require('images/icon_add.svg');
 
-export interface TemplateEditorFieldProps
+export interface Props extends TemplateEditorFieldProps
 {
-  keyPath: KeyPath;
-  field: TemplateField;
-  canEdit: boolean;
-  preview: any;
+  depth: number;
+  renderNestedFields?: (preview) => any;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
 }
 
-export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TerrainComponent<Props>
+@Radium
+class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
 {
-  constructor(props)
+  public state: {
+    expandableViewOpen: boolean;
+  } = {
+      expandableViewOpen: true,
+    };
+
+  public renderArrayChildren()
   {
-    super(props);
+    const { field, canEdit, preview, keyPath, depth } = this.props;
+    return List(preview).map((value, index) =>
+    {
+      return (
+        <TemplateEditorFieldArrayNode
+          keyPath={keyPath}
+          field={field}
+          canEdit={canEdit}
+          key={index}
+          renderNestedFields={this.props.renderNestedFields}
+          preview={value}
+          depth={depth + 1}
+        />
+      );
+    },
+    );
   }
 
-  protected _passProps(): TemplateEditorFieldProps
+  public render()
   {
-    return _.pick(this.props, ['keyPath', 'field', 'canEdit', 'preview']);
+    const { field, keyPath, canEdit, preview, depth } = this.props;
+    const content = null;
+    let children = null;
+    if (depth === this._arrayDepth())
+    {
+      if (this._isNested())
+      {
+        children = this.props.renderNestedFields(preview);
+      }
+      else
+      {
+        children = <div> {preview} </div>;
+      }
+    }
+    else
+    {
+      children = this.renderArrayChildren();
+    }
+
+    const childrenComponent = children !== null ?
+      <div className='template-editor-children-container'>
+        {children}
+      </div> : null;
+    return depth === 0 ? childrenComponent :
+      (
+        <ExpandableView
+          content={content}
+          open={this.state.expandableViewOpen}
+          onToggle={this.handleExpandArrowClicked}
+          children={childrenComponent}
+        />
+      );
   }
 
-  // Helper to calling setIn() on the TemplateField in the store.
-  protected _set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
+  public handleExpandArrowClicked()
   {
-    const { act, keyPath } = this.props;
-    act({
-      actionType: 'updateField',
-      sourcePath: keyPath,
-      key,
-      value,
+    this.setState({
+      expandableViewOpen: !this.state.expandableViewOpen,
     });
   }
 
-  protected _deleteSelf()
-  {
-    const { act, keyPath } = this.props;
-    act({
-      actionType: 'deleteField',
-      sourcePath: keyPath,
-    });
-  }
-
-  protected _clearChildren()
-  {
-    const { act, keyPath } = this.props;
-    act({
-      actionType: 'updateField',
-      sourcePath: keyPath,
-      key: 'children',
-      value: List([]),
-    });
-  }
-
-  // returns true if the field's type is nested or if the field's arrayType ends with nested
-  protected _isNested(): boolean
-  {
-    const { type, arrayType } = this.props.field.langSettings;
-    return type === ELASTIC_TYPES.NESTED ||
-      (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
-  }
-
-  // returns how deep the array type is. For example, if the field's type is array of array of text, then the depth is 2.
-  protected _arrayDepth(): number
-  {
-    const { arrayType } = this.props.field.langSettings;
-    return this._isArray() ? arrayType.size : 0;
-  }
-
-  // returns true if the field's type is an array
-  protected _isArray(): boolean
-  {
-    const type = this.props.field.langSettings.type;
-    return type === ELASTIC_TYPES.ARRAY;
-  }
-
-  protected _isExport(): boolean
-  {
-    return this.props.templateEditor.template !== undefined &&
-      this.props.templateEditor.template.type === TEMPLATE_TYPES.EXPORT;
-  }
-
-  protected _isRoot(): boolean
-  {
-    return this.props.keyPath.size === 0;
-  }
-
-  protected _inputDisabled(): boolean
-  {
-    return !this.props.field.isIncluded || !this.props.canEdit;
-  }
-
-  // Returns the given function if input is not disabled. Otherwise returns undefined.
-  protected _noopIfDisabled<F>(fn: F): F | undefined
-  {
-    return this._inputDisabled() ? undefined : fn;
-  }
 }
+
+const TemplateEditorFieldArrayNode = Util.createTypedContainer(
+  TemplateEditorFieldArrayNodeC,
+  ['templateEditor'],
+  { act: TemplateEditorActions },
+);
+
+export default TemplateEditorFieldArrayNode;

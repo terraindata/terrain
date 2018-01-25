@@ -62,6 +62,7 @@ import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/template
 import { TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
+import TemplateEditorFieldArrayNode from './TemplateEditorFieldArrayNode';
 import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 
 const AddIcon = require('images/icon_add.svg');
@@ -84,10 +85,9 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       expandableViewOpen: true,
     };
 
-  public renderChildFields()
+  public renderChildFields(preview = this.props.preview)
   {
-    const { field, keyPath, canEdit, preview } = this.props;
-
+    const { field, keyPath, canEdit } = this.props;
     return field.children.map((value, index) =>
     {
       const newKeyPath = keyPath.push('children', index);
@@ -104,59 +104,11 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
-  public renderArrayChildren()
-  {
-    const { field, canEdit, preview, keyPath, arrayKeyPath } = this.props;
-    const keyPathBase = arrayKeyPath === undefined || arrayKeyPath === null ?
-      List([]) : arrayKeyPath;
-
-    if (Array.isArray(preview) && preview.length > 0)
-    {
-      return List(preview).map((value, index) =>
-      {
-        const newArrayKeyPath = keyPathBase.push(index);
-        return (
-          <TemplateEditorFieldNode
-            keyPath={keyPath}
-            field={field}
-            canEdit={canEdit}
-            key={index}
-            preview={value}
-            arrayKeyPath={newArrayKeyPath}
-            arraySize={preview.length}
-          />
-        );
-      }).toList();
-    }
-    else
-    {
-      const newArrayKeyPath = keyPathBase.push(-1);
-      return List([
-        <TemplateEditorFieldNode
-          keyPath={keyPath}
-          field={field}
-          canEdit={canEdit}
-          key={-1}
-          preview={null}
-          arrayKeyPath={newArrayKeyPath}
-        />,
-      ]);
-    }
-  }
-
-  /*
-   *  A couple possibilities:
-   *  - Node is an array node, nested node, or primitive node
-   *  - Node has an array parent or a nested parent
-   *  cartesian product of those possibilities
-   *  The logic to render all of these option is awkward and sphagetti, so big TODO: clean this up / make the code easier to follow
-   */
   public render()
   {
-    const { field, keyPath, canEdit, preview, arrayKeyPath, arraySize } = this.props;
+    const { field, keyPath, canEdit, preview } = this.props;
     let children = null;
     let content = null;
-
     if (this._isRoot())
     {
       return (
@@ -167,28 +119,19 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }
     else if (this._isArray())
     {
-      const hasArrayKeyPath = arrayKeyPath !== undefined && arrayKeyPath !== null;
-      const isLeaf = hasArrayKeyPath &&
-        arrayKeyPath.size >= this._arrayDepth();
-      let labelOverride = null;
-      let notInteractable = false;
-      if (hasArrayKeyPath && arrayKeyPath.size > 0)
-      {
-        notInteractable = true;
-        labelOverride = arrayKeyPath.last() === -1 ? 'No Preview Available' : `${arrayKeyPath.last() + 1} of ${arraySize}`;
-      }
-
-      children = isLeaf ? (this._isNested() ? this.renderChildFields() : null) : this.renderArrayChildren();
-
-      content = (
-        <TemplateEditorFieldPreview
-          showPreviewValue={!this._isNested() && isLeaf}
-          notInteractable={notInteractable}
-          labelOverride={labelOverride}
+      children = (
+        <TemplateEditorFieldArrayNode
+          depth={0}
+          renderNestedFields={this.renderChildFields}
           {...this._passProps() }
         />
       );
-
+      content = (
+        <TemplateEditorFieldPreview
+          showPreviewValue={false}
+          {...this._passProps() }
+        />
+      );
     }
     else if (this._isNested())
     {
@@ -209,11 +152,10 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
         />
       );
     }
-    const childrenComponent = children !== null ?
+    const childrenComponent = children === null ? null :
       <div className='template-editor-children-container'>
         {children}
-      </div> : null;
-
+      </div>;
     const childrenStyle = (canEdit === true && field.isIncluded === false) ?
       getStyle('opacity', '0.7') : {};
     return (
