@@ -44,18 +44,16 @@ THE SOFTWARE.
 
 // Production build configuration for webpack.
 
-const webpack = require("webpack");
+const webpack = require('webpack');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-const conf = require("./webpack.config");
+const conf = require('./webpack.config');
 
 conf.plugins[0] =
   new webpack.DefinePlugin({
-    "process.env": {
-//    "NODE_ENV": JSON.stringify('production'),
-      "BABEL_ENV": JSON.stringify('production'),
-    },
-    DEV: "false",
-    MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || "localhost:3000") + "'",
+    'process.env.NODE_ENV': JSON.stringify('production'),
+    'process.env.BABEL_ENV': JSON.stringify('production'),
+    DEV: JSON.stringify(false),
+    MIDWAY_HOST: JSON.stringify('http://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
   });
 
 conf.plugins[1] =

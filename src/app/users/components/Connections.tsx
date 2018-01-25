@@ -63,7 +63,7 @@ import InfoArea from '../../common/components/InfoArea';
 import Modal from '../../common/components/Modal';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Ajax from '../../util/Ajax';
-import UserActions from '../data/UserActions';
+import { UserActions } from '../data/UserRedux';
 import * as UserTypes from '../UserTypes';
 
 const CloseIcon = require('../../../images/icon_close_8x8.svg');
@@ -354,7 +354,6 @@ class Connections extends TerrainComponent<Props>
     });
 
     const type = this.ConnectionTypes.get(index);
-    this.props.userActions.changeType(type);
   }
 
   public renderAddConnection()

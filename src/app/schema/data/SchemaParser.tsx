@@ -116,7 +116,7 @@ export function parseElasticDb(elasticServer: object,
 )
 {
   const isAnalytics = elasticServer['isAnalytics'] !== undefined &&
-    elasticServer['isAnalytics'] === 1;
+    elasticServer['isAnalytics'] === true;
 
   let server = SchemaTypes._Server({
     name: elasticServer['name'],

@@ -53,7 +53,7 @@ import * as React from 'react';
 import Util from 'util/Util';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Ajax from '../../util/Ajax';
-import Actions from '../data/AuthActions';
+import { AuthActions as Actions } from '../data/AuthRedux';
 import Loading from './../../common/components/Loading';
 import Modal from './../../common/components/Modal';
 import './Login.less';
@@ -195,7 +195,11 @@ class Login extends TerrainComponent<Props>
 
         (userData: { accessToken: string, id: number }) =>
         {
-          this.props.authActions.login(userData.accessToken, userData.id);
+          this.props.authActions({
+            actionType: 'login',
+            accessToken: userData.accessToken,
+            id: userData.id,
+          });
         },
 
         (ev: Event) =>

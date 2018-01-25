@@ -102,6 +102,12 @@ General coding standards for Javascript are located in the TechDocs repo, not in
 
 Whenever new packages are installed by other devs / on other branches, run `yarn add` to get the new package locally.
 
+### Migrations
+
+1. You may want to run `cp -R postgres-data pg-backup` to create a backup of your Midway data
+2. Run the scripts in `/midway/migrations` (you only need to run each script once, ever, and only if
+   you had Midway running before the script was created)
+
 ### Auto Styling
 
 To apply the auto styling / formatting, use `yarn run fix` - a combination of `yarn run style` and `yarn run lint`
@@ -307,8 +313,41 @@ test('GET /midway/v1/schema', (t) =>
 
 ### Front-end
 
-We do not yet have any front-end tests written.
+We are using Jest for front-end unit testing.
 
+#### How do I run front-end tests?
+
+To run all front-end tests, use:
+
+`yarn test-front`
+
+If you want to run an individual unit test, you can use:
+`./node_modules/.bin/jest <path/to/your/test/file>`
+
+#### Where are the test files?
+
+You can find them at `src/test`. It mirrors the structure of `src/app`.
+
+#### Writing your first test
+
+When you add a new feature in the front-end, you will have to test every new component, action creator and reducer. For examples of how to test each of these you can take a look at `src/test/analytics/`
+
+* In Component tests, you will be asserting on the component structure -make sure it renders the correct children in all variantions of component state and props- and also on the component interactions -event handlers and react lifecycle methods-
+* In redux action creator tests, you will be asserting that it dispatches all the actions that it is supposed to, to the redux store .
+* In redux reducer tests, you will be asserting that the state change is the expected.
+
+#### Test helpers
+
+In `src/test/test-helpers` you can find helper classes and functions that you can use to aid the creation of fake environments to isolate your unit tests and prevent duplicated code.
+
+#### Techonologies
+
+We combine [Jest](https://facebook.github.io/jest/) along with [Enzyme](http://airbnb.io/enzyme/) to fake the component render in unit tests.
+
+## Running in Production
+
+1. `yarn run build-prod` generates production `bundle.js` into `/midway/src/assets/bundle.js`
+1. Run midway with `NODE_ENV=production`
 
 ## Useful Tutorials and Articles
 

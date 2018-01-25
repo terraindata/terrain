@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands interface-name
 
 import * as classNames from 'classnames';
+import AccountDropdown from 'common/components/AccountDropdown';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -56,7 +57,6 @@ import { ColorsActions } from '../../colors/data/ColorsRedux';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import Util from '../../util/Util';
 import './Sidebar.less';
-import AccountDropdown from 'common/components/AccountDropdown';
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less
@@ -101,7 +101,7 @@ export interface Props
 export class Sidebar extends TerrainComponent<Props>
 {
   public state: {
-    linkOffset: number
+    linkOffset: number,
   } =
   {
     linkOffset: 0,
@@ -131,7 +131,7 @@ export class Sidebar extends TerrainComponent<Props>
     });
     this.setState({
       linkOffset: this.props.expanded ? linkOffsetExpanded : linkOffsetCollapsed,
-    })
+    });
   }
 
   public componentWillReceiveProps(nextProps)
@@ -140,7 +140,7 @@ export class Sidebar extends TerrainComponent<Props>
     {
       this.setState({
         linkOffset: nextProps.expanded ? linkOffsetExpanded : linkOffsetCollapsed,
-      })
+      });
     }
   }
 
@@ -161,7 +161,7 @@ export class Sidebar extends TerrainComponent<Props>
           'sidebar-container': true,
           'sidebar-container-expanded': this.props.expanded,
         })}
-        style={backgroundColor(Colors().highlightFont)}
+        style={backgroundColor(Colors().sidebarBg)}
       >
        {
          this.props.expanded ?
@@ -178,7 +178,7 @@ export class Sidebar extends TerrainComponent<Props>
         <div
           className={classNames({
             'sidebar-selected-square': true,
-            'sidebar-selected-square-hidden': this.props.selectedIndex === -1
+            'sidebar-selected-square-hidden': this.props.selectedIndex === -1,
           })}
           style={{
             top: (this.props.selectedIndex * linkHeight + this.state.linkOffset) + 'px',
@@ -218,7 +218,7 @@ export class Sidebar extends TerrainComponent<Props>
                   <div
                     className={classNames({
                       'sidebar-link-text': true,
-                      'sidebar-link-text-hidden': !this.props.expanded
+                      'sidebar-link-text-hidden': !this.props.expanded,
                     })}
                     style={fontColor(Colors().text1)}
                   >

@@ -82,6 +82,7 @@ export interface Props
   vertical?: boolean;
   openRight?: boolean; // menu will open to the right
   title?: string;
+  expanded?: boolean; // Force the menu to be expanded
 }
 
 @Radium
@@ -90,8 +91,8 @@ class Menu extends TerrainComponent<Props>
   public state: {
     open: boolean;
   } = {
-      open: false,
-    };
+    open: false,
+  };
 
   public renderOption(option, index)
   {
@@ -159,6 +160,19 @@ class Menu extends TerrainComponent<Props>
       selector: '.menu-wrapper .menu-icon .st0',
       style: { fill: Colors().text3 },
     });
+    this.setState({
+      open: this.props.expanded,
+    })
+  }
+
+  public componentWillReceiveProps(nextProps)
+  {
+    if (this.state.open !== nextProps.expanded)
+    {
+      this.setState({
+        open: nextProps.expanded,
+      })
+    }
   }
 
   public componentWillUnmount()

@@ -71,6 +71,7 @@ import TransportScheduler from './TransportScheduler';
 import './TemplateControlList.less';
 
 const DeleteIcon = require('images/icon_close.svg');
+const RunIcon = require('images/icon_expand_12x12.svg');
 
 type Template = FileImportTypes.Template;
 
@@ -87,6 +88,7 @@ enum ConfirmActionType
   DELETE,
   DEACTIVATE, // TODO
   ACTIVATE, // TODO
+  RUNONDEMAND,
 }
 
 class ScheduleControlList extends TerrainComponent<Props>
@@ -138,6 +140,11 @@ class ScheduleControlList extends TerrainComponent<Props>
         onClick: () => this.requestDeleteSchedule(schedule, index),
         icon: <DeleteIcon className='schedule-menu-option-icon' />,
       },
+      {
+        text: 'Run Now',
+        onClick: () => this.requestRunScheduleOnDemand(schedule, index),
+        icon: <RunIcon className='schedule-menu-option-icon' />,
+      },
     ]);
   }
 
@@ -173,6 +180,18 @@ class ScheduleControlList extends TerrainComponent<Props>
         this.handleDeleteScheduleError,
       );
     }
+    else if (this.state.confirmModalType === ConfirmActionType.RUNONDEMAND)
+    {
+      if (this.state.currentActiveSchedule === undefined)
+      {
+        return;
+      }
+      ControlActions.importExport.runOnDemandSchedule(
+        this.state.currentActiveSchedule.id,
+        this.handleRunScheduleOnDemandSuccess,
+        this.handleRunScheduleOnDemandError,
+      );
+    }
   }
 
   public requestDeleteSchedule(schedule, index)
@@ -185,6 +204,35 @@ class ScheduleControlList extends TerrainComponent<Props>
       confirmModalTitle: 'Confirm Action',
       confirmModalIsError: false,
       confirmModalType: ConfirmActionType.DELETE,
+    });
+  }
+
+  public requestRunScheduleOnDemand(schedule, index)
+  {
+    this.setState({
+      currentActiveSchedule: schedule,
+      currentActiveIndex: index,
+      confirmModalOpen: true,
+      confirmModalMessage: `Are you sure you want to run schedule "${schedule.id}" now?`,
+      confirmModalTitle: 'Confirm Action',
+      confirmModalIsError: false,
+      confirmModalType: ConfirmActionType.RUNONDEMAND,
+    });
+  }
+
+  public handleRunScheduleOnDemandSuccess(scheduleName: string)
+  {
+    notificationManager.addNotification('Schedule Running', `Successfully started schedule "${scheduleName}"`, 'info', 4);
+  }
+
+  public handleRunScheduleOnDemandError(error: string)
+  {
+    const readable = MidwayError.fromJSON(error).getDetail();
+    this.setState({
+      responseModalOpen: true,
+      responseModalMessage: `Error running schedule: ${readable}`,
+      responseModalTitle: 'Error',
+      responseModalIsError: true,
     });
   }
 

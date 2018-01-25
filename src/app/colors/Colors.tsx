@@ -58,8 +58,9 @@ interface Theme
   fontColorLightest: string;
   highlightFont: string; // Font color for when something is highlighted (in blue usually)
   blockBg: string; // e.g., in Pathfinder, behind block elements
-  
+
   sidebarBg: string;
+  backgroundColor: string;
 }
 
 const NewTheme: Theme =
@@ -72,7 +73,8 @@ const NewTheme: Theme =
   blockBg: '#F8F8F8',
 
   sidebarBg: '#fff',
-}
+  backgroundColor: 'lightgray',
+};
 
 // Will be deprecated
 interface OldTheme
@@ -1088,7 +1090,7 @@ const newTheme = NewTheme;
 
 // contains the mash of the old theme and the new theme
 // only initialized once, as we need to reload browser anyway for theme changes
-const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme); 
+const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme);
    // ^ new theme comes second, overrides old theme's properties
 
 export function Colors(): Theme & OldTheme
