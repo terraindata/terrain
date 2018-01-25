@@ -75,11 +75,6 @@ class CardsToElastic
     return eql;
   }
 
-  public static isRuntimeParameter(val): boolean
-  {
-    return true;
-  }
-
   public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
   {
     if (typeof block !== 'object')
