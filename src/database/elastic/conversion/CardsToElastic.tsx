@@ -53,7 +53,7 @@ import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import Query from '../../../items/types/Query';
 import Options from '../../types/CardsToCodeOptions';
 
-import { isInput } from '../../../blocks/types/Input';
+import { isInput, isRuntimeInput } from '../../../blocks/types/Input';
 import ESCardParser from './ESCardParser';
 import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
 
@@ -75,6 +75,11 @@ class CardsToElastic
     return eql;
   }
 
+  public static isRuntimeParameter(val): boolean
+  {
+    return true;
+  }
+
   public static blockToElastic(block: Block, options: Options = {}): string | object | number | boolean
   {
     if (typeof block !== 'object')
@@ -88,7 +93,7 @@ class CardsToElastic
       let value = tql(block, CardsToElastic.blockToElastic, options);
 
       if ((value === undefined || (typeof (value) === 'number' && isNaN(value)))
-        && isInput(block['value'], BuilderStore.getState().query.inputs))
+        && (isInput(block['value'], BuilderStore.getState().query.inputs) || isRuntimeInput(block['value'])))
       {
         value = block['value'];
       }

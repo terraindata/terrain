@@ -81,7 +81,22 @@ export default class ESVariantClause extends ESClause
     {
       if (valueInfo.parameterValue !== null && valueInfo.parameterValue.getValueInfo() !== null)
       {
-        valueType = ESJSONType[valueInfo.parameterValue.getValueInfo().jsonType];
+        const parameterType = ESJSONType[valueInfo.parameterValue.getValueInfo().jsonType];
+        if (parameterType === 'parameter')
+        {
+          // this is a runtime parameter
+          for (const t of ['string', 'number', 'boolean', 'base', 'null'])
+          {
+            if (this.subtypes[t] !== undefined)
+            {
+              valueType = t;
+              break;
+            }
+          }
+        } else
+        {
+          valueType = parameterType;
+        }
       }
     }
     const refinedValueType: string = this.refineType(valueType, valueInfo);
