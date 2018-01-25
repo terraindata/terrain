@@ -1,13 +1,22 @@
 {
   "empty query" : {
     "query": "{}",
+    "expect": {},
     "parameter": "{}"
   },
-  "empty query" : {
+  "number input" : {
       "query": "{\"from\": @number}",
       "expect": {
             "from" : "@number"
       },
       "parameter": {"number":0}
-    }
+    },
+    "runtime input" : {
+          "query": "{\"from\": @parent}",
+          "expect": {
+                "from" : "@parent"
+          },
+          "parameter": {}
+        }
+
 }

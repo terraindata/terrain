@@ -79,6 +79,7 @@ export default class ESBaseClause extends ESClause
       case ESJSONType.boolean:
       case ESJSONType.number:
       case ESJSONType.string:
+      case ESJSONType.parameter:
         break;
 
       default:
