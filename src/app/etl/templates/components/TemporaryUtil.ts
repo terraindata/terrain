@@ -76,6 +76,14 @@ export const SampleDocuments = [
         'Description': 'Carbs in a bowl',
       },
     ],
+    'Basic List': [
+      'Banana', 'Apple', 'Orange', 'Kiwi',
+    ],
+    'Terrible Nested': [
+      ['Aa', 'Bb', 'Cc'],
+      ['Foo', 'Bar', 'Baz'],
+      ['Cat', 'Dog', 'Bat'],
+    ],
   },
   {
     'Product Name': 'Cool stuff',

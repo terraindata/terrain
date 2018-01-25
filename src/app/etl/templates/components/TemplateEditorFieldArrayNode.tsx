@@ -69,6 +69,7 @@ const AddIcon = require('images/icon_add.svg');
 export interface Props extends TemplateEditorFieldProps
 {
   depth: number;
+  label?: string;
   renderNestedFields?: (preview) => any;
   // below from container
   templateEditor?: TemplateEditorState;
@@ -87,7 +88,12 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
   public renderArrayChildren()
   {
     const { field, canEdit, preview, keyPath, depth } = this.props;
-    return List(preview).map((value, index) =>
+    if (!Array.isArray(preview))
+    {
+      return null;
+    }
+    const previewList = List(preview);
+    return previewList.map((value, index) =>
     {
       return (
         <TemplateEditorFieldArrayNode
@@ -98,15 +104,16 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
           renderNestedFields={this.props.renderNestedFields}
           preview={value}
           depth={depth + 1}
+          label={`${index + 1} of ${previewList.size}`}
         />
       );
     },
-    );
+    ).toList();
   }
 
   public render()
   {
-    const { field, keyPath, canEdit, preview, depth } = this.props;
+    const { field, keyPath, canEdit, preview, depth, label } = this.props;
     const content = null;
     let children = null;
     if (depth === this._arrayDepth())
@@ -117,27 +124,24 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
       }
       else
       {
-        children = <div> {preview} </div>;
+        children = <div className='editor-array-leaf-item'> {preview} </div>;
       }
     }
     else
     {
-      children = this.renderArrayChildren();
+      children = (
+        <div style={depth !== 0 ? getStyle('marginLeft', '24px') : null}>
+          {this.renderArrayChildren()}
+        </div>
+      );
     }
 
     const childrenComponent = children !== null ?
-      <div className='template-editor-children-container'>
+      <div className='editor-array-children'>
+        {depth !== 0 ? <div className='editor-array-seperator'> {label} </div > : null}
         {children}
       </div> : null;
-    return depth === 0 ? childrenComponent :
-      (
-        <ExpandableView
-          content={content}
-          open={this.state.expandableViewOpen}
-          onToggle={this.handleExpandArrowClicked}
-          children={childrenComponent}
-        />
-      );
+    return childrenComponent;
   }
 
   public handleExpandArrowClicked()

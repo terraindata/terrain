@@ -69,8 +69,6 @@ const AddIcon = require('images/icon_add.svg');
 
 export interface Props extends TemplateEditorFieldProps
 {
-  arraySize?: number;
-  arrayKeyPath?: List<number>;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;

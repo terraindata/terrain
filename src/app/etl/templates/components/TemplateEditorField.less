@@ -11,7 +11,7 @@
 .template-editor-field-block {
   display: flex;
   flex-direction: column;
-  padding: @quarter-spacing 0px;
+  padding-bottom: 3px;
 
   .field-preview-label-group {
     flex: 0 0 160px;
@@ -107,15 +107,20 @@
 }
 
 // TemplateEditorFieldArrayNode
-.template-editor-field-array-item {
-  display: flex;
-  margin-left: @spacing + @half-spacing + 4px;
-  .field-array-index {
-    padding: @half-spacing;
-    width: 160px;
+.editor-array-children {
+  margin-bottom: @quarter-spacing;
+  .editor-array-seperator {
+    border-bottom: 1px solid #888;
+    .small-text;
+    display: inline-block;
+    margin: 0px @double-spacing;
+    margin-top: @quarter-spacing;
+    margin-bottom: -1px;
+    position: relative;
   }
-  .field-array-value {
-    padding: @half-spacing - 4px;
+  .editor-array-leaf-item {
+    padding: @half-spacing;
+    margin-left: @double-spacing;
   }
 }
 
