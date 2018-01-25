@@ -77,6 +77,22 @@ class MySQLClient
     });
   }
 
+  public isConnected(): Promise<boolean>
+  {
+    this.controller.log('MySQLClient.isConnected');
+    return new Promise<boolean>((resolve, reject) =>
+    {
+      this.getConnection((err, conn) =>
+      {
+        if (err !== null && err !== undefined)
+        {
+          resolve(false);
+        }
+        conn.ping((e) => resolve((e === undefined)));
+      });
+    });
+  }
+
   public query(queryString: string, params?: any[], callback?: any): mysql.Query
   {
     this.controller.log('MySQLClient.query', queryString, params);

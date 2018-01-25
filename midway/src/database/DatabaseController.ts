@@ -83,6 +83,11 @@ abstract class DatabaseController
     }
   }
 
+  public getID(): number
+  {
+    return this.id;
+  }
+
   public getType(): string
   {
     return this.type;

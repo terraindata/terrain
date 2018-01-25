@@ -71,6 +71,9 @@ import { scheduler } from './scheduler/SchedulerRouter';
 import * as Schema from './Schema';
 import { users } from './users/UserRouter';
 
+const MAX_CONN_RETRIES = 5;
+const CONN_RETRY_TIMEOUT = 1000;
+
 export let CFG: Config.Config;
 export let DB: Tasty.Tasty;
 export let HA: number;
@@ -143,6 +146,24 @@ export class App
 
   public async start(): Promise<http.Server>
   {
+    const client: any = this.DB.getController().getClient();
+    let isConnected = await client.isConnected();
+    for (let i = 1; i <= MAX_CONN_RETRIES && !isConnected; ++i)
+    {
+      winston.warn('Failed to establish database connection');
+
+      winston.info('Retrying in ' + String(CONN_RETRY_TIMEOUT * i) + ' ms....');
+      winston.info('Attempt ' + String(i) + ' of ' + String(MAX_CONN_RETRIES));
+
+      await new Promise((resolve) => setTimeout(resolve, CONN_RETRY_TIMEOUT * i));
+      isConnected = await client.isConnected();
+    }
+
+    if (!isConnected)
+    {
+      throw new Error('Failed to establish database connection!');
+    }
+
     // create application schema
     await Schema.createAppSchema(this.config.db as string, this.DB);
     winston.info('Finished creating application schema...');

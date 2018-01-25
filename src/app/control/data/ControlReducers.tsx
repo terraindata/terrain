@@ -219,6 +219,24 @@ ControlReducer[ActionTypes.importExport.deleteSchedule] =
     return state;
   };
 
+ControlReducer[ActionTypes.importExport.runOnDemandSchedule] =
+  (state, action) =>
+  {
+    Ajax.runOnDemandSchedule(action.payload.id,
+      (resp: object[]) =>
+      {
+        action.payload.onLoad(resp);
+        action.payload.fetchSchedules();
+      },
+      (err: string) =>
+      {
+        action.payload.onError(err);
+        action.payload.fetchSchedules();
+      },
+    );
+    return state;
+  };
+
 const ControlReducerWrapper = (state: ControlState = _ControlState(), action) =>
 {
   let nextState = state;

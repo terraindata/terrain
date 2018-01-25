@@ -106,8 +106,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         .set('loading', true)
         .set('loadingXhr', xhr)
         .set('loadingAlgorithmId', algorithmId)
-        // .setIn(List(['query', 'algorithmId']), algorithmId)
-        ;
+        .set('pastQueries', state.pastQueries.clear())
+        .set('nextQueries', state.nextQueries.clear())
+        .set('lastActionType', '')
+        .set('lastActionKeyPath', null)
+        .set('lastActionTime', 0)
+        .set('query', null)
+        .set('algorithmId', '');
     },
 
     [ActionTypes.queryLoaded]: (state: BuilderState,

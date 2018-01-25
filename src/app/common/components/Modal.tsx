@@ -51,6 +51,8 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
+import { ColorsActions } from '../../colors/data/ColorsRedux';
+import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import FadeInOut from './FadeInOut';
 import './Modal.less';
@@ -60,6 +62,7 @@ const Color = require('color');
 export interface Props
 {
   open: boolean;
+  colorsActions: typeof ColorsActions;
   message?: string;
   title?: string;
   error?: boolean;
@@ -90,6 +93,20 @@ export interface Props
 @Radium
 class Modal extends TerrainComponent<Props>
 {
+
+  public componentWillMount()
+  {
+    this.props.colorsActions({
+      actionType: 'setStyle',
+      selector: '.modal-content ::-webkit-scrollbar-thumb',
+      style: { background: Colors().altScrollbarPiece },
+    });
+  }
+
+  // ::-webkit-scrollbar-thumb {
+  //   background: rgba(0, 0, 0, 0.15);
+  // }
+
   public closeModalSuccess()
   {
     if (this.props.closeOnConfirm !== undefined && !this.props.closeOnConfirm)
@@ -323,4 +340,10 @@ const ReactModal = require('react-modal');
 const InfoIcon = require('./../../../images/icon_info.svg');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 
-export default Modal;
+export default Util.createContainer(
+  Modal,
+  [],
+  {
+    colorsActions: ColorsActions,
+  },
+);

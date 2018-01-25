@@ -64,6 +64,12 @@ export interface Input extends IRecord<Input>
   inputType: InputType;
 }
 
+export function isRuntimeInput(name: string)
+{
+  return name.charAt(0) === InputPrefix &&
+    name.substring(1).split('.')[0] === 'parent';
+}
+
 export function isInput(name: string, inputs: Immutable.List<Input>)
 {
   return inputs && name && name.charAt(0) === InputPrefix &&
