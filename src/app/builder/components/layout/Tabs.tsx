@@ -154,6 +154,7 @@ const Tab = createReactClass<any, any>({
         style={{
           zIndex: this.zIndexStyle(),
         }}
+        ref={this.props.name}
       >
         <div
           className='tab-inner'
@@ -193,7 +194,6 @@ class Tabs extends TerrainComponent<TabsProps> {
     algorithms: LibraryStore.getState().algorithms,
     tabs: null,
     selectorLeft: 0,
-    selectorHeight: 0,
     selectorWidth: 0,
   };
   public cancel = null;
@@ -214,20 +214,16 @@ class Tabs extends TerrainComponent<TabsProps> {
 
   public setSelectedPosition()
   {
-    console.log(this.state.tabs);
     if (this.state.tabs === null || this.state.tabs.length === 0)
     {
       return;
     }
-    const selected = this.state.tabs.filter((tab) => tab.selected);
-    console.log(selected);
+    const selected = this.state.tabs.filter((tab) => tab.selected)[0];
     const key = selected.name;
-    console.log(this.refs);
-    const cr = this.refs[key]['getBoundingClientRect']();
+    const cr = this.refs[key]['refs'][key]['getBoundingClientRect']();
     const parentCr = this.refs['all-tabs']['getBoundingClientRect']();
     this.setState({
       selectorLeft: cr.left - parentCr.left,
-      selectorHeight: cr.height,
       selectorWidth: cr.width,
     });
   }
@@ -450,8 +446,8 @@ class Tabs extends TerrainComponent<TabsProps> {
                 className='tabs-selected-marker'
                 style={{
                   width: this.state.selectorWidth,
-                  height: this.state.selectorHeight,
                   left: this.state.selectorLeft,
+                  backgroundColor: Colors().active,
                 }}
               />
               <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
