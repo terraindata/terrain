@@ -3,11 +3,12 @@
 .template-editor-documents-container {
   display: flex;
   flex-direction: column;
-  align-self: flex-start;
+  align-self: stretch;
 
   .documents-area {
     overflow-y: scroll;
-    display: block;
+    display: flex;
+    flex-direction: column;
     &:focus {
       outline: none;
     }
@@ -15,8 +16,7 @@
 
   .preview-document {
     margin: @spacing;
-    width: 400px;
-    height: 400px;
+    flex: 0 0 300px;
     padding: @spacing;
     display: flex;
     justify-content: center;

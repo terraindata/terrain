@@ -77,7 +77,8 @@ export const SampleDocuments = [
       },
     ],
     'Basic List': [
-      'Banana', 'Apple', 'Orange', 'Kiwi',
+      'Banana', 'Apple', 'Orange', 'Kiwi', 'Abcdefghijklmnopqrstuvwxyz that\'s the alphabet.',
+      'These are random words', 'Pay no attention me', 'Can I get another string?',
     ],
     'Terrible Nested': [
       ['Aa', 'Bb', 'Cc'],

@@ -68,8 +68,8 @@ export default class ArrayPreview extends TerrainComponent<Props>
   public renderItem(value, index)
   {
     return (
-      <div className='array-preview-item' style={this.props.style} key={index}>
-        {index !== 0 ? ', ' : ''}{value}
+      <div className='array-preview-item' style={_.extend({}, itemStyle, this.props.style)} key={index}>
+        {value}
       </div>
     );
   }
@@ -88,3 +88,5 @@ export default class ArrayPreview extends TerrainComponent<Props>
     );
   }
 }
+
+const itemStyle = backgroundColor(Colors().darkerHighlight);
