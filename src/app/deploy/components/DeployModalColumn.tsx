@@ -51,7 +51,6 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { ItemStatus } from '../../../items/types/Item';
 import { buttonColors, Colors, disabledButtonColors, fontColor } from '../../colors/Colors';
-import LibraryStore from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import UserThumbnail from '../../users/components/UserThumbnail';
 import Util from '../../util/Util';
@@ -96,6 +95,7 @@ export interface Props
   defaultChecked: boolean;
   deployedName: string;
   defaultAlgorithm: LibraryTypes.Algorithm;
+  library?: LibraryTypes.LibraryState;
   onDefaultCheckedChange(defaultChecked: boolean);
   onDeployedNameChange(deployedName: string);
   onDeploy();
@@ -177,7 +177,7 @@ class DeployModalColumn extends TerrainComponent<Props>
   public render()
   {
     const { algorithm, status } = this.props;
-    const state = LibraryStore.getState();
+    const state = this.props.library;
     const category = state.getIn(['categories', algorithm.categoryId]) as LibraryTypes.Category;
     const group = state.getIn(['groups', algorithm.groupId]) as LibraryTypes.Group;
 
@@ -381,4 +381,8 @@ class DeployModalColumn extends TerrainComponent<Props>
   }
 }
 
-export default DeployModalColumn;
+export default Util.createTypedContainer(
+  DeployModalColumn,
+  ['library'],
+  {},
+);

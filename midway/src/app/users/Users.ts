@@ -53,9 +53,6 @@ import * as App from '../App';
 import * as Util from '../Util';
 import UserConfig from './UserConfig';
 
-// CREATE TABLE users (id integer PRIMARY KEY, accessToken text NOT NULL, email text NOT NULL, isDisabled bool NOT NULL
-// , isSuperUser bool NOT NULL, name text NOT NULL, oldPassword text, password text NOT NULL, timezone string)
-
 export class Users
 {
   private readonly saltRounds = 10;
@@ -266,11 +263,6 @@ export class Users
 
   public async upsert(newUser: UserConfig): Promise<UserConfig>
   {
-    if (newUser.id === undefined)
-    {
-      const results: UserConfig[] = await this.get();
-      newUser.id = results.length + 1;
-    }
     return App.DB.upsert(this.userTable, newUser) as Promise<UserConfig>;
   }
 

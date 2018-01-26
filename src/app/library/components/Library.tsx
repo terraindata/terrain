@@ -130,7 +130,9 @@ class Library extends TerrainComponent<any>
   public componentDidMount()
   {
     this.props.roleActions.fetch();
-    this.props.userActions.fetch();
+    this.props.userActions({
+      actionType: 'fetch',
+    });
   }
 
   public componentWillReceiveProps(nextProps)

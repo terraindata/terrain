@@ -657,6 +657,40 @@ export class Scheduler
     }
   }
 
+  public async runOnDemand(user: UserConfig, scheduleID: number): Promise<string[]>
+  {
+    return new Promise<string[]>(async (resolve, reject) =>
+    {
+      if (user.isSuperUser !== true)
+      {
+        return reject(['Must be an admin to run a schedule on demand.']);
+      }
+      const schedules: SchedulerConfig[] = await this.get(scheduleID) as SchedulerConfig[];
+      if (schedules.length !== 0)
+      {
+        const schedule: SchedulerConfig = schedules[0];
+        if (schedule.currentlyRunning === false && schedule.archived === false)
+        {
+          resolve([schedule.name]); // resolve the promise so that the job gets executed after we return an OK
+          const unwrappedParams = [(schedule['jobId'] as number)].concat(JSON.parse(schedule.paramsScheduleStr as string));
+          this.jobMap[(schedule['jobId'] as number)](...unwrappedParams);
+        }
+        else if (schedule.currentlyRunning === true)
+        {
+          reject(['Schedule is already running.']);
+        }
+        else
+        {
+          reject(['Schedule is deleted and cannot be run.']);
+        }
+      }
+      else
+      {
+        return reject(['Schedule not found.']);
+      }
+    });
+  }
+
   public async setJobStatus(scheduleID: number, status: number): Promise<boolean>
   {
     return new Promise<boolean>(async (resolve, reject) =>
@@ -742,9 +776,6 @@ export class Scheduler
         schedule.active = schedule.active !== undefined ? schedule.active : false;
         schedule.archived = false;
         schedule.currentlyRunning = false;
-
-        const results: SchedulerConfig[] = await this.get();
-        schedule.id = results.length + 1;
       }
       return resolve(await App.DB.upsert(this.schedulerTable, schedule) as SchedulerConfig[]);
     });

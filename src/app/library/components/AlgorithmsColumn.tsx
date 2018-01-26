@@ -496,7 +496,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
       message='What would you like to name the duplicate algorithm?'
       textboxPlaceholderValue='Varaint Name'
       children={this.renderDuplicateDropdown()}
-      childrenMessage='Please select an group for the duplicate algorithm.'
+      childrenMessage='Please select a group for the duplicate algorithm.'
       allowOverflow={true}
       inputClassName='duplicate-group-modal-input'
     />);
@@ -662,7 +662,7 @@ export class AlgorithmsColumn extends TerrainComponent<Props>
         titleHidden={!archived}
       >
         {
-          this.props.algorithmsOrder.map((id, index) =>
+          this.props.algorithmsOrder.toSet().toList().map((id, index) =>
             this.props.algorithms.get(id) &&
             (archived ? this.hasStatus(id, 'ARCHIVE') : !this.hasStatus(id, 'ARCHIVE'))
             && this.renderAlgorithm(id, fadeIndex++),

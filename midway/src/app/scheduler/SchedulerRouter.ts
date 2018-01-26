@@ -96,6 +96,12 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
   ctx.body = await scheduler.createCustomSchedule(ctx.state.user, schedule);
 });
 
+// run a job on demand
+Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await scheduler.runOnDemand(ctx.state.user, ctx.params.id);
+});
+
 // Delete scheduled jobs by parameter
 Router.post('/delete/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
 {

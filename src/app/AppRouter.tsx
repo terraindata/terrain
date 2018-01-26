@@ -55,7 +55,6 @@ import TerrainComponent from './common/components/TerrainComponent';
 import ControlPage from './control/components/ControlPage';
 import FileImport from './fileImport/components/FileImport';
 import Library from './library/components/LibraryDnd';
-import LibraryActions from './library/data/LibraryActions';
 import ManualWrapper from './manual/components/ManualWrapper';
 import SchemaPage from './schema/components/SchemaPage';
 import Account from './users/components/Account';

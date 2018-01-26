@@ -107,7 +107,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         .set('loading', true)
         .set('loadingXhr', xhr)
         .set('loadingAlgorithmId', algorithmId)
-        ;
+        .set('pastQueries', state.pastQueries.clear())
+        .set('nextQueries', state.nextQueries.clear())
+        .set('lastActionType', '')
+        .set('lastActionKeyPath', null)
+        .set('lastActionTime', 0)
+        .set('query', null)
+        .set('algorithmId', '');
     },
 
     [ActionTypes.queryLoaded]: (state: BuilderState,
@@ -295,12 +301,14 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     [ActionTypes.changeTQL]: (state: BuilderState,
       action: Action<{
         tql: string,
+        tqlMode: string,
       }>) =>
     {
       // TODO MOD convert
       let { query } = state;
       const tql: string = action.payload.tql;
       query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
+      query = query.set('tqlMode', action.payload.tqlMode);
       query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
       query = AllBackendsMap[query.language].codeToQuery(
         query,

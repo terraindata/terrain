@@ -93,12 +93,12 @@ import { LibraryState } from 'library/LibraryTypes';
 import { SchemaActions } from 'schema/data/SchemaRedux';
 import { UserState } from 'users/UserTypes';
 import TerrainTools from 'util/TerrainTools';
-import AuthActions from './auth/data/AuthActions';
+import { AuthActions } from './auth/data/AuthRedux';
 import LibraryActions from './library/data/LibraryActions';
 // import RolesActions from './roles/data/RolesActions';
 // import RolesStore from './roles/data/RolesStore';
 import TerrainStore from './store/TerrainStore';
-import UserActions from './users/data/UserActions';
+import { UserActions } from './users/data/UserRedux';
 
 // Icons
 const TerrainIcon = require('./../images/logo_terrainLong_blue@2x.png');
@@ -176,6 +176,7 @@ interface Props
   auth?: AuthState;
   authActions?: typeof AuthActions;
   library?: LibraryState;
+  libraryActions?: typeof LibraryActions;
 }
 
 const APP_STYLE = _.extend({},
@@ -232,7 +233,11 @@ class App extends TerrainComponent<Props>
     const id = localStorage['id'];
     if (accessToken !== undefined && id !== undefined)
     {
-      this.props.authActions.login(accessToken, id);
+      this.props.authActions({
+        actionType: 'login',
+        accessToken,
+        id,
+      });
     }
   }
 
@@ -357,8 +362,11 @@ class App extends TerrainComponent<Props>
 
   public fetchData()
   {
-    this.props.userActions.fetch();
+    this.props.userActions({
+      actionType: 'fetch',
+    });
     TerrainStore.dispatch(LibraryActions.fetch());
+    this.props.libraryActions.fetch();
     this.props.schemaActions({
       actionType: 'fetch',
     });
@@ -500,5 +508,6 @@ export default Util.createContainer(
     schemaActions: SchemaActions,
     userActions: UserActions,
     colorsActions: ColorsActions,
+    libraryActions: LibraryActions,
   },
 );

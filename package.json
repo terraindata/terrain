@@ -5,7 +5,8 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "start": "yarn start-postgres && nodemon --exec ./node_modules/.bin/ts-node -P midway $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 --ignore postgres-data -- ./midway/src/Midway.ts",
+    "start": "yarn start-postgres && yarn start-midway",
+    "start-midway": "nodemon --exec ./node_modules/.bin/ts-node -P midway $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 --ignore postgres-data -- ./midway/src/Midway.ts",
     "start-postgres": "docker-compose -f midway-postgres-docker.yml up -d",
     "start-front": "yarn commit-log && webpack-dev-server --config webpack.config.js --inline --content-base src/app --history-api-fallback --compress --progress --info",
     "stop-postgres": "docker-compose -f midway-postgres-docker.yml down",
@@ -64,6 +65,7 @@
       "^control/(.*)$": "<rootDir>/src/app/control/$1",
       "^database/(.*)$": "<rootDir>/src/database/$1",
       "^deploy/(.*)$": "<rootDir>/src/app/deploy/$1",
+      "^etl/(.*)$": "<rootDir>/src/app/etc/$1",
       "^fileImport/(.*)$": "<rootDir>/src/app/fileImport/$1",
       "^images/(.*)$": "<rootDir>/src/images/$1",
       "^library/(.*)$": "<rootDir>/src/app/library/$1",

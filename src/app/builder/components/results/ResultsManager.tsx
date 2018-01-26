@@ -402,11 +402,13 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private queryM2Results(query: Query, db: BackendInstance)
   {
-    if (query.parseTree === null || query.parseTree.hasError())
+    if (query.tqlMode !== 'manual')
     {
-      return;
+      if (query.parseTree === null || query.parseTree.hasError())
+      {
+        return;
+      }
     }
-
     if (query !== this.state.lastQuery)
     {
       const eql = AllBackendsMap[query.language].parseTreeToQueryString(

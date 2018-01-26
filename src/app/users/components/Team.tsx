@@ -56,7 +56,7 @@ import * as UserTypes from '../UserTypes';
 import InfoArea from './../../common/components/InfoArea';
 import Modal from './../../common/components/Modal';
 import TerrainComponent from './../../common/components/TerrainComponent';
-import Actions from './../data/UserActions';
+import { UserActions as Actions } from './../data/UserRedux';
 import './Team.less';
 import UserThumbnail from './UserThumbnail';
 type User = UserTypes.User;
@@ -93,7 +93,9 @@ class Team extends TerrainComponent<Props>
 
   public componentWillMount()
   {
-    this.props.userActions.fetch();
+    this.props.userActions({
+      actionType: 'fetch',
+    });
   }
 
   public componentWillUnmount()
@@ -258,7 +260,9 @@ class Team extends TerrainComponent<Props>
 
     Ajax.createUser(email, password, () =>
     {
-      this.props.userActions.fetch();
+      this.props.userActions({
+        actionType: 'fetch',
+      });
     }, (error) =>
       {
         this.setState({

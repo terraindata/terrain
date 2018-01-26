@@ -164,11 +164,7 @@ export class ExportTemplates
 
         template = Util.updateObject(results[0], template);
       }
-      else
-      {
-        const results: ExportTemplateConfig[] = await this.select(['id'], []);
-        template.id = results.length + 1;
-      }
+
       if (template['persistentAccessToken'] === undefined || template['persistentAccessToken'] === '')
       {
         const persistentAccessToken = srs(
@@ -242,6 +238,12 @@ export class ExportTemplates
         tablename: template['tablename'],
         transformations: JSON.stringify(template['transformations']),
       };
+
+    if (template['id'] === undefined)
+    {
+      delete stringified.id;
+    }
+
     return stringified;
   }
 }
