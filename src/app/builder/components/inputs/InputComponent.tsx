@@ -76,6 +76,7 @@ interface Props
   canEdit: boolean;
   onCreateInput: (index: number) => void;
   language: string;
+  action: (keyPath, value) => void; // Need to use to keep track of whether path or cards is used (should change with Xi's parser)
 }
 
 const TYPE_OPTIONS =
@@ -132,7 +133,7 @@ class InputComponent extends TerrainComponent<Props>
 
   public handleInputTypeChange(inputType: number)
   {
-    Actions.change(this.getKeyPath('inputType'), inputType);
+    this.props.action(this.getKeyPath('inputType'), inputType);
 
     if (inputType === InputType.DATE)
     {
@@ -142,7 +143,7 @@ class InputComponent extends TerrainComponent<Props>
         date = new Date();
       }
       const value = Util.formatInputDate(date, this.props.language);
-      Actions.change(this.getKeyPath('value'), value);
+      this.props.action(this.getKeyPath('value'), value);
     }
   }
 
@@ -162,7 +163,7 @@ class InputComponent extends TerrainComponent<Props>
 
   public changeValue(value)
   {
-    Actions.change(this.getKeyPath('value'), value);
+    this.props.action(this.getKeyPath('value'), value);
   }
 
   public renderInputValue()

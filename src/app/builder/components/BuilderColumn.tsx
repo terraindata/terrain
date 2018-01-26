@@ -73,6 +73,7 @@ import TuningColumn from './cards/TuningColumn';
 import InputsArea from './inputs/InputsArea';
 import PathfinderColumn from './pathfinder/PathfinderColumn';
 import ResultsColumn from './results/ResultsColumn';
+import Actions from '../data/BuilderActions';
 
 const SplitScreenIcon = require('./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -257,6 +258,7 @@ const BuilderColumn = createReactClass<any, any>(
             inputs={query.inputs}
             canEdit={canEdit}
             language={query.language}
+            action={query.path !== undefined ? Actions.changePath : Actions.change}
           />;
 
         case COLUMNS.Results:

@@ -231,6 +231,38 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         },
       )
     ,
+    [ActionTypes.createInput]: (state: BuilderState,
+      action: {
+        payload?: {
+          keyPath: KeyPath,
+          index: number,
+          factoryType: string,
+          data: any,
+        },
+      }) =>
+        state.updateIn(
+        action.payload.keyPath,
+        (arr) =>
+        {
+          const item = action.payload.data ? action.payload.data :
+            BlockUtils.make(
+              AllBackendsMap[state.query.language].blocks, action.payload.factoryType,
+            );
+
+          if (action.payload.index === null)
+          {
+            return item; // creating at that spot
+          }
+
+          return arr.splice
+            (
+            action.payload.index === undefined || action.payload.index === -1 ? arr.size : action.payload.index,
+            0,
+            item,
+          );
+        },
+      )
+    ,
 
     [ActionTypes.move]: (state: BuilderState,
       action: {
