@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, Colors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
@@ -68,11 +68,27 @@ export interface Props
 @Radium
 class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
 {
+  constructor(props)
+  {
+    super(props);
+    this.handleDocumentClickedFactory = _.memoize(this.handleDocumentClickedFactory);
+  }
+
   public renderDocument(document: object, index: number)
   {
+    const { previewIndex } = this.props.templateEditor;
+    const border = index === previewIndex ?
+      borderColor(Colors().inactiveHover, Colors().inactiveHover) :
+      borderColor('rgba(0,0,0,0)', Colors().activeHover);
+
     return (
-      <div className='preview-document' key={index} style={backgroundColor(Colors().bg3)}>
-        <div className='preview-document-index-label'> {index} </div>
+      <div
+        className='preview-document'
+        key={index}
+        style={_.extend({}, backgroundColor(Colors().bg3), border)}
+        onClick={this.handleDocumentClickedFactory(index)}
+      >
+        <div className='preview-document-index-label'> {index + 1} </div>
       </div>
     );
   }
@@ -86,6 +102,18 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
         </div>
       </div>
     );
+  }
+
+  // memoized
+  public handleDocumentClickedFactory(index): () => void
+  {
+    return () =>
+    {
+      this.props.act({
+        actionType: 'setPreviewIndex',
+        index,
+      });
+    };
   }
 
 }

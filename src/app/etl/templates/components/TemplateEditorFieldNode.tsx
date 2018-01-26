@@ -124,19 +124,6 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
           {...this._passProps() }
         />
       );
-      // children = (
-      //   <TemplateEditorFieldArrayNode
-      //     depth={0}
-      //     renderNestedFields={this.renderChildFields}
-      //     {...this._passProps() }
-      //   />
-      // );
-      // content = (
-      //   <TemplateEditorFieldPreview
-      //     hidePreviewValue={true}
-      //     {...this._passProps() }
-      //   />
-      // );
     }
     else if (this._isNested())
     {
