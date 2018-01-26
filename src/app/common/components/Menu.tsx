@@ -91,8 +91,8 @@ class Menu extends TerrainComponent<Props>
   public state: {
     open: boolean;
   } = {
-    open: false,
-  };
+      open: false,
+    };
 
   public renderOption(option, index)
   {
@@ -162,7 +162,7 @@ class Menu extends TerrainComponent<Props>
     });
     this.setState({
       open: this.props.expanded,
-    })
+    });
   }
 
   public componentWillReceiveProps(nextProps)
@@ -171,7 +171,7 @@ class Menu extends TerrainComponent<Props>
     {
       this.setState({
         open: nextProps.expanded,
-      })
+      });
     }
   }
 

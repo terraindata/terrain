@@ -109,6 +109,7 @@ const ImportIcon = require('./../images/icon_import.svg?name=ImportIcon');
 const ControlIcon = require('./../images/icon_gear.svg');
 const TQLIcon = require('./../images/icon_tql_17x14.svg?name=TQLIcon');
 const ManualIcon = require('./../images/icon_info.svg');
+const BackgroundImage = require('./../images/background.png');
 
 const links =
   [
@@ -428,8 +429,11 @@ class App extends TerrainComponent<Props>
               content:
                 <div
                   className='app-inner'
-                  style={backgroundColor(Colors().backgroundColor)}
                 >
+                  <img
+                    src={BackgroundImage}
+                    className='background-image'
+                  />
                   {
                     this.props.children
                   }

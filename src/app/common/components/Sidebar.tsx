@@ -103,9 +103,9 @@ export class Sidebar extends TerrainComponent<Props>
   public state: {
     linkOffset: number,
   } =
-  {
-    linkOffset: 0,
-  };
+    {
+      linkOffset: 0,
+    };
 
   public componentWillMount()
   {
@@ -163,18 +163,18 @@ export class Sidebar extends TerrainComponent<Props>
         })}
         style={backgroundColor(Colors().sidebarBg)}
       >
-       {
-         this.props.expanded ?
-         <img
-          src={TerrainIcon}
-          className='sidebar-logo'
-        />
-        :
-        <img src={TerrainSmallIcon}
-        className='sidebar-logo-small'
-        />
-       }
-       <AccountDropdown small={!this.props.expanded}/>
+        {
+          this.props.expanded ?
+            <img
+              src={TerrainIcon}
+              className='sidebar-logo'
+            />
+            :
+            <img src={TerrainSmallIcon}
+              className='sidebar-logo-small'
+            />
+        }
+        <AccountDropdown small={!this.props.expanded} />
         <div
           className={classNames({
             'sidebar-selected-square': true,

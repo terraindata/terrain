@@ -139,9 +139,9 @@ const Tab = createReactClass<any, any>({
   render()
   {
     const style = _.extend({},
-            fontColor(this.props.selected ? Colors().highlightFont : Colors().fontColor2),
-            // backgroundColor(this.props.selected ? Colors().active : '')
-          );
+      fontColor(this.props.selected ? Colors().highlightFont : Colors().fontColor2),
+      // backgroundColor(this.props.selected ? Colors().active : '')
+    );
     return this.renderPanel(
       <div
         className={classNames({
@@ -276,7 +276,7 @@ class Tabs extends TerrainComponent<TabsProps> {
 
     this.setState({
       tabs,
-    }, () => {this.setSelectedPosition();});
+    }, () => { this.setSelectedPosition(); });
   }
 
   // shouldComponentUpdate(nextProps, nextState)
@@ -303,45 +303,45 @@ class Tabs extends TerrainComponent<TabsProps> {
         {
           this.props.actions.map((action, index) =>
             tooltip(
-            <a
-              className={classNames({
-                'tabs-action': true,
-                'tabs-action-text': action.text !== undefined && action.text !== '',
-                'tabs-action-enabled': action.enabled || action.enabled === undefined,
-              })}
-              key={index}
-              onClick={action.onClick}
-              style={
-                 action.text ? backgroundColor(action.enabled ? Colors().highlightFont : Colors().blockBg) : undefined
-              }
-            >
+              <a
+                className={classNames({
+                  'tabs-action': true,
+                  'tabs-action-text': action.text !== undefined && action.text !== '',
+                  'tabs-action-enabled': action.enabled || action.enabled === undefined,
+                })}
+                key={index}
+                onClick={action.onClick}
+                style={
+                  action.text ? backgroundColor(action.enabled ? Colors().highlightFont : Colors().blockBg) : undefined
+                }
+              >
+                {
+                  action.icon &&
+                  <div className='tabs-action-piece'>
+                    {
+                      action.icon
+                    }
+                  </div>
+                }
+                {
+                  action.text &&
+                  <div
+                    className='tabs-action-piece'
+                    style={_.extend({},
+                      fontColor(action.enabled ? Colors().active : Colors().fontColor),
+                    )}
+                  >
+                    {
+                      action.text
+                    }
+                  </div>
+                }
+              </a>,
               {
-                action.icon &&
-                <div className='tabs-action-piece'>
-                  {
-                    action.icon
-                  }
-                </div>
-              }
-              {
-                action.text &&
-                <div
-                  className='tabs-action-piece'
-                  style={_.extend({},
-                    fontColor(action.enabled ? Colors().active : Colors().fontColor),
-                  )}
-                >
-                  {
-                    action.text
-                  }
-                </div>
-              }
-            </a>,
-            {
-            title: action.tooltip,
-            distance: 24,
-            key: index,
-            },
+                title: action.tooltip,
+                distance: 24,
+                key: index,
+              },
             ),
           )
         }

@@ -83,13 +83,13 @@ class LinearSelector extends TerrainComponent<Props>
     selectorWidth: number,
     selectorHeight: number,
   } = {
-    usingCustomValue: false,
-    showCustomTextbox: false,
-    customInput: '',
-    selectorLeft: 0,
-    selectorHeight: 0,
-    selectorWidth: 0,
-  };
+      usingCustomValue: false,
+      showCustomTextbox: false,
+      customInput: '',
+      selectorLeft: 0,
+      selectorHeight: 0,
+      selectorWidth: 0,
+    };
 
   // Determine whether using custom input
   public componentWillMount()

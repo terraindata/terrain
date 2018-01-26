@@ -329,6 +329,7 @@ const BuilderColumn = createReactClass<any, any>(
 
       this.setState({
         column: index,
+        showColumnOptions: false,
       });
 
       const colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
@@ -363,6 +364,13 @@ const BuilderColumn = createReactClass<any, any>(
       localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
     },
 
+    toggleColumnOptions()
+    {
+      this.setState({
+        showColumnOptions: !this.state.showColumnOptions,
+      });
+    },
+
     render()
     {
       const { query, canEdit, cantEditReason } = this.props;
@@ -370,13 +378,9 @@ const BuilderColumn = createReactClass<any, any>(
       return this.renderPanel((
         <div
           className={'builder-column builder-column-' + this.props.index}
-          style={backgroundColor(Colors().bg1)}
         >
           <div
             className='builder-title-bar'
-            style={{
-              backgroundColor: Colors().backgroundColor,
-            }}
           >
             {
               this.props.index === 0 ? null : (
@@ -396,12 +400,12 @@ const BuilderColumn = createReactClass<any, any>(
               )
             }
             {
-            //  <div ref='handle' className='builder-title-bar-drag-handle'>
-            //               <DragHandle
-            //                 key={'builder-column-handle-' + this.props.index}
-            //                 showWhenHoveringClassName='builder-title-bar'
-            //               />
-            //             </div>
+              //  <div ref='handle' className='builder-title-bar-drag-handle'>
+              //               <DragHandle
+              //                 key={'builder-column-handle-' + this.props.index}
+              //                 showWhenHoveringClassName='builder-title-bar'
+              //               />
+              //             </div>
             }
             <div
               className={
@@ -412,29 +416,29 @@ const BuilderColumn = createReactClass<any, any>(
               style={fontColor(Colors().text2)}
             >
               <span>
-                <span onClick={() => {this.setState({showColumnOptions: !this.state.showColumnOptions})}}>
+                <span onClick={this.toggleColumnOptions}>
                   {
                     COLUMNS[this.state.column]
                   }
-                 <ArrowIcon
-                   className='builder-title-bar-arrow'
-                 />
-                 {
-                   this.state.showColumnOptions ?
-                   <Menu
-                     options={this.getMenuOptions()}
-                     title={''}
-                     expanded={true}
-                     openRight={true}
-                   />
-                   :
-                   null
-                 }
-               </span>
+                  <ArrowIcon
+                    className='builder-title-bar-arrow'
+                  />
+                  {
+                    this.state.showColumnOptions ?
+                      <Menu
+                        options={this.getMenuOptions()}
+                        title={''}
+                        expanded={true}
+                        openRight={true}
+                      />
+                      :
+                      null
+                  }
+                </span>
               </span>
-             {
+              {
                 !canEdit &&
-                tooltip(<LockedIcon style={getStyle('fill', Colors().highlightFont)}/>,
+                tooltip(<LockedIcon style={getStyle('fill', Colors().highlightFont)} />,
                   cantEditReason)
               }
             </div>
@@ -471,9 +475,6 @@ const BuilderColumn = createReactClass<any, any>(
                 this.state.column === COLUMNS.Cards ||
                 this.state.column === COLUMNS.Inputs,
             })}
-            style={
-              borderColor(Colors().stroke)
-            }
           >
             {
               this.renderContent(canEdit)

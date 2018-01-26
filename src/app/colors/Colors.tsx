@@ -64,17 +64,17 @@ interface Theme
 }
 
 const NewTheme: Theme =
-{
-  fontColor: '#221E1F',
-  fontColor2: '#606262',
-  fontColorLightest: '#CECECE',
-  highlightFont: '#FFFFFF',
+  {
+    fontColor: '#221E1F',
+    fontColor2: '#606262',
+    fontColorLightest: '#CECECE',
+    highlightFont: '#FFFFFF',
 
-  blockBg: '#F8F8F8',
+    blockBg: '#F8F8F8',
 
-  sidebarBg: '#fff',
-  backgroundColor: 'lightgray',
-};
+    sidebarBg: '#fff',
+    backgroundColor: '#f4f5f7',
+  };
 
 // Will be deprecated
 interface OldTheme
@@ -1091,7 +1091,7 @@ const newTheme = NewTheme;
 // contains the mash of the old theme and the new theme
 // only initialized once, as we need to reload browser anyway for theme changes
 const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme);
-   // ^ new theme comes second, overrides old theme's properties
+// ^ new theme comes second, overrides old theme's properties
 
 export function Colors(): Theme & OldTheme
 {
