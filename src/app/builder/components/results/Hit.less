@@ -11,9 +11,8 @@
 
 .result,
 .results-area-fodder {
-  min-width: 125px;
+  min-width: 95%;
   flex-grow: 1;
-  flex-basis: 125px;
   // padding: 0px (@standard-margin / 2);
   margin: 3px;
   cursor: pointer;
@@ -21,7 +20,7 @@
 
 .result {
   // margin-top: @standard-margin;
-  
+
   position: relative;
   z-index: 400;
   &:hover {
@@ -29,23 +28,23 @@
       // background: darken(@result-name-bg, 10%);
     }
   }
-  
+
   .menu-wrapper {
-    top: @standard-margin; 
+    top: @standard-margin;
     right: @standard-margin;
   }
 
 
   &.result-dragging {
-    opacity: 0.5; 
+    opacity: 0.5;
   }
-  
+
   &.result-drag-over {
     .result-inner {
       border: 2px solid @drag-color;
     }
   }
-  
+
   .menu-wrapper:not(.menu-open) {
     opacity: 0;
     .transition;
@@ -63,10 +62,10 @@
       opacity: 1;
     }
   }
-  
+
   .result-name {
     .big-text;
-    
+
     height: @result-name-height;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
@@ -74,24 +73,24 @@
     // background: @result-name-bg;
     box-sizing: border-box;
     position: relative;
-    
+
     .transition;
-    
+
     .result-name-inner {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      width: 100%; 
+      width: 100%;
       .transition;
     }
   }
-  
+
   &:hover {
     .result-name .result-name-inner {
       width: calc(~"100% - 24px");
     }
   }
-  
+
   .result-inner {
     position: relative;
     border-radius: 3px;
@@ -103,51 +102,51 @@
       padding: 3px;
       box-sizing: border-box;
     }
-    
+
     .result-fields-wrapper {
       overflow-y: hidden;
       padding: 3px;
     }
-      
+
     .result-field {
       border-bottom: 1px solid @off-white;
       padding: 1px;
       font-size: 12px;
-      
+
       .result-field-name {
         display: inline-block;
         word-break: break-all;
       }
-      
+
       .result-field-value {
         &.result-field-value-number {
           font-weight: 400;
         }
-        
+
         &.result-field-value-short {
           float: right;
           display: inline-block;
         }
-        
+
         &.result-field-value-open {
           white-space: normal;
           overflow: visible;
         }
-        
+
       }
     }
-    
+
     .result-expanded-fields {
       margin-top: 10px;
       padding-top: 10px;
-      
+
       .result-expanded-fields-title {
         text-align: center;
         font-size: 12px;
         margin-bottom: 10px;
       }
     }
-    
+
     .result-bottom {
       text-align: center;
       padding: 3px;
@@ -155,7 +154,7 @@
       .transition;
     }
   }
-  
+
   &:not(.result-expanded) {
     .result-field-value {
       white-space: nowrap;
@@ -168,19 +167,19 @@
   .result-field-value-show-overflow {
     overflow: visible !important;
   }
-  
+
   .result-pin-icon {
     display: none;
     float: right;
   }
-  
+
   &.result-pinned {
     .result-pin-icon {
       display: inline-block;
       vertical-align: bottom;
       // margin-top: -2px;
       margin-right: 5px;
-      
+
       svg {
         // margin-bottom: -3px;
         width: @result-icon-size;
@@ -193,7 +192,7 @@
     display: inline-block;
     float: right;
   }
-  
+
   .result-dragging {
     position: absolute;
     top: 0px;
@@ -229,9 +228,9 @@
     background-size: contain;
     background-position: center center;
     background-repeat: no-repeat;
-    
+
     // border-radius: 4px;
-    
+
     img {
       width: 100%;
       height: 100%;
@@ -251,51 +250,51 @@
   top: 40px;
   left: 0px;
   z-index: 1000;
-  
+
   overflow: hidden;
-  
+
   padding: 0px 20px;
   box-sizing: border-box;
-  
+
   background: rgba(0,0,0,0.5);
   .transition;
-  
+
   .result {
     margin: 40px 0px;
-    
+
     .result-inner {
       height: auto;
       overflow: hidden;
-      
+
       .result-field-value {
-        .can-select; 
+        .can-select;
         .force-select;
-        
+
         white-space: normal !important;
         margin-top: 3px;
-        
+
         &.result-field-value-short {
-          float: none !important; 
+          float: none !important;
           display: block !important;
         }
       }
     }
-    
+
     .result-fields-wrapper {
       height: auto !important;
       max-height: calc(~"100% - 130px") !important;
       overflow-y: auto;
     }
   }
-  
+
   .result-expanded-bg {
     position: absolute;
     width: 100%;
     height: 100%;
     top: 0px;
     left: 0px;
-  } 
-  
+  }
+
   &.result-collapsed-wrapper {
     background: rgba(0,0,0,0);
     height: 0px;
