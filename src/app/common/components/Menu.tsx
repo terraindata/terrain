@@ -51,6 +51,7 @@ import * as $ from 'jquery';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import onClickOutside from 'react-onclickoutside';
 import Util from '../../util/Util';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './Menu.less';
@@ -145,12 +146,11 @@ class Menu extends TerrainComponent<Props>
     );
   }
 
-  public close()
+  public handleClickOutside()
   {
     this.setState({
       open: false,
     });
-    $(document).off('click', this.close);
   }
 
   public componentWillMount()
@@ -175,23 +175,11 @@ class Menu extends TerrainComponent<Props>
     }
   }
 
-  public componentWillUnmount()
-  {
-    $(document).off('click', this.close);
-  }
-
   public toggleOpen(e)
   {
-    e.preventDefault();
-    e.stopPropagation();
     this.setState({
       open: !this.state.open,
     });
-
-    if (!this.state.open)
-    {
-      $(document).on('click', this.close);
-    }
   }
 
   public render()
@@ -275,7 +263,7 @@ class Menu extends TerrainComponent<Props>
 }
 
 const MenuContainer = Util.createContainer(
-  Menu,
+  onClickOutside(Menu),
   [],
   {
     colorsActions: ColorsActions,

@@ -381,6 +381,7 @@ const BuilderColumn = createReactClass<any, any>(
         >
           <div
             className='builder-title-bar'
+            style={borderColor(Colors().fontColorLightest)}
           >
             {
               this.props.index === 0 ? null : (
@@ -416,7 +417,10 @@ const BuilderColumn = createReactClass<any, any>(
               style={fontColor(Colors().text2)}
             >
               <span>
-                <span onClick={this.toggleColumnOptions}>
+                <span
+                  onClick={this.toggleColumnOptions}
+                  ref='handle'
+                >
                   {
                     COLUMNS[this.state.column]
                   }

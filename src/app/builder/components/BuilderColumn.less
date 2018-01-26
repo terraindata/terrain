@@ -15,10 +15,13 @@
     height: @title-bar-height;
     box-sizing: border-box;
     position: relative;
-    border-left: 1px solid @side-border-color;
     cursor: auto;
 
     z-index: 9;
+    margin-left: 40px;
+    padding-left: 0px;
+    margin-right: 40px;
+    border-bottom: 1px solid;
 
     &:hover {
       .builder-split-screen,
@@ -40,7 +43,6 @@
       text-shadow: 0px 0px 3px rgba(255,255,255,0.15);
       display: inline-block;
       position: relative;
-      left: @handle-width / 2;
       font-size: 20px;
       cursor: pointer;
       svg {
@@ -79,11 +81,12 @@
     .builder-resize-handle {
       position: absolute;
       top: 0px;
-      left: -1/2 * @handle-width;
+      left: -49px;;
       width: @handle-width;
       height: 100%;
       box-sizing: border-box;
       cursor: col-resize;
+      z-index: 1000;
       .transition;
 
       .builder-resize-handle-line {
@@ -159,12 +162,6 @@
         left: 0px;
         top: 0px;
       }
-    }
-  }
-
-  &:not(.builder-column-0) {
-    .builder-column-content {
-      border-left: 1px solid @side-border-color;
     }
   }
 
