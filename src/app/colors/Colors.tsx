@@ -51,26 +51,43 @@ import { extend } from 'lodash';
 
 const Color = require('color');
 
-interface Theme
+// Here are base colors for our 2018 theme
+// Pick from these colors when filling out the Theme interface
+// 1 is highest contrast (most to edge of spectrum) 
+//  as number increases, contrast decreases
+const NTColors =
 {
-  fontColor: string;
-  fontColor2: string; // less contrast
-  fontColorLightest: string;
+  light1: '#fff',
+  light2: '#f8f8f8',
+  light3: '#f4f5f7',
   
-  blockBg: string; // e.g., in Pathfinder, behind block elements
+  grey1: '#e3e3e3',
+  grey2: '#d8d8d8',
+  grey3: '#ccc',
   
-  sidebarBg: string;
-}
+  dark1: '#000',
+  dark2: '#231F20',
+  dark3: '#2f3132',
+  
+  mainBlue: '#1eb4fa',
+  blue1: '#a5e2ff',
+  blue2: '#55c6fa',
+  blue3: '#1a9cd9',
+  blue4: '#157eb0',
+};
 
-const NewTheme: Theme = 
+const NewTheme = 
 {
-  fontColor: '#221E1F',
+  fontColor: NTColors.dark3,
   fontColor2: '#606262',
-  fontColorLightest: '#CECECE',
+  fontColorLightest: NTColors.grey3,
   
-  blockBg: '#F8F8F8',
+  active: NTColors.mainBlue,
   
-  sidebarBg: '#fff',
+  blockBg: NTColors.light2, // e.g., in Pathfinder, behind block elements
+  blockOutline: NTColors.grey1,
+  
+  sidebarBg: NTColors.light1,
 }
 
 // Will be deprecated
