@@ -165,16 +165,6 @@ class Menu extends TerrainComponent<Props>
     });
   }
 
-  public componentWillReceiveProps(nextProps)
-  {
-    if (this.state.open !== nextProps.expanded)
-    {
-      this.setState({
-        open: nextProps.expanded,
-      });
-    }
-  }
-
   public toggleOpen(e)
   {
     this.setState({
