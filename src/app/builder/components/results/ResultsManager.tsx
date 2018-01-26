@@ -193,6 +193,7 @@ export class ResultsManager extends TerrainComponent<Props>
         && (!this.props.query ||
           (
             this.props.query.tql !== nextProps.query.tql ||
+            nextProps.query.tqlMode === 'manual' ||
             // this.props.query.cards !== nextProps.query.cards ||
             this.props.query.inputs !== nextProps.query.inputs
           )
