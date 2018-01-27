@@ -79,13 +79,21 @@ export default class ArrayPreview extends TerrainComponent<Props>
     const { items } = this.props;
     if (!Array.isArray(items))
     {
-      return <div className='array-preview-no-items' />;
+      return <div className='array-preview-no-items' > N/A </div>;
     }
-    return (
-      <div className='array-preview-container'>
-        {List(items).map(this.renderItem)}
-      </div>
-    );
+    else if (items.length === 0)
+    {
+      return <div className='array-preview-no-items' > List Empty </div>;
+    }
+    else
+    {
+      return (
+        <div className='array-preview-container'>
+          {List(items).map(this.renderItem)}
+        </div>
+      );
+    }
+
   }
 }
 

@@ -91,27 +91,62 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
     const { field, canEdit, preview, keyPath, depth } = this.props;
     if (!Array.isArray(preview))
     {
-      return null;
+      return (
+        <TemplateEditorFieldArrayNode
+          keyPath={keyPath}
+          field={field}
+          canEdit={canEdit}
+          renderNestedFields={this.props.renderNestedFields}
+          preview={null}
+          depth={depth + 1}
+          label={`N/A`}
+        />
+      );
     }
-    const previewList = List(preview);
-    return previewList.map((value, index) =>
+    else if (preview.length === 0)
     {
       return (
         <TemplateEditorFieldArrayNode
           keyPath={keyPath}
           field={field}
           canEdit={canEdit}
-          key={index}
           renderNestedFields={this.props.renderNestedFields}
-          preview={value}
+          preview={null}
           depth={depth + 1}
-          label={`${index + 1} of ${previewList.size}`}
+          label={`List Empty`}
         />
       );
-    }).toList();
+    }
+    else
+    {
+      const previewList = List(preview);
+      return previewList.map((value, index) =>
+      {
+        return (
+          <TemplateEditorFieldArrayNode
+            keyPath={keyPath}
+            field={field}
+            canEdit={canEdit}
+            key={index}
+            renderNestedFields={this.props.renderNestedFields}
+            preview={value}
+            depth={depth + 1}
+            label={`${index + 1} of ${previewList.size}`}
+          />
+        );
+      }).toList();
+    }
   }
 
-  public render()
+  // If depth is 0, then we need to render expandable view
+
+  // If depth is 1 less than max depth and it is array of primitives, then render out simple array
+
+  // If depth is max depth and nested, then render children via method passed by props
+
+  // Otherwise iterate through preview
+
+  public render() // TODO refactor the logic here
   {
     const { field, keyPath, canEdit, preview, depth, label } = this.props;
     let content = null;
@@ -119,12 +154,9 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
     let override = null;
     const simpleArrayDisplay: boolean = !this._isNested() && depth + 1 === this._arrayDepth();
 
-    if (depth === this._arrayDepth())
+    if (depth === this._arrayDepth() && this._isNested())
     {
-      if (this._isNested())
-      {
-        children = this.props.renderNestedFields(preview);
-      }
+      children = this.props.renderNestedFields(preview);
     }
     else if (simpleArrayDisplay)
     {

@@ -83,18 +83,15 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
   public render()
   {
     const { canEdit, field, keyPath, preview, hidePreviewValue, labelOverride, notInteractable, displayValueOverride } = this.props;
-    // const fieldNotInteractable = labelOverride !== undefined && labelOverride !== null;
     const settingsOpen = this.props.templateEditor.settingsKeyPath === keyPath;
     const labelStyle = settingsOpen ?
       _.extend({}, fontColor(Colors().text1, Colors().text1), backgroundColor(Colors().highlight))
       :
       fontColor(Colors().text3, notInteractable ? Colors().text3 : Colors().text2);
-    // const previewText = preview === undefined || preview === null ? 'Data Missing' : preview.toString();
 
+    const previewText = preview === undefined || preview === null ? 'N/A' : preview.toString();
     const previewContent = (displayValueOverride === undefined || displayValueOverride === null) ?
-      (preview === undefined || preview === null ? 'Data Missing' : preview.toString())
-      :
-      displayValueOverride;
+      previewText : displayValueOverride;
 
     return (
       <div className='template-editor-field-block'>

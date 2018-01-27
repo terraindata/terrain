@@ -94,6 +94,9 @@ export const SampleDocuments = [
       'Date Added': '01/10/2018',
       'Views': 515,
     },
+    'Basic List': [
+
+    ],
     'Related Products': [
       {
         'Item Name': 'Video Games',
