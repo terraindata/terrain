@@ -124,6 +124,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
         ),
       };
     }).toList();
+    
     return (
       <div
         className='pf-section'
@@ -155,6 +156,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
             selectedIndex={sourceNames.indexOf(this.props.pathfinderContext.source.dataSource.name)}
             canEdit={canEdit}
             onChange={this.handleSourceChange}
+            floatingLabel={'Data'}
           />
         </div>
       </div>
