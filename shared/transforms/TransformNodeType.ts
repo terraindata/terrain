@@ -46,18 +46,19 @@ THE SOFTWARE.
 
 enum TransformNodeType
 {
-  LoadNode,
-  StoreNode,
-  PutNode,
-  GetNode,
-  SplitNode,
-  JoinNode,
-  FilterNode,
-  DuplicateNode,
-  RenameNode,
-  PlusNode,
-  PrependNode,
-  AppendNode,
+  LoadNode = 0,
+  StoreNode = 1,
+  PutNode = 2,
+  GetNode = 3,
+  SplitNode = 4,
+  JoinNode = 5,
+  FilterNode = 6,
+  DuplicateNode = 7,
+  RenameNode = 8,
+  PlusNode = 9,
+  PrependNode = 10,
+  AppendNode = 11,
+  CapitalizeNode = 12,
 }
 
 export default TransformNodeType;

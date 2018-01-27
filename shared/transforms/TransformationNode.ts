@@ -44,12 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import TransformNodeType from 'shared/transforms/TransformNodeType';
+
 export class TransformationNode
 {
-  public label: string;
+  public id: number;
+  public typeCode: TransformNodeType;
+  public fieldIDs: number[];
 
-  constructor(label?: string)
+  constructor(id: number, typeCode: TransformNodeType, fieldIDs: number[], options?: object)
   {
-    this.label = label;
+    this.id = id;
+    this.typeCode = typeCode;
+    this.fieldIDs = fieldIDs;
   }
 }
+
+export default TransformationNode;

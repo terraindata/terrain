@@ -44,51 +44,127 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import TransformNode from './TransformNode';
-
-import AppendNode from './AppendNode';
-import DuplicateNode from './DuplicateNode';
-import FilterNode from './FilterNode';
-import GetNode from './GetNode';
-import JoinNode from './JoinNode';
-import LoadNode from './LoadNode';
-import PlusNode from './PlusNode';
-import PrependNode from './PrependNode';
-import PutNode from './PutNode';
-import RenameNode from './RenameNode';
-import SplitNode from './SplitNode';
-import StoreNode from './StoreNode';
+import {TransformationNode} from 'shared/transforms/TransformationNode';
+import TransformNodeType from 'shared/transforms/TransformNodeType';
+import * as winston from 'winston';
 
 /**
  *
  */
 abstract class TransformNodeVisitor<ReturnType>
 {
-  public abstract visitTransformNode(node: TransformNode): ReturnType;
+  public visit(node: TransformationNode, doc: object): ReturnType
+  {
+    switch (node.typeCode) {
+      case TransformNodeType.LoadNode:
+        return this.visitLoadNode(node, doc);
+      case TransformNodeType.StoreNode:
+        return this.visitStoreNode(node, doc);
+      case TransformNodeType.PutNode:
+        return this.visitPutNode(node, doc);
+      case TransformNodeType.GetNode:
+        return this.visitGetNode(node, doc);
+      case TransformNodeType.SplitNode:
+        return this.visitSplitNode(node, doc);
+      case TransformNodeType.JoinNode:
+        return this.visitJoinNode(node, doc);
+      case TransformNodeType.FilterNode:
+        return this.visitFilterNode(node, doc);
+      case TransformNodeType.DuplicateNode:
+        return this.visitDuplicateNode(node, doc);
+      case TransformNodeType.RenameNode:
+        return this.visitRenameNode(node, doc);
+      case TransformNodeType.PlusNode:
+        return this.visitPlusNode(node, doc);
+      case TransformNodeType.PrependNode:
+        return this.visitPrependNode(node, doc);
+      case TransformNodeType.AppendNode:
+        return this.visitAppendNode(node, doc);
+      case TransformNodeType.CapitalizeNode:
+        return this.visitCapitalizeNode(node, doc);
+      default:
+        winston.error('Attempted to visit an unsupported transformation node type: ' + node.typeCode);
+        break;
+    }
+  }
 
-  public visitLoadNode(node: LoadNode): ReturnType { return this.visitTransformNode(node); }
+  public visitLoadNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitStoreNode(node: StoreNode): ReturnType { return this.visitTransformNode(node); }
+  public visitStoreNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitPutNode(node: PutNode): ReturnType { return this.visitTransformNode(node); }
+  public visitPutNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitGetNode(node: GetNode): ReturnType { return this.visitTransformNode(node); }
+  public visitGetNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitSplitNode(node: SplitNode): ReturnType { return this.visitTransformNode(node); }
+  public visitSplitNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitJoinNode(node: JoinNode): ReturnType { return this.visitTransformNode(node); }
+  public visitJoinNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitFilterNode(node: FilterNode): ReturnType { return this.visitTransformNode(node); }
+  public visitFilterNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitDuplicateNode(node: DuplicateNode): ReturnType { return this.visitTransformNode(node); }
+  public visitDuplicateNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitRenameNode(node: RenameNode): ReturnType { return this.visitTransformNode(node); }
+  public visitRenameNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitPlusNode(node: PlusNode): ReturnType { return this.visitTransformNode(node); }
+  public visitPlusNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitPrependNode(node: PrependNode): ReturnType { return this.visitTransformNode(node); }
+  public visitPrependNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
 
-  public visitAppendNode(node: AppendNode): ReturnType { return this.visitTransformNode(node); }
+  public visitAppendNode(node: TransformationNode, doc: object): ReturnType
+  {
+    return ReturnType();
+  }
+
+  public visitCapitalizeNode(node: TransformationNode, doc: object): ReturnType
+  {
+    console.log(doc);
+    console.log(node.fieldIDs);
+    for (const fieldID of node.fieldIDs)
+    {
+      if (typeof doc[fieldID] !== 'string')
+      {
+        // TODO return error object
+      }
+      doc[fieldID] = doc[fieldID].toUpperCase();
+    }
+
+    return {
+      document: doc,
+    };
+  }
 }
 
 export default TransformNodeVisitor;

@@ -44,17 +44,36 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import TransformNodeType from 'shared/transforms/TransformNodeType';
 import { TransformationEngine } from '../../transforms/TransformationEngine';
 import {TransformationNode} from '../../transforms/TransformationNode';
 
-test('create basic DAG', () =>
+const doc1 = {
+  name: 'Bob',
+  age: 17,
+  meta: {
+    school: 'Stanford',
+  },
+};
+
+// test('create basic DAG', () =>
+// {
+//   const e: TransformationEngine = new TransformationEngine();
+//   const t1: TransformationNode = new TransformationNode('t1');
+//   const t2: TransformationNode = new TransformationNode('t2');
+//   e.appendTransformation(null, t1);
+//   console.log(e.json());
+//   expect(e.dag.nodes().length === 1);
+//   expect(e.dag.hasNode(t1));
+//   expect(!e.dag.hasNode(t2));
+// });
+
+test('capitalization', () =>
 {
-  const e: TransformationEngine = new TransformationEngine();
-  const t1: TransformationNode = new TransformationNode('t1');
-  const t2: TransformationNode = new TransformationNode('t2');
-  e.appendTransformation(null, t1);
-  console.log(e.json());
-  expect(e.dag.nodes().length === 1);
-  expect(e.dag.hasNode(t1));
-  expect(!e.dag.hasNode(t2));
+  const e: TransformationEngine = new TransformationEngine(doc1);
+  e.appendTransformation(TransformNodeType.CapitalizeNode, ['name']);
+  e.appendTransformation(TransformNodeType.CapitalizeNode, ['meta.school']);
+  const r = e.transform(doc1);
+  console.log(r);
+  expect(r['name'] === 'BOB');
 });
