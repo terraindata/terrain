@@ -135,6 +135,7 @@
     "memoize-one": "^3.0.1",
     "moment": "^2.20.1",
     "mysql": "^2.15.0",
+    "nested-property": "^0.0.7",
     "node-libs-browser": "^2.1.0",
     "node-schedule": "^1.2.5",
     "object-assign": "^4.1.1",

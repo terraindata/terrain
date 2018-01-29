@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import nestedProperty = require('nested-property');
 import TransformNodeType from 'shared/transforms/TransformNodeType';
 import { TransformationEngine } from '../../transforms/TransformationEngine';
 import {TransformationNode} from '../../transforms/TransformationNode';
@@ -76,4 +77,5 @@ test('capitalization', () =>
   const r = e.transform(doc1);
   console.log(r);
   expect(r['name'] === 'BOB');
+  expect(nestedProperty.get(r, 'meta.school') === 'STANFORD');
 });

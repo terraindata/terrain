@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import GraphLib = require('graphlib');
 import * as _ from 'lodash';
+import nestedProperty = require('nested-property');
 import TransformNodeVisitor from 'shared/transforms/TransformNodeVisitor';
 import TransformNodeType from 'sharedtransforms/TransformNodeType';
 import * as winston from 'winston';
@@ -152,57 +153,15 @@ export class TransformationEngine {
     }
   }
 
-  private hasOwnNestedProperty(obj, propertyPath): boolean
-  {
-    if (!propertyPath) {
-      return false;
-    }
-
-    const properties = propertyPath.split('.');
-
-    for (let i = 0; i < properties.length; i++) {
-      const prop = properties[i];
-
-      if (!obj || !obj.hasOwnProperty(prop)) {
-        return false;
-      } else {
-        obj = obj[prop];
-      }
-    }
-
-    return true;
-  }
-
-  private getNestedProperty(obj, propertyPath): boolean
-  {
-    if (!propertyPath) {
-      return false;
-    }
-
-    const properties = propertyPath.split('.');
-
-    for (let i = 0; i < properties.length; i++) {
-      const prop = properties[i];
-
-      if (!obj || !obj.hasOwnProperty(prop)) {
-        return false;
-      } else {
-        obj = obj[prop];
-      }
-    }
-
-    return obj[prop];
-  }
-
   private flatten(obj: object): object
   {
     console.log(obj);
     const output: object = {};
     for (const [key, value] of this.fieldNameToIDMap) {
       console.log('fkey = ' + key);
-      if (this.hasOwnNestedProperty(obj, key))
+      if (nestedProperty.has(obj, key))
       {
-        output[value] = this.getNestedProperty(obj, key);
+        output[value] = nestedProperty.get(obj, key);
       }
     }
     console.log(output);
@@ -215,7 +174,7 @@ export class TransformationEngine {
     for (const [key, value] of this.IDToFieldNameMap) {
       if (obj.hasOwnProperty(key))
       {
-        output[value] = obj[key];
+        nestedProperty.set(output, value, obj[key]);
       }
     }
     return output;
