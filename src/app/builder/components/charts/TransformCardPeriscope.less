@@ -1,13 +1,14 @@
 .tp-text-wrapper {
   position: relative;
   height: 20px;
+  margin-left: 20px;
   // margin-top: -20px;
   
   .tp-tb-left,
   .tp-tb-right {
     position: absolute;
     bottom: -2px;
-    width: calc(~"(100% - 80px) / 2 - 3px");
+    width: calc(~"((100% - 80px) / 2) - 3px");
     max-width: 80px;
     
     input {
@@ -20,7 +21,7 @@
   }
   
   .tp-tb-right {
-    right: 0px;
+    right: -80px;
     input {
       text-align: right;
     }
