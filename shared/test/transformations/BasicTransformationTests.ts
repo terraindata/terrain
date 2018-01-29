@@ -57,25 +57,13 @@ const doc1 = {
   },
 };
 
-// test('create basic DAG', () =>
-// {
-//   const e: TransformationEngine = new TransformationEngine();
-//   const t1: TransformationNode = new TransformationNode('t1');
-//   const t2: TransformationNode = new TransformationNode('t2');
-//   e.appendTransformation(null, t1);
-//   console.log(e.json());
-//   expect(e.dag.nodes().length === 1);
-//   expect(e.dag.hasNode(t1));
-//   expect(!e.dag.hasNode(t2));
-// });
-
 test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
   e.addField('meta.school', 'string');
   e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
   const r = e.transform(doc1);
-  expect(nestedProperty.get(r, 'meta.school') === 'STANFORD');
+  expect(nestedProperty.get(r, 'meta.school')).toBe('STANFORD');
 });
 
 test('capitalization', () =>
@@ -84,6 +72,69 @@ test('capitalization', () =>
   e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
   e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
   const r = e.transform(doc1);
-  expect(r['name'] === 'BOB');
-  expect(nestedProperty.get(r, 'meta.school') === 'STANFORD');
+  expect(r['name']).toBe('BOB');
+  expect(nestedProperty.get(r, 'meta.school')).toBe('STANFORD');
+});
+
+test('serialize to JSON', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc1);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
+  expect(e.json()).toEqual({
+    dag: {
+      options: {
+        directed: true,
+        multigraph: false,
+        compound: false
+      },
+      nodes: [
+        {
+          v: '0',
+          value: new TransformationNode(0, 12, [0]),
+        },
+        {
+          v: '1',
+          value: new TransformationNode(1, 12, [2]),
+        },
+      ],
+      edges: [],
+    },
+    doc: {
+      name: 'Bob',
+      age: 17,
+      meta: {
+        school: 'Stanford',
+      },
+    },
+    uidField: 3,
+    uidNode: 2,
+    fieldNameToIDMap: [
+      ['name', 0],
+      ['age', 1],
+      ['meta.school', 2],
+    ],
+    IDToFieldNameMap: [
+      [0, 'name'],
+      [1, 'age'],
+      [2, 'meta.school'],
+    ],
+    fieldTypes: [
+      [0, 'string'],
+      [1, 'number'],
+      [2, 'string'],
+    ],
+  });
+});
+
+test('JSON serialize/deserialize round trip', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc1);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
+  const j = e.json();
+  const e2 = TransformationEngine.load(j);
+  expect(e.equals(e2)).toBe(true);
+  e2.addField('i', 'number');
+  expect(e.equals(e2)).toBe(false);
 });

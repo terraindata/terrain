@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
+import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
 /**
@@ -56,37 +57,43 @@ class TransformationNodeVisitor
 {
   public static visit(node: TransformationNode, doc: object): TransformationVisitResult
   {
+    const docCopy = doc; // Preserve original doc in case of errors that would mangle it
     switch (node.typeCode)
     {
       case TransformationNodeType.LoadNode:
-        return TransformationNodeVisitor.visitLoadNode(node, doc);
+        return TransformationNodeVisitor.visitLoadNode(node, docCopy);
       case TransformationNodeType.StoreNode:
-        return TransformationNodeVisitor.visitStoreNode(node, doc);
+        return TransformationNodeVisitor.visitStoreNode(node, docCopy);
       case TransformationNodeType.PutNode:
-        return TransformationNodeVisitor.visitPutNode(node, doc);
+        return TransformationNodeVisitor.visitPutNode(node, docCopy);
       case TransformationNodeType.GetNode:
-        return TransformationNodeVisitor.visitGetNode(node, doc);
+        return TransformationNodeVisitor.visitGetNode(node, docCopy);
       case TransformationNodeType.SplitNode:
-        return TransformationNodeVisitor.visitSplitNode(node, doc);
+        return TransformationNodeVisitor.visitSplitNode(node, docCopy);
       case TransformationNodeType.JoinNode:
-        return TransformationNodeVisitor.visitJoinNode(node, doc);
+        return TransformationNodeVisitor.visitJoinNode(node, docCopy);
       case TransformationNodeType.FilterNode:
-        return TransformationNodeVisitor.visitFilterNode(node, doc);
+        return TransformationNodeVisitor.visitFilterNode(node, docCopy);
       case TransformationNodeType.DuplicateNode:
-        return TransformationNodeVisitor.visitDuplicateNode(node, doc);
+        return TransformationNodeVisitor.visitDuplicateNode(node, docCopy);
       case TransformationNodeType.RenameNode:
-        return TransformationNodeVisitor.visitRenameNode(node, doc);
+        return TransformationNodeVisitor.visitRenameNode(node, docCopy);
       case TransformationNodeType.PlusNode:
-        return TransformationNodeVisitor.visitPlusNode(node, doc);
+        return TransformationNodeVisitor.visitPlusNode(node, docCopy);
       case TransformationNodeType.PrependNode:
-        return TransformationNodeVisitor.visitPrependNode(node, doc);
+        return TransformationNodeVisitor.visitPrependNode(node, docCopy);
       case TransformationNodeType.AppendNode:
-        return TransformationNodeVisitor.visitAppendNode(node, doc);
+        return TransformationNodeVisitor.visitAppendNode(node, docCopy);
       case TransformationNodeType.CapitalizeNode:
-        return TransformationNodeVisitor.visitCapitalizeNode(node, doc);
+        return TransformationNodeVisitor.visitCapitalizeNode(node, docCopy);
       default:
-        winston.error(`Attempted to visit an unsupported transformation node type: ${node.typeCode}`);
-        break;
+        return {
+          errors: [
+            {
+              message: `Attempted to visit an unsupported transformation node type: ${node.typeCode}`,
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
     }
   }
 
@@ -156,7 +163,13 @@ class TransformationNodeVisitor
     {
       if (typeof doc[fieldID] !== 'string')
       {
-        // TODO return error object
+        return {
+          errors: [
+            {
+              message: 'Attempted to capitalize a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
       }
       doc[fieldID] = doc[fieldID].toUpperCase();
     }

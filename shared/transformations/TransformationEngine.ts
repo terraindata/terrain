@@ -45,33 +45,39 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import GraphLib = require('graphlib');
+import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
 import nestedProperty = require('nested-property');
 import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
+import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
 const Graph = GraphLib.Graph;
 
 export class TransformationEngine
 {
-  public static load(json: string | object): TransformationEngine
+  // TODO parse from strings as well (need to recover type information e.g. for nodes)
+  public static load(json: object): TransformationEngine
   {
-    // TODO need to (de)serialize more than just DAG (probably all props of TE)
     const parsedJSON = typeof json === 'string' ? JSON.parse(json) : json;
     const e: TransformationEngine = new TransformationEngine();
-    e.dag = GraphLib.json.read(parsedJSON);
+    const dag: any = GraphLib.json.read(parsedJSON['dag']);
+    /*for(let i: number =  0; i < dag.nodes.length; i++)
+    {
+      console.log('hh');
+      dag.nodes[i].value = new TransformationNode(dag.nodes[i].value.id, dag.nodes[i].value.typeCode, dag.nodes[i].value.fieldIDs);
+    }*/
+    e.dag = dag;
+    e.doc = parsedJSON['doc'];
+    e.uidField = parsedJSON['uidField'];
+    e.uidNode = parsedJSON['uidNode'];
+    e.fieldNameToIDMap = new Map<string, number>(parsedJSON['fieldNameToIDMap']);
+    e.IDToFieldNameMap = new Map<number, string>(parsedJSON['IDToFieldNameMap']);
+    e.fieldTypes = new Map<number, string>(parsedJSON['fieldTypes']);
     return e;
-  }
-
-  private static isPrimitive(obj): boolean
-  {
-    if (null === obj) { return true; }
-    if (undefined === obj) { return true; }
-    if (['string', 'number', 'boolean'].some((type) => type === typeof obj)) { return true; }
-    return false;
   }
 
   private dag: any = new Graph({ isDirected: true });
@@ -93,6 +99,17 @@ export class TransformationEngine
     // allow construction without example doc (manually add fields)
   }
 
+  public equals(other: TransformationEngine): boolean
+  {
+    return JSON.stringify(GraphLib.json.write(this.dag)) === JSON.stringify(GraphLib.json.write(other.dag))
+      && JSON.stringify(this.doc) === JSON.stringify(other.doc)
+      && this.uidField === other.uidField
+      && this.uidNode === other.uidNode
+      && JSON.stringify([...this.fieldNameToIDMap]) === JSON.stringify([...other.fieldNameToIDMap])
+      && JSON.stringify([...this.IDToFieldNameMap]) === JSON.stringify([...other.IDToFieldNameMap])
+      && JSON.stringify([...this.fieldTypes]) === JSON.stringify([...other.fieldTypes]);
+  }
+
   public appendTransformation(nodeType: TransformationNodeType, fieldNames: string[], options?: object, tags?: string[], weight?: number)
   {
     const fieldIDs: number[] = _.map(fieldNames, (name) => this.fieldNameToIDMap.get(name));
@@ -112,8 +129,12 @@ export class TransformationEngine
         const transformationResult: TransformationVisitResult = TransformationNodeVisitor.visit(this.dag.node(toTraverse[i]), output);
         if (transformationResult.errors !== undefined)
         {
-          winston.error('Transformation encountered errors!');
-          // TODO abort?
+          winston.error('Transformation encountered errors!:');
+          transformationResult.errors.forEach((error: TransformationVisitError) =>
+          {
+            winston.error(`\t -${error.message}`);
+          });
+          // TODO abort transforming if errors occur?
         }
         output = transformationResult.document;
       }
@@ -121,9 +142,17 @@ export class TransformationEngine
     return this.unflatten(output);
   }
 
-  public json(): string
+  public json(): object
   {
-    return GraphLib.json.write(this.dag);
+    return {
+      dag: GraphLib.json.write(this.dag),
+      doc: this.doc,
+      uidField: this.uidField,
+      uidNode: this.uidNode,
+      fieldNameToIDMap: [...this.fieldNameToIDMap],
+      IDToFieldNameMap: [...this.IDToFieldNameMap],
+      fieldTypes: [...this.fieldTypes],
+    };
   }
 
   public addField(fullKeyPath: string, typeName: string): void
@@ -139,7 +168,7 @@ export class TransformationEngine
   {
     for (const key of Object.keys(obj))
     {
-      if (TransformationEngine.isPrimitive(obj[key]))
+      if (isPrimitive(obj[key]))
       {
         this.addField(currentKeyPath + key, typeof obj[key]);
       } else if (Array.isArray(obj[key]))

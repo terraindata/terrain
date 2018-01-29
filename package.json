@@ -117,6 +117,7 @@
     "google-oauth-jwt": "^0.2.0",
     "graphlib": "^2.1.5",
     "immutable": "^3.8.2",
+    "is-primitive": "^3.0.0",
     "javascript-natural-sort": "^0.7.1",
     "jquery": "^3.2.1",
     "kcors": "^2.2.1",

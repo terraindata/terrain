@@ -44,13 +44,9 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import TransformationVisitError from './TransformationVisitError';
-
-export interface TransformationVisitResult
+export interface TransformationVisitError
 {
-  document?: object;
-  errors?: TransformationVisitError[];
-  // fields created?  fields destroyed?
+  message: string;
 }
 
-export default TransformationVisitResult;
+export default TransformationVisitError;
