@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access
+// tslint:disable:strict-boolean-expressions member-access restrict-plus-operands
 
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';

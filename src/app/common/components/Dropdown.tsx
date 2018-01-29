@@ -460,14 +460,14 @@ class Dropdown extends TerrainComponent<Props>
 
             {
               hasFloatingLabel &&
-                <FloatingInput
-                  label={floatingLabel}
-                  value={floatingInputValue}
-                  isTextInput={false /* TODO try to use this to input Other text */}
-                  canEdit={this.props.canEdit}
-                  onClick={_.noop}
-                  noBorder={true}
-                />
+              <FloatingInput
+                label={floatingLabel}
+                value={floatingInputValue}
+                isTextInput={false /* TODO try to use this to input Other text */}
+                canEdit={this.props.canEdit}
+                onClick={_.noop}
+                noBorder={true}
+              />
             }
           </div>,
           {
