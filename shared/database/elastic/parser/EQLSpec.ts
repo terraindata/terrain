@@ -306,7 +306,7 @@ const EQLSpec: ESClause[] =
           },
           'sort:elasticScore': null,
           'from:from': 0,
-          'size:size': 1000,
+          'size:size': 100,
           'track_scores:track_scores': true,
         },
         suggestions: ['query', 'sort', 'from', 'size'],
