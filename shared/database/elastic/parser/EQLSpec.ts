@@ -245,7 +245,7 @@ const EQLSpec: ESClause[] =
         path: ['control'],
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
-        template: '1000',
+        template: '100',
       }),
     new ESEnumClause('explain_wildcards',
       ['open', 'closed', 'none', 'all'],
