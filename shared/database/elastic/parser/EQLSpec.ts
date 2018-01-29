@@ -1816,6 +1816,7 @@ const EQLSpec: ESClause[] =
       {
         object: 'terms_lookup',
         array: 'base[]',
+        number: 'boost',
       },
       {
         path: ['filter'],

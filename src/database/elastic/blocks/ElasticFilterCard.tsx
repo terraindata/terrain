@@ -577,7 +577,10 @@ export const elasticFilter = _card({
     title: 'Filter',
     description: 'Terrain\'s custom card for filtering results in a human-readable way.',
     colors: getCardColors('filter', Colors().builder.cards.structureClause),
-    preview: '[cards.size] Properties',
+    preview: (c: Card) =>
+    {
+      return String(c['indexFilters'].size + c['typeFilters'].size + c['otherFilters'].size + c['cards'].size) + ' Filters'
+    },
     // this tql is same as tql of other clause cards.
     tql: (block, tqlTranslationFn, tqlConfig) =>
     {
