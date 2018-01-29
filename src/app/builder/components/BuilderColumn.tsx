@@ -444,7 +444,7 @@ const BuilderColumn = createReactClass<any, any>(
               </span>
               {
                 !canEdit &&
-                tooltip(<LockedIcon style={getStyle('fill', Colors().highlightFont)} />,
+                tooltip(<LockedIcon style={getStyle('fill', Colors().fontWhite)} />,
                   cantEditReason)
               }
             </div>

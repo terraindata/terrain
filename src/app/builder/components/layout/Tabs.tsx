@@ -130,7 +130,7 @@ const Tab = createReactClass<any, any>({
       >
         <CloseIcon
           className='close-icon'
-          style={getStyle('fill', this.props.selected ? Colors().highlightFont : Colors().iconColor)}
+          style={getStyle('fill', this.props.selected ? Colors().sidebarBg : Colors().iconColor)}
         />
       </div>
     );
@@ -139,7 +139,7 @@ const Tab = createReactClass<any, any>({
   render()
   {
     const style = _.extend({},
-      fontColor(this.props.selected ? Colors().highlightFont : Colors().fontColor2),
+      fontColor(this.props.selected ? Colors().sidebarBg : Colors().fontColor2),
       // backgroundColor(this.props.selected ? Colors().active : '')
     );
     return this.renderPanel(
@@ -312,7 +312,7 @@ class Tabs extends TerrainComponent<TabsProps> {
                 key={index}
                 onClick={action.onClick}
                 style={
-                  action.text ? backgroundColor(action.enabled ? Colors().highlightFont : Colors().blockBg) : undefined
+                  action.text ? backgroundColor(action.enabled ? Colors().sidebarBg : Colors().blockBg) : undefined
                 }
               >
                 {

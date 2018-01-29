@@ -57,6 +57,7 @@ import Actions from '../../builder/data/BuilderActions';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import KeyboardFocus from './../../common/components/KeyboardFocus';
 import TerrainComponent from './../../common/components/TerrainComponent';
+import FloatingInput from './FloatingInput';
 
 import './Dropdown.less';
 
@@ -81,6 +82,7 @@ export interface Props
   placeholder?: string;
   icons?: Immutable.Map<any, any>;
   action?: (keyPath, value) => void;
+  floatingLabel?: string;
 }
 
 @Radium
@@ -169,8 +171,8 @@ class Dropdown extends TerrainComponent<Props>
     const style = {
       'color': customColor,
       ':hover': {
-        backgroundColor: Colors().inactiveHover,
-        color: Colors().activeText,
+        borderColor: Colors().inactiveHover,
+        // color: Colors().activeText,
         stroke: Colors().activeText,
       },
       'stroke': customColor,
@@ -179,7 +181,7 @@ class Dropdown extends TerrainComponent<Props>
     if (focused)
     {
       _.extend(style, {
-        borderColor: Colors().inactiveHover,
+        borderColor: Colors().active,
         // color: Colors().text1,
       });
     }
@@ -187,11 +189,11 @@ class Dropdown extends TerrainComponent<Props>
     if (selected)
     {
       _.extend(style, {
-        'backgroundColor': customColor || Colors().active,
-        'color': Colors().activeText,
+        'borderColor': customColor || Colors().active,
+        // 'color': Colors().activeText,
         ':hover': {
-          backgroundColor: customColor || Colors().active,
-          color: Colors().activeText,
+          borderColor: customColor || Colors().active,
+          // color: Colors().activeText,
           stroke: Colors().activeText,
         },
         'stroke': Colors().activeText,
@@ -360,12 +362,12 @@ class Dropdown extends TerrainComponent<Props>
 
     const dropdownValueStyle = [
       this.props.canEdit ?
-        backgroundColor(
+        borderColor(
           !this.state.open ? Colors().inputBg : customColor || Colors().active,
           customColor || Colors().inactiveHover,
         )
         :
-        backgroundColor(Colors().darkerHighlight)
+        borderColor(Colors().darkerHighlight)
       ,
       this.state.open ?
         fontColor(Colors().activeText) :
@@ -382,6 +384,11 @@ class Dropdown extends TerrainComponent<Props>
       borderColor(Colors().inputBorder),
     ];
 
+    const { floatingLabel, placeholder } = this.props;
+    const hasFloatingLabel = floatingLabel !== undefined;
+    const floatingInputValue = selectedIndex === -1 ? placeholder : 
+      this.getOptionName(options.get(selectedIndex), selectedIndex);
+    
     return (
       <div
         onClick={this.toggleOpen}
@@ -393,6 +400,7 @@ class Dropdown extends TerrainComponent<Props>
           'dropdown-open': this.state.open,
           'dropdown-disabled': !this.props.canEdit,
           'dropdown-center': this.props.centerAlign,
+          'dropdown-wrapper-larger': hasFloatingLabel,
           [this.props.className]: !!this.props.className,
         })}
         key='dropdown-body'
@@ -403,7 +411,10 @@ class Dropdown extends TerrainComponent<Props>
         }
         {tooltip(
           <div
-            className='dropdown-value'
+            className={classNames({
+              'dropdown-value': true,
+              'dropdown-value-larger': hasFloatingLabel,
+            })}
             ref='value'
             style={[
               { width: this.props.width },
@@ -419,7 +430,7 @@ class Dropdown extends TerrainComponent<Props>
                   key={index}
                   className={classNames({
                     'dropdown-option-inner': true,
-                    'dropdown-option-value-selected': index === selectedIndex,
+                    'dropdown-option-value-selected': index === selectedIndex && !hasFloatingLabel,
                     'dropdown-option-inner-hidden': this.props.icons !== undefined,
                   })}
                   style={this.props.icons ? { paddingTop: 6 } : {}}
@@ -431,7 +442,7 @@ class Dropdown extends TerrainComponent<Props>
               )
             }
             {
-              this.props.placeholder &&
+              placeholder && !hasFloatingLabel &&
               <div
                 key={-1}
                 className={classNames({
@@ -442,9 +453,21 @@ class Dropdown extends TerrainComponent<Props>
                 style={fontColor(Colors().text3)}
               >
                 {
-                  this.props.placeholder
+                  placeholder
                 }
               </div>
+            }
+            
+            {
+              hasFloatingLabel &&
+                <FloatingInput
+                  label={floatingLabel}
+                  value={floatingInputValue}
+                  isTextInput={false /* TODO try to use this to input Other text */}
+                  canEdit={this.props.canEdit}
+                  onClick={_.noop}
+                  noBorder={true}
+                />
             }
           </div>,
           {
@@ -469,5 +492,6 @@ class Dropdown extends TerrainComponent<Props>
     );
   }
 }
+
 
 export default Dropdown;

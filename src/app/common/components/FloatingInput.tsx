@@ -58,7 +58,7 @@ import TerrainComponent from './../../common/components/TerrainComponent';
 const Container = styled.div`
   position: relative;
   flex-grow: 1;
-  margin: 0px 12px;
+  line-height: normal;
 `;
 
 const LEFT = '12px';
@@ -69,7 +69,7 @@ const Label = styled.label`
   top: 14px;
   font-size: 16px;
   transition: all 0.15s;
-  color: @grey-text;
+  color: ${Colors().text3};
 `;
 
 const floatingLabelStyle = {
@@ -77,16 +77,33 @@ const floatingLabelStyle = {
   top: 6,
 };
 
-const Input = styled.input`
+const inputStyle = `
   padding-right: 6px;
   padding-left: ${LEFT};
   padding-top: 20px;
   padding-bottom: 4px;
   border-radius: 3px;
   width: 100%;
-  border: 1px solid @grey;
+  border: 1px solid ${Colors().inputBorder};
   outline: none;
   font-size: 18px;
+  color: ${Colors().text1};
+  transition: all 0.15s;
+  
+  &:hover {
+    border-color: ${Colors().active};
+  }
+`;
+const noBorderFn = (props) => props.noBorder && 'border: none !important;';
+
+const Input = styled.input`
+  ${inputStyle}
+  ${noBorderFn}
+`;
+const InputDiv = styled.div`
+  ${inputStyle}
+  ${noBorderFn}
+  cursor: pointer;
 `;
 
 export interface Props
@@ -95,8 +112,11 @@ export interface Props
   isTextInput: boolean;
   value: any;
 
-  onChange?: (value: any) => void;
+  id?: any; // a unique identifier, pass to props handlers
+  onChange?: (value: any, id: any) => void;
+  onClick?: (id: any) => void;
   canEdit?: boolean;
+  noBorder?: boolean;
 }
 
 class FloatingInput extends TerrainComponent<Props>
@@ -121,17 +141,13 @@ class FloatingInput extends TerrainComponent<Props>
     const { props, state } = this;
     const { value } = props;
 
-    const isFloating = state.isFocused || (value !== undefined && value !== null && value.length > 0);
+    const isFloating = this.isFloating();
 
     return (
       <Container>
-        <Input
-          value={value}
-          id={state.myId}
-          onChange={this.handleChange}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-        />
+        {
+          this.renderValue()
+        }
         <Label
           htmlFor={state.myId}
           style={isFloating ? floatingLabelStyle : undefined}
@@ -143,20 +159,80 @@ class FloatingInput extends TerrainComponent<Props>
       </Container>
     );
   }
-
-  public handleChange(e)
+  
+  private isFloating()
   {
-    this.props.onChange(e.target.value);
+    if (this.state.isFocused)
+    {
+      return true;
+    }
+    
+    const { value } = this.props;
+    
+    if (value === undefined || value === null)
+    {
+      return false;
+    }
+    
+    if (('' + value).length > 0)
+    {
+      return true;
+    }
+    
+    return false;
+  }
+  
+  private renderValue()
+  {
+    const { props, state } = this;
+    const { value } = props;
+
+    if (props.isTextInput)
+    {
+      // Return a text input
+      return (
+        <Input
+          value={value}
+          id={state.myId}
+          onChange={this.handleChange}
+          onFocus={this.handleFocus}
+          onBlur={this.handleBlur}
+          noBorder={props.noBorder}
+        />
+      );
+    }
+    
+    // Return a normal div, uneditable
+    return (
+      <InputDiv
+        onClick={this.handleClick}
+        noBorder={props.noBorder}
+      >
+        {
+          value
+        }
+      </InputDiv>
+    );
+  }
+  
+  private handleClick()
+  {
+    this.props.onClick(this.props.id);
   }
 
-  public handleFocus()
+  private handleChange(e)
+  {
+    this.props.onChange(e.target.value, this.props.id);
+  }
+
+  private handleFocus()
   {
     this.setState({
       isFocused: true,
     });
   }
 
-  public handleBlur()
+  private handleBlur()
   {
     this.setState({
       isFocused: false,

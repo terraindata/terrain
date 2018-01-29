@@ -51,30 +51,44 @@ import { extend } from 'lodash';
 
 const Color = require('color');
 
-interface Theme
+// Here are base colors for our 2018 theme
+// Pick from these colors when filling out the Theme interface
+// 1 is highest contrast (most to edge of spectrum)
+//  as number increases, contrast decreases
+const NTColors =
 {
-  fontColor: string;
-  fontColor2: string; // less contrast
-  fontColorLightest: string;
-  highlightFont: string; // Font color for when something is highlighted (in blue usually)
-  blockBg: string; // e.g., in Pathfinder, behind block elements
+  light1: '#fff',
+  light2: '#f8f8f8',
+  light3: '#f4f5f7',
 
-  sidebarBg: string;
-  backgroundColor: string;
+  grey1: '#e3e3e3',
+  grey2: '#d8d8d8',
+  grey3: '#ccc',
+
+  dark1: '#000',
+  dark2: '#231F20',
+  dark3: '#2f3132',
+
+  mainBlue: '#1eb4fa',
+  blue1: '#a5e2ff',
+  blue2: '#55c6fa',
+  blue3: '#1a9cd9',
+  blue4: '#157eb0',
+};
+
+const NewTheme =
+{
+  fontColor: NTColors.dark3,
+  fontColor2: '#606262',
+  fontColorLightest: NTColors.grey3,
+
+  active: NTColors.mainBlue,
+
+  blockBg: NTColors.light2, // e.g., in Pathfinder, behind block elements
+  blockOutline: NTColors.grey1,
+
+  sidebarBg: NTColors.light1,
 }
-
-const NewTheme: Theme =
-  {
-    fontColor: '#221E1F',
-    fontColor2: '#606262',
-    fontColorLightest: '#CECECE',
-    highlightFont: '#FFFFFF',
-
-    blockBg: '#F8F8F8',
-
-    sidebarBg: '#fff',
-    backgroundColor: '#f4f5f7',
-  };
 
 // Will be deprecated
 interface OldTheme

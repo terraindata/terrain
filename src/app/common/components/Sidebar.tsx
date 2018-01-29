@@ -62,8 +62,8 @@ const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandI
 const linkHeight = 36; // Coordinate with Sidebar.less
 const TerrainIcon = require('images/logo_terrainLong_blue@2x.png');
 const TerrainSmallIcon = require('images/logo_terrain_mountain.png');
-const linkOffsetExpanded = 175;
-const linkOffsetCollapsed = 92;
+const linkOffsetExpanded = 174;
+const linkOffsetCollapsed = 100;
 export interface ILink
 {
   icon: any;
