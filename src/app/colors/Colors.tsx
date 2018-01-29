@@ -53,42 +53,55 @@ const Color = require('color');
 
 // Here are base colors for our 2018 theme
 // Pick from these colors when filling out the Theme interface
-// 1 is highest contrast (most to edge of spectrum) 
+// 1 is highest contrast (most to edge of spectrum)
 //  as number increases, contrast decreases
 const NTColors =
-{
-  light1: '#fff',
-  light2: '#f8f8f8',
-  light3: '#f4f5f7',
-  
-  grey1: '#e3e3e3',
-  grey2: '#d8d8d8',
-  grey3: '#ccc',
-  
-  dark1: '#000',
-  dark2: '#231F20',
-  dark3: '#2f3132',
-  
-  mainBlue: '#1eb4fa',
-  blue1: '#a5e2ff',
-  blue2: '#55c6fa',
-  blue3: '#1a9cd9',
-  blue4: '#157eb0',
-};
+  {
+    light1: '#fff',
+    light2: '#f8f8f8',
+    light3: '#f4f5f7',
 
-const NewTheme = 
+    grey1: '#e3e3e3',
+    grey2: '#d8d8d8',
+    grey3: '#ccc',
+
+    dark1: '#000',
+    dark2: '#231F20',
+    dark3: '#2f3132',
+
+    mainBlue: '#1eb4fa',
+    blue1: '#a5e2ff',
+    blue2: '#55c6fa',
+    blue3: '#1a9cd9',
+    blue4: '#157eb0',
+  };
+
+// Need to type these as strings
+interface Theme
 {
-  fontColor: NTColors.dark3,
-  fontColor2: '#606262',
-  fontColorLightest: NTColors.grey3,
-  
-  active: NTColors.mainBlue,
-  
-  blockBg: NTColors.light2, // e.g., in Pathfinder, behind block elements
-  blockOutline: NTColors.grey1,
-  
-  sidebarBg: NTColors.light1,
+  fontColor: string;
+  fontColor2: string;
+  fontColorLightest: string;
+
+  active: string;
+  blockBg: string;
+  blockOutline: string;
+  sidebarBg: string;
 }
+
+const NewTheme: Theme =
+  {
+    fontColor: NTColors.dark3,
+    fontColor2: '#606262',
+    fontColorLightest: NTColors.grey3,
+
+    active: NTColors.mainBlue,
+
+    blockBg: NTColors.light2, // e.g., in Pathfinder, behind block elements
+    blockOutline: NTColors.grey1,
+
+    sidebarBg: NTColors.light1,
+  };
 
 // Will be deprecated
 interface OldTheme
@@ -1104,8 +1117,8 @@ const newTheme = NewTheme;
 
 // contains the mash of the old theme and the new theme
 // only initialized once, as we need to reload browser anyway for theme changes
-const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme); 
-   // ^ new theme comes second, overrides old theme's properties
+const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme);
+// ^ new theme comes second, overrides old theme's properties
 
 export function Colors(): Theme & OldTheme
 {

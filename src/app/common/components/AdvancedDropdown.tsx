@@ -78,7 +78,7 @@ export interface Props
   textShouldBeNumber?: boolean;
   textboxWidth?: number;
   textPlaceholder?: string;
-  
+
   floatingLabel?: string;
 }
 

@@ -124,7 +124,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
         ),
       };
     }).toList();
-    
+
     return (
       <div
         className='pf-section'

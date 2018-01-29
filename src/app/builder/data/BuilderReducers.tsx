@@ -240,7 +240,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           data: any,
         },
       }) =>
-        state.updateIn(
+      state.updateIn(
         action.payload.keyPath,
         (arr) =>
         {
