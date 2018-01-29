@@ -47,14 +47,15 @@ THE SOFTWARE.
 import GraphLib = require('graphlib');
 import * as _ from 'lodash';
 import nestedProperty = require('nested-property');
-import TransformNodeVisitor from 'shared/transforms/TransformNodeVisitor';
-import TransformNodeType from 'sharedtransforms/TransformNodeType';
 import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
+import TransformationNodeType from './TransformationNodeType';
+import TransformationNodeVisitor from './TransformationNodeVisitor';
 
 const Graph = GraphLib.Graph;
 
-export class TransformationEngine {
+export class TransformationEngine
+{
   public static load(json: object): TransformationEngine
   {
     // TODO need to (de)serialize more than just DAG (probably all props of TE)
@@ -70,7 +71,8 @@ export class TransformationEngine {
     return e;
   }
 
-  private static isPrimitive(obj): boolean {
+  private static isPrimitive(obj): boolean
+  {
     if (null === obj) { return true; }
     if (undefined === obj) { return true; }
     if (['string', 'number', 'boolean'].some((type) => type === typeof obj)) { return true; }
@@ -87,7 +89,8 @@ export class TransformationEngine {
 
   constructor(doc?: object)
   {
-    if(doc) {
+    if (doc !== undefined)
+    {
       this.doc = doc;
       this.generateInitialFieldMaps(this.doc);
       // initial field nodes can be implicit, DAG should only represent actual transformations
@@ -95,7 +98,7 @@ export class TransformationEngine {
     // allow construction without example doc (manually add fields)
   }
 
-  public appendTransformation(nodeType: TransformNodeType, fieldNames: string[], options?: object, tags?: string[], weight?: number)
+  public appendTransformation(nodeType: TransformationNodeType, fieldNames: string[], options?: object, tags?: string[], weight?: number)
   {
     const fieldIDs: number = _.map(fieldNames, (name) => this.fieldNameToIDMap.get(name));
     const node = new TransformationNode(this.uidNode, nodeType, fieldIDs, options);
@@ -106,7 +109,7 @@ export class TransformationEngine {
   public transform(doc: object): object
   {
     let output: object = this.flatten(doc);
-    const visitor = new TransformNodeVisitor<object>();
+    const visitor = new TransformationNodeVisitor<object>();
     for (const nodeKey of this.dag.sources())
     {
       const toTraverse = GraphLib.alg.preorder(this.dag, nodeKey);
@@ -140,14 +143,19 @@ export class TransformationEngine {
 
   private generateInitialFieldMaps(obj: object, currentKeyPath?: string = ''): void
   {
-    for (const key of Object.keys(obj)) {
-      if (TransformationEngine.isPrimitive(obj[key])) {
+    for (const key of Object.keys(obj))
+    {
+      if (TransformationEngine.isPrimitive(obj[key]))
+      {
         this.addField(currentKeyPath + key, typeof obj[key]);
-      } else if (Array.isArray(obj[key])) {
-        for (const item of obj[key]) {
+      } else if (Array.isArray(obj[key]))
+      {
+        for (const item of obj[key])
+        {
           // TODO transform arrays in docs
         }
-      } else {
+      } else
+      {
         this.generateInitialFieldMaps(obj[key], currentKeyPath + key + '.');
       }
     }
@@ -156,7 +164,8 @@ export class TransformationEngine {
   private flatten(obj: object): object
   {
     const output: object = {};
-    for (const [key, value] of this.fieldNameToIDMap) {
+    for (const [key, value] of this.fieldNameToIDMap)
+    {
       if (nestedProperty.has(obj, key))
       {
         output[value] = nestedProperty.get(obj, key);
@@ -168,7 +177,8 @@ export class TransformationEngine {
   private unflatten(obj: object): object
   {
     const output: object = {};
-    for (const [key, value] of this.IDToFieldNameMap) {
+    for (const [key, value] of this.IDToFieldNameMap)
+    {
       if (obj.hasOwnProperty(key))
       {
         nestedProperty.set(output, value, obj[key]);

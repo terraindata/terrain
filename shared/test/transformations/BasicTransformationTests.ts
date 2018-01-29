@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import nestedProperty = require('nested-property');
-import TransformNodeType from 'shared/transforms/TransformNodeType';
-import { TransformationEngine } from '../../transforms/TransformationEngine';
-import {TransformationNode} from '../../transforms/TransformationNode';
+import { TransformationEngine } from '../../transformations/TransformationEngine';
+import { TransformationNode } from '../../transformations/TransformationNode';
+import TransformationNodeType from '../../transformations/TransformationNodeType.ts';
 
 const doc1 = {
   name: 'Bob',
@@ -73,7 +73,7 @@ test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
   e.addField('meta.school', 'string');
-  e.appendTransformation(TransformNodeType.CapitalizeNode, ['meta.school']);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
   const r = e.transform(doc1);
   expect(nestedProperty.get(r, 'meta.school') === 'STANFORD');
 });
@@ -81,8 +81,8 @@ test('add fields manually', () =>
 test('capitalization', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
-  e.appendTransformation(TransformNodeType.CapitalizeNode, ['name']);
-  e.appendTransformation(TransformNodeType.CapitalizeNode, ['meta.school']);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
   const r = e.transform(doc1);
   expect(r['name'] === 'BOB');
   expect(nestedProperty.get(r, 'meta.school') === 'STANFORD');

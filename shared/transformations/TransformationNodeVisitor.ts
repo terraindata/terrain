@@ -44,46 +44,47 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import {TransformationNode} from 'shared/transforms/TransformationNode';
-import TransformNodeType from 'shared/transforms/TransformNodeType';
 import * as winston from 'winston';
+import { TransformationNode } from './TransformationNode';
+import TransformationNodeType from './TransformationNodeType';
 
 /**
  *
  */
-abstract class TransformNodeVisitor<ReturnType>
+abstract class TransformationNodeVisitor<ReturnType>
 {
   public visit(node: TransformationNode, doc: object): ReturnType
   {
-    switch (node.typeCode) {
-      case TransformNodeType.LoadNode:
+    switch (node.typeCode)
+    {
+      case TransformationNodeType.LoadNode:
         return this.visitLoadNode(node, doc);
-      case TransformNodeType.StoreNode:
+      case TransformationNodeType.StoreNode:
         return this.visitStoreNode(node, doc);
-      case TransformNodeType.PutNode:
+      case TransformationNodeType.PutNode:
         return this.visitPutNode(node, doc);
-      case TransformNodeType.GetNode:
+      case TransformationNodeType.GetNode:
         return this.visitGetNode(node, doc);
-      case TransformNodeType.SplitNode:
+      case TransformationNodeType.SplitNode:
         return this.visitSplitNode(node, doc);
-      case TransformNodeType.JoinNode:
+      case TransformationNodeType.JoinNode:
         return this.visitJoinNode(node, doc);
-      case TransformNodeType.FilterNode:
+      case TransformationNodeType.FilterNode:
         return this.visitFilterNode(node, doc);
-      case TransformNodeType.DuplicateNode:
+      case TransformationNodeType.DuplicateNode:
         return this.visitDuplicateNode(node, doc);
-      case TransformNodeType.RenameNode:
+      case TransformationNodeType.RenameNode:
         return this.visitRenameNode(node, doc);
-      case TransformNodeType.PlusNode:
+      case TransformationNodeType.PlusNode:
         return this.visitPlusNode(node, doc);
-      case TransformNodeType.PrependNode:
+      case TransformationNodeType.PrependNode:
         return this.visitPrependNode(node, doc);
-      case TransformNodeType.AppendNode:
+      case TransformationNodeType.AppendNode:
         return this.visitAppendNode(node, doc);
-      case TransformNodeType.CapitalizeNode:
+      case TransformationNodeType.CapitalizeNode:
         return this.visitCapitalizeNode(node, doc);
       default:
-        winston.error('Attempted to visit an unsupported transformation node type: ' + node.typeCode);
+        winston.error(`Attempted to visit an unsupported transformation node type: ${node.typeCode}`);
         break;
     }
   }
@@ -165,4 +166,4 @@ abstract class TransformNodeVisitor<ReturnType>
   }
 }
 
-export default TransformNodeVisitor;
+export default TransformationNodeVisitor;

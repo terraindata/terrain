@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-enum TransformNodeType
+enum TransformationNodeType
 {
   LoadNode = 0,
   StoreNode = 1,
@@ -61,4 +61,4 @@ enum TransformNodeType
   CapitalizeNode = 12,
 }
 
-export default TransformNodeType;
+export default TransformationNodeType;
