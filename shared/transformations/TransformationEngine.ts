@@ -62,7 +62,7 @@ export class TransformationEngine
     // TODO need to (de)serialize more than just DAG (probably all props of TE)
     const parsedJSON = typeof json === 'string' ? JSON.parse(json) : json;
     const e: TransformationEngine = new TransformationEngine();
-    e.dag = GraphLib.json.read(json);
+    e.dag = GraphLib.json.read(parsedJSON);
     return e;
   }
 
