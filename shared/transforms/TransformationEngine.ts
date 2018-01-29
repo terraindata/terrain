@@ -57,6 +57,7 @@ const Graph = GraphLib.Graph;
 export class TransformationEngine {
   public static load(json: object): TransformationEngine
   {
+    // TODO need to (de)serialize more than just DAG (probably all props of TE)
     const e: TransformationEngine = new TransformationEngine();
     e.dag = GraphLib.json.read(json);
     return e;
@@ -77,18 +78,21 @@ export class TransformationEngine {
   }
 
   private dag: any = new Graph({ isDirected: true });
-  private doc: object = undefined;
+  private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;
   private fieldNameToIDMap: Map<string, int> = new Map<string, int>();
   private IDToFieldNameMap: Map<int, string> = new Map<int, string>();
   private fieldTypes: Map<int, string> = new Map<int, string>();
 
-  constructor(doc: object)
+  constructor(doc?: object)
   {
-    this.doc = doc;
-    this.generateInitialFieldMaps(this.doc);
-    // initial field nodes can be implicit, DAG should only represent actual transformations
+    if(doc) {
+      this.doc = doc;
+      this.generateInitialFieldMaps(this.doc);
+      // initial field nodes can be implicit, DAG should only represent actual transformations
+    }
+    // allow construction without example doc (manually add fields)
   }
 
   public appendTransformation(nodeType: TransformNodeType, fieldNames: string[], options?: object, tags?: string[], weight?: number)
@@ -96,7 +100,6 @@ export class TransformationEngine {
     const fieldIDs: number = _.map(fieldNames, (name) => this.fieldNameToIDMap.get(name));
     const node = new TransformationNode(this.uidNode, nodeType, fieldIDs, options);
     this.dag.setNode(this.uidNode.toString(), node);
-
     this.uidNode++;
   }
 
@@ -128,7 +131,6 @@ export class TransformationEngine {
 
   public addField(fullKeyPath: string, typeName: string): void
   {
-    console.log(fullKeyPath);
     this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
     this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
     this.fieldTypes.set(this.uidField, typeName);
@@ -140,14 +142,12 @@ export class TransformationEngine {
   {
     for (const key of Object.keys(obj)) {
       if (TransformationEngine.isPrimitive(obj[key])) {
-        console.log('is p ' + key);
         this.addField(currentKeyPath + key, typeof obj[key]);
       } else if (Array.isArray(obj[key])) {
         for (const item of obj[key]) {
           // TODO transform arrays in docs
         }
       } else {
-        console.log('r ' + key);
         this.generateInitialFieldMaps(obj[key], currentKeyPath + key + '.');
       }
     }
@@ -155,16 +155,13 @@ export class TransformationEngine {
 
   private flatten(obj: object): object
   {
-    console.log(obj);
     const output: object = {};
     for (const [key, value] of this.fieldNameToIDMap) {
-      console.log('fkey = ' + key);
       if (nestedProperty.has(obj, key))
       {
         output[value] = nestedProperty.get(obj, key);
       }
     }
-    console.log(output);
     return output;
   }
 

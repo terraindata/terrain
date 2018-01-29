@@ -69,13 +69,21 @@ const doc1 = {
 //   expect(!e.dag.hasNode(t2));
 // });
 
+test('add fields manually', () =>
+{
+  const e: TransformationEngine = new TransformationEngine();
+  e.addField('meta.school', 'string');
+  e.appendTransformation(TransformNodeType.CapitalizeNode, ['meta.school']);
+  const r = e.transform(doc1);
+  expect(nestedProperty.get(r, 'meta.school') === 'STANFORD');
+});
+
 test('capitalization', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
   e.appendTransformation(TransformNodeType.CapitalizeNode, ['name']);
   e.appendTransformation(TransformNodeType.CapitalizeNode, ['meta.school']);
   const r = e.transform(doc1);
-  console.log(r);
   expect(r['name'] === 'BOB');
   expect(nestedProperty.get(r, 'meta.school') === 'STANFORD');
 });

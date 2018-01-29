@@ -150,8 +150,6 @@ abstract class TransformNodeVisitor<ReturnType>
 
   public visitCapitalizeNode(node: TransformationNode, doc: object): ReturnType
   {
-    console.log(doc);
-    console.log(node.fieldIDs);
     for (const fieldID of node.fieldIDs)
     {
       if (typeof doc[fieldID] !== 'string')
