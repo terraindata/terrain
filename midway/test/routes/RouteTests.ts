@@ -1486,6 +1486,48 @@ describe('Scheduler tests', () =>
         })).toBe(true);
       });
   });
+
+  test('POST /midway/v1/scheduler/create INVALID scheduled export', async () =>
+  {
+    await request(server)
+      .post('/midway/v1/scheduler/create')
+      .send({
+        id: 1,
+        accessToken: 'ImAnAdmin',
+        body: {
+          jobTypeInvalidParam: 'export',
+          schedule: '* * * * *', // next run on some leap year date
+          sort: 'asc',
+          transport:
+            {
+              type: 'local',
+              filename: process.cwd() + '/midway/test/routes/scheduler/test_scheduled_export.json',
+            },
+          name: 'Test Local Export',
+          paramsJob:
+            {
+              dbid: 1,
+              dbname: 'movies',
+              templateId: exportTemplateID,
+              filetype: 'csv',
+              query: '{\"query\":{\"bool\":{\"filter\":[{\"term\":{\"_index\":\"movies\"}},'
+                + '{\"term\":{\"_type\":\"data\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":15}',
+            },
+          filetype: 'json',
+        },
+      })
+      .expect(400)
+      .then(async (response) =>
+      {
+        expect(response.text).not.toBe('');
+        if (response.text === '')
+        {
+          fail('POST /scheduler/create request returned empty response body');
+        }
+        const result = JSON.parse(response.text);
+        expect(Object.keys(result).lastIndexOf('errors')).not.toEqual(-1);
+      });
+  });
 });
 
 describe('Analytics events route tests', () =>
