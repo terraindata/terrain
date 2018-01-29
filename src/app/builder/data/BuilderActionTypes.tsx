@@ -69,6 +69,9 @@ export let BuilderActionTypes =
     dragCardOver: '',
     dropCard: '',
 
+    // Input actions
+    createInput: 'createInput',
+
     hoverCard: '',
 
     selectCard: '',
@@ -126,6 +129,7 @@ setValuesToKeys(BuilderActionTypes, '');
 export let BuilderDirtyActionTypes = {};
 [
   BuilderActionTypes.create,
+  BuilderActionTypes.createInput,
   BuilderActionTypes.change,
   BuilderActionTypes.changePath,
   BuilderActionTypes.move,

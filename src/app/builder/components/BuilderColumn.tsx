@@ -73,6 +73,7 @@ import TuningColumn from './cards/TuningColumn';
 import InputsArea from './inputs/InputsArea';
 import PathfinderColumn from './pathfinder/PathfinderColumn';
 import ResultsColumn from './results/ResultsColumn';
+import Actions from '../data/BuilderActions';
 
 const AddIcon = require('./../../../images/icon_add.svg?name=AddIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -259,6 +260,7 @@ const BuilderColumn = createReactClass<any, any>(
             inputs={query.inputs}
             canEdit={canEdit}
             language={query.language}
+            action={query.path !== undefined ? Actions.changePath : Actions.change}
           />;
 
         case COLUMNS.Results:
