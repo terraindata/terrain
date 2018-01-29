@@ -192,6 +192,7 @@ export class ResultsManager extends TerrainComponent<Props>
         && (!this.props.query ||
           (
             this.props.query.tql !== nextProps.query.tql ||
+            nextProps.query.tqlMode === 'manual' ||
             // this.props.query.cards !== nextProps.query.cards ||
             this.props.query.inputs !== nextProps.query.inputs
           )
@@ -400,11 +401,13 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private queryM2Results(query: Query, db: BackendInstance)
   {
-    if (query.parseTree === null || query.parseTree.hasError())
+    if (query.tqlMode !== 'manual')
     {
-      return;
+      if (query.parseTree === null || query.parseTree.hasError())
+      {
+        return;
+      }
     }
-
     if (query !== this.state.lastQuery)
     {
       const eql = AllBackendsMap[query.language].parseTreeToQueryString(
