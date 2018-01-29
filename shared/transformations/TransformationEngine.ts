@@ -51,23 +51,18 @@ import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
 import TransformationNodeVisitor from './TransformationNodeVisitor';
+import TransformationVisitResult from './TransformationVisitResult';
 
 const Graph = GraphLib.Graph;
 
 export class TransformationEngine
 {
-  public static load(json: object): TransformationEngine
+  public static load(json: string | object): TransformationEngine
   {
     // TODO need to (de)serialize more than just DAG (probably all props of TE)
+    const parsedJSON = typeof json === 'string' ? JSON.parse(json) : json;
     const e: TransformationEngine = new TransformationEngine();
     e.dag = GraphLib.json.read(json);
-    return e;
-  }
-
-  public static load(jsonString: string): TransformationEngine
-  {
-    const e: TransformationEngine = new TransformationEngine();
-    e.dag = GraphLib.json.read(JSON.parse(jsonString));
     return e;
   }
 
@@ -83,9 +78,9 @@ export class TransformationEngine
   private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;
-  private fieldNameToIDMap: Map<string, int> = new Map<string, int>();
-  private IDToFieldNameMap: Map<int, string> = new Map<int, string>();
-  private fieldTypes: Map<int, string> = new Map<int, string>();
+  private fieldNameToIDMap: Map<string, number> = new Map<string, number>();
+  private IDToFieldNameMap: Map<number, string> = new Map<number, string>();
+  private fieldTypes: Map<number, string> = new Map<number, string>();
 
   constructor(doc?: object)
   {
@@ -100,7 +95,7 @@ export class TransformationEngine
 
   public appendTransformation(nodeType: TransformationNodeType, fieldNames: string[], options?: object, tags?: string[], weight?: number)
   {
-    const fieldIDs: number = _.map(fieldNames, (name) => this.fieldNameToIDMap.get(name));
+    const fieldIDs: number[] = _.map(fieldNames, (name) => this.fieldNameToIDMap.get(name));
     const node = new TransformationNode(this.uidNode, nodeType, fieldIDs, options);
     this.dag.setNode(this.uidNode.toString(), node);
     this.uidNode++;
@@ -109,19 +104,18 @@ export class TransformationEngine
   public transform(doc: object): object
   {
     let output: object = this.flatten(doc);
-    const visitor = new TransformationNodeVisitor<object>();
     for (const nodeKey of this.dag.sources())
     {
       const toTraverse = GraphLib.alg.preorder(this.dag, nodeKey);
       for (let i = 0; i < toTraverse.length; i++)
       {
-        const transformResults = visitor.visit(this.dag.node(toTraverse[i]), output);
-        if (transformResults.hasOwnProperty('errors'))
+        const transformationResult: TransformationVisitResult = TransformationNodeVisitor.visit(this.dag.node(toTraverse[i]), output);
+        if (transformationResult.errors !== undefined)
         {
           winston.error('Transformation encountered errors!');
           // TODO abort?
         }
-        output = transformResults['document'];
+        output = transformationResult.document;
       }
     }
     return this.unflatten(output);
@@ -141,7 +135,7 @@ export class TransformationEngine
     this.uidField++;
   }
 
-  private generateInitialFieldMaps(obj: object, currentKeyPath?: string = ''): void
+  private generateInitialFieldMaps(obj: object, currentKeyPath: string = ''): void
   {
     for (const key of Object.keys(obj))
     {

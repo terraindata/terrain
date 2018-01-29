@@ -44,20 +44,11 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
-import TransformationNodeType from './TransformationNodeType';
-
-export class TransformationNode
+export interface TransformationVisitResult
 {
-  public id: number;
-  public typeCode: TransformationNodeType;
-  public fieldIDs: number[];
-
-  constructor(id: number, typeCode: TransformationNodeType, fieldIDs: number[], options?: object)
-  {
-    this.id = id;
-    this.typeCode = typeCode;
-    this.fieldIDs = fieldIDs;
-  }
+  document?: object;
+  errors?: object[];
+  // fields created?  fields destroyed?
 }
 
-export default TransformationNode;
+export default TransformationVisitResult;

@@ -47,7 +47,7 @@ THE SOFTWARE.
 import nestedProperty = require('nested-property');
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationNode } from '../../transformations/TransformationNode';
-import TransformationNodeType from '../../transformations/TransformationNodeType.ts';
+import TransformationNodeType from '../../transformations/TransformationNodeType';
 
 const doc1 = {
   name: 'Bob',

@@ -47,109 +47,110 @@ THE SOFTWARE.
 import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
+import TransformationVisitResult from './TransformationVisitResult';
 
 /**
- *
+ * A visitor should be stateless; thus, visiting methods should be static.
  */
-abstract class TransformationNodeVisitor<ReturnType>
+class TransformationNodeVisitor
 {
-  public visit(node: TransformationNode, doc: object): ReturnType
+  public static visit(node: TransformationNode, doc: object): TransformationVisitResult
   {
     switch (node.typeCode)
     {
       case TransformationNodeType.LoadNode:
-        return this.visitLoadNode(node, doc);
+        return TransformationNodeVisitor.visitLoadNode(node, doc);
       case TransformationNodeType.StoreNode:
-        return this.visitStoreNode(node, doc);
+        return TransformationNodeVisitor.visitStoreNode(node, doc);
       case TransformationNodeType.PutNode:
-        return this.visitPutNode(node, doc);
+        return TransformationNodeVisitor.visitPutNode(node, doc);
       case TransformationNodeType.GetNode:
-        return this.visitGetNode(node, doc);
+        return TransformationNodeVisitor.visitGetNode(node, doc);
       case TransformationNodeType.SplitNode:
-        return this.visitSplitNode(node, doc);
+        return TransformationNodeVisitor.visitSplitNode(node, doc);
       case TransformationNodeType.JoinNode:
-        return this.visitJoinNode(node, doc);
+        return TransformationNodeVisitor.visitJoinNode(node, doc);
       case TransformationNodeType.FilterNode:
-        return this.visitFilterNode(node, doc);
+        return TransformationNodeVisitor.visitFilterNode(node, doc);
       case TransformationNodeType.DuplicateNode:
-        return this.visitDuplicateNode(node, doc);
+        return TransformationNodeVisitor.visitDuplicateNode(node, doc);
       case TransformationNodeType.RenameNode:
-        return this.visitRenameNode(node, doc);
+        return TransformationNodeVisitor.visitRenameNode(node, doc);
       case TransformationNodeType.PlusNode:
-        return this.visitPlusNode(node, doc);
+        return TransformationNodeVisitor.visitPlusNode(node, doc);
       case TransformationNodeType.PrependNode:
-        return this.visitPrependNode(node, doc);
+        return TransformationNodeVisitor.visitPrependNode(node, doc);
       case TransformationNodeType.AppendNode:
-        return this.visitAppendNode(node, doc);
+        return TransformationNodeVisitor.visitAppendNode(node, doc);
       case TransformationNodeType.CapitalizeNode:
-        return this.visitCapitalizeNode(node, doc);
+        return TransformationNodeVisitor.visitCapitalizeNode(node, doc);
       default:
         winston.error(`Attempted to visit an unsupported transformation node type: ${node.typeCode}`);
         break;
     }
   }
 
-  public visitLoadNode(node: TransformationNode, doc: object): ReturnType
+  public static visitLoadNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitStoreNode(node: TransformationNode, doc: object): ReturnType
+  public static visitStoreNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitPutNode(node: TransformationNode, doc: object): ReturnType
+  public static visitPutNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitGetNode(node: TransformationNode, doc: object): ReturnType
+  public static visitGetNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitSplitNode(node: TransformationNode, doc: object): ReturnType
+  public static visitSplitNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitJoinNode(node: TransformationNode, doc: object): ReturnType
+  public static visitJoinNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitFilterNode(node: TransformationNode, doc: object): ReturnType
+  public static visitFilterNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitDuplicateNode(node: TransformationNode, doc: object): ReturnType
+  public static visitDuplicateNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitRenameNode(node: TransformationNode, doc: object): ReturnType
+  public static visitRenameNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitPlusNode(node: TransformationNode, doc: object): ReturnType
+  public static visitPlusNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitPrependNode(node: TransformationNode, doc: object): ReturnType
+  public static visitPrependNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitAppendNode(node: TransformationNode, doc: object): ReturnType
+  public static visitAppendNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    return ReturnType();
+    return {} as TransformationVisitResult;
   }
 
-  public visitCapitalizeNode(node: TransformationNode, doc: object): ReturnType
+  public static visitCapitalizeNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
     for (const fieldID of node.fieldIDs)
     {
@@ -162,7 +163,7 @@ abstract class TransformationNodeVisitor<ReturnType>
 
     return {
       document: doc,
-    };
+    } as TransformationVisitResult;
   }
 }
 

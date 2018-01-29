@@ -43,7 +43,8 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-
+// Temporarily deprecating these, though we may want to copy over some of this functionality
+/*
 // =====================================================================
 
 // put
@@ -188,3 +189,4 @@ function plus<T>(obj: T, leftName: string, rightName: string): T
   }
 
 }
+*/
