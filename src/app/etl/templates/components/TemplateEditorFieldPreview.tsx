@@ -87,7 +87,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
     const labelStyle = settingsOpen ?
       _.extend({}, fontColor(Colors().text1, Colors().text1), backgroundColor(Colors().highlight))
       :
-      fontColor(Colors().text3, notInteractable ? Colors().text3 : Colors().text2);
+      fontColor(Colors().text2, notInteractable ? Colors().text2 : Colors().text1);
 
     const previewText = preview === undefined || preview === null ? 'N/A' : preview.toString();
     const previewContent = (displayValueOverride === undefined || displayValueOverride === null) ?
@@ -113,6 +113,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
                 'field-preview-value': true,
                 'field-preview-value-settings-open': settingsOpen,
               })}
+              style={fontColor(Colors().text2)}
             >
               {previewContent}
             </div>

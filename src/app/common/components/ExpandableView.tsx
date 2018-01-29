@@ -82,7 +82,7 @@ class ExpandableView extends TerrainComponent<Props>
       })}
         style={this.props.style || {}}
       >
-        <div className='expandable-view-content-row' style={fontColor(Colors().text2)}>
+        <div className='expandable-view-content-row' style={fontColor(Colors().text3)}>
           <div className='expandable-view-arrow-column'>
             <div className='expandable-view-arrow-spacer-top' />
             <ArrowIcon
