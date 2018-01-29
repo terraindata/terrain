@@ -96,31 +96,15 @@ body {
   
 }
 
-@top-bar-height: 0px;
-@icon-height: 24px;
-@icon-padding: calc((@top-bar-height - @icon-height) / 2);
-
-.app-top-bar {
-  height: @top-bar-height;
-  background: #3e3c3c;
-  position: relative;
-  z-index: 999999999;
-
-  .slide-down;
-}
-
 .app-wrapper {
-  height: calc(~"100% - @{top-bar-height}");
+  height: 100%;
 }
 
 .app-inner {
   .fade-in;
   .animation-delay(0.75s);
-  .background-image {
-    width: 100%;
-    position: absolute;
-    height: 100%;
-  }
+  background-size: cover; // background will fill entire div, cropping
+  background-position: right top; // background pinned at top right, because that's where the blue intersects
 }
 
 

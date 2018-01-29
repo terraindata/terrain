@@ -125,33 +125,33 @@ const links =
     // },
     {
       icon: <LibraryIcon />,
-      text: 'MANAGE',
+      text: 'Manage',
       route: '/library',
     },
     {
       icon: <BuilderIcon />,
-      text: 'BUILD',
+      text: 'Build',
       route: '/builder',
     },
     {
       icon: <SchemaIcon />,
-      text: 'SCHEMA',
+      text: 'Schema',
       route: '/schema',
     },
     {
       icon: <ImportIcon />,
-      text: 'IMPORT',
+      text: 'Import',
       route: '/import',
     },
     {
       icon: <ReportingIcon />,
-      text: 'ANALYTICS',
+      text: 'Analytics',
       route: '/analytics',
       enabled: TerrainTools.isFeatureEnabled(TerrainTools.ANALYTICS),
     },
     {
       icon: <ControlIcon />,
-      text: 'CONTROL',
+      text: 'Control',
       route: '/control',
     },
     // {
@@ -408,7 +408,9 @@ class App extends TerrainComponent<Props>
 
     const sidebarWidth = this.state.sidebarExpanded ? 150 : 36;
     const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0);
-
+    const style = {
+      backgroundImage: `url(${BackgroundImage})`
+    };
     const layout =
       {
         fullHeight: true,
@@ -429,11 +431,8 @@ class App extends TerrainComponent<Props>
               content:
                 <div
                   className='app-inner'
+                  style={style}
                 >
-                  <img
-                    src={BackgroundImage}
-                    className='background-image'
-                  />
                   {
                     this.props.children
                   }
