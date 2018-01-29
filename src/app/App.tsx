@@ -409,7 +409,7 @@ class App extends TerrainComponent<Props>
     const sidebarWidth = this.state.sidebarExpanded ? 150 : 36;
     const selectedIndex = links.findIndex((link) => this.props.location.pathname.indexOf(link.route) === 0);
     const style = {
-      backgroundImage: `url(${BackgroundImage})`
+      backgroundImage: `url(${BackgroundImage})`,
     };
     const layout =
       {

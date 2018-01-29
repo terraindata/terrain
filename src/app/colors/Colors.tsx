@@ -88,7 +88,7 @@ const NewTheme =
   blockOutline: NTColors.grey1,
 
   sidebarBg: NTColors.light1,
-}
+};
 
 // Will be deprecated
 interface OldTheme

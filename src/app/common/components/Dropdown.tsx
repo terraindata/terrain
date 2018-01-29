@@ -386,9 +386,9 @@ class Dropdown extends TerrainComponent<Props>
 
     const { floatingLabel, placeholder } = this.props;
     const hasFloatingLabel = floatingLabel !== undefined;
-    const floatingInputValue = selectedIndex === -1 ? placeholder : 
+    const floatingInputValue = selectedIndex === -1 ? placeholder :
       this.getOptionName(options.get(selectedIndex), selectedIndex);
-    
+
     return (
       <div
         onClick={this.toggleOpen}
@@ -457,7 +457,7 @@ class Dropdown extends TerrainComponent<Props>
                 }
               </div>
             }
-            
+
             {
               hasFloatingLabel &&
                 <FloatingInput
@@ -492,6 +492,5 @@ class Dropdown extends TerrainComponent<Props>
     );
   }
 }
-
 
 export default Dropdown;
