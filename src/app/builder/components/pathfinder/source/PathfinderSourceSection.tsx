@@ -106,14 +106,15 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   public render()
   {
     const { source, step, canEdit } = this.props.pathfinderContext;
-    const sourceValues = this.state.dataSourceOptions.map((option) => option.value).toList();
-    const sourceNames = this.state.dataSourceOptions.map((option) => option.displayName).toList();
+    const { dataSourceOptions } = this.state;
+    const sourceValues = dataSourceOptions.map((option) => option.value).toList();
+    const sourceNames = dataSourceOptions.map((option) => option.displayName).toList();
     let displayNames: IMMap<string, any> = Map({});
-    this.state.dataSourceOptions.forEach((option) =>
+    dataSourceOptions.forEach((option) =>
     {
       displayNames = displayNames.set(option.value, option.displayName);
     });
-    const sourceOptions = this.state.dataSourceOptions.map((option) =>
+    const sourceOptions = dataSourceOptions.map((option) =>
     {
       return {
         title: String(option.displayName),
@@ -158,6 +159,19 @@ class PathfinderSourceSection extends TerrainComponent<Props>
             onChange={this.handleSourceChange}
             floatingLabel={'Data'}
           />
+          
+          <div className='pf-piece'>
+            <PathPicker
+              options={dataSourceOptions}
+              value={source.dataSource.index}
+              onChange={this.handleSourcePathChange}
+              canEdit={canEdit}
+              shortNameText={'Find'}
+              headerText={'Choose which data to use in your algorithm'}
+              forceOpen={false}
+              hasOther={false}
+            />
+          </div>
         </div>
       </div>
     );
@@ -172,6 +186,11 @@ class PathfinderSourceSection extends TerrainComponent<Props>
   //             forceOpen={true}
   //             hasOther={true}
   //           />
+
+  private handleSourcePathChange(value)
+  {
+    
+  }
 
   private handleSourceChange(index, key)
   {

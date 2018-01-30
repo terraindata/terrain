@@ -462,7 +462,10 @@ type ChoiceContext = {
 class ElasticDataSourceC extends DataSource
 {
   public index: string = '';
+  
+  // TODO remove
   public types: List<string> = List([]);
+  
   public getChoiceOptions = (context: ChoiceContext): List<ChoiceOption> =>
   {
     const server = BuilderStore.getState().db.name;

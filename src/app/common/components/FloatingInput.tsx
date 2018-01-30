@@ -59,6 +59,17 @@ const Container = styled.div`
   position: relative;
   flex-grow: 1;
   line-height: normal;
+  border: 1px solid ${Colors().inputBorder};
+  border-radius: 3px;
+  height: 48px;
+  width: 100%;
+  box-sizing: border-box;
+  
+  &:hover {
+    border-color: ${Colors().active};
+  }
+  
+  ${(props) => props.noBorder && 'border: none !important;'}
 `;
 
 const LEFT = '12px';
@@ -70,6 +81,7 @@ const Label = styled.label`
   font-size: 16px;
   transition: all 0.15s;
   color: ${Colors().text3};
+  cursor: pointer;
 `;
 
 const floatingLabelStyle = {
@@ -84,25 +96,18 @@ const inputStyle = `
   padding-bottom: 4px;
   border-radius: 3px;
   width: 100%;
-  border: 1px solid ${Colors().inputBorder};
+  border: none;
   outline: none;
   font-size: 18px;
   color: ${Colors().text1};
   transition: all 0.15s;
-  
-  &:hover {
-    border-color: ${Colors().active};
-  }
 `;
-const noBorderFn = (props) => props.noBorder && 'border: none !important;';
 
 const Input = styled.input`
   ${inputStyle}
-  ${noBorderFn}
 `;
 const InputDiv = styled.div`
   ${inputStyle}
-  ${noBorderFn}
   cursor: pointer;
 `;
 
@@ -142,7 +147,9 @@ class FloatingInput extends TerrainComponent<Props>
     const isFloating = this.isFloating();
 
     return (
-      <Container>
+      <Container
+        noBorder={props.noBorder}
+      >
         {
           this.renderValue()
         }
@@ -195,7 +202,6 @@ class FloatingInput extends TerrainComponent<Props>
           onChange={this.handleChange}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
-          noBorder={props.noBorder}
         />
       );
     }
@@ -204,7 +210,6 @@ class FloatingInput extends TerrainComponent<Props>
     return (
       <InputDiv
         onClick={this.handleClick}
-        noBorder={props.noBorder}
       >
         {
           value

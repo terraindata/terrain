@@ -54,12 +54,15 @@ import * as React from 'react';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './PathPickerStyle.less';
+import FloatingInput from './FloatingInput';
+import FadeInOut from './FadeInOut';
 
 export interface PathPickerOption
 {
   value: any;
   displayName?: string | number | El;
   color?: string;
+  sampleData: List<any>;
   extraContent?: string | El;
 }
 
@@ -74,7 +77,7 @@ export interface Props
   headerText: string;
 
   forceOpen?: boolean;
-  hasOther?: string;
+  hasOther?: boolean;
 
   // wrapperTooltip?: string;
 }
@@ -84,6 +87,7 @@ class PathPicker extends TerrainComponent<Props>
 {
   state = {
     showOther: false,
+    open: false,
   };
 
   componentWillReceiveProps(nextProps: Props)
@@ -120,19 +124,14 @@ class PathPicker extends TerrainComponent<Props>
     return (
       <div
         className='pathpicker-box-value'
-        style={borderColor(Colors().bg1)}
-        onClick={this.handleBoxValueClick}
       >
-        <div className='pathpicker-short-title'>
-          {
-            props.shortNameText
-          }
-        </div>
-        <div className='pathpicker-value'>
-          {
-            this.renderValue('short', this.getCurrentIndex())
-          }
-        </div>
+        <FloatingInput
+          label={props.shortNameText}
+          isTextInput={false}
+          value={this.renderValue('short', this.getCurrentIndex())}
+          onClick={this.handleBoxValueClick}
+          canEdit={props.canEdit}
+        />
       </div>
     );
   }
@@ -155,25 +154,29 @@ class PathPicker extends TerrainComponent<Props>
       option = props.options.get(index);
       value = option.value;
     }
+    
+    return value;
 
-    return (
-      <div
-      >
-        <div
-          className='pathpicker-value-text'
-          style={fontColor(Colors().active)}
-        >
-        {
-          value
-        }
-        </div>
-      </div>
-    );
+    // return (
+    //   <div
+    //   >
+    //     <div
+    //       className='pathpicker-value-text'
+    //       style={fontColor(Colors().active)}
+    //     >
+    //     {
+    //       value
+    //     }
+    //     </div>
+    //   </div>
+    // );
   }
 
   private handleBoxValueClick()
   {
-
+    this.setState({
+      open: !this.state.open,
+    });
   }
 
   private getCurrentIndex(): number
@@ -189,9 +192,58 @@ class PathPicker extends TerrainComponent<Props>
 
     return (
       <div
+        className='pathpicker-picker'
       >
+        <div
+          className='pathpicker-header'
+        >
+          {
+            props.headerText
+          }
+        </div>
+        {
+          props.options.map(this.renderOption)
+        }
       </div>
     );
+  }
+  
+  private renderOption(option: PathPickerOption, index: number)
+  {
+    console.log(option);
+    return (
+      <div
+        className='pathpicker-option'
+        key={index}
+      >
+        <div
+          className='pathpicker-option-name'
+          style={fontColor(Colors().active)}
+        >
+          {
+            option.displayName
+          }
+        </div>
+        
+        {
+          option.sampleData && 
+            <div className='pathpicker-data'>
+              <div className='pathpicker-data-header'>
+                Sample Data
+              </div>
+              {
+                option.sampleData.map(this.renderSampleDatum)
+              }
+            </div>
+        }
+      </div>
+    );
+  }
+  
+  private renderSampleDatum(data: any)
+  {
+    // TODO add more formatting here?
+    return JSON.stringify(data);
   }
 }
               // <input
