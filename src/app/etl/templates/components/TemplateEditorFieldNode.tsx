@@ -148,7 +148,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
         {children}
       </div>;
     const childrenStyle = (canEdit === true && field.isIncluded === false) ?
-      getStyle('opacity', '0.7') : {};
+      getStyle('opacity', '0.5') : {};
     return (
       <ExpandableView
         content={content}

@@ -17,12 +17,27 @@
   .preview-document {
     margin: @spacing;
     flex: 0 0 300px;
-    padding: @spacing;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: relative;
+    // display: flex;
+    display: block;
+    overflow: hidden;
+    // justify-content: center;
+    // align-items: center;
     border: 2px solid;
     border-radius: 3px;
+
+    .preview-document-spacer {
+      
+      padding: @spacing;
+    }
+    .preview-document-fader {
+      bottom: 0px;
+      position: absolute;
+      width: 100%;
+      height: 30px;
+      background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,1)); // TODO replace w/ real colors
+      pointer-events: none;
+    }
   }
 
   .preview-document-index-label {

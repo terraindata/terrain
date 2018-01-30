@@ -98,7 +98,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
             <div className={classNames({
               'field-preview-label': true,
             })}
-              onClick={this.handleLabelClicked}
+              onClick={this._noopIfDisabled(this.handleLabelClicked)}
             >
               {field.name}
             </div>

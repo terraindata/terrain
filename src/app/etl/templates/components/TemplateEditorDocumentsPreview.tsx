@@ -54,6 +54,7 @@ import Util from 'util/Util';
 
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
+import TemplateEditorFieldNode from './TemplateEditorFieldNode';
 
 import './TemplateEditorDocumentsPreview.less';
 const { List } = Immutable;
@@ -76,11 +77,11 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
 
   public renderDocument(document: object, index: number)
   {
-    const { previewIndex } = this.props.templateEditor;
+    const { previewIndex, documents, template } = this.props.templateEditor;
     const border = index === previewIndex ?
       borderColor(Colors().inactiveHover, Colors().inactiveHover) :
       borderColor('rgba(0,0,0,0)', Colors().activeHover);
-
+    const previewDocument = index < documents.size && documents.size > 0 ? documents.get(index) : null;
     return (
       <div
         className='preview-document'
@@ -88,9 +89,18 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
         style={_.extend({}, backgroundColor(Colors().bg3), border)}
         onClick={this.handleDocumentClickedFactory(index)}
       >
-        <div className='preview-document-index-label'> {index + 1} </div>
+        <div className='preview-document-spacer'>
+          <TemplateEditorFieldNode
+            keyPath={List([])}
+            field={template.rootField}
+            canEdit={false}
+            preview={previewDocument}
+          />
+        </div>
+        <div className='preview-document-fader' />
       </div>
     );
+    /*<div className='preview-document-index-label'> {index + 1} </div>*/
   }
 
   public render()
