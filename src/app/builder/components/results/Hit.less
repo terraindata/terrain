@@ -69,10 +69,10 @@
     height: @result-name-height;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
-    padding: 10px 9px;
     // background: @result-name-bg;
     box-sizing: border-box;
     position: relative;
+    display: flex;
 
     .transition;
 
@@ -82,6 +82,7 @@
       text-overflow: ellipsis;
       width: 100%;
       .transition;
+      flex: 1;
     }
   }
 
@@ -95,8 +96,19 @@
     position: relative;
     border-radius: 3px;
     border: 1px solid #fff;
+    display: flex;
 
     .transition;
+
+    .result-thumbnail-wrapper {
+      flex: 1;
+    }
+
+    .result-details-wrapper {
+      flex: 1.5;
+      display: flex;
+      flex-direction: column;
+    }
 
     .result-score {
       padding: 3px;
