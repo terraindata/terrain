@@ -86,6 +86,8 @@ class TransformationNodeVisitor
         return TransformationNodeVisitor.visitAppendNode(node, docCopy);
       case TransformationNodeType.CapitalizeNode:
         return TransformationNodeVisitor.visitCapitalizeNode(node, docCopy);
+      case TransformationNodeType.SubstringNode:
+        return TransformationNodeVisitor.visitSubstringNode(node, docCopy);
       default:
         return {
           errors: [
@@ -172,6 +174,49 @@ class TransformationNodeVisitor
         } as TransformationVisitResult;
       }
       doc[fieldID] = doc[fieldID].toUpperCase();
+    }
+
+    return {
+      document: doc,
+    } as TransformationVisitResult;
+  }
+
+  public static visitSubstringNode(node: TransformationNode, doc: object): TransformationVisitResult
+  {
+    for (const fieldID of node.fieldIDs)
+    {
+      if (typeof doc[fieldID] !== 'string')
+      {
+        return {
+          errors: [
+            {
+              message: 'Attempted to take a substring of a non-string field (this is not supported)',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      if (!node.meta.hasOwnProperty('from') || node.meta['from'] < 0)
+      {
+        return {
+          errors: [
+            {
+              message: 'Substring node: "from" property is missing or invalid',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      if (!node.meta.hasOwnProperty('length') || node.meta['length'] < 0)
+      {
+        return {
+          errors: [
+            {
+              message: 'Substring node: "length" property is missing or invalid',
+            } as TransformationVisitError,
+          ],
+        } as TransformationVisitResult;
+      }
+      // Currently assumes a single from and length for all fieldIDs
+      doc[fieldID] = doc[fieldID].substr(node.meta['from'], node.meta['length']);
     }
 
     return {

@@ -59,6 +59,7 @@ enum TransformationNodeType
   PrependNode = 10,
   AppendNode = 11,
   CapitalizeNode = 12,
+  SubstringNode = 13,
 }
 
 export default TransformationNodeType;

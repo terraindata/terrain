@@ -86,7 +86,7 @@ test('serialize to JSON', () =>
       options: {
         directed: true,
         multigraph: false,
-        compound: false
+        compound: false,
       },
       nodes: [
         {
@@ -137,4 +137,13 @@ test('JSON serialize/deserialize round trip', () =>
   expect(e.equals(e2)).toBe(true);
   e2.addField('i', 'number');
   expect(e.equals(e2)).toBe(false);
+});
+
+test('linear chain of transformations', () =>
+{
+  const e: TransformationEngine = new TransformationEngine(doc1);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
+  e.appendTransformation(TransformationNodeType.SubstringNode, ['name'], { from: 0, length: 2 });
+  const t = e.transform(doc1);
+  expect(t['name']).toBe('BO');
 });
