@@ -579,7 +579,7 @@ export const elasticFilter = _card({
     colors: getCardColors('filter', Colors().builder.cards.structureClause),
     preview: (c: Card) =>
     {
-      return String(c['indexFilters'].size + c['typeFilters'].size + c['otherFilters'].size + c['cards'].size) + ' Filters'
+      return String(c['indexFilters'].size + c['typeFilters'].size + c['otherFilters'].size + c['cards'].size) + ' Filters';
     },
     // this tql is same as tql of other clause cards.
     tql: (block, tqlTranslationFn, tqlConfig) =>
