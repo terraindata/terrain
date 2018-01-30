@@ -68,8 +68,6 @@ import './TemplateEditorField.less';
 export interface Props extends TemplateEditorFieldProps
 {
   hidePreviewValue?: boolean;
-  notInteractable?: boolean;
-  labelOverride?: string;
   displayValueOverride?: any;
   // below from container
   templateEditor?: TemplateEditorState;
@@ -82,12 +80,12 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 
   public render()
   {
-    const { canEdit, field, keyPath, preview, hidePreviewValue, labelOverride, notInteractable, displayValueOverride } = this.props;
+    const { canEdit, field, keyPath, preview, hidePreviewValue, displayValueOverride } = this.props;
     const settingsOpen = this.props.templateEditor.settingsKeyPath === keyPath;
     const labelStyle = settingsOpen ?
       _.extend({}, fontColor(Colors().text1, Colors().text1), backgroundColor(Colors().highlight))
       :
-      fontColor(Colors().text2, notInteractable ? Colors().text2 : Colors().text1);
+      fontColor(Colors().text2, Colors().text1);
 
     const previewText = preview === undefined || preview === null ? 'N/A' : preview.toString();
     const previewContent = (displayValueOverride === undefined || displayValueOverride === null) ?
@@ -99,11 +97,10 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
           <div className='field-preview-label-group' style={labelStyle}>
             <div className={classNames({
               'field-preview-label': true,
-              'no-interact': notInteractable,
             })}
-              onClick={notInteractable ? undefined : this.handleLabelClicked}
+              onClick={this.handleLabelClicked}
             >
-              {labelOverride !== undefined && labelOverride !== null ? labelOverride : field.name}
+              {field.name}
             </div>
           </div>
           {

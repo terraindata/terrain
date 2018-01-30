@@ -138,29 +138,19 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
     }
   }
 
-  // If depth is 0, then we need to render expandable view
-
-  // If depth is 1 less than max depth and it is array of primitives, then render out simple array
-
-  // If depth is max depth and nested, then render children via method passed by props
-
-  // Otherwise iterate through preview
-
-  public render() // TODO refactor the logic here
+  public render()
   {
     const { field, keyPath, canEdit, preview, depth, label } = this.props;
     let content = null;
-    let children = null;
-    let override = null;
     const simpleArrayDisplay: boolean = !this._isNested() && depth + 1 === this._arrayDepth();
 
     if (depth === this._arrayDepth() && this._isNested())
     {
-      children = this.props.renderNestedFields(preview);
+      content = this.props.renderNestedFields(preview);
     }
     else if (simpleArrayDisplay)
     {
-      override = (
+      content = (
         <div className='editor-array-item'>
           <ArrayPreview items={preview} style={fontColor(Colors().text2)} />
         </div>
@@ -168,25 +158,25 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
     }
     else
     {
-      children = (
+      content = (
         <div style={depth !== 0 ? getStyle('marginLeft', '24px') : null}>
           {this.renderArrayChildren()}
         </div>
       );
     }
 
-    const childrenComponent = (children !== null || override !== null) ?
+    const childrenComponent = content !== null ?
       <div className='editor-array-children'>
         {depth !== 0 ? <div className='editor-array-seperator'> {label} </div > : null}
-        {simpleArrayDisplay ? override : children}
+        {content}
       </div> : null;
 
     if (depth === 0)
     {
-      content = (
+      const previewComponent = (
         <TemplateEditorFieldPreview
           hidePreviewValue={!simpleArrayDisplay}
-          displayValueOverride={override}
+          displayValueOverride={simpleArrayDisplay ? content : null}
           {...this._passProps() }
         />
       );
@@ -194,7 +184,7 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
         getStyle('opacity', '0.7') : {};
       return (
         <ExpandableView
-          content={content}
+          content={previewComponent}
           open={this.state.expandableViewOpen}
           onToggle={this.handleExpandArrowClicked}
           children={simpleArrayDisplay ? null : childrenComponent}

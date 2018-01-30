@@ -98,4 +98,3 @@ export default class ArrayPreview extends TerrainComponent<Props>
 }
 
 const itemStyle = backgroundColor(Colors().darkerHighlight);
-console.log(itemStyle);
