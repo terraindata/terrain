@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
@@ -58,6 +58,7 @@ import TemplateEditorFieldNode from './TemplateEditorFieldNode';
 
 import './TemplateEditorDocumentsPreview.less';
 const { List } = Immutable;
+const Color = require('color');
 
 export interface Props
 {
@@ -82,11 +83,12 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
       borderColor(Colors().inactiveHover, Colors().inactiveHover) :
       borderColor('rgba(0,0,0,0)', Colors().activeHover);
     const previewDocument = index < documents.size && documents.size > 0 ? documents.get(index) : null;
+    const bgColor = Colors().bg3;
     return (
       <div
         className='preview-document'
         key={index}
-        style={_.extend({}, backgroundColor(Colors().bg3), border)}
+        style={_.extend({}, backgroundColor(bgColor), border)}
         onClick={this.handleDocumentClickedFactory(index)}
       >
         <div className='preview-document-spacer'>
@@ -97,10 +99,9 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
             preview={previewDocument}
           />
         </div>
-        <div className='preview-document-fader' />
+        <div className='preview-document-fader' style={getFaderStyle(bgColor)} />
       </div>
     );
-    /*<div className='preview-document-index-label'> {index + 1} </div>*/
   }
 
   public render()
@@ -125,8 +126,15 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
       });
     };
   }
-
 }
+
+const getFaderStyle = _.memoize((bg) =>
+{
+  const col = Color(bg);
+  const minFade = col.alpha(col.alpha());
+  const maxFade = col.alpha(0);
+  return getStyle('background', `linear-gradient(${maxFade.toString()}, ${minFade.toString()})`);
+});
 
 export default Util.createContainer(
   TemplateEditorDocumentsPreview,

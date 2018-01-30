@@ -1,5 +1,9 @@
 @import "../../../common/Common.less";
 
+@scale-factor: 0.75;
+@width-factor: 100% * 1 / @scale-factor;
+@translation-factor: (@width-factor - 100%) / 2 * @scale-factor;
+
 .template-editor-documents-container {
   display: flex;
   flex-direction: column;
@@ -16,26 +20,24 @@
 
   .preview-document {
     margin: @spacing;
-    flex: 0 0 300px;
+    flex: 0 0 240px;
     position: relative;
-    // display: flex;
     display: block;
     overflow: hidden;
-    // justify-content: center;
-    // align-items: center;
     border: 2px solid;
     border-radius: 3px;
+    padding: @spacing;
 
     .preview-document-spacer {
-      
-      padding: @spacing;
+      width: @width-factor;
+      transform: translateX(-@translation-factor) translateY(-@translation-factor) scale(@scale-factor);
     }
+
     .preview-document-fader {
       bottom: 0px;
       position: absolute;
       width: 100%;
       height: 30px;
-      background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,1)); // TODO replace w/ real colors
       pointer-events: none;
     }
   }
