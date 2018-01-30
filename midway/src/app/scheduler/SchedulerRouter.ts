@@ -54,6 +54,7 @@ import Users from '../users/Users';
 import * as Util from '../Util';
 import Scheduler from './Scheduler';
 import SchedulerConfig from './SchedulerConfig';
+import { SchedulerLogs } from './SchedulerLogs';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
@@ -61,6 +62,7 @@ const users = new Users();
 
 export const credentials: Credentials = new Credentials();
 export const scheduler: Scheduler = new Scheduler();
+export const schedulerLogs: SchedulerLogs = new SchedulerLogs();
 
 const allowedTypes: string[] = ['http', 'sftp', 'local'];
 
@@ -69,6 +71,12 @@ Router.get('/connections', passport.authenticate('access-token-local'), async (c
 {
   await perm.CredentialPermissions.verifyPermission(ctx.state.user as UserConfig, ctx.req);
   ctx.body = await credentials.getNames(ctx.query.type);
+});
+
+// Get logs from schedulerLogs table
+Router.get('/logs/:id?', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await schedulerLogs.get(ctx.params.id);
 });
 
 // Get job by search parameter, or all if none provided
