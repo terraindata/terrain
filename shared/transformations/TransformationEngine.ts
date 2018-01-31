@@ -110,12 +110,16 @@ export class TransformationEngine
       && JSON.stringify([...this.fieldTypes]) === JSON.stringify([...other.fieldTypes]);
   }
 
-  public appendTransformation(nodeType: TransformationNodeType, fieldNames: string[], options?: object, tags?: string[], weight?: number)
+  public appendTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: string[] | number[],
+    options?: object, tags?: string[], weight?: number): number
   {
-    const fieldIDs: number[] = _.map(fieldNames, (name) => this.fieldNameToIDMap.get(name));
+    const fieldIDs: number[] = fieldNamesOrIDs.length > 0 ?
+      (typeof fieldNamesOrIDs[0] === 'number' ? fieldNamesOrIDs as number[] :
+        _.map(fieldNamesOrIDs, (name) => this.fieldNameToIDMap.get(name))) : [];
     const node = new TransformationNode(this.uidNode, nodeType, fieldIDs, options);
     this.dag.setNode(this.uidNode.toString(), node);
     this.uidNode++;
+    return this.uidNode - 1;
   }
 
   public transform(doc: object): object
@@ -155,13 +159,38 @@ export class TransformationEngine
     };
   }
 
-  public addField(fullKeyPath: string, typeName: string): void
+  public addField(fullKeyPath: string, typeName: string): number
   {
     this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
     this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
     this.fieldTypes.set(this.uidField, typeName);
 
     this.uidField++;
+    return this.uidField - 1;
+  }
+
+  public nodesForField(field: string | number): TransformationNode[]
+  {
+    const target: number = typeof field === 'number' ? field : this.fieldNameToIDMap[field];
+    const nodes: TransformationNode[] = [];
+    _.each(this.dag.nodes(), (node) =>
+    {
+      if ((node.value as TransformationNode).fieldIDs.includes(target))
+      {
+        nodes.push(node.value as TransformationNode);
+      }
+    });
+    // Need to order nodes...
+    const allSorted = GraphLib.alg.topsort(this.dag);
+    const nodesSorted = [];
+    for (let i: number = 0; i < allSorted.length; i++)
+    {
+      if (nodes.includes(this.dag.node(allSorted[i])))
+      {
+        nodesSorted.push(this.dag.node(allSorted[i]));
+      }
+    }
+    return nodesSorted;
   }
 
   private generateInitialFieldMaps(obj: object, currentKeyPath: string = ''): void
