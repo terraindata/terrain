@@ -48,9 +48,10 @@ THE SOFTWARE.
 import * as SpotlightTypes from 'app/builder/data/SpotlightTypes';
 import Util from 'app/util/Util';
 import * as React from 'react';
-import MapComponent from '../../common/components/MapComponent';
+import MapComponent from '../../common/components/MapComponent2';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import { BuilderState, BuilderStore } from '../data/BuilderStore';
+import BuilderActions from '../data/BuilderActions';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -93,32 +94,34 @@ class BuilderMapComponent extends TerrainComponent<Props>
     });
   }
 
+  public handleChange(inputValue, coordinates?)
+  {
+    if (coordinates !== undefined)
+    {
+      BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), coordinates);
+    }
+    else
+    {
+      BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), inputValue);
+    }
+    BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'mapInputValue'), inputValue);
+  }
+
   public render()
   {
-    const { distance, distanceUnit, geopoint, map_text, field } = this.props.data;
+    const { distance, distanceUnit, locationValue, mapInputValue, field } = this.props.data;
     const spotlights = this.props.spotlights.spotlights;
     return (
       <div className='cards-builder-map-component'>
         <MapComponent
-          keyPath={this.props.keyPath}
-          location={geopoint.toJS !== undefined ? geopoint.toJS() : geopoint}
-          address={map_text !== undefined ? map_text : ''}
-          markLocation={true}
-          showDistanceCircle={true}
-          showSearchBar={true}
-          zoomControl={true}
-          distance={parseFloat(distance)}
+          geocoder='photon'
+          inputValue={mapInputValue}
+          coordinates={locationValue}
+          distance={distance}
           distanceUnit={distanceUnit}
-          geocoder='google'
-          hideSearchSettings={true}
           inputs={this.state.inputs}
-          textKeyPath={this._ikeyPath(this.props.parentKeyPath, 'map_text')}
-          spotlights={spotlights}
-          field={field}
-          keepAddressInSync={true}
+          onChange={this.handleChange}
           canEdit={this.props.canEdit}
-          colorMarker={true}
-          className={'builder-map-component-wrapper'}
         />
       </div>
     );

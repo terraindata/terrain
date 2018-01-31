@@ -206,6 +206,7 @@ export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
       }
     });
     const fieldValue = valueInfo.value[field];
+    // TODO LAURA TODO (if fieldvalue is an object or something....)
     const coords = MapUtil.getCoordinatesFromGeopoint(fieldValue);
     return make(
       Blocks, 'elasticDistance',
@@ -214,8 +215,8 @@ export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         distanceType,
         distanceUnit,
         field,
-        geopoint: coords,
-        map_text: '',
+        locationValue: fieldValue,
+        mapInputValue: fieldValue,
       },
       true);
   }

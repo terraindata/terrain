@@ -122,7 +122,7 @@ export interface Card extends IRecord<Card>
     topTql?: string;
 
     // This is used for the distance card, it will be overwritten by parser on load unless saved as metadata
-    map_text?: string;
+//    mapInputValue?: string;
 
     anythingAccepts?: boolean;
 
@@ -192,7 +192,7 @@ export interface CardConfig
   };
 }
 
-export const allCardsMetaFields = allBlocksMetaFields.concat(['disabled', 'closed', 'tuning', 'tuningClosed', 'map_text']);
+export const allCardsMetaFields = allBlocksMetaFields.concat(['disabled', 'closed', 'tuning', 'tuningClosed']);
 
 // helper function to populate random card fields
 export const _card = (config: CardConfig) =>
@@ -210,7 +210,6 @@ export const _card = (config: CardConfig) =>
     disabled: false,
     tuning: false,
     tuningClosed: false,
-    map_text: '',
   });
 
   if (config.static.metaFields)

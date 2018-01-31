@@ -80,8 +80,10 @@ export const elasticDistance = _card({
   field: '',
   distanceUnit: 'mi',
   distanceType: 'arc',
-  geopoint: [0, 0],
-  map_text: '',
+  locationValue: {},
+  mapInputValue: '',
+  // geopoint: [0, 0],
+  // map_text: '',
 
   static: {
     language: 'elastic',
@@ -92,14 +94,11 @@ export const elasticDistance = _card({
 
     tql: (block: Block, tqlTranslationFn: TQLTranslationFn, tqlConfig: object) =>
     {
-      const point = block['geopoint'].toJS !== undefined ? block['geopoint'].toJS() : block['geopoint'];
+      const locationValue = block['locationValue'].toJS !== undefined ? block['locationValue'].toJS() : block['locationValue'];
       return {
         distance: (block['distance']).toString() + block['distanceUnit'],
         distance_type: block['distanceType'],
-        [block['field']]: {
-          lat: point[0],
-          lon: point[1],
-        },
+        [block['field']]: locationValue,
       };
     },
 
