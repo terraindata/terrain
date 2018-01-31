@@ -55,7 +55,6 @@ import BuilderActions from '../../data/BuilderActions';
 import { scrollAction } from '../../data/BuilderScrollStore';
 import Switch from './../../../common/components/Switch';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import CardDropArea from './CardDropArea';
 import CardsArea from './CardsArea';
 import './CardsColumn.less';
 import CardsDeck from './CardsDeck';
@@ -96,7 +95,7 @@ class TuningColumn extends TerrainComponent<Props>
     noCardsMessage: string,
   } = {
       keyPath: this.computeKeyPath(this.props),
-      allCards: List([]),
+      allCards: this.props.builder.query.cards,
       tuningOrder: List([]),
       showNoCardsModal: false,
       noCardsMessage: '',
