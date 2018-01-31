@@ -100,8 +100,8 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
   public state: {
     shouldRender: boolean;
   } = {
-    shouldRender: this.computeShouldRender(this.props),
-  };
+      shouldRender: this.computeShouldRender(this.props),
+    };
 
   private findParentCardKeyPath(storeState, keyPath: KeyPath)
   {
@@ -158,8 +158,8 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
 }
 
 const PLACEHOLDER_STYLE = {
-  'height': 32,
-  'margin-left': 75,
+  height: 32,
+  marginLeft: 75,
 };
 
 export default ElasticKeyBuilderTextbox;

@@ -4,6 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 sqlite_path=${DIR}/../../../
 use_mysql=1
+use_postgres=1
 use_elastic=1
 use_sqlite=1
 use_chrome=1
@@ -21,6 +22,9 @@ do
 				;;
 		  --use-mysql=*)
 				use_mysql="${1#*=}"
+				;;
+		  --use-postgres=*)
+				use_postgres="${1#*=}"
 				;;
 		  --use-elastic=*)
 				use_elastic="${1#*=}"
@@ -54,6 +58,12 @@ if [ "$use_mysql" == 1 ] && [ $(docker ps -aq -f name=moviesdb-mysql | wc -l) !=
         echo "Stopping moviesdb docker mysql image..."
         docker stop moviesdb-mysql
         docker rm moviesdb-mysql || true
+fi
+
+if [ "$use_postgres" == 1 ] && [ $(docker ps -aq -f name=moviesdb-postgres | wc -l) != 0 ] ; then
+        echo "Stopping moviesdb docker postgres image..."
+        docker stop moviesdb-postgres
+        docker rm moviesdb-postgres || true
 fi
 
 if [ "$use_elastic" == 1 ] && [ $(docker ps -aq -f name=moviesdb-elk | wc -l) != 0 ] ; then

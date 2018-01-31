@@ -55,7 +55,7 @@ import Util from 'util/Util';
 import InfoArea from './../../common/components/InfoArea';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import Ajax from './../../util/Ajax';
-import Actions from './../data/UserActions';
+import { UserActions as Actions } from './../data/UserRedux';
 import * as UserTypes from './../UserTypes';
 import './Profile.less';
 
@@ -81,12 +81,12 @@ class Profile extends TerrainComponent<Props>
     isLoggedInUser: boolean,
     routeIsDirect: boolean,
   } = {
-    user: null,
-    me: null,
-    loading: false,
-    isLoggedInUser: false,
-    routeIsDirect: false,
-  };
+      user: null,
+      me: null,
+      loading: false,
+      isLoggedInUser: false,
+      routeIsDirect: false,
+    };
 
   public infoKeys = [
     'userId',
@@ -126,7 +126,9 @@ class Profile extends TerrainComponent<Props>
 
   public componentDidMount()
   {
-    this.props.userActions.fetch();
+    this.props.userActions({
+      actionType: 'fetch',
+    });
     this.updateUser(this.props);
   }
 
@@ -171,7 +173,10 @@ any existing system administrator privileges, including your own. \
 are still a system administrator yourself.)'))
     {
       const user = this.state.user.set('isSuperUser', !this.state.user.isSuperUser) as UserTypes.User;
-      this.props.userActions.change(user);
+      this.props.userActions({
+        actionType: 'change',
+        user,
+      });
       Ajax.adminSaveUser(user);
     }
   }
@@ -188,7 +193,10 @@ immediately be logged out of any existing sessions. \
 (You can re-enable this user later, if needed.)'))
     {
       const user = this.state.user.set('isDisabled', !this.state.user.isDisabled) as UserTypes.User;
-      this.props.userActions.change(user);
+      this.props.userActions({
+        actionType: 'change',
+        user,
+      });
       Ajax.adminSaveUser(user);
     }
   }

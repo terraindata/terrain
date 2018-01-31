@@ -47,11 +47,13 @@ THE SOFTWARE.
 import * as passport from 'koa-passport';
 import * as KoaRouter from 'koa-router';
 
-import { Credentials } from '../credentials/Credentials';
+import Credentials from '../credentials/Credentials';
 import { Permissions } from '../permissions/Permissions';
-import { UserConfig, Users } from '../users/Users';
+import UserConfig from '../users/UserConfig';
+import Users from '../users/Users';
 import * as Util from '../Util';
-import { Scheduler, SchedulerConfig } from './Scheduler';
+import Scheduler from './Scheduler';
+import SchedulerConfig from './SchedulerConfig';
 
 const Router = new KoaRouter();
 const perm: Permissions = new Permissions();
@@ -92,6 +94,12 @@ Router.post('/create', passport.authenticate('access-token-local'), async (ctx, 
   const schedule: SchedulerConfig = ctx.request.body.body;
   Util.verifyParameters(schedule, ['jobType', 'name', 'paramsJob', 'schedule', 'sort', 'transport']);
   ctx.body = await scheduler.createCustomSchedule(ctx.state.user, schedule);
+});
+
+// run a job on demand
+Router.post('/run/:id', passport.authenticate('access-token-local'), async (ctx, next) =>
+{
+  ctx.body = await scheduler.runOnDemand(ctx.state.user, ctx.params.id);
 });
 
 // Delete scheduled jobs by parameter

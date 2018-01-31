@@ -245,7 +245,7 @@ const EQLSpec: ESClause[] =
         path: ['control'],
         desc: 'How many results to return.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-from-size.html',
-        template: '1000',
+        template: '100',
       }),
     new ESEnumClause('explain_wildcards',
       ['open', 'closed', 'none', 'all'],
@@ -306,7 +306,7 @@ const EQLSpec: ESClause[] =
           },
           'sort:elasticScore': null,
           'from:from': 0,
-          'size:size': 1000,
+          'size:size': 100,
           'track_scores:track_scores': true,
         },
         suggestions: ['query', 'sort', 'from', 'size'],
@@ -1816,6 +1816,7 @@ const EQLSpec: ESClause[] =
       {
         object: 'terms_lookup',
         array: 'base[]',
+        number: 'boost',
       },
       {
         path: ['filter'],

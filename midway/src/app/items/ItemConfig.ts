@@ -43,26 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import UserActionTypes from 'users/data/UserActionTypes';
-import ActionTypes from './AuthActionTypes';
 
-const $ = (type: string, payload: any) =>
+import ConfigType from '../ConfigType';
+
+export class ItemConfig extends ConfigType
 {
-  return { type, payload };
-};
+  public id?: number = undefined;
+  public meta?: string = undefined;
+  public name: string = '';
+  public parent?: number = undefined;
+  public status?: string = undefined;
+  public type?: string = undefined;
 
-const AuthActions =
+  constructor(props: object)
   {
-    login:
-    (accessToken: string, id: number) => (dispatch) =>
-    {
-      dispatch($(ActionTypes.login, { accessToken, id }));
-      dispatch($(UserActionTypes.updateCurrentUser, { id }));
-    },
+    super();
+    ConfigType.initialize(this, props);
+  }
+}
 
-    logout:
-    () =>
-      $(ActionTypes.logout, {}),
-  };
-
-export default AuthActions;
+export default ItemConfig;

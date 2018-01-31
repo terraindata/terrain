@@ -43,61 +43,83 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import Ajax from './../../util/Ajax';
-import * as UserTypes from './../UserTypes';
-import ActionTypes from './UserActionTypes';
 
-const $ = (type: string, payload: any) =>
+import * as winston from 'winston';
+
+import PostgresConfig from '../../../../src/database/pg/PostgreSQLConfig';
+import PostgresController from '../../../../src/database/pg/PostgreSQLController';
+
+import * as Tasty from '../../../../src/tasty/Tasty';
+import PostgreSQLQueries from '../../../tasty/PostgreSQLQueries';
+import SQLQueries from '../../../tasty/SQLQueries';
+import * as Utils from '../../../Utils';
+
+function getExpectedFile(): string
 {
-  return { type, payload };
-};
+  return __filename.split('.')[0] + '.expected';
+}
 
-const Actions =
-  {
-    change:
-    (user: UserTypes.User) =>
-      $(ActionTypes.change, { user }),
+const DBMovies: Tasty.Table = new Tasty.Table('movies', ['movieid'], ['title', 'releasedate']);
+let tasty: Tasty.Tasty;
+let postgresController: PostgresController;
 
-    fetch:
-    () => (dispatch) =>
+beforeAll(async () =>
+{
+  // TODO: get rid of this monstrosity once @types/winston is updated.
+  (winston as any).level = 'debug';
+  const config: PostgresConfig =
     {
-      dispatch($(ActionTypes.fetch, {}));
-      Ajax.getUsers((usersObj) =>
-      {
-        let users: UserTypes.UserMap = Immutable.Map<any, UserTypes.User>({});
-        _.map(usersObj, (userObj, userId) =>
-        {
-          users = users.set(
-            +userId,
-            UserTypes._User(userObj),
-          );
-        });
-        dispatch(Actions.setUsers(users));
-      });
-    },
+      database: 'moviesdb',
+      host: 'localhost',
+      port: 65432,
+      password: 'r3curs1v3$',
+      user: 't3rr41n-demo',
+    };
 
-    setUsers:
-    (users: UserTypes.UserMap) => (dispatch, getState) =>
-      dispatch($(ActionTypes.setUsers, { users, currentUserId: getState().get('auth').id })),
+  try
+  {
+    postgresController = new PostgresController(config, 0, 'PostgresExecutorTests');
+    tasty = postgresController.getTasty();
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+});
 
-    updateCurrentUser:
-    () =>
-      (dispatch, getState) =>
-        $(ActionTypes.updateCurrentUser, { id: getState().get('auth').id }),
+function runTest(testObj: object)
+{
+  const testName: string = 'Postgres: execute ' + String(testObj[0]);
+  test(testName, async (done) =>
+  {
+    try
+    {
+      const results = await tasty.getDB().execute(testObj[1]);
+      await Utils.checkResults(getExpectedFile(), testName, JSON.parse(JSON.stringify(results)));
+    }
+    catch (e)
+    {
+      fail(e);
+    }
+    done();
+  });
+}
 
-    copmleteTutorial:
-    (stepId: string, complete: boolean = true) =>
-      $(ActionTypes.completeTutorial, { stepId, complete }),
+const tests = PostgreSQLQueries.concat(SQLQueries);
 
-    changeType:
-    (type: string) =>
-      $(ActionTypes.changeType, { type }),
+for (let i = 0; i < tests.length; i++)
+{
+  runTest(tests[i]);
+}
 
-  };
-
-// TODO remove when no longer needed
-window['completeTutorial'] = Actions.copmleteTutorial;
-
-export default Actions;
+afterAll(async () =>
+{
+  try
+  {
+    await tasty.destroy();
+  }
+  catch (e)
+  {
+    fail(e);
+  }
+});

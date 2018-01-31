@@ -44,20 +44,25 @@ THE SOFTWARE.
 
 // Production build configuration for webpack.
 
-var webpack = require("webpack");
-var conf = require("./webpack.config");
+const webpack = require('webpack');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const conf = require('./webpack.config');
 
 conf.plugins[0] =
   new webpack.DefinePlugin({
-    "process.env": {
-//    "NODE_ENV": JSON.stringify('production'),
-      "BABEL_ENV": JSON.stringify('production'),
-    },
-    DEV: "false",
-    MIDWAY_HOST: "'http://" + (process.env.MIDWAY_HOST || "localhost:3000") + "'",
+    'process.env.NODE_ENV': JSON.stringify('production'),
+    'process.env.BABEL_ENV': JSON.stringify('production'),
+    DEV: JSON.stringify(false),
+    MIDWAY_HOST: JSON.stringify('http://' + (process.env.MIDWAY_HOST || 'localhost:3000')),
   });
 
-conf.plugins.concat([
+conf.plugins[1] =
+  new HardSourceWebpackPlugin({
+    cacheDirectory: './.cache/hard-source/prod/[confighash]',
+    recordsPath: './.cache/hard-source/prod/[confighash]/records.json',
+  });
+
+conf.plugins = conf.plugins.concat([
   // Minify code.
   new webpack.optimize.UglifyJsPlugin({
     parallel: true,

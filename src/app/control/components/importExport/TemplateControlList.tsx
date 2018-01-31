@@ -105,32 +105,32 @@ class TemplateControlList extends TerrainComponent<Props>
     schedulerModalOpen: boolean;
     modalRequests: List<ModalProps>;
   } = {
-    confirmModalOpen: false,
-    confirmModalMessage: '',
-    confirmModalTitle: '',
-    confirmModalIsError: false,
-    confirmModalType: ConfirmActionType.DELETE,
-    currentActiveTemplate: undefined,
-    currentActiveIndex: -1,
-    headlessModalOpen: false,
-    schedulerModalOpen: false,
-    modalRequests: List([]),
-  };
+      confirmModalOpen: false,
+      confirmModalMessage: '',
+      confirmModalTitle: '',
+      confirmModalIsError: false,
+      confirmModalType: ConfirmActionType.DELETE,
+      currentActiveTemplate: undefined,
+      currentActiveIndex: -1,
+      headlessModalOpen: false,
+      schedulerModalOpen: false,
+      modalRequests: List([]),
+    };
 
   public templateConfig: HeaderConfig =
-  [
-    ['ID', (template, index) => template.templateId],
-    ['Name', (template, index) => template.templateName],
-    ['Template Type', (template, index) => template.export ? 'Export' : 'Import'],
-    ['Server Name', (template, index) => this.getServerName(template.dbid)],
-    ['ES Index', (template, index) => template.dbname],
-    ['ES Type', (template, index) => template.tablename],
-    ['Access Token', (template, index) =>
-      <div className='access-token-cell'>
-        {template.persistentAccessToken}
-      </div>,
-    ],
-  ];
+    [
+      ['ID', (template, index) => template.templateId],
+      ['Name', (template, index) => template.templateName],
+      ['Template Type', (template, index) => template.export ? 'Export' : 'Import'],
+      ['Server Name', (template, index) => this.getServerName(template.dbid)],
+      ['ES Index', (template, index) => template.dbname],
+      ['ES Type', (template, index) => template.tablename],
+      ['Access Token', (template, index) =>
+        <div className='access-token-cell'>
+          {template.persistentAccessToken}
+        </div>,
+      ],
+    ];
 
   public requestModal(newRequest: ModalProps)
   {
@@ -153,12 +153,12 @@ class TemplateControlList extends TerrainComponent<Props>
         text: `Headless ${typeText}`,
         onClick: () => this.requestCreateHeadless(template, index),
         icon:
-        <ImportIcon
-          className={classNames({
-            'template-menu-option-icon': true,
-            'template-icon-export': template.export,
-          })}
-        />,
+          <ImportIcon
+            className={classNames({
+              'template-menu-option-icon': true,
+              'template-icon-export': template.export,
+            })}
+          />,
       },
       {
         text: `Schedule ${typeText}`,

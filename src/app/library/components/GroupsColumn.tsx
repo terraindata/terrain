@@ -47,10 +47,10 @@ THE SOFTWARE.
 // tslint:disable:restrict-plus-operands no-var-requires no-shadowed-variable strict-boolean-expressions switch-default
 
 import * as Immutable from 'immutable';
+import { replaceRoute } from 'library/helpers/LibraryRoutesHelper';
 import * as _ from 'lodash';
 import memoizeOne from 'memoize-one';
 import * as React from 'react';
-import { browserHistory } from 'react-router';
 import BackendInstance from '../../../database/types/BackendInstance';
 import { ItemStatus } from '../../../items/types/Item';
 import { Colors, fontColor } from '../../colors/Colors';
@@ -92,6 +92,7 @@ export interface Props
   params: any;
   isFocused: boolean; // is this the last thing focused / selected?
   groupActions: any;
+  algorithmActions: any;
   referrer?: { label: string, path: string };
   users?: UserTypes.UserState;
 }
@@ -336,9 +337,13 @@ class GroupsColumn extends TerrainComponent<Props>
 
   public handleNewGroupCreated(groupId)
   {
-    const { groups } = this.props;
+    const { basePath, groups } = this.props;
     const categoryId = groups.get(groupId).categoryId;
-    browserHistory.push(`/library/${categoryId}/${groupId}`);
+    replaceRoute({
+      basePath,
+      categoryId,
+      groupId,
+    });
   }
 
   public handleNewGroupCreate()
@@ -411,6 +416,24 @@ class GroupsColumn extends TerrainComponent<Props>
     });
   }
 
+  public handleItemSelect(id: ID)
+  {
+    const {
+      basePath,
+      categoryId,
+    } = this.props;
+
+    this.props.algorithmActions.unselect();
+
+    replaceRoute({
+      basePath,
+      categoryId,
+      groupId: id,
+    });
+
+    return true;
+  }
+
   public renderGroup(id: ID, fadeIndex: number)
   {
     const { params, basePath, users } = this.props;
@@ -418,35 +441,35 @@ class GroupsColumn extends TerrainComponent<Props>
     const index = this.props.groupsOrder.indexOf(id);
     const scores = {
       [ItemStatus.Archive]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Archive),
-        name: 'Algorithms in Archived Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Archive),
+          name: 'Algorithms in Archived Status',
+        },
       [ItemStatus.Build]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Build),
-        name: 'Algorithms in Build Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Build),
+          name: 'Algorithms in Build Status',
+        },
       [ItemStatus.Approve]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Approve),
-        name: 'Algorithms in Approve Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Approve),
+          name: 'Algorithms in Approve Status',
+        },
       [ItemStatus.Live]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Live),
-        name: 'Algorithms in Live Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Live),
+          name: 'Algorithms in Live Status',
+        },
       [ItemStatus.Default]:
-      {
-        score: 0,
-        color: LibraryTypes.colorForStatus(ItemStatus.Default),
-        name: 'Algorithms in Default Status',
-      },
+        {
+          score: 0,
+          color: LibraryTypes.colorForStatus(ItemStatus.Default),
+          name: 'Algorithms in Default Status',
+        },
     };
 
     const algorithms = this.props.algorithms.filter(
@@ -528,6 +551,7 @@ class GroupsColumn extends TerrainComponent<Props>
         onHover={this.handleHover}
         onDropped={this.handleDropped}
         onDragFinish={this.handleDragFinish}
+        onSelect={this.handleItemSelect}
         item={group}
         canEdit={canEdit}
         canDrag={canDrag}

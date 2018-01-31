@@ -107,7 +107,13 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
         .set('loading', true)
         .set('loadingXhr', xhr)
         .set('loadingAlgorithmId', algorithmId)
-        ;
+        .set('pastQueries', state.pastQueries.clear())
+        .set('nextQueries', state.nextQueries.clear())
+        .set('lastActionType', '')
+        .set('lastActionKeyPath', null)
+        .set('lastActionTime', 0)
+        .set('query', null)
+        .set('algorithmId', '');
     },
 
     [ActionTypes.queryLoaded]: (state: BuilderState,
@@ -216,64 +222,64 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
 
     // first check original keypath
     [ActionTypes.nestedMove]: // a deep move
-    (state: BuilderState, action: {
-      payload?: { itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number },
-    }) =>
-    {
-      const { itemKeyPath, itemIndex, newKeyPath, newIndex } = action.payload;
-
-      if (itemKeyPath.equals(newKeyPath))
+      (state: BuilderState, action: {
+        payload?: { itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number },
+      }) =>
       {
-        if (itemIndex === newIndex)
-        {
-          return state;
-        }
+        const { itemKeyPath, itemIndex, newKeyPath, newIndex } = action.payload;
 
-        // moving within same list
-        return state.updateIn(itemKeyPath, (arr) =>
+        if (itemKeyPath.equals(newKeyPath))
         {
-          const item = arr.get(itemIndex);
-          let indexOffset = 0;
-          if (itemIndex < newIndex)
+          if (itemIndex === newIndex)
           {
-            // dragging down
-            indexOffset = -1;
+            return state;
           }
-          return arr.splice(itemIndex, 1).splice(newIndex + indexOffset, 0, item);
-        });
-      }
 
-      const itemReferenceKeyPath = itemIndex === null ? itemKeyPath : itemKeyPath.push(itemIndex);
-      const item = state.getIn(itemReferenceKeyPath);
-      const tempId = '' + Math.random(); // mark with a temporary ID so we know where to delete
-      state = state.setIn(itemReferenceKeyPath.push('id'), tempId);
-
-      state = state.updateIn(newKeyPath, (obj) =>
-      {
-        if (Immutable.List.isList(obj))
-        {
-          return obj.splice(newIndex, 0, item);
+          // moving within same list
+          return state.updateIn(itemKeyPath, (arr) =>
+          {
+            const item = arr.get(itemIndex);
+            let indexOffset = 0;
+            if (itemIndex < newIndex)
+            {
+              // dragging down
+              indexOffset = -1;
+            }
+            return arr.splice(itemIndex, 1).splice(newIndex + indexOffset, 0, item);
+          });
         }
-        return item;
-      });
 
-      if (state.getIn(itemReferenceKeyPath.push('id')) === tempId)
-      {
-        // location remained same, optimized delete
-        state = state.deleteIn(itemReferenceKeyPath);
-      }
-      else
-      {
-        // search and destroy
-        // NOTE: if in the future the same card is open in multiple places, this will break
-        state = state.deleteIn(Util.keyPathForId(state, tempId) as Array<string | number>);
-        // Consider an optimized search if performance becomes an issue.
-      }
+        const itemReferenceKeyPath = itemIndex === null ? itemKeyPath : itemKeyPath.push(itemIndex);
+        const item = state.getIn(itemReferenceKeyPath);
+        const tempId = '' + Math.random(); // mark with a temporary ID so we know where to delete
+        state = state.setIn(itemReferenceKeyPath.push('id'), tempId);
 
-      state = trimParent(state, itemKeyPath);
+        state = state.updateIn(newKeyPath, (obj) =>
+        {
+          if (Immutable.List.isList(obj))
+          {
+            return obj.splice(newIndex, 0, item);
+          }
+          return item;
+        });
 
-      return state;
-    },
+        if (state.getIn(itemReferenceKeyPath.push('id')) === tempId)
+        {
+          // location remained same, optimized delete
+          state = state.deleteIn(itemReferenceKeyPath);
+        }
+        else
+        {
+          // search and destroy
+          // NOTE: if in the future the same card is open in multiple places, this will break
+          state = state.deleteIn(Util.keyPathForId(state, tempId) as Array<string | number>);
+          // Consider an optimized search if performance becomes an issue.
+        }
+
+        state = trimParent(state, itemKeyPath);
+
+        return state;
+      },
 
     [ActionTypes.remove]: (state: BuilderState, action: {
       payload?: { keyPath: KeyPath, index: number },
@@ -295,12 +301,14 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     [ActionTypes.changeTQL]: (state: BuilderState,
       action: Action<{
         tql: string,
+        tqlMode: string,
       }>) =>
     {
       // TODO MOD convert
       let { query } = state;
       const tql: string = action.payload.tql;
       query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
+      query = query.set('tqlMode', action.payload.tqlMode);
       query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
       query = AllBackendsMap[query.language].codeToQuery(
         query,

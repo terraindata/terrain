@@ -62,7 +62,6 @@ import Query from '../../../items/types/Query';
 import FileImportStore from '../../fileImport/data/FileImportStore';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import LibraryActions from '../../library/data/LibraryActions';
-import { LibraryStore } from '../../library/data/LibraryStore';
 import * as LibraryTypes from '../../library/LibraryTypes';
 import RolesStore from '../../roles/data/RolesStore';
 import TerrainStore from '../../store/TerrainStore';
@@ -99,6 +98,8 @@ export interface Props
   router?: any;
   route?: any;
   users?: UserState;
+  library?: LibraryTypes.LibraryState;
+  algorithmActions: typeof LibraryActions.algorithms;
 }
 
 class Builder extends TerrainComponent<Props>
@@ -127,26 +128,26 @@ class Builder extends TerrainComponent<Props>
     savingAs?: boolean;
 
   } = {
-    exportState: FileImportStore.getState(),
-    builderState: BuilderStore.getState(),
-    algorithms: LibraryStore.getState().algorithms,
+      exportState: FileImportStore.getState(),
+      builderState: BuilderStore.getState(),
+      algorithms: this.props.library.algorithms,
 
-    colKeys: null,
-    noColumnAnimation: false,
-    columnType: null,
-    selectedCardName: '',
-    manualIndex: -1,
+      colKeys: null,
+      noColumnAnimation: false,
+      columnType: null,
+      selectedCardName: '',
+      manualIndex: -1,
 
-    leaving: false,
-    nextLocation: null,
-    tabActions: this.getTabActions(BuilderStore.getState()),
+      leaving: false,
+      nextLocation: null,
+      tabActions: this.getTabActions(BuilderStore.getState()),
 
-    nonexistentAlgorithmIds: List([]),
+      nonexistentAlgorithmIds: List([]),
 
-    navigationException: false,
+      navigationException: false,
 
-    saveAsTextboxValue: '',
-  };
+      saveAsTextboxValue: '',
+    };
 
   public initialColSizes: any;
 
@@ -172,11 +173,6 @@ class Builder extends TerrainComponent<Props>
           });
         }
       },
-    });
-
-    this._subscribe(LibraryStore, {
-      stateKey: 'algorithms',
-      storeKeyPath: ['algorithms'],
     });
 
     this._subscribe(FileImportStore, {
@@ -362,7 +358,7 @@ class Builder extends TerrainComponent<Props>
     }
     if (newConfig && (props === this.props || algorithmId !== this.getSelectedId(this.props)))
     {
-      const algorithm = this.state.algorithms.get(+algorithmId);
+      const algorithm = this.props.library.algorithms.get(+algorithmId);
       // need to fetch data for new query
       Actions.fetchQuery(algorithmId, this.handleNoAlgorithm, algorithm && algorithm.db);
     }
@@ -414,11 +410,11 @@ class Builder extends TerrainComponent<Props>
     }
 
     const algorithmId = this.getSelectedId(props);
-    const algorithm = this.state.algorithms &&
-      this.state.algorithms.get(+algorithmId);
+    const algorithm = this.props.library.algorithms &&
+      this.props.library.algorithms.get(+algorithmId);
     if (algorithmId && !algorithm)
     {
-      LibraryActions.algorithms.fetchVersion(algorithmId, () =>
+      this.props.algorithmActions.fetchVersion(algorithmId, () =>
       {
         // no version available
         this.handleNoAlgorithm(algorithmId);
@@ -566,7 +562,7 @@ class Builder extends TerrainComponent<Props>
       });
 
       // TODO remove if queries/algorithms model changes
-      TerrainStore.dispatch(LibraryActions.algorithms.change(algorithm));
+      this.props.algorithmActions.change(algorithm);
       this.onSaveSuccess(algorithm);
       Actions.save(); // register that we are saving
 
@@ -605,9 +601,9 @@ class Builder extends TerrainComponent<Props>
       onColSizeChange: this.handleColSizeChange,
       minColWidth: 316,
       columns:
-      _.range(0, this.state.colKeys.size).map((index) =>
-        this.getColumn(index),
-      ),
+        _.range(0, this.state.colKeys.size).map((index) =>
+          this.getColumn(index),
+        ),
     };
   }
 
@@ -850,7 +846,7 @@ class Builder extends TerrainComponent<Props>
   {
     let algorithm = LibraryTypes.touchAlgorithm(this.getAlgorithm());
     algorithm = algorithm.set('query', this.getQuery());
-    TerrainStore.dispatch(LibraryActions.algorithms.duplicateAs(algorithm, algorithm.get('index'), this.state.saveAsTextboxValue,
+    this.props.algorithmActions.duplicateAs(algorithm, algorithm.get('index'), this.state.saveAsTextboxValue,
       (response, newAlgorithm) =>
       {
         this.onSaveSuccess(newAlgorithm);
@@ -884,8 +880,7 @@ class Builder extends TerrainComponent<Props>
         {
           browserHistory.replace(`/builder/${newConfig}`);
         }
-      }),
-    );
+      });
   }
 
   public handleModalSaveAsCancel()
@@ -972,7 +967,7 @@ class Builder extends TerrainComponent<Props>
 }
 const BuilderContainer = Util.createTypedContainer(
   Builder,
-  ['users'],
-  {},
+  ['library', 'users'],
+  { algorithmActions: LibraryActions.algorithms },
 );
 export default withRouter(DragDropContext(HTML5Backend)(BuilderContainer));

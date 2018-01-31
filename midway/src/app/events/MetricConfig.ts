@@ -44,71 +44,20 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:no-empty
+import ConfigType from '../ConfigType';
 
-import * as Immutable from 'immutable';
-import * as _ from 'lodash';
-import Ajax from './../../util/Ajax';
-import * as UserTypes from './../UserTypes';
-import ActionTypes from './UserActionTypes';
-
-const UserReducers = {};
-
-UserReducers[ActionTypes.change] =
-  (state, action) =>
-    state.setIn(['users', action.payload.user.id], action.payload.user);
-
-UserReducers[ActionTypes.fetch] =
-  (state, action) =>
-  {
-    return state.set('loading', true);
-  };
-
-UserReducers[ActionTypes.setUsers] =
-  (state, action) =>
-  {
-    return state.set('users', action.payload.users)
-      .set('currentUser', action.payload.users.get(action.payload.currentUserId))
-      .set('loading', false)
-      .set('loaded', true);
-  };
-
-// This currentUser reference is hacky, and we should change it.
-UserReducers[ActionTypes.updateCurrentUser] =
-  (state, action) =>
-    state.set('currentUser',
-      state.getIn(['users', action.payload.id]));
-
-UserReducers[ActionTypes.completeTutorial] =
-  (
-    state: UserTypes.UserState,
-    action: Action<{
-      stepId: string,
-      complete: boolean,
-    }>,
-  ) =>
-  {
-    state = state.setIn(
-      ['users', state.currentUser.id, 'tutorialStepsCompleted', action.payload.stepId],
-      action.payload.complete,
-    );
-
-    const user = state.users.get(state.currentUser.id);
-    Ajax.saveUser(user, () => { }, () => { });
-
-    state = state.set('currentUser', user); // update the version of the current user reference
-    return state;
-  };
-
-const UserReducersWrapper = (state: UserTypes.UserState = UserTypes._UserState(), action) =>
+export class MetricConfig extends ConfigType
 {
-  let nextState = state;
-  if (UserReducers[action.type] !== undefined)
+  public id?: number = undefined;
+  public database: number = -1;
+  public label: string = '';
+  public events: string = '';
+
+  constructor(props: object)
   {
-    nextState = UserReducers[action.type](state, action);
+    super();
+    ConfigType.initialize(this, props);
   }
+}
 
-  return nextState;
-};
-
-export default UserReducersWrapper;
+export default MetricConfig;

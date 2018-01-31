@@ -52,15 +52,18 @@ import * as _ from 'lodash';
 import * as stream from 'stream';
 import * as winston from 'winston';
 
-import { addBodyToQuery } from '../../../../shared/database/elastic/ElasticUtil';
 import { CSVTypeParser } from '../../../../shared/etl/CSVTypeParser';
 import * as SharedUtil from '../../../../shared/Util';
 import DatabaseController from '../../database/DatabaseController';
-import ElasticClient from '../../database/elastic/client/ElasticClient';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
-import { ItemConfig, Items } from '../items/Items';
-import { ExportTemplateConfig, ExportTemplates } from './templates/ExportTemplates';
-import { TemplateBase } from './templates/Templates';
+import * as Tasty from '../../tasty/Tasty';
+import ItemConfig from '../items/ItemConfig';
+import Items from '../items/Items';
+import { QueryHandler } from '../query/QueryHandler';
+
+import ExportTemplateConfig from './templates/ExportTemplateConfig';
+import { ExportTemplates } from './templates/ExportTemplates';
+import { TemplateBase } from './templates/TemplateBase';
 
 const exportTemplates = new ExportTemplates();
 
@@ -72,46 +75,6 @@ export interface ExportConfig extends TemplateBase, ExportTemplateConfig
   file: stream.Readable;
   filetype: string;
   update: boolean;      // false means replace (instead of update) ; default should be true
-}
-
-function temporaryFindIndexAndType(queryObj)
-{
-  let index = '';
-  let type = '';
-  try
-  {
-    const filters = queryObj['body']['query']['bool']['filter'];
-    for (const filter of filters)
-    {
-      try
-      {
-        if (filter['term']['_index'] !== undefined)
-        {
-          index = filter['term']['_index'];
-        }
-      }
-      catch (e)
-      {
-        // do nothing
-      }
-      try
-      {
-        if (filter['term']['_type'] !== undefined)
-        {
-          type = filter['term']['_index'];
-        }
-      }
-      catch (e)
-      {
-        // do nothing
-      }
-    }
-  }
-  catch (e)
-  {
-    return [];
-  }
-  return [index, type];
 }
 
 export class Export
@@ -134,7 +97,6 @@ export class Export
       {
         return reject('File export currently is only supported for Elastic databases.');
       }
-      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
 
       if (exprt.filetype !== 'csv' && exprt.filetype !== 'json' && exprt.filetype !== 'json [type object]')
       {
@@ -173,38 +135,16 @@ export class Export
       {
         exprt.objectKey = objectKeyValue;
       }
-      let qry: string = '';
-
-      // if (this.props.exporting)
-      // {
-      //   const stringQuery: string =
-      //     ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
-      //   const parsedQuery = JSON.parse(stringQuery);
-      //   const dbName = parsedQuery['index'];
-      //   const tableName = parsedQuery['type'];
-      //   Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
-      // } // Parse the TQL and set the filters so that when we fetch we get the right templates.
 
       // get query data from algorithmId or query (or variant Id if necessary)
+      let qry: string = '';
       if ((exprt as any).variantId !== undefined && exprt.algorithmId === undefined)
       {
         exprt.algorithmId = (exprt as any).variantId;
       }
       if (exprt.algorithmId !== undefined && exprt.query === undefined)
       {
-        const algorithms: ItemConfig[] = await TastyItems.get(exprt.algorithmId);
-        if (algorithms.length === 0)
-        {
-          return reject('Algorithm not found.');
-        }
-        if (algorithms[0]['meta'] !== undefined)
-        {
-          const algorithmMeta: object = JSON.parse(algorithms[0]['meta'] as string);
-          if (algorithmMeta['query'] !== undefined && algorithmMeta['query']['tql'] !== undefined)
-          {
-            qry = algorithmMeta['query']['tql'];
-          }
-        }
+        qry = JSON.stringify(await this._getQueryFromAlgorithm(exprt.algorithmId));
       }
       else if (exprt.algorithmId === undefined && exprt.query !== undefined)
       {
@@ -219,8 +159,13 @@ export class Export
         return reject('Empty query provided.');
       }
 
-      let qryObj: object;
       const mapping: object = exprt.columnTypes;
+      if (typeof mapping === 'string')
+      {
+        return reject(mapping);
+      }
+
+      let qryObj: object;
       try
       {
         qryObj = JSON.parse(qry);
@@ -231,12 +176,6 @@ export class Export
       }
 
       qryObj = this._shouldRandomSample(qryObj);
-
-      if (typeof mapping === 'string')
-      {
-        return reject(mapping);
-      }
-      qryObj = addBodyToQuery(qryObj, this.SCROLL_TIMEOUT);
 
       let rankCounter: number = 1;
       let writer: any;
@@ -274,186 +213,164 @@ export class Export
       });
 
       const renameTransformations: object[] = exprt.transformations.filter((transformation) => transformation['name'] === 'rename');
-
       renameTransformations.forEach((transformation) =>
       {
         originalMapping[transformation['colName']] = mapping[transformation['args']['newName']];
       });
 
-      elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
+      const qh: QueryHandler = database.getQueryHandler();
+      const payload = {
+        database: exprt.dbid,
+        type: 'search',
+        streaming: false,
+        databasetype: 'elastic',
+        body: JSON.stringify(qryObj),
+      };
+
+      const qryResponse: any = await qh.handleQuery(payload);
+      if (qryResponse === undefined || qryResponse.hasError())
       {
-        if (resp === undefined || resp.hits === undefined || resp.hits.total === 0)
+        writer.end();
+        errMsg = 'Nothing to export.';
+        return reject(errMsg);
+      }
+      const resp = qryResponse.result;
+      if (resp === undefined || resp.hits === undefined || resp.hits.total === 0)
+      {
+        writer.end();
+        errMsg = 'Nothing to export.';
+        return reject(errMsg);
+      }
+
+      const newDocs: object[] = resp.hits.hits as object[];
+      if (newDocs.length === 0)
+      {
+        writer.end();
+        return resolve(pass);
+      }
+      let returnDocs: object[] = [];
+
+      const fieldArrayDepths: object = {};
+      for (const doc of newDocs)
+      {
+        // verify schema mapping with documents and fix documents accordingly
+        const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
+        if (typeof newDoc === 'string')
         {
           writer.end();
-          errMsg = 'Nothing to export.';
+          errMsg = newDoc;
           return reject(errMsg);
         }
-        const newDocs: object[] = resp.hits.hits as object[];
-        if (newDocs.length === 0)
+        for (const field of Object.keys(newDoc))
         {
-          writer.end();
-          return resolve(pass);
-        }
-        let returnDocs: object[] = [];
-
-        const fieldArrayDepths: object = {};
-        for (const doc of newDocs)
-        {
-          // verify schema mapping with documents and fix documents accordingly
-          const newDoc: object | string = await this._checkDocumentAgainstMapping(doc['_source'], originalMapping);
-          if (typeof newDoc === 'string')
+          if (newDoc[field] !== null && newDoc[field] !== undefined)
           {
-            writer.end();
-            errMsg = newDoc;
-            return reject(errMsg);
-          }
-          for (const field of Object.keys(newDoc))
-          {
-            if (newDoc[field] !== null && newDoc[field] !== undefined)
+            if (fieldArrayDepths[field] === undefined)
             {
-              if (fieldArrayDepths[field] === undefined)
-              {
-                fieldArrayDepths[field] = new Set<number>();
-              }
-              fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
+              fieldArrayDepths[field] = new Set<number>();
             }
-            if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
-            {
-              newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
-            }
+            fieldArrayDepths[field].add(this._getArrayDepth(newDoc[field]));
           }
-          returnDocs.push(newDoc as object);
-        }
-        for (const field of Object.keys(fieldArrayDepths))
-        {
-          if (fieldArrayDepths[field].size > 1)
+          if (newDoc.hasOwnProperty(field) && Array.isArray(newDoc[field]) && exprt.filetype === 'csv')
           {
-            errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
-            return reject(errMsg);
+            newDoc[field] = this._convertArrayToCSVArray(newDoc[field]);
           }
         }
-
-        winston.info('Beginning export transformations.');
-        // transform documents with template
-        try
+        returnDocs.push(newDoc as object);
+      }
+      for (const field of Object.keys(fieldArrayDepths))
+      {
+        if (fieldArrayDepths[field].size > 1)
         {
-          returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
-          for (const doc of returnDocs)
-          {
-            if (Boolean(exprt.rank))
-            {
-              if (doc['TERRAINRANK'] !== undefined)
-              {
-                errMsg = 'Conflicting field: TERRAINRANK.';
-                return reject(errMsg);
-              }
-              doc['TERRAINRANK'] = rankCounter;
-            }
-            rankCounter++;
-          }
-        } catch (e)
-        {
-          writer.end();
-          errMsg = e;
+          errMsg = 'Export field "' + field + '" contains mixed types. You will not be able to re-import the exported file.';
           return reject(errMsg);
         }
+      }
 
-        // export to csv
-        for (const returnDoc of returnDocs)
+      winston.info('Beginning export transformations.');
+      // transform documents with template
+      try
+      {
+        returnDocs = [].concat.apply([], await this._transformAndCheck(returnDocs, exprt, false));
+        for (const doc of returnDocs)
         {
-          if (exprt.filetype === 'csv')
+          if (Boolean(exprt.rank))
           {
-            writer.write(returnDoc);
-          }
-          else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-          {
-            isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
-            writer.write(JSON.stringify(returnDoc));
-          }
-        }
-        if (Math.min(resp.hits.total, qryObj['body']['size']) > rankCounter - 1)
-        {
-          elasticClient.scroll({
-            scrollId: resp._scroll_id,
-            scroll: this.SCROLL_TIMEOUT,
-          }, getMoreUntilDone);
-        }
-        else
-        {
-          if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
-          {
-            writer.write(']');
-            if (exprt.filetype === 'json [type object]')
+            if (doc['TERRAINRANK'] !== undefined)
             {
-              writer.write('}');
+              errMsg = 'Conflicting field: TERRAINRANK.';
+              return reject(errMsg);
             }
+            doc['TERRAINRANK'] = rankCounter;
           }
-          writer.end();
-          resolve(pass);
+          rankCounter++;
         }
-      }.bind(this),
-      );
+      } catch (e)
+      {
+        writer.end();
+        errMsg = e;
+        return reject(errMsg);
+      }
+
+      // export to csv
+      for (const returnDoc of returnDocs)
+      {
+        if (exprt.filetype === 'csv')
+        {
+          writer.write(returnDoc);
+        }
+        else if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+        {
+          isFirstJSONObj === true ? isFirstJSONObj = false : writer.write(',\n');
+          writer.write(JSON.stringify(returnDoc));
+        }
+      }
+
+      if (exprt.filetype === 'json' || exprt.filetype === 'json [type object]')
+      {
+        writer.write(']');
+        if (exprt.filetype === 'json [type object]')
+        {
+          writer.write('}');
+        }
+      }
+      writer.end();
+      resolve(pass);
     });
   }
 
   public async getNamesAndTypesFromQuery(dbid: number, qry: object | string): Promise<object | string>
   {
-    return new Promise<object | string>(async (resolve, reject) =>
+    if (typeof qry === 'string')
     {
-      if (typeof qry === 'string')
+      try
       {
-        try
-        {
-          qry = JSON.parse(qry);
-        }
-        catch (e)
-        {
-          return reject(e.message as string);
-        }
+        qry = JSON.parse(qry);
       }
+      catch (e)
+      {
+        throw e;
+      }
+    }
 
-      qry = this._shouldRandomSample(qry as object);
-      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
-      if (database === undefined)
-      {
-        return reject('Database "' + dbid.toString() + '" not found.');
-      }
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File export currently is only supported for Elastic databases.');
-      }
-      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-      return resolve(await this._getAllFieldsAndTypesFromQuery(elasticClient, qry as object));
-    });
+    qry = this._shouldRandomSample(qry as object);
+    const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
+    if (database === undefined)
+    {
+      throw new Error('Database "' + dbid.toString() + '" not found.');
+    }
+    if (database.getType() !== 'ElasticController')
+    {
+      throw new Error('File export currently is only supported for Elastic databases.');
+    }
+
+    return this._getAllFieldsAndTypesFromQuery(database, qry as object);
   }
 
   public async getNamesAndTypesFromAlgorithm(dbid: number, algorithmId: number): Promise<object | string>
   {
-    return new Promise<object | string>(async (resolve, reject) =>
-    {
-      const database: DatabaseController | undefined = DatabaseRegistry.get(dbid);
-      if (database === undefined)
-      {
-        return reject('Database "' + dbid.toString() + '" not found.');
-      }
-      if (database.getType() !== 'ElasticController')
-      {
-        return reject('File export currently is only supported for Elastic databases.');
-      }
-      const elasticClient: ElasticClient = database.getClient() as ElasticClient;
-      const algorithms: ItemConfig[] = await TastyItems.get(algorithmId);
-      if (algorithms.length === 0)
-      {
-        return reject('Algorithm not found.');
-      }
-      let qry: object | string = await this._getQueryFromAlgorithm(algorithms[0]);
-      if (typeof qry === 'string')
-      {
-        return reject(qry);
-      }
-      qry = this._shouldRandomSample(qry as object);
-      return resolve(await this._getAllFieldsAndTypesFromQuery(elasticClient, qry));
-    });
+    const qry: object | string = await this._getQueryFromAlgorithm(algorithmId);
+    return this.getNamesAndTypesFromQuery(dbid, qry);
   }
 
   private _shouldRandomSample(qry: object): object
@@ -470,27 +387,33 @@ export class Export
     return qry;
   }
 
-  private async _getQueryFromAlgorithm(algorithm: ItemConfig): Promise<object | string>
+  private async _getQueryFromAlgorithm(algorithmId: number): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
+      const algorithms: ItemConfig[] = await TastyItems.get(algorithmId);
+      if (algorithms.length === 0)
+      {
+        return reject('Algorithm not found.');
+      }
+
       let qry: object = {};
       try
       {
-        if (algorithm.meta !== undefined)
+        if (algorithms[0].meta !== undefined)
         {
-          qry = JSON.parse(algorithm.meta)['query']['tql'];
+          qry = JSON.parse(algorithms[0].meta as string)['query']['tql'];
         }
       }
       catch (e)
       {
-        return resolve('Malformed algorithm');
+        return reject('Malformed algorithm');
       }
       return resolve(qry);
     });
   }
 
-  private async _getAllFieldsAndTypesFromQuery(elasticClient: ElasticClient, qryObj: object, maxSize?: number): Promise<object | string>
+  private async _getAllFieldsAndTypesFromQuery(database: DatabaseController, qryObj: object, maxSize?: number): Promise<object | string>
   {
     return new Promise<object | string>(async (resolve, reject) =>
     {
@@ -510,40 +433,42 @@ export class Export
       {
         qrySize = Math.min(qryObj['body']['size'], maxSize);
       }
-      elasticClient.search(qryObj, async function getMoreUntilDone(err, resp)
+
+      const qh: QueryHandler = database.getQueryHandler();
+      const payload = {
+        database: database.getID(),
+        type: 'search',
+        streaming: false,
+        databasetype: 'elastic',
+        body: JSON.stringify(qryObj),
+      };
+
+      const qryResponse: any = await qh.handleQuery(payload);
+      if (qryResponse === undefined || qryResponse.hasError())
       {
-        if (resp.hits === undefined || (resp.hits !== undefined && resp.hits.hits === undefined))
-        {
-          return resolve(fieldObj);
-        }
-        const newDocs: object[] = resp.hits.hits as object[];
-        if (newDocs.length === undefined)
-        {
-          return resolve('Something was wrong with the query.');
-        }
-        if (newDocs.length === 0)
-        {
-          return resolve(fieldObj);
-        }
-        fieldsAndTypes = await this._getFieldsAndTypesFromDocuments(newDocs, fieldsAndTypes);
-        rankCounter += newDocs.length;
-        if (Math.min(Math.min(resp.hits.total, qrySize), maxSize as number) > rankCounter - 1)
-        {
-          elasticClient.scroll({
-            scrollId: resp._scroll_id,
-            scroll: this.SCROLL_TIMEOUT,
-          }, getMoreUntilDone);
-        }
-        else
-        {
-          for (const field of Object.keys(fieldsAndTypes))
-          {
-            fieldObj[field] = this._getPriorityType(fieldsAndTypes[field] as string[]);
-          }
-          return resolve(fieldObj);
-        }
-      }.bind(this),
-      );
+        return resolve(fieldObj);
+      }
+      const resp = qryResponse.result;
+      if (resp.hits === undefined || (resp.hits !== undefined && resp.hits.hits === undefined))
+      {
+        return resolve(fieldObj);
+      }
+      const newDocs: object[] = resp.hits.hits as object[];
+      if (newDocs.length === undefined)
+      {
+        return resolve('Something was wrong with the query.');
+      }
+      if (newDocs.length === 0)
+      {
+        return resolve(fieldObj);
+      }
+      fieldsAndTypes = await this._getFieldsAndTypesFromDocuments(newDocs, fieldsAndTypes);
+      rankCounter += newDocs.length;
+      for (const field of Object.keys(fieldsAndTypes))
+      {
+        fieldObj[field] = this._getPriorityType(fieldsAndTypes[field]);
+      }
+      return resolve(fieldObj);
     });
   }
 
@@ -562,12 +487,11 @@ export class Export
         const fields: string[] = Object.keys(doc['_source']);
         for (const field of fields)
         {
-          let fullTypeObj = {};
-          fullTypeObj = { type: 'text', index: 'not_analyzed', analyzer: null };
+          const fullTypeObj = { type: 'text', index: 'not_analyzed', analyzer: null as (string | null) };
           switch (typeof doc['_source'][field])
           {
             case 'number':
-              fullTypeObj['type'] = doc['_source'][field] % 1 === 0 ? 'long' : 'double';
+              fullTypeObj.type = doc['_source'][field] % 1 === 0 ? 'long' : 'double';
               if (!fieldObj.hasOwnProperty(field))
               {
                 fieldObj[field] = [fullTypeObj];
@@ -582,7 +506,7 @@ export class Export
               }
               break;
             case 'boolean':
-              fullTypeObj['type'] = 'boolean';
+              fullTypeObj.type = 'boolean';
               if (!fieldObj.hasOwnProperty(field))
               {
                 fieldObj[field] = [fullTypeObj];
@@ -597,15 +521,15 @@ export class Export
               }
               break;
             case 'object':
-              fullTypeObj['type'] = Array.isArray(doc['_source'][field]) === true ? 'array' : 'object';
+              fullTypeObj.type = Array.isArray(doc['_source'][field]) === true ? 'array' : 'object';
               if (!fieldObj.hasOwnProperty(field))
               {
-                fieldObj[field] = [fullTypeObj['type'] === 'array' ?
+                fieldObj[field] = [fullTypeObj.type === 'array' ?
                   this._recursiveArrayTypeHelper(doc['_source'][field]) : fullTypeObj];
               }
               else
               {
-                if (fullTypeObj['type'] === 'array')
+                if (fullTypeObj.type === 'array')
                 {
                   const fullArrayObj: object = this._recursiveArrayTypeHelper(doc['_source'][field]);
                   if (fieldObj[field].indexOf(fullArrayObj) < 0)
@@ -624,8 +548,8 @@ export class Export
               }
               break;
             default:
-              fullTypeObj['index'] = 'analyzed';
-              fullTypeObj['analyzer'] = 'standard';
+              fullTypeObj.index = 'analyzed';
+              fullTypeObj.analyzer = 'standard';
               if (!fieldObj.hasOwnProperty(field))
               {
                 fieldObj[field] = [fullTypeObj];
@@ -878,57 +802,40 @@ export class Export
    * nameToType: maps field name (string) to object (contains "type" field (string)) */
   private _checkTypes(obj: object, exprt: ExportConfig): string
   {
-    if (exprt.filetype === 'json')
+    const targetHash: string = this._buildDesiredHash(exprt.columnTypes);
+    const targetKeys: string = JSON.stringify(Object.keys(exprt.columnTypes).sort());
+
+    // parse dates
+    const dateColumns: string[] = [];
+    for (const colName of Object.keys(exprt.columnTypes))
     {
-      const targetHash: string = this._buildDesiredHash(exprt.columnTypes);
-      const targetKeys: string = JSON.stringify(Object.keys(exprt.columnTypes).sort());
-
-      // parse dates
-      const dateColumns: string[] = [];
-      for (const colName of Object.keys(exprt.columnTypes))
+      if (exprt.columnTypes.hasOwnProperty(colName) && this._getESType(exprt.columnTypes[colName]) === 'date')
       {
-        if (exprt.columnTypes.hasOwnProperty(colName) && this._getESType(exprt.columnTypes[colName]) === 'date')
-        {
-          dateColumns.push(colName);
-        }
-      }
-      if (dateColumns.length > 0)
-      {
-        dateColumns.forEach((colName) =>
-        {
-          this._parseDatesHelper(obj, colName);
-        });
-      }
-
-      if (this._hashObjectStructure(obj) !== targetHash)
-      {
-        if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
-        {
-          return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj);
-        }
-        for (const key of Object.keys(obj))
-        {
-          if (obj.hasOwnProperty(key))
-          {
-            if (!this._jsonCheckTypesHelper(obj[key], exprt.columnTypes[key]))
-            {
-              return 'Encountered an object whose field "' + key + '"does not match the specified type (' +
-                JSON.stringify(exprt.columnTypes[key]) + '): ' + JSON.stringify(obj);
-            }
-          }
-        }
+        dateColumns.push(colName);
       }
     }
-    else if (exprt.filetype === 'csv')
+    if (dateColumns.length > 0)
     {
-      for (const name of Object.keys(exprt.columnTypes))
+      dateColumns.forEach((colName) =>
       {
-        if (exprt.columnTypes.hasOwnProperty(name))
+        this._parseDatesHelper(obj, colName);
+      });
+    }
+
+    if (this._hashObjectStructure(obj) !== targetHash)
+    {
+      if (JSON.stringify(Object.keys(obj).sort()) !== targetKeys)
+      {
+        return 'Encountered an object that does not have the set of specified keys: ' + JSON.stringify(obj);
+      }
+      for (const key of Object.keys(obj))
+      {
+        if (obj.hasOwnProperty(key))
         {
-          if (!this._csvCheckTypesHelper(obj, exprt.columnTypes[name], name))
+          if (!this._jsonCheckTypesHelper(obj[key], exprt.columnTypes[key]))
           {
-            return 'Encountered an object whose field "' + name + '"does not match the specified type (' +
-              JSON.stringify(exprt.columnTypes[name]) + '): ' + JSON.stringify(obj);
+            return 'Encountered an object whose field "' + key + '"does not match the specified type (' +
+              JSON.stringify(exprt.columnTypes[key]) + '): ' + JSON.stringify(obj);
           }
         }
       }
@@ -1152,7 +1059,7 @@ export class Export
     if (Array.isArray(item[field]))
     {
       let i: number = 0;
-      while (i < Object.keys(item[field]).length)   // lint hack to get around not recognizing item[field] as an array
+      while (i < Object.keys(item[field]).length)
       {
         this._parseDatesHelper(item[field], String(i));
         i++;

@@ -78,11 +78,11 @@ class TemplateList extends TerrainComponent<Props>
     deleteIndex: number,
     errorMsg: string,
   } = {
-    selectedIndex: -1,
-    modalOpen: false,
-    deleteIndex: -1,
-    errorMsg: '',
-  };
+      selectedIndex: -1,
+      modalOpen: false,
+      deleteIndex: -1,
+      errorMsg: '',
+    };
 
   public componentWillMount()
   {

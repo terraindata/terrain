@@ -43,14 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-const AuthActionTypes =
+import ConfigType from '../ConfigType';
+
+export class VersionConfig extends ConfigType
+{
+  public createdAt?: string = undefined;
+  public createdByUserId: number = -1;
+  public id?: number = undefined;
+  public object: string = '';
+  public objectId: number = -1;
+  public objectType: string = '';
+
+  constructor(props: object)
   {
-    login: '',
-    logout: '',
-  };
+    super();
+    ConfigType.initialize(this, props);
+  }
+}
 
-Util.setValuesToKeys(AuthActionTypes, 'auth');
-
-export default AuthActionTypes;
+export default VersionConfig;

@@ -68,13 +68,13 @@ export interface Props
 class BuilderMapComponent extends TerrainComponent<Props>
 {
   public state:
-  {
-    showExpanded: boolean,
-    inputs: any,
-  } = {
-    showExpanded: false,
-    inputs: null,
-  };
+    {
+      showExpanded: boolean,
+      inputs: any,
+    } = {
+      showExpanded: false,
+      inputs: null,
+    };
 
   public constructor(props: Props)
   {
@@ -109,7 +109,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
           zoomControl={true}
           distance={parseFloat(distance)}
           distanceUnit={distanceUnit}
-          geocoder='photon'
+          geocoder='google'
           hideSearchSettings={true}
           inputs={this.state.inputs}
           textKeyPath={this._ikeyPath(this.props.parentKeyPath, 'map_text')}

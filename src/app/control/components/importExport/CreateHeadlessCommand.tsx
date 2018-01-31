@@ -61,7 +61,8 @@ import TerrainComponent from 'common/components/TerrainComponent';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
-import { LibraryStore } from 'library/data/LibraryStore';
+import { LibraryState } from 'library/LibraryTypes';
+import Util from 'util/Util';
 
 import TemplateSelector from './TemplateSelector';
 
@@ -75,6 +76,7 @@ export interface Props
 {
   templates: List<Template>;
   index: number;
+  library?: LibraryState;
   getServerName: (dbid) => string;
 }
 
@@ -201,13 +203,13 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     selectedIds: List<number>;
     filenameValue: string;
   } = {
-    index: this.props.index,
-    fileTypeIndex: 0,
-    midwayURLValue: this.getInitialURL(),
-    objectKeyValue: '',
-    selectedIds: List([-1, -1, -1]),
-    filenameValue: '',
-  };
+      index: this.props.index,
+      fileTypeIndex: 0,
+      midwayURLValue: this.getInitialURL(),
+      objectKeyValue: '',
+      selectedIds: List([-1, -1, -1]),
+      filenameValue: '',
+    };
 
   public componentDidMount()
   {
@@ -271,7 +273,7 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
     return (
       <div>
         <AlgorithmSelector
-          libraryState={LibraryStore.getState()}
+          libraryState={this.props.library}
           onChangeSelection={this._setStateWrapper('selectedIds')}
           ids={this.state.selectedIds}
           dropdownWidth={inputElementWidth}
@@ -456,4 +458,8 @@ class CreateHeadlessCommand extends TerrainComponent<Props>
   }
 }
 
-export default CreateHeadlessCommand;
+export default Util.createTypedContainer(
+  CreateHeadlessCommand,
+  ['library'],
+  {},
+);

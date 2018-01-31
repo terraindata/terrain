@@ -44,31 +44,18 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as AuthTypes from '../AuthTypes';
-import Ajax from './../../util/Ajax';
-import ActionTypes from './AuthActionTypes';
+import ConfigType from '../../ConfigType';
+import { TemplateBase } from './TemplateBase';
 
-const AuthReducer = {};
+export class ImportTemplateConfig extends TemplateBase
+{
+  public name: string = '';
 
-AuthReducer[ActionTypes.login] =
-  (state: AuthTypes.AuthState, action: Action<{ accessToken: string, id: number }>) =>
+  constructor(props: object)
   {
-    const { accessToken, id } = action.payload;
-    // store these values in localStorage so that the user is auto-logged in next time they visit
-    localStorage['accessToken'] = accessToken;
-    localStorage['id'] = id;
-    return state.set('accessToken', accessToken).set('id', +id);
-  };
+    super(props);
+    ConfigType.initialize(this, props);
+  }
+}
 
-AuthReducer[ActionTypes.logout] =
-  (state: AuthTypes.AuthState, action) =>
-  {
-    Ajax.logout((success) =>
-    {
-      delete localStorage['accessToken'];
-      delete localStorage['id'];
-    });
-    return state.set('accessToken', null).set('id', null);
-  };
-
-export default AuthReducer;
+export default ImportTemplateConfig;

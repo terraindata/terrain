@@ -48,19 +48,13 @@ import * as srs from 'secure-random-string';
 
 import * as Tasty from '../../../tasty/Tasty';
 import * as App from '../../App';
-import { UserConfig } from '../../users/UserRouter';
+import UserConfig from '../../users/UserConfig';
 import * as Util from '../../Util';
-import { TemplateBase, TemplateBaseStringified } from './Templates';
-
-export interface ImportTemplateConfig extends TemplateBase
-{
-  name: string;
-}
-
-export interface ImportTemplateBaseStringified extends TemplateBaseStringified
-{
-  name: string;
-}
+import ExportTemplateConfig from './ExportTemplateConfig';
+import ImportTemplateBaseStringified from './ImportTemplateBaseStringified';
+import ImportTemplateConfig from './ImportTemplateConfig';
+import { TemplateBase } from './TemplateBase';
+import { TemplateBaseStringified } from './TemplateBaseStringified';
 
 export class ImportTemplates
 {
@@ -69,7 +63,6 @@ export class ImportTemplates
 
   constructor()
   {
-
     this.importTemplateTable = new Tasty.Table(
       'importTemplates',
       ['id'],
@@ -120,9 +113,9 @@ export class ImportTemplates
   {
     return new Promise<ImportTemplateConfig[]>(async (resolve, reject) =>
     {
-      const templates: ImportTemplateBaseStringified[] =
-        await App.DB.select(this.importTemplateTable, columns, filter) as ImportTemplateBaseStringified[];
-      resolve(this._parseConfig(templates) as ImportTemplateConfig[]);
+      const rawResults = await App.DB.select(this.importTemplateTable, columns, filter);
+      const results: ImportTemplateConfig[] = rawResults.map((result: object) => new ImportTemplateConfig(result));
+      resolve(this._parseConfig(results.map((result) => new ImportTemplateBaseStringified(result))) as ImportTemplateConfig[]);
     });
   }
 
@@ -138,7 +131,7 @@ export class ImportTemplates
         {
           return reject('Invalid template id passed');
         }
-        if (user.isSuperUser !== 1)
+        if (!user.isSuperUser)
         {
           return reject('Insufficient Permissions');
         }
@@ -166,6 +159,7 @@ export class ImportTemplates
 
         template = Util.updateObject(results[0], template);
       }
+
       if (template['persistentAccessToken'] === undefined || template['persistentAccessToken'] === '')
       {
         const persistentAccessToken = srs(
@@ -175,8 +169,10 @@ export class ImportTemplates
         );
         template['persistentAccessToken'] = persistentAccessToken;
       }
+
       const upserted: ImportTemplateBaseStringified =
         await App.DB.upsert(this.importTemplateTable, this._stringifyConfig(template)) as ImportTemplateBaseStringified;
+
       resolve(this._parseConfig(upserted) as ImportTemplateConfig);
     });
   }
@@ -217,15 +213,19 @@ export class ImportTemplates
         columnTypes: JSON.stringify(template['columnTypes']),
         dbid: template['dbid'],
         dbname: template['dbname'],
-        id: template['id'],
         name: template['name'],
         originalNames: JSON.stringify(template['originalNames']),
-        // hack around silly linter complaint below
         primaryKeyDelimiter: (template['primaryKeyDelimiter'] === undefined ? '-' : template['primaryKeyDelimiter']) as string,
         primaryKeys: JSON.stringify(template['primaryKeys']),
         tablename: template['tablename'],
         transformations: JSON.stringify(template['transformations']),
       };
+
+    if (template['id'] === undefined)
+    {
+      delete stringified.id;
+    }
+
     return stringified;
   }
 }

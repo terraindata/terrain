@@ -292,9 +292,14 @@ export function getPreview(card: Card): string
   const { preview } = card.static;
   if (typeof preview === 'string')
   {
-    return preview.replace(/\[[a-z\.]*\]/g, (str) =>
+    return preview.replace(/\[[a-zA-Z\.]*\]/g, (str) =>
     {
       const pattern = str.substr(1, str.length - 2);
+      if (pattern.length === 0)
+      {
+        return '';
+      }
+
       const keys = pattern.split('.');
       if (keys.length === 1)
       {

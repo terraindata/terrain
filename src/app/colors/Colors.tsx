@@ -382,49 +382,49 @@ const DARK: Theme =
 
     // text
     text:
-    {
-      baseDark: '#000000',
-      secondaryDark: 'rgba(0,0,0,0.50)',
-      baseLight: '#FFFFFF',
-      secondaryLight: 'rgba(255,255,255,0.80)',
-      thirdLight: 'rgba(255,255,255,0.5)',
+      {
+        baseDark: '#000000',
+        secondaryDark: 'rgba(0,0,0,0.50)',
+        baseLight: '#FFFFFF',
+        secondaryLight: 'rgba(255,255,255,0.80)',
+        thirdLight: 'rgba(255,255,255,0.5)',
 
-      link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
-      linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
-    },
+        link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
+        linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
+      },
 
     button:
-    {
-      text: '#FFFFFF',
-      background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
-      backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
-    },
+      {
+        text: '#FFFFFF',
+        background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
+        backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
+      },
 
     // Library ------
 
     library:
-    {
-      // item
-      item: {
-        title: '#424242',
-        body: '#4B4B4B',
-        activeBody: '#4C7C9C',
-      },
+      {
+        // item
+        item: {
+          title: '#424242',
+          body: '#4B4B4B',
+          activeBody: '#4C7C9C',
+        },
 
-      // info graph selection btn
-      infoGraphBtn: {
-        btnBase: '#696666',
-        btnRoll: '#6E6B6B',
-        btnSelected: '#828080',
-        btnRadioBase: 'rgba(0,0,0,0.50)',
-        btnRadioSelected: '#80CCFF',
-      },
+        // info graph selection btn
+        infoGraphBtn: {
+          btnBase: '#696666',
+          btnRoll: '#6E6B6B',
+          btnSelected: '#828080',
+          btnRadioBase: 'rgba(0,0,0,0.50)',
+          btnRadioSelected: '#80CCFF',
+        },
 
-      //text box
-      textbox: {
-        base: '#FFFFFF',
+        //text box
+        textbox: {
+          base: '#FFFFFF',
+        },
       },
-    },
 
     // Builder -----------------------------
 
@@ -536,9 +536,9 @@ const DARK: Theme =
       },
 
       inputs:
-      {
-        background: '#626262',
-      },
+        {
+          background: '#626262',
+        },
     },
 
     // File import -----------------------------
@@ -583,7 +583,7 @@ const LIGHT: Theme =
     altHighlight: 'rgba(255,255,255,0.15)',
 
     highlight: 'rgba(210,215,219,0.25)', // for slight emphasis
-    darkerHighlight: 'rgb(210,215,219,0.5)', // to make a depth effect with highlight
+    darkerHighlight: 'rgba(210,215,219,0.5)', // to make a depth effect with highlight
     stroke: '#aaa', // stands out against any background
 
     boxShadow: 'rgba(130,130,130,0.3)',
@@ -621,49 +621,49 @@ const LIGHT: Theme =
 
     // text
     text:
-    {
-      baseDark: '#000000',
-      secondaryDark: 'rgba(0,0,0,0.50)',
-      baseLight: 'rgba(0, 0, 0, 0.6)',
-      secondaryLight: 'rgba(0, 0, 0, 0.8)',
-      thirdLight: 'rgba(0, 0, 0, 1)',
+      {
+        baseDark: '#000000',
+        secondaryDark: 'rgba(0,0,0,0.50)',
+        baseLight: 'rgba(0, 0, 0, 0.6)',
+        secondaryLight: 'rgba(0, 0, 0, 0.8)',
+        thirdLight: 'rgba(0, 0, 0, 1)',
 
-      link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
-      linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
-    },
+        link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
+        linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
+      },
 
     button:
-    {
-      text: '#FFFFFF',
-      background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
-      backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
-    },
+      {
+        text: '#FFFFFF',
+        background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
+        backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
+      },
 
     // Library ------
 
     library:
-    {
-      // item
-      item: {
-        title: '#424242',
-        body: '#4B4B4B',
-        activeBody: '#4C7C9C',
-      },
+      {
+        // item
+        item: {
+          title: '#424242',
+          body: '#4B4B4B',
+          activeBody: '#4C7C9C',
+        },
 
-      // info graph selection btn
-      infoGraphBtn: {
-        btnBase: '#696666',
-        btnRoll: '#6E6B6B',
-        btnSelected: '#828080',
-        btnRadioBase: 'rgba(0,0,0,0.50)',
-        btnRadioSelected: '#80CCFF',
-      },
+        // info graph selection btn
+        infoGraphBtn: {
+          btnBase: '#696666',
+          btnRoll: '#6E6B6B',
+          btnSelected: '#828080',
+          btnRadioBase: 'rgba(0,0,0,0.50)',
+          btnRadioSelected: '#80CCFF',
+        },
 
-      //text box
-      textbox: {
-        base: '#FFFFFF',
+        //text box
+        textbox: {
+          base: '#FFFFFF',
+        },
       },
-    },
 
     // Builder -----------------------------
 
@@ -775,9 +775,9 @@ const LIGHT: Theme =
       },
 
       inputs:
-      {
-        background: '#626262',
-      },
+        {
+          background: '#626262',
+        },
     },
 
     // File import -----------------------------
@@ -863,49 +863,49 @@ const HALLOWEEN: Theme =
 
     // text
     text:
-    {
-      baseDark: '#000000',
-      secondaryDark: 'rgba(0,0,0,0.50)',
-      baseLight: '#FFFFFF',
-      secondaryLight: 'rgba(255,255,255,0.80)',
-      thirdLight: 'rgba(255,255,255,0.5)',
+      {
+        baseDark: '#000000',
+        secondaryDark: 'rgba(0,0,0,0.50)',
+        baseLight: '#FFFFFF',
+        secondaryLight: 'rgba(255,255,255,0.80)',
+        thirdLight: 'rgba(255,255,255,0.5)',
 
-      link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
-      linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
-    },
+        link: Color('#4C7C9C').lighten(0.25).saturate(0.15).string(),
+        linkHover: Color('#4C7C9C').lighten(0.5).saturate(0.15).string(),
+      },
 
     button:
-    {
-      text: '#FFFFFF',
-      background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
-      backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
-    },
+      {
+        text: '#FFFFFF',
+        background: Color('#4C7C9C').lighten(0.15).saturate(0.15).string(),
+        backgroundHover: Color('#4C7C9C').saturate(0.15).string(),
+      },
 
     // Library ------
 
     library:
-    {
-      // item
-      item: {
-        title: '#424242',
-        body: '#4B4B4B',
-        activeBody: '#4C7C9C',
-      },
+      {
+        // item
+        item: {
+          title: '#424242',
+          body: '#4B4B4B',
+          activeBody: '#4C7C9C',
+        },
 
-      // info graph selection btn
-      infoGraphBtn: {
-        btnBase: '#696666',
-        btnRoll: '#6E6B6B',
-        btnSelected: '#828080',
-        btnRadioBase: 'rgba(0,0,0,0.50)',
-        btnRadioSelected: '#80CCFF',
-      },
+        // info graph selection btn
+        infoGraphBtn: {
+          btnBase: '#696666',
+          btnRoll: '#6E6B6B',
+          btnSelected: '#828080',
+          btnRadioBase: 'rgba(0,0,0,0.50)',
+          btnRadioSelected: '#80CCFF',
+        },
 
-      //text box
-      textbox: {
-        base: '#FFFFFF',
+        //text box
+        textbox: {
+          base: '#FFFFFF',
+        },
       },
-    },
 
     // Builder -----------------------------
 
@@ -1017,9 +1017,9 @@ const HALLOWEEN: Theme =
       },
 
       inputs:
-      {
-        background: '#626262',
-      },
+        {
+          background: '#626262',
+        },
     },
 
     // File import -----------------------------

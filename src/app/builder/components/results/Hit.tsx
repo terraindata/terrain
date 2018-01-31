@@ -103,26 +103,26 @@ class HitComponent extends TerrainComponent<Props> {
   public state: {
     // spotlights: IMMap<string, any>;
   } =
-  {
-    // spotlights: SpotlightStore.getState().spotlights,
-  };
+    {
+      // spotlights: SpotlightStore.getState().spotlights,
+    };
 
   public menuOptions =
-  [
-    List([
-      {
-        text: 'Spotlight',
-        onClick: this.spotlight,
-      },
-    ]),
+    [
+      List([
+        {
+          text: 'Spotlight',
+          onClick: this.spotlight,
+        },
+      ]),
 
-    List([
-      {
-        text: 'Un-Spotlight',
-        onClick: this.unspotlight,
-      },
-    ]),
-  ];
+      List([
+        {
+          text: 'Un-Spotlight',
+          onClick: this.unspotlight,
+        },
+      ]),
+    ];
 
   public constructor(props: Props)
   {
@@ -533,7 +533,7 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
               zoomControl={false}
               secondLocation={resultLocation}
               keepAddressInSync={false}
-              geocoder='photon'
+              geocoder='google'
               secondaryMarkerColor={color}
               colorMarker={true}
             />

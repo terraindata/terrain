@@ -51,6 +51,7 @@ import './Tabs.less';
 const moment = require('moment');
 import * as classNames from 'classnames';
 import createReactClass = require('create-react-class');
+import { LibraryState } from 'library/LibraryTypes';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
@@ -60,7 +61,6 @@ import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
 import { ColorsActions } from './../../../colors/data/ColorsRedux';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-import { LibraryStore } from './../../../library/data/LibraryStore';
 
 import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
 
@@ -71,14 +71,14 @@ const Tab = createReactClass<any, any>({
   mixins: [PanelMixin],
 
   propTypes:
-  {
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    selected: PropTypes.bool.isRequired,
-    index: PropTypes.number.isRequired,
-    onClick: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
-  },
+    {
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      selected: PropTypes.bool.isRequired,
+      index: PropTypes.number.isRequired,
+      onClick: PropTypes.func.isRequired,
+      onClose: PropTypes.func.isRequired,
+    },
 
   getDefaultProps(): any
   {
@@ -178,29 +178,17 @@ interface TabsProps
   config: string;
   actions: List<TabAction>;
   colorsActions: typeof ColorsActions;
+  library?: LibraryState;
+  algorithmActions: typeof LibraryActions.algorithms;
   onNoAlgorithm(algorithmId: string);
 }
 
 class Tabs extends TerrainComponent<TabsProps> {
   public state = {
-    algorithms: LibraryStore.getState().algorithms,
     tabs: null,
   };
-  public cancel = null;
 
-  public componentDidMount()
-  {
-    this._subscribe(LibraryStore, {
-      stateKey: 'algorithms',
-      storeKeyPath: ['algorithms'],
-      updater: (state) =>
-      {
-        this.computeTabs(this.props.config);
-      },
-      isMounted: true,
-    });
-    this.computeTabs(this.props.config);
-  }
+  public cancel = null;
 
   public componentWillMount()
   {
@@ -214,6 +202,8 @@ class Tabs extends TerrainComponent<TabsProps> {
       selector: '.tabs-container .tabs-actions .tabs-action',
       style: { 'border-color': Colors().text3 },
     });
+
+    this.computeTabs(this.props.config, this.props);
   }
 
   public componentWillUnmount()
@@ -223,15 +213,17 @@ class Tabs extends TerrainComponent<TabsProps> {
 
   public componentWillReceiveProps(nextProps)
   {
-    if (nextProps.config !== this.props.config)
+    if (nextProps.config !== this.props.config ||
+      nextProps.library.algorithms !== this.props.library.algorithms)
     {
-      this.computeTabs(nextProps.config);
+      this.computeTabs(nextProps.config, nextProps);
     }
   }
 
-  public computeTabs(config)
+  public computeTabs(config, props)
   {
-    const { algorithms } = this.state;
+    const { library } = props;
+    const { algorithms } = library;
     const tabs = config && algorithms && config.split(',').map((vId) =>
     {
       const id = this.getId(vId);
@@ -247,7 +239,7 @@ class Tabs extends TerrainComponent<TabsProps> {
       }
       else
       {
-        LibraryActions.algorithms.fetchVersion(id, this.props.onNoAlgorithm);
+        this.props.algorithmActions.fetchVersion(id, this.props.onNoAlgorithm);
       }
       return {
         id,
@@ -372,14 +364,14 @@ class Tabs extends TerrainComponent<TabsProps> {
           {
             key: tab.id,
             content:
-            <Tab
-              name={tab.name}
-              selected={tab.selected}
-              id={tab.id}
-              index={index}
-              onClick={this.handleClick}
-              onClose={this.handleClose}
-            />
+              <Tab
+                name={tab.name}
+                selected={tab.selected}
+                id={tab.id}
+                index={index}
+                onClick={this.handleClick}
+                onClose={this.handleClose}
+              />
             ,
           }))
           : [],
@@ -412,8 +404,11 @@ class Tabs extends TerrainComponent<TabsProps> {
 
 const TabsContainer = Util.createContainer(
   Tabs,
-  [],
-  { colorsActions: ColorsActions },
+  ['library'],
+  {
+    colorsActions: ColorsActions,
+    algorithmActions: LibraryActions.algorithms,
+  },
 );
 
 export { TabsContainer as Tabs };

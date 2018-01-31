@@ -221,7 +221,7 @@ class AggregationsArea extends TerrainComponent<Props>
 
   private isDatabaseEmpty(): boolean
   {
-    return !this.props.db || !this.props.db.id;
+    return !this.props.db || !(this.props.db.id > -1);
   }
 }
 

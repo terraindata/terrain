@@ -64,7 +64,8 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { CredentialConfig, SchedulerConfig } from 'control/ControlTypes';
 import * as FileImportTypes from 'fileImport/FileImportTypes';
 import AlgorithmSelector from 'library/components/AlgorithmSelector';
-import { LibraryStore } from 'library/data/LibraryStore';
+import { LibraryState } from 'library/LibraryTypes';
+import Util from 'util/Util';
 
 import ControlActions from '../../data/ControlActions';
 import TemplateSelector from './TemplateSelector';
@@ -78,6 +79,7 @@ export interface Props
   templates: List<Template>;
   credentials: List<CredentialConfig>;
   index: number;
+  library?: LibraryState;
   getServerName: (dbid) => string;
   modalOpen: boolean;
   onClose: () => void;
@@ -222,19 +224,19 @@ class TransportScheduler extends TerrainComponent<Props>
     cronParam3: string;
     cronParam4: string;
   } = {
-    index: this.props.index,
-    fileTypeIndex: 0,
-    credentialIndex: 0,
-    selectedIds: List([-1, -1, -1]),
-    objectKeyValue: '',
-    filenameValue: '',
-    scheduleNameValue: 'schedule 1',
-    cronParam0: defaultCRONparams[0],
-    cronParam1: defaultCRONparams[1],
-    cronParam2: defaultCRONparams[2],
-    cronParam3: defaultCRONparams[3],
-    cronParam4: defaultCRONparams[4],
-  };
+      index: this.props.index,
+      fileTypeIndex: 0,
+      credentialIndex: 0,
+      selectedIds: List([-1, -1, -1]),
+      objectKeyValue: '',
+      filenameValue: '',
+      scheduleNameValue: 'schedule 1',
+      cronParam0: defaultCRONparams[0],
+      cronParam1: defaultCRONparams[1],
+      cronParam2: defaultCRONparams[2],
+      cronParam3: defaultCRONparams[3],
+      cronParam4: defaultCRONparams[4],
+    };
 
   constructor(props)
   {
@@ -503,7 +505,7 @@ class TransportScheduler extends TerrainComponent<Props>
         {
           !!template.export &&
           <AlgorithmSelector
-            libraryState={LibraryStore.getState()}
+            libraryState={this.props.library}
             onChangeSelection={this._setStateWrapperPath('selectedIds')}
             ids={this.state.selectedIds}
             dropdownWidth={inputElementWidth}
@@ -661,4 +663,8 @@ Examples:
 const helpTooltipElement = <div className='scheduler-help-text'> {scheduleHelpText} </div>;
 const defaultCRONparams = ['0', '0', '*', '*', 'SUN'];
 
-export default TransportScheduler;
+export default Util.createTypedContainer(
+  TransportScheduler,
+  ['library'],
+  {},
+);

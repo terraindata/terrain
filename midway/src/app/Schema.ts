@@ -47,49 +47,49 @@ THE SOFTWARE.
 import * as winston from 'winston';
 import * as Tasty from '../tasty/Tasty';
 
-const appSchemaSQL: string[] = [
+const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeName: string, primaryKeyType: string) => [
   `CREATE TABLE IF NOT EXISTS versions
-    (id integer PRIMARY KEY,
+    (id ` + primaryKeyType + ` PRIMARY KEY,
      objectType text NOT NULL,
      objectId integer NOT NULL,
      object text NOT NULL,
-     createdAt datetime DEFAULT CURRENT_TIMESTAMP,
+     createdAt ` + datetimeTypeName + ` DEFAULT CURRENT_TIMESTAMP,
      createdByUserId integer NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS items
-    (id integer PRIMARY KEY,
+    (id ` + primaryKeyType + ` PRIMARY KEY,
      meta text,
      name text NOT NULL,
      parent integer,
      status text,
      type text);`,
   `CREATE TABLE IF NOT EXISTS databases
-    (id integer PRIMARY KEY,
+    (id ` + primaryKeyType + ` PRIMARY KEY,
      name text NOT NULL,
      type text NOT NULL,
      dsn text NOT NULL,
      host text NOT NULL,
      status text,
-     isAnalytics bool DEFAULT 0,
+     isAnalytics bool DEFAULT ` + falseValue + `,
      analyticsIndex text,
      analyticsType text);`,
   `CREATE TABLE IF NOT EXISTS users
-    (id integer PRIMARY KEY,
+    (id ` + primaryKeyType + ` PRIMARY KEY,
      accessToken text NOT NULL,
      email text NOT NULL,
-     isDisabled bool NOT NULL,
-     isSuperUser bool NOT NULL,
+     isDisabled bool NOT NULL DEFAULT false,
+     isSuperUser bool NOT NULL DEFAULT false,
      name text NOT NULL,
      oldPassword text,
      password text NOT NULL,
-     timezone string,
+     timezone ` + stringTypeName + `,
      meta text);`,
   `CREATE TABLE IF NOT EXISTS exportTemplates
-    (id integer PRIMARY KEY,
+    (id ` + primaryKeyType + ` PRIMARY KEY,
      name text,
      dbid integer NOT NULL,
      dbname text NOT NULL,
      tablename text NOT NULL,
-     objectKey string NOT NULL,
+     objectKey ` + stringTypeName + ` NOT NULL,
      originalNames text NOT NULL,
      columnTypes text NOT NULL,
      persistentAccessToken text NOT NULL,
@@ -98,7 +98,7 @@ const appSchemaSQL: string[] = [
      rank bool NOT NULL,
      transformations text NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS importTemplates
-    (id integer PRIMARY KEY,
+    (id ` + primaryKeyType + ` PRIMARY KEY,
      name text,
      dbid integer NOT NULL,
      dbname text NOT NULL,
@@ -110,7 +110,7 @@ const appSchemaSQL: string[] = [
      primaryKeys text NOT NULL,
      transformations text NOT NULL);`,
   `CREATE TABLE IF NOT EXISTS schedules
-    (id integer PRIMARY KEY,
+    (id ` + primaryKeyType + ` PRIMARY KEY,
      active bool NOT NULL,
      archived bool NOT NULL,
      currentlyRunning bool NOT NULL,
@@ -122,14 +122,14 @@ const appSchemaSQL: string[] = [
      sort text NOT NULL,
      transportStr text);`,
   `CREATE TABLE IF NOT EXISTS credentials
-    (id integer PRIMARY KEY,
+    (id ` + primaryKeyType + ` PRIMARY KEY,
      createdBy integer NOT NULL,
      meta text NOT NULL,
      name text NOT NULL,
      permissions integer,
      type text NOT NULL); `,
   `CREATE TABLE IF NOT EXISTS metrics
-    (id integer PRIMARY KEY,
+    (id ` + primaryKeyType + ` PRIMARY KEY,
      database integer NOT NULL,
      label text NOT NULL,
      events text NOT NULL); `,
@@ -137,9 +137,13 @@ const appSchemaSQL: string[] = [
 
 export async function createAppSchema(dbtype: string, tasty: Tasty.Tasty)
 {
-  if (dbtype === 'sqlite' || dbtype === 'mysql' || dbtype === 'postgres')
+  if (dbtype === 'sqlite' || dbtype === 'mysql')
   {
-    return tasty.getDB().execute(appSchemaSQL);
+    return tasty.getDB().execute(appSchemaSQL('datetime', '0', 'string', 'integer'));
+  }
+  else if (dbtype === 'postgres')
+  {
+    return tasty.getDB().execute(appSchemaSQL('timestamp with time zone', 'false', 'varchar(255)', 'serial'));
   }
   else
   {

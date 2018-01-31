@@ -52,24 +52,9 @@ import * as DBUtil from '../../database/Util';
 import DatabaseRegistry from '../../databaseRegistry/DatabaseRegistry';
 import * as Scripts from '../../scripts/Scripts';
 import { metrics } from '../events/EventRouter';
-import { UserConfig } from '../users/UserRouter';
+import UserConfig from '../users/UserConfig';
 import * as Util from '../Util';
-
-// CREATE TABLE databases (id integer PRIMARY KEY, name text NOT NULL, type text NOT NULL, \
-// dsn text NOT NULL, status text, isAnalytics bool NOT NULL, analyticsIndex text, analyticsType text);
-
-export interface DatabaseConfig
-{
-  id?: number;
-  name: string;
-  type: string;
-  dsn: string;
-  host: string;
-  status?: string;
-  isAnalytics: boolean;
-  analyticsIndex?: string;
-  analyticsType?: string;
-}
+import DatabaseConfig from './DatabaseConfig';
 
 export class Databases
 {
@@ -95,7 +80,7 @@ export class Databases
 
   public async delete(user: UserConfig, id: number): Promise<object>
   {
-    if (user.isSuperUser === 0)
+    if (!user.isSuperUser)
     {
       throw new Error('Only superusers can delete databases.');
     }
@@ -104,7 +89,12 @@ export class Databases
 
   public async select(columns: string[], filter?: object): Promise<DatabaseConfig[]>
   {
-    return App.DB.select(this.databaseTable, columns, filter) as Promise<DatabaseConfig[]>;
+    return new Promise<DatabaseConfig[]>(async (resolve, reject) =>
+    {
+      const rawResults = await App.DB.select(this.databaseTable, columns, filter);
+      const results: DatabaseConfig[] = rawResults.map((result: object) => new DatabaseConfig(result));
+      resolve(results);
+    });
   }
 
   public async get(id?: number, fields?: string[]): Promise<DatabaseConfig[]>
@@ -129,13 +119,10 @@ export class Databases
     if (db.id !== undefined)
     {
       const results: DatabaseConfig[] = await this.get(db.id);
-      // database id specified but database not found
-      if (results.length === 0)
+      if (results.length !== 0)
       {
-        throw new Error('Invalid db id passed');
+        db = Util.updateObject(results[0], db);
       }
-
-      db = Util.updateObject(results[0], db);
     }
 
     if (db.isAnalytics === undefined)

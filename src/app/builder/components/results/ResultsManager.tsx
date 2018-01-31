@@ -193,6 +193,7 @@ export class ResultsManager extends TerrainComponent<Props>
         && (!this.props.query ||
           (
             this.props.query.tql !== nextProps.query.tql ||
+            nextProps.query.tqlMode === 'manual' ||
             // this.props.query.cards !== nextProps.query.cards ||
             this.props.query.inputs !== nextProps.query.inputs
           )
@@ -210,15 +211,7 @@ export class ResultsManager extends TerrainComponent<Props>
       }
     }
 
-    if (this.props.algorithmPath !== undefined && (this.props.algorithmPath !== nextProps.algorithmPath))
-    {
-      this.changeResults({
-        hits: undefined,
-        aggregations: {},
-      });
-    }
-
-    if (nextProps.query && (nextProps.resultsState.hits !== this.props.resultsState.hits))
+    if (nextProps.query && this.props.spotlights && (nextProps.resultsState.hits !== this.props.resultsState.hits))
     {
       // update spotlights
       let nextState = nextProps.resultsState;
@@ -410,11 +403,13 @@ export class ResultsManager extends TerrainComponent<Props>
 
   private queryM2Results(query: Query, db: BackendInstance)
   {
-    if (query.parseTree === null || query.parseTree.hasError())
+    if (query.tqlMode !== 'manual')
     {
-      return;
+      if (query.parseTree === null || query.parseTree.hasError())
+      {
+        return;
+      }
     }
-
     if (query !== this.state.lastQuery)
     {
       const eql = AllBackendsMap[query.language].parseTreeToQueryString(
@@ -423,7 +418,6 @@ export class ResultsManager extends TerrainComponent<Props>
           replaceInputs: true,
         },
       );
-
       this.setState({
         lastQuery: query,
         queriedTql: eql,

@@ -61,9 +61,11 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 import TransformCardPeriscope from './TransformCardPeriscope';
 
+import BuilderStore, { BuilderState } from 'app/builder/data/BuilderStore';
 import Util from 'app/util/Util';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';
+import { AllBackendsMap } from '../../../../database/AllBackends';
 import { getIndex, getType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import MidwayQueryResponse from '../../../../database/types/MidwayQueryResponse';
 import { M1QueryResponse } from '../../../util/AjaxM1';
@@ -109,6 +111,7 @@ class TransformCard extends TerrainComponent<Props>
     queryXhr?: XMLHttpRequest;
     queryId?: string;
     error?: boolean;
+    builderState?: any;
   };
 
   constructor(props: Props)
@@ -120,7 +123,30 @@ class TransformCard extends TerrainComponent<Props>
       chartDomain: List([Number(props.data.domain.get(0)), Number(props.data.domain.get(1))]),
       range: List([0, 1]),
       bars: List([]),
+      builderState: this.props.builderState,
     };
+    // If the query changed, and you are scoring on _score, there is a chance that the filters changed which affects the
+    // distribution of _score, so you have to recalculate the domain and histogram
+    if (this.props.data.input === '_score')
+    {
+      this.subscribeToBuilderStore();
+    }
+  }
+
+  public subscribeToBuilderStore()
+  {
+    this._subscribe(BuilderStore, {
+      stateKey: 'builderState',
+      updater: (builderState: BuilderState) =>
+      {
+        if ((builderState.query.tql !== this.state.builderState.query.tql ||
+          builderState.query.inputs !== this.state.builderState.query.inputs)
+          && !this.props.data.closed)
+        {
+          this.computeBars(this.props.data.input, this.state.maxDomain, true, builderState.query);
+        }
+      },
+    });
   }
 
   public componentDidMount()
@@ -130,6 +156,17 @@ class TransformCard extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
+    if (this.props.data.input !== nextProps.data.input)
+    {
+      if (nextProps.data.input === '_score')
+      {
+        this.subscribeToBuilderStore();
+      }
+      else if (this.props.data.input === '_score')
+      {
+        this._unsubscribe();
+      }
+    }
     // nextProps.data.domain is list<string>
     const newDomain: List<number> = List([Number(nextProps.data.domain.get(0)), Number(nextProps.data.domain.get(1))]);
     if (!newDomain.equals(this.state.maxDomain))
@@ -354,12 +391,11 @@ class TransformCard extends TerrainComponent<Props>
     });
     this.props.onChange(this._ikeyPath(this.props.keyPath, 'domain'), newDomain, true);
     this.props.onChange(this._ikeyPath(this.props.keyPath, 'dataDomain'), newDomain, true);
-
     this.computeBars(this.props.data.input, this.state.maxDomain);
   }
 
   // TODO move the bars computation to a higher level
-  private computeBars(input: CardString, maxDomain: List<number>, recomputeDomain = false)
+  private computeBars(input: CardString, maxDomain: List<number>, recomputeDomain = false, overrideQuery?)
   {
     switch (this.props.language)
     {
@@ -367,14 +403,63 @@ class TransformCard extends TerrainComponent<Props>
         this.computeTQLBars(input);
         break;
       case 'elastic':
-        this.computeElasticBars(input, maxDomain, recomputeDomain);
+        this.computeElasticBars(input, maxDomain, recomputeDomain, overrideQuery);
         break;
       default:
         break;
     }
   }
 
-  private computeElasticBars(input: CardString, maxDomain: List<number>, recomputeDomain: boolean)
+  // To calculate a histogram for _score, the query that is actually being run has to
+  // be run because _score is only set when there are text filters, so an empty query isn't sufficient
+  private computeScoreElasticBars(maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
+  {
+    const query = overrideQuery || this.props.builderState.query;
+    const tqlString = AllBackendsMap[query.language].parseTreeToQueryString(
+      query,
+      {
+        replaceInputs: true,
+      },
+    );
+    const tql = JSON.parse(tqlString);
+    tql['size'] = 0;
+    tql['sort'] = {};
+    if (recomputeDomain)
+    {
+      tql['aggs'] = {
+        maximum: {
+          max: {
+            script: { inline: '_score' },
+          },
+        },
+        minimum: {
+          min: {
+            script: { inline: '_score' },
+          },
+        },
+      };
+    }
+    else
+    {
+      const min = maxDomain.get(0);
+      const max = maxDomain.get(1);
+      const interval = (max - min) / NUM_BARS;
+      tql['aggs'] = {
+        transformCard: {
+          histogram: {
+            script: { inline: '_score' },
+            interval,
+            extended_bounds: {
+              min, max,
+            },
+          },
+        },
+      };
+    }
+    return tql;
+  }
+
+  private computeElasticBars(input: CardString, maxDomain: List<number>, recomputeDomain: boolean, overrideQuery?)
   {
     const { builderState } = this.props;
     const { db } = builderState;
@@ -384,42 +469,56 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
 
-    const index: string = getIndex('');
-    const type: string = getType('');
-
+    const index: string | List<string> = getIndex('');
+    const type: string | List<string> = getType('');
+    const filter = [];
+    // If index and type are strings (there aren't multiple indexes/types) then add filters for them
+    if (typeof index === 'string')
+    {
+      filter.push({
+        term: {
+          _index: index,
+        },
+      });
+    }
+    if (typeof type === 'string')
+    {
+      filter.push({
+        term: {
+          _type: type,
+        },
+      });
+    }
     if (recomputeDomain)
     {
-      const domainQuery = {
-        query: {
-          bool: {
-            filter: [
-              {
-                term: {
-                  _index: index,
-                },
-              },
-              {
-                term: {
-                  _type: type,
-                },
-              },
-            ],
-          },
-        },
-        aggs: {
-          maximum: {
-            max: {
-              field: input,
+      let domainQuery;
+      if (input === '_score')
+      {
+        domainQuery = this.computeScoreElasticBars(maxDomain, recomputeDomain, overrideQuery);
+      }
+      else
+      {
+        domainQuery = {
+          query: {
+            bool: {
+              filter,
             },
           },
-          minimum: {
-            min: {
-              field: input,
+          aggs: {
+            maximum: {
+              max: {
+                field: input,
+              },
+            },
+            minimum: {
+              min: {
+                field: input,
+              },
             },
           },
-        },
-        size: 0,
-      };
+          size: 0,
+        };
+      }
       Ajax.query(
         JSON.stringify(domainQuery),
         db,
@@ -437,43 +536,38 @@ class TransformCard extends TerrainComponent<Props>
       const min = maxDomain.get(0);
       const max = maxDomain.get(1);
       const interval = (max - min) / NUM_BARS;
-
-      const aggQuery = {
-        query: {
-          bool: {
-            filter: [
-              {
-                term: {
-                  _index: index,
+      let aggQuery;
+      if (input === '_score')
+      {
+        aggQuery = this.computeScoreElasticBars(maxDomain, recomputeDomain, overrideQuery);
+      }
+      else
+      {
+        aggQuery = {
+          query: {
+            bool: {
+              filter,
+              must: {
+                range: {
+                  [input as string]: { gte: min, lt: max },
                 },
-              },
-              {
-                term: {
-                  _type: type,
-                },
-              },
-            ],
-            must: {
-              range: {
-                [input as string]: { gte: min, lt: max },
               },
             },
           },
-        },
-        aggs: {
-          transformCard: {
-            histogram: {
-              field: input,
-              interval,
-              extended_bounds: {
-                min, max, // force the ES server to return NUM_BARS + 1 bins.
+          aggs: {
+            transformCard: {
+              histogram: {
+                field: input,
+                interval,
+                extended_bounds: {
+                  min, max, // force the ES server to return NUM_BARS + 1 bins.
+                },
               },
             },
           },
-        },
-        size: 0,
-      };
-
+          size: 0,
+        };
+      }
       this.setState(
         Ajax.query(
           JSON.stringify(aggQuery),

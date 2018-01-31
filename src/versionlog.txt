@@ -1,0 +1,2 @@
+Version: v2.1.0.1
+Updates: Switched to new library columns (Categories, Groups, Algorithms), unification of stores, uploading to an empty file directory, dark transform chart background

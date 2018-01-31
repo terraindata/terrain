@@ -56,101 +56,101 @@ const $ = (type: string, payload: any) => Store.dispatch({ type, payload });
 const BuilderActions =
   {
     change: // reserved for cards only
-    (keyPath: KeyPath, value: any, notDirty = false) =>
-      $(ActionTypes.change, { keyPath, value, notDirty }),
+      (keyPath: KeyPath, value: any, notDirty = false) =>
+        $(ActionTypes.change, { keyPath, value, notDirty }),
 
     changeQuery:
-    (query: Query) =>
-      $(ActionTypes.changeQuery, { query }),
+      (query: Query) =>
+        $(ActionTypes.changeQuery, { query }),
 
     create:
-    (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
-      $(ActionTypes.create, { keyPath, factoryType, index, data }),
+      (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
+        $(ActionTypes.create, { keyPath, factoryType, index, data }),
 
     move:
-    (keyPath: KeyPath, index: number, newIndex: number) =>
-      $(ActionTypes.move, { keyPath, index, newIndex }),
+      (keyPath: KeyPath, index: number, newIndex: number) =>
+        $(ActionTypes.move, { keyPath, index, newIndex }),
 
     nestedMove:
-    (itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number) =>
-      $(ActionTypes.nestedMove, { itemKeyPath, itemIndex, newKeyPath, newIndex }),
+      (itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number) =>
+        $(ActionTypes.nestedMove, { itemKeyPath, itemIndex, newKeyPath, newIndex }),
 
     remove:
-    (keyPath: KeyPath, index: number) =>
-      $(ActionTypes.remove, { keyPath, index }),
+      (keyPath: KeyPath, index: number) =>
+        $(ActionTypes.remove, { keyPath, index }),
 
     dragCard:
-    (cardItem: CardItem | null) =>
-      $(ActionTypes.dragCard, { cardItem }),
+      (cardItem: CardItem | null) =>
+        $(ActionTypes.dragCard, { cardItem }),
 
     dragCardOver:
-    (keyPath: KeyPath, index: number) =>
-      $(ActionTypes.dragCardOver, { keyPath, index }),
+      (keyPath: KeyPath, index: number) =>
+        $(ActionTypes.dragCardOver, { keyPath, index }),
 
     dropCard:
-    () =>
-      $(ActionTypes.dropCard, {}),
+      () =>
+        $(ActionTypes.dropCard, {}),
 
     changeTQL:
-    (tql: string) =>
-      $(ActionTypes.changeTQL, { tql }),
+      (tql: string, tqlMode: string) =>
+        $(ActionTypes.changeTQL, { tql, tqlMode }),
 
     hoverCard:
-    (cardId: ID) =>
-      $(ActionTypes.hoverCard, { cardId }),
+      (cardId: ID) =>
+        $(ActionTypes.hoverCard, { cardId }),
 
     selectCard:
-    (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>
-      $(ActionTypes.selectCard, { cardId, shiftKey, ctrlKey }),
+      (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>
+        $(ActionTypes.selectCard, { cardId, shiftKey, ctrlKey }),
 
     toggleDeck:
-    (open: boolean) =>
-      $(ActionTypes.toggleDeck, { open }),
+      (open: boolean) =>
+        $(ActionTypes.toggleDeck, { open }),
 
     // fetches the query from the server
     fetchQuery:
-    (algorithmId: ID, handleNoAlgorithm: (algorithmId: ID) => void, db: BackendInstance) =>
-      $(ActionTypes.fetchQuery, { algorithmId, handleNoAlgorithm, db }),
+      (algorithmId: ID, handleNoAlgorithm: (algorithmId: ID) => void, db: BackendInstance) =>
+        $(ActionTypes.fetchQuery, { algorithmId, handleNoAlgorithm, db }),
 
     // load query from server into state
     queryLoaded:
-    (query: Query, xhr: XMLHttpRequest, db: BackendInstance) =>
-      $(ActionTypes.queryLoaded, { query, xhr, db }),
+      (query: Query, xhr: XMLHttpRequest, db: BackendInstance) =>
+        $(ActionTypes.queryLoaded, { query, xhr, db }),
 
     save:
-    (failed?: boolean) =>
-      $(ActionTypes.save, { failed }),
+      (failed?: boolean) =>
+        $(ActionTypes.save, { failed }),
 
     undo:
-    () =>
-      $(ActionTypes.undo, {}),
+      () =>
+        $(ActionTypes.undo, {}),
 
     redo:
-    () =>
-      $(ActionTypes.redo, {}),
+      () =>
+        $(ActionTypes.redo, {}),
 
     checkpoint:
-    () =>
-      $(ActionTypes.checkpoint, {}),
+      () =>
+        $(ActionTypes.checkpoint, {}),
 
     changeResultsConfig:
-    (resultsConfig) =>
-      $(ActionTypes.changeResultsConfig, {
-        resultsConfig,
-      }),
+      (resultsConfig) =>
+        $(ActionTypes.changeResultsConfig, {
+          resultsConfig,
+        }),
 
     updateKeyPath:
-    (id, keyPath) =>
-      $(ActionTypes.updateKeyPath, {
-        id,
-        keyPath,
-      }),
+      (id, keyPath) =>
+        $(ActionTypes.updateKeyPath, {
+          id,
+          keyPath,
+        }),
 
     results:
-    (resultsState) =>
-      $(ActionTypes.results, {
-        resultsState,
-      }),
+      (resultsState) =>
+        $(ActionTypes.results, {
+          resultsState,
+        }),
   };
 
 _.map(ActionTypes,

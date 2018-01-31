@@ -49,21 +49,21 @@ THE SOFTWARE.
 import { Record } from 'immutable';
 import { createRecordType } from '../Classes';
 
-// duplicate of SchedulerConfig defined in Scheduler.ts
+// equivalent of SchedulerConfig defined in miday/src/app/scheduler/SchedulerConfig.ts
 class SchedulerConfigC
 {
   public id: ID = -1;
   public name: string = '';                      // name of the schedule
-  public active?: number = 0;                   // whether the schedule is running (different from currentlyRunning)
-  public archived?: number = 0;                 // whether the schedule has been archived (deleted) or not
-  public currentlyRunning?: number = 0;         // whether the job is currently running
+  public active?: boolean = false;               // whether the schedule is running (different from currentlyRunning)
+  public archived?: boolean = false;             // whether the schedule has been archived (deleted) or not
+  public currentlyRunning?: boolean = false;     // whether the job is currently running
   public jobId?: number = -1;                    // corresponds to job ID
   public jobType?: string = '';                  // import or export etc.
   public paramsJob?: object = {};                // parameters passed for the job, excluding info like filename
   public paramsScheduleArr?: any[] = [];         // parameters passed for the schedule
   public paramsScheduleStr?: string = '';        // JSON stringified representation of paramsScheduleArr
   public schedule: string = '';                  // cronjob format for when the schedule should run
-  public sort?: string = 'asc';                     // for regex expression file matching, which end of the list should be used
+  public sort?: string = 'asc';                  // for regex expression file matching, which end of the list should be used
   public transport?: object = {};                // sftp and relevant parameters, https, local filesystem, etc.
   public transportStr?: string = '';             // JSON stringified representation of transport
 }
@@ -74,9 +74,9 @@ export const _SchedulerConfig =
   (config: {
     id: ID;
     name: string;
-    active?: number;
-    archived?: number;
-    currentlyRunning?: number;
+    active?: boolean;
+    archived?: boolean;
+    currentlyRunning?: boolean;
     jobId?: number;
     jobType?: string;
     paramsJob?: object;

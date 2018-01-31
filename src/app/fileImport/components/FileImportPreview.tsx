@@ -152,37 +152,37 @@ class FileImportPreview extends TerrainComponent<Props>
     exportColumnNames: List<string>,
     exportColumnTypes: List<object>,
   } = {
-    templateOptions: List([]),
-    appliedTemplateName: '',
-    saveTemplateName: '',
-    showingDelimTextBox: false,
-    showingUpdateTemplate: false,
-    showingApplyTemplate: false,
-    showingSaveTemplate: false,
+      templateOptions: List([]),
+      appliedTemplateName: '',
+      saveTemplateName: '',
+      showingDelimTextBox: false,
+      showingUpdateTemplate: false,
+      showingApplyTemplate: false,
+      showingSaveTemplate: false,
 
-    showingTransformModal: false,
-    transformColumnId: -1,
+      showingTransformModal: false,
+      transformColumnId: -1,
 
-    showingAdvanced: false,
-    showingAddColumn: false,
-    addColumnName: '',
-    advancedCheck: this.props.requireJSONHaveAllFields,
-    typeObjectKey: this.props.objectKey,
-    advancedExportRank: this.props.exportRank,
-    exportFiletype: 'csv',
+      showingAdvanced: false,
+      showingAddColumn: false,
+      addColumnName: '',
+      advancedCheck: this.props.requireJSONHaveAllFields,
+      typeObjectKey: this.props.objectKey,
+      advancedExportRank: this.props.exportRank,
+      exportFiletype: 'csv',
 
-    leaving: false,
-    nextLocation: null,
-    changeLocationAfterSave: false,
-    showResponseModal: false,
-    responseModalContent: '',
-    responseModalTitle: '',
-    responseModalError: false,
-    previewErrorMsg: '',
-    analyzers: List([]),
-    exportColumnNames: List([]),
-    exportColumnTypes: List([]),
-  };
+      leaving: false,
+      nextLocation: null,
+      changeLocationAfterSave: false,
+      showResponseModal: false,
+      responseModalContent: '',
+      responseModalTitle: '',
+      responseModalError: false,
+      previewErrorMsg: '',
+      analyzers: List([]),
+      exportColumnNames: List([]),
+      exportColumnTypes: List([]),
+    };
 
   public confirmedLeave: boolean = false;
 
@@ -209,7 +209,9 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       const dbName = getIndex('');
       const tableName = getType('');
-      Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
+      Actions.setServerDbTable(this.props.serverId, '',
+        typeof dbName === 'string' ? dbName : dbName.get(0),
+        typeof tableName === 'string' ? tableName : tableName.get(0));
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
       const parsedQuery = addBodyToQuery(stringQuery);
@@ -425,8 +427,13 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       const dbName = getIndex('');
       const tableName = getType('');
-      Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess,
-        this.props.serverId, dbName, tableName);
+      Actions.saveTemplate(
+        this.state.saveTemplateName,
+        this.props.exporting,
+        this.handleTemplateSaveSuccess,
+        this.props.serverId,
+        typeof dbName === 'string' ? dbName : dbName.get(0),
+        typeof tableName === 'string' ? tableName : tableName.get(0));
     }
     else
     {

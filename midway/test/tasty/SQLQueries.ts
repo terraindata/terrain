@@ -86,11 +86,6 @@ const SQLQueries: Array<[string, [string]]> = [
   ],
 
   [
-    'simple query (upsert)',
-    [`REPLACE \n  INTO movies (movieid, releasedate, title) VALUES (13371337, '2017-01-01', 'My New Movie');`],
-  ],
-
-  [
     'simple query (delete)',
     [`DELETE \n  FROM movies\n  WHERE movies.movieid = 13371337;`],
   ],

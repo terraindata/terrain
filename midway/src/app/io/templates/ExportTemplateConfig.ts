@@ -43,25 +43,23 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import Util from './../../util/Util';
 
-const create = '';
-const change = '';
+import ConfigType from '../../ConfigType';
+import { TemplateBase } from './TemplateBase';
 
-const UserActionTypes =
+export class ExportTemplateConfig extends TemplateBase
+{
+  public objectKey?: string = undefined;
+  public query?: string = undefined;
+  public rank?: boolean = undefined;
+  public templateId?: number = undefined;
+  public algorithmId?: number = undefined;
+
+  constructor(props: object)
   {
-    create,
-    change,
+    super(props);
+    ConfigType.initialize(this, props);
+  }
+}
 
-    changeType: '',
-    fetch: '',
-    setUsers: '',
-    updateCurrentUser: '',
-
-    completeTutorial: '',
-  };
-
-// jmansor: Because we'll have a global store, action types need to be unique.
-Util.setValuesToKeys(UserActionTypes, 'users');
-
-export default UserActionTypes;
+export default ExportTemplateConfig;
