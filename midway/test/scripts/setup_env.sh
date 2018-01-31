@@ -17,11 +17,8 @@ orig_elastic_port=9200
 mysql_port=63306
 postgres_port=65432
 elastic_port=9200
-<<<<<<< HEAD
 chrome_port=9222
-=======
 
->>>>>>> origin/master
 sqlite_path=${DIR}/../../../
 use_mysql=1
 use_postgres=1
@@ -100,11 +97,7 @@ do
 done
 
 # stop any existing instances
-<<<<<<< HEAD
-${DIR}/teardown_env.sh --use-mysql=${use_mysql} --use-elastic=${use_elastic} --use-sqlite=${use_sqlite} --use-chrome=${use_chrome}
-=======
-${DIR}/teardown_env.sh --use-mysql=${use_mysql} --use-postgres=${use_postgres} --use-elastic=${use_elastic} --use-sqlite=${use_sqlite}
->>>>>>> origin/master
+${DIR}/teardown_env.sh --use-mysql=${use_mysql} --use-postgres=${use_postgres} --use-elastic=${use_elastic} --use-chrome=${use_chrome} --use-sqlite=${use_sqlite}
 
 if [ "$use_mysql" == 1 ];
 then
@@ -175,17 +168,13 @@ else
     ELASTIC_ID=1
 fi
 
-<<<<<<< HEAD
 if [ "$use_chrome" == 1 ]; then
     CHROME_ID=$(docker run -d --name chrome --shm-size=1024m -p $chrome_port:$chrome_port --cap-add=SYS_ADMIN $chrome_image)
 else
     CHROME_ID=1
 fi
 
-if [ -z "$ELASTIC_ID" ] || [ -z "$MYSQL_ID" ] || [ -z "$CHROME_ID" ]; then
-=======
-if [ -z "$ELASTIC_ID" -o -z "$MYSQL_ID" -o -z "$POSTGRES_ID" ]; then
->>>>>>> origin/master
+if [ -z "$ELASTIC_ID" ] || [ -z "$MYSQL_ID" ] || [ -z "$POSTGRES_ID" ] || [ -z "$CHROME_ID" ]; then
 	echo "Docker services failed to start..."
 	exit 1
 fi
