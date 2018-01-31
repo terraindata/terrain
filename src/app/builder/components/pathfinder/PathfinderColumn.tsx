@@ -143,7 +143,6 @@ class PathfinderColumn extends TerrainComponent<Props>
           pathfinderContext={pathfinderContext}
           keyPath={keyPath.push('source')}
           onStepChange={this.incrementStep}
-          step={path.step}
           source={path.source}
         />
         {
@@ -153,7 +152,6 @@ class PathfinderColumn extends TerrainComponent<Props>
               filterGroup={path.filterGroup}
               keyPath={keyPath.push('filterGroup')}
               onStepChange={this.incrementStep}
-              step={path.step}
             />
             : null
         }
@@ -163,7 +161,6 @@ class PathfinderColumn extends TerrainComponent<Props>
               pathfinderContext={pathfinderContext}
               score={path.score}
               keyPath={keyPath.push('score')}
-              step={path.step}
               onStepChange={this.incrementStep}
 
             />

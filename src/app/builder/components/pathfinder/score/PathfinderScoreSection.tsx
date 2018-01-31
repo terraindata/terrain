@@ -72,7 +72,6 @@ export interface Props
   score: Score;
   keyPath: KeyPath;
   onStepChange: (oldStep: PathfinderSteps) => void;
-  step: PathfinderSteps;
 }
 
 class PathfinderScoreSection extends TerrainComponent<Props>
@@ -256,9 +255,11 @@ class PathfinderScoreSection extends TerrainComponent<Props>
 
   public handleStepChange()
   {
-    if (this.props.step === PathfinderSteps.Score)
+    const { step } = this.props.pathfinderContext;
+    
+    if (step === PathfinderSteps.Score)
     {
-      this.props.onStepChange(this.props.step);
+      this.props.onStepChange(step);
     }
   }
 

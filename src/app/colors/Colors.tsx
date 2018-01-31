@@ -88,6 +88,8 @@ const NewTheme =
   blockOutline: NTColors.grey1,
   
   sidebarBg: NTColors.light1,
+  
+  textboxBg: NTColors.light1,
 }
 
 // Will be deprecated
@@ -640,7 +642,7 @@ const LIGHT: OldTheme =
     inactiveHoverText: '#fff',
     activeHover: Color(darkActive).fade(0.75).string(),
 
-    scrollbarBG: '#fff',
+    scrollbarBG: 'rgba(0,0,0,0.1)',
     scrollbarPiece: 'rgb(180, 182, 186)',
 
     altScrollbarPiece: 'rgba(0, 0, 0, 0.25)',

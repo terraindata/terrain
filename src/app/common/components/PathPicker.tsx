@@ -78,6 +78,8 @@ export interface Props
 
   forceOpen?: boolean;
   hasOther?: boolean;
+  large?: boolean;
+  noShadow?: boolean;
 
   // wrapperTooltip?: string;
 }
@@ -107,14 +109,21 @@ class PathPicker extends TerrainComponent<Props>
         className='pathpicker'
       >
         {
+          this.renderVeil()
+        }
+        {
           this.renderBoxValue()
         }
-
         {
           this.renderPicker()
         }
       </div>
     );
+  }
+  
+  private isOpen()
+  {
+    return this.state.open || this.props.forceOpen;
   }
 
   private renderBoxValue()
@@ -123,7 +132,12 @@ class PathPicker extends TerrainComponent<Props>
 
     return (
       <div
-        className='pathpicker-box-value'
+        className={classNames({
+          'pathpicker-box-value': true,
+          'noselect': true,
+          'pathpicker-box-value-open': this.isOpen(),
+          'pathpicker-box-value-force-open': props.forceOpen,
+        })}
       >
         <FloatingInput
           label={props.shortNameText}
@@ -131,7 +145,14 @@ class PathPicker extends TerrainComponent<Props>
           value={this.renderValue('short', this.getCurrentIndex())}
           onClick={this.handleBoxValueClick}
           canEdit={props.canEdit}
+          large={props.large}
+          noBorder={true}
         />
+        <div
+          className='pathpicker-close'
+        >
+          Close
+        </div>
       </div>
     );
   }
@@ -142,7 +163,7 @@ class PathPicker extends TerrainComponent<Props>
     let showOther = false;
     let value;
     let option;
-
+    console.log(index);
     if (index === -1)
     {
       // value not present
@@ -152,7 +173,7 @@ class PathPicker extends TerrainComponent<Props>
     else
     {
       option = props.options.get(index);
-      value = option.value;
+      value = option.displayName;
     }
     
     return value;
@@ -183,16 +204,21 @@ class PathPicker extends TerrainComponent<Props>
   {
     const { props, state } = this;
     return props.options.findIndex(
-        (option) => option.value === props.value);
+        (option) => {console.log(option.value, props.value); return option.value === props.value});
   }
 
   private renderPicker()
   {
     const { props, state } = this;
+    
+    if(!this.isOpen()) return null;
 
     return (
       <div
-        className='pathpicker-picker'
+        className={classNames({
+          'pathpicker-picker': true,
+          'pathpicker-picker-no-shadow': props.noShadow,
+        })}
       >
         <div
           className='pathpicker-header'
@@ -201,20 +227,24 @@ class PathPicker extends TerrainComponent<Props>
             props.headerText
           }
         </div>
-        {
-          props.options.map(this.renderOption)
-        }
+        <div
+          className='pathpicker-options'
+        >
+          {
+            props.options.map(this.renderOption)
+          }
+        </div>
       </div>
     );
   }
   
   private renderOption(option: PathPickerOption, index: number)
   {
-    console.log(option);
     return (
       <div
         className='pathpicker-option'
         key={index}
+        onClick={this._fn(this.handleOptionClick, index)}
       >
         <div
           className='pathpicker-option-name'
@@ -240,10 +270,68 @@ class PathPicker extends TerrainComponent<Props>
     );
   }
   
-  private renderSampleDatum(data: any)
+  private handleOptionClick(optionIndex: number)
   {
-    // TODO add more formatting here?
-    return JSON.stringify(data);
+    const { props } = this;
+    const option = props.options.get(optionIndex);
+    props.onChange(option.value);
+    this.setState({
+      open: false,
+    });
+  }
+  
+  private renderSampleDatum(data: any, index: number)
+  {
+    // TODO coordinate formatting with ResultsArea
+    return (
+      <div
+        className='pathpicker-data-piece'
+        key={index}
+      >
+        {
+          _.map(data, (value, field) => (
+            <div
+              className='pathpicker-data-row'
+              key={field}
+            >
+              <div className='pathpicker-data-field'>
+                {
+                  field
+                }
+              </div>
+              <div className='pathpicker-data-value'>
+                {
+                  value
+                }
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    );
+  }
+  
+  private renderVeil()
+  {
+    if (this.props.noShadow)
+    {
+      return null;
+    }
+    
+    const isOpen = this.isOpen();
+    return (
+      <div 
+        className={'pathpicker-veil' + (isOpen ? '-open' : '')} 
+        onClick={this.handleVeilClick}
+      />
+    );
+  }
+  
+  private handleVeilClick()
+  {
+    this.setState({
+      open: false,
+    });
   }
 }
               // <input

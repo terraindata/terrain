@@ -419,7 +419,7 @@ abstract class DataSource extends BaseClass
 class PathfinderContextC extends BaseClass
 {
   public source: Source = null;
-  public step: string = null;
+  public step: PathfinderSteps = null;
   public canEdit: boolean = null;
   public schemaState: SchemaState = null;
 }
@@ -468,9 +468,12 @@ class ElasticDataSourceC extends DataSource
   
   public getChoiceOptions = (context: ChoiceContext): List<ChoiceOption> =>
   {
+    // TODO this function needs to be refactored
+    
     const server = BuilderStore.getState().db.name;
     if (context.type === 'source')
     {
+      // we need to make it clear what parts of Source are tracked
       const sources = context.schemaState.databases.toList().filter(
         (db) => db.serverId === server,
       ).map(
@@ -478,7 +481,7 @@ class ElasticDataSourceC extends DataSource
         {
           return _ChoiceOption({
             displayName: db.name,
-            value: db,
+            value: db.id,
           });
         },
       ).toList();
@@ -486,7 +489,7 @@ class ElasticDataSourceC extends DataSource
       const sourceExamples = {};
       sources.forEach((source) =>
       {
-        const databaseId = String(source.value.serverId) + '/' + String(source.value.name);
+        const databaseId = source.value; // String(source.value.serverId) + '/' + String(source.value.name);
         const types = context.schemaState.tables.toList().filter((table) =>
           table.databaseId === databaseId,
         );
@@ -504,11 +507,17 @@ class ElasticDataSourceC extends DataSource
       });
       return sources.map((source) =>
       {
-        const databaseId = String(source.value.serverId) + '/' + String(source.value.name);
+        const databaseId = source.value; // String(source.value.serverId) + '/' + String(source.value.name);
+        console.log(databaseId, sourceExamples);
+        let sampleData = sourceExamples[databaseId];
+        if (sampleData !== undefined)
+        {
+          sampleData = sampleData.map((data) => data['_source']);
+        }
         return _ChoiceOption({
           displayName: source.displayName,
           value: source.value,
-          sampleData: List(sourceExamples[databaseId]),
+          sampleData: List(sampleData),
         });
       }).toList();
     }

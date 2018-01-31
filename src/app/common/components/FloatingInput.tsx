@@ -61,18 +61,23 @@ const Container = styled.div`
   line-height: normal;
   border: 1px solid ${Colors().inputBorder};
   border-radius: 3px;
-  height: 48px;
+  height: ${(props) => props.large ? '86px' : '48px'};
   width: 100%;
   box-sizing: border-box;
+  min-width: 100px;
+  background: ${Colors().textboxBg};
   
   &:hover {
     border-color: ${Colors().active};
   }
   
-  ${(props) => props.noBorder && 'border: none !important;'}
+  ${(props) => props.noBorder && (`
+    border: none !important;
+    background: none;
+  `)}
 `;
 
-const LEFT = '12px';
+const LEFT = (props) => props.large ? '18px' : '12px';
 
 const Label = styled.label`
   position: absolute;
@@ -82,32 +87,47 @@ const Label = styled.label`
   transition: all 0.15s;
   color: ${Colors().text3};
   cursor: pointer;
+  
+  font-size: ${(props) => 
+    {
+      if (props.isFloating)
+      {
+        return props.large ? '14px' : '10px';
+      }
+      
+      return props.large ? '52px' : '18px';  
+    }};
 `;
 
 const floatingLabelStyle = {
-  fontSize: 10,
   top: 6,
 };
 
 const inputStyle = `
-  padding-right: 6px;
-  padding-left: ${LEFT};
   padding-top: 20px;
   padding-bottom: 4px;
   border-radius: 3px;
   width: 100%;
   border: none;
   outline: none;
-  font-size: 18px;
   color: ${Colors().text1};
   transition: all 0.15s;
+  color: ${Colors().active};
 `;
 
+// duplication of code because the functions don't work if you put them
+//  in inputStyle
 const Input = styled.input`
+  padding-left: ${LEFT};
+  padding-right: ${LEFT};
   ${inputStyle}
+  font-size: ${(props) => props.large ? '52px' : '18px'};
 `;
 const InputDiv = styled.div`
   ${inputStyle}
+  padding-left: ${LEFT};
+  padding-right: ${LEFT};
+  font-size: ${(props) => props.large ? '52px' : '18px'};
   cursor: pointer;
 `;
 
@@ -122,6 +142,7 @@ export interface Props
   onClick?: (id: any) => void;
   canEdit?: boolean;
   noBorder?: boolean;
+  large?: boolean;
 }
 
 class FloatingInput extends TerrainComponent<Props>
@@ -142,18 +163,20 @@ class FloatingInput extends TerrainComponent<Props>
   public render()
   {
     const { props, state } = this;
-    const { value } = props;
+    const { value, onClick } = props;
 
     const isFloating = this.isFloating();
 
     return (
       <Container
-        noBorder={props.noBorder}
+        {...props as any}
       >
         {
           this.renderValue()
         }
         <Label
+          {...props as any}
+          isFloating={isFloating}
           htmlFor={state.myId}
           style={ isFloating ? floatingLabelStyle : undefined }
         >
@@ -197,6 +220,7 @@ class FloatingInput extends TerrainComponent<Props>
       // Return a text input
       return (
         <Input
+          {...props as any}
           value={value}
           id={state.myId}
           onChange={this.handleChange}
@@ -209,7 +233,7 @@ class FloatingInput extends TerrainComponent<Props>
     // Return a normal div, uneditable
     return (
       <InputDiv
-        onClick={this.handleClick}
+        {...props as any}
       >
         {
           value

@@ -74,7 +74,6 @@ export interface Props
   pathfinderContext: PathfinderContext;
   keyPath: KeyPath;
   onStepChange: (oldStep: PathfinderSteps) => void;
-  step: PathfinderSteps;
   source: Source;
 }
 
@@ -88,6 +87,7 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   public componentWillMount()
   {
+    // TODO should probably move these source options to props, not state
     this.setState({
       dataSourceOptions: this.getDataSourceOptions(),
     });
@@ -114,65 +114,25 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     {
       displayNames = displayNames.set(option.value, option.displayName);
     });
-    const sourceOptions = dataSourceOptions.map((option) =>
-    {
-      return {
-        title: String(option.displayName),
-        key: option.value,
-        subtitle: 'Sample Values',
-        values: _.keys(option.sampleData.get(0)._source).map((key) =>
-          `${key}: ${option.sampleData.get(0)._source[key]}`,
-        ),
-      };
-    }).toList();
+    
+    const pickerIsForcedOpen = step === PathfinderSteps.Source;
     
     return (
       <div
         className='pf-section'
       >
-        <PathfinderSectionTitle
-          title={PathfinderText.findSectionTitle}
-          text={PathfinderText.findSectionSubtitle}
+        <PathPicker
+          options={dataSourceOptions}
+          value={source.dataSource.index}
+          onChange={this.handleSourcePathChange}
+          canEdit={canEdit}
+          shortNameText={'Find'}
+          headerText={'Choose which data to use in your algorithm'}
+          forceOpen={pickerIsForcedOpen}
+          noShadow={pickerIsForcedOpen}
+          hasOther={false}
+          large={true}
         />
-        <div
-          className='pf-line'
-        >
-          <div className='pf-piece'>
-            {
-              PathfinderText.firstWord
-            }
-          </div>
-          <div className='pf-piece'>
-            <FloatingInput
-              label='Count'
-              value={source.count}
-              onChange={this.handleCountChange}
-              canEdit={canEdit}
-              isTextInput={true}
-            />
-          </div>
-          <Dropdown
-            options={sourceValues}
-            optionsDisplayName={displayNames}
-            selectedIndex={sourceNames.indexOf(this.props.pathfinderContext.source.dataSource.name)}
-            canEdit={canEdit}
-            onChange={this.handleSourceChange}
-            floatingLabel={'Data'}
-          />
-          
-          <div className='pf-piece'>
-            <PathPicker
-              options={dataSourceOptions}
-              value={source.dataSource.index}
-              onChange={this.handleSourcePathChange}
-              canEdit={canEdit}
-              shortNameText={'Find'}
-              headerText={'Choose which data to use in your algorithm'}
-              forceOpen={false}
-              hasOther={false}
-            />
-          </div>
-        </div>
       </div>
     );
   }
@@ -189,23 +149,33 @@ class PathfinderSourceSection extends TerrainComponent<Props>
 
   private handleSourcePathChange(value)
   {
+    const { props } = this;
+    const keyPath = props.keyPath.push('dataSource');
     
+    // BuilderActions.changePath(keyPath, value);
+    BuilderActions.changePath(keyPath.push('index'), value);
+    // BuilderActions.changePath(keyPath.push('types'), value.tableIds);
+    
+    if (props.pathfinderContext.step === PathfinderSteps.Source)
+    {
+      props.onStepChange(props.pathfinderContext.step);
+    }
   }
 
   private handleSourceChange(index, key)
   {
-    const options = this.getDataSourceOptions();
-    const dataSource = this.props.pathfinderContext.source.dataSource;
-    if ((dataSource as any).index !== undefined)
-    {
-      BuilderActions.changePath(this.props.keyPath.push('dataSource').push('index'), options.get(index).value.id);
-      BuilderActions.changePath(this.props.keyPath.push('dataSource').push('types'), options.get(index).value.tableIds);
-    }
-    BuilderActions.changePath(this.props.keyPath.push('dataSource').push('name'), options.get(index).displayName);
-    if (this.props.step === PathfinderSteps.Source)
-    {
-      this.props.onStepChange(this.props.step);
-    }
+    // const options = this.getDataSourceOptions();
+    // const dataSource = this.props.pathfinderContext.source.dataSource;
+    // if ((dataSource as any).index !== undefined)
+    // {
+    //   BuilderActions.changePath(this.props.keyPath.push('dataSource').push('index'), options.get(index).value.id);
+    //   BuilderActions.changePath(this.props.keyPath.push('dataSource').push('types'), options.get(index).value.tableIds);
+    // }
+    // BuilderActions.changePath(this.props.keyPath.push('dataSource').push('name'), options.get(index).displayName);
+    // if (this.props.step === PathfinderSteps.Source)
+    // {
+    //   this.props.onStepChange(this.props.step);
+    // }
   }
 
   private handleCountChange(value: string | number)
