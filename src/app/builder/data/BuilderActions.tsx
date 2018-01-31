@@ -96,8 +96,8 @@ const BuilderActions =
         $(ActionTypes.dropCard, {}),
 
     changeTQL:
-      (tql: string) =>
-        $(ActionTypes.changeTQL, { tql, changeQuery: BuilderActions.changeQuery }),
+      (tql: string, tqlMode: string) =>
+        $(ActionTypes.changeTQL, { tql, tqlMode, changeQuery: BuilderActions.changeQuery }),
 
     hoverCard:
       (cardId: ID) =>

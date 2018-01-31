@@ -53,7 +53,7 @@ import { Block, TQLRecursiveObjectFn } from '../../../blocks/types/Block';
 import Query from '../../../items/types/Query';
 import Options from '../../types/CardsToCodeOptions';
 
-import { isInput } from '../../../blocks/types/Input';
+import { isInput, isRuntimeInput } from '../../../blocks/types/Input';
 import ESCardParser from './ESCardParser';
 import { ESQueryObject, ESQueryToCode } from './ParseElasticQuery';
 
@@ -96,7 +96,7 @@ class CardsToElastic
       );
 
       if ((value === undefined || (typeof (value) === 'number' && isNaN(value)))
-        && isInput(block['value'], query.inputs))
+        && (isInput(block['value'], query.inputs) || isRuntimeInput(block['value'])))
       {
         value = block['value'];
       }

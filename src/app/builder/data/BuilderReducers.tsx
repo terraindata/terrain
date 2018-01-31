@@ -265,12 +265,21 @@ const BuilderReducers =
     },
 
     // change handwritten tql
+<<<<<<< HEAD
     [ActionTypes.changeTQL]: (state, action) =>
+=======
+    [ActionTypes.changeTQL]: (state: BuilderState,
+      action: Action<{
+        tql: string,
+        tqlMode: string,
+      }>) =>
+>>>>>>> master
     {
       // TODO MOD convert
       let { query } = state;
       const tql: string = action.payload.tql;
       query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
+      query = query.set('tqlMode', action.payload.tqlMode);
       query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
       query = AllBackendsMap[query.language].codeToQuery(
         query,

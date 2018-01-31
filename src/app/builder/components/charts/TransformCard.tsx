@@ -443,8 +443,26 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
 
-    const index: string = getIndex('', builder);
-    const type: string = getType('', builder);
+    const index: string | List<string> = getIndex('', builder);
+    const type: string | List<string> = getType('', builder);
+    const filter = [];
+    // If index and type are strings (there aren't multiple indexes/types) then add filters for them
+    if (typeof index === 'string')
+    {
+      filter.push({
+        term: {
+          _index: index,
+        },
+      });
+    }
+    if (typeof type === 'string')
+    {
+      filter.push({
+        term: {
+          _type: type,
+        },
+      });
+    }
     if (recomputeDomain)
     {
       let domainQuery;
@@ -457,18 +475,7 @@ class TransformCard extends TerrainComponent<Props>
         domainQuery = {
           query: {
             bool: {
-              filter: [
-                {
-                  term: {
-                    _index: index,
-                  },
-                },
-                {
-                  term: {
-                    _type: type,
-                  },
-                },
-              ],
+              filter,
             },
           },
           aggs: {
@@ -513,18 +520,7 @@ class TransformCard extends TerrainComponent<Props>
         aggQuery = {
           query: {
             bool: {
-              filter: [
-                {
-                  term: {
-                    _index: index,
-                  },
-                },
-                {
-                  term: {
-                    _type: type,
-                  },
-                },
-              ],
+              filter,
               must: {
                 range: {
                   [input as string]: { gte: min, lt: max },

@@ -343,8 +343,8 @@ export const Ajax =
         'post',
         `users/${user.id}`,
         {
-          isSuperUser: user.isSuperUser ? 1 : 0,
-          isDisabled: user.isDisabled ? 1 : 0,
+          isSuperUser: user.isSuperUser,
+          isDisabled: user.isDisabled,
           email: user.email,
         },
         _.noop,

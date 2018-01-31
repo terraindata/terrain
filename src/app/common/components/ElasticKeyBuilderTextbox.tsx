@@ -161,8 +161,8 @@ class ElasticKeyBuilderTextbox extends TerrainComponent<Props>
 }
 
 const PLACEHOLDER_STYLE = {
-  'height': 32,
-  'margin-left': 75,
+  height: 32,
+  marginLeft: 75,
 };
 
 export default Util.createTypedContainer(

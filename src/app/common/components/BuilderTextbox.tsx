@@ -60,7 +60,7 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { SchemaState } from 'schema/SchemaTypes';
 import { Display } from '../../../blocks/displays/Display';
 import { Card, CardString, getCardTitle } from '../../../blocks/types/Card';
-import { isInput } from '../../../blocks/types/Input';
+import { isInput, isRuntimeInput } from '../../../blocks/types/Input';
 import { AllBackendsMap } from '../../../database/AllBackends';
 import * as BuilderHelpers from '../../builder/BuilderHelpers';
 import CardDropArea from '../../builder/components/cards/CardDropArea';
@@ -554,7 +554,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     const { builder } = this.props;
 
     if (typeof value === 'string' &&
-      isInput(value as string, builder.query.inputs))
+      (isInput(value as string, builder.query.inputs) || isRuntimeInput(value as string)))
     {
       return true;
     }

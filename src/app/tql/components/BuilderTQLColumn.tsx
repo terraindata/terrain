@@ -174,7 +174,7 @@ class BuilderTQLColumn extends TerrainComponent<Props>
 
   public sendTqlAction()
   {
-    this.props.builderActions.changeTQL(this.state.tql);
+    this.props.builderActions.changeTQL(this.state.tql, this.state.runMode);
   }
 
   // public changeThemeDefault()
