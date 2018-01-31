@@ -102,6 +102,7 @@ export class BaseClass
 
 const AllRecordMap: { [class_name: string]: Immutable.Record.Class } = {};
 const AllRecordArray = [];
+export const AllRecordNameArray = [];
 export let RecordsSerializer = Serialize.immutable(Immutable, []);
 
 export function New<T>(
@@ -115,6 +116,7 @@ export function New<T>(
   {
     TerrainLog.info('New Record ' + class_name);
     AllRecordMap[class_name] = Immutable.Record(new instance.__proto__.constructor({}));
+    AllRecordNameArray.push(class_name);
     AllRecordArray.push(AllRecordMap[class_name]);
     RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
   }
@@ -138,7 +140,7 @@ export function createRecordType(obj, name)
   {
     AllRecordMap[name] = Immutable.Record(obj);
   }
-
+  AllRecordNameArray.push(name);
   AllRecordArray.push(AllRecordMap[name]);
   RecordsSerializer = Serialize.immutable(Immutable, AllRecordArray);
   return AllRecordMap[name];

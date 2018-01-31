@@ -43,13 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
-import { BuilderStateUsedRecords } from 'builder/data/BuilderStore';
 import * as hdr from 'hdr-histogram-js';
 import * as Immutable from 'immutable';
 import * as TerrainLog from 'loglevel';
 import * as Serialize from 'remotedev-serialize';
 import { Block } from '../../../blocks/types/Block';
-import { RecordsSerializer } from '../../Classes';
+import {AllRecordNameArray, RecordsSerializer} from '../../Classes';
 
 export default class BuilderStoreLogger
 {
@@ -85,9 +84,20 @@ export default class BuilderStoreLogger
           }
           BuilderStoreLogger.actionLatencyLog[action.type].recordValue(actionLatency);
         }
+        if (BuilderStoreLogger.serializeAction)
+        {
+          BuilderStoreLogger.actionSerializationLog.push(RecordsSerializer.stringify(action));
+        }
         TerrainLog.debug(String(action.type) + ' takes ' + String(actionLatency) + 'ms');
         return result;
       }
+
+  public static replayAction(store, action: string)
+  {
+    //console.log('replaying ' + typeof action + ':' + action);
+    const theAction = RecordsSerializer.parse(action);
+    store.dispatch(theAction);
+  }
 
   public static reportActionLatency()
   {
@@ -99,5 +109,10 @@ export default class BuilderStoreLogger
         TerrainLog.info(actionType, actionHdr.outputPercentileDistribution());
       }
     }
+  }
+
+  public static serializeAllRecordName()
+  {
+    return AllRecordNameArray;
   }
 }

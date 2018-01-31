@@ -7,13 +7,16 @@ deploy_version=1.0a
 elastic_image="terrain/moviesdb-elk:$deploy_version"
 mysql_image="terrain/moviesdb-mysql:$deploy_version"
 sqlite_image="terrain/moviesdb-sqlite:$deploy_version"
+chrome_image="yukinying/chrome-headless-browser"
 
 mysql_port=3306
 elastic_port=9200
+chrome_port=9222
 sqlite_path=${DIR}/../../../
 use_mysql=1
 use_elastic=1
 use_sqlite=1
+use_chrome=1
 
 function usage {
 	 echo "Help!"
@@ -46,6 +49,9 @@ do
 		  --use-elastic=*)
 				use_elastic="${1#*=}"
 				;;
+		  --use-chrome=*)
+				use_chrome="${1#*=}"
+				;;
 		  --sqlite-path)
 				sqlite_path=$2
 				shift
@@ -73,7 +79,7 @@ do
 done
 
 # stop any existing instances
-${DIR}/teardown_env.sh --use-mysql=${use_mysql} --use-elastic=${use_elastic} --use-sqlite=${use_sqlite}
+${DIR}/teardown_env.sh --use-mysql=${use_mysql} --use-elastic=${use_elastic} --use-sqlite=${use_sqlite} --use-chrome=${use_chrome}
 
 if [ "$use_mysql" == 1 ];
 then
@@ -93,6 +99,11 @@ then
     else
     	 echo "Starting elastic on NON-STANDARD port $elastic_port..."
     fi
+fi
+
+if [ "$use_chrome" == 1 ];
+then
+    echo "Starting the headless Chrome on port $chrome_port...";
 fi
 
 # Pull images in parallel in order to minimize latency...
@@ -121,7 +132,13 @@ else
     ELASTIC_ID=1
 fi
 
-if [ -z "$ELASTIC_ID" -o -z "$MYSQL_ID" ]; then
+if [ "$use_chrome" == 1 ]; then
+    CHROME_ID=$(docker run -d --name chrome --shm-size=1024m -p $chrome_port:$chrome_port --cap-add=SYS_ADMIN $chrome_image)
+else
+    CHROME_ID=1
+fi
+
+if [ -z "$ELASTIC_ID" ] || [ -z "$MYSQL_ID" ] || [ -z "$CHROME_ID" ]; then
 	echo "Docker services failed to start..."
 	exit 1
 fi
@@ -134,4 +151,3 @@ fi
 if [ "$use_elastic" == 1 ]; then
     while [ "$(docker inspect -f {{.State.Health.Status}} moviesdb-elk)" != "healthy" ]; do sleep 0.1; done;
 fi
-

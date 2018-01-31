@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon --exec ./node_modules/.bin/ts-node -P midway $NODE_DEBUG_OPTION --harmony --max_executable_size=8192 --max_old_space_size=8192 -- ./midway/src/Midway.ts",
-    "start-front": "yarn commit-log && webpack-dev-server --config webpack.config.js --debug --inline --content-base src/app --history-api-fallback --compress --progress --info",
+    "start-front": "yarn commit-log && webpack-dev-server --host 0.0.0.0 --config webpack.config.js --debug --inline --content-base src/app --history-api-fallback --compress --progress --info --",
     "test": "yarn test-back && yarn test-front",
     "test-front": "jest src",
     "test-back-setup": "./midway/test/scripts/setup_env.sh",
@@ -27,7 +27,9 @@
     "style": "find midway src shared analytics.js sigint -type f \\( -iname \\*.tsx -o -iname \\*.ts \\) -not -path '*/node_modules/*' -not -path '*/build/*'  | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1",
     "fix": "yarn style && yarn lint-parallel;",
     "diff-style": "git ls-files -m  \\*.ts\\* | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1",
-    "rr": "nodemon --exec ./node_modules/.bin/ts-node -P rr -- ./rr/RecordReplay.ts"
+    "rr": "nodemon --exec ./node_modules/.bin/ts-node -P rr -- ./rr/RecordReplay.ts",
+    "headless": "nodemon --exec ./node_modules/.bin/ts-node -P rr -- ./rr/TestGoogle.ts",
+    "test-backend": "jest rr"
   },
   "repository": {
     "type": "git",
@@ -102,6 +104,7 @@
     "create-react-class": "^15.6.0",
     "cronstrue": "^0.10.10",
     "csv-string": "^2.3.2",
+    "readline-sync": "^1.4.7",
     "d3": "^3.5.14",
     "date-format": "^1.1.0",
     "deep-equal": "^1.0.1",
@@ -116,8 +119,11 @@
     "google-oauth-jwt": "^0.2.0",
     "hdr-histogram-js": "^1.0.0",
     "immutable": "^3.7.3",
+    "ip": "^1.1.5",
     "javascript-natural-sort": "^0.7.1",
     "json-immutable": "^0.4.0",
+    "json-file": "^0.1.0",
+    "jest-image-snapshot": "^2.3.0",
     "jquery": "^3.2.1",
     "kcors": "^2.2.1",
     "koa": "^2.3.0",
@@ -174,6 +180,7 @@
     "redux-thunk": "^2.2.0",
     "redux-logger": "^3.0.6",
     "request": "^2.83.0",
+    "sync-request": "^4.1.0",
     "secure-random-string": "^1.0.0",
     "sha1": "^1.1.1",
     "sqlite3": "^3.1.13",

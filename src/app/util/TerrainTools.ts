@@ -48,6 +48,7 @@ import * as _ from 'lodash';
 import * as TerrainLog from 'loglevel';
 import { LogLevelDesc } from 'loglevel';
 import TerrainStore from 'store/TerrainStore';
+import {BuilderStore} from 'builder/data/BuilderStore';
 
 // Log levels
 const LEVEL_TRACE = 'trace';
@@ -75,6 +76,7 @@ class TerrainTools
   public static ANALYTICS = 'analytics';
 
   public static builderStoreLogger = BuilderStoreLogger;
+  public static builderStore = BuilderStore;
 
   public static welcome()
   {

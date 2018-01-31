@@ -6,6 +6,7 @@ sqlite_path=${DIR}/../../../
 use_mysql=1
 use_elastic=1
 use_sqlite=1
+use_chrome=1
 
 function usage {
 	 echo "Help!"
@@ -34,6 +35,9 @@ do
 		  --use-sqlite=*)
 				use_sqlite="${1#*=}"
 				;;
+		  --use-chrome=*)
+				use_chrome="${1#*=}"
+				;;
 		  --*)
 				echo "Unknown option: $1" 1>&2
 				exit 1
@@ -56,6 +60,12 @@ if [ "$use_elastic" == 1 ] && [ $(docker ps -aq -f name=moviesdb-elk | wc -l) !=
         echo "Stopping moviesdb docker elk image..."
         docker stop moviesdb-elk
         docker rm moviesdb-elk || true
+fi
+
+if [ "$use_chrome" == 1 ] && [ $(docker ps -aq -f name=chrome | wc -l) != 0 ] ; then
+        echo "Stopping headless Chrome docker image..."
+        docker stop chrome
+        docker rm chrome || true
 fi
 
 if [ "$use_sqlite" == 1 ] && [ -f ${sqlite_path} ] ; then

@@ -63,6 +63,8 @@ import ESClauseType from '../../../../shared/database/elastic/parser/ESClauseTyp
 import ESValueInfo from '../../../../shared/database/elastic/parser/ESValueInfo';
 import { FilterUtils } from '../blocks/ElasticFilterCard';
 import ESCardParser from './ESCardParser';
+import {ESJSONParser} from '../../../../shared/database/elastic/parser/ESJSONParser';
+import ESInterpreter from '../../../../shared/database/elastic/parser/ESInterpreter';
 
 const { make } = BlockUtils;
 
@@ -115,7 +117,9 @@ export default function ElasticToCards(
   {
     try
     {
-      const rootValueInfo = query.parseTree.parser.getValueInfo();
+      const parser = new ESJSONParser(query.tql);
+      const interpreter = new ESInterpreter(parser);
+      const rootValueInfo = interpreter.parser.getValueInfo();
       const cards = ElasticValueInfoToCards(rootValueInfo, query.cards);
       return query
         .set('cards', cards)
