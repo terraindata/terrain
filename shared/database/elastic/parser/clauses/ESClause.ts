@@ -193,7 +193,7 @@ abstract class ESClause
       if (valueInfo.parameterValue && valueInfo.parameterValue.getValueInfo())
       {
         const parameterType = valueInfo.parameterValue.getValueInfo().jsonType;
-        if (parameterType !== expected && ESJSONType[parameterType] !== 'parameter')
+        if (parameterType !== expected && ESJSONType[parameterType] !== 'parameter' && ESJSONType[parameterType] !== 'array')
         {
           interpreter.accumulateError(valueInfo,
             'Expected a ' + ESJSONType[expected] + ', but found a parameter ' + String(valueInfo.parameter) +
