@@ -69,7 +69,16 @@ const { List, Map } = Immutable;
 
 const BuilderReducers =
   {
-    [ActionTypes.fetchQuery]: (state, action) =>
+    [ActionTypes.fetchQuery]: (state: BuilderState,
+      action: {
+        payload?: {
+          algorithmId: ID,
+          handleNoAlgorithm: (id: ID) => void,
+          db: BackendInstance,
+          dispatch: any,
+          onRequestDone: any,
+        },
+      }) =>
     {
       const {
         algorithmId,
@@ -119,7 +128,14 @@ const BuilderReducers =
         .set('algorithmId', '');
     },
 
-    [ActionTypes.queryLoaded]: (state, action) =>
+    [ActionTypes.queryLoaded]: (state: BuilderState,
+      action: Action<{
+        query: Query,
+        xhr: XMLHttpRequest,
+        db: BackendInstance,
+        dispatch: any,
+        changeQuery: any,
+      }>) =>
     {
       let { query, dispatch } = action.payload;
       if (state.loadingXhr !== action.payload.xhr)
@@ -141,7 +157,13 @@ const BuilderReducers =
         .set('db', action.payload.db);
     },
 
-    [ActionTypes.change]: (state, action) =>
+    [ActionTypes.change]: (state: BuilderState,
+      action: {
+        payload?: {
+          keyPath: KeyPath,
+          value: any,
+        },
+      }) =>
     {
       return state.setIn(
         action.payload.keyPath,
@@ -150,10 +172,23 @@ const BuilderReducers =
 
     },
 
-    [ActionTypes.changeQuery]: (state, action) =>
+    [ActionTypes.changeQuery]: (state: BuilderState,
+      action: {
+        payload?: {
+          query: Query,
+        },
+      }) =>
       state.set('query', action.payload.query),
 
-    [ActionTypes.create]: (state, action) =>
+    [ActionTypes.create]: (state: BuilderState,
+      action: {
+        payload?: {
+          keyPath: KeyPath,
+          index: number,
+          factoryType: string,
+          data: any,
+        },
+      }) =>
       state.updateIn(
         action.payload.keyPath,
         (arr) =>
@@ -178,7 +213,14 @@ const BuilderReducers =
       )
     ,
 
-    [ActionTypes.move]: (state, action) =>
+    [ActionTypes.move]: (state: BuilderState,
+      action: {
+        payload?: {
+          keyPath: KeyPath,
+          index: number,
+          newIndex; number
+        },
+      }) =>
       state.updateIn(
         action.payload.keyPath,
         (arr) =>
@@ -193,7 +235,9 @@ const BuilderReducers =
 
     // first check original keypath
     [ActionTypes.nestedMove]: // a deep move
-      (state, action) =>
+      (state: BuilderState, action: {
+        payload?: { itemKeyPath: KeyPath, itemIndex: number, newKeyPath: KeyPath, newIndex: number },
+      }) =>
       {
         const { itemKeyPath, itemIndex, newKeyPath, newIndex } = action.payload;
 
@@ -250,7 +294,9 @@ const BuilderReducers =
         return state;
       },
 
-    [ActionTypes.remove]: (state, action) =>
+    [ActionTypes.remove]: (state: BuilderState, action: {
+      payload?: { keyPath: KeyPath, index: number },
+    }) =>
     {
       let { keyPath, index } = action.payload;
       if (index !== null)
@@ -265,15 +311,12 @@ const BuilderReducers =
     },
 
     // change handwritten tql
-<<<<<<< HEAD
-    [ActionTypes.changeTQL]: (state, action) =>
-=======
     [ActionTypes.changeTQL]: (state: BuilderState,
       action: Action<{
         tql: string,
         tqlMode: string,
+        changeQuery: any,
       }>) =>
->>>>>>> master
     {
       // TODO MOD convert
       let { query } = state;
@@ -289,7 +332,11 @@ const BuilderReducers =
       return state;
     },
 
-    [ActionTypes.selectCard]: (state, action) =>
+    [ActionTypes.selectCard]: (state: BuilderState, action: Action<{
+      cardId: ID,
+      shiftKey: boolean,
+      ctrlKey: boolean,
+    }>) =>
     {
       const { cardId, shiftKey, ctrlKey } = action.payload;
       if (!shiftKey && !ctrlKey)
@@ -304,10 +351,15 @@ const BuilderReducers =
       return state.setIn(['selectedCardIds', cardId], true);
     },
 
-    [ActionTypes.dragCard]: (state, action) =>
+    [ActionTypes.dragCard]: (state: BuilderState,
+      action: Action<{
+        cardItem: any,
+      }>) =>
       state.set('draggingCardItem', action.payload.cardItem),
 
-    [ActionTypes.dragCardOver]: (state, action) =>
+    [ActionTypes.dragCardOver]: (state: BuilderState, action: {
+      payload?: { keyPath: KeyPath, index: number },
+    }) =>
     {
       const { keyPath, index } = action.payload;
       return state
@@ -320,21 +372,29 @@ const BuilderReducers =
       .set('draggingOverIndex', null)
       .set('draggingCardItem', null),
 
-    [ActionTypes.toggleDeck]: (state, action) => state
+    [ActionTypes.toggleDeck]: (state: BuilderState, action) => state
       .setIn(['query', 'deckOpen'], action.payload.open),
 
-    [ActionTypes.changeResultsConfig]: (state, action) =>
+    [ActionTypes.changeResultsConfig]: (state: BuilderState,
+      action: Action<{
+        resultsConfig: any,
+      }>) =>
       state
         .update('query',
         (query) =>
           query.set('resultsConfig', action.payload.resultsConfig),
       ),
 
-    [ActionTypes.save]: (state, action) =>
+    [ActionTypes.save]: (state: BuilderState,
+      action: Action<{
+        failed?: boolean,
+      }>) =>
+
       state
         .set('isDirty', action.payload && action.payload.failed),
 
-    [ActionTypes.undo]: (state, action) =>
+    [ActionTypes.undo]: (state: BuilderState,
+      action: Action<{}>) =>
     {
       if (state.pastQueries.size)
       {
@@ -349,7 +409,8 @@ const BuilderReducers =
       return state;
     },
 
-    [ActionTypes.redo]: (state, action) =>
+    [ActionTypes.redo]: (state: BuilderState,
+      action: Action<{}>) =>
     {
       if (state.nextQueries.size)
       {
@@ -364,12 +425,16 @@ const BuilderReducers =
       return state;
     },
 
-    [ActionTypes.checkpoint]: (state, action) => state,
+    [ActionTypes.checkpoint]: (state: BuilderState, action: Action<{}>) => state,
 
-    [ActionTypes.results]: (state, action) =>
+    [ActionTypes.results]: (state: BuilderState,
+      action: Action<{ resultsState, exportState }>) =>
       state.set('resultsState', action.payload.resultsState),
 
-    [ActionTypes.updateKeyPath]: (state, action) =>
+    [ActionTypes.updateKeyPath]: (state: BuilderState, action: Action<{
+      id: ID,
+      keyPath: KeyPath,
+    }>) =>
       state.setIn(['query', 'cardKeyPaths', action.payload.id], action.payload.keyPath),
   };
 
