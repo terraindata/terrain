@@ -70,7 +70,7 @@ export interface Props
   bounds?: [number[]];
   onMapClick?: (event) => void;
 
-  onChange?: (value) => void;
+  onChange?: (location, address) => void;
   geocoder?: string;
 
   // control what features are visible on map
@@ -268,7 +268,7 @@ class MapComponent extends TerrainComponent<Props>
     this.reverseGeoCache[String(location)] = address;
     if (this.props.onChange !== undefined)
     {
-      this.props.onChange({ location, address });
+      this.props.onChange({ lat: location[0], lon: location[1] }, address);
     }
     if (this.props.keyPath !== undefined)
     {

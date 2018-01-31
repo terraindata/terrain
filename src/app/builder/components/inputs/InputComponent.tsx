@@ -54,6 +54,7 @@ import CreateLine from '../../../common/components/CreateLine';
 import DatePicker from '../../../common/components/DatePicker';
 import Dropdown from '../../../common/components/Dropdown';
 import TerrainComponent from '../../../common/components/TerrainComponent';
+import MapUtil from '../../../util/MapUtil';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
@@ -185,25 +186,25 @@ class InputComponent extends TerrainComponent<Props>
     {
       let value = this.props.input.value.toJS !== undefined ? this.props.input.value.toJS() : this.props.input.value;
       let markLocation: boolean = false;
-      if (value && value.location && value.address)
+      if (value)
       {
         markLocation = true;
       }
       else
       {
-        value = { location: [37.4449002, -122.16174969999997], address: '' };
+        value = [37.4449002, -122.16174969999997];
       }
       return (
         <MapComponent
           onChange={this.changeValue}
-          address={value.address}
-          location={value.location}
+          address={this.props.input.meta}
+          location={MapUtil.getCoordinatesFromGeopoint(value)}
           markLocation={markLocation}
           showDirectDistance={false}
           showSearchBar={true}
           zoomControl={true}
           keepAddressInSync={false}
-          geocoder='google'
+          geocoder='photon'
           className='input-map-wrapper'
         />);
     }
@@ -211,7 +212,7 @@ class InputComponent extends TerrainComponent<Props>
     return (
       <BuilderTextbox
         canEdit={true}
-        value={typeof this.props.input.value !== 'string' ? this.props.input.value.address : this.props.input.value}
+        value={String(this.props.input.value)}
         className='input-text input-text-second'
         keyPath={this.getKeyPath('value')}
         isNumber={this.props.input.inputType === InputType.NUMBER}

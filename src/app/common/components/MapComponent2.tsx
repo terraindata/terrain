@@ -70,6 +70,15 @@ export interface Props
   inputs?: any; // inputs so that it can tell what is an input
   onChange?: (inputValue, coordinates?) => void;
   canEdit: boolean;
+  markers?: List<LocationMarker>;
+}
+
+interface LocationMarker
+{
+  name: string;
+  coordinates: any;
+  color: string;
+  index: number;
 }
 
 // for map markers, distances must be converted to meters
@@ -102,16 +111,61 @@ class MapComponent extends TerrainComponent<Props>
   public state: {
     zoom: number;
   }
-  = {
-    zoom: 15;
-  };
+    = {
+      zoom: 15,
+    };
 
   public geoCache = {};
   public reverseGeoCache = {};
 
+  public markerIconWithStyle(style, small, index)
+  {
+    const size = small ? [20, 20] : [40, 40];
+    const className = small ? 'map-marker-icon-small' : 'map-marker-icon';
+    const text = index >= 0 ? String(index) : '';
+    let textPos = 0;
+    let textSize = 130;
+
+    // This is hacky, can be improved ?
+    switch (String(index).length)
+    {
+      case 0:
+        textPos = 0;
+        break;
+      case 1:
+        textPos = 217;
+        break;
+      case 2:
+        textPos = 181;
+        break;
+      case 3:
+        textPos = 155;
+        textSize = 100;
+        break;
+      default:
+        break;
+    }
+
+    const styledIcon = divIcon({
+      html: `<svg class=${className} version="1.1" id="Capa_1"
+        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
+        viewBox="0 0 512 512" style="enable-background:new 0 0 512 512; ${style}" xml:space="preserve">
+        <g><path d="M256,0C167.641,0,96,71.625,96,160c0,24.75,5.625,48.219,15.672,69.125C112.234,230.313,256,512,256,512l142.594-279.375
+        C409.719,210.844,416,186.156,416,160C416,71.625,344.375,0,256,0z M256,256c-53.016,0-96-43-96-96s42.984-96,96-96
+        c53,0,96,43,96,96S309,256,256,256z"/>
+        <circle cx="257" cy="161" r="94" stroke="black" stroke-width="0" fill="white" />
+        <text x="${textPos}" y="209" font-family="Verdana" font-size="${textSize}">${text}</text>
+        </g></svg>
+    `,
+      iconSize: size,
+      className: 'map-marker-container',
+    });
+    return styledIcon;
+  }
+
   public componentWillReceiveProps(nextProps)
   {
-//
+    //
   }
 
   // Update state with the address and actual coordinates
@@ -126,21 +180,35 @@ class MapComponent extends TerrainComponent<Props>
     {
       MapUtil.geocodeByAddress('photon', address, (result) =>
       {
-        this.props.onChange(address, {lat: result[1], lon: result[0]});
+        this.props.onChange(address, { lat: result[1], lon: result[0] });
       });
     }
     else
     {
       MapUtil.geocodeByAddress('google', address)
         .then((results) => MapUtil.getLatLng(results[0]))
-        .then((latLng: any) => this.props.onChange(address, {lat: latLng.lat, lon: latLng.lng}))
+        .then((latLng: any) => this.props.onChange(address, { lat: latLng.lat, lon: latLng.lng }))
         .catch((error) => this.setState({ error }));
     }
   }
 
   public reverseGeocode(coordinates)
   {
-//
+    //
+  }
+
+  public parseInputs(toParse)
+  {
+    const inputs = {};
+    if (toParse === undefined || toParse === null)
+    {
+      return {};
+    }
+    toParse.forEach((input) =>
+    {
+      inputs['@' + String(input.key)] = input.value;
+    });
+    return inputs;
   }
 
   public convertDistanceToMeters()
@@ -161,26 +229,16 @@ class MapComponent extends TerrainComponent<Props>
     this.props.onChange(value);
   }
 
-  public renderMarker(address, location)
+  public renderMarker(address, location, color, index?)
   {
-     const icon = divIcon({
-      html: `<svg class="map-marker-icon" version="1.1" id="Capa_1"
-        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
-        viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-        <g><path d="M256,0C167.641,0,96,71.625,96,160c0,24.75,5.625,48.219,15.672,69.125C112.234,230.313,256,512,256,512l142.594-279.375
-        C409.719,210.844,416,186.156,416,160C416,71.625,344.375,0,256,0z M256,256c-53.016,0-96-43-96-96s42.984-96,96-96
-        c53,0,96,43,96,96S309,256,256,256z"/>
-        <circle cx="257" cy="161" r="94" stroke="black" stroke-width="0" fill="white" />
-        </g></svg>
-    `,
-      iconSize: [40, 40],
-      className: 'map-marker-container',
-    });
+    const style = 'fill: ' + String(color) + ' !important;';
+    const icon = this.markerIconWithStyle(style, false, index);
     return (
       <Marker
         position={location}
         icon={icon}
         riseOnHover={true}
+        key={index}
       >
         {
           address !== '' && address !== undefined ?
@@ -209,13 +267,35 @@ class MapComponent extends TerrainComponent<Props>
     }
   }
 
+  public renderMultiLocationMarkers(marker: LocationMarker)
+  {
+    if (marker !== undefined)
+    {
+      const location = MapUtil.getCoordinatesFromGeopoint(marker.coordinates);
+      const name = marker.name;
+      const color = marker.color !== undefined ? marker.color : 'black';
+      return this.renderMarker(name, location, color, marker.index);
+    }
+    return null;
+  }
+
   public renderMap()
   {
-\    const { coordinates, inputValue } = this.props;
+    const { coordinates, inputValue } = this.props;
     let location = MapUtil.getCoordinatesFromGeopoint(coordinates);
     if (location === undefined || location[0] === undefined || location[1] === undefined)
     {
-      location = [0, 0];
+      // Try to see if it inputValue is an input, in that case get the coordinates from there
+      const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
+      if (inputs[inputValue] !== undefined)
+      {
+        location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
+      }
+      // Double check, because input coordinates could also be invalid
+      if (location === undefined || location[0] === undefined || location[1] === undefined)
+      {
+        location = [0, 0];
+      }
     }
     return (
       <Map
@@ -223,21 +303,28 @@ class MapComponent extends TerrainComponent<Props>
         zoom={this.state.zoom}
         onViewportChanged={this.setZoomLevel}
       >
-          {
-            this.renderMarker(inputValue, location)
-          }
-          <Circle
-            center={location}
-            radius={this.convertDistanceToMeters()}
-            stroke={true}
-            color={Colors().builder.cards.categories.filter}
-            width={7}
-            fillColor={Colors().builder.cards.categories.filter}
-            fillOpacity={0.2}
-          />
+        {
+          this.renderMarker(inputValue, location, 'black')
+        }
+        <Circle
+          center={location}
+          radius={this.convertDistanceToMeters()}
+          stroke={true}
+          color={Colors().builder.cards.categories.filter}
+          width={7}
+          fillColor={Colors().builder.cards.categories.filter}
+          fillOpacity={0.2}
+        />
+        {
+          // Render addition locations (spotlights, aggregation map, etc.)
+          this.props.markers !== undefined && this.props.markers.size > 0 ?
+            _.map(this.props.markers.toJS(), this.renderMultiLocationMarkers)
+            :
+            null
+        }
         <TileLayer
-          attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors'
+          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         />
       </Map>
     );
@@ -266,8 +353,8 @@ class MapComponent extends TerrainComponent<Props>
   {
     return (
       <div>
-         {this.renderSearchBar()}
-         {this.renderMap()}
+        {this.renderSearchBar()}
+        {this.renderMap()}
       </div>
     );
   }

@@ -318,9 +318,14 @@ const MapUtil = {
       if (geopoint.split(',').length > 1)
       {
         const coords = geopoint.split(',');
-        lat = parseFloat(coords[0].replace(/ /g, ''));
-        lon = parseFloat(coords[1].replace(/ /g, ''));
-        console.assert(!isNaN(lat) && !isNaN(lon));
+        if (!isNaN(parseFloat(coords[0].replace(/ /g, ''))))
+        {
+          lat = parseFloat(coords[0].replace(/ /g, ''));
+        }
+        if (!isNaN(parseFloat(coords[1].replace(/ /g, ''))))
+        {
+          lon = parseFloat(coords[1].replace(/ /g, ''));
+        }
       }
       else
       {

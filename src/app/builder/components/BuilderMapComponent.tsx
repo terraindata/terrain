@@ -46,12 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-var-requires
 import * as SpotlightTypes from 'app/builder/data/SpotlightTypes';
+import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
+import { List } from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import MapComponent from '../../common/components/MapComponent2';
 import TerrainComponent from '../../common/components/TerrainComponent';
-import { BuilderState, BuilderStore } from '../data/BuilderStore';
 import BuilderActions from '../data/BuilderActions';
+import { BuilderState, BuilderStore } from '../data/BuilderStore';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -84,7 +87,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
       stateKey: 'builderState',
       updater: (builderState: BuilderState) =>
       {
-        if (builderState.query.inputs !== this.state.inputs)
+        if (builderState.query && builderState.query.inputs !== this.state.inputs)
         {
           this.setState({
             inputs: builderState.query.inputs,
@@ -107,10 +110,25 @@ class BuilderMapComponent extends TerrainComponent<Props>
     BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'mapInputValue'), inputValue);
   }
 
+  public spotlightsToMarkers()
+  {
+    const spotlights = Util.asJS(this.props.spotlights.spotlights);
+    const spotlightMarkers = (_.keys(spotlights)).map((key) =>
+    {
+      const spotlight = spotlights[key];
+      return {
+        coordinates: spotlight.fields[this.props.data.field],
+        name: spotlight.name,
+        index: spotlight.rank + 1,
+        color: spotlight.color,
+      };
+    });
+    return List(spotlightMarkers);
+  }
+
   public render()
   {
-    const { distance, distanceUnit, locationValue, mapInputValue, field } = this.props.data;
-    const spotlights = this.props.spotlights.spotlights;
+    const { distance, distanceUnit, locationValue, mapInputValue } = this.props.data;
     return (
       <div className='cards-builder-map-component'>
         <MapComponent
@@ -122,6 +140,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
           inputs={this.state.inputs}
           onChange={this.handleChange}
           canEdit={this.props.canEdit}
+          markers={this.spotlightsToMarkers()}
         />
       </div>
     );

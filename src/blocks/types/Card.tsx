@@ -122,7 +122,7 @@ export interface Card extends IRecord<Card>
     topTql?: string;
 
     // This is used for the distance card, it will be overwritten by parser on load unless saved as metadata
-//    mapInputValue?: string;
+    //    mapInputValue?: string;
 
     anythingAccepts?: boolean;
 
