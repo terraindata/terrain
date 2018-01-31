@@ -53,39 +53,9 @@ THE SOFTWARE.
 //  of this file sets all of the values equal to the keys.
 // So you end up with ActionTypes.cards.move === 'cards.move'
 
-export let BuilderActionTypes =
+export let BuilderCardsActionTypes =
   {
-    fetchQuery: '', // triggers server xhr
-    queryLoaded: '', // when the call to the server returns
-    changeQuery: '',
-
-    // these apply to the state's query
-    create: '',
-    change: '',
-    move: '', // within the same parent
-    nestedMove: '', // can occur between different parts of the tree
-    remove: '',
-    dragCard: '',
-    dragCardOver: '',
-    dropCard: '',
-
-    selectCard: '',
-
-    // Change the hand-writen TQL
-    changeTQL: '',
-
-    toggleDeck: '',
-
-    changeResultsConfig: '',
-    results: '',
-
-    updateKeyPath: '',
-
-    save: '', // just tells the store that something was saved
-
-    undo: '',
-    redo: '',
-    checkpoint: '', // inserts an undo checkpoint
+    hoverCard: '',
   };
 
 // I tried using this type to correclty classify this function,
@@ -115,32 +85,6 @@ const setValuesToKeys = (obj: any, prefix: string) =>
   }
 };
 
-setValuesToKeys(BuilderActionTypes, 'builder');
+setValuesToKeys(BuilderCardsActionTypes, 'builderCards');
 
-// which actions dirty the state?
-export let BuilderDirtyActionTypes = {};
-[
-  BuilderActionTypes.create,
-  BuilderActionTypes.change,
-  BuilderActionTypes.move,
-  BuilderActionTypes.remove,
-  BuilderActionTypes.nestedMove,
-  BuilderActionTypes.dropCard,
-  BuilderActionTypes.changeTQL,
-  BuilderActionTypes.toggleDeck,
-  BuilderActionTypes.checkpoint,
-  BuilderActionTypes.changeResultsConfig,
-].map((type) => BuilderDirtyActionTypes[type] = true);
-
-// which actions modify cards?
-export let BuilderCardActionTypes = {};
-[
-  BuilderActionTypes.create,
-  BuilderActionTypes.change,
-  BuilderActionTypes.move,
-  BuilderActionTypes.nestedMove,
-  BuilderActionTypes.remove,
-  BuilderActionTypes.dropCard,
-].map((type) => BuilderCardActionTypes[type] = true);
-
-export default BuilderActionTypes;
+export default BuilderCardsActionTypes;

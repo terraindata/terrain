@@ -77,8 +77,6 @@ export class BuilderStateClass
   public loadingXhr: XMLHttpRequest = null;
   public loadingAlgorithmId: ID = '';
 
-  public hoveringCardId: ID = '';
-
   public selectedCardIds = Map<ID, boolean>({});
 
   public db: BackendInstance = {} as any;

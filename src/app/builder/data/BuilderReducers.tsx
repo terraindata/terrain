@@ -280,10 +280,6 @@ const BuilderReducers =
       return state;
     },
 
-    [ActionTypes.hoverCard]: (state, action) =>
-      state.set('hoveringCardId', action.payload.cardId),
-    // if hovered over same card, will return original state object
-
     [ActionTypes.selectCard]: (state, action) =>
     {
       const { cardId, shiftKey, ctrlKey } = action.payload;

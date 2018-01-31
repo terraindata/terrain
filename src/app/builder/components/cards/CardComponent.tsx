@@ -71,6 +71,8 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import CardHelpTooltip from './CardHelpTooltip';
 
 const CDA = CardDropArea as any;
+import { BuilderCardsState } from 'builder/data/BuilderCardsState';
+import * as shallowCompare from 'react-addons-shallow-compare';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import { borderColor, cardStyle, Colors, fontColor, getStyle } from '../../../colors/Colors';
@@ -122,6 +124,7 @@ export interface Props
   colorsActions: typeof ColorsActions;
   builder?: BuilderState;
   builderActions: typeof BuilderActions;
+  builderCards?: BuilderCardsState;
 }
 
 @Radium
@@ -237,7 +240,7 @@ class _CardComponent extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps: Props)
   {
-    if (nextProps.builder.hoveringCardId === this.props.card.id && !this.state.hovering)
+    if (nextProps.builderCards.hoveringCardId === this.props.card.id && !this.state.hovering)
     {
       this.setState({
         hovering: true,
@@ -307,6 +310,19 @@ class _CardComponent extends TerrainComponent<Props>
       });
 
     this.props.connectDragPreview(this.dragPreview);
+  }
+
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    if (nextProps.builderCards === this.props.builderCards)
+    {
+      return shallowCompare(this, nextProps, nextState);
+    }
+    else
+    {
+      return nextProps.builderCards.hoveringCardId === nextProps.card.id
+        || this.props.builderCards.hoveringCardId === nextProps.card.id;
+    }
   }
 
   public getMenuOptions(): List<MenuOption>
@@ -1065,7 +1081,7 @@ const dragCollect = (connect, monitor) =>
 
 const CardContainer = Util.createContainer(
   _CardComponent,
-  ['builder'],
+  ['builder', 'builderCards'],
   {
     colorsActions: ColorsActions,
     builderActions: BuilderActions,

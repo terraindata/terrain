@@ -49,6 +49,7 @@ import Query from '../../../items/types/Query';
 import * as FileImportTypes from '../../fileImport/FileImportTypes';
 import { CardItem } from '../components/cards/CardComponent';
 import ActionTypes from './BuilderActionTypes';
+import BuilderCardsActionTypes from './BuilderCardsActionTypes';
 
 const $ = (type: string, payload: any) =>
 {
@@ -100,7 +101,7 @@ const BuilderActions =
 
     hoverCard:
       (cardId: ID) =>
-        $(ActionTypes.hoverCard, { cardId }),
+        $(BuilderCardsActionTypes.hoverCard, { cardId }),
 
     selectCard:
       (cardId: ID, shiftKey: boolean, ctrlKey: boolean) =>

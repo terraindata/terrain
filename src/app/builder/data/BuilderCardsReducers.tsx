@@ -43,43 +43,37 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+import ActionTypes from './BuilderCardsActionTypes';
+import { _BuilderCardsState, BuilderCardsState } from './BuilderCardsState';
 
-import * as Immutable from 'immutable';
+const BuilderCardsReducers =
+  {
+    [ActionTypes.hoverCard]: (state, action) =>
+    {
+      if (state.hoveringCardId !== action.payload.cardId)
+      {
+        return state.set('hoveringCardId', action.payload.cardId);
+      }
 
-import AnalyticsReducer from 'analytics/data/AnalyticsReducer';
-import { SpotlightReducers } from 'app/builder/data/SpotlightRedux';
-import { AuthReducers } from 'auth/data/AuthRedux';
-import BuilderCardsReducers from 'builder/data/BuilderCardsReducers';
-import BuilderReducers from 'builder/data/BuilderReducers';
-import LibraryReducer from 'library/data/LibraryReducers';
-import { applyMiddleware, compose, createStore } from 'redux';
-import { combineReducers } from 'redux-immutable';
-import thunk from 'redux-thunk';
-import RolesReducer from 'roles/data/RolesReducers';
-import { SchemaReducers } from 'schema/data/SchemaRedux';
-import { UserReducers } from 'users/data/UserRedux';
-import Ajax from 'util/Ajax';
-import { ColorsReducers } from '../colors/data/ColorsRedux';
+      return state;
+    },
+    // if hovered over same card, will return original state object
+  };
 
-const reducers = {
-  analytics: AnalyticsReducer,
-  auth: AuthReducers,
-  builder: BuilderReducers,
-  colors: ColorsReducers,
-  library: LibraryReducer,
-  roles: RolesReducer,
-  schema: SchemaReducers,
-  users: UserReducers,
-  spotlights: SpotlightReducers,
-  builderCards: BuilderCardsReducers,
+const BuilderCardsReducersWrapper = (
+  state: BuilderCardsState = _BuilderCardsState(),
+  action: Action<{
+    keyPath: KeyPath;
+    notDirty: boolean;
+  }>,
+) =>
+{
+  if (typeof BuilderCardsReducers[action.type] === 'function')
+  {
+    state = (BuilderCardsReducers[action.type] as any)(state, action);
+  }
+
+  return state;
 };
 
-const rootReducer = combineReducers(reducers);
-const initialState = Immutable.Map();
-
-const terrainStore = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk.withExtraArgument(Ajax)),
-  window['devToolsExtension'] ? window['devToolsExtension']() : (f) => f,
-));
-
-export default terrainStore;
+export default BuilderCardsReducersWrapper;
