@@ -52,6 +52,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 
 import BuilderActions from 'builder/data/BuilderActions';
+import { BuilderState } from 'builder/data/BuilderStore';
 import CreateLine from 'common/components/CreateLine';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as BlockUtils from 'src/blocks/BlockUtils';
@@ -94,6 +95,7 @@ export interface Props
 
   handleCardDrop?: (cardType: string) => any;
 
+  builder?: BuilderState;
   builderActions?: typeof BuilderActions;
 }
 
@@ -243,6 +245,8 @@ class CreateCardTool extends TerrainComponent<Props>
           renderPreview={typeof this.props.index !== 'number'}
           language={this.props.language}
           handleCardDrop={this.props.handleCardDrop}
+          builder={this.props.builder}
+          builderActions={this.props.builderActions}
         />
       </div>
     );
@@ -250,6 +254,6 @@ class CreateCardTool extends TerrainComponent<Props>
 }
 export default Util.createTypedContainer(
   CreateCardTool,
-  [],
+  ['builder'],
   { builderActions: BuilderActions },
 );

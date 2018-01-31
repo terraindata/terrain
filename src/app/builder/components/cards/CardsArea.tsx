@@ -219,6 +219,7 @@ class CardsArea extends TerrainComponent<Props>
                   tuningMode={this.props.tuningMode}
                   allowTuningDragAndDrop={this.props.allowTuningDragAndDrop}
                   handleCardReorder={this.props.handleCardReorder}
+                  builderActions={this.props.builderActions}
                 />
               </div>,
             )

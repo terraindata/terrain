@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
 
+import { BuilderState } from 'builder/data/BuilderStore';
 import * as classNames from 'classnames';
 import * as Immutable from 'immutable';
 import * as $ from 'jquery';
@@ -84,6 +85,7 @@ export interface Props
   containerHeight?: number;
 
   colorsActions?: typeof ColorsActions;
+  builder?: BuilderState;
   builderActions?: typeof BuilderActions;
 }
 
@@ -247,6 +249,8 @@ class CardsColumn extends TerrainComponent<Props>
               accepts={this.getPossibleCards()}
               language={this.props.language}
               handleCardDrop={this.handleCardDrop}
+              builder={this.props.builder}
+              builderActions={this.props.builderActions}
             />
             <CardsArea
               cards={cards}
@@ -366,7 +370,7 @@ class CardsColumn extends TerrainComponent<Props>
 
 export default Util.createContainer(
   Dimensions()(CardsColumn),
-  [],
+  ['builder'],
   {
     colorsActions: ColorsActions,
     builderActions: BuilderActions,

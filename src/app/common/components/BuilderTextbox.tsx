@@ -478,6 +478,8 @@ class BuilderTextbox extends TerrainComponent<Props>
               renderPreview={true}
               afterDrop={this.handleCardDrop}
               language={this.props.language}
+              builder={this.props.builder}
+              builderActions={this.props.builderActions}
             />
           }
         </div>

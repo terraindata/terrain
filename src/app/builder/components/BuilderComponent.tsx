@@ -230,6 +230,7 @@ class BuilderComponent extends TerrainComponent<Props>
           display={d}
           language={this.props.language}
           tuningMode={this.props.tuningMode}
+          builderActions={this.props.builderActions}
         />;
         break;
       case DisplayType.DROPDOWN:
