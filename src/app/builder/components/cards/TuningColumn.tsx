@@ -66,7 +66,7 @@ import { altStyle, backgroundColor, Colors, fontColor } from '../../../colors/Co
 import InfoArea from '../../../common/components/InfoArea';
 import Modal from '../../../common/components/Modal';
 import Util from '../../../util/Util';
-import { BuilderState } from '../../data/BuilderStore';
+import { BuilderState } from '../../data/BuilderState';
 const { List, Map } = Immutable;
 
 export interface Props

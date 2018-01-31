@@ -52,7 +52,7 @@ import * as React from 'react';
 import Util from 'util/Util';
 import { Display } from '../../../blocks/displays/Display';
 import { CardString } from '../../../blocks/types/Card';
-import { BuilderState } from '../../builder/data/BuilderStore';
+import { BuilderState } from '../../builder/data/BuilderState';
 // import { AllBackendsMap } from '../../../../shared/database/AllBackends';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import BuilderTextbox from './BuilderTextbox';

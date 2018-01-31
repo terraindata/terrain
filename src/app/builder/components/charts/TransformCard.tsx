@@ -61,7 +61,7 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import TransformCardChart from './TransformCardChart';
 import TransformCardPeriscope from './TransformCardPeriscope';
 
-import { BuilderState } from 'app/builder/data/BuilderStore';
+import { BuilderState } from 'app/builder/data/BuilderState';
 import Util from 'app/util/Util';
 import { ElasticQueryResult } from '../../../../../shared/database/elastic/ElasticQueryResponse';
 import { MidwayError } from '../../../../../shared/error/MidwayError';

@@ -64,7 +64,6 @@ export interface Props
   helpOn: boolean;
   className: string;
   onChange: (keyPath: KeyPath, value: any, notDirty: boolean) => void;
-  // builderState: d.requiresBuilderState && BuilderStore.getState(),
   language: string;
   handleCardDrop: (cardType: string) => any;
 

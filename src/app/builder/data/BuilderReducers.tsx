@@ -64,7 +64,7 @@ import
   BuilderDirtyActionTypes,
 } from './BuilderActionTypes';
 import ActionTypes from './BuilderActionTypes';
-import { _BuilderState, BuilderState } from './BuilderStore';
+import { _BuilderState, BuilderState } from './BuilderState';
 const { List, Map } = Immutable;
 
 const BuilderReducers =

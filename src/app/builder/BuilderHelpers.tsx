@@ -51,7 +51,7 @@ import { Input, InputPrefix } from '../../blocks/types/Input';
 
 import * as Immutable from 'immutable';
 import { SchemaState } from 'schema/SchemaTypes';
-import { BuilderState } from './data/BuilderStore';
+import { BuilderState } from './data/BuilderState';
 
 export function getTermsForKeyPath(
   keyPath: KeyPath,

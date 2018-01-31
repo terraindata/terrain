@@ -53,7 +53,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
 
-import { BuilderState } from 'builder/data/BuilderStore';
+import { BuilderState } from 'builder/data/BuilderState';
 import { getIndex, getType } from 'database/elastic/blocks/ElasticBlockHelpers';
 import { addBodyToQuery } from 'shared/database/elastic/ElasticUtil';
 import Util from 'util/Util';

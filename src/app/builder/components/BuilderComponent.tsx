@@ -58,7 +58,7 @@ import Dropdown from '../../common/components/Dropdown';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import ManualInfo from '../../manual/components/ManualInfo';
 import BuilderActions from '../data/BuilderActions';
-import { BuilderState } from '../data/BuilderStore';
+import { BuilderState } from '../data/BuilderState';
 import CardField from './cards/CardField';
 import CardsArea from './cards/CardsArea';
 

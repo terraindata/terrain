@@ -54,7 +54,7 @@ import * as React from 'react';
 import Util from 'util/Util';
 import { Card, Cards } from '../../../../blocks/types/Card';
 import BuilderActions from '../../data/BuilderActions';
-import { BuilderState } from '../../data/BuilderStore';
+import { BuilderState } from '../../data/BuilderState';
 import { CardComponent, CardItem } from '../cards/CardComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import CardDragPreview from './CardDragPreview';

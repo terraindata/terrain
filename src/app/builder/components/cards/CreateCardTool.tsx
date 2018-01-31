@@ -52,7 +52,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 
 import BuilderActions from 'builder/data/BuilderActions';
-import { BuilderState } from 'builder/data/BuilderStore';
+import { BuilderState } from 'builder/data/BuilderState';
 import CreateLine from 'common/components/CreateLine';
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as BlockUtils from 'src/blocks/BlockUtils';

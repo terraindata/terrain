@@ -56,7 +56,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import { DragSource } from 'react-dnd';
 const { createDragPreview } = require('react-dnd-text-dragpreview');
-import { BuilderState } from 'builder/data/BuilderStore';
+import { BuilderState } from 'builder/data/BuilderState';
 import { Display } from '../../../../blocks/displays/Display';
 import { Card, getCardTitle } from '../../../../blocks/types/Card';
 import { Menu, MenuOption } from '../../../common/components/Menu';

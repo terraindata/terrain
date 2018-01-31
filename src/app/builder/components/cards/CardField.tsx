@@ -51,7 +51,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 
 import BuilderActions from 'builder/data/BuilderActions';
-import { BuilderState } from 'builder/data/BuilderStore';
+import { BuilderState } from 'builder/data/BuilderState';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { Display, DisplayType, RowDisplay } from '../../../../blocks/displays/Display';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../../colors/Colors';

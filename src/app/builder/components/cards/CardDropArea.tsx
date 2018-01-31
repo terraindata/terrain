@@ -52,7 +52,7 @@ import { DropTarget } from 'react-dnd';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import './CardDropArea.less';
 const classNames = require('classnames');
-import { BuilderState } from 'builder/data/BuilderStore';
+import { BuilderState } from 'builder/data/BuilderState';
 import Util from 'util/Util';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';

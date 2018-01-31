@@ -67,7 +67,7 @@ import RolesStore from '../../roles/data/RolesStore';
 import TerrainStore from '../../store/TerrainStore';
 import Util from './../../util/Util';
 import BuilderActions from './../data/BuilderActions';
-import { BuilderState } from './../data/BuilderStore';
+import { BuilderState } from './../data/BuilderState';
 type Algorithm = LibraryTypes.Algorithm;
 
 // Components

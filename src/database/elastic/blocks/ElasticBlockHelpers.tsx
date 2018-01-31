@@ -47,7 +47,7 @@ THE SOFTWARE.
 import * as Immutable from 'immutable';
 const { Map, List } = Immutable;
 
-import { BuilderState } from 'builder/data/BuilderStore';
+import { BuilderState } from 'builder/data/BuilderState';
 import { forAllCards } from '../../../blocks/BlockUtils';
 import { Block } from '../../../blocks/types/Block';
 
