@@ -59,7 +59,7 @@ class TemplateEditorStateC
   public isDirty: boolean = true;
   public modalRequests: List<ModalProps> = List([]);
   public documents: List<object> = List([]);
-  public previewIndex: number = 0;
+  public previewIndex: number = -1;
   public settingsKeyPath: KeyPath = null;
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;

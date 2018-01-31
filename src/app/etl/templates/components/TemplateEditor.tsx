@@ -146,39 +146,46 @@ class ETLExportDisplay extends TerrainComponent<Props>
     );
   }
 
-  public renderEditorSection()
+  public renderEditorSection(showEditor: boolean = true)
   {
     const { template, documents, previewIndex } = this.props.templateEditor;
     const previewDocument = previewIndex < documents.size && documents.size > 0 ? documents.get(previewIndex) : null;
 
-    return (
-      <div className='template-editor-column main-document-column'>
-        <div className='template-editor-title-bar'>
-          <div className='template-editor-title-bar-spacer' />
-          <div className='template-editor-title'>
-            Preview
+    if (!showEditor)
+    {
+      return <div className='template-editor-column main-document-column-hidden' />;
+    }
+    else
+    {
+      return (
+        <div className='template-editor-column main-document-column'>
+          <div className='template-editor-title-bar'>
+            <div className='template-editor-title-bar-spacer' />
+            <div className='template-editor-title'>
+              Preview
+            </div>
+            <div className='template-editor-preview-control-spacer'>
+              <TemplateEditorPreviewControl />
+            </div>
           </div>
-          <div className='template-editor-preview-control-spacer'>
-            <TemplateEditorPreviewControl />
+          <div
+            className='template-editor'
+            style={backgroundColor(Colors().bg3)}
+            tabIndex={-1}
+          >
+            <div className='template-editor-full-area'>
+              <TemplateEditorFieldNode
+                keyPath={List([])}
+                field={template.rootField}
+                canEdit={true}
+                preview={previewDocument}
+              />
+            </div>
           </div>
+          {this.renderSettingsSection()}
         </div>
-        <div
-          className='template-editor'
-          style={backgroundColor(Colors().bg3)}
-          tabIndex={-1}
-        >
-          <div className='template-editor-full-area'>
-            <TemplateEditorFieldNode
-              keyPath={List([])}
-              field={template.rootField}
-              canEdit={true}
-              preview={previewDocument}
-            />
-          </div>
-        </div>
-        {this.renderSettingsSection()}
-      </div>
-    );
+      );
+    }
   }
 
   public renderDocumentsSection()
@@ -193,12 +200,12 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
   public render()
   {
-
+    const { previewIndex, documents } = this.props.templateEditor;
+    const showEditor = previewIndex >= 0 && previewIndex < documents.size;
     return (
       <div className='template-editor-root-container'>
         <div className='template-editor-columns-area'>
-          {/*this.renderSettingsSection()*/}
-          {this.renderEditorSection()}
+          {this.renderEditorSection(showEditor)}
           {this.renderDocumentsSection()}
         </div>
         <MultiModal

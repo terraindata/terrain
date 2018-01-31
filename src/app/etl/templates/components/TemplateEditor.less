@@ -18,13 +18,14 @@
       flex-direction: column;
       margin: @spacing;
       align-items: stretch;
-
-      &.settings-column {
-        flex: 0 1 400px;
-      }
+      .transition;
 
       &.main-document-column {
         flex: 0 1 640px;
+      }
+
+      &.main-document-column-hidden {
+        flex: 0 1 0px;
       }
 
       &.preview-documents-column {
