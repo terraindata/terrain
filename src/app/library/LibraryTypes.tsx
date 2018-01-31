@@ -88,11 +88,17 @@ export const _LibraryState = (config?: any) =>
   if (config && !(config['modelVersion'] || config['modelVersion'] < 2))
   {
     config['modelVersion'] = 3;
-    config['api'] = Ajax;
   }
   if (config === undefined)
   {
     config = { api: Ajax };
+  }
+  else
+  {
+    if (config.ajax === undefined)
+    {
+      config.api = Ajax;
+    }
   }
 
   return new LibraryState_Record(Util.extendId(config || {})) as any as LibraryState;
