@@ -47,6 +47,7 @@ THE SOFTWARE.
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Immutable from 'immutable';
 import * as _ from 'lodash';
+import memoizeOne from 'memoize-one';
 import * as Radium from 'radium';
 import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
@@ -59,6 +60,7 @@ import TemplateEditorFieldNode from './TemplateEditorFieldNode';
 import './TemplateEditorDocumentsPreview.less';
 const { List } = Immutable;
 const Color = require('color');
+const ShowIcon = require('images/icon_search.svg');
 
 export interface Props
 {
@@ -74,6 +76,7 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
   {
     super(props);
     this.handleDocumentClickedFactory = _.memoize(this.handleDocumentClickedFactory);
+    this.getVeilStyle = _.memoize(this.getVeilStyle, (bg: string, active: boolean) => active ? bg : bg + '!');
   }
 
   public renderDocument(document: object, index: number)
@@ -99,7 +102,18 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
             preview={previewDocument}
           />
         </div>
-        <div className='preview-document-fader' style={getFaderStyle(bgColor)} />
+        <div
+          key={`fader ${index}`}
+          className='preview-document-fader'
+          style={this.getFaderStyle(bgColor)}
+        />
+        <div
+          key={`veil ${index}`}
+          className='preview-document-veil'
+          style={this.getVeilStyle(bgColor, index === previewIndex)}
+        >
+          <ShowIcon className='preview-document-icon' width='64px' />
+        </div>
       </div>
     );
   }
@@ -126,15 +140,37 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
       });
     };
   }
+
+  public getVeilStyle(bg: string, active: boolean)
+  {
+    const hoverCol = scaleAlpha(bg, 0.5);
+    const defaultCol = scaleAlpha(bg, 0.0);
+    if (active)
+    {
+      const activeCol = scaleAlpha(Colors().active, 0.7);
+      return [backgroundColor(hoverCol, hoverCol), fontColor(activeCol, activeCol)];
+    }
+    else
+    {
+      const activeCol = scaleAlpha(Colors().inactiveHover, 0.5);
+      return [backgroundColor(defaultCol, hoverCol), fontColor('rgba(0,0,0,0)', activeCol)];
+    }
+  }
+
+  public getFaderStyle(bg: string)
+  {
+    const colObj = Color(bg);
+    const minFade = colObj.alpha(colObj.alpha());
+    const maxFade = colObj.alpha(0);
+    return getStyle('background', `linear-gradient(${maxFade.toString()}, ${minFade.toString()})`);
+  }
 }
 
-const getFaderStyle = _.memoize((bg) =>
+function scaleAlpha(color, factor)
 {
-  const col = Color(bg);
-  const minFade = col.alpha(col.alpha());
-  const maxFade = col.alpha(0);
-  return getStyle('background', `linear-gradient(${maxFade.toString()}, ${minFade.toString()})`);
-});
+  const colObj = Color(color);
+  return colObj.alpha(colObj.alpha() * factor).toString();
+}
 
 export default Util.createContainer(
   TemplateEditorDocumentsPreview,
