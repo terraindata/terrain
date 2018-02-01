@@ -254,14 +254,14 @@ class MapComponent extends TerrainComponent<Props>
 
     if (this.props.geocoder === 'photon')
     {
-      MapUtil.geocodeByLatLng('photon', { lat: location[0], lng: location[1]}, (result) =>
+      MapUtil.geocodeByLatLng('photon', { lat: location[0], lng: location[1] }, (result) =>
       {
         this.onChange(coordinates, result.address);
       });
     }
     else
     {
-      MapUtil.geocodeByLatLng('google', { lat: location[0], lng: location[1]})
+      MapUtil.geocodeByLatLng('google', { lat: location[0], lng: location[1] })
         .then((results: any) =>
         {
           if (results[0] === undefined)
@@ -321,7 +321,7 @@ class MapComponent extends TerrainComponent<Props>
         position={location}
         icon={icon}
         riseOnHover={true}
-        key={address + String(index)}
+        key={String(address) + String(index)}
       >
         {
           address !== '' && address !== undefined ?
@@ -357,8 +357,8 @@ class MapComponent extends TerrainComponent<Props>
         fillOpacity={0.3}
         key={id}
         ref={id}
-        // onMouseOver={this._fn(this.openPopup, id)}
-        // onMouseOut={this._fn(this.closePopup, id)}
+      // onMouseOver={this._fn(this.openPopup, id)}
+      // onMouseOut={this._fn(this.closePopup, id)}
       >
         {
           name !== '' && name !== undefined ?
@@ -461,11 +461,10 @@ class MapComponent extends TerrainComponent<Props>
   {
     const { coordinates, inputValue } = this.props;
     const location = this.parseLocation(coordinates, inputValue);
-    console.log(this.getMapProps(location));
     return (
       <div className={this.props.className} >
         <Map
-          {...this.getMapProps(location)}
+          {...this.getMapProps(location) }
           zoom={this.state.zoom}
           onViewportChanged={this.setZoomLevel}
           maxBounds={[[85, -180], [-85, 180]]}
@@ -479,17 +478,17 @@ class MapComponent extends TerrainComponent<Props>
             this.props.coordinates !== undefined &&
             this.renderMarker(inputValue, location, 'black')
           }
-        {
-          this.props.distance !== undefined &&
-          <Circle
-            center={location}
-            radius={this.convertDistanceToMeters()}
-            stroke={true}
-            color={Colors().builder.cards.categories.filter}
-            width={7}
-            fillColor={Colors().builder.cards.categories.filter}
-            fillOpacity={0.2}
-          />}
+          {
+            this.props.distance !== undefined &&
+            <Circle
+              center={location}
+              radius={this.convertDistanceToMeters()}
+              stroke={true}
+              color={Colors().builder.cards.categories.filter}
+              width={7}
+              fillColor={Colors().builder.cards.categories.filter}
+              fillOpacity={0.2}
+            />}
           {
             // Render addition locations (spotlights, aggregation map, etc.)
             this.props.markers !== undefined && this.props.markers.size > 0 ?
