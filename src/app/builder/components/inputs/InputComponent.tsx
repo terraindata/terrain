@@ -61,7 +61,7 @@ import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
 
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../colors/Colors';
-import MapComponent from '../../../common/components/MapComponent';
+import MapComponent from '../../../common/components/MapComponent2';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');
@@ -161,9 +161,13 @@ class InputComponent extends TerrainComponent<Props>
     this.props.onCreateInput(this.props.index);
   }
 
-  public changeValue(value)
+  public changeValue(value, meta?)
   {
     Actions.change(this.getKeyPath('value'), value);
+    if (meta !== undefined)
+    {
+      Actions.change(this.getKeyPath('meta'), meta);
+    }
   }
 
   public renderInputValue()
@@ -184,7 +188,7 @@ class InputComponent extends TerrainComponent<Props>
 
     if (this.props.input.inputType === InputType.LOCATION)
     {
-      let value = this.props.input.value.toJS !== undefined ? this.props.input.value.toJS() : this.props.input.value;
+      let value = this.props.input.value && Util.asJS(this.props.input.value);
       let markLocation: boolean = false;
       if (value)
       {
@@ -192,21 +196,18 @@ class InputComponent extends TerrainComponent<Props>
       }
       else
       {
-        value = [37.4449002, -122.16174969999997];
+        value = [0, 0];
       }
       return (
         <MapComponent
           onChange={this.changeValue}
-          address={this.props.input.meta}
-          location={MapUtil.getCoordinatesFromGeopoint(value)}
-          markLocation={markLocation}
-          showDirectDistance={false}
-          showSearchBar={true}
-          zoomControl={true}
-          keepAddressInSync={false}
+          canEdit={this.props.canEdit}
           geocoder='photon'
-          className='input-map-wrapper'
-        />);
+          inputValue={this.props.input.meta}
+          coordinates={value}
+          allowSearchByCoordinate={true}
+        />
+      );
     }
 
     return (

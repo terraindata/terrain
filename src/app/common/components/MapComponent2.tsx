@@ -56,6 +56,7 @@ import Actions from '../../builder/data/BuilderActions';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';
+import BuilderTextbox from './BuilderTextbox';
 import './MapComponentStyle.less';
 import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';
@@ -68,9 +69,10 @@ export interface Props
   distance?: number; // How large the distance circle shoudl be
   distanceUnit?: string; // Unit for above distance
   inputs?: any; // inputs so that it can tell what is an input
-  onChange?: (inputValue, coordinates?) => void;
+  onChange?: (coordinates, inputValue) => void;
   canEdit: boolean;
-  markers?: List<LocationMarker>;
+  markers?: List<LocationMarker>; // A list of additional markers to add to the map
+  allowSearchByCoordinate?: boolean;
 }
 
 interface LocationMarker
@@ -110,14 +112,17 @@ class MapComponent extends TerrainComponent<Props>
 
   public state: {
     zoom: number;
+    coordinateSearch: boolean;
   }
     = {
       zoom: 15,
+      coordinateSearch: false,
     };
 
   public geoCache = {};
   public reverseGeoCache = {};
 
+  // Create a marker icon given style parameters
   public markerIconWithStyle(style, small, index)
   {
     const size = small ? [20, 20] : [40, 40];
@@ -168,35 +173,77 @@ class MapComponent extends TerrainComponent<Props>
     //
   }
 
-  // Update state with the address and actual coordinates
+  // Check validiity of coordinate (formated [lat, lon])
+  public isValidCoordinate(location)
+  {
+    return location !== undefined &&
+      location[0] !== undefined &&
+      typeof location[0] === 'number' &&
+      location[1] !== undefined &&
+      typeof location[1] === 'number';
+  }
+
+  // Given an address, find the corresponding coorindates
   public geocode(address)
   {
     if (this.geoCache[address] !== undefined)
     {
-      this.props.onChange(address, this.geoCache[address]);
+      this.props.onChange(this.geoCache[address], address);
       return;
     }
     if (this.props.geocoder === 'photon')
     {
       MapUtil.geocodeByAddress('photon', address, (result) =>
       {
-        this.props.onChange(address, { lat: result[1], lon: result[0] });
+        this.props.onChange({ lat: result[1], lon: result[0] }, address);
       });
     }
     else
     {
       MapUtil.geocodeByAddress('google', address)
         .then((results) => MapUtil.getLatLng(results[0]))
-        .then((latLng: any) => this.props.onChange(address, { lat: latLng.lat, lon: latLng.lng }))
+        .then((latLng: any) => this.props.onChange({ lat: latLng.lat, lon: latLng.lng }, address))
         .catch((error) => this.setState({ error }));
     }
   }
 
+  // Given coordinates, find the corresponding address (this is more expensive than geocoding)
   public reverseGeocode(coordinates)
   {
-    //
+    if (this.reverseGeoCache[String(coordinates)] !== undefined)
+    {
+      this.props.onChange(coordinates, this.reverseGeoCache[String(coordinates)]);
+      return;
+    }
+
+    if (this.props.geocoder === 'photon')
+    {
+      MapUtil.geocodeByLatLng('photon', { lat: coordinates.lat, lng: coordinates.lon }, (result) =>
+      {
+        this.props.onChange(coordinates, result.address);
+      });
+    }
+    else
+    {
+      MapUtil.geocodeByLatLng('google', { lat: coordinates.lat, lng: coordinates.lon })
+        .then((results: any) =>
+        {
+          if (results[0] === undefined)
+          {
+            this.setState({
+              error: 'No results for the coordinates entered',
+            });
+          }
+          else
+          {
+            this.props.onChange(coordinates, results[0].formatted_address);
+          }
+        })
+        .catch((error) => this.setState({ error }));
+    }
   }
 
+  // Convert inputs list into a map of input name : input value
   public parseInputs(toParse)
   {
     const inputs = {};
@@ -226,7 +273,7 @@ class MapComponent extends TerrainComponent<Props>
 
   public handleInputValueChange(value)
   {
-    this.props.onChange(value);
+    this.props.onChange(undefined, value);
   }
 
   public renderMarker(address, location, color, index?)
@@ -283,7 +330,7 @@ class MapComponent extends TerrainComponent<Props>
   {
     const { coordinates, inputValue } = this.props;
     let location = MapUtil.getCoordinatesFromGeopoint(coordinates);
-    if (location === undefined || location[0] === undefined || location[1] === undefined)
+    if (!this.isValidCoordinate(location))
     {
       // Try to see if it inputValue is an input, in that case get the coordinates from there
       const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
@@ -292,9 +339,13 @@ class MapComponent extends TerrainComponent<Props>
         location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
       }
       // Double check, because input coordinates could also be invalid
-      if (location === undefined || location[0] === undefined || location[1] === undefined)
+      if (location[0] === undefined || String(location[0]) === '')
       {
-        location = [0, 0];
+        location[0] = 0;
+      }
+      if (location[1] === undefined || String(location[1]) === '')
+      {
+        location[1] = 0;
       }
     }
     return (
@@ -302,6 +353,9 @@ class MapComponent extends TerrainComponent<Props>
         center={location}
         zoom={this.state.zoom}
         onViewportChanged={this.setZoomLevel}
+        maxBounds={[[85, -180], [-85, 180]]}
+        minZoom={1}
+        zoomDelta={0.5}
       >
         {
           this.renderMarker(inputValue, location, 'black')
@@ -330,6 +384,21 @@ class MapComponent extends TerrainComponent<Props>
     );
   }
 
+  // When coordinates change, make sure the input is valid call change function
+  // and then reverse geocode (waiting for reverse geocode can take too long)
+  public handleCoordinateChange(key, value)
+  {
+    const oldLocation = MapUtil.getCoordinatesFromGeopoint(this.props.coordinates);
+    const newLocation =
+      {
+        lat: key === 'latitude' ? !isNaN(parseFloat(value)) ? parseFloat(value) : value : oldLocation[0],
+        lon: key === 'longitude' ? !isNaN(parseFloat(value)) ? parseFloat(value) : value : oldLocation[1],
+      };
+    this.props.onChange(newLocation, '');
+    this.reverseGeocode(newLocation);
+  }
+
+  // Render search bar - either a single input for address/value or 2 inputs for coordinates
   public renderSearchBar()
   {
     const inputProps = {
@@ -338,15 +407,51 @@ class MapComponent extends TerrainComponent<Props>
       disabled: this.props.canEdit === false,
     };
     const inputStyle = this.props.canEdit === false ? _.extend({}, backgroundColor(Colors().darkerHighlight)) : {};
+    const location = MapUtil.getCoordinatesFromGeopoint(this.props.coordinates);
     return (
-      <PlacesAutocomplete
-        inputProps={inputProps}
-        onSelect={this.geocode}
-        styles={{ input: inputStyle }}
-        geocoder={this.props.geocoder}
-        classNames={{ root: 'map-component-address-input' }}
-      />
-    );
+      <div className='map-component-search-bar'>
+        {
+          this.props.allowSearchByCoordinate && this.state.coordinateSearch ?
+            <div className='input-map-coordinates'>
+              <BuilderTextbox
+                value={location[0]}
+                onChange={this._fn(this.handleCoordinateChange, 'latitude')}
+                canEdit={this.props.canEdit}
+                placeholder='Latitude'
+                className='iinput-map-coordinates-latitude'
+              />
+              <BuilderTextbox
+                value={location[1]}
+                onChange={this._fn(this.handleCoordinateChange, 'longitude')}
+                canEdit={this.props.canEdit}
+                placeholder='Longitude'
+                className='input-map-coordinates-longitude'
+              />
+            </div>
+            :
+            <PlacesAutocomplete
+              inputProps={inputProps}
+              onSelect={this.geocode}
+              styles={{ input: inputStyle }}
+              geocoder={this.props.geocoder}
+              classNames={{ root: 'map-component-address-input' }}
+            />
+        }
+        {
+          this.props.allowSearchByCoordinate ?
+            <div className='input-map-search-settings-row' >
+              <Switch
+                first='Text Search'
+                second='Coordinates'
+                selected={this.state.coordinateSearch ? 2 : 1}
+                onChange={this._toggle('coordinateSearch')}
+                darker={true}
+              />
+            </div>
+            :
+            null
+        }
+      </div>);
   }
 
   public render()

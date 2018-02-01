@@ -97,7 +97,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
     });
   }
 
-  public handleChange(inputValue, coordinates?)
+  public handleChange(coordinates, inputValue)
   {
     if (coordinates !== undefined)
     {
