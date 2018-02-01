@@ -135,7 +135,11 @@ const MapUtil = {
           if (reverse)
           {
             const { lat, lon } = params;
-            const address = MapUtil.buildAddress(raw.features[0].properties);
+            let address = '';
+            if (raw.features !== undefined && raw.features.length > 0)
+            {
+              address = MapUtil.buildAddress(raw.features[0].properties);
+            }
             value = { address, location: [lat, lon] };
           }
           else

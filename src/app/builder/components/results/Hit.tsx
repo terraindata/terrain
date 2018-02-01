@@ -60,7 +60,7 @@ import ColorManager from '../../../util/ColorManager';
 import MapUtil from '../../../util/MapUtil';
 import { SpotlightActions } from '../../data/SpotlightRedux';
 import * as SpotlightTypes from '../../data/SpotlightTypes';
-import MapComponent from './../../../common/components/MapComponent';
+import MapComponent from './../../../common/components/MapComponent2';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
@@ -521,21 +521,22 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
         {
           targetLocation = MapUtil.getCoordinatesFromGeopoint(locations[field]) as [number, number];
         }
-
+        const marker = {
+          coordinates: resultLocation,
+          name: '',
+          color,
+          index: -1
+        }
         return (
           <div className='result-field-value-map-wrapper'>
             <MapComponent
-              address={''}
-              location={targetLocation}
-              markLocation={true}
+              coordinates={targetLocation}
               showDirectDistance={targetLocation !== undefined}
-              showSearchBar={false}
-              zoomControl={false}
-              secondLocation={resultLocation}
-              keepAddressInSync={false}
+              hideSearchBar={true}
+              hideZoomControl={true}
+              markers={List([marker])}
               geocoder='photon'
-              secondaryMarkerColor={color}
-              colorMarker={true}
+              canEdit={false}
             />
           </div>
         );

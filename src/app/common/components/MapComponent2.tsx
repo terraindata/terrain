@@ -73,6 +73,13 @@ export interface Props
   canEdit: boolean;
   markers?: List<LocationMarker>; // A list of additional markers to add to the map
   allowSearchByCoordinate?: boolean;
+  bounds?: [number, number];
+  boundingRectangles?: List<BoundingRectangle>;
+  // Show/Hide certain features
+  hideZoomControl?: boolean;
+  hideSearchBar?: boolean;
+  showDirectDistance?: boolean
+
 }
 
 interface LocationMarker
@@ -81,6 +88,13 @@ interface LocationMarker
   coordinates: any;
   color: string;
   index: number;
+}
+
+interface BoundingRectangle
+{
+  bottomRight: any;
+  topLeft: any;
+  name?: string;
 }
 
 // for map markers, distances must be converted to meters
@@ -122,6 +136,11 @@ class MapComponent extends TerrainComponent<Props>
   public geoCache = {};
   public reverseGeoCache = {};
 
+  public shouldComponentUpdate(nextProps, nextState)
+  {
+    return !(_.isEqual(nextProps, this.props) && this.state === nextState);
+  }
+
   // Create a marker icon given style parameters
   public markerIconWithStyle(style, small, index)
   {
@@ -150,7 +169,6 @@ class MapComponent extends TerrainComponent<Props>
       default:
         break;
     }
-
     const styledIcon = divIcon({
       html: `<svg class=${className} version="1.1" id="Capa_1"
         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
@@ -168,9 +186,14 @@ class MapComponent extends TerrainComponent<Props>
     return styledIcon;
   }
 
-  public componentWillReceiveProps(nextProps)
+  public componentWillReceiveProps(nextProps: Props)
   {
-    //
+    // If the coordinates change, and the input value is not defined, try to reverse geocode it
+    if (!_.isEqual(this.props.coordinates, nextProps.coordinates)
+      && (nextProps.inputValue === undefined || nextProps.inputValue === ''))
+    {
+      this.reverseGeocode(nextProps.coordinates);
+    }
   }
 
   // Check validiity of coordinate (formated [lat, lon])
@@ -208,8 +231,10 @@ class MapComponent extends TerrainComponent<Props>
   }
 
   // Given coordinates, find the corresponding address (this is more expensive than geocoding)
+
   public reverseGeocode(coordinates)
   {
+    const location = MapUtil.getCoordinatesFromGeopoint(coordinates);
     if (this.reverseGeoCache[String(coordinates)] !== undefined)
     {
       this.props.onChange(coordinates, this.reverseGeoCache[String(coordinates)]);
@@ -218,14 +243,14 @@ class MapComponent extends TerrainComponent<Props>
 
     if (this.props.geocoder === 'photon')
     {
-      MapUtil.geocodeByLatLng('photon', { lat: coordinates.lat, lng: coordinates.lon }, (result) =>
+      MapUtil.geocodeByLatLng('photon', { lat: location[0], lng: location[1]}, (result) =>
       {
         this.props.onChange(coordinates, result.address);
       });
     }
     else
     {
-      MapUtil.geocodeByLatLng('google', { lat: coordinates.lat, lng: coordinates.lon })
+      MapUtil.geocodeByLatLng('google', { lat: location[0], lng: location[1]})
         .then((results: any) =>
         {
           if (results[0] === undefined)
@@ -285,7 +310,7 @@ class MapComponent extends TerrainComponent<Props>
         position={location}
         icon={icon}
         riseOnHover={true}
-        key={index}
+        key={address + String(index)}
       >
         {
           address !== '' && address !== undefined ?
@@ -302,6 +327,43 @@ class MapComponent extends TerrainComponent<Props>
         }
       </Marker>
     );
+  }
+
+  public renderBoundingRectangles(boundingRectangle, index)
+  {
+    if (boundingRectangle !== undefined)
+    {
+      const bottomRight = MapUtil.getCoordinatesFromGeopoint(boundingRectangle.bottomRight);
+      const topLeft = MapUtil.getCoordinatesFromGeopoint(boundingRectangle.topLeft);
+      const { name } = boundingRectangle;
+      const id = 'rect_' + String(index);
+      return <Rectangle
+        bounds={[bottomRight, topLeft]}
+        stroke={true}
+        color={Colors().active}
+        width={7}
+        fillColor={Colors().active}
+        fillOpacity={0.3}
+        key={id}
+        ref={id}
+        // onMouseOver={this._fn(this.openPopup, id)}
+        // onMouseOut={this._fn(this.closePopup, id)}
+      >
+        {
+          name !== '' && name !== undefined ?
+            <Popup
+              className='map-component-popup'
+              closeButton={false}
+              autoPan={false}
+            >
+              <span>{name}</span>
+            </Popup>
+            :
+            null
+        }
+      </Rectangle>;
+    }
+    return null;
   }
 
   public setZoomLevel(viewport?: { center: [number, number], zoom: number })
@@ -326,40 +388,78 @@ class MapComponent extends TerrainComponent<Props>
     return null;
   }
 
+  public getMapProps(location)
+  {
+    const center = location;
+    let bounds;
+    // Calculate bounds if there are multiple locations
+    if (this.props.bounds !== undefined)
+    {
+      bounds = this.props.bounds;
+    }
+    else if (this.props.markers !== undefined && this.props.markers.size > 0)
+    {
+      let locations = this.props.markers.map((loc) =>
+        MapUtil.getCoordinatesFromGeopoint(loc.coordinates)).toList();
+      if (location !== undefined)
+      {
+        locations = locations.push([location[1], location[0]]);
+      }
+      bounds = MapUtil.getBounds(locations.toJS());
+    }
+    return bounds !== undefined ? { bounds } : { center };
+  }
+
+  // Given the coordinates and inputValue, try to find a vaild location
+  public parseLocation(coordinates, inputValue)
+  {
+    let location = [0, 0];
+    if (coordinates !== undefined)
+    {
+      location = MapUtil.getCoordinatesFromGeopoint(coordinates);
+      if (!this.isValidCoordinate(location))
+      {
+        // Try to see if it inputValue is an input, in that case get the coordinates from there
+        const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
+        if (inputs[inputValue] !== undefined)
+        {
+          location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
+        }
+        // Double check, because input coordinates could also be invalid
+        if (location[0] === undefined || String(location[0]) === '')
+        {
+          location[0] = 0;
+        }
+        if (location[1] === undefined || String(location[1]) === '')
+        {
+          location[1] = 0;
+        }
+      }
+    }
+    return location;
+  }
+
   public renderMap()
   {
     const { coordinates, inputValue } = this.props;
-    let location = MapUtil.getCoordinatesFromGeopoint(coordinates);
-    if (!this.isValidCoordinate(location))
-    {
-      // Try to see if it inputValue is an input, in that case get the coordinates from there
-      const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
-      if (inputs[inputValue] !== undefined)
-      {
-        location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
-      }
-      // Double check, because input coordinates could also be invalid
-      if (location[0] === undefined || String(location[0]) === '')
-      {
-        location[0] = 0;
-      }
-      if (location[1] === undefined || String(location[1]) === '')
-      {
-        location[1] = 0;
-      }
-    }
+    const location = this.parseLocation(coordinates, inputValue);
+    console.log(this.props.boundingRectangles);
     return (
       <Map
-        center={location}
+        {...this.getMapProps(location)}
         zoom={this.state.zoom}
         onViewportChanged={this.setZoomLevel}
         maxBounds={[[85, -180], [-85, 180]]}
         minZoom={1}
         zoomDelta={0.5}
+        zoomControl={!this.props.hideZoomControl}
       >
         {
+          this.props.coordinates !== undefined &&
           this.renderMarker(inputValue, location, 'black')
         }
+      {
+        this.props.distance !== undefined &&
         <Circle
           center={location}
           radius={this.convertDistanceToMeters()}
@@ -368,13 +468,21 @@ class MapComponent extends TerrainComponent<Props>
           width={7}
           fillColor={Colors().builder.cards.categories.filter}
           fillOpacity={0.2}
-        />
+        />}
         {
           // Render addition locations (spotlights, aggregation map, etc.)
           this.props.markers !== undefined && this.props.markers.size > 0 ?
             _.map(this.props.markers.toJS(), this.renderMultiLocationMarkers)
             :
             null
+        }
+        {
+          // Bounding rectangles (aggreagtions maps)
+          this.props.boundingRectangles !== undefined && this.props.boundingRectangles.size > 0 ?
+            _.map(this.props.boundingRectangles.toJS(), this.renderBoundingRectangles)
+            :
+            null
+
         }
         <TileLayer
           attribution='&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors'
@@ -458,7 +566,7 @@ class MapComponent extends TerrainComponent<Props>
   {
     return (
       <div>
-        {this.renderSearchBar()}
+        {!this.props.hideSearchBar && this.renderSearchBar()}
         {this.renderMap()}
       </div>
     );

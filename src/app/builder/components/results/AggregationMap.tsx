@@ -47,11 +47,12 @@ THE SOFTWARE.
 // tslint:disable:
 
 import * as _ from 'lodash';
+import { List } from 'immutable';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
-import MapComponent from './../../../common/components/MapComponent';
+import MapComponent from './../../../common/components/MapComponent2';
 export interface Props
 {
   data: any;
@@ -86,19 +87,17 @@ class AggregationMap extends TerrainComponent<Props>
     if (data.bounds !== undefined)
     {
       return {
-        boundingRectangles: [{
+        boundingRectangles: List([{
           bottomRight: data.bounds.bottom_right,
           topLeft: data.bounds.top_left,
-        }],
+        }]),
         bounds: [data.bounds.bottom_right, data.bounds.top_left],
-        location: [0, 0],
       };
     }
     else if (data.location !== undefined)
     {
       return {
-        location: MapUtil.getCoordinatesFromGeopoint(data.location),
-        markLocation: true,
+        coordinates: data.location,
       };
     }
     else if (data.buckets !== undefined)
@@ -131,7 +130,7 @@ class AggregationMap extends TerrainComponent<Props>
           const totalBottomRight = [Math.min.apply(null, latitudes), Math.min.apply(null, longitudes)];
           const totalTopLeft = [Math.max.apply(null, latitudes), Math.max.apply(null, longitudes)];
           return {
-            boundingRectangles,
+            boundingRectangles: List(boundingRectangles),
             bounds: [totalBottomRight, totalTopLeft],
             location: [0, 0],
           };
@@ -147,15 +146,16 @@ class AggregationMap extends TerrainComponent<Props>
             longitudes.push(location.lon);
             const name = String(bucket.key) + ': ' + String(bucket.doc_count);
             return {
-              location,
+              coordinates: location,
               index: -1,
               name,
+              color: 'black'
             };
           });
           const totalBottomRight = [Math.min.apply(null, latitudes), Math.min.apply(null, longitudes)];
           const totalTopLeft = [Math.max.apply(null, latitudes), Math.max.apply(null, longitudes)];
           return {
-            multiLocations,
+            markers: List(multiLocations),
             bounds: [totalBottomRight, totalTopLeft],
             location: [0, 0],
           };
@@ -176,10 +176,15 @@ class AggregationMap extends TerrainComponent<Props>
   public render()
   {
     const props = this.parseData(this.props.data);
+    // boundingRectanges
+    // bounds
+    // multilocations
     return (
       <MapComponent
         {...props}
-        zoomControl={true}
+        geocoder='photon'
+        canEdit={false}
+        hideSearchBar={true}
       />
     );
   }
