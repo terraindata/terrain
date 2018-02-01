@@ -52,7 +52,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
-import MapComponent from './../../../common/components/MapComponent2';
+import MapComponent from './../../../common/components/MapComponent';
 export interface Props
 {
   data: any;

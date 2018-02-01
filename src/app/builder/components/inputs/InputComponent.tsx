@@ -61,7 +61,7 @@ import './InputStyle.less';
 const shallowCompare = require('react-addons-shallow-compare');
 
 import { cardStyle, Colors, fontColor, getCardColors } from '../../../colors/Colors';
-import MapComponent from '../../../common/components/MapComponent2';
+import MapComponent from '../../../common/components/MapComponent';
 
 const TextIcon = require('./../../../../images/icon_textDropdown.svg');
 const DateIcon = require('./../../../../images/icon_dateDropdown.svg');

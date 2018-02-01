@@ -60,7 +60,7 @@ import ColorManager from '../../../util/ColorManager';
 import MapUtil from '../../../util/MapUtil';
 import { SpotlightActions } from '../../data/SpotlightRedux';
 import * as SpotlightTypes from '../../data/SpotlightTypes';
-import MapComponent from './../../../common/components/MapComponent2';
+import MapComponent from './../../../common/components/MapComponent';
 import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';

@@ -51,7 +51,7 @@ import Util from 'app/util/Util';
 import { List } from 'immutable';
 import * as _ from 'lodash';
 import * as React from 'react';
-import MapComponent from '../../common/components/MapComponent2';
+import MapComponent from '../../common/components/MapComponent';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import BuilderActions from '../data/BuilderActions';
 import { BuilderState, BuilderStore } from '../data/BuilderStore';

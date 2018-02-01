@@ -71,7 +71,7 @@ import Radium = require('radium');
 import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import DragHandle from '../../../common/components/DragHandle';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
-import MapComponent from '../../../common/components/MapComponent2';
+import MapComponent from '../../../common/components/MapComponent';
 import Switch from '../../../common/components/Switch';
 import TerrainComponent from '../../../common/components/TerrainComponent';
 import MapUtil from '../../../util/MapUtil';
