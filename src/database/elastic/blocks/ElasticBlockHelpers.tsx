@@ -155,7 +155,6 @@ export function findCardType(name: string, builderState: BuilderState): List<Blo
 {
   let theCards = List([]);
   forAllCards(builderState.query.cards, (card) =>
-
   {
     if (card.type === name)
     {
