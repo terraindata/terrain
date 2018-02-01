@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import { List } from 'immutable';
@@ -70,6 +71,7 @@ export interface Props
   distanceUnit?: string; // Unit for above distance
   inputs?: any; // inputs so that it can tell what is an input
   onChange?: (coordinates, inputValue) => void;
+  onMapClick?: (e) => void;
   canEdit: boolean;
   markers?: List<LocationMarker>; // A list of additional markers to add to the map
   allowSearchByCoordinate?: boolean;
@@ -78,8 +80,9 @@ export interface Props
   // Show/Hide certain features
   hideZoomControl?: boolean;
   hideSearchBar?: boolean;
-  showDirectDistance?: boolean
 
+  // Styling
+  className?: string;
 }
 
 interface LocationMarker
@@ -139,6 +142,14 @@ class MapComponent extends TerrainComponent<Props>
   public shouldComponentUpdate(nextProps, nextState)
   {
     return !(_.isEqual(nextProps, this.props) && this.state === nextState);
+  }
+
+  public onChange(coordinates, inputValue)
+  {
+    if (this.props.onChange !== undefined)
+    {
+      this.props.onChange(coordinates, inputValue);
+    }
   }
 
   // Create a marker icon given style parameters
@@ -211,21 +222,21 @@ class MapComponent extends TerrainComponent<Props>
   {
     if (this.geoCache[address] !== undefined)
     {
-      this.props.onChange(this.geoCache[address], address);
+      this.onChange(this.geoCache[address], address);
       return;
     }
     if (this.props.geocoder === 'photon')
     {
       MapUtil.geocodeByAddress('photon', address, (result) =>
       {
-        this.props.onChange({ lat: result[1], lon: result[0] }, address);
+        this.onChange({ lat: result[1], lon: result[0] }, address);
       });
     }
     else
     {
       MapUtil.geocodeByAddress('google', address)
         .then((results) => MapUtil.getLatLng(results[0]))
-        .then((latLng: any) => this.props.onChange({ lat: latLng.lat, lon: latLng.lng }, address))
+        .then((latLng: any) => this.onChange({ lat: latLng.lat, lon: latLng.lng }, address))
         .catch((error) => this.setState({ error }));
     }
   }
@@ -237,7 +248,7 @@ class MapComponent extends TerrainComponent<Props>
     const location = MapUtil.getCoordinatesFromGeopoint(coordinates);
     if (this.reverseGeoCache[String(coordinates)] !== undefined)
     {
-      this.props.onChange(coordinates, this.reverseGeoCache[String(coordinates)]);
+      this.onChange(coordinates, this.reverseGeoCache[String(coordinates)]);
       return;
     }
 
@@ -245,7 +256,7 @@ class MapComponent extends TerrainComponent<Props>
     {
       MapUtil.geocodeByLatLng('photon', { lat: location[0], lng: location[1]}, (result) =>
       {
-        this.props.onChange(coordinates, result.address);
+        this.onChange(coordinates, result.address);
       });
     }
     else
@@ -261,7 +272,7 @@ class MapComponent extends TerrainComponent<Props>
           }
           else
           {
-            this.props.onChange(coordinates, results[0].formatted_address);
+            this.onChange(coordinates, results[0].formatted_address);
           }
         })
         .catch((error) => this.setState({ error }));
@@ -298,7 +309,7 @@ class MapComponent extends TerrainComponent<Props>
 
   public handleInputValueChange(value)
   {
-    this.props.onChange(undefined, value);
+    this.onChange(undefined, value);
   }
 
   public renderMarker(address, location, color, index?)
@@ -399,8 +410,7 @@ class MapComponent extends TerrainComponent<Props>
     }
     else if (this.props.markers !== undefined && this.props.markers.size > 0)
     {
-      let locations = this.props.markers.map((loc) =>
-        MapUtil.getCoordinatesFromGeopoint(loc.coordinates)).toList();
+      let locations = this.props.markers.map((loc) => loc.coordinates).toList();
       if (location !== undefined)
       {
         locations = locations.push([location[1], location[0]]);
@@ -439,56 +449,68 @@ class MapComponent extends TerrainComponent<Props>
     return location;
   }
 
+  public handleOnMapClick(event)
+  {
+    if (this.props.onMapClick !== undefined)
+    {
+      this.props.onMapClick(event);
+    }
+  }
+
   public renderMap()
   {
     const { coordinates, inputValue } = this.props;
     const location = this.parseLocation(coordinates, inputValue);
-    console.log(this.props.boundingRectangles);
+    console.log(this.getMapProps(location));
     return (
-      <Map
-        {...this.getMapProps(location)}
-        zoom={this.state.zoom}
-        onViewportChanged={this.setZoomLevel}
-        maxBounds={[[85, -180], [-85, 180]]}
-        minZoom={1}
-        zoomDelta={0.5}
-        zoomControl={!this.props.hideZoomControl}
-      >
+      <div className={this.props.className} >
+        <Map
+          {...this.getMapProps(location)}
+          zoom={this.state.zoom}
+          onViewportChanged={this.setZoomLevel}
+          maxBounds={[[85, -180], [-85, 180]]}
+          minZoom={1}
+          zoomDelta={0.5}
+          zoomControl={!this.props.hideZoomControl}
+          onClick={this.handleOnMapClick}
+          onMouseDown={this.handleOnMapClick}
+        >
+          {
+            this.props.coordinates !== undefined &&
+            this.renderMarker(inputValue, location, 'black')
+          }
         {
-          this.props.coordinates !== undefined &&
-          this.renderMarker(inputValue, location, 'black')
-        }
-      {
-        this.props.distance !== undefined &&
-        <Circle
-          center={location}
-          radius={this.convertDistanceToMeters()}
-          stroke={true}
-          color={Colors().builder.cards.categories.filter}
-          width={7}
-          fillColor={Colors().builder.cards.categories.filter}
-          fillOpacity={0.2}
-        />}
-        {
-          // Render addition locations (spotlights, aggregation map, etc.)
-          this.props.markers !== undefined && this.props.markers.size > 0 ?
-            _.map(this.props.markers.toJS(), this.renderMultiLocationMarkers)
-            :
-            null
-        }
-        {
-          // Bounding rectangles (aggreagtions maps)
-          this.props.boundingRectangles !== undefined && this.props.boundingRectangles.size > 0 ?
-            _.map(this.props.boundingRectangles.toJS(), this.renderBoundingRectangles)
-            :
-            null
+          this.props.distance !== undefined &&
+          <Circle
+            center={location}
+            radius={this.convertDistanceToMeters()}
+            stroke={true}
+            color={Colors().builder.cards.categories.filter}
+            width={7}
+            fillColor={Colors().builder.cards.categories.filter}
+            fillOpacity={0.2}
+          />}
+          {
+            // Render addition locations (spotlights, aggregation map, etc.)
+            this.props.markers !== undefined && this.props.markers.size > 0 ?
+              _.map(this.props.markers.toJS(), this.renderMultiLocationMarkers)
+              :
+              null
+          }
+          {
+            // Bounding rectangles (aggreagtions maps)
+            this.props.boundingRectangles !== undefined && this.props.boundingRectangles.size > 0 ?
+              _.map(this.props.boundingRectangles.toJS(), this.renderBoundingRectangles)
+              :
+              null
 
-        }
-        <TileLayer
-          attribution='&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors'
-          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-        />
-      </Map>
+          }
+          <TileLayer
+            attribution='&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors'
+            url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          />
+        </Map>
+      </div>
     );
   }
 
@@ -502,7 +524,7 @@ class MapComponent extends TerrainComponent<Props>
         lat: key === 'latitude' ? !isNaN(parseFloat(value)) ? parseFloat(value) : value : oldLocation[0],
         lon: key === 'longitude' ? !isNaN(parseFloat(value)) ? parseFloat(value) : value : oldLocation[1],
       };
-    this.props.onChange(newLocation, '');
+    this.onChange(newLocation, '');
     this.reverseGeocode(newLocation);
   }
 

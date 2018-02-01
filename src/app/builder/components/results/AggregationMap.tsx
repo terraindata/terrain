@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 // tslint:disable:
 
-import * as _ from 'lodash';
 import { List } from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -149,7 +149,7 @@ class AggregationMap extends TerrainComponent<Props>
               coordinates: location,
               index: -1,
               name,
-              color: 'black'
+              color: 'black',
             };
           });
           const totalBottomRight = [Math.min.apply(null, latitudes), Math.min.apply(null, longitudes)];
