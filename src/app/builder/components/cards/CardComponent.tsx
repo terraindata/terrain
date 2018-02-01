@@ -314,14 +314,36 @@ class _CardComponent extends TerrainComponent<Props>
 
   public shouldComponentUpdate(nextProps, nextState)
   {
-    if (nextProps.builderCards === this.props.builderCards)
+    const { builder, builderCards } = this.props;
+    const { builder: nextBuilder, builderCards: nextBuilderCards } = nextProps;
+
+    if (nextBuilderCards === builderCards &&
+      nextBuilder.draggingCardItem === builder.draggingCardItem &&
+      nextBuilder.draggingOverIndex === builder.draggingOverIndex &&
+      nextBuilder.draggingOverKeyPath === builder.draggingOverKeyPath)
     {
       return shallowCompare(this, nextProps, nextState);
     }
     else
     {
-      return nextProps.builderCards.hoveringCardId === nextProps.card.id
-        || this.props.builderCards.hoveringCardId === nextProps.card.id;
+      if (nextProps.builderCards !== this.props.builderCards)
+      {
+        return nextProps.builderCards.hoveringCardId === nextProps.card.id
+          || this.props.builderCards.hoveringCardId === nextProps.card.id;
+      }
+      else
+      {
+        return nextBuilder.draggingCardItem !== null &&
+          nextBuilder.draggingOverIndex !== -1 &&
+          nextBuilder.draggingOverKeyPath !== null &&
+          nextBuilder.draggingOverKeyPath.count() > 0 &&
+          (
+            nextBuilder.draggingCardItem === nextProps.card ||
+            builder.draggingCardItem === nextProps.card ||
+            nextBuilder.draggingOverIndex === nextProps.index ||
+            builder.draggingOverIndex === nextProps.index
+          );
+      }
     }
   }
 
