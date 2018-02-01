@@ -91,6 +91,8 @@
     "testURL": "http://localhost"
   },
   "dependencies": {
+    "@types/react-beautiful-dnd": "^3.0.0",
+    "@types/react-onclickoutside": "^6.0.2",
     "aes-js": "^3.1.0",
     "async-busboy": "^0.6.2",
     "babel-polyfill": "^6.26.0",

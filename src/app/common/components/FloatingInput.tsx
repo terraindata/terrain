@@ -51,7 +51,7 @@ import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
-import styled from 'styled-components';
+import { default as styled } from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
@@ -71,7 +71,7 @@ const Container = styled.div`
     border-color: ${Colors().active};
   }
   
-  ${(props) => props.noBorder && (`
+  ${(props) => props['noBorder'] && (`
     border: none !important;
     background: none;
   `)}
