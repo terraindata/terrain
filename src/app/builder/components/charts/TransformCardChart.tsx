@@ -119,7 +119,7 @@ class TransformCardChart extends TerrainComponent<Props>
   constructor(props: Props)
   {
     super(props);
-    this.debouncedUpdatePoints = _.debounce(this.debouncedUpdatePoints, 300);
+    this.debouncedUpdatePoints = _.debounce(this.debouncedUpdatePoints, 3000);
   }
 
   public componentDidMount()
@@ -307,7 +307,11 @@ class TransformCardChart extends TerrainComponent<Props>
       });
     }
 
-    const isConcrete = this.state.moveSeed !== this.state.movedSeed;
+    // This logic was used to dispatch an action when the drag starts.
+    // However, we are not sure why that was necessary.
+    // It's now disabled, so that actions are only dispatched when the point is released,
+    //  to help with performance concerns.
+    const isConcrete = false; // this.state.moveSeed !== this.state.movedSeed;
     this.setState({
       movedSeed: this.state.moveSeed,
     });
