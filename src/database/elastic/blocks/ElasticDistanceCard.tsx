@@ -82,8 +82,6 @@ export const elasticDistance = _card({
   distanceType: 'arc',
   locationValue: {},
   mapInputValue: '',
-  // geopoint: [0, 0],
-  // map_text: '',
 
   static: {
     language: 'elastic',
