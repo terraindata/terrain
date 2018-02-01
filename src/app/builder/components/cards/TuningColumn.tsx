@@ -95,7 +95,7 @@ class TuningColumn extends TerrainComponent<Props>
     noCardsMessage: string,
   } = {
       keyPath: this.computeKeyPath(this.props),
-      allCards: this.props.builder.query.cards,
+      allCards: List([]),
       tuningOrder: List([]),
       showNoCardsModal: false,
       noCardsMessage: '',
@@ -128,6 +128,7 @@ class TuningColumn extends TerrainComponent<Props>
   public componentWillMount()
   {
     const order = this.props.builder.query.tuningOrder;
+    this.setTuningCards(this.props.builder.query.cards);
     this.setState({
       tuningOrder: order !== undefined ? List(order) : List([]),
     });
