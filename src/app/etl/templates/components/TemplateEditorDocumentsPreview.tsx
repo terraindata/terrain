@@ -96,10 +96,11 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
       >
         <div className='preview-document-spacer'>
           <TemplateEditorFieldNode
-            keyPath={List([])}
+            keyPath={emptyList}
             field={template.rootField}
             canEdit={false}
             preview={previewDocument}
+            displayKeyPath={emptyList}
           />
         </div>
         <div
@@ -165,6 +166,8 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
     return getStyle('background', `linear-gradient(${maxFade.toString()}, ${minFade.toString()})`);
   }
 }
+
+const emptyList = List([]);
 
 function scaleAlpha(color, factor)
 {

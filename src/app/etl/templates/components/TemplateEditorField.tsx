@@ -65,10 +65,11 @@ import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateType
 
 export interface TemplateEditorFieldProps
 {
-  keyPath: KeyPath;
+  keyPath: KeyPath; // keyPath from the root field to this field
   field: TemplateField;
   canEdit: boolean;
   preview: any;
+  displayKeyPath: KeyPath; // not the key path in the store, but the key path in virtual DOM
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
@@ -81,9 +82,9 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
     super(props);
   }
 
-  protected _passProps(): TemplateEditorFieldProps
+  protected _passProps(config: object = {}): TemplateEditorFieldProps
   {
-    return _.pick(this.props, ['keyPath', 'field', 'canEdit', 'preview']);
+    return _.extend(_.pick(this.props, ['keyPath', 'field', 'canEdit', 'preview', 'displayKeyPath']), config);
   }
 
   // Helper to calling setIn() on the TemplateField in the store.

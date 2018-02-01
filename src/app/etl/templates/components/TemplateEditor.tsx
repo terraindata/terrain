@@ -139,6 +139,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
                 field={field}
                 preview={'placeholder'}
                 canEdit={true}
+                displayKeyPath={List([])}
               />
             </div>
         }
@@ -175,10 +176,11 @@ class ETLExportDisplay extends TerrainComponent<Props>
           >
             <div className='template-editor-full-area'>
               <TemplateEditorFieldNode
-                keyPath={List([])}
+                keyPath={emptyList}
                 field={template.rootField}
                 canEdit={true}
                 preview={previewDocument}
+                displayKeyPath={emptyList}
               />
             </div>
           </div>
@@ -224,6 +226,8 @@ class ETLExportDisplay extends TerrainComponent<Props>
     });
   }
 }
+
+const emptyList = List([]);
 
 export default Util.createContainer(
   ETLExportDisplay,

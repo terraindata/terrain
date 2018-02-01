@@ -83,7 +83,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       expandableViewOpen: false,
     };
 
-  public renderChildFields(preview = this.props.preview)
+  public renderChildFields(preview: any, displayKeyPath: KeyPath)
   {
     const { field, keyPath, canEdit } = this.props;
     return field.children.map((value, index) =>
@@ -92,10 +92,13 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       const childPreview = preview !== undefined && preview !== null ? preview[value.name] : null;
       return (
         <TemplateEditorFieldNode
-          keyPath={newKeyPath}
-          field={value}
-          canEdit={field.isIncluded && canEdit}
-          preview={childPreview}
+          {...this._passProps({
+            keyPath: newKeyPath,
+            field: value,
+            canEdit: field.isIncluded && canEdit,
+            preview: childPreview,
+            displayKeyPath: displayKeyPath.push(value.name),
+          }) }
           key={index}
         />
       );
@@ -104,14 +107,15 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
 
   public render()
   {
-    const { field, keyPath, canEdit, preview } = this.props;
+    const { field, keyPath, canEdit, preview, displayKeyPath } = this.props;
     let children = null;
     let content = null;
+    console.log(this.props.displayKeyPath.toJS().toString());
     if (this._isRoot())
     {
       return (
         <div className='template-editor-children-container'>
-          {this.renderChildFields()}
+          {this.renderChildFields(preview, displayKeyPath)}
         </div>
       );
     }
@@ -127,7 +131,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }
     else if (this._isNested())
     {
-      children = this.renderChildFields();
+      children = this.renderChildFields(preview, displayKeyPath);
       content = (
         <TemplateEditorFieldPreview
           hidePreviewValue={true}

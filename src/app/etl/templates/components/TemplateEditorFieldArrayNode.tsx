@@ -71,7 +71,7 @@ export interface Props extends TemplateEditorFieldProps
 {
   depth: number;
   label?: string;
-  renderNestedFields?: (preview) => any;
+  renderNestedFields?: (preview: any, displayKeyPath: KeyPath) => any;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
@@ -88,16 +88,16 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
 
   public renderArrayChildren()
   {
-    const { field, canEdit, preview, keyPath, depth } = this.props;
+    const { field, preview, depth, displayKeyPath } = this.props;
     if (!Array.isArray(preview))
     {
       return (
         <TemplateEditorFieldArrayNode
-          keyPath={keyPath}
-          field={field}
-          canEdit={canEdit}
+          {...this._passProps({
+            preview: null,
+            displayKeyPath: displayKeyPath.push(0),
+          }) }
           renderNestedFields={this.props.renderNestedFields}
-          preview={null}
           depth={depth + 1}
           label={`N/A`}
         />
@@ -107,11 +107,11 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
     {
       return (
         <TemplateEditorFieldArrayNode
-          keyPath={keyPath}
-          field={field}
-          canEdit={canEdit}
+          {...this._passProps({
+            preview: null,
+            displayKeyPath: displayKeyPath.push(0),
+          }) }
           renderNestedFields={this.props.renderNestedFields}
-          preview={null}
           depth={depth + 1}
           label={`List Empty`}
         />
@@ -124,12 +124,12 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
       {
         return (
           <TemplateEditorFieldArrayNode
-            keyPath={keyPath}
-            field={field}
-            canEdit={canEdit}
+            {...this._passProps({
+              preview: value,
+              displayKeyPath: displayKeyPath.push(index),
+            }) }
             key={index}
             renderNestedFields={this.props.renderNestedFields}
-            preview={value}
             depth={depth + 1}
             label={`${index + 1} of ${previewList.size}`}
           />
@@ -140,13 +140,13 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
 
   public render()
   {
-    const { field, keyPath, canEdit, preview, depth, label } = this.props;
+    const { field, canEdit, preview, depth, label, displayKeyPath } = this.props;
     let content = null;
     const simpleArrayDisplay: boolean = !this._isNested() && depth + 1 === this._arrayDepth();
 
     if (depth === this._arrayDepth() && this._isNested())
     {
-      content = this.props.renderNestedFields(preview);
+      content = this.props.renderNestedFields(preview, displayKeyPath);
     }
     else if (simpleArrayDisplay)
     {
