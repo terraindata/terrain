@@ -194,6 +194,7 @@ export class ResultsManager extends TerrainComponent<Props>
         && (!this.props.query ||
           (
             this.props.query.tql !== nextProps.query.tql ||
+            nextProps.query.tqlMode === 'manual' ||
             // this.props.query.cards !== nextProps.query.cards ||
             this.props.query.inputs !== nextProps.query.inputs ||
             this.props.query.path !== nextProps.query.path
@@ -403,7 +404,7 @@ export class ResultsManager extends TerrainComponent<Props>
   }
 
   private queryM2Results(query: Query, db: BackendInstance)
-  {
+ {
     //
     // if (query.parseTree === null || query.parseTree.hasError())
     // {

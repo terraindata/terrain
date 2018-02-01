@@ -209,7 +209,9 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       const dbName = getIndex('');
       const tableName = getType('');
-      Actions.setServerDbTable(this.props.serverId, '', dbName, tableName);
+      Actions.setServerDbTable(this.props.serverId, '',
+        typeof dbName === 'string' ? dbName : dbName.get(0),
+        typeof tableName === 'string' ? tableName : tableName.get(0));
       const stringQuery: string =
         ESParseTreeToCode(this.props.query.parseTree.parser as ESJSONParser, { replaceInputs: true }, this.props.inputs);
       const parsedQuery = addBodyToQuery(stringQuery);
@@ -425,8 +427,13 @@ class FileImportPreview extends TerrainComponent<Props>
     {
       const dbName = getIndex('');
       const tableName = getType('');
-      Actions.saveTemplate(this.state.saveTemplateName, this.props.exporting, this.handleTemplateSaveSuccess,
-        this.props.serverId, dbName, tableName);
+      Actions.saveTemplate(
+        this.state.saveTemplateName,
+        this.props.exporting,
+        this.handleTemplateSaveSuccess,
+        this.props.serverId,
+        typeof dbName === 'string' ? dbName : dbName.get(0),
+        typeof tableName === 'string' ? tableName : tableName.get(0));
     }
     else
     {
