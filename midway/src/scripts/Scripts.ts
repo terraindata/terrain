@@ -47,6 +47,7 @@ THE SOFTWARE.
 import * as path from 'path';
 import * as winston from 'winston';
 
+import { doRequest } from '../app/Util';
 import DatabaseController from '../database/DatabaseController';
 import ElasticClient from '../database/elastic/client/ElasticClient';
 import { makePromiseCallback } from '../tasty/Utils';
@@ -106,25 +107,53 @@ export async function provisionScripts(controller: DatabaseController)
           continue;
         }
 
-        await new Promise(
-          (resolve, reject) =>
+        let host = (client.getConfig().host !== undefined ? client.getConfig().host : undefined);
+        if (host === undefined)
+        {
+          if (client.getConfig().hosts !== undefined && client.getConfig().hosts.length > 0)
           {
-            client.putScript(
-              {
-                id: script.id,
-                lang: script.lang,
-                body: {
-                  script: script.body,
-                },
-              },
-              makePromiseCallback(resolve, reject));
-          });
+            host = client.getConfig().hosts[0];
+          }
+          else
+          {
+            throw new Error('Unknown host');
+          }
+        }
+
+        // FIXME: Uncomment when the elasticsearch javascript client library (elasticsearch.js) is fixed
+        // to use the changed stored script body format in 6.1 from putScript
+        // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html
+        //
+        // await new Promise(
+        //   (resolve, reject) =>
+        //   {
+        //     client.putScript(
+        //       {
+        //         id: script.id,
+        //         lang: script.lang,
+        //         body: script.body,
+        //       },
+        //       makePromiseCallback(resolve, reject));
+        //   });
+
+        await doRequest({
+          method: 'POST',
+          url: 'http://' + host + '/_scripts/' + script.id,
+          json: true,
+          body: {
+            script: {
+              lang: script.lang,
+              source: script.body,
+            },
+          },
+        });
+
         winston.info('Provisioned script ' + script.id + ' to database ' + controller.getName());
       }
       catch (e)
       {
         winston.warn('Failed to provision script ' + script.id + ' to database '
-          + controller.getName() + ': ' + JSON.stringify(e.response));
+          + controller.getName() + ': ' + JSON.stringify(e));
       }
     }
   }

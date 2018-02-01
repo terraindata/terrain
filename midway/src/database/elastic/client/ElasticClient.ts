@@ -225,6 +225,11 @@ class ElasticClient
     return this.delegate;
   }
 
+  public getConfig(): ElasticConfig
+  {
+    return this.config;
+  }
+
   private log(methodName: string, info: any)
   {
     this.controller.log('ElasticClient.' + methodName, info);
