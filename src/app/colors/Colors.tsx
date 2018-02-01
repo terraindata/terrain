@@ -1050,7 +1050,7 @@ export const ThemesInt =
 
 export const ThemesArray = ['DARK', 'LIGHT', 'HALLOWEEN'];
 
-const curTheme = 'DARK';
+const curTheme = 'LIGHT';
 
 export function Colors()
 {
