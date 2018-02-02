@@ -135,7 +135,11 @@ const MapUtil = {
           if (reverse)
           {
             const { lat, lon } = params;
-            const address = MapUtil.buildAddress(raw.features[0].properties);
+            let address = '';
+            if (raw.features !== undefined && raw.features.length > 0)
+            {
+              address = MapUtil.buildAddress(raw.features[0].properties);
+            }
             value = { address, location: [lat, lon] };
           }
           else
@@ -318,9 +322,14 @@ const MapUtil = {
       if (geopoint.split(',').length > 1)
       {
         const coords = geopoint.split(',');
-        lat = parseFloat(coords[0].replace(/ /g, ''));
-        lon = parseFloat(coords[1].replace(/ /g, ''));
-        console.assert(!isNaN(lat) && !isNaN(lon));
+        if (!isNaN(parseFloat(coords[0].replace(/ /g, ''))))
+        {
+          lat = parseFloat(coords[0].replace(/ /g, ''));
+        }
+        if (!isNaN(parseFloat(coords[1].replace(/ /g, ''))))
+        {
+          lon = parseFloat(coords[1].replace(/ /g, ''));
+        }
       }
       else
       {
