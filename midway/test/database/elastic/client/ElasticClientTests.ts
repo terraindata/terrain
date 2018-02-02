@@ -96,7 +96,6 @@ test('search', async (done) =>
           index: 'movies',
           type: 'data',
           body: {
-            query: {},
             sort: [{ revenue: 'desc' }, { movieid: 'asc' }],
           },
           size: 1,
@@ -157,13 +156,12 @@ test('putScript', async (done) =>
           index: 'movies',
           type: 'data',
           body: {
-            query: {},
             sort: {
               _script: {
                 type: 'number',
                 order: 'desc',
                 script: {
-                  stored: 'terrain_test_movie_profit',
+                  id: 'terrain_test_movie_profit',
                   params: {},
                 },
               },

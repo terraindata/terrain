@@ -113,7 +113,42 @@ class ElasticClient
   public deleteTemplate(params: Elastic.DeleteTemplateParams, callback: (error: any, response: any) => void): void
   {
     this.log('deleteTemplate', params);
-    this.delegate.deleteTemplate(params, callback);
+    const scriptParams: Elastic.DeleteScriptParams =
+      {
+        id: params.id,
+        lang: 'mustache',
+      };
+    this.deleteScript(scriptParams, callback);
+  }
+
+  /**
+   */
+  public deleteScript(params: Elastic.DeleteScriptParams, callback: (error: any, response: any) => void): void
+  {
+    this.log('deleteScript', params);
+
+    let host = this.getConfig().host;
+    if (host === undefined)
+    {
+      if (this.getConfig().hosts !== undefined && this.getConfig().hosts.length > 0)
+      {
+        host = this.getConfig().hosts[0];
+      }
+    }
+
+    if (host === undefined)
+    {
+      return callback(new Error('Unknown host'), undefined);
+    }
+
+    request({
+      method: 'DELETE',
+      url: String(host) + '/_scripts/' + params.id,
+    }, (err, resp, body) => callback(err, body));
+
+    // FIXME: Uncomment when putScript in elasticsearch.js is fixed to use the changed stored script body format in 6.1
+    // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html
+    // this.delegate.deleteScript(params, callback);
   }
 
   /**
@@ -122,17 +157,45 @@ class ElasticClient
   public getTemplate(params: Elastic.GetTemplateParams, callback: (error: any, response: any) => void): void
   {
     this.log('getTemplate', params);
-    this.delegate.getTemplate(params, callback);
+    const scriptParams: Elastic.GetScriptParams =
+      {
+        id: params.id,
+        lang: 'mustache',
+      };
+    this.getScript(scriptParams, callback);
   }
 
   /**
    * https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-getscript
    */
   public getScript<T>(params: Elastic.GetScriptParams,
-    callback: (error: any, response: Elastic.SearchResponse<T>) => void): void
+    callback: (error: any, response: any) => void): void
   {
     this.log('get script', params);
-    this.delegate.getScript(params, callback);
+
+    let host = this.getConfig().host;
+    if (host === undefined)
+    {
+      if (this.getConfig().hosts !== undefined && this.getConfig().hosts.length > 0)
+      {
+        host = this.getConfig().hosts[0];
+      }
+    }
+
+    if (host === undefined)
+    {
+      return callback(new Error('Unknown host'), undefined);
+    }
+
+    request({
+      method: 'GET',
+      json: true,
+      url: String(host) + '/_scripts/' + params.id,
+    }, (err, res, body) => callback(err, body));
+
+    // FIXME: Uncomment when putScript in elasticsearch.js is fixed to use the changed stored script body format in 6.1
+    // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html
+    // this.delegate.getScript(params, callback);
   }
 
   /**
@@ -176,7 +239,7 @@ class ElasticClient
 
     request({
       method: 'POST',
-      url: 'http://' + String(host) + '/_scripts/' + params.id,
+      url: String(host) + '/_scripts/' + params.id,
       json: true,
       body: {
         script: {
@@ -197,7 +260,13 @@ class ElasticClient
   public putTemplate(params: Elastic.PutTemplateParams, callback: (err: any, response: any, status: any) => void): void
   {
     this.log('putTemplate', params);
-    this.delegate.putTemplate(params, callback);
+    const scriptParams: Elastic.PutScriptParams =
+      {
+        id: params.id,
+        lang: 'mustache',
+        body: params.body,
+      };
+    this.putScript(scriptParams, callback);
   }
 
   /**
