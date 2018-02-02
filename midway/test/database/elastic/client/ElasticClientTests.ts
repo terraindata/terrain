@@ -145,9 +145,7 @@ test('putScript', async (done) =>
         {
           id: 'terrain_test_movie_profit',
           lang: 'painless',
-          body: {
-            script: `return doc['revenue'].value - doc['budget'].value;`,
-          },
+          body: `return doc['revenue'].value - doc['budget'].value;`,
         },
         makePromiseCallback(resolve, reject));
     });

@@ -46,6 +46,7 @@ THE SOFTWARE.
 
 import * as Elastic from 'elasticsearch';
 import * as _ from 'lodash';
+import * as request from 'request';
 
 import ElasticConfig from '../ElasticConfig';
 import ElasticController from '../ElasticController';
@@ -158,7 +159,36 @@ class ElasticClient
   public putScript(params: Elastic.PutScriptParams, callback: (err: any, response: any, status: any) => void): void
   {
     this.log('putScript', params);
-    this.delegate.putScript(params, callback);
+
+    let host = this.getConfig().host;
+    if (host === undefined)
+    {
+      if (this.getConfig().hosts !== undefined && this.getConfig().hosts.length > 0)
+      {
+        host = this.getConfig().hosts[0];
+      }
+    }
+
+    if (host === undefined)
+    {
+      return callback(new Error('Unknown host'), undefined, undefined);
+    }
+
+    request({
+      method: 'POST',
+      url: 'http://' + String(host) + '/_scripts/' + params.id,
+      json: true,
+      body: {
+        script: {
+          lang: params.lang,
+          source: params.body,
+        },
+      },
+    }, callback);
+
+    // FIXME: Uncomment when putScript in elasticsearch.js is fixed to use the changed stored script body format in 6.1
+    // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html
+    // this.delegate.putScript(params, callback);
   }
 
   /**
