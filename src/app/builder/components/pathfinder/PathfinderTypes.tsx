@@ -107,6 +107,7 @@ class PathC extends BaseClass
   public score: Score = _Score();
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
+  public name?: string = undefined; // name of the query, this is usefull for when there is a groupJoin and inner queries have names
 }
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
@@ -120,6 +121,7 @@ export const _Path = (config?: { [key: string]: any }) =>
         filterGroup: _FilterGroup(config['filterGroup']),
         more: _More(config['more']),
         step: config['step'] as PathfinderSteps,
+        name: config['name']
       };
   }
   return New<Path>(new PathC(config || {}), config);
@@ -616,7 +618,6 @@ class ElasticDataSourceC extends DataSource
     if (context.type === 'comparison')
     {
       const { field, fieldType, schemaState, source } = context;
-
       let options = ElasticComparisons;
       if (fieldType !== null && fieldType !== undefined)
       {
@@ -654,6 +655,16 @@ export const _ElasticDataSource = (config?: { [key: string]: any }) =>
 };
 
 const ElasticComparisons = [
+  {
+    value: 'exists',
+    displayName: 'exists',
+    fieldTypes: List(
+      [FieldType.Numerical,
+      FieldType.Text,
+      FieldType.Date,
+      FieldType.Geopoint,
+      FieldType.Ip]),
+  },
   {
     value: 'equal',
     displayName: 'equals',

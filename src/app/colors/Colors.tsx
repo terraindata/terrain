@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import { extend } from 'lodash';
 
 const Color = require('color');

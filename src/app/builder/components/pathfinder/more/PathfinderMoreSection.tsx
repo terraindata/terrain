@@ -102,7 +102,7 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     BuilderActions.changePath(this.props.keyPath.push('reference'), value);
     if (this.props.more.nested === undefined)
     {
-      BuilderActions.changePath(this.props.keyPath.push('nested'), _Path(), true);
+      BuilderActions.changePath(this.props.keyPath.push('nested'), _Path({name: '', step: 0}), true);
     }
   }
 

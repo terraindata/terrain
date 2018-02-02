@@ -279,7 +279,7 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
       {
         mustNot = mustNot.push(lineInfo);
       }
-      else if (line.comparison === 'located') // TODO MAYBE ADD NON-TEXT FILTERS HERE AS WELL
+      else if (line.comparison === 'located' || line.comparison === 'exists') // TODO MAYBE ADD NON-TEXT FILTERS HERE AS WELL
       {
         filter = filter.push(lineInfo);
       }
@@ -312,6 +312,12 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
   const boost = typeof line.weight === 'string' ? parseFloat(line.weight) : line.weight;
   switch (line.comparison)
   {
+    case 'exists':
+      return Map({
+        exists: Map({
+          field: line.field,
+        }),
+      });
     case 'equal':
       return Map({
         term: Map({
@@ -543,6 +549,6 @@ function parseNested(more: More, inputs)
     return;
   }
   const nestedQuery = parsePath(more.nested, inputs, true);
-  return Map({nestedQuery});
+  return Map({[more.nested.name]: nestedQuery});
 }
 

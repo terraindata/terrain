@@ -270,14 +270,17 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 )
               }
             </div>
-            <Autocomplete
-              options={pathfinderContext.source.dataSource.getChoiceOptions({
-                type: 'input',
-              }).map((c) => c.value).toList()}
-              value={filterLine.value as string | number}
-              onChange={this._fn(this.handleChange, 'value')}
-              disabled={!pathfinderContext.canEdit}
-            />
+            {
+              filterLine.comparison !== 'exists' &&
+              <Autocomplete
+                options={pathfinderContext.source.dataSource.getChoiceOptions({
+                  type: 'input',
+                }).map((c) => c.value).toList()}
+                value={filterLine.value as string | number}
+                onChange={this._fn(this.handleChange, 'value')}
+                disabled={!pathfinderContext.canEdit}
+              />
+            }
           </div>
         );
 
@@ -306,13 +309,16 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               )
             }
           </div>
-          <DatePickerWrapper
-            date={String(filterLine.value)}
-            onChange={this._fn(this.handleChange, 'value')}
-            canEdit={pathfinderContext.canEdit}
-            language={'elastic'}
-            format='MM/DD/YYYY h:mma'
-          />
+          {
+            filterLine.comparison !== 'exists' &&
+            <DatePickerWrapper
+              date={String(filterLine.value)}
+              onChange={this._fn(this.handleChange, 'value')}
+              canEdit={pathfinderContext.canEdit}
+              language={'elastic'}
+              format='MM/DD/YYYY h:mma'
+            />
+          }
         </div>
         );
 
@@ -348,6 +354,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 )
               }
             </div>
+          {
+           filterLine.comparison !== 'exists' &&
             <div className='pf-filter-map-input-wrapper'>
               <BuilderTextbox
                 value={value.distance}
@@ -382,6 +390,7 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 action={this.props.onChange}
               />
             </div>
+          }
           </div>
         );
 

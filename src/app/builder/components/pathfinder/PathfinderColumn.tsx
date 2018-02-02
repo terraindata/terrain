@@ -64,6 +64,7 @@ import './Pathfinder.less';
 import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
+import FloatingInput from 'app/common/components/FloatingInput';
 
 export interface Props
 {
@@ -128,11 +129,18 @@ class PathfinderColumn extends TerrainComponent<Props>
     return this.props.keyPath !== undefined ? this.props.keyPath : List(['query', 'path'])
   }
 
+  public changePathName(value)
+  {
+    BuilderActions.changePath(this.getKeyPath().push('name'), value);
+  }
+
   public render()
   {
     const { path } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
+    console.log('PATH IS ', path);
+    console.log('STEP IS ', path.step);
     return (
       <div
         className='pathfinder-column'
@@ -141,6 +149,16 @@ class PathfinderColumn extends TerrainComponent<Props>
           fontColor(Colors().text3),
         ]}
       >
+        {
+          path.name !== undefined &&
+          <FloatingInput
+            value={path.name}
+            onChange={this.changePathName}
+            label={'Algorithm Name'}
+            isTextInput={true}
+            canEdit={pathfinderContext.canEdit}
+          />
+        }
         <PathfinderSourceSection
           pathfinderContext={pathfinderContext}
           keyPath={keyPath.push('source')}
