@@ -88,13 +88,14 @@ export class TransformationEngine
   private fieldNameToIDMap: Map<string, number> = new Map<string, number>();
   private IDToFieldNameMap: Map<number, string> = new Map<number, string>();
   private fieldTypes: Map<number, string> = new Map<number, string>();
+  private fieldEnabled: Map<number, boolean> = new Map<number, boolean>(); // TODO use + (de)serialize
 
   constructor(doc?: object)
   {
     if (doc !== undefined)
     {
       this.doc = doc;
-      this.generateInitialFieldMaps(this.doc);
+      this.generateInitialFieldMaps(this.doc); // TODO can't return ID list here... disable this or what?
       // initial field nodes can be implicit, DAG should only represent actual transformations
     }
     // allow construction without example doc (manually add fields)
@@ -114,9 +115,7 @@ export class TransformationEngine
   public appendTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: string[] | number[],
     options?: object, tags?: string[], weight?: number): number
   {
-    const fieldIDs: number[] = fieldNamesOrIDs.length > 0 ?
-      (typeof fieldNamesOrIDs[0] === 'number' ? fieldNamesOrIDs as number[] :
-        _.map(fieldNamesOrIDs, (name) => this.fieldNameToIDMap.get(name))) : [];
+    const fieldIDs: number[] = this.parseFieldIDs(fieldNamesOrIDs);
     const node = new TransformationNode(this.uidNode, nodeType, fieldIDs, options);
     this.dag.setNode(this.uidNode.toString(), node);
     this.uidNode++;
@@ -194,13 +193,49 @@ export class TransformationEngine
     return nodesSorted;
   }
 
-  private generateInitialFieldMaps(obj: object, currentKeyPath: string = ''): void
+  public getTransformationInfo(transformationID: number): TransformationNode | undefined
   {
+    if (!this.dag.nodes().includes(transformationID.toString()))
+    {
+      return undefined;
+    }
+    return this.dag.node(transformationID.toString()) as TransformationNode;
+  }
+
+  public editTransformation(transformationID: number, fieldNamesOrIDs?: string[] | number[],
+                            options?: object): void
+  {
+    if (!this.dag.nodes().includes(transformationID.toString()))
+    {
+      return;
+    }
+
+    if (fieldNamesOrIDs)
+    {
+      (this.dag.node(transformationID) as TransformationNode).fieldIDs = this.parseFieldIDs(fieldNamesOrIDs);
+    }
+
+    if (options)
+    {
+      (this.dag.node(transformationID) as TransformationNode).meta = options;
+    }
+  }
+
+  private parseFieldIDs(fieldNamesOrIDs: string[] | number[]): number[]
+  {
+    return fieldNamesOrIDs.length > 0 ?
+      (typeof fieldNamesOrIDs[0] === 'number' ? fieldNamesOrIDs as number[] :
+        _.map(fieldNamesOrIDs, (name) => this.fieldNameToIDMap.get(name))) : [];
+  }
+
+  private generateInitialFieldMaps(obj: object, currentKeyPath: string = ''): List<number>
+  {
+    let ids: List<number> = new List<number>();
     for (const key of Object.keys(obj))
     {
       if (isPrimitive(obj[key]))
       {
-        this.addField(currentKeyPath + key, typeof obj[key]);
+        ids = ids.push(this.addField(currentKeyPath + key, typeof obj[key]));
       } else if (Array.isArray(obj[key]))
       {
         for (const item of obj[key])
@@ -209,9 +244,10 @@ export class TransformationEngine
         }
       } else
       {
-        this.generateInitialFieldMaps(obj[key], currentKeyPath + key + '.');
+        ids = ids.concat(this.generateInitialFieldMaps(obj[key], currentKeyPath + key + '.'));
       }
     }
+    return ids;
   }
 
   private flatten(obj: object): object
