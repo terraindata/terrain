@@ -121,11 +121,21 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
 
   public handleLabelClicked()
   {
-    this.props.act({
-      actionType: 'setSettingsKeyPath',
-      keyPath: this.props.keyPath,
-      displayKeyPath: this.props.displayKeyPath,
-    });
+    if (this._settingsAreOpen())
+    {
+      this.props.act({
+        actionType: 'closeSettings',
+      });
+    }
+    else
+    {
+      this.props.act({
+        actionType: 'setSettingsKeyPath',
+        keyPath: this.props.keyPath,
+        displayKeyPath: this.props.displayKeyPath,
+      });
+    }
+
   }
 }
 

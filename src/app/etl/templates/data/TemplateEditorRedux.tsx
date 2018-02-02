@@ -99,7 +99,10 @@ export interface TemplateEditorActionTypes
   setSettingsKeyPath: {
     actionType: 'setSettingsKeyPath';
     keyPath: KeyPath;
-    displayKeyPath?: KeyPath;
+    displayKeyPath: KeyPath;
+  };
+  closeSettings: {
+    actionType: 'closeSettings';
   };
 }
 
@@ -153,12 +156,11 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       },
       setSettingsKeyPath: (state, action) =>
       {
-        let newState = state.set('settingsKeyPath', action.payload.keyPath);
-        if (action.payload.displayKeyPath !== undefined)
-        {
-          newState = newState.set('settingsDisplayKeyPath', action.payload.displayKeyPath);
-        }
-        return newState;
+        return state.set('settingsKeyPath', action.payload.keyPath).set('settingsDisplayKeyPath', action.payload.displayKeyPath);
+      },
+      closeSettings: (state, action) =>
+      {
+        return state.set('settingsKeyPath', null).set('settingsDisplayKeyPath', null);
       },
     };
 }

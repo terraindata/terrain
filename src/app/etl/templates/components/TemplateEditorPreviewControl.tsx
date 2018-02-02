@@ -111,6 +111,9 @@ class TemplateEditorPreviewControl extends TerrainComponent<Props>
     if (previewIndex > 0)
     {
       this.props.act({
+        actionType: 'closeSettings',
+      });
+      this.props.act({
         actionType: 'setPreviewIndex',
         index: previewIndex - 1,
       });
@@ -122,6 +125,9 @@ class TemplateEditorPreviewControl extends TerrainComponent<Props>
     const { documents, previewIndex } = this.props.templateEditor;
     if (previewIndex + 1 < documents.size)
     {
+      this.props.act({
+        actionType: 'closeSettings',
+      });
       this.props.act({
         actionType: 'setPreviewIndex',
         index: previewIndex + 1,

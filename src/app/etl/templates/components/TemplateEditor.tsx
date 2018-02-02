@@ -218,14 +218,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
     );
   }
 
-  // public handleCloseDrawer()
-  // {
-  //   this.props.act({
-  //     actionType: 'setSettingsKeyPath',
-  //     keyPath: null,
-  //     displayKeyPath: null,
-  //   });
-  // }
 }
 
 const emptyList = List([]);

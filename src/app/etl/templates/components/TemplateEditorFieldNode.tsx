@@ -219,9 +219,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
   public handleCloseDrawer()
   {
     this.props.act({
-      actionType: 'setSettingsKeyPath',
-      keyPath: null,
-      displayKeyPath: null,
+      actionType: 'closeSettings',
     });
   }
 

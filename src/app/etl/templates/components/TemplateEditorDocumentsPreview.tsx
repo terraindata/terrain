@@ -137,6 +137,9 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
     return () =>
     {
       this.props.act({
+        actionType: 'closeSettings',
+      });
+      this.props.act({
         actionType: 'setPreviewIndex',
         index,
       });
