@@ -44,6 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2018 Terrain Data, Inc.
 
+import { List } from 'immutable';
 import nestedProperty = require('nested-property');
 import { TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationNode } from '../../transformations/TransformationNode';
@@ -146,4 +147,15 @@ test('linear chain of transformations', () =>
   e.appendTransformation(TransformationNodeType.SubstringNode, ['name'], { from: 0, length: 2 });
   const t = e.transform(doc1);
   expect(t['name']).toBe('BO');
+});
+
+test('get transformations for a field', () =>
+{
+  const e: TransformationEngine = new TransformationEngine();
+  const id1: number = e.addField('name', 'string');
+  e.addField('meta.school', 'string');
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
+  e.appendTransformation(TransformationNodeType.SubstringNode, ['name'], { from: 0, length: 2 });
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
+  expect(e.getTransformations(id1)).toEqual(List<number>([0, 1]));
 });
