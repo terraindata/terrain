@@ -203,19 +203,19 @@ export class TransformationEngine
   }
 
   public editTransformation(transformationID: number, fieldNamesOrIDs?: string[] | number[],
-                            options?: object): void
+    options?: object): void
   {
     if (!this.dag.nodes().includes(transformationID.toString()))
     {
       return;
     }
 
-    if (fieldNamesOrIDs)
+    if (fieldNamesOrIDs !== undefined)
     {
       (this.dag.node(transformationID) as TransformationNode).fieldIDs = this.parseFieldIDs(fieldNamesOrIDs);
     }
 
-    if (options)
+    if (options !== undefined)
     {
       (this.dag.node(transformationID) as TransformationNode).meta = options;
     }
