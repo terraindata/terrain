@@ -82,9 +82,9 @@ export default class ESVariantClause extends ESClause
       if (valueInfo.parameterValue !== null && valueInfo.parameterValue.getValueInfo() !== null)
       {
         const parameterType = ESJSONType[valueInfo.parameterValue.getValueInfo().jsonType];
-        if (parameterType === 'parameter')
+        if (parameterType === 'parameter' || parameterType === 'array')
         {
-          // this is a runtime parameter
+          // this is a runtime parameter or a magic array parameter
           for (const t of ['string', 'number', 'boolean', 'base', 'null'])
           {
             if (this.subtypes[t] !== undefined)
