@@ -617,13 +617,16 @@ class ResultsConfigResultC extends TerrainComponent<ResultsConfigResultProps>
             >
               <ImageIcon /> Image
             </div>
-            <div className='results-config-map-btn'
-              key={'map-btn-' + this.props.field}
-              onClick={this.changeToMap}
-              style={map ? activeBtnStyle : inactiveBtnStyle}
-            >
-              <MarkerIcon /> Map
-            </div>
+            {
+              // Disallow option of having each result have their own map
+              // <div className='results-config-map-btn'
+              // key={'map-btn-' + this.props.field}
+              // onClick={this.changeToMap}
+              // style={map ? activeBtnStyle : inactiveBtnStyle}
+              // >
+              //   <MarkerIcon /> Map
+              // </div>
+            }
           </div>
 
           <div className='results-config-image'>

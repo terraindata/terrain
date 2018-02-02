@@ -372,22 +372,14 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 action={this.props.onChange}
               />
               <MapComponent
-                address={value.address}
-                location={value.location}
-                markLocation={true}
-                showSearchBar={true}
-                zoomControl={true}
-                keepAddressInSync={false}
-                geocoder='google'
-                keyPath={this.props.keyPath.push('value').push('location')}
-                textKeyPath={this.props.keyPath.push('value').push('address')}
-                hideSearchSettings={true}
-                showDistanceCircle={true}
+                geocoder='photon'
+                inptValue={value.address}
+                coordinates={value.location}
                 distance={value.distance}
                 distanceUnit={value.units}
                 wrapperClassName={'pf-filter-map-component-wrapper'}
                 fadeInOut={true}
-                action={this.props.onChange}
+                onChange={this.handleMapChange}
               />
             </div>
           }
@@ -407,6 +399,14 @@ class PathfinderFilterLine extends TerrainComponent<Props>
       default:
         throw new Error('No value type handler for ' + filterLine.valueType);
     }
+  }
+
+  private handleMapChange(coordinates, inputValue)
+  {
+    const filterLine = this.props.filterLine
+      .setIn(List(['value', 'location']), coordinates)
+      .setIn(List(['value', 'address']), inputValue);
+    this.props.onChange(this.props.keyPath, filterLine, false, false);
   }
 
   private handleChange(key, value, fieldType?, fieldChange?)
