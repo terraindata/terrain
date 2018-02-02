@@ -68,6 +68,7 @@ import HitsTable from './HitsTable';
 
 import Radium = require('radium');
 
+import { AllBackendsMap } from '../../../../database/AllBackends';
 import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import DragHandle from '../../../common/components/DragHandle';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
@@ -284,7 +285,7 @@ class HitsArea extends TerrainComponent<Props>
     _.keys(locations).forEach((field) =>
     {
       let multiLocations = [];
-      const target = MapUtil.getCoordinatesFromGeopoint(locations[field]);
+      const target = locations[field];
       hits.forEach((hit, i) =>
       {
         const { resultsConfig } = this.props.query;
@@ -293,13 +294,13 @@ class HitsArea extends TerrainComponent<Props>
         const spotlight = this.state.spotlightHits.get(hit.primaryKey);
         const color = spotlight !== undefined && spotlight.color !== undefined ? spotlight.color : 'black';
         multiLocations.push({
-          location: hit.fields.get(field),
+          coordinates: hit.fields.get(field),
           name,
           index: i + 1,
           color,
         });
       });
-      allMapsData.push({ target, multiLocations });
+      allMapsData.push({ target, multiLocations: List(multiLocations) });
     });
     return allMapsData;
   }
@@ -413,17 +414,14 @@ class HitsArea extends TerrainComponent<Props>
           {
             mapData.map((data, index) =>
               <MapComponent
-                location={data.target}
-                multiLocations={data.multiLocations}
-                markLocation={true}
-                showSearchBar={false}
-                showDistanceCircle={false}
-                hideSearchSettings={true}
-                zoomControl={true}
-                colorMarker={true}
+                coordinates={data.target}
+                markers={data.multiLocations}
+                hideSearchBar={true}
                 key={index}
                 className='results-area-map-container'
                 onMapClick={this.handleMapClick}
+                geocoder='photon'
+                canEdit={false}
               />,
             )}
         </div>
@@ -511,29 +509,40 @@ class HitsArea extends TerrainComponent<Props>
     else
     {
       // Extract the geo_distance fields and values from the query
-      const geoDistances = this.props.query.tql.match(/"geo_distance": \{[^\}]*\}/g);
-      this.locations = {};
-      if (geoDistances !== undefined && geoDistances !== null)
+      try
       {
-        geoDistances.forEach((geoDist) =>
-        {
-          geoDist = '{' + geoDist + '}}';
-          try
+        const tqlString = AllBackendsMap[this.props.query.language].parseTreeToQueryString(
+          this.props.query,
           {
-            const obj = JSON.parse(geoDist);
-            // find field that isn't distance or distance_type
-            _.keys(obj.geo_distance).forEach((key) =>
+            replaceInputs: true,
+          },
+        );
+        const geoDistances = tqlString.match(/"geo_distance": \{[^\}]*\}/g);
+        this.locations = {};
+        if (geoDistances !== undefined && geoDistances !== null)
+        {
+          geoDistances.forEach((geoDist) =>
+          {
+            geoDist = '{' + geoDist + '}}';
+            try
             {
-              if (key !== 'distance' && key !== 'distance_type')
+              const obj = JSON.parse(geoDist);
+              // find field that isn't distance or distance_type
+              _.keys(obj.geo_distance).forEach((key) =>
               {
-                this.locations[key] = obj.geo_distance[key];
-              }
-            });
-          }
-          catch (e)
-          { }
-        });
+                if (key !== 'distance' && key !== 'distance_type')
+                {
+                  this.locations[key] = obj.geo_distance[key];
+                }
+              });
+            }
+            catch (e)
+            { }
+          });
+        }
       }
+      catch (e)
+      { }
       hitsContent = (
         <InfiniteScroll
           className={classNames({
