@@ -655,3 +655,18 @@ export function getType(obj: object): string
   // handles "number", "boolean", "object", and "undefined" cases
   return typeof obj;
 }
+
+export function getRootFieldFromDocPath(path: string): string | undefined
+{
+  try
+  {
+    let pathAsArr: string[] = [];
+    path.split(/(\.)/g).forEach((elem) => pathAsArr = pathAsArr.concat(elem.split(/(\[\d+\])/g)));
+    pathAsArr = pathAsArr.filter((elem) => elem.length !== 0);
+    return pathAsArr[0];
+  }
+  catch (e)
+  {
+    return undefined;
+  }
+}

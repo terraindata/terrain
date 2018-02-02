@@ -62,6 +62,7 @@ const FileImportReducers = {};
 
 const applyTransform = (state: FileImportTypes.FileImportState, transform: Transform) =>
 {
+  console.log('applying transform');
   const transformCol: number = state.columnNames.indexOf(transform.colName);
 
   if (transform.name === 'rename')
@@ -137,6 +138,50 @@ const applyTransform = (state: FileImportTypes.FileImportState, transform: Trans
         )))
         .delete(mergeCol),
     );
+  }
+  else if (transform.name === 'extract')
+  {
+    /*
+    {
+      name: 'extract',
+      colName: getRootFieldFromDocPath(this.state.addExportColumnPath),
+      args: FileImportTypes._TransformArgs({
+        newName: this.state.addExportColumnName,
+        path: this.state.addExportColumnPath,
+      }),
+    }
+    */
+    if (transform.colName !== undefined && transform.args !== undefined
+      && transform.args.newName !== undefined && transform.args.path !== undefined)
+    {
+      try
+      {
+        const extractedFieldsFromColumn: string[] = [];
+        state.previewColumns.get(transformCol).forEach((row) =>
+        {
+          let rowParsedAsObject: object | undefined;
+          try
+          {
+            rowParsedAsObject = JSON.parse(row);
+          }
+          catch (e)
+          {
+            rowParsedAsObject = undefined;
+          }
+          extractedFieldsFromColumn.push(_.get(rowParsedAsObject, transform.args.path));
+        });
+        return state
+          .set('isDirty', true)
+          .set('columnsToInclude', state.columnsToInclude.push(true))
+          .set('columnTypes', state.columnTypes.push(state.columnTypes.get(transformCol)))
+          .set('columnNames', state.columnNames.push(transform.args.newName as string))
+          .set('previewColumns', state.previewColumns.push(List(extractedFieldsFromColumn)));
+      }
+      catch (e)
+      {
+        // do nothing, state does not change
+      }
+    }
   }
   return state;
 };
@@ -298,14 +343,16 @@ FileImportReducers[ActionTypes.setColumnType] =
       .setIn(keyPath, action.payload.type);
   };
 
-FileImportReducers[ActionTypes.setColumnTypes] =
+FileImportReducers[ActionTypes.setColumnNamesAndTypes] =
   (state, action) =>
   {
     const { previewColumns, columnNames } = state;
+    const newColumnNames: string[] = Object.keys(action.payload.newColumnNamesAndTypes);
     return state
-      .set('columnTypes', List(columnNames.map((colName) =>
-        action.payload.newColumnTypes[colName] ?
-          FileImportTypes._ColumnTypesTree(action.payload.newColumnTypes[colName])
+      .set('columnNames', List(newColumnNames))
+      .set('columnTypes', List(newColumnNames.map((colName) =>
+        action.payload.newColumnNamesAndTypes[colName] ?
+          FileImportTypes._ColumnTypesTree(action.payload.newColumnNamesAndTypes[colName])
           :
           FileImportTypes._ColumnTypesTree())));
   };
@@ -318,7 +365,7 @@ FileImportReducers[ActionTypes.fetchTypesFromQuery] =
       action.payload.query,
       (namesAndTypes) =>
       {
-        action.payload.setColumnTypes(namesAndTypes);
+        action.payload.setColumnNamesAndTypes(namesAndTypes);
       });
     return state;
   };

@@ -74,11 +74,11 @@ const FileImportActions =
 
     fetchTypesFromQuery:
       (serverId: number, query: object) =>
-        $(ActionTypes.fetchTypesFromQuery, { serverId, query, setColumnTypes: FileImportActions.setColumnTypes }),
+        $(ActionTypes.fetchTypesFromQuery, { serverId, query, setColumnNamesAndTypes: FileImportActions.setColumnNamesAndTypes }),
 
-    setColumnTypes:
-      (newColumnTypes) =>
-        $(ActionTypes.setColumnTypes, { newColumnTypes }),
+    setColumnNamesAndTypes:
+      (newColumnNamesAndTypes) =>
+        $(ActionTypes.setColumnNamesAndTypes, { newColumnNamesAndTypes }),
 
     changeHasCsvHeader:
       (hasCsvHeader: boolean) =>
