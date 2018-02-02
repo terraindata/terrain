@@ -612,12 +612,35 @@ export class ResultsManager extends TerrainComponent<Props>
     const resultsData = response.getResultsData();
     const hits = resultsData.hits.hits.map((hit) =>
     {
-      const sort = hit.sort !== undefined ? { _sort: hit.sort[0] } : {};
-      return _.extend({}, hit._source, sort, {
-        _index: hit._index,
-        _type: hit._type,
-        _score: hit._score,
-        _id: hit._id,
+      let hitTemp = _.cloneDeep(hit);
+      let rootKeys: string[] = [];
+      rootKeys = _.without(Object.keys(hitTemp), '_index', '_type', '_id', '_score', '_source', 'sort', '');
+      if (rootKeys.length > 0) // there were group join objects
+      {
+        const duplicateRootKeys: string[] = [];
+        rootKeys.forEach((rootKey) =>
+        {
+          if (Object.keys(hitTemp._source).indexOf(rootKey) > -1)
+          {
+            duplicateRootKeys.push(rootKey);
+          }
+        });
+        if (duplicateRootKeys.length !== 0)
+        {
+          console.log('Duplicate keys ' + JSON.stringify(duplicateRootKeys) + ' in root level and source mapping');
+        }
+        rootKeys.forEach((rootKey) =>
+        {
+          hitTemp['_source'][rootKey] = hitTemp[rootKey];
+          delete hitTemp[rootKey];
+        });
+      }
+      const sort = hitTemp.sort !== undefined ? { _sort: hitTemp.sort[0] } : {};
+      return _.extend({}, hitTemp._source, sort, {
+        _index: hitTemp._index,
+        _type: hitTemp._type,
+        _score: hitTemp._score,
+        _id: hitTemp._id,
       });
     });
     const aggregations = resultsData.aggregations;
