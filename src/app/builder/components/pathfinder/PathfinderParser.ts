@@ -296,7 +296,7 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
   });
   if (useShould)
   {
-    filterObj = filterObj.setIn(['bool', 'minimum_should_match'], filterGroup.minMatches === 'any' ? 1 : filterGroup.minMatches);
+    filterObj = filterObj.setIn(['bool', 'minimum_should_match'], filterGroup.minMatches === 'any' ? 1 : parseFloat(String(filterGroup.minMatches)));
   }
   filterObj = filterObj.setIn(['bool', 'must'], must);
   filterObj = filterObj.setIn(['bool', 'must_not'], mustNot);

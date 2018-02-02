@@ -65,6 +65,7 @@ import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 import FloatingInput from 'app/common/components/FloatingInput';
+const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
 {
@@ -134,13 +135,16 @@ class PathfinderColumn extends TerrainComponent<Props>
     BuilderActions.changePath(this.getKeyPath().push('name'), value);
   }
 
+  public handleDeletePath()
+  {
+    BuilderActions.changePath(this.getKeyPath(), undefined);
+  }
+
   public render()
   {
     const { path } = this.props;
     const keyPath = this.getKeyPath();
     const { pathfinderContext } = this.state;
-    console.log('PATH IS ', path);
-    console.log('STEP IS ', path.step);
     return (
       <div
         className='pathfinder-column'
@@ -151,13 +155,16 @@ class PathfinderColumn extends TerrainComponent<Props>
       >
         {
           path.name !== undefined &&
-          <FloatingInput
-            value={path.name}
-            onChange={this.changePathName}
-            label={'Algorithm Name'}
-            isTextInput={true}
-            canEdit={pathfinderContext.canEdit}
-          />
+          <div>
+            <FloatingInput
+              value={path.name}
+              onChange={this.changePathName}
+              label={'Algorithm Name'}
+              isTextInput={true}
+              canEdit={pathfinderContext.canEdit}
+            />
+            <RemoveIcon onClick={this.handleDeletePath}/>
+          </div>
         }
         <PathfinderSourceSection
           pathfinderContext={pathfinderContext}
