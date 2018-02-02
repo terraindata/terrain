@@ -583,7 +583,7 @@ const LIGHT: Theme =
     altHighlight: 'rgba(255,255,255,0.15)',
 
     highlight: 'rgba(210,215,219,0.25)', // for slight emphasis
-    darkerHighlight: 'rgb(210,215,219,0.5)', // to make a depth effect with highlight
+    darkerHighlight: 'rgba(210,215,219,0.5)', // to make a depth effect with highlight
     stroke: '#aaa', // stands out against any background
 
     boxShadow: 'rgba(130,130,130,0.3)',
@@ -1050,7 +1050,7 @@ export const ThemesInt =
 
 export const ThemesArray = ['DARK', 'LIGHT', 'HALLOWEEN'];
 
-const curTheme = 'DARK';
+const curTheme = 'LIGHT';
 
 export function Colors()
 {
