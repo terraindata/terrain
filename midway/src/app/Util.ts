@@ -162,7 +162,7 @@ export function getEmptyObject(payload: object): object
     emptyObj);
 }
 
-export function getRequest(url)
+export function doRequest(url)
 {
   return new Promise((resolve, reject) =>
   {

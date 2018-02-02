@@ -91,7 +91,6 @@ test('basic query', async (done) =>
         index: 'movies',
         type: 'data',
         body: {
-          query: {},
           sort: [{ revenue: 'desc' }, { movieid: 'asc' }],
         },
         size: 1,
@@ -115,8 +114,7 @@ test('store terrain_PWLScore script', async (done) =>
       {
         id: 'terrain_PWLScore',
         lang: 'painless',
-        body: {
-          script: `
+        body: `
 double pwlTransform(def ranges, def outputs, def input)
 {
 if (input <= ranges[0])
@@ -164,7 +162,6 @@ for(int i = 0; i < factors.length; ++i)
   total += weight * output;
 }
 return total;`,
-        },
       });
   }
   catch (e)
@@ -207,7 +204,7 @@ test('stored PWL transform sort query', async (done) =>
               type: 'number',
               order: 'desc',
               script: {
-                stored: 'terrain_PWLScore',
+                id: 'terrain_PWLScore',
                 params: {
                   factors: [
                     {
@@ -293,7 +290,7 @@ test('stored PWL transform sort query using function_score', async (done) =>
                 {
                   script_score: {
                     script: {
-                      stored: 'terrain_PWLScore',
+                      id: 'terrain_PWLScore',
                       params: {
                         factors: [
                           {
