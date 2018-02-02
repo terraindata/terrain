@@ -58,10 +58,13 @@ import BuilderActions from '../../../data/BuilderActions';
 import PathfinderCreateLine from '../PathfinderCreateLine';
 import PathfinderSectionTitle from '../PathfinderSectionTitle';
 import PathfinderText from '../PathfinderText';
-import { _AggregationLine, More, Path, PathfinderContext, Source } from '../PathfinderTypes';
+import { _AggregationLine, More, _Path, Path, PathfinderContext, Source } from '../PathfinderTypes';
 import DragAndDrop, { DraggableItem } from './../../../../common/components/DragAndDrop';
 import DragHandle from './../../../../common/components/DragHandle';
 import PathfinderAggregationLine from './PathfinderAggregationLine';
+import {tooltip} from 'app/common/components/tooltip/Tooltips';
+import FloatingInput from 'app/common/components/FloatingInput';
+import PathfinderColumn from '../PathfinderColumn';
 
 export interface Props
 {
@@ -70,6 +73,7 @@ export interface Props
   keyPath: KeyPath;
   hideTitle?: boolean;
   colorsActions?: typeof ColorsActions;
+  toSkip?: number;
 }
 
 class PathfinderMoreSection extends TerrainComponent<Props>
@@ -91,6 +95,20 @@ class PathfinderMoreSection extends TerrainComponent<Props>
       selector: '.pf-aggregation-arrow-advanced',
       style: getStyle('fill', Colors().iconColor),
     });
+  }
+
+  public handleReferenceChange(value)
+  {
+    BuilderActions.changePath(this.props.keyPath.push('reference'), value);
+    if (this.props.more.nested === undefined)
+    {
+      BuilderActions.changePath(this.props.keyPath.push('nested'), _Path(), true);
+    }
+  }
+
+  public handleAddNested()
+  {
+    BuilderActions.changePath(this.props.keyPath.push('reference'), '');
   }
 
   public handleAddLine()
@@ -136,6 +154,19 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     return lines;
   }
 
+  public renderPath(path: Path)
+  {
+    return (
+      <PathfinderColumn
+        path={path}
+        canEdit={this.props.pathfinderContext.canEdit}
+        schema={this.props.pathfinderContext.schemaState}
+        keyPath={this.props.keyPath.push('nested')}
+        toSkip={this.props.toSkip + 2} // Every time you nest, the filter section needs to know how nested it is
+      />
+    );
+  }
+
   public render()
   {
     const { canEdit } = this.props.pathfinderContext;
@@ -144,10 +175,10 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         className='pf-section pf-more-section'
       >
         {!this.props.hideTitle &&
-          <PathfinderSectionTitle
-            title={PathfinderText.moreSectionTitle}
-            text={PathfinderText.moreSectionSubtitle}
-          />
+        <PathfinderSectionTitle
+          title={PathfinderText.moreSectionTitle}
+          text={PathfinderText.moreSectionSubtitle}
+        />
         }
         <DragAndDrop
           draggableItems={this.getAggregationLines()}
@@ -159,6 +190,33 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           onCreate={this.handleAddLine}
           text={PathfinderText.createAggregationLine}
         />
+        <div>
+          {
+            this.props.more.reference !== undefined ?
+           <div>
+            {
+              tooltip(
+                <FloatingInput
+                  label={'Reference'}
+                  isTextInput={true}
+                  value={this.props.more.reference}
+                  onChange={this.handleReferenceChange}
+                  canEdit={canEdit}
+                />,
+                PathfinderText.referenceExplanation
+              )
+            }
+              {this.props.more.nested !== undefined && this.renderPath(this.props.more.nested)}
+            </div>
+            :
+            tooltip(
+              <div onClick={this.handleAddNested}>
+                Add a Nested Algorithm
+              </div>,
+              PathfinderText.nestedExplanation
+            )
+           }
+        </div>
       </div>
     );
   }

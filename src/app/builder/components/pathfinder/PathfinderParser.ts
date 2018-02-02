@@ -57,7 +57,7 @@ import { ESParseTreeToCode, stringifyWithParameters } from '../../../../database
 import { Query } from '../../../../items/types/Query';
 import { DistanceValue, FilterGroup, FilterLine, More, Path, Score, Source } from './PathfinderTypes';
 
-export function parsePath(path: Path, inputs): string
+export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 {
   let baseQuery = Map({
     query: Map({
@@ -102,8 +102,17 @@ export function parsePath(path: Path, inputs): string
         baseQuery.getIn(['query', 'bool', 'filter']).push(sortObj));
     }
   }
-  const moreObj = parseMore(path.more);
+  const moreObj = parseAggregations(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
+  const groupJoin = parseNested(path.more, inputs);
+  if (groupJoin)
+  {
+    baseQuery = baseQuery.set('groupJoin', groupJoin);
+  }
+  if (ignoreInputs)
+  {
+    return baseQuery;
+  }
   const text = stringifyWithParameters(baseQuery.toJS(), inputs);
   const parser: ESJSONParser = new ESJSONParser(text, true);
   return ESParseTreeToCode(parser, {}, inputs);
@@ -455,7 +464,7 @@ const unusedKeys = [
   'max',
   'sortField',
 ];
-function parseMore(more: More): {}
+function parseAggregations(more: More): {}
 {
   const moreObj = {};
   more.aggregations.forEach((agg) =>
@@ -524,3 +533,16 @@ function parseMore(more: More): {}
   });
   return moreObj;
 }
+
+// Put a nested path inside of a groupJoin
+// TODO nestedQuery should be a user-inputed number
+function parseNested(more: More, inputs)
+{
+  if (more.nested === undefined)
+  {
+    return;
+  }
+  const nestedQuery = parsePath(more.nested, inputs, true);
+  return Map({nestedQuery});
+}
+

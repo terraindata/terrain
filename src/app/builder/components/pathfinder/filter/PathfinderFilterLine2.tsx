@@ -160,11 +160,11 @@ class PathfinderFilterLine extends TerrainComponent<Props>
     return (
       <div>
         {
-          options.map((choiceOption) =>
+          options.map((choiceOption, index) =>
             <div
               style={pieceStyle}
               onClick={this._fn(this.handleChange, 'field', choiceOption.value, choiceOption.meta && choiceOption.meta.fieldType)}
-              key={choiceOption.value}
+              key={index}
             >
               {
                 choiceOption.displayName
@@ -254,13 +254,13 @@ class PathfinderFilterLine extends TerrainComponent<Props>
           >
             <div>
               {
-                comparisonOptions.map((option) =>
+                comparisonOptions.map((option, index) =>
                   option.value === filterLine.comparison ||
                     filterLine.comparison === null ?
                     <div
                       style={pieceStyle}
                       onClick={this._fn(this.handleChange, 'comparison', option.value)}
-                      key={option.value}
+                      key={index}
                     >
                       {
                         option.displayName

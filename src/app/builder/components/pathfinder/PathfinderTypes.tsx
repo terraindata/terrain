@@ -218,6 +218,8 @@ export const _ScorePoint = (config?: { [key: string]: any }) =>
 class MoreC extends BaseClass
 {
   public aggregations: List<AggregationLine> = List([]);
+  public reference: string = undefined; // What should this query be referred to in other queries (@parent in US query)
+  public nested: Path = undefined;
 }
 
 export type More = MoreC & IRecord<MoreC>;
@@ -226,6 +228,10 @@ export const _More = (config?: { [key: string]: any }) =>
   let more = New<More>(new MoreC(config || {}), config);
   more = more
     .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))));
+  if (more['nested'])
+  {
+    more = more.set('nested', _Path(more['nested']));
+  }
   return more;
 };
 

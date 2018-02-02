@@ -70,8 +70,10 @@ export interface Props
   path: Path;
   canEdit: boolean;
   schema: SchemaState;
+  keyPath?: KeyPath;
   colorsActions: typeof ColorsActions;
   colors: ColorsState;
+  toSkip?: number;
 }
 
 @Radium
@@ -123,7 +125,7 @@ class PathfinderColumn extends TerrainComponent<Props>
 
   public getKeyPath()
   {
-    return List(['query', 'path']);
+    return this.props.keyPath !== undefined ? this.props.keyPath : List(['query', 'path'])
   }
 
   public render()
@@ -154,6 +156,7 @@ class PathfinderColumn extends TerrainComponent<Props>
               keyPath={keyPath.push('filterGroup')}
               onStepChange={this.incrementStep}
               step={path.step}
+              toSkip={this.props.toSkip}
             />
             : null
         }
@@ -175,6 +178,7 @@ class PathfinderColumn extends TerrainComponent<Props>
               pathfinderContext={pathfinderContext}
               more={path.more}
               keyPath={keyPath.push('more')}
+              toSkip={this.props.toSkip !== undefined ? this.props.toSkip : 3}
             />
             : null
         }
