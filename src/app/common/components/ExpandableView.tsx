@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
+import FadeInOut from 'common/components/FadeInOut';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import './ExpandableView.less';
 
@@ -64,6 +65,7 @@ export interface Props
   onToggle: () => void;
   style?: any;
   children?: any;
+  injectedContent?: any;
 }
 
 const arrowSize = 12;
@@ -113,19 +115,36 @@ class ExpandableView extends TerrainComponent<Props>
             {this.props.content}
           </div>
         </div>
-        <div
-          className={classNames({
-            'expandable-view-children-container': true,
-            'expandable-view-open': this.props.open,
-          })}
-          style={{
-            marginLeft: containerLeftMargin,
-            paddingLeft: containerLeftPadding,
-            borderColor: Colors().active,
-          }}
-        >
-          {this.props.children}
-        </div>
+        {(this.props.injectedContent !== null && this.props.injectedContent !== undefined) &&
+          <div
+            className={classNames({
+              'expandable-view-injected-container': true,
+              'expandable-view-open': this.props.open,
+            })}
+            style={{
+              marginLeft: containerLeftMargin,
+              paddingLeft: containerLeftPadding,
+              borderColor: Colors().active,
+            }}
+          >
+            {this.props.injectedContent}
+          </div>
+        }
+        <FadeInOut open={this.props.open}>
+          <div
+            className={classNames({
+              'expandable-view-children-container': true,
+              'expandable-view-open': this.props.open,
+            })}
+            style={{
+              marginLeft: containerLeftMargin,
+              paddingLeft: containerLeftPadding,
+              borderColor: Colors().active,
+            }}
+          >
+            {this.props.children}
+          </div>
+        </FadeInOut>
       </div>
     );
   }

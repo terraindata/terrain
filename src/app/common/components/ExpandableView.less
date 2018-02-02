@@ -36,6 +36,7 @@
     fill: currentColor;
     flex-grow: 0;
     transform: rotate(90deg);
+    .transition;
     &.expandable-view-open {
       transform: rotate(180deg);
     }
@@ -49,25 +50,17 @@
   }
 
   .expandable-view-children-container {
-    padding-left: @half-spacing;
-    max-height: 0px;
     overflow: visible;
     display: none;
     &.expandable-view-open {
       border-left: 1px solid;
-      max-height: none;
       display: block;
     }
   }
-  
-  // &.expandable-view-open {
-  //   .expandable-view-arrow-icon {
-  //     transform: rotate(180deg);
-  //   }
-    
-  //   .expandable-view-children-container {
-  //     border-left: 1px solid;
-  //     max-height: none;
-  //   }
-  // }
+
+  .expandable-view-injected-container {
+    &.expandable-view-open {
+      border-left: 1px solid;
+    }
+  }
 }

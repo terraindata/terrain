@@ -61,6 +61,7 @@ class TemplateEditorStateC
   public documents: List<object> = List([]);
   public previewIndex: number = -1;
   public settingsKeyPath: KeyPath = null;
+  public settingsDisplayKeyPath: KeyPath = null;
 }
 export type TemplateEditorState = WithIRecord<TemplateEditorStateC>;
 export const _TemplateEditorState = makeConstructor(TemplateEditorStateC);

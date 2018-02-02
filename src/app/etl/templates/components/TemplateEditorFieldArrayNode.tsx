@@ -72,6 +72,7 @@ export interface Props extends TemplateEditorFieldProps
   depth: number;
   label?: string;
   renderNestedFields?: (preview: any, displayKeyPath: KeyPath) => any;
+  injectedContent?: any;
   // below from container
   templateEditor?: TemplateEditorState;
   act?: typeof TemplateEditorActions;
@@ -140,7 +141,7 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
 
   public render()
   {
-    const { field, canEdit, preview, depth, label, displayKeyPath } = this.props;
+    const { field, canEdit, preview, depth, label, displayKeyPath, injectedContent } = this.props;
     let content = null;
     const simpleArrayDisplay: boolean = !this._isNested() && depth + 1 === this._arrayDepth();
 
@@ -187,6 +188,7 @@ class TemplateEditorFieldArrayNodeC extends TemplateEditorField<Props>
           content={previewComponent}
           open={this.state.expandableViewOpen}
           onToggle={this.handleExpandArrowClicked}
+          injectedContent={injectedContent}
           children={simpleArrayDisplay ? null : childrenComponent}
           style={childrenStyle}
         />

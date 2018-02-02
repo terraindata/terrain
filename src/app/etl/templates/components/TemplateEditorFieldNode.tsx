@@ -55,6 +55,7 @@ import Util from 'util/Util';
 
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
+import FadeInOut from 'common/components/FadeInOut';
 
 import ExpandableView from 'common/components/ExpandableView';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
@@ -64,6 +65,7 @@ import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorF
 import './TemplateEditorField.less';
 import TemplateEditorFieldArrayNode from './TemplateEditorFieldArrayNode';
 import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
+import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
 const AddIcon = require('images/icon_add.svg');
 
@@ -105,12 +107,28 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
+  public renderSettingsContainer()
+  {
+    const showSettings = this.settingsAreOpen();
+    return (
+      <FadeInOut open={showSettings}>
+        <div className='injected-content-container'>
+          <div className='injected-content-content'>
+            {showSettings ?
+              <TemplateEditorFieldSettings
+                {...this._passProps() }
+              /> : null
+            }
+          </div>
+        </div>
+      </FadeInOut>
+    );
+  }
+
   public render()
   {
     const { field, keyPath, canEdit, preview, displayKeyPath } = this.props;
-    let children = null;
-    let content = null;
-    console.log(this.props.displayKeyPath.toJS().toString());
+
     if (this._isRoot())
     {
       return (
@@ -119,12 +137,18 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
         </div>
       );
     }
-    else if (this._isArray())
+
+    let children = null;
+    let content = null;
+    const injectedContent = this.renderSettingsContainer();
+
+    if (this._isArray())
     {
       return (
         <TemplateEditorFieldArrayNode
           depth={0}
           renderNestedFields={this.renderChildFields}
+          injectedContent={injectedContent}
           {...this._passProps() }
         />
       );
@@ -153,15 +177,25 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       </div>;
     const childrenStyle = (canEdit === true && field.isIncluded === false) ?
       getStyle('opacity', '0.5') : {};
+
     return (
       <ExpandableView
         content={content}
         open={this.state.expandableViewOpen}
         onToggle={this.handleExpandArrowClicked}
         children={childrenComponent}
+        injectedContent={injectedContent}
         style={childrenStyle}
       />
     );
+  }
+
+  public settingsAreOpen(): boolean
+  {
+    const { displayKeyPath, keyPath, templateEditor, noInteract } = this.props;
+    return !noInteract &&
+      displayKeyPath.equals(templateEditor.settingsDisplayKeyPath) &&
+      keyPath.equals(templateEditor.settingsKeyPath);
   }
 
   public handleExpandArrowClicked()

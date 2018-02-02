@@ -99,6 +99,7 @@ class TemplateEditorDocumentsPreview extends TerrainComponent<Props>
             keyPath={emptyList}
             field={template.rootField}
             canEdit={false}
+            noInteract={true}
             preview={previewDocument}
             displayKeyPath={emptyList}
           />

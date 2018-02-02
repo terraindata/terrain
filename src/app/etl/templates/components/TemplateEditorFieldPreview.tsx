@@ -61,7 +61,6 @@ import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
-import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
 import './TemplateEditorField.less';
 
@@ -125,6 +124,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
     this.props.act({
       actionType: 'setSettingsKeyPath',
       keyPath: this.props.keyPath,
+      displayKeyPath: this.props.displayKeyPath,
     });
   }
 }

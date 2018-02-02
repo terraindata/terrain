@@ -68,6 +68,7 @@ export interface TemplateEditorFieldProps
   keyPath: KeyPath; // keyPath from the root field to this field
   field: TemplateField;
   canEdit: boolean;
+  noInteract: boolean;
   preview: any;
   displayKeyPath: KeyPath; // not the key path in the store, but the key path in virtual DOM
   // below from container
@@ -84,7 +85,7 @@ export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps
 
   protected _passProps(config: object = {}): TemplateEditorFieldProps
   {
-    return _.extend(_.pick(this.props, ['keyPath', 'field', 'canEdit', 'preview', 'displayKeyPath']), config);
+    return _.extend(_.pick(this.props, ['keyPath', 'field', 'canEdit', 'noInteract', 'preview', 'displayKeyPath']), config);
   }
 
   // Helper to calling setIn() on the TemplateField in the store.
