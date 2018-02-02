@@ -45,6 +45,7 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import GraphLib = require('graphlib');
+import { List } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
 import nestedProperty = require('nested-property');
@@ -169,25 +170,25 @@ export class TransformationEngine
     return this.uidField - 1;
   }
 
-  public nodesForField(field: string | number): TransformationNode[]
+  public getTransformations(field: string | number): List<number>
   {
     const target: number = typeof field === 'number' ? field : this.fieldNameToIDMap[field];
     const nodes: TransformationNode[] = [];
     _.each(this.dag.nodes(), (node) =>
     {
-      if ((node.value as TransformationNode).fieldIDs.includes(target))
+      if ((this.dag.node(node) as TransformationNode).fieldIDs.includes(target))
       {
-        nodes.push(node.value as TransformationNode);
+        nodes.push(this.dag.node(node) as TransformationNode);
       }
     });
     // Need to order nodes...
     const allSorted = GraphLib.alg.topsort(this.dag);
-    const nodesSorted = [];
+    let nodesSorted: List<number> = new List<number>();
     for (let i: number = 0; i < allSorted.length; i++)
     {
       if (nodes.includes(this.dag.node(allSorted[i])))
       {
-        nodesSorted.push(this.dag.node(allSorted[i]));
+        nodesSorted = nodesSorted.push(parseInt(allSorted[i], 10));
       }
     }
     return nodesSorted;
