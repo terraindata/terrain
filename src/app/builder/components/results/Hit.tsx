@@ -107,23 +107,6 @@ class HitComponent extends TerrainComponent<Props> {
       // spotlights: SpotlightStore.getState().spotlights,
     };
 
-  public menuOptions =
-    [
-      List([
-        {
-          text: 'Spotlight',
-          onClick: this.spotlight,
-        },
-      ]),
-
-      List([
-        {
-          text: 'Un-Spotlight',
-          onClick: this.unspotlight,
-        },
-      ]),
-    ];
-
   public constructor(props: Props)
   {
     super(props);
@@ -209,7 +192,7 @@ class HitComponent extends TerrainComponent<Props> {
     );
   }
 
-  public spotlight(overrideId?, overrideColor?)
+  public spotlight(e, overrideId?, overrideColor?)
   {
     const id = overrideId || this.props.primaryKey;
     const spotlightColor = overrideColor || ColorManager.altColorForKey(id);
@@ -242,6 +225,7 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlight = spotlights.get(this.props.primaryKey);
     return (
       <div
+        onClick={spotlight !== undefined ? this.unspotlight : this.spotlight}
         className={classNames({
           'result-spotlight': true,
           'result-spotlight-lit': spotlight !== undefined,
@@ -258,7 +242,7 @@ class HitComponent extends TerrainComponent<Props> {
             'result-spotlight-text-large': this.props.index + 1 < 10,
           })}
         >
-          {this.props.index + 1}
+          {_.padStart((this.props.index + 1).toString(), 2, '0')}
         </div>
       </div>
     );
@@ -290,7 +274,9 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlights = this.props.spotlights.spotlights;
     const spotlight = spotlights.get(this.props.primaryKey);
     const color = spotlight ? spotlight.color : 'black';
-    const thumbnail = getResultThumbnail(hit, resultsConfig, this.props.expanded);
+    const thumbnail = resultsConfig.thumbnail !== null ?
+      getResultThumbnail(hit, resultsConfig, this.props.expanded) :
+      null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);
     const fields = getResultFields(hit, resultsConfig);
     const configHasFields = resultsConfigHasFields(resultsConfig);
@@ -336,12 +322,14 @@ class HitComponent extends TerrainComponent<Props> {
             backgroundColor((localStorage.getItem('theme') === 'DARK') ? Colors().emptyBg : Colors().bg3),
           ]}
         >
-          <div className="result-thumbnail-wrapper">
-            <div className="result-thumbnail">
-              {thumbnail}
+          {thumbnail !== null ? (
+            <div className='result-thumbnail-wrapper'>
+              <div className='result-thumbnail'>
+                {thumbnail}
+              </div>
             </div>
-          </div>
-          <div className="result-details-wrapper">
+          ) : null}
+          <div className='result-details-wrapper'>
             <div className='result-name'>
               <div
                 className='result-name-inner'
@@ -367,14 +355,6 @@ class HitComponent extends TerrainComponent<Props> {
                 }
               </div>
             </div>
-            {
-              this.props.allowSpotlights &&
-              <Menu
-                options={
-                  this.menuOptions[spotlight ? 1 : 0]
-                }
-              />
-            }
             <div className='result-fields-wrapper'>
               {score}
               {
