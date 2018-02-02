@@ -138,7 +138,7 @@ export async function provisionScripts(controller: DatabaseController)
 
         await doRequest({
           method: 'POST',
-          url: 'http://' + host + '/_scripts/' + script.id,
+          url: 'http://' + String(host) + '/_scripts/' + script.id,
           json: true,
           body: {
             script: {
