@@ -80,9 +80,9 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
   public render()
   {
     const { canEdit, field, keyPath, preview, hidePreviewValue, displayValueOverride } = this.props;
-    const settingsOpen = this.props.templateEditor.settingsKeyPath === keyPath;
+    const settingsOpen = this._settingsAreOpen();
     const labelStyle = settingsOpen ?
-      _.extend({}, fontColor(Colors().text1, Colors().text1), backgroundColor(Colors().highlight))
+      fontColor(Colors().active, Colors().active)
       :
       fontColor(Colors().text2, Colors().text1);
 
@@ -97,7 +97,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
             <div className={classNames({
               'field-preview-label': true,
             })}
-              onClick={this._noopIfDisabled(this.handleLabelClicked)}
+              onClick={this.handleLabelClicked}
             >
               {field.name}
             </div>
@@ -107,7 +107,7 @@ class TemplateEditorFieldPreview extends TemplateEditorField<Props>
             <div
               className={classNames({
                 'field-preview-value': true,
-                'field-preview-value-settings-open': settingsOpen,
+                /*'field-preview-value-settings-open': settingsOpen,*/
               })}
               style={fontColor(Colors().text2)}
             >

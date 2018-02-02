@@ -67,7 +67,7 @@ import TemplateEditorFieldArrayNode from './TemplateEditorFieldArrayNode';
 import TemplateEditorFieldPreview from './TemplateEditorFieldPreview';
 import TemplateEditorFieldSettings from './TemplateEditorFieldSettings';
 
-const AddIcon = require('images/icon_add.svg');
+const CloseIcon = require('images/icon_carrot.svg');
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -99,7 +99,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
             field: value,
             canEdit: field.isIncluded && canEdit,
             preview: childPreview,
-            displayKeyPath: displayKeyPath.push(value.name),
+            displayKeyPath: displayKeyPath.push(index),
           }) }
           key={index}
         />
@@ -107,19 +107,38 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     }).toList();
   }
 
+  public renderCloseLine()
+  {
+    return (
+      <div
+        className='template-editor-close-row'
+        style={[borderColor(Colors().text3, Colors().text2), fontColor(Colors().text3, Colors().text2)]}
+        onClick={this.handleCloseDrawer}
+      >
+        <div className='settings-drawer-close-line' style={getStyle('marginRight', '12px')} />
+        <CloseIcon
+          className='settings-drawer-close-icon'
+          width='16px' height='16px'
+        />
+        <div className='settings-drawer-close-line' style={getStyle('marginLeft', '12px')} />
+      </div>
+    );
+  }
+
   public renderSettingsContainer()
   {
-    const showSettings = this.settingsAreOpen();
+    const showSettings = this._settingsAreOpen();
     return (
       <FadeInOut open={showSettings}>
         <div className='injected-content-container'>
-          <div className='injected-content-content'>
-            {showSettings ?
+          {showSettings ?
+            <div className='injected-content-content' style={backgroundColor(Colors().bg2)}>
               <TemplateEditorFieldSettings
                 {...this._passProps() }
-              /> : null
-            }
-          </div>
+              />
+              {this.renderCloseLine()}
+            </div> : null
+          }
         </div>
       </FadeInOut>
     );
@@ -190,18 +209,19 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
     );
   }
 
-  public settingsAreOpen(): boolean
-  {
-    const { displayKeyPath, keyPath, templateEditor, noInteract } = this.props;
-    return !noInteract &&
-      displayKeyPath.equals(templateEditor.settingsDisplayKeyPath) &&
-      keyPath.equals(templateEditor.settingsKeyPath);
-  }
-
   public handleExpandArrowClicked()
   {
     this.setState({
       expandableViewOpen: !this.state.expandableViewOpen,
+    });
+  }
+
+  public handleCloseDrawer()
+  {
+    this.props.act({
+      actionType: 'setSettingsKeyPath',
+      keyPath: null,
+      displayKeyPath: null,
     });
   }
 

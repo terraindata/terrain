@@ -78,6 +78,7 @@ class ExpandableView extends TerrainComponent<Props>
   public render()
   {
     const hasChildren = this.props.children !== undefined && this.props.children !== null;
+    const leftBorderColor = Colors().inactiveHover;
     return (
       <div className={classNames({
         'expandable-view-container': true,
@@ -107,7 +108,7 @@ class ExpandableView extends TerrainComponent<Props>
                 'expandable-view-has-children': hasChildren,
               })}
               style={{
-                borderColor: Colors().active,
+                borderColor: leftBorderColor,
               }}
             />
           </div>
@@ -124,7 +125,7 @@ class ExpandableView extends TerrainComponent<Props>
             style={{
               marginLeft: containerLeftMargin,
               paddingLeft: containerLeftPadding,
-              borderColor: Colors().active,
+              borderColor: leftBorderColor,
             }}
           >
             {this.props.injectedContent}
@@ -139,7 +140,7 @@ class ExpandableView extends TerrainComponent<Props>
             style={{
               marginLeft: containerLeftMargin,
               paddingLeft: containerLeftPadding,
-              borderColor: Colors().active,
+              borderColor: leftBorderColor,
             }}
           >
             {this.props.children}

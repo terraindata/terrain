@@ -31,11 +31,11 @@
   .field-preview-value {
     padding: @half-spacing;
     padding-left: @spacing;
-    &.field-preview-value-settings-open {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-height: 1em;
-    }
+    // &.field-preview-value-settings-open {
+    //   overflow: hidden;
+    //   text-overflow: ellipsis;
+    //   max-height: 1em;
+    // }
   }
 
   .field-preview-row {
@@ -145,18 +145,40 @@
   bottom: 1px;
 }
 
-@settings-height: 300px;
+@settings-height: 240px;
 .injected-content-container {
   width: 100%;
   height: @settings-height + @spacing;
 
   .injected-content-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     height: @settings-height;
     width: ~"calc(100% - @{double-spacing})";
     left: @spacing;
-    background-color: #DDD;
     box-shadow: 2px 3px 10px rgba(0,0,0,0.25);
     position: absolute;
 
+  }
+}
+
+.template-editor-close-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px @spacing @half-spacing @spacing;
+
+  .settings-drawer-close-line {
+    flex: 1;
+    height: 1px;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    opacity: 0.2;
+  }
+
+  .settings-drawer-close-icon {
+    fill: currentColor;
+    transform: rotate(-90deg);
   }
 }

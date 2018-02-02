@@ -66,7 +66,6 @@ import './TemplateEditor.less';
 
 import { SampleDocuments, treeFromDocument } from './TemporaryUtil';
 
-const CloseIcon = require('images/icon_carrot.svg');
 const { List } = Immutable;
 
 export interface Props
@@ -219,14 +218,14 @@ class ETLExportDisplay extends TerrainComponent<Props>
     );
   }
 
-  public handleCloseDrawer()
-  {
-    this.props.act({
-      actionType: 'setSettingsKeyPath',
-      keyPath: null,
-      displayKeyPath: null,
-    });
-  }
+  // public handleCloseDrawer()
+  // {
+  //   this.props.act({
+  //     actionType: 'setSettingsKeyPath',
+  //     keyPath: null,
+  //     displayKeyPath: null,
+  //   });
+  // }
 }
 
 const emptyList = List([]);
