@@ -96,7 +96,7 @@ export async function provisionScripts(controller: DatabaseController)
           (resolve, reject) =>
           {
             client.ping({
-              requestTimeout: 100,
+              requestTimeout: 1000,
             }, (error) => resolve(!error));
           });
 
@@ -109,16 +109,38 @@ export async function provisionScripts(controller: DatabaseController)
         await new Promise(
           (resolve, reject) =>
           {
-            client.putScript(
-              {
-                id: script.id,
-                lang: script.lang,
-                body: {
-                  script: script.body,
-                },
-              },
-              makePromiseCallback(resolve, reject));
-          });
+            throw new Error('Unknown host');
+          }
+        }
+
+        // FIXME: Uncomment when the elasticsearch javascript client library (elasticsearch.js) is fixed
+        // to use the changed stored script body format in 6.1 from putScript
+        // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html
+        //
+        // await new Promise(
+        //   (resolve, reject) =>
+        //   {
+        //     client.putScript(
+        //       {
+        //         id: script.id,
+        //         lang: script.lang,
+        //         body: script.body,
+        //       },
+        //       makePromiseCallback(resolve, reject));
+        //   });
+
+        await doRequest({
+          method: 'POST',
+          url: 'http://' + String(host) + '/_scripts/' + script.id,
+          json: true,
+          body: {
+            script: {
+              lang: script.lang,
+              source: script.body,
+            },
+          },
+        });
+
         winston.info('Provisioned script ' + script.id + ' to database ' + controller.getName());
       }
       catch (e)

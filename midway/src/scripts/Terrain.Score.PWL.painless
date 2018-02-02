@@ -2,14 +2,29 @@
 
 double pwlTransform(def ranges, def outputs, def input)
 {
-if (input <= ranges[0])
+  if (ranges.length == 0)
+  {
+    return 1;
+  }
+
+  if (input <= ranges[0])
+  {
     return outputs[0];
+  }
+  
   if (input >= ranges[ranges.length - 1])
+  {
     return outputs[outputs.length - 1];
+  }
+  
   int range = Collections.binarySearch(ranges, input,
     (lhs, rhs) -> (lhs < rhs ? -1 : (lhs == rhs ? 0 : 1)));
+  
   if (range < 0)
+  {
     range = -range - 1;
+  }
+  
   def low = ranges[range - 1];
   def high = ranges[range];
   double pos = (input - low) / (double)(high - low);
@@ -24,11 +39,25 @@ double accumulateFactors(def doc, List factors, double offset, def _score)
   def range = 0;
   for (List element : factors)
   {
-    def value;
+    def sourceValue;
     if (element[0].equalsIgnoreCase("_score"))
-      value = _score;
+    {
+      sourceValue = _score;
+    } else
+    {
+      sourceValue = doc[element[0]].value;
+    }
+
+    def value;
+    if (!(sourceValue instanceof Number))
+    {
+      value = sourceValue.getMillis();
+    }
     else
-      value = doc[element[0]].value;
+    {
+      value = sourceValue;
+    }
+
     acc += element[1] * value;
   }
   return acc;
@@ -41,7 +70,9 @@ for (int i = 0; i < factors.length; ++i)
   Map factor = factors[i];
   double weight = factor['weight'];
   if (weight == 0)
+  {
     continue;
+  }
   double numerator = accumulateFactors(doc, factor['numerators'], factor['a'], _score);
   double denominator = accumulateFactors(doc, factor['denominators'], factor['b'], _score);
   double input = numerator / denominator;

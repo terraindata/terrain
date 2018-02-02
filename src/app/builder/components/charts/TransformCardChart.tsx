@@ -51,6 +51,7 @@ import * as _ from 'lodash';
 const { List, Map } = Immutable;
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { SchemaState } from 'schema/SchemaTypes';
 import * as BlockUtils from '../../../../blocks/BlockUtils';
 import { AllBackendsMap } from '../../../../database/AllBackends';
 import TerrainComponent from '../../../common/components/TerrainComponent';
@@ -88,6 +89,7 @@ export interface Props
   colors: [string, string];
   spotlights: any; // TODO spawtlights
   mode: string;
+  schema?: SchemaState;
 }
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
@@ -591,6 +593,7 @@ class TransformCardChart extends TerrainComponent<Props>
       colors: this.props.colors,
       contextOptions: this.getContextOptions(),
       mode,
+      schema: this.props.schema,
     };
   }
 
@@ -661,4 +664,10 @@ class TransformCardChart extends TerrainComponent<Props>
     );
   }
 }
-export default TransformCardChart;
+
+export default Util.createContainer(
+  TransformCardChart,
+  ['schema'],
+  {
+  },
+);
