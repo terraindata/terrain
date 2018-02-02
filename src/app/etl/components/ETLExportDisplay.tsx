@@ -43,11 +43,12 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:no-var-requires
 
 import TerrainComponent from 'common/components/TerrainComponent';
 import * as Radium from 'radium';
 import * as React from 'react';
-import { backgroundColor, borderColor, Colors, fontColor } from 'src/app/colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Query from 'src/items/types/Query';
 import Util from 'util/Util';
 
@@ -76,8 +77,9 @@ class ETLExportDisplay extends TerrainComponent<Props>
     return (
       <div
         className='etl-export-display-wrapper'
-        style={[backgroundColor(Colors().bg1), fontColor(Colors().text1)]}
+        style={[fontColor(Colors().text1)]}
       >
+        <div className='export-display-logo-bg' />
         <TemplateEditor />
       </div>
     );

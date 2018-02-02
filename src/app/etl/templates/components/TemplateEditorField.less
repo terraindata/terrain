@@ -146,6 +146,7 @@
 }
 
 @settings-height: 240px;
+@settings-extra-space: 2 * @double-spacing;
 .injected-content-container {
   width: 100%;
   height: @settings-height + @spacing;
@@ -155,11 +156,10 @@
     flex-direction: column;
     justify-content: space-between;
     height: @settings-height;
-    width: ~"calc(100% - 30px)";
-    left: @spacing;
+    width: ~"calc(100% - @{settings-extra-space})";
+    left: @double-spacing;
     box-shadow: 2px 3px 10px rgba(0,0,0,0.25);
     position: absolute;
-
   }
 }
 
