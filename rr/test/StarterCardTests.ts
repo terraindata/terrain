@@ -57,7 +57,7 @@ const CREATE_CATEGORY_SELECTOR = '#app > div > div.app-wrapper > div > div > div
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 
-expect.extend({ toMatchImageSnapshot });
+expect.extend({ toMatchImageSnapshot } as any);
 
 async function loginToBuilder(page, url)
 {
