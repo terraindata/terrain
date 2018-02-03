@@ -82,10 +82,10 @@ fullstack:
   script:
     - MIDWAY_HOST=pa-terraformer01.terrain.int:3000 yarn run build-prod
     - yarn test-fullstack-setup
-    - NODE_ENV=production yarn start-midway&
+    - NODE_ENV=production yarn start-midway > ./midwayConsole.log 2>&1&
     - sleep 5
     - yarn test-rr
-    - yarn test-back-teardown
+    - yarn test-fullstack-teardown
   stage: fullstack
   when: always
 
