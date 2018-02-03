@@ -85,6 +85,8 @@ fullstack:
     - fuser -k -n tcp 3000 || true
     - cd /opt/Search && NODE_ENV=production yarn start-midway&
     - yarn test-fullstack
+  stage: fullstack
+  when: always
 
 deploy:
   script:
