@@ -81,10 +81,11 @@ build-frontend-prod:
 fullstack:
   script:
     - MIDWAY_HOST=pa-terraformer01.terrain.int:3000 yarn run build-prod
-    - rsync -a --stats ../Search /opt --exclude '*.db' --exclude '.git'
-    - fuser -k -n tcp 3000 || true
-    - cd /opt/Search && NODE_ENV=production yarn start-midway&
-    - yarn test-fullstack
+    - rsync -a --stats ../Search /opt/fullstack --exclude '*.db' --exclude '.git'
+    - yarn test-fullstack-setup
+    - cd /opt/fullstack/Search && NODE_ENV=production yarn start-midway&
+    - yarn test-rr
+    - yarn test-back-teardown
   stage: fullstack
   when: always
 
