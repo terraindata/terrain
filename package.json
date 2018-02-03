@@ -33,7 +33,7 @@
     "fix": "yarn style && yarn lint-parallel;",
     "diff-style": "git ls-files -m  \\*.ts\\* | parallel --no-notice ./node_modules/.bin/tsfmt -r {}\\; | grep replaced || exit 0 && exit 1",
     "rr": "nodemon --exec ./node_modules/.bin/ts-node -P rr -- ./rr/RecordReplay.ts",
-    "test-rr": "jest rr --forceExit"
+    "test-rr": "jest ./rr --forceExit"
   },
   "repository": {
     "type": "git",
