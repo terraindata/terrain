@@ -22,6 +22,7 @@ stages:
   - test-sigint
   - build
   - deploy
+  - fullstack
 
 lint:
   script:
@@ -76,6 +77,14 @@ build-frontend-prod:
   only:
    - master
   stage: build
+
+fullstack:
+  script:
+    - MIDWAY_HOST=pa-terraformer01.terrain.int:3000 yarn run build-prod
+    - rsync -a --stats ../Search /opt --exclude '*.db' --exclude '.git'
+    - fuser -k -n tcp 3000 || true
+    - cd /opt/Search && NODE_ENV=production yarn start-midway&
+    - yarn test-fullstack
 
 deploy:
   script:
