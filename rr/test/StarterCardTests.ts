@@ -44,38 +44,43 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
+import * as ip from 'ip';
 import * as puppeteer from 'puppeteer';
 import * as sleep from 'sleep';
-import * as ip from 'ip';
 import * as syncRequest from 'sync-request';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
 const BUTTON_SELECTOR = '#app > div > div.app-wrapper > div > div.login-container > div.login-submit-button-wrapper > div';
 const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-area-buttons-container > div';
+const CREATE_CATEGORY_SELECTOR = '#app > div > div.app-wrapper > div > div > div:nth-child(2) > div > div > div > div.library-column.library-column-1 > div.library-column-content > div > div.info-area-buttons-container';
 
-import { toMatchImageSnapshot }  from 'jest-image-snapshot';
+import { toMatchImageSnapshot } from 'jest-image-snapshot';
 
 expect.extend({ toMatchImageSnapshot });
 
 async function loginToBuilder(page, url)
-sel  await page.goto(url);
-  sleep.sleep(3);
+{
+  await page.goto(url);
+  sleep.sleep(5);
+  console.log('goto ' + url);
   let image = await page.screenshot();
+  console.log('screenshot ' + url);
+  //login screen
   expect(image).toMatchImageSnapshot();
+  console.log('match ' + url);
   await page.waitForSelector(USERNAME_SELECTOR);
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type('admin@terraindata.com');
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type('secret');
   await page.click(BUTTON_SELECTOR);
-  await page.waitForSelector(CARDSTARTER_SELECTOR);
-
-  sleep.sleep(1);
+  sleep.sleep(5);
+  //await page.waitForSelector(CREATE_CATEGORY_SELECTOR);
+  console.log('Taking the screenshot after login.');
   image = await page.screenshot();
+  //after login
   expect(image).toMatchImageSnapshot();
-
-  await page.click(CARDSTARTER_SELECTOR);
 }
 
 function getChromeDebugAddress()
@@ -84,7 +89,7 @@ function getChromeDebugAddress()
   {
     const res = syncRequest('GET', 'http://localhost:9222/json');
     const resBody = JSON.parse(res.getBody());
-    const wsAddress = resBody[0]['webSocketDebuggerUrl'];
+    const wsAddress = resBody[resBody.length - 1]['webSocketDebuggerUrl'];
     return wsAddress;
   } catch (err)
   {
@@ -93,25 +98,29 @@ function getChromeDebugAddress()
   }
 }
 
-describe('jest-image-snapshot usage with an image received from puppeteer', () => {
+describe('jest-image-snapshot usage with an image received from puppeteer', () =>
+{
   let browser;
+  let page;
 
-  beforeAll(async () => {
+  beforeAll(async () =>
+  {
     const wsAddress = getChromeDebugAddress();
-    browser = await puppeteer.connect({ browserWSEndpoint: wsAddress});
+    browser = await puppeteer.connect({ browserWSEndpoint: wsAddress });
+    //browser = await puppeteer.launch({headless: false});
+    //page = await browser.newPage();
   });
 
-  it('works', async () => {
-    const page = await browser.newPage();
-    await page.setViewport({width: 1600, height: 1200});
-    const url = `http://${ip.address()}:8080/builder/!3`;
-    await loginToBuilder(page, url)
-    sleep.sleep(3);
-    const image = await page.screenshot();
-    expect(image).toMatchImageSnapshot();
-  }, 100000);
+  it('works', async () =>
+  {
+    page = await browser.newPage();
+    await page.setViewport({ width: 1600, height: 1200 });
+    const url = `http://${ip.address()}:3000`;
+    await loginToBuilder(page, url);
+  }, 1000000);
 
-  afterAll(async () => {
+  afterAll(async () =>
+  {
     await page.close();
   });
 });

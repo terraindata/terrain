@@ -44,12 +44,12 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-import * as puppeteer from 'puppeteer';
-import * as sleep from 'sleep';
-import * as readlineSync from 'readline-sync';
 import * as commandLineArgs from 'command-line-args';
 import * as getUsage from 'command-line-usage';
 import * as jsonfile from 'jsonfile';
+import * as puppeteer from 'puppeteer';
+import * as readlineSync from 'readline-sync';
+import * as sleep from 'sleep';
 
 const USERNAME_SELECTOR = '#login-email';
 const PASSWORD_SELECTOR = '#login-password';
@@ -59,15 +59,15 @@ const CARDSTARTER_SELECTOR = '#cards-column-inner > div.info-area > div.info-are
 const optionDefinitions = [
   { name: 'record', alias: 'r', type: Boolean },
   { name: 'reply', alias: 'p', type: Boolean },
-  {name: 'help', alias: 'h'},
-  { name: 'directory', alias: 'd', type: String},
-  { name: 'url', alias: 'u', type: String},
+  { name: 'help', alias: 'h' },
+  { name: 'directory', alias: 'd', type: String },
+  { name: 'url', alias: 'u', type: String },
 ];
 
 const usageSections = [
   {
     header: 'Terrain Redux Recorder',
-    content: 'This application records Redux actions while you play the builder, and saves the log for creating new tests.'
+    content: 'This application records Redux actions while you play the builder, and saves the log for creating new tests.',
   },
   {
     header: 'Options',
@@ -110,17 +110,18 @@ async function loginToBuilder(page, url)
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type('secret');
   await page.click(BUTTON_SELECTOR);
-  await page.waitForSelector(CARDSTARTER_SELECTOR);
-  await page.click(CARDSTARTER_SELECTOR);
+  // await page.waitForSelector(CARDSTARTER_SELECTOR);
+  // await page.click(CARDSTARTER_SELECTOR);
 }
 
 async function recordBuilderActions(browser, url)
 {
   const page = await browser.newPage();
-  await page.setViewport({width: 1600, height: 1200});
+  await page.setViewport({ width: 1600, height: 1200 });
   await loginToBuilder(page, url);
   sleep.sleep(1);
-  const records = await page.evaluate(() => {
+  const records = await page.evaluate(() =>
+  {
     const recordList = window['TerrainTools'].builderStoreLogger.serializeAllRecordName();
     window['TerrainTools'].builderStoreLogger.serializeAction = true;
     return recordList;
@@ -139,7 +140,7 @@ async function recordBuilderActions(browser, url)
       });
       await page.close();
       const timestamp = Date();
-      return {timestamp, records, actions};
+      return { timestamp, records, actions };
     } else
     {
       continue;
@@ -150,7 +151,7 @@ async function recordBuilderActions(browser, url)
 async function replayBuilderActions(browser, url, actions)
 {
   const page = await browser.newPage();
-  await page.setViewport({width: 1600, height: 1200});
+  await page.setViewport({ width: 1600, height: 1200 });
   await page.goto(url);
   //await loginToBuilder(page, url);
   sleep.sleep(3);
@@ -158,9 +159,9 @@ async function replayBuilderActions(browser, url, actions)
   await page.waitForSelector(CARDSTARTER_SELECTOR);
   await page.click(CARDSTARTER_SELECTOR);
   sleep.sleep(1);
-  await page.screenshot({path: 'screenshots/starter.png'});
+  await page.screenshot({ path: 'screenshots/starter.png' });
   // replay the log
-  for (let i = 0; i<actions.length; i=i+1)
+  for (let i = 0; i < actions.length; i = i + 1)
   {
     const action = actions[i];
     console.log('Replaying Action ' + typeof action + ':' + action);
@@ -169,7 +170,7 @@ async function replayBuilderActions(browser, url, actions)
       console.log('Ignoring hoverCard action');
       continue;
     }
-    await page.evaluate( (action) =>
+    await page.evaluate((action) =>
     {
       return window['TerrainTools'].builderStoreLogger.replayAction(window['TerrainTools'].builderStore, action);
     }, action);
@@ -188,7 +189,7 @@ async function rr()
   }
 
   // record
-  let url = 'http://localhost:8080/builder/!13';
+  let url = 'http://localhost:8080';
   if (options['url'] !== undefined)
   {
     url = options['url'];
@@ -199,7 +200,7 @@ async function rr()
     actionFileName = options['directory'] + '/actions.json';
   }
 
-  const browser = await puppeteer.launch({headless: false});
+  const browser = await puppeteer.launch({ headless: false });
 
   if (options['record'])
   {
@@ -234,20 +235,19 @@ async function rr()
   //await page.waitForNavigation({waitUntil: 'networkidle0'});
   //await page.screenshot({path: 'page.png', fullPage: true});
 
- // page.waitForSelector(PASSWORD_SELECTOR).then(() => page.click(PASSWORD_SELECTOR));
+  // page.waitForSelector(PASSWORD_SELECTOR).then(() => page.click(PASSWORD_SELECTOR));
   //page.waitForSelector(CARDSTARTER_SELECTOR).then(() => page.click(CARDSTARTER_SELECTOR));
 
-//  await page.click(BUTTON_SELECTOR);
+  //  await page.click(BUTTON_SELECTOR);
   //sleep.sleep(1);
-//  await page.click(CARDSTARTER_SELECTOR);
-//  const result = await page.evaluate(() => {
-//    return TerrainToo;
-//  });
-//  console.log(JSON.stringify(result));
-//  sleep.sleep(5);
-//await page.screenshot({path: 'screenshots/page.png'});
+  //  await page.click(CARDSTARTER_SELECTOR);
+  //  const result = await page.evaluate(() => {
+  //    return TerrainToo;
+  //  });
+  //  console.log(JSON.stringify(result));
+  //  sleep.sleep(5);
+  //await page.screenshot({path: 'screenshots/page.png'});
 
 }
 
 rr();
-

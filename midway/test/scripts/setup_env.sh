@@ -13,9 +13,11 @@ chrome_image="yukinying/chrome-headless-browser"
 orig_mysql_port=3306
 orig_postgres_port=5432
 orig_elastic_port=9200
+orig_postgres_db=moviesdb
 
 mysql_port=63306
 postgres_port=65432
+postgres_db=${orig_postgres_db}
 elastic_port=9200
 chrome_port=9222
 
@@ -54,6 +56,9 @@ do
 		  --postgres-port=*)
 				postgres_port="${1#*=}"
 				;;
+		  --postgres-db=*)
+		      postgres_db="${1#*=}"
+		                ;;
 		  --use-postgres=*)
 				use_postgres="${1#*=}"
 				;;
@@ -186,6 +191,10 @@ if [ "$use_mysql" == 1 ]; then
 fi
 if [ "$use_postgres" == 1 ]; then
     while [ "$(docker inspect -f {{.State.Health.Status}} moviesdb-postgres)" != "healthy" ]; do sleep 0.1; done;
+    if [ "$postgres_db" != "$orig_postgres_db" ]; then
+       echo "Create postgres database ${postgres_db}";
+       createdb --host=localhost --port=5432 --username=postgres ${postgres_db};
+    fi
 fi
 if [ "$use_elastic" == 1 ]; then
     while [ "$(docker inspect -f {{.State.Health.Status}} moviesdb-elk)" != "healthy" ]; do sleep 0.1; done;
