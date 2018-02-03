@@ -221,6 +221,23 @@ export class TransformationEngine
     }
   }
 
+  public setOutputKeyPath(fieldID: number, newKeyPath: string, dest?: any): void
+  {
+    const oldName: string = this.IDToFieldNameMap.get(fieldID);
+    this.IDToFieldNameMap.forEach((field: string, id: number) =>
+    {
+      if (field.startsWith(oldName))
+      {
+        let newName: string = field.replace(oldName, newKeyPath);
+        if (newName.startsWith('.'))
+        {
+          newName = newName.substr(1);
+        }
+        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, newName);
+      }
+    });
+  }
+
   private parseFieldIDs(fieldNamesOrIDs: string[] | number[]): number[]
   {
     return fieldNamesOrIDs.length > 0 ?

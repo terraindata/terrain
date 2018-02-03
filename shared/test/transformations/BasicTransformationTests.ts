@@ -58,6 +58,15 @@ const doc1 = {
   },
 };
 
+const doc2 = {
+  name: 'Bob',
+  age: 17,
+  meta: {
+    school: 'Stanford',
+    sport: 'bobsled',
+  },
+};
+
 test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
@@ -158,4 +167,51 @@ test('get transformations for a field', () =>
   e.appendTransformation(TransformationNodeType.SubstringNode, ['name'], { from: 0, length: 2 });
   e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
   expect(e.getTransformations(id1)).toEqual(List<number>([0, 1]));
+});
+
+test('rename a field (no structural changes)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine();
+  const id1: number = e.addField('name', 'string');
+  e.addField('meta.school', 'string');
+  e.setOutputKeyPath(id1, 'firstname');
+  expect(e.transform(doc1)['name']).toBe(undefined);
+  expect(e.transform(doc1)['firstname']).toBe('Bob');
+  e.setOutputKeyPath(id1, 'professor');
+  expect(e.transform(doc1)['name']).toBe(undefined);
+  expect(e.transform(doc1)['firstname']).toBe(undefined);
+  expect(e.transform(doc1)['professor']).toBe('Bob');
+});
+
+test('rename a field (subjugation)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine();
+  const id1: number = e.addField('name', 'string');
+  e.addField('meta.school', 'string');
+  e.setOutputKeyPath(id1, 'meta.firstname');
+  expect(e.transform(doc1)['name']).toBe(undefined);
+  expect(e.transform(doc1)['meta']['firstname']).toBe('Bob');
+});
+
+test('rename a field (promotion)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine();
+  e.addField('name', 'string');
+  const id2: number = e.addField('meta.school', 'string');
+  e.setOutputKeyPath(id2, 'skool');
+  expect(e.transform(doc1)['skool']).toBe('Stanford');
+  expect(e.transform(doc1)['meta']).toBe(undefined);
+});
+
+test('rename a field (an object with subkeys)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine();
+  e.addField('name', 'string');
+  const id2: number = e.addField('meta', 'object');
+  e.addField('meta.school', 'string');
+  e.addField('meta.sport', 'string');
+  e.setOutputKeyPath(id2, '');
+  expect(e.transform(doc2)['meta']).toBe(undefined);
+  expect(e.transform(doc2)['school']).toBe('Stanford');
+  expect(e.transform(doc2)['sport']).toBe('bobsled');
 });
