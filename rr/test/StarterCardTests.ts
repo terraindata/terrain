@@ -67,7 +67,7 @@ async function loginToBuilder(page, url)
   let image = await page.screenshot();
   console.log('screenshot ' + url);
   //login screen
-  expect(image).toMatchImageSnapshot();
+  (expect(image) as any).toMatchImageSnapshot();
   console.log('match ' + url);
   await page.waitForSelector(USERNAME_SELECTOR);
   await page.click(USERNAME_SELECTOR);
@@ -80,7 +80,7 @@ async function loginToBuilder(page, url)
   console.log('Taking the screenshot after login.');
   image = await page.screenshot();
   //after login
-  expect(image).toMatchImageSnapshot();
+  (expect(image) as any).toMatchImageSnapshot();
 }
 
 function getChromeDebugAddress()
