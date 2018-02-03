@@ -182,7 +182,7 @@ export class TransformationEngine
     });
     // Need to order nodes...
     const allSorted = GraphLib.alg.topsort(this.dag);
-    let nodesSorted: List<number> = new List<number>();
+    let nodesSorted: List<number> = List<number>();
     for (let i: number = 0; i < allSorted.length; i++)
     {
       if (nodes.includes(this.dag.node(allSorted[i])))
@@ -242,12 +242,12 @@ export class TransformationEngine
   {
     return fieldNamesOrIDs.length > 0 ?
       (typeof fieldNamesOrIDs[0] === 'number' ? fieldNamesOrIDs as number[] :
-        _.map(fieldNamesOrIDs, (name) => this.fieldNameToIDMap.get(name))) : [];
+        _.map(fieldNamesOrIDs as string[], (name) => this.fieldNameToIDMap.get(name))) : [];
   }
 
   private generateInitialFieldMaps(obj: object, currentKeyPath: string = ''): List<number>
   {
-    let ids: List<number> = new List<number>();
+    let ids: List<number> = List<number>();
     for (const key of Object.keys(obj))
     {
       if (isPrimitive(obj[key]))
@@ -261,7 +261,7 @@ export class TransformationEngine
         }
       } else
       {
-        ids = ids.concat(this.generateInitialFieldMaps(obj[key], currentKeyPath + key + '.'));
+        ids = ids.concat(this.generateInitialFieldMaps(obj[key], currentKeyPath + key + '.')).toList();
       }
     }
     return ids;
