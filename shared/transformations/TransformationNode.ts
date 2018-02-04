@@ -50,10 +50,10 @@ export class TransformationNode
 {
   public id: number;
   public typeCode: TransformationNodeType;
-  public fieldIDs: number[];
+  public fieldIDs: List<number>;
   public meta: object;
 
-  constructor(id: number, typeCode: TransformationNodeType, fieldIDs: number[], options?: object)
+  constructor(id: number, typeCode: TransformationNodeType, fieldIDs: List<number>, options?: object)
   {
     this.id = id;
     this.typeCode = typeCode;

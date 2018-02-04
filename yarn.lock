@@ -8903,6 +8903,23 @@ util@0.10.3, util@^0.10.3:
   dependencies:
     inherits "2.0.1"
 
+utils-deep-get@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/utils-deep-get/-/utils-deep-get-1.0.0.tgz#48404a77fa26f84e696e485a6389c2becdf0a0c9"
+  dependencies:
+    validate.io-array "^1.0.6"
+    validate.io-object "^1.0.4"
+    validate.io-string-primitive "^1.0.0"
+
+utils-deep-set@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/utils-deep-set/-/utils-deep-set-1.0.1.tgz#666af93ccd1d221c3fcafdf2151a22ee0bcb06fe"
+  dependencies:
+    validate.io-array "^1.0.6"
+    validate.io-boolean-primitive "^1.0.0"
+    validate.io-object "^1.0.4"
+    validate.io-string-primitive "^1.0.0"
+
 utils-merge@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
@@ -8933,6 +8950,24 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
+
+validate.io-array@^1.0.1, validate.io-array@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/validate.io-array/-/validate.io-array-1.0.6.tgz#5b5a2cafd8f8b85abb2f886ba153f2d93a27774d"
+
+validate.io-boolean-primitive@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/validate.io-boolean-primitive/-/validate.io-boolean-primitive-1.0.0.tgz#bb14c9cb8683c3c9f3d1329a95a7768e3ee29eb5"
+
+validate.io-object@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/validate.io-object/-/validate.io-object-1.0.4.tgz#dca01eceee390e110dbc2af843c81f7bf33a41ab"
+  dependencies:
+    validate.io-array "^1.0.1"
+
+validate.io-string-primitive@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/validate.io-string-primitive/-/validate.io-string-primitive-1.0.1.tgz#b8135b9fb1372bde02fdd53ad1d0ccd6de798fee"
 
 value-equal@^0.4.0:
   version "0.4.0"
