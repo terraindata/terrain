@@ -39,11 +39,17 @@ double accumulateFactors(def doc, List factors, double offset, def _score)
   def range = 0;
   for (List element : factors)
   {
+    if (element[0].equals(""))
+    {
+      continue;
+    }
+
     def sourceValue;
     if (element[0].equalsIgnoreCase("_score"))
     {
       sourceValue = _score;
-    } else
+    }
+    else
     {
       sourceValue = doc[element[0]].value;
     }
