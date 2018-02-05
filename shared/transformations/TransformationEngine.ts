@@ -45,10 +45,12 @@ THE SOFTWARE.
 // Copyright 2018 Terrain Data, Inc.
 
 import GraphLib = require('graphlib');
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 import isPrimitive = require('is-primitive');
 import * as _ from 'lodash';
 import nestedProperty = require('nested-property');
+import deepGet = require('utils-deep-get');
+import deepSet = require('utils-deep-set');
 import * as winston from 'winston';
 import { TransformationNode } from './TransformationNode';
 import TransformationNodeType from './TransformationNodeType';
@@ -57,6 +59,7 @@ import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
 const Graph = GraphLib.Graph;
+type KeyPath = List<string>;
 
 export class TransformationEngine
 {
@@ -75,26 +78,60 @@ export class TransformationEngine
     e.doc = parsedJSON['doc'];
     e.uidField = parsedJSON['uidField'];
     e.uidNode = parsedJSON['uidNode'];
-    e.fieldNameToIDMap = new Map<string, number>(parsedJSON['fieldNameToIDMap']);
-    e.IDToFieldNameMap = new Map<number, string>(parsedJSON['IDToFieldNameMap']);
+    e.fieldNameToIDMap = new Map<KeyPath, number>(parsedJSON['fieldNameToIDMap']);
+    e.IDToFieldNameMap = new Map<number, KeyPath>(parsedJSON['IDToFieldNameMap']);
     e.fieldTypes = new Map<number, string>(parsedJSON['fieldTypes']);
     return e;
+  }
+
+  private static keyPathPrefixMatch(toCheck: KeyPath, toMatch: KeyPath): boolean
+  {
+    if (toMatch.size === 0)
+    {
+      return true;
+    }
+
+    if (toCheck.size < toMatch.size)
+    {
+      return false;
+    }
+
+    for (let i: number = 0; i < toMatch.size; i++)
+    {
+      if (toMatch.get(i) !== toCheck.get(i))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private static updateKeyPath(toUpdate: KeyPath, toReplace: KeyPath, replaceWith: KeyPath): KeyPath
+  {
+    let updated: KeyPath = replaceWith;
+    for (let i: number = toReplace.size; i < toUpdate.size; i++)
+    {
+      updated = updated.push(toUpdate.get(i));
+    }
+
+    return updated;
   }
 
   private dag: any = new Graph({ isDirected: true });
   private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;
-  private fieldNameToIDMap: Map<string, number> = new Map<string, number>();
-  private IDToFieldNameMap: Map<number, string> = new Map<number, string>();
+  private fieldNameToIDMap: Map<KeyPath, number> = new Map<KeyPath, number>();
+  private IDToFieldNameMap: Map<number, KeyPath> = new Map<number, KeyPath>();
   private fieldTypes: Map<number, string> = new Map<number, string>();
+  private fieldEnabled: Map<number, boolean> = new Map<number, boolean>(); // TODO use + (de)serialize
 
   constructor(doc?: object)
   {
     if (doc !== undefined)
     {
       this.doc = doc;
-      this.generateInitialFieldMaps(this.doc);
+      this.generateInitialFieldMaps(this.doc); // TODO can't return ID list here... disable this or what?
       // initial field nodes can be implicit, DAG should only represent actual transformations
     }
     // allow construction without example doc (manually add fields)
@@ -111,12 +148,10 @@ export class TransformationEngine
       && JSON.stringify([...this.fieldTypes]) === JSON.stringify([...other.fieldTypes]);
   }
 
-  public appendTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: string[] | number[],
+  public appendTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<KeyPath> | List<number>,
     options?: object, tags?: string[], weight?: number): number
   {
-    const fieldIDs: number[] = fieldNamesOrIDs.length > 0 ?
-      (typeof fieldNamesOrIDs[0] === 'number' ? fieldNamesOrIDs as number[] :
-        _.map(fieldNamesOrIDs, (name) => this.fieldNameToIDMap.get(name))) : [];
+    const fieldIDs: List<number> = this.parseFieldIDs(fieldNamesOrIDs);
     const node = new TransformationNode(this.uidNode, nodeType, fieldIDs, options);
     this.dag.setNode(this.uidNode.toString(), node);
     this.uidNode++;
@@ -128,7 +163,7 @@ export class TransformationEngine
     let output: object = this.flatten(doc);
     for (const nodeKey of this.dag.sources())
     {
-      const toTraverse = GraphLib.alg.preorder(this.dag, nodeKey);
+      const toTraverse: string[] = GraphLib.alg.preorder(this.dag, nodeKey);
       for (let i = 0; i < toTraverse.length; i++)
       {
         const transformationResult: TransformationVisitResult = TransformationNodeVisitor.visit(this.dag.node(toTraverse[i]), output);
@@ -160,19 +195,19 @@ export class TransformationEngine
     };
   }
 
-  public addField(fullKeyPath: string, typeName: string): number
+  public addField(fullKeyPath: KeyPath, typeName: string): number
   {
-    this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
-    this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
-    this.fieldTypes.set(this.uidField, typeName);
+    this.fieldNameToIDMap = this.fieldNameToIDMap.set(fullKeyPath, this.uidField);
+    this.IDToFieldNameMap = this.IDToFieldNameMap.set(this.uidField, fullKeyPath);
+    this.fieldTypes = this.fieldTypes.set(this.uidField, typeName);
 
     this.uidField++;
     return this.uidField - 1;
   }
 
-  public getTransformations(field: string | number): List<number>
+  public getTransformations(field: KeyPath | number): List<number>
   {
-    const target: number = typeof field === 'number' ? field : this.fieldNameToIDMap[field];
+    const target: number = typeof field === 'number' ? field : this.fieldNameToIDMap.get(field);
     const nodes: TransformationNode[] = [];
     _.each(this.dag.nodes(), (node) =>
     {
@@ -183,7 +218,7 @@ export class TransformationEngine
     });
     // Need to order nodes...
     const allSorted = GraphLib.alg.topsort(this.dag);
-    let nodesSorted: List<number> = new List<number>();
+    let nodesSorted: List<number> = List<number>();
     for (let i: number = 0; i < allSorted.length; i++)
     {
       if (nodes.includes(this.dag.node(allSorted[i])))
@@ -194,13 +229,61 @@ export class TransformationEngine
     return nodesSorted;
   }
 
-  private generateInitialFieldMaps(obj: object, currentKeyPath: string = ''): void
+  public getTransformationInfo(transformationID: number): TransformationNode | undefined
   {
+    if (!this.dag.nodes().includes(transformationID.toString()))
+    {
+      return undefined;
+    }
+    return this.dag.node(transformationID.toString()) as TransformationNode;
+  }
+
+  public editTransformation(transformationID: number, fieldNamesOrIDs?: List<KeyPath> | List<number>,
+    options?: object): void
+  {
+    if (!this.dag.nodes().includes(transformationID.toString()))
+    {
+      return;
+    }
+
+    if (fieldNamesOrIDs !== undefined)
+    {
+      (this.dag.node(transformationID) as TransformationNode).fieldIDs = this.parseFieldIDs(fieldNamesOrIDs);
+    }
+
+    if (options !== undefined)
+    {
+      (this.dag.node(transformationID) as TransformationNode).meta = options;
+    }
+  }
+
+  public setOutputKeyPath(fieldID: number, newKeyPath: KeyPath, dest?: any): void
+  {
+    const oldName: KeyPath = this.IDToFieldNameMap.get(fieldID);
+    this.IDToFieldNameMap.forEach((field: KeyPath, id: number) =>
+    {
+      if (TransformationEngine.keyPathPrefixMatch(field, oldName))
+      {
+        this.IDToFieldNameMap = this.IDToFieldNameMap.set(id, TransformationEngine.updateKeyPath(field, oldName, newKeyPath));
+      }
+    });
+  }
+
+  private parseFieldIDs(fieldNamesOrIDs: List<KeyPath> | List<number>): List<number>
+  {
+    return fieldNamesOrIDs.size > 0 ?
+      (typeof fieldNamesOrIDs.first() === 'number' ? fieldNamesOrIDs as List<number> :
+        fieldNamesOrIDs.map((name: KeyPath) => this.fieldNameToIDMap.get(name)) as List<number>) : List<number>();
+  }
+
+  private generateInitialFieldMaps(obj: object, currentKeyPath: KeyPath = List<string>()): List<number>
+  {
+    let ids: List<number> = List<number>();
     for (const key of Object.keys(obj))
     {
       if (isPrimitive(obj[key]))
       {
-        this.addField(currentKeyPath + key, typeof obj[key]);
+        ids = ids.push(this.addField(currentKeyPath.push(key), typeof obj[key]));
       } else if (Array.isArray(obj[key]))
       {
         for (const item of obj[key])
@@ -209,19 +292,20 @@ export class TransformationEngine
         }
       } else
       {
-        this.generateInitialFieldMaps(obj[key], currentKeyPath + key + '.');
+        ids = ids.concat(this.generateInitialFieldMaps(obj[key], currentKeyPath.push(key))).toList();
       }
     }
+    return ids;
   }
 
   private flatten(obj: object): object
   {
     const output: object = {};
-    for (const [key, value] of this.fieldNameToIDMap)
+    for (const [keyPath, value] of this.fieldNameToIDMap)
     {
-      if (nestedProperty.has(obj, key))
+      if (deepGet(obj, [...keyPath]) !== undefined)
       {
-        output[value] = nestedProperty.get(obj, key);
+        output[value] = deepGet(obj, [...keyPath]);
       }
     }
     return output;
@@ -232,9 +316,9 @@ export class TransformationEngine
     const output: object = {};
     for (const [key, value] of this.IDToFieldNameMap)
     {
-      if (obj.hasOwnProperty(key))
+      if (obj !== undefined && obj.hasOwnProperty(key))
       {
-        nestedProperty.set(output, value, obj[key]);
+        deepSet(output, [...value], obj[key], { create: true });
       }
     }
     return output;

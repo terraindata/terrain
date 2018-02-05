@@ -58,11 +58,22 @@ const doc1 = {
   },
 };
 
+const doc2 = {
+  name: 'Bob',
+  age: 17,
+  meta: {
+    school: 'Stanford',
+    sport: 'bobsled',
+  },
+};
+
+// TODO what to do about crazy List syntax...
+
 test('add fields manually', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
-  e.addField('meta.school', 'string');
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
+  e.addField(List<string>(['meta', 'school']), 'string');
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['meta', 'school'])]));
   const r = e.transform(doc1);
   expect(nestedProperty.get(r, 'meta.school')).toBe('STANFORD');
 });
@@ -70,8 +81,8 @@ test('add fields manually', () =>
 test('capitalization', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['name'])]));
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['meta', 'school'])]));
   const r = e.transform(doc1);
   expect(r['name']).toBe('BOB');
   expect(nestedProperty.get(r, 'meta.school')).toBe('STANFORD');
@@ -80,8 +91,8 @@ test('capitalization', () =>
 test('serialize to JSON', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['name'])]));
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['meta', 'school'])]));
   expect(e.json()).toEqual({
     dag: {
       options: {
@@ -92,11 +103,11 @@ test('serialize to JSON', () =>
       nodes: [
         {
           v: '0',
-          value: new TransformationNode(0, 12, [0]),
+          value: new TransformationNode(0, 12, List<number>([0])),
         },
         {
           v: '1',
-          value: new TransformationNode(1, 12, [2]),
+          value: new TransformationNode(1, 12, List<number>([2])),
         },
       ],
       edges: [],
@@ -111,14 +122,14 @@ test('serialize to JSON', () =>
     uidField: 3,
     uidNode: 2,
     fieldNameToIDMap: [
-      ['name', 0],
-      ['age', 1],
-      ['meta.school', 2],
+      [List<string>(['name']), 0],
+      [List<string>(['age']), 1],
+      [List<string>(['meta', 'school']), 2],
     ],
     IDToFieldNameMap: [
-      [0, 'name'],
-      [1, 'age'],
-      [2, 'meta.school'],
+      [0, List<string>(['name'])],
+      [1, List<string>(['age'])],
+      [2, List<string>(['meta', 'school'])],
     ],
     fieldTypes: [
       [0, 'string'],
@@ -131,20 +142,20 @@ test('serialize to JSON', () =>
 test('JSON serialize/deserialize round trip', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['name'])]));
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['meta', 'school'])]));
   const j = e.json();
   const e2 = TransformationEngine.load(j);
   expect(e.equals(e2)).toBe(true);
-  e2.addField('i', 'number');
+  e2.addField(List<string>(['i']), 'number');
   expect(e.equals(e2)).toBe(false);
 });
 
 test('linear chain of transformations', () =>
 {
   const e: TransformationEngine = new TransformationEngine(doc1);
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
-  e.appendTransformation(TransformationNodeType.SubstringNode, ['name'], { from: 0, length: 2 });
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['name'])]));
+  e.appendTransformation(TransformationNodeType.SubstringNode, List<List<string>>([List<string>(['name'])]), { from: 0, length: 2 });
   const t = e.transform(doc1);
   expect(t['name']).toBe('BO');
 });
@@ -152,10 +163,57 @@ test('linear chain of transformations', () =>
 test('get transformations for a field', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
-  const id1: number = e.addField('name', 'string');
-  e.addField('meta.school', 'string');
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['name']);
-  e.appendTransformation(TransformationNodeType.SubstringNode, ['name'], { from: 0, length: 2 });
-  e.appendTransformation(TransformationNodeType.CapitalizeNode, ['meta.school']);
+  const id1: number = e.addField(List<string>(['name']), 'string');
+  e.addField(List<string>(['meta', 'school'], 'string');
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['name'])]));
+  e.appendTransformation(TransformationNodeType.SubstringNode, List<List<string>>([List<string>(['name'])]), { from: 0, length: 2 });
+  e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['meta', 'school'])]));
   expect(e.getTransformations(id1)).toEqual(List<number>([0, 1]));
+});
+
+test('rename a field (no structural changes)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine();
+  const id1: number = e.addField(List<string>(['name']), 'string');
+  e.addField(List<string>(['meta', 'school'], 'string');
+  e.setOutputKeyPath(id1, List<string>(['firstname']));
+  expect(e.transform(doc1)['name']).toBe(undefined);
+  expect(e.transform(doc1)['firstname']).toBe('Bob');
+  e.setOutputKeyPath(id1, List<string>(['professor']));
+  expect(e.transform(doc1)['name']).toBe(undefined);
+  expect(e.transform(doc1)['firstname']).toBe(undefined);
+  expect(e.transform(doc1)['professor']).toBe('Bob');
+});
+
+test('rename a field (subjugation)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine();
+  const id1: number = e.addField(List<string>(['name']), 'string');
+  e.addField(List<string>(['meta', 'school']), 'string');
+  e.setOutputKeyPath(id1, List<string>(['meta', 'firstname']));
+  expect(e.transform(doc1)['name']).toBe(undefined);
+  expect(e.transform(doc1)['meta']['firstname']).toBe('Bob');
+});
+
+test('rename a field (promotion)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine();
+  e.addField(List<string>(['name']), 'string');
+  const id2: number = e.addField(List<string>(['meta', 'school']), 'string');
+  e.setOutputKeyPath(id2, List<string>(['skool']));
+  expect(e.transform(doc1)['skool']).toBe('Stanford');
+  expect(e.transform(doc1)['meta']).toBe(undefined);
+});
+
+test('rename a field (an object with subkeys)', () =>
+{
+  const e: TransformationEngine = new TransformationEngine();
+  e.addField(List<string>(['name']), 'string');
+  const id2: number = e.addField(List<string>(['meta']), 'object');
+  e.addField(List<string>(['meta', 'school']), 'string');
+  e.addField(List<string>(['meta', 'sport']), 'string');
+  e.setOutputKeyPath(id2, List<string>());
+  expect(e.transform(doc2)['meta']).toBe(undefined);
+  expect(e.transform(doc2)['school']).toBe('Stanford');
+  expect(e.transform(doc2)['sport']).toBe('bobsled');
 });
