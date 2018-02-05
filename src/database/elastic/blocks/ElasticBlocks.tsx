@@ -95,6 +95,7 @@ export const ElasticBlocks = _.extend(
         key: '',
         value: '',
         inputType: InputType.NUMBER,
+        meta: '',
         static: {
           language: 'elastic',
           tql: '',

@@ -214,8 +214,8 @@ export const parseCardFromValueInfo = (valueInfo: ESValueInfo): Card =>
         distanceType,
         distanceUnit,
         field,
-        geopoint: coords,
-        map_text: '',
+        locationValue: fieldValue,
+        mapInputValue: typeof fieldValue !== 'object' ? fieldValue : '',
       },
       true);
   }

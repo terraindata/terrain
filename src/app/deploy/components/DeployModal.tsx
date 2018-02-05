@@ -146,9 +146,7 @@ class DeployModal extends TerrainComponent<Props>
       const template = EQLTemplateGenerator.generate(valueInfo);
       const body: object = {
         id: this.state.deployedName,
-        body: {
-          template,
-        },
+        body: template,
       };
       this.props.algorithmActions.deploy(algorithm, 'putTemplate', body, changingStatusTo, this.state.deployedName);
     }

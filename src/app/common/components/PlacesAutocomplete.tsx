@@ -286,10 +286,10 @@ class PlacesAutocomplete extends TerrainComponent<Props>
     const activeItem = this.getActiveItem();
     if (activeItem === undefined)
     {
+      this.clearAutocomplete();
       if (this.props.onEnterKeyDown !== undefined)
       {
         this.props.onEnterKeyDown(this.props.inputProps.value);
-        this.clearAutocomplete();
       } else
       {
         return;

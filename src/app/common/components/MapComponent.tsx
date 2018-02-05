@@ -43,6 +43,7 @@ THE SOFTWARE.
 */
 
 // Copyright 2017 Terrain Data, Inc.
+// tslint:disable:strict-boolean-expressions
 
 import * as classNames from 'classnames';
 import { List } from 'immutable';
@@ -52,68 +53,43 @@ import * as React from 'react';
 import { Circle, Map, Marker, Polyline, Popup, Rectangle, TileLayer } from 'react-leaflet';
 
 import Switch from 'common/components/Switch';
-import Util from 'util/Util';
-import BuilderActions from '../../builder/data/BuilderActions';
 import { backgroundColor, Colors } from '../../colors/Colors';
 import MapUtil from '../../util/MapUtil';
 import Autocomplete from './Autocomplete';
+import BuilderTextbox from './BuilderTextbox';
 import './MapComponentStyle.less';
 import PlacesAutocomplete from './PlacesAutocomplete';
 import TerrainComponent from './TerrainComponent';
 
 export interface Props
 {
-  // location and address for two points
-  location?: [number, number] | number[];
-  address?: string;
-  secondLocation?: [number, number] | number[];
-  secondAddress?: string;
-  bounds?: [number[]];
-  onMapClick?: (event) => void;
+  geocoder: string;
+  inputValue?: string; // What is rendered in the search bar (input, address, other)
+  coordinates?: any; // The coordinates that are used to create the map
+  distance?: number; // How large the distance circle shoudl be
+  distanceUnit?: string; // Unit for above distance
+  inputs?: any; // inputs so that it can tell what is an input
+  onChange?: (coordinates, inputValue) => void;
+  onMapClick?: (e) => void;
+  canEdit: boolean;
+  markers?: List<LocationMarker>; // A list of additional markers to add to the map
+  allowSearchByCoordinate?: boolean;
+  bounds?: [number, number];
+  boundingRectangles?: List<BoundingRectangle>;
+  // Show/Hide certain features
+  hideZoomControl?: boolean;
+  hideSearchBar?: boolean;
 
-  onChange?: (value) => void;
-  geocoder?: string;
-
-  // control what features are visible on map
-  markLocation?: boolean;
-  showDirectDistance?: boolean;
-  showSearchBar?: boolean;
-  showDistanceCircle?: boolean;
-  hideSearchSettings?: boolean;
-  zoomControl?: boolean;
-  keepAddressInSync?: boolean;
-  canEdit?: boolean;
-  colorMarker?: boolean;
-
-  distance?: number;
-  distanceUnit?: string;
-
-  // For card, keeps map in sync with card / builder
-  textKeyPath?: KeyPath;
-  keyPath?: KeyPath;
-
-  // builder information
-  spotlights?: any;
-  inputs?: any;
-  field?: any;
-  secondaryMarkerColor?: string;
-
-  // For displaying an aggregate maps
-  multiLocations?: LocationData[];
-  boundingRectangles?: BoundingRectangle[];
-
+  // Styling
   className?: string;
-  style?: string;
-
-  builderActions?: typeof BuilderActions;
 }
 
-interface LocationData
+interface LocationMarker
 {
-  location: any;
   name: string;
+  coordinates: any;
+  color: string;
   index: number;
-  color?: string;
 }
 
 interface BoundingRectangle
@@ -151,291 +127,31 @@ class MapComponent extends TerrainComponent<Props>
 {
 
   public state: {
-    address: string,
-    searchByCoordinate: boolean,
-    error?: any,
-    latitude: string,
-    longitude: string,
-    errorLatitude: boolean,
-    errorLongitude: boolean,
-    inputName: string,
-    usingInput: boolean,
-    zoom: number,
-    focused: boolean,
-  } = {
-      address: this.props.address !== undefined && this.props.address !== '' ? this.props.address : '',
-      searchByCoordinate: false,
-      error: null,
-      latitude: this.props.location !== undefined && this.props.location[0] !== undefined ? String(this.props.location[0]) : '',
-      longitude: this.props.location !== undefined && this.props.location[1] !== undefined ? String(this.props.location[1]) : '',
-      errorLatitude: false,
-      errorLongitude: false,
-      inputName: this.props.address !== undefined && this.props.address !== '' && this.props.address[0] === '@' ? this.props.address : '@',
-      usingInput: (this.props.address !== undefined && this.props.address !== ''
-        && this.props.address[0] === '@' && this.props.address !== '@'),
+    zoom: number;
+    coordinateSearch: boolean;
+  }
+    = {
       zoom: 15,
-      focused: false,
+      coordinateSearch: false,
     };
 
   public geoCache = {};
   public reverseGeoCache = {};
 
-  public componentWillReceiveProps(nextProps)
+  public shouldComponentUpdate(nextProps, nextState)
   {
-    // If the map is using an input for it's location and address values, and the input changes, update address and location
-    if (this.state.usingInput)
-    {
-      const currentInputs = this.props.inputs && this.props.inputs.toJS ? this.props.inputs.toJS() : this.props.inputs;
-      const nextInputs = nextProps.inputs && nextProps.inputs.toJS ? nextProps.inputs.toJS() : nextProps.inputs;
-      const currInputs = this.parseInputs(currentInputs);
-      const inputs = this.parseInputs(nextInputs);
-      if (!_.isEqual(inputs, currInputs) && inputs[this.state.inputName] !== undefined)
-      {
-        let value = inputs[this.state.inputName];
-        value = value.toJS !== undefined ? value.toJS() : value;
-        if (value !== undefined && value.location !== undefined && value.address !== undefined)
-        {
-          this.handleLocationChange(value.location, value.address, this.state.inputName);
-        }
-      }
-    }
-    // Keep state copies of address / coordinates in sync with props
-    if (this.props.address !== nextProps.address)
-    {
-      this.setState({
-        address: nextProps.address,
-      });
-    }
-    if (this.props.location !== nextProps.location)
-    {
-      this.setState({
-        latitude: String(nextProps.location[0]),
-        longitude: String(nextProps.location[1]),
-      });
-      // If the location changes with no address (i.e. in cards) fill in the address via reverse-geo
-      if (nextProps.keepAddressInSync && (nextProps.address === undefined || nextProps.address === '') && !this.state.usingInput)
-      {
-        const lat = nextProps.location[0];
-        const lng = nextProps.location[1];
-        if (this.reverseGeoCache[String([lat, lng])] !== undefined)
-        {
-          this.setState({
-            address: this.reverseGeoCache[String([lat, lng])],
-          });
-        }
-        else if (this.props.geocoder === 'photon')
-        {
-          MapUtil.geocodeByLatLng('photon', { lat, lng }, (result) =>
-          {
-            this.setState({
-              address: result.address,
-            });
-          });
-        }
-        else
-        {
-          MapUtil.geocodeByLatLng('google', { lat, lng })
-            .then((results: any) =>
-            {
-              if (results[0] !== undefined)
-              {
-                this.setState({
-                  address: results[0].formatted_address,
-                });
-              }
-            })
-            .catch((error) => this.setState({ error }));
-        }
-      }
-    }
+    return !(_.isEqual(nextProps, this.props) && this.state === nextState);
   }
 
-  public parseInputs(inputsToParse?)
+  public onChange(coordinates, inputValue)
   {
-    const inputs = {};
-    const toParse = inputsToParse !== undefined ? inputsToParse : this.props.inputs;
-    if (toParse === undefined || toParse === null)
-    {
-      return {};
-    }
-    toParse.forEach((input) =>
-    {
-      inputs['@' + String(input.key)] = input.value;
-    });
-    return inputs;
-  }
-
-  public handleLocationChange(location, address, inputName?)
-  {
-    this.geoCache[address] = location;
-    this.reverseGeoCache[String(location)] = address;
     if (this.props.onChange !== undefined)
     {
-      this.props.onChange({ location, address });
-    }
-    if (this.props.keyPath !== undefined)
-    {
-      this.props.builderActions.change(this.props.keyPath, location);
-      const addr = inputName ? inputName : address;
-      this.props.builderActions.change(this.props.textKeyPath, addr);
+      this.props.onChange(coordinates, inputValue);
     }
   }
 
-  public convertDistanceToMeters()
-  {
-    if (this.props.distance !== undefined &&
-      this.props.distanceUnit !== undefined &&
-      UNIT_CONVERSIONS[this.props.distanceUnit] !== undefined &&
-      !isNaN(this.props.distance)
-    )
-    {
-      return this.props.distance * UNIT_CONVERSIONS[this.props.distanceUnit];
-    }
-    return 0;
-  }
-
-  public geocode()
-  {
-    if (this.geoCache[this.state.address] !== undefined)
-    {
-      this.handleLocationChange(this.geoCache[this.state.address], this.state.address);
-      return;
-    }
-    if (this.props.geocoder === 'photon')
-    {
-      MapUtil.geocodeByAddress('photon', this.state.address, (result) =>
-      {
-        this.handleLocationChange([result[1], result[0]], this.state.address);
-      });
-    }
-    else
-    {
-      MapUtil.geocodeByAddress('google', this.state.address)
-        .then((results) => MapUtil.getLatLng(results[0]))
-        .then((latLng: any) => this.handleLocationChange([latLng.lat, latLng.lng], this.state.address))
-        .catch((error) => this.setState({ error }));
-    }
-  }
-
-  public reverseGeocode(overrideAddress?)
-  {
-    const lat = overrideAddress !== undefined ? overrideAddress[0]
-      : parseFloat(this.state.latitude);
-    const lng = overrideAddress !== undefined ? overrideAddress[1]
-      : parseFloat(this.state.longitude);
-
-    if (this.reverseGeoCache[String([lat, lng])] !== undefined)
-    {
-      this.handleLocationChange([lat, lng], this.reverseGeoCache[String([lat, lng])]);
-      return;
-    }
-
-    if (this.props.geocoder === 'photon')
-    {
-      MapUtil.geocodeByLatLng('photon', { lat, lng }, (result) =>
-      {
-        this.handleLocationChange(result.location, result.address);
-        return result.address;
-      });
-    }
-    else
-    {
-      MapUtil.geocodeByLatLng('google', { lat, lng })
-        .then((results: any) =>
-        {
-          if (results[0] === undefined)
-          {
-            this.setState({
-              error: 'No results for the coordinates entered',
-            });
-          }
-          else
-          {
-            this.handleLocationChange([lat, lng], results[0].formatted_address);
-          }
-        })
-        .catch((error) => this.setState({ error }));
-    }
-  }
-
-  public handleKeyPress(e)
-  {
-    if (e.key === 'Enter')
-    {
-      if (isNaN(parseFloat(this.state.latitude)) ||
-        isNaN(parseFloat(this.state.longitude)) ||
-        this.state.latitude === '' ||
-        this.state.longitude === ''
-      )
-      {
-        return;
-      }
-      else
-      {
-        this.reverseGeocode();
-      }
-    }
-  }
-
-  public handleAddressChange(address: string)
-  {
-    this.setState({ address });
-  }
-
-  public handleLatitudeChange(e)
-  {
-    let error = false;
-    if (isNaN(e.target.value))
-    {
-      error = true;
-    }
-    this.setState({
-      latitude: e.target.value,
-      errorLatitude: error,
-    });
-  }
-
-  public handleLongitudeChange(e)
-  {
-    let error = false;
-    if (isNaN(e.target.value))
-    {
-      error = true;
-    }
-    this.setState({
-      longitude: e.target.value,
-      errorLongitude: error,
-    });
-  }
-
-  public radians(degrees)
-  {
-    return degrees * Math.PI / 180;
-  }
-
-  // returns linnear distance between two coordinate points in METERS
-  public directDistance()
-  {
-    const firstLocation = this.props.location;
-    const secondLocation = this.props.secondLocation;
-    if (firstLocation === undefined || this.props.secondLocation === undefined)
-    {
-      return null;
-    }
-    const R = 6371e3; // meters
-    const phi1 = this.radians(firstLocation[0]);
-    const phi2 = this.radians(secondLocation[0]);
-    const deltaPhi = this.radians(secondLocation[0] - firstLocation[0]);
-    const deltaLambda = this.radians(secondLocation[1] - firstLocation[1]);
-
-    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-      Math.cos(phi1) * Math.cos(phi2) *
-      Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c;
-  }
-
+  // Create a marker icon given style parameters
   public markerIconWithStyle(style, small, index)
   {
     const size = small ? [20, 20] : [40, 40];
@@ -463,7 +179,6 @@ class MapComponent extends TerrainComponent<Props>
       default:
         break;
     }
-
     const styledIcon = divIcon({
       html: `<svg class=${className} version="1.1" id="Capa_1"
         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="512px" height="512px"
@@ -481,82 +196,131 @@ class MapComponent extends TerrainComponent<Props>
     return styledIcon;
   }
 
-  public setZoomLevel(viewport?: { center: [number, number], zoom: number })
+  public componentWillReceiveProps(nextProps: Props)
   {
-    if (viewport !== undefined && viewport.zoom !== undefined)
+    // If the coordinates change, and the input value is not defined, try to reverse geocode it
+    if (!_.isEqual(this.props.coordinates, nextProps.coordinates)
+      && (nextProps.inputValue === undefined || nextProps.inputValue === ''))
     {
-      this.setState({
-        zoom: viewport.zoom,
-      });
+      this.reverseGeocode(nextProps.coordinates);
     }
   }
 
-  public changeLocationInput(inputName)
+  // Check validiity of coordinate (formated [lat, lon])
+  public isValidCoordinate(location)
   {
-    if (inputName !== undefined && inputName !== '' && inputName[0] === '@')
+    return location !== undefined &&
+      location[0] !== undefined &&
+      typeof location[0] === 'number' &&
+      location[1] !== undefined &&
+      typeof location[1] === 'number';
+  }
+
+  // Given an address, find the corresponding coorindates
+  public geocode(address)
+  {
+    if (this.geoCache[address] !== undefined)
     {
-      this.setState({
-        inputName,
-        usingInput: true,
-      });
-      const inputs = this.parseInputs();
-      if (inputs[inputName] !== undefined)
+      this.onChange(this.geoCache[address], address);
+      return;
+    }
+    if (this.props.geocoder === 'photon')
+    {
+      MapUtil.geocodeByAddress('photon', address, (result) =>
       {
-        let value = inputs[inputName];
-        value = value.toJS !== undefined ? value.toJS() : value;
-        if (value !== undefined && value.location !== undefined && value.address !== undefined)
-        {
-          this.handleLocationChange(value.location, value.address, inputName);
-        }
-      }
+        this.onChange({ lat: result[1], lon: result[0] }, address);
+      });
     }
     else
     {
-      this.setState({
-        address: inputName,
-        usingInput: false,
-        inputName: '@',
-      });
+      MapUtil.geocodeByAddress('google', address)
+        .then((results) => MapUtil.getLatLng(results[0]))
+        .then((latLng: any) => this.onChange({ lat: latLng.lat, lon: latLng.lng }, address))
+        .catch((error) => this.setState({ error }));
     }
   }
 
-  public handleFocus()
+  // Given coordinates, find the corresponding address (this is more expensive than geocoding)
+
+  public reverseGeocode(coordinates)
   {
-    this.setState({
-      focused: true,
+    const location = MapUtil.getCoordinatesFromGeopoint(coordinates);
+    if (this.reverseGeoCache[String(coordinates)] !== undefined)
+    {
+      this.onChange(coordinates, this.reverseGeoCache[String(coordinates)]);
+      return;
+    }
+
+    if (this.props.geocoder === 'photon')
+    {
+      MapUtil.geocodeByLatLng('photon', { lat: location[0], lng: location[1] }, (result) =>
+      {
+        this.onChange(coordinates, result.address);
+      });
+    }
+    else
+    {
+      MapUtil.geocodeByLatLng('google', { lat: location[0], lng: location[1] })
+        .then((results: any) =>
+        {
+          if (results[0] === undefined)
+          {
+            this.setState({
+              error: 'No results for the coordinates entered',
+            });
+          }
+          else
+          {
+            this.onChange(coordinates, results[0].formatted_address);
+          }
+        })
+        .catch((error) => this.setState({ error }));
+    }
+  }
+
+  // Convert inputs list into a map of input name : input value
+  public parseInputs(toParse)
+  {
+    const inputs = {};
+    if (toParse === undefined || toParse === null)
+    {
+      return {};
+    }
+    toParse.forEach((input) =>
+    {
+      inputs['@' + String(input.key)] = input.value;
     });
+    return inputs;
   }
 
-  public handleBlur()
+  public convertDistanceToMeters()
   {
-    this.setState({
-      focused: false,
-    });
+    if (this.props.distance !== undefined &&
+      this.props.distanceUnit !== undefined &&
+      UNIT_CONVERSIONS[this.props.distanceUnit] !== undefined &&
+      !isNaN(this.props.distance)
+    )
+    {
+      return this.props.distance * UNIT_CONVERSIONS[this.props.distanceUnit];
+    }
+    return 0;
   }
 
-  public handleDragEnd(e)
+  public handleInputValueChange(value)
   {
-    const marker = e.target;
-    const newPosition = marker.getLatLng();
-    this.reverseGeocode([newPosition.lat, newPosition.lng]);
-    marker.setLatLng([newPosition.lat, newPosition.lng]);
+    this.onChange(undefined, value);
   }
 
-  public renderMarker(address, location, small, index, color, draggable, key?)
+  public renderMarker(address, location, color, index?)
   {
     const style = 'fill: ' + String(color) + ' !important;';
-    const icon = this.markerIconWithStyle(style, small, index);
+    const icon = this.markerIconWithStyle(style, false, index);
     return (
       <Marker
         position={location}
         icon={icon}
-        key={key}
-        ref={key}
-        onMouseOver={this._fn(this.openPopup, key)}
-        onMouseOut={this._fn(this.closePopup, key)}
-        draggable={draggable}
         riseOnHover={true}
-        onDragEnd={draggable ? this.handleDragEnd : null}
+        key={String(address) + String(index)}
       >
         {
           address !== '' && address !== undefined ?
@@ -573,53 +337,6 @@ class MapComponent extends TerrainComponent<Props>
         }
       </Marker>
     );
-  }
-
-  public renderSpotlightMarkers(spotlight, index)
-  {
-    if (spotlight !== undefined && typeof spotlight === 'object')
-    {
-      const location = MapUtil.getCoordinatesFromGeopoint(spotlight.fields[this.props.field]);
-      const address = spotlight.name;
-      return this.renderMarker(
-        address,
-        location,
-        false,
-        Number(spotlight.rank) + 1,
-        spotlight.color,
-        false,
-        String(address) + '_' + String(index),
-      );
-    }
-    return null;
-  }
-
-  public renderMultiLocationMarkers(locationData, index)
-  {
-    if (locationData !== undefined)
-    {
-      const location = MapUtil.getCoordinatesFromGeopoint(locationData.location);
-      const name = locationData.name;
-      const color = locationData.color !== undefined ? locationData.color : 'black';
-      return this.renderMarker(name, location, false, locationData.index, color, false, String(name) + '_' + String(index));
-    }
-    return null;
-  }
-
-  public openPopup(id)
-  {
-    if (id !== undefined && this.refs[id] !== undefined)
-    {
-      (this.refs[id] as any).leafletElement.openPopup();
-    }
-  }
-
-  public closePopup(id)
-  {
-    if (id !== undefined && this.refs[id] !== undefined)
-    {
-      (this.refs[id] as any).leafletElement.closePopup();
-    }
   }
 
   public renderBoundingRectangles(boundingRectangle, index)
@@ -639,8 +356,8 @@ class MapComponent extends TerrainComponent<Props>
         fillOpacity={0.3}
         key={id}
         ref={id}
-        onMouseOver={this._fn(this.openPopup, id)}
-        onMouseOut={this._fn(this.closePopup, id)}
+      // onMouseOver={this._fn(this.openPopup, id)}
+      // onMouseOut={this._fn(this.closePopup, id)}
       >
         {
           name !== '' && name !== undefined ?
@@ -659,6 +376,78 @@ class MapComponent extends TerrainComponent<Props>
     return null;
   }
 
+  public setZoomLevel(viewport?: { center: [number, number], zoom: number })
+  {
+    if (viewport !== undefined && viewport.zoom !== undefined)
+    {
+      this.setState({
+        zoom: viewport.zoom,
+      });
+    }
+  }
+
+  public renderMultiLocationMarkers(marker: LocationMarker)
+  {
+    if (marker !== undefined)
+    {
+      const location = MapUtil.getCoordinatesFromGeopoint(marker.coordinates);
+      const name = marker.name;
+      const color = marker.color !== undefined ? marker.color : 'black';
+      return this.renderMarker(name, location, color, marker.index);
+    }
+    return null;
+  }
+
+  public getMapProps(location)
+  {
+    const center = location;
+    let bounds;
+    // Calculate bounds if there are multiple locations
+    if (this.props.bounds !== undefined)
+    {
+      bounds = this.props.bounds;
+    }
+    else if (this.props.markers !== undefined && this.props.markers.size > 0)
+    {
+      let locations = this.props.markers.map((loc) => loc.coordinates).toList();
+      if (location !== undefined)
+      {
+        locations = locations.push([location[1], location[0]]);
+      }
+      bounds = MapUtil.getBounds(locations.toJS());
+    }
+    return bounds !== undefined ? { bounds } : { center };
+  }
+
+  // Given the coordinates and inputValue, try to find a vaild location
+  public parseLocation(coordinates, inputValue)
+  {
+    let location = [0, 0];
+    if (coordinates !== undefined)
+    {
+      location = MapUtil.getCoordinatesFromGeopoint(coordinates);
+      if (!this.isValidCoordinate(location))
+      {
+        // Try to see if it inputValue is an input, in that case get the coordinates from there
+        const inputs = this.parseInputs(this.props.inputs !== undefined ? this.props.inputs : []);
+        if (inputs[inputValue] !== undefined)
+        {
+          location = MapUtil.getCoordinatesFromGeopoint(inputs[inputValue]);
+        }
+        // Double check, because input coordinates could also be invalid
+        if (location[0] === undefined || String(location[0]) === '')
+        {
+          location[0] = 0;
+        }
+        if (location[1] === undefined || String(location[1]) === '')
+        {
+          location[1] = 0;
+        }
+      }
+    }
+    return location;
+  }
+
   public handleOnMapClick(event)
   {
     if (this.props.onMapClick !== undefined)
@@ -669,251 +458,139 @@ class MapComponent extends TerrainComponent<Props>
 
   public renderMap()
   {
-    const { location, secondLocation, multiLocations } = this.props;
-    const address = this.props.address !== undefined && this.props.address !== '' ? this.props.address : this.state.address;
-    const primaryMarkerColor = this.props.colorMarker ? Colors().builder.cards.categories.filter : 'black';
-    // const secondColor;
-    if (location === undefined || location[0] === undefined ||
-      location[1] === undefined || isNaN(location[0]) || isNaN(location[1]))
-    {
-      return null;
-    }
-
-    const center = location;
-    let bounds;
-    if (this.props.bounds !== undefined)
-    {
-      bounds = this.props.bounds;
-    }
-    else if (secondLocation !== undefined)
-    {
-      if (location[0] > secondLocation[0])
-      {
-        bounds = [[location[0] + 0.05, location[1]],
-        [secondLocation[0] - 0.05, secondLocation[1]]];
-      }
-      else
-      {
-        bounds = [[location[0] - 0.05, location[1]],
-        [secondLocation[0] + 0.05, secondLocation[1]]];
-      }
-    }
-    else if (multiLocations !== undefined && multiLocations.length > 0)
-    {
-      const locations = multiLocations.map((loc) => loc.location);
-      if (location !== undefined)
-      {
-        locations.push(List([location[1], location[0]]));
-      }
-      bounds = MapUtil.getBounds(locations);
-    }
-    const mapProps = bounds !== undefined ? { bounds } : { center };
+    const { coordinates, inputValue } = this.props;
+    const location = this.parseLocation(coordinates, inputValue);
     return (
-      <div
-        className={this.props.className}
-      >
+      <div className={this.props.className} >
         <Map
-          {...mapProps}
-          zoomControl={this.props.zoomControl}
+          {...this.getMapProps(location) }
           zoom={this.state.zoom}
-          ref='map'
           onViewportChanged={this.setZoomLevel}
-          onClick={this.handleOnMapClick}
-          onMouseDown={this.handleOnMapClick}
-          style={this.props.style}
           maxBounds={[[85, -180], [-85, 180]]}
           minZoom={1}
           zoomDelta={0.5}
-          keyboard={false}
+          zoomControl={!this.props.hideZoomControl}
+          onClick={this.handleOnMapClick}
+          onMouseDown={this.handleOnMapClick}
         >
           {
-            this.props.markLocation ?
-              this.renderMarker(address, location, secondLocation !== undefined, -1,
-                primaryMarkerColor,
-                secondLocation === undefined && this.props.multiLocations === undefined,
-              )
+            this.props.coordinates !== undefined &&
+            this.renderMarker(inputValue, location, 'black')
+          }
+          {
+            this.props.distance !== undefined &&
+            <Circle
+              center={location}
+              radius={this.convertDistanceToMeters()}
+              stroke={true}
+              color={Colors().builder.cards.categories.filter}
+              width={7}
+              fillColor={Colors().builder.cards.categories.filter}
+              fillOpacity={0.2}
+            />}
+          {
+            // Render addition locations (spotlights, aggregation map, etc.)
+            this.props.markers !== undefined && this.props.markers.size > 0 ?
+              _.map(this.props.markers.toJS(), this.renderMultiLocationMarkers)
               :
               null
           }
           {
-            this.props.secondLocation !== undefined && this.props.showDirectDistance ?
-              this.renderMarker(this.props.secondAddress, secondLocation, secondLocation !== undefined, -1,
-                this.props.secondaryMarkerColor !== undefined ? this.props.secondaryMarkerColor : 'black',
-                false)
-              :
-              null
-          }
-          {
-            this.props.spotlights !== undefined && this.props.spotlights !== null && this.props.spotlights.size > 0 ?
-              _.map(this.props.spotlights.toJS(), this.renderSpotlightMarkers)
-              :
-              null
-          }
-          {
-            this.props.multiLocations !== undefined && this.props.multiLocations.length > 0 ?
-              _.map(this.props.multiLocations, this.renderMultiLocationMarkers)
-              :
-              null
-          }
-          {
-            this.props.showDistanceCircle ?
-              <Circle
-                center={location}
-                radius={this.convertDistanceToMeters()}
-                stroke={true}
-                color={Colors().builder.cards.categories.filter}
-                width={7}
-                fillColor={Colors().builder.cards.categories.filter}
-                fillOpacity={0.2}
-              />
-              :
-              null
-          }
-          {
-            secondLocation !== undefined && this.props.showDirectDistance ?
-              <Polyline
-                positions={[location, secondLocation]}
-                color={'black'}
-                weight={2}
-              />
-              :
-              null
-          }
-          {
-            this.props.boundingRectangles !== undefined && this.props.boundingRectangles.length > 0 ?
-              _.map(this.props.boundingRectangles, this.renderBoundingRectangles)
+            // Bounding rectangles (aggreagtions maps)
+            this.props.boundingRectangles !== undefined && this.props.boundingRectangles.size > 0 ?
+              _.map(this.props.boundingRectangles.toJS(), this.renderBoundingRectangles)
               :
               null
 
           }
           <TileLayer
-            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
+            attribution='&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors'
+            url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           />
         </Map>
       </div>
     );
-
   }
 
-  public renderCoordinateInputs()
+  // When coordinates change, make sure the input is valid call change function
+  // and then reverse geocode (waiting for reverse geocode can take too long)
+  public handleCoordinateChange(key, value)
   {
-    return (
-      <div className='input-map-coordinates'>
-        <div className='input-map-coordinates-latitude'>
-          <input
-            type='text'
-            value={this.state.latitude}
-            placeholder={'Latitude'}
-            onChange={this.handleLatitudeChange}
-            onKeyPress={this.handleKeyPress}
-            className={classNames({
-              'input-map-input-error': this.state.errorLatitude,
-            })}
-          />
-        </div>
-        <div className='input-map-coordinates-longitude'>
-          <input
-            type='text'
-            value={this.state.longitude}
-            placeholder={'Latitude'}
-            onChange={this.handleLongitudeChange}
-            onKeyPress={this.reverseGeocode}
-            className={classNames({
-              'input-map-input-error': this.state.errorLongitude,
-            })}
-          />
-        </div>
-      </div>
-    );
+    const oldLocation = MapUtil.getCoordinatesFromGeopoint(this.props.coordinates);
+    const newLocation =
+      {
+        lat: key === 'latitude' ? !isNaN(parseFloat(value)) ? parseFloat(value) : value : oldLocation[0],
+        lon: key === 'longitude' ? !isNaN(parseFloat(value)) ? parseFloat(value) : value : oldLocation[1],
+      };
+    this.onChange(newLocation, '');
+    this.reverseGeocode(newLocation);
   }
 
+  // Render search bar - either a single input for address/value or 2 inputs for coordinates
   public renderSearchBar()
   {
-    // if there are inputs and the first key typed in is @, render an autocomplete that has the inputs as choices
-    // when an input is selected, set the value of the map to be that value
-    // make sure to not change input address (@location) to the actual address
-    if (this.props.inputs !== undefined && this.state.address !== undefined &&
-      this.state.address !== '' && this.state.address[0] === '@')
-    {
-      const inputs = this.parseInputs();
-      return (
-        <Autocomplete
-          value={this.state.inputName} // consider adding new state variable to be the input name
-          options={List(_.keys(inputs) as string[])}
-          onChange={this.changeLocationInput}
-          onFocus={this.handleFocus}
-          onBlur={this.handleBlur}
-          className='map-input-autocomplete'
-          autoFocus={this.state.focused}
-          moveCursorToEnd={true}
-          disabled={this.props.canEdit === false}
-        />
-      );
-    }
-
-    const inputStyle = this.props.canEdit === false ? _.extend({}, backgroundColor(Colors().darkerHighlight)) : {};
-    const style = this.props.hideSearchSettings ? { marginBottom: '0px' } : {};
-
     const inputProps = {
-      value: this.state.address,
-      onChange: this.handleAddressChange,
-      onFocus: this.handleFocus,
-      onBlur: this.handleBlur,
-      autoFocus: this.state.focused,
+      value: this.props.inputValue,
+      onChange: this.handleInputValueChange,
       disabled: this.props.canEdit === false,
     };
-
+    const inputStyle = this.props.canEdit === false ? _.extend({}, backgroundColor(Colors().darkerHighlight)) : {};
+    const location = MapUtil.getCoordinatesFromGeopoint(this.props.coordinates);
     return (
       <div className='map-component-search-bar'>
         {
-          this.state.searchByCoordinate ?
-            this.renderCoordinateInputs()
+          this.props.allowSearchByCoordinate && this.state.coordinateSearch ?
+            <div className='input-map-coordinates'>
+              <BuilderTextbox
+                value={location[0]}
+                onChange={this._fn(this.handleCoordinateChange, 'latitude')}
+                canEdit={this.props.canEdit}
+                placeholder='Latitude'
+                className='iinput-map-coordinates-latitude'
+              />
+              <BuilderTextbox
+                value={location[1]}
+                onChange={this._fn(this.handleCoordinateChange, 'longitude')}
+                canEdit={this.props.canEdit}
+                placeholder='Longitude'
+                className='input-map-coordinates-longitude'
+              />
+            </div>
             :
             <PlacesAutocomplete
               inputProps={inputProps}
-              onEnterKeyDown={this.geocode}
+              onSelect={this.geocode}
               styles={{ input: inputStyle }}
               geocoder={this.props.geocoder}
               classNames={{ root: 'map-component-address-input' }}
             />
         }
         {
-          this.props.hideSearchSettings ?
-            null
-            :
+          this.props.allowSearchByCoordinate ?
             <div className='input-map-search-settings-row' >
               <Switch
                 first='Text Search'
                 second='Coordinates'
-                selected={this.state.searchByCoordinate ? 2 : 1}
-                onChange={this._toggle('searchByCoordinate')}
+                selected={this.state.coordinateSearch ? 2 : 1}
+                onChange={this._toggle('coordinateSearch')}
                 darker={true}
               />
             </div>
+            :
+            null
         }
-      </div>
-    );
+      </div>);
   }
 
   public render()
   {
     return (
       <div>
-        {
-          this.props.showSearchBar ?
-            this.renderSearchBar()
-            :
-            null
-        }
+        {!this.props.hideSearchBar && this.renderSearchBar()}
         {this.renderMap()}
       </div>
     );
   }
 }
 
-export default Util.createTypedContainer(
-  MapComponent,
-  [],
-  { builderActions: BuilderActions },
-);
+export default MapComponent;

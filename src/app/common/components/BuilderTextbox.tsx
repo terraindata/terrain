@@ -250,8 +250,10 @@ class BuilderTextbox extends TerrainComponent<Props>
     // {
     //   value = +value;
     // }
-
-    this.props.builderActions.change(this.props.keyPath, value);
+    if (this.props.keyPath)
+    {
+      this.props.builderActions.change(this.props.keyPath, value);
+    }
     this.props.onChange && this.props.onChange(value);
   }
 
@@ -388,7 +390,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     {
       options = this.props.getAutoTerms(schema, builder);
     }
-    else
+    else if (this.props.keyPath)
     {
       options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath, schema, builder);
     }

@@ -514,31 +514,32 @@ export function ResultFormatValue(field: string, value: any, config: ResultsConf
           </div>
         );
 
-      case 'map':
-        const resultLocation = MapUtil.getCoordinatesFromGeopoint(value);
-        let targetLocation: [number, number];
-        if (locations !== undefined && locations[field] !== undefined)
-        {
-          targetLocation = MapUtil.getCoordinatesFromGeopoint(locations[field]) as [number, number];
-        }
-
-        return (
-          <div className='result-field-value-map-wrapper'>
-            <MapComponent
-              address={''}
-              location={targetLocation}
-              markLocation={true}
-              showDirectDistance={targetLocation !== undefined}
-              showSearchBar={false}
-              zoomControl={false}
-              secondLocation={resultLocation}
-              keepAddressInSync={false}
-              geocoder='google'
-              secondaryMarkerColor={color}
-              colorMarker={true}
-            />
-          </div>
-        );
+      // case 'map':
+      //   const resultLocation = MapUtil.getCoordinatesFromGeopoint(value);
+      //   let targetLocation: [number, number];
+      //   if (locations !== undefined && locations[field] !== undefined)
+      //   {
+      //     targetLocation = MapUtil.getCoordinatesFromGeopoint(locations[field]) as [number, number];
+      //   }
+      //   const marker = {
+      //     coordinates: resultLocation,
+      //     name: '',
+      //     color,
+      //     index: -1
+      //   };
+      //   return (
+      //     <div className='result-field-value-map-wrapper'>
+      //       <MapComponent
+      //         coordinates={targetLocation}
+      //         showDirectDistance={targetLocation !== undefined}
+      //         hideSearchBar={true}
+      //         hideZoomControl={true}
+      //         markers={List([marker])}
+      //         geocoder='photon'
+      //         canEdit={false}
+      //       />
+      //     </div>
+      //   );
 
       case 'text':
 

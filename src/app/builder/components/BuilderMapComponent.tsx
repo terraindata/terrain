@@ -46,11 +46,15 @@ THE SOFTWARE.
 
 // tslint:disable:strict-boolean-expressions restrict-plus-operands prefer-const no-var-requires
 import * as SpotlightTypes from 'app/builder/data/SpotlightTypes';
+import MapUtil from 'app/util/MapUtil';
 import Util from 'app/util/Util';
+import { List } from 'immutable';
+import * as _ from 'lodash';
 import * as React from 'react';
 import MapComponent from '../../common/components/MapComponent';
 import TerrainComponent from '../../common/components/TerrainComponent';
 import { BuilderState } from '../data/BuilderState';
+import BuilderActions from '../data/BuilderActions';
 
 const ArrowIcon = require('./../../../images/icon_arrow_8x5.svg?name=ArrowIcon');
 
@@ -78,7 +82,7 @@ class BuilderMapComponent extends TerrainComponent<Props>
 
   public componentWillReceiveProps(nextProps)
   {
-    if (nextProps.builder.query.inputs !== this.state.inputs)
+    if (nextProps.builder.query && nextProps.builder.query.inputs !== this.state.inputs)
     {
       this.setState({
         inputs: nextProps.builder.query.inputs,
@@ -86,32 +90,50 @@ class BuilderMapComponent extends TerrainComponent<Props>
     }
   }
 
+  public handleChange(coordinates, inputValue)
+  {
+    if (coordinates !== undefined)
+    {
+      BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), coordinates);
+    }
+    else
+    {
+      BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'locationValue'), inputValue);
+    }
+    BuilderActions.change(this._ikeyPath(this.props.parentKeyPath, 'mapInputValue'), inputValue);
+  }
+
+  public spotlightsToMarkers()
+  {
+    const spotlights = Util.asJS(this.props.spotlights.spotlights);
+    const spotlightMarkers = (_.keys(spotlights)).map((key) =>
+    {
+      const spotlight = spotlights[key];
+      return {
+        coordinates: spotlight.fields[this.props.data.field],
+        name: spotlight.name,
+        index: spotlight.rank + 1,
+        color: spotlight.color,
+      };
+    });
+    return List(spotlightMarkers);
+  }
+
   public render()
   {
-    const { distance, distanceUnit, geopoint, map_text, field } = this.props.data;
-    const spotlights = this.props.spotlights.spotlights;
+    const { distance, distanceUnit, locationValue, mapInputValue } = this.props.data;
     return (
       <div className='cards-builder-map-component'>
         <MapComponent
-          keyPath={this.props.keyPath}
-          location={geopoint.toJS !== undefined ? geopoint.toJS() : geopoint}
-          address={map_text !== undefined ? map_text : ''}
-          markLocation={true}
-          showDistanceCircle={true}
-          showSearchBar={true}
-          zoomControl={true}
-          distance={parseFloat(distance)}
+          geocoder='photon'
+          inputValue={mapInputValue}
+          coordinates={locationValue}
+          distance={distance}
           distanceUnit={distanceUnit}
-          geocoder='google'
-          hideSearchSettings={true}
           inputs={this.state.inputs}
-          textKeyPath={this._ikeyPath(this.props.parentKeyPath, 'map_text')}
-          spotlights={spotlights}
-          field={field}
-          keepAddressInSync={true}
+          onChange={this.handleChange}
           canEdit={this.props.canEdit}
-          colorMarker={true}
-          className={'builder-map-component-wrapper'}
+          markers={this.spotlightsToMarkers()}
         />
       </div>
     );
