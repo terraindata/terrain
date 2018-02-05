@@ -94,7 +94,7 @@ export interface Props
 
 // http://nicolashery.com/integrating-d3js-visualizations-in-a-react-app/
 
-class TransformCardChart extends TerrainComponent<Props>
+export class TransformCardChart extends TerrainComponent<Props>
 {
   public state: {
     pointsCache: ScorePoints; //  this component points
