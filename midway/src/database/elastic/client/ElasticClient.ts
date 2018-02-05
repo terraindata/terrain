@@ -205,7 +205,8 @@ class ElasticClient
           source: params.body,
         },
       },
-    }, (err, res, body) => {
+    }, (err, res, body) =>
+    {
       callback(err, body, res.statusCode);
     });
 
@@ -296,7 +297,7 @@ class ElasticClient
 
   private getHostFromConfig(): string
   {
-    let host = this.getConfig().host;
+    let host: string = this.getConfig().host;
     if (host === undefined)
     {
       if (this.getConfig().hosts !== undefined && this.getConfig().hosts.length > 0)
@@ -312,7 +313,7 @@ class ElasticClient
 
     if (host.substr(0, 4) !== 'http')
     {
-      host = 'http://' + host;
+      host = 'http://' + String(host);
     }
 
     return host;
