@@ -1266,6 +1266,47 @@ export const Ajax =
       });
     },
 
+    getResultConfig(
+      index: string,
+      onLoad?: (resp) => void,
+      onError?: (error) => void,
+    )
+    {
+      const body = {index};
+      return Ajax.req('get', 'resultsconfig/', body, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
+    updateResultConfig(
+      index: string,
+      resultsConfig: any,
+      onLoad?: (resp) => void,
+      onError?: (error) => void,
+    )
+    {
+      const body = {resultsConfig, index};
+      return Ajax.req('post', 'resultsconfig/update', body, (resp: any) =>
+      {
+        try
+        {
+          onLoad && onLoad(resp);
+        }
+        catch (e)
+        {
+          onError && onError(e);
+        }
+      });
+    },
+
     runOnDemandSchedule(
       id: ID,
       onLoad: (resp: object[]) => void,

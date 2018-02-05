@@ -67,7 +67,8 @@ import ResultsConfigComponent from '../results/ResultsConfigComponent';
 import HitsTable from './HitsTable';
 
 import Radium = require('radium');
-
+import {getIndex} from '../../../../database/elastic/blocks/ElasticBlockHelpers';
+import Ajax from 'app/util/Ajax';
 import { backgroundColor, Colors, fontColor, getStyle, link } from '../../../colors/Colors';
 import DragHandle from '../../../common/components/DragHandle';
 import InfiniteScroll from '../../../common/components/InfiniteScroll';
@@ -760,8 +761,17 @@ column if you have customized the results view.');
     });
   }
 
-  public hideConfig()
+  public hideConfig(config: ResultsConfig)
   {
+    // Update the default config for this index
+    let index = this.props.db.name + '/' + getIndex();
+    if (this.props.query.path &&
+      this.props.query.path.source &&
+      this.props.query.path.source.dataSource)
+    {
+      index = (this.props.query.path.source.dataSource as any).index;
+    }
+    Ajax.updateResultConfig(index, config);
     this.setState({
       showingConfig: false,
     });

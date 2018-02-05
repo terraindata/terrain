@@ -75,7 +75,7 @@ export interface Props
   fields: List<string>;
   config: ResultsConfig;
   onConfigChange: (config: ResultsConfig) => void;
-  onClose: () => void;
+  onClose: (config: ResultsConfig) => void;
   colorsActions: typeof ColorsActions;
 }
 
@@ -238,7 +238,7 @@ export class ResultsConfigComponent extends TerrainComponent<Props>
   public handleClose()
   {
     this.props.onConfigChange(this.state.config);
-    this.props.onClose();
+    this.props.onClose(this.state.config);
   }
 
   public handlePrimaryKeysChange(primaryKeys: List<string>)

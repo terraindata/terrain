@@ -138,7 +138,16 @@ const appSchemaSQL = (datetimeTypeName: string, falseValue: string, stringTypeNa
        columnId text NOT NULL,
        count integer NOT NULL,
        starred bool NOT NULL,
-       countByAlgorithm text); `
+       countByAlgorithm text); `,
+  `CREATE TABLE IF NOT EXISTS resultsConfig
+       (id ` + primaryKeyType + ` PRIMARY KEY,
+       index text NOT NULL,
+       thumbnail text,
+       name text,
+       score text,
+       fields text,
+       formats text,
+       primaryKeys text); `
   ,
 ];
 
