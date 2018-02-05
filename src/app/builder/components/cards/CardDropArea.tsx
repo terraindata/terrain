@@ -210,7 +210,7 @@ class CardDropArea extends TerrainComponent<Props>
         visible={this.props.isOver && this.props.canDrop && !!this.props.builder.draggingCardItem}
         keyPath={this.props.keyPath}
         index={this.props.index}
-        language={this.props.language}
+        language={this.props.builder.query.language}
         handleCardDrop={this.props.handleCardDrop}
         builder={this.props.builder}
         builderActions={this.props.builderActions}
