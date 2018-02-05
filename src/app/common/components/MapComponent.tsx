@@ -545,6 +545,29 @@ class MapComponent extends TerrainComponent<Props>
     this.reverseGeocode(newLocation);
   }
 
+  public renderCoordinateInputs(coordinates)
+  {
+    const location = MapUtil.getCoordinatesFromGeopoint(coordinates);
+    return (
+      <div className='input-map-coordinates'>
+        <BuilderTextbox
+          value={location[0]}
+          onChange={this._fn(this.handleCoordinateChange, 'latitude')}
+          canEdit={this.props.canEdit}
+          placeholder='Latitude'
+          className='input-map-coordinates-latitude'
+        />
+        <BuilderTextbox
+          value={location[1]}
+          onChange={this._fn(this.handleCoordinateChange, 'longitude')}
+          canEdit={this.props.canEdit}
+          placeholder='Longitude'
+          className='input-map-coordinates-longitude'
+        />
+      </div>
+    );
+  }
+
   // Render search bar - either a single input for address/value or 2 inputs for coordinates
   public renderSearchBar()
   {
@@ -562,30 +585,14 @@ class MapComponent extends TerrainComponent<Props>
       >
         {
           this.props.allowSearchByCoordinate && this.state.coordinateSearch ?
-            <div className='input-map-coordinates'>
-              <BuilderTextbox
-                value={location[0]}
-                onChange={this._fn(this.handleCoordinateChange, 'latitude')}
-                canEdit={this.props.canEdit}
-                placeholder='Latitude'
-                className='iinput-map-coordinates-latitude'
-              />
-              <BuilderTextbox
-                value={location[1]}
-                onChange={this._fn(this.handleCoordinateChange, 'longitude')}
-                canEdit={this.props.canEdit}
-                placeholder='Longitude'
-                className='input-map-coordinates-longitude'
-              />
-            </div>
-            :
-            <PlacesAutocomplete
-              inputProps={inputProps}
-              onSelect={this.geocode}
-              styles={{ input: inputStyle }}
-              geocoder={this.props.geocoder}
-              classNames={{ root: 'map-component-address-input' }}
-            />
+          this.renderCoordinateInputs(this.props.coordinates) :
+          <PlacesAutocomplete
+            inputProps={inputProps}
+            onSelect={this.geocode}
+            styles={{ input: inputStyle }}
+            geocoder={this.props.geocoder}
+            classNames={{ root: 'map-component-address-input' }}
+          />
         }
         {
           this.props.allowSearchByCoordinate ?

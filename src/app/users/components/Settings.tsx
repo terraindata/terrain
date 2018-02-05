@@ -58,7 +58,7 @@ import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { MidwayError } from 'shared/error/MidwayError';
 import Util from 'util/Util';
-import { Colors, Themes, ThemesArray } from '../../colors/Colors';
+import { Colors, OldThemesArray,  } from '../../colors/Colors';
 import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
 import { UserActions as Actions } from '../data/UserRedux';
@@ -459,7 +459,7 @@ class Settings extends TerrainComponent<Props>
 
   public changeTheme(val)
   {
-    const theme = ThemesArray[val];
+    const theme = OldThemesArray[val];
     if (localStorage.getItem('theme') !== theme)
     {
       localStorage.setItem('theme', theme);
@@ -510,8 +510,8 @@ class Settings extends TerrainComponent<Props>
         </div>
         <div className='settings-row'>
           <Dropdown
-            options={List(ThemesArray)}
-            selectedIndex={ThemesArray.indexOf(localStorage.getItem('theme'))}
+            options={List(OldThemesArray)}
+            selectedIndex={OldThemesArray.indexOf(localStorage.getItem('theme'))}
             onChange={this.changeTheme}
             canEdit={true}
             className='settings-theme-dropdown'

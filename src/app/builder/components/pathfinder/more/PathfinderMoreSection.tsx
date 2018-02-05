@@ -65,6 +65,7 @@ import PathfinderAggregationLine from './PathfinderAggregationLine';
 import {tooltip} from 'app/common/components/tooltip/Tooltips';
 import FloatingInput from 'app/common/components/FloatingInput';
 import PathfinderColumn from '../PathfinderColumn';
+const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
 {
@@ -167,6 +168,12 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     );
   }
 
+  public handleDeleteNested()
+  {
+    BuilderActions.changePath(this.props.keyPath.push('reference'), undefined);
+    BuilderActions.changePath(this.props.keyPath.push('nested'), undefined, true);
+  }
+
   public render()
   {
     const { canEdit } = this.props.pathfinderContext;
@@ -193,26 +200,38 @@ class PathfinderMoreSection extends TerrainComponent<Props>
         <div>
           {
             this.props.more.reference !== undefined ?
-           <div>
-            {
-              tooltip(
-                <FloatingInput
-                  label={'Reference'}
-                  isTextInput={true}
-                  value={this.props.more.reference}
-                  onChange={this.handleReferenceChange}
-                  canEdit={canEdit}
-                />,
-                PathfinderText.referenceExplanation
-              )
+           <div className='pf-more-nested'>
+            {this.props.more.nested !== undefined &&
+              <div className={'pf-nested-line'}>
+                <div className={'pf-nested-line-inner'}/>
+              </div>
             }
+            <div className='pf-more-nested-reference'>
+              {
+                tooltip(
+                  <FloatingInput
+                    label={'Reference'}
+                    isTextInput={true}
+                    value={this.props.more.reference}
+                    onChange={this.handleReferenceChange}
+                    canEdit={canEdit}
+                    className='pf-more-nested-reference-input'
+                  />,
+                  PathfinderText.referenceExplanation
+                )
+              }
+            <RemoveIcon onClick={this.handleDeleteNested} className='pf-more-nested-remove close'/>
+           </div>
               {this.props.more.nested !== undefined && this.renderPath(this.props.more.nested)}
             </div>
             :
             tooltip(
-              <div onClick={this.handleAddNested}>
-                Add a Nested Algorithm
-              </div>,
+              <PathfinderCreateLine
+                canEdit={canEdit}
+                onCreate={this.handleAddNested}
+                text={PathfinderText.createNestedLine}
+                style={{marginTop: 12}}
+              />,
               PathfinderText.nestedExplanation
             )
            }

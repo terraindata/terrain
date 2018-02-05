@@ -373,13 +373,14 @@ class PathfinderFilterLine extends TerrainComponent<Props>
               />
               <MapComponent
                 geocoder='photon'
-                inptValue={value.address}
-                coordinates={value.location}
+                inputValue={value.address}
+                coordinates={value.location !== undefined ? value.location : [0, 0]}
                 distance={value.distance}
                 distanceUnit={value.units}
                 wrapperClassName={'pf-filter-map-component-wrapper'}
                 fadeInOut={true}
                 onChange={this.handleMapChange}
+                canEdit={pathfinderContext.canEdit}
               />
             </div>
           }
@@ -403,6 +404,8 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private handleMapChange(coordinates, inputValue)
   {
+    console.log('changing location to ', coordinates);
+    console.log('changing address to ', inputValue);
     const filterLine = this.props.filterLine
       .setIn(List(['value', 'location']), coordinates)
       .setIn(List(['value', 'address']), inputValue);

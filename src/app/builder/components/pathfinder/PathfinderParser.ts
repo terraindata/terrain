@@ -296,7 +296,8 @@ function parseFilters(filterGroup: FilterGroup, inputs): any
   });
   if (useShould)
   {
-    filterObj = filterObj.setIn(['bool', 'minimum_should_match'], filterGroup.minMatches === 'any' ? 1 : parseFloat(String(filterGroup.minMatches)));
+    filterObj = filterObj.setIn(['bool', 'minimum_should_match'],
+      filterGroup.minMatches === 'any' ? 1 : parseFloat(String(filterGroup.minMatches)));
   }
   filterObj = filterObj.setIn(['bool', 'must'], must);
   filterObj = filterObj.setIn(['bool', 'must_not'], mustNot);
@@ -444,13 +445,13 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
         }),
       });
     case 'located':
-      const distanceObj = line.value as DistanceValue;
-      return Map({
-        geo_distance: Map({
-          distance: String(distanceObj.distance) + distanceObj.units,
-          [line.field]: [distanceObj.location[1], distanceObj.location[0]],
-        }),
-      });
+      // const distanceObj = line.value as DistanceValue;
+      // return Map({
+      //   geo_distance: Map({
+      //     distance: String(distanceObj.distance) + distanceObj.units,
+      //     [line.field]: [distanceObj.location[1], distanceObj.location[0]],
+      //   }),
+      // });
     default:
       return Map({});
   }

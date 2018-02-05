@@ -64,6 +64,7 @@ export const PathfinderText = {
   createFilterGroup: 'group of filter conditions',
   createScoreLine: 'score factor',
   createAggregationLine: 'metadata',
+  createNestedLine: 'nested algorithm',
 
   // Score section
   scoreSectionTitle: 'Score',

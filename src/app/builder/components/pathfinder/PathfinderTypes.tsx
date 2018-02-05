@@ -332,8 +332,8 @@ export const _FilterLine = (config?: { [key: string]: any }) =>
 
 class DistanceValueC extends BaseClass
 {
-  public location: [number, number] = [37.7749295, -122.41941550000001];
-  public address: string = 'San Francisco';
+  public location: [number, number] = [0, 0];
+  public address: string = '';
   public distance?: number = 10;
   public units?: string = 'mi';
 }

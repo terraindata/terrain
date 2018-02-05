@@ -65,7 +65,6 @@ import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 import FloatingInput from 'app/common/components/FloatingInput';
-const RemoveIcon = require('images/icon_close_8x8.svg?name=RemoveIcon');
 
 export interface Props
 {
@@ -135,11 +134,6 @@ class PathfinderColumn extends TerrainComponent<Props>
     BuilderActions.changePath(this.getKeyPath().push('name'), value);
   }
 
-  public handleDeletePath()
-  {
-    BuilderActions.changePath(this.getKeyPath(), undefined);
-  }
-
   public render()
   {
     const { path } = this.props;
@@ -155,58 +149,58 @@ class PathfinderColumn extends TerrainComponent<Props>
       >
         {
           path.name !== undefined &&
-          <div>
             <FloatingInput
               value={path.name}
               onChange={this.changePathName}
               label={'Algorithm Name'}
               isTextInput={true}
               canEdit={pathfinderContext.canEdit}
+              className='pf-column-name'
             />
-            <RemoveIcon onClick={this.handleDeletePath}/>
-          </div>
         }
-        <PathfinderSourceSection
-          pathfinderContext={pathfinderContext}
-          keyPath={keyPath.push('source')}
-          onStepChange={this.incrementStep}
-          step={path.step}
-          source={path.source}
-        />
-        {
-          path.step >= PathfinderSteps.Filter ?
-            <PathfinderFilterSection
-              pathfinderContext={pathfinderContext}
-              filterGroup={path.filterGroup}
-              keyPath={keyPath.push('filterGroup')}
-              onStepChange={this.incrementStep}
-              step={path.step}
-              toSkip={this.props.toSkip}
-            />
-            : null
-        }
-        {
-          path.step >= PathfinderSteps.Score ?
-            <PathfinderScoreSection
-              pathfinderContext={pathfinderContext}
-              score={path.score}
-              keyPath={keyPath.push('score')}
-              step={path.step}
-              onStepChange={this.incrementStep}
+        <div className='pathfinder-column-content'>
+          <PathfinderSourceSection
+            pathfinderContext={pathfinderContext}
+            keyPath={keyPath.push('source')}
+            onStepChange={this.incrementStep}
+            step={path.step}
+            source={path.source}
+          />
+          {
+            path.step >= PathfinderSteps.Filter ?
+              <PathfinderFilterSection
+                pathfinderContext={pathfinderContext}
+                filterGroup={path.filterGroup}
+                keyPath={keyPath.push('filterGroup')}
+                onStepChange={this.incrementStep}
+                step={path.step}
+                toSkip={this.props.toSkip}
+              />
+              : null
+          }
+          {
+            path.step >= PathfinderSteps.Score ?
+              <PathfinderScoreSection
+                pathfinderContext={pathfinderContext}
+                score={path.score}
+                keyPath={keyPath.push('score')}
+                step={path.step}
+                onStepChange={this.incrementStep}
 
-            />
-            : null
-        }
-        {
-          path.step >= PathfinderSteps.More ?
-            <PathfinderMoreSection
-              pathfinderContext={pathfinderContext}
-              more={path.more}
-              keyPath={keyPath.push('more')}
-              toSkip={this.props.toSkip !== undefined ? this.props.toSkip : 3}
-            />
-            : null
-        }
+              />
+              : null
+          }
+          {
+            path.step >= PathfinderSteps.More ?
+              <PathfinderMoreSection
+                pathfinderContext={pathfinderContext}
+                more={path.more}
+                keyPath={keyPath.push('more')}
+                toSkip={this.props.toSkip !== undefined ? this.props.toSkip : 3}
+              />
+              : null
+          }
+        </div>
       </div>
     );
   }

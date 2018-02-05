@@ -190,12 +190,7 @@ class InputComponent extends TerrainComponent<Props>
     if (this.props.input.inputType === InputType.LOCATION)
     {
       let value = this.props.input.value && Util.asJS(this.props.input.value);
-      let markLocation: boolean = false;
-      if (value)
-      {
-        markLocation = true;
-      }
-      else
+      if (!value)
       {
         value = [0, 0];
       }

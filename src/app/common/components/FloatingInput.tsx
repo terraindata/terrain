@@ -117,6 +117,7 @@ export interface Props
   onClick?: (id: any) => void;
   canEdit?: boolean;
   noBorder?: boolean;
+  className?: string;
 }
 
 class FloatingInput extends TerrainComponent<Props>
@@ -144,7 +145,7 @@ class FloatingInput extends TerrainComponent<Props>
     const isFloating = this.isFloating();
 
     return (
-      <Container>
+      <Container className={this.props.className}>
         {
           this.renderValue()
         }
