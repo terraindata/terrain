@@ -65,13 +65,21 @@ export interface Props
 
 export default class ArrayPreview extends TerrainComponent<Props>
 {
-  public renderItem(value, index)
+  // public renderItem(value, index)
+  // {
+  //   return (
+  //     <div className='array-preview-item' style={_.extend({}, itemStyle, this.props.style)} key={index}>
+  //       {value}
+  //     </div>
+  //   );
+  // }
+
+  public renderItems(items: any[])
   {
-    return (
-      <div className='array-preview-item' style={_.extend({}, itemStyle, this.props.style)} key={index}>
-        {value}
-      </div>
-    );
+    return items.reduce((prev, current, i, arr) =>
+    {
+      return `${prev}, ${current}`;
+    }).slice(0, -1);
   }
 
   public render()
@@ -89,7 +97,7 @@ export default class ArrayPreview extends TerrainComponent<Props>
     {
       return (
         <div className='array-preview-container'>
-          {List(items).map(this.renderItem)}
+          {/*List(items).map(this.renderItem)*/ this.renderItems(items)}
         </div>
       );
     }
