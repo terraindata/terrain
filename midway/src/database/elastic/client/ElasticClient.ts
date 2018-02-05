@@ -206,9 +206,9 @@ class ElasticClient
         },
       },
     }, (err, res, body) =>
-    {
-      callback(err, body, res.statusCode);
-    });
+      {
+        callback(err, body, res.statusCode);
+      });
 
     // FIXME: Uncomment when putScript in elasticsearch.js is fixed to use the changed stored script body format in 6.1
     // https://www.elastic.co/guide/en/elasticsearch/reference/6.1/modules-scripting-using.html
