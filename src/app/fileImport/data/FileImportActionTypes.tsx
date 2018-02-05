@@ -81,7 +81,7 @@ const FileImportActionTypes =
     setTypeObjectKey: '',
     setErrorMsg: '',
     fetchTypesFromQuery: '',
-    setColumnTypes: '',
+    setColumnNamesAndTypes: '',
     fetchColumnAnalyzers: '',
     setAnalyzers: '',
     setColumnTypeIndex: '',

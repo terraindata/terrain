@@ -406,7 +406,7 @@ class BuilderTextbox extends TerrainComponent<Props>
     {
       options = this.props.getAutoTerms(schema);
     }
-    else
+    else if (this.props.keyPath)
     {
       options = BuilderHelpers.getTermsForKeyPath(this.props.keyPath, schema);
     }

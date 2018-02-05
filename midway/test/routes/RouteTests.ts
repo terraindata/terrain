@@ -535,7 +535,6 @@ describe('Query route tests', () =>
           body: JSON.stringify({
             from: 0,
             size: 0,
-            query: {},
           }),
         },
       })
@@ -571,7 +570,6 @@ describe('Query route tests', () =>
           body: {
             from: 0,
             size: 0,
-            query: {},
           },
         },
       })
@@ -600,17 +598,17 @@ describe('Query route tests', () =>
     async () =>
     {
       const template: string = `{
-                   "from" : 0,
-                   "size" : {{#toJson}}size{{/toJson}},
-                   "query" : {
-                      "bool" : {
-                        "must" : [
-                          {"match" : {"_index" : "movies"}},
-                          {"match" : {"_type" : "data"}}
-                        ]
-                      }
-                   }
-                }`;
+          "from" : 0,
+          "size" : {{#toJson}}size{{/toJson}},
+          "query" : {
+            "bool" : {
+              "must" : [
+                {"match" : {"_index" : "movies"}},
+                {"match" : {"_type" : "data"}}
+              ]
+            }
+          }
+      }`;
 
       await request(server)
         .post('/midway/v1/query/')
@@ -622,9 +620,7 @@ describe('Query route tests', () =>
             type: 'putTemplate',
             body: {
               id: 'testTemplateQuery',
-              body: {
-                template,
-              },
+              body: template,
             },
           },
         }).expect(200).then((response) =>
@@ -654,9 +650,11 @@ describe('Query route tests', () =>
             {
               result: {
                 _id: 'testTemplateQuery',
-                lang: 'mustache',
                 found: true,
-                template,
+                script: {
+                  lang: 'mustache',
+                  source: template,
+                },
               }, errors: [], request: { database: 1, type: 'getTemplate', body: { id: 'testTemplateQuery' } },
             });
         }).catch((error) =>
@@ -699,11 +697,15 @@ describe('Query route tests', () =>
           expect(JSON.parse(response.text)).toMatchObject(
             {
               errors: [
-                {
-                  status: 404,
-                  title: 'Not Found',
-                },
+                // {
+                //   status: 404,
+                //   title: 'Not Found',
+                // },
               ],
+              result: {
+                _id: 'testTemplateQuery',
+                found: false,
+              },
             });
         }).catch((error) =>
         {
@@ -829,7 +831,6 @@ describe('File import route tests', () =>
               index: 'test_elastic_db',
               type: 'fileImportTestTable',
               body: {
-                query: {},
                 sort: [{ pkey: 'asc' }],
               },
             },
@@ -904,7 +905,6 @@ describe('File import route tests', () =>
               index: 'test_elastic_db',
               type: 'fileImportTestTable',
               body: {
-                query: {},
                 sort: [{ pkey: 'desc' }],
               },
             },
@@ -1217,7 +1217,6 @@ describe('File io templates route tests', () =>
               index: 'mysqlimport',
               type: 'data',
               body: {
-                query: {},
                 sort: [{ movieid: 'asc' }],
               },
             },
@@ -1426,8 +1425,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 11, 16, 7, 24, 4),
-        end: new Date(2017, 11, 16, 7, 36, 4),
+        start: new Date(2018, 1, 16, 7, 24, 4),
+        end: new Date(2018, 1, 16, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'terrain_5',
         agg: 'select',
@@ -1441,7 +1440,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(2);
+        expect(respData['terrain_5'].length).toEqual(3);
       });
   });
 
@@ -1453,8 +1452,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 11, 16, 7, 24, 4),
-        end: new Date(2017, 11, 16, 7, 36, 4),
+        start: new Date(2018, 1, 16, 7, 24, 4),
+        end: new Date(2018, 1, 16, 7, 36, 4),
         eventname: 'impression',
         algorithmid: 'terrain_5',
         agg: 'histogram',
@@ -1469,7 +1468,7 @@ describe('Analytics route tests', () =>
           fail('GET /schema request returned empty response body');
         }
         const respData = JSON.parse(response.text);
-        expect(respData['terrain_5'].length).toEqual(2);
+        expect(respData['terrain_5'].length).toEqual(5);
       });
   });
 
@@ -1481,8 +1480,8 @@ describe('Analytics route tests', () =>
         id: 1,
         accessToken: 'ImAnAdmin',
         database: 1,
-        start: new Date(2017, 11, 16, 7, 24, 4),
-        end: new Date(2017, 11, 16, 10, 24, 4),
+        start: new Date(2018, 1, 31, 7, 24, 4),
+        end: new Date(2018, 1, 31, 10, 24, 4),
         eventname: 'click,impression',
         algorithmid: 'terrain_5',
         agg: 'rate',
