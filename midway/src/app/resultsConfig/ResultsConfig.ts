@@ -66,13 +66,13 @@ export class ResultsConfig
       'resultsConfig',
       ['id'],
       [
-       'index',
-       'thumbnail',
-       'name',
-       'score',
-       'fields',
-       'formats',
-       'primaryKeys',
+        'index',
+        'thumbnail',
+        'name',
+        'score',
+        'fields',
+        'formats',
+        'primaryKeys',
       ],
     );
   }
@@ -95,7 +95,7 @@ export class ResultsConfig
     }
     else if (index !== undefined)
     {
-      return this.select([], {index});
+      return this.select([], { index });
     }
     return this.select([], {});
   }

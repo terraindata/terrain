@@ -163,9 +163,9 @@ class PathPicker extends TerrainComponent<Props>
           className='pathpicker-value-text'
           style={fontColor(Colors().active)}
         >
-        {
-          value
-        }
+          {
+            value
+          }
         </div>
       </div>
     );
@@ -180,7 +180,7 @@ class PathPicker extends TerrainComponent<Props>
   {
     const { props, state } = this;
     return props.options.findIndex(
-        (option) => option.value === props.value);
+      (option) => option.value === props.value);
   }
 
   private renderPicker()
@@ -194,13 +194,13 @@ class PathPicker extends TerrainComponent<Props>
     );
   }
 }
-              // <input
-              //   type='text'
-              //   value={props.value}
-              //   placeholder={this.props.textPlaceholder !== undefined ?
-              //     this.props.textPlaceholder : 'Custom value'}
-              //   onChange={this.handleTextChange}
-              //   className='transition box-size'
-              // />
+// <input
+//   type='text'
+//   value={props.value}
+//   placeholder={this.props.textPlaceholder !== undefined ?
+//     this.props.textPlaceholder : 'Custom value'}
+//   onChange={this.handleTextChange}
+//   className='transition box-size'
+// />
 
 export default PathPicker;

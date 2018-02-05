@@ -1266,18 +1266,17 @@ export const Ajax =
       });
     },
 
-    getResultConfig(
+    getResultsConfig(
       index: string,
       onLoad?: (resp) => void,
       onError?: (error) => void,
     )
     {
-      const body = {index};
-      return Ajax.req('get', 'resultsconfig/', body, (resp: any) =>
+      return Ajax.req('post', 'resultsconfig/', { index }, (resp: any) =>
       {
         try
         {
-          onLoad && onLoad(resp);
+          onLoad && onLoad(JSON.parse(JSON.stringify(resp)));
         }
         catch (e)
         {
@@ -1286,14 +1285,14 @@ export const Ajax =
       });
     },
 
-    updateResultConfig(
+    updateResultsConfig(
       index: string,
       resultsConfig: any,
       onLoad?: (resp) => void,
       onError?: (error) => void,
     )
     {
-      const body = {resultsConfig, index};
+      const body = { resultsConfig, index };
       return Ajax.req('post', 'resultsconfig/update', body, (resp: any) =>
       {
         try

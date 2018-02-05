@@ -57,21 +57,19 @@ import ResultsConfigConfig from './ResultsConfigConfig';
 const Router = new KoaRouter();
 export const resultsConfig = new ResultsConfig();
 
-Router.get('/', passport.authenticate('access-token-local'), async (ctx, next) =>
+Router.post('/', passport.authenticate('access-token-local'), async (ctx, next) =>
 {
   let getItems;
-  if (ctx.request.body.body !== undefined && ctx.request.body.body.id !== undefined)
-  {
-    winston.info('Getting results config by id', ctx.request.body.body.id);
-    getItems = resultsConfig.get(ctx.request.body.body.id);
-  }
   if (ctx.request.body.body !== undefined && ctx.request.body.body.index !== undefined)
   {
-    winston.info('Getting results config by index', ctx.request.body.body.index);
-    getItems = resultsConfig.get(undefined, ctx.request.body.body.index);
+    winston.info('Getting results config of a specific index');
+    getItems = await resultsConfig.get(undefined, ctx.request.body.body.index);
   }
-  winston.info('getting all results config');
-  getItems = await resultsConfig.get();
+  else
+  {
+    winston.info('getting all results config');
+    getItems = await resultsConfig.get();
+  }
   ctx.body = getItems;
 });
 

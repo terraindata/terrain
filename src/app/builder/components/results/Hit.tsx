@@ -53,6 +53,7 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
 const { List, Map } = Immutable;
+import Ajax from 'app/util/Ajax';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
@@ -65,6 +66,7 @@ import TerrainComponent from './../../../common/components/TerrainComponent';
 import { tooltip } from './../../../common/components/tooltip/Tooltips';
 import Util from './../../../util/Util';
 import { Hit } from './ResultTypes';
+
 const PinIcon = require('./../../../../images/icon_pin_21X21.svg?name=PinIcon');
 const ScoreIcon = require('./../../../../images/icon_terrain_27x16.svg?name=ScoreIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -91,6 +93,8 @@ export interface Props
   connectDragPreview?: (a: any) => void;
 
   locations?: { [field: string]: any };
+
+  indexName?: string;
 
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
@@ -255,8 +259,7 @@ class HitComponent extends TerrainComponent<Props> {
 
   public render()
   {
-    const { isDragging, connectDragSource, isOver, connectDropTarget, resultsConfig, hit } = this.props;
-
+    const { isDragging, connectDragSource, isOver, resultsConfig, connectDropTarget, hit } = this.props;
     const classes = classNames({
       'result': true,
       'result-expanded': this.props.expanded,
@@ -274,7 +277,7 @@ class HitComponent extends TerrainComponent<Props> {
     const spotlights = this.props.spotlights.spotlights;
     const spotlight = spotlights.get(this.props.primaryKey);
     const color = spotlight ? spotlight.color : 'black';
-    const thumbnail = resultsConfig.thumbnail !== null ?
+    const thumbnail = resultsConfig && resultsConfig.thumbnail !== null ?
       getResultThumbnail(hit, resultsConfig, this.props.expanded) :
       null;
     const name = getResultName(hit, resultsConfig, this.props.expanded, this.props.locations, color);

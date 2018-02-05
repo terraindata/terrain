@@ -132,7 +132,7 @@ class FloatingInput extends TerrainComponent<Props>
         />
         <Label
           htmlFor={state.myId}
-          style={ isFloating ? floatingLabelStyle : undefined }
+          style={isFloating ? floatingLabelStyle : undefined}
         >
           {
             props.label
