@@ -100,10 +100,12 @@ class PathPicker extends TerrainComponent<Props>
 
   componentWillReceiveProps(nextProps: Props)
   {
+    //
   }
 
   public componentDidUpdate(prevProps: Props, prevState)
   {
+    //
   }
 
   public render()
@@ -190,21 +192,11 @@ class PathPicker extends TerrainComponent<Props>
       value = option.displayName;
     }
     
+    // NOTE: If, in the future, you return a styled element from here,
+    //  it may cause funkiness with FloatingLabel, which will think that
+    //  there is a value even when it is blank.
+    
     return value;
-
-    // return (
-    //   <div
-    //   >
-    //     <div
-    //       className='pathpicker-value-text'
-    //       style={fontColor(Colors().active)}
-    //     >
-    //     {
-    //       value
-    //     }
-    //     </div>
-    //   </div>
-    // );
   }
 
   private handleBoxValueClick()
@@ -218,7 +210,7 @@ class PathPicker extends TerrainComponent<Props>
   {
     const { props, state } = this;
     return props.options.findIndex(
-        (option) => {console.log(option.value, props.value); return option.value === props.value});
+      (option) => option.value === props.value);
   }
 
   private renderPicker()
@@ -444,13 +436,5 @@ const OPTION_NAME_STYLE = {
   fontSize: 24,
   color: Colors().active,
 };
-              // <input
-              //   type='text'
-              //   value={props.value}
-              //   placeholder={this.props.textPlaceholder !== undefined ?
-              //     this.props.textPlaceholder : 'Custom value'}
-              //   onChange={this.handleTextChange}
-              //   className='transition box-size'
-              // />
 
 export default PathPicker;

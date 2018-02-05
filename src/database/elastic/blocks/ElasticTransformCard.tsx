@@ -217,6 +217,7 @@ export const elasticTransform = _card(
         return {
           a: 0,
           b: 1,
+          mode: block['mode'],
           numerators: [[block['input'], 1]],
           denominators: [],
           ranges,

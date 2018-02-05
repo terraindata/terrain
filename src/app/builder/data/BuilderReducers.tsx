@@ -240,7 +240,7 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
           data: any,
         },
       }) =>
-        state.updateIn(
+      state.updateIn(
         action.payload.keyPath,
         (arr) =>
         {
@@ -365,12 +365,14 @@ const BuidlerReducers: ReduxActions.ReducerMap<BuilderState, any> =
     [ActionTypes.changeTQL]: (state: BuilderState,
       action: Action<{
         tql: string,
+        tqlMode: string,
       }>) =>
     {
       // TODO MOD convert
       let { query } = state;
       const tql: string = action.payload.tql;
       query = query.set('lastMutation', query.lastMutation + 1).set('tql', tql);
+      query = query.set('tqlMode', action.payload.tqlMode);
       query = query.set('parseTree', AllBackendsMap[query.language].parseQuery(query));
       query = AllBackendsMap[query.language].codeToQuery(
         query,

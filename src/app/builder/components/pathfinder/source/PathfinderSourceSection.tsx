@@ -136,16 +136,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
       </div>
     );
   }
-  // <PathPicker
-  //             options={sourceCountDropdownOptions}
-  //             value={source.count}
-  //             onChange={this.handleCountChange}
-  //             canEdit={canEdit}
-  //             shortNameText={'Count'}
-  //             headerText={'Choose how many results to show'}
-  //             forceOpen={true}
-  //             hasOther={true}
-  //           />
 
   private handleSourcePathChange(value)
   {
@@ -160,22 +150,6 @@ class PathfinderSourceSection extends TerrainComponent<Props>
     {
       props.onStepChange(props.pathfinderContext.step);
     }
-  }
-
-  private handleSourceChange(index, key)
-  {
-    // const options = this.getDataSourceOptions();
-    // const dataSource = this.props.pathfinderContext.source.dataSource;
-    // if ((dataSource as any).index !== undefined)
-    // {
-    //   BuilderActions.changePath(this.props.keyPath.push('dataSource').push('index'), options.get(index).value.id);
-    //   BuilderActions.changePath(this.props.keyPath.push('dataSource').push('types'), options.get(index).value.tableIds);
-    // }
-    // BuilderActions.changePath(this.props.keyPath.push('dataSource').push('name'), options.get(index).displayName);
-    // if (this.props.step === PathfinderSteps.Source)
-    // {
-    //   this.props.onStepChange(this.props.step);
-    // }
   }
 
   private handleCountChange(value: string | number)

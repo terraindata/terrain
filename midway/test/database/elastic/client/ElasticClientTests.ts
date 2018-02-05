@@ -96,7 +96,6 @@ test('search', async (done) =>
           index: 'movies',
           type: 'data',
           body: {
-            query: {},
             sort: [{ revenue: 'desc' }, { movieid: 'asc' }],
           },
           size: 1,
@@ -145,9 +144,7 @@ test('putScript', async (done) =>
         {
           id: 'terrain_test_movie_profit',
           lang: 'painless',
-          body: {
-            script: `return doc['revenue'].value - doc['budget'].value;`,
-          },
+          body: `return doc['revenue'].value - doc['budget'].value;`,
         },
         makePromiseCallback(resolve, reject));
     });
@@ -159,13 +156,12 @@ test('putScript', async (done) =>
           index: 'movies',
           type: 'data',
           body: {
-            query: {},
             sort: {
               _script: {
                 type: 'number',
                 order: 'desc',
                 script: {
-                  stored: 'terrain_test_movie_profit',
+                  id: 'terrain_test_movie_profit',
                   params: {},
                 },
               },

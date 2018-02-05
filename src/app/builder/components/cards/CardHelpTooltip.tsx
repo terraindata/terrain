@@ -102,10 +102,10 @@ export default class CardHelpTooltip extends TerrainComponent<Props>
             {errorMessage}
           </div>
         }
-        {
+        {this.props.staticInfo.url !== undefined && this.props.staticInfo.url !== null ?
           <div className='card-help-link'>
             <a target='_blank' href={this.props.staticInfo.url}> Learn More </a>
-          </div>
+          </div> : null
         }
       </div>
     );

@@ -47,40 +47,42 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import { extend } from 'lodash';
 
 const Color = require('color');
 
 // Here are base colors for our 2018 theme
 // Pick from these colors when filling out the Theme interface
-// 1 is highest contrast (most to edge of spectrum) 
+// 1 is highest contrast (most to edge of spectrum)
 //  as number increases, contrast decreases
 const NTColors =
-{
-  light1: '#fff',
-  light2: '#f8f8f8',
-  light3: '#f4f5f7',
-  
-  grey1: '#e3e3e3',
-  grey2: '#d8d8d8',
-  grey3: '#ccc',
-  
-  dark1: '#000',
-  dark2: '#231F20',
-  dark3: '#2f3132',
-  
-  mainBlue: '#1eb4fa',
-  blue1: '#a5e2ff',
-  blue2: '#55c6fa',
-  blue3: '#1a9cd9',
-  blue4: '#157eb0',
-};
+  {
+    light1: '#fff',
+    light2: '#f8f8f8',
+    light3: '#f4f5f7',
 
-const NewTheme = 
+    grey1: '#e3e3e3',
+    grey2: '#d8d8d8',
+    grey3: '#ccc',
+
+    dark1: '#000',
+    dark2: '#231F20',
+    dark3: '#2f3132',
+
+    mainBlue: '#1eb4fa',
+    blue1: '#a5e2ff',
+    blue2: '#55c6fa',
+    blue3: '#1a9cd9',
+    blue4: '#157eb0',
+  };
+
+const NewTheme: Theme =
 {
   fontColor: NTColors.dark3,
   fontColor2: '#606262',
   fontColorLightest: NTColors.grey3,
+  fontWhite: NTColors.light1,
   
   active: NTColors.mainBlue,
   
@@ -625,7 +627,7 @@ const LIGHT: OldTheme =
     altHighlight: 'rgba(255,255,255,0.15)',
 
     highlight: 'rgba(210,215,219,0.25)', // for slight emphasis
-    darkerHighlight: 'rgb(210,215,219,0.5)', // to make a depth effect with highlight
+    darkerHighlight: 'rgba(210,215,219,0.5)', // to make a depth effect with highlight
     stroke: '#aaa', // stands out against any background
 
     boxShadow: 'rgba(130,130,130,0.3)',
@@ -1092,7 +1094,7 @@ export const OldThemesInt =
 
 export const OldThemesArray = ['DARK', 'LIGHT', 'HALLOWEEN'];
 
-const curTheme = 'DARK';
+const curTheme = 'LIGHT';
 
 // Moving setup out here, since we currently need to reload the webpage anyways
 //  for theme changes to take effect
@@ -1106,8 +1108,8 @@ const newTheme = NewTheme;
 
 // contains the mash of the old theme and the new theme
 // only initialized once, as we need to reload browser anyway for theme changes
-const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme); 
-   // ^ new theme comes second, overrides old theme's properties
+const themeMash: Theme & OldTheme = _.extend({}, oldTheme, newTheme);
+// ^ new theme comes second, overrides old theme's properties
 
 export function Colors(): Theme & OldTheme
 {

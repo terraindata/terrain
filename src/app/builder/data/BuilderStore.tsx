@@ -160,8 +160,6 @@ export const BuilderStore: IStore<BuilderState> = createStore(
 
     if (BuilderCardActionTypes[action.type])
     {
-      console.log('card action type');
-      console.log(action.type);
       // a card changed and we need to re-translate the tql
       //  needs to be after the card change has affected the state
       const newCards = ESCardParser.parseAndUpdateCards(state.query.cards);

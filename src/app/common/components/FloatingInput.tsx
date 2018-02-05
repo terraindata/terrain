@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 // Copyright 2017 Terrain Data, Inc.
 
-// tslint:disable:strict-boolean-expressions member-access
+// tslint:disable:strict-boolean-expressions member-access restrict-plus-operands
 
 import * as classNames from 'classnames';
 import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
@@ -119,6 +119,10 @@ const inputStyle = `
   color: ${Colors().text1};
   transition: all 0.15s;
   color: ${Colors().active};
+
+  &:hover {
+    border-color: ${Colors().active};
+  }
 `;
 
 const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : FONT_SIZE;
@@ -160,15 +164,17 @@ export class FloatingInput extends TerrainComponent<Props>
 {
   state = {
     isFocused: false,
-    myId: Math.random() + '-floatinginput',
+    myId: String(Math.random()) + '-floatinginput',
   };
 
   componentWillReceiveProps(nextProps: Props)
   {
+    //
   }
 
   public componentDidUpdate(prevProps: Props, prevState)
   {
+    //
   }
 
   public render()
@@ -189,7 +195,7 @@ export class FloatingInput extends TerrainComponent<Props>
           {...props as any}
           isFloating={isFloating}
           htmlFor={state.myId}
-          style={ isFloating ? floatingLabelStyle : undefined }
+          style={isFloating ? floatingLabelStyle : undefined}
         >
           {
             props.label
@@ -198,7 +204,7 @@ export class FloatingInput extends TerrainComponent<Props>
       </Container>
     );
   }
-  
+
   private isFloating()
   {
     const { value, forceFloat } = this.props;
@@ -207,20 +213,20 @@ export class FloatingInput extends TerrainComponent<Props>
     {
       return true;
     }
-    
+
     if (value === undefined || value === null)
     {
       return false;
     }
-    
+
     if (('' + value).length > 0)
     {
       return true;
     }
-    
+
     return false;
   }
-  
+
   private renderValue()
   {
     const { props, state } = this;
@@ -241,12 +247,13 @@ export class FloatingInput extends TerrainComponent<Props>
         />
       );
     }
-    
+
     // Return a normal div, uneditable
     return (
       <InputDiv
         {...props as any}
         ref={props.getValueRef}
+        onClick={this.handleClick}
       >
         {
           value
@@ -254,7 +261,7 @@ export class FloatingInput extends TerrainComponent<Props>
       </InputDiv>
     );
   }
-  
+
   private handleClick()
   {
     this.props.onClick(this.props.id);
