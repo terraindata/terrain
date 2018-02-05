@@ -1,14 +1,5 @@
 @import "../../../common/Common.less";
 
-@tab-bg-color: #69735d;
-@tab-selected-bg-color: @fresh-moss;
-@tab-border-color: @tab-bg-color;
-@tab-selected-border-color: @tab-selected-bg-color;
-@tab-hover-color: rgba(255,255,255,0.1);
-
-@font-color: @fresh-moss;
-@selected-font-color: #798072;
-
 @tabs-row-height: 36px;
 
 .inner-shadow {
@@ -62,9 +53,7 @@
 			box-sizing: border-box;
 			height: @tabs-row-height;
 			font-weight: @bold-font-weight;
-			color: @white;
 			border-left: 1px solid @dark-green-border;
-
 			&.tabs-title-no-tabs {
 				width: 100%;
 			}
@@ -82,31 +71,23 @@
     z-index: 500;
     top: 0px;
     pointer-events: none;
-    border-bottom: 1px solid @tab-selected-border-color;
     box-sizing: border-box;
   }
   
   .tabs-tab {
     .normal-text;
-    line-height: 0px;
-    
-    padding-top: 5px; // ribbon width
-    
     display: inline-block;
     position: relative;
-    height: 35px;
     box-sizing: border-box;
     cursor: pointer;
-    color: @font-color;
     
     position: relative;
     z-index: 1;
+    top: 3px;
         
     .tab-icon {
-      fill: @tab-bg-color;
       height: 32px;
       display: inline-block;
-      stroke: @tab-border-color;
       position: relative;
       z-index: 3;  
       top: -4px;
@@ -123,15 +104,20 @@
     }
     
     .tab-inner {
-      padding: 8px;
+      margin: 6px;
       z-index: 17;
-      display: inline-block;
       .transition;
-      height: 31px;
       position: relative;
+      padding: 2px;
+      border-radius: 10px;
+      padding-left: 10px;
+      text-transform: uppercase;
+      font-size: 10px;
+      font-weight: 500;
       
       .tabs-close {
-        margin-left: 10px;
+        margin-left: 5px;
+        margin-right: 4px;
         opacity: 0;
         display: inline-block;
         position: relative;
@@ -141,7 +127,19 @@
         
         svg {
           position: absolute;
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          border-radius: 12px;
+          // .transition;
+          background: transparent;
+          cursor: pointer;
         }
+      }
+    }
+    .tab-inner:hover {
+      .tabs-close {
+        opacity: 1;
       }
     }
     
@@ -153,55 +151,17 @@
       svg {
         width: 22px;
         margin-top: 11px;
-        .cls-1 {
-          fill: @tab-bg-color;  
-        }
-        .cls-2 {
-          fill: @font-color;
-        }
-      }
-    }
-    
-    &:hover {
-      .tabs-close {
-        opacity: 1;
-      }
-    }
-    
-    &:hover:not(.tabs-tab-selected):not(.tabs-tab-no-bg) {
-      .tab-icon {
-        fill: @tab-hover-color;
-      }
-      
-      .tab-inner {
-        background: @tab-hover-color;
       }
     }
   }
 
   .tabs-tab-selected {
     z-index: 9999;
-    color: @selected-font-color;
-    background: @tab-selected-bg-color;
-    
     .tab-inner {
-      .tabs-close svg {
-        fill: @selected-font-color !important;
-        &:hover {
-          fill: #fff !important;
-        }
+      .transition;
+      .tabs-close {
+        opacity: 1;
       }
-    }
-    
-    .tab-icon {
-      fill: @tab-selected-bg-color;
-      stroke: @tab-selected-border-color;
-    }
-  }
-  
-  :not(.tabs-tab-selected) {
-    .tabs-close:not(:hover) svg {
-      fill: @font-color;
     }
   }
   
@@ -209,17 +169,17 @@
     flex-grow: 1;
     overflow-x: auto;
     overflow-y: hidden;
+    padding-left: 12px;
+    .tabs-selected-marker {
+      position: absolute;
+      border-radius: 10px;
+      top: 7px;
+      height: 20px;
+      .transition(~"all 500ms cubic-bezier(0.23, 1, 0.32, 1)");
+    }
     
     &::-webkit-scrollbar {
       height: 6px;
-    }
-    
-    &::-webkit-scrollbar-track {
-      background: lighten(@font-color, 18%);
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: lighten(@font-color, 10%);
     }
   }
   
@@ -228,52 +188,34 @@
     padding-left: 6px;
     padding-right: 6px;
     padding-top: 0px;
-    
-    color: rgba(255,255,255,0.8);
-    
+      
     .tabs-action {
       // height: 35px;
       .normal-white-text;
       display: inline-block;
       padding: 4px 6px;
       margin-top: 6px;
-      margin-left: 6px;
       cursor: default;
-      border-radius: 3px;
+      border-radius: 6px;
+      letter-spacing: 1;
+      font-weight: 500;
       
       svg {
         .transition;
-        opacity: 0.75;
+        opacity: 0.5;
         width: 14px;
       }
       
-      .transition;
-      border: 1px solid;
-      
+      .transition;      
       opacity: 0.5;
       
       &.tabs-action-enabled {
         cursor: pointer;
         opacity: 1;
-        &:hover {
-          border-color: rgba(255,255,255,0.75);
-          svg {
-            opacity: 0.9;
-          }
-        }
-        &:active {
-          border-color: #fff;
-          svg {
-            opacity: #fff;
-          }
-        }
       }
-      
-      // border-left: 1px solid rgba(255,255,255,0.6);
-      // &:first-child, &.tabs-action-no-divider {
-      //   border-left: none;
-      // }
-      
+      &.tabs-action-text {
+        margin-left: 6px;
+      }
       .transition;
       
       .tabs-action-piece {

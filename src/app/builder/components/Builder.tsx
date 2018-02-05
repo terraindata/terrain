@@ -86,8 +86,10 @@ import ResultsManager from './results/ResultsManager';
 
 const NewIcon = require('./../../../images/icon_new_21x17.svg?name=NewIcon');
 const OpenIcon = require('./../../../images/icon_open_11x10.svg?name=OpenIcon');
-const DuplicateIcon = require('./../../../images/icon_duplicate_11x12.svg?name=DuplicateIcon');
+const DuplicateIcon = require('./../../../images/icon_save_as.svg?name=DuplicateIcon');
 const SaveIcon = require('./../../../images/icon_save_10x10.svg?name=SaveIcon');
+const UndoIcon = require('./../../../images/icon_undo.svg?name=UndoIcon');
+const RedoIcon = require('./../../../images/icon_redo.svg?name=RedoIcon');
 
 const { Map, List } = Immutable;
 
@@ -427,28 +429,29 @@ class Builder extends TerrainComponent<Props>
   {
     return Immutable.List([
       {
-        text: 'Undo',
-        icon: null,
+        tooltip: 'Undo',
+        icon: <UndoIcon />,
         onClick: this.handleUndo,
         enabled: !!builderState.pastQueries.size,
       },
       {
-        text: 'Redo',
-        icon: null,
+        tooltip: 'Redo',
+        icon: <RedoIcon />,
         onClick: this.handleRedo,
         enabled: !!builderState.nextQueries.size,
       },
       {
-        text: 'Save',
-        icon: <SaveIcon />,
-        onClick: this.onSave,
-        enabled: this.shouldSave(builderState),
-      },
-      {
-        text: 'Save As',
-        icon: <SaveIcon />,
+        tooltip: 'Save As',
+        icon: <DuplicateIcon />,
         onClick: this.onSaveAs,
         enabled: true,
+      },
+      {
+        text: 'SAVE',
+        tooltip: 'Save',
+        icon: null,
+        onClick: this.onSave,
+        enabled: this.shouldSave(builderState),
       },
       //   {
       //     text: 'Duplicate',
@@ -903,7 +906,6 @@ class Builder extends TerrainComponent<Props>
           'builder': true,
           'builder-no-column-animation': this.state.noColumnAnimation,
         })}
-        style={backgroundColor(Colors().bg1)}
       >
         {
           !config || !config.length ?

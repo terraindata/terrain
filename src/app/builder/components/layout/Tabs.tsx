@@ -50,19 +50,20 @@ import './Tabs.less';
 // import * as moment from 'moment';
 const moment = require('moment');
 import * as classNames from 'classnames';
+import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import createReactClass = require('create-react-class');
 import { LibraryState } from 'library/LibraryTypes';
+import * as _ from 'lodash';
 import * as PropTypes from 'prop-types';
 import * as React from 'react';
 import { browserHistory } from 'react-router';
+import { backgroundColor, Colors, fontColor, getStyle } from '../../../colors/Colors';
 import LibraryActions from '../../../library/data/LibraryActions';
 import Util from '../../../util/Util';
 import LayoutManager from '../layout/LayoutManager';
 import PanelMixin from '../layout/PanelMixin';
 import { ColorsActions } from './../../../colors/data/ColorsRedux';
 import TerrainComponent from './../../../common/components/TerrainComponent';
-
-import { backgroundColor, Colors, fontColor } from '../../../colors/Colors';
 
 // const TabIcon = require('./../../../../images/tab_corner_27x31.svg?name=TabIcon');
 const CloseIcon = require('./../../../../images/icon_close_8x8.svg?name=CloseIcon');
@@ -127,13 +128,20 @@ const Tab = createReactClass<any, any>({
         className='tabs-close'
         onClick={this.close}
       >
-        <CloseIcon className='close close-icon' />
+        <CloseIcon
+          className='close-icon'
+          style={getStyle('fill', this.props.selected ? Colors().sidebarBg : Colors().iconColor)}
+        />
       </div>
     );
   },
 
   render()
   {
+    const style = _.extend({},
+      fontColor(this.props.selected ? Colors().sidebarBg : Colors().fontColor2),
+      // backgroundColor(this.props.selected ? Colors().active : '')
+    );
     return this.renderPanel(
       <div
         className={classNames({
@@ -144,14 +152,13 @@ const Tab = createReactClass<any, any>({
         key={this.props.id}
         onClick={this.handleClick}
         style={{
-          backgroundColor: this.props.selected ? Colors().active : Colors().bg3,
-          color: this.props.selected ? Colors().text.baseLight : Colors().text.secondaryLight,
           zIndex: this.zIndexStyle(),
         }}
+        ref={this.props.name}
       >
         <div
           className='tab-inner'
-          style={backgroundColor(this.props.selected ? Colors().bg2 : Colors().bg1)}
+          style={style}
         >
           {
             this.props.name
@@ -167,7 +174,8 @@ const Tab = createReactClass<any, any>({
 
 export interface TabAction
 {
-  text: string;
+  text?: string;
+  tooltip?: string;
   icon: any;
   enabled?: boolean;
   onClick();
@@ -186,9 +194,27 @@ interface TabsProps
 class Tabs extends TerrainComponent<TabsProps> {
   public state = {
     tabs: null,
+    selectorLeft: 0,
+    selectorWidth: 0,
   };
 
   public cancel = null;
+
+  public setSelectedPosition()
+  {
+    if (this.state.tabs === null || this.state.tabs.length === 0)
+    {
+      return;
+    }
+    const selected = this.state.tabs.filter((tab) => tab.selected)[0];
+    const key = selected.name;
+    const cr = this.refs[key]['refs'][key]['getBoundingClientRect']();
+    const parentCr = this.refs['all-tabs']['getBoundingClientRect']();
+    this.setState({
+      selectorLeft: cr.left - parentCr.left,
+      selectorWidth: cr.width,
+    });
+  }
 
   public componentWillMount()
   {
@@ -250,7 +276,7 @@ class Tabs extends TerrainComponent<TabsProps> {
 
     this.setState({
       tabs,
-    });
+    }, () => { this.setSelectedPosition(); });
   }
 
   // shouldComponentUpdate(nextProps, nextState)
@@ -276,32 +302,48 @@ class Tabs extends TerrainComponent<TabsProps> {
       <div className='tabs-actions'>
         {
           this.props.actions.map((action, index) =>
-            <a
-              className={classNames({
-                'tabs-action': true,
-                'tabs-action-enabled': action.enabled || action.enabled === undefined,
-              })}
-              key={index}
-              onClick={action.onClick}
-              style={action.enabled ? backgroundColor(Colors().bg3) : undefined}
-            >
-              {
-                action.icon &&
-                <div className='tabs-action-piece'>
-                  {
-                    action.icon
-                  }
-                </div>
-              }
-              <div
-                className='tabs-action-piece'
-                style={fontColor(Colors().text1)}
+            tooltip(
+              <a
+                className={classNames({
+                  'tabs-action': true,
+                  'tabs-action-text': action.text !== undefined && action.text !== '',
+                  'tabs-action-enabled': action.enabled || action.enabled === undefined,
+                })}
+                key={index}
+                onClick={action.onClick}
+                style={
+                  action.text ? backgroundColor(action.enabled ? Colors().sidebarBg : Colors().blockBg) : undefined
+                }
               >
                 {
-                  action.text
+                  action.icon &&
+                  <div className='tabs-action-piece'>
+                    {
+                      action.icon
+                    }
+                  </div>
                 }
-              </div>
-            </a>)
+                {
+                  action.text &&
+                  <div
+                    className='tabs-action-piece'
+                    style={_.extend({},
+                      fontColor(action.enabled ? Colors().active : Colors().fontColor),
+                    )}
+                  >
+                    {
+                      action.text
+                    }
+                  </div>
+                }
+              </a>,
+              {
+                title: action.tooltip,
+                distance: 24,
+                key: index,
+              },
+            ),
+          )
         }
       </div>
     );
@@ -371,6 +413,7 @@ class Tabs extends TerrainComponent<TabsProps> {
                 index={index}
                 onClick={this.handleClick}
                 onClose={this.handleClose}
+                ref={tab.name}
               />
             ,
           }))
@@ -386,9 +429,19 @@ class Tabs extends TerrainComponent<TabsProps> {
         >
           <div
             className='tabs-row'
-            style={backgroundColor(Colors().emptyBg)}
           >
-            <div className='tabs-inner-wrapper'>
+            <div
+              className='tabs-inner-wrapper'
+              ref={'all-tabs'}
+            >
+              <div
+                className='tabs-selected-marker'
+                style={{
+                  width: this.state.selectorWidth,
+                  left: this.state.selectorLeft,
+                  backgroundColor: Colors().active,
+                }}
+              />
               <LayoutManager layout={tabsLayout} moveTo={this.moveTabs} />
             </div>
             {

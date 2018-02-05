@@ -197,7 +197,7 @@ class FloatingInput extends TerrainComponent<Props>
           onChange={this.handleChange}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
-          noBorder={props.noBorder}
+        // noBorder={props.noBorder}
         />
       );
     }
@@ -206,7 +206,7 @@ class FloatingInput extends TerrainComponent<Props>
     return (
       <InputDiv
         onClick={this.handleClick}
-        noBorder={props.noBorder}
+      // noBorder={props.noBorder}
       >
         {
           value

@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires strict-boolean-expressions max-line-length comment-format restrict-plus-operands
 
 import * as $ from 'jquery';
+import * as _ from 'lodash';
 import { extend } from 'lodash';
 
 const Color = require('color');
@@ -82,6 +83,7 @@ interface Theme
   fontColor: string;
   fontColor2: string;
   fontColorLightest: string;
+  fontWhite: string;
 
   active: string;
   blockBg: string;
@@ -94,6 +96,7 @@ const NewTheme: Theme =
     fontColor: NTColors.dark3,
     fontColor2: '#606262',
     fontColorLightest: NTColors.grey3,
+    fontWhite: NTColors.light1,
 
     active: NTColors.mainBlue,
 
