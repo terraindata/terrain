@@ -51,10 +51,12 @@ import { tooltip, TooltipProps } from 'common/components/tooltip/Tooltips';
 import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import * as $ from 'jquery';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './PathPickerStyle.less';
-import FloatingInput from './FloatingInput';
+import { FloatingInput, LARGE_FONT_SIZE, FONT_SIZE } from './FloatingInput';
 import FadeInOut from './FadeInOut';
 
 export interface PathPickerOption
@@ -90,6 +92,10 @@ class PathPicker extends TerrainComponent<Props>
   state = {
     showOther: false,
     open: false,
+    picked: false,
+    pickedIndex: -1,
+    valueRef: null,
+    animationEl: null,
   };
 
   componentWillReceiveProps(nextProps: Props)
@@ -106,7 +112,10 @@ class PathPicker extends TerrainComponent<Props>
 
     return (
       <div
-        className='pathpicker'
+        className={classNames({
+          'pathpicker': true,
+          'pathpicker-picked': state.picked,
+        })}
       >
         {
           this.renderVeil()
@@ -129,6 +138,9 @@ class PathPicker extends TerrainComponent<Props>
   private renderBoxValue()
   {
     const { props, state } = this;
+    
+    const currentIndex = this.getCurrentIndex();
+    let renderedValue = this.renderValue('short', currentIndex);
 
     return (
       <div
@@ -142,11 +154,13 @@ class PathPicker extends TerrainComponent<Props>
         <FloatingInput
           label={props.shortNameText}
           isTextInput={false}
-          value={this.renderValue('short', this.getCurrentIndex())}
+          value={renderedValue}
           onClick={this.handleBoxValueClick}
           canEdit={props.canEdit}
           large={props.large}
           noBorder={true}
+          getValueRef={this.handleValueRef}
+          forceFloat={state.picked}
         />
         <div
           className='pathpicker-close'
@@ -242,13 +256,17 @@ class PathPicker extends TerrainComponent<Props>
   {
     return (
       <div
-        className='pathpicker-option'
+        className={classNames({
+          'pathpicker-option': true,
+          'pathpicker-option-picked': this.state.pickedIndex === index,
+        })}
         key={index}
         onClick={this._fn(this.handleOptionClick, index)}
       >
         <div
           className='pathpicker-option-name'
-          style={fontColor(Colors().active)}
+          style={OPTION_NAME_STYLE}
+          ref={'option-'+index}
         >
           {
             option.displayName
@@ -270,14 +288,93 @@ class PathPicker extends TerrainComponent<Props>
     );
   }
   
-  private handleOptionClick(optionIndex: number)
+  private handleOptionClick(pickedIndex: number)
+  {
+    const { state, props } = this;
+    
+    if (state.picked)
+    {
+      return;
+    }
+    
+    const optionBox = ReactDOM.findDOMNode(this.refs['option-' + pickedIndex]).getBoundingClientRect();
+    const valueEl = ReactDOM.findDOMNode(state.valueRef);
+    const valueBox = valueEl.getBoundingClientRect();
+    
+    const option = this.props.options.get(pickedIndex);
+    
+    const animationEl = $("<div>" + option.displayName + "</div>")
+      .addClass("pathpicker-option-name")
+      .css("position", "fixed")
+      .css("color", OPTION_NAME_STYLE.color)
+      .css("font-size", OPTION_NAME_STYLE.fontSize)
+      .css("left", optionBox.left)
+      .css("top", optionBox.top)
+      .css("width", optionBox.width)
+      // .css("height", optionBox.height)
+      .css("box-sizing", "border-box")
+      .css("z-index", 9999)
+      ;
+      
+    $("body").append(animationEl);
+    
+    animationEl.animate(
+      {
+        left: valueBox.left,
+        top: valueBox.top,
+        width: valueBox.width,
+        // height: valueBox.height, // can make it collapse to 0
+        padding: '20px 18px 4px 18px',
+        fontSize: props.large ? LARGE_FONT_SIZE : FONT_SIZE,
+      }, 
+      700, 
+      () =>
+      {
+        // use a timeout to make the end of the animation smooth
+        setTimeout(() => {
+          $(valueEl).css("opacity", 1);
+          this.handleValueChange(this.state.pickedIndex);
+        }, 150);
+        
+      }
+    );
+    
+    $(valueEl).css("opacity", 1);
+    $(valueEl).animate({
+        opacity: 0,
+      },
+      200);
+    
+    
+    this.setState({
+      picked: true,
+      pickedIndex,
+      animationEl,
+    });
+  }
+  
+  private handlePickAnimationEnd()
+  {
+    
+  }
+  
+  private cleanUpAnimation()
+  {
+    this.state.animationEl.remove();
+  }
+  
+  private handleValueChange(optionIndex: number)
   {
     const { props } = this;
     const option = props.options.get(optionIndex);
     props.onChange(option.value);
     this.setState({
       open: false,
+      picked: false,
+      pickedIndex: -1,
     });
+    
+    setTimeout(this.cleanUpAnimation, 150);
   }
   
   private renderSampleDatum(data: any, index: number)
@@ -333,7 +430,20 @@ class PathPicker extends TerrainComponent<Props>
       open: false,
     });
   }
+  
+  private handleValueRef(valueRef)
+  {
+    console.log(valueRef);
+    this.setState({
+      valueRef,
+    });
+  }
 }
+
+const OPTION_NAME_STYLE = {
+  fontSize: 24,
+  color: Colors().active,
+};
               // <input
               //   type='text'
               //   value={props.value}

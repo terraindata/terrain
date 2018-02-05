@@ -1,13 +1,15 @@
 @import "../../common/Common.less";
 
 @br: 6px;
+@option-max-height: 350px;
+@option-max-width: calc(~"50% - 16px");
 
 .pathpicker {
 	min-width: 125px; // arbitrary, can change
 	
 	.pathpicker-box-value {
 		position: relative;
-    z-index: 2;
+    z-index: 1;
     .transition;
     
     background: #fff;
@@ -29,7 +31,6 @@
     	border-top-right-radius: @br;
     	
 	    .pathpicker-close {
-	    	opacity: 1;
 	    }
     }
     &:hover {
@@ -62,6 +63,8 @@
 		}
 		background: #fff;
 		z-index: 1;
+		opacity: 1;
+		// .transition;
 		
 		.pathpicker-header {
 			margin: 6px;
@@ -75,23 +78,18 @@
 			.pathpicker-option {
 				flex-grow: 1;
 				min-width: 150px;
-		    max-width: calc(~"50% - 16px");
+		    max-width: @option-max-width;
+				max-height: @option-max-height;
 				margin: 6px;
 				border: 2px solid #eee;
 				border-radius: 6px;
 				cursor: pointer;
 				
-				max-height: 350px;
 				display: flex;
 				flex-direction: column;
 				
 				&:hover {
 					border-color: #1eb4fa;
-				}
-				
-				.pathpicker-option-name {
-					padding: 12px 24px;
-					font-size: 42px;
 				}
 			}
 		}
@@ -142,6 +140,12 @@
 			}
 		}
 	}
+	
+}
+
+.pathpicker-option-name {
+	padding: 12px 24px;
+	font-size: 42px;
 }
 
 .pathpicker-veil, .pathpicker-veil-open {
@@ -153,12 +157,85 @@
 	width: 100%;
 }
 
+.pathpicker-veil-open {
+	background: rgba(0,0,0,0.25);
+}
+
+.pathpicker.pathpicker-picked .pathpicker-veil,
 .pathpicker-veil:not(.pathpicker-veil-open) {
 	background: rgba(0,0,0,0);
 	pointer-events: none;
 }
 
-.pathpicker-veil-open {
-	background: rgba(0,0,0,0.25);
+
+
+// @keyframes collapse-option {
+//   0% {
+//     max-height: @option-max-height;
+//     max-width: @option-max-width;
+//   }
+//   100% {
+//     max-height: 0px;
+//     max-width: 0px;
+//     min-width: 0px;
+//   }
+// }
+// .collapse-option {
+//   animation: collapse-option 0.25s linear 0.15s forwards;
+// }
+
+
+// these need to be here, not in the above nested structure, so that they don't override
+//  the opacity: 0 call below
+// .pathpicker-close,
+// .pathpicker-option,
+// .pathpicker-data,
+// .pathpicker-option-name {
+// 	opacity: 1;
+// 	.transition;
+// }
+
+.pathpicker.pathpicker-picked {
+	
+	.pathpicker-picker {
+		opacity: 0;
+		.transition(~"all 0.5s");
+	}
+	
+	.pathpicker-box-value-open:not(.pathpicker-box-value-force-open) {
+  	border-bottom-left-radius: @br;
+  	border-bottom-right-radius: @br;
+  }
+	
+	// .pathpicker-picker {
+	// 	top: 0px;
+	// 	background: rgba(255,255,255,0);
+	// 	.transition;
+	// }
+	
+	// .pathpicker-header,
+	// .pathpicker-close,
+	// .pathpicker-option,
+	// .pathpicker-data {
+	// 	opacity: 0;
+	// 	.transition;
+	// 	border-color: rgba(0,0,0,0) !important;
+	// 	padding: 0px !important;
+	// 	margin: 0px !important;
+	// }
+	
+	// .pathpicker-option:not(.pathpicker-option-picked) {
+	// 	.collapse-option;
+	// }
+	
+	// .pathpicker-option.pathpicker-option-picked {
+	// 	opacity: 1;
+	// 	.pathpicker-data {
+	// 		opacity: 0;
+	// 	}
+	// 	.pathpicker-option-name {
+	// 		padding: 0px;
+	// 	}
+	// }
 	
 }

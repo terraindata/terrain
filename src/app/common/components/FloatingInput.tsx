@@ -55,6 +55,12 @@ import { default as styled } from 'styled-components';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 
+export let LARGE_FONT_SIZE = '52px';
+export let FONT_SIZE = '18px';
+export let LARGE_LABEL_FLOATING_FONT_SIZE = '14px';
+export let LABEL_FLOATING_FONT_SIZE = '10px';
+
+
 const Container = styled.div`
   position: relative;
   flex-grow: 1;
@@ -92,10 +98,10 @@ const Label = styled.label`
     {
       if (props.isFloating)
       {
-        return props.large ? '14px' : '10px';
+        return props.large ? LARGE_LABEL_FLOATING_FONT_SIZE : LABEL_FLOATING_FONT_SIZE;
       }
       
-      return props.large ? '52px' : '18px';  
+      return props.large ? LARGE_FONT_SIZE : FONT_SIZE;  
     }};
 `;
 
@@ -115,19 +121,21 @@ const inputStyle = `
   color: ${Colors().active};
 `;
 
+const fontSizeFn = (props) => props.large ? LARGE_FONT_SIZE : FONT_SIZE;
+
 // duplication of code because the functions don't work if you put them
 //  in inputStyle
 const Input = styled.input`
   padding-left: ${LEFT};
   padding-right: ${LEFT};
   ${inputStyle}
-  font-size: ${(props) => props.large ? '52px' : '18px'};
+  font-size: ${fontSizeFn};
 `;
 const InputDiv = styled.div`
   ${inputStyle}
   padding-left: ${LEFT};
   padding-right: ${LEFT};
-  font-size: ${(props) => props.large ? '52px' : '18px'};
+  font-size: ${fontSizeFn};
   cursor: pointer;
 `;
 
@@ -143,9 +151,12 @@ export interface Props
   canEdit?: boolean;
   noBorder?: boolean;
   large?: boolean;
+  forceFloat?: boolean;
+  
+  getValueRef?: (ref) => void;
 }
 
-class FloatingInput extends TerrainComponent<Props>
+export class FloatingInput extends TerrainComponent<Props>
 {
   state = {
     isFocused: false,
@@ -190,12 +201,12 @@ class FloatingInput extends TerrainComponent<Props>
   
   private isFloating()
   {
-    if (this.state.isFocused)
+    const { value, forceFloat } = this.props;
+    
+    if (this.state.isFocused || forceFloat)
     {
       return true;
     }
-    
-    const { value } = this.props;
     
     if (value === undefined || value === null)
     {
@@ -226,6 +237,7 @@ class FloatingInput extends TerrainComponent<Props>
           onChange={this.handleChange}
           onFocus={this.handleFocus}
           onBlur={this.handleBlur}
+          ref={props.getValueRef}
         />
       );
     }
@@ -234,6 +246,7 @@ class FloatingInput extends TerrainComponent<Props>
     return (
       <InputDiv
         {...props as any}
+        ref={props.getValueRef}
       >
         {
           value
