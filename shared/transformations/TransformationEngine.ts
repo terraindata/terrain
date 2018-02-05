@@ -59,7 +59,8 @@ import TransformationVisitError from './TransformationVisitError';
 import TransformationVisitResult from './TransformationVisitResult';
 
 const Graph = GraphLib.Graph;
-type KeyPath = List<string>;
+export type KeyPath = List<string>;
+export const KeyPath = (args: string[]) => List<string>(args);
 
 export class TransformationEngine
 {
@@ -78,9 +79,9 @@ export class TransformationEngine
     e.doc = parsedJSON['doc'];
     e.uidField = parsedJSON['uidField'];
     e.uidNode = parsedJSON['uidNode'];
-    e.fieldNameToIDMap = new Map<KeyPath, number>(parsedJSON['fieldNameToIDMap']);
-    e.IDToFieldNameMap = new Map<number, KeyPath>(parsedJSON['IDToFieldNameMap']);
-    e.fieldTypes = new Map<number, string>(parsedJSON['fieldTypes']);
+    e.fieldNameToIDMap = Map<KeyPath, number>(parsedJSON['fieldNameToIDMap']);
+    e.IDToFieldNameMap = Map<number, KeyPath>(parsedJSON['IDToFieldNameMap']);
+    e.fieldTypes = Map<number, string>(parsedJSON['fieldTypes']);
     return e;
   }
 
@@ -121,10 +122,10 @@ export class TransformationEngine
   private doc: object = {};
   private uidField: number = 0;
   private uidNode: number = 0;
-  private fieldNameToIDMap: Map<KeyPath, number> = new Map<KeyPath, number>();
-  private IDToFieldNameMap: Map<number, KeyPath> = new Map<number, KeyPath>();
-  private fieldTypes: Map<number, string> = new Map<number, string>();
-  private fieldEnabled: Map<number, boolean> = new Map<number, boolean>(); // TODO use + (de)serialize
+  private fieldNameToIDMap: Map<KeyPath, number> = Map<KeyPath, number>();
+  private IDToFieldNameMap: Map<number, KeyPath> = Map<number, KeyPath>();
+  private fieldTypes: Map<number, string> = Map<number, string>();
+  private fieldEnabled: Map<number, boolean> = Map<number, boolean>(); // TODO use + (de)serialize
 
   constructor(doc?: object)
   {

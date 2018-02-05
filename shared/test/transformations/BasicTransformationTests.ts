@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import nestedProperty = require('nested-property');
-import { TransformationEngine } from '../../transformations/TransformationEngine';
+import { TransformationEngine, KeyPath } from '../../transformations/TransformationEngine';
 import { TransformationNode } from '../../transformations/TransformationNode';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
 
@@ -67,10 +67,9 @@ const doc2 = {
   },
 };
 
-// TODO what to do about crazy List syntax...
-
 test('add fields manually', () =>
 {
+  // const f: Foo = new Foo(['bob']);
   const e: TransformationEngine = new TransformationEngine();
   e.addField(List<string>(['meta', 'school']), 'string');
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['meta', 'school'])]));
@@ -164,7 +163,7 @@ test('get transformations for a field', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
   const id1: number = e.addField(List<string>(['name']), 'string');
-  e.addField(List<string>(['meta', 'school'], 'string');
+  e.addField(List<string>(['meta', 'school']), 'string');
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['name'])]));
   e.appendTransformation(TransformationNodeType.SubstringNode, List<List<string>>([List<string>(['name'])]), { from: 0, length: 2 });
   e.appendTransformation(TransformationNodeType.CapitalizeNode, List<List<string>>([List<string>(['meta', 'school'])]));
@@ -175,7 +174,7 @@ test('rename a field (no structural changes)', () =>
 {
   const e: TransformationEngine = new TransformationEngine();
   const id1: number = e.addField(List<string>(['name']), 'string');
-  e.addField(List<string>(['meta', 'school'], 'string');
+  e.addField(List<string>(['meta', 'school']), 'string');
   e.setOutputKeyPath(id1, List<string>(['firstname']));
   expect(e.transform(doc1)['name']).toBe(undefined);
   expect(e.transform(doc1)['firstname']).toBe('Bob');
