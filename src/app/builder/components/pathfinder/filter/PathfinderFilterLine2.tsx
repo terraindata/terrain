@@ -354,36 +354,36 @@ class PathfinderFilterLine extends TerrainComponent<Props>
                 )
               }
             </div>
-          {
-           filterLine.comparison !== 'exists' &&
-            <div className='pf-filter-map-input-wrapper'>
-              <BuilderTextbox
-                value={value.distance}
-                canEdit={pathfinderContext.canEdit}
-                keyPath={this.props.keyPath.push('value').push('distance')}
-                action={this.props.onChange}
-              />
-              <Dropdown
-                options={List(_.keys(units))}
-                selectedIndex={_.keys(units).indexOf(value.units)}
-                canEdit={pathfinderContext.canEdit}
-                optionsDisplayName={Map(units)}
-                keyPath={this.props.keyPath.push('value').push('units')}
-                action={this.props.onChange}
-              />
-              <MapComponent
-                geocoder='photon'
-                inputValue={value.address}
-                coordinates={value.location !== undefined ? value.location : [0, 0]}
-                distance={value.distance}
-                distanceUnit={value.units}
-                wrapperClassName={'pf-filter-map-component-wrapper'}
-                fadeInOut={true}
-                onChange={this.handleMapChange}
-                canEdit={pathfinderContext.canEdit}
-              />
-            </div>
-          }
+            {
+              filterLine.comparison !== 'exists' &&
+              <div className='pf-filter-map-input-wrapper'>
+                <BuilderTextbox
+                  value={value.distance}
+                  canEdit={pathfinderContext.canEdit}
+                  keyPath={this.props.keyPath.push('value').push('distance')}
+                  action={this.props.onChange}
+                />
+                <Dropdown
+                  options={List(_.keys(units))}
+                  selectedIndex={_.keys(units).indexOf(value.units)}
+                  canEdit={pathfinderContext.canEdit}
+                  optionsDisplayName={Map(units)}
+                  keyPath={this.props.keyPath.push('value').push('units')}
+                  action={this.props.onChange}
+                />
+                <MapComponent
+                  geocoder='photon'
+                  inputValue={value.address}
+                  coordinates={value.location !== undefined ? value.location : [0, 0]}
+                  distance={value.distance}
+                  distanceUnit={value.units}
+                  wrapperClassName={'pf-filter-map-component-wrapper'}
+                  fadeInOut={true}
+                  onChange={this.handleMapChange}
+                  canEdit={pathfinderContext.canEdit}
+                />
+              </div>
+            }
           </div>
         );
 
@@ -404,8 +404,6 @@ class PathfinderFilterLine extends TerrainComponent<Props>
 
   private handleMapChange(coordinates, inputValue)
   {
-    console.log('changing location to ', coordinates);
-    console.log('changing address to ', inputValue);
     const filterLine = this.props.filterLine
       .setIn(List(['value', 'location']), coordinates)
       .setIn(List(['value', 'address']), inputValue);

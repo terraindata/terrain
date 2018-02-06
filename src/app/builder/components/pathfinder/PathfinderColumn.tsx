@@ -56,6 +56,8 @@ const { List } = Immutable;
 import BuilderActions from 'app/builder/data/BuilderActions';
 import { ColorsActions } from 'app/colors/data/ColorsRedux';
 import { ColorsState } from 'app/colors/data/ColorsTypes';
+import FadeInOut from 'app/common/components/FadeInOut';
+import FloatingInput from 'app/common/components/FloatingInput';
 import { SchemaState } from 'schema/SchemaTypes';
 import Util from 'util/Util';
 import PathfinderFilterSection from './filter/PathfinderFilterSection';
@@ -64,8 +66,6 @@ import './Pathfinder.less';
 import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
-import FloatingInput from 'app/common/components/FloatingInput';
-import FadeInOut from 'app/common/components/FadeInOut';
 
 export interface Props
 {
@@ -127,7 +127,7 @@ class PathfinderColumn extends TerrainComponent<Props>
 
   public getKeyPath()
   {
-    return this.props.keyPath !== undefined ? this.props.keyPath : List(['query', 'path'])
+    return this.props.keyPath !== undefined ? this.props.keyPath : List(['query', 'path']);
   }
 
   public changePathName(value)
@@ -150,18 +150,18 @@ class PathfinderColumn extends TerrainComponent<Props>
       >
         <FadeInOut
           children={
-           <div
-             className='pf-column-name-background'
-             style={backgroundColor(Colors().sidebarBg)}
-           >
-            <FloatingInput
-              value={path.name}
-              onChange={this.changePathName}
-              label={'Algorithm Name'}
-              isTextInput={true}
-              canEdit={pathfinderContext.canEdit}
-              className='pf-column-name'
-            />
+            <div
+              className='pf-column-name-background'
+              style={backgroundColor(Colors().sidebarBg)}
+            >
+              <FloatingInput
+                value={path.name}
+                onChange={this.changePathName}
+                label={'Algorithm Name'}
+                isTextInput={true}
+                canEdit={pathfinderContext.canEdit}
+                className='pf-column-name'
+              />
             </div>
           }
           open={path.name !== undefined}
@@ -185,11 +185,11 @@ class PathfinderColumn extends TerrainComponent<Props>
                 toSkip={this.props.toSkip}
               />
             }
-              open={path.step >= PathfinderSteps.Filter}
+            open={path.step >= PathfinderSteps.Filter}
           />
-        <FadeInOut
+          <FadeInOut
             children={
-             <PathfinderScoreSection
+              <PathfinderScoreSection
                 pathfinderContext={pathfinderContext}
                 score={path.score}
                 keyPath={keyPath.push('score')}
@@ -198,7 +198,7 @@ class PathfinderColumn extends TerrainComponent<Props>
 
               />
             }
-              open={path.step >= PathfinderSteps.Score}
+            open={path.step >= PathfinderSteps.Score}
           />
           <FadeInOut
             children={

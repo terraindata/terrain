@@ -58,7 +58,7 @@ import Switch from 'common/components/Switch';
 import TerrainComponent from 'common/components/TerrainComponent';
 import { MidwayError } from 'shared/error/MidwayError';
 import Util from 'util/Util';
-import { Colors, OldThemesArray,  } from '../../colors/Colors';
+import { Colors, OldThemesArray } from '../../colors/Colors';
 import Ajax from '../../util/Ajax';
 import TerrainTools from '../../util/TerrainTools';
 import { UserActions as Actions } from '../data/UserRedux';

@@ -104,11 +104,11 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   }
   const moreObj = parseAggregations(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
-  // const groupJoin = parseNested(path.more, inputs);
-  // if (groupJoin)
-  // {
-  //   baseQuery = baseQuery.set('groupJoin', groupJoin);
-  // }
+  const groupJoin = parseNested(path.more, inputs);
+  if (groupJoin)
+  {
+    baseQuery = baseQuery.set('groupJoin', groupJoin);
+  }
   if (ignoreInputs)
   {
     return baseQuery;
@@ -445,13 +445,13 @@ function parseFilterLine(line: FilterLine, useShould: boolean, inputs)
         }),
       });
     case 'located':
-      // const distanceObj = line.value as DistanceValue;
-      // return Map({
-      //   geo_distance: Map({
-      //     distance: String(distanceObj.distance) + distanceObj.units,
-      //     [line.field]: [distanceObj.location[1], distanceObj.location[0]],
-      //   }),
-      // });
+    // const distanceObj = line.value as DistanceValue;
+    // return Map({
+    //   geo_distance: Map({
+    //     distance: String(distanceObj.distance) + distanceObj.units,
+    //     [line.field]: [distanceObj.location[1], distanceObj.location[0]],
+    //   }),
+    // });
     default:
       return Map({});
   }
@@ -545,11 +545,17 @@ function parseAggregations(more: More): {}
 // TODO nestedQuery should be a user-inputed number
 function parseNested(more: More, inputs)
 {
-  if (more.nested === undefined)
+  if (more.nested.size === 0)
   {
-    return;
+    return undefined;
   }
-  const nestedQuery = parsePath(more.nested, inputs, true);
-  return Map({[more.nested.name]: nestedQuery});
+  let groupJoins = Map({});
+  more.nested.forEach((nested) =>
+  {
+    if (nested)
+    {
+      groupJoins = groupJoins.set(nested.name, parsePath(nested, inputs, true));
+    }
+  });
+  return groupJoins;
 }
-

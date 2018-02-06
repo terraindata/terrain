@@ -45,9 +45,9 @@ THE SOFTWARE.
 // Copyright 2017 Terrain Data, Inc.
 
 // tslint:disable:no-var-requires restrict-plus-operands strict-boolean-expressions
-import * as _ from 'lodash';
 import { Colors, fontColor } from 'app/colors/Colors';
 import TerrainComponent from 'app/common/components/TerrainComponent';
+import * as _ from 'lodash';
 import * as Radium from 'radium';
 import * as React from 'react';
 
@@ -76,7 +76,7 @@ class PathfinderCreateLine extends TerrainComponent<Props>
         className='pf-create'
         style={[
           fontColor(Colors().text3, Colors().active),
-          this.props.style
+          this.props.style,
         ]}
         onClick={onCreate}
       >
