@@ -179,7 +179,7 @@ class PathPicker extends TerrainComponent<Props>
     let showOther = false;
     let value;
     let option;
-    console.log(index);
+    
     if (index === -1)
     {
       // value not present
@@ -226,19 +226,21 @@ class PathPicker extends TerrainComponent<Props>
           'pathpicker-picker-no-shadow': props.noShadow,
         })}
       >
-        <div
-          className='pathpicker-header'
-        >
-          {
-            props.headerText
-          }
-        </div>
-        <div
-          className='pathpicker-options'
-        >
-          {
-            props.options.map(this.renderOption)
-          }
+        <div className='pathpicker-picker-inner'>
+          <div
+            className='pathpicker-header'
+          >
+            {
+              props.headerText
+            }
+          </div>
+          <div
+            className='pathpicker-options'
+          >
+            {
+              props.options.map(this.renderOption)
+            }
+          </div>
         </div>
       </div>
     );
@@ -250,7 +252,8 @@ class PathPicker extends TerrainComponent<Props>
       <div
         className={classNames({
           'pathpicker-option': true,
-          'pathpicker-option-picked': this.state.pickedIndex === index,
+          'pathpicker-option-selected': this.getCurrentIndex() === index,
+          'pathpicker-option-picked': this.state.pickedIndex === index, // when it's just been picked
         })}
         key={index}
         onClick={this._fn(this.handleOptionClick, index)}
@@ -286,57 +289,75 @@ class PathPicker extends TerrainComponent<Props>
     
     if (state.picked)
     {
+      // double clicked
       return;
     }
     
-    const optionBox = ReactDOM.findDOMNode(this.refs['option-' + pickedIndex]).getBoundingClientRect();
-    const valueEl = ReactDOM.findDOMNode(state.valueRef);
-    const valueBox = valueEl.getBoundingClientRect();
+    let animationEl = null;
     
-    const option = this.props.options.get(pickedIndex);
-    
-    const animationEl = $("<div>" + option.displayName + "</div>")
-      .addClass("pathpicker-option-name")
-      .css("position", "fixed")
-      .css("color", OPTION_NAME_STYLE.color)
-      .css("font-size", OPTION_NAME_STYLE.fontSize)
-      .css("left", optionBox.left)
-      .css("top", optionBox.top)
-      .css("width", optionBox.width)
-      // .css("height", optionBox.height)
-      .css("box-sizing", "border-box")
-      .css("z-index", 9999)
-      ;
+    if (pickedIndex !== this.getCurrentIndex())
+    {
+      // animation, if we're changing value
       
-    $("body").append(animationEl);
-    
-    animationEl.animate(
-      {
-        left: valueBox.left,
-        top: valueBox.top,
-        width: valueBox.width,
-        // height: valueBox.height, // can make it collapse to 0
-        padding: '20px 18px 4px 18px',
-        fontSize: props.large ? LARGE_FONT_SIZE : FONT_SIZE,
-      }, 
-      700, 
-      () =>
-      {
-        // use a timeout to make the end of the animation smooth
-        setTimeout(() => {
-          $(valueEl).css("opacity", 1);
-          this.handleValueChange(this.state.pickedIndex);
-        }, 150);
+      const optionBox = ReactDOM.findDOMNode(this.refs['option-' + pickedIndex]).getBoundingClientRect();
+      const valueEl = ReactDOM.findDOMNode(state.valueRef);
+      const valueBox = valueEl.getBoundingClientRect();
+      
+      const option = this.props.options.get(pickedIndex);
+      
+      animationEl = $("<div>" + option.displayName + "</div>")
+        .addClass("pathpicker-option-name")
+        .css("position", "fixed")
+        .css("color", OPTION_NAME_STYLE.color)
+        .css("font-size", OPTION_NAME_STYLE.fontSize)
+        .css("left", optionBox.left)
+        .css("top", optionBox.top)
+        .css("width", optionBox.width)
+        // .css("height", optionBox.height)
+        .css("box-sizing", "border-box")
+        .css("z-index", 9999)
+        ;
         
-      }
-    );
-    
-    $(valueEl).css("opacity", 1);
-    $(valueEl).animate({
-        opacity: 0,
-      },
-      200);
-    
+      $("body").append(animationEl);
+      
+      animationEl.animate(
+        {
+          left: valueBox.left,
+          top: valueBox.top,
+          width: valueBox.width,
+          // height: valueBox.height, // can make it collapse to 0
+          padding: '20px 18px 4px 18px',
+          fontSize: props.large ? LARGE_FONT_SIZE : FONT_SIZE,
+        }, 
+        700, 
+        () =>
+        {
+          // use a timeout to make the end of the animation smooth
+          setTimeout(() => {
+            $(valueEl).css("opacity", 1);
+            this.handleValueChange(this.state.pickedIndex);
+          }, 150);
+          
+        }
+      );
+      
+      $(valueEl).css("opacity", 1);
+      $(valueEl).animate({
+          opacity: 0,
+        },
+        200);
+    }
+    else
+    {
+      // close without dispatching a value change
+      setTimeout(() => {
+        this.setState({
+          open: false,
+          picked: false,
+          pickedIndex: -1,
+        });
+      }, 850);
+    }
     
     this.setState({
       picked: true,
@@ -352,7 +373,10 @@ class PathPicker extends TerrainComponent<Props>
   
   private cleanUpAnimation()
   {
-    this.state.animationEl.remove();
+    if (this.state.animationEl !== null)
+    {
+      this.state.animationEl.remove();
+    }
   }
   
   private handleValueChange(optionIndex: number)
@@ -425,7 +449,6 @@ class PathPicker extends TerrainComponent<Props>
   
   private handleValueRef(valueRef)
   {
-    console.log(valueRef);
     this.setState({
       valueRef,
     });

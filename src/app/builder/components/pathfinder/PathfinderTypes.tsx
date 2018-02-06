@@ -142,7 +142,7 @@ export const _FilterGroup = (config?: { [key: string]: any }) =>
 class ScoreC extends BaseClass
 {
   public lines: List<ScoreLine> = List<ScoreLine>([]);
-  public type: 'terrain' | 'linear' | 'elastic' | 'random' | 'none' = 'terrain';
+  public type: 'terrain' | 'linear' | 'elastic' | 'random' | 'none' = 'random'; // 'terrain';
 }
 export type Score = ScoreC & IRecord<ScoreC>;
 export const _Score = (config?: { [key: string]: any }) =>

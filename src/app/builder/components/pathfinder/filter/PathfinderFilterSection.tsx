@@ -68,7 +68,6 @@ export interface Props
   pathfinderContext: PathfinderContext;
   filterGroup: FilterGroup;
   keyPath: KeyPath;
-  step?: PathfinderSteps;
   onStepChange?: (oldStep: PathfinderSteps) => void;
 }
 
@@ -88,6 +87,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
     // flatten tree
     const entries: FilterEntry[] = [];
     this.buildFilterTree(filterGroup, entries, 0, this.props.keyPath);
+
     return (
       <div
         className='pf-section'
@@ -96,7 +96,7 @@ class PathfinderFilterSection extends TerrainComponent<Props>
           entries.map(this.renderFilterEntry)
         }
         {
-          this.props.step === PathfinderSteps.Filter &&
+          step === PathfinderSteps.Filter &&
           <div
             onClick={this.handleStepChange}
             className='pf-step-button'
@@ -110,9 +110,11 @@ class PathfinderFilterSection extends TerrainComponent<Props>
 
   private handleStepChange()
   {
-    if (this.props.step === PathfinderSteps.Filter)
+    const { step } = this.props.pathfinderContext;
+
+    if (step === PathfinderSteps.Filter)
     {
-      this.props.onStepChange(this.props.step);
+      this.props.onStepChange(step);
     }
   }
 

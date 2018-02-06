@@ -64,7 +64,14 @@
 		background: #fff;
 		z-index: 1;
 		opacity: 1;
-		// .transition;
+		
+		
+		max-height: 450px;
+		.transition;
+		
+		.pathpicker-picker-inner {
+			opacity: 1;
+		}
 		
 		.pathpicker-header {
 			margin: 6px;
@@ -89,6 +96,10 @@
 				flex-direction: column;
 				
 				&:hover {
+					border-color: #1eb4fa;
+				}
+				
+				&.pathpicker-option-selected {
 					border-color: #1eb4fa;
 				}
 			}
@@ -198,8 +209,15 @@
 .pathpicker.pathpicker-picked {
 	
 	.pathpicker-picker {
-		opacity: 0;
-		.transition(~"all 0.5s");
+		
+		.pathpicker-picker-inner {
+			opacity: 0;
+			.transition(~"all 0.5s");
+		}
+		
+		padding: 0px;
+		max-height: 0px;
+		.transition(~"all 1s");
 	}
 	
 	.pathpicker-box-value-open:not(.pathpicker-box-value-force-open) {
