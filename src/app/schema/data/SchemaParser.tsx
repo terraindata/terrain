@@ -52,6 +52,7 @@ import * as _ from 'lodash';
 import { SchemaActionType, SchemaActionTypes } from 'schema/data/SchemaRedux';
 import BackendInstance from '../../../database/types/BackendInstance';
 import * as SchemaTypes from '../SchemaTypes';
+import { _Hit } from 'builder/components/results/ResultTypes';
 
 const { Map, List } = Immutable;
 
@@ -207,7 +208,12 @@ export function parseElasticDb(elasticServer: object,
             results = resp.result.hits;
             tables = tables.setIn(
               [tableId, 'sampleData'],
-              results.hits,
+              results.hits.map((hit) =>
+                {
+                  return _Hit({
+                    fields: Immutable.Map(hit['_source']),
+                  });
+                }),
             );
             _.each((tableFields as any), (fieldProperties, fieldName) =>
             {

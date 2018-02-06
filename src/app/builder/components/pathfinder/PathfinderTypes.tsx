@@ -91,6 +91,7 @@ import { SchemaState } from 'schema/SchemaTypes';
 import { FieldType, FieldTypeMapping } from '../../../../../shared/builder/FieldTypes';
 import ElasticBlockHelpers, { AutocompleteMatchType } from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import { BaseClass, New } from '../../../Classes';
+import { Hit, _Hit } from 'builder/components/results/ResultTypes';
 
 export enum PathfinderSteps
 {
@@ -142,7 +143,7 @@ export const _FilterGroup = (config?: { [key: string]: any }) =>
 class ScoreC extends BaseClass
 {
   public lines: List<ScoreLine> = List<ScoreLine>([]);
-  public type: 'terrain' | 'linear' | 'elastic' | 'random' | 'none' = 'random'; // 'terrain';
+  public type: 'terrain' | 'linear' | 'elastic' | 'random' | 'none' = 'terrain';
 }
 export type Score = ScoreC & IRecord<ScoreC>;
 export const _Score = (config?: { [key: string]: any }) =>
@@ -510,10 +511,7 @@ class ElasticDataSourceC extends DataSource
         const databaseId = source.value; // String(source.value.serverId) + '/' + String(source.value.name);
         console.log(databaseId, sourceExamples);
         let sampleData = sourceExamples[databaseId];
-        if (sampleData !== undefined)
-        {
-          sampleData = sampleData.map((data) => data['_source']);
-        }
+        
         return _ChoiceOption({
           displayName: source.displayName,
           value: source.value,
@@ -737,7 +735,7 @@ class ChoiceOptionC extends BaseClass
   public displayName: string | number | El = '';
   public color: string = null;
   public tooltipContent: string | El = null;
-  public sampleData: List<any> = List([]);
+  public sampleData: List<Hit> = List([]);
   public meta: any = null; // metadata, no specific shape, used for helper functions
 }
 export type ChoiceOption = ChoiceOptionC & IRecord<ChoiceOptionC>;

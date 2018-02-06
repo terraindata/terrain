@@ -53,11 +53,15 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as $ from 'jquery';
+import { Map } from 'immutable';
 import { altStyle, backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import TerrainComponent from './../../common/components/TerrainComponent';
 import './PathPickerStyle.less';
 import { FloatingInput, LARGE_FONT_SIZE, FONT_SIZE } from './FloatingInput';
 import FadeInOut from './FadeInOut';
+import { ResultsConfig, _ResultsConfig } from 'shared/results/types/ResultsConfig';
+import Hit from 'builder/components/results/Hit.tsx';
+
 
 export interface PathPickerOption
 {
@@ -395,33 +399,47 @@ class PathPicker extends TerrainComponent<Props>
   
   private renderSampleDatum(data: any, index: number)
   {
-    // TODO coordinate formatting with ResultsArea
     return (
-      <div
-        className='pathpicker-data-piece'
+      <Hit
+        hit={data}
+        resultsConfig={_ResultsConfig() /* TODO, use a suitable results config here */}
+        index={index}
+        primaryKey={data._id}
+        onExpand={_.noop}
+        allowSpotlights={false}
+        onSpotlightAdded={_.noop}
+        onSpotlightRemoved={_.noop}
         key={index}
-      >
-        {
-          _.map(data, (value, field) => (
-            <div
-              className='pathpicker-data-row'
-              key={field}
-            >
-              <div className='pathpicker-data-field'>
-                {
-                  field
-                }
-              </div>
-              <div className='pathpicker-data-value'>
-                {
-                  value
-                }
-              </div>
-            </div>
-          ))
-        }
-      </div>
+      />
     );
+    
+    // TODO coordinate formatting with ResultsArea
+    // return (
+    //   <div
+    //     className='pathpicker-data-piece'
+    //     key={index}
+    //   >
+    //     {
+    //       _.map(data, (value, field) => (
+    //         <div
+    //           className='pathpicker-data-row'
+    //           key={field}
+    //         >
+    //           <div className='pathpicker-data-field'>
+    //             {
+    //               field
+    //             }
+    //           </div>
+    //           <div className='pathpicker-data-value'>
+    //             {
+    //               value
+    //             }
+    //           </div>
+    //         </div>
+    //       ))
+    //     }
+    //   </div>
+    // );
   }
   
   private renderVeil()
