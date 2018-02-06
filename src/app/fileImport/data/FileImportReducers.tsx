@@ -359,7 +359,7 @@ FileImportReducers[ActionTypes.fetchColumnAnalyzers] =
       state.dbName,
       (analyzerArr) =>
       {
-        const analyzers: List<string> = List<string>(analyzerArr);
+        const analyzers: List<string> = List<string>(analyzerArr as string[]);
         action.payload.setAnalyzers(analyzers);
       },
     );

@@ -58,7 +58,7 @@ class AnalyticsStateC
   public selectedDateRange: ID = 3;
   public selectedDateRangeDomain: { start: number, end: number } = { start: 0, end: 0 };
   public selectedAnalyticsConnection: string = '';
-  public pinnedAlgorithms: Immutable.Map<ID, boolean> = Immutable.Map<ID, boolean>({});
+  public pinnedAlgorithms: Immutable.Map<ID, boolean> = Immutable.Map<ID, boolean>();
   public availableMetrics: Immutable.List<any> = Immutable.List<any>([]);
 }
 

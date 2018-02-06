@@ -59,8 +59,8 @@ describe('LibraryActions', () =>
   describe('#categories.create', () =>
   {
     const library: LibraryState = _LibraryState({
-      categories: Immutable.Map<number, LibraryTypes.Category>({}),
-      algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({}),
+      categories: Immutable.Map<number, LibraryTypes.Category>(),
+      algorithms: Immutable.Map<number, LibraryTypes.Algorithm>(),
     });
 
     const category = LibraryTypes._Category();

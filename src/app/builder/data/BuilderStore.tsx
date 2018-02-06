@@ -79,16 +79,16 @@ export class BuilderStateClass
 
   public hoveringCardId: ID = '';
 
-  public selectedCardIds = Map<ID, boolean>({});
+  public selectedCardIds = Map<ID, boolean>();
 
   public db: BackendInstance = {} as any;
 
   // TODO move
-  public manual = Map<ID, Cards>({});
+  public manual = Map<ID, Cards>();
   // Card examples used in the manual are stored here.
 
   public draggingCardItem: CardItem | null = null;
-  public draggingOverKeyPath: KeyPath = Immutable.List([]);
+  public draggingOverKeyPath: KeyPath = Immutable.List();
   public draggingOverIndex: number = -1;
 
   public isDirty: boolean = false;

@@ -46,7 +46,7 @@ THE SOFTWARE.
 
 import { List } from 'immutable';
 import nestedProperty = require('nested-property');
-import { TransformationEngine, KeyPath } from '../../transformations/TransformationEngine';
+import { KeyPath, TransformationEngine } from '../../transformations/TransformationEngine';
 import { TransformationNode } from '../../transformations/TransformationNode';
 import TransformationNodeType from '../../transformations/TransformationNodeType';
 

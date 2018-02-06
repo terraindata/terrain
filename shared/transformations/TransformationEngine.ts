@@ -315,7 +315,7 @@ export class TransformationEngine
   private unflatten(obj: object): object
   {
     const output: object = {};
-    for (const [key, value] of this.IDToFieldNameMap)
+    for (const [key, value] of this.IDToFieldNameMap as Map<number, KeyPath>)
     {
       if (obj !== undefined && obj.hasOwnProperty(key))
       {
