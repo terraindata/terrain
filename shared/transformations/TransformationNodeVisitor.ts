@@ -161,7 +161,7 @@ class TransformationNodeVisitor
 
   public static visitCapitalizeNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    for (const fieldID of node.fieldIDs)
+    for (const fieldID of node.fieldIDs.toJS())
     {
       if (typeof doc[fieldID] !== 'string')
       {
@@ -183,7 +183,7 @@ class TransformationNodeVisitor
 
   public static visitSubstringNode(node: TransformationNode, doc: object): TransformationVisitResult
   {
-    for (const fieldID of node.fieldIDs)
+    for (const fieldID of node.fieldIDs.toJS())
     {
       if (typeof doc[fieldID] !== 'string')
       {

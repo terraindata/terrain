@@ -144,9 +144,9 @@ export class TransformationEngine
       && JSON.stringify(this.doc) === JSON.stringify(other.doc)
       && this.uidField === other.uidField
       && this.uidNode === other.uidNode
-      && JSON.stringify([...this.fieldNameToIDMap]) === JSON.stringify([...other.fieldNameToIDMap])
-      && JSON.stringify([...this.IDToFieldNameMap]) === JSON.stringify([...other.IDToFieldNameMap])
-      && JSON.stringify([...this.fieldTypes]) === JSON.stringify([...other.fieldTypes]);
+      && JSON.stringify([...this.fieldNameToIDMap.toJS()]) === JSON.stringify([...other.fieldNameToIDMap.toJS()])
+      && JSON.stringify([...this.IDToFieldNameMap.toJS()]) === JSON.stringify([...other.IDToFieldNameMap.toJS()])
+      && JSON.stringify([...this.fieldTypes.toJS()]) === JSON.stringify([...other.fieldTypes.toJS()]);
   }
 
   public appendTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<KeyPath> | List<number>,
@@ -190,9 +190,9 @@ export class TransformationEngine
       doc: this.doc,
       uidField: this.uidField,
       uidNode: this.uidNode,
-      fieldNameToIDMap: [...this.fieldNameToIDMap],
-      IDToFieldNameMap: [...this.IDToFieldNameMap],
-      fieldTypes: [...this.fieldTypes],
+      fieldNameToIDMap: [...this.fieldNameToIDMap.toJS()],
+      IDToFieldNameMap: [...this.IDToFieldNameMap.toJS()],
+      fieldTypes: [...this.fieldTypes.toJS()],
     };
   }
 
@@ -274,7 +274,7 @@ export class TransformationEngine
   {
     return fieldNamesOrIDs.size > 0 ?
       (typeof fieldNamesOrIDs.first() === 'number' ? fieldNamesOrIDs as List<number> :
-        fieldNamesOrIDs.map((name: KeyPath) => this.fieldNameToIDMap.get(name)) as List<number>) : List<number>();
+        (fieldNamesOrIDs as List<KeyPath>).map((name: KeyPath) => this.fieldNameToIDMap.get(name)).toList()) : List<number>();
   }
 
   private generateInitialFieldMaps(obj: object, currentKeyPath: KeyPath = List<string>()): List<number>
@@ -302,26 +302,26 @@ export class TransformationEngine
   private flatten(obj: object): object
   {
     const output: object = {};
-    for (const [keyPath, value] of this.fieldNameToIDMap)
+    this.fieldNameToIDMap.map((value: number, keyPath: KeyPath) =>
     {
-      if (deepGet(obj, [...keyPath]) !== undefined)
+      if (deepGet(obj, [...keyPath.toJS()]) !== undefined)
       {
-        output[value] = deepGet(obj, [...keyPath]);
+        output[value] = deepGet(obj, [...keyPath.toJS()]);
       }
-    }
+    });
     return output;
   }
 
   private unflatten(obj: object): object
   {
     const output: object = {};
-    for (const [key, value] of this.IDToFieldNameMap as Map<number, KeyPath>)
+    this.IDToFieldNameMap.map((value: KeyPath, key: number) =>
     {
       if (obj !== undefined && obj.hasOwnProperty(key))
       {
-        deepSet(output, [...value], obj[key], { create: true });
+        deepSet(output, [...value.toJS()], obj[key], { create: true });
       }
-    }
+    });
     return output;
   }
 }
