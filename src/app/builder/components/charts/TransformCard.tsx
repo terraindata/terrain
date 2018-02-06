@@ -470,7 +470,7 @@ class TransformCard extends TerrainComponent<Props>
     }
     // When using pathfinder, index will be passed in, and there is no type
     let index: string | List<string> = '';
-    let type: string | List <string> = '';
+    let type: string | List<string> = '';
     if (this.props.index !== undefined)
     {
       index = this.props.index;
