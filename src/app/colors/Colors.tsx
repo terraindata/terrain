@@ -1050,6 +1050,8 @@ export const ThemesInt =
 
 export const ThemesArray = ['DARK', 'LIGHT', 'HALLOWEEN'];
 
+const curTheme = 'LIGHT';
+
 export function Colors()
 {
   if (localStorage.getItem('theme') === null)
