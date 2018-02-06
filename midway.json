@@ -15,18 +15,6 @@
             "type": "mysql",
             "dsn": "t3rr41n-demo:r3curs1v3$@127.0.0.1:63306",
             "host": "127.0.0.1:63306"
-        },
-        {
-            "name": "Zazzle ES 1",
-            "type": "elastic",
-            "dsn": "10.1.0.30:9200",
-            "host": "10.1.0.30:9200"
-        },
-        {
-            "name": "Aurea ES 1",
-            "type": "elastic",
-            "dsn": "52.35.213.216:9200",
-            "host": "52.35.213.216:9200"
         }
     ]
 }
