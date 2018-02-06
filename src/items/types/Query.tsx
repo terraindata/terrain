@@ -82,6 +82,7 @@ class QueryC
   inputs: List<any> = List([]);
   resultsConfig = null; //: ResultsConfig = null;
   tql: string = '';
+  tqlMode: 'auto' | 'manual' = 'auto';
   parseTree: ESInterpreter = null;
   lastMutation: number = 0;
   deckOpen: boolean = false; // TODO change back to TRUE once deck is complete
@@ -142,6 +143,7 @@ export function queryForSave(query: Query): object
   query = query
     .set('cards', BlockUtils.cardsForServer(query.cards))
     .set('parseTree', null)
+    .set('tqlMode', 'auto')
     .set('resultsConfig', query.resultsConfig.toJS());
   return query.toJS();
 }

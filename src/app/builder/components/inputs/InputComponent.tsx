@@ -54,6 +54,7 @@ import CreateLine from '../../../common/components/CreateLine';
 import DatePicker from '../../../common/components/DatePicker';
 import Dropdown from '../../../common/components/Dropdown';
 import TerrainComponent from '../../../common/components/TerrainComponent';
+import MapUtil from '../../../util/MapUtil';
 import Util from '../../../util/Util';
 import Actions from '../../data/BuilderActions';
 import './InputStyle.less';
@@ -76,6 +77,7 @@ interface Props
   canEdit: boolean;
   onCreateInput: (index: number) => void;
   language: string;
+  action: (keyPath, value) => void; // Need to use to keep track of whether path or cards is used (should change with Xi's parser)
 }
 
 const TYPE_OPTIONS =
@@ -132,7 +134,7 @@ class InputComponent extends TerrainComponent<Props>
 
   public handleInputTypeChange(inputType: number)
   {
-    Actions.change(this.getKeyPath('inputType'), inputType);
+    this.props.action(this.getKeyPath('inputType'), inputType);
 
     if (inputType === InputType.DATE)
     {
@@ -142,7 +144,7 @@ class InputComponent extends TerrainComponent<Props>
         date = new Date();
       }
       const value = Util.formatInputDate(date, this.props.language);
-      Actions.change(this.getKeyPath('value'), value);
+      this.props.action(this.getKeyPath('value'), value);
     }
   }
 
@@ -160,9 +162,13 @@ class InputComponent extends TerrainComponent<Props>
     this.props.onCreateInput(this.props.index);
   }
 
-  public changeValue(value)
+  public changeValue(value, meta?)
   {
-    Actions.change(this.getKeyPath('value'), value);
+    this.props.action(this.getKeyPath('value'), value);
+    if (meta !== undefined)
+    {
+      this.props.action(this.getKeyPath('meta'), meta);
+    }
   }
 
   public renderInputValue()
@@ -183,35 +189,32 @@ class InputComponent extends TerrainComponent<Props>
 
     if (this.props.input.inputType === InputType.LOCATION)
     {
-      let value = this.props.input.value.toJS !== undefined ? this.props.input.value.toJS() : this.props.input.value;
+      let value = this.props.input.value && Util.asJS(this.props.input.value);
       let markLocation: boolean = false;
-      if (value && value.location && value.address)
+      if (value)
       {
         markLocation = true;
       }
       else
       {
-        value = { location: [37.4449002, -122.16174969999997], address: '' };
+        value = [0, 0];
       }
       return (
         <MapComponent
           onChange={this.changeValue}
-          address={value.address}
-          location={value.location}
-          markLocation={markLocation}
-          showDirectDistance={false}
-          showSearchBar={true}
-          zoomControl={true}
-          keepAddressInSync={false}
-          geocoder='google'
-          className='input-map-wrapper'
-        />);
+          canEdit={this.props.canEdit}
+          geocoder='photon'
+          inputValue={this.props.input.meta}
+          coordinates={value}
+          allowSearchByCoordinate={true}
+        />
+      );
     }
 
     return (
       <BuilderTextbox
         canEdit={true}
-        value={typeof this.props.input.value !== 'string' ? this.props.input.value.address : this.props.input.value}
+        value={String(this.props.input.value)}
         className='input-text input-text-second'
         keyPath={this.getKeyPath('value')}
         isNumber={this.props.input.inputType === InputType.NUMBER}

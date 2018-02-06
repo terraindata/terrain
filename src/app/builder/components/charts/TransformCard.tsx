@@ -469,8 +469,8 @@ class TransformCard extends TerrainComponent<Props>
       return;
     }
     // When using pathfinder, index will be passed in, and there is no type
-    let index: string = '';
-    let type: string = '';
+    let index: string | List<string> = '';
+    let type: string | List <string> = '';
     if (this.props.index !== undefined)
     {
       index = this.props.index;
@@ -480,13 +480,24 @@ class TransformCard extends TerrainComponent<Props>
       index = getIndex('');
       type = getType('');
     }
-    const typeObj =
-      {
+    const filter = [];
+    // If index and type are strings (there aren't multiple indexes/types) then add filters for them
+    if (typeof index === 'string')
+    {
+      filter.push({
+        term: {
+          _index: index,
+        },
+      });
+    }
+    if (typeof type === 'string' && type !== '')
+    {
+      filter.push({
         term: {
           _type: type,
         },
-      };
-
+      });
+    }
     if (recomputeDomain)
     {
       let domainQuery;
@@ -499,13 +510,7 @@ class TransformCard extends TerrainComponent<Props>
         domainQuery = {
           query: {
             bool: {
-              filter: [
-                {
-                  term: {
-                    _index: index,
-                  },
-                },
-              ],
+              filter,
             },
           },
           aggs: {
@@ -521,10 +526,6 @@ class TransformCard extends TerrainComponent<Props>
             },
           },
         };
-        if (type)
-        {
-          (domainQuery.query.bool.filter as any).push(typeObj);
-        }
         Ajax.query(
           JSON.stringify(domainQuery),
           db,
@@ -554,13 +555,7 @@ class TransformCard extends TerrainComponent<Props>
         aggQuery = {
           query: {
             bool: {
-              filter: [
-                {
-                  term: {
-                    _index: index,
-                  },
-                },
-              ],
+              filter,
               must: {
                 range: {
                   [input as string]: { gte: min, lt: max },
@@ -581,10 +576,6 @@ class TransformCard extends TerrainComponent<Props>
           },
           size: 0,
         };
-        if (type)
-        {
-          (aggQuery.query.bool.filter as any).push(typeObj);
-        }
         this.setState(
           Ajax.query(
             JSON.stringify(aggQuery),

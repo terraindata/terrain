@@ -113,18 +113,17 @@ export async function provisionScripts(controller: DatabaseController)
               {
                 id: script.id,
                 lang: script.lang,
-                body: {
-                  script: script.body,
-                },
+                body: script.body,
               },
               makePromiseCallback(resolve, reject));
           });
+
         winston.info('Provisioned script ' + script.id + ' to database ' + controller.getName());
       }
       catch (e)
       {
         winston.warn('Failed to provision script ' + script.id + ' to database '
-          + controller.getName() + ': ' + JSON.stringify(e.response));
+          + controller.getName() + ': ' + JSON.stringify(e));
       }
     }
   }

@@ -6,7 +6,12 @@
 
 .dropdown-wrapper {
  cursor: pointer;
+ 
  height: @dropdown-height;
+ &.dropdown-wrapper-larger {
+  height: 48px;
+ }
+ 
  box-sizing: border-box;
  z-index: 0;
  transition: height 0.15s;
@@ -63,11 +68,21 @@
     .dropdown-options-wrapper {
       top: @dropdown-height + 1px;
     }
+    &.dropdown-wrapper-larger {
+      .dropdown-options-wrapper {
+        top: 48px + 1px;
+      }
+    }
   }
 
   &.dropdown-up {
     .dropdown-options-wrapper {
       bottom:  @dropdown-height + 1px;
+    }
+    &.dropdown-wrapper-larger {
+      .dropdown-options-wrapper {
+        bottom: 48px + 1px;
+      }
     }
   }
  }
@@ -89,6 +104,7 @@
     box-sizing: border-box;
     padding-right: 28px; // apply padding that exists in options menu
     padding-top: 2px;
+    
     
     border: 1px solid;
     svg {
@@ -161,6 +177,14 @@
         border-right: 7px solid transparent;
         border-left: 7px solid transparent;
     }
+   
+    &.dropdown-value-larger {
+      padding-top: 0px;
+      padding-left: 0px;
+      &:before {
+        top: 18px;
+      }
+    }
   }
   &:not(.dropdown-disabled):hover {
     .dropdown-value:before {
@@ -181,15 +205,13 @@
   }
 
   .dropdown-option {
-    border: 2px solid rgba(0,0,0,0);
+    border: 1px solid rgba(0,0,0,0);
 
     &:hover,
     &.dropdown-option-selected {
-      background: #d1efe7;
     }
 
     &:active {
-      background: fade(#D1EFE7, 25%);
     }
 
     &.dropdown-option-focused {

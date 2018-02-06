@@ -111,9 +111,10 @@ export function parsePath(path: Path, inputs): string
 
 function parseSource(source: Source): any
 {
+  const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: typeof source.count !== 'string' ? source.count : 1000,
+    size: !isNaN(count) ? count : 1000, // if it is all results, just default to 1000 ? change...
     index: (source.dataSource as any).index,
   };
 }

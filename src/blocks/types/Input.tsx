@@ -62,6 +62,7 @@ export interface Input extends IRecord<Input>
   key: string;
   value: string;
   inputType: InputType;
+  meta?: any; // Meta data (this is used for the map component, related to value but does not go in elastic query)
 }
 
 export function isRuntimeInput(name: string)

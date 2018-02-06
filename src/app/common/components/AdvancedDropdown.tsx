@@ -78,6 +78,8 @@ export interface Props
   textShouldBeNumber?: boolean;
   textboxWidth?: number;
   textPlaceholder?: string;
+
+  floatingLabel?: string;
 }
 
 @Radium
@@ -155,6 +157,7 @@ class AdvancedDropdown extends TerrainComponent<Props>
           tooltips={state.computedTooltips}
           wrapperTooltip={props.wrapperTooltip}
           placeholder={props.placeholder}
+          floatingLabel={props.floatingLabel}
         />
 
         <div

@@ -71,6 +71,10 @@ const BuilderActions =
       (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
         $(ActionTypes.create, { keyPath, factoryType, index, data }),
 
+    createInput:
+      (keyPath: KeyPath, index: number, factoryType: string, data?: any) =>
+        $(ActionTypes.createInput, { keyPath, factoryType, index, data }),
+
     move:
       (keyPath: KeyPath, index: number, newIndex: number) =>
         $(ActionTypes.move, { keyPath, index, newIndex }),
@@ -96,8 +100,8 @@ const BuilderActions =
         $(ActionTypes.dropCard, {}),
 
     changeTQL:
-      (tql: string) =>
-        $(ActionTypes.changeTQL, { tql }),
+      (tql: string, tqlMode: string) =>
+        $(ActionTypes.changeTQL, { tql, tqlMode }),
 
     hoverCard:
       (cardId: ID) =>

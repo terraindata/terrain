@@ -1,56 +1,77 @@
 @import "../../common/Common.less";
 
 .account-dropdown-wrapper {
-  float: right;
   padding-right: 10px;
   padding-left: 10px;
-  height: 100%;
   cursor: pointer;
+  margin-top: 12px;
+  margin-bottom: 12px;
   .transition;
   position: relative;
-  
   &:hover {
     background: rgba(255,255,255,0.1);
   }
   
   .account-dropdown-top-bar {
-    .account-photo,
-    .account-name,
-    .account-arrow-icon {
-      display: inline-block;
-      pointer-events: none;
-      .transition;
+    margin-bottom: 20px;
+    .account-dropdown-image {
+      width: 60%;
+      border-radius: 50%;
+      padding-top: 60%;
+      margin: auto;
+      background-size: cover;
+      background-position: center center;
     }
-    
-    .account-arrow-icon {
-      fill: @off-white;
-      width: 8px;
-      
-      position: relative;
-      vertical-align: middle;
+    .account-dropdown-name-wrapper {
+      text-align: center;
+      margin-top: 12px;
+      text-transform: uppercase;
+      .account-dropdown-name {
+        display: inline;
+        font-size: 12px;
+        font-weight: 400;
+        letter-spacing: 0.5;
+      }
+      .account-arrow-icon {
+        width: 8px;
+        position: relative;
+        vertical-align: middle;
+        top: -2px;
+        margin-left: 3px;
+        .transition
+      }
     }
-    
-    .user-thumbnail {
-      vertical-align: middle;
-      position: relative;
-      top: 2px;
-      .big-white-text;
+  }
+  .account-dropdown-top-bar-small {
+    .account-dropdown-image {
+      height: 30px;
+      width: 30px;
+      padding-top: 0px;
+      margin-left: -7px;
+    }
+    .account-dropdown-name-wrapper {
+      display: none;
     }
   }
   
   &.account-dropdown-open {
     background: rgba(255,255,255,0.15);
-     
-    .account-arrow-icon {
-      .rotate180;
-      top: 3px;
+    .account-dropdown-top-bar
+    {
+      .account-dropdown-name-wrapper
+      {
+        .account-arrow-icon {
+          .rotate180;
+          .transition;
+          top: 0px;
+        }      
+      }
     }
   }
   
   .account-dropdown-icon {
     width: 12px;
     float: left;
-    display: inline-block;
     position: relative;
     padding-right: 6px;
     // padding-left: 12px;
@@ -80,13 +101,20 @@
     position: absolute;
     z-index: 99999999999;
     top: 100%;
-    right: 0px;
+    right: 15px;
     width: 120px;
     padding: 6px 0px;
     border-radius: 6px;
     box-shadow: 0px 0px 6px #C7CAC9;
     margin-right: 2px;
-
+    &.account-dropdown-content-open-right
+    {
+      left: 5px;
+      top: calc(~"100% + 10px");
+      &:after, &:before {
+        left: 14px;
+      }
+    }
     &:after, &:before {
       bottom: 100%;
       left: 90%;
