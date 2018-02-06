@@ -183,3 +183,31 @@ export function makeConstructor<T>(Type: { new(): T; })
   return (config?: { [key: string]: any }) =>
     New<WithIRecord<T>>(new Type(), config);
 }
+
+type overrideMap<T> = {
+  [key in keyof T]?: (config?: any, deep?: boolean) => T[key]
+};
+
+/**
+ * You should use makeDeepConstructor instead of makeConstructor if the immutable record can be
+ * rebuilt from a recordForSave. Any child immutable records that also contains immutable objects should use makeDeepConstructor
+ * like makeConstructor, but takes a map of functions that overrides values inside config
+ * the overrider is called if the resultant constructor is called with deep = true
+ */
+export function makeDeepConstructor<T>(Type: { new(): T; }, override: overrideMap<T>)
+{
+  const overrideKeys = Object.keys(override);
+  return (config?: { [key: string]: any }, deep?: boolean) =>
+  {
+    if (deep)
+    {
+      const overridenConfig = {};
+      for (const key of overrideKeys)
+      {
+        overridenConfig[key] = override[key](config[key], true);
+      }
+      config = _.defaults(overridenConfig, config);
+    }
+    return New<WithIRecord<T>>(new Type(), config);
+  };
+}
