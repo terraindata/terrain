@@ -91,15 +91,16 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   baseQuery = baseQuery.set('query', filterObj);
   if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
-    const sortObj = parseScore(path.score);
+    let sortObj = parseScore(path.score);
     if (path.score.type !== 'random')
     {
       baseQuery = baseQuery.set('sort', sortObj);
     }
     else
     {
-      baseQuery = baseQuery.setIn(['query', 'bool', 'filter'],
-        baseQuery.getIn(['query', 'bool', 'filter']).push(sortObj));
+      sortObj = sortObj.setIn(['function_score', 'query'], baseQuery.get('query'));
+      baseQuery = baseQuery.set('query', sortObj);
+      baseQuery = baseQuery.delete('sort');
     }
   }
   const moreObj = parseAggregations(path.more);
@@ -120,9 +121,10 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
 
 function parseSource(source: Source): any
 {
+  const count = parseFloat(String(source.count));
   return {
     from: source.start,
-    size: typeof source.count !== 'string' ? source.count : 1000,
+    size: !isNaN(count) ? count : 1000, // if it is all results, just default to 1000 ? change...
     index: (source.dataSource as any).index,
   };
 }
@@ -138,14 +140,14 @@ function parseScore(score: Score): any
     case 'elastic':
       return { _score: { order: 'asc' } };
     case 'random':
-      return {
-        function_score: {
+      return Map({
+        function_score: Map({
           random_score: {
             seed: 10,
           },
           query: {},
-        },
-      };
+        }),
+      });
     case 'none':
     default:
       return {};

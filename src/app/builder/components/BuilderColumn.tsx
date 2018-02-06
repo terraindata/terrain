@@ -63,7 +63,7 @@ import Query from '../../../items/types/Query';
 
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import Util from 'util/Util';
-import { backgroundColor, borderColor, Colors, fontColor } from '../../colors/Colors';
+import { backgroundColor, borderColor, Colors, fontColor, getStyle } from '../../colors/Colors';
 import { ColorsActions } from '../../colors/data/ColorsRedux';
 import DragHandle from '../../common/components/DragHandle';
 import SchemaView from '../../schema/components/SchemaView';
@@ -75,9 +75,10 @@ import InputsArea from './inputs/InputsArea';
 import PathfinderColumn from './pathfinder/PathfinderColumn';
 import ResultsColumn from './results/ResultsColumn';
 
-const SplitScreenIcon = require('./../../../images/icon_splitScreen_13x16.svg?name=SplitScreenIcon');
+const AddIcon = require('./../../../images/icon_add.svg?name=AddIcon');
 const CloseIcon = require('./../../../images/icon_close_8x8.svg?name=CloseIcon');
 const LockedIcon = require('./../../../images/icon_lock.svg?name=LockedIcon');
+const ArrowIcon = require('images/icon_carrot.svg?name=ArrowIcon');
 
 const BuilderIcon = require('./../../../images/icon_builder.svg');
 const ResultsIcon = require('./../../../images/icon_resultsDropdown.svg');
@@ -163,6 +164,7 @@ const BuilderColumn = createReactClass<any, any>(
 
       return {
         column: this.props.columnType ? this.props.columnType : column,
+        showColumnOptions: false,
       };
     },
 
@@ -329,6 +331,7 @@ const BuilderColumn = createReactClass<any, any>(
 
       this.setState({
         column: index,
+        showColumnOptions: false,
       });
 
       const colKeyTypes = JSON.parse(localStorage.getItem('colKeyTypes') || '{}');
@@ -363,6 +366,13 @@ const BuilderColumn = createReactClass<any, any>(
       localStorage.setItem('colKeyTypes', JSON.stringify(colKeyTypes));
     },
 
+    toggleColumnOptions()
+    {
+      this.setState({
+        showColumnOptions: !this.state.showColumnOptions,
+      });
+    },
+
     render()
     {
       const { query, canEdit, cantEditReason } = this.props;
@@ -370,15 +380,10 @@ const BuilderColumn = createReactClass<any, any>(
       return this.renderPanel((
         <div
           className={'builder-column builder-column-' + this.props.index}
-          style={backgroundColor(Colors().bg1)}
         >
           <div
             className='builder-title-bar'
-            style={{
-              boxShadow: '0px 3px 9px ' + Colors().boxShadow,
-              borderColor: Colors().stroke,
-              backgroundColor: Colors().bg2,
-            }}
+            style={borderColor(Colors().fontColorLightest)}
           >
             {
               this.props.index === 0 ? null : (
@@ -397,50 +402,75 @@ const BuilderColumn = createReactClass<any, any>(
                 </div>
               )
             }
-            <div ref='handle' className='builder-title-bar-drag-handle'>
-              <DragHandle
-                key={'builder-column-handle-' + this.props.index}
-                showWhenHoveringClassName='builder-title-bar'
-              />
-            </div>
+            {
+              //  <div ref='handle' className='builder-title-bar-drag-handle'>
+              //               <DragHandle
+              //                 key={'builder-column-handle-' + this.props.index}
+              //                 showWhenHoveringClassName='builder-title-bar'
+              //               />
+              //             </div>
+            }
             <div
-              className='builder-title-bar-title'
+              className={
+                classNames({
+                  'builder-title-bar-title': true,
+                  'builder-title-bar-title-locked': !canEdit,
+                })}
               style={fontColor(Colors().text2)}
             >
               <span>
-                {
-                  COLUMNS[this.state.column]
-                }
-                {
-                  !canEdit &&
-                  tooltip(<LockedIcon />, cantEditReason)
-                }
+                <span
+                  onClick={this.toggleColumnOptions}
+                  ref='handle'
+                >
+                  {
+                    COLUMNS[this.state.column]
+                  }
+                  <ArrowIcon
+                    className='builder-title-bar-arrow'
+                  />
+                  {
+                    this.state.showColumnOptions ?
+                      <Menu
+                        options={this.getMenuOptions()}
+                        title={''}
+                        expanded={true}
+                        openRight={true}
+                      />
+                      :
+                      null
+                  }
+                </span>
               </span>
+              {
+                !canEdit &&
+                tooltip(<LockedIcon style={getStyle('fill', Colors().fontWhite)} />,
+                  cantEditReason)
+              }
             </div>
             <div className='builder-title-bar-options'>
+              {
+                this.props.canAddColumn &&
+                tooltip(
+                  <AddIcon
+                    onClick={this.handleAddColumn}
+                    className='bc-options-svg builder-split-screen'
+                    style={getStyle('fill', Colors().iconColor)}
+                  />,
+                  'Add Column',
+                )
+              }
               {
                 this.props.canCloseColumn &&
                 tooltip(
                   <CloseIcon
                     onClick={this.handleCloseColumn}
-                    className='close close-builder-title-bar'
+                    className='bc-options-svg close-builder-title-bar'
+                    style={getStyle('fill', Colors().iconColor)}
                   />,
                   'Close Column',
                 )
               }
-              {
-                this.props.canAddColumn &&
-                tooltip(
-                  <SplitScreenIcon
-                    onClick={this.handleAddColumn}
-                    className='bc-options-svg builder-split-screen'
-                  />,
-                  'Add Column',
-                )
-              }
-              <Menu
-                options={this.getMenuOptions()}
-              />
             </div>
           </div>
           <div
@@ -451,9 +481,6 @@ const BuilderColumn = createReactClass<any, any>(
                 this.state.column === COLUMNS.Cards ||
                 this.state.column === COLUMNS.Inputs,
             })}
-            style={
-              borderColor(Colors().stroke)
-            }
           >
             {
               this.renderContent(canEdit)

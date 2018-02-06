@@ -47,6 +47,7 @@ THE SOFTWARE.
 // tslint:disable:no-var-requires restrict-plus-operands interface-name
 
 import * as classNames from 'classnames';
+import AccountDropdown from 'common/components/AccountDropdown';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import * as Radium from 'radium';
 import * as React from 'react';
@@ -59,7 +60,10 @@ import './Sidebar.less';
 
 const ExpandIcon = require('./../../../images/icon_expand_12x12.svg?name=ExpandIcon');
 const linkHeight = 36; // Coordinate with Sidebar.less
-
+const TerrainIcon = require('images/logo_terrainLong_blue@2x.png');
+const TerrainSmallIcon = require('images/logo_terrain_mountain.png');
+const linkOffsetExpanded = 174;
+const linkOffsetCollapsed = 100;
 export interface ILink
 {
   icon: any;
@@ -79,8 +83,30 @@ export interface Props
 }
 
 @Radium
+/*
+        {
+          this.state.loggedInAndLoaded &&
+          <div
+            className='app-top-bar'
+            style={backgroundColor(Colors().bg2)}
+          >
+            <img
+              src={TerrainIcon}
+              className='app-top-bar-icon'
+            />
+            <AccountDropdown />
+          </div>
+        }
+*/
 export class Sidebar extends TerrainComponent<Props>
 {
+  public state: {
+    linkOffset: number,
+  } =
+    {
+      linkOffset: 0,
+    };
+
   public componentWillMount()
   {
     this.props.colorsActions({
@@ -103,7 +129,19 @@ export class Sidebar extends TerrainComponent<Props>
       selector: '.sidebar-link .sidebar-link-inner-selected svg',
       style: { fill: Colors().activeText },
     });
+    this.setState({
+      linkOffset: this.props.expanded ? linkOffsetExpanded : linkOffsetCollapsed,
+    });
+  }
 
+  public componentWillReceiveProps(nextProps)
+  {
+    if (nextProps.expanded !== this.props.expanded)
+    {
+      this.setState({
+        linkOffset: nextProps.expanded ? linkOffsetExpanded : linkOffsetCollapsed,
+      });
+    }
   }
 
   public handleLinkDisabled(link)
@@ -123,12 +161,27 @@ export class Sidebar extends TerrainComponent<Props>
           'sidebar-container': true,
           'sidebar-container-expanded': this.props.expanded,
         })}
-        style={backgroundColor(Colors().bg2)}
+        style={backgroundColor(Colors().sidebarBg)}
       >
+        {
+          this.props.expanded ?
+            <img
+              src={TerrainIcon}
+              className='sidebar-logo'
+            />
+            :
+            <img src={TerrainSmallIcon}
+              className='sidebar-logo-small'
+            />
+        }
+        <AccountDropdown small={!this.props.expanded} />
         <div
-          className='sidebar-selected-square'
+          className={classNames({
+            'sidebar-selected-square': true,
+            'sidebar-selected-square-hidden': this.props.selectedIndex === -1,
+          })}
           style={{
-            top: (this.props.selectedIndex * linkHeight) + 'px',
+            top: (this.props.selectedIndex * linkHeight + this.state.linkOffset) + 'px',
             backgroundColor: Colors().active,
           }}
         />
@@ -163,7 +216,10 @@ export class Sidebar extends TerrainComponent<Props>
                     link.icon
                   }
                   <div
-                    className='sidebar-link-text'
+                    className={classNames({
+                      'sidebar-link-text': true,
+                      'sidebar-link-text-hidden': !this.props.expanded,
+                    })}
                     style={fontColor(Colors().text1)}
                   >
                     {
@@ -172,7 +228,7 @@ export class Sidebar extends TerrainComponent<Props>
                   </div>
                 </div>,
                   {
-                    title: link.text,
+                    title: (!this.props.expanded ? link.text : ''),
                     position: 'right',
                   })}
               </div>

@@ -83,6 +83,7 @@ interface Theme
   fontColor: string;
   fontColor2: string;
   fontColorLightest: string;
+  fontWhite: string;
 
   active: string;
   blockBg: string;
@@ -95,6 +96,7 @@ const NewTheme: Theme =
     fontColor: NTColors.dark3,
     fontColor2: '#606262',
     fontColorLightest: NTColors.grey3,
+    fontWhite: NTColors.light1,
 
     active: NTColors.mainBlue,
 
