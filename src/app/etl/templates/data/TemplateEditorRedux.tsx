@@ -109,7 +109,7 @@ export interface TemplateEditorActionTypes
   };
   dfsForEach: {
     actionType: 'dfsForEach';
-    fn: () => any;
+    fn: (obj: TemplateFieldProxy<any>) => any;
     act: typeof TemplateEditorActions;
   };
 }
@@ -172,13 +172,13 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       },
       dfsForEach: (state, action) =>
       {
-        const Test = new TemplateFieldProxy({
+        const root = new TemplateFieldProxy({
           keyPath: List([]),
           field: state.template.rootField,
           templateEditor: state,
           act: action.payload.act,
         });
-        Test.dfs();
+        root._dfs(action.payload.fn);
         return state;
       },
     };

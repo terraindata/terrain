@@ -79,10 +79,10 @@ export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends T
     super(props);
   }
 
-  public dfs()
+  public _dfs(operator: (obj: TemplateFieldProxy<Props>) => void)
   {
     const { field, keyPath } = this.props;
-
+    operator(this);
     this.props.field.children.map((value, index) =>
     {
       const newKeyPath = keyPath.push('children', index);
@@ -92,12 +92,12 @@ export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends T
         templateEditor: this.props.templateEditor,
         act: this.props.act,
       });
-      child.dfs();
+      child._dfs(operator);
     });
   }
 
   // Helper to calling setIn() on the TemplateField in the store.
-  protected _set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
+  public _set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
   {
     const { act, keyPath } = this.props;
     act({
@@ -108,7 +108,7 @@ export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends T
     });
   }
 
-  protected _deleteSelf()
+  public _deleteSelf()
   {
     const { act, keyPath } = this.props;
     act({
@@ -117,7 +117,7 @@ export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends T
     });
   }
 
-  protected _clearChildren()
+  public _clearChildren()
   {
     const { act, keyPath } = this.props;
     act({
@@ -129,7 +129,7 @@ export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends T
   }
 
   // returns true if the field's type is nested or if the field's arrayType ends with nested
-  protected _isNested(): boolean
+  public _isNested(): boolean
   {
     const { type, arrayType } = this.props.field.langSettings;
     return type === ELASTIC_TYPES.NESTED ||
@@ -137,26 +137,26 @@ export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends T
   }
 
   // returns how deep the array type is. For example, if the field's type is array of array of text, then the depth is 2.
-  protected _arrayDepth(): number
+  public _arrayDepth(): number
   {
     const { arrayType } = this.props.field.langSettings;
     return this._isArray() ? arrayType.size : 0;
   }
 
   // returns true if the field's type is an array
-  protected _isArray(): boolean
+  public _isArray(): boolean
   {
     const type = this.props.field.langSettings.type;
     return type === ELASTIC_TYPES.ARRAY;
   }
 
-  protected _isExport(): boolean
+  public _isExport(): boolean
   {
     return this.props.templateEditor.template !== undefined &&
       this.props.templateEditor.template.type === TEMPLATE_TYPES.EXPORT;
   }
 
-  protected _isRoot(): boolean
+  public _isRoot(): boolean
   {
     return this.props.keyPath.size === 0;
   }

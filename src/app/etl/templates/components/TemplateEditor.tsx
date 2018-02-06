@@ -103,7 +103,7 @@ class ETLExportDisplay extends TerrainComponent<Props>
 
     this.props.act({
       actionType: 'dfsForEach',
-      fn: () => null,
+      fn: (obj) => { return null; },
       act: this.props.act,
     });
   }
