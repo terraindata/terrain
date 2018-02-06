@@ -31,11 +31,6 @@
   .field-preview-value {
     padding: @half-spacing;
     padding-left: @spacing;
-    // &.field-preview-value-settings-open {
-    //   overflow: hidden;
-    //   text-overflow: ellipsis;
-    //   max-height: 1em;
-    // }
   }
 
   .field-preview-row {
@@ -100,52 +95,69 @@
 
 // TemplateEditorFieldTransformations
 .template-editor-field-transformations {
-  padding: @half-spacing @spacing;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
 
-  .transformation-row {
+  .transformations-list {
+    padding: @half-spacing @spacing;
+    display: flex;
+    flex-direction: column;
     align-items: stretch;
-    display: flex;
-    width: 240px;
-    justify-content: space-between;
-  }
 
-  .transformation-row-text {
-    padding: @half-spacing;
-    display: flex;
-    align-items: center;
-  }
+    .transformation-row {
+      align-items: stretch;
+      display: flex;
+      width: 240px;
+      justify-content: space-between;
+    }
 
-  .edit-transformation-button {
-    padding: @half-spacing;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    svg {
-      width: 12px;
-      height: 12px;
-      fill: currentColor;
+    .transformation-row-text {
+      .transition;
+      padding: @half-spacing;
+      display: flex;
+      align-items: center;
+    }
+
+    .edit-transformation-spacer {
+      display: flex;
+      align-items: center;
+    }
+
+    .edit-transformation-button {
+      .transition;
+      padding: @half-spacing;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-radius: 3px;
+      svg {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
+      }
+    }
+
+    .add-transformation-row {
+      cursor: pointer;
+      align-items: stretch;
+      display: flex;
+    }
+
+    .add-transformation-button {
+      display: flex;
+      align-items: center;
+      padding: @half-spacing;
+      padding-bottom: @half-spacing + 1px;
+      .transition;
+      svg {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
+      } 
     }
   }
 
-  .add-transformation-row {
-    cursor: pointer;
-    align-items: stretch;
-    display: flex;
-  }
-
-  .add-transformation-button {
-    display: flex;
-    align-items: center;
-    padding: @half-spacing;
-    padding-bottom: @half-spacing + 1px;
-    svg {
-      width: 12px;
-      height: 12px;
-      fill: currentColor;
-    } 
+  .transformation-editor {
+    padding: @spacing;
   }
 }
 
@@ -198,6 +210,7 @@
   height: @settings-height + @spacing;
 
   .injected-content-content {
+    overflow: auto;
     border: 1px solid;
     display: flex;
     flex-direction: column;

@@ -54,6 +54,7 @@ import * as React from 'react';
 import { backgroundColor, borderColor, buttonColors, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import FadeInOut from 'common/components/FadeInOut';
 import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 
@@ -78,23 +79,68 @@ export interface Props extends TemplateEditorFieldProps
   act?: typeof TemplateEditorActions;
 }
 
+const enum ViewState
+{
+  LIST_ALL,
+  EDIT,
+  CREATE_NEW,
+}
+
 @Radium
 class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
 {
-  public renderTransformation(value, index)
+  public state: {
+    viewState: ViewState,
+    currentIndex: number,
+  } = {
+      viewState: ViewState.LIST_ALL,
+      currentIndex: -1,
+    };
+
+  constructor(props)
   {
+    super(props);
+    this.transformationListItemStyle = _.memoize(this.transformationListItemStyle);
+    this.handleEditTransformationFactory = _.memoize(this.handleEditTransformationFactory);
+  }
+
+  public transformationListItemStyle(isActive: boolean): { textStyle: object, buttonStyle: object }
+  {
+    const textStyle = fontColor(isActive ? Colors().active : Colors().text2);
+    const buttonStyle = isActive ?
+      [fontColor(Colors().altBg1, Colors().altBg1), backgroundColor(Colors().active, Colors().activeHover)] :
+      [fontColor(Colors().text3, Colors().altBg1), backgroundColor('rgba(0,0,0,0)', Colors().inactiveHover)];
+    return { textStyle, buttonStyle };
+  }
+
+  public renderTransformationListItem(value, index)
+  {
+    const style = this.transformationListItemStyle(index === this.state.currentIndex && this.state.viewState === ViewState.EDIT);
+
     return (
       <div className='transformation-row' key={index}>
-        <div className='transformation-row-text'>
+        <div className='transformation-row-text' style={style.textStyle}>
           {value}
         </div>
-        <div
-          className='edit-transformation-button'
-          key={`edit ${index}`}
-          style={fontColor(Colors().text3, Colors().active)}
-        >
-          <EditIcon />
+        <div className='edit-transformation-spacer'>
+          <div
+            className='edit-transformation-button'
+            key={`edit ${index}`}
+            style={style.buttonStyle}
+            onClick={this.handleEditTransformationFactory(index)}
+          >
+            <EditIcon />
+          </div>
         </div>
+      </div>
+    );
+  }
+
+  public renderEditTransformationSection()
+  {
+    return (
+      <div className='transformation-editor'>
+        I don't know what should go here yet.
       </div>
     );
   }
@@ -106,6 +152,7 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
         className='add-transformation-row'
         key='new-button'
         style={fontColor(Colors().text3, Colors().active)}
+        onClick={this.handleAddNewTransformation}
       >
         <div className='add-transformation-button' >
           <AddIcon />
@@ -124,10 +171,33 @@ class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
     const transformations = List(['Sample Transformation 1', 'Sample Transformation 2', 'Hey there bud']);
     return (
       <div className='template-editor-field-transformations'>
-        {transformations.map(this.renderTransformation)}
-        {this.renderNewTransformationButton()}
+        <div className='transformations-list'>
+          {transformations.map(this.renderTransformationListItem)}
+          {this.renderNewTransformationButton()}
+        </div>
+        <FadeInOut open={this.state.viewState === ViewState.EDIT}>
+          {this.renderEditTransformationSection()}
+        </FadeInOut>
       </div>
     );
+  }
+
+  public handleEditTransformationFactory(index: number)
+  {
+    return () =>
+    {
+      this.setState({
+        viewState: ViewState.EDIT,
+        currentIndex: index,
+      });
+    };
+  }
+
+  public handleAddNewTransformation()
+  {
+    this.setState({
+      viewState: ViewState.CREATE_NEW,
+    });
   }
 
 }
