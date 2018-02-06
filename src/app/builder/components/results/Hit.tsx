@@ -163,13 +163,11 @@ class HitComponent extends TerrainComponent<Props> {
       <div
         className='result-field'
         key={field}
-        style={borderColor(Colors().resultLine)}
       >
         {
           showField &&
           <div
             className='result-field-name'
-            style={fontColor(Colors().text.thirdLight)}
           >
             {
               field
@@ -341,9 +339,7 @@ class HitComponent extends TerrainComponent<Props> {
                 <div className='result-pin-icon'>
                   <PinIcon />
                 </div>
-                {
-                  name
-                }
+                <span className='result-name-label'>{name}</span>
                 {
                   this.props.expanded &&
                   <div
