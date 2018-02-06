@@ -64,10 +64,12 @@ import { Menu, MenuOption } from 'common/components/Menu';
 import { tooltip } from 'common/components/tooltip/Tooltips';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
+
+const EditIcon = require('images/icon_edit.svg');
+const AddIcon = require('images/icon_add.svg');
 
 export interface Props extends TemplateEditorFieldProps
 {
@@ -79,12 +81,51 @@ export interface Props extends TemplateEditorFieldProps
 @Radium
 class TemplateEditorFieldTransformations extends TemplateEditorField<Props>
 {
+  public renderTransformation(value, index)
+  {
+    return (
+      <div className='transformation-row' key={index}>
+        <div className='transformation-row-text'>
+          {value}
+        </div>
+        <div
+          className='edit-transformation-button'
+          key={`edit ${index}`}
+          style={fontColor(Colors().text3, Colors().active)}
+        >
+          <EditIcon />
+        </div>
+      </div>
+    );
+  }
+
+  public renderNewTransformationButton()
+  {
+    return (
+      <div
+        className='add-transformation-row'
+        key='new-button'
+        style={fontColor(Colors().text3, Colors().active)}
+      >
+        <div className='add-transformation-button' >
+          <AddIcon />
+        </div>
+        <div className='transformation-row-text'>
+          Add Another Transformation
+        </div>
+
+      </div>
+    );
+  }
+
   public render()
   {
     const { keyPath, field, canEdit, preview } = this.props;
+    const transformations = List(['Sample Transformation 1', 'Sample Transformation 2', 'Hey there bud']);
     return (
       <div className='template-editor-field-transformations'>
-        Edit transformations here
+        {transformations.map(this.renderTransformation)}
+        {this.renderNewTransformationButton()}
       </div>
     );
   }

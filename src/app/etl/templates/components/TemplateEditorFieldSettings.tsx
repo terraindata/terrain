@@ -95,8 +95,6 @@ class TemplateEditorFieldSettings extends TemplateEditorField<Props>
             onChange={this.handleNameChange}
             options={List([])}
           />
-        </div>
-        <div className='field-settings-row'>
           <div
             className='tef-checkbox-section'
             style={field.isIncluded ? fontColor(Colors().text2) : fontColor(Colors().text3)}

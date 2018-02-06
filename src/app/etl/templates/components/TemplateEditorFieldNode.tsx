@@ -132,7 +132,7 @@ class TemplateEditorFieldNodeC extends TemplateEditorField<Props>
       <FadeInOut open={showSettings}>
         <div className='injected-content-container'>
           {showSettings ?
-            <div className='injected-content-content' style={backgroundColor(Colors().bg2)}>
+            <div className='injected-content-content' style={[backgroundColor(Colors().bg3), borderColor(Colors().border1)]}>
               <TemplateEditorFieldSettings
                 {...this._passProps() }
               />

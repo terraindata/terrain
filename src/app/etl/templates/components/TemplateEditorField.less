@@ -101,6 +101,52 @@
 // TemplateEditorFieldTransformations
 .template-editor-field-transformations {
   padding: @half-spacing @spacing;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  .transformation-row {
+    align-items: stretch;
+    display: flex;
+    width: 240px;
+    justify-content: space-between;
+  }
+
+  .transformation-row-text {
+    padding: @half-spacing;
+    display: flex;
+    align-items: center;
+  }
+
+  .edit-transformation-button {
+    padding: @half-spacing;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+    }
+  }
+
+  .add-transformation-row {
+    cursor: pointer;
+    align-items: stretch;
+    display: flex;
+  }
+
+  .add-transformation-button {
+    display: flex;
+    align-items: center;
+    padding: @half-spacing;
+    padding-bottom: @half-spacing + 1px;
+    svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+    } 
+  }
 }
 
 // TemplateEditorFieldArrayNode
@@ -145,13 +191,14 @@
   bottom: 1px;
 }
 
-@settings-height: 240px;
+@settings-height: 300px;
 @settings-extra-space: 2 * @double-spacing;
 .injected-content-container {
   width: 100%;
   height: @settings-height + @spacing;
 
   .injected-content-content {
+    border: 1px solid;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
