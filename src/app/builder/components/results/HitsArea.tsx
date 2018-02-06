@@ -277,7 +277,6 @@ class HitsArea extends TerrainComponent<Props>
           primaryKey={hit.primaryKey}
           onSpotlightAdded={this.handleSpotlightAdded}
           onSpotlightRemoved={this.handleSpotlightRemoved}
-          indexName={this.state.indexName}
         />
       </div>
     );
@@ -620,7 +619,6 @@ class HitsArea extends TerrainComponent<Props>
                   locations={this.locations}
                   onSpotlightAdded={this.handleSpotlightAdded}
                   onSpotlightRemoved={this.handleSpotlightRemoved}
-                  indexName={this.state.indexName}
                 />
               );
             })

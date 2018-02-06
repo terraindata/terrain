@@ -53,7 +53,6 @@ import * as Radium from 'radium';
 import * as React from 'react';
 import './Hit.less';
 const { List, Map } = Immutable;
-import Ajax from 'app/util/Ajax';
 import { ResultsConfig } from '../../../../../shared/results/types/ResultsConfig';
 import { backgroundColor, borderColor, Colors, fontColor } from '../../../colors/Colors';
 import Menu from '../../../common/components/Menu';
@@ -93,8 +92,6 @@ export interface Props
   connectDragPreview?: (a: any) => void;
 
   locations?: { [field: string]: any };
-
-  indexName?: string;
 
   // injected props
   spotlights?: SpotlightTypes.SpotlightState;
