@@ -55,6 +55,9 @@ import
   TemplateField,
 } from 'etl/templates/TemplateTypes';
 import { ConstrainedMap, GetType, TerrainRedux, Unroll } from 'src/app/store/TerrainRedux';
+
+import { TemplateFieldProxy } from 'etl/templates/components/TemplateFieldProxy';
+
 const { List, Map } = Immutable;
 
 import { ModalProps, MultiModal } from 'common/components/overlay/MultiModal';
@@ -103,6 +106,11 @@ export interface TemplateEditorActionTypes
   };
   closeSettings: {
     actionType: 'closeSettings';
+  };
+  dfsForEach: {
+    actionType: 'dfsForEach';
+    fn: () => any;
+    act: typeof TemplateEditorActions;
   };
 }
 
@@ -161,6 +169,17 @@ class TemplateEditorActionsClass extends TerrainRedux<TemplateEditorActionTypes,
       closeSettings: (state, action) =>
       {
         return state.set('settingsKeyPath', null).set('settingsDisplayKeyPath', null);
+      },
+      dfsForEach: (state, action) =>
+      {
+        const Test = new TemplateFieldProxy({
+          keyPath: List([]),
+          field: state.template.rootField,
+          templateEditor: state,
+          act: action.payload.act,
+        });
+        Test.dfs();
+        return state;
       },
     };
 }

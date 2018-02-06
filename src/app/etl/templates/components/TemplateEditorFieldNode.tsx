@@ -60,7 +60,6 @@ import FadeInOut from 'common/components/FadeInOut';
 import ExpandableView from 'common/components/ExpandableView';
 import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
-import { TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 import { TemplateEditorField, TemplateEditorFieldProps } from './TemplateEditorField';
 import './TemplateEditorField.less';
 import TemplateEditorFieldArrayNode from './TemplateEditorFieldArrayNode';

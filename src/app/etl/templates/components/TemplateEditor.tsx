@@ -100,6 +100,12 @@ class ETLExportDisplay extends TerrainComponent<Props>
       actionType: 'setDocuments',
       documents: List(SampleDocuments),
     });
+
+    this.props.act({
+      actionType: 'dfsForEach',
+      fn: () => null,
+      act: this.props.act,
+    });
   }
 
   public setModalRequests(requests)

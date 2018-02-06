@@ -57,49 +57,107 @@ import { TemplateEditorActions } from 'etl/templates/data/TemplateEditorRedux';
 import { _TemplateField, TemplateEditorState, TemplateField } from 'etl/templates/TemplateTypes';
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
-import { TemplateFieldProxy, TemplateFieldProxyProps } from './TemplateFieldProxy';
 /*
  *  This class defines a base class with useful functions that are used by components
  *  that handle UI for template editor fields. This abstract "component" is sort of an object-oriented representation
  *  of a template editor field.
  */
 
-export interface TemplateEditorFieldProps extends TemplateFieldProxyProps
+export interface TemplateFieldProxyProps
 {
-  canEdit: boolean;
-  noInteract: boolean;
-  preview: any;
-  displayKeyPath: KeyPath; // not the key path in the store, but the key path in virtual DOM
+  keyPath: KeyPath; // keyPath from the root field to this field
+  field: TemplateField;
+
+  templateEditor?: TemplateEditorState;
+  act?: typeof TemplateEditorActions;
 }
 
-export abstract class TemplateEditorField<Props extends TemplateEditorFieldProps> extends TemplateFieldProxy<Props>
+export class TemplateFieldProxy<Props extends TemplateFieldProxyProps> extends TerrainComponent<Props>
 {
   constructor(props)
   {
     super(props);
   }
 
-  protected _passProps(config: object = {}): TemplateEditorFieldProps
+  public dfs()
   {
-    return _.extend(_.pick(this.props, ['keyPath', 'field', 'canEdit', 'noInteract', 'preview', 'displayKeyPath']), config);
+    const { field, keyPath } = this.props;
+
+    this.props.field.children.map((value, index) =>
+    {
+      const newKeyPath = keyPath.push('children', index);
+      const child = new TemplateFieldProxy({
+        keyPath: newKeyPath,
+        field: value,
+        templateEditor: this.props.templateEditor,
+        act: this.props.act,
+      });
+      child.dfs();
+    });
   }
 
-  protected _inputDisabled(): boolean
+  // Helper to calling setIn() on the TemplateField in the store.
+  protected _set<K extends keyof TemplateField>(key: K, value: TemplateField[K])
   {
-    return !this.props.field.isIncluded || !this.props.canEdit;
+    const { act, keyPath } = this.props;
+    act({
+      actionType: 'updateField',
+      sourcePath: keyPath,
+      key,
+      value,
+    });
   }
 
-  protected _settingsAreOpen(): boolean
+  protected _deleteSelf()
   {
-    const { displayKeyPath, keyPath, templateEditor, noInteract } = this.props;
-    return !noInteract &&
-      displayKeyPath.equals(templateEditor.settingsDisplayKeyPath) &&
-      keyPath.equals(templateEditor.settingsKeyPath);
+    const { act, keyPath } = this.props;
+    act({
+      actionType: 'deleteField',
+      sourcePath: keyPath,
+    });
   }
 
-  // Returns the given function if input is not disabled. Otherwise returns undefined.
-  protected _noopIfDisabled<F>(fn: F): F | undefined
+  protected _clearChildren()
   {
-    return this._inputDisabled() ? undefined : fn;
+    const { act, keyPath } = this.props;
+    act({
+      actionType: 'updateField',
+      sourcePath: keyPath,
+      key: 'children',
+      value: List([]),
+    });
+  }
+
+  // returns true if the field's type is nested or if the field's arrayType ends with nested
+  protected _isNested(): boolean
+  {
+    const { type, arrayType } = this.props.field.langSettings;
+    return type === ELASTIC_TYPES.NESTED ||
+      (type === ELASTIC_TYPES.ARRAY && arrayType.size > 0 && arrayType.last() === ELASTIC_TYPES.NESTED);
+  }
+
+  // returns how deep the array type is. For example, if the field's type is array of array of text, then the depth is 2.
+  protected _arrayDepth(): number
+  {
+    const { arrayType } = this.props.field.langSettings;
+    return this._isArray() ? arrayType.size : 0;
+  }
+
+  // returns true if the field's type is an array
+  protected _isArray(): boolean
+  {
+    const type = this.props.field.langSettings.type;
+    return type === ELASTIC_TYPES.ARRAY;
+  }
+
+  protected _isExport(): boolean
+  {
+    return this.props.templateEditor.template !== undefined &&
+      this.props.templateEditor.template.type === TEMPLATE_TYPES.EXPORT;
+  }
+
+  protected _isRoot(): boolean
+  {
+    return this.props.keyPath.size === 0;
   }
 }
