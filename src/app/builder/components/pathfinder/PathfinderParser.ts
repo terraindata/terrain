@@ -91,15 +91,16 @@ export function parsePath(path: Path, inputs): string
   baseQuery = baseQuery.set('query', filterObj);
   if ((path.score.type !== 'terrain' && path.score.type !== 'linear') || path.score.lines.size)
   {
-    const sortObj = parseScore(path.score);
+    let sortObj = parseScore(path.score);
     if (path.score.type !== 'random')
     {
       baseQuery = baseQuery.set('sort', sortObj);
     }
     else
     {
-      baseQuery = baseQuery.setIn(['query', 'bool', 'filter'],
-        baseQuery.getIn(['query', 'bool', 'filter']).push(sortObj));
+      sortObj = sortObj.setIn(['function_score', 'query'], baseQuery.get('query'));
+      baseQuery = baseQuery.set('query', sortObj);
+      baseQuery = baseQuery.delete('sort');
     }
   }
   const moreObj = parseMore(path.more);
@@ -130,14 +131,14 @@ function parseScore(score: Score): any
     case 'elastic':
       return { _score: { order: 'asc' } };
     case 'random':
-      return {
-        function_score: {
+      return Map({
+        function_score: Map({
           random_score: {
             seed: 10,
           },
           query: {},
-        },
-      };
+        }),
+      });
     case 'none':
     default:
       return {};

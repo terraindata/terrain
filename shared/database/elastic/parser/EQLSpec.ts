@@ -2241,7 +2241,7 @@ const EQLSpec: ESClause[] =
         path: ['score', 'function'],
         desc: 'Customizes the scoring of a subquery using a built-in function score.',
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html#query-dsl-function-score-query',
-        required: ['query'],
+        required: [],
       }),
     new ESNumberClause('function_score_weight',
       {
@@ -2252,6 +2252,7 @@ const EQLSpec: ESClause[] =
     new ESStructureClause('random_score',
       {
         seed: 'number',
+        field: 'string',
       },
       {
         path: ['score', 'function'],
