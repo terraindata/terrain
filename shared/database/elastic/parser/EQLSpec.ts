@@ -325,10 +325,10 @@ const EQLSpec: ESClause[] =
       }),
     // Terrain Extension: groupJoin clause
     new ESBooleanClause('ignoreEmpty',
-    {
-      path: ['groupjoin'],
-      desc: 'Whether groupJoin should ignore subqueries with empty results.',
-    }),
+      {
+        path: ['groupjoin'],
+        desc: 'Whether groupJoin should ignore subqueries with empty results.',
+      }),
     new ESMapClause('groupjoin_clause',
       'groupjoin_name',
       'groupjoin_body',
