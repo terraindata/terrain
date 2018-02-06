@@ -53,6 +53,35 @@ import { makeConstructor, makeDeepConstructor, WithIRecord } from 'src/app/Class
 
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
+class ElasticFieldSettingsC
+{
+  public isAnalyzed: boolean = true;
+  public analyzer: string = '';
+  public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
+  public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
+}
+export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
+export const _ElasticFieldSettings = makeDeepConstructor(ElasticFieldSettingsC, {
+  arrayType: List,
+});
+
+class TemplateFieldC
+{
+  public isIncluded: boolean = true;
+  public langSettings: ElasticFieldSettings = _ElasticFieldSettings(); // if we add more languages, make this a union
+  public originalName: string = ''; // this may change based on how we implement transformations
+  public name: string = '';
+  public children: List<TemplateField> = List([]);
+}
+export type TemplateField = WithIRecord<TemplateFieldC>;
+export const _TemplateField = makeDeepConstructor(TemplateFieldC, {
+  children: (config: object[] = []) =>
+  {
+    return List<TemplateField>(config.map((value: object, index) => _TemplateField(value, true)));
+  },
+  langSettings: _ElasticFieldSettings,
+});
+
 class TemplateEditorStateC
 {
   public template: ExportTemplate | ImportTemplate = _ExportTemplate({});
@@ -73,7 +102,6 @@ interface TemplateBase
   type: TEMPLATE_TYPES;
   filetype: FILE_TYPES;
   rootField: TemplateField;
-  transformations: any;
   objectKey: string;
   dbid: number;
   dbname: string;
@@ -89,8 +117,7 @@ interface ExportTemplateBase extends TemplateBase
 interface ImportTemplateBase extends TemplateBase
 {
   type: TEMPLATE_TYPES.IMPORT;
-  primaryKeys: List<number>;
-  primaryKeyDelimiter: string;
+  primaryKeySettings: any;
 }
 
 class ExportTemplateC implements ExportTemplateBase
@@ -100,7 +127,6 @@ class ExportTemplateC implements ExportTemplateBase
   public readonly type = TEMPLATE_TYPES.EXPORT;
   public filetype = FILE_TYPES.JSON;
   public rootField = _TemplateField();
-  public transformations = List([]);
   public objectKey = '';
   public dbid = -1;
   public dbname = '';
@@ -108,7 +134,9 @@ class ExportTemplateC implements ExportTemplateBase
   public rank = true;
 }
 export type ExportTemplate = WithIRecord<ExportTemplateC>;
-export const _ExportTemplate = makeConstructor(ExportTemplateC);
+export const _ExportTemplate = makeDeepConstructor(ExportTemplateC, {
+  rootField: _TemplateField,
+});
 
 class ImportTemplateC implements ImportTemplateBase
 {
@@ -117,45 +145,15 @@ class ImportTemplateC implements ImportTemplateBase
   public readonly type = TEMPLATE_TYPES.IMPORT;
   public filetype = FILE_TYPES.JSON;
   public rootField = _TemplateField();
-  public transformations = List([]);
   public objectKey = '';
   public dbid = -1;
   public dbname = '';
   public tablename = '';
-  public primaryKeys = List([]);
-  public primaryKeyDelimiter = '-';
+  public primaryKeySettings = {};
 }
 export type ImportTemplate = WithIRecord<ImportTemplateC>;
-export const _ImportTemplate = makeConstructor(ImportTemplateC);
+export const _ImportTemplate = makeDeepConstructor(ImportTemplateC, {
+  rootField: _TemplateField,
+});
 
 export type ETLTemplate = ImportTemplate | ExportTemplate;
-
-class ElasticFieldSettingsC
-{
-  public isAnalyzed: boolean = true;
-  public analyzer: string = '';
-  public type: ELASTIC_TYPES = ELASTIC_TYPES.TEXT;
-  public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
-}
-export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
-export const _ElasticFieldSettings = makeDeepConstructor(ElasticFieldSettingsC, {
-  arrayType: List,
-});
-
-class TemplateFieldC
-{
-  public isPrimaryKey: boolean = false; // import only
-  public isIncluded: boolean = true;
-  public langSettings: ElasticFieldSettings = _ElasticFieldSettings(); // if we add more languages, make this a union
-  public originalName: string = ''; // this may change based on how we implement transformations
-  public name: string = '';
-  public children: List<TemplateField> = List([]);
-}
-export type TemplateField = WithIRecord<TemplateFieldC>;
-export const _TemplateField = makeDeepConstructor(TemplateFieldC, {
-  children: (config: object[] = []) =>
-  {
-    return List<TemplateField>(config.map((value: object, index) => _TemplateField(value, true)));
-  },
-  langSettings: _ElasticFieldSettings,
-});
