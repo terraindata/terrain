@@ -60,7 +60,7 @@ import TransformationVisitResult from './TransformationVisitResult';
 
 const Graph = GraphLib.Graph;
 export type KeyPath = List<string>;
-export const KeyPath = (args: string[]) => List<string>(args);
+export const KeyPath = (args: string[] = []) => List<string>(args);
 
 export class TransformationEngine
 {
@@ -144,9 +144,12 @@ export class TransformationEngine
       && JSON.stringify(this.doc) === JSON.stringify(other.doc)
       && this.uidField === other.uidField
       && this.uidNode === other.uidNode
-      && JSON.stringify([...this.fieldNameToIDMap.toJS()]) === JSON.stringify([...other.fieldNameToIDMap.toJS()])
-      && JSON.stringify([...this.IDToFieldNameMap.toJS()]) === JSON.stringify([...other.IDToFieldNameMap.toJS()])
-      && JSON.stringify([...this.fieldTypes.toJS()]) === JSON.stringify([...other.fieldTypes.toJS()]);
+      && JSON.stringify(this.fieldNameToIDMap.map((v: number, k: KeyPath) => [k, v]).toArray()) ===
+      JSON.stringify(other.fieldNameToIDMap.map((v: number, k: KeyPath) => [k, v]).toArray())
+      && JSON.stringify(this.IDToFieldNameMap.map((v: KeyPath, k: number) => [k, v]).toArray()) ===
+      JSON.stringify(other.IDToFieldNameMap.map((v: KeyPath, k: number) => [k, v]).toArray())
+      && JSON.stringify(this.fieldTypes.map((v: string, k: number) => [k, v]).toArray()) ===
+      JSON.stringify(other.fieldTypes.map((v: string, k: number) => [k, v]).toArray());
   }
 
   public appendTransformation(nodeType: TransformationNodeType, fieldNamesOrIDs: List<KeyPath> | List<number>,
@@ -190,9 +193,9 @@ export class TransformationEngine
       doc: this.doc,
       uidField: this.uidField,
       uidNode: this.uidNode,
-      fieldNameToIDMap: [...this.fieldNameToIDMap.toJS()],
-      IDToFieldNameMap: [...this.IDToFieldNameMap.toJS()],
-      fieldTypes: [...this.fieldTypes.toJS()],
+      fieldNameToIDMap: this.fieldNameToIDMap.map((v: number, k: KeyPath) => [k, v]).toArray(),
+      IDToFieldNameMap: this.IDToFieldNameMap.map((v: KeyPath, k: number) => [k, v]).toArray(),
+      fieldTypes: this.fieldTypes.map((v: string, k: number) => [k, v]).toArray(),
     };
   }
 
@@ -304,9 +307,9 @@ export class TransformationEngine
     const output: object = {};
     this.fieldNameToIDMap.map((value: number, keyPath: KeyPath) =>
     {
-      if (deepGet(obj, [...keyPath.toJS()]) !== undefined)
+      if (deepGet(obj, keyPath.toArray()) !== undefined)
       {
-        output[value] = deepGet(obj, [...keyPath.toJS()]);
+        output[value] = deepGet(obj, keyPath.toArray());
       }
     });
     return output;
@@ -319,7 +322,7 @@ export class TransformationEngine
     {
       if (obj !== undefined && obj.hasOwnProperty(key))
       {
-        deepSet(output, [...value.toJS()], obj[key], { create: true });
+        deepSet(output, value.toArray(), obj[key], { create: true });
       }
     });
     return output;
