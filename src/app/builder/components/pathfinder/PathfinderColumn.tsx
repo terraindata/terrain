@@ -65,6 +65,7 @@ import { _PathfinderContext, Path, PathfinderSteps } from './PathfinderTypes';
 import PathfinderScoreSection from './score/PathfinderScoreSection';
 import PathfinderSourceSection from './source/PathfinderSourceSection';
 import FloatingInput from 'app/common/components/FloatingInput';
+import FadeInOut from 'app/common/components/FadeInOut';
 
 export interface Props
 {
@@ -147,8 +148,12 @@ class PathfinderColumn extends TerrainComponent<Props>
           fontColor(Colors().text3),
         ]}
       >
-        {
-          path.name !== undefined &&
+        <FadeInOut
+          children={
+           <div
+             className='pf-column-name-background'
+             style={backgroundColor(Colors().sidebarBg)}
+           >
             <FloatingInput
               value={path.name}
               onChange={this.changePathName}
@@ -157,7 +162,10 @@ class PathfinderColumn extends TerrainComponent<Props>
               canEdit={pathfinderContext.canEdit}
               className='pf-column-name'
             />
-        }
+            </div>
+          }
+          open={path.name !== undefined}
+        />
         <div className='pathfinder-column-content'>
           <PathfinderSourceSection
             pathfinderContext={pathfinderContext}
@@ -166,8 +174,8 @@ class PathfinderColumn extends TerrainComponent<Props>
             step={path.step}
             source={path.source}
           />
-          {
-            path.step >= PathfinderSteps.Filter ?
+          <FadeInOut
+            children={
               <PathfinderFilterSection
                 pathfinderContext={pathfinderContext}
                 filterGroup={path.filterGroup}
@@ -176,11 +184,12 @@ class PathfinderColumn extends TerrainComponent<Props>
                 step={path.step}
                 toSkip={this.props.toSkip}
               />
-              : null
-          }
-          {
-            path.step >= PathfinderSteps.Score ?
-              <PathfinderScoreSection
+            }
+              open={path.step >= PathfinderSteps.Filter}
+          />
+        <FadeInOut
+            children={
+             <PathfinderScoreSection
                 pathfinderContext={pathfinderContext}
                 score={path.score}
                 keyPath={keyPath.push('score')}
@@ -188,18 +197,20 @@ class PathfinderColumn extends TerrainComponent<Props>
                 onStepChange={this.incrementStep}
 
               />
-              : null
-          }
-          {
-            path.step >= PathfinderSteps.More ?
+            }
+              open={path.step >= PathfinderSteps.Score}
+          />
+          <FadeInOut
+            children={
               <PathfinderMoreSection
                 pathfinderContext={pathfinderContext}
                 more={path.more}
                 keyPath={keyPath.push('more')}
                 toSkip={this.props.toSkip !== undefined ? this.props.toSkip : 3}
               />
-              : null
-          }
+            }
+            open={path.step >= PathfinderSteps.More}
+          />
         </div>
       </div>
     );

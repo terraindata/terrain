@@ -107,24 +107,19 @@ class PathC extends BaseClass
   public score: Score = _Score();
   public step: PathfinderSteps = PathfinderSteps.Source;
   public more: More = _More();
-  public name?: string = undefined; // name of the query, this is usefull for when there is a groupJoin and inner queries have names
+  public name?: string = undefined; // name of the query, this is useful for when there is a groupJoin and inner queries have names
 }
 export type Path = PathC & IRecord<PathC>;
 export const _Path = (config?: { [key: string]: any }) =>
 {
   if (config)
   {
-    config =
-      {
-        source: _Source(config['source']),
-        score: _Score(config['score']),
-        filterGroup: _FilterGroup(config['filterGroup']),
-        more: _More(config['more']),
-        step: config['step'] as PathfinderSteps,
-        name: config['name']
-      };
+    config['source'] = _Source(config['source']);
+    config['filterGroup'] = _FilterGroup(config['filterGroup']);
+    config['score'] = _Score(config['score']);
+    config['more'] = _More(config['more']);
   }
-  return New<Path>(new PathC(config || {}), config);
+  return New<Path>(new PathC(config), config);
 };
 
 class FilterGroupC extends BaseClass
@@ -220,8 +215,8 @@ export const _ScorePoint = (config?: { [key: string]: any }) =>
 class MoreC extends BaseClass
 {
   public aggregations: List<AggregationLine> = List([]);
-  public reference: string = undefined; // What should this query be referred to in other queries (@parent in US query)
-  public nested: Path = undefined;
+  public references: List<string> = List([]); // What should this query be referred to in other queries (@parent in US query)
+  public nested: List<Path> = List([]);
 }
 
 export type More = MoreC & IRecord<MoreC>;
@@ -229,11 +224,10 @@ export const _More = (config?: { [key: string]: any }) =>
 {
   let more = New<More>(new MoreC(config || {}), config);
   more = more
-    .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))));
-  if (more['nested'])
-  {
-    more = more.set('nested', _Path(more['nested']));
-  }
+    .set('aggregations', List(more['aggregations'].map((agg) => _AggregationLine(agg))))
+    .set('nested', List(more['nested'].map((nested) => _Path(nested))))
+    .set('references', List(more['references']));
+
   return more;
 };
 

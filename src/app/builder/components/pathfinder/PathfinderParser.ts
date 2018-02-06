@@ -104,11 +104,11 @@ export function parsePath(path: Path, inputs, ignoreInputs?: boolean): any
   }
   const moreObj = parseAggregations(path.more);
   baseQuery = baseQuery.set('aggs', Map(moreObj));
-  const groupJoin = parseNested(path.more, inputs);
-  if (groupJoin)
-  {
-    baseQuery = baseQuery.set('groupJoin', groupJoin);
-  }
+  // const groupJoin = parseNested(path.more, inputs);
+  // if (groupJoin)
+  // {
+  //   baseQuery = baseQuery.set('groupJoin', groupJoin);
+  // }
   if (ignoreInputs)
   {
     return baseQuery;

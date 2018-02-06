@@ -74,7 +74,10 @@ class PathfinderCreateLine extends TerrainComponent<Props>
     return (
       <div
         className='pf-create'
-        style={_.extend({}, fontColor(Colors().text3, Colors().active), this.props.style)}
+        style={[
+          fontColor(Colors().text3, Colors().active),
+          this.props.style
+        ]}
         onClick={onCreate}
       >
         + Add a {text}

@@ -98,18 +98,31 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     });
   }
 
-  public handleReferenceChange(value)
+  public handleReferenceChange(i, value)
   {
-    BuilderActions.changePath(this.props.keyPath.push('reference'), value);
-    if (this.props.more.nested === undefined)
+    BuilderActions.changePath(this.props.keyPath.push('references').push(i), value);
+    if (this.props.more.nested.get(i) === undefined)
     {
-      BuilderActions.changePath(this.props.keyPath.push('nested'), _Path({name: '', step: 0}), true);
+      BuilderActions.changePath(this.props.keyPath.push('nested').push(i), _Path({name: '', step: 0}), true);
     }
   }
 
   public handleAddNested()
   {
-    BuilderActions.changePath(this.props.keyPath.push('reference'), '');
+    const newReferences = this.props.more.references.push('');
+    BuilderActions.changePath(this.props.keyPath.push('references'), newReferences);
+    BuilderActions.changePath(this.props.keyPath.push('nested'), this.props.more.nested.push(undefined));
+  }
+
+  public handleDeleteNested(i)
+  {
+    BuilderActions.changePath(
+      this.props.keyPath.push('references'),
+      this.props.more.references.splice(i, 1),
+    );
+    BuilderActions.changePath
+      (this.props.keyPath.push('nested'),
+      this.props.more.nested.splice(i, 1), true);
   }
 
   public handleAddLine()
@@ -155,23 +168,61 @@ class PathfinderMoreSection extends TerrainComponent<Props>
     return lines;
   }
 
-  public renderPath(path: Path)
+  public renderPath(path: Path, i: number)
   {
     return (
       <PathfinderColumn
         path={path}
         canEdit={this.props.pathfinderContext.canEdit}
         schema={this.props.pathfinderContext.schemaState}
-        keyPath={this.props.keyPath.push('nested')}
-        toSkip={this.props.toSkip + 2} // Every time you nest, the filter section needs to know how nested it is
+        keyPath={this.props.keyPath.push('nested').push(i)}
+        toSkip={this.props.toSkip + 3} // Every time you nest, the filter section needs to know how nested it is
       />
     );
   }
 
-  public handleDeleteNested()
+  public renderNestedPaths()
   {
-    BuilderActions.changePath(this.props.keyPath.push('reference'), undefined);
-    BuilderActions.changePath(this.props.keyPath.push('nested'), undefined, true);
+    const {nested, references} = this.props.more;
+    const {canEdit} = this.props.pathfinderContext;
+    return (
+      <div>
+        {
+          references.map((ref, i) => {
+            return (
+              <div
+                className='pf-more-nested'
+                key={i}
+              >
+                {
+                  nested.get(i) !== undefined &&
+                  <div className={'pf-nested-line'}>
+                    <div className={'pf-nested-line-inner'}/>
+                  </div>
+                }
+              <div className='pf-more-nested-reference'>
+              {
+                tooltip(
+                  <FloatingInput
+                    label={'Reference'}
+                    isTextInput={true}
+                    value={ref}
+                    onChange={this._fn(this.handleReferenceChange, i)}
+                    canEdit={canEdit}
+                    className='pf-more-nested-reference-input'
+                  />,
+                  PathfinderText.referenceExplanation
+                )
+              }
+              <RemoveIcon onClick={this._fn(this.handleDeleteNested, i)} className='pf-more-nested-remove close'/>
+             </div>
+              {nested.get(i) !== undefined && this.renderPath(nested.get(i), i)}
+              </div>
+            );
+          })
+        }
+      </div>
+    );
   }
 
   public render()
@@ -198,41 +249,16 @@ class PathfinderMoreSection extends TerrainComponent<Props>
           text={PathfinderText.createAggregationLine}
         />
         <div>
-          {
-            this.props.more.reference !== undefined ?
-           <div className='pf-more-nested'>
-            {this.props.more.nested !== undefined &&
-              <div className={'pf-nested-line'}>
-                <div className={'pf-nested-line-inner'}/>
-              </div>
-            }
-            <div className='pf-more-nested-reference'>
-              {
-                tooltip(
-                  <FloatingInput
-                    label={'Reference'}
-                    isTextInput={true}
-                    value={this.props.more.reference}
-                    onChange={this.handleReferenceChange}
-                    canEdit={canEdit}
-                    className='pf-more-nested-reference-input'
-                  />,
-                  PathfinderText.referenceExplanation
-                )
-              }
-            <RemoveIcon onClick={this.handleDeleteNested} className='pf-more-nested-remove close'/>
-           </div>
-              {this.props.more.nested !== undefined && this.renderPath(this.props.more.nested)}
-            </div>
-            :
-            tooltip(
-              <PathfinderCreateLine
-                canEdit={canEdit}
-                onCreate={this.handleAddNested}
-                text={PathfinderText.createNestedLine}
-                style={{marginTop: 12}}
-              />,
-              PathfinderText.nestedExplanation
+          {this.renderNestedPaths()}
+           {
+             tooltip(
+               <PathfinderCreateLine
+                 canEdit={canEdit}
+                 onCreate={this.handleAddNested}
+                 text={PathfinderText.createNestedLine}
+                 style={{marginTop: 12}}
+               />,
+               PathfinderText.nestedExplanation
             )
            }
         </div>
