@@ -238,6 +238,9 @@ export default class ElasticQueryHandler extends QueryHandler
 
   private async handleGroupJoinSubQueries(parentValueInfo: ESValueInfo, query: object, results: object)
   {
+    const ignoreEmpty = (query['ignoreEmpty'] !== undefined) ? query['ignoreEmpty'] : false;
+    delete query['ignoreEmpty'];
+
     const promises: Array<Promise<any>> = [];
     for (const subQuery of Object.keys(query))
     {
@@ -247,12 +250,12 @@ export default class ElasticQueryHandler extends QueryHandler
         throw new Error('Error finding subquery property');
       }
 
-      promises.push(this.handleGroupJoinSubQuery(vi, subQuery, results));
+      promises.push(this.handleGroupJoinSubQuery(vi, subQuery, results, ignoreEmpty));
     }
     return Promise.all(promises);
   }
 
-  private async handleGroupJoinSubQuery(valueInfo: ESValueInfo, subQuery: string, parentResults: any)
+  private async handleGroupJoinSubQuery(valueInfo: ESValueInfo, subQuery: string, parentResults: any, ignoreEmpty: boolean)
   {
     const hits = parentResults.hits.hits;
     const promises: Array<Promise<any>> = [];
@@ -301,7 +304,10 @@ export default class ElasticQueryHandler extends QueryHandler
 
               if (response.responses[j].hits !== undefined)
               {
-                hits[i + j][subQuery] = response.responses[j].hits.hits;
+                if (!ignoreEmpty || response.responses[j].hits.hits.length > 0)
+                {
+                  hits[i + j][subQuery] = response.responses[j].hits.hits;
+                }
               }
             }
             resolve();

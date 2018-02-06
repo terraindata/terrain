@@ -83,7 +83,7 @@ export class App
   private static initializeDB(type: string, dsn: string): Tasty.Tasty
   {
     winston.info('Initializing system database { type: ' + type + ' dsn: ' + dsn + ' }');
-    const controller = DBUtil.makeDatabaseController(type, dsn);
+    const controller = DBUtil.makeDatabaseController(type, 0, dsn);
     return controller.getTasty();
   }
 
