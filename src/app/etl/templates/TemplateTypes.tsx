@@ -49,7 +49,7 @@ import * as Immutable from 'immutable';
 const { List, Map } = Immutable;
 import { ModalProps } from 'common/components/overlay/MultiModal';
 import { FILE_TYPES } from 'etl/ETLTypes';
-import { makeConstructor, New, WithIRecord } from 'src/app/Classes';
+import { makeConstructor, makeDeepConstructor, WithIRecord } from 'src/app/Classes';
 
 import { ELASTIC_TYPES, TEMPLATE_TYPES } from 'shared/etl/templates/TemplateTypes';
 
@@ -138,7 +138,9 @@ class ElasticFieldSettingsC
   public arrayType: List<ELASTIC_TYPES> = List([ELASTIC_TYPES.TEXT]);
 }
 export type ElasticFieldSettings = WithIRecord<ElasticFieldSettingsC>;
-export const _ElasticFieldSettings = makeConstructor(ElasticFieldSettingsC);
+export const _ElasticFieldSettings = makeDeepConstructor(ElasticFieldSettingsC, {
+  arrayType: List,
+});
 
 class TemplateFieldC
 {
@@ -150,13 +152,10 @@ class TemplateFieldC
   public children: List<TemplateField> = List([]);
 }
 export type TemplateField = WithIRecord<TemplateFieldC>;
-export const _TemplateField = (cfg?: any) =>
-{
-  const config = cfg || {};
-  config.type = config.type || ELASTIC_TYPES.TEXT;
-  config.analyzer = config.analyzer || (config.type === ELASTIC_TYPES.TEXT ? 'standard' : null);
-  config.originalName = config.originalName || config.name || '';
-  config.name = config.name || config.originalName;
-
-  return New<WithIRecord<TemplateFieldC>>(new TemplateFieldC(), config);
-};
+export const _TemplateField = makeDeepConstructor(TemplateFieldC, {
+  children: (config: object[] = []) =>
+  {
+    return List<TemplateField>(config.map((value: object, index) => _TemplateField(value, true)));
+  },
+  langSettings: _ElasticFieldSettings,
+});

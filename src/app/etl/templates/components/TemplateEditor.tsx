@@ -51,6 +51,8 @@ import * as React from 'react';
 import { backgroundColor, borderColor, Colors, fontColor, getStyle } from 'src/app/colors/Colors';
 import Util from 'util/Util';
 
+import { recordForSave } from 'src/app/Classes';
+
 import { MultiModal } from 'common/components/overlay/MultiModal';
 import TemplateEditorDocumentsPreview from 'etl/templates/components/TemplateEditorDocumentsPreview';
 import TemplateEditorFieldNode from 'etl/templates/components/TemplateEditorFieldNode';
@@ -84,7 +86,11 @@ class ETLExportDisplay extends TerrainComponent<Props>
       templateId: 1,
       templateName: 'Test Template',
     });
-    template = template.set('rootField', treeFromDocument(SampleDocuments[0]));
+    const rootField = treeFromDocument(SampleDocuments[0]);
+    const jsRootField = recordForSave(rootField);
+    const rebuiltRootField = _TemplateField(jsRootField, true);
+    template = template.set('rootField', rebuiltRootField);
+
     this.props.act({
       actionType: 'loadTemplate',
       template,
@@ -142,7 +148,6 @@ class ETLExportDisplay extends TerrainComponent<Props>
               />
             </div>
           </div>
-          {this.renderSettingsSection()}
         </div>
       );
     }
