@@ -107,7 +107,7 @@ const categories: List<CardCategory> = List(
     { name: 'other', color: Colors().text2 }, // special category
   ]);
 
-const categoryCounter: IMMap<string, number> = Map(categories.map((v, i) => [v.name, 0]));
+const categoryCounter: IMMap<string, number> = Map<string, number>(categories.map((v, i) => [v.name as string, 0]));
 // Convenient starting point for optimization.
 // It is an immutable map mapping category names to how many cards there are in each category
 

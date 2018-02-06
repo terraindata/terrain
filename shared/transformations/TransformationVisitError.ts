@@ -42,54 +42,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH
 THE SOFTWARE.
 */
 
-// Copyright 2017 Terrain Data, Inc.
-import * as Immutable from 'immutable';
-import Actions from 'library/data/LibraryActions';
-import ActionTypes from 'library/data/LibraryActionTypes';
-import { _LibraryState, LibraryState } from 'library/LibraryTypes';
-import * as LibraryTypes from 'library/LibraryTypes';
-import { Ajax, createMockStore } from '../../helpers';
+// Copyright 2018 Terrain Data, Inc.
 
-const MIDWAY_BASE_URL = `${MIDWAY_HOST}/midway/v1`;
-
-const mockStore = createMockStore();
-
-describe('LibraryActions', () =>
+export interface TransformationVisitError
 {
-  describe('#categories.create', () =>
-  {
-    const library: LibraryState = _LibraryState({
-      categories: Immutable.Map<number, LibraryTypes.Category>(),
-      algorithms: Immutable.Map<number, LibraryTypes.Algorithm>(),
-    });
+  message: string;
+}
 
-    const category = LibraryTypes._Category();
-    const categoryId = 1;
-    const categoryName = 'Test Category';
-    category.set('name', categoryName);
-
-    it('should create a categories.create action after the new category has been created', (done) =>
-    {
-      Ajax.saveItem = (
-        item: any,
-        onLoad?: (resp: any) => void,
-        onError?: (ev: Event) => void,
-      ) => onLoad({ id: categoryId });
-
-      const expectedActions = [
-        {
-          type: ActionTypes.categories.create,
-          payload: { category: category.set('id', categoryId), versioning: true },
-        },
-      ];
-
-      const store = mockStore({ library });
-
-      store.dispatch(Actions.categories.create(category, (id) =>
-      {
-        expect(store.getActions()).toEqual(expectedActions);
-        done();
-      }));
-    });
-  });
-});
+export default TransformationVisitError;

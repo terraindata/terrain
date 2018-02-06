@@ -62,9 +62,9 @@ describe('Library', () =>
   const algorithmId = 3;
 
   let library: LibraryState = _LibraryState({
-    categories: Immutable.Map<number, LibraryTypes.Category>({}),
-    groups: Immutable.Map<number, LibraryTypes.Group>({}),
-    algorithms: Immutable.Map<number, LibraryTypes.Algorithm>({}),
+    categories: Immutable.Map<number, LibraryTypes.Category>(),
+    groups: Immutable.Map<number, LibraryTypes.Group>(),
+    algorithms: Immutable.Map<number, LibraryTypes.Algorithm>(),
   });
 
   library = library.set('categories', library.categories.set(categoryId, LibraryTypes._Category({
@@ -97,7 +97,7 @@ describe('Library', () =>
 
   const analytics: AnalyticsState = _AnalyticsState({
     loaded: true,
-    data: Immutable.Map({}),
+    data: Immutable.Map(),
     selectedMetric: 1,
   });
 
