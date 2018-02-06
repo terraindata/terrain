@@ -324,9 +324,14 @@ const EQLSpec: ESClause[] =
         url: 'https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html',
       }),
     // Terrain Extension: groupJoin clause
+    new ESBooleanClause('ignoreEmpty',
+    {
+      path: ['groupjoin'],
+      desc: 'Whether groupJoin should ignore subqueries with empty results.',
+    }),
     new ESMapClause('groupjoin_clause',
       'groupjoin_name',
-      'body',
+      'groupjoin_body',
       {
         path: ['groupjoin'],
         name: 'groupJoin query',
@@ -338,6 +343,14 @@ const EQLSpec: ESClause[] =
         path: ['groupjoin'],
         desc: 'names this groupJoin subquery, must be alpha-numeric and can only contain \'_\' and \'-\'',
         url: '',
+      }),
+    new ESVariantClause('groupjoin_body',
+      {
+        boolean: 'ignoreEmpty',
+        object: 'body',
+      },
+      {
+        path: ['groupjoin'],
       }),
     // aggregation
     // AggregatorFactories.java
