@@ -59,7 +59,7 @@ const { List, Map } = Immutable;
 
 export function getChildIds(_block: Block): IMMap<ID, boolean>
 {
-  let map = Map<ID, boolean>({});
+  let map = Map<ID, boolean>();
 
   if (Immutable.Iterable.isIterable(_block))
   {

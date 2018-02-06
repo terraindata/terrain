@@ -75,7 +75,7 @@ describe('LibraryReducers', () =>
     {
       library = library.set(
         'categories',
-        Immutable.Map<number, LibraryTypes.Category>({}),
+        Immutable.Map<number, LibraryTypes.Category>(),
       );
 
       const nextState = reducer(library, {
