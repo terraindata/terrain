@@ -52,9 +52,12 @@ import { Colors } from '../../../colors/Colors';
 
 // consider upgrading to v4 which has types
 const d3 = require('d3');
+const moment = require('moment');
 // import * as d3 from 'd3';
 import * as $ from 'jquery';
 import * as _ from 'lodash';
+
+import ElasticBlockHelpers from '../../../../database/elastic/blocks/ElasticBlockHelpers';
 import TransformUtil, { NUM_CURVE_POINTS } from '../../../util/TransformUtil';
 import Util from '../../../util/Util';
 
@@ -169,7 +172,7 @@ const TransformChart = {
     this._draw(el, scales, barsData, state.pointsData, state.onMove, state.onRelease,
       state.spotlights, state.inputKey, state.onLineClick, state.onLineMove, state.onSelect,
       state.onCreate, state.onDelete, state.onPointMoveStart, state.width, state.height,
-      state.canEdit, state.domain, state.mode, state.colors);
+      state.canEdit, state.domain, state.mode, state.colors, state.schema);
 
     d3.select(el).select('.inner-svg').on('mousedown', () =>
     {
@@ -425,11 +428,25 @@ const TransformChart = {
     overlay.on('mouseover', this._overlayMouseoverFactory(el));
   },
 
-  _drawAxes(el, scales, width, height)
+  _drawAxes(el, scales, width, height, inputKey, schema)
   {
+    const isDate = ElasticBlockHelpers.getColumnType(schema, inputKey) === 'date';
+    const numSideTicks = height > 200 ? 10 : 5;
+    let numBottomTicks = width > 500 ? 6 : 4;
+    let bottomTickFormatFn = Util.formatNumber;
+
+    if (isDate)
+    {
+      numBottomTicks = 3;
+      bottomTickFormatFn = (n: number): string =>
+      {
+        return moment(new Date(n)).format('YYYY-MM-DD');
+      };
+    }
+
     const yLeftAxis = d3.svg.axis()
       .scale(scales.pointY)
-      .ticks(height > 200 ? 10 : 5)
+      .ticks(numSideTicks)
       .tickSize(scaleMin(scales.x) - scaleMax(scales.x), scaleMin(scales.x) - scaleMax(scales.x))
       .tickFormat(Util.formatNumber)
       .orient('left');
@@ -440,7 +457,7 @@ const TransformChart = {
 
     const yRightAxis = d3.svg.axis()
       .scale(scales.barY)
-      .ticks(height > 200 ? 10 : 5)
+      .ticks(numSideTicks)
       .tickSize(0, 0)
       .tickFormat(Util.formatNumber) // try '%' if more precision is needed
       // .tickFormat(d3.format(" <-.2p")) // try '%' if more precision is needed
@@ -452,9 +469,9 @@ const TransformChart = {
     // var bottomAxisTickFn: any = (tick, index: number): string => index == 0 || index == 10 ? "" : tick;
     const bottomAxis = d3.svg.axis()
       .scale(scales.x)
-      .ticks(width > 500 ? 6 : 4)
+      .ticks(numBottomTicks)
       .tickSize(-1 * scaleMin(scales.pointY) + scaleMax(scales.pointY), -1 * scaleMin(scales.pointY) + scaleMax(scales.pointY))
-      .tickFormat(Util.formatNumber)
+      .tickFormat(bottomTickFormatFn)
       // .tickFormat(d3.format(".3g"))
       .orient('bottom');
     d3.select(el).select('.bottomAxis')
@@ -1683,14 +1700,14 @@ const TransformChart = {
     point.exit().remove();
   },
 
-  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit, domain, mode, colors)
+  _draw(el, scales, barsData, pointsData, onMove, onRelease, spotlights, inputKey, onLineClick, onLineMove, onSelect, onCreate, onDelete, onPointMoveStart, width, height, canEdit, domain, mode, colors, schema)
   {
     d3.select(el).select('.inner-svg')
       .attr('width', scaleMax(scales.realX))
       .attr('height', scaleMin(scales.realBarY));
 
     this._drawBg(el, scales);
-    this._drawAxes(el, scales, width, height);
+    this._drawAxes(el, scales, width, height, inputKey, schema);
     if (inputKey === '' || inputKey === undefined)
     {
       this._drawDisabledOverlay(el, scales);
